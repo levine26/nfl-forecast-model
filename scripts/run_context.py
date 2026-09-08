@@ -16,6 +16,7 @@ from nfl_forecast.context import (
 )
 from nfl_forecast.data import configure_cache
 from nfl_forecast.injuries import fetch_nfl_injuries, practice_status_evidence
+from nfl_forecast.narrative import build_game_previews
 
 
 def _pandas(frame):
@@ -28,8 +29,6 @@ def _load_best_effort(season: int, cache_dir: str) -> tuple[pd.DataFrame | None,
     configure_cache(cache_dir)
     status = {}
 
-    # Historical PBP deliberately stops before the forecast season. This avoids a package
-    # current-season guard while still supporting QB/coordinator and scheme-history research.
     pbp_years = list(range(max(2020, season - 6), season))
     try:
         pbp = _pandas(nfl.load_pbp(pbp_years))
@@ -145,9 +144,6 @@ def main():
     )
 
     if official_injuries:
-        # Game-designation evidence is created by the shared personnel engine. Rewrite
-        # provider labels that predate the NFL.com source migration, and then add a
-        # conservative practice-only layer for DNP/limited players with no game status.
         for items in evidence.values():
             for item in items:
                 if item.get("category") in {"personnel", "scenario"} and "ESPN" in str(item.get("source_name", "")):
@@ -157,9 +153,6 @@ def main():
         for gid, items in practice.items():
             evidence.setdefault(gid, []).extend(items)
 
-    # The current React app groups coaching/continuity evidence into the
-    # "History vs. What's Different Now" section. Normalize the internal label at
-    # publication time so the analytical engine can retain its more specific name.
     for items in evidence.values():
         for item in items:
             if item.get("category") == "structural_change":
@@ -167,6 +160,8 @@ def main():
         rank = {"Strong": 3, "Moderate": 2, "Weak": 1}
         items.sort(key=lambda x: (rank.get(x.get("strength"), 0), x.get("category", "")), reverse=True)
         del items[12:]
+
+    previews = build_game_previews(predictions, evidence)
 
     source_status.update(context_status)
     source_status["evidence"] = {
@@ -176,12 +171,20 @@ def main():
         "generated_utc":generated,
         "guardrail":"Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
     }
+    source_status["previews"] = {
+        "status": "healthy",
+        "games": len(previews),
+        "generator": "deterministic evidence composer",
+        "guardrail": "Written previews may synthesize verified context but do not alter numerical probabilities.",
+    }
 
     (out / "contextual_evidence.json").write_text(json.dumps(evidence, indent=2, sort_keys=True), encoding="utf-8")
+    (out / "game_previews.json").write_text(json.dumps(previews, indent=2, sort_keys=True), encoding="utf-8")
     (out / "context_source_status.json").write_text(json.dumps(source_status, indent=2, sort_keys=True), encoding="utf-8")
 
     counts = {gid: len(items) for gid, items in evidence.items()}
     print(f"Context refresh complete: {sum(counts.values())} evidence signals across {len(counts)} games")
+    print(f"Written previews generated: {len(previews)}")
     print(json.dumps(source_status, indent=2))
 
 
