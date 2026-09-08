@@ -10,8 +10,16 @@ def _fixtures():
         {"team":"PIT","player_name":"PIT QB","pos_abb":"QB","pos_rank":1,"gsis_id":"pitqb"},
     ])
     pbp = pd.DataFrame([
-        {"season":2024,"posteam":"MIA","defteam":"PIT","passer_player_id":"tua","epa":0.20,"game_id":"m1"},
-        {"season":2024,"posteam":"MIA","defteam":"PIT","passer_player_id":"tua","epa":-0.10,"game_id":"m1"},
+        {
+            "season":2025,"season_type":"POST","week":22,"game_date":"2026-02-08",
+            "posteam":"MIA","defteam":"PIT","passer_player_id":"tua","epa":0.20,"game_id":"m1",
+            "away_team":"MIA","home_team":"PIT","total_away_score":24,"total_home_score":21,
+        },
+        {
+            "season":2025,"season_type":"POST","week":22,"game_date":"2026-02-08",
+            "posteam":"MIA","defteam":"PIT","passer_player_id":"tua","epa":-0.10,"game_id":"m1",
+            "away_team":"MIA","home_team":"PIT","total_away_score":24,"total_home_score":21,
+        },
     ] * 12)
     return game, depth, pbp
 
@@ -24,6 +32,17 @@ def test_qb_opponent_history_follows_player_across_team_change():
     assert tua[0]["sample_size"] == 24
     assert tua[0]["metadata"]["team_changed"] is True
     assert "MIA" in tua[0]["metadata"]["prior_offenses"]
+
+
+def test_qb_history_names_the_actual_postseason_meeting():
+    game, depth, pbp = _fixtures()
+    item = portable_qb_history(game, pbp, depth, 2026)[0]
+    meeting = item["metadata"]["meetings"][0]
+    assert meeting["stage"] == "Super Bowl"
+    assert meeting["human_label"] == "last season's Super Bowl"
+    assert meeting["date"] == "2026-02-08"
+    assert "last season's Super Bowl" in item["summary"]
+    assert "old playbook does not" in item["summary"]
 
 
 def test_portable_history_replaces_generic_duplicate_but_keeps_coordinator_history():
