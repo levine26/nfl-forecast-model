@@ -17,6 +17,9 @@ CURRENT_COLUMNS = [
     "spread_line","total_line","model_edge","cover_home_prob","over_prob","confidence",
     "model_disagreement","consistency_flag","market_available","data_state","snapshot_type",
     "model_version","prediction_timestamp_utc",
+    # Append-only diagnostic fields. Keeping them at the end preserves CSV compatibility.
+    "logistic_home_prob","extra_trees_home_prob","xgboost_home_prob","catboost_home_prob",
+    "elo_home_prob","home_elo","away_elo",
 ]
 
 LOCK_META_COLUMNS = [
@@ -48,7 +51,6 @@ def _empty_official(columns: list[str]) -> pd.DataFrame:
 
 
 def _coerce_grade_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
-    """Keep tri-state grading fields as nullable booleans under pandas 3+."""
     frame = frame.copy()
     for c in BOOLEAN_GRADE_COLUMNS:
         if c not in frame.columns:
@@ -65,8 +67,6 @@ def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
         old = pd.read_csv(path)
     except Exception:
         return _empty_official(columns)
-    # Before v0.2 this file was an audit log. Those rows were never official locks,
-    # so intentionally migrate to a clean official-history file rather than grading them.
     if "lock_status" not in old.columns:
         return _empty_official(columns)
     old = old[old["lock_status"].eq("LOCKED")].copy()
@@ -91,6 +91,43 @@ def _append_run_history(p: pd.DataFrame, path: Path, columns: list[str]) -> None
             pass
     audit = audit.drop_duplicates("prediction_id", keep="last")
     audit.to_csv(path, index=False)
+
+
+def _write_power_ratings(power: pd.DataFrame, path: Path) -> None:
+    current = power.copy()
+    if current.empty:
+        current.to_csv(path, index=False)
+        return
+    previous = None
+    if path.exists():
+        try:
+            old = pd.read_csv(path)
+            if {"team", "rank"}.issubset(old.columns):
+                previous = old[["team", "rank"]].drop_duplicates("team", keep="last").rename(columns={"rank": "previous_rank"})
+        except Exception:
+            previous = None
+    if previous is not None:
+        current = current.merge(previous, on="team", how="left")
+    else:
+        current["previous_rank"] = np.nan
+    current["rank_change"] = current["previous_rank"] - current["rank"]
+
+    def movement(row) -> str:
+        if pd.isna(row.get("previous_rank")):
+            return "NEW"
+        change = int(row.get("rank_change", 0))
+        if change > 0:
+            return f"▲{change}"
+        if change < 0:
+            return f"▼{abs(change)}"
+        return "→"
+
+    current["movement"] = current.apply(movement, axis=1)
+    order = [
+        "rank","team","elo_plus","off_epa","def_epa_allowed","pass_epa","recent_win_pct",
+        "rank_change","movement","as_of",
+    ]
+    current[[c for c in order if c in current.columns]].to_csv(path, index=False)
 
 
 def _lock_new_games(
@@ -195,6 +232,11 @@ def write_outputs(
     p[cols].to_csv(out / "this_week.csv", index=False)
     _append_run_history(p, out / "run_history.csv", cols)
 
+    if hasattr(artifacts, "power_ratings"):
+        _write_power_ratings(artifacts.power_ratings, out / "power_ratings.csv")
+    if hasattr(artifacts, "leaderboard") and artifacts.leaderboard is not None:
+        artifacts.leaderboard.to_csv(out / "model_leaderboard.csv", index=False)
+
     official_path = out / "prediction_history.csv"
     official = _load_official(official_path, cols)
     official = _lock_new_games(official, p, cols, now_utc, lock_window_minutes)
@@ -217,6 +259,7 @@ def write_outputs(
         "generated_utc": now_utc.isoformat(),
         "games": int(len(p)),
         "locked_official_predictions": int(len(official)),
+        "power_rating_teams": int(len(getattr(artifacts, "power_ratings", []))),
         "next_kickoff_utc": next_kickoff,
         "model_version": str(p["model_version"].iloc[0]) if len(p) and "model_version" in p else None,
         "data_state": str(p["data_state"].iloc[0]) if len(p) and "data_state" in p else None,
