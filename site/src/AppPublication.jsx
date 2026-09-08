@@ -171,9 +171,17 @@ function Stat({ label, value, sub }) {
   return <div className="pub-stat"><span>{label}</span><b>{value}</b><small>{sub}</small></div>
 }
 
+function probabilityAxisPosition(probability) {
+  const p = num(probability)
+  if (p == null) return null
+  // The visible axis is 40%–80% so small model/market gaps are readable. Values
+  // outside that range pin to the edge rather than lying about their position.
+  return Math.max(0, Math.min(100, ((p * 100) - 40) / 40 * 100))
+}
+
 function MarketGap({ game, compact = false }) {
-  const model = game.pickP == null ? 50 : Math.max(2, Math.min(98, game.pickP*100))
-  const market = game.marketPickP == null ? null : Math.max(2, Math.min(98, game.marketPickP*100))
+  const model = probabilityAxisPosition(game.pickP) ?? 25
+  const market = probabilityAxisPosition(game.marketPickP)
   const gap = game.marketPickP == null || game.pickP == null ? null : (game.pickP-game.marketPickP)*100
   return <div className={`pub-gap ${compact?'compact':''}`}>
     <div className="pub-gap-head"><span>WIN PROBABILITY</span><b>{gap == null ? 'Market unavailable' : `${gap>=0?'+':''}${gap.toFixed(1)} pts vs market`}</b></div>
@@ -322,17 +330,17 @@ function HistoryPage({ history, autopsies }) {
 
 function MethodPage() {
   const nodes=[
-    ['INPUTS','EPA · success rate · explosives · turnovers · Elo · rest · home field'],
+    ['FOOTBALL INPUTS','EPA · success rate · explosives · turnovers · Elo · rest · home field'],
     ['FOUR MODELS','Logistic · Extra Trees · XGBoost · CatBoost'],
     ['PURE','Football-only ensemble probability'],
-    ['MARKET','Consensus market-implied probability'],
+    ['+ MARKET','Separate consensus market-implied probability joins here'],
     ['LEVLINE','75% PURE + 25% MARKET'],
     ['LOCK','First valid forecast inside T−120 becomes official'],
     ['AUDIT','Calibration · Brier · log loss · margin/total error'],
   ]
   return <main className="pub-inner"><PageHead kicker="METHODOLOGY" title="The thesis behind LevLine." copy="The goal is not to sound certain. The goal is to be well calibrated, explain the football underneath the number, and preserve exactly what the model believed before kickoff."/>
     <section className="pub-thesis"><span>THE SHORT VERSION</span><h2>Start with football. Let different models disagree. Use the market as information, not scripture. Lock the answer before the game. Then keep score honestly.</h2><p>That is the entire philosophy. Everything else is implementation detail.</p></section>
-    <section className="pub-pipeline"><div className="pub-block-head"><span>HOW A FORECAST BECOMES OFFICIAL</span></div><div className="pub-pipeline-row">{nodes.map(([title,body],index)=><React.Fragment key={title}><div className={`pub-node n${index}`}><span>{title}</span><b>{body}</b></div>{index<nodes.length-1&&<i>→</i>}</React.Fragment>)}</div></section>
+    <section className="pub-pipeline"><div className="pub-block-head"><span>HOW A FORECAST BECOMES OFFICIAL</span></div><div className="pub-pipeline-row">{nodes.map(([title,body],index)=><React.Fragment key={title}><div className={`pub-node n${index}`}><span>{title}</span><b>{body}</b></div>{index<nodes.length-1&&<i>→</i>}</React.Fragment>)}</div><p className="pub-empty">PURE and MARKET are parallel inputs to the published LevLine probability. The market is not produced by the football models; it joins the pipeline only at the 75/25 blend.</p></section>
     <div className="pub-method-grid">
       <div><span>1 · TRAIN WITHOUT PEEKING</span><h3>Chronological expanding-window validation</h3><p>Older seasons train the model; later seasons test it. The model does not get to study the answer key before taking the exam.</p></div>
       <div><span>2 · KEEP 2026 SACRED</span><h3>The current season is a forward test</h3><p>2026 results are for measurement, not for choosing the architecture. Any upgrade has to prove itself on earlier held-out data first.</p></div>
