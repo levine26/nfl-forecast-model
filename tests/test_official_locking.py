@@ -15,6 +15,24 @@ def _prediction(prob=0.70):
     }])
 
 
+def test_official_prediction_waits_until_lock_window(tmp_path):
+    # 20:20 ET in September = 00:20 UTC the next day. At T-121, no official
+    # prediction may exist; the first valid refresh inside T-120 becomes official.
+    games = pd.DataFrame([{"game_id":"2026_01_A_B","home_team":"B","away_team":"A","home_score":None,"away_score":None}])
+    too_early = datetime(2026, 9, 9, 22, 19, tzinfo=timezone.utc)
+    write_outputs(SimpleNamespace(predictions=_prediction(0.68), games=games), tmp_path, now_utc=too_early)
+    before = pd.read_csv(tmp_path / "prediction_history.csv")
+    assert before.empty
+
+    inside = datetime(2026, 9, 9, 22, 21, tzinfo=timezone.utc)
+    write_outputs(SimpleNamespace(predictions=_prediction(0.70), games=games), tmp_path, now_utc=inside)
+    locked = pd.read_csv(tmp_path / "prediction_history.csv")
+    assert len(locked) == 1
+    assert locked.loc[0, "lock_status"] == "LOCKED"
+    assert locked.loc[0, "final_home_prob"] == 0.70
+    assert 118.9 < locked.loc[0, "minutes_to_kickoff_at_lock"] < 119.1
+
+
 def test_official_prediction_locks_once_and_is_immutable(tmp_path):
     # 20:20 ET = 00:20 UTC next day; this run is 80 minutes before kickoff.
     now = datetime(2026, 9, 9, 23, 0, tzinfo=timezone.utc)
