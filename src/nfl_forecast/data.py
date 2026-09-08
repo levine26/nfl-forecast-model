@@ -36,8 +36,27 @@ def configure_cache(cache_dir: str) -> None:
 def load_core_data(seasons: Iterable[int], cache_dir: str = ".cache/nflreadpy") -> NFLDataBundle:
     seasons = list(seasons)
     configure_cache(cache_dir)
-    schedules = _pandas(nfl.load_schedules(seasons))
-    pbp = _pandas(nfl.load_pbp(seasons))
+    # nflreadpy can lag the live season by a package release. The underlying
+    # nflverse schedule is a public CSV and is the authoritative live scaffold.
+    schedules = pd.read_csv("https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv", low_memory=False)
+    schedules = schedules[schedules["season"].isin(seasons)].copy()
+
+    # Prefer nflreadpy for PBP. If its package-level current-season guard lags,
+    # retry only the seasons it currently supports; the schedule/results/Elo layer
+    # still remains live and the next package/data refresh automatically restores PBP.
+    try:
+        pbp = _pandas(nfl.load_pbp(seasons))
+    except ValueError as exc:
+        msg = str(exc)
+        import re
+        m = re.search(r"between 1999 and (\d{4})", msg)
+        if not m:
+            raise
+        supported_max = int(m.group(1))
+        supported = [y for y in seasons if y <= supported_max]
+        if not supported:
+            raise
+        pbp = _pandas(nfl.load_pbp(supported))
     try:
         team_stats = _pandas(nfl.load_team_stats(seasons))
     except Exception:
