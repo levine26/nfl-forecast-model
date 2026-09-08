@@ -3,17 +3,23 @@ name: Contextual football intelligence
 on:
   workflow_dispatch:
   push:
-    branches: [main, context-intelligence-v1]
+    branches: [main, context-intelligence-v1, injury-source-v1]
     paths:
       - "src/nfl_forecast/context.py"
+      - "src/nfl_forecast/injuries.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
+      - "tests/test_injuries.py"
+      - "pyproject.toml"
       - ".github/workflows/context.yml"
   pull_request:
     paths:
       - "src/nfl_forecast/context.py"
+      - "src/nfl_forecast/injuries.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
+      - "tests/test_injuries.py"
+      - "pyproject.toml"
       - ".github/workflows/context.yml"
   schedule:
     # Personnel/weather/context can change during the week; three-hour cadence is
@@ -38,7 +44,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py
+        run: pytest -q tests/test_context.py tests/test_injuries.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
