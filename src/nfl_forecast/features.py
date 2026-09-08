@@ -106,7 +106,7 @@ def build_matchup_features(team_games: pd.DataFrame, schedules: pd.DataFrame, el
     away_scaffold = away_scaffold.rename(columns={"away_team": "team"})
     scaffold = pd.concat([home_scaffold, away_scaffold], ignore_index=True)
 
-    metric_cols = [c for c in team_games.columns if c not in {"season", "week", "gameday", "gametime", "home_team", "away_team"}]
+    metric_cols = [c for c in team_games.columns if c not in {"season", "week", "gameday", "gametime", "home_team", "away_team", "home_score", "away_score", "is_home", "points_for", "points_against"}]
     observed = team_games[metric_cols].drop_duplicates(["game_id", "team"], keep="last")
     team_schedule = scaffold.merge(observed, on=["game_id", "team"], how="left")
 
