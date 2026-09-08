@@ -15,6 +15,7 @@ from nfl_forecast.context import (
     load_coaching_history,
 )
 from nfl_forecast.data import configure_cache
+from nfl_forecast.injuries import fetch_nfl_injuries, practice_status_evidence
 
 
 def _pandas(frame):
@@ -64,6 +65,24 @@ def _load_best_effort(season: int, cache_dir: str) -> tuple[pd.DataFrame | None,
     return pbp, ftn, depth, status
 
 
+def _fetch_injuries(season: int, week: int):
+    """Prefer the official NFL injury report; retain ESPN as a fail-safe only."""
+    nfl_rows, nfl_status = fetch_nfl_injuries(season, week)
+    if nfl_status.get("status") == "healthy":
+        return nfl_rows, nfl_status, True
+
+    espn_rows, espn_status = fetch_espn_injuries()
+    combined = {
+        "status": "degraded",
+        "provider": "NFL.com primary / ESPN fallback",
+        "primary": nfl_status,
+        "fallback": espn_status,
+        "source": nfl_status.get("source"),
+        "as_of": datetime.now(timezone.utc).isoformat(),
+    }
+    return espn_rows, combined, False
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--season", type=int, default=2026)
@@ -81,6 +100,11 @@ def main():
     if missing:
         raise SystemExit(f"Prediction feed missing required fields: {missing}")
 
+    week_values = pd.to_numeric(predictions.get("week"), errors="coerce").dropna()
+    if week_values.empty:
+        raise SystemExit("Prediction feed does not contain a valid week number")
+    week = int(week_values.iloc[0])
+
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
     generated = datetime.now(timezone.utc).isoformat()
@@ -94,7 +118,7 @@ def main():
         schedules = None
         source_status["schedule"] = {"status":"degraded", "source":NFLVERSE_SCHEDULE_URL, "error":str(exc)[:240]}
 
-    injuries, injury_status = fetch_espn_injuries()
+    injuries, injury_status, official_injuries = _fetch_injuries(args.season, week)
     source_status["injuries"] = injury_status
 
     teams = sorted(set(predictions["away_team"].astype(str)).union(predictions["home_team"].astype(str)))
@@ -119,6 +143,20 @@ def main():
         injuries=injuries,
         season=args.season,
     )
+
+    if official_injuries:
+        # Game-designation evidence is created by the shared personnel engine. Rewrite
+        # provider labels that predate the NFL.com source migration, and then add a
+        # conservative practice-only layer for DNP/limited players with no game status.
+        for items in evidence.values():
+            for item in items:
+                if item.get("category") in {"personnel", "scenario"} and "ESPN" in str(item.get("source_name", "")):
+                    item["source_name"] = "NFL.com official injury report"
+                    item["summary"] = str(item.get("summary", "")).replace("ESPN currently lists", "The official NFL injury report lists")
+        practice = practice_status_evidence(predictions, injuries)
+        for gid, items in practice.items():
+            evidence.setdefault(gid, []).extend(items)
+
     # The current React app groups coaching/continuity evidence into the
     # "History vs. What's Different Now" section. Normalize the internal label at
     # publication time so the analytical engine can retain its more specific name.
@@ -126,6 +164,9 @@ def main():
         for item in items:
             if item.get("category") == "structural_change":
                 item["category"] = "coaching"
+        rank = {"Strong": 3, "Moderate": 2, "Weak": 1}
+        items.sort(key=lambda x: (rank.get(x.get("strength"), 0), x.get("category", "")), reverse=True)
+        del items[12:]
 
     source_status.update(context_status)
     source_status["evidence"] = {
