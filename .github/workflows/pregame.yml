@@ -42,14 +42,41 @@ jobs:
           key: nflreadpy-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             nflreadpy-${{ runner.os }}-
-      - run: python scripts/run_week.py --season 2026 --snapshot FINAL
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
-      - name: Commit outputs
+      - name: Generate and publish final outputs
         if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
+          set -euo pipefail
           git config user.name "levline-model-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/
-          git diff --cached --quiet || git commit -m "Refresh LevLine final forecasts"
-          git pull --rebase origin main
-          git push
+
+          for attempt in 1 2 3; do
+            if [ "$attempt" -gt 1 ]; then
+              echo "main advanced during pregame generation; regenerating from current main (attempt $attempt/3)"
+              git reset --hard origin/main
+              git clean -fd outputs/
+            fi
+
+            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+              python scripts/run_week.py --season 2026 --snapshot FINAL
+            git add outputs/
+
+            if git diff --cached --quiet; then
+              echo "No final forecast output changes to publish."
+              exit 0
+            fi
+
+            git commit -m "Refresh LevLine final forecasts"
+            base_sha=$(git rev-parse HEAD^)
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+
+            git fetch origin main
+            if [ "$(git rev-parse origin/main)" = "$base_sha" ]; then
+              echo "Push failed even though main did not advance; refusing to mask a non-race publish error."
+              exit 1
+            fi
+          done
+
+          echo "main changed during all three pregame generation attempts; leaving existing published outputs untouched."
+          exit 1
