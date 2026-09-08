@@ -1,6 +1,6 @@
 import pandas as pd
 
-from nfl_forecast.context_plus import diversify_game_evidence, upgrade_contextual_evidence
+from nfl_forecast.context_plus import _humanize_existing_summary, diversify_game_evidence, upgrade_contextual_evidence
 from nfl_forecast.narrative import build_game_previews
 
 
@@ -41,3 +41,22 @@ def test_upgrade_does_not_mutate_prediction_probabilities():
     upgraded,status=upgrade_contextual_evidence(preds,{"g1":[]},pbp,ftn,None,{},2026)
     assert status["status"]=="healthy" and "g1" in upgraded
     assert "final_home_prob" not in preds.columns
+
+
+def test_reader_copy_strips_machine_sounding_guardrails():
+    raw=(
+        "NE enters 2026 with head coach Mike Vrabel. "
+        "Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted "
+        "in the written analysis rather than treated as directly transferable."
+    )
+    polished=_humanize_existing_summary(raw)
+    assert "down-weighted in the written analysis" not in polished
+    assert "people calling the offense are different" in polished
+
+    injury=(
+        "ESPN currently lists Player X (WR) as Questionable. "
+        "The status is surfaced as personnel evidence; no unvalidated point-value adjustment is silently applied to the official forecast."
+    )
+    polished_injury=_humanize_existing_summary(injury)
+    assert "silently applied" not in polished_injury
+    assert "does not make up an injury point value" in polished_injury
