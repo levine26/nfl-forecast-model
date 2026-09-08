@@ -1,124 +1,150 @@
 :root{
   --brand-red:#9E1B32;
   --brand-red-bright:#B5233E;
+  --brand-red-deep:#6F1324;
   --brand-black:#0B0B0B;
   --brand-cream:#F8F6ED;
   --brand-gold:#C9B37A;
+  --brand-stone:#8A8F94;
 }
 
-/* Production brand identity: Arizona-inspired without borrowing an official team mark. */
+/* Sunday Signal publication identity: Arizona-inspired, original marks, LevLine kept distinct. */
+html,body{background:#080808}
+body{
+  background:
+    radial-gradient(circle at 18% 0%,rgba(158,27,50,.11),transparent 28%),
+    radial-gradient(circle at 82% 9%,rgba(201,179,122,.055),transparent 23%),
+    linear-gradient(180deg,#0B0B0B 0%,#0A0D10 48%,#080808 100%);
+}
+
+.ss-topbar{
+  background:rgba(10,10,10,.93);
+  border-bottom-color:rgba(201,179,122,.15);
+}
+.ss-nav{background:rgba(11,11,11,.96);border-bottom-color:rgba(201,179,122,.12)}
+.ss-nav button.active{color:var(--brand-cream);box-shadow:inset 0 -2px var(--brand-red-bright)}
+.ss-nav button:hover{color:var(--brand-cream)}
+.fresh-strip{background:rgba(13,13,13,.86);border-bottom-color:rgba(201,179,122,.10)}
+
 .ss-mark{
-  width:52px;
-  height:52px;
-  padding:0;
-  border:0;
-  border-radius:13px;
-  background-image:url('/nfl-forecast-model/brand/sunday-signal-icon.svg');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  box-shadow:0 8px 24px rgba(158,27,50,.22),0 0 0 1px rgba(201,179,122,.18);
+  width:52px;height:52px;padding:0;border:0;border-radius:13px;
+  background:url('/nfl-forecast-model/brand/sunday-signal-icon.svg') center/cover no-repeat;
+  box-shadow:0 8px 26px rgba(158,27,50,.28),0 0 0 1px rgba(201,179,122,.18)
 }
 .ss-mark span,.ss-mark i{display:none!important}
 .ss-title{
   background:linear-gradient(90deg,var(--brand-cream) 0 51.5%,var(--brand-red-bright) 51.5% 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  font-style:italic;
-  letter-spacing:.12em;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-style:italic;letter-spacing:.12em;text-shadow:0 0 28px rgba(181,35,62,.04)
 }
-.ss-sub b{color:var(--brand-gold)}
+.ss-sub{color:#8E969E}.ss-sub b{color:var(--brand-gold)}
+.top-health b{color:var(--brand-cream)}
 
-.signal-hero{
-  position:relative;
-  isolation:isolate;
-}
+.signal-hero{position:relative;isolation:isolate}
 .signal-hero:before{
-  content:"";
-  position:absolute;
-  width:430px;
-  height:430px;
-  left:38%;
-  top:0;
-  transform:translateX(-50%) rotate(-6deg);
+  content:"";position:absolute;width:470px;height:470px;left:37%;top:-20px;
+  transform:translateX(-50%) rotate(-7deg);
   background:url('/nfl-forecast-model/brand/sunday-signal-mark.svg') center/contain no-repeat;
-  opacity:.035;
-  pointer-events:none;
-  z-index:-1;
-  filter:saturate(.8);
+  opacity:.045;pointer-events:none;z-index:-1
 }
-.hero-copy:after{
-  content:"";
-  display:block;
-  width:min(520px,92%);
-  aspect-ratio:920/260;
-  margin-top:24px;
-  background:url('/nfl-forecast-model/brand/sunday-signal-lockup.svg') left center/contain no-repeat;
-  opacity:.94;
+.signal-hero:after{
+  content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background:linear-gradient(100deg,rgba(158,27,50,.065),transparent 36%,rgba(201,179,122,.025) 75%,transparent)
 }
-.hero-copy h1{margin-bottom:15px}
 .hero-copy .eyebrow{color:var(--brand-gold)}
-
-.spotlight-tile>span,.page-head>span,.section-title>div>span,.story-kicker{
-  color:var(--brand-gold);
+.hero-copy h1{color:var(--brand-cream);text-wrap:balance}
+.hero-copy h1 em{color:#A6A09A}
+.hero-copy:after{
+  content:"";display:block;width:min(535px,94%);aspect-ratio:920/260;margin-top:24px;
+  background:url('/nfl-forecast-model/brand/sunday-signal-lockup.svg') left center/contain no-repeat;
+  opacity:.98;filter:drop-shadow(0 18px 34px rgba(0,0,0,.22))
 }
+.hero-board,.history-summary{
+  background:linear-gradient(145deg,rgba(22,22,22,.96),rgba(11,11,11,.96));
+  border-color:rgba(201,179,122,.14)
+}
+.hero-stat{border-color:rgba(201,179,122,.10)}
+.hero-stat b{color:var(--brand-cream)}
+
+.spotlight-tile,.signal-card,.team-card,.method-card,.cal-card,.article-block,.case-grid>div,.metric,.forecast-core>div,.table-wrap{
+  background:linear-gradient(145deg,#141414,#0D0D0D);
+  border-color:rgba(201,179,122,.13)
+}
+.spotlight-tile:before{height:3px;background:linear-gradient(90deg,var(--brand-red-bright),var(--brand-gold))}
+.spotlight-tile>span,.page-head>span,.section-title>div>span,.story-kicker,.method-card span,.cal-card>span{color:var(--brand-gold)}
 .spotlight-tile:after{
-  content:"";
-  position:absolute;
-  inset:auto 13px 12px auto;
-  width:34px;
-  height:34px;
-  background:url('/nfl-forecast-model/brand/sunday-signal-mark.svg') center/contain no-repeat;
-  opacity:.08;
+  content:"";position:absolute;inset:auto 13px 12px auto;width:36px;height:36px;
+  background:url('/nfl-forecast-model/brand/sunday-signal-mark.svg') center/contain no-repeat;opacity:.09
+}
+.spotlight-tile:hover,.signal-card:hover,.team-card:hover{
+  border-color:rgba(181,35,62,.45);
+  box-shadow:0 24px 62px rgba(0,0,0,.34),0 0 0 1px rgba(158,27,50,.09)
 }
 
+.signal-card:before{filter:saturate(.82) brightness(.9)}
+.card-teaser{color:#A9A29C}
+.card-foot{border-top-color:rgba(201,179,122,.09)}
+.card-foot button{color:var(--brand-cream)}
+.slate-toolbar button{background:#101010;border-color:#302824;color:#9C9690}
+.slate-toolbar button.active{background:#261117;border-color:#713044;color:#E7D5D5}
+
+.page-head h1,.section-title h2,.story-headline{color:var(--brand-cream)}
+.page-head p,.section-title p{color:#8D949B}
+.table-wrap table thead th{background:#111;color:#887E73}
+tbody tr:hover{background:#161111}
+
+.game-modal,.team-modal{
+  background:linear-gradient(180deg,#111 0%,#0B0B0B 100%);
+  border-color:rgba(201,179,122,.18)
+}
 .game-modal:before{
-  content:"";
-  position:absolute;
-  right:66px;
-  top:52px;
-  width:120px;
-  height:120px;
+  content:"";position:absolute;right:64px;top:50px;width:132px;height:132px;
   background:url('/nfl-forecast-model/brand/sunday-signal-mark.svg') center/contain no-repeat;
-  opacity:.045;
-  pointer-events:none;
+  opacity:.055;pointer-events:none
 }
 .story-kicker{letter-spacing:.19em}
-.story-headline{font-family:Inter,ui-sans-serif,system-ui,sans-serif}
-.verdict>span,.numbers-title span,.verdict-copy .block-head span{color:var(--brand-gold)}
 .verdict{
-  border-color:rgba(158,27,50,.52);
-  background:radial-gradient(circle at 50% -20%,rgba(158,27,50,.20),rgba(11,24,38,.92) 66%);
+  border-color:rgba(158,27,50,.58);
+  background:radial-gradient(circle at 50% -20%,rgba(158,27,50,.24),rgba(17,15,15,.96) 64%)
 }
-.verdict .signal-pill{border-color:rgba(201,179,122,.35)}
+.verdict>span,.numbers-title span,.verdict-copy .block-head span{color:var(--brand-gold)}
+.verdict>strong{color:var(--brand-cream)}
+.verdict .signal-pill{border-color:rgba(201,179,122,.34);background:#15120E}
+.article-block.intro p:first-of-type{color:#EDE9E0}
+.factor-card>span{color:var(--brand-red-bright)}
+.meter-row>div{background:#121212;border-color:#2E2924}
+.meter-row i{background:linear-gradient(90deg,rgba(158,27,50,.48),rgba(201,179,122,.25))}
+.evidence-card,.factor-card{border-color:rgba(201,179,122,.10)}
+.raw-evidence{background:#0E0E0E;border-color:rgba(201,179,122,.12)}
+.raw-evidence summary{color:#B7A47B}
+.danger{background:#1A0E12;border-color:#60303B}
+.verdict-copy{background:#15120E;border-color:#51452D}
+.source-health{background:#101010;border-color:rgba(201,179,122,.13)}
+.trend-chart{background:#0E0E0E;border-color:rgba(201,179,122,.12)}
 
-.team-card,.signal-card,.spotlight-tile{
-  box-shadow:0 16px 46px rgba(0,0,0,.10);
-}
-.signal-card:hover,.spotlight-tile:hover,.team-card:hover{
-  box-shadow:0 22px 58px rgba(0,0,0,.24),0 0 0 1px rgba(158,27,50,.08);
-}
+.state-pill.locked{color:#EBD8A4;border-color:#665632;background:#201B10}
+.state-pill.window{color:#EBD8A4;border-color:#665632;background:#201B10}
+.signal-pill{color:#D7D2C8;border-color:#39332C;background:#111}
 
-.method-card span,.cal-card>span{color:var(--brand-gold)}
-.raw-evidence summary{color:#a39270}
+.empty-state,.fatal{
+  position:relative;background:linear-gradient(145deg,#141111,#0D0D0D);border-color:rgba(181,35,62,.35);overflow:hidden
+}
+.empty-state:before,.fatal:before{
+  content:"";position:absolute;right:-28px;bottom:-35px;width:150px;height:150px;
+  background:url('/nfl-forecast-model/brand/sunday-signal-mark.svg') center/contain no-repeat;opacity:.065;pointer-events:none
+}
 
 footer{
-  position:relative;
-  min-height:92px;
-  align-items:center;
-  padding-right:220px;
+  position:relative;min-height:100px;align-items:center;padding-right:232px;
+  border-top-color:rgba(201,179,122,.14);color:#716F6B
+}
+footer:before{
+  content:"";position:absolute;left:24px;right:24px;top:-1px;height:1px;
+  background:linear-gradient(90deg,var(--brand-red-bright),var(--brand-gold),transparent);opacity:.45
 }
 footer:after{
-  content:"";
-  position:absolute;
-  right:24px;
-  top:50%;
-  transform:translateY(-50%);
-  width:180px;
-  height:68px;
-  background:url('/nfl-forecast-model/brand/levline-mark.svg') center/contain no-repeat;
-  opacity:.94;
+  content:"";position:absolute;right:24px;top:50%;transform:translateY(-50%);
+  width:190px;height:72px;background:url('/nfl-forecast-model/brand/levline-mark.svg') center/contain no-repeat;opacity:.96
 }
 footer b{color:var(--brand-gold)}
 
@@ -128,6 +154,7 @@ footer b{color:var(--brand-gold)}
   .hero-copy:after{width:100%;margin-top:18px}
   .signal-hero:before{width:320px;height:320px;left:56%;top:48px}
   .game-modal:before{display:none}
-  footer{padding-right:14px;padding-bottom:92px}
-  footer:after{right:14px;left:14px;top:auto;bottom:18px;transform:none;width:165px;height:62px;background-position:left center}
+  footer{padding-right:14px;padding-bottom:96px}
+  footer:after{right:14px;left:14px;top:auto;bottom:17px;transform:none;width:170px;height:64px;background-position:left center}
+  footer:before{left:14px;right:14px}
 }
