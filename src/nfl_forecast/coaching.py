@@ -3,22 +3,98 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 import json
+import re
 import time
 from typing import Any, Callable
+from urllib.parse import quote
 
+from bs4 import BeautifulSoup
 import requests
 
-from nfl_forecast.context import fetch_coaching_staff, utc_now
+from nfl_forecast.context import TEAM_META, utc_now
 
 
 NEGATIVE_CACHE_TTL_SECONDS = 60 * 60
 CURRENT_STAFF_TTL_SECONDS = 7 * 24 * 60 * 60
 REQUEST_INTERVAL_SECONDS = 0.12
 CURRENT_RETRY_DELAY_SECONDS = 0.4
+WIKIPEDIA_ROOT = "https://en.wikipedia.org/wiki/"
 
 
 def _norm_team(team: str) -> str:
     return "JAX" if str(team).upper() == "JAC" else str(team).upper()
+
+
+def _page_title(team: str, season: int) -> str | None:
+    meta = TEAM_META.get(_norm_team(team))
+    if not meta:
+        return None
+    return f"{season} {meta['name']} season"
+
+
+def _clean_cell(text: str) -> str:
+    text = re.sub(r"\[[^\]]*\]", "", text)
+    return re.sub(r"\s+", " ", text).strip(" ,")
+
+
+def _label(text: str) -> str:
+    text = re.sub(r"[^a-z ]", " ", text.lower())
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def fetch_coaching_staff(team: str, season: int, session=requests) -> tuple[dict[str, Any] | None, str]:
+    """Read staff from the rendered season-page infobox.
+
+    The rendered table is materially more stable for this use than relying on raw
+    template parameter names from MediaWiki wikitext, which vary across season pages.
+    """
+    team = _norm_team(team)
+    title = _page_title(team, season)
+    if title is None:
+        return None, WIKIPEDIA_ROOT
+    source_url = WIKIPEDIA_ROOT + quote(title.replace(" ", "_"))
+    try:
+        r = session.get(
+            source_url,
+            timeout=20,
+            headers={"User-Agent": "nfl-forecast-model/1.0 (public research project)"},
+        )
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "lxml")
+    except Exception:
+        return None, source_url
+
+    table = soup.select_one("table.infobox")
+    if table is None:
+        return None, source_url
+
+    result: dict[str, Any] = {
+        "team": team,
+        "season": season,
+        "source_url": source_url,
+        "head_coach": None,
+        "off_coach": None,
+        "def_coach": None,
+    }
+    for row in table.find_all("tr"):
+        th = row.find("th")
+        td = row.find("td")
+        if th is None or td is None:
+            continue
+        label = _label(th.get_text(" ", strip=True))
+        value = _clean_cell(td.get_text(" ", strip=True))
+        if not value:
+            continue
+        if label in {"coach", "head coach"} or label.endswith(" head coach"):
+            result["head_coach"] = value
+        elif label in {"off coach", "offensive coach", "offensive coordinator"}:
+            result["off_coach"] = value
+        elif label in {"def coach", "defensive coach", "defensive coordinator"}:
+            result["def_coach"] = value
+
+    if not any(result.get(k) for k in ("head_coach", "off_coach", "def_coach")):
+        return None, source_url
+    return result, source_url
 
 
 def _age_seconds(entry: dict[str, Any] | None, now: datetime) -> float | None:
@@ -125,7 +201,7 @@ def load_coaching_history(
     status = {
         "status": "healthy" if pages_missing < max(2, len(teams)) else "degraded",
         "as_of": utc_now(),
-        "source": "Wikipedia season pages",
+        "source": "Wikipedia season-page rendered infoboxes",
         "pages_missing": pages_missing,
         "refresh_attempts": refresh_attempts,
         "negative_entries_retried": negative_entries_retried,
