@@ -3,15 +3,17 @@ name: Sunday Signal contextual intelligence
 on:
   workflow_dispatch:
   push:
-    branches: [main, sunday-signal-v1]
+    branches: [main]
     paths:
       - "src/nfl_forecast/context.py"
       - "src/nfl_forecast/context_plus.py"
+      - "src/nfl_forecast/qb_history.py"
       - "src/nfl_forecast/injuries.py"
       - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
+      - "tests/test_qb_history_portability.py"
       - "tests/test_injuries.py"
       - "tests/test_narrative.py"
       - "pyproject.toml"
@@ -20,11 +22,13 @@ on:
     paths:
       - "src/nfl_forecast/context.py"
       - "src/nfl_forecast/context_plus.py"
+      - "src/nfl_forecast/qb_history.py"
       - "src/nfl_forecast/injuries.py"
       - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
+      - "tests/test_qb_history_portability.py"
       - "tests/test_injuries.py"
       - "tests/test_narrative.py"
       - "pyproject.toml"
@@ -50,7 +54,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_injuries.py tests/test_narrative.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_narrative.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
