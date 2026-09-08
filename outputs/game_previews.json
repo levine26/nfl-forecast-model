@@ -2,7 +2,7 @@
   "2026_01_ARI_LAC": {
     "brand": "Sunday Signal",
     "case_for_opponent": "ARI hit a 20+ yard pass on 6.4% of pass plays; LAC allowed one on 6.5%. ARI threw on 65% of first- and second-down plays and averaged +0.06 EPA per early-down pass.",
-    "case_for_pick": "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. Justin Herbert has seen ARI 2 times: +0.10 EPA/dropback and a 48% positive-EPA rate across 94 dropbacks.",
+    "case_for_pick": "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. Justin Herbert has faced ARI 2 times; the most recent was 2024 Week 7.",
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -10,14 +10,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Justin Herbert vs ARI: prior meetings"
+        "title": "Justin Herbert vs ARI: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Justin Herbert vs ARI: player history"
+        "title": "Jacoby Brissett vs LAC: player history"
       },
       {
         "category": "coaching",
@@ -113,7 +113,7 @@
     ],
     "paragraphs": [
       "LevLine has LAC at 74.7% to win. The middle of the distribution is LAC by 10.1, with 47.4 total points. The football-only model is 6.5 percentage points higher on ARI than the market is.",
-      "Justin Herbert has seen ARI 2 times: +0.10 EPA/dropback and a 48% positive-EPA rate across 94 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: ARI enters 2026 with head coach Mike LaFleur and offensive coordinator Nathaniel Hackett. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Justin Herbert has faced ARI 2 times; the most recent was 2024 Week 7. Across those snaps he averaged +0.10 EPA per dropback with a 48% positive-EPA rate over 94 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: ARI enters 2026 with head coach Mike LaFleur and offensive coordinator Nathaniel Hackett. Older matchup history gets a haircut here: the people calling the offense are different.",
       "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. If this turns into an obvious-passing-down game, that matchup gets loud fast. The other matchup worth watching: ARI hit a 20+ yard pass on 6.4% of pass plays; LAC allowed one on 6.5%."
     ],
     "prediction": "LAC to win; LAC 28.7 \u2013 ARI 18.7 is the central score projection.",
@@ -234,7 +234,7 @@
   },
   "2026_01_BAL_IND": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass.",
+    "case_for_opponent": "BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass. Daniel Jones has faced BAL once before: 2022 Week 6.",
     "case_for_pick": "BAL gave up sacks on 8.4% of pass plays last season; IND got home on 5.3%. IND hit a 20+ yard pass on 6.9% of pass plays; BAL allowed one on 9.3%.",
     "engine": "LevLine",
     "evidence_used": [
@@ -243,14 +243,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Lamar Jackson vs IND: prior meetings"
+        "title": "Lamar Jackson vs IND: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Lamar Jackson vs IND: player history"
+        "title": "Daniel Jones vs BAL: player history"
       },
       {
         "category": "coaching",
@@ -346,7 +346,7 @@
     ],
     "paragraphs": [
       "LevLine has BAL at 58.1% to win. The middle of the distribution is BAL by 3.2, with 44.2 total points. The football-only model is 3.7 percentage points higher on IND than the market is. The component models are not exactly singing from one hymnal.",
-      "Lamar Jackson has seen IND 2 times: +0.24 EPA/dropback and a 63% positive-EPA rate across 82 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: BAL enters 2026 with head coach Jesse Minter and offensive coordinator Declan Doyle. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Lamar Jackson has faced IND 2 times; the most recent was 2023 Week 3. Across those snaps he averaged +0.24 EPA per dropback with a 63% positive-EPA rate over 82 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: BAL enters 2026 with head coach Jesse Minter and offensive coordinator Declan Doyle. Older matchup history gets a haircut here: the people calling the offense are different.",
       "BAL gave up sacks on 8.4% of pass plays last season; IND got home on 5.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast. The other matchup worth watching: BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass."
     ],
     "prediction": "BAL to win; IND 20.5 \u2013 BAL 23.7 is the central score projection.",
@@ -363,14 +363,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Moderate",
-        "title": "Josh Allen vs HOU: prior meetings"
+        "title": "Josh Allen vs HOU: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "C.J. Stroud vs BUF: prior meetings"
+        "title": "C.J. Stroud vs BUF: player history"
       },
       {
         "category": "coaching",
@@ -466,9 +466,9 @@
     ],
     "paragraphs": [
       "LevLine has HOU at 56.6% to win. The middle of the distribution is HOU by 6.7, with 48.7 total points. The football-only model is 10.3 percentage points higher on HOU than the market is. On the spread scale, LevLine likes HOU by 8.2 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Josh Allen has seen HOU 3 times: -0.16 EPA/dropback and a 39% positive-EPA rate across 104 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: BUF enters 2026 with head coach Joe Brady. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Josh Allen has faced HOU 3 times; the most recent was last season, Week 12. Across those snaps he averaged -0.16 EPA per dropback with a 39% positive-EPA rate over 104 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: BUF enters 2026 with head coach Joe Brady. Older matchup history gets a haircut here: the people calling the offense are different.",
       "BUF threw on 50% of first- and second-down plays and averaged +0.20 EPA per early-down pass. HOU allowed -0.16. The other matchup worth watching: BUF gave up sacks on 6.2% of pass plays last season; HOU got home on 7.6%.",
-      "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 9 mph, and 14% precipitation probability."
+      "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 12 mph, and 14% precipitation probability."
     ],
     "prediction": "HOU to win; HOU 27.7 \u2013 BUF 21.0 is the central score projection.",
     "what_could_make_us_wrong": "The component models disagree more than usual (8.7%). The favorite is not far from coin-flip territory. Weather, travel or another live scenario could change the shape of the game."
@@ -476,7 +476,7 @@
   "2026_01_CHI_CAR": {
     "brand": "Sunday Signal",
     "case_for_opponent": "CAR needs the high-variance parts of the game\u2014turnovers, explosives and late-down conversions\u2014to break its way.",
-    "case_for_pick": "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. Bryce Young has seen CHI 2 times: -0.18 EPA/dropback and a 29% positive-EPA rate across 49 dropbacks.",
+    "case_for_pick": "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. Bryce Young has faced CHI 2 times; the most recent was 2024 Week 5.",
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -484,14 +484,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Bryce Young vs CHI: prior meetings"
+        "title": "Bryce Young vs CHI: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Caleb Williams vs CAR: prior meetings"
+        "title": "Caleb Williams vs CAR: player history"
       },
       {
         "category": "scheme",
@@ -573,7 +573,7 @@
     ],
     "paragraphs": [
       "LevLine has CHI at 50.3% to win. The middle of the distribution is CHI by 0.3, with 43.7 total points. The football-only model is 12.1 percentage points higher on CAR than the market is. The spread view is cooler: LevLine is 2.7 points less favorable to CHI than the market line. This is a coin flip wearing a decimal point.",
-      "Bryce Young has seen CHI 2 times: -0.18 EPA/dropback and a 29% positive-EPA rate across 49 dropbacks. Same opponent, not necessarily the same defense.",
+      "Bryce Young has faced CHI 2 times; the most recent was 2024 Week 5. Across those snaps he averaged -0.18 EPA per dropback with a 29% positive-EPA rate over 49 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
       "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. The short version: CAR wants chunks, and CHI would rather make it earn twelve-play drives. The other matchup worth watching: CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps."
     ],
     "prediction": "CHI to win; CAR 21.7 \u2013 CHI 22.0 is the central score projection.",
@@ -581,7 +581,7 @@
   },
   "2026_01_CLE_JAX": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%. Trevor Lawrence has seen CLE 2 times: -0.18 EPA/dropback and a 36% positive-EPA rate across 89 dropbacks.",
+    "case_for_opponent": "CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%. Trevor Lawrence has faced CLE 2 times; the most recent was 2024 Week 2.",
     "case_for_pick": "CLE hit a 20+ yard pass on 5.1% of pass plays; JAX allowed one on 6.3%.",
     "engine": "LevLine",
     "evidence_used": [
@@ -590,14 +590,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Trevor Lawrence vs CLE: prior meetings"
+        "title": "Trevor Lawrence vs CLE: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Deshaun Watson vs JAX: prior meetings"
+        "title": "Deshaun Watson vs JAX: player history"
       },
       {
         "category": "coaching",
@@ -693,17 +693,17 @@
     ],
     "paragraphs": [
       "LevLine has JAX at 73.2% to win. The middle of the distribution is JAX by 8.4, with 45.9 total points. The football-only model is 7.3 percentage points higher on CLE than the market is.",
-      "Trevor Lawrence has seen CLE 2 times: -0.18 EPA/dropback and a 36% positive-EPA rate across 89 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: CLE enters 2026 with head coach Todd Monken. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Trevor Lawrence has faced CLE 2 times; the most recent was 2024 Week 2. Across those snaps he averaged -0.18 EPA per dropback with a 36% positive-EPA rate over 89 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: CLE enters 2026 with head coach Todd Monken. Older matchup history gets a haircut here: the people calling the offense are different.",
       "CLE hit a 20+ yard pass on 5.1% of pass plays; JAX allowed one on 6.3%. The short version: CLE wants chunks, and JAX would rather make it earn twelve-play drives. The other matchup worth watching: CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%.",
-      "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 3 mph sustained wind with gusts near 4 mph, and 10% precipitation probability."
+      "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 3 mph sustained wind with gusts near 3 mph, and 10% precipitation probability."
     ],
     "prediction": "JAX to win; JAX 27.1 \u2013 CLE 18.8 is the central score projection.",
     "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. CLE owns at least one real matchup counter-signal."
   },
   "2026_01_DAL_NYG": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. Dak Prescott has seen NYG 8 times: +0.24 EPA/dropback and a 51% positive-EPA rate across 257 dropbacks.",
-    "case_for_pick": "NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%. Jaxson Dart has seen DAL 1 time: +0.22 EPA/dropback and a 53% positive-EPA rate across 36 dropbacks.",
+    "case_for_opponent": "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. Dak Prescott has faced NYG 8 times; the most recent was last season, Week 18.",
+    "case_for_pick": "NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%. Jaxson Dart has faced DAL once before: last season, Week 18.",
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -711,14 +711,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "title": "Dak Prescott vs NYG: prior meetings"
+        "title": "Dak Prescott vs NYG: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Jaxson Dart vs DAL: prior meetings"
+        "title": "Jaxson Dart vs DAL: player history"
       },
       {
         "category": "coaching",
@@ -780,8 +780,8 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "summary": "Dak Prescott has seen NYG 8 times: +0.24 EPA/dropback and a 51% positive-EPA rate across 257 dropbacks. Same opponent, not necessarily the same defense.",
-        "title": "Dak Prescott vs NYG: prior meetings"
+        "summary": "Dak Prescott has faced NYG 8 times; the most recent was last season, Week 18. Across those snaps he averaged +0.24 EPA per dropback with a 51% positive-EPA rate over 257 dropbacks.",
+        "title": "Dak Prescott vs NYG: player history"
       }
     ],
     "matchup": "DAL @ NYG",
@@ -807,7 +807,7 @@
     ],
     "paragraphs": [
       "LevLine has NYG at 54.8% to win. The middle of the distribution is NYG by 1.7, with 46.2 total points. The football-only model is 18.8 percentage points higher on NYG than the market is. On the spread scale, LevLine likes NYG by 4.7 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Dak Prescott has seen NYG 8 times: +0.24 EPA/dropback and a 51% positive-EPA rate across 257 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: NYG enters 2026 with head coach John Harbaugh. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Dak Prescott has faced NYG 8 times; the most recent was last season, Week 18. Across those snaps he averaged +0.24 EPA per dropback with a 51% positive-EPA rate over 257 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: NYG enters 2026 with head coach John Harbaugh. Older matchup history gets a haircut here: the people calling the offense are different.",
       "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. The short version: NYG wants chunks, and DAL would rather make it earn twelve-play drives. The other matchup worth watching: NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%."
     ],
     "prediction": "NYG to win; NYG 23.9 \u2013 DAL 22.3 is the central score projection.",
@@ -815,8 +815,8 @@
   },
   "2026_01_DEN_KC": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "KC gave up sacks on 6.4% of pass plays last season; DEN got home on 9.3%.",
-    "case_for_pick": "KC threw on 61% of first- and second-down plays and averaged +0.11 EPA per early-down pass. Patrick Mahomes has seen DEN 8 times: +0.06 EPA/dropback and a 46% positive-EPA rate across 338 dropbacks.",
+    "case_for_opponent": "KC gave up sacks on 6.4% of pass plays last season; DEN got home on 9.3%. Bo Nix has faced KC 4 times; the most recent was last season, Week 17.",
+    "case_for_pick": "KC threw on 61% of first- and second-down plays and averaged +0.11 EPA per early-down pass. Patrick Mahomes has faced DEN 8 times; the most recent was last season, Week 11.",
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -824,7 +824,7 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "title": "Patrick Mahomes vs DEN: prior meetings"
+        "title": "Patrick Mahomes vs DEN: player history"
       },
       {
         "category": "history",
@@ -893,8 +893,8 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "summary": "Patrick Mahomes has seen DEN 8 times: +0.06 EPA/dropback and a 46% positive-EPA rate across 338 dropbacks. Same opponent, not necessarily the same defense.",
-        "title": "Patrick Mahomes vs DEN: prior meetings"
+        "summary": "Patrick Mahomes has faced DEN 8 times; the most recent was last season, Week 11. Across those snaps he averaged +0.06 EPA per dropback with a 46% positive-EPA rate over 338 dropbacks.",
+        "title": "Patrick Mahomes vs DEN: player history"
       }
     ],
     "matchup": "DEN @ KC",
@@ -920,7 +920,7 @@
     ],
     "paragraphs": [
       "LevLine has KC at 50.3% to win. The middle of the distribution is DEN by 2.3, with 48.9 total points. The football-only model is 9.2 percentage points higher on DEN than the market is. The spread view is cooler: LevLine is 4.8 points less favorable to KC than the market line. This is a coin flip wearing a decimal point.",
-      "Patrick Mahomes has seen DEN 8 times: +0.06 EPA/dropback and a 46% positive-EPA rate across 338 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: DEN enters 2026 with offensive coordinator Davis Webb. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Patrick Mahomes has faced DEN 8 times; the most recent was last season, Week 11. Across those snaps he averaged +0.06 EPA per dropback with a 46% positive-EPA rate over 338 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: DEN enters 2026 with offensive coordinator Davis Webb. Older matchup history gets a haircut here: the people calling the offense are different.",
       "KC gave up sacks on 6.4% of pass plays last season; DEN got home on 9.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast. The other matchup worth watching: KC threw on 61% of first- and second-down plays and averaged +0.11 EPA per early-down pass."
     ],
     "prediction": "KC to win; KC 23.3 \u2013 DEN 25.6 is the central score projection.",
@@ -937,14 +937,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "title": "Jordan Love vs MIN: prior meetings"
+        "title": "Jordan Love vs MIN: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "Jordan Love vs MIN: player history"
+        "strength": "Weak",
+        "title": "Kyler Murray vs GB: player history"
       },
       {
         "category": "scheme",
@@ -1026,7 +1026,7 @@
     ],
     "paragraphs": [
       "LevLine has MIN at 61.8% to win. The middle of the distribution is MIN by 7.1, with 50.3 total points. The football-only model is 12.2 percentage points higher on MIN than the market is. On the spread scale, LevLine likes MIN by 5.6 points more than the current line. The component models are not exactly singing from one hymnal.",
-      "Jordan Love has seen MIN 8 times: +0.01 EPA/dropback and a 48% positive-EPA rate across 202 dropbacks. Same opponent, not necessarily the same defense.",
+      "Jordan Love has faced MIN 8 times; the most recent was last season, Week 12. Across those snaps he averaged +0.01 EPA per dropback with a 48% positive-EPA rate over 202 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
       "GB hit a 20+ yard pass on 10.6% of pass plays; MIN allowed one on 5.8%. The short version: GB wants chunks, and MIN would rather make it earn twelve-play drives. The other matchup worth watching: MIN gave up sacks on 9.9% of pass plays last season; GB got home on 5.2%."
     ],
     "prediction": "MIN to win; MIN 28.7 \u2013 GB 21.6 is the central score projection.",
@@ -1155,7 +1155,7 @@
   },
   "2026_01_NE_SEA": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "NE gave up sacks on 8.5% of pass plays last season; SEA got home on 6.5%.",
+    "case_for_opponent": "NE gave up sacks on 8.5% of pass plays last season; SEA got home on 6.5%. Sam Darnold has faced NE 2 times; the most recent was last season's Super Bowl.",
     "case_for_pick": "SEA hit a 20+ yard pass on 9.7% of pass plays; NE allowed one on 6.0%. SEA threw on 47% of first- and second-down plays and averaged +0.22 EPA per early-down pass.",
     "engine": "LevLine",
     "evidence_used": [
@@ -1164,14 +1164,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Drake Maye vs SEA: prior meetings"
+        "title": "Sam Darnold vs NE: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Sam Darnold vs NE: prior meetings"
+        "title": "Drake Maye vs SEA: player history"
       },
       {
         "category": "coaching",
@@ -1295,7 +1295,7 @@
     ],
     "paragraphs": [
       "LevLine has SEA at 70.4% to win. The middle of the distribution is SEA by 7.7, with 45.2 total points. The football-only model is 13.3 percentage points higher on SEA than the market is. On the spread scale, LevLine likes SEA by 4.7 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Drake Maye has seen SEA 1 time: -0.43 EPA/dropback and a 38% positive-EPA rate across 50 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: SEA enters 2026 with offensive coordinator Brian Fleury. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Sam Darnold has faced NE 2 times; the most recent was last season's Super Bowl. Across those snaps he averaged -0.33 EPA per dropback with a 34% positive-EPA rate over 73 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: SEA enters 2026 with offensive coordinator Brian Fleury. Older matchup history gets a haircut here: the people calling the offense are different.",
       "SEA hit a 20+ yard pass on 9.7% of pass plays; NE allowed one on 6.0%. The short version: SEA wants chunks, and NE would rather make it earn twelve-play drives. The other matchup worth watching: SEA threw on 47% of first- and second-down plays and averaged +0.22 EPA per early-down pass.",
       "The official NFL injury report lists Ben Brown (C) as Out. Knee LevLine does not make up an injury point value for it. The official NFL injury report lists TreVeyon Henderson (RB) as Out. Ankle LevLine does not make up an injury point value for it.",
       "NE travels roughly 2,485 miles to SEA and crosses about 3 time zones."
@@ -1309,13 +1309,6 @@
     "case_for_pick": "NO hit a 20+ yard pass on 4.8% of pass plays; DET allowed one on 8.5%. NO gave up sacks on 6.9% of pass plays last season; DET got home on 7.2%.",
     "engine": "LevLine",
     "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Jared Goff vs NO: prior meetings"
-      },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
@@ -1403,7 +1396,7 @@
     ],
     "paragraphs": [
       "LevLine has DET at 73.5% to win. The middle of the distribution is DET by 10.5, with 46.5 total points. On the spread scale, LevLine likes DET by 3.5 points more than the current line.",
-      "Jared Goff has seen NO 1 time: +0.28 EPA/dropback and a 44% positive-EPA rate across 27 dropbacks. Same opponent, not necessarily the same defense.",
+      "Jared Goff has faced NO once before: 2023 Week 13. Across those snaps he averaged +0.28 EPA per dropback with a 44% positive-EPA rate over 27 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
       "NO hit a 20+ yard pass on 4.8% of pass plays; DET allowed one on 8.5%. The short version: NO wants chunks, and DET would rather make it earn twelve-play drives. The other matchup worth watching: NO gave up sacks on 6.9% of pass plays last season; DET got home on 7.2%."
     ],
     "prediction": "DET to win; DET 28.5 \u2013 NO 18.0 is the central score projection.",
@@ -1532,8 +1525,8 @@
   },
   "2026_01_SF_LA": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "SF produced positive EPA on 51% of third downs; LA allowed it on 40%. Brock Purdy has seen LA 3 times: +0.08 EPA/dropback and a 46% positive-EPA rate across 91 dropbacks.",
-    "case_for_pick": "LA hit a 20+ yard pass on 10.9% of pass plays; SF allowed one on 6.5%. Matthew Stafford has seen SF 10 times: +0.08 EPA/dropback and a 49% positive-EPA rate across 413 dropbacks.",
+    "case_for_opponent": "SF produced positive EPA on 51% of third downs; LA allowed it on 40%. Brock Purdy has faced LA 3 times; the most recent was 2024 Week 15.",
+    "case_for_pick": "LA hit a 20+ yard pass on 10.9% of pass plays; SF allowed one on 6.5%. Matthew Stafford has faced SF 10 times; the most recent was last season, Week 10.",
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1541,14 +1534,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "title": "Matthew Stafford vs SF: prior meetings"
+        "title": "Matthew Stafford vs SF: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Moderate",
-        "title": "Brock Purdy vs LA: prior meetings"
+        "title": "Brock Purdy vs LA: player history"
       },
       {
         "category": "coaching",
@@ -1638,8 +1631,8 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "summary": "Matthew Stafford has seen SF 10 times: +0.08 EPA/dropback and a 49% positive-EPA rate across 413 dropbacks. Same opponent, not necessarily the same defense.",
-        "title": "Matthew Stafford vs SF: prior meetings"
+        "summary": "Matthew Stafford has faced SF 10 times; the most recent was last season, Week 10. Across those snaps he averaged +0.08 EPA per dropback with a 49% positive-EPA rate over 413 dropbacks.",
+        "title": "Matthew Stafford vs SF: player history"
       }
     ],
     "matchup": "SF @ LA",
@@ -1665,7 +1658,7 @@
     ],
     "paragraphs": [
       "LevLine has LA at 69.8% to win. The middle of the distribution is LA by 6.3, with 46.7 total points. The football-only model is 8.2 percentage points higher on LA than the market is. On the spread scale, LevLine likes LA by 2.8 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Matthew Stafford has seen SF 10 times: +0.08 EPA/dropback and a 49% positive-EPA rate across 413 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: LA enters 2026 with offensive coordinator Nathan Scheelhaase. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Matthew Stafford has faced SF 10 times; the most recent was last season, Week 10. Across those snaps he averaged +0.08 EPA per dropback with a 49% positive-EPA rate over 413 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: LA enters 2026 with offensive coordinator Nathan Scheelhaase. Older matchup history gets a haircut here: the people calling the offense are different.",
       "LA hit a 20+ yard pass on 10.9% of pass plays; SF allowed one on 6.5%. The short version: LA wants chunks, and SF would rather make it earn twelve-play drives. The other matchup worth watching: SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps.",
       "The official NFL injury report lists James Thompson Jr. (DT) as Did Not Participate In Practice. The official NFL injury report lists Alaric Jackson (T) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive."
     ],
@@ -1683,14 +1676,14 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Joe Burrow vs TB: prior meetings"
+        "title": "Baker Mayfield vs CIN: player history"
       },
       {
         "category": "history",
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
-        "title": "Baker Mayfield vs CIN: player history"
+        "title": "Joe Burrow vs TB: player history"
       },
       {
         "category": "scheme",
@@ -1772,7 +1765,7 @@
     ],
     "paragraphs": [
       "LevLine has CIN at 63.1% to win. The middle of the distribution is CIN by 4.8, with 45.2 total points. The component models are not exactly singing from one hymnal.",
-      "Joe Burrow has seen TB 1 time: +0.07 EPA/dropback and a 56% positive-EPA rate across 43 dropbacks. Same opponent, not necessarily the same defense.",
+      "Baker Mayfield has faced CIN 2 times; the most recent was 2022 Week 9. Across those snaps he averaged +0.52 EPA per dropback with a 49% positive-EPA rate over 43 dropbacks. Those games came with CAR, CLE, not TB.",
       "TB hit a 20+ yard pass on 8.7% of pass plays; CIN allowed one on 9.5%. The short version: TB wants chunks, and CIN would rather make it earn twelve-play drives. The other matchup worth watching: CIN threw on 60% of first- and second-down plays and averaged -0.05 EPA per early-down pass."
     ],
     "prediction": "CIN to win; CIN 25.0 \u2013 TB 20.2 is the central score projection.",
@@ -1781,7 +1774,7 @@
   "2026_01_WAS_PHI": {
     "brand": "Sunday Signal",
     "case_for_opponent": "PHI averaged 4.3 yards after catch per completion; WAS allowed 6.4. PHI hit a 20+ yard pass on 6.8% of pass plays; WAS allowed one on 8.3%.",
-    "case_for_pick": "Jalen Hurts has seen WAS 10 times: +0.25 EPA/dropback and a 50% positive-EPA rate across 297 dropbacks.",
+    "case_for_pick": "Jalen Hurts has faced WAS 10 times; the most recent was last season, Week 16. Jayden Daniels has faced PHI 3 times; the most recent was 2024 Conference Championship.",
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1789,7 +1782,7 @@
         "source_name": "nflverse play-by-play",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "title": "Jalen Hurts vs WAS: prior meetings"
+        "title": "Jalen Hurts vs WAS: player history"
       },
       {
         "category": "history",
@@ -1899,9 +1892,9 @@
     ],
     "paragraphs": [
       "LevLine has PHI at 71.3% to win. The middle of the distribution is PHI by 9.5, with 47.9 total points. The football-only model is 7.4 percentage points higher on PHI than the market is. On the spread scale, LevLine likes PHI by 4.0 points more than the current line.",
-      "Jalen Hurts has seen WAS 10 times: +0.25 EPA/dropback and a 50% positive-EPA rate across 297 dropbacks. Same opponent, not necessarily the same defense. But this is not a rerun: WAS enters 2026 with offensive coordinator David Blough. Older matchup history gets a haircut here: the people calling the offense are different.",
+      "Jalen Hurts has faced WAS 10 times; the most recent was last season, Week 16. Across those snaps he averaged +0.25 EPA per dropback with a 50% positive-EPA rate over 297 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: WAS enters 2026 with offensive coordinator David Blough. Older matchup history gets a haircut here: the people calling the offense are different.",
       "PHI averaged 4.3 yards after catch per completion; WAS allowed 6.4. The five-yard throw becoming a fifteen-yard gain is the thing to watch. The other matchup worth watching: PHI hit a 20+ yard pass on 6.8% of pass plays; WAS allowed one on 8.3%.",
-      "Open-Meteo's forecast nearest kickoff is 70\u00b0F, 5 mph sustained wind with gusts near 9 mph, and 35% precipitation probability."
+      "Open-Meteo's forecast nearest kickoff is 70\u00b0F, 5 mph sustained wind with gusts near 15 mph, and 35% precipitation probability."
     ],
     "prediction": "PHI to win; PHI 28.7 \u2013 WAS 19.2 is the central score projection.",
     "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. WAS owns at least one real matchup counter-signal."

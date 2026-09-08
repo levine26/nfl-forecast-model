@@ -1,6 +1,6 @@
 {
   "coaching": {
-    "as_of": "2026-09-08T23:50:05.773214+00:00",
+    "as_of": "2026-09-08T23:56:07.910859+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -16,7 +16,7 @@
     "status": "healthy"
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-08T23:50:50.925132+00:00",
+    "as_of": "2026-09-08T23:56:30.320229+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -37,9 +37,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-08T23:50:05.478962+00:00",
+    "generated_utc": "2026-09-08T23:56:07.699755+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 117,
+    "signals": 118,
     "status": "healthy"
   },
   "ftn": {
@@ -52,9 +52,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-08T23:50:05.478962+00:00",
+  "generated_utc": "2026-09-08T23:56:07.699755+00:00",
   "injuries": {
-    "as_of": "2026-09-08T23:50:05.628754+00:00",
+    "as_of": "2026-09-08T23:56:07.800909+00:00",
     "players": 29,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -80,7 +80,8 @@
     "status": "healthy"
   },
   "qb_history": {
-    "games_with_player_opponent_history": 27,
+    "game_level_meeting_metadata": true,
+    "games_with_player_opponent_history": 28,
     "guardrail": "Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes.",
     "status": "healthy",
     "team_change_safe": true
@@ -91,15 +92,15 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-08T23:50:08.553192+00:00",
+    "as_of": "2026-09-08T23:56:09.783450+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
     "status": "healthy"
   },
   "weather": {
-    "as_of": "2026-09-08T23:50:36.145146+00:00",
+    "as_of": "2026-09-08T23:56:16.633680+00:00",
     "games_checked": 11,
-    "status": "degraded"
+    "status": "healthy"
   }
 }
