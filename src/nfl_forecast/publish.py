@@ -25,6 +25,8 @@ LOCK_META_COLUMNS = [
     "margin_abs_error","total_abs_error","actual_home_cover","actual_over",
 ]
 
+BOOLEAN_GRADE_COLUMNS = ["winner_correct", "actual_home_cover", "actual_over"]
+
 
 def kickoff_utc(gameday, gametime) -> datetime:
     """nflverse gametime is Eastern time; convert the scheduled kickoff to UTC."""
@@ -38,7 +40,22 @@ def _available_current_columns(df: pd.DataFrame) -> list[str]:
 
 
 def _empty_official(columns: list[str]) -> pd.DataFrame:
-    return pd.DataFrame(columns=columns + [c for c in LOCK_META_COLUMNS if c not in columns])
+    frame = pd.DataFrame(columns=columns + [c for c in LOCK_META_COLUMNS if c not in columns])
+    for c in BOOLEAN_GRADE_COLUMNS:
+        if c in frame.columns:
+            frame[c] = pd.Series(dtype="boolean")
+    return frame
+
+
+def _coerce_grade_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
+    """Keep tri-state grading fields as nullable booleans under pandas 3+."""
+    frame = frame.copy()
+    for c in BOOLEAN_GRADE_COLUMNS:
+        if c not in frame.columns:
+            frame[c] = pd.Series(pd.NA, index=frame.index, dtype="boolean")
+        else:
+            frame[c] = pd.array(frame[c], dtype="boolean")
+    return frame
 
 
 def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
@@ -55,8 +72,9 @@ def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
     old = old[old["lock_status"].eq("LOCKED")].copy()
     for c in columns + LOCK_META_COLUMNS:
         if c not in old.columns:
-            old[c] = np.nan
-    return old[columns + [c for c in LOCK_META_COLUMNS if c not in columns]]
+            old[c] = pd.NA if c in BOOLEAN_GRADE_COLUMNS else np.nan
+    old = old[columns + [c for c in LOCK_META_COLUMNS if c not in columns]]
+    return _coerce_grade_dtypes(old)
 
 
 def _append_run_history(p: pd.DataFrame, path: Path, columns: list[str]) -> None:
@@ -105,22 +123,23 @@ def _lock_new_games(
             "actual_away_score": np.nan,
             "actual_margin": np.nan,
             "actual_total": np.nan,
-            "winner_correct": np.nan,
+            "winner_correct": pd.NA,
             "margin_abs_error": np.nan,
             "total_abs_error": np.nan,
-            "actual_home_cover": np.nan,
-            "actual_over": np.nan,
+            "actual_home_cover": pd.NA,
+            "actual_over": pd.NA,
         })
         new_rows.append(locked)
         already.add(gid)
     if new_rows:
         official = pd.concat([official, pd.DataFrame(new_rows)], ignore_index=True)
-    return official
+    return _coerce_grade_dtypes(official)
 
 
 def _grade_locked_games(official: pd.DataFrame, games: pd.DataFrame) -> pd.DataFrame:
     if official.empty or games is None or "game_id" not in games.columns:
         return official
+    official = _coerce_grade_dtypes(official)
     result_cols = [c for c in ["game_id","home_team","away_team","home_score","away_score"] if c in games.columns]
     if not {"game_id","home_score","away_score"}.issubset(result_cols):
         return official
@@ -151,9 +170,9 @@ def _grade_locked_games(official: pd.DataFrame, games: pd.DataFrame) -> pd.DataF
         spread = pd.to_numeric(row.get("spread_line"), errors="coerce")
         line_total = pd.to_numeric(row.get("total_line"), errors="coerce")
         if pd.notna(spread):
-            official.at[i, "actual_home_cover"] = bool(margin > float(spread)) if margin != float(spread) else np.nan
+            official.at[i, "actual_home_cover"] = bool(margin > float(spread)) if margin != float(spread) else pd.NA
         if pd.notna(line_total):
-            official.at[i, "actual_over"] = bool(total > float(line_total)) if total != float(line_total) else np.nan
+            official.at[i, "actual_over"] = bool(total > float(line_total)) if total != float(line_total) else pd.NA
     return official
 
 
