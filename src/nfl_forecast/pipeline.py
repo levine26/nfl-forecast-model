@@ -8,6 +8,7 @@ import pandas as pd
 
 from .config import load_config
 from .data import load_core_data, load_advanced_data
+from .diagnostics import add_confidence_diagnostics, build_calibration_table
 from .elo import build_pregame_elo
 from .features import aggregate_team_games, add_game_results, build_matchup_features, sujar_baseline_columns, core_columns
 from .market import add_vig_free_market_prob
@@ -21,6 +22,7 @@ class PipelineArtifacts:
     predictions: pd.DataFrame
     power_ratings: pd.DataFrame
     leaderboard: pd.DataFrame
+    calibration: pd.DataFrame
 
 
 def projected_score(margin: pd.Series, total: pd.Series) -> tuple[pd.Series, pd.Series]:
@@ -266,6 +268,7 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     current["confidence"] = current.apply(
         lambda r: confidence_label(r["final_home_prob"], r["model_disagreement"], r["consistency_flag"]), axis=1
     )
+    current = add_confidence_diagnostics(current)
 
     pbp_max = int(pd.to_numeric(bundle.pbp.get("season"), errors="coerce").max()) if len(bundle.pbp) else start
     if pbp_max >= season_to_predict:
@@ -274,10 +277,11 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
         data_state = f"{season_to_predict} schedule/results/Elo live; EPA/form through {pbp_max}"
     timestamp = datetime.now(timezone.utc).isoformat()
     current["data_state"] = data_state
-    current["model_version"] = "0.3.0-dashboard-diagnostics"
+    current["model_version"] = "0.4.0-accountability"
     current["snapshot_type"] = snapshot_type
     current["prediction_timestamp_utc"] = timestamp
 
     power = _power_ratings(unresolved, timestamp)
     leaderboard = _leaderboard(historical, baseline, core, margin, total)
-    return PipelineArtifacts(games=games, predictions=current, power_ratings=power, leaderboard=leaderboard)
+    calibration = build_calibration_table(historical, baseline.oof_predictions, core.oof_predictions)
+    return PipelineArtifacts(games=games, predictions=current, power_ratings=power, leaderboard=leaderboard, calibration=calibration)

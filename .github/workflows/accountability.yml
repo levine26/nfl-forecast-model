@@ -1,0 +1,52 @@
+name: Accountability diagnostics
+
+on:
+  push:
+    branches: [main, diagnostics-v1]
+    paths:
+      - 'src/nfl_forecast/diagnostics.py'
+      - 'src/nfl_forecast/pipeline.py'
+      - 'scripts/run_week.py'
+      - 'tests/test_diagnostics.py'
+      - '.github/workflows/accountability.yml'
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/diagnostics.py'
+      - 'src/nfl_forecast/pipeline.py'
+      - 'scripts/run_week.py'
+      - 'tests/test_diagnostics.py'
+      - '.github/workflows/accountability.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: accountability-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - run: pytest -q tests/test_diagnostics.py
+      - name: Smoke-test published diagnostics from existing outputs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import pandas as pd
+          from nfl_forecast.diagnostics import build_movement_attribution, build_postgame_autopsies, build_weekly_brief
+          out = Path('outputs')
+          runs = pd.read_csv(out/'run_history.csv') if (out/'run_history.csv').exists() else pd.DataFrame()
+          current = pd.read_csv(out/'this_week.csv') if (out/'this_week.csv').exists() else pd.DataFrame()
+          history = pd.read_csv(out/'prediction_history.csv') if (out/'prediction_history.csv').exists() else pd.DataFrame()
+          movement = build_movement_attribution(runs)
+          build_weekly_brief(current, movement)
+          build_postgame_autopsies(history)
+          print(f'movement rows={len(movement)} current games={len(current)}')
+          PY
