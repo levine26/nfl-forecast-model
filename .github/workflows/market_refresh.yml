@@ -1,0 +1,30 @@
+name: Hourly NFL market refresh
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "35 * * * *"
+permissions:
+  contents: write
+concurrency:
+  group: nfl-market-refresh
+  cancel-in-progress: true
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install "pandas>=2.2" "numpy>=2.0"
+      - run: pip install -e . --no-deps
+      - run: python scripts/refresh_market.py --season 2026
+      - name: Commit outputs
+        run: |
+          git config user.name "nfl-market-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add outputs/
+          git diff --cached --quiet || git commit -m "Refresh NFL market forecast"
+          git pull --rebase origin main
+          git push

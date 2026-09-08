@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
-import json
+from statistics import NormalDist
 import numpy as np
 import pandas as pd
 
@@ -13,6 +12,7 @@ from .elo import build_pregame_elo
 from .features import aggregate_team_games, add_game_results, build_matchup_features, sujar_baseline_columns, core_columns
 from .market import add_vig_free_market_prob
 from .models import fit_season_stacked_classifier, fit_weighted_regression
+from .publish import write_outputs
 
 
 @dataclass
@@ -27,12 +27,34 @@ def projected_score(margin: pd.Series, total: pd.Series) -> tuple[pd.Series, pd.
     return home, away
 
 
-def confidence_label(prob: float) -> str:
-    q = max(prob, 1 - prob)
-    if q >= 0.70: return "High"
-    if q >= 0.60: return "Solid"
-    if q >= 0.55: return "Lean"
-    return "Coin Flip"
+def fair_american_odds(prob: float) -> float:
+    p = float(np.clip(prob, 1e-6, 1 - 1e-6))
+    if p >= 0.5:
+        return -100.0 * p / (1.0 - p)
+    return 100.0 * (1.0 - p) / p
+
+
+def probability_above(threshold, mean, sigma) -> float:
+    if pd.isna(threshold) or pd.isna(mean) or pd.isna(sigma) or float(sigma) <= 0:
+        return np.nan
+    return float(1.0 - NormalDist(mu=float(mean), sigma=float(sigma)).cdf(float(threshold)))
+
+
+def consistency_flag(prob: float, margin: float) -> str:
+    # Tiny near-50/near-zero differences are noise, not a meaningful conflict.
+    if abs(float(prob) - 0.5) < 0.02 or abs(float(margin)) < 1.0:
+        return "NEUTRAL"
+    return "ALIGNED" if (float(prob) - 0.5) * float(margin) > 0 else "WIN-MARGIN SPLIT"
+
+
+def confidence_label(prob: float, disagreement: float = 0.0, consistency: str = "ALIGNED") -> str:
+    q = max(float(prob), 1.0 - float(prob))
+    level = 3 if q >= 0.70 else 2 if q >= 0.60 else 1 if q >= 0.55 else 0
+    if float(disagreement) >= 0.10:
+        level -= 1
+    if consistency == "WIN-MARGIN SPLIT":
+        level -= 1
+    return ["Coin Flip", "Lean", "Solid", "High"][max(0, min(3, level))]
 
 
 def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="EARLY") -> PipelineArtifacts:
@@ -68,65 +90,69 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     if len(baseline_cols) < 4:
         raise RuntimeError(f"Baseline feature build incomplete: {baseline_cols}")
 
-    # Use recent, fully completed seasons to learn ensemble weights while retaining
-    # the full historical sample for the final fitted models. The live test season
-    # is therefore never used to tune stacker/weight parameters.
     validation_start = max(start + 1, season_to_predict - 4)
     validation_end = season_to_predict - 1
-    baseline = fit_season_stacked_classifier(historical, baseline_cols, seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
-    core = fit_season_stacked_classifier(historical, core_cols, seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
-    margin = fit_weighted_regression(historical, core_cols, "margin", seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
-    total = fit_weighted_regression(historical, core_cols, "game_total", seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
+    seed = cfg["model"]["random_state"]
+    baseline = fit_season_stacked_classifier(historical, baseline_cols, seed=seed, validation_start=validation_start, validation_end=validation_end)
+    core = fit_season_stacked_classifier(historical, core_cols, seed=seed, validation_start=validation_start, validation_end=validation_end)
+    margin = fit_weighted_regression(historical, core_cols, "margin", seed=seed, validation_start=validation_start, validation_end=validation_end)
+    total = fit_weighted_regression(historical, core_cols, "game_total", seed=seed, validation_start=validation_start, validation_end=validation_end)
 
     current["sujar_home_prob"] = baseline.predict_proba(current)[:, 1]
     current["pure_home_prob"] = core.predict_proba(current)[:, 1]
     current["expected_margin"] = margin.predict(current)
     current["expected_total"] = total.predict(current)
+    current["margin_sigma"] = float(margin.residual_std)
+    current["total_sigma"] = float(total.residual_std)
 
     has_market = current["market_home_prob"].notna()
+    current["market_available"] = has_market
     current["final_home_prob"] = current["pure_home_prob"]
     current.loc[has_market, "final_home_prob"] = (
-        0.75 * current.loc[has_market, "pure_home_prob"] + 0.25 * current.loc[has_market, "market_home_prob"]
+        0.75 * current.loc[has_market, "pure_home_prob"]
+        + 0.25 * current.loc[has_market, "market_home_prob"]
     )
+
+    current["fair_home_moneyline"] = current["final_home_prob"].map(fair_american_odds)
+    current["model_edge"] = np.where(
+        current["spread_line"].notna(), current["expected_margin"] - current["spread_line"], np.nan
+    )
+    current["cover_home_prob"] = current.apply(
+        lambda r: probability_above(r.get("spread_line"), r.get("expected_margin"), r.get("margin_sigma")), axis=1
+    )
+    current["over_prob"] = current.apply(
+        lambda r: probability_above(r.get("total_line"), r.get("expected_total"), r.get("total_sigma")), axis=1
+    )
+    z80 = 1.2815515655446004
+    current["margin_low_80"] = current["expected_margin"] - z80 * current["margin_sigma"]
+    current["margin_high_80"] = current["expected_margin"] + z80 * current["margin_sigma"]
+    current["total_low_80"] = current["expected_total"] - z80 * current["total_sigma"]
+    current["total_high_80"] = current["expected_total"] + z80 * current["total_sigma"]
 
     hp, ap = projected_score(current["expected_margin"], current["expected_total"])
     current["projected_home_score"] = hp
     current["projected_away_score"] = ap
-    current["projected_score"] = current.apply(lambda r: f"{r.home_team} {r.projected_home_score:.1f} – {r.away_team} {r.projected_away_score:.1f}", axis=1)
+    current["projected_score"] = current.apply(
+        lambda r: f"{r.home_team} {r.projected_home_score:.1f} – {r.away_team} {r.projected_away_score:.1f}", axis=1
+    )
     current["pick"] = np.where(current["final_home_prob"] >= 0.5, current["home_team"], current["away_team"])
-    current["confidence"] = current["final_home_prob"].map(confidence_label)
-    current["model_version"] = "0.1.0-core"
-    current["snapshot_type"] = snapshot_type
-    current["prediction_timestamp_utc"] = datetime.now(timezone.utc).isoformat()
 
     base_probs = core.base_predict(current)
     current["model_disagreement"] = base_probs.std(axis=1)
+    current["consistency_flag"] = current.apply(
+        lambda r: consistency_flag(r["final_home_prob"], r["expected_margin"]), axis=1
+    )
+    current["confidence"] = current.apply(
+        lambda r: confidence_label(r["final_home_prob"], r["model_disagreement"], r["consistency_flag"]), axis=1
+    )
+
+    pbp_max = int(pd.to_numeric(bundle.pbp.get("season"), errors="coerce").max()) if len(bundle.pbp) else start
+    if pbp_max >= season_to_predict:
+        data_state = f"{season_to_predict} schedule/results/Elo + PBP/EPA live"
+    else:
+        data_state = f"{season_to_predict} schedule/results/Elo live; EPA/form through {pbp_max}"
+    current["data_state"] = data_state
+    current["model_version"] = "0.2.0-locks-uncertainty"
+    current["snapshot_type"] = snapshot_type
+    current["prediction_timestamp_utc"] = datetime.now(timezone.utc).isoformat()
     return PipelineArtifacts(games=games, predictions=current)
-
-
-def write_outputs(artifacts: PipelineArtifacts, output_dir="outputs") -> None:
-    out = Path(output_dir); out.mkdir(parents=True, exist_ok=True)
-    p = artifacts.predictions.copy()
-    cols = [c for c in [
-        "game_id","season","week","gameday","gametime","away_team","home_team",
-        "sujar_home_prob","pure_home_prob","market_home_prob","final_home_prob","pick",
-        "expected_margin","expected_total","projected_score","spread_line","total_line",
-        "confidence","model_disagreement","snapshot_type","model_version","prediction_timestamp_utc"
-    ] if c in p.columns]
-    p[cols].to_csv(out / "this_week.csv", index=False)
-
-    hist_path = out / "prediction_history.csv"
-    hist = p[cols].copy()
-    hist["prediction_id"] = hist["game_id"].astype(str) + "__" + hist["snapshot_type"] + "__" + hist["prediction_timestamp_utc"]
-    if hist_path.exists():
-        old = pd.read_csv(hist_path)
-        hist = pd.concat([old, hist], ignore_index=True).drop_duplicates("prediction_id")
-    hist.to_csv(hist_path, index=False)
-
-    status = {
-        "status": "healthy",
-        "generated_utc": datetime.now(timezone.utc).isoformat(),
-        "games": int(len(p)),
-        "model_version": str(p["model_version"].iloc[0]) if len(p) else None,
-    }
-    (out / "status.json").write_text(json.dumps(status, indent=2), encoding="utf-8")

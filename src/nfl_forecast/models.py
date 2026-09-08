@@ -24,7 +24,10 @@ class FittedWinEnsemble:
     model_names: list[str]
 
     def base_predict(self, X: pd.DataFrame) -> pd.DataFrame:
-        return pd.DataFrame({name: model.predict_proba(X[self.feature_cols])[:, 1] for name, model in self.base_models.items()}, index=X.index)
+        return pd.DataFrame(
+            {name: model.predict_proba(X[self.feature_cols])[:, 1] for name, model in self.base_models.items()},
+            index=X.index,
+        )
 
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         base = self.base_predict(X)
@@ -53,8 +56,16 @@ def _win_models(seed: int = 26) -> dict:
     return {"logistic": linear, "extra_trees": extra, "xgboost": xgb, "catboost": cat}
 
 
-def fit_season_stacked_classifier(df: pd.DataFrame, feature_cols: list[str], target="home_win", season_col="season", seed=26, validation_start: int | None = None, validation_end: int | None = None) -> FittedWinEnsemble:
-    """Expanding-window, season-level OOF stacking; no random CV leakage."""
+def fit_season_stacked_classifier(
+    df: pd.DataFrame,
+    feature_cols: list[str],
+    target="home_win",
+    season_col="season",
+    seed=26,
+    validation_start: int | None = None,
+    validation_end: int | None = None,
+) -> FittedWinEnsemble:
+    """Expanding-window, season-level OOF stacking; no random-CV leakage."""
     train = df[df[target].notna()].copy()
     seasons = sorted(int(x) for x in train[season_col].dropna().unique())
     if len(seasons) < 3:
@@ -62,7 +73,11 @@ def fit_season_stacked_classifier(df: pd.DataFrame, feature_cols: list[str], tar
 
     templates = _win_models(seed)
     oof_parts = []
-    validation_seasons = [s for s in seasons[1:] if (validation_start is None or s >= validation_start) and (validation_end is None or s <= validation_end)]
+    validation_seasons = [
+        s for s in seasons[1:]
+        if (validation_start is None or s >= validation_start)
+        and (validation_end is None or s <= validation_end)
+    ]
     for test_season in validation_seasons:
         tr = train[train[season_col] < test_season]
         va = train[train[season_col] == test_season]
@@ -99,6 +114,7 @@ class RegressionEnsemble:
     feature_cols: list[str]
     models: dict
     weights: dict[str, float]
+    residual_std: float
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
         total = np.zeros(len(X), dtype=float)
@@ -128,34 +144,63 @@ def _reg_models(seed=26) -> dict:
     return {"elastic_net": linear, "extra_trees": extra, "xgboost": xgb, "catboost": cat}
 
 
-def fit_weighted_regression(df: pd.DataFrame, feature_cols: list[str], target: str, season_col="season", seed=26, validation_start: int | None = None, validation_end: int | None = None) -> RegressionEnsemble:
+def fit_weighted_regression(
+    df: pd.DataFrame,
+    feature_cols: list[str],
+    target: str,
+    season_col="season",
+    seed=26,
+    validation_start: int | None = None,
+    validation_end: int | None = None,
+) -> RegressionEnsemble:
     train = df[df[target].notna()].copy()
     seasons = sorted(int(x) for x in train[season_col].dropna().unique())
     templates = _reg_models(seed)
     errors = {name: [] for name in templates}
-    validation_seasons = [s for s in seasons[1:] if (validation_start is None or s >= validation_start) and (validation_end is None or s <= validation_end)]
+    oof_parts: list[pd.DataFrame] = []
+    validation_seasons = [
+        s for s in seasons[1:]
+        if (validation_start is None or s >= validation_start)
+        and (validation_end is None or s <= validation_end)
+    ]
     for test_season in validation_seasons:
         tr = train[train[season_col] < test_season]
         va = train[train[season_col] == test_season]
         if len(tr) < 100 or len(va) == 0:
             continue
+        part = pd.DataFrame(index=va.index)
+        part["actual"] = va[target].astype(float)
         for name, template in templates.items():
             model = clone(template)
             model.fit(tr[feature_cols], tr[target])
             pred = model.predict(va[feature_cols])
+            part[name] = pred
             errors[name].append(mean_absolute_error(va[target], pred))
+        oof_parts.append(part)
 
     scores = {n: np.mean(e) if e else 99.0 for n, e in errors.items()}
     inv = {n: 1.0 / max(v, 1e-6) for n, v in scores.items()}
     denom = sum(inv.values())
     weights = {n: v / denom for n, v in inv.items()}
 
+    if oof_parts:
+        oof = pd.concat(oof_parts).sort_index()
+        ensemble_oof = np.zeros(len(oof), dtype=float)
+        for name in templates:
+            ensemble_oof += weights[name] * oof[name].to_numpy(dtype=float)
+        residuals = oof["actual"].to_numpy(dtype=float) - ensemble_oof
+        residual_std = float(np.std(residuals, ddof=1)) if len(residuals) > 1 else float(train[target].std())
+    else:
+        residual_std = float(train[target].std())
+    if not np.isfinite(residual_std) or residual_std <= 0:
+        residual_std = 1.0
+
     fitted = {}
     for name, template in templates.items():
         model = clone(template)
         model.fit(train[feature_cols], train[target])
         fitted[name] = model
-    return RegressionEnsemble(feature_cols, fitted, weights)
+    return RegressionEnsemble(feature_cols, fitted, weights, residual_std)
 
 
 def classification_metrics(y, p) -> dict:

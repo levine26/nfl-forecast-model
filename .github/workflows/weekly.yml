@@ -1,4 +1,4 @@
-name: Weekly NFL model refresh
+name: Daily NFL model refresh
 on:
   workflow_dispatch:
   push:
@@ -10,8 +10,8 @@ on:
       - "pyproject.toml"
       - ".github/workflows/**"
   schedule:
-    # Tuesday 14:15 UTC ~= Tuesday morning Pacific. No paid services required.
-    - cron: "15 14 * * 2"
+    # Full football-model rebuild every morning. Market-only refreshes run hourly.
+    - cron: "5 14 * * *"
 permissions:
   contents: write
 concurrency:
