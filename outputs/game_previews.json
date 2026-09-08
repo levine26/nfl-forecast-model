@@ -13,6 +13,13 @@
         "title": "Justin Herbert vs ARI: prior meetings"
       },
       {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Justin Herbert vs ARI: player history"
+      },
+      {
         "category": "coaching",
         "source_name": "Wikipedia season staff records",
         "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
@@ -114,10 +121,17 @@
   },
   "2026_01_ATL_PIT": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "ATL threw on 49% of first- and second-down plays and generated +0.16 EPA per early-down pass.",
+    "case_for_opponent": "ATL threw on 49% of first- and second-down plays and generated +0.16 EPA per early-down pass. Across 2 prior meetings with PIT, Tua Tagovailoa averaged +0.12 EPA/dropback with a 49% positive-EPA rate over 69 dropbacks.",
     "case_for_pick": "ATL allowed sacks on 4.2% of pass plays in the latest complete season, while PIT generated sacks on 6.7%. PIT averaged 6.4 yards after catch on completed passes; ATL allowed 4.9.",
     "engine": "LevLine",
     "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Tua Tagovailoa vs PIT: player history"
+      },
       {
         "category": "coaching",
         "source_name": "Wikipedia season staff records",
@@ -206,7 +220,7 @@
     "paragraphs": [
       "PIT is the current model pick at 67.0% under LevLine. The central margin is PIT by 6.2, with a projected total of 47.7. LevLine's football-only probability is 6.3 percentage points more bullish on PIT than the market-implied probability. On the spread scale, LevLine is 2.7 points more favorable to PIT than the current market line.",
       "The clearest tactical stress point is protection versus pressure. ATL allowed sacks on 4.2% of pass plays in the latest complete season, while PIT generated sacks on 6.7%. This is a direct trench interaction: if PIT can force longer downs, the pressure matchup becomes more important than the raw season averages. A second, different lever: PIT averaged 6.4 yards after catch on completed passes; ATL allowed 4.9.",
-      "Older matchup history needs to be discounted because the decision-makers changed. ATL enters 2026 with head coach Kevin Stefanski."
+      "The historical matchup is relevant, but not automatically transferable. Across 2 prior meetings with PIT, Tua Tagovailoa averaged +0.12 EPA/dropback with a 49% positive-EPA rate over 69 dropbacks. Those meetings came while Tua Tagovailoa played for MIA, not ATL; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel. What is different now: ATL enters 2026 with head coach Kevin Stefanski. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable. That is why Sunday Signal treats the old result as evidence, not destiny."
     ],
     "prediction": "PIT to win, with PIT 27.0 \u2013 ATL 20.7 as the central score projection.",
     "what_could_make_us_wrong": "Atl owns at least one matchup-specific counter-signal in the evidence set."
@@ -223,6 +237,13 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
         "title": "Lamar Jackson vs IND: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Lamar Jackson vs IND: player history"
       },
       {
         "category": "scheme",
@@ -790,13 +811,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "DEN play action vs KC"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Moderate",
-        "title": "Kickoff weather in KC"
       }
     ],
     "game_id": "2026_01_DEN_KC",
@@ -858,11 +872,10 @@
     "paragraphs": [
       "KC is the current model pick at 50.3% under LevLine. The central margin is DEN by 2.3, with a projected total of 48.9. LevLine's football-only probability is 9.2 percentage points more bullish on DEN than the market-implied probability. On the spread scale, LevLine is 4.8 points less favorable to KC than the current market line.",
       "The clearest tactical stress point is protection versus pressure. KC allowed sacks on 6.4% of pass plays in the latest complete season, while DEN generated sacks on 9.3%. This is a direct trench interaction: if DEN can force longer downs, the pressure matchup becomes more important than the raw season averages. A second, different lever: KC threw on 61% of first- and second-down plays and generated +0.11 EPA per early-down pass.",
-      "There is useful historical context: Across 8 prior meetings with DEN, Patrick Mahomes averaged +0.06 EPA/dropback with a 46% positive-EPA rate over 338 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
-      "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 88\u00b0F, 11 mph sustained wind with gusts near 29 mph, and 19% precipitation probability."
+      "There is useful historical context: Across 8 prior meetings with DEN, Patrick Mahomes averaged +0.06 EPA/dropback with a 46% positive-EPA rate over 338 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
     ],
     "prediction": "KC to win, with KC 23.3 \u2013 DEN 25.6 as the central score projection.",
-    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected; the active weather/travel/personnel scenario could shift the game script; den owns at least one matchup-specific counter-signal in the evidence set."
+    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected; den owns at least one matchup-specific counter-signal in the evidence set."
   },
   "2026_01_GB_MIN": {
     "brand": "Sunday Signal",
@@ -876,6 +889,13 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "Jordan Love vs MIN: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "Jordan Love vs MIN: player history"
       },
       {
         "category": "scheme",
@@ -970,6 +990,13 @@
     "engine": "LevLine",
     "evidence_used": [
       {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Kirk Cousins vs MIA: player history"
+      },
+      {
         "category": "scheme",
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -1057,6 +1084,7 @@
     "paragraphs": [
       "LV is the current model pick at 51.0% under LevLine. The central margin is MIA by 0.2, with a projected total of 46.1. LevLine's football-only probability is 15.0 percentage points more bullish on MIA than the market-implied probability. On the spread scale, LevLine is 3.7 points less favorable to LV than the current market line.",
       "Early downs may determine who controls the script. LV threw on 57% of first- and second-down plays and generated -0.11 EPA per early-down pass. MIA allowed +0.19 EPA on opponent early-down passes. A second, different lever: MIA produced gains of 20+ yards on 7.7% of pass plays, while LV allowed them on 5.9%.",
+      "There is useful historical context: Across 2 prior meetings with MIA, Kirk Cousins averaged -0.16 EPA/dropback with a 42% positive-EPA rate over 66 dropbacks. Those meetings came while Kirk Cousins played for ATL, MIN, not LV; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
       "The main situational branch is this: MIA travels roughly 2,171 miles to LV and crosses about 3 time zones."
     ],
     "prediction": "LV to win, with LV 23.0 \u2013 MIA 23.1 as the central score projection.",
@@ -1212,6 +1240,13 @@
         "title": "Jared Goff vs NO: prior meetings"
       },
       {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Jared Goff vs NO: player history"
+      },
+      {
         "category": "scheme",
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -1299,10 +1334,17 @@
   },
   "2026_01_NYJ_TEN": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "TEN threw on 58% of first- and second-down plays and generated -0.10 EPA per early-down pass.",
+    "case_for_opponent": "TEN threw on 58% of first- and second-down plays and generated -0.10 EPA per early-down pass. Across 2 prior meetings with TEN, Geno Smith averaged +0.18 EPA/dropback with a 47% positive-EPA rate over 64 dropbacks.",
     "case_for_pick": "NYJ produced gains of 20+ yards on 4.4% of pass plays, while TEN allowed them on 9.5%. TEN allowed sacks on 8.2% of pass plays in the latest complete season, while NYJ generated sacks on 4.2%.",
     "engine": "LevLine",
     "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Geno Smith vs TEN: player history"
+      },
       {
         "category": "scheme",
         "source_name": "nflverse PBP + FTN charting",
@@ -1391,6 +1433,7 @@
     "paragraphs": [
       "TEN is the current model pick at 59.1% under LevLine. The central margin is TEN by 4.6, with a projected total of 44.4. LevLine's football-only probability is 7.7 percentage points more bullish on TEN than the market-implied probability. On the spread scale, LevLine is 3.1 points more favorable to TEN than the current market line.",
       "The most volatile matchup is the explosive-pass battle. NYJ produced gains of 20+ yards on 4.4% of pass plays, while TEN allowed them on 9.5%. That isolates the vertical-volatility question: whether NYJ can create chunk plays before TEN forces the offense to sustain long drives. A second, different lever: TEN threw on 58% of first- and second-down plays and generated -0.10 EPA per early-down pass.",
+      "There is useful historical context: Across 2 prior meetings with TEN, Geno Smith averaged +0.18 EPA/dropback with a 47% positive-EPA rate over 64 dropbacks. Those meetings came while Geno Smith played for LV, SEA, not NYJ; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
       "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 91\u00b0F, 4 mph sustained wind with gusts near 7 mph, and 10% precipitation probability."
     ],
     "prediction": "TEN to win, with TEN 24.5 \u2013 NYJ 19.9 as the central score projection.",
@@ -1526,7 +1569,7 @@
   },
   "2026_01_TB_CIN": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "CIN threw on 60% of first- and second-down plays and generated -0.05 EPA per early-down pass.",
+    "case_for_opponent": "CIN threw on 60% of first- and second-down plays and generated -0.05 EPA per early-down pass. Across 2 prior meetings with CIN, Baker Mayfield averaged +0.52 EPA/dropback with a 49% positive-EPA rate over 43 dropbacks.",
     "case_for_pick": "TB produced gains of 20+ yards on 8.7% of pass plays, while CIN allowed them on 9.5%. TB averaged 5.6 yards after catch on completed passes; CIN allowed 7.0.",
     "engine": "LevLine",
     "evidence_used": [
@@ -1536,6 +1579,13 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Weak",
         "title": "Joe Burrow vs TB: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Baker Mayfield vs CIN: player history"
       },
       {
         "category": "scheme",
@@ -1663,13 +1713,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "WAS early-down approach vs PHI"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.9008&longitude=-75.1675&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in PHI"
       }
     ],
     "game_id": "2026_01_WAS_PHI",
@@ -1731,10 +1774,9 @@
     "paragraphs": [
       "PHI is the current model pick at 71.3% under LevLine. The central margin is PHI by 9.5, with a projected total of 47.9. LevLine's football-only probability is 7.4 percentage points more bullish on PHI than the market-implied probability. On the spread scale, LevLine is 4.0 points more favorable to PHI than the current market line.",
       "The yards-after-catch battle is more meaningful here than it is in a typical game. PHI averaged 4.3 yards after catch on completed passes; WAS allowed 6.4. This game can swing on whether routine completions become extra first downs after the catch. A second, different lever: PHI produced gains of 20+ yards on 6.8% of pass plays, while WAS allowed them on 8.3%.",
-      "There is useful historical context: Across 10 prior meetings with WAS, Jalen Hurts averaged +0.25 EPA/dropback with a 50% positive-EPA rate over 297 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
-      "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 70\u00b0F, 4 mph sustained wind with gusts near 9 mph, and 35% precipitation probability."
+      "There is useful historical context: Across 10 prior meetings with WAS, Jalen Hurts averaged +0.25 EPA/dropback with a 50% positive-EPA rate over 297 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
     ],
     "prediction": "PHI to win, with PHI 28.7 \u2013 WAS 19.2 as the central score projection.",
-    "what_could_make_us_wrong": "The active weather/travel/personnel scenario could shift the game script; was owns at least one matchup-specific counter-signal in the evidence set."
+    "what_could_make_us_wrong": "Was owns at least one matchup-specific counter-signal in the evidence set."
   }
 }

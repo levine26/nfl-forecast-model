@@ -1,7 +1,7 @@
 {
   "2026_01_ARI_LAC": [
     {
-      "as_of": "2026-09-08T22:51:13.225841+00:00",
+      "as_of": "2026-09-08T22:59:40.038557+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LAC",
@@ -19,7 +19,7 @@
       "title": "LAC protection vs ARI pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:13.225425+00:00",
+      "as_of": "2026-09-08T22:59:40.037728+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -37,7 +37,7 @@
       "title": "ARI explosives vs LAC prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:13.225573+00:00",
+      "as_of": "2026-09-08T22:59:40.037997+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -55,7 +55,7 @@
       "title": "ARI early-down approach vs LAC"
     },
     {
-      "as_of": "2026-09-08T22:51:13.501571+00:00",
+      "as_of": "2026-09-08T22:59:40.617412+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
@@ -75,7 +75,32 @@
       "title": "Justin Herbert vs ARI: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:06.834234+00:00",
+      "as_of": "2026-09-08T22:59:27.950247+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "LAC",
+        "current_team": "LAC",
+        "epa_per_dropback": 0.09704359404899171,
+        "family": "qb_opponent_history",
+        "games": 2,
+        "prior_offenses": [
+          "LAC"
+        ],
+        "success_rate": 0.4787234042553192,
+        "team_changed": false
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 94,
+      "side": "home",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Weak",
+      "summary": "Across 2 prior meetings with ARI, Justin Herbert averaged +0.10 EPA/dropback with a 48% positive-EPA rate over 94 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "title": "Justin Herbert vs ARI: player history"
+    },
+    {
+      "as_of": "2026-09-08T22:58:20.899627+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Jonathan Gannon",
@@ -91,7 +116,7 @@
       "title": "ARI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T22:51:06.834257+00:00",
+      "as_of": "2026-09-08T22:58:20.899653+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -105,7 +130,7 @@
   ],
   "2026_01_ATL_PIT": [
     {
-      "as_of": "2026-09-08T22:51:12.667723+00:00",
+      "as_of": "2026-09-08T22:59:38.861829+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "PIT",
@@ -123,7 +148,7 @@
       "title": "ATL protection vs PIT pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:12.668539+00:00",
+      "as_of": "2026-09-08T22:59:38.863837+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "PIT",
@@ -141,7 +166,7 @@
       "title": "PIT YAC creation vs ATL tackling"
     },
     {
-      "as_of": "2026-09-08T22:51:12.668038+00:00",
+      "as_of": "2026-09-08T22:59:38.862583+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ATL",
@@ -159,7 +184,32 @@
       "title": "ATL early-down approach vs PIT"
     },
     {
-      "as_of": "2026-09-08T22:51:05.611096+00:00",
+      "as_of": "2026-09-08T22:59:26.934826+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "ATL",
+        "current_team": "ATL",
+        "epa_per_dropback": 0.11902566621381806,
+        "family": "qb_opponent_history",
+        "games": 2,
+        "prior_offenses": [
+          "MIA"
+        ],
+        "success_rate": 0.4927536231884058,
+        "team_changed": true
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 69,
+      "side": "away",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Weak",
+      "summary": "Across 2 prior meetings with PIT, Tua Tagovailoa averaged +0.12 EPA/dropback with a 49% positive-EPA rate over 69 dropbacks. Those meetings came while Tua Tagovailoa played for MIA, not ATL; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "title": "Tua Tagovailoa vs PIT: player history"
+    },
+    {
+      "as_of": "2026-09-08T22:58:19.553433+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Raheem Morris",
@@ -177,7 +227,7 @@
   ],
   "2026_01_BAL_IND": [
     {
-      "as_of": "2026-09-08T22:51:12.066111+00:00",
+      "as_of": "2026-09-08T22:59:37.701203+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -195,7 +245,7 @@
       "title": "BAL protection vs IND pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:12.066438+00:00",
+      "as_of": "2026-09-08T22:59:37.701999+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "IND",
@@ -213,7 +263,7 @@
       "title": "BAL early-down approach vs IND"
     },
     {
-      "as_of": "2026-09-08T22:51:12.066820+00:00",
+      "as_of": "2026-09-08T22:59:37.702948+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -231,7 +281,7 @@
       "title": "IND explosives vs BAL prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:12.332943+00:00",
+      "as_of": "2026-09-08T22:59:38.270895+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "BAL",
@@ -249,11 +299,36 @@
       "strength": "Weak",
       "summary": "Across 2 prior meetings with IND, Lamar Jackson averaged +0.24 EPA/dropback with a 63% positive-EPA rate over 82 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
       "title": "Lamar Jackson vs IND: prior meetings"
+    },
+    {
+      "as_of": "2026-09-08T22:59:25.951182+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "BAL",
+        "current_team": "BAL",
+        "epa_per_dropback": 0.24327686207988578,
+        "family": "qb_opponent_history",
+        "games": 2,
+        "prior_offenses": [
+          "BAL"
+        ],
+        "success_rate": 0.6341463414634146,
+        "team_changed": false
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 82,
+      "side": "away",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Weak",
+      "summary": "Across 2 prior meetings with IND, Lamar Jackson averaged +0.24 EPA/dropback with a 63% positive-EPA rate over 82 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "title": "Lamar Jackson vs IND: player history"
     }
   ],
   "2026_01_BUF_HOU": [
     {
-      "as_of": "2026-09-08T22:51:11.789318+00:00",
+      "as_of": "2026-09-08T22:59:37.118119+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BUF",
@@ -271,7 +346,7 @@
       "title": "BUF early-down approach vs HOU"
     },
     {
-      "as_of": "2026-09-08T22:51:11.788966+00:00",
+      "as_of": "2026-09-08T22:59:37.117303+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -289,7 +364,7 @@
       "title": "BUF protection vs HOU pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:11.789740+00:00",
+      "as_of": "2026-09-08T22:59:37.119177+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -307,7 +382,7 @@
       "title": "HOU explosives vs BUF prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:12.056023+00:00",
+      "as_of": "2026-09-08T22:59:37.680536+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
@@ -327,7 +402,7 @@
       "title": "Josh Allen vs HOU: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:12.063772+00:00",
+      "as_of": "2026-09-08T22:59:37.697967+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
@@ -347,7 +422,7 @@
       "title": "C.J. Stroud vs BUF: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:04.188133+00:00",
+      "as_of": "2026-09-08T22:58:17.845850+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 8.9,
@@ -368,7 +443,7 @@
   ],
   "2026_01_CHI_CAR": [
     {
-      "as_of": "2026-09-08T22:51:10.942492+00:00",
+      "as_of": "2026-09-08T22:59:35.372452+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CHI",
@@ -386,7 +461,7 @@
       "title": "CAR explosives vs CHI prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:02.229917+00:00",
+      "as_of": "2026-09-08T22:58:15.545430+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -407,7 +482,7 @@
       "title": "CHI play action vs CAR"
     },
     {
-      "as_of": "2026-09-08T22:51:02.230915+00:00",
+      "as_of": "2026-09-08T22:58:15.547604+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -428,7 +503,7 @@
       "title": "CAR RPOs vs CHI"
     },
     {
-      "as_of": "2026-09-08T22:51:11.227425+00:00",
+      "as_of": "2026-09-08T22:59:35.958066+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
@@ -448,7 +523,7 @@
       "title": "Bryce Young vs CHI: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:11.218116+00:00",
+      "as_of": "2026-09-08T22:59:35.941549+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
@@ -470,7 +545,7 @@
   ],
   "2026_01_CLE_JAX": [
     {
-      "as_of": "2026-09-08T22:51:12.343045+00:00",
+      "as_of": "2026-09-08T22:59:38.289265+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "JAX",
@@ -488,7 +563,7 @@
       "title": "CLE explosives vs JAX prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:12.342808+00:00",
+      "as_of": "2026-09-08T22:59:38.288734+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CLE",
@@ -506,7 +581,7 @@
       "title": "CLE protection vs JAX pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:04.815817+00:00",
+      "as_of": "2026-09-08T22:58:18.549229+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -527,7 +602,7 @@
       "title": "JAX pre-snap motion vs CLE"
     },
     {
-      "as_of": "2026-09-08T22:51:12.665055+00:00",
+      "as_of": "2026-09-08T22:59:38.858846+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
@@ -547,7 +622,7 @@
       "title": "Trevor Lawrence vs CLE: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:12.655911+00:00",
+      "as_of": "2026-09-08T22:59:38.842101+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
@@ -567,7 +642,7 @@
       "title": "Deshaun Watson vs JAX: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:05.568641+00:00",
+      "as_of": "2026-09-08T22:58:19.339835+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 4.5,
@@ -588,7 +663,7 @@
   ],
   "2026_01_DAL_NYG": [
     {
-      "as_of": "2026-09-08T22:51:14.339001+00:00",
+      "as_of": "2026-09-08T22:59:42.370599+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DAL",
@@ -606,7 +681,7 @@
       "title": "NYG explosives vs DAL prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:14.338784+00:00",
+      "as_of": "2026-09-08T22:59:42.370082+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYG",
@@ -624,7 +699,7 @@
       "title": "NYG protection vs DAL pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:07.542567+00:00",
+      "as_of": "2026-09-08T22:58:41.746585+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -645,7 +720,7 @@
       "title": "DAL RPOs vs NYG"
     },
     {
-      "as_of": "2026-09-08T22:51:14.599562+00:00",
+      "as_of": "2026-09-08T22:59:42.936613+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DAL",
@@ -665,7 +740,7 @@
       "title": "Dak Prescott vs NYG: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:14.609019+00:00",
+      "as_of": "2026-09-08T22:59:42.953140+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NYG",
@@ -687,7 +762,7 @@
   ],
   "2026_01_DEN_KC": [
     {
-      "as_of": "2026-09-08T22:51:14.612377+00:00",
+      "as_of": "2026-09-08T22:59:42.957286+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DEN",
@@ -705,7 +780,7 @@
       "title": "KC protection vs DEN pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:14.612704+00:00",
+      "as_of": "2026-09-08T22:59:42.958021+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "KC",
@@ -723,7 +798,7 @@
       "title": "KC early-down approach vs DEN"
     },
     {
-      "as_of": "2026-09-08T22:51:08.153406+00:00",
+      "as_of": "2026-09-08T22:59:02.123020+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -744,7 +819,7 @@
       "title": "DEN play action vs KC"
     },
     {
-      "as_of": "2026-09-08T22:51:14.892193+00:00",
+      "as_of": "2026-09-08T22:59:43.525299+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "KC",
@@ -764,7 +839,7 @@
       "title": "Patrick Mahomes vs DEN: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:14.882212+00:00",
+      "as_of": "2026-09-08T22:59:43.507713+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DEN",
@@ -782,30 +857,11 @@
       "strength": "Moderate",
       "summary": "Across 4 prior meetings with KC, Bo Nix averaged +0.30 EPA/dropback with a 55% positive-EPA rate over 139 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
       "title": "Bo Nix vs KC: prior meetings"
-    },
-    {
-      "as_of": "2026-09-08T22:51:08.779620+00:00",
-      "category": "weather",
-      "metadata": {
-        "gust_mph": 28.6,
-        "precip_pct": 19.0,
-        "roof": "outdoor",
-        "temp_f": 87.6,
-        "wind_mph": 11.0
-      },
-      "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-      "strength": "Moderate",
-      "summary": "Open-Meteo's forecast nearest kickoff is 88\u00b0F, 11 mph sustained wind with gusts near 29 mph, and 19% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
-      "title": "Kickoff weather in KC"
     }
   ],
   "2026_01_GB_MIN": [
     {
-      "as_of": "2026-09-08T22:51:13.778239+00:00",
+      "as_of": "2026-09-08T22:59:41.202871+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -823,7 +879,7 @@
       "title": "GB explosives vs MIN prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:13.778612+00:00",
+      "as_of": "2026-09-08T22:59:41.203711+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIN",
@@ -841,7 +897,7 @@
       "title": "MIN protection vs GB pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:13.778369+00:00",
+      "as_of": "2026-09-08T22:59:41.203141+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -859,7 +915,7 @@
       "title": "GB early-down approach vs MIN"
     },
     {
-      "as_of": "2026-09-08T22:51:14.052154+00:00",
+      "as_of": "2026-09-08T22:59:41.776323+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
@@ -877,11 +933,36 @@
       "strength": "Strong",
       "summary": "Across 8 prior meetings with MIN, Jordan Love averaged +0.01 EPA/dropback with a 48% positive-EPA rate over 202 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
       "title": "Jordan Love vs MIN: prior meetings"
+    },
+    {
+      "as_of": "2026-09-08T22:59:28.900358+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "GB",
+        "current_team": "GB",
+        "epa_per_dropback": 0.012319282886451687,
+        "family": "qb_opponent_history",
+        "games": 8,
+        "prior_offenses": [
+          "GB"
+        ],
+        "success_rate": 0.4752475247524752,
+        "team_changed": false
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 202,
+      "side": "away",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Strong",
+      "summary": "Across 8 prior meetings with MIN, Jordan Love averaged +0.01 EPA/dropback with a 48% positive-EPA rate over 202 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "title": "Jordan Love vs MIN: player history"
     }
   ],
   "2026_01_MIA_LV": [
     {
-      "as_of": "2026-09-08T22:51:13.505415+00:00",
+      "as_of": "2026-09-08T22:59:40.622568+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -899,7 +980,7 @@
       "title": "LV early-down approach vs MIA"
     },
     {
-      "as_of": "2026-09-08T22:51:13.504751+00:00",
+      "as_of": "2026-09-08T22:59:40.620916+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -917,7 +998,7 @@
       "title": "MIA explosives vs LV prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:13.505112+00:00",
+      "as_of": "2026-09-08T22:59:40.621766+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LV",
@@ -935,7 +1016,33 @@
       "title": "LV protection vs MIA pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:06.880784+00:00",
+      "as_of": "2026-09-08T22:59:28.433835+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "MIA",
+        "current_team": "LV",
+        "epa_per_dropback": -0.15670325990484552,
+        "family": "qb_opponent_history",
+        "games": 2,
+        "prior_offenses": [
+          "ATL",
+          "MIN"
+        ],
+        "success_rate": 0.42424242424242425,
+        "team_changed": true
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 66,
+      "side": "home",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Weak",
+      "summary": "Across 2 prior meetings with MIA, Kirk Cousins averaged -0.16 EPA/dropback with a 42% positive-EPA rate over 66 dropbacks. Those meetings came while Kirk Cousins played for ATL, MIN, not LV; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "title": "Kirk Cousins vs MIA: player history"
+    },
+    {
+      "as_of": "2026-09-08T22:58:21.124217+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -949,7 +1056,7 @@
   ],
   "2026_01_NE_SEA": [
     {
-      "as_of": "2026-09-08T22:51:10.354148+00:00",
+      "as_of": "2026-09-08T22:59:34.202315+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -967,7 +1074,7 @@
       "title": "SEA explosives vs NE prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:10.354262+00:00",
+      "as_of": "2026-09-08T22:59:34.202584+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -985,7 +1092,7 @@
       "title": "SEA early-down approach vs NE"
     },
     {
-      "as_of": "2026-09-08T22:51:10.353362+00:00",
+      "as_of": "2026-09-08T22:59:34.200533+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NE",
@@ -1003,7 +1110,7 @@
       "title": "NE protection vs SEA pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:10.633240+00:00",
+      "as_of": "2026-09-08T22:59:34.774600+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -1023,7 +1130,7 @@
       "title": "Drake Maye vs SEA: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:10.641331+00:00",
+      "as_of": "2026-09-08T22:59:34.790845+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -1043,7 +1150,7 @@
       "title": "Sam Darnold vs NE: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:01.543158+00:00",
+      "as_of": "2026-09-08T22:58:14.613643+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1061,7 +1168,7 @@
       "title": "NE: Ben Brown \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T22:51:01.543179+00:00",
+      "as_of": "2026-09-08T22:58:14.613664+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1079,7 +1186,7 @@
       "title": "NE: TreVeyon Henderson \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T22:51:01.543208+00:00",
+      "as_of": "2026-09-08T22:58:14.613709+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1097,7 +1204,7 @@
       "title": "SEA: Ty Okada \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T22:51:01.588431+00:00",
+      "as_of": "2026-09-08T22:58:14.839273+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -1109,7 +1216,7 @@
       "title": "Long travel spot for NE"
     },
     {
-      "as_of": "2026-09-08T22:51:01.543213+00:00",
+      "as_of": "2026-09-08T22:58:14.613717+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1127,7 +1234,7 @@
       "title": "SEA: Tory Horton \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-08T22:51:01.543216+00:00",
+      "as_of": "2026-09-08T22:58:14.613723+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1145,7 +1252,7 @@
       "title": "SEA: Nick Emmanwori \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-08T22:51:08.781340+00:00",
+      "as_of": "2026-09-08T22:59:22.493509+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1167,7 +1274,7 @@
   ],
   "2026_01_NO_DET": [
     {
-      "as_of": "2026-09-08T22:51:11.510281+00:00",
+      "as_of": "2026-09-08T22:59:36.535419+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -1185,7 +1292,7 @@
       "title": "NO explosives vs DET prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:11.510046+00:00",
+      "as_of": "2026-09-08T22:59:36.534876+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -1203,7 +1310,7 @@
       "title": "NO protection vs DET pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:11.510920+00:00",
+      "as_of": "2026-09-08T22:59:36.536990+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "DET",
@@ -1221,7 +1328,7 @@
       "title": "DET YAC creation vs NO tackling"
     },
     {
-      "as_of": "2026-09-08T22:51:11.786086+00:00",
+      "as_of": "2026-09-08T22:59:37.114374+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DET",
@@ -1239,11 +1346,36 @@
       "strength": "Weak",
       "summary": "Across 1 prior meeting with NO, Jared Goff averaged +0.28 EPA/dropback with a 44% positive-EPA rate over 27 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
       "title": "Jared Goff vs NO: prior meetings"
+    },
+    {
+      "as_of": "2026-09-08T22:59:24.976813+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "DET",
+        "current_team": "DET",
+        "epa_per_dropback": 0.27749770534715973,
+        "family": "qb_opponent_history",
+        "games": 1,
+        "prior_offenses": [
+          "DET"
+        ],
+        "success_rate": 0.4444444444444444,
+        "team_changed": false
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 27,
+      "side": "home",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Weak",
+      "summary": "Across 1 prior meeting with NO, Jared Goff averaged +0.28 EPA/dropback with a 44% positive-EPA rate over 27 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "title": "Jared Goff vs NO: player history"
     }
   ],
   "2026_01_NYJ_TEN": [
     {
-      "as_of": "2026-09-08T22:51:12.941210+00:00",
+      "as_of": "2026-09-08T22:59:39.441414+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -1261,7 +1393,7 @@
       "title": "NYJ explosives vs TEN prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:12.941879+00:00",
+      "as_of": "2026-09-08T22:59:39.443001+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1279,7 +1411,7 @@
       "title": "TEN early-down approach vs NYJ"
     },
     {
-      "as_of": "2026-09-08T22:51:12.941567+00:00",
+      "as_of": "2026-09-08T22:59:39.442250+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -1297,7 +1429,33 @@
       "title": "TEN protection vs NYJ pass rush"
     },
     {
-      "as_of": "2026-09-08T22:51:06.792703+00:00",
+      "as_of": "2026-09-08T22:59:27.426256+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "NYJ",
+        "current_team": "NYJ",
+        "epa_per_dropback": 0.18158580272775776,
+        "family": "qb_opponent_history",
+        "games": 2,
+        "prior_offenses": [
+          "LV",
+          "SEA"
+        ],
+        "success_rate": 0.46875,
+        "team_changed": true
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 64,
+      "side": "away",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Weak",
+      "summary": "Across 2 prior meetings with TEN, Geno Smith averaged +0.18 EPA/dropback with a 47% positive-EPA rate over 64 dropbacks. Those meetings came while Geno Smith played for LV, SEA, not NYJ; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "title": "Geno Smith vs TEN: player history"
+    },
+    {
+      "as_of": "2026-09-08T22:58:20.686292+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 6.9,
@@ -1318,7 +1476,7 @@
   ],
   "2026_01_SF_LA": [
     {
-      "as_of": "2026-09-08T22:51:10.644813+00:00",
+      "as_of": "2026-09-08T22:59:34.795699+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LA",
@@ -1336,7 +1494,7 @@
       "title": "LA explosives vs SF prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:02.183782+00:00",
+      "as_of": "2026-09-08T22:58:15.327375+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -1357,7 +1515,7 @@
       "title": "SF pre-snap motion vs LA"
     },
     {
-      "as_of": "2026-09-08T22:51:10.644390+00:00",
+      "as_of": "2026-09-08T22:59:34.794715+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "SF",
@@ -1375,7 +1533,7 @@
       "title": "SF third downs vs LA"
     },
     {
-      "as_of": "2026-09-08T22:51:10.939093+00:00",
+      "as_of": "2026-09-08T22:59:35.367730+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LA",
@@ -1395,7 +1553,7 @@
       "title": "Matthew Stafford vs SF: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:10.928991+00:00",
+      "as_of": "2026-09-08T22:59:35.350371+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SF",
@@ -1415,7 +1573,7 @@
       "title": "Brock Purdy vs LA: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:08.781384+00:00",
+      "as_of": "2026-09-08T22:59:22.493590+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1435,7 +1593,7 @@
       "title": "SF: James Thompson Jr. \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T22:51:08.781398+00:00",
+      "as_of": "2026-09-08T22:59:22.493630+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1455,7 +1613,7 @@
       "title": "LA: Alaric Jackson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T22:51:08.781420+00:00",
+      "as_of": "2026-09-08T22:59:22.493634+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1475,7 +1633,7 @@
       "title": "LA: Jaylen Watson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T22:51:08.781423+00:00",
+      "as_of": "2026-09-08T22:59:22.493638+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1495,7 +1653,7 @@
       "title": "LA: Tyler Higbee \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T22:51:08.781387+00:00",
+      "as_of": "2026-09-08T22:59:22.493597+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1515,7 +1673,7 @@
       "title": "SF: Renardo Green \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-08T22:51:08.781389+00:00",
+      "as_of": "2026-09-08T22:59:22.493618+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1537,7 +1695,7 @@
   ],
   "2026_01_TB_CIN": [
     {
-      "as_of": "2026-09-08T22:51:11.230500+00:00",
+      "as_of": "2026-09-08T22:59:35.961525+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CIN",
@@ -1555,7 +1713,7 @@
       "title": "TB explosives vs CIN prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:11.231185+00:00",
+      "as_of": "2026-09-08T22:59:35.963026+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TB",
@@ -1573,7 +1731,7 @@
       "title": "CIN early-down approach vs TB"
     },
     {
-      "as_of": "2026-09-08T22:51:11.230676+00:00",
+      "as_of": "2026-09-08T22:59:35.961816+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "CIN",
@@ -1591,7 +1749,7 @@
       "title": "TB YAC creation vs CIN tackling"
     },
     {
-      "as_of": "2026-09-08T22:51:11.507012+00:00",
+      "as_of": "2026-09-08T22:59:36.531945+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CIN",
@@ -1609,11 +1767,37 @@
       "strength": "Weak",
       "summary": "Across 1 prior meeting with TB, Joe Burrow averaged +0.07 EPA/dropback with a 56% positive-EPA rate over 43 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
       "title": "Joe Burrow vs TB: prior meetings"
+    },
+    {
+      "as_of": "2026-09-08T22:59:24.465325+00:00",
+      "category": "history",
+      "metadata": {
+        "advantage_team": "TB",
+        "current_team": "TB",
+        "epa_per_dropback": 0.5179692012645982,
+        "family": "qb_opponent_history",
+        "games": 2,
+        "prior_offenses": [
+          "CAR",
+          "CLE"
+        ],
+        "success_rate": 0.4883720930232558,
+        "team_changed": true
+      },
+      "promoted_to_model": false,
+      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
+      "sample_size": 43,
+      "side": "away",
+      "source_name": "nflverse play-by-play",
+      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "strength": "Weak",
+      "summary": "Across 2 prior meetings with CIN, Baker Mayfield averaged +0.52 EPA/dropback with a 49% positive-EPA rate over 43 dropbacks. Those meetings came while Baker Mayfield played for CAR, CLE, not TB; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "title": "Baker Mayfield vs CIN: player history"
     }
   ],
   "2026_01_WAS_PHI": [
     {
-      "as_of": "2026-09-08T22:51:14.063554+00:00",
+      "as_of": "2026-09-08T22:59:41.795628+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "WAS",
@@ -1631,7 +1815,7 @@
       "title": "PHI YAC creation vs WAS tackling"
     },
     {
-      "as_of": "2026-09-08T22:51:14.063402+00:00",
+      "as_of": "2026-09-08T22:59:41.795290+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -1649,7 +1833,7 @@
       "title": "PHI explosives vs WAS prevention"
     },
     {
-      "as_of": "2026-09-08T22:51:14.062965+00:00",
+      "as_of": "2026-09-08T22:59:41.794264+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -1667,7 +1851,7 @@
       "title": "WAS early-down approach vs PHI"
     },
     {
-      "as_of": "2026-09-08T22:51:14.335766+00:00",
+      "as_of": "2026-09-08T22:59:42.366081+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PHI",
@@ -1687,7 +1871,7 @@
       "title": "Jalen Hurts vs WAS: prior meetings"
     },
     {
-      "as_of": "2026-09-08T22:51:14.326361+00:00",
+      "as_of": "2026-09-08T22:59:42.348201+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PHI",
@@ -1705,25 +1889,6 @@
       "strength": "Moderate",
       "summary": "Across 3 prior meetings with PHI, Jayden Daniels averaged -0.05 EPA/dropback with a 43% positive-EPA rate over 129 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
       "title": "Jayden Daniels vs PHI: prior meetings"
-    },
-    {
-      "as_of": "2026-09-08T22:51:07.539797+00:00",
-      "category": "weather",
-      "metadata": {
-        "gust_mph": 9.2,
-        "precip_pct": 35.0,
-        "roof": "outdoor",
-        "temp_f": 70.4,
-        "wind_mph": 4.1
-      },
-      "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.9008&longitude=-75.1675&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-      "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 70\u00b0F, 4 mph sustained wind with gusts near 9 mph, and 35% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
-      "title": "Kickoff weather in PHI"
     }
   ]
 }
