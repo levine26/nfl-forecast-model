@@ -116,9 +116,20 @@ def add_portable_qb_history(
 ) -> dict[str, list[dict[str, Any]]]:
     for _, game in predictions.iterrows():
         gid = str(game.get("game_id"))
-        items = list(evidence.get(gid, []))
+        generated = portable_qb_history(game, pbp, depth, season)
+        if not generated:
+            continue
+
+        # The older fallback used current-team filtering and can duplicate the
+        # same QB/opponent sample when a quarterback has not changed teams.
+        # Portable history supersedes only that generic family; exact verified
+        # QB-vs-coordinator history remains untouched.
+        items = [
+            item for item in list(evidence.get(gid, []))
+            if (item.get("metadata") or {}).get("family") != "qb_opponent_history"
+        ]
         titles = {str(item.get("title")) for item in items}
-        for item in portable_qb_history(game, pbp, depth, season):
+        for item in generated:
             if item["title"] not in titles:
                 items.append(item)
                 titles.add(item["title"])
