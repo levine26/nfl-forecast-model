@@ -46,6 +46,7 @@ def test_rendered_infobox_extracts_current_staff():
     assert data["head_coach"] == "Mike Vrabel"
     assert data["off_coach"] == "Josh McDaniels"
     assert data["def_coach"] == "Zak Kuhr"
+    assert data["source_url"] == source
     assert "2026_New_England_Patriots_season" in source
     assert session.urls == [source]
 
