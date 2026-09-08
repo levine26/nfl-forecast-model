@@ -22,6 +22,7 @@ class FittedWinEnsemble:
     base_models: dict
     meta_model: Pipeline
     model_names: list[str]
+    oof_predictions: pd.DataFrame
 
     def base_predict(self, X: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(
@@ -89,6 +90,7 @@ def fit_season_stacked_classifier(
             model.fit(tr[feature_cols], tr[target].astype(int))
             part[name] = model.predict_proba(va[feature_cols])[:, 1]
         part[target] = va[target].astype(int)
+        part[season_col] = va[season_col].astype(int)
         oof_parts.append(part)
     if not oof_parts:
         raise ValueError("No valid out-of-fold seasons available.")
@@ -100,13 +102,20 @@ def fit_season_stacked_classifier(
         ("model", LogisticRegression(C=0.5, max_iter=3000, random_state=seed)),
     ])
     meta.fit(oof[names], oof[target])
+    oof["stack"] = meta.predict_proba(oof[names])[:, 1]
 
     fitted = {}
     for name, template in templates.items():
         model = clone(template)
         model.fit(train[feature_cols], train[target].astype(int))
         fitted[name] = model
-    return FittedWinEnsemble(feature_cols=feature_cols, base_models=fitted, meta_model=meta, model_names=names)
+    return FittedWinEnsemble(
+        feature_cols=feature_cols,
+        base_models=fitted,
+        meta_model=meta,
+        model_names=names,
+        oof_predictions=oof,
+    )
 
 
 @dataclass
@@ -115,6 +124,7 @@ class RegressionEnsemble:
     models: dict
     weights: dict[str, float]
     residual_std: float
+    validation_mae: float
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
         total = np.zeros(len(X), dtype=float)
@@ -190,8 +200,10 @@ def fit_weighted_regression(
             ensemble_oof += weights[name] * oof[name].to_numpy(dtype=float)
         residuals = oof["actual"].to_numpy(dtype=float) - ensemble_oof
         residual_std = float(np.std(residuals, ddof=1)) if len(residuals) > 1 else float(train[target].std())
+        validation_mae = float(mean_absolute_error(oof["actual"], ensemble_oof))
     else:
         residual_std = float(train[target].std())
+        validation_mae = float("nan")
     if not np.isfinite(residual_std) or residual_std <= 0:
         residual_std = 1.0
 
@@ -200,7 +212,7 @@ def fit_weighted_regression(
         model = clone(template)
         model.fit(train[feature_cols], train[target])
         fitted[name] = model
-    return RegressionEnsemble(feature_cols, fitted, weights, residual_std)
+    return RegressionEnsemble(feature_cols, fitted, weights, residual_std, validation_mae)
 
 
 def classification_metrics(y, p) -> dict:
