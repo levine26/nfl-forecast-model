@@ -1,15 +1,17 @@
-name: Contextual football intelligence
+name: Sunday Signal contextual intelligence
 
 on:
   workflow_dispatch:
   push:
-    branches: [main, context-intelligence-v1, injury-source-v1]
+    branches: [main, sunday-signal-v1]
     paths:
       - "src/nfl_forecast/context.py"
+      - "src/nfl_forecast/context_plus.py"
       - "src/nfl_forecast/injuries.py"
       - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
+      - "tests/test_context_plus.py"
       - "tests/test_injuries.py"
       - "tests/test_narrative.py"
       - "pyproject.toml"
@@ -17,10 +19,12 @@ on:
   pull_request:
     paths:
       - "src/nfl_forecast/context.py"
+      - "src/nfl_forecast/context_plus.py"
       - "src/nfl_forecast/injuries.py"
       - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
+      - "tests/test_context_plus.py"
       - "tests/test_injuries.py"
       - "tests/test_narrative.py"
       - "pyproject.toml"
@@ -46,7 +50,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_injuries.py tests/test_narrative.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_injuries.py tests/test_narrative.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -63,9 +67,9 @@ jobs:
       - name: Commit contextual outputs
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
-          git config user.name "nfl-context-bot"
+          git config user.name "sunday-signal-context-bot"
           git config user.email "actions@users.noreply.github.com"
           git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json
-          git diff --cached --quiet || git commit -m "Refresh contextual football intelligence"
+          git diff --cached --quiet || git commit -m "Refresh Sunday Signal contextual intelligence"
           git pull --rebase origin main
           git push

@@ -1,8 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './AppV3.jsx'
-import './styles.css'
-import './v3.css'
+import App from './AppSundaySignal.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
