@@ -18,6 +18,7 @@ from nfl_forecast.context_plus import upgrade_contextual_evidence
 from nfl_forecast.data import configure_cache
 from nfl_forecast.injuries import fetch_nfl_injuries, practice_status_evidence
 from nfl_forecast.narrative import build_game_previews
+from nfl_forecast.qb_history import add_portable_qb_history
 
 
 def _pandas(frame):
@@ -95,9 +96,15 @@ def main():
         for item in items:
             if item.get("category")=="structural_change": item["category"]="coaching"
 
+    # Player-centric opponent history must follow the quarterback when he changes
+    # teams (for example, a current ATL starter's prior meetings while with MIA).
+    # The history is explanatory only and explicitly discounts old system/personnel.
+    evidence=add_portable_qb_history(predictions=predictions,evidence=evidence,pbp=pbp,depth=depth,season=args.season)
     evidence,editorial_status=upgrade_contextual_evidence(predictions=predictions,evidence=evidence,pbp=pbp,ftn=ftn,depth=depth,injuries=injuries,season=args.season)
+    portable_count=sum(1 for items in evidence.values() for item in items if (item.get("metadata") or {}).get("family")=="qb_opponent_history")
     previews=build_game_previews(predictions,evidence)
     source_status.update(context_status); source_status["editorial_intelligence"]=editorial_status
+    source_status["qb_history"]={"status":"healthy","games_with_player_opponent_history":portable_count,"team_change_safe":True,"guardrail":"Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes."}
     source_status["evidence"]={"status":"healthy","games":len(evidence),"signals":sum(len(v) for v in evidence.values()),"generated_utc":generated,"guardrail":"Context is explanatory only unless a feature is separately validated and promoted into the numerical model."}
     source_status["previews"]={"status":"healthy","games":len(previews),"generator":"Sunday Signal deterministic evidence composer","engine":"LevLine","guardrail":"Written previews may synthesize verified context but do not alter numerical probabilities."}
     (out/"contextual_evidence.json").write_text(json.dumps(evidence,indent=2,sort_keys=True),encoding="utf-8"); (out/"game_previews.json").write_text(json.dumps(previews,indent=2,sort_keys=True),encoding="utf-8"); (out/"context_source_status.json").write_text(json.dumps(source_status,indent=2,sort_keys=True),encoding="utf-8")
