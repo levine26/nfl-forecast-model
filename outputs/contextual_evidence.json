@@ -1,7 +1,7 @@
 {
   "2026_01_ARI_LAC": [
     {
-      "as_of": "2026-09-08T23:27:49.427472+00:00",
+      "as_of": "2026-09-08T23:43:53.635875+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LAC",
@@ -19,7 +19,7 @@
       "title": "LAC protection vs ARI pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:49.426651+00:00",
+      "as_of": "2026-09-08T23:43:53.635199+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -37,7 +37,7 @@
       "title": "ARI explosives vs LAC prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:49.426921+00:00",
+      "as_of": "2026-09-08T23:43:53.635415+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -55,7 +55,7 @@
       "title": "ARI early-down approach vs LAC"
     },
     {
-      "as_of": "2026-09-08T23:27:49.986884+00:00",
+      "as_of": "2026-09-08T23:43:54.082506+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
@@ -75,7 +75,7 @@
       "title": "Justin Herbert vs ARI: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:37.322226+00:00",
+      "as_of": "2026-09-08T23:43:44.979385+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
@@ -83,6 +83,50 @@
         "epa_per_dropback": 0.09704359404899171,
         "family": "qb_opponent_history",
         "games": 2,
+        "latest_meeting": {
+          "date": "2024-10-21",
+          "dropbacks": 42,
+          "epa_per_dropback": 0.14190590745590514,
+          "game_id": "2024_07_LAC_ARI",
+          "human_label": "2024 Week 7",
+          "label": "2024 Week 7",
+          "offense": "LAC",
+          "score": "LAC 12, ARI 14",
+          "season": 2024,
+          "stage": "Week 7",
+          "success_rate": 0.47619047619047616,
+          "week": 7
+        },
+        "meetings": [
+          {
+            "date": "2024-10-21",
+            "dropbacks": 42,
+            "epa_per_dropback": 0.14190590745590514,
+            "game_id": "2024_07_LAC_ARI",
+            "human_label": "2024 Week 7",
+            "label": "2024 Week 7",
+            "offense": "LAC",
+            "score": "LAC 12, ARI 14",
+            "season": 2024,
+            "stage": "Week 7",
+            "success_rate": 0.47619047619047616,
+            "week": 7
+          },
+          {
+            "date": "2022-11-27",
+            "dropbacks": 52,
+            "epa_per_dropback": 0.06080864860494628,
+            "game_id": "2022_12_LAC_ARI",
+            "human_label": "2022 Week 12",
+            "label": "2022 Week 12",
+            "offense": "LAC",
+            "score": "LAC 25, ARI 24",
+            "season": 2022,
+            "stage": "Week 12",
+            "success_rate": 0.4807692307692308,
+            "week": 12
+          }
+        ],
         "prior_offenses": [
           "LAC"
         ],
@@ -96,11 +140,11 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Across 2 prior meetings with ARI, Justin Herbert averaged +0.10 EPA/dropback with a 48% positive-EPA rate over 94 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "summary": "Justin Herbert has faced ARI 2 times; the most recent was 2024 Week 7. Across those snaps he averaged +0.10 EPA per dropback with a 48% positive-EPA rate over 94 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
       "title": "Justin Herbert vs ARI: player history"
     },
     {
-      "as_of": "2026-09-08T23:26:29.793963+00:00",
+      "as_of": "2026-09-08T23:42:40.047129+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Jonathan Gannon",
@@ -116,7 +160,7 @@
       "title": "ARI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:29.793992+00:00",
+      "as_of": "2026-09-08T23:42:40.047158+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -130,7 +174,7 @@
   ],
   "2026_01_ATL_PIT": [
     {
-      "as_of": "2026-09-08T23:27:48.288021+00:00",
+      "as_of": "2026-09-08T23:43:52.817440+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "PIT",
@@ -148,7 +192,7 @@
       "title": "ATL protection vs PIT pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:48.290047+00:00",
+      "as_of": "2026-09-08T23:43:52.819084+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "PIT",
@@ -166,7 +210,7 @@
       "title": "PIT YAC creation vs ATL tackling"
     },
     {
-      "as_of": "2026-09-08T23:27:48.288787+00:00",
+      "as_of": "2026-09-08T23:43:52.818046+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ATL",
@@ -184,7 +228,7 @@
       "title": "ATL early-down approach vs PIT"
     },
     {
-      "as_of": "2026-09-08T23:27:36.342444+00:00",
+      "as_of": "2026-09-08T23:43:44.307438+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "ATL",
@@ -192,6 +236,50 @@
         "epa_per_dropback": 0.11902566621381806,
         "family": "qb_opponent_history",
         "games": 2,
+        "latest_meeting": {
+          "date": "2025-12-15",
+          "dropbacks": 34,
+          "epa_per_dropback": 0.07767174485643558,
+          "game_id": "2025_15_MIA_PIT",
+          "human_label": "last season, Week 15",
+          "label": "2025 Week 15",
+          "offense": "MIA",
+          "score": "MIA 15, PIT 28",
+          "season": 2025,
+          "stage": "Week 15",
+          "success_rate": 0.5,
+          "week": 15
+        },
+        "meetings": [
+          {
+            "date": "2025-12-15",
+            "dropbacks": 34,
+            "epa_per_dropback": 0.07767174485643558,
+            "game_id": "2025_15_MIA_PIT",
+            "human_label": "last season, Week 15",
+            "label": "2025 Week 15",
+            "offense": "MIA",
+            "score": "MIA 15, PIT 28",
+            "season": 2025,
+            "stage": "Week 15",
+            "success_rate": 0.5,
+            "week": 15
+          },
+          {
+            "date": "2022-10-23",
+            "dropbacks": 35,
+            "epa_per_dropback": 0.15919804696098958,
+            "game_id": "2022_07_PIT_MIA",
+            "human_label": "2022 Week 7",
+            "label": "2022 Week 7",
+            "offense": "MIA",
+            "score": "PIT 10, MIA 16",
+            "season": 2022,
+            "stage": "Week 7",
+            "success_rate": 0.4857142857142857,
+            "week": 7
+          }
+        ],
         "prior_offenses": [
           "MIA"
         ],
@@ -205,11 +293,11 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Across 2 prior meetings with PIT, Tua Tagovailoa averaged +0.12 EPA/dropback with a 49% positive-EPA rate over 69 dropbacks. Those meetings came while Tua Tagovailoa played for MIA, not ATL; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "summary": "Tua Tagovailoa has faced PIT 2 times; the most recent was last season, Week 15. Across those snaps he averaged +0.12 EPA per dropback with a 49% positive-EPA rate over 69 dropbacks. Those games came with MIA, not ATL. The quarterback history travels; the old playbook does not.",
       "title": "Tua Tagovailoa vs PIT: player history"
     },
     {
-      "as_of": "2026-09-08T23:26:08.491469+00:00",
+      "as_of": "2026-09-08T23:42:16.786049+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Raheem Morris",
@@ -225,7 +313,7 @@
       "title": "ATL offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:08.491490+00:00",
+      "as_of": "2026-09-08T23:42:16.786073+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -237,7 +325,7 @@
       "title": "New defensive coordinator in PIT"
     },
     {
-      "as_of": "2026-09-08T23:26:08.491514+00:00",
+      "as_of": "2026-09-08T23:42:16.786096+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike Tomlin",
@@ -255,7 +343,7 @@
   ],
   "2026_01_BAL_IND": [
     {
-      "as_of": "2026-09-08T23:27:47.149418+00:00",
+      "as_of": "2026-09-08T23:43:51.986941+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -273,7 +361,7 @@
       "title": "BAL protection vs IND pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:47.150234+00:00",
+      "as_of": "2026-09-08T23:43:51.987563+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "IND",
@@ -291,7 +379,7 @@
       "title": "BAL early-down approach vs IND"
     },
     {
-      "as_of": "2026-09-08T23:27:47.151153+00:00",
+      "as_of": "2026-09-08T23:43:51.988285+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -309,7 +397,7 @@
       "title": "IND explosives vs BAL prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:47.695118+00:00",
+      "as_of": "2026-09-08T23:43:52.383412+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "BAL",
@@ -329,7 +417,7 @@
       "title": "Lamar Jackson vs IND: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:35.371626+00:00",
+      "as_of": "2026-09-08T23:43:43.649660+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "BAL",
@@ -337,6 +425,50 @@
         "epa_per_dropback": 0.24327686207988578,
         "family": "qb_opponent_history",
         "games": 2,
+        "latest_meeting": {
+          "date": "2023-09-24",
+          "dropbacks": 35,
+          "epa_per_dropback": -0.35787386694820256,
+          "game_id": "2023_03_IND_BAL",
+          "human_label": "2023 Week 3",
+          "label": "2023 Week 3",
+          "offense": "BAL",
+          "score": "IND 19, BAL 19",
+          "season": 2023,
+          "stage": "Week 3",
+          "success_rate": 0.4857142857142857,
+          "week": 3
+        },
+        "meetings": [
+          {
+            "date": "2023-09-24",
+            "dropbacks": 35,
+            "epa_per_dropback": -0.35787386694820256,
+            "game_id": "2023_03_IND_BAL",
+            "human_label": "2023 Week 3",
+            "label": "2023 Week 3",
+            "offense": "BAL",
+            "score": "IND 19, BAL 19",
+            "season": 2023,
+            "stage": "Week 3",
+            "success_rate": 0.4857142857142857,
+            "week": 3
+          },
+          {
+            "date": "2021-10-11",
+            "dropbacks": 47,
+            "epa_per_dropback": 0.6909422985901643,
+            "game_id": "2021_05_IND_BAL",
+            "human_label": "2021 Week 5",
+            "label": "2021 Week 5",
+            "offense": "BAL",
+            "score": "IND 25, BAL 31",
+            "season": 2021,
+            "stage": "Week 5",
+            "success_rate": 0.7446808510638298,
+            "week": 5
+          }
+        ],
         "prior_offenses": [
           "BAL"
         ],
@@ -350,11 +482,11 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Across 2 prior meetings with IND, Lamar Jackson averaged +0.24 EPA/dropback with a 63% positive-EPA rate over 82 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "summary": "Lamar Jackson has faced IND 2 times; the most recent was 2023 Week 3. Across those snaps he averaged +0.24 EPA per dropback with a 63% positive-EPA rate over 82 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
       "title": "Lamar Jackson vs IND: player history"
     },
     {
-      "as_of": "2026-09-08T23:26:06.339179+00:00",
+      "as_of": "2026-09-08T23:42:15.620099+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "John Harbaugh",
@@ -370,7 +502,7 @@
       "title": "BAL offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:06.339234+00:00",
+      "as_of": "2026-09-08T23:42:15.620133+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -384,7 +516,7 @@
   ],
   "2026_01_BUF_HOU": [
     {
-      "as_of": "2026-09-08T23:27:46.571019+00:00",
+      "as_of": "2026-09-08T23:43:51.564467+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BUF",
@@ -402,7 +534,7 @@
       "title": "BUF early-down approach vs HOU"
     },
     {
-      "as_of": "2026-09-08T23:27:46.570233+00:00",
+      "as_of": "2026-09-08T23:43:51.563842+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -420,7 +552,7 @@
       "title": "BUF protection vs HOU pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:46.572038+00:00",
+      "as_of": "2026-09-08T23:43:51.565260+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -438,7 +570,7 @@
       "title": "HOU explosives vs BUF prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:47.130043+00:00",
+      "as_of": "2026-09-08T23:43:51.969605+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
@@ -458,7 +590,7 @@
       "title": "Josh Allen vs HOU: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:47.146489+00:00",
+      "as_of": "2026-09-08T23:43:51.983804+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
@@ -478,7 +610,7 @@
       "title": "C.J. Stroud vs BUF: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:26:05.492504+00:00",
+      "as_of": "2026-09-08T23:42:15.170223+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean McDermott",
@@ -494,14 +626,14 @@
       "title": "BUF offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:06.123378+00:00",
+      "as_of": "2026-09-08T23:42:15.567086+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 8.9,
         "precip_pct": 14.0,
         "roof": "retractable",
         "temp_f": 93.7,
-        "wind_mph": 8.1
+        "wind_mph": 9.1
       },
       "promoted_to_model": false,
       "relevance": "Nearest-hour forecast at home venue",
@@ -509,13 +641,13 @@
       "source_name": "Open-Meteo",
       "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
       "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 8 mph sustained wind with gusts near 9 mph, and 14% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "summary": "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 9 mph, and 14% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. Weather is shown as context until its incremental forecast value is validated chronologically.",
       "title": "Kickoff weather in HOU"
     }
   ],
   "2026_01_CHI_CAR": [
     {
-      "as_of": "2026-09-08T23:27:44.818514+00:00",
+      "as_of": "2026-09-08T23:43:50.322022+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CHI",
@@ -533,7 +665,7 @@
       "title": "CAR explosives vs CHI prevention"
     },
     {
-      "as_of": "2026-09-08T23:26:03.034506+00:00",
+      "as_of": "2026-09-08T23:42:14.127667+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -554,7 +686,7 @@
       "title": "CHI play action vs CAR"
     },
     {
-      "as_of": "2026-09-08T23:26:03.036695+00:00",
+      "as_of": "2026-09-08T23:42:14.129396+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -575,7 +707,7 @@
       "title": "CAR RPOs vs CHI"
     },
     {
-      "as_of": "2026-09-08T23:27:45.388944+00:00",
+      "as_of": "2026-09-08T23:43:50.741241+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
@@ -595,7 +727,7 @@
       "title": "Bryce Young vs CHI: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:45.371525+00:00",
+      "as_of": "2026-09-08T23:43:50.726748+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
@@ -617,7 +749,7 @@
   ],
   "2026_01_CLE_JAX": [
     {
-      "as_of": "2026-09-08T23:27:47.713326+00:00",
+      "as_of": "2026-09-08T23:43:52.400323+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "JAX",
@@ -635,7 +767,7 @@
       "title": "CLE explosives vs JAX prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:47.712781+00:00",
+      "as_of": "2026-09-08T23:43:52.399903+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CLE",
@@ -653,7 +785,7 @@
       "title": "CLE protection vs JAX pass rush"
     },
     {
-      "as_of": "2026-09-08T23:26:07.203612+00:00",
+      "as_of": "2026-09-08T23:42:16.042560+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -674,7 +806,7 @@
       "title": "JAX pre-snap motion vs CLE"
     },
     {
-      "as_of": "2026-09-08T23:27:48.285023+00:00",
+      "as_of": "2026-09-08T23:43:52.814066+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
@@ -694,7 +826,7 @@
       "title": "Trevor Lawrence vs CLE: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:48.268298+00:00",
+      "as_of": "2026-09-08T23:43:52.799168+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
@@ -714,7 +846,7 @@
       "title": "Deshaun Watson vs JAX: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:26:07.413426+00:00",
+      "as_of": "2026-09-08T23:42:16.089020+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Kevin Stefanski",
@@ -730,14 +862,14 @@
       "title": "CLE offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:08.274483+00:00",
+      "as_of": "2026-09-08T23:42:16.733836+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 4.5,
         "precip_pct": 10.0,
         "roof": "outdoor",
         "temp_f": 96.7,
-        "wind_mph": 5.0
+        "wind_mph": 3.4
       },
       "promoted_to_model": false,
       "relevance": "Nearest-hour forecast at home venue",
@@ -745,13 +877,13 @@
       "source_name": "Open-Meteo",
       "source_url": "https://api.open-meteo.com/v1/forecast?latitude=30.3239&longitude=-81.6373&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
       "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 10% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "summary": "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 3 mph sustained wind with gusts near 4 mph, and 10% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
       "title": "Kickoff weather in JAX"
     }
   ],
   "2026_01_DAL_NYG": [
     {
-      "as_of": "2026-09-08T23:27:51.702420+00:00",
+      "as_of": "2026-09-08T23:43:55.331480+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DAL",
@@ -769,7 +901,7 @@
       "title": "NYG explosives vs DAL prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:51.701861+00:00",
+      "as_of": "2026-09-08T23:43:55.331094+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYG",
@@ -787,7 +919,7 @@
       "title": "NYG protection vs DAL pass rush"
     },
     {
-      "as_of": "2026-09-08T23:26:50.880705+00:00",
+      "as_of": "2026-09-08T23:43:00.621219+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -808,7 +940,7 @@
       "title": "DAL RPOs vs NYG"
     },
     {
-      "as_of": "2026-09-08T23:27:52.249273+00:00",
+      "as_of": "2026-09-08T23:43:55.730557+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DAL",
@@ -828,7 +960,7 @@
       "title": "Dak Prescott vs NYG: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:52.265900+00:00",
+      "as_of": "2026-09-08T23:43:55.745456+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NYG",
@@ -848,7 +980,7 @@
       "title": "Jaxson Dart vs DAL: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:26:51.094363+00:00",
+      "as_of": "2026-09-08T23:43:00.671255+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Brian Daboll (fired November 10, 2\u20138 record) Mike Kafka (interim, 2\u20135 record)",
@@ -866,7 +998,7 @@
   ],
   "2026_01_DEN_KC": [
     {
-      "as_of": "2026-09-08T23:27:52.270038+00:00",
+      "as_of": "2026-09-08T23:43:55.749725+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DEN",
@@ -884,7 +1016,7 @@
       "title": "KC protection vs DEN pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:52.270875+00:00",
+      "as_of": "2026-09-08T23:43:55.750350+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "KC",
@@ -902,7 +1034,7 @@
       "title": "KC early-down approach vs DEN"
     },
     {
-      "as_of": "2026-09-08T23:27:11.284353+00:00",
+      "as_of": "2026-09-08T23:43:20.829744+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -923,7 +1055,7 @@
       "title": "DEN play action vs KC"
     },
     {
-      "as_of": "2026-09-08T23:27:52.843811+00:00",
+      "as_of": "2026-09-08T23:43:56.161597+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "KC",
@@ -943,7 +1075,7 @@
       "title": "Patrick Mahomes vs DEN: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:11.697438+00:00",
+      "as_of": "2026-09-08T23:43:21.091907+00:00",
       "category": "history",
       "metadata": {
         "dc": "Vance Joseph",
@@ -968,7 +1100,7 @@
       "title": "Patrick Mahomes vs Vance Joseph's DEN defense"
     },
     {
-      "as_of": "2026-09-08T23:27:11.496056+00:00",
+      "as_of": "2026-09-08T23:43:20.879795+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean Payton",
@@ -986,7 +1118,7 @@
   ],
   "2026_01_GB_MIN": [
     {
-      "as_of": "2026-09-08T23:27:50.561180+00:00",
+      "as_of": "2026-09-08T23:43:54.492301+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -1004,7 +1136,7 @@
       "title": "GB explosives vs MIN prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:50.561992+00:00",
+      "as_of": "2026-09-08T23:43:54.492981+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIN",
@@ -1022,7 +1154,7 @@
       "title": "MIN protection vs GB pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:50.561476+00:00",
+      "as_of": "2026-09-08T23:43:54.492538+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -1040,7 +1172,7 @@
       "title": "GB early-down approach vs MIN"
     },
     {
-      "as_of": "2026-09-08T23:27:51.106598+00:00",
+      "as_of": "2026-09-08T23:43:54.900861+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
@@ -1060,7 +1192,7 @@
       "title": "Jordan Love vs MIN: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:38.272142+00:00",
+      "as_of": "2026-09-08T23:43:45.639248+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
@@ -1068,6 +1200,134 @@
         "epa_per_dropback": 0.012319282886451687,
         "family": "qb_opponent_history",
         "games": 8,
+        "latest_meeting": {
+          "date": "2025-11-23",
+          "dropbacks": 22,
+          "epa_per_dropback": 0.24957993678135876,
+          "game_id": "2025_12_MIN_GB",
+          "human_label": "last season, Week 12",
+          "label": "2025 Week 12",
+          "offense": "GB",
+          "score": "MIN 6, GB 23",
+          "season": 2025,
+          "stage": "Week 12",
+          "success_rate": 0.5454545454545454,
+          "week": 12
+        },
+        "meetings": [
+          {
+            "date": "2025-11-23",
+            "dropbacks": 22,
+            "epa_per_dropback": 0.24957993678135876,
+            "game_id": "2025_12_MIN_GB",
+            "human_label": "last season, Week 12",
+            "label": "2025 Week 12",
+            "offense": "GB",
+            "score": "MIN 6, GB 23",
+            "season": 2025,
+            "stage": "Week 12",
+            "success_rate": 0.5454545454545454,
+            "week": 12
+          },
+          {
+            "date": "2024-12-29",
+            "dropbacks": 34,
+            "epa_per_dropback": 0.022190431859370995,
+            "game_id": "2024_17_GB_MIN",
+            "human_label": "2024 Week 17",
+            "label": "2024 Week 17",
+            "offense": "GB",
+            "score": "GB 24, MIN 27",
+            "season": 2024,
+            "stage": "Week 17",
+            "success_rate": 0.5,
+            "week": 17
+          },
+          {
+            "date": "2024-09-29",
+            "dropbacks": 56,
+            "epa_per_dropback": -0.16105358689305158,
+            "game_id": "2024_04_MIN_GB",
+            "human_label": "2024 Week 4",
+            "label": "2024 Week 4",
+            "offense": "GB",
+            "score": "MIN 31, GB 28",
+            "season": 2024,
+            "stage": "Week 4",
+            "success_rate": 0.42857142857142855,
+            "week": 4
+          },
+          {
+            "date": "2023-12-31",
+            "dropbacks": 33,
+            "epa_per_dropback": 0.424647449112109,
+            "game_id": "2023_17_GB_MIN",
+            "human_label": "2023 Week 17",
+            "label": "2023 Week 17",
+            "offense": "GB",
+            "score": "GB 30, MIN 10",
+            "season": 2023,
+            "stage": "Week 17",
+            "success_rate": 0.6060606060606061,
+            "week": 17
+          },
+          {
+            "date": "2023-10-29",
+            "dropbacks": 45,
+            "epa_per_dropback": -0.17568850526844876,
+            "game_id": "2023_08_MIN_GB",
+            "human_label": "2023 Week 8",
+            "label": "2023 Week 8",
+            "offense": "GB",
+            "score": "MIN 24, GB 10",
+            "season": 2023,
+            "stage": "Week 8",
+            "success_rate": 0.4,
+            "week": 8
+          },
+          {
+            "date": "2023-01-01",
+            "dropbacks": 3,
+            "epa_per_dropback": -0.12954061094205827,
+            "game_id": "2022_17_MIN_GB",
+            "human_label": "2022 Week 17",
+            "label": "2022 Week 17",
+            "offense": "GB",
+            "score": "MIN 10, GB 41",
+            "season": 2022,
+            "stage": "Week 17",
+            "success_rate": 0.3333333333333333,
+            "week": 17
+          },
+          {
+            "date": "2022-09-11",
+            "dropbacks": 5,
+            "epa_per_dropback": -0.06192042630864307,
+            "game_id": "2022_01_GB_MIN",
+            "human_label": "2022 Week 1",
+            "label": "2022 Week 1",
+            "offense": "GB",
+            "score": "GB 7, MIN 23",
+            "season": 2022,
+            "stage": "Week 1",
+            "success_rate": 0.4,
+            "week": 1
+          },
+          {
+            "date": "2022-01-02",
+            "dropbacks": 4,
+            "epa_per_dropback": -0.03672410064609721,
+            "game_id": "2021_17_MIN_GB",
+            "human_label": "2021 Week 17",
+            "label": "2021 Week 17",
+            "offense": "GB",
+            "score": "MIN 10, GB 37",
+            "season": 2021,
+            "stage": "Week 17",
+            "success_rate": 0.5,
+            "week": 17
+          }
+        ],
         "prior_offenses": [
           "GB"
         ],
@@ -1081,13 +1341,13 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Strong",
-      "summary": "Across 8 prior meetings with MIN, Jordan Love averaged +0.01 EPA/dropback with a 48% positive-EPA rate over 202 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "summary": "Jordan Love has faced MIN 8 times; the most recent was last season, Week 12. Across those snaps he averaged +0.01 EPA per dropback with a 48% positive-EPA rate over 202 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
       "title": "Jordan Love vs MIN: player history"
     }
   ],
   "2026_01_MIA_LV": [
     {
-      "as_of": "2026-09-08T23:27:49.992088+00:00",
+      "as_of": "2026-09-08T23:43:54.087415+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -1105,7 +1365,7 @@
       "title": "LV early-down approach vs MIA"
     },
     {
-      "as_of": "2026-09-08T23:27:49.990475+00:00",
+      "as_of": "2026-09-08T23:43:54.086175+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -1123,7 +1383,7 @@
       "title": "MIA explosives vs LV prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:49.991348+00:00",
+      "as_of": "2026-09-08T23:43:54.086859+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LV",
@@ -1141,7 +1401,7 @@
       "title": "LV protection vs MIA pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:37.806904+00:00",
+      "as_of": "2026-09-08T23:43:45.308933+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "MIA",
@@ -1149,6 +1409,50 @@
         "epa_per_dropback": -0.15670325990484552,
         "family": "qb_opponent_history",
         "games": 2,
+        "latest_meeting": {
+          "date": "2025-10-26",
+          "dropbacks": 32,
+          "epa_per_dropback": -0.1833727801185887,
+          "game_id": "2025_08_MIA_ATL",
+          "human_label": "last season, Week 8",
+          "label": "2025 Week 8",
+          "offense": "ATL",
+          "score": "MIA 34, ATL 3",
+          "season": 2025,
+          "stage": "Week 8",
+          "success_rate": 0.40625,
+          "week": 8
+        },
+        "meetings": [
+          {
+            "date": "2025-10-26",
+            "dropbacks": 32,
+            "epa_per_dropback": -0.1833727801185887,
+            "game_id": "2025_08_MIA_ATL",
+            "human_label": "last season, Week 8",
+            "label": "2025 Week 8",
+            "offense": "ATL",
+            "score": "MIA 34, ATL 3",
+            "season": 2025,
+            "stage": "Week 8",
+            "success_rate": 0.40625,
+            "week": 8
+          },
+          {
+            "date": "2022-10-16",
+            "dropbacks": 34,
+            "epa_per_dropback": -0.13160253499779312,
+            "game_id": "2022_06_MIN_MIA",
+            "human_label": "2022 Week 6",
+            "label": "2022 Week 6",
+            "offense": "MIN",
+            "score": "MIN 24, MIA 10",
+            "season": 2022,
+            "stage": "Week 6",
+            "success_rate": 0.4411764705882353,
+            "week": 6
+          }
+        ],
         "prior_offenses": [
           "ATL",
           "MIN"
@@ -1163,11 +1467,11 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Across 2 prior meetings with MIA, Kirk Cousins averaged -0.16 EPA/dropback with a 42% positive-EPA rate over 66 dropbacks. Those meetings came while Kirk Cousins played for ATL, MIN, not LV; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "summary": "Kirk Cousins has faced MIA 2 times; the most recent was last season, Week 8. Across those snaps he averaged -0.16 EPA per dropback with a 42% positive-EPA rate over 66 dropbacks. Those games came with ATL, MIN, not LV. The quarterback history travels; the old playbook does not.",
       "title": "Kirk Cousins vs MIA: player history"
     },
     {
-      "as_of": "2026-09-08T23:26:30.019126+00:00",
+      "as_of": "2026-09-08T23:42:40.124763+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike McDaniel",
@@ -1183,7 +1487,7 @@
       "title": "MIA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:30.019154+00:00",
+      "as_of": "2026-09-08T23:42:40.124792+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Pete Carroll",
@@ -1199,7 +1503,7 @@
       "title": "LV offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:30.021087+00:00",
+      "as_of": "2026-09-08T23:42:40.126796+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -1213,7 +1517,7 @@
   ],
   "2026_01_NE_SEA": [
     {
-      "as_of": "2026-09-08T23:27:43.654031+00:00",
+      "as_of": "2026-09-08T23:43:49.482345+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -1231,7 +1535,7 @@
       "title": "SEA explosives vs NE prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:43.654329+00:00",
+      "as_of": "2026-09-08T23:43:49.482557+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -1249,7 +1553,7 @@
       "title": "SEA early-down approach vs NE"
     },
     {
-      "as_of": "2026-09-08T23:27:43.652123+00:00",
+      "as_of": "2026-09-08T23:43:49.480942+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NE",
@@ -1267,7 +1571,7 @@
       "title": "NE protection vs SEA pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:44.210085+00:00",
+      "as_of": "2026-09-08T23:43:49.890219+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -1287,7 +1591,7 @@
       "title": "Drake Maye vs SEA: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:44.226675+00:00",
+      "as_of": "2026-09-08T23:43:49.904751+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -1307,7 +1611,7 @@
       "title": "Sam Darnold vs NE: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:26:01.930470+00:00",
+      "as_of": "2026-09-08T23:42:13.420256+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike Macdonald",
@@ -1323,7 +1627,7 @@
       "title": "SEA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:01.930483+00:00",
+      "as_of": "2026-09-08T23:42:13.420268+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1335,7 +1639,7 @@
       "title": "New defensive coordinator in NE"
     },
     {
-      "as_of": "2026-09-08T23:26:01.511533+00:00",
+      "as_of": "2026-09-08T23:42:13.157844+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1353,7 +1657,7 @@
       "title": "NE: Ben Brown \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T23:26:01.511554+00:00",
+      "as_of": "2026-09-08T23:42:13.157868+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1371,7 +1675,7 @@
       "title": "NE: TreVeyon Henderson \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T23:26:01.511600+00:00",
+      "as_of": "2026-09-08T23:42:13.157913+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1389,7 +1693,7 @@
       "title": "SEA: Ty Okada \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T23:26:01.933477+00:00",
+      "as_of": "2026-09-08T23:42:13.431967+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -1401,7 +1705,7 @@
       "title": "Long travel spot for NE"
     },
     {
-      "as_of": "2026-09-08T23:26:01.511608+00:00",
+      "as_of": "2026-09-08T23:42:13.157922+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1419,7 +1723,7 @@
       "title": "SEA: Tory Horton \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-08T23:26:01.511614+00:00",
+      "as_of": "2026-09-08T23:42:13.157928+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1437,7 +1741,7 @@
       "title": "SEA: Nick Emmanwori \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-08T23:27:31.918693+00:00",
+      "as_of": "2026-09-08T23:43:41.241573+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1459,7 +1763,7 @@
   ],
   "2026_01_NO_DET": [
     {
-      "as_of": "2026-09-08T23:27:45.975318+00:00",
+      "as_of": "2026-09-08T23:43:51.154167+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -1477,7 +1781,7 @@
       "title": "NO explosives vs DET prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:45.974783+00:00",
+      "as_of": "2026-09-08T23:43:51.153745+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -1495,7 +1799,7 @@
       "title": "NO protection vs DET pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:45.976869+00:00",
+      "as_of": "2026-09-08T23:43:51.155372+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "DET",
@@ -1513,7 +1817,7 @@
       "title": "DET YAC creation vs NO tackling"
     },
     {
-      "as_of": "2026-09-08T23:27:46.567235+00:00",
+      "as_of": "2026-09-08T23:43:51.560561+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DET",
@@ -1533,7 +1837,7 @@
       "title": "Jared Goff vs NO: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:34.422889+00:00",
+      "as_of": "2026-09-08T23:43:42.987335+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DET",
@@ -1541,6 +1845,36 @@
         "epa_per_dropback": 0.27749770534715973,
         "family": "qb_opponent_history",
         "games": 1,
+        "latest_meeting": {
+          "date": "2023-12-03",
+          "dropbacks": 27,
+          "epa_per_dropback": 0.27749770534715973,
+          "game_id": "2023_13_DET_NO",
+          "human_label": "2023 Week 13",
+          "label": "2023 Week 13",
+          "offense": "DET",
+          "score": "DET 33, NO 28",
+          "season": 2023,
+          "stage": "Week 13",
+          "success_rate": 0.4444444444444444,
+          "week": 13
+        },
+        "meetings": [
+          {
+            "date": "2023-12-03",
+            "dropbacks": 27,
+            "epa_per_dropback": 0.27749770534715973,
+            "game_id": "2023_13_DET_NO",
+            "human_label": "2023 Week 13",
+            "label": "2023 Week 13",
+            "offense": "DET",
+            "score": "DET 33, NO 28",
+            "season": 2023,
+            "stage": "Week 13",
+            "success_rate": 0.4444444444444444,
+            "week": 13
+          }
+        ],
         "prior_offenses": [
           "DET"
         ],
@@ -1554,13 +1888,13 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Across 1 prior meeting with NO, Jared Goff averaged +0.28 EPA/dropback with a 44% positive-EPA rate over 27 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
+      "summary": "Jared Goff has faced NO once before: 2023 Week 13. Across those snaps he averaged +0.28 EPA per dropback with a 44% positive-EPA rate over 27 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
       "title": "Jared Goff vs NO: player history"
     }
   ],
   "2026_01_NYJ_TEN": [
     {
-      "as_of": "2026-09-08T23:27:48.853140+00:00",
+      "as_of": "2026-09-08T23:43:53.228317+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -1578,7 +1912,7 @@
       "title": "NYJ explosives vs TEN prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:48.854745+00:00",
+      "as_of": "2026-09-08T23:43:53.229544+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1596,7 +1930,7 @@
       "title": "TEN early-down approach vs NYJ"
     },
     {
-      "as_of": "2026-09-08T23:27:48.853958+00:00",
+      "as_of": "2026-09-08T23:43:53.228977+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -1614,7 +1948,7 @@
       "title": "TEN protection vs NYJ pass rush"
     },
     {
-      "as_of": "2026-09-08T23:27:36.829555+00:00",
+      "as_of": "2026-09-08T23:43:44.631872+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1622,6 +1956,50 @@
         "epa_per_dropback": 0.18158580272775776,
         "family": "qb_opponent_history",
         "games": 2,
+        "latest_meeting": {
+          "date": "2025-10-12",
+          "dropbacks": 25,
+          "epa_per_dropback": 0.022773055117577313,
+          "game_id": "2025_06_TEN_LV",
+          "human_label": "last season, Week 6",
+          "label": "2025 Week 6",
+          "offense": "LV",
+          "score": "TEN 10, LV 20",
+          "season": 2025,
+          "stage": "Week 6",
+          "success_rate": 0.48,
+          "week": 6
+        },
+        "meetings": [
+          {
+            "date": "2025-10-12",
+            "dropbacks": 25,
+            "epa_per_dropback": 0.022773055117577313,
+            "game_id": "2025_06_TEN_LV",
+            "human_label": "last season, Week 6",
+            "label": "2025 Week 6",
+            "offense": "LV",
+            "score": "TEN 10, LV 20",
+            "season": 2025,
+            "stage": "Week 6",
+            "success_rate": 0.48,
+            "week": 6
+          },
+          {
+            "date": "2023-12-24",
+            "dropbacks": 39,
+            "epa_per_dropback": 0.283388846067617,
+            "game_id": "2023_16_SEA_TEN",
+            "human_label": "2023 Week 16",
+            "label": "2023 Week 16",
+            "offense": "SEA",
+            "score": "SEA 19, TEN 17",
+            "season": 2023,
+            "stage": "Week 16",
+            "success_rate": 0.46153846153846156,
+            "week": 16
+          }
+        ],
         "prior_offenses": [
           "LV",
           "SEA"
@@ -1636,11 +2014,11 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Across 2 prior meetings with TEN, Geno Smith averaged +0.18 EPA/dropback with a 47% positive-EPA rate over 64 dropbacks. Those meetings came while Geno Smith played for LV, SEA, not NYJ; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "summary": "Geno Smith has faced TEN 2 times; the most recent was last season, Week 6. Across those snaps he averaged +0.18 EPA per dropback with a 47% positive-EPA rate over 64 dropbacks. Those games came with LV, SEA, not NYJ. The quarterback history travels; the old playbook does not.",
       "title": "Geno Smith vs TEN: player history"
     },
     {
-      "as_of": "2026-09-08T23:26:09.368154+00:00",
+      "as_of": "2026-09-08T23:42:17.236403+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1652,7 +2030,7 @@
       "title": "New defensive coordinator in TEN"
     },
     {
-      "as_of": "2026-09-08T23:26:09.368197+00:00",
+      "as_of": "2026-09-08T23:42:17.236448+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Brian Callahan (fired October 13, 1\u20135 record) Mike McCoy (interim, 2\u20139 record)",
@@ -1670,7 +2048,7 @@
   ],
   "2026_01_SF_LA": [
     {
-      "as_of": "2026-09-08T23:27:44.231662+00:00",
+      "as_of": "2026-09-08T23:43:49.909524+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LA",
@@ -1688,7 +2066,7 @@
       "title": "LA explosives vs SF prevention"
     },
     {
-      "as_of": "2026-09-08T23:26:02.611443+00:00",
+      "as_of": "2026-09-08T23:42:13.860003+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -1709,7 +2087,7 @@
       "title": "SF pre-snap motion vs LA"
     },
     {
-      "as_of": "2026-09-08T23:27:44.230680+00:00",
+      "as_of": "2026-09-08T23:43:49.908799+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "SF",
@@ -1727,7 +2105,7 @@
       "title": "SF third downs vs LA"
     },
     {
-      "as_of": "2026-09-08T23:27:44.813608+00:00",
+      "as_of": "2026-09-08T23:43:50.317280+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LA",
@@ -1747,7 +2125,7 @@
       "title": "Matthew Stafford vs SF: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:44.794764+00:00",
+      "as_of": "2026-09-08T23:43:50.301959+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SF",
@@ -1767,7 +2145,7 @@
       "title": "Brock Purdy vs LA: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:26:03.026034+00:00",
+      "as_of": "2026-09-08T23:42:14.119727+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean McVay",
@@ -1783,7 +2161,7 @@
       "title": "LA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:03.026046+00:00",
+      "as_of": "2026-09-08T23:42:14.119740+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1795,7 +2173,7 @@
       "title": "New defensive coordinator in SF"
     },
     {
-      "as_of": "2026-09-08T23:27:31.918774+00:00",
+      "as_of": "2026-09-08T23:43:41.241648+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1815,7 +2193,7 @@
       "title": "SF: James Thompson Jr. \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:27:31.918797+00:00",
+      "as_of": "2026-09-08T23:43:41.241670+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1835,7 +2213,7 @@
       "title": "LA: Alaric Jackson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:27:31.918801+00:00",
+      "as_of": "2026-09-08T23:43:41.241674+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1855,7 +2233,7 @@
       "title": "LA: Jaylen Watson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:27:31.918806+00:00",
+      "as_of": "2026-09-08T23:43:41.241678+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1875,7 +2253,7 @@
       "title": "LA: Tyler Higbee \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:27:31.918781+00:00",
+      "as_of": "2026-09-08T23:43:41.241653+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1895,7 +2273,7 @@
       "title": "SF: Renardo Green \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-08T23:27:31.918785+00:00",
+      "as_of": "2026-09-08T23:43:41.241657+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1917,7 +2295,7 @@
   ],
   "2026_01_TB_CIN": [
     {
-      "as_of": "2026-09-08T23:27:45.392509+00:00",
+      "as_of": "2026-09-08T23:43:50.744924+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CIN",
@@ -1935,7 +2313,7 @@
       "title": "TB explosives vs CIN prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:45.394045+00:00",
+      "as_of": "2026-09-08T23:43:50.746166+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TB",
@@ -1953,7 +2331,7 @@
       "title": "CIN early-down approach vs TB"
     },
     {
-      "as_of": "2026-09-08T23:27:45.392801+00:00",
+      "as_of": "2026-09-08T23:43:50.745167+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "CIN",
@@ -1971,7 +2349,7 @@
       "title": "TB YAC creation vs CIN tackling"
     },
     {
-      "as_of": "2026-09-08T23:27:45.971783+00:00",
+      "as_of": "2026-09-08T23:43:51.150545+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CIN",
@@ -1991,7 +2369,7 @@
       "title": "Joe Burrow vs TB: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:27:33.928183+00:00",
+      "as_of": "2026-09-08T23:43:42.646346+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "TB",
@@ -1999,6 +2377,50 @@
         "epa_per_dropback": 0.5179692012645982,
         "family": "qb_opponent_history",
         "games": 2,
+        "latest_meeting": {
+          "date": "2022-11-06",
+          "dropbacks": 20,
+          "epa_per_dropback": 0.5915947020446766,
+          "game_id": "2022_09_CAR_CIN",
+          "human_label": "2022 Week 9",
+          "label": "2022 Week 9",
+          "offense": "CAR",
+          "score": "CAR 14, CIN 42",
+          "season": 2022,
+          "stage": "Week 9",
+          "success_rate": 0.55,
+          "week": 9
+        },
+        "meetings": [
+          {
+            "date": "2022-11-06",
+            "dropbacks": 20,
+            "epa_per_dropback": 0.5915947020446766,
+            "game_id": "2022_09_CAR_CIN",
+            "human_label": "2022 Week 9",
+            "label": "2022 Week 9",
+            "offense": "CAR",
+            "score": "CAR 14, CIN 42",
+            "season": 2022,
+            "stage": "Week 9",
+            "success_rate": 0.55,
+            "week": 9
+          },
+          {
+            "date": "2021-11-07",
+            "dropbacks": 23,
+            "epa_per_dropback": 0.45394702667322584,
+            "game_id": "2021_09_CLE_CIN",
+            "human_label": "2021 Week 9",
+            "label": "2021 Week 9",
+            "offense": "CLE",
+            "score": "CLE 40, CIN 16",
+            "season": 2021,
+            "stage": "Week 9",
+            "success_rate": 0.43478260869565216,
+            "week": 9
+          }
+        ],
         "prior_offenses": [
           "CAR",
           "CLE"
@@ -2013,13 +2435,13 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Across 2 prior meetings with CIN, Baker Mayfield averaged +0.52 EPA/dropback with a 49% positive-EPA rate over 43 dropbacks. Those meetings came while Baker Mayfield played for CAR, CLE, not TB; the history follows the quarterback but is explicitly discounted for the new offensive system and personnel.",
+      "summary": "Baker Mayfield has faced CIN 2 times; the most recent was 2022 Week 9. Across those snaps he averaged +0.52 EPA per dropback with a 49% positive-EPA rate over 43 dropbacks. Those games came with CAR, CLE, not TB. The quarterback history travels; the old playbook does not.",
       "title": "Baker Mayfield vs CIN: player history"
     }
   ],
   "2026_01_WAS_PHI": [
     {
-      "as_of": "2026-09-08T23:27:51.125700+00:00",
+      "as_of": "2026-09-08T23:43:54.918448+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "WAS",
@@ -2037,7 +2459,7 @@
       "title": "PHI YAC creation vs WAS tackling"
     },
     {
-      "as_of": "2026-09-08T23:27:51.125367+00:00",
+      "as_of": "2026-09-08T23:43:54.918178+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -2055,7 +2477,7 @@
       "title": "PHI explosives vs WAS prevention"
     },
     {
-      "as_of": "2026-09-08T23:27:51.124330+00:00",
+      "as_of": "2026-09-08T23:43:54.917340+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -2073,7 +2495,7 @@
       "title": "WAS early-down approach vs PHI"
     },
     {
-      "as_of": "2026-09-08T23:27:51.697764+00:00",
+      "as_of": "2026-09-08T23:43:55.326939+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PHI",
@@ -2093,7 +2515,7 @@
       "title": "Jalen Hurts vs WAS: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:26:30.665553+00:00",
+      "as_of": "2026-09-08T23:42:40.451868+00:00",
       "category": "history",
       "metadata": {
         "dc": "Vic Fangio",
@@ -2117,7 +2539,7 @@
       "title": "Jayden Daniels vs Vic Fangio's PHI defense"
     },
     {
-      "as_of": "2026-09-08T23:26:30.461543+00:00",
+      "as_of": "2026-09-08T23:42:40.236540+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Dan Quinn",
@@ -2133,7 +2555,7 @@
       "title": "WAS offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:30.665592+00:00",
+      "as_of": "2026-09-08T23:42:40.451908+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Nick Sirianni",
@@ -2149,7 +2571,7 @@
       "title": "PHI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:26:30.665603+00:00",
+      "as_of": "2026-09-08T23:42:40.451920+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
