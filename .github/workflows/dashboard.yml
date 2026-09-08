@@ -2,7 +2,7 @@ name: NFL dashboard
 
 on:
   push:
-    branches: [main]
+    branches: [main, dashboard-v1]
     paths:
       - 'site/**'
       - 'outputs/**'
@@ -19,7 +19,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -45,13 +45,13 @@ jobs:
         working-directory: site
         run: npm run build
       - name: Upload build artifact
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
