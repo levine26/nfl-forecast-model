@@ -8,11 +8,11 @@ import json
 import nflreadpy as nfl
 import pandas as pd
 
+from nfl_forecast.coaching import load_coaching_history
 from nfl_forecast.context import (
     NFLVERSE_SCHEDULE_URL,
     build_contextual_evidence,
     fetch_espn_injuries,
-    load_coaching_history,
 )
 from nfl_forecast.context_plus import upgrade_contextual_evidence
 from nfl_forecast.data import configure_cache
