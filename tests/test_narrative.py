@@ -20,7 +20,9 @@ def test_preview_connects_history_and_structural_change_without_changing_forecas
     assert "historical matchup is relevant, but not automatically transferable" in text
     assert "What is different now" in text
     assert "LAC is the current model pick at 64.0%" in text
-    assert "do not alter numerical probabilities" in out["guardrail"]
+    guardrail = out["guardrail"].lower()
+    assert "numerical forecast" in guardrail
+    assert "chronological out-of-sample validation" in guardrail
 
 
 def test_preview_flags_uncertainty_when_models_disagree():
@@ -31,5 +33,6 @@ def test_preview_flags_uncertainty_when_models_disagree():
         "projected_score":"H 21.7 – A 21.3","model_disagreement":.11,"consistency_flag":"NEUTRAL",
     }])
     out=build_game_previews(predictions,{"g2":[]})["g2"]
-    assert "component-model disagreement is elevated" in out["what_could_make_us_wrong"]
-    assert "close to a coin flip" in out["what_could_make_us_wrong"]
+    warning = out["what_could_make_us_wrong"].lower()
+    assert "component-model disagreement is elevated" in warning
+    assert "close to a coin flip" in warning
