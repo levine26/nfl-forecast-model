@@ -2,6 +2,8 @@
 
 A free, automated NFL forecasting project inspired by Sujar Henry's public methodology and extended with leakage-safe feature engineering, walk-forward ensembles, score forecasts, uncertainty, and a separate market signal.
 
+**Deployment status:** live on GitHub; automated forecasts publish from GitHub Actions into `outputs/`.
+
 ## Design constraints
 
 - **$0 data/API spend**
