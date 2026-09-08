@@ -1,0 +1,14 @@
+/* AppV3-specific presentation. The hidden nested hero prevents the compact WeekPage
+   shell from duplicating the global weekly hero while preserving its standalone safety. */
+main > .hero{display:none}
+.lock-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border-radius:999px;font-size:8px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+.lock-pill.live{color:#6bd7a6;background:rgba(107,215,166,.10);border:1px solid rgba(107,215,166,.18)}
+.lock-pill.locked{color:#a8c8ff;background:rgba(85,168,255,.12);border:1px solid rgba(85,168,255,.2)}
+.lock-pill.window{color:#f4c56a;background:rgba(244,197,106,.10);border:1px solid rgba(244,197,106,.18)}
+.lock-pill.started{color:#91a0b0;background:rgba(145,160,176,.10);border:1px solid rgba(145,160,176,.18)}
+.modal-kicker .lock-pill{margin-left:6px;vertical-align:middle}
+.editorial-preview{border-left:2px solid rgba(85,168,255,.7);padding-left:18px}
+.editorial-preview p{font-size:15px;line-height:1.72;color:#d5e0eb}
+.card-footer{gap:8px;flex-wrap:wrap}
+.card-footer button{margin-left:auto}
+@media(max-width:720px){.editorial-preview p{font-size:14px}.lock-pill{font-size:7px}}
