@@ -10,8 +10,8 @@ def test_schedule_results_fill_recent_win_when_pbp_missing():
         {"game_id":"2026_02_A_B","season":2026,"week":2,"gameday":"2026-09-08","gametime":"20:00","game_type":"REG","home_team":"A","away_team":"B","home_score":None,"away_score":None,"home_rest":7,"away_rest":7},
     ])
     tg = pd.DataFrame([
-        {"game_id":"2025_18_A_B","season":2025,"week":18,"team":"A","gameday":"2026-01-01","off_epa":0.2,"pass_epa":0.3,"rush_epa":0.05,"success_rate":0.52,"neutral_epa":0.18,"def_epa_allowed":-0.1,"def_pass_epa_allowed":-0.12,"def_rush_epa_allowed":-0.07,"def_success_allowed":0.4,"win":1.0},
-        {"game_id":"2025_18_A_B","season":2025,"week":18,"team":"B","gameday":"2026-01-01","off_epa":-0.1,"pass_epa":-0.12,"rush_epa":-0.07,"success_rate":0.4,"neutral_epa":-0.08,"def_epa_allowed":0.2,"def_pass_epa_allowed":0.3,"def_rush_epa_allowed":0.05,"def_success_allowed":0.52,"win":0.0},
+        {"game_id":"2025_18_A_B","season":2025,"week":18,"team":"A","gameday":"2026-01-01","off_epa":0.2,"pass_epa":0.3,"rush_epa":0.05,"success_rate":0.52,"neutral_epa":0.18,"def_epa_allowed":-0.1,"def_pass_epa_allowed":-0.12,"def_rush_epa_allowed":-0.07,"def_success_allowed":0.4,"win":1.0,"home_score":20,"away_score":17,"is_home":True,"points_for":20,"points_against":17},
+        {"game_id":"2025_18_A_B","season":2025,"week":18,"team":"B","gameday":"2026-01-01","off_epa":-0.1,"pass_epa":-0.12,"rush_epa":-0.07,"success_rate":0.4,"neutral_epa":-0.08,"def_epa_allowed":0.2,"def_pass_epa_allowed":0.3,"def_rush_epa_allowed":0.05,"def_success_allowed":0.52,"win":0.0,"home_score":20,"away_score":17,"is_home":False,"points_for":17,"points_against":20},
     ])
     elo = pd.DataFrame([
         {"game_id":"2025_18_A_B","home_elo":1500,"away_elo":1500,"elo_home_prob":.56},
