@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import json
 
-from nfl_forecast.coaching import load_coaching_history
+from nfl_forecast.coaching import fetch_coaching_staff, load_coaching_history
 
 
 def _staff(team="NE", season=2026):
@@ -12,6 +12,42 @@ def _staff(team="NE", season=2026):
         "off_coach": "Offensive Coach",
         "def_coach": "Defensive Coach",
     }
+
+
+class _Response:
+    def __init__(self, text):
+        self.text = text
+
+    def raise_for_status(self):
+        return None
+
+
+class _Session:
+    def __init__(self, html):
+        self.html = html
+        self.urls = []
+
+    def get(self, url, **kwargs):
+        self.urls.append(url)
+        return _Response(self.html)
+
+
+def test_rendered_infobox_extracts_current_staff():
+    html = """
+    <html><table class="infobox">
+      <tr><th>Coach</th><td><a>Mike Vrabel</a></td></tr>
+      <tr><th>Off. coach</th><td>Josh McDaniels <sup>[1]</sup></td></tr>
+      <tr><th>Def. coach</th><td>Zak Kuhr</td></tr>
+    </table></html>
+    """
+    session = _Session(html)
+    data, source = fetch_coaching_staff("NE", 2026, session=session)
+
+    assert data["head_coach"] == "Mike Vrabel"
+    assert data["off_coach"] == "Josh McDaniels"
+    assert data["def_coach"] == "Zak Kuhr"
+    assert "2026_New_England_Patriots_season" in source
+    assert session.urls == [source]
 
 
 def test_stale_negative_cache_is_retried_and_can_recover(tmp_path):
