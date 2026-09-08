@@ -1,6 +1,918 @@
 {
-  "schema_version": "1.0",
-  "generated_utc": null,
-  "games": {},
-  "notes": "Verified contextual football claims populate this file automatically. The dashboard will not fabricate coordinator, injury, historical, scheme, or reporting claims when a sourced signal is unavailable. Each evidence item supports: category, title, summary, strength, sample_size, source_name, source_url, as_of_utc, model_relevance, and promoted_to_model."
+  "2026_01_ARI_LAC": [
+    {
+      "as_of": "2026-09-08T20:55:14.634421+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Jonathan Gannon",
+        "previous_off_coach": null
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
+      "strength": "Strong",
+      "summary": "ARI enters 2026 with head coach Mike LaFleur and offensive coordinator Nathaniel Hackett. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "ARI offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.634442+00:00",
+      "category": "coaching",
+      "promoted_to_model": false,
+      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
+      "strength": "Strong",
+      "summary": "ARI is coordinated by Nick Rallis in 2026, replacing the prior defensive staff. Older LAC-vs-ARI results are not labeled as quarterback-vs-coordinator history because the defensive decision-maker changed.",
+      "title": "New defensive coordinator in ARI"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.539448+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": -0.03620680021804533,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.027016731907693197,
+        "offense_rate": 0.13835125448028673
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 145,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "ARI used play action on 14% of charted plays in 2025, versus a league median of 11%, and produced +0.03 EPA/play on those snaps. LAC allowed -0.04 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "ARI play action vs LAC"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.540870+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": 0.18683237666513275,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": -0.11321147444557493,
+        "offense_rate": 0.027815468113975575
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 34,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Weak",
+      "summary": "LAC used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced -0.11 EPA/play on those snaps. ARI allowed +0.19 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "LAC screens vs ARI"
+    }
+  ],
+  "2026_01_ATL_PIT": [
+    {
+      "as_of": "2026-09-08T20:55:13.355645+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Raheem Morris",
+        "previous_off_coach": null
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Atlanta_Falcons_season",
+      "strength": "Strong",
+      "summary": "ATL enters 2026 with head coach Kevin Stefanski. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "ATL offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T20:55:13.257339+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": -0.1513132726705139,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.26792983055686087,
+        "offense_rate": 0.09317681584739546
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 127,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "ATL used play action on 9% of charted plays in 2025, versus a league median of 11%, and produced +0.27 EPA/play on those snaps. PIT allowed -0.15 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "ATL play action vs PIT"
+    },
+    {
+      "as_of": "2026-09-08T20:55:13.257991+00:00",
+      "category": "scheme",
+      "metadata": {
+        "dc": null,
+        "dc_tenure": [],
+        "defense_blitz_rate": 0.19022103148024114,
+        "league_blitz_rate": 0.13608347419285077,
+        "qb_blitz_epa": -0.06022187101752085
+      },
+      "promoted_to_model": false,
+      "relevance": "Quarterback performance against blitz paired with opponent blitz tendency",
+      "sample_size": 201,
+      "side": "away",
+      "source_name": "FTN Data + nflverse PBP",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "PIT blitzed on 19% of charted plays in the latest complete FTN season (league median 14%). Tua Tagovailoa produced -0.06 EPA/dropback across 201 charted blitzed dropbacks over the two most recent available seasons. The sample describes a pressure-style matchup; it does not prove the quarterback will repeat that result.",
+      "title": "Tua Tagovailoa vs PIT pressure profile"
+    },
+    {
+      "as_of": "2026-09-08T20:55:13.258778+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": -0.13632369389866894,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": 0.018831205532874772,
+        "offense_rate": 0.06582840236686391
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 46,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "PIT used screens on 7% of charted plays in 2025, versus a league median of 4%, and produced +0.02 EPA/play on those snaps. ATL allowed -0.14 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "PIT screens vs ATL"
+    }
+  ],
+  "2026_01_BAL_IND": [
+    {
+      "as_of": "2026-09-08T20:55:11.914030+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "rpo",
+        "defense_epa_allowed": -0.18176515561340653,
+        "league_rate": 0.043930544351750686,
+        "offense_epa": -0.10228316844237732,
+        "offense_rate": 0.07218844984802432
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 88,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "IND used RPOs on 7% of charted plays in 2025, versus a league median of 4%, and produced -0.10 EPA/play on those snaps. BAL allowed -0.18 EPA/play against the same concept. That creates a matchup to monitor; it is contextual evidence, not a silently added model feature.",
+      "title": "IND RPOs vs BAL"
+    },
+    {
+      "as_of": "2026-09-08T20:55:11.912618+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "rpo",
+        "defense_epa_allowed": -0.33880637400031377,
+        "league_rate": 0.043930544351750686,
+        "offense_epa": -0.1310571715714643,
+        "offense_rate": 0.0438871473354232
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 56,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "BAL used RPOs on 4% of charted plays in 2025, versus a league median of 4%, and produced -0.13 EPA/play on those snaps. IND allowed -0.34 EPA/play against the same concept. That creates a matchup to monitor; it is contextual evidence, not a silently added model feature.",
+      "title": "BAL RPOs vs IND"
+    }
+  ],
+  "2026_01_BUF_HOU": [
+    {
+      "as_of": "2026-09-08T20:55:11.245242+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": -0.10483328955860549,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.3471947498170431,
+        "offense_rate": 0.11641595814257685
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 161,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "BUF used play action on 12% of charted plays in 2025, versus a league median of 11%, and produced +0.35 EPA/play on those snaps. HOU allowed -0.10 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "BUF play action vs HOU"
+    },
+    {
+      "as_of": "2026-09-08T20:55:11.910087+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 8.9,
+        "precip_pct": 14.0,
+        "roof": "retractable",
+        "temp_f": 93.8,
+        "wind_mph": 8.9
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 9 mph, and 14% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "title": "Kickoff weather in HOU"
+    },
+    {
+      "as_of": "2026-09-08T20:55:11.247007+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": -0.5413665204952243,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": -0.38143750415317734,
+        "offense_rate": 0.022179974651457542
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 35,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Weak",
+      "summary": "HOU used screens on 2% of charted plays in 2025, versus a league median of 4%, and produced -0.38 EPA/play on those snaps. BUF allowed -0.54 EPA/play against the same concept. That creates a matchup to monitor; it is contextual evidence, not a silently added model feature.",
+      "title": "HOU screens vs BUF"
+    }
+  ],
+  "2026_01_CHI_CAR": [
+    {
+      "as_of": "2026-09-08T20:55:09.692607+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": -0.034167269944975,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.1588852953843307,
+        "offense_rate": 0.14731585518102372
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 144,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps. CAR allowed -0.03 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "CHI play action vs CAR"
+    },
+    {
+      "as_of": "2026-09-08T20:55:09.693965+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "rpo",
+        "defense_epa_allowed": -0.11723028843335413,
+        "league_rate": 0.043930544351750686,
+        "offense_epa": 0.029704627429526644,
+        "offense_rate": 0.0782041998551774
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 62,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "CAR used RPOs on 8% of charted plays in 2025, versus a league median of 4%, and produced +0.03 EPA/play on those snaps. CHI allowed -0.12 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "CAR RPOs vs CHI"
+    }
+  ],
+  "2026_01_CLE_JAX": [
+    {
+      "as_of": "2026-09-08T20:55:12.579034+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": -0.10353390082511056,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": -0.08798598882430839,
+        "offense_rate": 0.39349112426035504
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 532,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "CLE used pre-snap motion on 39% of charted plays in 2025, versus a league median of 43%, and produced -0.09 EPA/play on those snaps. JAX allowed -0.10 EPA/play against the same concept. That creates a matchup to monitor; it is contextual evidence, not a silently added model feature.",
+      "title": "CLE pre-snap motion vs JAX"
+    },
+    {
+      "as_of": "2026-09-08T20:55:12.580434+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": -0.15722756817604733,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": 0.06805630182059316,
+        "offense_rate": 0.4709851551956815
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 604,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "JAX used pre-snap motion on 47% of charted plays in 2025, versus a league median of 43%, and produced +0.07 EPA/play on those snaps. CLE allowed -0.16 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "JAX pre-snap motion vs CLE"
+    },
+    {
+      "as_of": "2026-09-08T20:55:12.579664+00:00",
+      "category": "scheme",
+      "metadata": {
+        "dc": null,
+        "dc_tenure": [],
+        "defense_blitz_rate": 0.17663617171006332,
+        "league_blitz_rate": 0.13608347419285077,
+        "qb_blitz_epa": -0.5154856375642366
+      },
+      "promoted_to_model": false,
+      "relevance": "Quarterback performance against blitz paired with opponent blitz tendency",
+      "sample_size": 91,
+      "side": "away",
+      "source_name": "FTN Data + nflverse PBP",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "JAX blitzed on 18% of charted plays in the latest complete FTN season (league median 14%). Deshaun Watson produced -0.52 EPA/dropback across 91 charted blitzed dropbacks over the two most recent available seasons. The sample describes a pressure-style matchup; it does not prove the quarterback will repeat that result.",
+      "title": "Deshaun Watson vs JAX pressure profile"
+    },
+    {
+      "as_of": "2026-09-08T20:55:13.254930+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 4.5,
+        "precip_pct": 10.0,
+        "roof": "outdoor",
+        "temp_f": 96.4,
+        "wind_mph": 5.3
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=30.3239&longitude=-81.6373&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 96\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 10% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "title": "Kickoff weather in JAX"
+    }
+  ],
+  "2026_01_DAL_NYG": [
+    {
+      "as_of": "2026-09-08T20:55:15.486635+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": 0.13815659585445114,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": 0.0332830136587218,
+        "offense_rate": 0.30807365439093487
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 435,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "NYG used pre-snap motion on 31% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps. DAL allowed +0.14 EPA/play against the same concept. That creates a potential advantage; it is contextual evidence, not a silently added model feature.",
+      "title": "NYG pre-snap motion vs DAL"
+    },
+    {
+      "as_of": "2026-09-08T20:55:15.485150+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "rpo",
+        "defense_epa_allowed": 0.20909439702518284,
+        "league_rate": 0.043930544351750686,
+        "offense_epa": -0.015212947377099073,
+        "offense_rate": 0.04120879120879121
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 60,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "DAL used RPOs on 4% of charted plays in 2025, versus a league median of 4%, and produced -0.02 EPA/play on those snaps. NYG allowed +0.21 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "DAL RPOs vs NYG"
+    }
+  ],
+  "2026_01_DEN_KC": [
+    {
+      "as_of": "2026-09-08T20:55:35.778956+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": 0.3780661094504967,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.03256988618382885,
+        "offense_rate": 0.12540192926045016
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 131,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "DEN used play action on 13% of charted plays in 2025, versus a league median of 11%, and produced +0.03 EPA/play on those snaps. KC allowed +0.38 EPA/play against the same concept. That creates a potential advantage; it is contextual evidence, not a silently added model feature.",
+      "title": "DEN play action vs KC"
+    },
+    {
+      "as_of": "2026-09-08T20:55:35.779688+00:00",
+      "category": "scheme",
+      "metadata": {
+        "dc": null,
+        "dc_tenure": [],
+        "defense_blitz_rate": 0.1853582554517134,
+        "league_blitz_rate": 0.13608347419285077,
+        "qb_blitz_epa": 0.06373462421413423
+      },
+      "promoted_to_model": false,
+      "relevance": "Quarterback performance against blitz paired with opponent blitz tendency",
+      "sample_size": 374,
+      "side": "away",
+      "source_name": "FTN Data + nflverse PBP",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "KC blitzed on 19% of charted plays in the latest complete FTN season (league median 14%). Bo Nix produced +0.06 EPA/dropback across 374 charted blitzed dropbacks over the two most recent available seasons. The sample describes a pressure-style matchup; it does not prove the quarterback will repeat that result.",
+      "title": "Bo Nix vs KC pressure profile"
+    },
+    {
+      "as_of": "2026-09-08T20:55:35.780473+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": -0.08441804694010216,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.0819100122595564,
+        "offense_rate": 0.08080059303187546
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 109,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "KC used play action on 8% of charted plays in 2025, versus a league median of 11%, and produced +0.08 EPA/play on those snaps. DEN allowed -0.08 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "KC play action vs DEN"
+    }
+  ],
+  "2026_01_GB_MIN": [
+    {
+      "as_of": "2026-09-08T20:55:14.745804+00:00",
+      "category": "scheme",
+      "metadata": {
+        "dc": null,
+        "dc_tenure": [],
+        "defense_blitz_rate": 0.21241585639491398,
+        "league_blitz_rate": 0.13608347419285077,
+        "qb_blitz_epa": 0.13232591648530012
+      },
+      "promoted_to_model": false,
+      "relevance": "Quarterback performance against blitz paired with opponent blitz tendency",
+      "sample_size": 318,
+      "side": "away",
+      "source_name": "FTN Data + nflverse PBP",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "MIN blitzed on 21% of charted plays in the latest complete FTN season (league median 14%). Jordan Love produced +0.13 EPA/dropback across 318 charted blitzed dropbacks over the two most recent available seasons. The sample describes a pressure-style matchup; it does not prove the quarterback will repeat that result.",
+      "title": "Jordan Love vs MIN pressure profile"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.745197+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": -0.5538081715805202,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": 0.011011727400302047,
+        "offense_rate": 0.03343023255813953
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 44,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "GB used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced +0.01 EPA/play on those snaps. MIN allowed -0.55 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "GB screens vs MIN"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.746547+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": -0.01926947096422724,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": 0.06762042270252336,
+        "offense_rate": 0.0424
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 53,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "MIN used screens on 4% of charted plays in 2025, versus a league median of 4%, and produced +0.07 EPA/play on those snaps. GB allowed -0.02 EPA/play against the same concept. That creates a potential advantage; it is contextual evidence, not a silently added model feature.",
+      "title": "MIN screens vs GB"
+    }
+  ],
+  "2026_01_MIA_LV": [
+    {
+      "as_of": "2026-09-08T20:55:14.645035+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": 0.04273142548342926,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": -0.02167903083460349,
+        "offense_rate": 0.5594462540716613
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 509,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "MIA used pre-snap motion on 56% of charted plays in 2025, versus a league median of 43%, and produced -0.02 EPA/play on those snaps. LV allowed +0.04 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "MIA pre-snap motion vs LV"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.741197+00:00",
+      "category": "travel",
+      "promoted_to_model": false,
+      "relevance": "Long-distance multi-time-zone road trip",
+      "side": "away",
+      "source_name": "nflverse schedule + venue geography",
+      "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+      "strength": "Moderate",
+      "summary": "MIA travels roughly 2,171 miles to LV and crosses about 3 time zones. Travel is treated as a situational context signal; the model already contains rest/schedule features and this narrative layer does not double-count it.",
+      "title": "Long travel spot for MIA"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.646387+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": 0.1654460097107666,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": -0.1298132430742055,
+        "offense_rate": 0.0412621359223301
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 47,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "LV used screens on 4% of charted plays in 2025, versus a league median of 4%, and produced -0.13 EPA/play on those snaps. MIA allowed +0.17 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "LV screens vs MIA"
+    }
+  ],
+  "2026_01_NE_SEA": [
+    {
+      "as_of": "2026-09-08T20:55:08.814763+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": -0.06388832411591909,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.2653996428814935,
+        "offense_rate": 0.10783132530120482
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 178,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "NE used play action on 11% of charted plays in 2025, versus a league median of 11%, and produced +0.27 EPA/play on those snaps. SEA allowed -0.06 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "NE play action vs SEA"
+    },
+    {
+      "as_of": "2026-09-08T20:55:08.816506+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": -0.20257511050328852,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.378569087157801,
+        "offense_rate": 0.10702772404900064
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 166,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "SEA used play action on 11% of charted plays in 2025, versus a league median of 11%, and produced +0.38 EPA/play on those snaps. NE allowed -0.20 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "SEA play action vs NE"
+    },
+    {
+      "as_of": "2026-09-08T20:55:08.930113+00:00",
+      "category": "travel",
+      "promoted_to_model": false,
+      "relevance": "Long-distance multi-time-zone road trip",
+      "side": "away",
+      "source_name": "nflverse schedule + venue geography",
+      "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+      "strength": "Moderate",
+      "summary": "NE travels roughly 2,485 miles to SEA and crosses about 3 time zones. Travel is treated as a situational context signal; the model already contains rest/schedule features and this narrative layer does not double-count it.",
+      "title": "Long travel spot for NE"
+    }
+  ],
+  "2026_01_NO_DET": [
+    {
+      "as_of": "2026-09-08T20:55:11.140694+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": 0.04814891133844591,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": 0.13550035601234547,
+        "offense_rate": 0.47287390029325516
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 645,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "DET used pre-snap motion on 47% of charted plays in 2025, versus a league median of 43%, and produced +0.14 EPA/play on those snaps. NO allowed +0.05 EPA/play against the same concept. That creates a potential advantage; it is contextual evidence, not a silently added model feature.",
+      "title": "DET pre-snap motion vs NO"
+    },
+    {
+      "as_of": "2026-09-08T20:55:11.139337+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": -0.24278901724657673,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": 0.032145862408744036,
+        "offense_rate": 0.026831036983321246
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 37,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Weak",
+      "summary": "NO used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced +0.03 EPA/play on those snaps. DET allowed -0.24 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "NO screens vs DET"
+    }
+  ],
+  "2026_01_NYJ_TEN": [
+    {
+      "as_of": "2026-09-08T20:55:13.875657+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": 0.1787484861645685,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": -0.08541765539518317,
+        "offense_rate": 0.49809885931558934
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 568,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "NYJ used pre-snap motion on 50% of charted plays in 2025, versus a league median of 43%, and produced -0.09 EPA/play on those snaps. TEN allowed +0.18 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "NYJ pre-snap motion vs TEN"
+    },
+    {
+      "as_of": "2026-09-08T20:55:13.877058+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": 0.411175465318198,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": -0.047639737311949586,
+        "offense_rate": 0.09886792452830188
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 131,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "TEN used play action on 10% of charted plays in 2025, versus a league median of 11%, and produced -0.05 EPA/play on those snaps. NYJ allowed +0.41 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "TEN play action vs NYJ"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.536906+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 6.9,
+        "precip_pct": 10.0,
+        "roof": "outdoor",
+        "temp_f": 90.8,
+        "wind_mph": 3.6
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=36.1665&longitude=-86.7713&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 91\u00b0F, 4 mph sustained wind with gusts near 7 mph, and 10% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "title": "Kickoff weather in TEN"
+    }
+  ],
+  "2026_01_SF_LA": [
+    {
+      "as_of": "2026-09-08T20:55:09.591310+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": -0.049324994930470566,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": 0.0298595959319999,
+        "offense_rate": 0.5508701472556894
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 734,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps. LA allowed -0.05 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "SF pre-snap motion vs LA"
+    },
+    {
+      "as_of": "2026-09-08T20:55:09.592608+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": 0.11797846601660118,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": 0.08273802886756741,
+        "offense_rate": 0.030432136335970784
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 50,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "LA used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced +0.08 EPA/play on those snaps. SF allowed +0.12 EPA/play against the same concept. That creates a potential advantage; it is contextual evidence, not a silently added model feature.",
+      "title": "LA screens vs SF"
+    }
+  ],
+  "2026_01_TB_CIN": [
+    {
+      "as_of": "2026-09-08T20:55:10.477647+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "play_action",
+        "defense_epa_allowed": 0.30681133822233003,
+        "league_rate": 0.10998366087925848,
+        "offense_epa": 0.30379260505162226,
+        "offense_rate": 0.08351331893448524
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 116,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "TB used play action on 8% of charted plays in 2025, versus a league median of 11%, and produced +0.30 EPA/play on those snaps. CIN allowed +0.31 EPA/play against the same concept. That creates a potential advantage; it is contextual evidence, not a silently added model feature.",
+      "title": "TB play action vs CIN"
+    },
+    {
+      "as_of": "2026-09-08T20:55:10.479748+00:00",
+      "category": "scheme",
+      "metadata": {
+        "dc": null,
+        "dc_tenure": [],
+        "defense_blitz_rate": 0.19506553585196607,
+        "league_blitz_rate": 0.13608347419285077,
+        "qb_blitz_epa": 0.10137351036597476
+      },
+      "promoted_to_model": false,
+      "relevance": "Quarterback performance against blitz paired with opponent blitz tendency",
+      "sample_size": 260,
+      "side": "home",
+      "source_name": "FTN Data + nflverse PBP",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "TB blitzed on 20% of charted plays in the latest complete FTN season (league median 14%). Joe Burrow produced +0.10 EPA/dropback across 260 charted blitzed dropbacks over the two most recent available seasons. The sample describes a pressure-style matchup; it does not prove the quarterback will repeat that result.",
+      "title": "Joe Burrow vs TB pressure profile"
+    },
+    {
+      "as_of": "2026-09-08T20:55:10.479128+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "screen",
+        "defense_epa_allowed": 0.1642757309251465,
+        "league_rate": 0.03582684369980277,
+        "offense_epa": -0.5602348468939335,
+        "offense_rate": 0.0332129963898917
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 46,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "CIN used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced -0.56 EPA/play on those snaps. TB allowed +0.16 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "CIN screens vs TB"
+    }
+  ],
+  "2026_01_WAS_PHI": [
+    {
+      "as_of": "2026-09-08T20:55:14.845929+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "motion",
+        "defense_epa_allowed": 0.19994110978072052,
+        "league_rate": 0.42985175626337657,
+        "offense_epa": -0.0010471462291922532,
+        "offense_rate": 0.36428571428571427
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 510,
+      "side": "home",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Strong",
+      "summary": "PHI used pre-snap motion on 36% of charted plays in 2025, versus a league median of 43%, and produced -0.00 EPA/play on those snaps. WAS allowed +0.20 EPA/play against the same concept. That creates a tactical tension; it is contextual evidence, not a silently added model feature.",
+      "title": "PHI pre-snap motion vs WAS"
+    },
+    {
+      "as_of": "2026-09-08T20:55:14.844577+00:00",
+      "category": "scheme",
+      "metadata": {
+        "concept": "rpo",
+        "defense_epa_allowed": -0.15755381415339045,
+        "league_rate": 0.043930544351750686,
+        "offense_epa": -0.029370653719879777,
+        "offense_rate": 0.06264323911382735
+      },
+      "promoted_to_model": false,
+      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
+      "sample_size": 53,
+      "side": "away",
+      "source_name": "FTN Data via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+      "strength": "Moderate",
+      "summary": "WAS used RPOs on 6% of charted plays in 2025, versus a league median of 4%, and produced -0.03 EPA/play on those snaps. PHI allowed -0.16 EPA/play against the same concept. That creates a matchup to monitor; it is contextual evidence, not a silently added model feature.",
+      "title": "WAS RPOs vs PHI"
+    },
+    {
+      "as_of": "2026-09-08T20:55:15.482461+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 9.2,
+        "precip_pct": 35.0,
+        "roof": "outdoor",
+        "temp_f": 70.4,
+        "wind_mph": 4.1
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.9008&longitude=-75.1675&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 70\u00b0F, 4 mph sustained wind with gusts near 9 mph, and 35% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "title": "Kickoff weather in PHI"
+    }
+  ]
 }
