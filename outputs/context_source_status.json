@@ -1,7 +1,9 @@
 {
   "coaching": {
-    "as_of": "2026-09-08T21:25:33.990151+00:00",
+    "as_of": "2026-09-08T22:50:58.367676+00:00",
+    "current_team_coverage": 3,
     "pages_missing": 140,
+    "requested_teams": 32,
     "source": "Wikipedia season pages",
     "status": "degraded"
   },
@@ -9,11 +11,31 @@
     "season": 2026,
     "status": "healthy"
   },
+  "editorial_intelligence": {
+    "as_of": "2026-09-08T22:51:14.894529+00:00",
+    "families": [
+      "pressure",
+      "explosives",
+      "early_down",
+      "run_front",
+      "alignment",
+      "third_down",
+      "yac",
+      "motion",
+      "play_action",
+      "rpo",
+      "screen"
+    ],
+    "games": 16,
+    "guardrail": "Diversity ranking changes only explanatory evidence, never LevLine probabilities.",
+    "signals_added_before_diversity_filter": 112,
+    "status": "healthy"
+  },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-08T21:25:33.241451+00:00",
+    "generated_utc": "2026-09-08T22:50:57.793142+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 51,
+    "signals": 91,
     "status": "healthy"
   },
   "ftn": {
@@ -26,14 +48,14 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-08T21:25:33.241451+00:00",
+  "generated_utc": "2026-09-08T22:50:57.793142+00:00",
   "injuries": {
-    "as_of": "2026-09-08T21:25:33.781731+00:00",
-    "players": 11,
+    "as_of": "2026-09-08T22:50:57.976573+00:00",
+    "players": 29,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
     "status": "healthy",
-    "teams_with_reported_players": 2
+    "teams_with_reported_players": 4
   },
   "pbp": {
     "seasons": [
@@ -47,8 +69,9 @@
     "status": "healthy"
   },
   "previews": {
+    "engine": "LevLine",
     "games": 16,
-    "generator": "deterministic evidence composer",
+    "generator": "Sunday Signal deterministic evidence composer",
     "guardrail": "Written previews may synthesize verified context but do not alter numerical probabilities.",
     "status": "healthy"
   },
@@ -58,15 +81,15 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-08T21:25:37.304806+00:00",
+    "as_of": "2026-09-08T22:51:01.140675+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
     "status": "healthy"
   },
   "weather": {
-    "as_of": "2026-09-08T21:26:45.253032+00:00",
+    "as_of": "2026-09-08T22:51:08.780569+00:00",
     "games_checked": 11,
-    "status": "degraded"
+    "status": "healthy"
   }
 }

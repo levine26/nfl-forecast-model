@@ -1,6 +1,17 @@
 {
   "2026_01_ARI_LAC": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "ARI produced gains of 20+ yards on 6.4% of pass plays, while LAC allowed them on 6.5%. ARI threw on 65% of first- and second-down plays and generated +0.06 EPA per early-down pass.",
+    "case_for_pick": "LAC allowed sacks on 8.7% of pass plays in the latest complete season, while ARI generated sacks on 4.5%. Across 2 prior meetings with ARI, Justin Herbert averaged +0.10 EPA/dropback with a 48% positive-EPA rate over 94 dropbacks.",
+    "engine": "LevLine",
     "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Justin Herbert vs ARI: prior meetings"
+      },
       {
         "category": "coaching",
         "source_name": "Wikipedia season staff records",
@@ -17,32 +28,95 @@
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "ARI play action vs LAC"
+        "title": "LAC protection vs ARI pass rush"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Weak",
-        "title": "LAC screens vs ARI"
+        "strength": "Strong",
+        "title": "ARI explosives vs LAC prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "ARI early-down approach vs LAC"
       }
     ],
     "game_id": "2026_01_ARI_LAC",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "LAC 74.7% \u2014 LAC 28.7 \u2013 ARI 18.7",
+    "key_factors": [
+      {
+        "advantage_team": "LAC",
+        "family": "pressure",
+        "sample_size": 758,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "LAC allowed sacks on 8.7% of pass plays in the latest complete season, while ARI generated sacks on 4.5%. This is a direct trench interaction: if ARI can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "LAC protection vs ARI pass rush"
+      },
+      {
+        "advantage_team": "ARI",
+        "family": "explosives",
+        "sample_size": 758,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "ARI produced gains of 20+ yards on 6.4% of pass plays, while LAC allowed them on 6.5%. That isolates the vertical-volatility question: whether ARI can create chunk plays before LAC forces the offense to sustain long drives.",
+        "title": "ARI explosives vs LAC prevention"
+      },
+      {
+        "advantage_team": "ARI",
+        "family": "early down",
+        "sample_size": 758,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "ARI threw on 65% of first- and second-down plays and generated +0.06 EPA per early-down pass. LAC allowed -0.05 EPA on opponent early-down passes.",
+        "title": "ARI early-down approach vs LAC"
+      }
+    ],
     "matchup": "ARI @ LAC",
+    "matchup_meter": [
+      {
+        "label": "Pressure",
+        "leader": "LAC",
+        "strength": "Strong",
+        "title": "LAC protection vs ARI pass rush"
+      },
+      {
+        "label": "Explosives",
+        "leader": "ARI",
+        "strength": "Strong",
+        "title": "ARI explosives vs LAC prevention"
+      },
+      {
+        "label": "Early Down",
+        "leader": "ARI",
+        "strength": "Strong",
+        "title": "ARI early-down approach vs LAC"
+      }
+    ],
     "paragraphs": [
-      "LAC is the current model pick at 74.7%. The expected-margin model makes LAC about 10.1 points better in the central forecast, with an expected total of 47.4. The PURE model is 6.5 percentage points more bullish on ARI than the market-implied probability.",
-      "Historical comparisons need an adjustment because this is not the same structural matchup as last season. ARI enters 2026 with head coach Mike LaFleur and offensive coordinator Nathaniel Hackett. ARI is coordinated by Nick Rallis in 2026, replacing the prior defensive staff.",
-      "Schematically, ARI used play action on 14% of charted plays in 2025, versus a league median of 11%, and produced +0.03 EPA/play on those snaps. LAC allowed -0.04 EPA/play against the same concept. LAC used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced -0.11 EPA/play on those snaps. ARI allowed +0.19 EPA/play against the same concept."
+      "LAC is the current model pick at 74.7% under LevLine. The central margin is LAC by 10.1, with a projected total of 47.4. LevLine's football-only probability is 6.5 percentage points more bullish on ARI than the market-implied probability.",
+      "The clearest tactical stress point is protection versus pressure. LAC allowed sacks on 8.7% of pass plays in the latest complete season, while ARI generated sacks on 4.5%. This is a direct trench interaction: if ARI can force longer downs, the pressure matchup becomes more important than the raw season averages. A second, different lever: ARI produced gains of 20+ yards on 6.4% of pass plays, while LAC allowed them on 6.5%.",
+      "The historical matchup is relevant, but not automatically transferable. Across 2 prior meetings with ARI, Justin Herbert averaged +0.10 EPA/dropback with a 48% positive-EPA rate over 94 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. What is different now: ARI enters 2026 with head coach Mike LaFleur and offensive coordinator Nathaniel Hackett. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable. That is why Sunday Signal treats the old result as evidence, not destiny."
     ],
     "prediction": "LAC to win, with LAC 28.7 \u2013 ARI 18.7 as the central score projection.",
-    "what_could_make_us_wrong": "Ari can still overturn the central forecast through turnover margin, explosive plays, or unusually strong high-leverage down performance."
+    "what_could_make_us_wrong": "Ari owns at least one matchup-specific counter-signal in the evidence set."
   },
   "2026_01_ATL_PIT": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "ATL threw on 49% of first- and second-down plays and generated +0.16 EPA per early-down pass.",
+    "case_for_pick": "ATL allowed sacks on 4.2% of pass plays in the latest complete season, while PIT generated sacks on 6.7%. PIT averaged 6.4 yards after catch on completed passes; ATL allowed 4.9.",
+    "engine": "LevLine",
     "evidence_used": [
       {
         "category": "coaching",
@@ -53,74 +127,229 @@
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data + nflverse PBP",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "Tua Tagovailoa vs PIT pressure profile"
+        "title": "ATL protection vs PIT pass rush"
+      },
+      {
+        "category": "matchup",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "PIT YAC creation vs ATL tackling"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "ATL play action vs PIT"
+        "title": "ATL early-down approach vs PIT"
       }
     ],
     "game_id": "2026_01_ATL_PIT",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "PIT 67.0% \u2014 PIT 27.0 \u2013 ATL 20.7",
-    "matchup": "ATL @ PIT",
-    "paragraphs": [
-      "PIT is the current model pick at 67.0%. The expected-margin model makes PIT about 6.2 points better in the central forecast, with an expected total of 47.7. The PURE model is 6.3 percentage points more bullish on PIT than the market-implied probability. On the spread scale, the model is 2.7 points more favorable to PIT than the current market line.",
-      "Historical comparisons need an adjustment because this is not the same structural matchup as last season. ATL enters 2026 with head coach Kevin Stefanski.",
-      "Schematically, PIT blitzed on 19% of charted plays in the latest complete FTN season (league median 14%). Tua Tagovailoa produced -0.06 EPA/dropback across 201 charted blitzed dropbacks over the two most recent available seasons. ATL used play action on 9% of charted plays in 2025, versus a league median of 11%, and produced +0.27 EPA/play on those snaps. PIT allowed -0.15 EPA/play against the same concept."
-    ],
-    "prediction": "PIT to win, with PIT 27.0 \u2013 ATL 20.7 as the central score projection.",
-    "what_could_make_us_wrong": "Atl can still overturn the central forecast through turnover margin, explosive plays, or unusually strong high-leverage down performance."
-  },
-  "2026_01_BAL_IND": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "advantage_team": "PIT",
+        "family": "pressure",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "IND RPOs vs BAL"
+        "summary": "ATL allowed sacks on 4.2% of pass plays in the latest complete season, while PIT generated sacks on 6.7%. This is a direct trench interaction: if PIT can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "ATL protection vs PIT pass rush"
+      },
+      {
+        "advantage_team": "PIT",
+        "family": "yac",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "PIT averaged 6.4 yards after catch on completed passes; ATL allowed 4.9. This game can swing on whether routine completions become extra first downs after the catch.",
+        "title": "PIT YAC creation vs ATL tackling"
+      },
+      {
+        "advantage_team": "ATL",
+        "family": "early down",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "ATL threw on 49% of first- and second-down plays and generated +0.16 EPA per early-down pass. PIT allowed +0.01 EPA on opponent early-down passes.",
+        "title": "ATL early-down approach vs PIT"
+      }
+    ],
+    "matchup": "ATL @ PIT",
+    "matchup_meter": [
+      {
+        "label": "Pressure",
+        "leader": "PIT",
+        "strength": "Strong",
+        "title": "ATL protection vs PIT pass rush"
+      },
+      {
+        "label": "Yac",
+        "leader": "PIT",
+        "strength": "Strong",
+        "title": "PIT YAC creation vs ATL tackling"
+      },
+      {
+        "label": "Early Down",
+        "leader": "ATL",
+        "strength": "Strong",
+        "title": "ATL early-down approach vs PIT"
+      }
+    ],
+    "paragraphs": [
+      "PIT is the current model pick at 67.0% under LevLine. The central margin is PIT by 6.2, with a projected total of 47.7. LevLine's football-only probability is 6.3 percentage points more bullish on PIT than the market-implied probability. On the spread scale, LevLine is 2.7 points more favorable to PIT than the current market line.",
+      "The clearest tactical stress point is protection versus pressure. ATL allowed sacks on 4.2% of pass plays in the latest complete season, while PIT generated sacks on 6.7%. This is a direct trench interaction: if PIT can force longer downs, the pressure matchup becomes more important than the raw season averages. A second, different lever: PIT averaged 6.4 yards after catch on completed passes; ATL allowed 4.9.",
+      "Older matchup history needs to be discounted because the decision-makers changed. ATL enters 2026 with head coach Kevin Stefanski."
+    ],
+    "prediction": "PIT to win, with PIT 27.0 \u2013 ATL 20.7 as the central score projection.",
+    "what_could_make_us_wrong": "Atl owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_BAL_IND": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "BAL threw on 45% of first- and second-down plays and generated +0.08 EPA per early-down pass.",
+    "case_for_pick": "BAL allowed sacks on 8.4% of pass plays in the latest complete season, while IND generated sacks on 5.3%. IND produced gains of 20+ yards on 6.9% of pass plays, while BAL allowed them on 9.3%.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Lamar Jackson vs IND: prior meetings"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Moderate",
-        "title": "BAL RPOs vs IND"
+        "strength": "Strong",
+        "title": "BAL protection vs IND pass rush"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "BAL early-down approach vs IND"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "IND explosives vs BAL prevention"
       }
     ],
     "game_id": "2026_01_BAL_IND",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "BAL 58.1% \u2014 IND 20.5 \u2013 BAL 23.7",
-    "matchup": "BAL @ IND",
-    "paragraphs": [
-      "BAL is the current model pick at 58.1%. The expected-margin model makes BAL about 3.2 points better in the central forecast, with an expected total of 44.2. The PURE model is 3.7 percentage points more bullish on IND than the market-implied probability.",
-      "Schematically, IND used RPOs on 7% of charted plays in 2025, versus a league median of 4%, and produced -0.10 EPA/play on those snaps. BAL allowed -0.18 EPA/play against the same concept. BAL used RPOs on 4% of charted plays in 2025, versus a league median of 4%, and produced -0.13 EPA/play on those snaps. IND allowed -0.34 EPA/play against the same concept."
-    ],
-    "prediction": "BAL to win, with IND 20.5 \u2013 BAL 23.7 as the central score projection.",
-    "what_could_make_us_wrong": "Component-model disagreement is elevated (11.6%)."
-  },
-  "2026_01_BUF_HOU": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "advantage_team": "BAL",
+        "family": "pressure",
+        "sample_size": 533,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "BUF play action vs HOU"
+        "summary": "BAL allowed sacks on 8.4% of pass plays in the latest complete season, while IND generated sacks on 5.3%. This is a direct trench interaction: if IND can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "BAL protection vs IND pass rush"
+      },
+      {
+        "advantage_team": "IND",
+        "family": "early down",
+        "sample_size": 533,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "BAL threw on 45% of first- and second-down plays and generated +0.08 EPA per early-down pass. IND allowed +0.10 EPA on opponent early-down passes.",
+        "title": "BAL early-down approach vs IND"
+      },
+      {
+        "advantage_team": "BAL",
+        "family": "explosives",
+        "sample_size": 533,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "IND produced gains of 20+ yards on 6.9% of pass plays, while BAL allowed them on 9.3%. That isolates the vertical-volatility question: whether IND can create chunk plays before BAL forces the offense to sustain long drives.",
+        "title": "IND explosives vs BAL prevention"
+      }
+    ],
+    "matchup": "BAL @ IND",
+    "matchup_meter": [
+      {
+        "label": "Pressure",
+        "leader": "BAL",
+        "strength": "Strong",
+        "title": "BAL protection vs IND pass rush"
+      },
+      {
+        "label": "Early Down",
+        "leader": "IND",
+        "strength": "Strong",
+        "title": "BAL early-down approach vs IND"
+      },
+      {
+        "label": "Explosives",
+        "leader": "BAL",
+        "strength": "Strong",
+        "title": "IND explosives vs BAL prevention"
+      }
+    ],
+    "paragraphs": [
+      "BAL is the current model pick at 58.1% under LevLine. The central margin is BAL by 3.2, with a projected total of 44.2. LevLine's football-only probability is 3.7 percentage points more bullish on IND than the market-implied probability.",
+      "The clearest tactical stress point is protection versus pressure. BAL allowed sacks on 8.4% of pass plays in the latest complete season, while IND generated sacks on 5.3%. This is a direct trench interaction: if IND can force longer downs, the pressure matchup becomes more important than the raw season averages. A second, different lever: BAL threw on 45% of first- and second-down plays and generated +0.08 EPA per early-down pass.",
+      "There is useful historical context: Across 2 prior meetings with IND, Lamar Jackson averaged +0.24 EPA/dropback with a 63% positive-EPA rate over 82 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
+    ],
+    "prediction": "BAL to win, with IND 20.5 \u2013 BAL 23.7 as the central score projection.",
+    "what_could_make_us_wrong": "Component-model disagreement is elevated (11.6%); ind owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_BUF_HOU": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "BUF threw on 50% of first- and second-down plays and generated +0.20 EPA per early-down pass.",
+    "case_for_pick": "BUF allowed sacks on 6.2% of pass plays in the latest complete season, while HOU generated sacks on 7.6%. HOU produced gains of 20+ yards on 6.9% of pass plays, while BUF allowed them on 7.2%.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Moderate",
+        "title": "Josh Allen vs HOU: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "C.J. Stroud vs BUF: prior meetings"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Weak",
-        "title": "HOU screens vs BUF"
+        "strength": "Strong",
+        "title": "BUF early-down approach vs HOU"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "BUF protection vs HOU pass rush"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "HOU explosives vs BUF prevention"
       },
       {
         "category": "weather",
@@ -131,18 +360,97 @@
       }
     ],
     "game_id": "2026_01_BUF_HOU",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "HOU 56.6% \u2014 HOU 27.7 \u2013 BUF 21.0",
+    "key_factors": [
+      {
+        "advantage_team": "BUF",
+        "family": "early down",
+        "sample_size": 706,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "BUF threw on 50% of first- and second-down plays and generated +0.20 EPA per early-down pass. HOU allowed -0.16 EPA on opponent early-down passes.",
+        "title": "BUF early-down approach vs HOU"
+      },
+      {
+        "advantage_team": "HOU",
+        "family": "pressure",
+        "sample_size": 706,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "BUF allowed sacks on 6.2% of pass plays in the latest complete season, while HOU generated sacks on 7.6%. This is a direct trench interaction: if HOU can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "BUF protection vs HOU pass rush"
+      },
+      {
+        "advantage_team": "HOU",
+        "family": "explosives",
+        "sample_size": 706,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "HOU produced gains of 20+ yards on 6.9% of pass plays, while BUF allowed them on 7.2%. That isolates the vertical-volatility question: whether HOU can create chunk plays before BUF forces the offense to sustain long drives.",
+        "title": "HOU explosives vs BUF prevention"
+      }
+    ],
     "matchup": "BUF @ HOU",
+    "matchup_meter": [
+      {
+        "label": "Early Down",
+        "leader": "BUF",
+        "strength": "Strong",
+        "title": "BUF early-down approach vs HOU"
+      },
+      {
+        "label": "Pressure",
+        "leader": "HOU",
+        "strength": "Strong",
+        "title": "BUF protection vs HOU pass rush"
+      },
+      {
+        "label": "Explosives",
+        "leader": "HOU",
+        "strength": "Strong",
+        "title": "HOU explosives vs BUF prevention"
+      }
+    ],
     "paragraphs": [
-      "HOU is the current model pick at 56.6%. The expected-margin model makes HOU about 6.7 points better in the central forecast, with an expected total of 48.7. The PURE model is 10.3 percentage points more bullish on HOU than the market-implied probability. On the spread scale, the model is 8.2 points more favorable to HOU than the current market line.",
-      "Schematically, BUF used play action on 12% of charted plays in 2025, versus a league median of 11%, and produced +0.35 EPA/play on those snaps. HOU allowed -0.10 EPA/play against the same concept. HOU used screens on 2% of charted plays in 2025, versus a league median of 4%, and produced -0.38 EPA/play on those snaps. BUF allowed -0.54 EPA/play against the same concept. Situationally, Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 9 mph, and 14% precipitation probability."
+      "HOU is the current model pick at 56.6% under LevLine. The central margin is HOU by 6.7, with a projected total of 48.7. LevLine's football-only probability is 10.3 percentage points more bullish on HOU than the market-implied probability. On the spread scale, LevLine is 8.2 points more favorable to HOU than the current market line.",
+      "Early downs may determine who controls the script. BUF threw on 50% of first- and second-down plays and generated +0.20 EPA per early-down pass. HOU allowed -0.16 EPA on opponent early-down passes. A second, different lever: BUF allowed sacks on 6.2% of pass plays in the latest complete season, while HOU generated sacks on 7.6%.",
+      "There is useful historical context: Across 3 prior meetings with HOU, Josh Allen averaged -0.16 EPA/dropback with a 39% positive-EPA rate over 104 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
+      "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 9 mph, and 14% precipitation probability."
     ],
     "prediction": "HOU to win, with HOU 27.7 \u2013 BUF 21.0 as the central score projection.",
-    "what_could_make_us_wrong": "Component-model disagreement is elevated (8.7%); the game is close to a coin flip even though a side must be selected; late personnel or weather changes could materially alter the matchup context."
+    "what_could_make_us_wrong": "Component-model disagreement is elevated (8.7%); the game is close to a coin flip even though a side must be selected; the active weather/travel/personnel scenario could shift the game script; buf owns at least one matchup-specific counter-signal in the evidence set."
   },
   "2026_01_CHI_CAR": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "CAR produced gains of 20+ yards on 7.2% of pass plays, while CHI allowed them on 10.1%. Across 2 prior meetings with CHI, Bryce Young averaged -0.18 EPA/dropback with a 29% positive-EPA rate over 49 dropbacks.",
+    "case_for_pick": "LevLine's combined probability and margin heads favor CAR; the strongest supporting evidence is shown in the matchup factors above.",
+    "engine": "LevLine",
     "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Bryce Young vs CHI: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Caleb Williams vs CAR: prior meetings"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "CAR explosives vs CHI prevention"
+      },
       {
         "category": "scheme",
         "source_name": "FTN Data via nflverse",
@@ -159,31 +467,109 @@
       }
     ],
     "game_id": "2026_01_CHI_CAR",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "CAR 50.0% \u2014 CAR 21.7 \u2013 CHI 22.0",
-    "matchup": "CHI @ CAR",
-    "paragraphs": [
-      "CAR is the current model pick at 50.0%. The expected-margin model makes CHI about 0.3 points better in the central forecast, with an expected total of 43.7. The PURE model is 11.1 percentage points more bullish on CAR than the market-implied probability. On the spread scale, the model is 2.7 points more favorable to CAR than the current market line.",
-      "Schematically, CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps. CAR allowed -0.03 EPA/play against the same concept. CAR used RPOs on 8% of charted plays in 2025, versus a league median of 4%, and produced +0.03 EPA/play on those snaps. CHI allowed -0.12 EPA/play against the same concept."
-    ],
-    "prediction": "CAR to win, with CAR 21.7 \u2013 CHI 22.0 as the central score projection.",
-    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected."
-  },
-  "2026_01_CLE_JAX": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
+        "advantage_team": "CHI",
+        "family": "explosives",
+        "sample_size": 668,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "CAR produced gains of 20+ yards on 7.2% of pass plays, while CHI allowed them on 10.1%. That isolates the vertical-volatility question: whether CAR can create chunk plays before CHI forces the offense to sustain long drives.",
+        "title": "CAR explosives vs CHI prevention"
+      },
+      {
+        "advantage_team": null,
+        "family": "play action",
+        "sample_size": 144,
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "JAX pre-snap motion vs CLE"
+        "summary": "CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps. CAR allowed -0.03 EPA/play against the same concept.",
+        "title": "CHI play action vs CAR"
+      },
+      {
+        "advantage_team": null,
+        "family": "rpo",
+        "sample_size": 62,
+        "source_name": "FTN Data via nflverse",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Moderate",
+        "summary": "CAR used RPOs on 8% of charted plays in 2025, versus a league median of 4%, and produced +0.03 EPA/play on those snaps. CHI allowed -0.12 EPA/play against the same concept.",
+        "title": "CAR RPOs vs CHI"
+      }
+    ],
+    "matchup": "CHI @ CAR",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "CHI",
+        "strength": "Strong",
+        "title": "CAR explosives vs CHI prevention"
+      },
+      {
+        "label": "Play Action",
+        "leader": "Mixed",
+        "strength": "Strong",
+        "title": "CHI play action vs CAR"
+      },
+      {
+        "label": "Rpo",
+        "leader": "Mixed",
+        "strength": "Moderate",
+        "title": "CAR RPOs vs CHI"
+      }
+    ],
+    "paragraphs": [
+      "CAR is the current model pick at 50.0% under LevLine. The central margin is CHI by 0.3, with a projected total of 43.7. LevLine's football-only probability is 11.1 percentage points more bullish on CAR than the market-implied probability. On the spread scale, LevLine is 2.7 points more favorable to CAR than the current market line.",
+      "The most volatile matchup is the explosive-pass battle. CAR produced gains of 20+ yards on 7.2% of pass plays, while CHI allowed them on 10.1%. That isolates the vertical-volatility question: whether CAR can create chunk plays before CHI forces the offense to sustain long drives. A second, different lever: CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps.",
+      "There is useful historical context: Across 2 prior meetings with CHI, Bryce Young averaged -0.18 EPA/dropback with a 29% positive-EPA rate over 49 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
+    ],
+    "prediction": "CAR to win, with CAR 21.7 \u2013 CHI 22.0 as the central score projection.",
+    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected; chi owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_CLE_JAX": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "CLE allowed sacks on 7.5% of pass plays in the latest complete season, while JAX generated sacks on 4.2%. Across 2 prior meetings with CLE, Trevor Lawrence averaged -0.18 EPA/dropback with a 36% positive-EPA rate over 89 dropbacks.",
+    "case_for_pick": "CLE produced gains of 20+ yards on 5.1% of pass plays, while JAX allowed them on 6.3%.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Trevor Lawrence vs CLE: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Deshaun Watson vs JAX: prior meetings"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "CLE explosives vs JAX prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "CLE protection vs JAX pass rush"
       },
       {
         "category": "scheme",
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "CLE pre-snap motion vs JAX"
+        "title": "JAX pre-snap motion vs CLE"
       },
       {
         "category": "weather",
@@ -194,24 +580,103 @@
       }
     ],
     "game_id": "2026_01_CLE_JAX",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "JAX 73.2% \u2014 JAX 27.1 \u2013 CLE 18.8",
-    "matchup": "CLE @ JAX",
-    "paragraphs": [
-      "JAX is the current model pick at 73.2%. The expected-margin model makes JAX about 8.4 points better in the central forecast, with an expected total of 45.9. The PURE model is 7.3 percentage points more bullish on CLE than the market-implied probability.",
-      "Schematically, JAX used pre-snap motion on 47% of charted plays in 2025, versus a league median of 43%, and produced +0.07 EPA/play on those snaps. CLE allowed -0.16 EPA/play against the same concept. CLE used pre-snap motion on 39% of charted plays in 2025, versus a league median of 43%, and produced -0.09 EPA/play on those snaps. JAX allowed -0.10 EPA/play against the same concept. Situationally, Open-Meteo's forecast nearest kickoff is 96\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 10% precipitation probability."
-    ],
-    "prediction": "JAX to win, with JAX 27.1 \u2013 CLE 18.8 as the central score projection.",
-    "what_could_make_us_wrong": "Late personnel or weather changes could materially alter the matchup context."
-  },
-  "2026_01_DAL_NYG": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
+        "advantage_team": "JAX",
+        "family": "explosives",
+        "sample_size": 681,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "CLE produced gains of 20+ yards on 5.1% of pass plays, while JAX allowed them on 6.3%. That isolates the vertical-volatility question: whether CLE can create chunk plays before JAX forces the offense to sustain long drives.",
+        "title": "CLE explosives vs JAX prevention"
+      },
+      {
+        "advantage_team": "CLE",
+        "family": "pressure",
+        "sample_size": 681,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "CLE allowed sacks on 7.5% of pass plays in the latest complete season, while JAX generated sacks on 4.2%. This is a direct trench interaction: if JAX can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "CLE protection vs JAX pass rush"
+      },
+      {
+        "advantage_team": null,
+        "family": "motion",
+        "sample_size": 604,
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "NYG pre-snap motion vs DAL"
+        "summary": "JAX used pre-snap motion on 47% of charted plays in 2025, versus a league median of 43%, and produced +0.07 EPA/play on those snaps. CLE allowed -0.16 EPA/play against the same concept.",
+        "title": "JAX pre-snap motion vs CLE"
+      }
+    ],
+    "matchup": "CLE @ JAX",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "JAX",
+        "strength": "Strong",
+        "title": "CLE explosives vs JAX prevention"
+      },
+      {
+        "label": "Pressure",
+        "leader": "CLE",
+        "strength": "Strong",
+        "title": "CLE protection vs JAX pass rush"
+      },
+      {
+        "label": "Motion",
+        "leader": "Mixed",
+        "strength": "Strong",
+        "title": "JAX pre-snap motion vs CLE"
+      }
+    ],
+    "paragraphs": [
+      "JAX is the current model pick at 73.2% under LevLine. The central margin is JAX by 8.4, with a projected total of 45.9. LevLine's football-only probability is 7.3 percentage points more bullish on CLE than the market-implied probability.",
+      "The most volatile matchup is the explosive-pass battle. CLE produced gains of 20+ yards on 5.1% of pass plays, while JAX allowed them on 6.3%. That isolates the vertical-volatility question: whether CLE can create chunk plays before JAX forces the offense to sustain long drives. A second, different lever: CLE allowed sacks on 7.5% of pass plays in the latest complete season, while JAX generated sacks on 4.2%.",
+      "There is useful historical context: Across 2 prior meetings with CLE, Trevor Lawrence averaged -0.18 EPA/dropback with a 36% positive-EPA rate over 89 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
+      "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 96\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 10% precipitation probability."
+    ],
+    "prediction": "JAX to win, with JAX 27.1 \u2013 CLE 18.8 as the central score projection.",
+    "what_could_make_us_wrong": "The active weather/travel/personnel scenario could shift the game script; cle owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_DAL_NYG": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "NYG produced gains of 20+ yards on 8.1% of pass plays, while DAL allowed them on 8.8%. Across 8 prior meetings with NYG, Dak Prescott averaged +0.24 EPA/dropback with a 51% positive-EPA rate over 257 dropbacks.",
+    "case_for_pick": "NYG allowed sacks on 7.1% of pass plays in the latest complete season, while DAL generated sacks on 5.2%. Across 1 prior meeting with DAL, Jaxson Dart averaged +0.22 EPA/dropback with a 53% positive-EPA rate over 36 dropbacks.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "Dak Prescott vs NYG: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Jaxson Dart vs DAL: prior meetings"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "NYG explosives vs DAL prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "NYG protection vs DAL pass rush"
       },
       {
         "category": "scheme",
@@ -222,24 +687,102 @@
       }
     ],
     "game_id": "2026_01_DAL_NYG",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "NYG 54.8% \u2014 NYG 23.9 \u2013 DAL 22.3",
-    "matchup": "DAL @ NYG",
-    "paragraphs": [
-      "NYG is the current model pick at 54.8%. The expected-margin model makes NYG about 1.7 points better in the central forecast, with an expected total of 46.2. The PURE model is 18.8 percentage points more bullish on NYG than the market-implied probability. On the spread scale, the model is 4.7 points more favorable to NYG than the current market line.",
-      "Schematically, NYG used pre-snap motion on 31% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps. DAL allowed +0.14 EPA/play against the same concept. DAL used RPOs on 4% of charted plays in 2025, versus a league median of 4%, and produced -0.02 EPA/play on those snaps. NYG allowed +0.21 EPA/play against the same concept."
-    ],
-    "prediction": "NYG to win, with NYG 23.9 \u2013 DAL 22.3 as the central score projection.",
-    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected."
-  },
-  "2026_01_DEN_KC": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data + nflverse PBP",
+        "advantage_team": "DAL",
+        "family": "explosives",
+        "sample_size": 676,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "Bo Nix vs KC pressure profile"
+        "summary": "NYG produced gains of 20+ yards on 8.1% of pass plays, while DAL allowed them on 8.8%. That isolates the vertical-volatility question: whether NYG can create chunk plays before DAL forces the offense to sustain long drives.",
+        "title": "NYG explosives vs DAL prevention"
+      },
+      {
+        "advantage_team": "NYG",
+        "family": "pressure",
+        "sample_size": 676,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "NYG allowed sacks on 7.1% of pass plays in the latest complete season, while DAL generated sacks on 5.2%. This is a direct trench interaction: if DAL can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "NYG protection vs DAL pass rush"
+      },
+      {
+        "advantage_team": "DAL",
+        "family": "qb opponent history",
+        "sample_size": 257,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "Across 8 prior meetings with NYG, Dak Prescott averaged +0.24 EPA/dropback with a 51% positive-EPA rate over 257 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
+        "title": "Dak Prescott vs NYG: prior meetings"
+      }
+    ],
+    "matchup": "DAL @ NYG",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "DAL",
+        "strength": "Strong",
+        "title": "NYG explosives vs DAL prevention"
+      },
+      {
+        "label": "Pressure",
+        "leader": "NYG",
+        "strength": "Strong",
+        "title": "NYG protection vs DAL pass rush"
+      },
+      {
+        "label": "Rpo",
+        "leader": "Mixed",
+        "strength": "Moderate",
+        "title": "DAL RPOs vs NYG"
+      }
+    ],
+    "paragraphs": [
+      "NYG is the current model pick at 54.8% under LevLine. The central margin is NYG by 1.7, with a projected total of 46.2. LevLine's football-only probability is 18.8 percentage points more bullish on NYG than the market-implied probability. On the spread scale, LevLine is 4.7 points more favorable to NYG than the current market line.",
+      "The most volatile matchup is the explosive-pass battle. NYG produced gains of 20+ yards on 8.1% of pass plays, while DAL allowed them on 8.8%. That isolates the vertical-volatility question: whether NYG can create chunk plays before DAL forces the offense to sustain long drives. A second, different lever: NYG allowed sacks on 7.1% of pass plays in the latest complete season, while DAL generated sacks on 5.2%.",
+      "There is useful historical context: Across 8 prior meetings with NYG, Dak Prescott averaged +0.24 EPA/dropback with a 51% positive-EPA rate over 257 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
+    ],
+    "prediction": "NYG to win, with NYG 23.9 \u2013 DAL 22.3 as the central score projection.",
+    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected; dal owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_DEN_KC": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "KC allowed sacks on 6.4% of pass plays in the latest complete season, while DEN generated sacks on 9.3%. Across 4 prior meetings with KC, Bo Nix averaged +0.30 EPA/dropback with a 55% positive-EPA rate over 139 dropbacks.",
+    "case_for_pick": "KC threw on 61% of first- and second-down plays and generated +0.11 EPA per early-down pass. Across 8 prior meetings with DEN, Patrick Mahomes averaged +0.06 EPA/dropback with a 46% positive-EPA rate over 338 dropbacks.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "Patrick Mahomes vs DEN: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Moderate",
+        "title": "Bo Nix vs KC: prior meetings"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "KC protection vs DEN pass rush"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "KC early-down approach vs DEN"
       },
       {
         "category": "scheme",
@@ -247,62 +790,205 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "DEN play action vs KC"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+        "strength": "Moderate",
+        "title": "Kickoff weather in KC"
       }
     ],
     "game_id": "2026_01_DEN_KC",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "KC 50.3% \u2014 KC 23.3 \u2013 DEN 25.6",
-    "matchup": "DEN @ KC",
-    "paragraphs": [
-      "KC is the current model pick at 50.3%. The expected-margin model makes DEN about 2.3 points better in the central forecast, with an expected total of 48.9. The PURE model is 9.2 percentage points more bullish on DEN than the market-implied probability. On the spread scale, the model is 5.3 points less favorable to KC than the current market line.",
-      "Schematically, KC blitzed on 19% of charted plays in the latest complete FTN season (league median 14%). Bo Nix produced +0.06 EPA/dropback across 374 charted blitzed dropbacks over the two most recent available seasons. DEN used play action on 13% of charted plays in 2025, versus a league median of 11%, and produced +0.03 EPA/play on those snaps. KC allowed +0.38 EPA/play against the same concept."
-    ],
-    "prediction": "KC to win, with KC 23.3 \u2013 DEN 25.6 as the central score projection.",
-    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected."
-  },
-  "2026_01_GB_MIN": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data + nflverse PBP",
+        "advantage_team": "DEN",
+        "family": "pressure",
+        "sample_size": 734,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "Jordan Love vs MIN pressure profile"
+        "summary": "KC allowed sacks on 6.4% of pass plays in the latest complete season, while DEN generated sacks on 9.3%. This is a direct trench interaction: if DEN can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "KC protection vs DEN pass rush"
+      },
+      {
+        "advantage_team": "KC",
+        "family": "early down",
+        "sample_size": 734,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "KC threw on 61% of first- and second-down plays and generated +0.11 EPA per early-down pass. DEN allowed -0.02 EPA on opponent early-down passes.",
+        "title": "KC early-down approach vs DEN"
+      },
+      {
+        "advantage_team": "KC",
+        "family": "qb opponent history",
+        "sample_size": 338,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "Across 8 prior meetings with DEN, Patrick Mahomes averaged +0.06 EPA/dropback with a 46% positive-EPA rate over 338 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
+        "title": "Patrick Mahomes vs DEN: prior meetings"
+      }
+    ],
+    "matchup": "DEN @ KC",
+    "matchup_meter": [
+      {
+        "label": "Pressure",
+        "leader": "DEN",
+        "strength": "Strong",
+        "title": "KC protection vs DEN pass rush"
+      },
+      {
+        "label": "Early Down",
+        "leader": "KC",
+        "strength": "Strong",
+        "title": "KC early-down approach vs DEN"
+      },
+      {
+        "label": "Play Action",
+        "leader": "Mixed",
+        "strength": "Strong",
+        "title": "DEN play action vs KC"
+      }
+    ],
+    "paragraphs": [
+      "KC is the current model pick at 50.3% under LevLine. The central margin is DEN by 2.3, with a projected total of 48.9. LevLine's football-only probability is 9.2 percentage points more bullish on DEN than the market-implied probability. On the spread scale, LevLine is 4.8 points less favorable to KC than the current market line.",
+      "The clearest tactical stress point is protection versus pressure. KC allowed sacks on 6.4% of pass plays in the latest complete season, while DEN generated sacks on 9.3%. This is a direct trench interaction: if DEN can force longer downs, the pressure matchup becomes more important than the raw season averages. A second, different lever: KC threw on 61% of first- and second-down plays and generated +0.11 EPA per early-down pass.",
+      "There is useful historical context: Across 8 prior meetings with DEN, Patrick Mahomes averaged +0.06 EPA/dropback with a 46% positive-EPA rate over 338 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
+      "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 88\u00b0F, 11 mph sustained wind with gusts near 29 mph, and 19% precipitation probability."
+    ],
+    "prediction": "KC to win, with KC 23.3 \u2013 DEN 25.6 as the central score projection.",
+    "what_could_make_us_wrong": "The game is close to a coin flip even though a side must be selected; the active weather/travel/personnel scenario could shift the game script; den owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_GB_MIN": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "GB produced gains of 20+ yards on 10.6% of pass plays, while MIN allowed them on 5.8%. GB threw on 49% of first- and second-down plays and generated +0.22 EPA per early-down pass.",
+    "case_for_pick": "MIN allowed sacks on 9.9% of pass plays in the latest complete season, while GB generated sacks on 5.2%.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "Jordan Love vs MIN: prior meetings"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Moderate",
-        "title": "MIN screens vs GB"
+        "strength": "Strong",
+        "title": "GB explosives vs MIN prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "MIN protection vs GB pass rush"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "GB early-down approach vs MIN"
       }
     ],
     "game_id": "2026_01_GB_MIN",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "MIN 61.8% \u2014 MIN 28.7 \u2013 GB 21.6",
+    "key_factors": [
+      {
+        "advantage_team": "GB",
+        "family": "explosives",
+        "sample_size": 608,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "GB produced gains of 20+ yards on 10.6% of pass plays, while MIN allowed them on 5.8%. That isolates the vertical-volatility question: whether GB can create chunk plays before MIN forces the offense to sustain long drives.",
+        "title": "GB explosives vs MIN prevention"
+      },
+      {
+        "advantage_team": "MIN",
+        "family": "pressure",
+        "sample_size": 608,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "MIN allowed sacks on 9.9% of pass plays in the latest complete season, while GB generated sacks on 5.2%. This is a direct trench interaction: if GB can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "MIN protection vs GB pass rush"
+      },
+      {
+        "advantage_team": "GB",
+        "family": "early down",
+        "sample_size": 608,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "GB threw on 49% of first- and second-down plays and generated +0.22 EPA per early-down pass. MIN allowed -0.08 EPA on opponent early-down passes.",
+        "title": "GB early-down approach vs MIN"
+      }
+    ],
     "matchup": "GB @ MIN",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "GB",
+        "strength": "Strong",
+        "title": "GB explosives vs MIN prevention"
+      },
+      {
+        "label": "Pressure",
+        "leader": "MIN",
+        "strength": "Strong",
+        "title": "MIN protection vs GB pass rush"
+      },
+      {
+        "label": "Early Down",
+        "leader": "GB",
+        "strength": "Strong",
+        "title": "GB early-down approach vs MIN"
+      }
+    ],
     "paragraphs": [
-      "MIN is the current model pick at 61.8%. The expected-margin model makes MIN about 7.1 points better in the central forecast, with an expected total of 50.3. The PURE model is 12.2 percentage points more bullish on MIN than the market-implied probability. On the spread scale, the model is 5.6 points more favorable to MIN than the current market line.",
-      "Schematically, MIN blitzed on 21% of charted plays in the latest complete FTN season (league median 14%). Jordan Love produced +0.13 EPA/dropback across 318 charted blitzed dropbacks over the two most recent available seasons. MIN used screens on 4% of charted plays in 2025, versus a league median of 4%, and produced +0.07 EPA/play on those snaps. GB allowed -0.02 EPA/play against the same concept."
+      "MIN is the current model pick at 61.8% under LevLine. The central margin is MIN by 7.1, with a projected total of 50.3. LevLine's football-only probability is 12.2 percentage points more bullish on MIN than the market-implied probability. On the spread scale, LevLine is 5.6 points more favorable to MIN than the current market line.",
+      "The most volatile matchup is the explosive-pass battle. GB produced gains of 20+ yards on 10.6% of pass plays, while MIN allowed them on 5.8%. That isolates the vertical-volatility question: whether GB can create chunk plays before MIN forces the offense to sustain long drives. A second, different lever: MIN allowed sacks on 9.9% of pass plays in the latest complete season, while GB generated sacks on 5.2%.",
+      "There is useful historical context: Across 8 prior meetings with MIN, Jordan Love averaged +0.01 EPA/dropback with a 48% positive-EPA rate over 202 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
     ],
     "prediction": "MIN to win, with MIN 28.7 \u2013 GB 21.6 as the central score projection.",
-    "what_could_make_us_wrong": "Component-model disagreement is elevated (15.4%)."
+    "what_could_make_us_wrong": "Component-model disagreement is elevated (15.4%); gb owns at least one matchup-specific counter-signal in the evidence set."
   },
   "2026_01_MIA_LV": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "LV threw on 57% of first- and second-down plays and generated -0.11 EPA per early-down pass. MIA produced gains of 20+ yards on 7.7% of pass plays, while LV allowed them on 5.9%.",
+    "case_for_pick": "LV allowed sacks on 10.1% of pass plays in the latest complete season, while MIA generated sacks on 6.2%.",
+    "engine": "LevLine",
     "evidence_used": [
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "MIA pre-snap motion vs LV"
+        "title": "LV early-down approach vs MIA"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Moderate",
-        "title": "LV screens vs MIA"
+        "strength": "Strong",
+        "title": "MIA explosives vs LV prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "LV protection vs MIA pass rush"
       },
       {
         "category": "travel",
@@ -313,31 +999,109 @@
       }
     ],
     "game_id": "2026_01_MIA_LV",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "LV 51.0% \u2014 LV 23.0 \u2013 MIA 23.1",
-    "matchup": "MIA @ LV",
-    "paragraphs": [
-      "LV is the current model pick at 51.0%. The expected-margin model makes MIA about 0.2 points better in the central forecast, with an expected total of 46.1. The PURE model is 15.0 percentage points more bullish on MIA than the market-implied probability. On the spread scale, the model is 3.7 points less favorable to LV than the current market line.",
-      "Schematically, MIA used pre-snap motion on 56% of charted plays in 2025, versus a league median of 43%, and produced -0.02 EPA/play on those snaps. LV allowed +0.04 EPA/play against the same concept. LV used screens on 4% of charted plays in 2025, versus a league median of 4%, and produced -0.13 EPA/play on those snaps. MIA allowed +0.17 EPA/play against the same concept. Situationally, MIA travels roughly 2,171 miles to LV and crosses about 3 time zones."
-    ],
-    "prediction": "LV to win, with LV 23.0 \u2013 MIA 23.1 as the central score projection.",
-    "what_could_make_us_wrong": "Component-model disagreement is elevated (9.1%); the game is close to a coin flip even though a side must be selected; late personnel or weather changes could materially alter the matchup context."
-  },
-  "2026_01_NE_SEA": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "advantage_team": "MIA",
+        "family": "early down",
+        "sample_size": 558,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "NE play action vs SEA"
+        "summary": "LV threw on 57% of first- and second-down plays and generated -0.11 EPA per early-down pass. MIA allowed +0.19 EPA on opponent early-down passes.",
+        "title": "LV early-down approach vs MIA"
+      },
+      {
+        "advantage_team": "MIA",
+        "family": "explosives",
+        "sample_size": 558,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "MIA produced gains of 20+ yards on 7.7% of pass plays, while LV allowed them on 5.9%. That isolates the vertical-volatility question: whether MIA can create chunk plays before LV forces the offense to sustain long drives.",
+        "title": "MIA explosives vs LV prevention"
+      },
+      {
+        "advantage_team": "LV",
+        "family": "pressure",
+        "sample_size": 558,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "LV allowed sacks on 10.1% of pass plays in the latest complete season, while MIA generated sacks on 6.2%. This is a direct trench interaction: if MIA can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "LV protection vs MIA pass rush"
+      }
+    ],
+    "matchup": "MIA @ LV",
+    "matchup_meter": [
+      {
+        "label": "Early Down",
+        "leader": "MIA",
+        "strength": "Strong",
+        "title": "LV early-down approach vs MIA"
+      },
+      {
+        "label": "Explosives",
+        "leader": "MIA",
+        "strength": "Strong",
+        "title": "MIA explosives vs LV prevention"
+      },
+      {
+        "label": "Pressure",
+        "leader": "LV",
+        "strength": "Strong",
+        "title": "LV protection vs MIA pass rush"
+      }
+    ],
+    "paragraphs": [
+      "LV is the current model pick at 51.0% under LevLine. The central margin is MIA by 0.2, with a projected total of 46.1. LevLine's football-only probability is 15.0 percentage points more bullish on MIA than the market-implied probability. On the spread scale, LevLine is 3.7 points less favorable to LV than the current market line.",
+      "Early downs may determine who controls the script. LV threw on 57% of first- and second-down plays and generated -0.11 EPA per early-down pass. MIA allowed +0.19 EPA on opponent early-down passes. A second, different lever: MIA produced gains of 20+ yards on 7.7% of pass plays, while LV allowed them on 5.9%.",
+      "The main situational branch is this: MIA travels roughly 2,171 miles to LV and crosses about 3 time zones."
+    ],
+    "prediction": "LV to win, with LV 23.0 \u2013 MIA 23.1 as the central score projection.",
+    "what_could_make_us_wrong": "Component-model disagreement is elevated (9.1%); the game is close to a coin flip even though a side must be selected; the active weather/travel/personnel scenario could shift the game script; mia owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_NE_SEA": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "NE allowed sacks on 8.5% of pass plays in the latest complete season, while SEA generated sacks on 6.5%.",
+    "case_for_pick": "SEA produced gains of 20+ yards on 9.7% of pass plays, while NE allowed them on 6.0%. SEA threw on 47% of first- and second-down plays and generated +0.22 EPA per early-down pass.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Drake Maye vs SEA: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Sam Darnold vs NE: prior meetings"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "SEA play action vs NE"
+        "title": "SEA explosives vs NE prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "SEA early-down approach vs NE"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "NE protection vs SEA pass rush"
       },
       {
         "category": "personnel",
@@ -354,6 +1118,13 @@
         "title": "NE: TreVeyon Henderson \u2014 Out"
       },
       {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Strong",
+        "title": "SEA: Ty Okada \u2014 Out"
+      },
+      {
         "category": "travel",
         "source_name": "nflverse schedule + venue geography",
         "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
@@ -362,59 +1133,196 @@
       }
     ],
     "game_id": "2026_01_NE_SEA",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "SEA 70.4% \u2014 SEA 26.4 \u2013 NE 18.8",
-    "matchup": "NE @ SEA",
-    "paragraphs": [
-      "SEA is the current model pick at 70.4%. The expected-margin model makes SEA about 7.7 points better in the central forecast, with an expected total of 45.2. The PURE model is 13.3 percentage points more bullish on SEA than the market-implied probability. On the spread scale, the model is 4.7 points more favorable to SEA than the current market line.",
-      "Schematically, NE used play action on 11% of charted plays in 2025, versus a league median of 11%, and produced +0.27 EPA/play on those snaps. SEA allowed -0.06 EPA/play against the same concept. SEA used play action on 11% of charted plays in 2025, versus a league median of 11%, and produced +0.38 EPA/play on those snaps. NE allowed -0.20 EPA/play against the same concept. On personnel, The official NFL injury report lists Ben Brown (C) as Out. The official NFL injury report lists TreVeyon Henderson (RB) as Out. Situationally, NE travels roughly 2,485 miles to SEA and crosses about 3 time zones."
-    ],
-    "prediction": "SEA to win, with SEA 26.4 \u2013 NE 18.8 as the central score projection.",
-    "what_could_make_us_wrong": "Late personnel or weather changes could materially alter the matchup context."
-  },
-  "2026_01_NO_DET": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "advantage_team": "SEA",
+        "family": "explosives",
+        "sample_size": 652,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "DET pre-snap motion vs NO"
+        "summary": "SEA produced gains of 20+ yards on 9.7% of pass plays, while NE allowed them on 6.0%. That isolates the vertical-volatility question: whether SEA can create chunk plays before NE forces the offense to sustain long drives.",
+        "title": "SEA explosives vs NE prevention"
+      },
+      {
+        "advantage_team": "SEA",
+        "family": "early down",
+        "sample_size": 652,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "SEA threw on 47% of first- and second-down plays and generated +0.22 EPA per early-down pass. NE allowed +0.05 EPA on opponent early-down passes.",
+        "title": "SEA early-down approach vs NE"
+      },
+      {
+        "advantage_team": "NE",
+        "family": "pressure",
+        "sample_size": 652,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "NE allowed sacks on 8.5% of pass plays in the latest complete season, while SEA generated sacks on 6.5%. This is a direct trench interaction: if SEA can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "NE protection vs SEA pass rush"
+      }
+    ],
+    "matchup": "NE @ SEA",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "SEA",
+        "strength": "Strong",
+        "title": "SEA explosives vs NE prevention"
+      },
+      {
+        "label": "Early Down",
+        "leader": "SEA",
+        "strength": "Strong",
+        "title": "SEA early-down approach vs NE"
+      },
+      {
+        "label": "Pressure",
+        "leader": "NE",
+        "strength": "Strong",
+        "title": "NE protection vs SEA pass rush"
+      }
+    ],
+    "paragraphs": [
+      "SEA is the current model pick at 70.4% under LevLine. The central margin is SEA by 7.7, with a projected total of 45.2. LevLine's football-only probability is 13.3 percentage points more bullish on SEA than the market-implied probability. On the spread scale, LevLine is 4.7 points more favorable to SEA than the current market line.",
+      "The most volatile matchup is the explosive-pass battle. SEA produced gains of 20+ yards on 9.7% of pass plays, while NE allowed them on 6.0%. That isolates the vertical-volatility question: whether SEA can create chunk plays before NE forces the offense to sustain long drives. A second, different lever: SEA threw on 47% of first- and second-down plays and generated +0.22 EPA per early-down pass.",
+      "There is useful historical context: Across 1 prior meeting with SEA, Drake Maye averaged -0.43 EPA/dropback with a 38% positive-EPA rate over 50 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
+      "Availability is part of the matchup rather than a generic injury list. The official NFL injury report lists Ben Brown (C) as Out. The matchup relevance is elevated because SEA generated sacks on 6.5% of opponent pass plays last season. The official NFL injury report lists TreVeyon Henderson (RB) as Out. The direct matchup context is SEA's -0.15 rushing EPA allowed per play last season.",
+      "The main situational branch is this: NE travels roughly 2,485 miles to SEA and crosses about 3 time zones."
+    ],
+    "prediction": "SEA to win, with SEA 26.4 \u2013 NE 18.8 as the central score projection.",
+    "what_could_make_us_wrong": "The official availability picture can still change before kickoff; the active weather/travel/personnel scenario could shift the game script; ne owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_NO_DET": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "NO's path is to beat the assumptions behind LevLine's efficiency edge, especially through turnovers, explosive plays, and high-leverage downs.",
+    "case_for_pick": "NO produced gains of 20+ yards on 4.8% of pass plays, while DET allowed them on 8.5%. NO allowed sacks on 6.9% of pass plays in the latest complete season, while DET generated sacks on 7.2%.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Jared Goff vs NO: prior meetings"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Weak",
-        "title": "NO screens vs DET"
+        "strength": "Strong",
+        "title": "NO explosives vs DET prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "NO protection vs DET pass rush"
+      },
+      {
+        "category": "matchup",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "DET YAC creation vs NO tackling"
       }
     ],
     "game_id": "2026_01_NO_DET",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "DET 73.5% \u2014 DET 28.5 \u2013 NO 18.0",
+    "key_factors": [
+      {
+        "advantage_team": "DET",
+        "family": "explosives",
+        "sample_size": 650,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "NO produced gains of 20+ yards on 4.8% of pass plays, while DET allowed them on 8.5%. That isolates the vertical-volatility question: whether NO can create chunk plays before DET forces the offense to sustain long drives.",
+        "title": "NO explosives vs DET prevention"
+      },
+      {
+        "advantage_team": "DET",
+        "family": "pressure",
+        "sample_size": 650,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "NO allowed sacks on 6.9% of pass plays in the latest complete season, while DET generated sacks on 7.2%. This is a direct trench interaction: if DET can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "NO protection vs DET pass rush"
+      },
+      {
+        "advantage_team": "DET",
+        "family": "yac",
+        "sample_size": 650,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "DET averaged 6.1 yards after catch on completed passes; NO allowed 5.2. This game can swing on whether routine completions become extra first downs after the catch.",
+        "title": "DET YAC creation vs NO tackling"
+      }
+    ],
     "matchup": "NO @ DET",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "DET",
+        "strength": "Strong",
+        "title": "NO explosives vs DET prevention"
+      },
+      {
+        "label": "Pressure",
+        "leader": "DET",
+        "strength": "Strong",
+        "title": "NO protection vs DET pass rush"
+      },
+      {
+        "label": "Yac",
+        "leader": "DET",
+        "strength": "Strong",
+        "title": "DET YAC creation vs NO tackling"
+      }
+    ],
     "paragraphs": [
-      "DET is the current model pick at 73.5%. The expected-margin model makes DET about 10.5 points better in the central forecast, with an expected total of 46.5. On the spread scale, the model is 3.5 points more favorable to DET than the current market line.",
-      "Schematically, DET used pre-snap motion on 47% of charted plays in 2025, versus a league median of 43%, and produced +0.14 EPA/play on those snaps. NO allowed +0.05 EPA/play against the same concept. NO used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced +0.03 EPA/play on those snaps. DET allowed -0.24 EPA/play against the same concept."
+      "DET is the current model pick at 73.5% under LevLine. The central margin is DET by 10.5, with a projected total of 46.5. On the spread scale, LevLine is 3.5 points more favorable to DET than the current market line.",
+      "The most volatile matchup is the explosive-pass battle. NO produced gains of 20+ yards on 4.8% of pass plays, while DET allowed them on 8.5%. That isolates the vertical-volatility question: whether NO can create chunk plays before DET forces the offense to sustain long drives. A second, different lever: NO allowed sacks on 6.9% of pass plays in the latest complete season, while DET generated sacks on 7.2%.",
+      "There is useful historical context: Across 1 prior meeting with NO, Jared Goff averaged +0.28 EPA/dropback with a 44% positive-EPA rate over 27 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
     ],
     "prediction": "DET to win, with DET 28.5 \u2013 NO 18.0 as the central score projection.",
-    "what_could_make_us_wrong": "No can still overturn the central forecast through turnover margin, explosive plays, or unusually strong high-leverage down performance."
+    "what_could_make_us_wrong": "No can still overturn the central forecast through turnover margin, explosive plays, or unusually strong high-leverage-down performance."
   },
   "2026_01_NYJ_TEN": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "TEN threw on 58% of first- and second-down plays and generated -0.10 EPA per early-down pass.",
+    "case_for_pick": "NYJ produced gains of 20+ yards on 4.4% of pass plays, while TEN allowed them on 9.5%. TEN allowed sacks on 8.2% of pass plays in the latest complete season, while NYJ generated sacks on 4.2%.",
+    "engine": "LevLine",
     "evidence_used": [
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "NYJ pre-snap motion vs TEN"
+        "title": "NYJ explosives vs TEN prevention"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "TEN play action vs NYJ"
+        "title": "TEN early-down approach vs NYJ"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "TEN protection vs NYJ pass rush"
       },
       {
         "category": "weather",
@@ -425,18 +1333,96 @@
       }
     ],
     "game_id": "2026_01_NYJ_TEN",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "TEN 59.1% \u2014 TEN 24.5 \u2013 NYJ 19.9",
+    "key_factors": [
+      {
+        "advantage_team": "TEN",
+        "family": "explosives",
+        "sample_size": 636,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "NYJ produced gains of 20+ yards on 4.4% of pass plays, while TEN allowed them on 9.5%. That isolates the vertical-volatility question: whether NYJ can create chunk plays before TEN forces the offense to sustain long drives.",
+        "title": "NYJ explosives vs TEN prevention"
+      },
+      {
+        "advantage_team": "NYJ",
+        "family": "early down",
+        "sample_size": 636,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "TEN threw on 58% of first- and second-down plays and generated -0.10 EPA per early-down pass. NYJ allowed +0.33 EPA on opponent early-down passes.",
+        "title": "TEN early-down approach vs NYJ"
+      },
+      {
+        "advantage_team": "TEN",
+        "family": "pressure",
+        "sample_size": 636,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "TEN allowed sacks on 8.2% of pass plays in the latest complete season, while NYJ generated sacks on 4.2%. This is a direct trench interaction: if NYJ can force longer downs, the pressure matchup becomes more important than the raw season averages.",
+        "title": "TEN protection vs NYJ pass rush"
+      }
+    ],
     "matchup": "NYJ @ TEN",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "TEN",
+        "strength": "Strong",
+        "title": "NYJ explosives vs TEN prevention"
+      },
+      {
+        "label": "Early Down",
+        "leader": "NYJ",
+        "strength": "Strong",
+        "title": "TEN early-down approach vs NYJ"
+      },
+      {
+        "label": "Pressure",
+        "leader": "TEN",
+        "strength": "Strong",
+        "title": "TEN protection vs NYJ pass rush"
+      }
+    ],
     "paragraphs": [
-      "TEN is the current model pick at 59.1%. The expected-margin model makes TEN about 4.6 points better in the central forecast, with an expected total of 44.4. The PURE model is 7.7 percentage points more bullish on TEN than the market-implied probability. On the spread scale, the model is 3.1 points more favorable to TEN than the current market line.",
-      "Schematically, NYJ used pre-snap motion on 50% of charted plays in 2025, versus a league median of 43%, and produced -0.09 EPA/play on those snaps. TEN allowed +0.18 EPA/play against the same concept. TEN used play action on 10% of charted plays in 2025, versus a league median of 11%, and produced -0.05 EPA/play on those snaps. NYJ allowed +0.41 EPA/play against the same concept. Situationally, Open-Meteo's forecast nearest kickoff is 91\u00b0F, 4 mph sustained wind with gusts near 7 mph, and 10% precipitation probability."
+      "TEN is the current model pick at 59.1% under LevLine. The central margin is TEN by 4.6, with a projected total of 44.4. LevLine's football-only probability is 7.7 percentage points more bullish on TEN than the market-implied probability. On the spread scale, LevLine is 3.1 points more favorable to TEN than the current market line.",
+      "The most volatile matchup is the explosive-pass battle. NYJ produced gains of 20+ yards on 4.4% of pass plays, while TEN allowed them on 9.5%. That isolates the vertical-volatility question: whether NYJ can create chunk plays before TEN forces the offense to sustain long drives. A second, different lever: TEN threw on 58% of first- and second-down plays and generated -0.10 EPA per early-down pass.",
+      "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 91\u00b0F, 4 mph sustained wind with gusts near 7 mph, and 10% precipitation probability."
     ],
     "prediction": "TEN to win, with TEN 24.5 \u2013 NYJ 19.9 as the central score projection.",
-    "what_could_make_us_wrong": "Late personnel or weather changes could materially alter the matchup context."
+    "what_could_make_us_wrong": "The active weather/travel/personnel scenario could shift the game script; nyj owns at least one matchup-specific counter-signal in the evidence set."
   },
   "2026_01_SF_LA": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "SF produced positive EPA on 51% of third downs, versus a 40% positive-EPA rate allowed by LA. Across 3 prior meetings with LA, Brock Purdy averaged +0.08 EPA/dropback with a 46% positive-EPA rate over 91 dropbacks.",
+    "case_for_pick": "LA produced gains of 20+ yards on 10.9% of pass plays, while SF allowed them on 6.5%. Across 10 prior meetings with SF, Matthew Stafford averaged +0.08 EPA/dropback with a 49% positive-EPA rate over 413 dropbacks.",
+    "engine": "LevLine",
     "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "Matthew Stafford vs SF: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Moderate",
+        "title": "Brock Purdy vs LA: prior meetings"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "LA explosives vs SF prevention"
+      },
       {
         "category": "scheme",
         "source_name": "FTN Data via nflverse",
@@ -445,78 +1431,310 @@
         "title": "SF pre-snap motion vs LA"
       },
       {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "category": "matchup",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "SF third downs vs LA"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
         "strength": "Moderate",
-        "title": "LA screens vs SF"
+        "title": "SF: James Thompson Jr. \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "LA: Alaric Jackson \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "LA: Jaylen Watson \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_01_SF_LA",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "LA 69.8% \u2014 LA 26.5 \u2013 SF 20.2",
-    "matchup": "SF @ LA",
-    "paragraphs": [
-      "LA is the current model pick at 69.8%. The expected-margin model makes LA about 6.3 points better in the central forecast, with an expected total of 46.7. The PURE model is 8.2 percentage points more bullish on LA than the market-implied probability. On the spread scale, the model is 2.8 points more favorable to LA than the current market line.",
-      "Schematically, SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps. LA allowed -0.05 EPA/play against the same concept. LA used screens on 3% of charted plays in 2025, versus a league median of 4%, and produced +0.08 EPA/play on those snaps. SF allowed +0.12 EPA/play against the same concept."
-    ],
-    "prediction": "LA to win, with LA 26.5 \u2013 SF 20.2 as the central score projection.",
-    "what_could_make_us_wrong": "Sf can still overturn the central forecast through turnover margin, explosive plays, or unusually strong high-leverage down performance."
-  },
-  "2026_01_TB_CIN": {
-    "evidence_used": [
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data + nflverse PBP",
+        "advantage_team": "LA",
+        "family": "explosives",
+        "sample_size": 732,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "Joe Burrow vs TB pressure profile"
+        "summary": "LA produced gains of 20+ yards on 10.9% of pass plays, while SF allowed them on 6.5%. That isolates the vertical-volatility question: whether LA can create chunk plays before SF forces the offense to sustain long drives.",
+        "title": "LA explosives vs SF prevention"
       },
       {
-        "category": "scheme",
+        "advantage_team": null,
+        "family": "motion",
+        "sample_size": 734,
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "TB play action vs CIN"
+        "summary": "SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps. LA allowed -0.05 EPA/play against the same concept.",
+        "title": "SF pre-snap motion vs LA"
+      },
+      {
+        "advantage_team": "LA",
+        "family": "qb opponent history",
+        "sample_size": 413,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "Across 10 prior meetings with SF, Matthew Stafford averaged +0.08 EPA/dropback with a 49% positive-EPA rate over 413 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
+        "title": "Matthew Stafford vs SF: prior meetings"
+      }
+    ],
+    "matchup": "SF @ LA",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "LA",
+        "strength": "Strong",
+        "title": "LA explosives vs SF prevention"
+      },
+      {
+        "label": "Motion",
+        "leader": "Mixed",
+        "strength": "Strong",
+        "title": "SF pre-snap motion vs LA"
+      },
+      {
+        "label": "Third Down",
+        "leader": "SF",
+        "strength": "Strong",
+        "title": "SF third downs vs LA"
+      }
+    ],
+    "paragraphs": [
+      "LA is the current model pick at 69.8% under LevLine. The central margin is LA by 6.3, with a projected total of 46.7. LevLine's football-only probability is 8.2 percentage points more bullish on LA than the market-implied probability. On the spread scale, LevLine is 2.8 points more favorable to LA than the current market line.",
+      "The most volatile matchup is the explosive-pass battle. LA produced gains of 20+ yards on 10.9% of pass plays, while SF allowed them on 6.5%. That isolates the vertical-volatility question: whether LA can create chunk plays before SF forces the offense to sustain long drives. A second, different lever: SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps.",
+      "There is useful historical context: Across 10 prior meetings with SF, Matthew Stafford averaged +0.08 EPA/dropback with a 49% positive-EPA rate over 413 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
+      "Availability is part of the matchup rather than a generic injury list. The official NFL injury report lists James Thompson Jr. (DT) as Did Not Participate In Practice. The official NFL injury report lists Alaric Jackson (T) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive."
+    ],
+    "prediction": "LA to win, with LA 26.5 \u2013 SF 20.2 as the central score projection.",
+    "what_could_make_us_wrong": "The official availability picture can still change before kickoff; sf owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_TB_CIN": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "CIN threw on 60% of first- and second-down plays and generated -0.05 EPA per early-down pass.",
+    "case_for_pick": "TB produced gains of 20+ yards on 8.7% of pass plays, while CIN allowed them on 9.5%. TB averaged 5.6 yards after catch on completed passes; CIN allowed 7.0.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Weak",
+        "title": "Joe Burrow vs TB: prior meetings"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "TB explosives vs CIN prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "CIN early-down approach vs TB"
+      },
+      {
+        "category": "matchup",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "TB YAC creation vs CIN tackling"
       }
     ],
     "game_id": "2026_01_TB_CIN",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
-    "headline": "CIN 62.9% \u2014 CIN 25.0 \u2013 TB 20.2",
-    "matchup": "TB @ CIN",
-    "paragraphs": [
-      "CIN is the current model pick at 62.9%. The expected-margin model makes CIN about 4.8 points better in the central forecast, with an expected total of 45.2.",
-      "Schematically, TB blitzed on 20% of charted plays in the latest complete FTN season (league median 14%). Joe Burrow produced +0.10 EPA/dropback across 260 charted blitzed dropbacks over the two most recent available seasons. TB used play action on 8% of charted plays in 2025, versus a league median of 11%, and produced +0.30 EPA/play on those snaps. CIN allowed +0.31 EPA/play against the same concept."
-    ],
-    "prediction": "CIN to win, with CIN 25.0 \u2013 TB 20.2 as the central score projection.",
-    "what_could_make_us_wrong": "Component-model disagreement is elevated (10.5%)."
-  },
-  "2026_01_WAS_PHI": {
-    "evidence_used": [
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
+    "headline": "CIN 63.1% \u2014 CIN 25.0 \u2013 TB 20.2",
+    "key_factors": [
       {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "advantage_team": "CIN",
+        "family": "explosives",
+        "sample_size": 690,
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "title": "PHI pre-snap motion vs WAS"
+        "summary": "TB produced gains of 20+ yards on 8.7% of pass plays, while CIN allowed them on 9.5%. That isolates the vertical-volatility question: whether TB can create chunk plays before CIN forces the offense to sustain long drives.",
+        "title": "TB explosives vs CIN prevention"
+      },
+      {
+        "advantage_team": "TB",
+        "family": "early down",
+        "sample_size": 690,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "CIN threw on 60% of first- and second-down plays and generated -0.05 EPA per early-down pass. TB allowed +0.14 EPA on opponent early-down passes.",
+        "title": "CIN early-down approach vs TB"
+      },
+      {
+        "advantage_team": "CIN",
+        "family": "yac",
+        "sample_size": 690,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "TB averaged 5.6 yards after catch on completed passes; CIN allowed 7.0. This game can swing on whether routine completions become extra first downs after the catch.",
+        "title": "TB YAC creation vs CIN tackling"
+      }
+    ],
+    "matchup": "TB @ CIN",
+    "matchup_meter": [
+      {
+        "label": "Explosives",
+        "leader": "CIN",
+        "strength": "Strong",
+        "title": "TB explosives vs CIN prevention"
+      },
+      {
+        "label": "Early Down",
+        "leader": "TB",
+        "strength": "Strong",
+        "title": "CIN early-down approach vs TB"
+      },
+      {
+        "label": "Yac",
+        "leader": "CIN",
+        "strength": "Strong",
+        "title": "TB YAC creation vs CIN tackling"
+      }
+    ],
+    "paragraphs": [
+      "CIN is the current model pick at 63.1% under LevLine. The central margin is CIN by 4.8, with a projected total of 45.2.",
+      "The most volatile matchup is the explosive-pass battle. TB produced gains of 20+ yards on 8.7% of pass plays, while CIN allowed them on 9.5%. That isolates the vertical-volatility question: whether TB can create chunk plays before CIN forces the offense to sustain long drives. A second, different lever: CIN threw on 60% of first- and second-down plays and generated -0.05 EPA per early-down pass.",
+      "There is useful historical context: Across 1 prior meeting with TB, Joe Burrow averaged +0.07 EPA/dropback with a 56% positive-EPA rate over 43 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law."
+    ],
+    "prediction": "CIN to win, with CIN 25.0 \u2013 TB 20.2 as the central score projection.",
+    "what_could_make_us_wrong": "Component-model disagreement is elevated (10.5%); tb owns at least one matchup-specific counter-signal in the evidence set."
+  },
+  "2026_01_WAS_PHI": {
+    "brand": "Sunday Signal",
+    "case_for_opponent": "PHI averaged 4.3 yards after catch on completed passes; WAS allowed 6.4. PHI produced gains of 20+ yards on 6.8% of pass plays, while WAS allowed them on 8.3%.",
+    "case_for_pick": "Across 10 prior meetings with WAS, Jalen Hurts averaged +0.25 EPA/dropback with a 50% positive-EPA rate over 297 dropbacks. Across 3 prior meetings with PHI, Jayden Daniels averaged -0.05 EPA/dropback with a 43% positive-EPA rate over 129 dropbacks.",
+    "engine": "LevLine",
+    "evidence_used": [
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "Jalen Hurts vs WAS: prior meetings"
+      },
+      {
+        "category": "history",
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Moderate",
+        "title": "Jayden Daniels vs PHI: prior meetings"
+      },
+      {
+        "category": "matchup",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "title": "PHI YAC creation vs WAS tackling"
       },
       {
         "category": "scheme",
-        "source_name": "FTN Data via nflverse",
+        "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Moderate",
-        "title": "WAS RPOs vs PHI"
+        "strength": "Strong",
+        "title": "PHI explosives vs WAS prevention"
+      },
+      {
+        "category": "scheme",
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "title": "WAS early-down approach vs PHI"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.9008&longitude=-75.1675&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in PHI"
       }
     ],
     "game_id": "2026_01_WAS_PHI",
-    "guardrail": "Narrative evidence explains the matchup. It does not change the numerical forecast unless the underlying feature has separately passed chronological out-of-sample validation.",
+    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "PHI 71.3% \u2014 PHI 28.7 \u2013 WAS 19.2",
+    "key_factors": [
+      {
+        "advantage_team": "WAS",
+        "family": "yac",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "PHI averaged 4.3 yards after catch on completed passes; WAS allowed 6.4. This game can swing on whether routine completions become extra first downs after the catch.",
+        "title": "PHI YAC creation vs WAS tackling"
+      },
+      {
+        "advantage_team": "WAS",
+        "family": "explosives",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "PHI produced gains of 20+ yards on 6.8% of pass plays, while WAS allowed them on 8.3%. That isolates the vertical-volatility question: whether PHI can create chunk plays before WAS forces the offense to sustain long drives.",
+        "title": "PHI explosives vs WAS prevention"
+      },
+      {
+        "advantage_team": "WAS",
+        "family": "early down",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "WAS threw on 50% of first- and second-down plays and generated +0.11 EPA per early-down pass. PHI allowed +0.05 EPA on opponent early-down passes.",
+        "title": "WAS early-down approach vs PHI"
+      }
+    ],
     "matchup": "WAS @ PHI",
+    "matchup_meter": [
+      {
+        "label": "Yac",
+        "leader": "WAS",
+        "strength": "Strong",
+        "title": "PHI YAC creation vs WAS tackling"
+      },
+      {
+        "label": "Explosives",
+        "leader": "WAS",
+        "strength": "Strong",
+        "title": "PHI explosives vs WAS prevention"
+      },
+      {
+        "label": "Early Down",
+        "leader": "WAS",
+        "strength": "Strong",
+        "title": "WAS early-down approach vs PHI"
+      }
+    ],
     "paragraphs": [
-      "PHI is the current model pick at 71.3%. The expected-margin model makes PHI about 9.5 points better in the central forecast, with an expected total of 47.9. The PURE model is 7.4 percentage points more bullish on PHI than the market-implied probability. On the spread scale, the model is 4.0 points more favorable to PHI than the current market line.",
-      "Schematically, PHI used pre-snap motion on 36% of charted plays in 2025, versus a league median of 43%, and produced -0.00 EPA/play on those snaps. WAS allowed +0.20 EPA/play against the same concept. WAS used RPOs on 6% of charted plays in 2025, versus a league median of 4%, and produced -0.03 EPA/play on those snaps. PHI allowed -0.16 EPA/play against the same concept."
+      "PHI is the current model pick at 71.3% under LevLine. The central margin is PHI by 9.5, with a projected total of 47.9. LevLine's football-only probability is 7.4 percentage points more bullish on PHI than the market-implied probability. On the spread scale, LevLine is 4.0 points more favorable to PHI than the current market line.",
+      "The yards-after-catch battle is more meaningful here than it is in a typical game. PHI averaged 4.3 yards after catch on completed passes; WAS allowed 6.4. This game can swing on whether routine completions become extra first downs after the catch. A second, different lever: PHI produced gains of 20+ yards on 6.8% of pass plays, while WAS allowed them on 8.3%.",
+      "There is useful historical context: Across 10 prior meetings with WAS, Jalen Hurts averaged +0.25 EPA/dropback with a 50% positive-EPA rate over 297 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves. The evidence grade and sample size stay visible so a small head-to-head sample cannot masquerade as a stable law.",
+      "The main situational branch is this: Open-Meteo's forecast nearest kickoff is 70\u00b0F, 4 mph sustained wind with gusts near 9 mph, and 35% precipitation probability."
     ],
     "prediction": "PHI to win, with PHI 28.7 \u2013 WAS 19.2 as the central score projection.",
-    "what_could_make_us_wrong": "Was can still overturn the central forecast through turnover margin, explosive plays, or unusually strong high-leverage down performance."
+    "what_could_make_us_wrong": "The active weather/travel/personnel scenario could shift the game script; was owns at least one matchup-specific counter-signal in the evidence set."
   }
 }
