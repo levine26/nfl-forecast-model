@@ -25,8 +25,11 @@ permissions:
   pages: write
   id-token: write
 
+# Only events capable of a production deploy share the production concurrency
+# group. A failed producer creates a no-op workflow_run, and PRs are build-only;
+# neither may cancel an in-progress deployment from a successful producer.
 concurrency:
-  group: pages-${{ github.ref }}
+  group: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') && format('pages-noop-{0}', github.run_id) || github.event_name == 'pull_request' && format('pages-pr-{0}', github.event.pull_request.number) || 'pages-production' }}
   cancel-in-progress: true
 
 jobs:
