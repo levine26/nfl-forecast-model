@@ -73,6 +73,7 @@ def _ewma_shifted(s: pd.Series, alpha: float) -> pd.Series:
 
 
 def add_pregame_rolling(team_games: pd.DataFrame, windows=(3,5,8), alpha=0.15) -> pd.DataFrame:
+    """All rolling features are shifted one game, preventing same-game leakage."""
     df = team_games.sort_values(["team", "season", "week", "gameday"], na_position="last").copy()
     base = [
         "off_epa","pass_epa","rush_epa","success_rate","neutral_epa",
@@ -87,7 +88,14 @@ def add_pregame_rolling(team_games: pd.DataFrame, windows=(3,5,8), alpha=0.15) -
 
 
 def build_matchup_features(team_games: pd.DataFrame, schedules: pd.DataFrame, elo: pd.DataFrame) -> pd.DataFrame:
-    schedule_cols = [c for c in ["game_id", "season", "week", "gameday", "gametime", "home_team", "away_team"] if c in schedules.columns]
+    """One row per scheduled game with leakage-safe home-minus-away pregame features.
+
+    The schedule scaffold is built *before* rolling features. This matters for future games:
+    an upcoming game has no PBP row yet, but it still needs a synthetic team-game row so
+    ``shift(1)`` can carry the most recently observed team state into that matchup.
+    """
+    schedule_cols = [c for c in ["game_id", "season", "week", "gameday", "gametime",
+                                      "home_team", "away_team"] if c in schedules.columns]
     sched = schedules[schedule_cols + (["game_type"] if "game_type" in schedules.columns else [])].copy()
     if "game_type" in sched.columns:
         sched = sched[sched["game_type"].eq("REG")].copy()
@@ -101,6 +109,22 @@ def build_matchup_features(team_games: pd.DataFrame, schedules: pd.DataFrame, el
     metric_cols = [c for c in team_games.columns if c not in {"season", "week", "gameday", "gametime", "home_team", "away_team"}]
     observed = team_games[metric_cols].drop_duplicates(["game_id", "team"], keep="last")
     team_schedule = scaffold.merge(observed, on=["game_id", "team"], how="left")
+
+    # Results exist in the live schedule before processed PBP may be published.
+    # Populate the Sujar recent-win signal directly from schedule scores so a
+    # package/data lag never discards completed current-season W/L information.
+    if {"home_score", "away_score"}.issubset(schedules.columns):
+        result_cols = schedules[["game_id", "home_team", "away_team", "home_score", "away_score"]].copy()
+        team_schedule = team_schedule.merge(result_cols, on="game_id", how="left")
+        is_home = team_schedule["team"].eq(team_schedule["home_team"])
+        pf = np.where(is_home, team_schedule["home_score"], team_schedule["away_score"])
+        pa = np.where(is_home, team_schedule["away_score"], team_schedule["home_score"])
+        schedule_win = np.where(pd.notna(pf), (pf > pa).astype(float), np.nan)
+        if "win" in team_schedule.columns:
+            team_schedule["win"] = team_schedule["win"].where(team_schedule["win"].notna(), schedule_win)
+        else:
+            team_schedule["win"] = schedule_win
+
     pre = add_pregame_rolling(team_schedule)
 
     feature_cols = [c for c in pre.columns if c.endswith("_ewma") or any(c.endswith(f"_l{w}") for w in (3,5,8))]
@@ -138,6 +162,7 @@ def sujar_baseline_columns(df: pd.DataFrame) -> list[str]:
 
 
 def core_columns(df: pd.DataFrame) -> list[str]:
-    cols = [c for c in df.columns if c.startswith("diff_")]
+    prefixes = ("diff_",)
+    cols = [c for c in df.columns if c.startswith(prefixes)]
     extras = [c for c in ["home_elo","away_elo","elo_home_prob","rest_diff"] if c in df.columns]
     return sorted(set(cols + extras))
