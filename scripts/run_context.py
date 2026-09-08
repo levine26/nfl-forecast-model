@@ -119,6 +119,14 @@ def main():
         injuries=injuries,
         season=args.season,
     )
+    # The current React app groups coaching/continuity evidence into the
+    # "History vs. What's Different Now" section. Normalize the internal label at
+    # publication time so the analytical engine can retain its more specific name.
+    for items in evidence.values():
+        for item in items:
+            if item.get("category") == "structural_change":
+                item["category"] = "coaching"
+
     source_status.update(context_status)
     source_status["evidence"] = {
         "status":"healthy",
