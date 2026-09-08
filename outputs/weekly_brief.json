@@ -1,25 +1,25 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_NE_SEA",
+      "game_id": "2026_01_TB_CIN",
+      "largest_driver": "Market movement",
+      "pick": "CIN",
+      "pick_delta_pp": 0.19562492765277106
+    },
+    {
+      "game_id": "2026_01_CLE_JAX",
       "largest_driver": "No material move",
-      "pick": "SEA",
+      "pick": "JAX",
       "pick_delta_pp": -2.220446049250313e-14
     },
     {
-      "game_id": "2026_01_DAL_NYG",
+      "game_id": "2026_01_MIA_LV",
       "largest_driver": "No material move",
-      "pick": "NYG",
-      "pick_delta_pp": 1.1102230246251565e-14
-    },
-    {
-      "game_id": "2026_01_BAL_IND",
-      "largest_driver": "No material move",
-      "pick": "BAL",
-      "pick_delta_pp": -0.0
+      "pick": "LV",
+      "pick_delta_pp": 2.220446049250313e-14
     }
   ],
-  "generated_utc": "2026-09-08T21:11:02.131249+00:00",
+  "generated_utc": "2026-09-08T21:25:28.886147+00:00",
   "market_disagreements": [
     {
       "confidence": "Coin Flip",
@@ -35,18 +35,18 @@
       "game_id": "2026_01_MIA_LV",
       "matchup": "MIA @ LV",
       "pick": "LV",
-      "pick_prob": 0.5102044016492021,
+      "pick_prob": 0.5102044016492023,
       "projected_score": "LV 23.0 \u2013 MIA 23.1",
-      "pure_market_gap_pp": 14.968286694929544
+      "pure_market_gap_pp": 14.968286694929523
     },
     {
       "confidence": "High",
       "game_id": "2026_01_NE_SEA",
       "matchup": "NE @ SEA",
       "pick": "SEA",
-      "pick_prob": 0.7035921885128433,
+      "pick_prob": 0.7035921885128434,
       "projected_score": "SEA 26.4 \u2013 NE 18.8",
-      "pure_market_gap_pp": 13.311362342755395
+      "pure_market_gap_pp": 13.311362342755405
     }
   ],
   "most_uncertain": [
@@ -71,7 +71,7 @@
       "game_id": "2026_01_MIA_LV",
       "matchup": "MIA @ LV",
       "pick": "LV",
-      "pick_prob": 0.5102044016492021,
+      "pick_prob": 0.5102044016492023,
       "projected_score": "LV 23.0 \u2013 MIA 23.1"
     }
   ],
@@ -97,7 +97,7 @@
       "game_id": "2026_01_CLE_JAX",
       "matchup": "CLE @ JAX",
       "pick": "JAX",
-      "pick_prob": 0.732167043553317,
+      "pick_prob": 0.7321670435533167,
       "projected_score": "JAX 27.1 \u2013 CLE 18.8"
     }
   ],
