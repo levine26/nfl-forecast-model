@@ -6,16 +6,25 @@ on:
     paths:
       - "src/**"
       - "scripts/**"
+      - "tests/**"
       - "config/**"
       - "pyproject.toml"
-      - ".github/workflows/**"
+      - ".github/workflows/weekly.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "tests/**"
+      - "config/**"
+      - "pyproject.toml"
+      - ".github/workflows/weekly.yml"
   schedule:
     # Full football-model rebuild every morning. Market-only refreshes run hourly.
     - cron: "5 14 * * *"
 permissions:
   contents: write
 concurrency:
-  group: nfl-forecast-${{ github.workflow }}
+  group: nfl-forecast-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   forecast:
@@ -29,13 +38,16 @@ jobs:
       - run: pip install ".[dev]"
       - run: pytest -q
       - uses: actions/cache@v4
+        if: github.event_name != 'pull_request'
         with:
           path: .cache/nflreadpy
           key: nflreadpy-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             nflreadpy-${{ runner.os }}-
       - run: python scripts/run_week.py --season 2026 --snapshot EARLY
+        if: github.event_name != 'pull_request'
       - name: Commit outputs
+        if: github.event_name != 'pull_request'
         run: |
           git config user.name "nfl-model-bot"
           git config user.email "actions@users.noreply.github.com"
