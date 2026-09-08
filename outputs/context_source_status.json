@@ -1,18 +1,22 @@
 {
   "coaching": {
-    "as_of": "2026-09-08T23:06:36.540042+00:00",
-    "current_team_coverage": 3,
-    "pages_missing": 140,
+    "as_of": "2026-09-08T23:25:57.014280+00:00",
+    "current_retry_recoveries": 0,
+    "current_team_coverage": 32,
+    "negative_cache_ttl_minutes": 60,
+    "negative_entries_retried": 140,
+    "pages_missing": 0,
+    "refresh_attempts": 140,
     "requested_teams": 32,
-    "source": "Wikipedia season pages",
-    "status": "degraded"
+    "source": "Wikipedia season-page rendered infoboxes",
+    "status": "healthy"
   },
   "depth_charts": {
     "season": 2026,
     "status": "healthy"
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-08T23:08:08.908088+00:00",
+    "as_of": "2026-09-08T23:27:52.845991+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -33,9 +37,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-08T23:06:36.317328+00:00",
+    "generated_utc": "2026-09-08T23:24:58.757623+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 97,
+    "signals": 115,
     "status": "healthy"
   },
   "ftn": {
@@ -48,9 +52,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-08T23:06:36.317328+00:00",
+  "generated_utc": "2026-09-08T23:24:58.757623+00:00",
   "injuries": {
-    "as_of": "2026-09-08T23:06:36.434796+00:00",
+    "as_of": "2026-09-08T23:24:58.853738+00:00",
     "players": 29,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -76,7 +80,7 @@
     "status": "healthy"
   },
   "qb_history": {
-    "games_with_player_opponent_history": 29,
+    "games_with_player_opponent_history": 27,
     "guardrail": "Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes.",
     "status": "healthy",
     "team_change_safe": true
@@ -87,14 +91,14 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-08T23:06:38.869939+00:00",
+    "as_of": "2026-09-08T23:26:00.590979+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
     "status": "healthy"
   },
   "weather": {
-    "as_of": "2026-09-08T23:07:47.509800+00:00",
+    "as_of": "2026-09-08T23:27:31.917792+00:00",
     "games_checked": 11,
     "status": "degraded"
   }

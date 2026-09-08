@@ -1,7 +1,7 @@
 {
   "2026_01_ARI_LAC": [
     {
-      "as_of": "2026-09-08T23:08:05.335609+00:00",
+      "as_of": "2026-09-08T23:27:49.427472+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LAC",
@@ -19,7 +19,7 @@
       "title": "LAC protection vs ARI pass rush"
     },
     {
-      "as_of": "2026-09-08T23:08:05.334772+00:00",
+      "as_of": "2026-09-08T23:27:49.426651+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -37,7 +37,7 @@
       "title": "ARI explosives vs LAC prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:05.335077+00:00",
+      "as_of": "2026-09-08T23:27:49.426921+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -55,7 +55,7 @@
       "title": "ARI early-down approach vs LAC"
     },
     {
-      "as_of": "2026-09-08T23:08:05.920421+00:00",
+      "as_of": "2026-09-08T23:27:49.986884+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
@@ -75,7 +75,7 @@
       "title": "Justin Herbert vs ARI: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:07:53.055525+00:00",
+      "as_of": "2026-09-08T23:27:37.322226+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
@@ -100,7 +100,7 @@
       "title": "Justin Herbert vs ARI: player history"
     },
     {
-      "as_of": "2026-09-08T23:06:45.929331+00:00",
+      "as_of": "2026-09-08T23:26:29.793963+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Jonathan Gannon",
@@ -116,7 +116,7 @@
       "title": "ARI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-08T23:06:45.929358+00:00",
+      "as_of": "2026-09-08T23:26:29.793992+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -130,7 +130,7 @@
   ],
   "2026_01_ATL_PIT": [
     {
-      "as_of": "2026-09-08T23:08:04.121627+00:00",
+      "as_of": "2026-09-08T23:27:48.288021+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "PIT",
@@ -148,7 +148,7 @@
       "title": "ATL protection vs PIT pass rush"
     },
     {
-      "as_of": "2026-09-08T23:08:04.123708+00:00",
+      "as_of": "2026-09-08T23:27:48.290047+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "PIT",
@@ -166,7 +166,7 @@
       "title": "PIT YAC creation vs ATL tackling"
     },
     {
-      "as_of": "2026-09-08T23:08:04.122457+00:00",
+      "as_of": "2026-09-08T23:27:48.288787+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ATL",
@@ -184,7 +184,7 @@
       "title": "ATL early-down approach vs PIT"
     },
     {
-      "as_of": "2026-09-08T23:07:52.021686+00:00",
+      "as_of": "2026-09-08T23:27:36.342444+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "ATL",
@@ -209,7 +209,7 @@
       "title": "Tua Tagovailoa vs PIT: player history"
     },
     {
-      "as_of": "2026-09-08T23:06:44.450748+00:00",
+      "as_of": "2026-09-08T23:26:08.491469+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Raheem Morris",
@@ -223,11 +223,39 @@
       "strength": "Strong",
       "summary": "ATL enters 2026 with head coach Kevin Stefanski. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
       "title": "ATL offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:08.491490+00:00",
+      "category": "coaching",
+      "promoted_to_model": false,
+      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
+      "strength": "Strong",
+      "summary": "PIT is coordinated by Patrick Graham in 2026, replacing Teryl Austin. Older ATL-vs-PIT results are not labeled as quarterback-vs-coordinator history because the defensive decision-maker changed.",
+      "title": "New defensive coordinator in PIT"
+    },
+    {
+      "as_of": "2026-09-08T23:26:08.491514+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Mike Tomlin",
+        "previous_off_coach": "Arthur Smith"
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
+      "strength": "Strong",
+      "summary": "PIT enters 2026 with head coach Mike McCarthy and offensive coordinator Brian Angelichio. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "PIT offense changed its decision-makers"
     }
   ],
   "2026_01_BAL_IND": [
     {
-      "as_of": "2026-09-08T23:08:02.931292+00:00",
+      "as_of": "2026-09-08T23:27:47.149418+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -245,7 +273,7 @@
       "title": "BAL protection vs IND pass rush"
     },
     {
-      "as_of": "2026-09-08T23:08:02.932101+00:00",
+      "as_of": "2026-09-08T23:27:47.150234+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "IND",
@@ -263,7 +291,7 @@
       "title": "BAL early-down approach vs IND"
     },
     {
-      "as_of": "2026-09-08T23:08:02.933066+00:00",
+      "as_of": "2026-09-08T23:27:47.151153+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -281,7 +309,7 @@
       "title": "IND explosives vs BAL prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:03.503481+00:00",
+      "as_of": "2026-09-08T23:27:47.695118+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "BAL",
@@ -301,7 +329,7 @@
       "title": "Lamar Jackson vs IND: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:07:51.025260+00:00",
+      "as_of": "2026-09-08T23:27:35.371626+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "BAL",
@@ -324,11 +352,39 @@
       "strength": "Weak",
       "summary": "Across 2 prior meetings with IND, Lamar Jackson averaged +0.24 EPA/dropback with a 63% positive-EPA rate over 82 dropbacks. This is opponent history rather than proof of a stable matchup law, so current staff and personnel still determine its weight.",
       "title": "Lamar Jackson vs IND: player history"
+    },
+    {
+      "as_of": "2026-09-08T23:26:06.339179+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "John Harbaugh",
+        "previous_off_coach": "Todd Monken"
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Baltimore_Ravens_season",
+      "strength": "Strong",
+      "summary": "BAL enters 2026 with head coach Jesse Minter and offensive coordinator Declan Doyle. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "BAL offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:06.339234+00:00",
+      "category": "coaching",
+      "promoted_to_model": false,
+      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Baltimore_Ravens_season",
+      "strength": "Strong",
+      "summary": "BAL is coordinated by Anthony Weaver in 2026, replacing Zach Orr. Older IND-vs-BAL results are not labeled as quarterback-vs-coordinator history because the defensive decision-maker changed.",
+      "title": "New defensive coordinator in BAL"
     }
   ],
   "2026_01_BUF_HOU": [
     {
-      "as_of": "2026-09-08T23:08:02.327378+00:00",
+      "as_of": "2026-09-08T23:27:46.571019+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BUF",
@@ -346,7 +402,7 @@
       "title": "BUF early-down approach vs HOU"
     },
     {
-      "as_of": "2026-09-08T23:08:02.326565+00:00",
+      "as_of": "2026-09-08T23:27:46.570233+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -364,7 +420,7 @@
       "title": "BUF protection vs HOU pass rush"
     },
     {
-      "as_of": "2026-09-08T23:08:02.328404+00:00",
+      "as_of": "2026-09-08T23:27:46.572038+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -382,7 +438,7 @@
       "title": "HOU explosives vs BUF prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:02.911477+00:00",
+      "as_of": "2026-09-08T23:27:47.130043+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
@@ -402,7 +458,7 @@
       "title": "Josh Allen vs HOU: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:08:02.928315+00:00",
+      "as_of": "2026-09-08T23:27:47.146489+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
@@ -422,14 +478,30 @@
       "title": "C.J. Stroud vs BUF: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:06:42.947685+00:00",
+      "as_of": "2026-09-08T23:26:05.492504+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Sean McDermott",
+        "previous_off_coach": null
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Buffalo_Bills_season",
+      "strength": "Strong",
+      "summary": "BUF enters 2026 with head coach Joe Brady. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "BUF offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:06.123378+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 8.9,
         "precip_pct": 14.0,
         "roof": "retractable",
-        "temp_f": 93.8,
-        "wind_mph": 8.9
+        "temp_f": 93.7,
+        "wind_mph": 8.1
       },
       "promoted_to_model": false,
       "relevance": "Nearest-hour forecast at home venue",
@@ -437,13 +509,13 @@
       "source_name": "Open-Meteo",
       "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
       "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 9 mph, and 14% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "summary": "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 8 mph sustained wind with gusts near 9 mph, and 14% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. Weather is shown as context until its incremental forecast value is validated chronologically.",
       "title": "Kickoff weather in HOU"
     }
   ],
   "2026_01_CHI_CAR": [
     {
-      "as_of": "2026-09-08T23:08:00.559298+00:00",
+      "as_of": "2026-09-08T23:27:44.818514+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CHI",
@@ -461,7 +533,7 @@
       "title": "CAR explosives vs CHI prevention"
     },
     {
-      "as_of": "2026-09-08T23:06:40.787294+00:00",
+      "as_of": "2026-09-08T23:26:03.034506+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -482,7 +554,7 @@
       "title": "CHI play action vs CAR"
     },
     {
-      "as_of": "2026-09-08T23:06:40.789528+00:00",
+      "as_of": "2026-09-08T23:26:03.036695+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -503,7 +575,7 @@
       "title": "CAR RPOs vs CHI"
     },
     {
-      "as_of": "2026-09-08T23:08:01.144221+00:00",
+      "as_of": "2026-09-08T23:27:45.388944+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
@@ -523,7 +595,7 @@
       "title": "Bryce Young vs CHI: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:08:01.127520+00:00",
+      "as_of": "2026-09-08T23:27:45.371525+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
@@ -545,7 +617,7 @@
   ],
   "2026_01_CLE_JAX": [
     {
-      "as_of": "2026-09-08T23:08:03.522158+00:00",
+      "as_of": "2026-09-08T23:27:47.713326+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "JAX",
@@ -563,7 +635,7 @@
       "title": "CLE explosives vs JAX prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:03.521600+00:00",
+      "as_of": "2026-09-08T23:27:47.712781+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CLE",
@@ -581,7 +653,7 @@
       "title": "CLE protection vs JAX pass rush"
     },
     {
-      "as_of": "2026-09-08T23:06:43.598210+00:00",
+      "as_of": "2026-09-08T23:26:07.203612+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -602,7 +674,7 @@
       "title": "JAX pre-snap motion vs CLE"
     },
     {
-      "as_of": "2026-09-08T23:08:04.118692+00:00",
+      "as_of": "2026-09-08T23:27:48.285023+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
@@ -622,7 +694,7 @@
       "title": "Trevor Lawrence vs CLE: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:08:04.101585+00:00",
+      "as_of": "2026-09-08T23:27:48.268298+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
@@ -642,14 +714,30 @@
       "title": "Deshaun Watson vs JAX: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:06:44.228969+00:00",
+      "as_of": "2026-09-08T23:26:07.413426+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Kevin Stefanski",
+        "previous_off_coach": null
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Cleveland_Browns_season",
+      "strength": "Strong",
+      "summary": "CLE enters 2026 with head coach Todd Monken. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "CLE offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:08.274483+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 4.5,
         "precip_pct": 10.0,
         "roof": "outdoor",
-        "temp_f": 96.4,
-        "wind_mph": 5.3
+        "temp_f": 96.7,
+        "wind_mph": 5.0
       },
       "promoted_to_model": false,
       "relevance": "Nearest-hour forecast at home venue",
@@ -657,13 +745,13 @@
       "source_name": "Open-Meteo",
       "source_url": "https://api.open-meteo.com/v1/forecast?latitude=30.3239&longitude=-81.6373&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
       "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 96\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 10% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
+      "summary": "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 10% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
       "title": "Kickoff weather in JAX"
     }
   ],
   "2026_01_DAL_NYG": [
     {
-      "as_of": "2026-09-08T23:08:07.716490+00:00",
+      "as_of": "2026-09-08T23:27:51.702420+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DAL",
@@ -681,7 +769,7 @@
       "title": "NYG explosives vs DAL prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:07.716008+00:00",
+      "as_of": "2026-09-08T23:27:51.701861+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYG",
@@ -699,7 +787,7 @@
       "title": "NYG protection vs DAL pass rush"
     },
     {
-      "as_of": "2026-09-08T23:07:06.765907+00:00",
+      "as_of": "2026-09-08T23:26:50.880705+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -720,7 +808,7 @@
       "title": "DAL RPOs vs NYG"
     },
     {
-      "as_of": "2026-09-08T23:08:08.286913+00:00",
+      "as_of": "2026-09-08T23:27:52.249273+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DAL",
@@ -740,7 +828,7 @@
       "title": "Dak Prescott vs NYG: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:08:08.303503+00:00",
+      "as_of": "2026-09-08T23:27:52.265900+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NYG",
@@ -758,11 +846,27 @@
       "strength": "Weak",
       "summary": "Across 1 prior meeting with DAL, Jaxson Dart averaged +0.22 EPA/dropback with a 53% positive-EPA rate over 36 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
       "title": "Jaxson Dart vs DAL: prior meetings"
+    },
+    {
+      "as_of": "2026-09-08T23:26:51.094363+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Brian Daboll (fired November 10, 2\u20138 record) Mike Kafka (interim, 2\u20135 record)",
+        "previous_off_coach": null
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
+      "strength": "Strong",
+      "summary": "NYG enters 2026 with head coach John Harbaugh. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "NYG offense changed its decision-makers"
     }
   ],
   "2026_01_DEN_KC": [
     {
-      "as_of": "2026-09-08T23:08:08.307548+00:00",
+      "as_of": "2026-09-08T23:27:52.270038+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DEN",
@@ -780,7 +884,7 @@
       "title": "KC protection vs DEN pass rush"
     },
     {
-      "as_of": "2026-09-08T23:08:08.308381+00:00",
+      "as_of": "2026-09-08T23:27:52.270875+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "KC",
@@ -798,7 +902,7 @@
       "title": "KC early-down approach vs DEN"
     },
     {
-      "as_of": "2026-09-08T23:07:27.134426+00:00",
+      "as_of": "2026-09-08T23:27:11.284353+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -819,7 +923,7 @@
       "title": "DEN play action vs KC"
     },
     {
-      "as_of": "2026-09-08T23:08:08.905887+00:00",
+      "as_of": "2026-09-08T23:27:52.843811+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "KC",
@@ -839,29 +943,50 @@
       "title": "Patrick Mahomes vs DEN: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:08:08.886986+00:00",
+      "as_of": "2026-09-08T23:27:11.697438+00:00",
       "category": "history",
       "metadata": {
-        "advantage_team": "DEN",
-        "epa_per_dropback": 0.29955894925637205,
-        "family": "qb_opponent_history",
+        "dc": "Vance Joseph",
+        "epa_per_dropback": -0.03910588438907867,
         "games": 4,
-        "success_rate": 0.5467625899280576
+        "success_rate": 0.4406779661016949,
+        "tenure_years": [
+          2026,
+          2025,
+          2024,
+          2023
+        ]
       },
       "promoted_to_model": false,
-      "relevance": "Same quarterback versus the same franchise; secondary to exact coordinator history",
-      "sample_size": 139,
-      "side": "away",
-      "source_name": "nflverse play-by-play",
-      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "relevance": "Same quarterback, same opponent, verified continuity of the current defensive coordinator",
+      "sample_size": 177,
+      "side": "home",
+      "source_name": "nflverse PBP + Wikipedia staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Denver_Broncos_season",
       "strength": "Moderate",
-      "summary": "Across 4 prior meetings with KC, Bo Nix averaged +0.30 EPA/dropback with a 55% positive-EPA rate over 139 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
-      "title": "Bo Nix vs KC: prior meetings"
+      "summary": "Across 4 prior games in seasons when Vance Joseph was the listed DEN defensive coordinator, Patrick Mahomes averaged -0.04 EPA/dropback with a 44% positive-EPA rate over 177 charted dropbacks. The sample is labeled moderate evidence and is explicitly discounted when offensive personnel or coaching context has changed.",
+      "title": "Patrick Mahomes vs Vance Joseph's DEN defense"
+    },
+    {
+      "as_of": "2026-09-08T23:27:11.496056+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Sean Payton",
+        "previous_off_coach": "Joe Lombardi"
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Denver_Broncos_season",
+      "strength": "Strong",
+      "summary": "DEN enters 2026 with offensive coordinator Davis Webb. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "DEN offense changed its decision-makers"
     }
   ],
   "2026_01_GB_MIN": [
     {
-      "as_of": "2026-09-08T23:08:06.526228+00:00",
+      "as_of": "2026-09-08T23:27:50.561180+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -879,7 +1004,7 @@
       "title": "GB explosives vs MIN prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:06.527065+00:00",
+      "as_of": "2026-09-08T23:27:50.561992+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIN",
@@ -897,7 +1022,7 @@
       "title": "MIN protection vs GB pass rush"
     },
     {
-      "as_of": "2026-09-08T23:08:06.526502+00:00",
+      "as_of": "2026-09-08T23:27:50.561476+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -915,7 +1040,7 @@
       "title": "GB early-down approach vs MIN"
     },
     {
-      "as_of": "2026-09-08T23:08:07.097124+00:00",
+      "as_of": "2026-09-08T23:27:51.106598+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
@@ -935,7 +1060,7 @@
       "title": "Jordan Love vs MIN: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:07:54.027605+00:00",
+      "as_of": "2026-09-08T23:27:38.272142+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
@@ -962,7 +1087,7 @@
   ],
   "2026_01_MIA_LV": [
     {
-      "as_of": "2026-09-08T23:08:05.925491+00:00",
+      "as_of": "2026-09-08T23:27:49.992088+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -980,7 +1105,7 @@
       "title": "LV early-down approach vs MIA"
     },
     {
-      "as_of": "2026-09-08T23:08:05.923867+00:00",
+      "as_of": "2026-09-08T23:27:49.990475+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -998,7 +1123,7 @@
       "title": "MIA explosives vs LV prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:05.924696+00:00",
+      "as_of": "2026-09-08T23:27:49.991348+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LV",
@@ -1016,7 +1141,7 @@
       "title": "LV protection vs MIA pass rush"
     },
     {
-      "as_of": "2026-09-08T23:07:53.546309+00:00",
+      "as_of": "2026-09-08T23:27:37.806904+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "MIA",
@@ -1042,7 +1167,39 @@
       "title": "Kirk Cousins vs MIA: player history"
     },
     {
-      "as_of": "2026-09-08T23:06:46.162919+00:00",
+      "as_of": "2026-09-08T23:26:30.019126+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Mike McDaniel",
+        "previous_off_coach": null
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
+      "strength": "Strong",
+      "summary": "MIA enters 2026 with head coach Jeff Hafley. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "MIA offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:30.019154+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Pete Carroll",
+        "previous_off_coach": null
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Las_Vegas_Raiders_season",
+      "strength": "Strong",
+      "summary": "LV enters 2026 with head coach Klint Kubiak. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "LV offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:30.021087+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -1056,7 +1213,7 @@
   ],
   "2026_01_NE_SEA": [
     {
-      "as_of": "2026-09-08T23:07:59.367720+00:00",
+      "as_of": "2026-09-08T23:27:43.654031+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -1074,7 +1231,7 @@
       "title": "SEA explosives vs NE prevention"
     },
     {
-      "as_of": "2026-09-08T23:07:59.368015+00:00",
+      "as_of": "2026-09-08T23:27:43.654329+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -1092,7 +1249,7 @@
       "title": "SEA early-down approach vs NE"
     },
     {
-      "as_of": "2026-09-08T23:07:59.365965+00:00",
+      "as_of": "2026-09-08T23:27:43.652123+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NE",
@@ -1110,7 +1267,7 @@
       "title": "NE protection vs SEA pass rush"
     },
     {
-      "as_of": "2026-09-08T23:07:59.935517+00:00",
+      "as_of": "2026-09-08T23:27:44.210085+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -1130,7 +1287,7 @@
       "title": "Drake Maye vs SEA: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:07:59.953970+00:00",
+      "as_of": "2026-09-08T23:27:44.226675+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -1150,7 +1307,35 @@
       "title": "Sam Darnold vs NE: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:06:39.797014+00:00",
+      "as_of": "2026-09-08T23:26:01.930470+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Mike Macdonald",
+        "previous_off_coach": "Klint Kubiak"
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Seattle_Seahawks_season",
+      "strength": "Strong",
+      "summary": "SEA enters 2026 with offensive coordinator Brian Fleury. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "SEA offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:01.930483+00:00",
+      "category": "coaching",
+      "promoted_to_model": false,
+      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_New_England_Patriots_season",
+      "strength": "Strong",
+      "summary": "NE is coordinated by Zak Kuhr in 2026, replacing Terrell Williams. Older SEA-vs-NE results are not labeled as quarterback-vs-coordinator history because the defensive decision-maker changed.",
+      "title": "New defensive coordinator in NE"
+    },
+    {
+      "as_of": "2026-09-08T23:26:01.511533+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1168,7 +1353,7 @@
       "title": "NE: Ben Brown \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T23:06:39.797037+00:00",
+      "as_of": "2026-09-08T23:26:01.511554+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1186,7 +1371,7 @@
       "title": "NE: TreVeyon Henderson \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T23:06:39.797081+00:00",
+      "as_of": "2026-09-08T23:26:01.511600+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1204,7 +1389,7 @@
       "title": "SEA: Ty Okada \u2014 Out"
     },
     {
-      "as_of": "2026-09-08T23:06:40.031730+00:00",
+      "as_of": "2026-09-08T23:26:01.933477+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -1216,7 +1401,7 @@
       "title": "Long travel spot for NE"
     },
     {
-      "as_of": "2026-09-08T23:06:39.797090+00:00",
+      "as_of": "2026-09-08T23:26:01.511608+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1234,7 +1419,7 @@
       "title": "SEA: Tory Horton \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-08T23:06:39.797095+00:00",
+      "as_of": "2026-09-08T23:26:01.511614+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1252,7 +1437,7 @@
       "title": "SEA: Nick Emmanwori \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-08T23:07:47.510591+00:00",
+      "as_of": "2026-09-08T23:27:31.918693+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1274,7 +1459,7 @@
   ],
   "2026_01_NO_DET": [
     {
-      "as_of": "2026-09-08T23:08:01.745446+00:00",
+      "as_of": "2026-09-08T23:27:45.975318+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -1292,7 +1477,7 @@
       "title": "NO explosives vs DET prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:01.744930+00:00",
+      "as_of": "2026-09-08T23:27:45.974783+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -1310,7 +1495,7 @@
       "title": "NO protection vs DET pass rush"
     },
     {
-      "as_of": "2026-09-08T23:08:01.747058+00:00",
+      "as_of": "2026-09-08T23:27:45.976869+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "DET",
@@ -1328,7 +1513,7 @@
       "title": "DET YAC creation vs NO tackling"
     },
     {
-      "as_of": "2026-09-08T23:08:02.323687+00:00",
+      "as_of": "2026-09-08T23:27:46.567235+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DET",
@@ -1348,7 +1533,7 @@
       "title": "Jared Goff vs NO: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:07:50.036306+00:00",
+      "as_of": "2026-09-08T23:27:34.422889+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DET",
@@ -1375,7 +1560,7 @@
   ],
   "2026_01_NYJ_TEN": [
     {
-      "as_of": "2026-09-08T23:08:04.708816+00:00",
+      "as_of": "2026-09-08T23:27:48.853140+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -1393,7 +1578,7 @@
       "title": "NYJ explosives vs TEN prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:04.710446+00:00",
+      "as_of": "2026-09-08T23:27:48.854745+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1411,7 +1596,7 @@
       "title": "TEN early-down approach vs NYJ"
     },
     {
-      "as_of": "2026-09-08T23:08:04.709644+00:00",
+      "as_of": "2026-09-08T23:27:48.853958+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -1429,7 +1614,7 @@
       "title": "TEN protection vs NYJ pass rush"
     },
     {
-      "as_of": "2026-09-08T23:07:52.516211+00:00",
+      "as_of": "2026-09-08T23:27:36.829555+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1455,28 +1640,37 @@
       "title": "Geno Smith vs TEN: player history"
     },
     {
-      "as_of": "2026-09-08T23:06:45.706914+00:00",
-      "category": "weather",
+      "as_of": "2026-09-08T23:26:09.368154+00:00",
+      "category": "coaching",
+      "promoted_to_model": false,
+      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Tennessee_Titans_season",
+      "strength": "Strong",
+      "summary": "TEN is coordinated by Gus Bradley in 2026, replacing the prior defensive staff. Older NYJ-vs-TEN results are not labeled as quarterback-vs-coordinator history because the defensive decision-maker changed.",
+      "title": "New defensive coordinator in TEN"
+    },
+    {
+      "as_of": "2026-09-08T23:26:09.368197+00:00",
+      "category": "coaching",
       "metadata": {
-        "gust_mph": 6.9,
-        "precip_pct": 10.0,
-        "roof": "outdoor",
-        "temp_f": 90.8,
-        "wind_mph": 3.6
+        "previous_head_coach": "Brian Callahan (fired October 13, 1\u20135 record) Mike McCoy (interim, 2\u20139 record)",
+        "previous_off_coach": null
       },
       "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=36.1665&longitude=-86.7713&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-      "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 91\u00b0F, 4 mph sustained wind with gusts near 7 mph, and 10% precipitation probability. Weather is shown as context until its incremental forecast value is validated chronologically.",
-      "title": "Kickoff weather in TEN"
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Tennessee_Titans_season",
+      "strength": "Strong",
+      "summary": "TEN enters 2026 with head coach Robert Saleh and offensive coordinator Brian Daboll. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "TEN offense changed its decision-makers"
     }
   ],
   "2026_01_SF_LA": [
     {
-      "as_of": "2026-09-08T23:07:59.958733+00:00",
+      "as_of": "2026-09-08T23:27:44.231662+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LA",
@@ -1494,7 +1688,7 @@
       "title": "LA explosives vs SF prevention"
     },
     {
-      "as_of": "2026-09-08T23:06:40.558774+00:00",
+      "as_of": "2026-09-08T23:26:02.611443+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -1515,7 +1709,7 @@
       "title": "SF pre-snap motion vs LA"
     },
     {
-      "as_of": "2026-09-08T23:07:59.957767+00:00",
+      "as_of": "2026-09-08T23:27:44.230680+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "SF",
@@ -1533,7 +1727,7 @@
       "title": "SF third downs vs LA"
     },
     {
-      "as_of": "2026-09-08T23:08:00.554615+00:00",
+      "as_of": "2026-09-08T23:27:44.813608+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LA",
@@ -1553,7 +1747,7 @@
       "title": "Matthew Stafford vs SF: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:08:00.537068+00:00",
+      "as_of": "2026-09-08T23:27:44.794764+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SF",
@@ -1573,7 +1767,35 @@
       "title": "Brock Purdy vs LA: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:07:47.510673+00:00",
+      "as_of": "2026-09-08T23:26:03.026034+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Sean McVay",
+        "previous_off_coach": "Mike LaFleur"
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Los_Angeles_Rams_season",
+      "strength": "Strong",
+      "summary": "LA enters 2026 with offensive coordinator Nathan Scheelhaase. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "LA offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:03.026046+00:00",
+      "category": "coaching",
+      "promoted_to_model": false,
+      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_San_Francisco_49ers_season",
+      "strength": "Strong",
+      "summary": "SF is coordinated by Raheem Morris in 2026, replacing Robert Saleh. Older LA-vs-SF results are not labeled as quarterback-vs-coordinator history because the defensive decision-maker changed.",
+      "title": "New defensive coordinator in SF"
+    },
+    {
+      "as_of": "2026-09-08T23:27:31.918774+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1593,7 +1815,7 @@
       "title": "SF: James Thompson Jr. \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:07:47.510696+00:00",
+      "as_of": "2026-09-08T23:27:31.918797+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1613,7 +1835,7 @@
       "title": "LA: Alaric Jackson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:07:47.510699+00:00",
+      "as_of": "2026-09-08T23:27:31.918801+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1633,7 +1855,7 @@
       "title": "LA: Jaylen Watson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:07:47.510704+00:00",
+      "as_of": "2026-09-08T23:27:31.918806+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1653,7 +1875,7 @@
       "title": "LA: Tyler Higbee \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-08T23:07:47.510680+00:00",
+      "as_of": "2026-09-08T23:27:31.918781+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1673,7 +1895,7 @@
       "title": "SF: Renardo Green \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-08T23:07:47.510684+00:00",
+      "as_of": "2026-09-08T23:27:31.918785+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1695,7 +1917,7 @@
   ],
   "2026_01_TB_CIN": [
     {
-      "as_of": "2026-09-08T23:08:01.147593+00:00",
+      "as_of": "2026-09-08T23:27:45.392509+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CIN",
@@ -1713,7 +1935,7 @@
       "title": "TB explosives vs CIN prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:01.149135+00:00",
+      "as_of": "2026-09-08T23:27:45.394045+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TB",
@@ -1731,7 +1953,7 @@
       "title": "CIN early-down approach vs TB"
     },
     {
-      "as_of": "2026-09-08T23:08:01.147905+00:00",
+      "as_of": "2026-09-08T23:27:45.392801+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "CIN",
@@ -1749,7 +1971,7 @@
       "title": "TB YAC creation vs CIN tackling"
     },
     {
-      "as_of": "2026-09-08T23:08:01.742071+00:00",
+      "as_of": "2026-09-08T23:27:45.971783+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CIN",
@@ -1769,7 +1991,7 @@
       "title": "Joe Burrow vs TB: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:07:49.522921+00:00",
+      "as_of": "2026-09-08T23:27:33.928183+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "TB",
@@ -1797,7 +2019,7 @@
   ],
   "2026_01_WAS_PHI": [
     {
-      "as_of": "2026-09-08T23:08:07.116762+00:00",
+      "as_of": "2026-09-08T23:27:51.125700+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "WAS",
@@ -1815,7 +2037,7 @@
       "title": "PHI YAC creation vs WAS tackling"
     },
     {
-      "as_of": "2026-09-08T23:08:07.116431+00:00",
+      "as_of": "2026-09-08T23:27:51.125367+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -1833,7 +2055,7 @@
       "title": "PHI explosives vs WAS prevention"
     },
     {
-      "as_of": "2026-09-08T23:08:07.115408+00:00",
+      "as_of": "2026-09-08T23:27:51.124330+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -1851,7 +2073,7 @@
       "title": "WAS early-down approach vs PHI"
     },
     {
-      "as_of": "2026-09-08T23:08:07.712071+00:00",
+      "as_of": "2026-09-08T23:27:51.697764+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PHI",
@@ -1871,24 +2093,72 @@
       "title": "Jalen Hurts vs WAS: prior meetings"
     },
     {
-      "as_of": "2026-09-08T23:08:07.693919+00:00",
+      "as_of": "2026-09-08T23:26:30.665553+00:00",
       "category": "history",
       "metadata": {
-        "advantage_team": "PHI",
+        "dc": "Vic Fangio",
         "epa_per_dropback": -0.05419761250164074,
-        "family": "qb_opponent_history",
         "games": 3,
-        "success_rate": 0.4263565891472868
+        "success_rate": 0.4263565891472868,
+        "tenure_years": [
+          2026,
+          2025,
+          2024
+        ]
       },
       "promoted_to_model": false,
-      "relevance": "Same quarterback versus the same franchise; secondary to exact coordinator history",
+      "relevance": "Same quarterback, same opponent, verified continuity of the current defensive coordinator",
       "sample_size": 129,
       "side": "away",
-      "source_name": "nflverse play-by-play",
-      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+      "source_name": "nflverse PBP + Wikipedia staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Philadelphia_Eagles_season",
       "strength": "Moderate",
-      "summary": "Across 3 prior meetings with PHI, Jayden Daniels averaged -0.05 EPA/dropback with a 43% positive-EPA rate over 129 dropbacks. This is opponent history, not coordinator-specific history, so current staff and personnel changes determine how much weight it deserves.",
-      "title": "Jayden Daniels vs PHI: prior meetings"
+      "summary": "Across 3 prior games in seasons when Vic Fangio was the listed PHI defensive coordinator, Jayden Daniels averaged -0.05 EPA/dropback with a 43% positive-EPA rate over 129 charted dropbacks. The sample is labeled moderate evidence and is explicitly discounted when offensive personnel or coaching context has changed.",
+      "title": "Jayden Daniels vs Vic Fangio's PHI defense"
+    },
+    {
+      "as_of": "2026-09-08T23:26:30.461543+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Dan Quinn",
+        "previous_off_coach": "Kliff Kingsbury"
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "away",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Washington_Commanders_season",
+      "strength": "Strong",
+      "summary": "WAS enters 2026 with offensive coordinator David Blough. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "WAS offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:30.665592+00:00",
+      "category": "coaching",
+      "metadata": {
+        "previous_head_coach": "Nick Sirianni",
+        "previous_off_coach": "Kevin Patullo"
+      },
+      "promoted_to_model": false,
+      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Philadelphia_Eagles_season",
+      "strength": "Strong",
+      "summary": "PHI enters 2026 with offensive coordinator Sean Mannion. Historical quarterback/team matchup results from the prior offensive staff are therefore down-weighted in the written analysis rather than treated as directly transferable.",
+      "title": "PHI offense changed its decision-makers"
+    },
+    {
+      "as_of": "2026-09-08T23:26:30.665603+00:00",
+      "category": "coaching",
+      "promoted_to_model": false,
+      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
+      "side": "home",
+      "source_name": "Wikipedia season staff records",
+      "source_url": "https://en.wikipedia.org/wiki/2026_Washington_Commanders_season",
+      "strength": "Strong",
+      "summary": "WAS is coordinated by Daronte Jones in 2026, replacing Joe Whitt Jr.. Older PHI-vs-WAS results are not labeled as quarterback-vs-coordinator history because the defensive decision-maker changed.",
+      "title": "New defensive coordinator in WAS"
     }
   ]
 }
