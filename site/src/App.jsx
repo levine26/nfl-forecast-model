@@ -1,8 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip,
-  BarChart, Bar, CartesianGrid,
-} from 'recharts'
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -15,338 +12,65 @@ const TEAM_NAMES = {
   MIA:'Miami Dolphins', MIN:'Minnesota Vikings', NE:'New England Patriots', NO:'New Orleans Saints',
   NYG:'New York Giants', NYJ:'New York Jets', PHI:'Philadelphia Eagles', PIT:'Pittsburgh Steelers',
   SEA:'Seattle Seahawks', SF:'San Francisco 49ers', TB:'Tampa Bay Buccaneers', TEN:'Tennessee Titans',
-  WAS:'Washington Commanders',
+  WAS:'Washington Commanders'
 }
 
 function parseCSV(text) {
-  const rows = []
-  let row = [], cell = '', quoted = false
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i]
-    if (quoted) {
-      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++ }
-      else if (c === '"') quoted = false
-      else cell += c
-    } else {
-      if (c === '"') quoted = true
-      else if (c === ',') { row.push(cell); cell = '' }
-      else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = '' }
-      else if (c !== '\r') cell += c
-    }
+  const rows=[]; let row=[],cell='',quoted=false
+  for(let i=0;i<text.length;i++){
+    const c=text[i]
+    if(quoted){if(c==='"'&&text[i+1]==='"'){cell+='"';i++}else if(c==='"')quoted=false;else cell+=c}
+    else if(c==='"')quoted=true;else if(c===','){row.push(cell);cell=''}else if(c==='\n'){row.push(cell);rows.push(row);row=[];cell=''}else if(c!=='\r')cell+=c
   }
-  if (cell.length || row.length) { row.push(cell); rows.push(row) }
-  const header = rows.shift() || []
-  return rows.filter(r => r.some(Boolean)).map(r => Object.fromEntries(header.map((h, i) => [h, r[i] ?? ''])))
+  if(cell.length||row.length){row.push(cell);rows.push(row)}
+  const header=rows.shift()||[]
+  return rows.filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(header.map((h,i)=>[h,r[i]??''])))
+}
+async function fetchCSV(path){const res=await fetch(`${BASE}data/${path}`,{cache:'no-store'});if(!res.ok)throw new Error(`${path}: ${res.status}`);return parseCSV(await res.text())}
+async function fetchJSON(path,fallback=null){try{const res=await fetch(`${BASE}data/${path}`,{cache:'no-store'});if(!res.ok)return fallback;return await res.json()}catch{return fallback}}
+const n=v=>{if(v===''||v==null)return null;const x=Number(v);return Number.isFinite(x)?x:null}
+const pct=(v,d=1)=>n(v)==null?'—':`${(n(v)*100).toFixed(d)}%`
+const one=v=>n(v)==null?'—':n(v).toFixed(1)
+const signed=v=>n(v)==null?'—':`${n(v)>0?'+':''}${n(v).toFixed(1)}`
+function american(prob){const p=n(prob);if(p==null||p<=0||p>=1)return'—';const x=p>=.5?-100*p/(1-p):100*(1-p)/p;return`${x>0?'+':''}${Math.round(x)}`}
+function kickoff(game){if(!game.gameday)return null;const[hh='00',mm='00']=(game.gametime||'').split(':');const d=new Date(`${game.gameday}T${hh}:${mm}:00-04:00`);return Number.isNaN(d.getTime())?null:d}
+function kickoffText(game){const d=kickoff(game);return d?new Intl.DateTimeFormat('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/Los_Angeles'}).format(d):(game.gameday||'TBD')}
+function normalizeGame(g){const homeP=n(g.final_home_prob),home=g.home_team,away=g.away_team,pick=g.pick||(homeP>=.5?home:away),pickP=homeP==null?null:pick===home?homeP:1-homeP,margin=n(g.expected_margin),market=n(g.spread_line),pickEdge=margin==null||market==null?null:(pick===home?margin-market:market-margin);return{...g,homeP,pickP,margin,market,pickEdge}}
+function lineFromMargin(margin,home,away){const x=n(margin);if(x==null)return'—';if(Math.abs(x)<.05)return'PK';return x>0?`${home} -${Math.abs(x).toFixed(1)}`:`${away} -${Math.abs(x).toFixed(1)}`}
+function confidenceClass(label=''){const x=label.toLowerCase();if(x.includes('high'))return'high';if(x.includes('solid'))return'solid';if(x.includes('lean'))return'lean';return'coin'}
+function evidenceStrength(e){const s=(e?.strength||'').toLowerCase();return['strong','moderate','weak'].includes(s)?s:'context'}
+
+function derivePreview(game,evidence=[]){
+  const pickName=TEAM_NAMES[game.pick]||game.pick,opponent=game.pick===game.home_team?game.away_team:game.home_team,opponentName=TEAM_NAMES[opponent]||opponent,disagreement=n(game.model_disagreement),aligned=game.consistency_flag==='ALIGNED'
+  const intro=`${pickName} is the model's ${game.confidence?.toLowerCase()||'current'} selection at ${pct(game.pickP)}. The central forecast is ${game.projected_score||`${pickName} by ${one(Math.abs(game.margin??0))}`}, with a model line of ${lineFromMargin(game.margin,game.home_team,game.away_team)}.`
+  const marketSentence=game.market==null?`A current market spread is not available in the feed, so the forecast is being evaluated on its standalone football signal.`:`The market is pricing the game around ${lineFromMargin(game.market,game.home_team,game.away_team)}, leaving ${signed(game.pickEdge)} points of spread difference on the model's chosen side.`
+  const agreementSentence=disagreement==null?'':disagreement<.05?`The component models are tightly clustered, which strengthens the conviction behind the ensemble.`:disagreement<.10?`There is some component-model dispersion, so the headline probability is stronger than the agreement underneath it.`:`Component-model disagreement is elevated, which is a meaningful reason to treat the point estimate cautiously.`
+  const context=evidence.length?`The verified context feed contains ${evidence.length} matchup-specific signal${evidence.length>1?'s':''}; those claims are separated below by category and evidence strength.`:`No verified coaching, injury, or historical scheme claim has been attached to this matchup yet; the site will not manufacture one simply to make the preview sound richer.`
+  const wrong=aligned?`${opponentName}'s upset path is to attack the assumptions producing the model's current efficiency edge: create short fields, win the high-leverage downs, and prevent the favorite's projected advantage from compounding over a normal number of possessions.`:`The win-probability and expected-margin heads are not fully aligned here. That internal split is itself a warning that this matchup has multiple plausible game scripts and a wider practical uncertainty band than the headline pick suggests.`
+  return{intro,marketSentence,agreementSentence,context,wrong}
 }
 
-async function fetchCSV(path) {
-  const res = await fetch(`${BASE}data/${path}`, { cache: 'no-store' })
-  if (!res.ok) throw new Error(`${path}: ${res.status}`)
-  return parseCSV(await res.text())
-}
+function Header({tab,setTab,status}){const tabs=[['week','Week'],['ratings','Power Ratings'],['models','Model Lab'],['history','History'],['method','Methodology']];return <><header className="topbar"><div className="brand"><div className="brand-mark">NF</div><div><div className="brand-title">NFL FORECAST</div><div className="brand-sub">Sujar+ quantitative game intelligence</div></div></div><div className={`health ${status?.status==='healthy'?'healthy':''}`}><span/> {status?.status==='healthy'?'MODEL LIVE':'MODEL STATUS'}</div></header><nav className="nav">{tabs.map(([k,l])=><button key={k} className={tab===k?'active':''} onClick={()=>setTab(k)}>{l}</button>)}</nav></>}
+function ProbabilityBar({game}){const awayP=game.homeP==null?.5:1-game.homeP,homeP=game.homeP==null?.5:game.homeP;return <div className="prob-wrap"><div className="prob-labels"><span>{game.away_team} {pct(awayP,0)}</span><span>{pct(homeP,0)} {game.home_team}</span></div><div className="probbar"><div className="away-fill" style={{width:`${awayP*100}%`}}/><div className="home-fill" style={{width:`${homeP*100}%`}}/></div></div>}
+function GameCard({game,runs,evidence,onOpen}){const movementRows=runs.filter(r=>r.game_id===game.game_id),first=movementRows[0],move=first&&n(first.final_home_prob)!=null&&game.homeP!=null?game.homeP-n(first.final_home_prob):null,pickMove=move==null?null:game.pick===game.home_team?move:-move;return <article className="game-card" onClick={onOpen}><div className="game-top"><div><div className="kickoff">{kickoffText(game)}</div><div className="matchup"><span>{game.away_team}</span><em>@</em><span>{game.home_team}</span></div></div><div className={`confidence ${confidenceClass(game.confidence)}`}>{game.confidence||'Forecast'}</div></div><ProbabilityBar game={game}/><div className="pick-line"><span>MODEL PICK</span><strong>{game.pick} {pct(game.pickP)}</strong>{pickMove!=null&&Math.abs(pickMove)>.001&&<small className={pickMove>0?'up':'down'}>{pickMove>0?'↑':'↓'} {Math.abs(pickMove*100).toFixed(1)} pp</small>}</div><div className="game-metrics"><div><span>Projected</span><b>{game.projected_score||'—'}</b></div><div><span>Model line</span><b>{lineFromMargin(game.margin,game.home_team,game.away_team)}</b></div><div><span>Market</span><b>{lineFromMargin(game.market,game.home_team,game.away_team)}</b></div><div><span>Edge</span><b className={(game.pickEdge||0)>0?'positive':''}>{signed(game.pickEdge)}</b></div></div><div className="card-footer"><span>{evidence?.length?`${evidence.length} verified context signal${evidence.length>1?'s':''}`:'Quantitative preview'}</span><button>Open game →</button></div></article>}
+function Hero({games,status}){const strongest=[...games].sort((a,b)=>(b.pickP||0)-(a.pickP||0))[0],edge=[...games].filter(g=>g.pickEdge!=null).sort((a,b)=>b.pickEdge-a.pickEdge)[0],next=[...games].filter(g=>kickoff(g)&&kickoff(g)>new Date()).sort((a,b)=>kickoff(a)-kickoff(b))[0];return <section className="hero"><div className="hero-copy"><div className="eyebrow">2026 • WEEK {games[0]?.week||'—'}</div><h1>Every game.<br/><span>One accountable forecast.</span></h1><p>Live probabilities, score distributions, market comparisons, contextual football intelligence and immutable pregame locks.</p></div><div className="hero-stats"><div><span>NEXT GAME</span><b>{next?`${next.away_team} @ ${next.home_team}`:'Slate complete'}</b><small>{next?kickoffText(next):''}</small></div><div><span>STRONGEST PICK</span><b>{strongest?`${strongest.pick} ${pct(strongest.pickP)}`:'—'}</b><small>{strongest?.confidence||''}</small></div><div><span>BIGGEST EDGE</span><b>{edge?`${edge.pick} ${signed(edge.pickEdge)} pts`:'—'}</b><small>model vs market</small></div><div><span>LAST MODEL RUN</span><b>{status?.generated_utc?new Date(status.generated_utc).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/Los_Angeles'}):'—'}</b><small>{status?.data_state||'waiting for status feed'}</small></div></div></section>}
+function WeeklyOutlook({games}){const top=[...games].sort((a,b)=>(b.pickP||0)-(a.pickP||0)).slice(0,3),market=[...games].filter(g=>n(g.pure_home_prob)!=null&&n(g.market_home_prob)!=null).sort((a,b)=>Math.abs(n(b.pure_home_prob)-n(b.market_home_prob))-Math.abs(n(a.pure_home_prob)-n(a.market_home_prob))).slice(0,3),close=[...games].sort((a,b)=>Math.abs((a.pickP||.5)-.5)-Math.abs((b.pickP||.5)-.5)).slice(0,3);return <section className="outlook"><div className="section-head"><div><span>WEEKLY OUTLOOK</span><h2>What the model sees</h2></div><p>The editorial layer summarizes the slate without changing the numerical forecast.</p></div><div className="outlook-grid"><div><span>Highest conviction</span>{top.map((g,i)=><b key={g.game_id}>{i+1}. {g.pick} <em>{pct(g.pickP)}</em></b>)}</div><div><span>Largest market disagreement</span>{market.map(g=><b key={g.game_id}>{g.away_team} @ {g.home_team} <em>{pct(Math.abs(n(g.pure_home_prob)-n(g.market_home_prob)),0)} gap</em></b>)}</div><div><span>Most uncertain</span>{close.map(g=><b key={g.game_id}>{g.away_team} @ {g.home_team} <em>{pct(g.pickP)}</em></b>)}</div></div></section>}
+function EvidenceSection({title,items,emptyText}){return <div className="article-section"><span className="article-label">{title}</span>{items.length?items.map((e,i)=><div className="evidence" key={i}><span className={`strength ${evidenceStrength(e)}`}>{e.strength||'Context'}</span><b>{e.title||'Verified context'}</b><p>{e.summary}</p>{e.sample_size&&<small>Relevant sample: {e.sample_size}</small>}{e.source_url&&<a href={e.source_url} target="_blank" rel="noreferrer">Source ↗</a>}</div>):<p>{emptyText}</p>}</div>}
+function GameModal({game,runs,evidence=[],onClose}){const p=derivePreview(game,evidence),trend=runs.filter(r=>r.game_id===game.game_id).map((r,i)=>({run:i+1,p:n(r.final_home_prob)})).filter(x=>x.p!=null),historyItems=evidence.filter(e=>['history','coaching','coordinator'].includes((e.category||'').toLowerCase())),personnelItems=evidence.filter(e=>['injury','personnel'].includes((e.category||'').toLowerCase())),schemeItems=evidence.filter(e=>['scheme','matchup'].includes((e.category||'').toLowerCase())),scenarioItems=evidence.filter(e=>['scenario','weather','travel'].includes((e.category||'').toLowerCase())),homeML=game.fair_home_moneyline||american(game.homeP);return <div className="modal-backdrop" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={onClose}>×</button><div className="modal-kicker">{kickoffText(game)} • {game.confidence||'Forecast'} confidence</div><h2>{TEAM_NAMES[game.away_team]||game.away_team} <span>@</span> {TEAM_NAMES[game.home_team]||game.home_team}</h2><div className="score-pred"><span>MODEL PREDICTION</span><strong>{game.projected_score||`${game.pick} to win`}</strong><b>{game.pick} {pct(game.pickP)}</b></div><ProbabilityBar game={game}/><div className="article-grid"><article className="preview-copy"><div className="article-section"><span className="article-label">GAME PREVIEW</span><p>{p.intro}</p><p>{p.marketSentence} {p.agreementSentence}</p></div><EvidenceSection title="PERSONNEL & AVAILABILITY" items={personnelItems} emptyText="No verified personnel adjustment has been attached yet. Injury news will only appear here when the source and timestamp are known."/><EvidenceSection title="SCHEME MATCHUP" items={schemeItems} emptyText="No verified scheme-specific signal has been attached yet. The research layer is designed to cover pressure, coverage, motion, play action, boxes and other tactical interactions once available."/><EvidenceSection title="HISTORY VS. WHAT'S DIFFERENT NOW" items={historyItems} emptyText={p.context}/><EvidenceSection title="SCENARIO SENSITIVITY" items={scenarioItems} emptyText="No verified scenario adjustment is active. This section is reserved for material branches such as a questionable quarterback, offensive-line absence, wind, or another condition that meaningfully changes the forecast."/><div className="article-section"><span className="article-label">WHAT COULD MAKE US WRONG?</span><p>{p.wrong}</p></div><div className="article-section"><span className="article-label">PREDICTION</span><p>The official forecast will be preserved when the pregame lock window is reached. Until then, this page reflects the latest valid model run.</p></div></article><aside className="numbers-panel"><h3>The numbers</h3><Metric label="Sujar baseline" value={pct(n(game.sujar_home_prob))} sub={`${game.home_team} home win`}/><Metric label="PURE ensemble" value={pct(n(game.pure_home_prob))} sub={`${game.home_team} home win`}/><Metric label="Market" value={pct(n(game.market_home_prob))} sub={`${game.home_team} vig-free`}/><Metric label="Final MARKET+" value={pct(game.homeP)} sub={`${game.home_team} home win`}/><Metric label="Fair home moneyline" value={String(homeML)}/><Metric label="Expected margin" value={lineFromMargin(game.margin,game.home_team,game.away_team)}/><Metric label="Expected total" value={one(game.expected_total)}/><Metric label="Home cover probability" value={pct(n(game.cover_home_prob))}/><Metric label="Over probability" value={pct(n(game.over_prob))}/><Metric label="Model disagreement" value={pct(n(game.model_disagreement))}/><Metric label="80% margin interval" value={n(game.margin_low_80)!=null?`${signed(game.margin_low_80)} to ${signed(game.margin_high_80)}`:'—'}/></aside></div><section className="trend-section"><div className="section-head"><div><span>FORECAST HISTORY</span><h3>How the prediction moved</h3></div></div><div className="chart-box">{trend.length>1?<ResponsiveContainer width="100%" height={220}><AreaChart data={trend}><defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#55a8ff" stopOpacity={.45}/><stop offset="100%" stopColor="#55a8ff" stopOpacity={0}/></linearGradient></defs><XAxis dataKey="run" tickLine={false}/><YAxis domain={[0,1]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false}/><Tooltip formatter={v=>pct(v)} labelFormatter={v=>`Run ${v}`}/><Area dataKey="p" type="monotone" stroke="#55a8ff" fill="url(#grad)" strokeWidth={3}/></AreaChart></ResponsiveContainer>:<div className="empty-chart">Movement appears after the second model run.</div>}</div></section></div></div>}
+function Metric({label,value,sub}){return <div className="metric"><span>{label}</span><b>{value}</b>{sub&&<small>{sub}</small>}</div>}
+function WeekPage({games,runs,evidenceMap,status,setSelected}){return <main><Hero games={games} status={status}/><WeeklyOutlook games={games}/><section className="slate"><div className="section-head"><div><span>CURRENT SLATE</span><h2>Week {games[0]?.week||'—'} forecasts</h2></div><p>Click any matchup for the full written preview and model breakdown.</p></div><div className="game-grid">{games.map(g=><GameCard key={g.game_id} game={g} runs={runs} evidence={evidenceMap[g.game_id]||[]} onOpen={()=>setSelected(g)}/>)}</div></section></main>}
+function RatingsPage({ratings}){const rows=[...ratings].sort((a,b)=>(n(a.rank)||999)-(n(b.rank)||999));return <main className="inner"><div className="page-head"><span>TEAM STRENGTH</span><h1>Power Ratings</h1><p>Elo+ is the ranking spine. Efficiency indicators are shown alongside it rather than hidden inside an unvalidated composite score.</p></div>{rows.length?<div className="table-card"><table><thead><tr><th>Rank</th><th>Team</th><th>Elo+</th><th>Move</th><th>Off EPA</th><th>Def EPA Allowed</th><th>Pass EPA</th><th>Recent W%</th></tr></thead><tbody>{rows.map(r=><tr key={r.team}><td className="rank">{r.rank}</td><td><b>{r.team}</b><small>{TEAM_NAMES[r.team]||''}</small></td><td><strong>{Math.round(n(r.elo)||0)}</strong></td><td className={(n(r.rank_change)||0)>0?'positive':''}>{n(r.rank_change)==null?'NEW':`${n(r.rank_change)>0?'▲ ':n(r.rank_change)<0?'▼ ':''}${Math.abs(n(r.rank_change))}`}</td><td>{n(r.off_epa_ewma)==null?'—':n(r.off_epa_ewma).toFixed(3)}</td><td>{n(r.def_epa_allowed_ewma)==null?'—':n(r.def_epa_allowed_ewma).toFixed(3)}</td><td>{n(r.pass_epa_ewma)==null?'—':n(r.pass_epa_ewma).toFixed(3)}</td><td>{pct(n(r.win_ewma),0)}</td></tr>)}</tbody></table></div>:<EmptyState text="Power-rating feed will appear after the next diagnostic model publish."/>}</main>}
+function ModelsPage({leaderboard,games}){const cols=[['sujar_home_prob','Sujar'],['logistic_home_prob','Logistic'],['extra_trees_home_prob','Extra Trees'],['xgboost_home_prob','XGBoost'],['catboost_home_prob','CatBoost'],['pure_home_prob','Core Stack'],['market_home_prob','Market'],['final_home_prob','Final']];return <main className="inner"><div className="page-head"><span>MODEL LAB</span><h1>Consensus & validation</h1><p>Component forecasts are compared game by game, while the leaderboard is based on chronological out-of-sample seasons rather than in-sample fit.</p></div><section className="lab-section"><h2>Current-week consensus</h2><div className="table-card wide"><table><thead><tr><th>Game</th>{cols.map(([,l])=><th key={l}>{l}</th>)}</tr></thead><tbody>{games.map(g=><tr key={g.game_id}><td><b>{g.away_team} @ {g.home_team}</b></td>{cols.map(([c,l])=><td key={l}>{pct(n(g[c]))}</td>)}</tr>)}</tbody></table></div></section><section className="lab-section"><h2>Walk-forward leaderboard</h2>{leaderboard.length?<div className="table-card"><table><thead><tr><th>Model</th><th>Games</th><th>Winner %</th><th>Brier ↓</th><th>Log Loss ↓</th><th>Margin MAE ↓</th><th>Total MAE ↓</th></tr></thead><tbody>{leaderboard.map(r=><tr key={r.model}><td><b>{r.model}</b></td><td>{r.games||'—'}</td><td>{pct(n(r.winner_pct))}</td><td>{n(r.brier)==null?'—':n(r.brier).toFixed(3)}</td><td>{n(r.log_loss)==null?'—':n(r.log_loss).toFixed(3)}</td><td>{one(r.margin_mae)}</td><td>{one(r.total_mae)}</td></tr>)}</tbody></table></div>:<EmptyState text="OOS leaderboard is refreshing with the diagnostic export."/>}</section></main>}
+function HistoryPage({history}){return <main className="inner"><div className="page-head"><span>ACCOUNTABILITY</span><h1>Official prediction history</h1><p>Only immutable pregame locks belong here. Live refreshes are retained separately and never retroactively replace an official prediction.</p></div>{history.length?<div className="table-card wide"><table><thead><tr><th>Game</th><th>Pick</th><th>Win %</th><th>Projected</th><th>Locked</th><th>Actual</th><th>Winner</th><th>Margin error</th></tr></thead><tbody>{history.map(r=><tr key={r.game_id}><td><b>{r.away_team} @ {r.home_team}</b></td><td>{r.pick}</td><td>{pct(r.pick===r.home_team?n(r.final_home_prob):1-n(r.final_home_prob))}</td><td>{r.projected_score}</td><td>{r.lock_timestamp_utc?new Date(r.lock_timestamp_utc).toLocaleString():'—'}</td><td>{r.actual_home_score!==''?`${r.home_team} ${r.actual_home_score} – ${r.away_team} ${r.actual_away_score}`:'Pending'}</td><td>{r.winner_correct===''?'—':String(r.winner_correct).toLowerCase()==='true'?'✓':'✕'}</td><td>{one(r.margin_abs_error)}</td></tr>)}</tbody></table></div>:<EmptyState text="Official history begins when the first game enters the pregame lock window."/>}</main>}
+function MethodPage(){return <main className="inner methodology"><div className="page-head"><span>HOW IT WORKS</span><h1>Prediction first. Narrative second.</h1><p>The project is designed to be interesting without becoming narrative-driven or statistically dishonest.</p></div><div className="method-grid"><Method n="01" title="Quantitative forecast" text="Elo, recent form, rest, EPA and richer matchup features feed multiple independent models. Chronological out-of-sample predictions feed the ensemble."/><Method n="02" title="Market benchmark" text="Free market information is treated as a powerful external benchmark. PURE remains visible; MARKET+ is a separate, auditable blend."/><Method n="03" title="Football intelligence" text="Injuries, personnel, scheme, QB-vs-coordinator history, coaching changes, weather and verified reporting can explain a game. They do not silently rewrite the probability."/><Method n="04" title="Evidence strength" text="Historical/context claims are labeled Strong, Moderate or Weak based on sample relevance, continuity and tactical similarity. Tiny head-to-head samples are never sold as laws."/><Method n="05" title="Promotion rule" text="If contextual research reveals a potentially predictive variable, it is backtested chronologically. Only features that improve calibration or error out of sample get promoted into the numerical model."/><Method n="06" title="Immutable accountability" text="A live forecast can move all week. The first valid forecast inside the official lock window is frozen and becomes the only version graded in historical results."/></div><section className="guardrails"><h2>Editorial guardrails</h2><ul><li>No fabricated coaching or injury claims.</li><li>Source links for factual contextual claims.</li><li>Explicit “what could make us wrong?” section on every game.</li><li>Model uncertainty and outcome uncertainty remain separate concepts.</li><li>No player-prop product creep.</li></ul></section></main>}
+function Method({n,title,text}){return <div className="method-card"><span>{n}</span><h3>{title}</h3><p>{text}</p></div>}
+function EmptyState({text}){return <div className="empty-state"><div className="pulse"/><b>Feed preparing</b><p>{text}</p></div>}
 
-async function fetchJSON(path, fallback = null) {
-  try {
-    const res = await fetch(`${BASE}data/${path}`, { cache: 'no-store' })
-    if (!res.ok) return fallback
-    return await res.json()
-  } catch { return fallback }
-}
-
-const n = (v) => {
-  const x = Number(v)
-  return Number.isFinite(x) ? x : null
-}
-const pct = (v, d=1) => n(v) == null ? '—' : `${(n(v)*100).toFixed(d)}%`
-const one = (v) => n(v) == null ? '—' : n(v).toFixed(1)
-const signed = (v) => n(v) == null ? '—' : `${n(v) > 0 ? '+' : ''}${n(v).toFixed(1)}`
-
-function american(prob) {
-  const p = n(prob)
-  if (p == null || p <= 0 || p >= 1) return '—'
-  const x = p >= .5 ? -100 * p/(1-p) : 100*(1-p)/p
-  return `${x > 0 ? '+' : ''}${Math.round(x)}`
-}
-
-function kickoff(game) {
-  const date = game.gameday || ''
-  const time = game.gametime || ''
-  if (!date) return null
-  const [hh='00', mm='00'] = time.split(':')
-  // nflverse game times are Eastern. Explicit offset is safe for September slates.
-  const iso = `${date}T${hh}:${mm}:00-04:00`
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? null : d
-}
-
-function kickoffText(game) {
-  const d = kickoff(game)
-  if (!d) return game.gameday || 'TBD'
-  return new Intl.DateTimeFormat('en-US', {
-    weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit',
-    timeZone:'America/Los_Angeles'
-  }).format(d)
-}
-
-function normalizeGame(g) {
-  const homeP = n(g.final_home_prob)
-  const home = g.home_team
-  const away = g.away_team
-  const pick = g.pick || (homeP >= .5 ? home : away)
-  const pickP = homeP == null ? null : pick === home ? homeP : 1-homeP
-  const margin = n(g.expected_margin)
-  const market = n(g.spread_line)
-  const pickEdge = margin == null || market == null ? null : (pick === home ? margin-market : market-margin)
-  return { ...g, homeP, pickP, margin, market, pickEdge }
-}
-
-function lineFromMargin(margin, home, away) {
-  const x = n(margin)
-  if (x == null) return '—'
-  if (Math.abs(x) < .05) return 'PK'
-  return x > 0 ? `${home} -${Math.abs(x).toFixed(1)}` : `${away} -${Math.abs(x).toFixed(1)}`
-}
-
-function confidenceClass(label='') {
-  const x = label.toLowerCase()
-  if (x.includes('high')) return 'high'
-  if (x.includes('solid')) return 'solid'
-  if (x.includes('lean')) return 'lean'
-  return 'coin'
-}
-
-function evidenceStrength(e) {
-  const s = (e?.strength || '').toLowerCase()
-  return ['strong','moderate','weak'].includes(s) ? s : 'context'
-}
-
-function derivePreview(game, evidence=[]) {
-  const pickName = TEAM_NAMES[game.pick] || game.pick
-  const opponent = game.pick === game.home_team ? game.away_team : game.home_team
-  const opponentName = TEAM_NAMES[opponent] || opponent
-  const marketDiff = n(game.pure_home_prob) != null && n(game.market_home_prob) != null
-    ? Math.abs(n(game.pure_home_prob)-n(game.market_home_prob)) : null
-  const disagreement = n(game.model_disagreement)
-  const aligned = game.consistency_flag === 'ALIGNED'
-  const marginAbs = Math.abs(game.margin ?? 0)
-
-  const intro = `${pickName} is the model's ${game.confidence?.toLowerCase() || 'current'} selection at ${pct(game.pickP)}. ` +
-    `The central forecast is ${game.projected_score || `${pickName} by ${one(marginAbs)}`}, with a model line of ${lineFromMargin(game.margin, game.home_team, game.away_team)}.`
-
-  const marketSentence = game.market == null ?
-    `A current market spread is not available in the feed, so the forecast is being evaluated on its standalone football signal.` :
-    `The market is pricing the game around ${lineFromMargin(game.market, game.home_team, game.away_team)}, leaving ${signed(game.pickEdge)} points of spread difference on the model's chosen side.`
-
-  const agreementSentence = disagreement == null ? '' : disagreement < .05 ?
-    `The component models are tightly clustered, which strengthens the conviction behind the ensemble.` : disagreement < .10 ?
-    `There is some component-model dispersion, so the headline probability is stronger than the agreement underneath it.` :
-    `Component-model disagreement is elevated, which is a meaningful reason to treat the point estimate cautiously.`
-
-  const context = evidence.length ? evidence.map(x => x.summary).join(' ') :
-    `No verified coaching, injury, or historical scheme claim has been attached to this matchup yet; the site will not manufacture one simply to make the preview sound richer.`
-
-  const wrong = aligned ?
-    `${opponentName}'s upset path is to attack the assumptions producing the model's current efficiency edge: create short fields, win the high-leverage downs, and prevent the favorite's projected advantage from compounding over a normal number of possessions.` :
-    `The win-probability and expected-margin heads are not fully aligned here. That internal split is itself a warning that this matchup has multiple plausible game scripts and a wider practical uncertainty band than the headline pick suggests.`
-
-  return { intro, marketSentence, agreementSentence, context, wrong, marketDiff }
-}
-
-function Header({ tab, setTab, status }) {
-  const tabs = [['week','Week'],['ratings','Power Ratings'],['models','Model Lab'],['history','History'],['method','Methodology']]
-  return <>
-    <header className="topbar">
-      <div className="brand">
-        <div className="brand-mark">NF</div>
-        <div><div className="brand-title">NFL FORECAST</div><div className="brand-sub">Sujar+ quantitative game intelligence</div></div>
-      </div>
-      <div className={`health ${status?.status === 'healthy' ? 'healthy' : ''}`}><span/> {status?.status === 'healthy' ? 'MODEL LIVE' : 'MODEL STATUS'}</div>
-    </header>
-    <nav className="nav">{tabs.map(([k,l]) => <button key={k} className={tab===k?'active':''} onClick={()=>setTab(k)}>{l}</button>)}</nav>
-  </>
-}
-
-function ProbabilityBar({ game }) {
-  const awayP = game.homeP == null ? .5 : 1-game.homeP
-  const homeP = game.homeP == null ? .5 : game.homeP
-  return <div className="prob-wrap">
-    <div className="prob-labels"><span>{game.away_team} {pct(awayP,0)}</span><span>{pct(homeP,0)} {game.home_team}</span></div>
-    <div className="probbar"><div className="away-fill" style={{width:`${awayP*100}%`}}/><div className="home-fill" style={{width:`${homeP*100}%`}}/></div>
-  </div>
-}
-
-function GameCard({ game, runs, evidence, onOpen }) {
-  const movementRows = runs.filter(r => r.game_id === game.game_id)
-  const first = movementRows[0]
-  const move = first && n(first.final_home_prob) != null && game.homeP != null ? game.homeP - n(first.final_home_prob) : null
-  const pickMove = move == null ? null : game.pick === game.home_team ? move : -move
-  return <article className="game-card" onClick={onOpen}>
-    <div className="game-top">
-      <div><div className="kickoff">{kickoffText(game)}</div><div className="matchup"><span>{game.away_team}</span><em>@</em><span>{game.home_team}</span></div></div>
-      <div className={`confidence ${confidenceClass(game.confidence)}`}>{game.confidence || 'Forecast'}</div>
-    </div>
-    <ProbabilityBar game={game}/>
-    <div className="pick-line"><span>MODEL PICK</span><strong>{game.pick} {pct(game.pickP)}</strong>{pickMove != null && Math.abs(pickMove)>.001 && <small className={pickMove>0?'up':'down'}>{pickMove>0?'↑':'↓'} {Math.abs(pickMove*100).toFixed(1)} pp</small>}</div>
-    <div className="game-metrics">
-      <div><span>Projected</span><b>{game.projected_score || '—'}</b></div>
-      <div><span>Model line</span><b>{lineFromMargin(game.margin, game.home_team, game.away_team)}</b></div>
-      <div><span>Market</span><b>{lineFromMargin(game.market, game.home_team, game.away_team)}</b></div>
-      <div><span>Edge</span><b className={(game.pickEdge||0)>0?'positive':''}>{signed(game.pickEdge)}</b></div>
-    </div>
-    <div className="card-footer"><span>{evidence?.length ? `${evidence.length} verified context signal${evidence.length>1?'s':''}` : 'Quantitative preview'}</span><button>Open game →</button></div>
-  </article>
-}
-
-function Hero({ games, status }) {
-  const strongest = [...games].sort((a,b)=>(b.pickP||0)-(a.pickP||0))[0]
-  const edge = [...games].filter(g=>g.pickEdge!=null).sort((a,b)=>b.pickEdge-a.pickEdge)[0]
-  const next = [...games].filter(g => kickoff(g) && kickoff(g)>new Date()).sort((a,b)=>kickoff(a)-kickoff(b))[0]
-  return <section className="hero">
-    <div className="hero-copy"><div className="eyebrow">2026 • WEEK {games[0]?.week || '—'}</div><h1>Every game.<br/><span>One accountable forecast.</span></h1><p>Live probabilities, score distributions, market comparisons, contextual football intelligence and immutable pregame locks.</p></div>
-    <div className="hero-stats">
-      <div><span>NEXT GAME</span><b>{next ? `${next.away_team} @ ${next.home_team}` : 'Slate complete'}</b><small>{next ? kickoffText(next) : ''}</small></div>
-      <div><span>STRONGEST PICK</span><b>{strongest ? `${strongest.pick} ${pct(strongest.pickP)}` : '—'}</b><small>{strongest?.confidence || ''}</small></div>
-      <div><span>BIGGEST EDGE</span><b>{edge ? `${edge.pick} ${signed(edge.pickEdge)} pts` : '—'}</b><small>model vs market</small></div>
-      <div><span>LAST MODEL RUN</span><b>{status?.generated_utc ? new Date(status.generated_utc).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/Los_Angeles'}) : '—'}</b><small>{status?.data_state || 'waiting for status feed'}</small></div>
-    </div>
-  </section>
-}
-
-function WeeklyOutlook({ games }) {
-  const top = [...games].sort((a,b)=>(b.pickP||0)-(a.pickP||0)).slice(0,3)
-  const market = [...games].filter(g=>n(g.pure_home_prob)!=null&&n(g.market_home_prob)!=null).sort((a,b)=>Math.abs(n(b.pure_home_prob)-n(b.market_home_prob))-Math.abs(n(a.pure_home_prob)-n(a.market_home_prob))).slice(0,3)
-  const close = [...games].sort((a,b)=>Math.abs((a.pickP||.5)-.5)-Math.abs((b.pickP||.5)-.5)).slice(0,3)
-  return <section className="outlook">
-    <div className="section-head"><div><span>WEEKLY OUTLOOK</span><h2>What the model sees</h2></div><p>The editorial layer summarizes the slate without changing the numerical forecast.</p></div>
-    <div className="outlook-grid">
-      <div><span>Highest conviction</span>{top.map((g,i)=><b key={g.game_id}>{i+1}. {g.pick} <em>{pct(g.pickP)}</em></b>)}</div>
-      <div><span>Largest market disagreement</span>{market.map(g=><b key={g.game_id}>{g.away_team} @ {g.home_team} <em>{pct(Math.abs(n(g.pure_home_prob)-n(g.market_home_prob)),0)} gap</em></b>)}</div>
-      <div><span>Most uncertain</span>{close.map(g=><b key={g.game_id}>{g.away_team} @ {g.home_team} <em>{pct(g.pickP)}</em></b>)}</div>
-    </div>
-  </section>
-}
-
-function GameModal({ game, runs, evidence=[], onClose }) {
-  const p = derivePreview(game, evidence)
-  const trend = runs.filter(r=>r.game_id===game.game_id).map((r,i)=>({run:i+1,p:n(r.final_home_prob),ts:r.prediction_timestamp_utc})).filter(x=>x.p!=null)
-  const homeCover = n(game.cover_home_prob)
-  const over = n(game.over_prob)
-  const homeML = game.fair_home_moneyline || american(game.homeP)
-  return <div className="modal-backdrop" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}>
-    <button className="close" onClick={onClose}>×</button>
-    <div className="modal-kicker">{kickoffText(game)} • {game.confidence || 'Forecast'} confidence</div>
-    <h2>{TEAM_NAMES[game.away_team] || game.away_team} <span>@</span> {TEAM_NAMES[game.home_team] || game.home_team}</h2>
-    <div className="score-pred"><span>MODEL PREDICTION</span><strong>{game.projected_score || `${game.pick} to win`}</strong><b>{game.pick} {pct(game.pickP)}</b></div>
-    <ProbabilityBar game={game}/>
-
-    <div className="article-grid">
-      <article className="preview-copy">
-        <div className="article-section"><span className="article-label">GAME PREVIEW</span><p>{p.intro}</p><p>{p.marketSentence} {p.agreementSentence}</p></div>
-        <div className="article-section"><span className="article-label">HISTORY VS. WHAT'S DIFFERENT NOW</span><p>{p.context}</p>{evidence.map((e,i)=><div className="evidence" key={i}><span className={`strength ${evidenceStrength(e)}`}>{e.strength || 'Context'}</span><b>{e.title || 'Verified context'}</b><p>{e.summary}</p>{e.source_url && <a href={e.source_url} target="_blank" rel="noreferrer">Source ↗</a>}</div>)}</div>
-        <div className="article-section"><span className="article-label">WHAT COULD MAKE US WRONG?</span><p>{p.wrong}</p></div>
-        <div className="article-section"><span className="article-label">PREDICTION</span><p>The official forecast will be preserved when the pregame lock window is reached. Until then, this page reflects the latest valid model run.</p></div>
-      </article>
-
-      <aside className="numbers-panel">
-        <h3>The numbers</h3>
-        <Metric label="Sujar baseline" value={pct(n(game.sujar_home_prob))} sub={`${game.home_team} home win`}/>
-        <Metric label="PURE ensemble" value={pct(n(game.pure_home_prob))} sub={`${game.home_team} home win`}/>
-        <Metric label="Market" value={pct(n(game.market_home_prob))} sub={`${game.home_team} vig-free`}/>
-        <Metric label="Final MARKET+" value={pct(game.homeP)} sub={`${game.home_team} home win`}/>
-        <Metric label="Fair home moneyline" value={String(homeML).startsWith('-') || String(homeML).startsWith('+') ? homeML : `${n(homeML)>0?'+':''}${Math.round(n(homeML)||0)}`}/>
-        <Metric label="Expected margin" value={lineFromMargin(game.margin, game.home_team, game.away_team)}/>
-        <Metric label="Expected total" value={one(game.expected_total)}/>
-        <Metric label="Home cover probability" value={pct(homeCover)}/>
-        <Metric label="Over probability" value={pct(over)}/>
-        <Metric label="Model disagreement" value={pct(n(game.model_disagreement))}/>
-        <Metric label="80% margin interval" value={n(game.margin_low_80)!=null ? `${signed(game.margin_low_80)} to ${signed(game.margin_high_80)}` : '—'}/>
-      </aside>
-    </div>
-
-    <section className="trend-section"><div className="section-head"><div><span>FORECAST HISTORY</span><h3>How the prediction moved</h3></div></div>
-      <div className="chart-box">{trend.length > 1 ? <ResponsiveContainer width="100%" height={220}><AreaChart data={trend}><defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#55a8ff" stopOpacity={.45}/><stop offset="100%" stopColor="#55a8ff" stopOpacity={0}/></linearGradient></defs><XAxis dataKey="run" tickLine={false}/><YAxis domain={[0,1]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false}/><Tooltip formatter={v=>pct(v)} labelFormatter={v=>`Run ${v}`}/><Area dataKey="p" type="monotone" stroke="#55a8ff" fill="url(#grad)" strokeWidth={3}/></AreaChart></ResponsiveContainer> : <div className="empty-chart">Movement appears after the second model run.</div>}</div>
-    </section>
-  </div></div>
-}
-
-function Metric({label,value,sub}) { return <div className="metric"><span>{label}</span><b>{value}</b>{sub&&<small>{sub}</small>}</div> }
-
-function WeekPage({ games, runs, evidenceMap, status, setSelected }) {
-  return <main><Hero games={games} status={status}/><WeeklyOutlook games={games}/><section className="slate"><div className="section-head"><div><span>CURRENT SLATE</span><h2>Week {games[0]?.week || '—'} forecasts</h2></div><p>Click any matchup for the full written preview and model breakdown.</p></div><div className="game-grid">{games.map(g=><GameCard key={g.game_id} game={g} runs={runs} evidence={evidenceMap[g.game_id] || []} onOpen={()=>setSelected(g)}/>)}</div></section></main>
-}
-
-function RatingsPage({ratings}) {
-  const rows = [...ratings].sort((a,b)=>(n(a.rank)||999)-(n(b.rank)||999))
-  return <main className="inner"><div className="page-head"><span>TEAM STRENGTH</span><h1>Power Ratings</h1><p>Elo+ is the ranking spine. Efficiency indicators are shown alongside it rather than hidden inside an unvalidated composite score.</p></div>
-    {rows.length ? <div className="table-card"><table><thead><tr><th>Rank</th><th>Team</th><th>Elo+</th><th>Move</th><th>Off EPA</th><th>Def EPA Allowed</th><th>Pass EPA</th><th>Recent W%</th></tr></thead><tbody>{rows.map(r=><tr key={r.team}><td className="rank">{r.rank}</td><td><b>{r.team}</b><small>{TEAM_NAMES[r.team] || ''}</small></td><td><strong>{Math.round(n(r.elo)||0)}</strong></td><td className={(n(r.rank_change)||0)>0?'positive':''}>{n(r.rank_change)==null?'NEW':`${n(r.rank_change)>0?'▲ ':n(r.rank_change)<0?'▼ ':''}${Math.abs(n(r.rank_change))}`}</td><td>{n(r.off_epa_ewma)==null?'—':n(r.off_epa_ewma).toFixed(3)}</td><td>{n(r.def_epa_allowed_ewma)==null?'—':n(r.def_epa_allowed_ewma).toFixed(3)}</td><td>{n(r.pass_epa_ewma)==null?'—':n(r.pass_epa_ewma).toFixed(3)}</td><td>{pct(n(r.win_ewma),0)}</td></tr>)}</tbody></table></div> : <EmptyState text="Power-rating feed will appear after the next diagnostic model publish."/>}
-  </main>
-}
-
-function ModelsPage({leaderboard, games}) {
-  const cols = [['sujar_home_prob','Sujar'],['logistic_home_prob','Logistic'],['extra_trees_home_prob','Extra Trees'],['xgboost_home_prob','XGBoost'],['catboost_home_prob','CatBoost'],['pure_home_prob','Core Stack'],['market_home_prob','Market'],['final_home_prob','Final']]
-  return <main className="inner"><div className="page-head"><span>MODEL LAB</span><h1>Consensus & validation</h1><p>Component forecasts are compared game by game, while the leaderboard is based on chronological out-of-sample seasons rather than in-sample fit.</p></div>
-    <section className="lab-section"><h2>Current-week consensus</h2><div className="table-card wide"><table><thead><tr><th>Game</th>{cols.map(([,l])=><th key={l}>{l}</th>)}</tr></thead><tbody>{games.map(g=><tr key={g.game_id}><td><b>{g.away_team} @ {g.home_team}</b></td>{cols.map(([c,l])=><td key={l}>{pct(n(g[c]))}</td>)}</tr>)}</tbody></table></div></section>
-    <section className="lab-section"><h2>Walk-forward leaderboard</h2>{leaderboard.length ? <div className="table-card"><table><thead><tr><th>Model</th><th>Games</th><th>Winner %</th><th>Brier ↓</th><th>Log Loss ↓</th><th>Margin MAE ↓</th><th>Total MAE ↓</th></tr></thead><tbody>{leaderboard.map(r=><tr key={r.model}><td><b>{r.model}</b></td><td>{r.games||'—'}</td><td>{pct(n(r.winner_pct))}</td><td>{n(r.brier)==null?'—':n(r.brier).toFixed(3)}</td><td>{n(r.log_loss)==null?'—':n(r.log_loss).toFixed(3)}</td><td>{one(r.margin_mae)}</td><td>{one(r.total_mae)}</td></tr>)}</tbody></table></div> : <EmptyState text="OOS leaderboard is refreshing with the v0.3 diagnostic export."/>}</section>
-  </main>
-}
-
-function HistoryPage({history}) {
-  return <main className="inner"><div className="page-head"><span>ACCOUNTABILITY</span><h1>Official prediction history</h1><p>Only immutable pregame locks belong here. Live refreshes are retained separately and never retroactively replace an official prediction.</p></div>
-    {history.length ? <div className="table-card wide"><table><thead><tr><th>Game</th><th>Pick</th><th>Win %</th><th>Projected</th><th>Locked</th><th>Actual</th><th>Winner</th><th>Margin error</th></tr></thead><tbody>{history.map(r=><tr key={r.game_id}><td><b>{r.away_team} @ {r.home_team}</b></td><td>{r.pick}</td><td>{pct(r.pick===r.home_team?n(r.final_home_prob):1-n(r.final_home_prob))}</td><td>{r.projected_score}</td><td>{r.lock_timestamp_utc ? new Date(r.lock_timestamp_utc).toLocaleString() : '—'}</td><td>{r.actual_home_score!=='' ? `${r.home_team} ${r.actual_home_score} – ${r.away_team} ${r.actual_away_score}` : 'Pending'}</td><td>{r.winner_correct===''?'—':String(r.winner_correct).toLowerCase()==='true'?'✓':'✕'}</td><td>{one(r.margin_abs_error)}</td></tr>)}</tbody></table></div> : <EmptyState text="Official history begins when the first game enters the pregame lock window."/>}
-  </main>
-}
-
-function MethodPage() {
-  return <main className="inner methodology"><div className="page-head"><span>HOW IT WORKS</span><h1>Prediction first. Narrative second.</h1><p>The project is designed to be interesting without becoming narrative-driven or statistically dishonest.</p></div>
-    <div className="method-grid">
-      <Method n="01" title="Quantitative forecast" text="Elo, recent form, rest, EPA and richer matchup features feed multiple independent models. Chronological out-of-sample predictions feed the ensemble."/>
-      <Method n="02" title="Market benchmark" text="Free market information is treated as a powerful external benchmark. PURE remains visible; MARKET+ is a separate, auditable blend."/>
-      <Method n="03" title="Football intelligence" text="Injuries, personnel, scheme, QB-vs-coordinator history, coaching changes, weather and verified reporting can explain a game. They do not silently rewrite the probability."/>
-      <Method n="04" title="Evidence strength" text="Historical/context claims are labeled Strong, Moderate or Weak based on sample relevance, continuity and tactical similarity. Tiny head-to-head samples are never sold as laws."/>
-      <Method n="05" title="Promotion rule" text="If contextual research reveals a potentially predictive variable, it is backtested chronologically. Only features that improve calibration or error out of sample get promoted into the numerical model."/>
-      <Method n="06" title="Immutable accountability" text="A live forecast can move all week. The first valid forecast inside the official lock window is frozen and becomes the only version graded in historical results."/>
-    </div>
-    <section className="guardrails"><h2>Editorial guardrails</h2><ul><li>No fabricated coaching or injury claims.</li><li>Source links for factual contextual claims.</li><li>Explicit “what could make us wrong?” section on every game.</li><li>Model uncertainty and outcome uncertainty remain separate concepts.</li><li>No player-prop product creep.</li></ul></section>
-  </main>
-}
-function Method({n,title,text}) { return <div className="method-card"><span>{n}</span><h3>{title}</h3><p>{text}</p></div> }
-function EmptyState({text}) { return <div className="empty-state"><div className="pulse"/><b>Feed preparing</b><p>{text}</p></div> }
-
-export default function App() {
-  const [data, setData] = useState({games:[],runs:[],ratings:[],leaderboard:[],history:[],status:null,evidence:{}})
-  const [loading,setLoading] = useState(true)
-  const [error,setError] = useState('')
-  const [tab,setTab] = useState('week')
-  const [selected,setSelected] = useState(null)
-
-  useEffect(()=>{
-    let active = true
-    Promise.all([
-      fetchCSV('this_week.csv'),
-      fetchCSV('run_history.csv').catch(()=>[]),
-      fetchCSV('power_ratings.csv').catch(()=>[]),
-      fetchCSV('model_leaderboard.csv').catch(()=>[]),
-      fetchCSV('prediction_history.csv').catch(()=>[]),
-      fetchJSON('status.json', null),
-      fetchJSON('contextual_evidence.json', {}),
-    ]).then(([games,runs,ratings,leaderboard,history,status,evidence])=>{
-      if (!active) return
-      setData({games:games.map(normalizeGame),runs,ratings,leaderboard,history,status,evidence:evidence||{}})
-      setLoading(false)
-    }).catch(e=>{if(active){setError(e.message);setLoading(false)}})
-    return ()=>{active=false}
-  },[])
-
-  const page = useMemo(()=>{
-    if (tab==='ratings') return <RatingsPage ratings={data.ratings}/>
-    if (tab==='models') return <ModelsPage leaderboard={data.leaderboard} games={data.games}/>
-    if (tab==='history') return <HistoryPage history={data.history}/>
-    if (tab==='method') return <MethodPage/>
-    return <WeekPage games={data.games} runs={data.runs} evidenceMap={data.evidence} status={data.status} setSelected={setSelected}/>
-  },[tab,data])
-
-  if (loading) return <div className="loading"><div className="loader"/><b>Loading the latest forecast</b></div>
-  if (error || !data.games.length) return <div className="loading error"><b>Dashboard feed unavailable</b><p>{error || 'No current games were published.'}</p></div>
-
-  return <div className="app"><Header tab={tab} setTab={setTab} status={data.status}/>{page}{selected && <GameModal game={selected} runs={data.runs} evidence={data.evidence[selected.game_id] || []} onClose={()=>setSelected(null)}/>}<footer><b>NFL FORECAST</b><span>Free-data quantitative forecasting • Live forecasts are not official until locked.</span></footer></div>
+export default function App(){
+  const[data,setData]=useState({games:[],runs:[],ratings:[],leaderboard:[],history:[],status:null,evidence:{}}),[loading,setLoading]=useState(true),[error,setError]=useState(''),[tab,setTab]=useState('week'),[selected,setSelected]=useState(null)
+  useEffect(()=>{let active=true;Promise.all([fetchCSV('this_week.csv'),fetchCSV('run_history.csv').catch(()=>[]),fetchCSV('power_ratings.csv').catch(()=>[]),fetchCSV('model_leaderboard.csv').catch(()=>[]),fetchCSV('prediction_history.csv').catch(()=>[]),fetchJSON('status.json',null),fetchJSON('contextual_evidence.json',{})]).then(([games,runs,ratings,leaderboard,history,status,evidenceRaw])=>{if(!active)return;const evidence=evidenceRaw?.games||evidenceRaw||{};setData({games:games.map(normalizeGame),runs,ratings,leaderboard,history,status,evidence});setLoading(false)}).catch(e=>{if(active){setError(e.message);setLoading(false)}});return()=>{active=false}},[])
+  const page=useMemo(()=>{if(tab==='ratings')return <RatingsPage ratings={data.ratings}/>;if(tab==='models')return <ModelsPage leaderboard={data.leaderboard} games={data.games}/>;if(tab==='history')return <HistoryPage history={data.history}/>;if(tab==='method')return <MethodPage/>;return <WeekPage games={data.games} runs={data.runs} evidenceMap={data.evidence} status={data.status} setSelected={setSelected}/>},[tab,data])
+  if(loading)return <div className="loading"><div className="loader"/><b>Loading the latest forecast</b></div>
+  if(error||!data.games.length)return <div className="loading error"><b>Dashboard feed unavailable</b><p>{error||'No current games were published.'}</p></div>
+  return <div className="app"><Header tab={tab} setTab={setTab} status={data.status}/>{page}{selected&&<GameModal game={selected} runs={data.runs} evidence={data.evidence[selected.game_id]||[]} onClose={()=>setSelected(null)}/>}<footer><b>NFL FORECAST</b><span>Free-data quantitative forecasting • Live forecasts are not official until locked.</span></footer></div>
 }
