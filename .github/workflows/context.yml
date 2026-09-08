@@ -7,12 +7,14 @@ on:
     paths:
       - "src/nfl_forecast/context.py"
       - "src/nfl_forecast/context_plus.py"
+      - "src/nfl_forecast/coaching.py"
       - "src/nfl_forecast/qb_history.py"
       - "src/nfl_forecast/injuries.py"
       - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
+      - "tests/test_coaching.py"
       - "tests/test_qb_history_portability.py"
       - "tests/test_injuries.py"
       - "tests/test_narrative.py"
@@ -22,12 +24,14 @@ on:
     paths:
       - "src/nfl_forecast/context.py"
       - "src/nfl_forecast/context_plus.py"
+      - "src/nfl_forecast/coaching.py"
       - "src/nfl_forecast/qb_history.py"
       - "src/nfl_forecast/injuries.py"
       - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
+      - "tests/test_coaching.py"
       - "tests/test_qb_history_portability.py"
       - "tests/test_injuries.py"
       - "tests/test_narrative.py"
@@ -54,7 +58,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_narrative.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_narrative.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -65,6 +69,22 @@ jobs:
       - name: Smoke-test contextual evidence generation
         if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
         run: python scripts/run_context.py --season 2026 --output-dir /tmp/nfl-context
+      - name: Require usable current coaching coverage
+        if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('/tmp/nfl-context/context_source_status.json').read_text())
+          coaching = status.get('coaching', {})
+          covered = int(coaching.get('current_team_coverage', 0))
+          requested = int(coaching.get('requested_teams', 0))
+          minimum = max(8, int(0.65 * requested)) if requested else 21
+          print(f'current coaching coverage: {covered}/{requested}; required >= {minimum}')
+          if covered < minimum:
+              raise SystemExit(f'coaching source coverage below merge gate: {covered}/{requested}')
+          PY
       - name: Build contextual evidence
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: python scripts/run_context.py --season 2026
