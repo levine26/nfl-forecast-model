@@ -3,21 +3,29 @@ name: Contextual football intelligence
 on:
   workflow_dispatch:
   push:
-    branches: [main, context-intelligence-v1]
+    branches: [main, context-intelligence-v1, injury-source-v1]
     paths:
       - "src/nfl_forecast/context.py"
+      - "src/nfl_forecast/injuries.py"
+      - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
+      - "tests/test_injuries.py"
+      - "tests/test_narrative.py"
+      - "pyproject.toml"
       - ".github/workflows/context.yml"
   pull_request:
     paths:
       - "src/nfl_forecast/context.py"
+      - "src/nfl_forecast/injuries.py"
+      - "src/nfl_forecast/narrative.py"
       - "scripts/run_context.py"
       - "tests/test_context.py"
+      - "tests/test_injuries.py"
+      - "tests/test_narrative.py"
+      - "pyproject.toml"
       - ".github/workflows/context.yml"
   schedule:
-    # Personnel/weather/context can change during the week; three-hour cadence is
-    # frequent enough to stay fresh without hammering public sources.
     - cron: "17 */3 * * *"
 
 permissions:
@@ -38,7 +46,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py
+        run: pytest -q tests/test_context.py tests/test_injuries.py tests/test_narrative.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -57,7 +65,7 @@ jobs:
         run: |
           git config user.name "nfl-context-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/contextual_evidence.json outputs/context_source_status.json outputs/coaching_cache.json
+          git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json
           git diff --cached --quiet || git commit -m "Refresh contextual football intelligence"
           git pull --rebase origin main
           git push
