@@ -1,0 +1,37 @@
+project:
+  timezone: America/Los_Angeles
+  cost_policy: free_only
+  manual_weekly_inputs: false
+
+data:
+  core_start_season: 2012
+  advanced_start_season: 2022
+  live_test_season: 2026
+  neutral_wp_lower: 0.05
+  neutral_wp_upper: 0.95
+  cache_dir: .cache/nflreadpy
+
+features:
+  rolling_windows: [3, 5, 8]
+  ewma_alpha: 0.15
+  min_games_for_team_form: 2
+  early_season_prior_games: 8
+
+elo:
+  initial: 1500.0
+  k_factor: 20.0
+  home_advantage: 45.0
+  offseason_regression: 0.33
+
+model:
+  random_state: 26
+  calibrate: true
+  official_snapshot_types: [EARLY, FINAL]
+
+confidence:
+  high: 0.70
+  solid: 0.60
+  lean: 0.55
+
+outputs:
+  directory: outputs
