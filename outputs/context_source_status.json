@@ -1,6 +1,6 @@
 {
   "coaching": {
-    "as_of": "2026-09-08T20:55:05.210581+00:00",
+    "as_of": "2026-09-08T21:18:33.557409+00:00",
     "pages_missing": 140,
     "source": "Wikipedia season pages",
     "status": "degraded"
@@ -11,9 +11,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-08T20:54:46.170164+00:00",
+    "generated_utc": "2026-09-08T21:18:33.329022+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 46,
+    "signals": 52,
     "status": "healthy"
   },
   "ftn": {
@@ -26,12 +26,14 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-08T20:54:46.170164+00:00",
+  "generated_utc": "2026-09-08T21:18:33.329022+00:00",
   "injuries": {
-    "as_of": "2026-09-08T20:54:46.413306+00:00",
-    "error": "403 Client Error: Forbidden for url: https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries",
-    "source": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries",
-    "status": "degraded"
+    "as_of": "2026-09-08T21:18:33.423179+00:00",
+    "players": 11,
+    "provider": "NFL.com",
+    "source": "https://www.nfl.com/injuries/league/2026/reg1",
+    "status": "healthy",
+    "teams_with_reported_players": 2
   },
   "pbp": {
     "seasons": [
@@ -44,20 +46,26 @@
     ],
     "status": "healthy"
   },
+  "previews": {
+    "games": 16,
+    "generator": "deterministic evidence composer",
+    "guardrail": "Written previews may synthesize verified context but do not alter numerical probabilities.",
+    "status": "healthy"
+  },
   "schedule": {
     "rows": 272,
     "source": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-08T20:55:08.234872+00:00",
+    "as_of": "2026-09-08T21:18:36.692703+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
     "status": "healthy"
   },
   "weather": {
-    "as_of": "2026-09-08T20:55:56.099620+00:00",
+    "as_of": "2026-09-08T21:19:24.563162+00:00",
     "games_checked": 11,
     "status": "degraded"
   }
