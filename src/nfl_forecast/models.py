@@ -53,7 +53,8 @@ def _win_models(seed: int = 26) -> dict:
     return {"logistic": linear, "extra_trees": extra, "xgboost": xgb, "catboost": cat}
 
 
-def fit_season_stacked_classifier(df: pd.DataFrame, feature_cols: list[str], target="home_win", season_col="season", seed=26) -> FittedWinEnsemble:
+def fit_season_stacked_classifier(df: pd.DataFrame, feature_cols: list[str], target="home_win", season_col="season", seed=26, validation_start: int | None = None, validation_end: int | None = None) -> FittedWinEnsemble:
+    """Expanding-window, season-level OOF stacking; no random CV leakage."""
     train = df[df[target].notna()].copy()
     seasons = sorted(int(x) for x in train[season_col].dropna().unique())
     if len(seasons) < 3:
@@ -61,7 +62,8 @@ def fit_season_stacked_classifier(df: pd.DataFrame, feature_cols: list[str], tar
 
     templates = _win_models(seed)
     oof_parts = []
-    for test_season in seasons[1:]:
+    validation_seasons = [s for s in seasons[1:] if (validation_start is None or s >= validation_start) and (validation_end is None or s <= validation_end)]
+    for test_season in validation_seasons:
         tr = train[train[season_col] < test_season]
         va = train[train[season_col] == test_season]
         if len(tr) < 100 or len(va) == 0:
@@ -126,12 +128,13 @@ def _reg_models(seed=26) -> dict:
     return {"elastic_net": linear, "extra_trees": extra, "xgboost": xgb, "catboost": cat}
 
 
-def fit_weighted_regression(df: pd.DataFrame, feature_cols: list[str], target: str, season_col="season", seed=26) -> RegressionEnsemble:
+def fit_weighted_regression(df: pd.DataFrame, feature_cols: list[str], target: str, season_col="season", seed=26, validation_start: int | None = None, validation_end: int | None = None) -> RegressionEnsemble:
     train = df[df[target].notna()].copy()
     seasons = sorted(int(x) for x in train[season_col].dropna().unique())
     templates = _reg_models(seed)
     errors = {name: [] for name in templates}
-    for test_season in seasons[1:]:
+    validation_seasons = [s for s in seasons[1:] if (validation_start is None or s >= validation_start) and (validation_end is None or s <= validation_end)]
+    for test_season in validation_seasons:
         tr = train[train[season_col] < test_season]
         va = train[train[season_col] == test_season]
         if len(tr) < 100 or len(va) == 0:

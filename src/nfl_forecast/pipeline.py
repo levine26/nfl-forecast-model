@@ -68,10 +68,15 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     if len(baseline_cols) < 4:
         raise RuntimeError(f"Baseline feature build incomplete: {baseline_cols}")
 
-    baseline = fit_season_stacked_classifier(historical, baseline_cols, seed=cfg["model"]["random_state"])
-    core = fit_season_stacked_classifier(historical, core_cols, seed=cfg["model"]["random_state"])
-    margin = fit_weighted_regression(historical, core_cols, "margin", seed=cfg["model"]["random_state"])
-    total = fit_weighted_regression(historical, core_cols, "game_total", seed=cfg["model"]["random_state"])
+    # Use recent, fully completed seasons to learn ensemble weights while retaining
+    # the full historical sample for the final fitted models. The live test season
+    # is therefore never used to tune stacker/weight parameters.
+    validation_start = max(start + 1, season_to_predict - 4)
+    validation_end = season_to_predict - 1
+    baseline = fit_season_stacked_classifier(historical, baseline_cols, seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
+    core = fit_season_stacked_classifier(historical, core_cols, seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
+    margin = fit_weighted_regression(historical, core_cols, "margin", seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
+    total = fit_weighted_regression(historical, core_cols, "game_total", seed=cfg["model"]["random_state"], validation_start=validation_start, validation_end=validation_end)
 
     current["sujar_home_prob"] = baseline.predict_proba(current)[:, 1]
     current["pure_home_prob"] = core.predict_proba(current)[:, 1]
