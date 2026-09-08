@@ -46,6 +46,9 @@ jobs:
           restore-keys: |
             nfl-context-${{ runner.os }}-
             nflreadpy-${{ runner.os }}-
+      - name: Smoke-test contextual evidence generation
+        if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
+        run: python scripts/run_context.py --season 2026 --output-dir /tmp/nfl-context
       - name: Build contextual evidence
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: python scripts/run_context.py --season 2026
