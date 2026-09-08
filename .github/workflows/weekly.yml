@@ -14,6 +14,9 @@ on:
     - cron: "15 14 * * 2"
 permissions:
   contents: write
+concurrency:
+  group: nfl-forecast-${{ github.workflow }}
+  cancel-in-progress: true
 jobs:
   forecast:
     runs-on: ubuntu-latest
