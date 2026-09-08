@@ -120,7 +120,7 @@ def build_game_previews(predictions: pd.DataFrame, evidence: dict[str, list[dict
         hp=_num(game.get("final_home_prob")); pick_prob=None if hp is None else (hp if pick==home else 1-hp); margin=_num(game.get("expected_margin")); total=_num(game.get("expected_total")); score=str(game.get("projected_score") or ""); disagreement=_num(game.get("model_disagreement")); consistency=str(game.get("consistency_flag") or "")
         history=_best(items,{"history"},2); coaching=_best(items,{"coaching","structural_change","coordinator"},2); scheme=_best(items,{"scheme","matchup"},3); personnel=_best(items,{"personnel","injury"},3); scenarios=_best(items,{"weather","travel","scenario"},2)
 
-        p1=f"LevLine makes {pick} the current pick at {_pct(pick_prob)}."
+        p1=f"{pick} is the current model pick at {_pct(pick_prob)} under LevLine."
         if margin is not None:
             favorite=home if margin>=0 else away; p1+=f" The central margin is {favorite} by {abs(margin):.1f}"; p1+=f", with a projected total of {total:.1f}." if total is not None else "."
         market=_market_sentence(game)
