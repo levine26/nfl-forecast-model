@@ -11,6 +11,13 @@ on:
     paths:
       - 'site/**'
       - '.github/workflows/dashboard.yml'
+  workflow_run:
+    workflows:
+      - 'Daily NFL model refresh'
+      - 'Hourly NFL market refresh'
+      - 'Sunday Signal contextual intelligence'
+      - 'Pregame NFL refresh'
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -24,9 +31,15 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        if: github.event_name != 'workflow_run'
+      - uses: actions/checkout@v4
+        if: github.event_name == 'workflow_run'
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -48,13 +61,13 @@ jobs:
         working-directory: site
         run: npm run build
       - name: Upload build artifact
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_run') && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist
 
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_run') && github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
