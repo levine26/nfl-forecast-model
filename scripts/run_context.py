@@ -8,11 +8,11 @@ import json
 import nflreadpy as nfl
 import pandas as pd
 
+from nfl_forecast.coaching import load_coaching_history
 from nfl_forecast.context import (
     NFLVERSE_SCHEDULE_URL,
     build_contextual_evidence,
     fetch_espn_injuries,
-    load_coaching_history,
 )
 from nfl_forecast.context_plus import upgrade_contextual_evidence
 from nfl_forecast.data import configure_cache
@@ -96,9 +96,6 @@ def main():
         for item in items:
             if item.get("category")=="structural_change": item["category"]="coaching"
 
-    # Player-centric opponent history must follow the quarterback when he changes
-    # teams (for example, a current ATL starter's prior meetings while with MIA).
-    # The history is explanatory only and explicitly discounts old system/personnel.
     evidence=add_portable_qb_history(predictions=predictions,evidence=evidence,pbp=pbp,depth=depth,season=args.season)
     evidence,editorial_status=upgrade_contextual_evidence(predictions=predictions,evidence=evidence,pbp=pbp,ftn=ftn,depth=depth,injuries=injuries,season=args.season)
     portable_count=sum(1 for items in evidence.values() for item in items if (item.get("metadata") or {}).get("family")=="qb_opponent_history")
