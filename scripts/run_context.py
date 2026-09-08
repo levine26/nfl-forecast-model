@@ -96,12 +96,16 @@ def main():
         for item in items:
             if item.get("category")=="structural_change": item["category"]="coaching"
 
-    evidence=add_portable_qb_history(predictions=predictions,evidence=evidence,pbp=pbp,depth=depth,season=args.season)
+    # Build/diversify generic editorial context first. Portable QB history is
+    # deliberately applied last so its game-level meeting metadata (date,
+    # postseason round, score, team-change context) replaces the generic
+    # same-team fallback instead of getting crowded out by it.
     evidence,editorial_status=upgrade_contextual_evidence(predictions=predictions,evidence=evidence,pbp=pbp,ftn=ftn,depth=depth,injuries=injuries,season=args.season)
-    portable_count=sum(1 for items in evidence.values() for item in items if (item.get("metadata") or {}).get("family")=="qb_opponent_history")
+    evidence=add_portable_qb_history(predictions=predictions,evidence=evidence,pbp=pbp,depth=depth,season=args.season)
+    portable_count=sum(1 for items in evidence.values() for item in items if (item.get("metadata") or {}).get("family")=="qb_opponent_history" and (item.get("metadata") or {}).get("meetings"))
     previews=build_game_previews(predictions,evidence)
     source_status.update(context_status); source_status["editorial_intelligence"]=editorial_status
-    source_status["qb_history"]={"status":"healthy","games_with_player_opponent_history":portable_count,"team_change_safe":True,"guardrail":"Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes."}
+    source_status["qb_history"]={"status":"healthy","games_with_player_opponent_history":portable_count,"game_level_meeting_metadata":True,"team_change_safe":True,"guardrail":"Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes."}
     source_status["evidence"]={"status":"healthy","games":len(evidence),"signals":sum(len(v) for v in evidence.values()),"generated_utc":generated,"guardrail":"Context is explanatory only unless a feature is separately validated and promoted into the numerical model."}
     source_status["previews"]={"status":"healthy","games":len(previews),"generator":"Sunday Signal deterministic evidence composer","engine":"LevLine","guardrail":"Written previews may synthesize verified context but do not alter numerical probabilities."}
     (out/"contextual_evidence.json").write_text(json.dumps(evidence,indent=2,sort_keys=True),encoding="utf-8"); (out/"game_previews.json").write_text(json.dumps(previews,indent=2,sort_keys=True),encoding="utf-8"); (out/"context_source_status.json").write_text(json.dumps(source_status,indent=2,sort_keys=True),encoding="utf-8")
