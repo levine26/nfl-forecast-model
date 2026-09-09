@@ -31,7 +31,7 @@ class _Session:
             return _Response(
                 """<?xml version='1.0'?><rss><channel>
                 <item><title>Chiefs left tackle trending toward missing opener</title>
-                <link>https://example.com/cbs</link><description>Latest Kansas City injury update without a Broncos reference.</description>
+                <link>https://example.com/cbs</link><description>Latest Kansas City injury update.</description>
                 <pubDate>Tue, 08 Sep 2026 21:00:00 GMT</pubDate><source>CBS Sports</source></item>
                 </channel></rss>"""
             )
