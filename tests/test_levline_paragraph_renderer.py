@@ -68,3 +68,19 @@ def test_same_pure_probability_remains_unique_by_matchup():
     a = render(hou, {"key_factors": [{"title": "BUF protection vs HOU pass rush"}]})
     b = render(dal, {"key_factors": [{"title": "NYG protection vs DAL pass rush"}]})
     assert not (_grams(a) & _grams(b))
+
+
+def test_two_los_angeles_picks_do_not_share_pre_pick_seven_gram():
+    lac = pd.Series({
+        "away_team": "ARI", "home_team": "LAC", "pick": "LAC",
+        "final_home_prob": 0.693, "pure_home_prob": 0.656, "market_home_prob": 0.804,
+        "expected_margin": 6.7, "spread_line": 9.5, "projected_score": "LAC 25.5 – ARI 18.8",
+    })
+    lar = pd.Series({
+        "away_team": "SF", "home_team": "LA", "pick": "LA",
+        "final_home_prob": 0.620, "pure_home_prob": 0.615, "market_home_prob": 0.637,
+        "expected_margin": 5.0, "spread_line": 3.5, "projected_score": "LA 26.4 – SF 21.4",
+    })
+    a = render(lac, {"key_factors": [{"title": "LAC protection vs ARI pass rush"}]})
+    b = render(lar, {"key_factors": [{"title": "SF availability vs LA pressure"}]})
+    assert not (_grams(a) & _grams(b))

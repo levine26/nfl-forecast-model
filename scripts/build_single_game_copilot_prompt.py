@@ -34,8 +34,8 @@ def main() -> None:
         prior = Path(args.feedback_file).read_text(encoding="utf-8", errors="replace").strip()
         if prior:
             feedback = (
-                "\nPRIOR FULL-SLATE VALIDATION FEEDBACK\n"
-                "A previous candidate failed publication. Avoid every repeated phrase named below and make source coverage especially explicit. "
+                "\nPRIOR VALIDATION FEEDBACK FOR THIS MATCHUP\n"
+                "The previous candidate for this game failed publication. Fix every issue named below, especially source independence or repeated prose. "
                 "Do not change or invent facts merely to satisfy this feedback.\n"
                 + prior[-6000:]
                 + "\n"
@@ -47,7 +47,7 @@ THIS IS A MATCHUP PREVIEW, NOT A NEWS ROUNDUP.
 Write three human fields: a headline, one matchup paragraph, and one short model-rationale sentence. Do NOT write the final numerical model paragraph yourself.
 
 HEADLINE
-Write one matchup-oriented headline identifying the football tension. Do not copy an article headline or use generic betting language.
+Write one matchup-oriented headline identifying the football tension. Do not copy an article headline or use generic betting language. Avoid stock headline structures that could be reused by simply swapping team names.
 
 PARAGRAPH 1 — THE MATCHUP
 Write 55-100 words explaining how the game is likely to be decided. Discuss BOTH teams and what each side needs to do. Use current reporting to inform the football analysis, but synthesize it instead of writing outlet-led notes. Focus on concrete factors such as quarterback situation, protection/pass rush, coverage, explosive plays, early-down efficiency, run-game leverage, injuries, coaching changes, travel or weather.

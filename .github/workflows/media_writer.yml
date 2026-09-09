@@ -15,12 +15,14 @@ on:
       - "scripts/merge_copilot_game_payloads.py"
       - "scripts/compose_copilot_media_reads.py"
       - "scripts/render_levline_paragraphs.py"
+      - "scripts/validate_single_copilot_game.py"
       - "scripts/validate_copilot_media_reads.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
       - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
       - "tests/test_levline_paragraph_renderer.py"
+      - "tests/test_single_copilot_game_validator.py"
       - "tests/test_read_contract.py"
       - "pyproject.toml"
       - ".github/workflows/media_writer.yml"
@@ -51,9 +53,6 @@ jobs:
         run: |
           set -euo pipefail
           context_seen=0
-          # A media-only merge does not trigger context.yml. Give GitHub a short
-          # window to register a matching context run; if none exists, use the
-          # latest already-published context on main instead of timing out.
           for discovery in 1 2 3 4; do
             state=$(gh run list \
               --workflow "Sunday Signal contextual intelligence" \
@@ -115,7 +114,7 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_read_contract.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py
 
       - name: Refresh deterministic reporting packet
         run: python scripts/finalize_editorial.py --skip-copilot
@@ -149,78 +148,92 @@ jobs:
           for domain in "${approved_domains[@]}"; do
             copilot_args+=("--allow-url=$domain")
           done
+
+          parts=/tmp/copilot-game-parts
+          prompts=/tmp/copilot-game-prompts
+          rm -rf "$parts" "$prompts"
+          mkdir -p "$parts" "$prompts"
+          rm -f /tmp/copilot-media-raw.json /tmp/copilot-media-composed.json /tmp/copilot-media-rendered.json outputs/copilot_media_reads.json
           echo "Copilot approved source domains: ${#approved_domains[@]}"
-          echo "Focused matchup research calls per attempt: ${#game_ids[@]}"
+          echo "Focused matchups: ${#game_ids[@]}"
 
-          validated=0
-          feedback=/tmp/copilot-validation-feedback.txt
-          : > "$feedback"
-          for attempt in 1 2 3; do
-            echo "Copilot focused editorial attempt $attempt/3"
-            parts=/tmp/copilot-game-parts
-            prompts=/tmp/copilot-game-prompts
-            rm -rf "$parts" "$prompts"
-            mkdir -p "$parts" "$prompts"
-            rm -f /tmp/copilot-media-raw.json /tmp/copilot-media-composed.json /tmp/copilot-media-rendered.json outputs/copilot_media_reads.json
-
-            research_failed=0
-            for gid in "${game_ids[@]}"; do
+          for gid in "${game_ids[@]}"; do
+            feedback="/tmp/copilot-${gid}-feedback.txt"
+            : > "$feedback"
+            accepted=0
+            for attempt in 1 2 3; do
+              echo "$gid focused research attempt $attempt/3"
               prompt="$prompts/$gid.txt"
               python scripts/build_single_game_copilot_prompt.py \
                 --game-id "$gid" \
                 --prompt-file "$prompt" \
                 --feedback-file "$feedback"
               if ! copilot "${copilot_args[@]}" -p "$(cat "$prompt")" > "$parts/$gid.txt"; then
-                echo "$gid: Copilot research call failed" | tee -a "$feedback"
-                research_failed=1
+                echo "$gid: Copilot research call failed" > "$feedback"
+                cat "$feedback"
+                continue
+              fi
+              if python scripts/validate_single_copilot_game.py \
+                  --input "$parts/$gid.txt" \
+                  --game-id "$gid" \
+                  --predictions outputs/this_week.csv \
+                  --accepted-dir "$parts" \
+                  2> "$feedback"; then
+                accepted=1
+                echo "$gid passed focused source/prose validation on attempt $attempt."
                 break
               fi
+              cat "$feedback"
             done
-            if [ "$research_failed" -ne 0 ]; then
-              echo "Focused research attempt $attempt failed before composition."
-              continue
+            if [ "$accepted" -ne 1 ]; then
+              echo "$gid failed all three focused validation attempts."
+              exit 1
             fi
-
-            if ! python scripts/merge_copilot_game_payloads.py \
-                --input-dir "$parts" \
-                --predictions outputs/this_week.csv \
-                --output /tmp/copilot-media-raw.json; then
-              echo "Focused response merge failed on attempt $attempt" | tee -a "$feedback"
-              continue
-            fi
-            if ! python scripts/compose_copilot_media_reads.py \
-                --input /tmp/copilot-media-raw.json \
-                --predictions outputs/this_week.csv \
-                --previews outputs/game_previews.json \
-                --evidence outputs/contextual_evidence.json \
-                --output /tmp/copilot-media-composed.json; then
-              echo "Deterministic composition failed on attempt $attempt" | tee -a "$feedback"
-              continue
-            fi
-            if ! python scripts/render_levline_paragraphs.py \
-                --input /tmp/copilot-media-composed.json \
-                --predictions outputs/this_week.csv \
-                --previews outputs/game_previews.json \
-                --output /tmp/copilot-media-rendered.json; then
-              echo "Deterministic LevLine paragraph render failed on attempt $attempt" | tee -a "$feedback"
-              continue
-            fi
-
-            if python scripts/validate_copilot_media_reads.py \
-                --input /tmp/copilot-media-rendered.json \
-                --predictions outputs/this_week.csv \
-                --output outputs/copilot_media_reads.json \
-                2> "$feedback"; then
-              validated=1
-              echo "Copilot focused editorial attempt $attempt passed all publication gates."
-              break
-            fi
-            echo "Copilot focused editorial attempt $attempt failed strict validation."
-            cat "$feedback"
           done
-          if [ "$validated" -ne 1 ]; then
-            echo "All three focused Copilot editorial attempts failed strict publication validation."
-            exit 1
+
+          python scripts/merge_copilot_game_payloads.py \
+            --input-dir "$parts" \
+            --predictions outputs/this_week.csv \
+            --output /tmp/copilot-media-raw.json
+          python scripts/compose_copilot_media_reads.py \
+            --input /tmp/copilot-media-raw.json \
+            --predictions outputs/this_week.csv \
+            --previews outputs/game_previews.json \
+            --evidence outputs/contextual_evidence.json \
+            --output /tmp/copilot-media-composed.json
+          python scripts/render_levline_paragraphs.py \
+            --input /tmp/copilot-media-composed.json \
+            --predictions outputs/this_week.csv \
+            --previews outputs/game_previews.json \
+            --output /tmp/copilot-media-rendered.json
+          python scripts/validate_copilot_media_reads.py \
+            --input /tmp/copilot-media-rendered.json \
+            --predictions outputs/this_week.csv \
+            --output outputs/copilot_media_reads.json
+          echo "All focused responses passed the unchanged full-slate publication validator."
+
+      - name: Reconcile candidate with latest main snapshot
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "Main advanced during research; rebuilding deterministic editorial facts on latest main."
+            git reset --hard origin/main
+            python scripts/compose_copilot_media_reads.py \
+              --input /tmp/copilot-media-raw.json \
+              --predictions outputs/this_week.csv \
+              --previews outputs/game_previews.json \
+              --evidence outputs/contextual_evidence.json \
+              --output /tmp/copilot-media-composed.json
+            python scripts/render_levline_paragraphs.py \
+              --input /tmp/copilot-media-composed.json \
+              --predictions outputs/this_week.csv \
+              --previews outputs/game_previews.json \
+              --output /tmp/copilot-media-rendered.json
+            python scripts/validate_copilot_media_reads.py \
+              --input /tmp/copilot-media-rendered.json \
+              --predictions outputs/this_week.csv \
+              --output outputs/copilot_media_reads.json
           fi
 
       - name: Finalize and enforce full-slate launch gate
@@ -246,6 +259,28 @@ jobs:
       - name: Publish editorial-only outputs
         run: |
           set -euo pipefail
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "Main advanced after finalization; revalidating on the newest forecast snapshot before publication."
+            git reset --hard origin/main
+            python scripts/compose_copilot_media_reads.py \
+              --input /tmp/copilot-media-raw.json \
+              --predictions outputs/this_week.csv \
+              --previews outputs/game_previews.json \
+              --evidence outputs/contextual_evidence.json \
+              --output /tmp/copilot-media-composed.json
+            python scripts/render_levline_paragraphs.py \
+              --input /tmp/copilot-media-composed.json \
+              --predictions outputs/this_week.csv \
+              --previews outputs/game_previews.json \
+              --output /tmp/copilot-media-rendered.json
+            python scripts/validate_copilot_media_reads.py \
+              --input /tmp/copilot-media-rendered.json \
+              --predictions outputs/this_week.csv \
+              --output outputs/copilot_media_reads.json
+            python scripts/finalize_editorial.py
+          fi
+
           git config user.name "sunday-signal-media-bot"
           git config user.email "actions@users.noreply.github.com"
           git add \
@@ -257,5 +292,4 @@ jobs:
             exit 0
           fi
           git commit -m "Refresh human Sunday Signal Reads"
-          git pull --rebase origin main
           git push origin HEAD:main
