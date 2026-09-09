@@ -100,7 +100,7 @@ def render(row: pd.Series, preview: dict) -> str:
     if projected:
         sentences.append(f"The {matchup} projected score is {projected}.")
     sentences.append(
-        f"The {matchup} football context is {factor}; {matchup} evidence explains the {pn} side. No extra adjustment is added."
+        f"The {matchup} football context is {factor}; {matchup} evidence explains the {pn} side. No {matchup} numerical adjustment is added."
     )
     sentences.append(f"The pick: {pick_name} moneyline.")
     return " ".join(sentences)
