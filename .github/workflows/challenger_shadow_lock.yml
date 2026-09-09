@@ -30,7 +30,7 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - name: Record immutable challenger shadow from production locks
+      - name: Record immutable challenger shadows from production locks
         run: |
           set -euo pipefail
           git config user.name 'levline-challenger-bot'
@@ -43,7 +43,7 @@ jobs:
               git clean -fd challenger_outputs/
             fi
 
-            if [ ! -f challenger_outputs/this_week_shadow.csv ]; then
+            if [ ! -f challenger_outputs/candidate_shadow_slate.csv ] && [ ! -f challenger_outputs/this_week_shadow.csv ]; then
               echo 'No precommitted challenger shadow exists yet; nothing to lock.'
               exit 0
             fi
