@@ -22,7 +22,9 @@ from nfl_forecast.data import configure_cache
 from nfl_forecast.editorial_voice import polish_preview_slate
 from nfl_forecast.injuries import fetch_nfl_injuries, practice_status_evidence
 from nfl_forecast.narrative import build_game_previews
+from nfl_forecast.personnel_impact import enrich_personnel_usage
 from nfl_forecast.qb_history import add_portable_qb_history
+from nfl_forecast.staff_impact import add_staff_impact
 
 
 NORMALIZED_READ_SIMILARITY_LIMIT = 0.78
@@ -230,6 +232,27 @@ def main():
     for items in evidence.values():
         for item in items:
             if item.get("category")=="structural_change": item["category"]="coaching"
+
+    # Turn staff identity and official availability into football context before
+    # the editorial ranker decides what deserves prominence. These layers remain
+    # explanatory only and cannot move LevLine numerically.
+    evidence,staff_impact_status=add_staff_impact(
+        predictions=predictions,
+        evidence=evidence,
+        coaching_history=coaches,
+        ftn=ftn,
+        pbp=pbp,
+        season=args.season,
+    )
+    source_status["staff_impact"]=staff_impact_status
+    evidence,personnel_usage_status=enrich_personnel_usage(
+        predictions=predictions,
+        evidence=evidence,
+        injuries=injuries,
+        pbp=pbp,
+        season=args.season,
+    )
+    source_status["personnel_usage"]=personnel_usage_status
 
     # Build/diversify generic editorial context first. Portable QB history is
     # deliberately applied last so its game-level meeting metadata (date,

@@ -10,6 +10,8 @@ on:
       - "src/nfl_forecast/coaching.py"
       - "src/nfl_forecast/qb_history.py"
       - "src/nfl_forecast/injuries.py"
+      - "src/nfl_forecast/personnel_impact.py"
+      - "src/nfl_forecast/staff_impact.py"
       - "src/nfl_forecast/narrative.py"
       - "src/nfl_forecast/editorial_voice.py"
       - "scripts/run_context.py"
@@ -18,6 +20,8 @@ on:
       - "tests/test_coaching.py"
       - "tests/test_qb_history_portability.py"
       - "tests/test_injuries.py"
+      - "tests/test_personnel_impact.py"
+      - "tests/test_staff_impact.py"
       - "tests/test_narrative.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
@@ -28,6 +32,8 @@ on:
       - "src/nfl_forecast/coaching.py"
       - "src/nfl_forecast/qb_history.py"
       - "src/nfl_forecast/injuries.py"
+      - "src/nfl_forecast/personnel_impact.py"
+      - "src/nfl_forecast/staff_impact.py"
       - "src/nfl_forecast/narrative.py"
       - "src/nfl_forecast/editorial_voice.py"
       - "scripts/run_context.py"
@@ -36,6 +42,8 @@ on:
       - "tests/test_coaching.py"
       - "tests/test_qb_history_portability.py"
       - "tests/test_injuries.py"
+      - "tests/test_personnel_impact.py"
+      - "tests/test_staff_impact.py"
       - "tests/test_narrative.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
@@ -60,7 +68,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_narrative.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -71,7 +79,7 @@ jobs:
       - name: Smoke-test contextual evidence generation
         if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
         run: python scripts/run_context.py --season 2026 --output-dir /tmp/nfl-context
-      - name: Require usable current coaching coverage
+      - name: Require usable current coaching and impact coverage
         if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
         run: |
           python - <<'PY'
@@ -86,6 +94,15 @@ jobs:
           print(f'current coaching coverage: {covered}/{requested}; required >= {minimum}')
           if covered < minimum:
               raise SystemExit(f'coaching source coverage below merge gate: {covered}/{requested}')
+
+          staff = status.get('staff_impact', {})
+          personnel = status.get('personnel_usage', {})
+          print('staff impact:', json.dumps(staff, sort_keys=True))
+          print('personnel usage:', json.dumps(personnel, sort_keys=True))
+          if status.get('ftn', {}).get('status') == 'healthy' and status.get('pbp', {}).get('status') == 'healthy' and staff.get('status') != 'healthy':
+              raise SystemExit(f'staff-impact layer failed despite healthy FTN/PBP: {staff}')
+          if status.get('pbp', {}).get('status') == 'healthy' and personnel.get('status') != 'healthy':
+              raise SystemExit(f'personnel-usage layer failed despite healthy PBP: {personnel}')
           PY
       - name: Build contextual evidence
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import json
 
-from nfl_forecast.coaching import fetch_coaching_staff, load_coaching_history
+from nfl_forecast.coaching import COACHING_CACHE_VERSION, fetch_coaching_staff, load_coaching_history
 
 
 def _staff(team="NE", season=2026):
@@ -49,6 +49,40 @@ def test_rendered_infobox_extracts_current_staff():
     assert data["source_url"] == source
     assert "2026_New_England_Patriots_season" in source
     assert session.urls == [source]
+
+
+def test_rendered_staff_table_fills_historical_coordinators_missing_from_infobox():
+    html = """
+    <html>
+      <table class="infobox"><tr><th>Coach</th><td>Robert Saleh</td></tr></table>
+      <table class="wikitable">
+        <caption>2023 New York Jets staff</caption>
+        <tr><td><ul>
+          <li>Head coach – Robert Saleh</li>
+          <li>Offensive coordinator – Nathaniel Hackett</li>
+          <li>Defensive coordinator – Jeff Ulbrich</li>
+        </ul></td></tr>
+      </table>
+    </html>
+    """
+    data, _ = fetch_coaching_staff("NYJ", 2023, session=_Session(html))
+    assert data["head_coach"] == "Robert Saleh"
+    assert data["off_coach"] == "Nathaniel Hackett"
+    assert data["def_coach"] == "Jeff Ulbrich"
+
+
+def test_malformed_infobox_role_is_replaced_by_explicit_staff_table():
+    html = """
+    <html>
+      <table class="infobox">
+        <tr><th>Coach</th><td>Todd Bowles</td></tr>
+        <tr><th>Def. coach</th><td>general_manager = Jason Licht</td></tr>
+      </table>
+      <table><tr><td><li>Defensive coordinator – Kacy Rodgers</li></td></tr></table>
+    </html>
+    """
+    data, _ = fetch_coaching_staff("TB", 2023, session=_Session(html))
+    assert data["def_coach"] == "Kacy Rodgers"
 
 
 def test_stale_negative_cache_is_retried_and_can_recover(tmp_path):
@@ -113,3 +147,31 @@ def test_current_season_miss_gets_one_paced_retry(tmp_path):
     assert history["BAL"][2026]["head_coach"] == "Head Coach"
     assert status["current_retry_recoveries"] == 1
     assert status["refresh_attempts"] == 2
+
+
+def test_successful_old_parser_cache_refreshes_once(tmp_path):
+    cache = tmp_path / "coaching.json"
+    cache.write_text(json.dumps({
+        "NYJ:2023": {
+            "fetched_at": datetime.now(timezone.utc).isoformat(),
+            "data": {"team":"NYJ","season":2023,"head_coach":"Robert Saleh","off_coach":None,"def_coach":None},
+        }
+    }))
+    calls = []
+
+    def fetcher(team, year, session=None):
+        calls.append((team, year))
+        return {
+            "team":team,"season":year,"head_coach":"Robert Saleh",
+            "off_coach":"Nathaniel Hackett","def_coach":"Jeff Ulbrich",
+        }, "https://example.test"
+
+    history, status = load_coaching_history(
+        ["NYJ"], 2023, cache, lookback=0, fetcher=fetcher,
+        request_interval_seconds=0, current_retry_delay_seconds=0,
+    )
+
+    assert calls == [("NYJ", 2023)]
+    assert history["NYJ"][2023]["off_coach"] == "Nathaniel Hackett"
+    assert status["parser_version"] == COACHING_CACHE_VERSION
+    assert status["parser_version_refreshes"] == 1
