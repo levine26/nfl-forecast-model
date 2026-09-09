@@ -39,11 +39,11 @@ jobs:
           cd site
           npm install
           npm run build
-      - name: Commit only validated source change and remove helpers
+      - name: Commit only validated source changes and remove helpers
         run: |
           git config user.name "sunday-signal-editorial-bot"
           git config user.email "actions@users.noreply.github.com"
           git rm scripts/patch_full_refresh_read_diversity.py .github/workflows/validate-full-refresh-read-diversity.yml
-          git add src/nfl_forecast/editorial_voice.py
+          git add src/nfl_forecast/editorial_voice.py scripts/polish_publication.py tests/test_publication_polish.py
           git commit -m "Keep Reads distinct through full contextual refresh"
           git push origin HEAD:editorial/full-refresh-read-diversity
