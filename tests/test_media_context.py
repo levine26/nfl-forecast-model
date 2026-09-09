@@ -62,7 +62,9 @@ def test_media_context_prioritizes_major_reporting_over_betting_noise(monkeypatc
     items = media["2026_01_DEN_KC"]
     assert items[0]["source_name"] == "ESPN"
     assert any(item["source_name"] == "CBS Sports" for item in items)
+    assert items[0]["metadata"]["substantive"] is True
     assert status["games_with_reporting"] == 1
+    assert status["games_with_substantive_reporting"] == 1
     assert status["providers"]["x_recent_search"]["status"] == "unavailable"
 
 
@@ -82,14 +84,14 @@ def test_media_led_read_uses_reporting_then_quantitative_mechanism():
                 "source_name": "ESPN",
                 "source_url": "https://example.com/espn",
                 "as_of": "2026-09-08T20:00:00+00:00",
-                "metadata": {"editorial_score": 130, "family": "reported_angle"},
+                "metadata": {"editorial_score": 130, "family": "reported_angle", "substantive": True},
             },
             {
                 "title": "Chiefs left tackle trending toward missing opener",
                 "source_name": "CBS Sports",
                 "source_url": "https://example.com/cbs",
                 "as_of": "2026-09-08T21:00:00+00:00",
-                "metadata": {"editorial_score": 120, "family": "reported_angle"},
+                "metadata": {"editorial_score": 120, "family": "reported_angle", "substantive": True},
             },
         ]
     }
@@ -107,9 +109,11 @@ def test_media_led_read_uses_reporting_then_quantitative_mechanism():
     read = result["2026_01_DEN_KC"]["paragraphs"][0]
     assert "ESPN" in read
     assert "CBS Sports" in read
-    assert "protection battle concrete" in read
+    assert "DEN-KC pressure check" in read
     assert "8.2%" in read and "9.7%" in read
-    assert "26.5 percentage points more bullish on DEN" in read
+    assert "DEN-KC market split" in read
+    assert "PURE gives DEN 26.5 percentage points more win probability" in read
     assert "deserves the first paragraph" not in read
     assert result["2026_01_DEN_KC"]["editorial_voice"]["media_led"] is True
+    assert result["2026_01_DEN_KC"]["editorial_voice"]["game_specific"] is True
     assert result["2026_01_DEN_KC"]["reported_sources"][0]["source_name"] == "ESPN"
