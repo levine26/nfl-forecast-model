@@ -107,13 +107,14 @@ def test_media_led_read_uses_reporting_then_quantitative_mechanism():
     }
     result = rewrite_reads_with_media(previews, predictions, evidence, media)
     read = result["2026_01_DEN_KC"]["paragraphs"][0]
-    assert "ESPN" in read
-    assert "CBS Sports" in read
-    assert "DEN-KC pressure check" in read
-    assert "8.2%" in read and "9.7%" in read
-    assert "DEN-KC market split" in read
-    assert "PURE gives DEN 26.5 percentage points more win probability" in read
+    assert "ESPN reports Patrick Mahomes is expected to start Week 1 against Broncos" in read
+    assert "CBS Sports has Chiefs left tackle trending toward missing opener" in read
+    assert "Broncos–Chiefs pressure note" in read
+    assert "Chiefs allowed an 8.2% sack rate" in read
+    assert "Broncos generated 9.7%" in read
+    assert "PURE has Denver 26.5 percentage points above consensus in Broncos–Chiefs" in read
     assert "deserves the first paragraph" not in read
+    assert "KC protection vs DEN pass rush" not in read
     assert result["2026_01_DEN_KC"]["editorial_voice"]["media_led"] is True
     assert result["2026_01_DEN_KC"]["editorial_voice"]["game_specific"] is True
     assert result["2026_01_DEN_KC"]["reported_sources"][0]["source_name"] == "ESPN"
