@@ -51,6 +51,19 @@ def _nick(code: Any) -> str:
     return _full(code).split()[-1]
 
 
+def _possessive(name: str) -> str:
+    return f"{name}'" if str(name).lower().endswith("s") else f"{name}'s"
+
+
+def _sentence_fragment(text: str) -> str:
+    value = str(text or "").strip()
+    if not value:
+        return value
+    if len(value) >= 2 and value[:2].isupper():
+        return value
+    return value[0].lower() + value[1:]
+
+
 def _matchup(away: Any, home: Any) -> str:
     return f"{_nick(away)}–{_nick(home)}"
 
@@ -177,11 +190,10 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
             focus, opponent = _side_teams(away, home, item)
             focus_name = _nick(focus)
             opponent_name = _nick(opponent)
-            title_phrase = title[0].lower() + title[1:] if len(title) > 1 else title.lower()
             headline = f"{matchup}: {title}"
             sentences.append(
-                f"{matchup} centers on {title_phrase}. {summary.rstrip('.')} "
-                f"For {focus_name}, that detail changes {focus_name}'s choices against {opponent_name}; {opponent_name} can exploit it only by forcing {focus_name} off schedule."
+                f"{matchup} centers on {_sentence_fragment(title)}. {summary.rstrip('.')} "
+                f"For {focus_name}, that detail changes {_possessive(focus_name)} choices against {opponent_name}; {opponent_name} can exploit it only by forcing {focus_name} off schedule."
             )
 
     if not sentences:
@@ -250,7 +262,7 @@ def _model_paragraph(row: pd.Series, item: dict[str, Any] | None) -> str:
     if item:
         title = _clean_title(item.get("title"), max_words=12)
         if title:
-            sentences.append(f"The matchup evidence that best supports the forecast is {title[0].lower() + title[1:] if len(title) > 1 else title.lower()}.")
+            sentences.append(f"The matchup evidence that best supports the forecast is {_sentence_fragment(title)}.")
 
     sentences.append(f"The pick: {_full(pick)} moneyline.")
     return " ".join(sentences)
