@@ -125,10 +125,13 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None, media: 
             details = _pressure_details(summary)
             if details:
                 protected, sack_rate, rusher, pressure_rate = details
-                headline = f"{matchup}: {_nick(rusher)} pass rush vs. {_nick(protected)} protection"
+                protected_name = _nick(protected)
+                rusher_name = _nick(rusher)
+                headline = f"{matchup}: {rusher_name} pass rush vs. {protected_name} protection"
                 sentences.append(
-                    f"{matchup} should turn first on whether the {_nick(protected)} can keep their passing game on schedule against the {_nick(rusher)} rush. "
-                    f"The {_nick(protected)} allowed sacks on {sack_rate}% of pass plays last season, while the {_nick(rusher)} got home on {pressure_rate}%, so obvious passing downs are where this matchup can tilt."
+                    f"{matchup} centers on the {rusher_name} rush against {protected_name} protection. "
+                    f"The {protected_name} posted a {sack_rate}% sack rate last season; the {rusher_name} reached {pressure_rate}%. "
+                    f"{protected_name} needs clean early downs to keep {rusher_name} out of favorable rush situations, while {rusher_name} wants to force {protected_name} into obvious passing downs."
                 )
         elif fam == "explosives":
             headline = f"{matchup}: explosive plays will set the terms"
