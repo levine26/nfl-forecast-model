@@ -1,6 +1,6 @@
 {
   "coaching": {
-    "as_of": "2026-09-09T00:38:12.474233+00:00",
+    "as_of": "2026-09-09T00:51:31.171510+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -16,7 +16,7 @@
     "status": "healthy"
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-09T00:38:52.391974+00:00",
+    "as_of": "2026-09-09T00:52:11.629445+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -37,7 +37,7 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-09T00:38:12.042898+00:00",
+    "generated_utc": "2026-09-09T00:51:30.817281+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
     "signals": 118,
     "status": "healthy"
@@ -52,9 +52,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-09T00:38:12.042898+00:00",
+  "generated_utc": "2026-09-09T00:51:30.817281+00:00",
   "injuries": {
-    "as_of": "2026-09-09T00:38:12.277063+00:00",
+    "as_of": "2026-09-09T00:51:30.967806+00:00",
     "players": 29,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -73,10 +73,25 @@
     "status": "healthy"
   },
   "previews": {
+    "editorial_audit": {
+      "counter_led_reads": [],
+      "headline_count": 16,
+      "high_similarity_read_pair_count": 0,
+      "high_similarity_read_pairs": [],
+      "normalized_read_similarity_limit": 0.78,
+      "read_count": 16,
+      "read_evidence_overlap": [],
+      "read_evidence_overlap_count": 0,
+      "read_evidence_similarity_limit": 0.9,
+      "repeated_read_sentence_count": 0,
+      "repeated_read_sentences": {},
+      "unique_headlines": 16,
+      "unique_read_leads": 16
+    },
     "engine": "LevLine",
     "games": 16,
-    "generator": "Sunday Signal deterministic evidence composer",
-    "guardrail": "Written previews may synthesize verified context but do not alter numerical probabilities.",
+    "generator": "Sunday Signal ranked story-spine + slate-aware voice composer",
+    "guardrail": "The Read synthesizes verified context; detailed modules below retain the underlying facts and sources. Neither layer alters LevLine probabilities.",
     "status": "healthy"
   },
   "qb_history": {
@@ -92,14 +107,14 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-09T00:38:14.990052+00:00",
+    "as_of": "2026-09-09T00:51:33.926938+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
     "status": "healthy"
   },
   "weather": {
-    "as_of": "2026-09-09T00:38:44.283584+00:00",
+    "as_of": "2026-09-09T00:52:01.736775+00:00",
     "games_checked": 11,
     "status": "degraded"
   }

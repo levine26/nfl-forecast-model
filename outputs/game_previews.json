@@ -1,8 +1,13 @@
 {
   "2026_01_ARI_LAC": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "ARI hit a 20+ yard pass on 6.4% of pass plays; LAC allowed one on 6.5%. ARI threw on 65% of first- and second-down plays and averaged +0.06 EPA per early-down pass.",
-    "case_for_pick": "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. Justin Herbert has faced ARI 2 times; the most recent was 2024 Week 7.",
+    "case_for_opponent": "The case for ARI has two distinct levers: explosives and early downs. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for LAC has two distinct levers: pressure and qb history. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 0,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -57,7 +62,7 @@
     ],
     "game_id": "2026_01_ARI_LAC",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LAC gets the edge at 74.7%",
+    "headline": "LAC's game starts in the pocket",
     "key_factors": [
       {
         "advantage_team": "LAC",
@@ -66,7 +71,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts LAC; obvious passing downs are where it can become decisive.",
         "title": "LAC protection vs ARI pass rush"
       },
       {
@@ -76,53 +81,84 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "ARI hit a 20+ yard pass on 6.4% of pass plays; LAC allowed one on 6.5%. The short version: ARI wants chunks, and LAC would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts ARI; the opponent's answer is forcing longer drives.",
         "title": "ARI explosives vs LAC prevention"
       },
       {
         "advantage_team": "ARI",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 758,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "ARI threw on 65% of first- and second-down plays and averaged +0.06 EPA per early-down pass. LAC allowed -0.05.",
+        "summary": "Early-down leverage tilts ARI, which matters because it keeps the full playbook available.",
         "title": "ARI early-down approach vs LAC"
       }
     ],
     "matchup": "ARI @ LAC",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:51:39.753125+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "ARI offense changed its decision-makers"
+      },
+      {
+        "as_of": "2026-09-09T00:52:09.038932+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "LAC",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "LAC protection vs ARI pass rush"
       },
       {
+        "as_of": "2026-09-09T00:52:09.038298+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "ARI",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "ARI explosives vs LAC prevention"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:09.038517+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "ARI",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "ARI early-down approach vs LAC"
       }
     ],
     "paragraphs": [
-      "LevLine has LAC at 74.7% to win. The middle of the distribution is LAC by 10.1, with 47.4 total points. The football-only model is 6.5 percentage points higher on ARI than the market is.",
-      "Justin Herbert has faced ARI 2 times; the most recent was 2024 Week 7. Across those snaps he averaged +0.10 EPA per dropback with a 48% positive-EPA rate over 94 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: ARI enters 2026 with head coach Mike LaFleur and offensive coordinator Nathaniel Hackett. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. If this turns into an obvious-passing-down game, that matchup gets loud fast. The other matchup worth watching: ARI hit a 20+ yard pass on 6.4% of pass plays; LAC allowed one on 6.5%."
+      "Start with the pocket. The case for LAC is that long-yardage situations can become the defining feature of ARI-LAC; ARI has to keep third-and-obvious off the menu. The answer on the other side is ARI's explosive plays edge; if it becomes the dominant texture of ARI-LAC, the cleaner LAC path gets much narrower.",
+      "The market is the other story in ARI-LAC: PURE is 6.5 percentage points more bullish on ARI. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "LAC to win; LAC 28.7 \u2013 ARI 18.7 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "LAC",
+      "primary_family": "pressure",
+      "primary_mode": "support",
+      "primary_title": "LAC protection vs ARI pass rush",
+      "secondary_advantage_team": "ARI",
+      "secondary_family": "explosives",
+      "secondary_title": "ARI explosives vs LAC prevention"
+    },
     "what_could_make_us_wrong": "ARI owns at least one real matchup counter-signal."
   },
   "2026_01_ATL_PIT": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "ATL threw on 49% of first- and second-down plays and averaged +0.16 EPA per early-down pass. Tua Tagovailoa has faced PIT 2 times; the most recent was last season, Week 15.",
-    "case_for_pick": "ATL gave up sacks on 4.2% of pass plays last season; PIT got home on 6.7%. PIT averaged 6.4 yards after catch per completion; ATL allowed 4.9.",
+    "case_for_opponent": "The case for ATL has two distinct levers: early downs and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for PIT has two distinct levers: pressure and yac. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 1,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -170,7 +206,7 @@
     ],
     "game_id": "2026_01_ATL_PIT",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "PIT gets the edge at 67.0%",
+    "headline": "PIT's game starts in the pocket",
     "key_factors": [
       {
         "advantage_team": "PIT",
@@ -179,7 +215,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "ATL gave up sacks on 4.2% of pass plays last season; PIT got home on 6.7%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts PIT; obvious passing downs are where it can become decisive.",
         "title": "ATL protection vs PIT pass rush"
       },
       {
@@ -189,53 +225,84 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "summary": "PIT averaged 6.4 yards after catch per completion; ATL allowed 4.9. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "summary": "The after-catch matchup tilts PIT; routine completions can become the hidden explosives.",
         "title": "PIT YAC creation vs ATL tackling"
       },
       {
         "advantage_team": "ATL",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 617,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "ATL threw on 49% of first- and second-down plays and averaged +0.16 EPA per early-down pass. PIT allowed +0.01.",
+        "summary": "Early-down leverage tilts ATL, which matters because it keeps the full playbook available.",
         "title": "ATL early-down approach vs PIT"
       }
     ],
     "matchup": "ATL @ PIT",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:51:38.710959+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "ATL offense changed its decision-makers"
+      },
+      {
+        "as_of": "2026-09-09T00:52:08.188322+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "PIT",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "ATL protection vs PIT pass rush"
       },
       {
-        "label": "Yac",
+        "as_of": "2026-09-09T00:52:08.189891+00:00",
+        "family": "yac",
+        "label": "YAC",
         "leader": "PIT",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "PIT YAC creation vs ATL tackling"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:08.188896+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "ATL",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "ATL early-down approach vs PIT"
       }
     ],
     "paragraphs": [
-      "LevLine has PIT at 67.0% to win. The middle of the distribution is PIT by 6.2, with 47.7 total points. The football-only model is 6.3 percentage points higher on PIT than the market is. On the spread scale, LevLine likes PIT by 2.7 points more than the current line.",
-      "Tua Tagovailoa has faced PIT 2 times; the most recent was last season, Week 15. Across those snaps he averaged +0.12 EPA per dropback with a 49% positive-EPA rate over 69 dropbacks. Those games came with MIA, not ATL. But this is not a rerun: ATL enters 2026 with head coach Kevin Stefanski. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "ATL gave up sacks on 4.2% of pass plays last season; PIT got home on 6.7%. If this turns into an obvious-passing-down game, that matchup gets loud fast. The other matchup worth watching: PIT averaged 6.4 yards after catch per completion; ATL allowed 4.9."
+      "ATL-PIT has a pressure economy: every lost early down gets more expensive for ATL. That is where the edge can compound instead of merely survive for PIT. The answer on the other side is ATL's early downs edge; if it becomes the dominant texture of ATL-PIT, the cleaner PIT path gets much narrower.",
+      "Consensus pricing and the football-only model tell different versions of ATL-PIT. PURE is 6.3 points higher on PIT, and LevLine keeps enough of that split visible to matter."
     ],
     "prediction": "PIT to win; PIT 27.0 \u2013 ATL 20.7 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "PIT",
+      "primary_family": "pressure",
+      "primary_mode": "support",
+      "primary_title": "ATL protection vs PIT pass rush",
+      "secondary_advantage_team": "ATL",
+      "secondary_family": "early_down",
+      "secondary_title": "ATL early-down approach vs PIT"
+    },
     "what_could_make_us_wrong": "ATL owns at least one real matchup counter-signal."
   },
   "2026_01_BAL_IND": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass. Daniel Jones has faced BAL once before: 2022 Week 6.",
-    "case_for_pick": "BAL gave up sacks on 8.4% of pass plays last season; IND got home on 5.3%. IND hit a 20+ yard pass on 6.9% of pass plays; BAL allowed one on 9.3%.",
+    "case_for_opponent": "The case for IND has two distinct levers: early downs and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for BAL has two distinct levers: pressure and explosives. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 2,
+      "secondary_variant": 1,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -290,7 +357,7 @@
     ],
     "game_id": "2026_01_BAL_IND",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "BAL gets the edge at 58.1%",
+    "headline": "BAL's game starts in the pocket",
     "key_factors": [
       {
         "advantage_team": "BAL",
@@ -299,17 +366,17 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "BAL gave up sacks on 8.4% of pass plays last season; IND got home on 5.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts BAL; obvious passing downs are where it can become decisive.",
         "title": "BAL protection vs IND pass rush"
       },
       {
         "advantage_team": "IND",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 533,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass. IND allowed +0.10.",
+        "summary": "Early-down leverage tilts IND, which matters because it keeps the full playbook available.",
         "title": "BAL early-down approach vs IND"
       },
       {
@@ -319,43 +386,73 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "IND hit a 20+ yard pass on 6.9% of pass plays; BAL allowed one on 9.3%. The short version: IND wants chunks, and BAL would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts BAL; the opponent's answer is forcing longer drives.",
         "title": "IND explosives vs BAL prevention"
       }
     ],
     "matchup": "BAL @ IND",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:51:37.582087+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "BAL offense changed its decision-makers"
+      },
+      {
+        "as_of": "2026-09-09T00:52:07.309487+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "BAL",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "BAL protection vs IND pass rush"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:07.310107+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "IND",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "BAL early-down approach vs IND"
       },
       {
+        "as_of": "2026-09-09T00:52:07.310858+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "BAL",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "IND explosives vs BAL prevention"
       }
     ],
     "paragraphs": [
-      "LevLine has BAL at 58.1% to win. The middle of the distribution is BAL by 3.2, with 44.2 total points. The football-only model is 3.7 percentage points higher on IND than the market is. The component models are not exactly singing from one hymnal.",
-      "Lamar Jackson has faced IND 2 times; the most recent was 2023 Week 3. Across those snaps he averaged +0.24 EPA per dropback with a 63% positive-EPA rate over 82 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: BAL enters 2026 with head coach Jesse Minter and offensive coordinator Declan Doyle. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "BAL gave up sacks on 8.4% of pass plays last season; IND got home on 5.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast. The other matchup worth watching: BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass."
+      "The forecast does not need BAL to win every phase. It needs the pressure advantage to own the moments when IND has to announce pass, because those snaps are where this matchup can stop being subtle. The warning is early downs: IND owns that piece of the matchup, so the BAL forecast is strongest when the game is decided somewhere else."
     ],
     "prediction": "BAL to win; IND 20.5 \u2013 BAL 23.7 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "BAL",
+      "primary_family": "pressure",
+      "primary_mode": "support",
+      "primary_title": "BAL protection vs IND pass rush",
+      "secondary_advantage_team": "IND",
+      "secondary_family": "early_down",
+      "secondary_title": "BAL early-down approach vs IND"
+    },
     "what_could_make_us_wrong": "The component models disagree more than usual (11.6%). IND owns at least one real matchup counter-signal."
   },
   "2026_01_BUF_HOU": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "BUF threw on 50% of first- and second-down plays and averaged +0.20 EPA per early-down pass.",
-    "case_for_pick": "BUF gave up sacks on 6.2% of pass plays last season; HOU got home on 7.6%. HOU hit a 20+ yard pass on 6.9% of pass plays; BUF allowed one on 7.2%.",
+    "case_for_opponent": "The cleanest case for BUF runs through early downs. That is the matchup lever most capable of changing the game's shape.",
+    "case_for_pick": "The case for HOU has two distinct levers: pressure and explosives. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 3,
+      "secondary_variant": 2,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -410,16 +507,16 @@
     ],
     "game_id": "2026_01_BUF_HOU",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on HOU",
+    "headline": "The market and LevLine disagree on HOU",
     "key_factors": [
       {
         "advantage_team": "BUF",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 706,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "BUF threw on 50% of first- and second-down plays and averaged +0.20 EPA per early-down pass. HOU allowed -0.16.",
+        "summary": "Early-down leverage tilts BUF, which matters because it keeps the full playbook available.",
         "title": "BUF early-down approach vs HOU"
       },
       {
@@ -429,7 +526,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "BUF gave up sacks on 6.2% of pass plays last season; HOU got home on 7.6%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts HOU; obvious passing downs are where it can become decisive.",
         "title": "BUF protection vs HOU pass rush"
       },
       {
@@ -439,44 +536,74 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "HOU hit a 20+ yard pass on 6.9% of pass plays; BUF allowed one on 7.2%. The short version: HOU wants chunks, and BUF would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts HOU; the opponent's answer is forcing longer drives.",
         "title": "HOU explosives vs BUF prevention"
       }
     ],
     "matchup": "BUF @ HOU",
     "matchup_meter": [
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:51:37.120648+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "BUF offense changed its decision-makers"
+      },
+      {
+        "as_of": "2026-09-09T00:52:06.828305+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "BUF",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "BUF early-down approach vs HOU"
       },
       {
+        "as_of": "2026-09-09T00:52:06.827654+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "HOU",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "BUF protection vs HOU pass rush"
       },
       {
+        "as_of": "2026-09-09T00:52:06.829065+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "HOU",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "HOU explosives vs BUF prevention"
       }
     ],
     "paragraphs": [
-      "LevLine has HOU at 56.5% to win. The middle of the distribution is HOU by 6.7, with 48.7 total points. The football-only model is 11.0 percentage points higher on HOU than the market is. On the spread scale, LevLine likes HOU by 8.2 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Josh Allen has faced HOU 3 times; the most recent was last season, Week 12. Across those snaps he averaged -0.16 EPA per dropback with a 39% positive-EPA rate over 104 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: BUF enters 2026 with head coach Joe Brady. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "BUF threw on 50% of first- and second-down plays and averaged +0.20 EPA per early-down pass. HOU allowed -0.16. The other matchup worth watching: BUF gave up sacks on 6.2% of pass plays last season; HOU got home on 7.6%.",
-      "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 12 mph, and 14% precipitation probability."
+      "There is a direct route for HOU to control BUF-HOU: make the pocket shrink before the route concept has time to matter. The setup favors that approach. There is an honest countercase here. BUF has the better early downs setup, the part of BUF-HOU most capable of making LevLine uncomfortable.",
+      "Consensus pricing and the football-only model tell different versions of BUF-HOU. PURE is 11.0 points higher on HOU, and LevLine keeps enough of that split visible to matter."
     ],
     "prediction": "HOU to win; HOU 27.7 \u2013 BUF 21.0 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "HOU",
+      "primary_family": "pressure",
+      "primary_mode": "support",
+      "primary_title": "BUF protection vs HOU pass rush",
+      "secondary_advantage_team": "BUF",
+      "secondary_family": "early_down",
+      "secondary_title": "BUF early-down approach vs HOU"
+    },
     "what_could_make_us_wrong": "The component models disagree more than usual (8.7%). The favorite is not far from coin-flip territory. Weather, travel or another live scenario could change the shape of the game."
   },
   "2026_01_CHI_CAR": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "CAR needs the high-variance parts of the game\u2014turnovers, explosives and late-down conversions\u2014to break its way.",
-    "case_for_pick": "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. Bryce Young has faced CHI 2 times; the most recent was 2024 Week 5.",
+    "case_for_opponent": "CAR's case is less about one clean mismatch and more about creating the high-leverage swing plays that sit outside the central projection.",
+    "case_for_pick": "The case for CHI has two distinct levers: explosives and qb history. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 0,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -517,7 +644,7 @@
     ],
     "game_id": "2026_01_CHI_CAR",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "CHI by a whisker: 50.3%",
+    "headline": "CHI is where LevLine breaks from consensus",
     "key_factors": [
       {
         "advantage_team": "CHI",
@@ -526,17 +653,17 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. The short version: CAR wants chunks, and CHI would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts CHI; the opponent's answer is forcing longer drives.",
         "title": "CAR explosives vs CHI prevention"
       },
       {
         "advantage_team": null,
-        "family": "play action",
+        "family": "play_action",
         "sample_size": 144,
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps. CAR allowed -0.03 EPA/play against the same concept.",
+        "summary": "Play action is one of this matchup's clearest live signals.",
         "title": "CHI play action vs CAR"
       },
       {
@@ -546,43 +673,74 @@
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Moderate",
-        "summary": "CAR used RPOs on 8% of charted plays in 2025, versus a league median of 4%, and produced +0.03 EPA/play on those snaps. CHI allowed -0.12 EPA/play against the same concept.",
+        "summary": "RPO is one of this matchup's clearest live signals.",
         "title": "CAR RPOs vs CHI"
       }
     ],
     "matchup": "CHI @ CAR",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:52:12.726551+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "CHI",
+        "source_name": "nflverse play-by-play",
+        "strength": "Weak",
+        "title": "Bryce Young vs CHI: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:05.512340+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "CHI",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "CAR explosives vs CHI prevention"
       },
       {
-        "label": "Play Action",
-        "leader": "Mixed",
+        "as_of": "2026-09-09T00:51:35.677380+00:00",
+        "family": "play_action",
+        "label": "Play action",
+        "leader": "Watch",
+        "source_name": "FTN Data via nflverse",
         "strength": "Strong",
         "title": "CHI play action vs CAR"
       },
       {
-        "label": "Rpo",
-        "leader": "Mixed",
+        "as_of": "2026-09-09T00:51:35.679534+00:00",
+        "family": "rpo",
+        "label": "RPO",
+        "leader": "Watch",
+        "source_name": "FTN Data via nflverse",
         "strength": "Moderate",
         "title": "CAR RPOs vs CHI"
       }
     ],
     "paragraphs": [
-      "LevLine has CHI at 50.3% to win. The middle of the distribution is CHI by 0.3, with 43.7 total points. The football-only model is 12.1 percentage points higher on CAR than the market is. The spread view is cooler: LevLine is 2.7 points less favorable to CHI than the market line. This is a coin flip wearing a decimal point.",
-      "Bryce Young has faced CHI 2 times; the most recent was 2024 Week 5. Across those snaps he averaged -0.18 EPA per dropback with a 29% positive-EPA rate over 49 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
-      "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. The short version: CAR wants chunks, and CHI would rather make it earn twelve-play drives. The other matchup worth watching: CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps."
+      "This is a geometry game. CHI has the cleaner way to make the field suddenly smaller, while CAR would rather turn CHI-CAR into a sequence of patient twelve-play drives. The case also has a second leg: quarterback history tilts CHI. That matters if the primary route gets neutralized.",
+      "The market is the other story in CHI-CAR: PURE is 12.1 percentage points more bullish on CAR. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "CHI to win; CAR 21.7 \u2013 CHI 22.0 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "CHI",
+      "primary_family": "explosives",
+      "primary_mode": "support",
+      "primary_title": "CAR explosives vs CHI prevention",
+      "secondary_advantage_team": "CHI",
+      "secondary_family": "qb_opponent_history",
+      "secondary_title": "Bryce Young vs CHI: player history"
+    },
     "what_could_make_us_wrong": "The favorite is not far from coin-flip territory."
   },
   "2026_01_CLE_JAX": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%. Trevor Lawrence has faced CLE 2 times; the most recent was 2024 Week 2.",
-    "case_for_pick": "CLE hit a 20+ yard pass on 5.1% of pass plays; JAX allowed one on 6.3%.",
+    "case_for_opponent": "The case for CLE has two distinct levers: pressure and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The cleanest case for JAX runs through explosives. That is the matchup lever most capable of changing the game's shape.",
+    "editorial_voice": {
+      "primary_variant": 1,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -637,7 +795,7 @@
     ],
     "game_id": "2026_01_CLE_JAX",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on JAX",
+    "headline": "LevLine sees JAX differently than the market",
     "key_factors": [
       {
         "advantage_team": "JAX",
@@ -646,7 +804,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "CLE hit a 20+ yard pass on 5.1% of pass plays; JAX allowed one on 6.3%. The short version: CLE wants chunks, and JAX would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts JAX; the opponent's answer is forcing longer drives.",
         "title": "CLE explosives vs JAX prevention"
       },
       {
@@ -656,7 +814,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts CLE; obvious passing downs are where it can become decisive.",
         "title": "CLE protection vs JAX pass rush"
       },
       {
@@ -666,44 +824,74 @@
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "JAX used pre-snap motion on 47% of charted plays in 2025, versus a league median of 43%, and produced +0.07 EPA/play on those snaps. CLE allowed -0.16 EPA/play against the same concept.",
+        "summary": "Motion is one of this matchup's clearest live signals.",
         "title": "JAX pre-snap motion vs CLE"
       }
     ],
     "matchup": "CLE @ JAX",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:51:38.027172+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "CLE offense changed its decision-makers"
+      },
+      {
+        "as_of": "2026-09-09T00:52:07.745592+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "JAX",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "CLE explosives vs JAX prevention"
       },
       {
+        "as_of": "2026-09-09T00:52:07.745138+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "CLE",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "CLE protection vs JAX pass rush"
       },
       {
+        "as_of": "2026-09-09T00:51:37.977126+00:00",
+        "family": "motion",
         "label": "Motion",
-        "leader": "Mixed",
+        "leader": "Watch",
+        "source_name": "FTN Data via nflverse",
         "strength": "Strong",
         "title": "JAX pre-snap motion vs CLE"
       }
     ],
     "paragraphs": [
-      "LevLine has JAX at 73.2% to win. The middle of the distribution is JAX by 8.4, with 45.9 total points. The football-only model is 7.3 percentage points higher on CLE than the market is.",
-      "Trevor Lawrence has faced CLE 2 times; the most recent was 2024 Week 2. Across those snaps he averaged -0.18 EPA per dropback with a 36% positive-EPA rate over 89 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: CLE enters 2026 with head coach Todd Monken. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "CLE hit a 20+ yard pass on 5.1% of pass plays; JAX allowed one on 6.3%. The short version: CLE wants chunks, and JAX would rather make it earn twelve-play drives. The other matchup worth watching: CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%.",
-      "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 3 mph sustained wind with gusts near 3 mph, and 10% precipitation probability."
+      "The fastest route through CLE-JAX belongs to JAX. One or two chunk plays can do more for the JAX case than a dozen tidy five-yard gains. The answer on the other side is CLE's pressure edge; if it becomes the dominant texture of CLE-JAX, the cleaner JAX path gets much narrower.",
+      "The market is the other story in CLE-JAX: PURE is 7.3 percentage points more bullish on CLE. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "JAX to win; JAX 27.1 \u2013 CLE 18.8 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "JAX",
+      "primary_family": "explosives",
+      "primary_mode": "support",
+      "primary_title": "CLE explosives vs JAX prevention",
+      "secondary_advantage_team": "CLE",
+      "secondary_family": "pressure",
+      "secondary_title": "CLE protection vs JAX pass rush"
+    },
     "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. CLE owns at least one real matchup counter-signal."
   },
   "2026_01_DAL_NYG": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. Dak Prescott has faced NYG 8 times; the most recent was last season, Week 18.",
-    "case_for_pick": "NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%. Jaxson Dart has faced DAL once before: last season, Week 18.",
+    "case_for_opponent": "The case for DAL has two distinct levers: qb history and explosives. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for NYG has two distinct levers: pressure and qb history. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 4,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -751,8 +939,18 @@
     ],
     "game_id": "2026_01_DAL_NYG",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on NYG",
+    "headline": "LevLine sees NYG differently than the market",
     "key_factors": [
+      {
+        "advantage_team": "DAL",
+        "family": "qb_opponent_history",
+        "sample_size": 257,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "There is usable quarterback-opponent history here; the detailed section below handles the actual meetings and how much should carry forward.",
+        "title": "Dak Prescott vs NYG: player history"
+      },
       {
         "advantage_team": "DAL",
         "family": "explosives",
@@ -760,7 +958,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. The short version: NYG wants chunks, and DAL would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts DAL; the opponent's answer is forcing longer drives.",
         "title": "NYG explosives vs DAL prevention"
       },
       {
@@ -770,53 +968,74 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts NYG; obvious passing downs are where it can become decisive.",
         "title": "NYG protection vs DAL pass rush"
-      },
-      {
-        "advantage_team": "DAL",
-        "family": "qb opponent history",
-        "sample_size": 257,
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "Dak Prescott has faced NYG 8 times; the most recent was last season, Week 18. Across those snaps he averaged +0.24 EPA per dropback with a 51% positive-EPA rate over 257 dropbacks.",
-        "title": "Dak Prescott vs NYG: player history"
       }
     ],
     "matchup": "DAL @ NYG",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:52:16.950074+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "DAL",
+        "source_name": "nflverse play-by-play",
+        "strength": "Strong",
+        "title": "Dak Prescott vs NYG: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:10.759553+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "NYG explosives vs DAL prevention"
       },
       {
+        "as_of": "2026-09-09T00:52:10.759085+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "NYG protection vs DAL pass rush"
       },
       {
-        "label": "Rpo",
-        "leader": "Mixed",
-        "strength": "Moderate",
-        "title": "DAL RPOs vs NYG"
+        "as_of": "2026-09-09T00:51:40.746353+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "NYG offense changed its decision-makers"
       }
     ],
     "paragraphs": [
-      "LevLine has NYG at 54.8% to win. The middle of the distribution is NYG by 1.7, with 46.2 total points. The football-only model is 18.8 percentage points higher on NYG than the market is. On the spread scale, LevLine likes NYG by 4.7 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Dak Prescott has faced NYG 8 times; the most recent was last season, Week 18. Across those snaps he averaged +0.24 EPA per dropback with a 51% positive-EPA rate over 257 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: NYG enters 2026 with head coach John Harbaugh. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. The short version: NYG wants chunks, and DAL would rather make it earn twelve-play drives. The other matchup worth watching: NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%."
+      "Watch how often DAL gets a comfortable, on-schedule dropback. If the answer is 'not many,' the rest of the NYG case gets much easier to understand. The answer on the other side is DAL's quarterback history edge; if it becomes the dominant texture of DAL-NYG, the cleaner NYG path gets much narrower.",
+      "The market is the dissenting vote in DAL-NYG. PURE sits 18.8 percentage points higher on NYG; the published blend respects that outside information without surrendering the football view."
     ],
     "prediction": "NYG to win; NYG 23.9 \u2013 DAL 22.3 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "NYG",
+      "primary_family": "pressure",
+      "primary_mode": "support",
+      "primary_title": "NYG protection vs DAL pass rush",
+      "secondary_advantage_team": "DAL",
+      "secondary_family": "qb_opponent_history",
+      "secondary_title": "Dak Prescott vs NYG: player history"
+    },
     "what_could_make_us_wrong": "The favorite is not far from coin-flip territory. DAL owns at least one real matchup counter-signal."
   },
   "2026_01_DEN_KC": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "KC gave up sacks on 6.4% of pass plays last season; DEN got home on 9.3%. Bo Nix has faced KC 4 times; the most recent was last season, Week 17.",
-    "case_for_pick": "KC threw on 61% of first- and second-down plays and averaged +0.11 EPA per early-down pass. Patrick Mahomes has faced DEN 8 times; the most recent was last season, Week 11.",
+    "case_for_opponent": "The case for DEN has two distinct levers: pressure and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for KC has two distinct levers: qb history and early downs. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 0,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -864,8 +1083,18 @@
     ],
     "game_id": "2026_01_DEN_KC",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "KC by a whisker: 50.3%",
+    "headline": "LevLine sees KC differently than the market",
     "key_factors": [
+      {
+        "advantage_team": "KC",
+        "family": "qb_opponent_history",
+        "sample_size": 338,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "There is usable quarterback-opponent history here; the detailed section below handles the actual meetings and how much should carry forward.",
+        "title": "Patrick Mahomes vs DEN: player history"
+      },
       {
         "advantage_team": "DEN",
         "family": "pressure",
@@ -873,63 +1102,84 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "KC gave up sacks on 6.4% of pass plays last season; DEN got home on 9.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts DEN; obvious passing downs are where it can become decisive.",
         "title": "KC protection vs DEN pass rush"
       },
       {
         "advantage_team": "KC",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 734,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "KC threw on 61% of first- and second-down plays and averaged +0.11 EPA per early-down pass. DEN allowed -0.02.",
+        "summary": "Early-down leverage tilts KC, which matters because it keeps the full playbook available.",
         "title": "KC early-down approach vs DEN"
-      },
-      {
-        "advantage_team": "KC",
-        "family": "qb opponent history",
-        "sample_size": 338,
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "Patrick Mahomes has faced DEN 8 times; the most recent was last season, Week 11. Across those snaps he averaged +0.06 EPA per dropback with a 46% positive-EPA rate over 338 dropbacks.",
-        "title": "Patrick Mahomes vs DEN: player history"
       }
     ],
     "matchup": "DEN @ KC",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:52:17.335489+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "KC",
+        "source_name": "nflverse play-by-play",
+        "strength": "Strong",
+        "title": "Patrick Mahomes vs DEN: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:11.200300+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "KC protection vs DEN pass rush"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:11.200899+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "KC",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "KC early-down approach vs DEN"
       },
       {
-        "label": "Play Action",
-        "leader": "Mixed",
+        "as_of": "2026-09-09T00:51:41.187687+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "title": "DEN play action vs KC"
+        "title": "DEN offense changed its decision-makers"
       }
     ],
     "paragraphs": [
-      "LevLine has KC at 50.3% to win. The middle of the distribution is DEN by 2.3, with 48.9 total points. The football-only model is 9.2 percentage points higher on DEN than the market is. The spread view is cooler: LevLine is 4.8 points less favorable to KC than the market line. This is a coin flip wearing a decimal point.",
-      "Patrick Mahomes has faced DEN 8 times; the most recent was last season, Week 11. Across those snaps he averaged +0.06 EPA per dropback with a 46% positive-EPA rate over 338 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: DEN enters 2026 with offensive coordinator Davis Webb. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "KC gave up sacks on 6.4% of pass plays last season; DEN got home on 9.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast. The other matchup worth watching: KC threw on 61% of first- and second-down plays and averaged +0.11 EPA per early-down pass."
+      "Patrick Mahomes is not entering DEN-KC with a blank notebook. The prior tape gives both sides a real reference point; the KC case turns on what remains transferable after the surrounding system changed. The answer on the other side is DEN's pressure edge; if it becomes the dominant texture of DEN-KC, the cleaner KC path gets much narrower.",
+      "The market is the other story in DEN-KC: PURE is 9.2 percentage points more bullish on DEN. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "KC to win; KC 23.3 \u2013 DEN 25.6 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "KC",
+      "primary_family": "qb_opponent_history",
+      "primary_mode": "support",
+      "primary_title": "Patrick Mahomes vs DEN: player history",
+      "secondary_advantage_team": "DEN",
+      "secondary_family": "pressure",
+      "secondary_title": "KC protection vs DEN pass rush"
+    },
     "what_could_make_us_wrong": "The favorite is not far from coin-flip territory. DEN owns at least one real matchup counter-signal."
   },
   "2026_01_GB_MIN": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "GB hit a 20+ yard pass on 10.6% of pass plays; MIN allowed one on 5.8%. GB threw on 49% of first- and second-down plays and averaged +0.22 EPA per early-down pass.",
-    "case_for_pick": "MIN gave up sacks on 9.9% of pass plays last season; GB got home on 5.2%.",
+    "case_for_opponent": "The case for GB has two distinct levers: qb history and explosives. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The cleanest case for MIN runs through pressure. That is the matchup lever most capable of changing the game's shape.",
+    "editorial_voice": {
+      "primary_variant": 5,
+      "secondary_variant": 1,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -970,8 +1220,18 @@
     ],
     "game_id": "2026_01_GB_MIN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on MIN",
+    "headline": "LevLine sees MIN differently than the market",
     "key_factors": [
+      {
+        "advantage_team": "GB",
+        "family": "qb_opponent_history",
+        "sample_size": 202,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "There is usable quarterback-opponent history here; the detailed section below handles the actual meetings and how much should carry forward.",
+        "title": "Jordan Love vs MIN: player history"
+      },
       {
         "advantage_team": "GB",
         "family": "explosives",
@@ -979,7 +1239,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "GB hit a 20+ yard pass on 10.6% of pass plays; MIN allowed one on 5.8%. The short version: GB wants chunks, and MIN would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts GB; the opponent's answer is forcing longer drives.",
         "title": "GB explosives vs MIN prevention"
       },
       {
@@ -989,53 +1249,74 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "MIN gave up sacks on 9.9% of pass plays last season; GB got home on 5.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts MIN; obvious passing downs are where it can become decisive.",
         "title": "MIN protection vs GB pass rush"
-      },
-      {
-        "advantage_team": "GB",
-        "family": "early down",
-        "sample_size": 608,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "GB threw on 49% of first- and second-down plays and averaged +0.22 EPA per early-down pass. MIN allowed -0.08.",
-        "title": "GB early-down approach vs MIN"
       }
     ],
     "matchup": "GB @ MIN",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:52:16.190472+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "GB",
+        "source_name": "nflverse play-by-play",
+        "strength": "Strong",
+        "title": "Jordan Love vs MIN: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:09.885237+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "GB",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "GB explosives vs MIN prevention"
       },
       {
+        "as_of": "2026-09-09T00:52:09.885887+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "MIN protection vs GB pass rush"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:09.885472+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "GB",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "GB early-down approach vs MIN"
       }
     ],
     "paragraphs": [
-      "LevLine has MIN at 61.8% to win. The middle of the distribution is MIN by 7.1, with 50.3 total points. The football-only model is 12.2 percentage points higher on MIN than the market is. On the spread scale, LevLine likes MIN by 5.6 points more than the current line. The component models are not exactly singing from one hymnal.",
-      "Jordan Love has faced MIN 8 times; the most recent was last season, Week 12. Across those snaps he averaged +0.01 EPA per dropback with a 48% positive-EPA rate over 202 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
-      "GB hit a 20+ yard pass on 10.6% of pass plays; MIN allowed one on 5.8%. The short version: GB wants chunks, and MIN would rather make it earn twelve-play drives. The other matchup worth watching: MIN gave up sacks on 9.9% of pass plays last season; GB got home on 5.2%."
+      "The hidden scoreboard in GB-MIN may be obvious passing downs. Those snaps favor MIN, and every one of them makes the MIN path cleaner. The warning is quarterback history: GB owns that piece of the matchup, so the MIN forecast is strongest when the game is decided somewhere else.",
+      "Consensus pricing and the football-only model tell different versions of GB-MIN. PURE is 12.2 points higher on MIN, and LevLine keeps enough of that split visible to matter."
     ],
     "prediction": "MIN to win; MIN 28.7 \u2013 GB 21.6 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "MIN",
+      "primary_family": "pressure",
+      "primary_mode": "support",
+      "primary_title": "MIN protection vs GB pass rush",
+      "secondary_advantage_team": "GB",
+      "secondary_family": "qb_opponent_history",
+      "secondary_title": "Jordan Love vs MIN: player history"
+    },
     "what_could_make_us_wrong": "The component models disagree more than usual (15.4%). GB owns at least one real matchup counter-signal."
   },
   "2026_01_MIA_LV": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "LV threw on 57% of first- and second-down plays and averaged -0.11 EPA per early-down pass. MIA hit a 20+ yard pass on 7.7% of pass plays; LV allowed one on 5.9%.",
-    "case_for_pick": "LV gave up sacks on 10.1% of pass plays last season; MIA got home on 6.2%.",
+    "case_for_opponent": "The case for MIA has two distinct levers: early downs and explosives. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The cleanest case for LV runs through pressure. That is the matchup lever most capable of changing the game's shape.",
+    "editorial_voice": {
+      "primary_variant": 6,
+      "secondary_variant": 3,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1090,16 +1371,16 @@
     ],
     "game_id": "2026_01_MIA_LV",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LV by a whisker: 51.0%",
+    "headline": "The market and LevLine disagree on LV",
     "key_factors": [
       {
         "advantage_team": "MIA",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 558,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "LV threw on 57% of first- and second-down plays and averaged -0.11 EPA per early-down pass. MIA allowed +0.19.",
+        "summary": "Early-down leverage tilts MIA, which matters because it keeps the full playbook available.",
         "title": "LV early-down approach vs MIA"
       },
       {
@@ -1109,7 +1390,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "MIA hit a 20+ yard pass on 7.7% of pass plays; LV allowed one on 5.9%. The short version: MIA wants chunks, and LV would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts MIA; the opponent's answer is forcing longer drives.",
         "title": "MIA explosives vs LV prevention"
       },
       {
@@ -1119,44 +1400,74 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "LV gave up sacks on 10.1% of pass plays last season; MIA got home on 6.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts LV; obvious passing downs are where it can become decisive.",
         "title": "LV protection vs MIA pass rush"
       }
     ],
     "matchup": "MIA @ LV",
     "matchup_meter": [
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:51:39.812598+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "MIA offense changed its decision-makers"
+      },
+      {
+        "as_of": "2026-09-09T00:52:09.462974+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "MIA",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "LV early-down approach vs MIA"
       },
       {
+        "as_of": "2026-09-09T00:52:09.461732+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "MIA",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "MIA explosives vs LV prevention"
       },
       {
+        "as_of": "2026-09-09T00:52:09.462418+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "LV",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "LV protection vs MIA pass rush"
       }
     ],
     "paragraphs": [
-      "LevLine has LV at 51.0% to win. The middle of the distribution is MIA by 0.2, with 46.1 total points. The football-only model is 15.0 percentage points higher on MIA than the market is. The spread view is cooler: LevLine is 3.7 points less favorable to LV than the market line. This is a coin flip wearing a decimal point.",
-      "Kirk Cousins has faced MIA 2 times; the most recent was last season, Week 8. Across those snaps he averaged -0.16 EPA per dropback with a 42% positive-EPA rate over 66 dropbacks. Those games came with ATL, MIN, not LV. But this is not a rerun: MIA enters 2026 with head coach Jeff Hafley. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "LV threw on 57% of first- and second-down plays and averaged -0.11 EPA per early-down pass. MIA allowed +0.19. The other matchup worth watching: MIA hit a 20+ yard pass on 7.7% of pass plays; LV allowed one on 5.9%.",
-      "MIA travels roughly 2,171 miles to LV and crosses about 3 time zones."
+      "The most expensive mistake for MIA may be arriving at third down with only one credible answer. The pressure edge gives LV a chance to turn predictable downs into possession swings. What keeps this from being one-way is early downs. That edge sits with MIA, giving MIA a specific upset mechanism rather than a vague 'anything can happen' argument.",
+      "Consensus pricing and the football-only model tell different versions of MIA-LV. PURE is 15.0 points higher on MIA, and LevLine keeps enough of that split visible to matter."
     ],
     "prediction": "LV to win; LV 23.0 \u2013 MIA 23.1 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "LV",
+      "primary_family": "pressure",
+      "primary_mode": "support",
+      "primary_title": "LV protection vs MIA pass rush",
+      "secondary_advantage_team": "MIA",
+      "secondary_family": "early_down",
+      "secondary_title": "LV early-down approach vs MIA"
+    },
     "what_could_make_us_wrong": "The component models disagree more than usual (9.1%). The favorite is not far from coin-flip territory. Weather, travel or another live scenario could change the shape of the game."
   },
   "2026_01_NE_SEA": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "NE gave up sacks on 8.5% of pass plays last season; SEA got home on 6.5%. Sam Darnold has faced NE 2 times; the most recent was last season's Super Bowl.",
-    "case_for_pick": "SEA hit a 20+ yard pass on 9.7% of pass plays; NE allowed one on 6.0%. SEA threw on 47% of first- and second-down plays and averaged +0.22 EPA per early-down pass.",
+    "case_for_opponent": "The case for NE has two distinct levers: pressure and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for SEA has two distinct levers: explosives and early downs. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 2,
+      "secondary_variant": 1,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1239,8 +1550,18 @@
     ],
     "game_id": "2026_01_NE_SEA",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on SEA",
+    "headline": "SEA is where LevLine breaks from consensus",
     "key_factors": [
+      {
+        "advantage_team": null,
+        "family": "availability",
+        "sample_size": null,
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Strong",
+        "summary": "The personnel board can reshape the matchup and deserves a final check close to kickoff.",
+        "title": "NE: Ben Brown \u2014 Out"
+      },
       {
         "advantage_team": "SEA",
         "family": "explosives",
@@ -1248,65 +1569,84 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "SEA hit a 20+ yard pass on 9.7% of pass plays; NE allowed one on 6.0%. The short version: SEA wants chunks, and NE would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts SEA; the opponent's answer is forcing longer drives.",
         "title": "SEA explosives vs NE prevention"
       },
       {
         "advantage_team": "SEA",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 652,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "SEA threw on 47% of first- and second-down plays and averaged +0.22 EPA per early-down pass. NE allowed +0.05.",
+        "summary": "Early-down leverage tilts SEA, which matters because it keeps the full playbook available.",
         "title": "SEA early-down approach vs NE"
-      },
-      {
-        "advantage_team": "NE",
-        "family": "pressure",
-        "sample_size": 652,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "NE gave up sacks on 8.5% of pass plays last season; SEA got home on 6.5%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "NE protection vs SEA pass rush"
       }
     ],
     "matchup": "NE @ SEA",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:51:34.581256+00:00",
+        "family": "availability",
+        "label": "Availability",
+        "leader": "Watch",
+        "source_name": "NFL.com official injury report",
+        "strength": "Strong",
+        "title": "NE: Ben Brown \u2014 Out"
+      },
+      {
+        "as_of": "2026-09-09T00:52:04.608671+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "SEA",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "SEA explosives vs NE prevention"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:04.608879+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "SEA",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "SEA early-down approach vs NE"
       },
       {
+        "as_of": "2026-09-09T00:52:04.607274+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "NE",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "NE protection vs SEA pass rush"
       }
     ],
     "paragraphs": [
-      "LevLine has SEA at 70.4% to win. The middle of the distribution is SEA by 7.7, with 45.2 total points. The football-only model is 13.3 percentage points higher on SEA than the market is. On the spread scale, LevLine likes SEA by 4.7 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Sam Darnold has faced NE 2 times; the most recent was last season's Super Bowl. Across those snaps he averaged -0.33 EPA per dropback with a 34% positive-EPA rate over 73 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: SEA enters 2026 with offensive coordinator Brian Fleury. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "SEA hit a 20+ yard pass on 9.7% of pass plays; NE allowed one on 6.0%. The short version: SEA wants chunks, and NE would rather make it earn twelve-play drives. The other matchup worth watching: SEA threw on 47% of first- and second-down plays and averaged +0.22 EPA per early-down pass.",
-      "The official NFL injury report lists Ben Brown (C) as Out. Knee LevLine does not make up an injury point value for it. The official NFL injury report lists TreVeyon Henderson (RB) as Out. Ankle LevLine does not make up an injury point value for it.",
-      "NE travels roughly 2,485 miles to SEA and crosses about 3 time zones."
+      "If NE-SEA feels even snap to snap, do not assume it is even on the scoreboard. The explosive-play edge gives SEA a way to create separation without owning every possession. The warning is pressure: NE owns that piece of the matchup, so the SEA forecast is strongest when the game is decided somewhere else.",
+      "The market is the other story in NE-SEA: PURE is 13.3 percentage points more bullish on SEA. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "SEA to win; SEA 26.4 \u2013 NE 18.8 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "SEA",
+      "primary_family": "explosives",
+      "primary_mode": "support",
+      "primary_title": "SEA explosives vs NE prevention",
+      "secondary_advantage_team": "NE",
+      "secondary_family": "pressure",
+      "secondary_title": "NE protection vs SEA pass rush"
+    },
     "what_could_make_us_wrong": "The availability picture can still change before kickoff. Weather, travel or another live scenario could change the shape of the game. NE owns at least one real matchup counter-signal."
   },
   "2026_01_NO_DET": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "NO needs the high-variance parts of the game\u2014turnovers, explosives and late-down conversions\u2014to break its way.",
-    "case_for_pick": "NO hit a 20+ yard pass on 4.8% of pass plays; DET allowed one on 8.5%. NO gave up sacks on 6.9% of pass plays last season; DET got home on 7.2%.",
+    "case_for_opponent": "NO's case is less about one clean mismatch and more about creating the high-leverage swing plays that sit outside the central projection.",
+    "case_for_pick": "The case for DET has two distinct levers: explosives and pressure. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 3,
+      "secondary_variant": 2,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1340,7 +1680,7 @@
     ],
     "game_id": "2026_01_NO_DET",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "DET gets the edge at 73.5%",
+    "headline": "DET's edge lives in the explosive-play battle",
     "key_factors": [
       {
         "advantage_team": "DET",
@@ -1349,7 +1689,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "NO hit a 20+ yard pass on 4.8% of pass plays; DET allowed one on 8.5%. The short version: NO wants chunks, and DET would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts DET; the opponent's answer is forcing longer drives.",
         "title": "NO explosives vs DET prevention"
       },
       {
@@ -1359,7 +1699,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "NO gave up sacks on 6.9% of pass plays last season; DET got home on 7.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts DET; obvious passing downs are where it can become decisive.",
         "title": "NO protection vs DET pass rush"
       },
       {
@@ -1369,43 +1709,74 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "summary": "DET averaged 6.1 yards after catch per completion; NO allowed 5.2. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "summary": "The after-catch matchup tilts DET; routine completions can become the hidden explosives.",
         "title": "DET YAC creation vs NO tackling"
       }
     ],
     "matchup": "NO @ DET",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:52:13.440430+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "DET",
+        "source_name": "nflverse play-by-play",
+        "strength": "Weak",
+        "title": "Jared Goff vs NO: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:06.393709+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "DET",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "NO explosives vs DET prevention"
       },
       {
+        "as_of": "2026-09-09T00:52:06.393295+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "DET",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "NO protection vs DET pass rush"
       },
       {
-        "label": "Yac",
+        "as_of": "2026-09-09T00:52:06.394924+00:00",
+        "family": "yac",
+        "label": "YAC",
         "leader": "DET",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "DET YAC creation vs NO tackling"
       }
     ],
     "paragraphs": [
-      "LevLine has DET at 73.5% to win. The middle of the distribution is DET by 10.5, with 46.5 total points. On the spread scale, LevLine likes DET by 3.5 points more than the current line.",
-      "Jared Goff has faced NO once before: 2023 Week 13. Across those snaps he averaged +0.28 EPA per dropback with a 44% positive-EPA rate over 27 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
-      "NO hit a 20+ yard pass on 4.8% of pass plays; DET allowed one on 8.5%. The short version: NO wants chunks, and DET would rather make it earn twelve-play drives. The other matchup worth watching: NO gave up sacks on 6.9% of pass plays last season; DET got home on 7.2%."
+      "The shortcut belongs to DET. NO can defend well for ten snaps and still lose the drive on the eleventh, which is why the DET forecast is so sensitive to the big-play battle. A different part of the game supports the same side too: pressure favors DET, making the case broader than the headline angle.",
+      "The probability is not the only DET signal in NO-DET: LevLine's central margin is 3.5 points more favorable than the current spread."
     ],
     "prediction": "DET to win; DET 28.5 \u2013 NO 18.0 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "DET",
+      "primary_family": "explosives",
+      "primary_mode": "support",
+      "primary_title": "NO explosives vs DET prevention",
+      "secondary_advantage_team": "DET",
+      "secondary_family": "pressure",
+      "secondary_title": "NO protection vs DET pass rush"
+    },
     "what_could_make_us_wrong": "The cleanest upset path for NO is a turnover or explosive-play swing that the central projection cannot predict in advance."
   },
   "2026_01_NYJ_TEN": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "TEN threw on 58% of first- and second-down plays and averaged -0.10 EPA per early-down pass. Geno Smith has faced TEN 2 times; the most recent was last season, Week 6.",
-    "case_for_pick": "NYJ hit a 20+ yard pass on 4.4% of pass plays; TEN allowed one on 9.5%. TEN gave up sacks on 8.2% of pass plays last season; NYJ got home on 4.2%.",
+    "case_for_opponent": "The case for NYJ has two distinct levers: early downs and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for TEN has two distinct levers: explosives and pressure. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 4,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1460,7 +1831,7 @@
     ],
     "game_id": "2026_01_NYJ_TEN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on TEN",
+    "headline": "TEN is where LevLine breaks from consensus",
     "key_factors": [
       {
         "advantage_team": "TEN",
@@ -1469,17 +1840,17 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "NYJ hit a 20+ yard pass on 4.4% of pass plays; TEN allowed one on 9.5%. The short version: NYJ wants chunks, and TEN would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts TEN; the opponent's answer is forcing longer drives.",
         "title": "NYJ explosives vs TEN prevention"
       },
       {
         "advantage_team": "NYJ",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 636,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "TEN threw on 58% of first- and second-down plays and averaged -0.10 EPA per early-down pass. NYJ allowed +0.33.",
+        "summary": "Early-down leverage tilts NYJ, which matters because it keeps the full playbook available.",
         "title": "TEN early-down approach vs NYJ"
       },
       {
@@ -1489,44 +1860,74 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "TEN gave up sacks on 8.2% of pass plays last season; NYJ got home on 4.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "summary": "The pressure matchup tilts TEN; obvious passing downs are where it can become decisive.",
         "title": "TEN protection vs NYJ pass rush"
       }
     ],
     "matchup": "NYJ @ TEN",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:51:39.314026+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "New defensive coordinator in TEN"
+      },
+      {
+        "as_of": "2026-09-09T00:52:08.614659+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "TEN",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "NYJ explosives vs TEN prevention"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:08.615895+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "NYJ",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "TEN early-down approach vs NYJ"
       },
       {
+        "as_of": "2026-09-09T00:52:08.615309+00:00",
+        "family": "pressure",
         "label": "Pressure",
         "leader": "TEN",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "TEN protection vs NYJ pass rush"
       }
     ],
     "paragraphs": [
-      "LevLine has TEN at 58.9% to win. The middle of the distribution is TEN by 4.6, with 44.4 total points. The football-only model is 8.4 percentage points higher on TEN than the market is. On the spread scale, LevLine likes TEN by 3.1 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Geno Smith has faced TEN 2 times; the most recent was last season, Week 6. Across those snaps he averaged +0.18 EPA per dropback with a 47% positive-EPA rate over 64 dropbacks. Those games came with LV, SEA, not NYJ. But this is not a rerun: TEN is coordinated by Gus Bradley in 2026, replacing the prior defensive staff. Older NYJ-vs-TEN tape came against a different defensive play-caller.",
-      "NYJ hit a 20+ yard pass on 4.4% of pass plays; TEN allowed one on 9.5%. The short version: NYJ wants chunks, and TEN would rather make it earn twelve-play drives. The other matchup worth watching: TEN threw on 58% of first- and second-down plays and averaged -0.10 EPA per early-down pass.",
-      "Open-Meteo's forecast nearest kickoff is 91\u00b0F, 6 mph sustained wind with gusts near 7 mph, and 10% precipitation probability."
+      "Field position can change violently in this matchup. TEN is more likely to create that kind of swing, and TEN does not need many before the game script tilts. The answer on the other side is NYJ's early downs edge; if it becomes the dominant texture of NYJ-TEN, the cleaner TEN path gets much narrower.",
+      "The market is the other story in NYJ-TEN: PURE is 8.4 percentage points more bullish on TEN. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "TEN to win; TEN 24.5 \u2013 NYJ 19.9 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "TEN",
+      "primary_family": "explosives",
+      "primary_mode": "support",
+      "primary_title": "NYJ explosives vs TEN prevention",
+      "secondary_advantage_team": "NYJ",
+      "secondary_family": "early_down",
+      "secondary_title": "TEN early-down approach vs NYJ"
+    },
     "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. NYJ owns at least one real matchup counter-signal."
   },
   "2026_01_SF_LA": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "SF produced positive EPA on 51% of third downs; LA allowed it on 40%. Brock Purdy has faced LA 3 times; the most recent was 2024 Week 15.",
-    "case_for_pick": "LA hit a 20+ yard pass on 10.9% of pass plays; SF allowed one on 6.5%. Matthew Stafford has faced SF 10 times; the most recent was last season, Week 10.",
+    "case_for_opponent": "The case for SF has two distinct levers: third down and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for LA has two distinct levers: qb history and explosives. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 1,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1602,8 +2003,18 @@
     ],
     "game_id": "2026_01_SF_LA",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on LA",
+    "headline": "LevLine sees LA differently than the market",
     "key_factors": [
+      {
+        "advantage_team": "LA",
+        "family": "qb_opponent_history",
+        "sample_size": 413,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "There is usable quarterback-opponent history here; the detailed section below handles the actual meetings and how much should carry forward.",
+        "title": "Matthew Stafford vs SF: player history"
+      },
       {
         "advantage_team": "LA",
         "family": "explosives",
@@ -1611,7 +2022,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "LA hit a 20+ yard pass on 10.9% of pass plays; SF allowed one on 6.5%. The short version: LA wants chunks, and SF would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts LA; the opponent's answer is forcing longer drives.",
         "title": "LA explosives vs SF prevention"
       },
       {
@@ -1621,54 +2032,74 @@
         "source_name": "FTN Data via nflverse",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps. LA allowed -0.05 EPA/play against the same concept.",
+        "summary": "Motion is one of this matchup's clearest live signals.",
         "title": "SF pre-snap motion vs LA"
-      },
-      {
-        "advantage_team": "LA",
-        "family": "qb opponent history",
-        "sample_size": 413,
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "Matthew Stafford has faced SF 10 times; the most recent was last season, Week 10. Across those snaps he averaged +0.08 EPA per dropback with a 49% positive-EPA rate over 413 dropbacks.",
-        "title": "Matthew Stafford vs SF: player history"
       }
     ],
     "matchup": "SF @ LA",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:52:12.384755+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "LA",
+        "source_name": "nflverse play-by-play",
+        "strength": "Strong",
+        "title": "Matthew Stafford vs SF: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:05.067329+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "LA",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "LA explosives vs SF prevention"
       },
       {
+        "as_of": "2026-09-09T00:51:35.383959+00:00",
+        "family": "motion",
         "label": "Motion",
-        "leader": "Mixed",
+        "leader": "Watch",
+        "source_name": "FTN Data via nflverse",
         "strength": "Strong",
         "title": "SF pre-snap motion vs LA"
       },
       {
-        "label": "Third Down",
-        "leader": "SF",
+        "as_of": "2026-09-09T00:51:35.667152+00:00",
+        "family": "coaching",
+        "label": "Staff",
+        "leader": "Watch",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "title": "SF third downs vs LA"
+        "title": "LA offense changed its decision-makers"
       }
     ],
     "paragraphs": [
-      "LevLine has LA at 69.8% to win. The middle of the distribution is LA by 6.3, with 46.7 total points. The football-only model is 8.2 percentage points higher on LA than the market is. On the spread scale, LevLine likes LA by 2.8 points more than the current line. That gap is big enough to be the story, not a rounding error.",
-      "Matthew Stafford has faced SF 10 times; the most recent was last season, Week 10. Across those snaps he averaged +0.08 EPA per dropback with a 49% positive-EPA rate over 413 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: LA enters 2026 with offensive coordinator Nathan Scheelhaase. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "LA hit a 20+ yard pass on 10.9% of pass plays; SF allowed one on 6.5%. The short version: LA wants chunks, and SF would rather make it earn twelve-play drives. The other matchup worth watching: SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps.",
-      "The official NFL injury report lists James Thompson Jr. (DT) as Did Not Participate In Practice. The official NFL injury report lists Alaric Jackson (T) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive."
+      "There is actual memory in this quarterback matchup. Matthew Stafford has seen this opponent's problems before, so the interesting part is not the old box score\u2014it is which answers still exist in 2026. The answer on the other side is SF's third down edge; if it becomes the dominant texture of SF-LA, the cleaner LA path gets much narrower.",
+      "Consensus pricing and the football-only model tell different versions of SF-LA. PURE is 8.2 points higher on LA, and LevLine keeps enough of that split visible to matter."
     ],
     "prediction": "LA to win; LA 26.5 \u2013 SF 20.2 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "LA",
+      "primary_family": "qb_opponent_history",
+      "primary_mode": "support",
+      "primary_title": "Matthew Stafford vs SF: player history",
+      "secondary_advantage_team": "SF",
+      "secondary_family": "third_down",
+      "secondary_title": "SF third downs vs LA"
+    },
     "what_could_make_us_wrong": "The availability picture can still change before kickoff. SF owns at least one real matchup counter-signal."
   },
   "2026_01_TB_CIN": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "CIN threw on 60% of first- and second-down plays and averaged -0.05 EPA per early-down pass. Baker Mayfield has faced CIN 2 times; the most recent was 2022 Week 9.",
-    "case_for_pick": "TB hit a 20+ yard pass on 8.7% of pass plays; CIN allowed one on 9.5%. TB averaged 5.6 yards after catch per completion; CIN allowed 7.0.",
+    "case_for_opponent": "The case for TB has two distinct levers: early downs and qb history. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The case for CIN has two distinct levers: explosives and yac. If both show up, the game can move quickly in its direction.",
+    "editorial_voice": {
+      "primary_variant": 5,
+      "secondary_variant": 1,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1709,7 +2140,7 @@
     ],
     "game_id": "2026_01_TB_CIN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "CIN gets the edge at 63.1%",
+    "headline": "CIN's edge lives in the explosive-play battle",
     "key_factors": [
       {
         "advantage_team": "CIN",
@@ -1718,17 +2149,17 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "TB hit a 20+ yard pass on 8.7% of pass plays; CIN allowed one on 9.5%. The short version: TB wants chunks, and CIN would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts CIN; the opponent's answer is forcing longer drives.",
         "title": "TB explosives vs CIN prevention"
       },
       {
         "advantage_team": "TB",
-        "family": "early down",
+        "family": "early_down",
         "sample_size": 690,
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "CIN threw on 60% of first- and second-down plays and averaged -0.05 EPA per early-down pass. TB allowed +0.14.",
+        "summary": "Early-down leverage tilts TB, which matters because it keeps the full playbook available.",
         "title": "CIN early-down approach vs TB"
       },
       {
@@ -1738,43 +2169,73 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "summary": "TB averaged 5.6 yards after catch per completion; CIN allowed 7.0. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "summary": "The after-catch matchup tilts CIN; routine completions can become the hidden explosives.",
         "title": "TB YAC creation vs CIN tackling"
       }
     ],
     "matchup": "TB @ CIN",
     "matchup_meter": [
       {
+        "as_of": "2026-09-09T00:52:13.084990+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "TB",
+        "source_name": "nflverse play-by-play",
+        "strength": "Weak",
+        "title": "Baker Mayfield vs CIN: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:05.959481+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "CIN",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "TB explosives vs CIN prevention"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:05.960667+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "TB",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "CIN early-down approach vs TB"
       },
       {
-        "label": "Yac",
+        "as_of": "2026-09-09T00:52:05.959719+00:00",
+        "family": "yac",
+        "label": "YAC",
         "leader": "CIN",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "TB YAC creation vs CIN tackling"
       }
     ],
     "paragraphs": [
-      "LevLine has CIN at 63.1% to win. The middle of the distribution is CIN by 4.8, with 45.2 total points. The component models are not exactly singing from one hymnal.",
-      "Baker Mayfield has faced CIN 2 times; the most recent was 2022 Week 9. Across those snaps he averaged +0.52 EPA per dropback with a 49% positive-EPA rate over 43 dropbacks. Those games came with CAR, CLE, not TB.",
-      "TB hit a 20+ yard pass on 8.7% of pass plays; CIN allowed one on 9.5%. The short version: TB wants chunks, and CIN would rather make it earn twelve-play drives. The other matchup worth watching: CIN threw on 60% of first- and second-down plays and averaged -0.05 EPA per early-down pass."
+      "The CIN forecast is betting on leverage, not volume. The best plays on that side are more capable of flipping the field in one shot; TB's job is to make every yard expensive. The warning is early downs: TB owns that piece of the matchup, so the CIN forecast is strongest when the game is decided somewhere else."
     ],
     "prediction": "CIN to win; CIN 25.0 \u2013 TB 20.2 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "CIN",
+      "primary_family": "explosives",
+      "primary_mode": "support",
+      "primary_title": "TB explosives vs CIN prevention",
+      "secondary_advantage_team": "TB",
+      "secondary_family": "early_down",
+      "secondary_title": "CIN early-down approach vs TB"
+    },
     "what_could_make_us_wrong": "The component models disagree more than usual (10.5%). TB owns at least one real matchup counter-signal."
   },
   "2026_01_WAS_PHI": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "PHI averaged 4.3 yards after catch per completion; WAS allowed 6.4. PHI hit a 20+ yard pass on 6.8% of pass plays; WAS allowed one on 8.3%.",
-    "case_for_pick": "Jalen Hurts has faced WAS 10 times; the most recent was last season, Week 16. Jayden Daniels has faced PHI 3 times; the most recent was 2024 Conference Championship.",
+    "case_for_opponent": "The case for WAS has two distinct levers: yac and explosives. If both show up, the game can move quickly in its direction.",
+    "case_for_pick": "The cleanest case for PHI runs through qb history. That is the matchup lever most capable of changing the game's shape.",
+    "editorial_voice": {
+      "primary_variant": 2,
+      "secondary_variant": 0,
+      "slate_aware": true
+    },
     "engine": "LevLine",
     "evidence_used": [
       {
@@ -1836,8 +2297,18 @@
     ],
     "game_id": "2026_01_WAS_PHI",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LevLine is taking a stand on PHI",
+    "headline": "The market and LevLine disagree on PHI",
     "key_factors": [
+      {
+        "advantage_team": "PHI",
+        "family": "qb_opponent_history",
+        "sample_size": 297,
+        "source_name": "nflverse play-by-play",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "There is usable quarterback-opponent history here; the detailed section below handles the actual meetings and how much should carry forward.",
+        "title": "Jalen Hurts vs WAS: player history"
+      },
       {
         "advantage_team": "WAS",
         "family": "yac",
@@ -1845,7 +2316,7 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
-        "summary": "PHI averaged 4.3 yards after catch per completion; WAS allowed 6.4. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "summary": "The after-catch matchup tilts WAS; routine completions can become the hidden explosives.",
         "title": "PHI YAC creation vs WAS tackling"
       },
       {
@@ -1855,48 +2326,63 @@
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
-        "summary": "PHI hit a 20+ yard pass on 6.8% of pass plays; WAS allowed one on 8.3%. The short version: PHI wants chunks, and WAS would rather make it earn twelve-play drives.",
+        "summary": "The chunk-play path tilts WAS; the opponent's answer is forcing longer drives.",
         "title": "PHI explosives vs WAS prevention"
-      },
-      {
-        "advantage_team": "WAS",
-        "family": "early down",
-        "sample_size": 617,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "WAS threw on 50% of first- and second-down plays and averaged +0.11 EPA per early-down pass. PHI allowed +0.05.",
-        "title": "WAS early-down approach vs PHI"
       }
     ],
     "matchup": "WAS @ PHI",
     "matchup_meter": [
       {
-        "label": "Yac",
+        "as_of": "2026-09-09T00:52:16.612137+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "PHI",
+        "source_name": "nflverse play-by-play",
+        "strength": "Strong",
+        "title": "Jalen Hurts vs WAS: player history"
+      },
+      {
+        "as_of": "2026-09-09T00:52:10.328106+00:00",
+        "family": "yac",
+        "label": "YAC",
         "leader": "WAS",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "PHI YAC creation vs WAS tackling"
       },
       {
+        "as_of": "2026-09-09T00:52:10.327836+00:00",
+        "family": "explosives",
         "label": "Explosives",
         "leader": "WAS",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "PHI explosives vs WAS prevention"
       },
       {
-        "label": "Early Down",
+        "as_of": "2026-09-09T00:52:10.326992+00:00",
+        "family": "early_down",
+        "label": "Early downs",
         "leader": "WAS",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
         "title": "WAS early-down approach vs PHI"
       }
     ],
     "paragraphs": [
-      "LevLine has PHI at 71.3% to win. The middle of the distribution is PHI by 9.5, with 47.9 total points. The football-only model is 7.4 percentage points higher on PHI than the market is. On the spread scale, LevLine likes PHI by 4.0 points more than the current line.",
-      "Jalen Hurts has faced WAS 10 times; the most recent was last season, Week 16. Across those snaps he averaged +0.25 EPA per dropback with a 50% positive-EPA rate over 297 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward. But this is not a rerun: WAS enters 2026 with offensive coordinator David Blough. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "PHI averaged 4.3 yards after catch per completion; WAS allowed 6.4. The five-yard throw becoming a fifteen-yard gain is the thing to watch. The other matchup worth watching: PHI hit a 20+ yard pass on 6.8% of pass plays; WAS allowed one on 8.3%.",
-      "Open-Meteo's forecast nearest kickoff is 70\u00b0F, 5 mph sustained wind with gusts near 15 mph, and 35% precipitation probability."
+      "Prior meetings give WAS-PHI a useful baseline without turning it into a rerun. For PHI, the value is in what Jalen Hurts already knows and what the current staff can still exploit. The answer on the other side is WAS's yards after the catch edge; if it becomes the dominant texture of WAS-PHI, the cleaner PHI path gets much narrower.",
+      "The market is the dissenting vote in WAS-PHI. PURE sits 7.4 percentage points higher on PHI; the published blend respects that outside information without surrendering the football view."
     ],
     "prediction": "PHI to win; PHI 28.7 \u2013 WAS 19.2 is the central score projection.",
+    "story_spine": {
+      "primary_advantage_team": "PHI",
+      "primary_family": "qb_opponent_history",
+      "primary_mode": "support",
+      "primary_title": "Jalen Hurts vs WAS: player history",
+      "secondary_advantage_team": "WAS",
+      "secondary_family": "yac",
+      "secondary_title": "PHI YAC creation vs WAS tackling"
+    },
     "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. WAS owns at least one real matchup counter-signal."
   }
 }
