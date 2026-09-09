@@ -1,77 +1,77 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_BUF_HOU",
-      "largest_driver": "Market movement",
-      "pick": "HOU",
-      "pick_delta_pp": -0.16324723785984263
-    },
-    {
       "game_id": "2026_01_BAL_IND",
       "largest_driver": "No material move",
       "pick": "BAL",
-      "pick_delta_pp": -4.1678882567453e-10
+      "pick_delta_pp": 4.1677772344428377e-10
+    },
+    {
+      "game_id": "2026_01_BUF_HOU",
+      "largest_driver": "No material move",
+      "pick": "HOU",
+      "pick_delta_pp": -3.8820058279043224e-10
     },
     {
       "game_id": "2026_01_MIA_LV",
       "largest_driver": "No material move",
       "pick": "LV",
-      "pick_delta_pp": 2.848055125070914e-10
+      "pick_delta_pp": -2.847833080465989e-10
     }
   ],
-  "generated_utc": "2026-09-09T00:08:35.241420+00:00",
+  "generated_utc": "2026-09-09T01:06:13.129352+00:00",
   "market_disagreements": [
     {
       "confidence": "Coin Flip",
       "game_id": "2026_01_DAL_NYG",
       "matchup": "DAL @ NYG",
       "pick": "NYG",
-      "pick_prob": 0.5475293229403825,
+      "pick_prob": 0.5475293229387375,
       "projected_score": "NYG 23.9 \u2013 DAL 22.3",
-      "pure_market_gap_pp": 18.78654361330751
+      "pure_market_gap_pp": 18.786543613088185
     },
     {
       "confidence": "Coin Flip",
       "game_id": "2026_01_MIA_LV",
       "matchup": "MIA @ LV",
       "pick": "LV",
-      "pick_prob": 0.5102044016520503,
+      "pick_prob": 0.5102044016492023,
       "projected_score": "LV 23.0 \u2013 MIA 23.1",
-      "pure_market_gap_pp": 14.968286694549798
+      "pure_market_gap_pp": 14.968286694929523
     },
     {
       "confidence": "High",
       "game_id": "2026_01_NE_SEA",
       "matchup": "NE @ SEA",
       "pick": "SEA",
-      "pick_prob": 0.7035921885113727,
+      "pick_prob": 0.7035921885128434,
       "projected_score": "SEA 26.4 \u2013 NE 18.8",
-      "pure_market_gap_pp": 13.311362342559308
+      "pure_market_gap_pp": 13.311362342755405
     }
   ],
   "most_uncertain": [
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_01_CHI_CAR",
-      "matchup": "CHI @ CAR",
-      "pick": "CHI",
-      "pick_prob": 0.5025401003447271,
-      "projected_score": "CAR 21.7 \u2013 CHI 22.0"
-    },
-    {
-      "confidence": "Coin Flip",
       "game_id": "2026_01_DEN_KC",
       "matchup": "DEN @ KC",
       "pick": "KC",
-      "pick_prob": 0.5030057158805817,
+      "pick_prob": 0.5030057158777783,
       "projected_score": "KC 23.3 \u2013 DEN 25.6"
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_01_CHI_CAR",
+      "matchup": "CHI @ CAR",
+      "pick": "CHI",
+      "pick_prob": 0.5041073547619119,
+      "projected_score": "CAR 21.7 \u2013 CHI 22.0"
     },
     {
       "confidence": "Coin Flip",
       "game_id": "2026_01_MIA_LV",
       "matchup": "MIA @ LV",
       "pick": "LV",
-      "pick_prob": 0.5102044016520503,
+      "pick_prob": 0.5102044016492023,
       "projected_score": "LV 23.0 \u2013 MIA 23.1"
     }
   ],
@@ -81,7 +81,7 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.7470270354109602,
+      "pick_prob": 0.7470270354089723,
       "projected_score": "LAC 28.7 \u2013 ARI 18.7"
     },
     {
@@ -89,7 +89,7 @@
       "game_id": "2026_01_NO_DET",
       "matchup": "NO @ DET",
       "pick": "DET",
-      "pick_prob": 0.734807787185086,
+      "pick_prob": 0.734807787183914,
       "projected_score": "DET 28.5 \u2013 NO 18.0"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_01_CLE_JAX",
       "matchup": "CLE @ JAX",
       "pick": "JAX",
-      "pick_prob": 0.7321670435552241,
+      "pick_prob": 0.7321670435533167,
       "projected_score": "JAX 27.1 \u2013 CLE 18.8"
     }
   ],
