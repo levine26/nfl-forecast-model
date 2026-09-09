@@ -1,6 +1,94 @@
 {
+  "advanced_sources": {
+    "as_of": "2026-09-09T05:37:48.035180+00:00",
+    "matrix": [
+      {
+        "automation": "production",
+        "role": "quantitative_backbone",
+        "source": "nflverse / nflreadpy",
+        "use": "schedule, play-by-play, EPA, player/team stats, participation, rosters and identifiers"
+      },
+      {
+        "automation": "production_best_effort",
+        "role": "advanced_player_context",
+        "source": "NFL Next Gen Stats via nflverse",
+        "use": "passing, rushing and receiving context when fields and season coverage are available"
+      },
+      {
+        "automation": "production_best_effort",
+        "role": "advanced_historical_context",
+        "source": "PFR advanced stats via nflverse",
+        "use": "historical passing/rushing/receiving context and cross-checking"
+      },
+      {
+        "automation": "production_when_supported",
+        "role": "official_truth",
+        "source": "NFL.com / official team sources / official gamebooks",
+        "use": "injuries, starters, transactions, venue/event facts and official game statistics"
+      },
+      {
+        "automation": "manual_only",
+        "role": "research_cross_check",
+        "source": "StatMuse / PFR-style career queries",
+        "use": "manual QA for career counts and historical claims; never required for production"
+      }
+    ],
+    "ngs_passing": {
+      "rows": 2442,
+      "status": "healthy"
+    },
+    "ngs_receiving": {
+      "rows": 5776,
+      "status": "healthy"
+    },
+    "ngs_rushing": {
+      "rows": 2489,
+      "status": "healthy"
+    },
+    "pfr_pass": {
+      "rows": 2766,
+      "status": "healthy"
+    },
+    "pfr_rec": {
+      "rows": 18127,
+      "status": "healthy"
+    },
+    "pfr_rush": {
+      "rows": 9483,
+      "status": "healthy"
+    },
+    "player_id_map": {
+      "rows": 24826,
+      "status": "healthy"
+    },
+    "player_stats": {
+      "rows": 75879,
+      "status": "healthy"
+    },
+    "policy": "Best-effort context only; no advanced source may block or silently alter LevLine.",
+    "seasons": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "status": "healthy"
+  },
+  "career_qb_verification": {
+    "as_of": "2026-09-09T05:37:53.738100+00:00",
+    "conflicts": 0,
+    "evidence_items_added": 28,
+    "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
+    "seasons_loaded_end": 2025,
+    "seasons_loaded_start": 2009,
+    "source": "nflverse weekly player stats",
+    "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+    "status": "healthy",
+    "targets": 28,
+    "verified": 28
+  },
   "coaching": {
-    "as_of": "2026-09-09T03:28:30.958022+00:00",
+    "as_of": "2026-09-09T05:35:45.930447+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -17,8 +105,15 @@
     "season": 2026,
     "status": "healthy"
   },
+  "editorial_finalizer": {
+    "editorial_version": "story-desk-v3",
+    "games": 16,
+    "guardrail": "Final editorial pass changes only public explanation and story hierarchy, never LevLine probabilities.",
+    "status": "healthy",
+    "unique_headlines": 16
+  },
   "editorial_intelligence": {
-    "as_of": "2026-09-09T03:29:56.873057+00:00",
+    "as_of": "2026-09-09T05:37:38.368017+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -39,9 +134,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-09T03:28:30.656252+00:00",
+    "generated_utc": "2026-09-09T05:35:45.443743+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 147,
+    "signals": 146,
     "status": "healthy"
   },
   "ftn": {
@@ -54,14 +149,24 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-09T03:28:30.656252+00:00",
+  "generated_utc": "2026-09-09T05:35:45.443743+00:00",
   "injuries": {
-    "as_of": "2026-09-09T03:28:30.775891+00:00",
+    "as_of": "2026-09-09T05:35:45.702486+00:00",
     "players": 29,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
     "status": "healthy",
     "teams_with_reported_players": 4
+  },
+  "nextgen_qb_context": {
+    "as_of": "2026-09-09T05:37:52.831972+00:00",
+    "evidence_items_added": 27,
+    "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
+    "qb_profiles_matched": 27,
+    "season": 2025,
+    "source": "NFL Next Gen Stats via nflverse",
+    "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+    "status": "healthy"
   },
   "pbp": {
     "seasons": [
@@ -114,13 +219,20 @@
     "status": "healthy",
     "team_change_safe": true
   },
+  "qb_history_verification": {
+    "career_counts_published": false,
+    "guardrail": "Displayed counts are explicitly recent nflverse PBP samples; short cameos do not count as meaningful games and no limited sample is presented as a career total.",
+    "meaningful_game_threshold_dropbacks": 10,
+    "recent_samples_audited": 28,
+    "status": "healthy"
+  },
   "schedule": {
     "rows": 272,
     "source": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-09T03:28:33.357816+00:00",
+    "as_of": "2026-09-09T05:35:49.528154+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -145,8 +257,15 @@
     "source": "Wikipedia rendered staff records + FTN charting + nflverse PBP",
     "status": "healthy"
   },
+  "story_desk": {
+    "editorial_version": "story-desk-v2",
+    "games_with_notebook": 5,
+    "guardrail": "Rivalry, event, history and fun-fact context is explanatory only and never changes LevLine numerically.",
+    "status": "healthy",
+    "story_items_added": 19
+  },
   "weather": {
-    "as_of": "2026-09-09T03:29:42.190216+00:00",
+    "as_of": "2026-09-09T05:37:23.765398+00:00",
     "games_checked": 11,
     "status": "degraded"
   }

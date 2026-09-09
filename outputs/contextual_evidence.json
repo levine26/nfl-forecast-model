@@ -1,7 +1,7 @@
 {
   "2026_01_ARI_LAC": [
     {
-      "as_of": "2026-09-09T03:29:53.288965+00:00",
+      "as_of": "2026-09-09T05:37:34.840038+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LAC",
@@ -19,7 +19,7 @@
       "title": "LAC protection vs ARI pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:53.288094+00:00",
+      "as_of": "2026-09-09T05:37:34.839154+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -37,7 +37,7 @@
       "title": "ARI explosives vs LAC prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:53.288368+00:00",
+      "as_of": "2026-09-09T05:37:34.839433+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -55,7 +55,7 @@
       "title": "ARI early-down approach vs LAC"
     },
     {
-      "as_of": "2026-09-09T03:28:39.992505+00:00",
+      "as_of": "2026-09-09T05:37:19.896652+00:00",
       "category": "history",
       "metadata": {
         "dc": "Nick Rallis",
@@ -80,7 +80,7 @@
       "title": "Justin Herbert vs Nick Rallis's ARI defense"
     },
     {
-      "as_of": "2026-09-09T03:29:42.844731+00:00",
+      "as_of": "2026-09-09T05:37:24.411939+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Nathaniel Hackett",
@@ -137,7 +137,7 @@
       "title": "What Nathaniel Hackett could change in ARI"
     },
     {
-      "as_of": "2026-09-09T03:28:39.792099+00:00",
+      "as_of": "2026-09-09T05:37:19.693659+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Jonathan Gannon",
@@ -153,7 +153,7 @@
       "title": "ARI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:39.792119+00:00",
+      "as_of": "2026-09-09T05:37:19.693682+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -165,7 +165,7 @@
       "title": "New defensive coordinator in LAC"
     },
     {
-      "as_of": "2026-09-09T03:28:39.792142+00:00",
+      "as_of": "2026-09-09T05:37:19.693708+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Jim Harbaugh",
@@ -181,29 +181,11 @@
       "title": "LAC offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:30:02.432756+00:00",
+      "as_of": "2026-09-09T05:37:43.841331+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "ARI",
-        "current_team": "ARI",
-        "epa_per_dropback": 0.13351146432973773,
-        "family": "qb_opponent_history",
-        "games": 2,
-        "latest_meeting": {
-          "date": "2024-12-28",
-          "dropbacks": 2,
-          "epa_per_dropback": -1.0905354339047335,
-          "game_id": "2024_17_LAC_NE",
-          "human_label": "2024 Week 17",
-          "label": "2024 Week 17",
-          "offense": "NE",
-          "score": "LAC 40, NE 7",
-          "season": 2024,
-          "stage": "Week 17",
-          "success_rate": 0.0,
-          "week": 17
-        },
-        "meetings": [
+        "cameos": [
           {
             "date": "2024-12-28",
             "dropbacks": 2,
@@ -217,7 +199,28 @@
             "stage": "Week 17",
             "success_rate": 0.0,
             "week": 17
-          },
+          }
+        ],
+        "current_team": "ARI",
+        "epa_per_dropback": 0.2055142230494125,
+        "excluded_cameos": 1,
+        "family": "qb_opponent_history",
+        "games": 1,
+        "latest_meeting": {
+          "date": "2022-10-09",
+          "dropbacks": 34,
+          "epa_per_dropback": 0.2055142230494125,
+          "game_id": "2022_05_LAC_CLE",
+          "human_label": "2022 Week 5",
+          "label": "2022 Week 5",
+          "offense": "CLE",
+          "score": "LAC 30, CLE 28",
+          "season": 2022,
+          "stage": "Week 5",
+          "success_rate": 0.5,
+          "week": 5
+        },
+        "meetings": [
           {
             "date": "2022-10-09",
             "dropbacks": 34,
@@ -237,26 +240,31 @@
           "CLE",
           "NE"
         ],
-        "success_rate": 0.4722222222222222,
-        "team_changed": true
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2022,
+        "success_rate": 0.5,
+        "team_changed": true,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
-      "sample_size": 36,
+      "sample_size": 34,
       "side": "away",
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Jacoby Brissett has faced LAC 2 times; the most recent was 2024 Week 17. Across those snaps he averaged +0.13 EPA per dropback with a 47% positive-EPA rate over 36 dropbacks. Those games came with CLE, NE, not ARI. The quarterback history travels; the old playbook does not.",
+      "summary": "In the nflverse play-by-play sample since 2022, Jacoby Brissett has 1 meaningful game against LAC; the most recent was 2022 Week 5. Over 34 charted dropbacks in those games, he averaged +0.21 EPA/dropback with a 50% positive-EPA rate. A further 1 short cameo under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
       "title": "Jacoby Brissett vs LAC: player history"
     },
     {
-      "as_of": "2026-09-09T03:30:02.455314+00:00",
+      "as_of": "2026-09-09T05:37:43.864089+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
+        "cameos": [],
         "current_team": "LAC",
-        "epa_per_dropback": 0.09704359404899171,
+        "epa_per_dropback": 0.09704359404899174,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -306,8 +314,11 @@
         "prior_offenses": [
           "LAC"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2022,
         "success_rate": 0.4787234042553192,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -316,13 +327,136 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Justin Herbert has faced ARI 2 times; the most recent was 2024 Week 7. Across those snaps he averaged +0.10 EPA per dropback with a 48% positive-EPA rate over 94 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2022, Justin Herbert has 2 meaningful games against ARI; the most recent was 2024 Week 7. Over 94 charted dropbacks in those games, he averaged +0.10 EPA/dropback with a 48% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Justin Herbert vs ARI: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.959136+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 2,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, ARI and LAC have played 2 completed games in the nflverse schedule sample: ARI is 1-1. The most recent finished LAC 15, ARI 17.",
+      "title": "ARI-LAC: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 16.49484536082474,
+        "attempts": 485,
+        "avg_intended_air_yards": 7.758537117903929,
+        "avg_time_to_throw": 2.9404834710743804,
+        "cpoe": 3.533525773195869,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 485,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jacoby Brissett, over 485 attempts: 2.94s average time to throw; +3.5 completion percentage points over expectation; 7.8 average intended air yards; 16.5% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Jacoby Brissett: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 14.6484375,
+        "attempts": 512,
+        "avg_intended_air_yards": 7.965526315789474,
+        "avg_time_to_throw": 2.9019433593750006,
+        "cpoe": 3.063073529411767,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 512,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Justin Herbert, over 512 attempts: 2.90s average time to throw; +3.1 completion percentage points over expectation; 8.0 average intended air yards; 14.6% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Justin Herbert: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2019_01_IND_LAC",
+          "2022_05_LAC_CLE"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 2,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2022_05_LAC_CLE"
+        ],
+        "regular_season_games": 2,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 2,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2019 through 2022 contains 2 meaningful passing games for Jacoby Brissett against LAC (2 regular season, 0 postseason). Across those games: 61 attempts, 420 passing yards, 3 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Jacoby Brissett vs LAC: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2022_12_LAC_ARI",
+          "2024_07_LAC_ARI"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 2,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2022_12_LAC_ARI",
+          "2024_07_LAC_ARI"
+        ],
+        "regular_season_games": 2,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 2,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2022 through 2024 contains 2 meaningful passing games for Justin Herbert against ARI (2 regular season, 0 postseason). Across those games: 86 attempts, 623 passing yards, 3 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Justin Herbert vs ARI: career game ledger"
     }
   ],
   "2026_01_ATL_PIT": [
     {
-      "as_of": "2026-09-09T03:29:52.117393+00:00",
+      "as_of": "2026-09-09T05:37:33.690485+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "PIT",
@@ -340,7 +474,7 @@
       "title": "ATL protection vs PIT pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:52.119529+00:00",
+      "as_of": "2026-09-09T05:37:33.692558+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "PIT",
@@ -358,7 +492,7 @@
       "title": "PIT YAC creation vs ATL tackling"
     },
     {
-      "as_of": "2026-09-09T03:29:52.118169+00:00",
+      "as_of": "2026-09-09T05:37:33.691254+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ATL",
@@ -376,7 +510,7 @@
       "title": "ATL early-down approach vs PIT"
     },
     {
-      "as_of": "2026-09-09T03:29:42.843570+00:00",
+      "as_of": "2026-09-09T05:37:24.410737+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Patrick Graham",
@@ -433,7 +567,7 @@
       "title": "What Patrick Graham could change in PIT"
     },
     {
-      "as_of": "2026-09-09T03:28:38.986875+00:00",
+      "as_of": "2026-09-09T05:36:38.657712+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Raheem Morris",
@@ -449,7 +583,7 @@
       "title": "ATL offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:38.986898+00:00",
+      "as_of": "2026-09-09T05:36:38.657732+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -461,7 +595,7 @@
       "title": "New defensive coordinator in PIT"
     },
     {
-      "as_of": "2026-09-09T03:28:38.986923+00:00",
+      "as_of": "2026-09-09T05:36:38.657755+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike Tomlin",
@@ -477,7 +611,7 @@
       "title": "PIT offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:29:42.843219+00:00",
+      "as_of": "2026-09-09T05:37:24.410338+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Tommy Rees",
@@ -529,12 +663,14 @@
       "title": "What Tommy Rees could change in ATL"
     },
     {
-      "as_of": "2026-09-09T03:30:01.441618+00:00",
+      "as_of": "2026-09-09T05:37:42.863500+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "ATL",
+        "cameos": [],
         "current_team": "ATL",
         "epa_per_dropback": 0.11902566621381806,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -584,8 +720,11 @@
         "prior_offenses": [
           "MIA"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2022,
         "success_rate": 0.4927536231884058,
-        "team_changed": true
+        "team_changed": true,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -594,13 +733,83 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Tua Tagovailoa has faced PIT 2 times; the most recent was last season, Week 15. Across those snaps he averaged +0.12 EPA per dropback with a 49% positive-EPA rate over 69 dropbacks. Those games came with MIA, not ATL. The quarterback history travels; the old playbook does not.",
+      "summary": "In the nflverse play-by-play sample since 2022, Tua Tagovailoa has 2 meaningful games against PIT; the most recent was last season, Week 15. Over 69 charted dropbacks in those games, he averaged +0.12 EPA/dropback with a 49% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Tua Tagovailoa vs PIT: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.934810+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 2,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, ATL and PIT have played 2 completed games in the nflverse schedule sample: ATL is 0-2. The most recent finished PIT 18, ATL 10.",
+      "title": "ATL-PIT: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 12.760416666666666,
+        "attempts": 384,
+        "avg_intended_air_yards": 6.656883468834688,
+        "avg_time_to_throw": 2.654879581151833,
+        "cpoe": -0.3672656250000017,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 384,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Tua Tagovailoa, over 384 attempts: 2.65s average time to throw; -0.4 completion percentage points over expectation; 6.7 average intended air yards; 12.8% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Tua Tagovailoa: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2022_07_PIT_MIA",
+          "2025_15_MIA_PIT"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 2,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2022_07_PIT_MIA",
+          "2025_15_MIA_PIT"
+        ],
+        "regular_season_games": 2,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 2,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2022 through 2025 contains 2 meaningful passing games for Tua Tagovailoa against PIT (2 regular season, 0 postseason). Across those games: 63 attempts, 514 passing yards, 3 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Tua Tagovailoa vs PIT: career game ledger"
     }
   ],
   "2026_01_BAL_IND": [
     {
-      "as_of": "2026-09-09T03:29:50.933853+00:00",
+      "as_of": "2026-09-09T05:37:32.531005+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -618,7 +827,7 @@
       "title": "BAL protection vs IND pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:50.934645+00:00",
+      "as_of": "2026-09-09T05:37:32.531816+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "IND",
@@ -636,7 +845,7 @@
       "title": "BAL early-down approach vs IND"
     },
     {
-      "as_of": "2026-09-09T03:29:50.935608+00:00",
+      "as_of": "2026-09-09T05:37:32.532818+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -654,7 +863,7 @@
       "title": "IND explosives vs BAL prevention"
     },
     {
-      "as_of": "2026-09-09T03:28:37.943658+00:00",
+      "as_of": "2026-09-09T05:35:57.299485+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "John Harbaugh",
@@ -670,7 +879,7 @@
       "title": "BAL offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:38.143295+00:00",
+      "as_of": "2026-09-09T05:35:57.501745+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -682,7 +891,7 @@
       "title": "New defensive coordinator in BAL"
     },
     {
-      "as_of": "2026-09-09T03:29:42.842315+00:00",
+      "as_of": "2026-09-09T05:37:24.409419+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Declan Doyle",
@@ -734,12 +943,14 @@
       "title": "What Declan Doyle could change in BAL"
     },
     {
-      "as_of": "2026-09-09T03:30:00.406573+00:00",
+      "as_of": "2026-09-09T05:37:41.846159+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "BAL",
+        "cameos": [],
         "current_team": "BAL",
         "epa_per_dropback": 0.24327686207988578,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -789,8 +1000,11 @@
         "prior_offenses": [
           "BAL"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.6341463414634146,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -799,16 +1013,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Lamar Jackson has faced IND 2 times; the most recent was 2023 Week 3. Across those snaps he averaged +0.24 EPA per dropback with a 63% positive-EPA rate over 82 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2021, Lamar Jackson has 2 meaningful games against IND; the most recent was 2023 Week 3. Over 82 charted dropbacks in those games, he averaged +0.24 EPA/dropback with a 63% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Lamar Jackson vs IND: player history"
     },
     {
-      "as_of": "2026-09-09T03:30:00.425944+00:00",
+      "as_of": "2026-09-09T05:37:41.866281+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "IND",
+        "cameos": [],
         "current_team": "IND",
         "epa_per_dropback": 0.32871887495351215,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -844,8 +1060,11 @@
         "prior_offenses": [
           "NYG"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2022,
         "success_rate": 0.5161290322580645,
-        "team_changed": true
+        "team_changed": true,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -854,13 +1073,137 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Daniel Jones has faced BAL once before: 2022 Week 6. Across those snaps he averaged +0.33 EPA per dropback with a 52% positive-EPA rate over 31 dropbacks. Those games came with NYG, not IND. The quarterback history travels; the old playbook does not.",
+      "summary": "In the nflverse play-by-play sample since 2022, Daniel Jones has 1 meaningful game against BAL; the most recent was 2022 Week 6. Over 31 charted dropbacks in those games, he averaged +0.33 EPA/dropback with a 52% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Daniel Jones vs BAL: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.910353+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 2,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, BAL and IND have played 2 completed games in the nflverse schedule sample: BAL is 1-1. The most recent finished IND 22, BAL 19.",
+      "title": "BAL-IND: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 11.589403973509933,
+        "attempts": 302,
+        "avg_intended_air_yards": 9.10951724137931,
+        "avg_time_to_throw": 3.0146699999999997,
+        "cpoe": -2.5672516556291427,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 302,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Lamar Jackson, over 302 attempts: 3.01s average time to throw; -2.6 completion percentage points over expectation; 9.1 average intended air yards; 11.6% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Lamar Jackson: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 17.708333333333336,
+        "attempts": 384,
+        "avg_intended_air_yards": 8.219651474530831,
+        "avg_time_to_throw": 2.7010026178010476,
+        "cpoe": 3.622552083333346,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 384,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Daniel Jones, over 384 attempts: 2.70s average time to throw; +3.6 completion percentage points over expectation; 8.2 average intended air yards; 17.7% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Daniel Jones: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2020_09_BAL_IND",
+          "2021_05_IND_BAL",
+          "2023_03_IND_BAL"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 3,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_05_IND_BAL",
+          "2023_03_IND_BAL"
+        ],
+        "regular_season_games": 3,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 3,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Moderate",
+      "summary": "The full nflverse weekly player-stat ledger from 2020 through 2023 contains 3 meaningful passing games for Lamar Jackson against IND (3 regular season, 0 postseason). Across those games: 97 attempts, 814 passing yards, 4 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Lamar Jackson vs IND: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2020_16_NYG_BAL",
+          "2022_06_BAL_NYG"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 2,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2022_06_BAL_NYG"
+        ],
+        "regular_season_games": 2,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 2,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2020 through 2022 contains 2 meaningful passing games for Daniel Jones against BAL (2 regular season, 0 postseason). Across those games: 68 attempts, 425 passing yards, 3 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Daniel Jones vs BAL: career game ledger"
     }
   ],
   "2026_01_BUF_HOU": [
     {
-      "as_of": "2026-09-09T03:29:50.345760+00:00",
+      "as_of": "2026-09-09T05:37:31.953395+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BUF",
@@ -878,7 +1221,7 @@
       "title": "BUF early-down approach vs HOU"
     },
     {
-      "as_of": "2026-09-09T03:29:50.344979+00:00",
+      "as_of": "2026-09-09T05:37:31.952600+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -896,7 +1239,7 @@
       "title": "BUF protection vs HOU pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:50.346823+00:00",
+      "as_of": "2026-09-09T05:37:31.954439+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -914,7 +1257,7 @@
       "title": "HOU explosives vs BUF prevention"
     },
     {
-      "as_of": "2026-09-09T03:28:37.640923+00:00",
+      "as_of": "2026-09-09T05:35:56.451276+00:00",
       "category": "history",
       "metadata": {
         "dc": "Matt Burke",
@@ -939,7 +1282,7 @@
       "title": "Josh Allen vs Matt Burke's HOU defense"
     },
     {
-      "as_of": "2026-09-09T03:28:37.437764+00:00",
+      "as_of": "2026-09-09T05:35:56.245792+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean McDermott",
@@ -955,7 +1298,7 @@
       "title": "BUF offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:37.640964+00:00",
+      "as_of": "2026-09-09T05:35:56.451317+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -967,7 +1310,7 @@
       "title": "New defensive coordinator in BUF"
     },
     {
-      "as_of": "2026-09-09T03:29:42.841811+00:00",
+      "as_of": "2026-09-09T05:37:24.408909+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Pete Carmichael",
@@ -1019,14 +1362,14 @@
       "title": "What Pete Carmichael could change in BUF"
     },
     {
-      "as_of": "2026-09-09T03:28:37.719497+00:00",
+      "as_of": "2026-09-09T05:35:57.085490+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 12.3,
         "precip_pct": 14.0,
         "roof": "retractable",
-        "temp_f": 93.7,
-        "wind_mph": 9.1
+        "temp_f": 88.3,
+        "wind_mph": 9.2
       },
       "promoted_to_model": false,
       "relevance": "Nearest-hour forecast at home venue",
@@ -1034,16 +1377,18 @@
       "source_name": "Open-Meteo",
       "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
       "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 94\u00b0F, 9 mph sustained wind with gusts near 12 mph, and 14% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "summary": "Open-Meteo's forecast nearest kickoff is 88\u00b0F, 9 mph sustained wind with gusts near 12 mph, and 14% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
       "title": "Kickoff weather in HOU"
     },
     {
-      "as_of": "2026-09-09T03:29:59.903134+00:00",
+      "as_of": "2026-09-09T05:37:41.351697+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
+        "cameos": [],
         "current_team": "BUF",
-        "epa_per_dropback": -0.1582736033971259,
+        "epa_per_dropback": -0.15827360339712593,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 3,
         "latest_meeting": {
@@ -1107,8 +1452,11 @@
         "prior_offenses": [
           "BUF"
         ],
+        "recent_sample_games": 3,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.3942307692307692,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -1117,16 +1465,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Moderate",
-      "summary": "Josh Allen has faced HOU 3 times; the most recent was last season, Week 12. Across those snaps he averaged -0.16 EPA per dropback with a 39% positive-EPA rate over 104 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2021, Josh Allen has 3 meaningful games against HOU; the most recent was last season, Week 12. Over 104 charted dropbacks in those games, he averaged -0.16 EPA/dropback with a 39% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Josh Allen vs HOU: player history"
     },
     {
-      "as_of": "2026-09-09T03:29:59.923153+00:00",
+      "as_of": "2026-09-09T05:37:41.372211+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
+        "cameos": [],
         "current_team": "HOU",
         "epa_per_dropback": 0.15964891808686357,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -1162,8 +1512,11 @@
         "prior_offenses": [
           "HOU"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2024,
         "success_rate": 0.48717948717948717,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -1172,13 +1525,139 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "C.J. Stroud has faced BUF once before: 2024 Week 5. Across those snaps he averaged +0.16 EPA per dropback with a 49% positive-EPA rate over 39 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2024, C.J. Stroud has 1 meaningful game against BUF; the most recent was 2024 Week 5. Over 39 charted dropbacks in those games, he averaged +0.16 EPA/dropback with a 49% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "C.J. Stroud vs BUF: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.898022+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 3,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, BUF and HOU have played 3 completed games in the nflverse schedule sample: BUF is 1-2. The most recent finished BUF 19, HOU 23.",
+      "title": "BUF-HOU: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 11.304347826086957,
+        "attempts": 460,
+        "avg_intended_air_yards": 7.145258426966292,
+        "avg_time_to_throw": 2.8916252723311544,
+        "cpoe": 1.5356304347825898,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 460,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Josh Allen, over 460 attempts: 2.89s average time to throw; +1.5 completion percentage points over expectation; 7.1 average intended air yards; 11.3% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Josh Allen: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 12.76595744680851,
+        "attempts": 423,
+        "avg_intended_air_yards": 8.034776119402984,
+        "avg_time_to_throw": 2.8201547619047616,
+        "cpoe": 0.9626713947990524,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 423,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for C.J. Stroud, over 423 attempts: 2.82s average time to throw; +1.0 completion percentage points over expectation; 8.0 average intended air yards; 12.8% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "C.J. Stroud: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2018_06_BUF_HOU",
+          "2019_18_BUF_HOU",
+          "2021_04_HOU_BUF",
+          "2024_05_BUF_HOU",
+          "2025_12_BUF_HOU"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 5,
+        "postseason_games": 1,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_04_HOU_BUF",
+          "2024_05_BUF_HOU",
+          "2025_12_BUF_HOU"
+        ],
+        "regular_season_games": 4,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 5,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2018 through 2025 contains 5 meaningful passing games for Josh Allen against HOU (4 regular season, 1 postseason). Across those games: 157 attempts, 980 passing yards, 3 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Josh Allen vs HOU: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2024_05_BUF_HOU"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 1,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2024_05_BUF_HOU"
+        ],
+        "regular_season_games": 1,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 1,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2024 through 2024 contains 1 meaningful passing games for C.J. Stroud against BUF (1 regular season, 0 postseason). Across those games: 38 attempts, 331 passing yards, 1 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "C.J. Stroud vs BUF: career game ledger"
     }
   ],
   "2026_01_CHI_CAR": [
     {
-      "as_of": "2026-09-09T03:29:48.555204+00:00",
+      "as_of": "2026-09-09T05:37:30.200175+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CHI",
@@ -1196,7 +1675,7 @@
       "title": "CAR explosives vs CHI prevention"
     },
     {
-      "as_of": "2026-09-09T03:28:35.309222+00:00",
+      "as_of": "2026-09-09T05:35:52.018544+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -1217,7 +1696,7 @@
       "title": "CHI play action vs CAR"
     },
     {
-      "as_of": "2026-09-09T03:28:35.311342+00:00",
+      "as_of": "2026-09-09T05:35:52.020693+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -1238,7 +1717,7 @@
       "title": "CAR RPOs vs CHI"
     },
     {
-      "as_of": "2026-09-09T03:28:35.737649+00:00",
+      "as_of": "2026-09-09T05:35:52.439068+00:00",
       "category": "history",
       "metadata": {
         "dc": "Ejiro Evero",
@@ -1263,7 +1742,7 @@
       "title": "Caleb Williams vs Ejiro Evero's CAR defense"
     },
     {
-      "as_of": "2026-09-09T03:29:42.840658+00:00",
+      "as_of": "2026-09-09T05:37:24.407755+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Press Taylor",
@@ -1325,7 +1804,7 @@
       "title": "What Press Taylor could change in CHI"
     },
     {
-      "as_of": "2026-09-09T03:28:35.529688+00:00",
+      "as_of": "2026-09-09T05:35:52.228420+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Ben Johnson",
@@ -1341,12 +1820,14 @@
       "title": "CHI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:29:58.396338+00:00",
+      "as_of": "2026-09-09T05:37:39.875311+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
+        "cameos": [],
         "current_team": "CHI",
         "epa_per_dropback": 0.4562230382124289,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -1382,8 +1863,11 @@
         "prior_offenses": [
           "CHI"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2024,
         "success_rate": 0.45161290322580644,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -1392,33 +1876,15 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Caleb Williams has faced CAR once before: 2024 Week 5. Across those snaps he averaged +0.46 EPA per dropback with a 45% positive-EPA rate over 31 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2024, Caleb Williams has 1 meaningful game against CAR; the most recent was 2024 Week 5. Over 31 charted dropbacks in those games, he averaged +0.46 EPA/dropback with a 45% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Caleb Williams vs CAR: player history"
     },
     {
-      "as_of": "2026-09-09T03:29:58.418569+00:00",
+      "as_of": "2026-09-09T05:37:39.899344+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
-        "current_team": "CAR",
-        "epa_per_dropback": -0.17564360760276293,
-        "family": "qb_opponent_history",
-        "games": 2,
-        "latest_meeting": {
-          "date": "2024-10-06",
-          "dropbacks": 8,
-          "epa_per_dropback": -0.0445160557719646,
-          "game_id": "2024_05_CAR_CHI",
-          "human_label": "2024 Week 5",
-          "label": "2024 Week 5",
-          "offense": "CAR",
-          "score": "CAR 10, CHI 36",
-          "season": 2024,
-          "stage": "Week 5",
-          "success_rate": 0.375,
-          "week": 5
-        },
-        "meetings": [
+        "cameos": [
           {
             "date": "2024-10-06",
             "dropbacks": 8,
@@ -1432,7 +1898,28 @@
             "stage": "Week 5",
             "success_rate": 0.375,
             "week": 5
-          },
+          }
+        ],
+        "current_team": "CAR",
+        "epa_per_dropback": -0.20122947137462602,
+        "excluded_cameos": 1,
+        "family": "qb_opponent_history",
+        "games": 1,
+        "latest_meeting": {
+          "date": "2023-11-09",
+          "dropbacks": 41,
+          "epa_per_dropback": -0.20122947137462602,
+          "game_id": "2023_10_CAR_CHI",
+          "human_label": "2023 Week 10",
+          "label": "2023 Week 10",
+          "offense": "CAR",
+          "score": "CAR 13, CHI 16",
+          "season": 2023,
+          "stage": "Week 10",
+          "success_rate": 0.2682926829268293,
+          "week": 10
+        },
+        "meetings": [
           {
             "date": "2023-11-09",
             "dropbacks": 41,
@@ -1451,23 +1938,146 @@
         "prior_offenses": [
           "CAR"
         ],
-        "success_rate": 0.2857142857142857,
-        "team_changed": false
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2023,
+        "success_rate": 0.2682926829268293,
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
-      "sample_size": 49,
+      "sample_size": 41,
       "side": "home",
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Bryce Young has faced CHI 2 times; the most recent was 2024 Week 5. Across those snaps he averaged -0.18 EPA per dropback with a 29% positive-EPA rate over 49 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2023, Bryce Young has 1 meaningful game against CHI; the most recent was 2023 Week 10. Over 41 charted dropbacks in those games, he averaged -0.20 EPA/dropback with a 27% positive-EPA rate. A further 1 short cameo under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
       "title": "Bryce Young vs CHI: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.861229+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 2,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, CHI and CAR have played 2 completed games in the nflverse schedule sample: CHI is 2-0. The most recent finished CAR 10, CHI 36.",
+      "title": "CHI-CAR: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 11.267605633802818,
+        "attempts": 568,
+        "avg_intended_air_yards": 8.446653992395436,
+        "avg_time_to_throw": 3.1954999999999996,
+        "cpoe": -6.665792253521133,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 568,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Caleb Williams, over 568 attempts: 3.20s average time to throw; -6.7 completion percentage points over expectation; 8.4 average intended air yards; 11.3% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Caleb Williams: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 12.133891213389122,
+        "attempts": 478,
+        "avg_intended_air_yards": 6.9436261261261265,
+        "avg_time_to_throw": 2.8341386554621852,
+        "cpoe": -0.2980334728033611,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 478,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Bryce Young, over 478 attempts: 2.83s average time to throw; -0.3 completion percentage points over expectation; 6.9 average intended air yards; 12.1% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Bryce Young: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2024_05_CAR_CHI"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 1,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2024_05_CAR_CHI"
+        ],
+        "regular_season_games": 1,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 1,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2024 through 2024 contains 1 meaningful passing games for Caleb Williams against CAR (1 regular season, 0 postseason). Across those games: 29 attempts, 304 passing yards, 2 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Caleb Williams vs CAR: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2023_10_CAR_CHI"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 1,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2023_10_CAR_CHI"
+        ],
+        "regular_season_games": 1,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 1,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2023 through 2023 contains 1 meaningful passing games for Bryce Young against CHI (1 regular season, 0 postseason). Across those games: 38 attempts, 185 passing yards, 0 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Bryce Young vs CHI: career game ledger"
     }
   ],
   "2026_01_CLE_JAX": [
     {
-      "as_of": "2026-09-09T03:29:51.532247+00:00",
+      "as_of": "2026-09-09T05:37:33.118420+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "JAX",
@@ -1485,7 +2095,7 @@
       "title": "CLE explosives vs JAX prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:51.531690+00:00",
+      "as_of": "2026-09-09T05:37:33.117902+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CLE",
@@ -1503,7 +2113,7 @@
       "title": "CLE protection vs JAX pass rush"
     },
     {
-      "as_of": "2026-09-09T03:28:38.231998+00:00",
+      "as_of": "2026-09-09T05:36:17.814044+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -1524,7 +2134,7 @@
       "title": "JAX pre-snap motion vs CLE"
     },
     {
-      "as_of": "2026-09-09T03:28:38.451121+00:00",
+      "as_of": "2026-09-09T05:36:18.024978+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Kevin Stefanski",
@@ -1540,7 +2150,7 @@
       "title": "CLE offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:38.649355+00:00",
+      "as_of": "2026-09-09T05:36:18.226916+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1552,31 +2162,14 @@
       "title": "New defensive coordinator in CLE"
     },
     {
-      "as_of": "2026-09-09T03:28:38.761993+00:00",
-      "category": "weather",
-      "metadata": {
-        "gust_mph": 2.9,
-        "precip_pct": 11.0,
-        "roof": "outdoor",
-        "temp_f": 96.7,
-        "wind_mph": 3.4
-      },
-      "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=30.3239&longitude=-81.6373&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-      "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 3 mph sustained wind with gusts near 3 mph, and 11% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
-      "title": "Kickoff weather in JAX"
-    },
-    {
-      "as_of": "2026-09-09T03:30:00.930429+00:00",
+      "as_of": "2026-09-09T05:37:42.367470+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
+        "cameos": [],
         "current_team": "CLE",
         "epa_per_dropback": 0.03460983649571514,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -1612,8 +2205,11 @@
         "prior_offenses": [
           "CLE"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2024,
         "success_rate": 0.4166666666666667,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -1622,16 +2218,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Deshaun Watson has faced JAX once before: 2024 Week 2. Across those snaps he averaged +0.03 EPA per dropback with a 42% positive-EPA rate over 36 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2024, Deshaun Watson has 1 meaningful game against JAX; the most recent was 2024 Week 2. Over 36 charted dropbacks in those games, he averaged +0.03 EPA/dropback with a 42% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Deshaun Watson vs JAX: player history"
     },
     {
-      "as_of": "2026-09-09T03:30:00.953278+00:00",
+      "as_of": "2026-09-09T05:37:42.390431+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
+        "cameos": [],
         "current_team": "JAX",
         "epa_per_dropback": -0.17840165829471938,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -1681,8 +2279,11 @@
         "prior_offenses": [
           "JAX"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2023,
         "success_rate": 0.3595505617977528,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -1691,13 +2292,119 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Trevor Lawrence has faced CLE 2 times; the most recent was 2024 Week 2. Across those snaps he averaged -0.18 EPA per dropback with a 36% positive-EPA rate over 89 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2023, Trevor Lawrence has 2 meaningful games against CLE; the most recent was 2024 Week 2. Over 89 charted dropbacks in those games, he averaged -0.18 EPA/dropback with a 36% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Trevor Lawrence vs CLE: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.922641+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 2,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, CLE and JAX have played 2 completed games in the nflverse schedule sample: CLE is 2-0. The most recent finished CLE 18, JAX 13.",
+      "title": "CLE-JAX: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 16.785714285714285,
+        "attempts": 560,
+        "avg_intended_air_yards": 8.994485294117647,
+        "avg_time_to_throw": 2.8681149012567326,
+        "cpoe": -2.4868928571428484,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 560,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Trevor Lawrence, over 560 attempts: 2.87s average time to throw; -2.5 completion percentage points over expectation; 9.0 average intended air yards; 16.8% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Trevor Lawrence: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2017_01_JAX_HOU",
+          "2018_07_HOU_JAX",
+          "2018_17_JAX_HOU",
+          "2019_02_JAX_HOU",
+          "2019_09_HOU_JAX",
+          "2020_05_JAX_HOU",
+          "2020_09_HOU_JAX",
+          "2024_02_CLE_JAX"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 8,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2024_02_CLE_JAX"
+        ],
+        "regular_season_games": 8,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 8,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2017 through 2024 contains 8 meaningful passing games for Deshaun Watson against JAX (8 regular season, 0 postseason). Across those games: 240 attempts, 1,661 passing yards, 9 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Deshaun Watson vs JAX: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2023_14_JAX_CLE",
+          "2024_02_CLE_JAX"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 2,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2023_14_JAX_CLE",
+          "2024_02_CLE_JAX"
+        ],
+        "regular_season_games": 2,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 2,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2023 through 2024 contains 2 meaningful passing games for Trevor Lawrence against CLE (2 regular season, 0 postseason). Across those games: 80 attempts, 477 passing yards, 3 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Trevor Lawrence vs CLE: career game ledger"
     }
   ],
   "2026_01_DAL_NYG": [
     {
-      "as_of": "2026-09-09T03:29:55.687401+00:00",
+      "as_of": "2026-09-09T05:37:37.196574+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DAL",
@@ -1715,7 +2422,7 @@
       "title": "NYG explosives vs DAL prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:55.686879+00:00",
+      "as_of": "2026-09-09T05:37:37.196070+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYG",
@@ -1733,7 +2440,7 @@
       "title": "NYG protection vs DAL pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:01.157625+00:00",
+      "as_of": "2026-09-09T05:37:21.595716+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "rpo",
@@ -1754,7 +2461,7 @@
       "title": "DAL RPOs vs NYG"
     },
     {
-      "as_of": "2026-09-09T03:29:42.847235+00:00",
+      "as_of": "2026-09-09T05:37:24.414451+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Matt Nagy",
@@ -1816,7 +2523,7 @@
       "title": "What Matt Nagy could change in NYG"
     },
     {
-      "as_of": "2026-09-09T03:29:42.847420+00:00",
+      "as_of": "2026-09-09T05:37:24.414664+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Dennard Wilson",
@@ -1863,7 +2570,7 @@
       "title": "What Dennard Wilson could change in NYG"
     },
     {
-      "as_of": "2026-09-09T03:29:01.380053+00:00",
+      "as_of": "2026-09-09T05:37:21.806050+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1875,7 +2582,7 @@
       "title": "New defensive coordinator in NYG"
     },
     {
-      "as_of": "2026-09-09T03:29:01.380096+00:00",
+      "as_of": "2026-09-09T05:37:21.806094+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Brian Daboll (fired November 10, 2\u20138 record) Mike Kafka (interim, 2\u20135 record)",
@@ -1891,7 +2598,7 @@
       "title": "NYG offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:29:01.380106+00:00",
+      "as_of": "2026-09-09T05:37:21.806103+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1903,12 +2610,14 @@
       "title": "New defensive coordinator in DAL"
     },
     {
-      "as_of": "2026-09-09T03:30:04.512424+00:00",
+      "as_of": "2026-09-09T05:37:45.880152+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DAL",
+        "cameos": [],
         "current_team": "DAL",
         "epa_per_dropback": 0.2438315202671464,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 8,
         "latest_meeting": {
@@ -2042,8 +2751,11 @@
         "prior_offenses": [
           "DAL"
         ],
+        "recent_sample_games": 8,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.5136186770428015,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -2052,16 +2764,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Strong",
-      "summary": "Dak Prescott has faced NYG 8 times; the most recent was last season, Week 18. Across those snaps he averaged +0.24 EPA per dropback with a 51% positive-EPA rate over 257 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2021, Dak Prescott has 8 meaningful games against NYG; the most recent was last season, Week 18. Over 257 charted dropbacks in those games, he averaged +0.24 EPA/dropback with a 51% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Dak Prescott vs NYG: player history"
     },
     {
-      "as_of": "2026-09-09T03:30:04.532282+00:00",
+      "as_of": "2026-09-09T05:37:45.903063+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NYG",
+        "cameos": [],
         "current_team": "NYG",
         "epa_per_dropback": 0.22372055787708728,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -2097,8 +2811,11 @@
         "prior_offenses": [
           "NYG"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2025,
         "success_rate": 0.5277777777777778,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -2107,13 +2824,156 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Jaxson Dart has faced DAL once before: last season, Week 18. Across those snaps he averaged +0.22 EPA per dropback with a 53% positive-EPA rate over 36 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2025, Jaxson Dart has 1 meaningful game against DAL; the most recent was last season, Week 18. Over 36 charted dropbacks in those games, he averaged +0.22 EPA/dropback with a 53% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Jaxson Dart vs DAL: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:48.009097+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "rivalry",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 10,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Strong",
+      "summary": "Since 2021, DAL and NYG have played 10 completed games in the nflverse schedule sample: DAL is 9-1. The most recent finished DAL 17, NYG 34.",
+      "title": "DAL-NYG: division rivalry"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 20.333333333333332,
+        "attempts": 600,
+        "avg_intended_air_yards": 8.33302564102564,
+        "avg_time_to_throw": 2.819700167504188,
+        "cpoe": 4.600966666666665,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 600,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Dak Prescott, over 600 attempts: 2.82s average time to throw; +4.6 completion percentage points over expectation; 8.3 average intended air yards; 20.3% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Dak Prescott: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 12.979351032448378,
+        "attempts": 339,
+        "avg_intended_air_yards": 8.29176291793313,
+        "avg_time_to_throw": 2.8210266272189353,
+        "cpoe": -1.9900884955752147,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 339,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jaxson Dart, over 339 attempts: 2.82s average time to throw; -2.0 completion percentage points over expectation; 8.3 average intended air yards; 13.0% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Jaxson Dart: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2016_01_NYG_DAL",
+          "2016_14_DAL_NYG",
+          "2017_01_NYG_DAL",
+          "2017_14_DAL_NYG",
+          "2018_02_NYG_DAL",
+          "2018_17_DAL_NYG",
+          "2019_01_NYG_DAL",
+          "2019_09_DAL_NYG",
+          "2020_05_NYG_DAL",
+          "2021_05_NYG_DAL",
+          "2021_15_DAL_NYG",
+          "2022_12_NYG_DAL",
+          "2023_01_DAL_NYG",
+          "2023_10_NYG_DAL",
+          "2024_04_DAL_NYG",
+          "2025_02_NYG_DAL",
+          "2025_18_DAL_NYG"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 17,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_05_NYG_DAL",
+          "2021_15_DAL_NYG",
+          "2022_12_NYG_DAL",
+          "2023_01_DAL_NYG",
+          "2023_10_NYG_DAL",
+          "2024_04_DAL_NYG",
+          "2025_02_NYG_DAL",
+          "2025_18_DAL_NYG"
+        ],
+        "regular_season_games": 17,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 17,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2016 through 2025 contains 17 meaningful passing games for Dak Prescott against NYG (17 regular season, 0 postseason). Across those games: 556 attempts, 4,346 passing yards, 31 TD, 9 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Dak Prescott vs NYG: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2025_18_DAL_NYG"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 1,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2025_18_DAL_NYG"
+        ],
+        "regular_season_games": 1,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 1,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2025 through 2025 contains 1 meaningful passing games for Jaxson Dart against DAL (1 regular season, 0 postseason). Across those games: 32 attempts, 230 passing yards, 2 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Jaxson Dart vs DAL: career game ledger"
     }
   ],
   "2026_01_DEN_KC": [
     {
-      "as_of": "2026-09-09T03:29:56.286443+00:00",
+      "as_of": "2026-09-09T05:37:37.788476+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DEN",
@@ -2131,7 +2991,7 @@
       "title": "KC protection vs DEN pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:56.287230+00:00",
+      "as_of": "2026-09-09T05:37:37.789282+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "KC",
@@ -2149,7 +3009,7 @@
       "title": "KC early-down approach vs DEN"
     },
     {
-      "as_of": "2026-09-09T03:29:21.456571+00:00",
+      "as_of": "2026-09-09T05:37:22.513395+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -2170,7 +3030,7 @@
       "title": "DEN play action vs KC"
     },
     {
-      "as_of": "2026-09-09T03:29:22.078292+00:00",
+      "as_of": "2026-09-09T05:37:23.121560+00:00",
       "category": "history",
       "metadata": {
         "dc": "Vance Joseph",
@@ -2195,7 +3055,7 @@
       "title": "Patrick Mahomes vs Vance Joseph's DEN defense"
     },
     {
-      "as_of": "2026-09-09T03:29:42.848037+00:00",
+      "as_of": "2026-09-09T05:37:24.415252+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Eric Bieniemy",
@@ -2252,7 +3112,7 @@
       "title": "What Eric Bieniemy could change in KC"
     },
     {
-      "as_of": "2026-09-09T03:29:21.679518+00:00",
+      "as_of": "2026-09-09T05:37:22.722689+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean Payton",
@@ -2268,7 +3128,7 @@
       "title": "DEN offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:29:21.879668+00:00",
+      "as_of": "2026-09-09T05:37:22.921816+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Andy Reid",
@@ -2284,12 +3144,33 @@
       "title": "KC offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:30:05.020086+00:00",
+      "as_of": "2026-09-09T05:37:23.764296+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 2.2,
+        "precip_pct": 31.0,
+        "roof": "outdoor",
+        "temp_f": 90.3,
+        "wind_mph": 4.9
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 90\u00b0F, 5 mph sustained wind with gusts near 2 mph, and 31% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in KC"
+    },
+    {
+      "as_of": "2026-09-09T05:37:46.392126+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DEN",
+        "cameos": [],
         "current_team": "DEN",
         "epa_per_dropback": 0.29955894925637205,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 4,
         "latest_meeting": {
@@ -2367,8 +3248,11 @@
         "prior_offenses": [
           "DEN"
         ],
+        "recent_sample_games": 4,
+        "recent_sample_start_season": 2024,
         "success_rate": 0.5467625899280576,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -2377,16 +3261,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Moderate",
-      "summary": "Bo Nix has faced KC 4 times; the most recent was last season, Week 17. Across those snaps he averaged +0.30 EPA per dropback with a 55% positive-EPA rate over 139 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2024, Bo Nix has 4 meaningful games against KC; the most recent was last season, Week 17. Over 139 charted dropbacks in those games, he averaged +0.30 EPA/dropback with a 55% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Bo Nix vs KC: player history"
     },
     {
-      "as_of": "2026-09-09T03:30:05.060306+00:00",
+      "as_of": "2026-09-09T05:37:46.458118+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "KC",
+        "cameos": [],
         "current_team": "KC",
-        "epa_per_dropback": 0.05632230971115185,
+        "epa_per_dropback": 0.056322309711151874,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 8,
         "latest_meeting": {
@@ -2520,8 +3406,11 @@
         "prior_offenses": [
           "KC"
         ],
+        "recent_sample_games": 8,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.46449704142011833,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -2530,13 +3419,160 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Strong",
-      "summary": "Patrick Mahomes has faced DEN 8 times; the most recent was last season, Week 11. Across those snaps he averaged +0.06 EPA per dropback with a 46% positive-EPA rate over 338 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2021, Patrick Mahomes has 8 meaningful games against DEN; the most recent was last season, Week 11. Over 338 charted dropbacks in those games, he averaged +0.06 EPA/dropback with a 46% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Patrick Mahomes vs DEN: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:48.021634+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "rivalry",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 10,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Strong",
+      "summary": "Since 2021, DEN and KC have played 10 completed games in the nflverse schedule sample: DEN is 4-6. The most recent finished DEN 20, KC 13.",
+      "title": "DEN-KC: division rivalry"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 11.11111111111111,
+        "attempts": 612,
+        "avg_intended_air_yards": 7.514716981132075,
+        "avg_time_to_throw": 2.8641112929623564,
+        "cpoe": -2.0216176470588394,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 612,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Bo Nix, over 612 attempts: 2.86s average time to throw; -2.0 completion percentage points over expectation; 7.5 average intended air yards; 11.1% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Bo Nix: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 13.346613545816732,
+        "attempts": 502,
+        "avg_intended_air_yards": 7.874820295983087,
+        "avg_time_to_throw": 2.790962,
+        "cpoe": -2.6773107569720906,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 502,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Patrick Mahomes, over 502 attempts: 2.79s average time to throw; -2.7 completion percentage points over expectation; 7.9 average intended air yards; 13.3% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Patrick Mahomes: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2024_10_DEN_KC",
+          "2024_18_KC_DEN",
+          "2025_11_KC_DEN",
+          "2025_17_DEN_KC"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 4,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2024_10_DEN_KC",
+          "2024_18_KC_DEN",
+          "2025_11_KC_DEN",
+          "2025_17_DEN_KC"
+        ],
+        "regular_season_games": 4,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 4,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Moderate",
+      "summary": "The full nflverse weekly player-stat ledger from 2024 through 2025 contains 4 meaningful passing games for Bo Nix against KC (4 regular season, 0 postseason). Across those games: 134 attempts, 1,013 passing yards, 7 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Bo Nix vs KC: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2017_17_KC_DEN",
+          "2018_04_KC_DEN",
+          "2018_08_DEN_KC",
+          "2019_07_KC_DEN",
+          "2019_15_DEN_KC",
+          "2020_07_KC_DEN",
+          "2020_13_DEN_KC",
+          "2021_13_DEN_KC",
+          "2021_18_KC_DEN",
+          "2022_14_KC_DEN",
+          "2022_17_DEN_KC",
+          "2023_06_DEN_KC",
+          "2023_08_KC_DEN",
+          "2024_10_DEN_KC",
+          "2025_11_KC_DEN"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 15,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_13_DEN_KC",
+          "2021_18_KC_DEN",
+          "2022_14_KC_DEN",
+          "2022_17_DEN_KC",
+          "2023_06_DEN_KC",
+          "2023_08_KC_DEN",
+          "2024_10_DEN_KC",
+          "2025_11_KC_DEN"
+        ],
+        "regular_season_games": 15,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 15,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2017 through 2025 contains 15 meaningful passing games for Patrick Mahomes against DEN (15 regular season, 0 postseason). Across those games: 544 attempts, 4,047 passing yards, 21 TD, 12 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Patrick Mahomes vs DEN: career game ledger"
     }
   ],
   "2026_01_GB_MIN": [
     {
-      "as_of": "2026-09-09T03:29:54.489137+00:00",
+      "as_of": "2026-09-09T05:37:36.017147+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -2554,7 +3590,7 @@
       "title": "GB explosives vs MIN prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:54.490028+00:00",
+      "as_of": "2026-09-09T05:37:36.018011+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIN",
@@ -2572,7 +3608,7 @@
       "title": "MIN protection vs GB pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:54.489428+00:00",
+      "as_of": "2026-09-09T05:37:36.017427+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "GB",
@@ -2590,7 +3626,7 @@
       "title": "GB early-down approach vs MIN"
     },
     {
-      "as_of": "2026-09-09T03:28:40.658668+00:00",
+      "as_of": "2026-09-09T05:37:20.543960+00:00",
       "category": "history",
       "metadata": {
         "dc": "Brian Flores",
@@ -2615,7 +3651,7 @@
       "title": "Jordan Love vs Brian Flores's MIN defense"
     },
     {
-      "as_of": "2026-09-09T03:28:40.658709+00:00",
+      "as_of": "2026-09-09T05:37:20.544000+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -2627,14 +3663,59 @@
       "title": "New defensive coordinator in GB"
     },
     {
-      "as_of": "2026-09-09T03:30:03.453225+00:00",
+      "as_of": "2026-09-09T05:37:44.840684+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
+        "cameos": [
+          {
+            "date": "2023-01-01",
+            "dropbacks": 3,
+            "epa_per_dropback": -0.12954061094205827,
+            "game_id": "2022_17_MIN_GB",
+            "human_label": "2022 Week 17",
+            "label": "2022 Week 17",
+            "offense": "GB",
+            "score": "MIN 10, GB 41",
+            "season": 2022,
+            "stage": "Week 17",
+            "success_rate": 0.3333333333333333,
+            "week": 17
+          },
+          {
+            "date": "2022-09-11",
+            "dropbacks": 5,
+            "epa_per_dropback": -0.06192042630864307,
+            "game_id": "2022_01_GB_MIN",
+            "human_label": "2022 Week 1",
+            "label": "2022 Week 1",
+            "offense": "GB",
+            "score": "GB 7, MIN 23",
+            "season": 2022,
+            "stage": "Week 1",
+            "success_rate": 0.4,
+            "week": 1
+          },
+          {
+            "date": "2022-01-02",
+            "dropbacks": 4,
+            "epa_per_dropback": -0.03672410064609721,
+            "game_id": "2021_17_MIN_GB",
+            "human_label": "2021 Week 17",
+            "label": "2021 Week 17",
+            "offense": "GB",
+            "score": "MIN 10, GB 37",
+            "season": 2021,
+            "stage": "Week 17",
+            "success_rate": 0.5,
+            "week": 17
+          }
+        ],
         "current_team": "GB",
-        "epa_per_dropback": 0.012319282886451687,
+        "epa_per_dropback": 0.017545344789563277,
+        "excluded_cameos": 3,
         "family": "qb_opponent_history",
-        "games": 8,
+        "games": 5,
         "latest_meeting": {
           "date": "2025-11-23",
           "dropbacks": 22,
@@ -2719,73 +3800,36 @@
             "stage": "Week 8",
             "success_rate": 0.4,
             "week": 8
-          },
-          {
-            "date": "2023-01-01",
-            "dropbacks": 3,
-            "epa_per_dropback": -0.12954061094205827,
-            "game_id": "2022_17_MIN_GB",
-            "human_label": "2022 Week 17",
-            "label": "2022 Week 17",
-            "offense": "GB",
-            "score": "MIN 10, GB 41",
-            "season": 2022,
-            "stage": "Week 17",
-            "success_rate": 0.3333333333333333,
-            "week": 17
-          },
-          {
-            "date": "2022-09-11",
-            "dropbacks": 5,
-            "epa_per_dropback": -0.06192042630864307,
-            "game_id": "2022_01_GB_MIN",
-            "human_label": "2022 Week 1",
-            "label": "2022 Week 1",
-            "offense": "GB",
-            "score": "GB 7, MIN 23",
-            "season": 2022,
-            "stage": "Week 1",
-            "success_rate": 0.4,
-            "week": 1
-          },
-          {
-            "date": "2022-01-02",
-            "dropbacks": 4,
-            "epa_per_dropback": -0.03672410064609721,
-            "game_id": "2021_17_MIN_GB",
-            "human_label": "2021 Week 17",
-            "label": "2021 Week 17",
-            "offense": "GB",
-            "score": "MIN 10, GB 37",
-            "season": 2021,
-            "stage": "Week 17",
-            "success_rate": 0.5,
-            "week": 17
           }
         ],
         "prior_offenses": [
           "GB"
         ],
-        "success_rate": 0.4752475247524752,
-        "team_changed": false
+        "recent_sample_games": 5,
+        "recent_sample_start_season": 2023,
+        "success_rate": 0.4789473684210526,
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
-      "sample_size": 202,
+      "sample_size": 190,
       "side": "away",
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Strong",
-      "summary": "Jordan Love has faced MIN 8 times; the most recent was last season, Week 12. Across those snaps he averaged +0.01 EPA per dropback with a 48% positive-EPA rate over 202 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2023, Jordan Love has 5 meaningful games against MIN; the most recent was last season, Week 12. Over 190 charted dropbacks in those games, he averaged +0.02 EPA/dropback with a 48% positive-EPA rate. A further 3 short cameos under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
       "title": "Jordan Love vs MIN: player history"
     },
     {
-      "as_of": "2026-09-09T03:30:03.475364+00:00",
+      "as_of": "2026-09-09T05:37:44.863679+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
+        "cameos": [],
         "current_team": "MIN",
         "epa_per_dropback": -0.01583341711792178,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -2835,8 +3879,11 @@
         "prior_offenses": [
           "ARI"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.5373134328358209,
-        "team_changed": true
+        "team_changed": true,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -2845,13 +3892,143 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Kyler Murray has faced GB 2 times; the most recent was 2024 Week 6. Across those snaps he averaged -0.02 EPA per dropback with a 54% positive-EPA rate over 67 dropbacks. Those games came with ARI, not MIN. The quarterback history travels; the old playbook does not.",
+      "summary": "In the nflverse play-by-play sample since 2021, Kyler Murray has 2 meaningful games against GB; the most recent was 2024 Week 6. Over 67 charted dropbacks in those games, he averaged -0.02 EPA/dropback with a 54% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Kyler Murray vs GB: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.983999+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "rivalry",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 10,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Strong",
+      "summary": "Since 2021, GB and MIN have played 10 completed games in the nflverse schedule sample: GB is 4-6. The most recent finished GB 3, MIN 16.",
+      "title": "GB-MIN: division rivalry"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 16.173120728929387,
+        "attempts": 439,
+        "avg_intended_air_yards": 8.829172749391727,
+        "avg_time_to_throw": 2.890995433789954,
+        "cpoe": 3.9293849658314386,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 439,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jordan Love, over 439 attempts: 2.89s average time to throw; +3.9 completion percentage points over expectation; 8.8 average intended air yards; 16.2% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Jordan Love: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 13.043478260869565,
+        "attempts": 161,
+        "avg_intended_air_yards": 6.035859872611465,
+        "avg_time_to_throw": 2.683403726708074,
+        "cpoe": -1.2358385093167783,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 161,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Moderate",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Kyler Murray, over 161 attempts: 2.68s average time to throw; -1.2 completion percentage points over expectation; 6.0 average intended air yards; 13.0% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Kyler Murray: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2023_08_MIN_GB",
+          "2023_17_GB_MIN",
+          "2024_04_MIN_GB",
+          "2024_17_GB_MIN",
+          "2025_12_MIN_GB"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 5,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2023_08_MIN_GB",
+          "2023_17_GB_MIN",
+          "2024_04_MIN_GB",
+          "2024_17_GB_MIN",
+          "2025_12_MIN_GB"
+        ],
+        "regular_season_games": 5,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 5,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2023 through 2025 contains 5 meaningful passing games for Jordan Love against MIN (5 regular season, 0 postseason). Across those games: 179 attempts, 1,198 passing yards, 9 TD, 4 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Jordan Love vs MIN: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2021_08_GB_ARI",
+          "2024_06_ARI_GB"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 2,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_08_GB_ARI",
+          "2024_06_ARI_GB"
+        ],
+        "regular_season_games": 2,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 2,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2021 through 2024 contains 2 meaningful passing games for Kyler Murray against GB (2 regular season, 0 postseason). Across those games: 65 attempts, 488 passing yards, 1 TD, 2 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Kyler Murray vs GB: career game ledger"
     }
   ],
   "2026_01_MIA_LV": [
     {
-      "as_of": "2026-09-09T03:29:53.883243+00:00",
+      "as_of": "2026-09-09T05:37:35.447383+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -2869,7 +4046,7 @@
       "title": "LV early-down approach vs MIA"
     },
     {
-      "as_of": "2026-09-09T03:29:53.881579+00:00",
+      "as_of": "2026-09-09T05:37:35.445709+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -2887,7 +4064,7 @@
       "title": "MIA explosives vs LV prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:53.882437+00:00",
+      "as_of": "2026-09-09T05:37:35.446553+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LV",
@@ -2905,7 +4082,7 @@
       "title": "LV protection vs MIA pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:42.845435+00:00",
+      "as_of": "2026-09-09T05:37:24.412642+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Bobby Slowik",
@@ -2962,7 +4139,7 @@
       "title": "What Bobby Slowik could change in MIA"
     },
     {
-      "as_of": "2026-09-09T03:28:40.227500+00:00",
+      "as_of": "2026-09-09T05:37:20.123493+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike McDaniel",
@@ -2978,7 +4155,7 @@
       "title": "MIA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:40.227521+00:00",
+      "as_of": "2026-09-09T05:37:20.123515+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -2990,7 +4167,7 @@
       "title": "New defensive coordinator in LV"
     },
     {
-      "as_of": "2026-09-09T03:28:40.227544+00:00",
+      "as_of": "2026-09-09T05:37:20.123539+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Pete Carroll",
@@ -3006,7 +4183,7 @@
       "title": "LV offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:40.227552+00:00",
+      "as_of": "2026-09-09T05:37:20.123547+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3018,7 +4195,7 @@
       "title": "New defensive coordinator in MIA"
     },
     {
-      "as_of": "2026-09-09T03:28:40.229420+00:00",
+      "as_of": "2026-09-09T05:37:20.125384+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -3030,12 +4207,14 @@
       "title": "Long travel spot for MIA"
     },
     {
-      "as_of": "2026-09-09T03:30:02.950876+00:00",
+      "as_of": "2026-09-09T05:37:44.353122+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "MIA",
+        "cameos": [],
         "current_team": "LV",
-        "epa_per_dropback": -0.15670325990484552,
+        "epa_per_dropback": -0.15670325990484554,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -3086,8 +4265,11 @@
           "ATL",
           "MIN"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2022,
         "success_rate": 0.42424242424242425,
-        "team_changed": true
+        "team_changed": true,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -3096,13 +4278,85 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Kirk Cousins has faced MIA 2 times; the most recent was last season, Week 8. Across those snaps he averaged -0.16 EPA per dropback with a 42% positive-EPA rate over 66 dropbacks. Those games came with ATL, MIN, not LV. The quarterback history travels; the old playbook does not.",
+      "summary": "In the nflverse play-by-play sample since 2022, Kirk Cousins has 2 meaningful games against MIA; the most recent was last season, Week 8. Over 66 charted dropbacks in those games, he averaged -0.16 EPA/dropback with a 42% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Kirk Cousins vs MIA: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.971508+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 3,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, MIA and LV have played 3 completed games in the nflverse schedule sample: MIA is 2-1. The most recent finished LV 19, MIA 34.",
+      "title": "MIA-LV: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 17.472118959107807,
+        "attempts": 269,
+        "avg_intended_air_yards": 6.932431372549019,
+        "avg_time_to_throw": 2.7773496240601503,
+        "cpoe": -1.732379182156123,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 269,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Moderate",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Kirk Cousins, over 269 attempts: 2.78s average time to throw; -1.7 completion percentage points over expectation; 6.9 average intended air yards; 17.5% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Kirk Cousins: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2015_01_MIA_WAS",
+          "2018_15_MIA_MIN",
+          "2022_06_MIN_MIA",
+          "2025_08_MIA_ATL"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 4,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2022_06_MIN_MIA",
+          "2025_08_MIA_ATL"
+        ],
+        "regular_season_games": 4,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 4,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Moderate",
+      "summary": "The full nflverse weekly player-stat ledger from 2015 through 2025 contains 4 meaningful passing games for Kirk Cousins against MIA (4 regular season, 0 postseason). Across those games: 113 attempts, 759 passing yards, 5 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Kirk Cousins vs MIA: career game ledger"
     }
   ],
   "2026_01_NE_SEA": [
     {
-      "as_of": "2026-09-09T03:29:47.347407+00:00",
+      "as_of": "2026-09-09T05:37:29.015415+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -3120,7 +4374,7 @@
       "title": "SEA explosives vs NE prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:47.347694+00:00",
+      "as_of": "2026-09-09T05:37:29.015714+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -3138,7 +4392,7 @@
       "title": "SEA early-down approach vs NE"
     },
     {
-      "as_of": "2026-09-09T03:29:47.345593+00:00",
+      "as_of": "2026-09-09T05:37:29.013608+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NE",
@@ -3156,7 +4410,7 @@
       "title": "NE protection vs SEA pass rush"
     },
     {
-      "as_of": "2026-09-09T03:28:34.774127+00:00",
+      "as_of": "2026-09-09T05:35:50.860902+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike Macdonald",
@@ -3172,7 +4426,7 @@
       "title": "SEA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:34.774140+00:00",
+      "as_of": "2026-09-09T05:35:50.860914+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3184,7 +4438,7 @@
       "title": "New defensive coordinator in NE"
     },
     {
-      "as_of": "2026-09-09T03:28:34.338309+00:00",
+      "as_of": "2026-09-09T05:35:50.434468+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3202,7 +4456,7 @@
       "title": "NE: Ben Brown \u2014 Out"
     },
     {
-      "as_of": "2026-09-09T03:28:34.338331+00:00",
+      "as_of": "2026-09-09T05:35:50.434490+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3214,7 +4468,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "NE",
-        "usage_as_of": "2026-09-09T03:29:43.597739+00:00",
+        "usage_as_of": "2026-09-09T05:37:25.174855+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -3235,7 +4489,7 @@
       "title": "NE: TreVeyon Henderson \u2014 Out"
     },
     {
-      "as_of": "2026-09-09T03:28:34.338376+00:00",
+      "as_of": "2026-09-09T05:35:50.434535+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3253,7 +4507,7 @@
       "title": "SEA: Ty Okada \u2014 Out"
     },
     {
-      "as_of": "2026-09-09T03:28:34.787231+00:00",
+      "as_of": "2026-09-09T05:35:50.872375+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -3265,7 +4519,7 @@
       "title": "Long travel spot for NE"
     },
     {
-      "as_of": "2026-09-09T03:28:34.338385+00:00",
+      "as_of": "2026-09-09T05:35:50.434544+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3283,7 +4537,7 @@
       "title": "SEA: Tory Horton \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-09T03:28:34.338390+00:00",
+      "as_of": "2026-09-09T05:35:50.434551+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3301,7 +4555,7 @@
       "title": "SEA: Nick Emmanwori \u2014 Questionable"
     },
     {
-      "as_of": "2026-09-09T03:29:42.190963+00:00",
+      "as_of": "2026-09-09T05:37:23.766411+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3321,12 +4575,14 @@
       "title": "SEA: Josh Jones \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-09T03:29:57.359161+00:00",
+      "as_of": "2026-09-09T05:37:38.847697+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
+        "cameos": [],
         "current_team": "NE",
         "epa_per_dropback": -0.42958037209027444,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -3362,8 +4618,11 @@
         "prior_offenses": [
           "NE"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2025,
         "success_rate": 0.38,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -3372,16 +4631,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Drake Maye has faced SEA once before: last season's Super Bowl. Across those snaps he averaged -0.43 EPA per dropback with a 38% positive-EPA rate over 50 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2025, Drake Maye has 1 meaningful game against SEA; the most recent was last season's Super Bowl. Over 50 charted dropbacks in those games, he averaged -0.43 EPA/dropback with a 38% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Drake Maye vs SEA: player history"
     },
     {
-      "as_of": "2026-09-09T03:29:57.381264+00:00",
+      "as_of": "2026-09-09T05:37:38.871271+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NE",
+        "cameos": [],
         "current_team": "SEA",
-        "epa_per_dropback": -0.3298995752736374,
+        "epa_per_dropback": -0.32989957527363745,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -3432,8 +4693,11 @@
           "CAR",
           "SEA"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.3424657534246575,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -3442,13 +4706,138 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Sam Darnold has faced NE 2 times; the most recent was last season's Super Bowl. Across those snaps he averaged -0.33 EPA per dropback with a 34% positive-EPA rate over 73 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2021, Sam Darnold has 2 meaningful games against NE; the most recent was last season's Super Bowl. Over 73 charted dropbacks in those games, he averaged -0.33 EPA/dropback with a 34% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Sam Darnold vs NE: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.835436+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 2,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, NE and SEA have played 2 completed games in the nflverse schedule sample: NE is 0-2. The most recent finished SEA 29, NE 13.",
+      "title": "NE-SEA: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 17.88617886178862,
+        "attempts": 492,
+        "avg_intended_air_yards": 9.111758474576272,
+        "avg_time_to_throw": 2.9732459349593494,
+        "cpoe": 9.027012195121955,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 492,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Drake Maye, over 492 attempts: 2.97s average time to throw; +9.0 completion percentage points over expectation; 9.1 average intended air yards; 17.9% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Drake Maye: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 13.20754716981132,
+        "attempts": 477,
+        "avg_intended_air_yards": 8.361729490022174,
+        "avg_time_to_throw": 2.8650972515856243,
+        "cpoe": 4.098784067085965,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 477,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Sam Darnold, over 477 attempts: 2.87s average time to throw; +4.1 completion percentage points over expectation; 8.4 average intended air yards; 13.2% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Sam Darnold: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2025_22_SEA_NE"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 1,
+        "postseason_games": 1,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2025_22_SEA_NE"
+        ],
+        "regular_season_games": 0,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 1,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2025 through 2025 contains 1 meaningful passing games for Drake Maye against SEA (0 regular season, 1 postseason). Across those games: 43 attempts, 295 passing yards, 2 TD, 2 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Drake Maye vs SEA: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2018_17_NYJ_NE",
+          "2019_07_NE_NYJ",
+          "2020_17_NYJ_NE",
+          "2021_09_NE_CAR",
+          "2025_22_SEA_NE"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 5,
+        "postseason_games": 1,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_09_NE_CAR",
+          "2025_22_SEA_NE"
+        ],
+        "regular_season_games": 4,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 5,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2018 through 2025 contains 5 meaningful passing games for Sam Darnold against NE (4 regular season, 1 postseason). Across those games: 165 attempts, 893 passing yards, 2 TD, 9 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Sam Darnold vs NE: career game ledger"
     }
   ],
   "2026_01_NO_DET": [
     {
-      "as_of": "2026-09-09T03:29:49.750087+00:00",
+      "as_of": "2026-09-09T05:37:31.365198+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -3466,7 +4855,7 @@
       "title": "NO explosives vs DET prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:49.749538+00:00",
+      "as_of": "2026-09-09T05:37:31.364676+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DET",
@@ -3484,7 +4873,7 @@
       "title": "NO protection vs DET pass rush"
     },
     {
-      "as_of": "2026-09-09T03:29:49.751691+00:00",
+      "as_of": "2026-09-09T05:37:31.366820+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "DET",
@@ -3502,7 +4891,7 @@
       "title": "DET YAC creation vs NO tackling"
     },
     {
-      "as_of": "2026-09-09T03:29:42.841445+00:00",
+      "as_of": "2026-09-09T05:37:24.408534+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Drew Petzing",
@@ -3564,7 +4953,7 @@
       "title": "What Drew Petzing could change in DET"
     },
     {
-      "as_of": "2026-09-09T03:28:37.003014+00:00",
+      "as_of": "2026-09-09T05:35:55.816065+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Dan Campbell",
@@ -3580,12 +4969,14 @@
       "title": "DET offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:29:59.415456+00:00",
+      "as_of": "2026-09-09T05:37:40.872171+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DET",
+        "cameos": [],
         "current_team": "DET",
         "epa_per_dropback": 0.27749770534715973,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -3621,8 +5012,11 @@
         "prior_offenses": [
           "DET"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2023,
         "success_rate": 0.4444444444444444,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -3631,13 +5025,86 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Jared Goff has faced NO once before: 2023 Week 13. Across those snaps he averaged +0.28 EPA per dropback with a 44% positive-EPA rate over 27 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2023, Jared Goff has 1 meaningful game against NO; the most recent was 2023 Week 13. Over 27 charted dropbacks in those games, he averaged +0.28 EPA/dropback with a 44% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Jared Goff vs NO: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.885208+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 1,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, NO and DET have played 1 completed games in the nflverse schedule sample: NO is 0-1. The most recent finished DET 33, NO 28.",
+      "title": "NO-DET: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 12.45674740484429,
+        "attempts": 578,
+        "avg_intended_air_yards": 6.828131868131869,
+        "avg_time_to_throw": 2.6984913194444444,
+        "cpoe": 1.7020934256055398,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 578,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jared Goff, over 578 attempts: 2.70s average time to throw; +1.7 completion percentage points over expectation; 6.8 average intended air yards; 12.5% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Jared Goff: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2016_12_LA_NO",
+          "2017_12_NO_LA",
+          "2018_09_LA_NO",
+          "2018_20_LA_NO",
+          "2019_02_NO_LA",
+          "2023_13_DET_NO"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 6,
+        "postseason_games": 1,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2023_13_DET_NO"
+        ],
+        "regular_season_games": 5,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 6,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2016 through 2023 contains 6 meaningful passing games for Jared Goff against NO (5 regular season, 1 postseason). Across those games: 208 attempts, 1,752 passing yards, 12 TD, 4 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Jared Goff vs NO: career game ledger"
     }
   ],
   "2026_01_NYJ_TEN": [
     {
-      "as_of": "2026-09-09T03:29:52.706555+00:00",
+      "as_of": "2026-09-09T05:37:34.269938+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -3655,7 +5122,7 @@
       "title": "NYJ explosives vs TEN prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:52.708164+00:00",
+      "as_of": "2026-09-09T05:37:34.271605+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYJ",
@@ -3673,7 +5140,7 @@
       "title": "TEN early-down approach vs NYJ"
     },
     {
-      "as_of": "2026-09-09T03:29:52.707378+00:00",
+      "as_of": "2026-09-09T05:37:34.270822+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -3691,7 +5158,7 @@
       "title": "TEN protection vs NYJ pass rush"
     },
     {
-      "as_of": "2026-09-09T03:28:39.491604+00:00",
+      "as_of": "2026-09-09T05:36:59.278115+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Aaron Glenn",
@@ -3707,7 +5174,7 @@
       "title": "NYJ offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:39.491627+00:00",
+      "as_of": "2026-09-09T05:36:59.278138+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3719,7 +5186,7 @@
       "title": "New defensive coordinator in TEN"
     },
     {
-      "as_of": "2026-09-09T03:28:39.491659+00:00",
+      "as_of": "2026-09-09T05:36:59.278170+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Brian Callahan (fired October 13, 1\u20135 record) Mike McCoy (interim, 2\u20139 record)",
@@ -3735,7 +5202,7 @@
       "title": "TEN offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:39.491667+00:00",
+      "as_of": "2026-09-09T05:36:59.278178+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3747,31 +5214,14 @@
       "title": "New defensive coordinator in NYJ"
     },
     {
-      "as_of": "2026-09-09T03:28:39.567620+00:00",
-      "category": "weather",
-      "metadata": {
-        "gust_mph": 6.9,
-        "precip_pct": 12.0,
-        "roof": "outdoor",
-        "temp_f": 90.6,
-        "wind_mph": 5.5
-      },
-      "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=36.1665&longitude=-86.7713&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-      "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 91\u00b0F, 6 mph sustained wind with gusts near 7 mph, and 12% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
-      "title": "Kickoff weather in TEN"
-    },
-    {
-      "as_of": "2026-09-09T03:30:01.936904+00:00",
+      "as_of": "2026-09-09T05:37:43.356970+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NYJ",
+        "cameos": [],
         "current_team": "NYJ",
-        "epa_per_dropback": 0.18158580272775776,
+        "epa_per_dropback": 0.18158580272775773,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -3822,8 +5272,11 @@
           "LV",
           "SEA"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2023,
         "success_rate": 0.46875,
-        "team_changed": true
+        "team_changed": true,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -3832,13 +5285,85 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Geno Smith has faced TEN 2 times; the most recent was last season, Week 6. Across those snaps he averaged +0.18 EPA per dropback with a 47% positive-EPA rate over 64 dropbacks. Those games came with LV, SEA, not NYJ. The quarterback history travels; the old playbook does not.",
+      "summary": "In the nflverse play-by-play sample since 2023, Geno Smith has 2 meaningful games against TEN; the most recent was last season, Week 6. Over 64 charted dropbacks in those games, he averaged +0.18 EPA/dropback with a 47% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Geno Smith vs TEN: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.947007+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 2,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, NYJ and TEN have played 2 completed games in the nflverse schedule sample: NYJ is 2-0. The most recent finished NYJ 24, TEN 17.",
+      "title": "NYJ-TEN: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 15.401785714285715,
+        "attempts": 448,
+        "avg_intended_air_yards": 6.631471962616821,
+        "avg_time_to_throw": 2.802056053811659,
+        "cpoe": 1.5631919642857213,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 448,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Geno Smith, over 448 attempts: 2.80s average time to throw; +1.6 completion percentage points over expectation; 6.6 average intended air yards; 15.4% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Geno Smith: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2013_04_NYJ_TEN",
+          "2014_15_NYJ_TEN",
+          "2023_16_SEA_TEN",
+          "2025_06_TEN_LV"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 4,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2023_16_SEA_TEN",
+          "2025_06_TEN_LV"
+        ],
+        "regular_season_games": 4,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 4,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Moderate",
+      "summary": "The full nflverse weekly player-stat ledger from 2013 through 2025 contains 4 meaningful passing games for Geno Smith against TEN (4 regular season, 0 postseason). Across those games: 121 attempts, 869 passing yards, 5 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Geno Smith vs TEN: career game ledger"
     }
   ],
   "2026_01_SF_LA": [
     {
-      "as_of": "2026-09-09T03:29:47.959253+00:00",
+      "as_of": "2026-09-09T05:37:29.615889+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LA",
@@ -3856,7 +5381,7 @@
       "title": "LA explosives vs SF prevention"
     },
     {
-      "as_of": "2026-09-09T03:28:34.871631+00:00",
+      "as_of": "2026-09-09T05:35:51.588996+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "motion",
@@ -3877,7 +5402,7 @@
       "title": "SF pre-snap motion vs LA"
     },
     {
-      "as_of": "2026-09-09T03:29:47.958296+00:00",
+      "as_of": "2026-09-09T05:37:29.614885+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "SF",
@@ -3895,7 +5420,7 @@
       "title": "SF third downs vs LA"
     },
     {
-      "as_of": "2026-09-09T03:28:35.300955+00:00",
+      "as_of": "2026-09-09T05:35:52.010376+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean McVay",
@@ -3911,7 +5436,7 @@
       "title": "LA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:35.300967+00:00",
+      "as_of": "2026-09-09T05:35:52.010387+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3923,7 +5448,7 @@
       "title": "New defensive coordinator in SF"
     },
     {
-      "as_of": "2026-09-09T03:29:42.191045+00:00",
+      "as_of": "2026-09-09T05:37:23.766503+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3943,7 +5468,7 @@
       "title": "SF: James Thompson Jr. \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-09T03:29:42.191067+00:00",
+      "as_of": "2026-09-09T05:37:23.766525+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3963,7 +5488,7 @@
       "title": "LA: Alaric Jackson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-09T03:29:42.191071+00:00",
+      "as_of": "2026-09-09T05:37:23.766529+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3983,7 +5508,7 @@
       "title": "LA: Jaylen Watson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-09T03:29:42.191075+00:00",
+      "as_of": "2026-09-09T05:37:23.766532+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4003,7 +5528,7 @@
       "title": "LA: Tyler Higbee \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-09T03:29:42.191052+00:00",
+      "as_of": "2026-09-09T05:37:23.766510+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4023,7 +5548,7 @@
       "title": "SF: Renardo Green \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-09T03:29:42.191056+00:00",
+      "as_of": "2026-09-09T05:37:23.766514+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4043,12 +5568,14 @@
       "title": "SF: Nick Bosa \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-09T03:29:57.866312+00:00",
+      "as_of": "2026-09-09T05:37:39.349706+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SF",
+        "cameos": [],
         "current_team": "SF",
-        "epa_per_dropback": 0.07709304579967988,
+        "epa_per_dropback": 0.07709304579967989,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 3,
         "latest_meeting": {
@@ -4112,8 +5639,11 @@
         "prior_offenses": [
           "SF"
         ],
+        "recent_sample_games": 3,
+        "recent_sample_start_season": 2023,
         "success_rate": 0.46153846153846156,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -4122,16 +5652,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Moderate",
-      "summary": "Brock Purdy has faced LA 3 times; the most recent was 2024 Week 15. Across those snaps he averaged +0.08 EPA per dropback with a 46% positive-EPA rate over 91 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2023, Brock Purdy has 3 meaningful games against LA; the most recent was 2024 Week 15. Over 91 charted dropbacks in those games, he averaged +0.08 EPA/dropback with a 46% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Brock Purdy vs LA: player history"
     },
     {
-      "as_of": "2026-09-09T03:29:57.912714+00:00",
+      "as_of": "2026-09-09T05:37:39.397392+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LA",
+        "cameos": [],
         "current_team": "LA",
         "epa_per_dropback": 0.08380186581889915,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 10,
         "latest_meeting": {
@@ -4293,8 +5825,11 @@
         "prior_offenses": [
           "LA"
         ],
+        "recent_sample_games": 10,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.4939467312348668,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -4303,13 +5838,210 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Strong",
-      "summary": "Matthew Stafford has faced SF 10 times; the most recent was last season, Week 10. Across those snaps he averaged +0.08 EPA per dropback with a 49% positive-EPA rate over 413 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2021, Matthew Stafford has 10 meaningful games against SF; the most recent was last season, Week 10. Over 413 charted dropbacks in those games, he averaged +0.08 EPA/dropback with a 49% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Matthew Stafford vs SF: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.848725+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "rivalry",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 11,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Strong",
+      "summary": "Since 2021, SF and LA have played 11 completed games in the nflverse schedule sample: SF is 6-5. The most recent finished LA 42, SF 26.",
+      "title": "SF-LA: division rivalry"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.848757+00:00",
+      "category": "travel",
+      "metadata": {
+        "city": "Melbourne, Australia",
+        "family": "international_event",
+        "provenance_grade": "B",
+        "venue": "Melbourne Cricket Ground"
+      },
+      "relevance": "Verified one-off event context",
+      "side": "neutral",
+      "source_name": "NFL International",
+      "source_url": "https://www.nfl.com/international/games/melbourne/",
+      "strength": "Strong",
+      "summary": "Rams-49ers is being played at the Melbourne Cricket Ground, the first NFL regular-season game in Australia. The novelty is part of the football story too: both teams are dealing with an extreme time-zone and travel adjustment before a division game.",
+      "title": "The NFL's first regular-season game in Australia"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.848762+00:00",
+      "category": "travel",
+      "metadata": {
+        "49ers_miles": 7872,
+        "family": "international_travel",
+        "provenance_grade": "B",
+        "rams_miles": 7937
+      },
+      "relevance": "Verified travel burden and historical event context",
+      "side": "neutral",
+      "source_name": "NFL.com schedule analysis",
+      "source_url": "https://www.nfl.com/news/2026-nfl-schedule-release-how-do-travel-rest-prime-time-and-outdoor-games-impact-teams",
+      "strength": "Strong",
+      "summary": "NFL schedule analysis lists the Rams' Los Angeles-to-Melbourne trip at 7,937 miles and San Francisco's at 7,872 miles, making this the longest city-to-city trip for a regular-season game in league history.",
+      "title": "The longest regular-season trip in NFL history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.848765+00:00",
+      "category": "history",
+      "metadata": {
+        "all_time_series": "SF 79-72-3",
+        "family": "rivalry",
+        "provenance_grade": "B"
+      },
+      "relevance": "Official franchise rivalry history",
+      "sample_size": 154,
+      "side": "neutral",
+      "source_name": "San Francisco 49ers official schedule notes",
+      "source_url": "https://www.49ers.com/news/a-game-by-game-look-at-the-san-francisco-49ers-2026-schedule-release",
+      "strength": "Strong",
+      "summary": "The 49ers' official 2026 schedule notes list San Francisco ahead 79-72-3 in the all-time series with the Rams. That is 154 meetings before this Melbourne opener, which makes the setting new even if the opponent is anything but.",
+      "title": "A 154-game rivalry leaves the country"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 15.845070422535212,
+        "attempts": 284,
+        "avg_intended_air_yards": 7.845955882352941,
+        "avg_time_to_throw": 3.1684260563380287,
+        "cpoe": 4.865669014084517,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 284,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Moderate",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Brock Purdy, over 284 attempts: 3.17s average time to throw; +4.9 completion percentage points over expectation; 7.8 average intended air yards; 15.8% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Brock Purdy: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 19.262981574539364,
+        "attempts": 597,
+        "avg_intended_air_yards": 9.15786574870912,
+        "avg_time_to_throw": 2.801262626262626,
+        "cpoe": 2.032981574539356,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 597,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Matthew Stafford, over 597 attempts: 2.80s average time to throw; +2.0 completion percentage points over expectation; 9.2 average intended air yards; 19.3% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Matthew Stafford: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2023_02_SF_LA",
+          "2024_03_SF_LA",
+          "2024_15_LA_SF"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 3,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2023_02_SF_LA",
+          "2024_03_SF_LA",
+          "2024_15_LA_SF"
+        ],
+        "regular_season_games": 3,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 3,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Moderate",
+      "summary": "The full nflverse weekly player-stat ledger from 2023 through 2024 contains 3 meaningful passing games for Brock Purdy against LA (3 regular season, 0 postseason). Across those games: 86 attempts, 640 passing yards, 3 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Brock Purdy vs LA: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2011_06_SF_DET",
+          "2012_02_DET_SF",
+          "2015_16_SF_DET",
+          "2018_02_DET_SF",
+          "2021_10_LA_SF",
+          "2021_18_SF_LA",
+          "2021_21_SF_LA",
+          "2022_04_LA_SF",
+          "2022_08_SF_LA",
+          "2023_02_SF_LA",
+          "2024_03_SF_LA",
+          "2024_15_LA_SF",
+          "2025_05_SF_LA",
+          "2025_10_LA_SF"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 14,
+        "postseason_games": 1,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_10_LA_SF",
+          "2021_18_SF_LA",
+          "2021_21_SF_LA",
+          "2022_04_LA_SF",
+          "2022_08_SF_LA",
+          "2023_02_SF_LA",
+          "2024_03_SF_LA",
+          "2024_15_LA_SF",
+          "2025_05_SF_LA",
+          "2025_10_LA_SF"
+        ],
+        "regular_season_games": 13,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 14,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2011 through 2025 contains 14 meaningful passing games for Matthew Stafford against SF (13 regular season, 1 postseason). Across those games: 561 attempts, 3,787 passing yards, 24 TD, 9 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Matthew Stafford vs SF: career game ledger"
     }
   ],
   "2026_01_TB_CIN": [
     {
-      "as_of": "2026-09-09T03:29:49.165640+00:00",
+      "as_of": "2026-09-09T05:37:30.793213+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CIN",
@@ -4327,7 +6059,7 @@
       "title": "TB explosives vs CIN prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:49.167194+00:00",
+      "as_of": "2026-09-09T05:37:30.794793+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TB",
@@ -4345,7 +6077,7 @@
       "title": "CIN early-down approach vs TB"
     },
     {
-      "as_of": "2026-09-09T03:29:49.165957+00:00",
+      "as_of": "2026-09-09T05:37:30.793512+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "CIN",
@@ -4363,7 +6095,7 @@
       "title": "TB YAC creation vs CIN tackling"
     },
     {
-      "as_of": "2026-09-09T03:29:42.841076+00:00",
+      "as_of": "2026-09-09T05:37:24.408166+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Zac Robinson",
@@ -4420,7 +6152,7 @@
       "title": "What Zac Robinson could change in TB"
     },
     {
-      "as_of": "2026-09-09T03:28:36.292762+00:00",
+      "as_of": "2026-09-09T05:35:54.550896+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Todd Bowles",
@@ -4436,12 +6168,14 @@
       "title": "TB offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:29:58.903080+00:00",
+      "as_of": "2026-09-09T05:37:40.372711+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "TB",
+        "cameos": [],
         "current_team": "TB",
         "epa_per_dropback": 0.5179692012645982,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 2,
         "latest_meeting": {
@@ -4492,8 +6226,11 @@
           "CAR",
           "CLE"
         ],
+        "recent_sample_games": 2,
+        "recent_sample_start_season": 2021,
         "success_rate": 0.4883720930232558,
-        "team_changed": true
+        "team_changed": true,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -4502,16 +6239,18 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Baker Mayfield has faced CIN 2 times; the most recent was 2022 Week 9. Across those snaps he averaged +0.52 EPA per dropback with a 49% positive-EPA rate over 43 dropbacks. Those games came with CAR, CLE, not TB. The quarterback history travels; the old playbook does not.",
+      "summary": "In the nflverse play-by-play sample since 2021, Baker Mayfield has 2 meaningful games against CIN; the most recent was 2022 Week 9. Over 43 charted dropbacks in those games, he averaged +0.52 EPA/dropback with a 49% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Baker Mayfield vs CIN: player history"
     },
     {
-      "as_of": "2026-09-09T03:29:58.922425+00:00",
+      "as_of": "2026-09-09T05:37:40.392112+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CIN",
+        "cameos": [],
         "current_team": "CIN",
         "epa_per_dropback": 0.06712101818657647,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 1,
         "latest_meeting": {
@@ -4547,8 +6286,11 @@
         "prior_offenses": [
           "CIN"
         ],
+        "recent_sample_games": 1,
+        "recent_sample_start_season": 2022,
         "success_rate": 0.5581395348837209,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -4557,13 +6299,141 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Weak",
-      "summary": "Joe Burrow has faced TB once before: 2022 Week 15. Across those snaps he averaged +0.07 EPA per dropback with a 56% positive-EPA rate over 43 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2022, Joe Burrow has 1 meaningful game against TB; the most recent was 2022 Week 15. Over 43 charted dropbacks in those games, he averaged +0.07 EPA/dropback with a 56% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Joe Burrow vs TB: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.873198+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "recent_series",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 1,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Moderate",
+      "summary": "Since 2021, TB and CIN have played 1 completed games in the nflverse schedule sample: TB is 0-1. The most recent finished CIN 34, TB 23.",
+      "title": "TB-CIN: recent series"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 16.390423572744016,
+        "attempts": 543,
+        "avg_intended_air_yards": 8.087386363636362,
+        "avg_time_to_throw": 2.846171586715867,
+        "cpoe": -1.6707151060460887,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 543,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Baker Mayfield, over 543 attempts: 2.85s average time to throw; -1.7 completion percentage points over expectation; 8.1 average intended air yards; 16.4% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Baker Mayfield: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 17.374517374517374,
+        "attempts": 259,
+        "avg_intended_air_yards": 7.594717741935483,
+        "avg_time_to_throw": 2.8016177606177606,
+        "cpoe": 1.9825868725868645,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 259,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Moderate",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Joe Burrow, over 259 attempts: 2.80s average time to throw; +2.0 completion percentage points over expectation; 7.6 average intended air yards; 17.4% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Joe Burrow: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2018_12_CLE_CIN",
+          "2018_16_CIN_CLE",
+          "2019_14_CIN_CLE",
+          "2019_17_CLE_CIN",
+          "2020_02_CIN_CLE",
+          "2020_07_CLE_CIN",
+          "2021_09_CLE_CIN",
+          "2022_09_CAR_CIN"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 8,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_09_CLE_CIN",
+          "2022_09_CAR_CIN"
+        ],
+        "regular_season_games": 8,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 8,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2018 through 2022 contains 8 meaningful passing games for Baker Mayfield against CIN (8 regular season, 0 postseason). Across those games: 206 attempts, 1,902 passing yards, 21 TD, 7 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Baker Mayfield vs CIN: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2022_15_CIN_TB"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 1,
+        "postseason_games": 0,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2022_15_CIN_TB"
+        ],
+        "regular_season_games": 1,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 1,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Weak",
+      "summary": "The full nflverse weekly player-stat ledger from 2022 through 2022 contains 1 meaningful passing games for Joe Burrow against TB (1 regular season, 0 postseason). Across those games: 39 attempts, 200 passing yards, 4 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Joe Burrow vs TB: career game ledger"
     }
   ],
   "2026_01_WAS_PHI": [
     {
-      "as_of": "2026-09-09T03:29:55.092817+00:00",
+      "as_of": "2026-09-09T05:37:36.612853+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "WAS",
@@ -4581,7 +6451,7 @@
       "title": "PHI YAC creation vs WAS tackling"
     },
     {
-      "as_of": "2026-09-09T03:29:55.092461+00:00",
+      "as_of": "2026-09-09T05:37:36.612474+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -4599,7 +6469,7 @@
       "title": "PHI explosives vs WAS prevention"
     },
     {
-      "as_of": "2026-09-09T03:29:55.091384+00:00",
+      "as_of": "2026-09-09T05:37:36.611375+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -4617,7 +6487,7 @@
       "title": "WAS early-down approach vs PHI"
     },
     {
-      "as_of": "2026-09-09T03:28:41.089727+00:00",
+      "as_of": "2026-09-09T05:37:20.962884+00:00",
       "category": "history",
       "metadata": {
         "dc": "Vic Fangio",
@@ -4641,7 +6511,7 @@
       "title": "Jayden Daniels vs Vic Fangio's PHI defense"
     },
     {
-      "as_of": "2026-09-09T03:28:40.887694+00:00",
+      "as_of": "2026-09-09T05:37:20.762279+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Dan Quinn",
@@ -4657,7 +6527,7 @@
       "title": "WAS offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:41.089766+00:00",
+      "as_of": "2026-09-09T05:37:20.962923+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Nick Sirianni",
@@ -4673,7 +6543,7 @@
       "title": "PHI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-09T03:28:41.089777+00:00",
+      "as_of": "2026-09-09T05:37:20.962935+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -4685,12 +6555,14 @@
       "title": "New defensive coordinator in WAS"
     },
     {
-      "as_of": "2026-09-09T03:30:03.959501+00:00",
+      "as_of": "2026-09-09T05:37:45.344274+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PHI",
+        "cameos": [],
         "current_team": "WAS",
-        "epa_per_dropback": -0.05419761250164074,
+        "epa_per_dropback": -0.054197612501640756,
+        "excluded_cameos": 0,
         "family": "qb_opponent_history",
         "games": 3,
         "latest_meeting": {
@@ -4754,8 +6626,11 @@
         "prior_offenses": [
           "WAS"
         ],
+        "recent_sample_games": 3,
+        "recent_sample_start_season": 2024,
         "success_rate": 0.4263565891472868,
-        "team_changed": false
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
@@ -4764,18 +6639,35 @@
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Moderate",
-      "summary": "Jayden Daniels has faced PHI 3 times; the most recent was 2024 Conference Championship. Across those snaps he averaged -0.05 EPA per dropback with a 43% positive-EPA rate over 129 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2024, Jayden Daniels has 3 meaningful games against PHI; the most recent was 2024 Conference Championship. Over 129 charted dropbacks in those games, he averaged -0.05 EPA/dropback with a 43% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
       "title": "Jayden Daniels vs PHI: player history"
     },
     {
-      "as_of": "2026-09-09T03:30:04.005070+00:00",
+      "as_of": "2026-09-09T05:37:45.391455+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PHI",
+        "cameos": [
+          {
+            "date": "2024-12-22",
+            "dropbacks": 4,
+            "epa_per_dropback": -0.5195613577961922,
+            "game_id": "2024_16_PHI_WAS",
+            "human_label": "2024 Week 16",
+            "label": "2024 Week 16",
+            "offense": "PHI",
+            "score": "PHI 7, WAS 0",
+            "season": 2024,
+            "stage": "Week 16",
+            "success_rate": 0.25,
+            "week": 16
+          }
+        ],
         "current_team": "PHI",
-        "epa_per_dropback": 0.25351742058391136,
+        "epa_per_dropback": 0.2640713970805681,
+        "excluded_cameos": 1,
         "family": "qb_opponent_history",
-        "games": 10,
+        "games": 9,
         "latest_meeting": {
           "date": "2025-12-20",
           "dropbacks": 32,
@@ -4818,20 +6710,6 @@
             "stage": "Conference Championship",
             "success_rate": 0.6666666666666666,
             "week": 21
-          },
-          {
-            "date": "2024-12-22",
-            "dropbacks": 4,
-            "epa_per_dropback": -0.5195613577961922,
-            "game_id": "2024_16_PHI_WAS",
-            "human_label": "2024 Week 16",
-            "label": "2024 Week 16",
-            "offense": "PHI",
-            "score": "PHI 7, WAS 0",
-            "season": 2024,
-            "stage": "Week 16",
-            "success_rate": 0.25,
-            "week": 16
           },
           {
             "date": "2024-11-14",
@@ -4935,18 +6813,162 @@
         "prior_offenses": [
           "PHI"
         ],
-        "success_rate": 0.4983164983164983,
-        "team_changed": false
+        "recent_sample_games": 9,
+        "recent_sample_start_season": 2021,
+        "success_rate": 0.5017064846416383,
+        "team_changed": false,
+        "verification_scope": "recent_pbp_not_career"
       },
       "promoted_to_model": false,
       "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
-      "sample_size": 297,
+      "sample_size": 293,
       "side": "home",
       "source_name": "nflverse play-by-play",
       "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
       "strength": "Strong",
-      "summary": "Jalen Hurts has faced WAS 10 times; the most recent was last season, Week 16. Across those snaps he averaged +0.25 EPA per dropback with a 50% positive-EPA rate over 297 dropbacks. The opponent is familiar, but current staff and personnel still decide how much of that history carries forward.",
+      "summary": "In the nflverse play-by-play sample since 2021, Jalen Hurts has 9 meaningful games against WAS; the most recent was last season, Week 16. Over 293 charted dropbacks in those games, he averaged +0.26 EPA/dropback with a 50% positive-EPA rate. A further 1 short cameo under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
       "title": "Jalen Hurts vs WAS: player history"
+    },
+    {
+      "as_of": "2026-09-09T05:37:47.996507+00:00",
+      "category": "history",
+      "metadata": {
+        "family": "rivalry",
+        "sample_start_season": 2021
+      },
+      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
+      "sample_size": 11,
+      "side": "neutral",
+      "source_name": "nflverse schedule/results",
+      "source_url": "https://github.com/nflverse/nfldata",
+      "strength": "Strong",
+      "summary": "Since 2021, WAS and PHI have played 11 completed games in the nflverse schedule sample: WAS is 3-8. The most recent finished WAS 24, PHI 17.",
+      "title": "WAS-PHI: division rivalry"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 12.76595744680851,
+        "attempts": 188,
+        "avg_intended_air_yards": 7.613505747126437,
+        "avg_time_to_throw": 2.794279569892473,
+        "cpoe": -3.665319148936163,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 188,
+      "side": "away",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Moderate",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jayden Daniels, over 188 attempts: 2.79s average time to throw; -3.7 completion percentage points over expectation; 7.6 average intended air yards; 12.8% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Jayden Daniels: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:52.831972+00:00",
+      "category": "personnel",
+      "metadata": {
+        "aggressiveness": 17.841409691629956,
+        "attempts": 454,
+        "avg_intended_air_yards": 8.965654205607477,
+        "avg_time_to_throw": 2.9762831858407077,
+        "cpoe": 3.0481718061674172,
+        "family": "ngs_qb_profile",
+        "provenance_grade": "B",
+        "season": 2025
+      },
+      "promoted_to_model": false,
+      "relevance": "Prior-season tracking profile for the current starting quarterback",
+      "sample_size": 454,
+      "side": "home",
+      "source_name": "NFL Next Gen Stats via nflverse",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
+      "strength": "Strong",
+      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jalen Hurts, over 454 attempts: 2.98s average time to throw; +3.0 completion percentage points over expectation; 9.0 average intended air yards; 17.8% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
+      "title": "Jalen Hurts: Next Gen passing profile"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2024_11_WAS_PHI",
+          "2024_16_PHI_WAS",
+          "2024_21_WAS_PHI"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 3,
+        "postseason_games": 1,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2024_11_WAS_PHI",
+          "2024_16_PHI_WAS",
+          "2024_21_WAS_PHI"
+        ],
+        "regular_season_games": 2,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 3,
+      "side": "away",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Moderate",
+      "summary": "The full nflverse weekly player-stat ledger from 2024 through 2024 contains 3 meaningful passing games for Jayden Daniels against PHI (2 regular season, 1 postseason). Across those games: 119 attempts, 704 passing yards, 7 TD, 4 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Jayden Daniels vs PHI: career game ledger"
+    },
+    {
+      "as_of": "2026-09-09T05:37:53.738100+00:00",
+      "category": "history",
+      "metadata": {
+        "attempt_threshold": 10,
+        "career_game_ids": [
+          "2020_17_WAS_PHI",
+          "2021_15_WAS_PHI",
+          "2021_17_PHI_WAS",
+          "2022_03_PHI_WAS",
+          "2022_10_WAS_PHI",
+          "2023_04_WAS_PHI",
+          "2023_08_PHI_WAS",
+          "2024_11_WAS_PHI",
+          "2024_21_WAS_PHI",
+          "2025_16_PHI_WAS"
+        ],
+        "family": "career_qb_opponent_ledger",
+        "meaningful_games": 10,
+        "postseason_games": 1,
+        "provenance_grade": "B",
+        "recent_overlap_verified": true,
+        "recent_pbp_game_ids": [
+          "2021_15_WAS_PHI",
+          "2021_17_PHI_WAS",
+          "2022_03_PHI_WAS",
+          "2022_10_WAS_PHI",
+          "2023_04_WAS_PHI",
+          "2023_08_PHI_WAS",
+          "2024_11_WAS_PHI",
+          "2024_21_WAS_PHI",
+          "2025_16_PHI_WAS"
+        ],
+        "regular_season_games": 9,
+        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
+      },
+      "promoted_to_model": false,
+      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
+      "sample_size": 10,
+      "side": "home",
+      "source_name": "nflverse weekly player stats",
+      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
+      "strength": "Strong",
+      "summary": "The full nflverse weekly player-stat ledger from 2020 through 2025 contains 10 meaningful passing games for Jalen Hurts against WAS (9 regular season, 1 postseason). Across those games: 294 attempts, 2,387 passing yards, 15 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
+      "title": "Jalen Hurts vs WAS: career game ledger"
     }
   ]
 }
