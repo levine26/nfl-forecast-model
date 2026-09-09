@@ -55,6 +55,13 @@ def _possessive(name: str) -> str:
     return f"{name}'" if str(name).lower().endswith("s") else f"{name}'s"
 
 
+def _ensure_sentence(text: str) -> str:
+    value = re.sub(r"\s+", " ", str(text or "")).strip()
+    if not value:
+        return value
+    return value if value[-1] in ".!?" else value + "."
+
+
 def _sentence_fragment(text: str) -> str:
     value = str(text or "").strip()
     if not value:
@@ -150,6 +157,7 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
     if item:
         fam = _family(item)
         summary = re.sub(r"\s+", " ", str(item.get("summary") or "")).strip()
+        summary_sentence = _ensure_sentence(summary)
         title = _clean_title(item.get("title"), max_words=12)
         if fam == "pressure":
             details = _pressure_details(summary)
@@ -160,19 +168,19 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
                 headline = f"{matchup}: {rusher_name} pass rush vs. {protected_name} protection"
                 sentences.append(
                     f"{matchup} centers on the {rusher_name} rush against {protected_name} protection. "
-                    f"The {protected_name} posted a {sack_rate}% sack rate last season; the {rusher_name} reached {pressure_rate}%. "
-                    f"{protected_name} needs clean early downs to keep {rusher_name} out of favorable rush situations, while {rusher_name} wants to force {protected_name} into obvious passing downs."
+                    f"The {protected_name} allowed sacks on {sack_rate}% of pass plays last season; the {rusher_name} generated sacks on {pressure_rate}%. "
+                    f"The {protected_name} need clean early downs to keep the {rusher_name} out of favorable rush situations, while the {rusher_name} want to force the {protected_name} into obvious passing downs."
                 )
         elif fam == "explosives":
             headline = f"{matchup}: explosive plays will set the terms"
             sentences.append(
-                f"{matchup} turns on whether {_nick(away)} can create chunk gains without giving {_nick(home)} short fields or easy answers. {summary.rstrip('.')} "
+                f"{matchup} turns on whether {_nick(away)} can create chunk gains without giving {_nick(home)} short fields or easy answers. {summary_sentence} "
                 f"If {_nick(away)} forces {_nick(home)} to defend the full field, {_nick(away)} can dictate tempo; if {_nick(home)} limits explosives, {_nick(away)} has to sustain longer drives."
             )
         elif fam == "early_down":
             headline = f"{matchup}: early downs will decide who controls the script"
             sentences.append(
-                f"{matchup} puts early-down efficiency at the center of the game. {summary.rstrip('.')} "
+                f"{matchup} puts early-down efficiency at the center of the game. {summary_sentence} "
                 f"{_nick(away)} needs favorable second downs to keep its full call sheet available, while {_nick(home)} wants to create third-and-long and make the quarterback solve the game."
             )
         elif fam == "qb_opponent_history":
@@ -182,9 +190,9 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
             subject = _qb_subject(title, f"the {offense_name} quarterback")
             headline = f"{matchup}: {subject} against the {defense_name} defense"
             sentences.append(
-                f"{matchup} puts {subject}'s prior {defense_name} meetings in context for the {offense_name}. "
-                f"{subject} must show that {offense_name} protection can answer {defense_name} pressure without leaning on {subject}'s old results. "
-                f"For {offense_name}, the key is keeping {subject} on schedule against {defense_name}; {defense_name}'s job is changing the look before {subject} can reuse earlier answers."
+                f"{matchup} puts {_possessive(subject)} prior {defense_name} meetings in context for the {offense_name}. "
+                f"{subject} must show that {offense_name} protection can answer {defense_name} pressure without leaning on {_possessive(subject)} old results. "
+                f"For {offense_name}, the key is keeping {subject} on schedule against {defense_name}; {_possessive(defense_name)} job is changing the look before {subject} can reuse earlier answers."
             )
         elif title:
             focus, opponent = _side_teams(away, home, item)
@@ -192,7 +200,7 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
             opponent_name = _nick(opponent)
             headline = f"{matchup}: {title}"
             sentences.append(
-                f"{matchup} centers on {_sentence_fragment(title)}. {summary.rstrip('.')} "
+                f"{matchup} centers on {_sentence_fragment(title)}. {summary_sentence} "
                 f"For {focus_name}, that detail changes {_possessive(focus_name)} choices against {opponent_name}; {opponent_name} can exploit it only by forcing {focus_name} off schedule."
             )
 
@@ -262,7 +270,7 @@ def _model_paragraph(row: pd.Series, item: dict[str, Any] | None) -> str:
     if item:
         title = _clean_title(item.get("title"), max_words=12)
         if title:
-            sentences.append(f"The matchup evidence that best supports the forecast is {_sentence_fragment(title)}.")
+            sentences.append(f"The matchup evidence that best supports the forecast is {title}.")
 
     sentences.append(f"The pick: {_full(pick)} moneyline.")
     return " ".join(sentences)
