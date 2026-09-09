@@ -1,5 +1,6 @@
 import pandas as pd
 
+from nfl_forecast.editorial_voice import polish_preview_slate
 from nfl_forecast.narrative import build_game_previews
 
 
@@ -170,3 +171,34 @@ def test_uncertainty_stays_in_what_could_make_this_wrong_section():
     assert "component models disagree more than usual" in warning
     assert "coin-flip territory" in warning
     assert "coin flip wearing a decimal point" not in read
+
+
+def test_slate_voice_rotates_same_family_reads_without_touching_evidence_modules():
+    predictions = pd.DataFrame([
+        _base_game("p1","A1","H1","H1",.64),
+        _base_game("p2","A2","H2","H2",.64),
+        _base_game("p3","A3","H3","H3",.64),
+    ])
+    evidence = {}
+    for game_id, away, home in [("p1","A1","H1"),("p2","A2","H2"),("p3","A3","H3")]:
+        evidence[game_id] = [
+            {
+                "category":"scheme","title":f"{home} pass rush vs {away} protection","summary":"Pressure detail lives below the Read.",
+                "strength":"Strong","sample_size":300,"metadata":{"family":"pressure","advantage_team":home,"editorial_score":1.0},
+            },
+            {
+                "category":"scheme","title":f"{away} early downs vs {home}","summary":"Counter detail lives below the Read.",
+                "strength":"Moderate","sample_size":200,"metadata":{"family":"early_down","advantage_team":away,"editorial_score":.5},
+            },
+        ]
+
+    base = build_game_previews(predictions,evidence)
+    original_factors = {gid:list(preview["key_factors"]) for gid,preview in base.items()}
+    polished = polish_preview_slate(base,predictions)
+    reads = [polished[gid]["paragraphs"][0] for gid in ["p1","p2","p3"]]
+    variants = [polished[gid]["editorial_voice"]["primary_variant"] for gid in ["p1","p2","p3"]]
+
+    assert len(set(reads)) == 3
+    assert variants == [0,1,2]
+    assert all(polished[gid]["editorial_voice"]["slate_aware"] for gid in polished)
+    assert all(polished[gid]["key_factors"] == original_factors[gid] for gid in polished)
