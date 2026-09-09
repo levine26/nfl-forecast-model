@@ -102,9 +102,15 @@ WRITING RULES
 - Do not change, recalculate, or recommend changes to LevLine probabilities.
 
 OUTPUT
-Return ONLY valid JSON, no Markdown and no commentary, with exactly this schema:
+Return ONLY one syntactically valid JSON object, no Markdown and no commentary, with exactly this schema:
 {"games":{"GAME_ID":{"headline":"...","read":"...","sources":[{"name":"ESPN","title":"article/report title","url":"https://..."},{"name":"NFL.com","title":"...","url":"https://..."}]}}}
 Every supplied game_id must appear exactly once. Source URLs must be real URLs you actually used. Use two or more approved-domain sources per game whenever available.
+CRITICAL SERIALIZATION RULES:
+- The response must parse with a standard JSON parser exactly as returned.
+- Use JSON double quotes only as delimiters. Escape every literal double quote inside a headline, Read, source title or URL, or better paraphrase/remove embedded quotation marks.
+- Do not use trailing commas, comments, ellipses outside strings, concatenated JSON objects, or Markdown fences.
+- Before returning the response, check internally that every object/array is closed and every property is comma-separated.
+- Do not shorten the response by truncating a game or source object; complete all 16 games.
 
 GAME PACKET
 """ + json.dumps({"games": packets}, indent=2)
