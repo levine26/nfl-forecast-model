@@ -1,4 +1,12 @@
+from pathlib import Path
+import sys
+
 import pandas as pd
+
+# The executable story-desk pass lives under scripts/ so production can run it
+# directly. Add the repository root explicitly because pytest's installed-package
+# import mode does not guarantee that the checkout root is on sys.path.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from nfl_forecast.source_policy import provenance_grade
 from nfl_forecast.story_context import build_story_context
