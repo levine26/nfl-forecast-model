@@ -14,7 +14,10 @@ on:
       - "src/nfl_forecast/staff_impact.py"
       - "src/nfl_forecast/narrative.py"
       - "src/nfl_forecast/editorial_voice.py"
+      - "src/nfl_forecast/story_context.py"
+      - "src/nfl_forecast/source_policy.py"
       - "scripts/run_context.py"
+      - "scripts/polish_publication.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
       - "tests/test_coaching.py"
@@ -23,6 +26,7 @@ on:
       - "tests/test_personnel_impact.py"
       - "tests/test_staff_impact.py"
       - "tests/test_narrative.py"
+      - "tests/test_publication_polish.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   pull_request:
@@ -36,7 +40,10 @@ on:
       - "src/nfl_forecast/staff_impact.py"
       - "src/nfl_forecast/narrative.py"
       - "src/nfl_forecast/editorial_voice.py"
+      - "src/nfl_forecast/story_context.py"
+      - "src/nfl_forecast/source_policy.py"
       - "scripts/run_context.py"
+      - "scripts/polish_publication.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
       - "tests/test_coaching.py"
@@ -45,6 +52,7 @@ on:
       - "tests/test_personnel_impact.py"
       - "tests/test_staff_impact.py"
       - "tests/test_narrative.py"
+      - "tests/test_publication_polish.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   schedule:
@@ -68,7 +76,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py tests/test_publication_polish.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -78,7 +86,9 @@ jobs:
             nflreadpy-${{ runner.os }}-
       - name: Smoke-test contextual evidence generation
         if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
-        run: python scripts/run_context.py --season 2026 --output-dir /tmp/nfl-context
+        run: |
+          python scripts/run_context.py --season 2026 --output-dir /tmp/nfl-context
+          python scripts/polish_publication.py --season 2026 --output-dir /tmp/nfl-context
       - name: Require usable current coaching and impact coverage
         if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
         run: |
@@ -97,22 +107,32 @@ jobs:
 
           staff = status.get('staff_impact', {})
           personnel = status.get('personnel_usage', {})
+          story = status.get('story_desk', {})
+          qb = status.get('qb_history_verification', {})
           print('staff impact:', json.dumps(staff, sort_keys=True))
           print('personnel usage:', json.dumps(personnel, sort_keys=True))
+          print('story desk:', json.dumps(story, sort_keys=True))
+          print('QB history verification:', json.dumps(qb, sort_keys=True))
           if status.get('ftn', {}).get('status') == 'healthy' and status.get('pbp', {}).get('status') == 'healthy' and staff.get('status') != 'healthy':
               raise SystemExit(f'staff-impact layer failed despite healthy FTN/PBP: {staff}')
           if status.get('pbp', {}).get('status') == 'healthy' and personnel.get('status') != 'healthy':
               raise SystemExit(f'personnel-usage layer failed despite healthy PBP: {personnel}')
+          if story.get('status') != 'healthy':
+              raise SystemExit(f'story-desk publication layer failed: {story}')
+          if qb.get('status') != 'healthy' or qb.get('career_counts_published') is not False:
+              raise SystemExit(f'QB history publication guardrail failed: {qb}')
           PY
       - name: Build contextual evidence
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        run: python scripts/run_context.py --season 2026
+        run: |
+          python scripts/run_context.py --season 2026
+          python scripts/polish_publication.py --season 2026 --probe-advanced
       - name: Commit contextual outputs
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
           git config user.name "sunday-signal-context-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json
+          git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json outputs/qb_history_audit.json
           git diff --cached --quiet || git commit -m "Refresh Sunday Signal contextual intelligence"
           git pull --rebase origin main
           git push
