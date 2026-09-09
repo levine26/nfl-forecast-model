@@ -1,0 +1,30 @@
+name: Validate story-desk preservation
+on:
+  push:
+    branches: [editorial/story-desk-preservation]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/story-desk-preservation
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python scripts/patch_story_desk_preservation.py
+      - run: pip install '.[dev]'
+      - name: Run unit suite
+        run: pytest -q
+      - name: Commit validated source and tests only
+        run: |
+          git config user.name "sunday-signal-editorial-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm scripts/patch_story_desk_preservation.py .github/workflows/validate-story-desk-preservation.yml
+          git add scripts/polish_publication.py tests/test_publication_polish.py
+          git commit -m "Preserve slate-aware prose through story-desk enrichment"
+          git push origin HEAD:editorial/story-desk-preservation
