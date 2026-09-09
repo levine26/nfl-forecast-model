@@ -13,9 +13,11 @@ on:
       - "scripts/validate_copilot_media_reads.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
+      - "tests/test_copilot_json_handoff.py"
+      - "tests/test_read_contract.py"
+      - "pyproject.toml"
       - ".github/workflows/media_writer.yml"
   schedule:
-    # Twenty minutes after the three-hour contextual refresh cadence during NFL-season months.
     - cron: "37 */3 * 1-2,9-12 *"
 
 permissions:
@@ -83,7 +85,7 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_json_handoff.py tests/test_read_contract.py tests/test_editorial_finalize.py
 
       - name: Refresh deterministic reporting packet
         run: |
@@ -137,7 +139,7 @@ jobs:
               raise SystemExit(f'Copilot did not cover full slate: {copilot}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
               raise SystemExit(f'final editorial gate failed: {finalizer}')
-          print('Copilot media launch gate passed:', games, 'games')
+          print('Copilot matchup/model/pick launch gate passed:', games, 'games')
           PY
 
       - name: Publish editorial-only outputs
