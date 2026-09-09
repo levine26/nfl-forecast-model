@@ -142,6 +142,51 @@ def _contains_score(text: str, projected_score: str) -> bool:
     return not numbers or all(number in text for number in numbers[-2:])
 
 
+def _float_or_none(value) -> float | None:
+    try:
+        number = float(value)
+    except Exception:
+        return None
+    return None if pd.isna(number) else number
+
+
+def _contains_labeled_line(
+    text: str,
+    value,
+    home: str,
+    away: str,
+    labels: tuple[str, ...],
+) -> bool:
+    """Verify a rounded line value, its favored team, and a nearby model/market label."""
+    number = _float_or_none(value)
+    if number is None:
+        return True
+
+    lowered = str(text or "").lower()
+    if abs(number) < 0.05:
+        has_even = any(token in lowered for token in ("pick'em", "pick em", "even"))
+        return has_even and any(label in lowered for label in labels)
+
+    favored = home if number > 0 else away
+    aliases = _team_aliases(favored)
+    magnitude = abs(number)
+    candidates = {
+        f"{magnitude:.1f}",
+        f"{magnitude:.2f}".rstrip("0").rstrip("."),
+    }
+    for candidate in candidates:
+        if not candidate:
+            continue
+        pattern = rf"(?<![\d.]){re.escape(candidate)}(?![\d.])"
+        for match in re.finditer(pattern, lowered):
+            left = max(0, match.start() - 100)
+            right = min(len(lowered), match.end() + 100)
+            window = lowered[left:right]
+            if any(label in window for label in labels) and _mentions_any(window, aliases):
+                return True
+    return False
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -221,6 +266,22 @@ def main() -> None:
                 failures.append(f"{gid}: paragraph2 missing PURE pick-side probability")
             if not _contains_pct(paragraph2, market_prob):
                 failures.append(f"{gid}: paragraph2 missing market pick-side probability")
+        if not _contains_labeled_line(
+            paragraph2,
+            row.get("expected_margin"),
+            home,
+            away,
+            ("levline", "model", "project", "margin"),
+        ):
+            failures.append(f"{gid}: paragraph2 missing correct LevLine model line/projected margin")
+        if not _contains_labeled_line(
+            paragraph2,
+            row.get("spread_line"),
+            home,
+            away,
+            ("market", "spread", "consensus"),
+        ):
+            failures.append(f"{gid}: paragraph2 missing correct market spread")
         if not _contains_score(paragraph2, str(row.get("projected_score") or "")):
             failures.append(f"{gid}: paragraph2 missing projected score")
 
