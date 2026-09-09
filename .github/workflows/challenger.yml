@@ -8,15 +8,18 @@ on:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
       - 'src/nfl_forecast/challenger_v07.py'
+      - 'src/nfl_forecast/challenger_v08.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
+      - 'scripts/run_challenger_v08.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
       - 'tests/test_challenger_v07.py'
+      - 'tests/test_challenger_v08.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
       - '.github/workflows/challenger_shadow_lock.yml'
@@ -25,15 +28,18 @@ on:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
       - 'src/nfl_forecast/challenger_v07.py'
+      - 'src/nfl_forecast/challenger_v08.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
+      - 'scripts/run_challenger_v08.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
       - 'tests/test_challenger_v07.py'
+      - 'tests/test_challenger_v08.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
       - '.github/workflows/challenger_shadow_lock.yml'
@@ -62,7 +68,7 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
       - name: Test challenger research logic
-        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_shadow_lock.py
+        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_v08.py tests/test_challenger_shadow_lock.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -78,7 +84,7 @@ jobs:
             cp challenger_outputs/prediction_history_shadow.csv /tmp/challenger-immutable/
           fi
           rm -rf challenger_outputs
-          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v07.py
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v08.py
           if [ -f /tmp/challenger-immutable/prediction_history_shadow.csv ]; then
             cp /tmp/challenger-immutable/prediction_history_shadow.csv challenger_outputs/
           fi
@@ -110,12 +116,13 @@ jobs:
           report = json.loads(Path('challenger_outputs/report.json').read_text())
           assert report['status'] == 'healthy'
           assert report['mode'] == 'research_only'
-          assert report['challenger_version'] == '0.7-opponent-adjusted'
+          assert report['challenger_version'] == '0.8-qb-starter'
           assert report['live_season_firewall'] == 2026
           assert report['promotion_authorized'] is False
           assert report['target_seasons'] == [2022, 2023, 2024, 2025]
           assert report['minimum_pure_weight'] >= 0.25
           assert len(report['opponent_adjusted_features']) == 32
+          assert len(report['qb_features']) >= 12
           assert report['2026_outcomes_used_in_fitting'] == 0
           assert report['production_outputs_modified'] == 0
           shadow = pd.read_csv('challenger_outputs/this_week_shadow.csv')
@@ -123,7 +130,7 @@ jobs:
           assert shadow['shadow_source_sha'].notna().all()
           assert shadow['research_method'].isin(['fixed', 'linear', 'logit', 'pure']).all()
           assert shadow['effective_pure_weight'].min() >= 0.25
-          assert shadow['challenger_version'].eq('0.7-opponent-adjusted').all()
+          assert shadow['challenger_version'].eq('0.8-qb-starter').all()
           print(json.dumps(report, indent=2))
           PY
       - name: Upload challenger evidence
