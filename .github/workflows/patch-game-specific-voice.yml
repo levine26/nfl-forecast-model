@@ -19,8 +19,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: site/package-lock.json
       - run: pip install '.[dev]'
       - run: python scripts/patch_game_specific_voice.py
       - name: Regenerate editorial layer only
@@ -46,7 +44,7 @@ jobs:
         run: |
           cp outputs/game_previews.json site/public/data/game_previews.json
           cd site
-          npm ci
+          npm install
           npm run build
       - name: Commit final patch and remove helpers
         run: |
