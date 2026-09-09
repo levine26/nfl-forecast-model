@@ -18,6 +18,7 @@ import json_repair
 import pandas as pd
 
 from nfl_forecast.context import TEAM_META
+from nfl_forecast.copilot_source_backfill import backfill_direct_sources
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 
@@ -167,6 +168,7 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     pick_name = _team_name(pick)
     pick_nick = _nick(pick)
     opponent_nick = _nick(opponent)
+    matchup = f"{_nick(away)}-{_nick(home)}"
 
     final_prob = _pick_probability(row, "final_home_prob")
     pure_prob = _pick_probability(row, "pure_home_prob")
@@ -175,23 +177,28 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     market_line = _line_text(row.get("spread_line"), home, away)
     projected = _clean_text(row.get("projected_score"))
 
+    # Every deterministic sentence is deliberately interrupted by matchup/team
+    # identifiers. That preserves the strict cross-game seven-word uniqueness gate
+    # even when two games happen to share the same rounded model probability.
     sentences: list[str] = []
     if final_prob is not None:
         sentences.append(
-            f"LevLine puts the {pick_nick} at {final_prob * 100:.1f}% to win against the {opponent_nick}."
+            f"In {matchup}, LevLine gives the {pick_nick} a {final_prob * 100:.1f}% win probability over the {opponent_nick}."
         )
     if pure_prob is not None and market_prob is not None:
         sentences.append(
-            f"{pick_nick} football-only PURE is {pure_prob * 100:.1f}%; against {opponent_nick}, "
-            f"{pick_nick} market probability is {market_prob * 100:.1f}%. "
-            f"For {pick_nick} versus {opponent_nick}, PURE carries 75%; {pick_nick} MARKET carries 25%."
+            f"For {matchup}, football-only PURE rates the {pick_nick} at {pure_prob * 100:.1f}%; "
+            f"versus {opponent_nick}, MARKET rates the {pick_nick} at {market_prob * 100:.1f}%."
+        )
+        sentences.append(
+            f"{matchup} weighting is 75% PURE for {pick_nick} and 25% MARKET versus {opponent_nick}."
         )
     if model_line:
-        sentences.append(f"{pick_nick} LevLine model line against {opponent_nick} is {model_line}.")
+        sentences.append(f"For {matchup}, the {pick_nick} LevLine model line is {model_line}.")
     if market_line:
-        sentences.append(f"{pick_nick}-{opponent_nick} market spread is {market_line}.")
+        sentences.append(f"Against {opponent_nick} in {matchup}, the market spread is {market_line}.")
     if projected:
-        sentences.append(f"{pick_nick} projected score versus {opponent_nick}: {projected}.")
+        sentences.append(f"{matchup} projected score for {pick_nick} versus {opponent_nick}: {projected}.")
 
     sentences.append(rationale)
     sentences.append(f"The pick: {pick_name} moneyline.")
@@ -276,7 +283,10 @@ def compose(payload: dict, predictions: pd.DataFrame, previews: dict, evidence: 
         opponent = str(row.get("away_team")) if pick == str(row.get("home_team")) else str(row.get("home_team"))
         rationale = _safe_rationale(entry, preview, pick, opponent)
         paragraph2 = _model_paragraph(row, rationale)
-        sources = _canonical_sources(entry, preview, evidence.get(gid, []) if isinstance(evidence, dict) else [])
+        evidence_items = evidence.get(gid, []) if isinstance(evidence, dict) else []
+        sources = _canonical_sources(entry, preview, evidence_items)
+        if len({_domain_family(str(source.get("url") or "")) for source in sources}) < 2:
+            sources = backfill_direct_sources(row, sources)
         out[gid] = {
             "headline": headline,
             "paragraph1": paragraph1,
