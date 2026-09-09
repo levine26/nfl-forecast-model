@@ -1,6 +1,15 @@
 from __future__ import annotations
 
-from scripts.validate_copilot_media_reads import _extract_json
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+
+_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "validate_copilot_media_reads.py"
+_SPEC = spec_from_file_location("validate_copilot_media_reads", _SCRIPT)
+assert _SPEC is not None and _SPEC.loader is not None
+_MODULE = module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_MODULE)
+_extract_json = _MODULE._extract_json
 
 
 def test_extract_json_preserves_valid_payload():
