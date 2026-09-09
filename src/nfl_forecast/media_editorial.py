@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-"""Human-facing Read compositor driven by current reporting first.
+"""Reporting-first Read compositor.
 
-The old slate-aware template writer remains a fallback. When fresh reporting exists,
-this module replaces only the Read paragraph/headline and attaches source metadata.
-It does not modify predictions or any numerical feature.
+Fresh reporting supplies the story. LevLine's existing evidence supplies a compact
+football check. The old template composer is used only when no media is available.
+This module never changes a prediction, feature, market weight, lock or grade.
 """
 
 import re
@@ -32,88 +32,60 @@ def _family(item: dict[str, Any]) -> str:
     return str(meta.get("family") or item.get("family") or item.get("category") or "context").lower().replace(" ", "_")
 
 
-def _priority(item: dict[str, Any]) -> float:
+def _priority(item: dict[str, Any]) -> tuple[bool, float]:
     meta = item.get("metadata") or {}
     try:
-        return float(meta.get("editorial_score") or meta.get("source_priority") or 0)
+        score = float(meta.get("editorial_score") or meta.get("source_priority") or 0)
     except Exception:
-        return 0.0
+        score = 0.0
+    return bool(meta.get("substantive")), score
 
 
-def _clean_title(title: Any) -> str:
+def _clean_title(title: Any, max_words: int = 20) -> str:
     text = re.sub(r"\s+", " ", str(title or "")).strip().strip(" -|—")
     text = re.sub(r"\bHC\b", "coach", text)
     text = re.sub(r"\bQB\b", "quarterback", text)
     text = re.sub(r"\bRB\b", "running back", text)
     text = re.sub(r"\bWR\b", "receiver", text)
-    text = text.replace(" vs. ", " against ").replace(" vs ", " against ")
-    # If a headline uses a generic update/preview label before a colon, the useful
-    # human angle is almost always on the right-hand side.
+
+    # Strip aggregator/content-label scaffolding when a headline contains a real
+    # reported fact after it. This specifically avoids publishing phrases such as
+    # "Preview Week 1" as though they were the football story.
     if ":" in text:
         left, right = text.split(":", 1)
-        if any(word in left.lower() for word in ("preview", "update", "week 1", "week one", "injury")) and len(right.strip()) >= 18:
+        if any(word in left.lower() for word in ("preview", "update", "week 1", "week one", "injury report", "news")) and len(right.split()) >= 4:
             text = right.strip()
+    text = re.sub(
+        r"^(?:nfl\s+)?(?:week\s*(?:1|one)\s+)?(?:game\s+)?(?:preview|predictions?|picks?|matchup)\s*(?:[-–—:]\s*)?",
+        "",
+        text,
+        flags=re.I,
+    ).strip()
+    text = re.sub(r"\s+(?:week\s*(?:1|one)\s+)?preview\s*$", "", text, flags=re.I).strip()
+    words = text.rstrip(".").split()
+    if len(words) > max_words:
+        text = " ".join(words[:max_words]).rstrip(" ,;:-") + "…"
     return text.rstrip(".")
 
 
-def _topic_kind(item: dict[str, Any]) -> str:
-    text = f"{item.get('title','')} {item.get('summary','')}".lower()
-    if any(word in text for word in ("injury", "questionable", "doubtful", "ruled out", "likely out", "expected to play", "expected to start", "on track", "return", "practice")):
-        return "availability"
-    if any(word in text for word in ("coordinator", "play-caller", "playcaller", "new coach", "scheme")):
-        return "staff"
-    if any(word in text for word in ("trade", "traded", "debut", "signed", "acquired")):
-        return "roster"
-    return "matchup"
-
-
-def _reported_sentence(slot: int, away: str, home: str, item: dict[str, Any]) -> str:
-    source = str(item.get("source_name") or "current reporting")
+def _reported_sentence(away: str, home: str, item: dict[str, Any]) -> str:
+    source = str(item.get("source_name") or "Current reporting").strip()
     fact = _clean_title(item.get("title"))
-    kind = _topic_kind(item)
     matchup = f"{away}-{home}"
-    if kind == "availability":
-        options = [
-            f"{matchup} starts with a live availability story: {source} is reporting {fact}.",
-            f"The first real question in {matchup} is who is actually ready to go; {source} is tracking {fact}.",
-            f"Before getting to scheme in {matchup}, the news matters: {source} has {fact} at the center of its coverage.",
-            f"The matchup changed when the availability picture changed. {source} is focused on {fact}.",
-        ]
-    elif kind == "staff":
-        options = [
-            f"The interesting part of {matchup} is the new tactical layer. {source} is focused on {fact}.",
-            f"{matchup} has a genuine play-calling question before the first snap; {source} is highlighting {fact}.",
-            f"There is a new schematic variable in {matchup}. {source} is framing the week around {fact}.",
-            f"This is not the same version of the matchup as last year. {source} is watching {fact}.",
-        ]
-    elif kind == "roster":
-        options = [
-            f"The roster version of {matchup} has changed, and {source} is centered on {fact}.",
-            f"A new personnel wrinkle gives {matchup} a different feel. {source} is tracking {fact}.",
-            f"The most relevant offseason change in {matchup} is the one {source} is writing about: {fact}.",
-            f"There is a new face in the middle of this matchup story. {source} is focused on {fact}.",
-        ]
-    else:
-        options = [
-            f"The clearest outside angle on {matchup} comes from {source}: {fact}.",
-            f"There is a real football story in {matchup} before the probability enters the conversation. {source} is focused on {fact}.",
-            f"Current coverage gives {matchup} a better starting point than a generic matchup label: {source} is tracking {fact}.",
-            f"The week has already supplied a concrete storyline for {matchup}. {source} is centered on {fact}.",
-        ]
-    return options[slot % len(options)]
+    if not fact:
+        return f"{source}'s {matchup} coverage is the lead source for this Read."
+    substantive = bool((item.get("metadata") or {}).get("substantive"))
+    if substantive:
+        return f"{source}'s {matchup} reporting centers on {fact}."
+    return f"{source}'s {matchup} preview frames the game around {fact}."
 
 
-def _second_report(slot: int, item: dict[str, Any]) -> str:
-    source = str(item.get("source_name") or "another outlet")
+def _second_report(away: str, home: str, item: dict[str, Any]) -> str:
+    source = str(item.get("source_name") or "Another outlet").strip()
     fact = _clean_title(item.get("title"))
-    options = [
-        f"{source} adds another live thread: {fact}.",
-        f"There is a second piece worth carrying into kickoff—{source} is also tracking {fact}.",
-        f"That is not the only current angle. {source} is separately focused on {fact}.",
-        f"The reporting picture is broader than one story; {source} also has {fact} in view.",
-        f"One more update matters here: {source} is following {fact}.",
-    ]
-    return options[slot % len(options)]
+    if not fact:
+        return ""
+    return f"{source} adds a separate {away}-{home} thread: {fact}."
 
 
 def _quant_item(items: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -123,42 +95,51 @@ def _quant_item(items: list[dict[str, Any]]) -> dict[str, Any] | None:
     return min(candidates, key=lambda item: QUANT_FAMILY_ORDER.get(_family(item), 50))
 
 
-def _quant_sentence(item: dict[str, Any] | None) -> str:
+def _quant_sentence(away: str, home: str, item: dict[str, Any] | None) -> str:
     if not item:
         return ""
+    matchup = f"{away}-{home}"
     summary = re.sub(r"\s+", " ", str(item.get("summary") or "")).strip()
     title = str(item.get("title") or "").strip().rstrip(".: ")
     fam = _family(item)
+
     if fam == "pressure":
         match = re.search(r"([A-Z]{2,4}) gave up sacks on ([0-9.]+)% of pass plays last season; ([A-Z]{2,4}) got home on ([0-9.]+)%", summary)
         if match:
             protected, allowed, rusher, created = match.groups()
-            return f"That makes the protection battle concrete: {protected} allowed sacks on {allowed}% of pass plays last year, while {rusher} generated them on {created}%."
+            return f"{matchup} pressure check: {protected} allowed an {allowed}% sack rate; {rusher} generated {created}%."
         tilt = re.search(r"pressure matchup tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
-            return f"On the field, the clearest supporting pressure point is the pass rush, which tilts toward {tilt.group(1).upper()}."
+            team = tilt.group(1).upper()
+            return f"{matchup} pressure edge: the pass-rush evidence favors {team}."
+
     if fam == "explosives":
         match = re.search(r"([A-Z]{2,4}) hit a 20\+ yard pass on ([0-9.]+)% of pass plays; ([A-Z]{2,4}) allowed one on ([0-9.]+)%", summary)
         if match:
             offense, created, defense, allowed = match.groups()
-            return f"The big-play numbers give that story a football mechanism: {offense} created 20-plus-yard passes on {created}% of attempts, and {defense} allowed them on {allowed}%."
+            return f"{matchup} explosive-pass check: {offense} created 20-plus gains on {created}% of passes; {defense} allowed {allowed}%."
+        tilt = re.search(r"chunk-play path tilts ([A-Z]{2,4})", summary, re.I)
+        if tilt:
+            return f"{matchup} explosive-play evidence favors {tilt.group(1).upper()}."
+
     if fam == "early_down":
         match = re.search(r"([A-Z]{2,4}) threw on ([0-9.]+)% of first- and second-down plays and averaged ([+\-][0-9.]+) EPA per early-down pass", summary)
         if match:
             offense, rate, epa = match.groups()
-            return f"The early-down profile matters too: {offense} threw on {rate}% of first and second downs and produced {epa} EPA per pass in that sample."
+            return f"{matchup} early-down check: {offense} passed {rate}% of the time and produced {epa} EPA per pass."
+        tilt = re.search(r"early-down leverage tilts ([A-Z]{2,4})", summary, re.I)
+        if tilt:
+            return f"{matchup} early-down evidence favors {tilt.group(1).upper()}."
+
     if fam == "qb_opponent_history":
         qb = title.split(" vs ", 1)[0].strip() if " vs " in title else "The quarterback"
         match = re.search(r"([0-9]+) meaningful games.*?([0-9]+) charted dropbacks.*?([+\-][0-9.]+) EPA/dropback", summary)
         if match:
             games, drops, epa = match.groups()
-            return f"There is useful opponent history behind the storyline as well: {qb} has {games} meaningful meetings and {drops} charted dropbacks in the sample, at {epa} EPA per dropback."
-    if fam in {"availability", "personnel"} and title:
-        return f"The internal evidence points to the same part of the game: {title}."
-    if fam in {"staff_impact", "coaching"} and title:
-        return f"The staff context reinforces that angle rather than creating a separate one: {title}."
+            return f"{matchup} opponent history: {qb} has {games} meaningful meetings, {drops} charted dropbacks and {epa} EPA per dropback."
+
     if title:
-        return f"The quantitative file adds one useful football check: {title}."
+        return f"{matchup} supporting evidence: {_clean_title(title, max_words=14)}."
     return ""
 
 
@@ -177,7 +158,7 @@ def _market_sentence(row: pd.Series) -> str:
     away = str(row.get("away_team"))
     team = home if gap > 0 else away
     points = abs(gap) * 100.0
-    return f"The model-market disagreement is real: PURE is {points:.1f} percentage points more bullish on {team} than the market is."
+    return f"{away}-{home} market split: PURE gives {team} {points:.1f} percentage points more win probability than {team}'s market price."
 
 
 def rewrite_reads_with_media(
@@ -190,7 +171,8 @@ def rewrite_reads_with_media(
     if not media_by_game:
         return previews
     prediction_rows = {str(row.get("game_id")): row for _, row in predictions.iterrows()}
-    for slot, game_id in enumerate(sorted(previews)):
+
+    for game_id in sorted(previews):
         media = sorted(media_by_game.get(game_id, []), key=_priority, reverse=True)
         if not media:
             continue
@@ -201,36 +183,37 @@ def rewrite_reads_with_media(
         home = str(row.get("home_team"))
         preview = previews[game_id]
 
-        sentences = [_reported_sentence(slot, away, home, media[0])]
-        if len(media) > 1:
-            # Do not repeat two versions of the same headline merely because two
-            # aggregators surfaced it. Distinct source/title content earns sentence two.
-            first_key = re.sub(r"[^a-z0-9]+", " ", str(media[0].get("title") or "").lower())
-            second = next(
-                (
-                    item for item in media[1:]
-                    if re.sub(r"[^a-z0-9]+", " ", str(item.get("title") or "").lower()) != first_key
-                ),
-                None,
-            )
-            if second:
-                sentences.append(_second_report(slot, second))
+        sentences = [_reported_sentence(away, home, media[0])]
+        first_key = re.sub(r"[^a-z0-9]+", " ", str(media[0].get("title") or "").lower()).strip()
+        second = next(
+            (
+                item for item in media[1:]
+                if re.sub(r"[^a-z0-9]+", " ", str(item.get("title") or "").lower()).strip() != first_key
+            ),
+            None,
+        )
+        if second:
+            second_sentence = _second_report(away, home, second)
+            if second_sentence:
+                sentences.append(second_sentence)
 
-        quant = _quant_sentence(_quant_item(evidence.get(game_id, [])))
+        quant = _quant_sentence(away, home, _quant_item(evidence.get(game_id, [])))
         if quant:
             sentences.append(quant)
         market = _market_sentence(row)
         if market:
             sentences.append(market)
 
-        paragraphs = list(preview.get("paragraphs") or [])
         read = " ".join(sentence for sentence in sentences if sentence).strip()
+        paragraphs = list(preview.get("paragraphs") or [])
         if paragraphs:
             paragraphs[0] = read
         else:
             paragraphs = [read]
         preview["paragraphs"] = paragraphs
-        preview["headline"] = _clean_title(media[0].get("title")) or preview.get("headline")
+
+        headline_fact = _clean_title(media[0].get("title"), max_words=16)
+        preview["headline"] = headline_fact or f"{away}-{home}: current reporting"
         preview["reported_sources"] = [
             {
                 "source_name": item.get("source_name"),
@@ -244,6 +227,7 @@ def rewrite_reads_with_media(
         voice.update({
             "media_led": True,
             "reporting_first": True,
+            "game_specific": True,
             "media_source_count": len(media),
             "fallback_templates_used": False,
         })
