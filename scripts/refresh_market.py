@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from nfl_forecast.market import add_vig_free_market_prob
+from nfl_forecast.market_t120 import write_t120_market_research
 from nfl_forecast.publish import write_outputs
 
 
@@ -77,6 +78,11 @@ def refresh(output_dir: str = "outputs", season: int = 2026) -> pd.DataFrame:
     p["snapshot_type"] = "MARKET"
     p["prediction_timestamp_utc"] = datetime.now(timezone.utc).isoformat()
     write_outputs(SimpleNamespace(predictions=p, games=schedules), output_dir)
+
+    # Research only: reconstruct the last observed MARKET snapshot at or before
+    # kickoff minus 120 minutes from append-only run history. LevLine never reads
+    # this artifact, so instrumentation cannot change the published probability.
+    write_t120_market_research(output_dir)
     return p
 
 
