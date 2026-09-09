@@ -177,7 +177,9 @@ def _contains_labeled_line(
     for candidate in candidates:
         if not candidate:
             continue
-        pattern = rf"(?<![\d.]){re.escape(candidate)}(?![\d.])"
+        # Disallow embedding in another number, but allow ordinary punctuation
+        # immediately after a valid decimal (for example: "Chiefs -3.5.").
+        pattern = rf"(?<![\d.]){re.escape(candidate)}(?!\d)"
         for match in re.finditer(pattern, lowered):
             left = max(0, match.start() - 100)
             right = min(len(lowered), match.end() + 100)
