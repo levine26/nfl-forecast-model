@@ -20,4 +20,13 @@ text = text.replace(
     'return f"{offense} generated a 20+ yard completion on {created}% of passes; {defense} allowed 20+ on {allowed}%."',
     'return f"{offense} explosives: {created}% of passes gained 20+ yards; {defense} allowed 20+ on {allowed}%."',
 )
+text = text.replace(
+    '    for game_id in sorted(previews):\n',
+    '    for slate_index, game_id in enumerate(sorted(previews)):\n',
+)
+old_voice = '''        preview["editorial_voice"] = {\n            "evidence_led": True,\n            "game_specific": True,\n            "lead_items": [str(item.get("title") or "") for item in selected[:2]],\n        }\n'''
+new_voice = '''        preview["editorial_voice"] = {\n            "evidence_led": True,\n            "game_specific": True,\n            "slate_aware": True,\n            "primary_variant": slate_index,\n            "secondary_variant": slate_index,\n            "lead_items": [str(item.get("title") or "") for item in selected[:2]],\n        }\n'''
+if old_voice not in text:
+    raise SystemExit('editorial voice metadata block not found')
+text = text.replace(old_voice, new_voice)
 path.write_text(text)
