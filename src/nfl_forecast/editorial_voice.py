@@ -181,7 +181,11 @@ def _second(counter_slot: int, family: str, advantage: str | None, pick: str, op
     return options[counter_slot % len(options)]
 
 
-def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -> dict[str, dict]:
+def polish_preview_slate(
+    previews: dict[str, dict],
+    predictions: pd.DataFrame,
+    evidence: dict[str, list[dict[str, Any]]] | None = None,
+) -> dict[str, dict]:
     """Make each game file evidence-led instead of template-led."""
     def advantage(item: dict[str, Any] | None) -> str | None:
         if not item:
@@ -196,17 +200,39 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
         meta = item.get("metadata") or {}
         return _clean_family(meta.get("family") or item.get("family") or item.get("category"))
 
-    def candidates(preview: dict[str, Any]) -> list[dict[str, Any]]:
+    raw_evidence = evidence or {}
+
+    def candidates(game_id: str, preview: dict[str, Any]) -> list[dict[str, Any]]:
+        raw_items = [item for item in (raw_evidence.get(str(game_id)) or []) if isinstance(item, dict)]
+        raw_by_title = {str(item.get("title") or "").strip(): item for item in raw_items if str(item.get("title") or "").strip()}
         rows: list[dict[str, Any]] = []
+        seen: set[str] = set()
         for key in ("key_factors", "matchup_meter", "notebook"):
             for item in preview.get(key) or []:
-                if isinstance(item, dict):
-                    rows.append(item)
+                if not isinstance(item, dict):
+                    continue
+                title = str(item.get("title") or "").strip()
+                canonical = raw_by_title.get(title, item)
+                marker = title or f"anon:{len(rows)}"
+                if marker in seen:
+                    continue
+                rows.append(canonical)
+                seen.add(marker)
+        # Make raw contextual evidence available as a secondary pool. Story-spine
+        # titles and visible cards keep their ordering, but support/counter lookup
+        # is no longer trapped inside generic UI summaries.
+        for item in raw_items:
+            title = str(item.get("title") or "").strip()
+            marker = title or f"raw:{len(rows)}"
+            if marker in seen:
+                continue
+            rows.append(item)
+            seen.add(marker)
         return rows
 
-    def detail(preview: dict[str, Any], title: Any) -> dict[str, Any] | None:
+    def detail(game_id: str, preview: dict[str, Any], title: Any) -> dict[str, Any] | None:
         wanted = str(title or "").strip()
-        return next((item for item in candidates(preview) if str(item.get("title") or "").strip() == wanted), None) if wanted else None
+        return next((item for item in candidates(game_id, preview) if str(item.get("title") or "").strip() == wanted), None) if wanted else None
 
     def usable(item: dict[str, Any] | None) -> bool:
         if not item:
@@ -226,21 +252,37 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
         if not summary:
             return ""
         if fam == "qb_opponent_history":
+            meta = item.get("metadata") or {}
+            title = str(item.get("title") or "").strip()
+            quarterback = title.split(" vs ", 1)[0].strip() if " vs " in title else "Quarterback"
+            opponent = title.split(" vs ", 1)[1].split(":", 1)[0].strip() if " vs " in title else "opponent"
+            meetings = list(meta.get("meetings") or [])
+            meaningful = [row for row in meetings if float(row.get("dropbacks") or 0) >= 10]
+            games = int(meta.get("recent_sample_games") or meta.get("games") or len(meaningful) or 0)
+            dropbacks = int(item.get("sample_size") or sum(int(row.get("dropbacks") or 0) for row in meaningful) or 0)
+            epa = meta.get("epa_per_dropback")
+            success = meta.get("success_rate")
+            latest = meta.get("latest_meeting") or (sorted(meaningful, key=lambda row: (row.get("season") or 0, row.get("week") or 0), reverse=True)[0] if meaningful else {})
+            latest_label = str(latest.get("human_label") or latest.get("label") or "").strip() if isinstance(latest, dict) else ""
+            if games:
+                parts = [f"{quarterback}–{opponent} recent file: {games} meaningful meetings"]
+                if dropbacks:
+                    parts.append(f"{quarterback} logged {dropbacks} charted dropbacks")
+                if epa is not None and success is not None:
+                    parts.append(f"{quarterback} produced {float(epa):+.2f} EPA/dropback with {float(success):.0%} positive-EPA")
+                if latest_label:
+                    parts.append(f"latest {quarterback}–{opponent} entry: {latest_label}")
+                return "; ".join(parts) + "."
+            return f"{quarterback}–{opponent} recent history is too sparse for a stable {quarterback} aggregate."
+        if fam in {"rivalry", "recent_series"}:
             match = re.search(
-                r"^In the nflverse play-by-play sample since 2021, (.+?) has ([0-9]+) meaningful games against ([A-Z]{2,4}); the most recent was (.+?)\. Over ([0-9]+) charted dropbacks in those games, (?:he|she|they) averaged ([+\-][0-9.]+) EPA/dropback with a ([0-9.]+)% positive-EPA rate",
+                r"^Since 2021, ([A-Za-z0-9]+) and ([A-Za-z0-9]+) have played ([0-9]+) completed games in the nflverse schedule sample: ([A-Za-z0-9]+) is ([0-9]+-[0-9]+)(?: with ([0-9]+) ties?)?\. The most recent finished (.+?)\.$",
                 summary,
             )
             if match:
-                quarterback, games, opponent, latest, dropbacks, epa, positive = match.groups()
-                return f"{quarterback}–{opponent} recent sample: {games} meaningful games, {dropbacks} dropbacks, {epa} EPA/dropback, {positive}% positive-EPA; latest: {latest}."
-        if fam == "rivalry":
-            match = re.search(
-                r"^Since 2021, ([A-Za-z0-9]+) and ([A-Za-z0-9]+) have played ([0-9]+) completed games in the nflverse schedule sample: ([A-Za-z0-9]+) is ([0-9]+-[0-9]+)\. The most recent finished (.+?)\.$",
-                summary,
-            )
-            if match:
-                team_a, team_b, games, leader, record, latest = match.groups()
-                return f"{team_a}-{team_b} since 2021: {games} meetings, {leader} {record}; latest: {latest}."
+                team_a, team_b, games, leader, record, ties, latest = match.groups()
+                tie_note = f", {ties} ties" if ties else ""
+                return f"{team_a}-{team_b} recent series: {games} meetings; {leader} {record}{tie_note}; latest {team_a}-{team_b} result: {latest}."
         if fam == "pressure":
             match = re.search(r"^([A-Z]{2,4}) gave up sacks on ([0-9.]+)% of pass plays last season; ([A-Z]{2,4}) got home on ([0-9.]+)%", summary)
             if match:
@@ -252,47 +294,71 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
                 offense, created, defense, allowed = match.groups()
                 return f"{offense} explosives: {created}% of passes gained 20+ yards; {defense} allowed 20+ on {allowed}%."
         if fam == "early_down":
-            match = re.search(r"^([A-Z]{2,4}) threw on ([0-9.]+)% of first- and second-down plays and averaged ([+\-][0-9.]+) EPA per early-down pass\. ([A-Z]{2,4}) allowed ([+\-][0-9.]+)", summary)
+            match = re.search(r"^([A-Z]{2,4}) threw on ([0-9.]+)% of first- and second-down plays and averaged ([+\-][0-9]+(?:\.[0-9]+)?) EPA per early-down pass\. ([A-Z]{2,4}) allowed ([+\-][0-9]+(?:\.[0-9]+)?)", summary)
             if match:
                 offense, rate, epa, defense, allowed = match.groups()
                 return f"{offense} early downs: {rate}% pass rate and {epa} EPA per pass; {defense} allowed {allowed}."
-        title = str(item.get("title") or _label(fam)).strip().rstrip('.:')
-
-        # Some downstream evidence enrichers intentionally replace raw statistical
-        # summaries with short football interpretations. Those interpretations are
-        # useful in detail cards, but their reusable sentence tails must never leak
-        # back into the public game-file cases. Keep the public renderer anchored to
-        # the matchup title and the actual side of the evidence.
-        if fam == "pressure":
-            tilt = re.search(r"pressure matchup tilts ([A-Z]{2,4})", summary, re.I)
-            if tilt:
-                return f"{title}: pass-rush leverage favors {tilt.group(1).upper()}."
-        if fam == "explosives":
-            tilt = re.search(r"chunk-play path tilts ([A-Z]{2,4})", summary, re.I)
-            if tilt:
-                return f"{title}: explosive-pass leverage favors {tilt.group(1).upper()}."
-        if fam == "early_down":
-            tilt = re.search(r"early-down leverage tilts ([A-Z]{2,4})", summary, re.I)
-            if tilt:
-                return f"{title}: early-down leverage favors {tilt.group(1).upper()}."
-        if fam in {"staff_impact", "coaching", "personnel", "injury", "history", "qb_opponent_history"}:
-            return f"{title}: {_label(fam)} context."
-        if fam == "rivalry":
-            return f"{title}: rivalry history."
-
+        if fam == "alignment":
+            match = re.search(r"^([A-Z]{2,4}) was ([a-z-]+), lining up in shotgun on ([0-9.]+)% of charted snaps\. It produced ([+\-][0-9]+(?:\.[0-9]+)?) EPA/play from shotgun; ([A-Z]{2,4}) allowed ([+\-][0-9]+(?:\.[0-9]+)?)", summary)
+            if match:
+                offense, identity, rate, epa, defense, allowed = match.groups()
+                return f"{offense} formation: {identity}, {rate}% shotgun, {epa} EPA/play; {defense} allowed {allowed}."
+        if fam == "third_down":
+            match = re.search(r"^([A-Z]{2,4}) produced positive EPA on ([0-9.]+)% of third downs; ([A-Z]{2,4}) allowed it on ([0-9.]+)%", summary)
+            if match:
+                offense, rate, defense, allowed = match.groups()
+                return f"{offense} third downs: {rate}% positive-EPA; {defense} allowed {allowed}%."
+        if fam == "yac":
+            match = re.search(r"^([A-Z]{2,4}) averaged ([0-9.]+) yards after catch per completion; ([A-Z]{2,4}) allowed ([0-9.]+)", summary)
+            if match:
+                offense, yac, defense, allowed = match.groups()
+                return f"{offense} YAC: {yac} per completion; {defense} allowed {allowed}."
+        if fam == "run_front":
+            match = re.search(r"^([A-Z]{2,4}) used a ([a-z-]+)-than-typical box, averaging ([0-9.]+) defenders near the line\. ([A-Z]{2,4}) ran for ([+\-][0-9]+(?:\.[0-9]+)?) EPA/play; \1 allowed ([+\-][0-9]+(?:\.[0-9]+)?)", summary)
+            if match:
+                defense, descriptor, box, offense, rush_epa, allowed = match.groups()
+                return f"{offense} run game: {rush_epa} EPA/play; {defense} {descriptor} box ({box}) allowed {allowed}."
+        if fam == "staff_impact":
+            meta = item.get("metadata") or {}
+            coordinator = str(meta.get("coordinator") or "").strip()
+            prior = meta.get("prior_profile") or {}
+            baseline = meta.get("team_baseline") or {}
+            deltas = []
+            for key in sorted(set(prior).intersection(baseline)):
+                if key == "plays":
+                    continue
+                try:
+                    before = float(baseline[key]); after = float(prior[key])
+                except Exception:
+                    continue
+                deltas.append((abs(after-before), key, after, before))
+            deltas.sort(reverse=True)
+            if coordinator and deltas:
+                bits = []
+                for _, key, after, before in deltas[:2]:
+                    label = key.replace("_", " ")
+                    if "rate" in key:
+                        bits.append(f"{label} {after:.0%} vs {before:.0%}")
+                    else:
+                        bits.append(f"{label} {after:.2f} vs {before:.2f}")
+                return f"{coordinator} tendency delta: " + "; ".join(bits) + "."
+        if fam == "availability":
+            title = str(item.get("title") or "").strip().rstrip('.')
+            if title:
+                return f"{title}; official availability."
+        if fam == "qb_opponent_history":
+            match = re.search(r"^(.+?) has seen ([A-Z]{2,4}) ([0-9]+) time(?:s)?: ([+\-][0-9.]+) EPA/dropback and a ([0-9.]+)% positive-EPA rate across ([0-9]+) dropbacks", summary)
+            if match:
+                quarterback, opponent, games, epa, positive, dropbacks = match.groups()
+                return f"{quarterback}-{opponent}: {games} prior games, {dropbacks} dropbacks, {epa} EPA/dropback, {positive}% positive-EPA."
         sentences = [part.strip() for part in summary.split(". ") if part.strip()]
         if not sentences:
             return summary
-        if fam in {"international_event", "international_travel"}:
-            kept = sentences[:2]
-            result = ". ".join(kept)
-            if summary.endswith(".") and not result.endswith("."):
-                result += "."
-            return result
-
-        # Fail closed on unparsed public evidence: use a compact title-anchored
-        # formulation instead of importing an arbitrary reusable source sentence.
-        return f"{title}: {_label(fam)} evidence."
+        kept = sentences[:2] if fam in {"international_event", "rivalry", "international_travel"} else sentences[:1]
+        result = ". ".join(kept)
+        if summary.endswith(".") and not result.endswith("."):
+            result += "."
+        return result
 
     def beat(item: dict[str, Any]) -> str:
         title = str(item.get("title") or "").strip().rstrip('.:')
@@ -302,22 +368,22 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
     def read_hook(slot: int, item: dict[str, Any], pick: str, opponent: str) -> str:
         title = str(item.get("title") or _label(family(item))).strip().rstrip('.:')
         hooks = [
-            f"{title} gets first billing in this file. It is the sourced matchup fact that most clearly explains why {pick} has a path to control the terms rather than merely survive them.",
-            f"The opening question is not the spread; it is {title}. That evidence tells us which part of the field {opponent} must solve before the broader forecast can be trusted.",
-            f"Build the football case from {title} outward. The number matters because this particular matchup can dictate play selection, down-and-distance, and the kind of possessions both staffs are forced to manage.",
-            f"{title} is the hinge worth isolating before anything else. If that edge shows up as the source data suggests, the {pick} projection has a concrete mechanism instead of a generic favorite's argument.",
-            f"This matchup file starts below the headline level with {title}. It gives the forecast a tactical center of gravity and identifies exactly where {opponent} has to keep the game from tilting.",
-            f"The most useful first read is {title}, not a broad power-rating story. That sourced detail narrows the game to a football problem the {pick} side can repeatedly test.",
-            f"There is one place to begin the film-room version of this forecast: {title}. Its value is that it connects the underlying data to a repeatable on-field question for both teams.",
-            f"{title} deserves the first paragraph because it can alter the menu available to each coordinator. That makes it more informative for this game than a generic statement about which roster is stronger.",
-            f"Strip away the win probability for a moment and look at {title}. This is the evidence thread most capable of turning the model's preference into a recognizable game script.",
-            f"The clearest route from data to football runs through {title}. It tells us what {pick} can press, what {opponent} must protect, and where the forecast is most likely to become visible.",
-            f"Treat {title} as the matchup's organizing fact. It does not decide the game by itself, but it gives the {pick} case a specific lever that can be checked snap by snap.",
-            f"Before the game branches into turnovers, fourth downs, and variance, {title} supplies the cleanest baseline. It is the part of this matchup where the evidence gives one side a defined structural advantage.",
-            f"The first layer of this forecast is {title}. That detail matters because it can force a response from {opponent}, and forced responses are where a pregame edge starts changing the rest of the call sheet.",
-            f"{title} is the best place to test whether the model's preference has real football substance. The evidence there creates a matchup-specific burden that {opponent} cannot solve with probability or reputation.",
-            f"Rather than start with the final percentage, start with {title}. It provides the most concrete explanation for how {pick} can create leverage and where the opposing plan has to be unusually clean.",
-            f"This read is anchored by {title} because it links source data to an identifiable coaching decision. If the matchup behaves that way, the {pick} side can make the game look like its preferred version.",
+            f"{title} gets first billing because it gives {pick} a concrete way to control this matchup.",
+            f"The opening question is {title}; {opponent} has to solve that football problem before the broader forecast matters.",
+            f"Build this game from {title} outward, because it can dictate play selection and down-and-distance.",
+            f"{title} is the hinge worth isolating first; it gives the {pick} projection an on-field mechanism.",
+            f"Start below the headline level with {title}; that is where the matchup can begin tilting.",
+            f"The useful first read is {title}, a specific football problem the {pick} side can repeatedly test.",
+            f"Begin the film-room version here: {title}, the evidence thread tying the data to repeatable decisions.",
+            f"{title} deserves the first paragraph because it can change the menu available to both coordinators.",
+            f"Strip away the probability and look at {title}; that is the clearest route to a recognizable game script.",
+            f"The cleanest route from data to football runs through {title}, the lever most likely to show up early.",
+            f"Treat {title} as the organizing fact; it gives the {pick} case something concrete to check snap by snap.",
+            f"Before turnovers and fourth downs enter the story, {title} supplies this matchup's cleanest baseline.",
+            f"The first layer is {title}; if it forces a response, the rest of the call sheet starts changing.",
+            f"{title} is the best test of whether the model preference has real football substance in this matchup.",
+            f"Rather than open with the final percentage, open with {title}, the most concrete source of leverage here.",
+            f"This Read is anchored by {title}, linking source data to an identifiable coaching decision before kickoff.",
         ]
         return hooks[slot % len(hooks)]
 
@@ -330,17 +396,18 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
         home, away, pick = str(row.get("home_team")), str(row.get("away_team")), str(row.get("pick"))
         opponent = away if pick == home else home
         spine = preview.get("story_spine") or {}
-        all_items = candidates(preview)
+        all_items = candidates(str(game_id), preview)
 
         selected: list[dict[str, Any]] = []
         special = next((item for item in all_items if family(item) in special_families and usable(item)), None)
         if special:
             selected.append(special)
         for title in (spine.get("primary_title"), spine.get("secondary_title")):
-            item = detail(preview, title)
+            item = detail(str(game_id), preview, title)
             if usable(item) and item not in selected:
                 selected.append(item)
-        for item in preview.get("key_factors") or []:
+        for factor in preview.get("key_factors") or []:
+            item = detail(str(game_id), preview, factor.get("title") if isinstance(factor, dict) else None)
             if usable(item) and item not in selected:
                 selected.append(item)
             if len(selected) >= 3:
@@ -349,10 +416,7 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
         if selected:
             preview["headline"] = str(selected[0].get("title") or f"{away}-{home}").strip()
             evidence_beats = " ".join(beat(item) for item in selected[:2]).strip()
-            if family(selected[0]) in special_families:
-                lead = evidence_beats
-            else:
-                lead = f"{read_hook(slate_index, selected[0], pick, opponent)} {evidence_beats}".strip()
+            lead = evidence_beats if family(selected[0]) in special_families else f"{read_hook(slate_index, selected[0], pick, opponent)} {evidence_beats}".strip()
         else:
             preview["headline"] = f"{away}-{home} matchup file"
             lead = f"{away}-{home}: sourced lead unavailable."
