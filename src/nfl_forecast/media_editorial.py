@@ -77,26 +77,6 @@ def _clean_title(title: Any, max_words: int = 18) -> str:
     return text.rstrip(".")
 
 
-def _reported_sentence(item: dict[str, Any]) -> str:
-    source = str(item.get("source_name") or "Current reporting").strip()
-    fact = _clean_title(item.get("title"))
-    if not fact:
-        return ""
-    expect = re.match(r"^(.+?)\s+expect(?:s)?\s+(.+?)\s+to\s+(.+)$", fact, flags=re.I)
-    if expect:
-        _, subject, action = expect.groups()
-        return f"{source} has {subject} expected to {action}."
-    expected = re.match(r"^(.+?)\s+(?:is\s+)?expected\s+to\s+(.+)$", fact, flags=re.I)
-    if expected:
-        subject, action = expected.groups()
-        return f"{source} has {subject} expected to {action}."
-    ruled = re.match(r"^(.+?)\s+(?:is\s+)?ruled\s+out(?:\s+(.+))?$", fact, flags=re.I)
-    if ruled:
-        subject, detail = ruled.groups()
-        return f"{source} lists {subject} out{(' ' + detail) if detail else ''}."
-    return f"{source} is tracking {fact[0].lower() + fact[1:] if len(fact) > 1 else fact.lower()}."
-
-
 def _quant_item(items: list[dict[str, Any]]) -> dict[str, Any] | None:
     candidates = [item for item in items if _family(item) != "reported_angle"]
     if not candidates:
@@ -112,7 +92,7 @@ def _pressure_details(summary: str) -> tuple[str, str, str, str] | None:
     return match.groups() if match else None
 
 
-def _football_preview(away: str, home: str, item: dict[str, Any] | None, media: list[dict[str, Any]]) -> tuple[str, str]:
+def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tuple[str, str]:
     matchup = _matchup(away, home)
     sentences: list[str] = []
     headline = f"{matchup}: the matchup that decides the game"
@@ -136,44 +116,35 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None, media: 
         elif fam == "explosives":
             headline = f"{matchup}: explosive plays will set the terms"
             sentences.append(
-                f"{matchup} has an explosive-play question at its center. {summary.rstrip('.')} The offense that creates chunk gains without living in third-and-long should be able to dictate tempo, while the other side has to force longer drives and win red-zone downs."
+                f"{matchup} turns on whether {_nick(away)} can create chunk gains without giving {_nick(home)} short fields or easy answers. {summary.rstrip('.')} "
+                f"If {_nick(away)} forces {_nick(home)} to defend the full field, {_nick(away)} can dictate tempo; if {_nick(home)} limits explosives, {_nick(away)} has to sustain longer drives."
             )
         elif fam == "early_down":
             headline = f"{matchup}: early downs will decide who controls the script"
             sentences.append(
-                f"{matchup} is likely to be decided before third down. {summary.rstrip('.')} If that early-down edge holds, it changes the entire play-calling menu; if it does not, the game becomes much more dependent on obvious passing situations and quarterback creation."
+                f"{matchup} puts early-down efficiency at the center of the game. {summary.rstrip('.')} "
+                f"{_nick(away)} needs favorable second downs to keep its full call sheet available, while {_nick(home)} wants to create third-and-long and make the quarterback solve the game."
             )
         elif fam == "qb_opponent_history":
             headline = f"{matchup}: quarterback answers under pressure"
             sentences.append(
-                f"{matchup} starts with the quarterback matchup and how each defense can force the passer off schedule. {summary.rstrip('.')} The key is less the historical record itself than whether the same pressure, coverage and down-and-distance problems show up again in this version of the matchup."
+                f"{matchup} puts {_nick(away)} quarterback context against {_nick(home)}'s defensive plan. {summary.rstrip('.')} "
+                f"{_nick(away)} needs the passer to stay on schedule against {_nick(home)}, while {_nick(home)} wants to recreate the pressure or coverage problems that have shown up in this matchup before."
             )
         elif title:
             headline = f"{matchup}: {title}"
             sentences.append(
-                f"{matchup} centers on {title[0].lower() + title[1:] if len(title) > 1 else title.lower()}. {summary.rstrip('.')} That factor matters because it changes which side can stay on schedule and avoid asking its quarterback to solve the game from obvious passing downs."
+                f"{matchup} centers on {title[0].lower() + title[1:] if len(title) > 1 else title.lower()}. {summary.rstrip('.')} "
+                f"{_nick(away)} has to solve that issue without giving {_nick(home)} favorable down-and-distance, while {_nick(home)} wants to keep the game in that exact script."
             )
 
     if not sentences:
         sentences.append(
-            f"{matchup} is a game of which offense can stay on schedule and which defense can create the first real disruption. Both teams have plausible paths, so the most important question is whether the favorite can create efficient early downs without giving the opponent short fields or high-leverage third-down chances."
+            f"{matchup} is a game of whether {_nick(away)} can stay on schedule before {_nick(home)} creates the first real disruption. "
+            f"{_nick(away)} needs efficient early downs and clean possessions; {_nick(home)} wants to force longer-yardage situations and make {_nick(away)} win through the quarterback."
         )
 
-    substantive = [m for m in media if bool((m.get("metadata") or {}).get("substantive"))]
-    used_sources: set[str] = set()
-    for report in substantive:
-        source = str(report.get("source_name") or "")
-        if not source or source.lower() in used_sources:
-            continue
-        sentence = _reported_sentence(report)
-        if sentence:
-            sentences.append(sentence)
-            used_sources.add(source.lower())
-        if len(used_sources) >= 2:
-            break
-
-    paragraph = " ".join(sentences).strip()
-    return headline, paragraph
+    return headline, " ".join(sentences).strip()
 
 
 def _pick_probability(row: pd.Series, field: str) -> float | None:
@@ -256,7 +227,7 @@ def rewrite_reads_with_media(
         home = str(row.get("home_team"))
         media = sorted(media_by_game.get(game_id, []), key=_priority, reverse=True)
         item = _quant_item(evidence.get(game_id, []))
-        headline, paragraph1 = _football_preview(away, home, item, media)
+        headline, paragraph1 = _football_preview(away, home, item)
         paragraph2 = _model_paragraph(row, item)
         preview = previews[game_id]
 
