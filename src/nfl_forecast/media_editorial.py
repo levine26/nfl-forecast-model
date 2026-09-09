@@ -101,6 +101,27 @@ def _qb_subject(title: str, fallback: str) -> str:
     return fallback
 
 
+def _qb_offense_defense(away: str, home: str, item: dict[str, Any], title: str) -> tuple[str, str]:
+    """Resolve which current offense owns a QB-history item without assuming away-team ownership."""
+    side = str(item.get("side") or "").strip().lower()
+    if side == "home":
+        return home, away
+    if side == "away":
+        return away, home
+
+    opponent = ""
+    raw_title = str(title or "")
+    if " vs " in raw_title:
+        opponent = raw_title.split(" vs ", 1)[1].split(":", 1)[0].strip().upper()
+    away_key = "JAX" if str(away).upper() == "JAC" else str(away).upper()
+    home_key = "JAX" if str(home).upper() == "JAC" else str(home).upper()
+    if opponent in {away_key, _nick(away).upper(), _full(away).upper()}:
+        return home, away
+    if opponent in {home_key, _nick(home).upper(), _full(home).upper()}:
+        return away, home
+    return away, home
+
+
 def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tuple[str, str]:
     matchup = _matchup(away, home)
     sentences: list[str] = []
@@ -135,13 +156,15 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
                 f"{_nick(away)} needs favorable second downs to keep its full call sheet available, while {_nick(home)} wants to create third-and-long and make the quarterback solve the game."
             )
         elif fam == "qb_opponent_history":
-            subject = _qb_subject(title, f"the {_nick(away)} quarterback")
-            away_name = _nick(away)
-            home_name = _nick(home)
-            headline = f"{matchup}: {subject} against the {home_name} defense"
+            offense, defense = _qb_offense_defense(away, home, item, title)
+            offense_name = _nick(offense)
+            defense_name = _nick(defense)
+            subject = _qb_subject(title, f"the {offense_name} quarterback")
+            headline = f"{matchup}: {subject} against the {defense_name} defense"
             sentences.append(
-                f"{matchup} gives the {away_name} a history sample: {subject} has seen the {home_name} before, but {home_name}'s current coverage and {away_name}'s present protection decide whether it carries over. "
-                f"{away_name} need {subject} to identify {home_name}'s pressure quickly; {home_name} need to make {away_name}'s route timing and pocket answers look different from those prior meetings."
+                f"{matchup} puts {subject}'s prior {defense_name} meetings in context for the {offense_name}. "
+                f"{subject} must show that {offense_name} protection can answer {defense_name} pressure without leaning on {subject}'s old results. "
+                f"For {offense_name}, the key is keeping {subject} on schedule against {defense_name}; for {defense_name}, it is changing the coverage picture before {subject} can reuse earlier answers."
             )
         elif title:
             headline = f"{matchup}: {title}"
