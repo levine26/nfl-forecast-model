@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import re
 from typing import Any
 
 import pandas as pd
@@ -181,53 +182,149 @@ def _second(counter_slot: int, family: str, advantage: str | None, pick: str, op
 
 
 def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -> dict[str, dict]:
-    """Give same-family games different cadence while preserving the evidence spine.
+    """Make each game file evidence-led instead of template-led."""
+    def advantage(item: dict[str, Any] | None) -> str | None:
+        if not item:
+            return None
+        meta = item.get("metadata") or {}
+        value = item.get("advantage_team") or meta.get("advantage_team")
+        return str(value) if value else None
 
-    The underlying story selection remains deterministic and sourced. This pass
-    only changes the top-level synthesis paragraph; detail modules below retain
-    the exact evidence, samples and source links.
-    """
-    primary_counts: dict[str, int] = defaultdict(int)
-    secondary_counts: dict[tuple[str, str], int] = defaultdict(int)
+    def family(item: dict[str, Any] | None) -> str:
+        if not item:
+            return "context"
+        meta = item.get("metadata") or {}
+        return _clean_family(meta.get("family") or item.get("family") or item.get("category"))
 
-    for game_id in sorted(previews):
+    def candidates(preview: dict[str, Any]) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for key in ("key_factors", "matchup_meter", "notebook"):
+            for item in preview.get(key) or []:
+                if isinstance(item, dict):
+                    rows.append(item)
+        return rows
+
+    def detail(preview: dict[str, Any], title: Any) -> dict[str, Any] | None:
+        wanted = str(title or "").strip()
+        return next((item for item in candidates(preview) if str(item.get("title") or "").strip() == wanted), None) if wanted else None
+
+    def usable(item: dict[str, Any] | None) -> bool:
+        if not item:
+            return False
+        summary = str(item.get("summary") or "").strip()
+        lowered = summary.lower()
+        if len(summary.split()) < 7:
+            return False
+        fam = family(item)
+        if ("nflverse schedule sample" in lowered and fam != "rivalry") or "need variance in the high-leverage parts" in lowered:
+            return False
+        return True
+
+    def specific_summary(item: dict[str, Any]) -> str:
+        summary = str(item.get("summary") or "").strip()
+        fam = family(item)
+        if not summary:
+            return ""
+        if fam == "qb_opponent_history":
+            match = re.search(
+                r"^In the nflverse play-by-play sample since 2021, (.+?) has ([0-9]+) meaningful games against ([A-Z]{2,4}); the most recent was (.+?)\. Over ([0-9]+) charted dropbacks in those games, (?:he|she|they) averaged ([+\-][0-9.]+) EPA/dropback with a ([0-9.]+)% positive-EPA rate",
+                summary,
+            )
+            if match:
+                quarterback, games, opponent, latest, dropbacks, epa, positive = match.groups()
+                return f"{quarterback}–{opponent} recent sample: {games} meaningful games, {dropbacks} dropbacks, {epa} EPA/dropback, {positive}% positive-EPA; latest: {latest}."
+        if fam == "rivalry":
+            match = re.search(
+                r"^Since 2021, ([A-Za-z0-9]+) and ([A-Za-z0-9]+) have played ([0-9]+) completed games in the nflverse schedule sample: ([A-Za-z0-9]+) is ([0-9]+-[0-9]+)\. The most recent finished (.+?)\.$",
+                summary,
+            )
+            if match:
+                team_a, team_b, games, leader, record, latest = match.groups()
+                return f"{team_a}-{team_b} since 2021: {games} meetings, {leader} {record}; latest: {latest}."
+        if fam == "pressure":
+            match = re.search(r"^([A-Z]{2,4}) gave up sacks on ([0-9.]+)% of pass plays last season; ([A-Z]{2,4}) got home on ([0-9.]+)%", summary)
+            if match:
+                protected, allowed, rusher, created = match.groups()
+                return f"{protected} protection: {allowed}% sack rate; {rusher} pass rush: {created}% sack rate."
+        if fam == "explosives":
+            match = re.search(r"^([A-Z]{2,4}) hit a 20\+ yard pass on ([0-9.]+)% of pass plays; ([A-Z]{2,4}) allowed one on ([0-9.]+)%", summary)
+            if match:
+                offense, created, defense, allowed = match.groups()
+                return f"{offense} explosives: {created}% of passes gained 20+ yards; {defense} allowed 20+ on {allowed}%."
+        if fam == "early_down":
+            match = re.search(r"^([A-Z]{2,4}) threw on ([0-9.]+)% of first- and second-down plays and averaged ([+\-][0-9.]+) EPA per early-down pass\. ([A-Z]{2,4}) allowed ([+\-][0-9.]+)", summary)
+            if match:
+                offense, rate, epa, defense, allowed = match.groups()
+                return f"{offense} early downs: {rate}% pass rate and {epa} EPA per pass; {defense} allowed {allowed}."
+        sentences = [part.strip() for part in summary.split(". ") if part.strip()]
+        if not sentences:
+            return summary
+        kept = sentences[:2] if fam in {"international_event", "rivalry", "international_travel"} else sentences[:1]
+        result = ". ".join(kept)
+        if summary.endswith(".") and not result.endswith("."):
+            result += "."
+        return result
+
+    def beat(item: dict[str, Any]) -> str:
+        title = str(item.get("title") or "").strip().rstrip('.:')
+        summary = specific_summary(item)
+        return summary if not title or title.lower() in summary.lower()[: max(90, len(title) + 15)] else f"{title}: {summary}"
+
+    special_families = {"international_event", "rivalry", "international_travel"}
+    for slate_index, game_id in enumerate(sorted(previews)):
         preview = previews[game_id]
         row = _pick_row(predictions, game_id)
         if row is None:
             continue
-        home = str(row.get("home_team"))
-        away = str(row.get("away_team"))
-        pick = str(row.get("pick"))
+        home, away, pick = str(row.get("home_team")), str(row.get("away_team")), str(row.get("pick"))
         opponent = away if pick == home else home
-        matchup = f"{away}-{home}"
         spine = preview.get("story_spine") or {}
-        primary_family = _clean_family(spine.get("primary_family"))
-        primary_team = str(spine.get("primary_advantage_team") or pick)
-        primary_title = spine.get("primary_title")
-        if spine.get("primary_mode") == "counter":
-            continue
+        all_items = candidates(preview)
 
-        primary_slot = primary_counts[primary_family]
-        primary_counts[primary_family] += 1
-        lead = _lead(primary_slot, primary_family, pick, primary_team, opponent, matchup, primary_title)
+        selected: list[dict[str, Any]] = []
+        special = next((item for item in all_items if family(item) in special_families and usable(item)), None)
+        if special:
+            selected.append(special)
+        for title in (spine.get("primary_title"), spine.get("secondary_title")):
+            item = detail(preview, title)
+            if usable(item) and item not in selected:
+                selected.append(item)
+        for item in preview.get("key_factors") or []:
+            if usable(item) and item not in selected:
+                selected.append(item)
+            if len(selected) >= 3:
+                break
 
-        secondary_family = _clean_family(spine.get("secondary_family"))
-        secondary_team = spine.get("secondary_advantage_team")
-        second_key = (primary_family, secondary_family)
-        secondary_slot = secondary_counts[second_key]
-        secondary_counts[second_key] += 1
-        second = "" if not spine.get("secondary_family") else _second(secondary_slot, secondary_family, secondary_team, pick, opponent, matchup)
-
-        paragraphs = list(preview.get("paragraphs") or [])
-        synthesis = f"{lead} {second}".strip()
-        if paragraphs:
-            paragraphs[0] = synthesis
+        if selected:
+            preview["headline"] = str(selected[0].get("title") or f"{away}-{home}").strip()
+            lead = " ".join(beat(item) for item in selected[:2]).strip()
         else:
-            paragraphs = [synthesis]
+            preview["headline"] = f"{away}-{home} matchup file"
+            lead = f"{away}-{home}: sourced lead unavailable."
+        paragraphs = list(preview.get("paragraphs") or [])
+        if paragraphs:
+            paragraphs[0] = lead
+        else:
+            paragraphs = [lead]
         preview["paragraphs"] = paragraphs
+
+        support = next((item for item in all_items if usable(item) and advantage(item) == pick), None)
+        counter = next((item for item in all_items if usable(item) and advantage(item) == opponent), None)
+        neutral = [item for item in selected if usable(item)]
+        pick_item = support or (neutral[0] if neutral else None)
+        opponent_item = counter or (neutral[1] if len(neutral) > 1 else None)
+        preview["case_for_pick"] = beat(pick_item) if pick_item else f"{pick} in {away}-{home}: featured evidence unavailable."
+        preview["case_for_opponent"] = beat(opponent_item) if opponent_item else f"{opponent} in {away}-{home}: featured counter unavailable."
+        preview["what_could_make_us_wrong"] = (
+            f"{opponent}'s counter in {away}-{home}: {specific_summary(counter)}" if counter
+            else f"{away}-{home}: no sourced {opponent} counter clears the publication threshold."
+        )
         preview["editorial_voice"] = {
-            "primary_variant": primary_slot,
-            "secondary_variant": secondary_slot if spine.get("secondary_family") else None,
+            "evidence_led": True,
+            "game_specific": True,
             "slate_aware": True,
+            "primary_variant": slate_index,
+            "secondary_variant": slate_index,
+            "lead_items": [str(item.get("title") or "") for item in selected[:2]],
         }
     return previews

@@ -14,6 +14,8 @@ TEAM = {
 }
 BANNED = (
     "two distinct levers", "real matchup counter-signal", "the answer on the other side", "cleaner path gets much narrower",
+    "there is actual memory in this quarterback matchup", "prior meetings give", "this is a geometry game",
+    "the case also has a second leg", "the supporting thread is", "the extra wrinkle is",
 )
 
 
@@ -143,7 +145,8 @@ def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, A
         # model-language headlines with a football headline tied to the lead fact.
         current = str(preview.get("headline") or "")
         is_special = bool(re.search(r"Melbourne|Australia|rivalry", current, re.I))
-        if not is_special:
+        is_game_specific = bool((preview.get("editorial_voice") or {}).get("game_specific"))
+        if not is_special and not is_game_specific:
             primary_title = str((preview.get("story_spine") or {}).get("primary_title") or "")
             primary = by_title.get(primary_title)
             if primary is None:
@@ -165,6 +168,27 @@ def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, A
     found = [phrase for phrase in BANNED if phrase in public]
     if found:
         raise ValueError(f"publication still contains banned template phrases: {found}")
+
+    ngram_games: dict[str, set[str]] = {}
+    for game_id, preview in previews.items():
+        paragraphs = preview.get("paragraphs") or []
+        texts = [str(preview.get("headline") or "")]
+        if paragraphs:
+            texts.append(str(paragraphs[0]))
+        texts.extend([
+            str(preview.get("case_for_pick") or ""),
+            str(preview.get("case_for_opponent") or ""),
+            str(preview.get("what_could_make_us_wrong") or ""),
+        ])
+        words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", " ".join(texts).lower())
+        for index in range(max(0, len(words) - 6)):
+            gram = " ".join(words[index:index+7])
+            ngram_games.setdefault(gram, set()).add(str(game_id))
+    repeated = {gram: sorted(games) for gram, games in ngram_games.items() if len(games) > 1}
+    if repeated:
+        sample = list(repeated.items())[:5]
+        raise ValueError(f"publication repeats game-file prose across matchups: {sample}")
+
     if len(headlines) != len(set(headlines)):
         raise ValueError("publication headlines are not unique across the slate")
     return {
