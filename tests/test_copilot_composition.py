@@ -30,6 +30,15 @@ def test_bing_redirect_resolves_to_direct_approved_publisher():
     assert _canonical_url(url, "Yahoo Sports") == "https://sports.yahoo.com/articles/broncos-example.html"
 
 
+def test_official_team_domains_are_approved_publishers():
+    assert _canonical_url(
+        "https://www.packers.com/news/example", "Green Bay Packers"
+    ) == "https://www.packers.com/news/example"
+    assert _canonical_url(
+        "https://www.vikings.com/news/example", "Minnesota Vikings"
+    ) == "https://www.vikings.com/news/example"
+
+
 def test_unresolved_or_homepage_substitution_is_not_fabricated():
     assert _canonical_url("https://news.google.com/rss/articles/opaque", "ESPN") == ""
     assert _canonical_url("", "NFL.com", "https://www.nfl.com/") == ""
@@ -130,16 +139,16 @@ def test_numeric_llm_rationale_is_discarded_instead_of_published():
     assert "ATL protection vs PIT pass rush" in entry["paragraph2"]
 
 
-def test_deterministic_model_paragraphs_do_not_share_seven_word_template_span():
+def test_deterministic_model_paragraphs_do_not_share_seven_word_template_span_when_market_rounding_matches():
     predictions = pd.DataFrame([
         {
             "game_id": "g1", "away_team": "DEN", "home_team": "KC", "pick": "DEN",
-            "final_home_prob": 0.38, "pure_home_prob": 0.32, "market_home_prob": 0.48,
+            "final_home_prob": 0.38, "pure_home_prob": 0.32, "market_home_prob": 0.407,
             "expected_margin": -6.5, "spread_line": 3.5, "projected_score": "DEN 27.0 – KC 20.5",
         },
         {
             "game_id": "g2", "away_team": "ATL", "home_team": "PIT", "pick": "PIT",
-            "final_home_prob": 0.64, "pure_home_prob": 0.66, "market_home_prob": 0.58,
+            "final_home_prob": 0.64, "pure_home_prob": 0.66, "market_home_prob": 0.593,
             "expected_margin": 5.2, "spread_line": 3.5, "projected_score": "PIT 26.0 – ATL 20.8",
         },
     ])
@@ -165,4 +174,6 @@ def test_deterministic_model_paragraphs_do_not_share_seven_word_template_span():
     }}
     previews = {"g1": {}, "g2": {}}
     result = compose(payload, predictions, previews, {"g1": [], "g2": []})["games"]
+    assert "market probability is 59.3%" in result["g1"]["paragraph2"]
+    assert "market probability is 59.3%" in result["g2"]["paragraph2"]
     assert not (_ngrams(result["g1"]["paragraph2"]) & _ngrams(result["g2"]["paragraph2"]))
