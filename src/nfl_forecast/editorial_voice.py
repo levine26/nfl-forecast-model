@@ -155,7 +155,7 @@ def _second(counter_slot: int, family: str, advantage: str | None, pick: str, op
     label = _label(family)
     if advantage and advantage != pick:
         options = [
-            f"The answer on the other side is {label}. That part belongs to {advantage}, and if it becomes the dominant texture of {matchup}, the cleaner {pick} path gets much narrower.",
+            f"The answer on the other side is {advantage}'s {label} edge; if it becomes the dominant texture of {matchup}, the cleaner {pick} path gets much narrower.",
             f"The warning is {label}: {advantage} owns that piece of the matchup, so the {pick} forecast is strongest when the game is decided somewhere else.",
             f"There is an honest countercase here. {advantage} has the better {label} setup, the part of {matchup} most capable of making LevLine uncomfortable.",
             f"What keeps this from being one-way is {label}. That edge sits with {advantage}, giving {opponent} a specific upset mechanism rather than a vague 'anything can happen' argument.",
