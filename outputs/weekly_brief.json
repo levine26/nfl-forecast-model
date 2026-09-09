@@ -1,34 +1,34 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_ARI_LAC",
+      "game_id": "2026_01_CLE_JAX",
       "largest_driver": "No material move",
-      "pick": "LAC",
-      "pick_delta_pp": -2.220446049250313e-14
-    },
-    {
-      "game_id": "2026_01_NO_DET",
-      "largest_driver": "No material move",
-      "pick": "DET",
-      "pick_delta_pp": -2.220446049250313e-14
+      "pick": "JAX",
+      "pick_delta_pp": 2.220446049250313e-14
     },
     {
       "game_id": "2026_01_WAS_PHI",
       "largest_driver": "No material move",
       "pick": "PHI",
-      "pick_delta_pp": -2.220446049250313e-14
+      "pick_delta_pp": 2.220446049250313e-14
+    },
+    {
+      "game_id": "2026_01_ATL_PIT",
+      "largest_driver": "No material move",
+      "pick": "PIT",
+      "pick_delta_pp": 1.1102230246251565e-14
     }
   ],
-  "generated_utc": "2026-09-09T05:46:16.120168+00:00",
+  "generated_utc": "2026-09-09T06:17:56.003942+00:00",
   "market_disagreements": [
     {
       "confidence": "Solid",
       "game_id": "2026_01_DEN_KC",
       "matchup": "DEN @ KC",
       "pick": "DEN",
-      "pick_prob": 0.6159372888065542,
+      "pick_prob": 0.6159372888065543,
       "projected_score": "KC 19.8 \u2013 DEN 25.3",
-      "pure_market_gap_pp": 26.52399064708812
+      "pure_market_gap_pp": 26.523990647088127
     },
     {
       "confidence": "Lean",
@@ -44,9 +44,9 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.693037154336658,
+      "pick_prob": 0.6930371543366581,
       "projected_score": "LAC 25.5 \u2013 ARI 18.8",
-      "pure_market_gap_pp": 14.834103327502845
+      "pure_market_gap_pp": 14.834103327502834
     }
   ],
   "most_uncertain": [
@@ -71,7 +71,7 @@
       "game_id": "2026_01_NYJ_TEN",
       "matchup": "NYJ @ TEN",
       "pick": "TEN",
-      "pick_prob": 0.5595992906849185,
+      "pick_prob": 0.5595992906849184,
       "projected_score": "TEN 24.0 \u2013 NYJ 22.1"
     }
   ],
@@ -81,7 +81,7 @@
       "game_id": "2026_01_CLE_JAX",
       "matchup": "CLE @ JAX",
       "pick": "JAX",
-      "pick_prob": 0.7874546475225495,
+      "pick_prob": 0.7874546475225497,
       "projected_score": "JAX 29.8 \u2013 CLE 15.9"
     },
     {
@@ -89,7 +89,7 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.693037154336658,
+      "pick_prob": 0.6930371543366581,
       "projected_score": "LAC 25.5 \u2013 ARI 18.8"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_01_WAS_PHI",
       "matchup": "WAS @ PHI",
       "pick": "PHI",
-      "pick_prob": 0.6685369583681475,
+      "pick_prob": 0.6685369583681477,
       "projected_score": "PHI 27.0 \u2013 WAS 20.7"
     }
   ],
