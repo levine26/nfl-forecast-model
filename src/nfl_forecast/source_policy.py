@@ -8,7 +8,9 @@ cross-checks. StatMuse is deliberately *not* an automated production dependency.
 """
 
 from datetime import datetime, timezone
+import re
 from typing import Any, Callable
+from urllib.parse import urlparse
 
 import nflreadpy as nfl
 
@@ -67,6 +69,120 @@ APPROVED_MEDIA_DOMAINS = frozenset(
         "yahoo.com",
     }
 ) | OFFICIAL_TEAM_MEDIA_DOMAINS
+
+_BETTING_SOURCE_SIGNALS = (
+    "betting",
+    "best bet",
+    "bonus bet",
+    "bonus bets",
+    "fanduel",
+    "draftkings",
+    "sportsbook",
+    "promo code",
+    "parlay",
+    "prop bet",
+    "prop bets",
+    "same-game",
+    "same game",
+    "against the spread",
+    "odds",
+)
+
+_GENERIC_SOURCE_TITLE_SIGNALS = (
+    "team page",
+    "news, scores, stats, schedule",
+    "news, scores and stats",
+    "2026 schedule",
+    "team roster",
+)
+
+
+def _media_host(url: str) -> str:
+    try:
+        return (urlparse(str(url or "")).hostname or "").lower().removeprefix("www.")
+    except Exception:
+        return ""
+
+
+def _media_domain_allowed(url: str) -> bool:
+    host = _media_host(url)
+    return any(host == domain or host.endswith("." + domain) for domain in APPROVED_MEDIA_DOMAINS)
+
+
+def is_substantive_media_source(url: str, title: str = "") -> bool:
+    """Require a direct approved article/report, not a landing page or betting page.
+
+    This is the publication-grade URL gate shared by Copilot composition and both
+    focused/full-slate validators. It deliberately rejects generic team pages,
+    schedules, rosters, game hubs, stats pages and betting/promotional content.
+    """
+    raw = str(url or "").strip()
+    if not raw or not _media_domain_allowed(raw):
+        return False
+    parsed = urlparse(raw)
+    host = _media_host(raw)
+    path = re.sub(r"/+", "/", parsed.path or "").rstrip("/")
+    lowered_title = re.sub(r"\s+", " ", str(title or "")).lower()
+    combined = f"{lowered_title} {path.lower()}"
+    if any(signal in combined for signal in _BETTING_SOURCE_SIGNALS):
+        return False
+    if any(signal in lowered_title for signal in _GENERIC_SOURCE_TITLE_SIGNALS):
+        return False
+    if not path:
+        return False
+
+    if host in OFFICIAL_TEAM_MEDIA_DOMAINS:
+        return any(
+            marker in path.lower()
+            for marker in ("/news/", "/article/", "/articles/", "/press-release/", "/press-releases/")
+        )
+
+    generic_prefixes = (
+        "/teams/",
+        "/team/",
+        "/games/",
+        "/game/",
+        "/stats/",
+        "/players/",
+        "/roster",
+        "/schedule",
+        "/standings",
+        "/scores",
+        "/scoreboard",
+        "/nfl/teams/",
+        "/nfl/team/",
+        "/nfl/game/",
+        "/nfl/stats/",
+        "/nfl/schedule",
+        "/nfl/standings",
+        "/nfl/scoreboard",
+    )
+    lowered_path = path.lower()
+    if any(lowered_path.startswith(prefix) for prefix in generic_prefixes):
+        return False
+
+    if host == "nfl.com" and not lowered_path.startswith("/news/"):
+        return False
+    if host == "cbssports.com" and not lowered_path.startswith("/nfl/news/"):
+        return False
+    if host == "espn.com" and not (
+        lowered_path.startswith("/nfl/story/") or lowered_path.startswith("/video/clip/")
+    ):
+        return False
+    if host == "foxsports.com" and not lowered_path.startswith("/stories/nfl/"):
+        return False
+    if host == "nbcsports.com" and not lowered_path.startswith("/nfl/news/"):
+        return False
+    if host == "apnews.com" and not lowered_path.startswith("/article/"):
+        return False
+    if host in {"sports.yahoo.com", "yahoo.com"} and not (
+        "/article/" in lowered_path or "/articles/" in lowered_path
+    ):
+        return False
+    if host in {"x.com", "twitter.com"} and "/status/" not in lowered_path:
+        return False
+
+    return True
 
 
 SOURCE_MATRIX = [
