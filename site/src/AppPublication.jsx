@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import './publication.css'
 import './accountability.css'
+import './polish-v3.css'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -114,6 +115,12 @@ function normalizeGame(game) {
   return { ...game, homeP, pick, pickP, marketHomeP, marketPickP, margin, market, pickEdge }
 }
 
+function pickProbability(game, homeProbability) {
+  const value = num(homeProbability)
+  if (value == null) return null
+  return game.pick === game.home_team ? value : 1 - value
+}
+
 function TeamMark({ team, size = 'md' }) {
   const [failed, setFailed] = useState(false)
   return <span className={`pub-team ${size}`} style={{ '--team':teamColor(team) }}>
@@ -190,8 +197,8 @@ function MarketGap({ game, compact = false }) {
   const market = probabilityAxisPosition(game.marketPickP)
   const gap = game.marketPickP == null || game.pickP == null ? null : (game.pickP-game.marketPickP)*100
   return <div className={`pub-gap ${compact?'compact':''}`}>
-    <div className="pub-gap-head"><span>LEVLINE vs MARKET</span><b>{gap == null ? 'Market unavailable' : `${gap>=0?'+':''}${gap.toFixed(1)} pts`}</b></div>
-    <div className="pub-gap-track"><i className="mid" />{market != null && <i className="market" style={{ left:`${market}%` }}><em>Market</em></i>}<i className="model" style={{ left:`${model}%` }}><em>LevLine</em></i></div>
+    <div className="pub-gap-head"><span>LEVLINE vs MARKET</span><b>{gap == null ? 'Market unavailable' : `LevLine is ${Math.abs(gap).toFixed(1)} pts ${gap>=0?'more bullish':'more cautious'}`}</b></div>
+    <div className="pub-gap-track"><i className="mid" />{market != null && <i className="market" style={{ left:`${market}%` }}><em>Market {pct(game.marketPickP)}</em></i>}<i className="model" style={{ left:`${model}%` }}><em>LevLine {pct(game.pickP)}</em></i></div>
     <div className="pub-gap-scale"><span>40%</span><span>50</span><span>60</span><span>70</span><span>80%+</span></div>
   </div>
 }
@@ -209,26 +216,31 @@ function GameCard({ game, preview, evidence, locked, onOpen, compact = false }) 
   </button>
 }
 
+function editorialInterest(game, preview) {
+  const marketGap = game.marketPickP == null || game.pickP == null ? 0 : Math.abs(game.pickP-game.marketPickP)*100
+  const spreadEdge = Math.abs(game.pickEdge || 0)
+  const closeness = Math.max(0, 10 - Math.abs((game.pickP || .5)-.5)*20)
+  const notebook = (preview?.notebook || []).length
+  const eventBonus = (preview?.notebook || []).some(item => /Australia|Melbourne|rivalry/i.test(`${item.title} ${item.summary}`)) ? 12 : 0
+  return marketGap + spreadEdge + closeness + notebook*3 + eventBonus
+}
+
 function Spotlight({ games, previews, onOpen }) {
-  const strongest = [...games].sort((a,b)=>(b.pickP||0)-(a.pickP||0))[0]
+  const strongest = [...games].sort((a,b)=>editorialInterest(b,previews[b.game_id])-editorialInterest(a,previews[a.game_id]))[0]
   if (!strongest) return null
   const preview = previews[strongest.game_id]
   const marketGap = strongest.marketPickP == null ? null : (strongest.pickP-strongest.marketPickP)*100
   return <section className="pub-spotlight" style={{ '--away':teamColor(strongest.away_team), '--home':teamColor(strongest.home_team) }}>
-    <div className="pub-spot-copy"><span>SIGNAL OF THE WEEK</span><h2>{preview?.headline || `${strongest.pick} ${pct(strongest.pickP)}`}</h2><p>{preview?.paragraphs?.[0] || 'The strongest current probability on the slate.'}</p><button onClick={() => onOpen(strongest)}>Open the full case →</button></div>
-    <div className="pub-spot-board"><div><TeamMark team={strongest.away_team} size="lg" /><b>{strongest.away_team}</b><em>@</em><TeamMark team={strongest.home_team} size="lg" /><b>{strongest.home_team}</b></div><strong>{strongest.pick} {pct(strongest.pickP)}</strong><small>{marketGap == null ? 'Market probability unavailable' : `${marketGap>=0?'+':''}${marketGap.toFixed(1)} percentage points vs market`}</small><MarketGap game={strongest} compact /></div>
+    <div className="pub-spot-copy"><span>SIGNAL OF THE WEEK</span><h2>{preview?.headline || `${strongest.pick} ${pct(strongest.pickP)}`}</h2><p>{preview?.paragraphs?.[0] || 'The game where forecast, market and story context intersect most clearly.'}</p><button onClick={() => onOpen(strongest)}>Open the full case →</button></div>
+    <div className="pub-spot-board"><div><TeamMark team={strongest.away_team} size="lg" /><b>{strongest.away_team}</b><em>@</em><TeamMark team={strongest.home_team} size="lg" /><b>{strongest.home_team}</b></div><strong>{strongest.pick} {pct(strongest.pickP)}</strong><small>{marketGap == null ? 'Market probability unavailable' : `${Math.abs(marketGap).toFixed(1)} percentage points ${marketGap>=0?'above':'below'} market`}</small><MarketGap game={strongest} compact /></div>
   </section>
 }
 
 function GamesToWatch({ games, previews, evidence, history, onOpen }) {
   if (games.length < 2) return null
-  const signal = [...games].sort((a,b)=>(b.pickP||0)-(a.pickP||0))[0]?.game_id
+  const signal = [...games].sort((a,b)=>editorialInterest(b,previews[b.game_id])-editorialInterest(a,previews[a.game_id]))[0]?.game_id
   const locked = new Set(history.filter(row=>row.lock_status==='LOCKED').map(row=>row.game_id))
-  const watch = [...games].filter(g=>g.game_id!==signal).sort((a,b)=>{
-    const aGap = a.marketPickP == null ? 0 : Math.abs((a.pickP||.5)-a.marketPickP)
-    const bGap = b.marketPickP == null ? 0 : Math.abs((b.pickP||.5)-b.marketPickP)
-    return (bGap + Math.abs(b.pickEdge||0)/20) - (aGap + Math.abs(a.pickEdge||0)/20)
-  }).slice(0,3)
+  const watch = [...games].filter(g=>g.game_id!==signal).sort((a,b)=>editorialInterest(b,previews[b.game_id])-editorialInterest(a,previews[a.game_id])).slice(0,3)
   return <section className="pub-watch"><div className="pub-section-head"><div><span>GAMES TO WATCH</span><h2>Where the board gets interesting.</h2></div></div><div className="pub-watch-grid">{watch.map(game=><GameCard key={game.game_id} game={game} preview={previews[game.game_id]} evidence={evidence[game.game_id]||[]} locked={locked.has(game.game_id)} onOpen={()=>onOpen(game)} compact />)}</div></section>
 }
 
@@ -246,45 +258,48 @@ function WeekPage({ games, evidence, previews, history, status, setSelected }) {
 }
 
 function modelProbabilityRows(game) {
-  return [['Logistic',game.logistic_home_prob],['Extra Trees',game.extra_trees_home_prob],['XGBoost',game.xgboost_home_prob],['CatBoost',game.catboost_home_prob],['Elo',game.elo_home_prob]].map(([label,value])=>({label,value:num(value)})).filter(row=>row.value!=null)
+  return [['Logistic',game.logistic_home_prob],['Extra Trees',game.extra_trees_home_prob],['XGBoost',game.xgboost_home_prob],['CatBoost',game.catboost_home_prob],['Elo',game.elo_home_prob]]
+    .map(([label,value])=>({label,value:pickProbability(game,value)})).filter(row=>row.value!=null)
 }
 
 function ModelConsensus({ game }) {
   const engines = modelProbabilityRows(game)
-  const home = game.home_team
-  const away = game.away_team
   const values = engines.map(row=>row.value)
   const range = values.length ? (Math.max(...values)-Math.min(...values))*100 : null
-  const homeLeans = engines.filter(row=>row.value>=.5).length
-  const leanTeam = homeLeans >= Math.ceil(engines.length/2) ? home : away
-  const summary = engines.length ? `${homeLeans} of ${engines.length} component models lean ${home}; the model spread is ${range?.toFixed(1)} percentage points.` : 'Component-model probabilities are not available for this run.'
-  const pos = p => Math.max(0,Math.min(100,((p-.25)/.5)*100))
-  return <div className="consensus-panel"><div className="consensus-axis"><span>25%</span><span>50</span><span>75%</span>{engines.map(row=><i key={row.label} style={{left:`${pos(row.value)}%`}} title={`${row.label}: ${pct(row.value)}`}><em>{row.label}</em></i>)}</div><p>{summary} Majority lean: <b>{leanTeam}</b>.</p><div className="consensus-outcomes"><div><span>PURE</span><b>{pct(game.pure_home_prob)}</b><small>football-only</small></div><div><span>MARKET</span><b>{pct(game.market_home_prob)}</b><small>outside signal</small></div><div className="final"><span>LEVLINE</span><b>{pct(game.final_home_prob)}</b><small>published</small></div></div></div>
+  const leans = engines.filter(row=>row.value>=.5).length
+  const bullish = engines.length ? [...engines].sort((a,b)=>b.value-a.value)[0] : null
+  const cautious = engines.length ? [...engines].sort((a,b)=>a.value-b.value)[0] : null
+  const pos = p => Math.max(0,Math.min(100,((p-.40)/.50)*100))
+  const pure = pickProbability(game,game.pure_home_prob)
+  const market = pickProbability(game,game.market_home_prob)
+  const final = pickProbability(game,game.final_home_prob)
+  return <div className="consensus-panel consensus-v3">
+    <p><b>{leans} of {engines.length}</b> football engines lean {game.pick}.{range!=null&&bullish&&cautious?` The internal spread is ${range.toFixed(1)} points: ${bullish.label} is most bullish and ${cautious.label} most cautious.`:''}</p>
+    <div className="consensus-model-list">{engines.map(row=><div className="consensus-model-row" key={row.label}><span>{row.label}</span><div><i style={{left:`${pos(row.value)}%`}} /></div><b>{pct(row.value,0)}</b></div>)}</div>
+    <div className="consensus-scale"><span>40%</span><span>50</span><span>60</span><span>70</span><span>80</span><span>90%</span></div>
+    <div className="consensus-formula"><div><span>PURE</span><b>{pct(pure)}</b><small>× 75%</small></div><em>+</em><div><span>MARKET</span><b>{pct(market)}</b><small>× 25%</small></div><em>→</em><div className="final"><span>LEVLINE</span><b>{game.pick} {pct(final)}</b><small>published</small></div></div>
+  </div>
 }
 
 function EvidenceBlock({ title, items, empty }) {
   return <section className="pub-article-block"><div className="pub-block-head"><span>{title}</span><b>{items.length}</b></div>{items.length ? <div className="pub-evidence-list">{items.map((item,index)=><div className="pub-evidence" key={`${item.title}-${index}`}><div><span>{item.strength || 'Context'}</span><b>{item.title}</b></div><p>{item.summary}</p><small>{item.sample_size ? `Sample ${item.sample_size}` : ''}{item.source_url && <a href={item.source_url} target="_blank" rel="noreferrer">Source ↗</a>}</small></div>)}</div> : <p className="pub-empty">{empty}</p>}</section>
 }
 
+function Notebook({ items=[] }) {
+  if (!items.length) return null
+  return <section className="pub-article-block pub-notebook"><div className="pub-block-head"><span>RIVALRY & NOTEBOOK</span><b>{items.length}</b></div><div>{items.map((item,index)=><article key={`${item.title}-${index}`}><b>{item.title}</b><p>{item.summary}</p>{item.source_url&&<a href={item.source_url} target="_blank" rel="noreferrer">Source ↗</a>}</article>)}</div></section>
+}
+
 function HistoryFeature({ items }) {
   const qb = items.find(item => (item.metadata||{}).family === 'qb_opponent_history')
   if (!qb) return null
   const latest = (qb.metadata||{}).latest_meeting
-  return <div className="pub-history-feature"><span>BEEN HERE BEFORE</span><h3>{qb.title}</h3><p>{qb.summary}</p>{latest && <div><b>{latest.human_label || latest.label}</b>{latest.score && <em>{latest.score}</em>}{latest.date && <small>{latest.date}</small>}</div>}</div>
-}
-
-function meterPosition(row, away, home) {
-  const leader=row.leader
-  const strength=String(row.strength||'').toLowerCase()
-  const distance=strength==='strong'?34:strength==='moderate'?24:strength==='weak'?14:0
-  if (leader===away) return 50-distance
-  if (leader===home) return 50+distance
-  return 50
+  return <div className="pub-history-feature"><span>RECENT QB SAMPLE</span><h3>{qb.title}</h3><p>{qb.summary}</p>{latest && <div><b>{latest.human_label || latest.label}</b>{latest.score && <em>{latest.score}</em>}{latest.date && <small>{latest.date}</small>}</div>}</div>
 }
 
 function MatchupMeter({ rows=[], away, home }) {
   if (!rows.length) return null
-  return <section className="pub-article-block"><div className="pub-block-head"><span>MATCHUP METER</span></div><div className="pub-meter-rich">{rows.map((row,index)=><div className="meter-row" key={`${row.label}-${index}`}><div className="meter-copy"><span>{row.label}</span><b>{row.leader || 'Watch'}</b><p>{row.title || 'Live matchup evidence'}</p></div><div className="meter-scale"><small>{away}</small><div><i className="mid"/><b style={{left:`${meterPosition(row,away,home)}%`}}/></div><small>{home}</small></div><em>{row.strength || 'Context'}</em></div>)}</div></section>
+  return <section className="pub-article-block"><div className="pub-block-head"><span>MATCHUP EDGES</span><b>QUALITATIVE UNLESS NUMERIC</b></div><div className="pub-meter-rich qualitative-meter">{rows.map((row,index)=><div className="meter-row" key={`${row.label}-${index}`}><div className="meter-copy"><span>{row.label}</span><b>{row.leader && row.leader!=='Watch' ? `Edge ${row.leader}` : 'Worth watching'}</b><p>{row.title || 'Live matchup evidence'}</p></div><em>{row.strength || 'Context'}</em></div>)}</div><p className="meter-note">These labels summarize evidence strength. Sunday Signal does not place a fake numeric dot on a qualitative matchup.</p></section>
 }
 
 function QuickNumbers({ game }) {
@@ -294,17 +309,13 @@ function QuickNumbers({ game }) {
 function MovementAttribution({ game, rows=[] }) {
   const row=[...rows].filter(item=>item.game_id===game.game_id).sort((a,b)=>new Date(a.to_timestamp_utc)-new Date(b.to_timestamp_utc)).at(-1)
   if (!row) return <section className="pub-article-block movement-panel"><div className="pub-block-head"><span>WHAT MOVED THE NUMBER?</span></div><p className="pub-empty">Attribution appears after two comparable forecast snapshots.</p></section>
-  const parts=[
-    ['Football model',num(row.model_component_pp)],
-    ['Market',num(row.market_component_pp)],
-    ['Residual',num(row.residual_component_pp)],
-  ]
+  const parts=[['Football model',num(row.model_component_pp)],['Market',num(row.market_component_pp)],['Residual',num(row.residual_component_pp)]]
   return <section className="pub-article-block movement-panel"><div className="pub-block-head"><span>WHAT MOVED THE NUMBER?</span><b>{row.largest_driver||'Latest run'}</b></div><div className="movement-grid">{parts.map(([label,value])=><div key={label}><span>{label}</span><b>{value==null?'—':`${value>=0?'+':''}${value.toFixed(2)} pp`}</b></div>)}</div><p>The latest published move was <b>{num(row.pick_delta_pp)==null?'—':`${num(row.pick_delta_pp)>=0?'+':''}${num(row.pick_delta_pp).toFixed(2)} percentage points`}</b> toward the current pick. Personnel, weather and staff notes are not credited as causes because they are not numerical LevLine inputs unless separately validated.</p></section>
 }
 
 function ScenarioBoard({ game, evidence=[], locked }) {
   const candidates=evidence.filter(item=>['injury','personnel','weather','travel','scenario'].includes(String(item.category||'').toLowerCase())).slice(0,5)
-  return <section className="pub-article-block scenario-board"><div className="pub-block-head"><span>CONDITIONAL SCENARIO BOARD</span><b>{locked?'OFFICIAL LOCKED':'PREGAME'}</b></div><p className="scenario-lead">This is the line Sunday Signal will not cross: no made-up injury points and no fake weather delta. A conditional probability appears only when the underlying scenario can be recomputed from a numerically validated feature.</p>{candidates.length?<div className="scenario-list">{candidates.map((item,index)=><div key={`${item.title}-${index}`}><span>{String(item.category||'context').toUpperCase()}</span><b>{item.title}</b><p>{item.summary}</p><em>Context only · no validated probability delta</em></div>)}</div>:<p className="pub-empty">No material conditional scenario is active right now.</p>}<small>{locked?'The official T−120 forecast is immutable even if explanatory context changes later.':'Current forecast can still update through the validated pipeline before the official lock.'}</small></section>
+  return <section className="pub-article-block scenario-board"><div className="pub-block-head"><span>CONDITIONAL SCENARIO BOARD</span><b>{locked?'OFFICIAL LOCKED':'PREGAME'}</b></div><p className="scenario-lead">A conditional probability appears only when the scenario can be recomputed from a numerically validated feature. No made-up injury points or fake weather deltas.</p>{candidates.length?<div className="scenario-list">{candidates.map((item,index)=><div key={`${item.title}-${index}`}><span>{String(item.category||'context').toUpperCase()}</span><b>{item.title}</b><p>{item.summary}</p><em>Context only · no validated probability delta</em></div>)}</div>:<p className="pub-empty">No material conditional scenario is active right now.</p>}<small>{locked?'The official T−120 forecast is immutable even if explanatory context changes later.':'Current forecast can still update through the validated pipeline before the official lock.'}</small></section>
 }
 
 function GameModal({ game, runs, movement=[], evidence=[], preview, locked, onClose }) {
@@ -313,10 +324,10 @@ function GameModal({ game, runs, movement=[], evidence=[], preview, locked, onCl
   const history=evidence.filter(item=>['history','coaching','coordinator','structural_change'].includes(category(item)))
   const scenarios=evidence.filter(item=>['scenario','weather','travel'].includes(category(item)))
   const scheme=evidence.filter(item=>['scheme','matchup'].includes(category(item)))
-  const trend=runs.filter(row=>row.game_id===game.game_id).sort((a,b)=>new Date(a.prediction_timestamp_utc)-new Date(b.prediction_timestamp_utc)).map((row,index)=>({run:index+1,p:num(row.final_home_prob),market:num(row.market_home_prob)})).filter(row=>row.p!=null)
+  const trend=runs.filter(row=>row.game_id===game.game_id).sort((a,b)=>new Date(a.prediction_timestamp_utc)-new Date(b.prediction_timestamp_utc)).map(row=>({label:new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/Los_Angeles'}).format(new Date(row.prediction_timestamp_utc)),p:pickProbability(game,row.final_home_prob),market:pickProbability(game,row.market_home_prob)})).filter(row=>row.p!=null)
   const paragraphs=preview?.paragraphs?.length ? preview.paragraphs : [`LevLine has ${game.pick} at ${pct(game.pickP)} to win.`]
   const opponent=game.pick===game.home_team?game.away_team:game.home_team
-  return <div className="pub-modal-backdrop" onClick={onClose}><div className="pub-modal dossier" onClick={e=>e.stopPropagation()}><button className="pub-close" onClick={onClose}>×</button><div className="pub-modal-id"><span><TeamMark team={game.away_team} size="lg" /><b>{teamName(game.away_team)}</b></span><div><small>{kickoffText(game)}</small><strong>@</strong><StateBadge game={game} locked={locked}/></div><span><TeamMark team={game.home_team} size="lg" /><b>{teamName(game.home_team)}</b></span></div><div className="pub-story-kicker">SUNDAY SIGNAL · GAME FILE</div><h1>{preview?.headline || `${game.pick} ${pct(game.pickP)}`}</h1><div className={`pub-verdict ${locked?'locked':''}`}><div><span>{locked?'OFFICIAL FORECAST':'CURRENT FORECAST'}</span><strong>{game.pick} {pct(game.pickP)}</strong><small>{locked?'Locked. This forecast can no longer change.':'Updates until the official pregame lock.'}</small></div><div><b>{game.projected_score || 'Score projection pending'}</b><small>LevLine {modelLine(game.margin,game.home_team,game.away_team)} · Market {modelLine(game.market,game.home_team,game.away_team)} · Edge {signed(game.pickEdge)}</small></div></div><MarketGap game={game}/><MovementAttribution game={game} rows={movement}/><div className="pub-modal-grid"><article><ScenarioBoard game={game} evidence={evidence} locked={locked}/><section className="pub-article-block pub-prose"><div className="pub-block-head"><span>THE READ</span></div>{paragraphs.map((p,i)=><p key={i}>{p}</p>)}</section><HistoryFeature items={history}/><MatchupMeter rows={preview?.matchup_meter || []} away={game.away_team} home={game.home_team}/><section className="pub-article-block"><div className="pub-block-head"><span>THREE THINGS THAT MATTER</span></div><div className="pub-factors">{(preview?.key_factors||[]).slice(0,3).map((factor,index)=><div key={index}><span>0{index+1}</span><b>{factor.title || factor.family}</b><p>{factor.summary}</p><small>{factor.advantage_team?`Edge ${factor.advantage_team} · `:''}{factor.strength || 'Context'}</small></div>)}</div></section><div className="pub-case-grid"><div><span>CASE FOR {game.pick}</span><p>{preview?.case_for_pick || `The central estimates favor ${game.pick}.`}</p></div><div><span>CASE FOR {opponent}</span><p>{preview?.case_for_opponent || `${opponent} needs the volatile parts of the game to swing its way.`}</p></div></div><EvidenceBlock title="PERSONNEL" items={personnel} empty="Nothing material on the official availability report yet."/><EvidenceBlock title="HISTORY, STAFF & IMPACT" items={history} empty="No verified staff or matchup history is material enough to feature."/><EvidenceBlock title="WEATHER, TRAVEL & SCENARIOS" items={scenarios} empty="No live situational issue is material enough to feature."/><section className="pub-article-block pub-wrong"><div className="pub-block-head"><span>WHAT COULD MAKE THIS WRONG?</span></div><p>{preview?.what_could_make_us_wrong || 'Turnovers, explosives and fourth-down variance remain the cleanest ways for the game to outrun a central forecast.'}</p></section><details className="pub-raw"><summary>Deeper scheme evidence</summary><EvidenceBlock title="SCHEME NOTES" items={scheme} empty="No tactical item cleared the display threshold."/></details></article><aside><div className="pub-aside-card"><span>MODEL CONSENSUS</span><h3>Five engines, then the blend</h3><ModelConsensus game={game}/></div><div className="pub-aside-card"><span>QUICK NUMBERS</span><QuickNumbers game={game}/></div></aside></div><section className="pub-trend"><div><span>FORECAST HISTORY</span><h3>How the probability moved</h3></div><div>{trend.length>1?<ResponsiveContainer width="100%" height={220}><AreaChart data={trend}><XAxis dataKey="run" tickLine={false} axisLine={false}/><YAxis domain={[0,1]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false} axisLine={false}/><Tooltip formatter={v=>pct(v)}/><Area dataKey="p" type="monotone" stroke="#68d8c7" fill="#68d8c722" strokeWidth={3}/></AreaChart></ResponsiveContainer>:<p className="pub-empty">Movement appears after the second comparable model run.</p>}</div></section></div></div>
+  return <div className="pub-modal-backdrop" onClick={onClose}><div className="pub-modal dossier" onClick={e=>e.stopPropagation()}><button className="pub-close" onClick={onClose}>×</button><div className="pub-modal-id"><span><TeamMark team={game.away_team} size="lg" /><b>{teamName(game.away_team)}</b></span><div><small>{kickoffText(game)}</small><strong>@</strong><StateBadge game={game} locked={locked}/></div><span><TeamMark team={game.home_team} size="lg" /><b>{teamName(game.home_team)}</b></span></div><div className="pub-story-kicker">SUNDAY SIGNAL · GAME FILE</div><h1>{preview?.headline || `${game.pick} ${pct(game.pickP)}`}</h1><div className={`pub-verdict ${locked?'locked':''}`}><div><span>{locked?'OFFICIAL FORECAST':'CURRENT FORECAST'}</span><strong>{game.pick} {pct(game.pickP)}</strong><small>{locked?'Locked. This forecast can no longer change.':'Updates until the official pregame lock.'}</small></div><div><b>{game.projected_score || 'Score projection pending'}</b><small>LevLine {modelLine(game.margin,game.home_team,game.away_team)} · Market {modelLine(game.market,game.home_team,game.away_team)} · Edge {signed(game.pickEdge)}</small></div></div><MarketGap game={game}/><MovementAttribution game={game} rows={movement}/><div className="pub-modal-grid"><article><section className="pub-article-block pub-prose"><div className="pub-block-head"><span>THE READ</span></div>{paragraphs.map((p,i)=><p key={i}>{p}</p>)}</section><Notebook items={preview?.notebook||[]}/><HistoryFeature items={history}/><section className="pub-article-block"><div className="pub-block-head"><span>THREE THINGS THAT MATTER</span></div><div className="pub-factors">{(preview?.key_factors||[]).slice(0,3).map((factor,index)=><div key={index}><span>0{index+1}</span><b>{factor.title || factor.family}</b><p>{factor.summary}</p><small>{factor.advantage_team?`Edge ${factor.advantage_team} · `:''}{factor.strength || 'Context'}</small></div>)}</div></section><MatchupMeter rows={preview?.matchup_meter || []} away={game.away_team} home={game.home_team}/><div className="pub-case-grid"><div><span>HOW {game.pick} WINS</span><p>{preview?.case_for_pick || `The central estimates favor ${game.pick}.`}</p></div><div><span>HOW {opponent} WINS</span><p>{preview?.case_for_opponent || `${opponent} needs the volatile parts of the game to swing its way.`}</p></div></div><EvidenceBlock title="PERSONNEL" items={personnel} empty="Nothing material on the official availability report yet."/><EvidenceBlock title="HISTORY, STAFF & IMPACT" items={history} empty="No verified staff or matchup history is material enough to feature."/><EvidenceBlock title="WEATHER, TRAVEL & SCENARIOS" items={scenarios} empty="No live situational issue is material enough to feature."/><ScenarioBoard game={game} evidence={evidence} locked={locked}/><section className="pub-article-block pub-wrong"><div className="pub-block-head"><span>WHAT COULD MAKE THIS WRONG?</span></div><p>{preview?.what_could_make_us_wrong || 'Turnovers, explosives and fourth-down variance remain the cleanest ways for the game to outrun a central forecast.'}</p></section><details className="pub-raw"><summary>Deeper scheme evidence</summary><EvidenceBlock title="SCHEME NOTES" items={scheme} empty="No tactical item cleared the display threshold."/></details></article><aside><div className="pub-aside-card"><span>MODEL CONSENSUS</span><h3>Five engines, one shared scale</h3><ModelConsensus game={game}/></div><div className="pub-aside-card"><span>QUICK NUMBERS</span><QuickNumbers game={game}/></div></aside></div><section className="pub-trend"><div><span>FORECAST HISTORY</span><h3>LevLine and the market over time</h3></div><div>{trend.length>1?<ResponsiveContainer width="100%" height={220}><AreaChart data={trend}><XAxis dataKey="label" tickLine={false} axisLine={false}/><YAxis domain={[0,1]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false} axisLine={false}/><Tooltip formatter={v=>pct(v)}/><Area name="LevLine" dataKey="p" type="monotone" stroke="#68d8c7" fill="#68d8c722" strokeWidth={3}/><Area name="Market" dataKey="market" type="monotone" stroke="#8fa0b4" fill="transparent" strokeWidth={2}/></AreaChart></ResponsiveContainer>:<p className="pub-empty">Movement appears after the second comparable model run.</p>}</div></section></div></div>
 }
 
 function PageHead({ kicker,title,copy }) { return <div className="pub-page-head"><span>{kicker}</span><h1>{title}</h1><p>{copy}</p></div> }
@@ -344,7 +355,7 @@ function movementClass(text='') { return text.startsWith('▲') ? 'up' : text.st
 function RatingsPage({ rows, editorial }) {
   const sorted=[...rows].sort((a,b)=>(num(a.rank)||999)-(num(b.rank)||999))
   const notes=new Map((editorial?.teams||[]).map(item=>[item.team,item]))
-  return <main className="pub-inner"><PageHead kicker="POWER RATINGS" title="The rankings, with an argument attached." copy="Elo+ sets the order. The notes explain what in the efficiency profile supports it—and what could move it next."/><div className="power-list">{sorted.map(row=>{const note=notes.get(row.team)||{};return <article key={row.team} className="power-row"><div className="power-rank"><b>#{row.rank}</b><span className={movementClass(row.movement)}>{row.movement || '→'}</span></div><TeamMark team={row.team}/><div className="power-copy"><h2>{teamName(row.team)}</h2><p>{note.why_here || `Elo+ currently places ${row.team} at No. ${row.rank}.`}</p><small><b>What could move them:</b> {note.what_moves_them || 'New game data will determine the next meaningful move.'}</small></div><div className="power-metrics"><span><small>Elo+</small><b>{Math.round(num(row.elo_plus)||0)}</b></span><span><small>Off EPA</small><b>{three(row.off_epa)}</b></span><span><small>Def EPA</small><b>{three(row.def_epa_allowed)}</b></span><span><small>Pass EPA</small><b>{three(row.pass_epa)}</b></span></div></article>})}</div></main>
+  return <main className="pub-inner"><PageHead kicker="POWER RATINGS" title="The ranking — and the tension underneath it." copy="Elo+ sets the order. Efficiency metrics can support that order or challenge it; disagreement is useful information, not something to explain away."/><div className="power-list">{sorted.map(row=>{const note=notes.get(row.team)||{};return <article key={row.team} className="power-row"><div className="power-rank"><b>#{row.rank}</b><span className={movementClass(row.movement)}>{row.movement || '→'}</span></div><TeamMark team={row.team}/><div className="power-copy"><h2>{teamName(row.team)}</h2><p>{note.why_here || `Elo+ currently places ${row.team} at No. ${row.rank}.`}</p><small><b>What could move them:</b> {note.what_moves_them || 'New game data will determine the next meaningful move.'}</small></div><div className="power-metrics"><span><small>Elo+</small><b>{Math.round(num(row.elo_plus)||0)}</b></span><span><small>Off EPA</small><b>{three(row.off_epa)}</b></span><span><small>Def EPA</small><b>{three(row.def_epa_allowed)}</b></span><span><small>Pass EPA</small><b>{three(row.pass_epa)}</b></span></div></article>})}</div></main>
 }
 
 function CalibrationPanel({ calibration }) {
@@ -370,8 +381,8 @@ function ValidationTable({ rows }) {
 }
 
 function MethodPage({ models }) {
-  const nodes=[['NFL DATA','EPA · success rate · explosives · turnovers · Elo · QB · rest'],['FEATURES','Rolling form · opponent-adjusted context · home/travel'],['ENSEMBLE','Logistic · Extra Trees · XGBoost · CatBoost · Elo reference'],['PURE','Football-only probability'],['MARKET','Independent consensus signal'],['LEVLINE','75% PURE + 25% MARKET'],['T−120 LOCK','First valid forecast becomes immutable'],['AUDIT','Brier · calibration · error · market comparison']]
-  return <main className="pub-inner method-page"><PageHead kicker="METHODOLOGY" title="The thesis behind LevLine." copy="A forecast should be reproducible before kickoff and accountable after it."/><section className="pub-pipeline pipeline-thesis"><div className="pub-block-head"><span>FROM RAW FOOTBALL TO AN OFFICIAL FORECAST</span></div><div className="method-flow">{nodes.map(([title,body],index)=><React.Fragment key={title}><div className="method-node"><span>{String(index+1).padStart(2,'0')}</span><h3>{title}</h3><p>{body}</p></div>{index<nodes.length-1&&<i>→</i>}</React.Fragment>)}</div><p className="method-callout"><b>Important:</b> PURE and Market are separate information streams. The market joins only at the published 75/25 blend; it is not fed into the football models.</p></section><div className="pub-method-grid"><div><span>TRAIN WITHOUT PEEKING</span><h3>Expanding-window validation</h3><p>Older seasons train the architecture; later seasons test it. Chronology prevents the model from learning from games it is supposed to predict.</p></div><div><span>KEEP 2026 SACRED</span><h3>The current season is a forward test</h3><p>2026 outcomes measure the system. They do not get used to choose a better-looking architecture after the fact.</p></div><div><span>SEPARATE NUMBER FROM STORY</span><h3>Context explains unless validated</h3><p>Injuries, staff, scheme, QB history, weather and travel enrich the analysis. They change LevLine only after separate chronological validation.</p></div><div><span>LOCK IT</span><h3>No moving the goalposts</h3><p>The first valid forecast inside T−120 is immutable. Later news can update explanatory context, not rewrite the official pick.</p></div></div><section className="history-panel validation-panel"><span>HISTORICAL VALIDATION</span><h2>The old Model Lab lives here now—for a reason.</h2><p>These are architecture-validation metrics, not a second consumer product.</p><ValidationTable rows={models}/></section><section className="pub-not-do"><span>WHAT LEVLINE DOES NOT DO</span><div><b>No hindsight edits.</b><b>No unvalidated injury-point guesses.</b><b>No tuning the architecture on 2026 outcomes.</b><b>No pretending winner accuracy is the same as calibration.</b></div></section></main>
+  const nodes=[['FOOTBALL DATA','EPA · success rate · explosives · turnovers · Elo · QB · rest'],['PURE','Logistic · Extra Trees · XGBoost · CatBoost · Elo reference'],['MARKET','Independent consensus signal; 25% of the published blend'],['LEVLINE','75% PURE + 25% MARKET'],['LOCK & AUDIT','Official T−120 snapshot · Brier · calibration · error · market comparison']]
+  return <main className="pub-inner method-page"><PageHead kicker="METHODOLOGY" title="The thesis behind LevLine." copy="A forecast should be reproducible before kickoff and accountable after it."/><section className="pub-pipeline pipeline-thesis"><div className="pub-block-head"><span>THE SHORT VERSION</span></div><div className="method-flow method-flow-v3">{nodes.map(([title,body],index)=><React.Fragment key={title}><div className="method-node"><span>{String(index+1).padStart(2,'0')}</span><h3>{title}</h3><p>{body}</p></div>{index<nodes.length-1&&<i>→</i>}</React.Fragment>)}</div><p className="method-callout"><b>Inside PURE:</b> the football engines are trained and validated chronologically. Market information stays separate until the final 75/25 blend.</p></section><div className="pub-method-grid"><div><span>TRAIN WITHOUT PEEKING</span><h3>Expanding-window validation</h3><p>Older seasons train the architecture; later seasons test it. Chronology prevents the model from learning from games it is supposed to predict.</p></div><div><span>KEEP 2026 SACRED</span><h3>The current season is a forward test</h3><p>2026 outcomes measure the system. They do not get used to choose a better-looking architecture after the fact.</p></div><div><span>SEPARATE NUMBER FROM STORY</span><h3>Context explains unless validated</h3><p>Injuries, staff, scheme, QB history, weather, rivalry notes and travel enrich the analysis. They change LevLine only after separate chronological validation.</p></div><div><span>LOCK IT</span><h3>No moving the goalposts</h3><p>The first valid forecast inside T−120 is immutable. Later news can update explanatory context, not rewrite the official pick.</p></div></div><section className="history-panel validation-panel"><span>HISTORICAL VALIDATION</span><h2>The architecture earns its place here.</h2><p>These are validation metrics, not a second consumer product.</p><ValidationTable rows={models}/></section><section className="pub-not-do"><span>WHAT LEVLINE DOES NOT DO</span><div><b>No hindsight edits.</b><b>No unvalidated injury-point guesses.</b><b>No tuning the architecture on 2026 outcomes.</b><b>No pretending winner accuracy is the same as calibration.</b></div></section></main>
 }
 
 export default function App() {
