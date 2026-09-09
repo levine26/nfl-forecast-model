@@ -67,8 +67,6 @@ def _season_summary(frame: pd.DataFrame, season: int) -> pd.DataFrame:
         work = work[work["season"].eq(season)]
     if "season_type" in work.columns:
         work = work[work["season_type"].astype(str).str.upper().eq("REG")]
-    # NGS publishes week 0 regular-season summaries. Prefer those; otherwise
-    # use the latest weekly row as a safe fallback rather than averaging rates.
     if "week" in work.columns:
         work["week"] = pd.to_numeric(work["week"], errors="coerce")
         summary = work[work["week"].eq(0)]
@@ -157,7 +155,7 @@ def build_ngs_qb_evidence(
                 + ". These tracking metrics describe how he played, not a standalone prediction for this matchup."
             )
             items.append({
-                "category": "player",
+                "category": "personnel",
                 "title": title,
                 "summary": summary,
                 "strength": "Strong" if attempts >= 300 else "Moderate",
