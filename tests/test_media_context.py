@@ -49,8 +49,12 @@ def _predictions() -> pd.DataFrame:
             "away_team": "DEN",
             "home_team": "KC",
             "pick": "DEN",
+            "final_home_prob": 0.40875,
             "pure_home_prob": 0.34,
-            "market_home_prob": 0.605,
+            "market_home_prob": 0.615,
+            "expected_margin": -6.5,
+            "spread_line": -3.5,
+            "projected_score": "DEN 27.0 – KC 20.5",
         }
     ])
 
@@ -62,7 +66,6 @@ def test_media_context_prioritizes_major_reporting_and_rejects_noise(monkeypatch
     items = media["2026_01_DEN_KC"]
     assert items[0]["source_name"] == "ESPN"
     assert all("Betting Blog" != item["source_name"] for item in items)
-    # This CBS fixture contains only Kansas City, so the matchup-relevance gate must reject it.
     assert all("CBS Sports" != item["source_name"] for item in items)
     assert items[0]["metadata"]["substantive"] is True
     assert items[0]["metadata"]["trusted_source"] is True
@@ -72,12 +75,12 @@ def test_media_context_prioritizes_major_reporting_and_rejects_noise(monkeypatch
     assert status["providers"]["x_recent_search"]["status"] == "unavailable"
 
 
-def test_media_led_read_uses_reporting_then_quantitative_mechanism():
+def test_media_led_read_is_matchup_preview_then_model_explanation():
     predictions = _predictions()
     previews = {
         "2026_01_DEN_KC": {
             "headline": "old template headline",
-            "paragraphs": ["KC protection vs DEN pass rush deserves the first paragraph because it can alter the menu."],
+            "paragraphs": ["old paragraph one", "old paragraph two", "old paragraph three"],
             "editorial_voice": {"primary_variant": 0},
         }
     }
@@ -120,16 +123,27 @@ def test_media_led_read_uses_reporting_then_quantitative_mechanism():
         ]
     }
     result = rewrite_reads_with_media(previews, predictions, evidence, media)
-    read = result["2026_01_DEN_KC"]["paragraphs"][0]
-    assert "ESPN reports Patrick Mahomes is expected to start Week 1 against Broncos" in read
-    assert "CBS Sports has Chiefs left tackle trending toward missing opener" in read
-    assert "Broncos–Chiefs: the Chiefs were sacked on 8.2% of pass plays; the Broncos got home on 9.7%" in read
-    assert "Broncos–Chiefs market gap: LevLine rates Denver 26.5 percentage points above consensus" in read
-    assert "coverage highlights" not in read
-    assert "pressure note" not in read
-    assert "PURE has" not in read
-    assert "deserves the first paragraph" not in read
-    assert "KC protection vs DEN pass rush" not in read
-    assert result["2026_01_DEN_KC"]["editorial_voice"]["media_led"] is True
-    assert result["2026_01_DEN_KC"]["editorial_voice"]["game_specific"] is True
-    assert result["2026_01_DEN_KC"]["reported_sources"][0]["source_name"] == "ESPN"
+    preview = result["2026_01_DEN_KC"]
+    assert len(preview["paragraphs"]) == 2
+    paragraph1, paragraph2 = preview["paragraphs"]
+
+    assert "Broncos" in paragraph1 and "Chiefs" in paragraph1
+    assert "8.2%" in paragraph1 and "9.7%" in paragraph1
+    assert "according to" not in paragraph1.lower()
+    assert "deserves the first paragraph" not in paragraph1.lower()
+    assert "market gap:" not in paragraph1.lower()
+
+    assert "LevLine" in paragraph2
+    assert "59.1%" in paragraph2
+    assert "66.0%" in paragraph2
+    assert "38.5%" in paragraph2
+    assert "75% PURE / 25% market" in paragraph2
+    assert "Denver Broncos -6.5" in paragraph2
+    assert "Denver Broncos -3.5" in paragraph2
+    assert "DEN 27.0 – KC 20.5" in paragraph2
+    assert paragraph2.endswith("The pick: Denver Broncos moneyline.")
+
+    assert all("old paragraph" not in p.lower() for p in preview["paragraphs"])
+    assert preview["editorial_voice"]["media_led"] is True
+    assert preview["editorial_voice"]["two_paragraph_contract"] is True
+    assert preview["reported_sources"][0]["source_name"] == "ESPN"
