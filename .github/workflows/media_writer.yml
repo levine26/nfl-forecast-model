@@ -11,12 +11,16 @@ on:
       - "src/nfl_forecast/source_policy.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_copilot_media_prompt.py"
+      - "scripts/build_single_game_copilot_prompt.py"
+      - "scripts/merge_copilot_game_payloads.py"
       - "scripts/compose_copilot_media_reads.py"
+      - "scripts/render_levline_paragraphs.py"
       - "scripts/validate_copilot_media_reads.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
       - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
+      - "tests/test_levline_paragraph_renderer.py"
       - "tests/test_read_contract.py"
       - "pyproject.toml"
       - ".github/workflows/media_writer.yml"
@@ -88,12 +92,10 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_read_contract.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_read_contract.py tests/test_editorial_finalize.py
 
       - name: Refresh deterministic reporting packet
-        run: |
-          python scripts/finalize_editorial.py --skip-copilot
-          python scripts/build_copilot_media_prompt.py --prompt-file /tmp/sunday-signal-media-prompt.txt
+        run: python scripts/finalize_editorial.py --skip-copilot
 
       - name: Install GitHub Copilot CLI
         run: npm install -g @github/copilot
@@ -109,6 +111,12 @@ jobs:
               print(domain)
           PY
           )
+          mapfile -t game_ids < <(python - <<'PY'
+          import pandas as pd
+          for gid in pd.read_csv('outputs/this_week.csv')['game_id'].astype(str):
+              print(gid)
+          PY
+          )
           copilot_args=(
             -s
             --no-ask-user
@@ -119,31 +127,76 @@ jobs:
             copilot_args+=("--allow-url=$domain")
           done
           echo "Copilot approved source domains: ${#approved_domains[@]}"
+          echo "Focused matchup research calls per attempt: ${#game_ids[@]}"
 
           validated=0
+          feedback=/tmp/copilot-validation-feedback.txt
+          : > "$feedback"
           for attempt in 1 2 3; do
-            echo "Copilot editorial attempt $attempt/3"
-            rm -f /tmp/copilot-media-raw.txt /tmp/copilot-media-composed.json outputs/copilot_media_reads.json
-            if copilot "${copilot_args[@]}" -p "$(cat /tmp/sunday-signal-media-prompt.txt)" \
-                > /tmp/copilot-media-raw.txt \
-              && python scripts/compose_copilot_media_reads.py \
-                --input /tmp/copilot-media-raw.txt \
+            echo "Copilot focused editorial attempt $attempt/3"
+            parts=/tmp/copilot-game-parts
+            prompts=/tmp/copilot-game-prompts
+            rm -rf "$parts" "$prompts"
+            mkdir -p "$parts" "$prompts"
+            rm -f /tmp/copilot-media-raw.json /tmp/copilot-media-composed.json /tmp/copilot-media-rendered.json outputs/copilot_media_reads.json
+
+            research_failed=0
+            for gid in "${game_ids[@]}"; do
+              prompt="$prompts/$gid.txt"
+              python scripts/build_single_game_copilot_prompt.py \
+                --game-id "$gid" \
+                --prompt-file "$prompt" \
+                --feedback-file "$feedback"
+              if ! copilot "${copilot_args[@]}" -p "$(cat "$prompt")" > "$parts/$gid.txt"; then
+                echo "$gid: Copilot research call failed" | tee -a "$feedback"
+                research_failed=1
+                break
+              fi
+            done
+            if [ "$research_failed" -ne 0 ]; then
+              echo "Focused research attempt $attempt failed before composition."
+              continue
+            fi
+
+            if ! python scripts/merge_copilot_game_payloads.py \
+                --input-dir "$parts" \
+                --predictions outputs/this_week.csv \
+                --output /tmp/copilot-media-raw.json; then
+              echo "Focused response merge failed on attempt $attempt" | tee -a "$feedback"
+              continue
+            fi
+            if ! python scripts/compose_copilot_media_reads.py \
+                --input /tmp/copilot-media-raw.json \
                 --predictions outputs/this_week.csv \
                 --previews outputs/game_previews.json \
                 --evidence outputs/contextual_evidence.json \
-                --output /tmp/copilot-media-composed.json \
-              && python scripts/validate_copilot_media_reads.py \
+                --output /tmp/copilot-media-composed.json; then
+              echo "Deterministic composition failed on attempt $attempt" | tee -a "$feedback"
+              continue
+            fi
+            if ! python scripts/render_levline_paragraphs.py \
                 --input /tmp/copilot-media-composed.json \
                 --predictions outputs/this_week.csv \
-                --output outputs/copilot_media_reads.json; then
+                --previews outputs/game_previews.json \
+                --output /tmp/copilot-media-rendered.json; then
+              echo "Deterministic LevLine paragraph render failed on attempt $attempt" | tee -a "$feedback"
+              continue
+            fi
+
+            if python scripts/validate_copilot_media_reads.py \
+                --input /tmp/copilot-media-rendered.json \
+                --predictions outputs/this_week.csv \
+                --output outputs/copilot_media_reads.json \
+                2> "$feedback"; then
               validated=1
-              echo "Copilot editorial attempt $attempt passed all publication gates."
+              echo "Copilot focused editorial attempt $attempt passed all publication gates."
               break
             fi
-            echo "Copilot editorial attempt $attempt failed; no output will publish from this attempt."
+            echo "Copilot focused editorial attempt $attempt failed strict validation."
+            cat "$feedback"
           done
           if [ "$validated" -ne 1 ]; then
-            echo "All three Copilot editorial attempts failed strict publication validation."
+            echo "All three focused Copilot editorial attempts failed strict publication validation."
             exit 1
           fi
 
