@@ -68,7 +68,10 @@ def _nickname(code: str) -> str:
 
 
 def _clean(value: object) -> str:
-    text = BeautifulSoup(unescape(str(value or "")), "html.parser").get_text(" ", strip=True)
+    raw = unescape(str(value or "")).strip()
+    if raw.startswith(("http://", "https://")):
+        return re.sub(r"\s+", " ", raw).strip()
+    text = BeautifulSoup(raw, "html.parser").get_text(" ", strip=True)
     return re.sub(r"\s+", " ", text).strip()
 
 
