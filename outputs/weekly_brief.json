@@ -1,43 +1,43 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_NO_DET",
-      "largest_driver": "No material move",
-      "pick": "DET",
-      "pick_delta_pp": -2.220446049250313e-14
-    },
-    {
-      "game_id": "2026_01_ARI_LAC",
-      "largest_driver": "No material move",
-      "pick": "LAC",
-      "pick_delta_pp": 1.1102230246251565e-14
+      "game_id": "2026_01_NE_SEA",
+      "largest_driver": "Market movement",
+      "pick": "SEA",
+      "pick_delta_pp": -0.10295497794938768
     },
     {
       "game_id": "2026_01_GB_MIN",
       "largest_driver": "No material move",
       "pick": "MIN",
-      "pick_delta_pp": 1.1102230246251565e-14
+      "pick_delta_pp": -1.1102230246251565e-14
+    },
+    {
+      "game_id": "2026_01_ARI_LAC",
+      "largest_driver": "No material move",
+      "pick": "LAC",
+      "pick_delta_pp": 0.0
     }
   ],
-  "generated_utc": "2026-09-09T17:59:25.462884+00:00",
+  "generated_utc": "2026-09-09T19:00:12.346264+00:00",
   "market_disagreements": [
-    {
-      "confidence": "Solid",
-      "game_id": "2026_01_DEN_KC",
-      "matchup": "DEN @ KC",
-      "pick": "DEN",
-      "pick_prob": 0.6159372888065542,
-      "projected_score": "KC 19.8 \u2013 DEN 25.3",
-      "pure_market_gap_pp": 26.52399064708812
-    },
     {
       "confidence": "Lean",
       "game_id": "2026_01_MIA_LV",
       "matchup": "MIA @ LV",
       "pick": "MIA",
-      "pick_prob": 0.5717659330641509,
+      "pick_prob": 0.569647485084045,
       "projected_score": "LV 19.9 \u2013 MIA 23.6",
-      "pure_market_gap_pp": 25.897664656709946
+      "pure_market_gap_pp": 26.74504384875233
+    },
+    {
+      "confidence": "Solid",
+      "game_id": "2026_01_DEN_KC",
+      "matchup": "DEN @ KC",
+      "pick": "DEN",
+      "pick_prob": 0.6159372888065543,
+      "projected_score": "KC 19.8 \u2013 DEN 25.3",
+      "pure_market_gap_pp": 26.523990647088127
     },
     {
       "confidence": "Solid",
