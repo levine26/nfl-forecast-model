@@ -17,9 +17,11 @@ on:
       - "src/nfl_forecast/story_context.py"
       - "src/nfl_forecast/source_policy.py"
       - "src/nfl_forecast/advanced_player_context.py"
+      - "src/nfl_forecast/career_qb_context.py"
       - "scripts/run_context.py"
       - "scripts/polish_publication.py"
       - "scripts/add_advanced_player_context.py"
+      - "scripts/add_career_qb_context.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
       - "tests/test_coaching.py"
@@ -30,6 +32,7 @@ on:
       - "tests/test_narrative.py"
       - "tests/test_publication_polish.py"
       - "tests/test_advanced_player_context.py"
+      - "tests/test_career_qb_context.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   pull_request:
@@ -46,9 +49,11 @@ on:
       - "src/nfl_forecast/story_context.py"
       - "src/nfl_forecast/source_policy.py"
       - "src/nfl_forecast/advanced_player_context.py"
+      - "src/nfl_forecast/career_qb_context.py"
       - "scripts/run_context.py"
       - "scripts/polish_publication.py"
       - "scripts/add_advanced_player_context.py"
+      - "scripts/add_career_qb_context.py"
       - "tests/test_context.py"
       - "tests/test_context_plus.py"
       - "tests/test_coaching.py"
@@ -59,6 +64,7 @@ on:
       - "tests/test_narrative.py"
       - "tests/test_publication_polish.py"
       - "tests/test_advanced_player_context.py"
+      - "tests/test_career_qb_context.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   schedule:
@@ -82,7 +88,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py tests/test_publication_polish.py tests/test_advanced_player_context.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py tests/test_publication_polish.py tests/test_advanced_player_context.py tests/test_career_qb_context.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -96,6 +102,7 @@ jobs:
           python scripts/run_context.py --season 2026 --output-dir /tmp/nfl-context
           python scripts/polish_publication.py --season 2026 --output-dir /tmp/nfl-context
           python scripts/add_advanced_player_context.py --season 2026 --output-dir /tmp/nfl-context
+          python scripts/add_career_qb_context.py --season 2026 --output-dir /tmp/nfl-context
       - name: Require usable current coaching and impact coverage
         if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
         run: |
@@ -117,11 +124,13 @@ jobs:
           story = status.get('story_desk', {})
           qb = status.get('qb_history_verification', {})
           ngs = status.get('nextgen_qb_context', {})
+          career = status.get('career_qb_verification', {})
           print('staff impact:', json.dumps(staff, sort_keys=True))
           print('personnel usage:', json.dumps(personnel, sort_keys=True))
           print('story desk:', json.dumps(story, sort_keys=True))
           print('QB history verification:', json.dumps(qb, sort_keys=True))
           print('NGS quarterback context:', json.dumps(ngs, sort_keys=True))
+          print('Career QB verification:', json.dumps(career, sort_keys=True))
           if status.get('ftn', {}).get('status') == 'healthy' and status.get('pbp', {}).get('status') == 'healthy' and staff.get('status') != 'healthy':
               raise SystemExit(f'staff-impact layer failed despite healthy FTN/PBP: {staff}')
           if status.get('pbp', {}).get('status') == 'healthy' and personnel.get('status') != 'healthy':
@@ -130,11 +139,12 @@ jobs:
               raise SystemExit(f'story-desk publication layer failed: {story}')
           if qb.get('status') != 'healthy' or qb.get('career_counts_published') is not False:
               raise SystemExit(f'QB history publication guardrail failed: {qb}')
-          # NGS is genuinely best-effort and therefore never a merge blocker.
-          # If it is healthy, however, require proof that the live slate produced
-          # at least one actual player-profile match rather than a nominal source check.
           if ngs.get('status') == 'healthy' and int(ngs.get('evidence_items_added', 0)) < 1:
               raise SystemExit(f'NGS reported healthy but enriched no current quarterbacks: {ngs}')
+          # Career verification is allowed to degrade when two datasets conflict;
+          # HOLD means the disputed career claim is suppressed rather than guessed.
+          if career.get('status') == 'healthy' and int(career.get('verified', 0)) < 1:
+              raise SystemExit(f'career ledger reported healthy but verified no quarterbacks: {career}')
           PY
       - name: Build contextual evidence
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -142,12 +152,13 @@ jobs:
           python scripts/run_context.py --season 2026
           python scripts/polish_publication.py --season 2026 --probe-advanced
           python scripts/add_advanced_player_context.py --season 2026
+          python scripts/add_career_qb_context.py --season 2026
       - name: Commit contextual outputs
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
           git config user.name "sunday-signal-context-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json outputs/qb_history_audit.json
+          git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json outputs/qb_history_audit.json outputs/career_qb_audit.json
           git diff --cached --quiet || git commit -m "Refresh Sunday Signal contextual intelligence"
           git pull --rebase origin main
           git push
