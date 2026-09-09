@@ -1,0 +1,39 @@
+name: Launch patch editorial voice
+
+on:
+  push:
+    branches: [launch/copilot-factual-composition]
+    paths:
+      - '.github/workflows/_launch_patch_editorial_voice.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: launch/copilot-factual-composition
+      - name: Patch compact structured evidence handling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/nfl_forecast/editorial_voice.py')
+          text = path.read_text()
+          old = '''    def usable(item: dict[str, Any] | None) -> bool:\n        if not item:\n            return False\n        summary = str(item.get("summary") or "").strip()\n        lowered = summary.lower()\n        if len(summary.split()) < 7:\n            return False\n        fam = family(item)\n        if ("nflverse schedule sample" in lowered and fam != "rivalry") or "need variance in the high-leverage parts" in lowered:\n            return False\n        return True\n'''
+          new = '''    def usable(item: dict[str, Any] | None) -> bool:\n        if not item:\n            return False\n        summary = str(item.get("summary") or "").strip()\n        lowered = summary.lower()\n        fam = family(item)\n        title = str(item.get("title") or "").strip()\n\n        # Compact pressure summaries are intentionally produced by downstream\n        # evidence enrichment (for example, "pressure matchup tilts LAC").\n        # They are structured evidence, not empty/generic copy. Let the pressure\n        # renderer consume them instead of falling into the identical\n        # "sourced lead unavailable" fallback across several games.\n        compact_pressure = bool(\n            fam == "pressure"\n            and title\n            and (\n                re.search(r"pressure matchup tilts [A-Z]{2,4}", summary, re.I)\n                or re.search(\n                    r"^[A-Z]{2,4} gave up sacks on [0-9.]+% of pass plays last season; [A-Z]{2,4} got home on [0-9.]+%",\n                    summary,\n                )\n            )\n        )\n        if len(summary.split()) < 7 and not compact_pressure:\n            return False\n        if ("nflverse schedule sample" in lowered and fam != "rivalry") or "need variance in the high-leverage parts" in lowered:\n            return False\n        return True\n'''
+          if old not in text:
+              raise SystemExit('expected usable() block not found; refusing stale patch')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Commit source patch
+        run: |
+          set -euo pipefail
+          git config user.name "launch-readiness-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/nfl_forecast/editorial_voice.py
+          git commit -m "Accept compact structured pressure evidence"
+          git push origin HEAD:launch/copilot-factual-composition
