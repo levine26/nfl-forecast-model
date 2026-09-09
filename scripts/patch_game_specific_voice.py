@@ -38,15 +38,32 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
         summary = str(item.get("summary") or "").strip()
         if len(summary.split()) < 7:
             return False
-        # Generic schedule-sample boilerplate can remain in the raw history file,
-        # but it should never become the public lead or a win-case paragraph.
         if "nflverse schedule sample" in summary.lower():
             return False
         return True
 
+    def specific_summary(item: dict[str, Any]) -> str:
+        """Keep the game-specific factual sentence; drop shared explanatory boilerplate."""
+        summary = str(item.get("summary") or "").strip()
+        if not summary:
+            return ""
+        family = _clean_family((item.get("metadata") or {}).get("family") or item.get("family") or item.get("category"))
+        sentences = [part.strip() for part in summary.split(". ") if part.strip()]
+        if not sentences:
+            return summary
+        # Event/rivalry notes are already bespoke and may need a second sentence for meaning.
+        if family in {"international_event", "rivalry", "international_travel"}:
+            kept = sentences[:2]
+        else:
+            kept = sentences[:1]
+        result = ". ".join(kept)
+        if summary.endswith(".") and not result.endswith("."):
+            result += "."
+        return result
+
     def beat(item: dict[str, Any]) -> str:
         title = str(item.get("title") or "").strip().rstrip('.:')
-        summary = str(item.get("summary") or "").strip()
+        summary = specific_summary(item)
         if not title or title.lower() in summary.lower()[: max(90, len(title) + 15)]:
             return summary
         return f"{title}: {summary}"
@@ -67,7 +84,6 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
         all_items = candidates(preview)
 
         selected: list[dict[str, Any]] = []
-        # Rare event/rivalry context deserves the first beat when it actually exists.
         for item in all_items:
             family = _clean_family((item.get("metadata") or {}).get("family") or item.get("family") or item.get("category"))
             if family in special_families and usable(item):
@@ -105,8 +121,7 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
             preview["case_for_pick"] = beat(support)
         if counter:
             preview["case_for_opponent"] = beat(counter)
-        if counter:
-            preview["what_could_make_us_wrong"] = f"If {opponent} wins the part of the game highlighted here, LevLine can miss: {str(counter.get('summary') or '').strip()}"
+            preview["what_could_make_us_wrong"] = f"{opponent}'s cleanest counter is {str(counter.get('title') or 'the matchup counter').strip()}: {specific_summary(counter)}"
 
         preview["editorial_voice"] = {
             "evidence_led": True,
