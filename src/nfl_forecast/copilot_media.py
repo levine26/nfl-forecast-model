@@ -27,7 +27,7 @@ def apply_copilot_reads(
     predictions: pd.DataFrame,
     path: str | Path,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, list[dict[str, Any]]], dict[str, Any]]:
-    """Use validated Copilot Reads when no curated human Read already exists."""
+    """Use validated Copilot research when available; curated copy is the fallback."""
     generated = load_copilot_reads(path)
     if not generated:
         return previews, evidence, {"status":"unavailable", "games_applied":0}
@@ -35,9 +35,6 @@ def apply_copilot_reads(
     rows = {str(row.game_id): row for _, row in predictions.iterrows()} if "game_id" in predictions.columns else {}
     applied = 0
     for game_id, preview in previews.items():
-        # Hand-curated reporting remains the highest-confidence editorial source.
-        if bool((preview.get("editorial_voice") or {}).get("source_first_reporting")):
-            continue
         entry = generated.get(str(game_id))
         if not isinstance(entry, dict):
             continue
