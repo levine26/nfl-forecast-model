@@ -17,7 +17,7 @@ def test_diversity_prefers_different_scheme_families():
     assert "pressure" in families and "explosives" in families
 
 
-def test_preview_exposes_three_deciding_factors_and_levline_brand():
+def test_preview_exposes_three_deciding_factors_and_levline_brand_without_forcing_brand_into_read():
     preds=pd.DataFrame([{"game_id":"2026_01_ATL_PIT","away_team":"ATL","home_team":"PIT","pick":"PIT","final_home_prob":.67,"expected_margin":6.2,"expected_total":47.7,"projected_score":"PIT 27 - ATL 21","pure_home_prob":.70,"market_home_prob":.60,"spread_line":3.5,"model_disagreement":.04,"consistency_flag":"ALIGNED"}])
     evidence={"2026_01_ATL_PIT":[
         {"category":"scheme","title":"Pressure","summary":"PIT creates pressure at an above-average rate.","strength":"Strong","sample_size":180,"metadata":{"family":"pressure","advantage_team":"PIT"}},
@@ -28,7 +28,9 @@ def test_preview_exposes_three_deciding_factors_and_levline_brand():
     assert p["brand"]=="Sunday Signal"
     assert p["engine"]=="LevLine"
     assert len(p["key_factors"])==3
-    assert "LevLine" in p["paragraphs"][0]
+    assert p["story_spine"]["primary_family"]=="pressure"
+    assert "pressure" in p["paragraphs"][0].lower()
+    assert not p["paragraphs"][0].startswith("LevLine has")
 
 
 def test_upgrade_does_not_mutate_prediction_probabilities():
