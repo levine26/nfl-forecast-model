@@ -30,6 +30,11 @@ def test_bing_redirect_resolves_to_direct_approved_publisher():
     assert _canonical_url(url, "Yahoo Sports") == "https://sports.yahoo.com/articles/broncos-example.html"
 
 
+def test_unresolved_or_homepage_substitution_is_not_fabricated():
+    assert _canonical_url("https://news.google.com/rss/articles/opaque", "ESPN") == ""
+    assert _canonical_url("", "NFL.com", "https://www.nfl.com/") == ""
+
+
 def test_composer_owns_exact_model_facts_and_sources():
     predictions = pd.DataFrame([
         {
@@ -76,10 +81,10 @@ def test_composer_owns_exact_model_facts_and_sources():
     result = compose(payload, predictions, previews, {"2026_01_DEN_KC": []})
     entry = result["games"]["2026_01_DEN_KC"]
     p2 = entry["paragraph2"]
-    assert "62.0% win probability" in p2
-    assert "football-only PURE is 68.0%" in p2
-    assert "market view is 52.0%" in p2
-    assert "75% PURE / 25% MARKET" in p2
+    assert "Broncos at 62.0% to win" in p2
+    assert "Broncos football-only PURE is 68.0%" in p2
+    assert "Broncos market probability is 52.0%" in p2
+    assert "PURE carries 75%" in p2 and "MARKET carries 25%" in p2
     assert "Denver Broncos -6.5" in p2
     assert "Kansas City Chiefs -3.5" in p2
     assert "DEN 27.0 – KC 20.5" in p2
