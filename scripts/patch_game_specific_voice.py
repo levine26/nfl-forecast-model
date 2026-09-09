@@ -46,30 +46,25 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
         return True
 
     def specific_summary(item: dict[str, Any]) -> str:
-        """Convert recurring stat templates into concise matchup-specific facts."""
         summary = str(item.get("summary") or "").strip()
         fam = family(item)
         if not summary:
             return ""
-
         if fam == "pressure":
             match = re.search(r"^([A-Z]{2,4}) gave up sacks on ([0-9.]+)% of pass plays last season; ([A-Z]{2,4}) got home on ([0-9.]+)%", summary)
             if match:
                 protected, allowed, rusher, created = match.groups()
                 return f"{protected} protection allowed a {allowed}% sack rate; {rusher}'s rush produced {created}%."
-
         if fam == "explosives":
             match = re.search(r"^([A-Z]{2,4}) hit a 20\+ yard pass on ([0-9.]+)% of pass plays; ([A-Z]{2,4}) allowed one on ([0-9.]+)%", summary)
             if match:
                 offense, created, defense, allowed = match.groups()
                 return f"{offense} generated a 20+ yard completion on {created}% of passes; {defense} allowed 20+ on {allowed}%."
-
         if fam == "early_down":
             match = re.search(r"^([A-Z]{2,4}) threw on ([0-9.]+)% of first- and second-down plays and averaged ([+\-][0-9.]+) EPA per early-down pass\. ([A-Z]{2,4}) allowed ([+\-][0-9.]+)", summary)
             if match:
                 offense, rate, epa, defense, allowed = match.groups()
                 return f"{offense} early downs: {rate}% pass rate and {epa} EPA per pass; {defense} allowed {allowed}."
-
         sentences = [part.strip() for part in summary.split(". ") if part.strip()]
         if not sentences:
             return summary
@@ -82,9 +77,7 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
     def beat(item: dict[str, Any]) -> str:
         title = str(item.get("title") or "").strip().rstrip('.:')
         summary = specific_summary(item)
-        if not title or title.lower() in summary.lower()[: max(90, len(title) + 15)]:
-            return summary
-        return f"{title}: {summary}"
+        return summary if not title or title.lower() in summary.lower()[: max(90, len(title) + 15)] else f"{title}: {summary}"
 
     special_families = {"international_event", "rivalry", "international_travel"}
     for game_id in sorted(previews):
@@ -111,23 +104,30 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
             if len(selected) >= 3:
                 break
 
-        paragraphs = list(preview.get("paragraphs") or [])
         if selected:
+            preview["headline"] = str(selected[0].get("title") or f"{away}-{home}").strip()
             lead = " ".join(beat(item) for item in selected[:2]).strip()
-            if paragraphs:
-                paragraphs[0] = lead
-            else:
-                paragraphs = [lead]
+        else:
+            preview["headline"] = f"{away}-{home} matchup file"
+            lead = f"{away}-{home}: sourced lead unavailable."
+        paragraphs = list(preview.get("paragraphs") or [])
+        if paragraphs:
+            paragraphs[0] = lead
+        else:
+            paragraphs = [lead]
         preview["paragraphs"] = paragraphs
 
         support = next((item for item in all_items if usable(item) and advantage(item) == pick), None)
         counter = next((item for item in all_items if usable(item) and advantage(item) == opponent), None)
-        if support:
-            preview["case_for_pick"] = beat(support)
-        if counter:
-            preview["case_for_opponent"] = beat(counter)
-            preview["what_could_make_us_wrong"] = f"{opponent}'s cleanest counter is {str(counter.get('title') or 'the matchup counter').strip()}: {specific_summary(counter)}"
-
+        neutral = [item for item in selected if usable(item)]
+        pick_item = support or (neutral[0] if neutral else None)
+        opponent_item = counter or (neutral[1] if len(neutral) > 1 else None)
+        preview["case_for_pick"] = beat(pick_item) if pick_item else f"{pick} in {away}-{home}: featured evidence unavailable."
+        preview["case_for_opponent"] = beat(opponent_item) if opponent_item else f"{opponent} in {away}-{home}: featured counter unavailable."
+        preview["what_could_make_us_wrong"] = (
+            f"{opponent}'s counter in {away}-{home}: {specific_summary(counter)}" if counter
+            else f"{away}-{home}: no sourced {opponent} counter clears the publication threshold."
+        )
         preview["editorial_voice"] = {
             "evidence_led": True,
             "game_specific": True,
@@ -144,8 +144,21 @@ new_banned = '''BANNED = (\n    "two distinct levers", "real matchup counter-sig
 if old_banned not in text:
     raise SystemExit('BANNED block missing')
 text = text.replace(old_banned, new_banned)
+# Preserve headlines explicitly set by the game-specific editorial pass.
+old_headline = '''        if not is_special:\n            primary_title = str((preview.get("story_spine") or {}).get("primary_title") or "")\n            primary = by_title.get(primary_title)\n            if primary is None:\n                primary = next((item for item in items if _advantage(item) == pick), None)\n            preview["headline"] = _headline(pick, opponent, primary)'''
+new_headline = '''        is_game_specific = bool((preview.get("editorial_voice") or {}).get("game_specific"))\n        if not is_special and not is_game_specific:\n            primary_title = str((preview.get("story_spine") or {}).get("primary_title") or "")\n            primary = by_title.get(primary_title)\n            if primary is None:\n                primary = next((item for item in items if _advantage(item) == pick), None)\n            preview["headline"] = _headline(pick, opponent, primary)'''
+if old_headline not in text:
+    raise SystemExit('headline rewrite block missing')
+text = text.replace(old_headline, new_headline)
 needle = '''    found = [phrase for phrase in BANNED if phrase in public]\n    if found:\n        raise ValueError(f"publication still contains banned template phrases: {found}")\n    if len(headlines) != len(set(headlines)):\n'''
-replacement = '''    found = [phrase for phrase in BANNED if phrase in public]\n    if found:\n        raise ValueError(f"publication still contains banned template phrases: {found}")\n\n    ngram_games: dict[str, set[str]] = {}\n    for game_id, preview in previews.items():\n        texts = []\n        paragraphs = preview.get("paragraphs") or []\n        if paragraphs:\n            texts.append(str(paragraphs[0]))\n        texts.extend([str(preview.get("case_for_pick") or ""), str(preview.get("case_for_opponent") or "")])\n        words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", " ".join(texts).lower())\n        for index in range(max(0, len(words) - 6)):\n            gram = " ".join(words[index:index+7])\n            ngram_games.setdefault(gram, set()).add(str(game_id))\n    repeated = {gram: sorted(games) for gram, games in ngram_games.items() if len(games) > 1}\n    if repeated:\n        sample = list(repeated.items())[:5]\n        raise ValueError(f"publication repeats game-file prose across matchups: {sample}")\n\n    if len(headlines) != len(set(headlines)):\n'''
+replacement = '''    found = [phrase for phrase in BANNED if phrase in public]\n    if found:\n        raise ValueError(f"publication still contains banned template phrases: {found}")\n\n    ngram_games: dict[str, set[str]] = {}\n    for game_id, preview in previews.items():\n        paragraphs = preview.get("paragraphs") or []\n        texts = [str(preview.get("headline") or "")]\n        if paragraphs:\n            texts.append(str(paragraphs[0]))\n        texts.extend([\n            str(preview.get("case_for_pick") or ""),\n            str(preview.get("case_for_opponent") or ""),\n            str(preview.get("what_could_make_us_wrong") or ""),\n        ])\n        words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", " ".join(texts).lower())\n        for index in range(max(0, len(words) - 6)):\n            gram = " ".join(words[index:index+7])\n            ngram_games.setdefault(gram, set()).add(str(game_id))\n    repeated = {gram: sorted(games) for gram, games in ngram_games.items() if len(games) > 1}\n    if repeated:\n        sample = list(repeated.items())[:5]\n        raise ValueError(f"publication repeats game-file prose across matchups: {sample}")\n\n    if len(headlines) != len(set(headlines)):\n'''
 if needle not in text:
     raise SystemExit('final QA insertion point missing')
 finalize.write_text(text.replace(needle, replacement))
+
+# Keep the standalone regression test aligned with the production guard.
+test = Path('tests/test_editorial_uniqueness.py')
+if test.exists():
+    t = test.read_text()
+    t = t.replace("visible = [paragraphs[0] if paragraphs else '', preview.get('case_for_pick') or '', preview.get('case_for_opponent') or '']", "visible = [preview.get('headline') or '', paragraphs[0] if paragraphs else '', preview.get('case_for_pick') or '', preview.get('case_for_opponent') or '', preview.get('what_could_make_us_wrong') or '']")
+    test.write_text(t)
