@@ -183,7 +183,7 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     sentences: list[str] = []
     if final_prob is not None:
         sentences.append(
-            f"In {matchup}, LevLine gives the {pick_nick} a {final_prob * 100:.1f}% win probability over the {opponent_nick}."
+            f"For {matchup}, LevLine's {pick_nick} win probability is {final_prob * 100:.1f}% against {opponent_nick}."
         )
     if pure_prob is not None and market_prob is not None:
         sentences.append(
