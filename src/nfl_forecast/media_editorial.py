@@ -136,10 +136,12 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
             )
         elif fam == "qb_opponent_history":
             subject = _qb_subject(title, f"the {_nick(away)} quarterback")
-            headline = f"{matchup}: {subject} against the {_nick(home)} defense"
+            away_name = _nick(away)
+            home_name = _nick(home)
+            headline = f"{matchup}: {subject} against the {home_name} defense"
             sentences.append(
-                f"{matchup} brings {subject}'s history with the {_nick(home)} into the game plan, but the current matchup matters more than the old box scores. "
-                f"The {_nick(away)} need {subject} on schedule against {_nick(home)} coverage, while the {_nick(home)} want to speed up his decisions and recreate the pressure points they have shown they can reach."
+                f"{matchup} gives the {away_name} a history sample: {subject} has seen the {home_name} before, but {home_name}'s current coverage and {away_name}'s present protection decide whether it carries over. "
+                f"{away_name} need {subject} to identify {home_name}'s pressure quickly; {home_name} need to make {away_name}'s route timing and pocket answers look different from those prior meetings."
             )
         elif title:
             headline = f"{matchup}: {title}"
