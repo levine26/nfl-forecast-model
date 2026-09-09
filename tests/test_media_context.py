@@ -62,6 +62,7 @@ def test_media_context_prioritizes_major_reporting_and_rejects_noise(monkeypatch
     items = media["2026_01_DEN_KC"]
     assert items[0]["source_name"] == "ESPN"
     assert all("Betting Blog" != item["source_name"] for item in items)
+    # This CBS fixture contains only Kansas City, so the matchup-relevance gate must reject it.
     assert all("CBS Sports" != item["source_name"] for item in items)
     assert items[0]["metadata"]["substantive"] is True
     assert items[0]["metadata"]["trusted_source"] is True
@@ -87,14 +88,24 @@ def test_media_led_read_uses_reporting_then_quantitative_mechanism():
                 "source_name": "ESPN",
                 "source_url": "https://example.com/espn",
                 "as_of": "2026-09-08T20:00:00+00:00",
-                "metadata": {"editorial_score": 130, "family": "reported_angle", "substantive": True},
+                "metadata": {
+                    "editorial_score": 130,
+                    "family": "reported_angle",
+                    "substantive": True,
+                    "trusted_source": True,
+                },
             },
             {
                 "title": "Chiefs left tackle trending toward missing opener",
                 "source_name": "CBS Sports",
                 "source_url": "https://example.com/cbs",
                 "as_of": "2026-09-08T21:00:00+00:00",
-                "metadata": {"editorial_score": 120, "family": "reported_angle", "substantive": True},
+                "metadata": {
+                    "editorial_score": 120,
+                    "family": "reported_angle",
+                    "substantive": True,
+                    "trusted_source": True,
+                },
             },
         ]
     }
@@ -112,10 +123,14 @@ def test_media_led_read_uses_reporting_then_quantitative_mechanism():
     read = result["2026_01_DEN_KC"]["paragraphs"][0]
     assert "ESPN reports Patrick Mahomes is expected to start Week 1 against Broncos" in read
     assert "CBS Sports has Chiefs left tackle trending toward missing opener" in read
-    assert "Broncos–Chiefs pressure note" in read
-    assert "Chiefs allowed an 8.2% sack rate" in read
+    assert "In Broncos–Chiefs" in read
+    assert "Chiefs allowed a 8.2% sack rate last season" in read
     assert "Broncos generated 9.7%" in read
-    assert "PURE has Denver 26.5 percentage points above consensus in Broncos–Chiefs" in read
+    assert "LevLine is much more bullish on Denver in Broncos–Chiefs than the broader consensus" in read
+    assert "26.5-point probability gap" in read
+    assert "coverage highlights" not in read
+    assert "pressure note" not in read
+    assert "PURE has" not in read
     assert "deserves the first paragraph" not in read
     assert "KC protection vs DEN pass rush" not in read
     assert result["2026_01_DEN_KC"]["editorial_voice"]["media_led"] is True
