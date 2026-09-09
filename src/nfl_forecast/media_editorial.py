@@ -132,49 +132,43 @@ def _quant_sentence(away: str, home: str, item: dict[str, Any] | None) -> str:
         if match:
             protected, allowed, rusher, created = match.groups()
             return (
-                f"In {matchup}, the {_nick(protected)} were sacked on {allowed}% of pass plays last season "
-                f"while the {_nick(rusher)} got home on {created}%, making protection an immediate stress point."
+                f"{matchup}: the {_nick(protected)} were sacked on {allowed}% of pass plays; "
+                f"the {_nick(rusher)} got home on {created}%."
             )
         tilt = re.search(r"pressure matchup tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
-            return f"The {matchup} pass-rush matchup leans toward the {_nick(tilt.group(1))}."
+            return f"{matchup}: pass-rush leverage favors the {_nick(tilt.group(1))}."
 
     if fam == "explosives":
         match = re.search(r"([A-Z]{2,4}) hit a 20\+ yard pass on ([0-9.]+)% of pass plays; ([A-Z]{2,4}) allowed one on ([0-9.]+)%", summary)
         if match:
             offense, created, defense, allowed = match.groups()
             return (
-                f"The {_nick(offense)} created 20-plus-yard completions on {created}% of passes last year; "
-                f"the {_nick(defense)} allowed them on {allowed}%, a real {matchup} big-play tension."
+                f"{matchup}: the {_nick(offense)} created 20-plus-yard completions on {created}% of passes; "
+                f"the {_nick(defense)} allowed {allowed}%."
             )
         tilt = re.search(r"chunk-play path tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
-            return f"The {matchup} explosive-play evidence leans toward the {_nick(tilt.group(1))}."
+            return f"{matchup}: explosive-play leverage favors the {_nick(tilt.group(1))}."
 
     if fam == "early_down":
         match = re.search(r"([A-Z]{2,4}) threw on ([0-9.]+)% of first- and second-down plays and averaged ([+\-][0-9.]+) EPA per early-down pass", summary)
         if match:
             offense, rate, epa = match.groups()
-            return (
-                f"The {_nick(offense)} threw on {rate}% of early downs last year and produced {epa} EPA per pass, "
-                f"which gives {matchup} a clear pace-and-script question."
-            )
+            return f"{matchup}: the {_nick(offense)} passed on {rate}% of early downs at {epa} EPA per pass."
         tilt = re.search(r"early-down leverage tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
-            return f"The {matchup} early-down profile leans toward the {_nick(tilt.group(1))}."
+            return f"{matchup}: early-down leverage favors the {_nick(tilt.group(1))}."
 
     if fam == "qb_opponent_history":
         qb = title.split(" vs ", 1)[0].strip() if " vs " in title else "The quarterback"
         match = re.search(r"([0-9]+) meaningful games.*?([0-9]+) charted dropbacks.*?([+\-][0-9.]+) EPA/dropback", summary)
         if match:
             games, drops, epa = match.groups()
-            return (
-                f"{qb}'s recent {matchup} sample covers {games} meaningful meetings and {drops} charted dropbacks "
-                f"at {epa} EPA per dropback."
-            )
+            return f"{matchup}: {qb} has {games} meaningful meetings, {drops} charted dropbacks and {epa} EPA per dropback."
 
     if title:
-        return f"Another {matchup} factor is {_clean_title(title, max_words=14)}."
+        return f"{matchup}: {_clean_title(title, max_words=14)}."
     return ""
 
 
@@ -193,10 +187,7 @@ def _market_sentence(row: pd.Series) -> str:
     away = str(row.get("away_team"))
     team = home if gap > 0 else away
     points = abs(gap) * 100.0
-    return (
-        f"LevLine is much more bullish on {_city(team)} in {_matchup(away, home)} than the broader consensus, "
-        f"a {points:.1f}-point probability gap."
-    )
+    return f"{_matchup(away, home)} market gap: LevLine rates {_city(team)} {points:.1f} percentage points above consensus."
 
 
 def rewrite_reads_with_media(
