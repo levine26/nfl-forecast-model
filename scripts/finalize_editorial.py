@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from nfl_forecast.copilot_media import apply_copilot_reads
 from nfl_forecast.editorial_finalize import finalize_previews
 from nfl_forecast.media_context import add_media_context, apply_source_first_reads
 
@@ -37,7 +38,17 @@ def main() -> None:
         week=week,
     )
     previews = apply_source_first_reads(previews, evidence, predictions)
+
+    # A validated Copilot research artifact is a fallback for slates without a
+    # hand-curated Read. Curated human copy always wins when both are present.
+    previews, evidence, copilot_status = apply_copilot_reads(
+        previews=previews,
+        evidence=evidence,
+        predictions=predictions,
+        path=out / "copilot_media_reads.json",
+    )
     status["media_reporting"] = media_status
+    status["copilot_media"] = copilot_status
     status["editorial_finalizer"] = finalize_previews(predictions, previews, evidence)
 
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
