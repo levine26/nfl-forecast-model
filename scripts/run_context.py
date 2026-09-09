@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
+from difflib import SequenceMatcher
 from pathlib import Path
 import json
 import re
@@ -18,9 +19,13 @@ from nfl_forecast.context import (
 )
 from nfl_forecast.context_plus import upgrade_contextual_evidence
 from nfl_forecast.data import configure_cache
+from nfl_forecast.editorial_voice import polish_preview_slate
 from nfl_forecast.injuries import fetch_nfl_injuries, practice_status_evidence
 from nfl_forecast.narrative import build_game_previews
 from nfl_forecast.qb_history import add_portable_qb_history
+
+
+NORMALIZED_READ_SIMILARITY_LIMIT = 0.78
 
 
 def _pandas(frame):
@@ -63,12 +68,29 @@ def _fetch_injuries(season: int, week: int):
     return espn_rows, {"status":"degraded","provider":"NFL.com primary / ESPN fallback","primary":nfl_status,"fallback":espn_status,"source":nfl_status.get("source"),"as_of":datetime.now(timezone.utc).isoformat()}, False
 
 
-def _editorial_audit(previews: dict[str, dict]) -> dict:
+def _normalize_read(text: str, team_tokens: set[str]) -> str:
+    normalized = str(text or "").lower()
+    for team in sorted((t for t in team_tokens if t), key=len, reverse=True):
+        normalized = re.sub(rf"\b{re.escape(team.lower())}\b", "<team>", normalized)
+    normalized = normalized.replace("sunday signal", "<brand>").replace("levline", "<brand>")
+    normalized = re.sub(r"\b\d+(?:\.\d+)?%?\b", "<num>", normalized)
+    normalized = re.sub(r"[^a-z<>\s]+", " ", normalized)
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _editorial_audit(previews: dict[str, dict], predictions: pd.DataFrame | None = None) -> dict:
     headlines = [str(p.get("headline") or "").strip() for p in previews.values() if p.get("headline")]
     first_paragraphs = [str((p.get("paragraphs") or [""])[0]).strip() for p in previews.values() if p.get("paragraphs")]
     lead_sentences = []
     all_sentences = []
     counter_led = []
+    team_tokens: set[str] = set()
+    if predictions is not None and not predictions.empty:
+        for column in ("home_team", "away_team", "pick"):
+            if column in predictions.columns:
+                team_tokens.update(predictions[column].dropna().astype(str).tolist())
+
+    normalized_reads: dict[str, str] = {}
     for game_id, preview in previews.items():
         paragraph = str((preview.get("paragraphs") or [""])[0]).strip()
         sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", paragraph) if s.strip()]
@@ -77,8 +99,28 @@ def _editorial_audit(previews: dict[str, dict]) -> dict:
         all_sentences.extend(sentence for sentence in sentences if len(sentence) >= 36)
         if (preview.get("story_spine") or {}).get("primary_mode") == "counter":
             counter_led.append(game_id)
+        normalized_reads[str(game_id)] = _normalize_read(paragraph, team_tokens)
+
     counts = Counter(all_sentences)
     repeats = {sentence: count for sentence, count in counts.items() if count > 1}
+    similar_pairs = []
+    game_ids = sorted(normalized_reads)
+    for index, left_id in enumerate(game_ids):
+        left = normalized_reads[left_id]
+        if not left:
+            continue
+        for right_id in game_ids[index + 1:]:
+            right = normalized_reads[right_id]
+            if not right:
+                continue
+            similarity = SequenceMatcher(None, left, right).ratio()
+            if similarity >= NORMALIZED_READ_SIMILARITY_LIMIT:
+                similar_pairs.append({
+                    "game_a": left_id,
+                    "game_b": right_id,
+                    "similarity": round(similarity, 3),
+                })
+
     return {
         "unique_headlines": len(set(headlines)),
         "headline_count": len(headlines),
@@ -87,6 +129,9 @@ def _editorial_audit(previews: dict[str, dict]) -> dict:
         "repeated_read_sentences": repeats,
         "repeated_read_sentence_count": len(repeats),
         "counter_led_reads": sorted(counter_led),
+        "normalized_read_similarity_limit": NORMALIZED_READ_SIMILARITY_LIMIT,
+        "high_similarity_read_pairs": similar_pairs,
+        "high_similarity_read_pair_count": len(similar_pairs),
     }
 
 
@@ -105,6 +150,8 @@ def _require_editorial_quality(audit: dict, game_count: int) -> None:
         failures.append(f"Read leads are not unique ({audit.get('unique_read_leads')}/{game_count})")
     if int(audit.get("repeated_read_sentence_count", 0)):
         failures.append(f"repeated Read sentences remain: {audit.get('repeated_read_sentences')}")
+    if int(audit.get("high_similarity_read_pair_count", 0)):
+        failures.append(f"normalized Reads are still too similar: {audit.get('high_similarity_read_pairs')}")
     if failures:
         raise SystemExit("Sunday Signal editorial quality gate failed: " + "; ".join(failures))
 
@@ -152,20 +199,21 @@ def main():
     evidence=add_portable_qb_history(predictions=predictions,evidence=evidence,pbp=pbp,depth=depth,season=args.season)
     portable_count=sum(1 for items in evidence.values() for item in items if (item.get("metadata") or {}).get("family")=="qb_opponent_history" and (item.get("metadata") or {}).get("meetings"))
     previews=build_game_previews(predictions,evidence)
-    editorial_audit=_editorial_audit(previews)
+    previews=polish_preview_slate(previews,predictions)
+    editorial_audit=_editorial_audit(previews,predictions)
     _require_editorial_quality(editorial_audit,len(previews))
 
     source_status.update(context_status); source_status["editorial_intelligence"]=editorial_status
     source_status["qb_history"]={"status":"healthy","games_with_player_opponent_history":portable_count,"game_level_meeting_metadata":True,"team_change_safe":True,"guardrail":"Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes."}
     source_status["evidence"]={"status":"healthy","games":len(evidence),"signals":sum(len(v) for v in evidence.values()),"generated_utc":generated,"guardrail":"Context is explanatory only unless a feature is separately validated and promoted into the numerical model."}
-    source_status["previews"]={"status":"healthy","games":len(previews),"generator":"Sunday Signal ranked story-spine composer","engine":"LevLine","editorial_audit":editorial_audit,"guardrail":"Written previews synthesize verified context but do not alter numerical probabilities."}
+    source_status["previews"]={"status":"healthy","games":len(previews),"generator":"Sunday Signal ranked story-spine + slate-aware voice composer","engine":"LevLine","editorial_audit":editorial_audit,"guardrail":"Written previews synthesize verified context but do not alter numerical probabilities."}
     (out/"contextual_evidence.json").write_text(json.dumps(evidence,indent=2,sort_keys=True),encoding="utf-8"); (out/"game_previews.json").write_text(json.dumps(previews,indent=2,sort_keys=True),encoding="utf-8"); (out/"context_source_status.json").write_text(json.dumps(source_status,indent=2,sort_keys=True),encoding="utf-8")
     counts={gid:len(items) for gid,items in evidence.items()}; print(f"Sunday Signal context refresh complete: {sum(counts.values())} evidence signals across {len(counts)} games"); print(f"Written previews generated: {len(previews)}")
     print("Editorial diversity audit:",json.dumps(editorial_audit,sort_keys=True))
     for gid in sorted(previews):
         preview=previews[gid]; lead=(preview.get("paragraphs") or [""])[0]
-        spine=preview.get("story_spine") or {}
-        print(f"EDITORIAL {gid} | {preview.get('headline','')} | {spine.get('primary_mode')}:{spine.get('primary_family')} | {lead}")
+        spine=preview.get("story_spine") or {}; voice=preview.get("editorial_voice") or {}
+        print(f"EDITORIAL {gid} | {preview.get('headline','')} | {spine.get('primary_mode')}:{spine.get('primary_family')} | voice={voice.get('primary_variant')} | {lead}")
     print(json.dumps(source_status,indent=2))
 
 
