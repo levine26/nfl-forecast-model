@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from urllib.parse import urlparse
 import re
 
 import pandas as pd
 
-from compose_copilot_media_reads import _domain_allowed, _domain_family, _extract_json
+from compose_copilot_media_reads import _domain_family, _extract_json
 from validate_copilot_media_reads import _mentions_any, _team_aliases
+from nfl_forecast.source_policy import is_substantive_media_source
 
 
 def _clean(value: object) -> str:
@@ -52,19 +52,14 @@ def _valid_sources(sources: object) -> tuple[list[dict], set[str], list[str]]:
         if not name or not title or not url:
             failures.append("source is missing name, title, or URL")
             continue
-        parsed = urlparse(url)
-        path = (parsed.path or "").strip("/")
-        if not _domain_allowed(url):
-            failures.append(f"unapproved or indirect source URL: {url}")
-            continue
-        if not path or path.lower().startswith("search"):
-            failures.append(f"source URL is not a direct article/report: {url}")
+        if not is_substantive_media_source(url, title):
+            failures.append(f"source URL is not a substantive direct article/report: {url}")
             continue
         family = _domain_family(url)
         families.add(family)
         valid.append({"name": name, "title": title, "url": url})
     if len(valid) < 2 or len(families) < 2:
-        failures.append("requires at least two independent direct approved-domain sources")
+        failures.append("requires at least two independent substantive direct approved-domain sources")
     return valid, families, failures
 
 
