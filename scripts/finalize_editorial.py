@@ -7,6 +7,8 @@ from pathlib import Path
 import pandas as pd
 
 from nfl_forecast.editorial_finalize import finalize_previews
+from nfl_forecast.media_context import fetch_media_context
+from nfl_forecast.media_editorial import rewrite_reads_with_media
 
 
 def main() -> None:
@@ -21,7 +23,15 @@ def main() -> None:
     previews = json.loads(previews_path.read_text())
     evidence = json.loads(evidence_path.read_text())
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
+
+    # Editorial only: discover fresh public reporting and use it to choose/write the
+    # Read before the final uniqueness gate. This runs after every quantitative and
+    # contextual enrichment step, and no media value is passed back into LevLine.
+    media, media_status = fetch_media_context(predictions, timeout=8)
+    previews = rewrite_reads_with_media(previews, predictions, evidence, media)
+    status["media_reporting"] = media_status
     status["editorial_finalizer"] = finalize_previews(predictions, previews, evidence)
+
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
     status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + "\n")
 
