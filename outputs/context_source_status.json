@@ -1,14 +1,16 @@
 {
   "coaching": {
-    "as_of": "2026-09-09T00:51:31.171510+00:00",
+    "as_of": "2026-09-09T01:53:05.482178+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
     "negative_entries_retried": 0,
     "pages_missing": 0,
-    "refresh_attempts": 0,
+    "parser_version": 2,
+    "parser_version_refreshes": 160,
+    "refresh_attempts": 160,
     "requested_teams": 32,
-    "source": "Wikipedia season-page rendered infoboxes",
+    "source": "Wikipedia season-page rendered infoboxes + explicit staff tables",
     "status": "healthy"
   },
   "depth_charts": {
@@ -16,7 +18,7 @@
     "status": "healthy"
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-09T00:52:11.629445+00:00",
+    "as_of": "2026-09-09T01:55:16.061360+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -37,9 +39,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-09T00:51:30.817281+00:00",
+    "generated_utc": "2026-09-09T01:52:04.977075+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 118,
+    "signals": 145,
     "status": "healthy"
   },
   "ftn": {
@@ -52,9 +54,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-09T00:51:30.817281+00:00",
+  "generated_utc": "2026-09-09T01:52:04.977075+00:00",
   "injuries": {
-    "as_of": "2026-09-09T00:51:30.967806+00:00",
+    "as_of": "2026-09-09T01:52:05.073138+00:00",
     "players": 29,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -70,6 +72,17 @@
       2024,
       2025
     ],
+    "status": "healthy"
+  },
+  "personnel_usage": {
+    "ambiguous_player_keys_discarded": 2,
+    "eligible_skill_injuries": 6,
+    "evidence_items_enriched": 1,
+    "guardrail": "Prior usage clarifies role importance but is not converted into an unvalidated point-value injury adjustment; ambiguous abbreviated-name matches are discarded.",
+    "matched_injured_players": 3,
+    "season": 2025,
+    "source": "NFL.com official injury report + nflverse PBP usage",
+    "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
     "status": "healthy"
   },
   "previews": {
@@ -107,14 +120,33 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-09T00:51:33.926938+00:00",
+    "as_of": "2026-09-09T01:53:08.850809+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
     "status": "healthy"
   },
+  "staff_impact": {
+    "guardrail": "Coordinator impact is a historical tendency projection for explanation only; it does not alter LevLine unless separately validated out of sample.",
+    "impacts_added": 12,
+    "new_coordinator_roles": 36,
+    "profile_status": {
+      "seasons": [
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "source": "FTN charting + nflverse PBP",
+      "status": "healthy",
+      "team_seasons": 128
+    },
+    "roles_with_verified_prior_tendency_profile": 12,
+    "source": "Wikipedia rendered staff records + FTN charting + nflverse PBP",
+    "status": "healthy"
+  },
   "weather": {
-    "as_of": "2026-09-09T00:52:01.736775+00:00",
+    "as_of": "2026-09-09T01:55:01.473016+00:00",
     "games_checked": 11,
     "status": "degraded"
   }

@@ -19,10 +19,17 @@
       },
       {
         "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "source_name": "nflverse PBP + Wikipedia staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
         "strength": "Weak",
-        "title": "Jacoby Brissett vs LAC: player history"
+        "title": "Justin Herbert vs Nick Rallis's ARI defense"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
+        "strength": "Strong",
+        "title": "What Nathaniel Hackett could change in ARI"
       },
       {
         "category": "coaching",
@@ -30,13 +37,6 @@
         "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
         "strength": "Strong",
         "title": "ARI offense changed its decision-makers"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in ARI"
       },
       {
         "category": "scheme",
@@ -62,8 +62,18 @@
     ],
     "game_id": "2026_01_ARI_LAC",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "LAC's game starts in the pocket",
+    "headline": "LevLine sees LAC differently than the market",
     "key_factors": [
+      {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 2703,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Nathaniel Hackett could change in ARI"
+      },
       {
         "advantage_team": "LAC",
         "family": "pressure",
@@ -83,31 +93,21 @@
         "strength": "Strong",
         "summary": "The chunk-play path tilts ARI; the opponent's answer is forcing longer drives.",
         "title": "ARI explosives vs LAC prevention"
-      },
-      {
-        "advantage_team": "ARI",
-        "family": "early_down",
-        "sample_size": 758,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "Early-down leverage tilts ARI, which matters because it keeps the full playbook available.",
-        "title": "ARI early-down approach vs LAC"
       }
     ],
     "matchup": "ARI @ LAC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:39.753125+00:00",
-        "family": "coaching",
-        "label": "Staff",
+        "as_of": "2026-09-09T01:55:02.121909+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
         "leader": "Watch",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
         "strength": "Strong",
-        "title": "ARI offense changed its decision-makers"
+        "title": "What Nathaniel Hackett could change in ARI"
       },
       {
-        "as_of": "2026-09-09T00:52:09.038932+00:00",
+        "as_of": "2026-09-09T01:55:12.539477+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LAC",
@@ -116,7 +116,7 @@
         "title": "LAC protection vs ARI pass rush"
       },
       {
-        "as_of": "2026-09-09T00:52:09.038298+00:00",
+        "as_of": "2026-09-09T01:55:12.538618+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "ARI",
@@ -125,7 +125,7 @@
         "title": "ARI explosives vs LAC prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:09.038517+00:00",
+        "as_of": "2026-09-09T01:55:12.538890+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ARI",
@@ -136,7 +136,7 @@
     ],
     "paragraphs": [
       "Start with the pocket. The case for LAC is that long-yardage situations can become the defining feature of ARI-LAC; ARI has to keep third-and-obvious off the menu. The answer on the other side is ARI's explosive plays edge; if it becomes the dominant texture of ARI-LAC, the cleaner LAC path gets much narrower.",
-      "The market is the other story in ARI-LAC: PURE is 6.5 percentage points more bullish on ARI. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
+      "The market is the other story in ARI-LAC: PURE is 7.4 percentage points more bullish on ARI. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "LAC to win; LAC 28.7 \u2013 ARI 18.7 is the central score projection.",
     "story_spine": {
@@ -170,17 +170,17 @@
       },
       {
         "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Atlanta_Falcons_season",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
         "strength": "Strong",
-        "title": "ATL offense changed its decision-makers"
+        "title": "What Patrick Graham could change in PIT"
       },
       {
         "category": "coaching",
         "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Atlanta_Falcons_season",
         "strength": "Strong",
-        "title": "New defensive coordinator in PIT"
+        "title": "ATL offense changed its decision-makers"
       },
       {
         "category": "scheme",
@@ -209,6 +209,16 @@
     "headline": "PIT's game starts in the pocket",
     "key_factors": [
       {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 5367,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Patrick Graham could change in PIT"
+      },
+      {
         "advantage_team": "PIT",
         "family": "pressure",
         "sample_size": 617,
@@ -227,31 +237,21 @@
         "strength": "Strong",
         "summary": "The after-catch matchup tilts PIT; routine completions can become the hidden explosives.",
         "title": "PIT YAC creation vs ATL tackling"
-      },
-      {
-        "advantage_team": "ATL",
-        "family": "early_down",
-        "sample_size": 617,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "Early-down leverage tilts ATL, which matters because it keeps the full playbook available.",
-        "title": "ATL early-down approach vs PIT"
       }
     ],
     "matchup": "ATL @ PIT",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:38.710959+00:00",
-        "family": "coaching",
-        "label": "Staff",
+        "as_of": "2026-09-09T01:55:02.120745+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
         "leader": "Watch",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
         "strength": "Strong",
-        "title": "ATL offense changed its decision-makers"
+        "title": "What Patrick Graham could change in PIT"
       },
       {
-        "as_of": "2026-09-09T00:52:08.188322+00:00",
+        "as_of": "2026-09-09T01:55:11.371979+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "PIT",
@@ -260,7 +260,7 @@
         "title": "ATL protection vs PIT pass rush"
       },
       {
-        "as_of": "2026-09-09T00:52:08.189891+00:00",
+        "as_of": "2026-09-09T01:55:11.374067+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "PIT",
@@ -269,7 +269,7 @@
         "title": "PIT YAC creation vs ATL tackling"
       },
       {
-        "as_of": "2026-09-09T00:52:08.188896+00:00",
+        "as_of": "2026-09-09T01:55:11.372733+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ATL",
@@ -393,7 +393,7 @@
     "matchup": "BAL @ IND",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:37.582087+00:00",
+        "as_of": "2026-09-09T01:53:15.491240+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -402,7 +402,7 @@
         "title": "BAL offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T00:52:07.309487+00:00",
+        "as_of": "2026-09-09T01:55:10.171525+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "BAL",
@@ -411,7 +411,7 @@
         "title": "BAL protection vs IND pass rush"
       },
       {
-        "as_of": "2026-09-09T00:52:07.310107+00:00",
+        "as_of": "2026-09-09T01:55:10.172341+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "IND",
@@ -420,7 +420,7 @@
         "title": "BAL early-down approach vs IND"
       },
       {
-        "as_of": "2026-09-09T00:52:07.310858+00:00",
+        "as_of": "2026-09-09T01:55:10.173361+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BAL",
@@ -464,10 +464,10 @@
       },
       {
         "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "source_name": "nflverse PBP + Wikipedia staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Houston_Texans_season",
         "strength": "Weak",
-        "title": "C.J. Stroud vs BUF: player history"
+        "title": "Josh Allen vs Matt Burke's HOU defense"
       },
       {
         "category": "coaching",
@@ -475,6 +475,13 @@
         "source_url": "https://en.wikipedia.org/wiki/2026_Buffalo_Bills_season",
         "strength": "Strong",
         "title": "BUF offense changed its decision-makers"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Buffalo_Bills_season",
+        "strength": "Strong",
+        "title": "New defensive coordinator in BUF"
       },
       {
         "category": "scheme",
@@ -543,7 +550,7 @@
     "matchup": "BUF @ HOU",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:37.120648+00:00",
+        "as_of": "2026-09-09T01:53:14.420090+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -552,7 +559,7 @@
         "title": "BUF offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T00:52:06.828305+00:00",
+        "as_of": "2026-09-09T01:55:09.586390+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BUF",
@@ -561,7 +568,7 @@
         "title": "BUF early-down approach vs HOU"
       },
       {
-        "as_of": "2026-09-09T00:52:06.827654+00:00",
+        "as_of": "2026-09-09T01:55:09.585597+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "HOU",
@@ -570,7 +577,7 @@
         "title": "BUF protection vs HOU pass rush"
       },
       {
-        "as_of": "2026-09-09T00:52:06.829065+00:00",
+        "as_of": "2026-09-09T01:55:09.587527+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "HOU",
@@ -615,10 +622,24 @@
       },
       {
         "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "source_name": "nflverse PBP + Wikipedia staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Carolina_Panthers_season",
         "strength": "Weak",
-        "title": "Caleb Williams vs CAR: player history"
+        "title": "Caleb Williams vs Ejiro Evero's CAR defense"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
+        "strength": "Strong",
+        "title": "What Press Taylor could change in CHI"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
+        "strength": "Strong",
+        "title": "CHI offense changed its decision-makers"
       },
       {
         "category": "scheme",
@@ -647,6 +668,16 @@
     "headline": "CHI is where LevLine breaks from consensus",
     "key_factors": [
       {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 4088,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Press Taylor could change in CHI"
+      },
+      {
         "advantage_team": "CHI",
         "family": "explosives",
         "sample_size": 668,
@@ -658,38 +689,28 @@
       },
       {
         "advantage_team": null,
-        "family": "play_action",
-        "sample_size": 144,
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "family": "coaching",
+        "sample_size": null,
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
         "strength": "Strong",
-        "summary": "Play action is one of this matchup's clearest live signals.",
-        "title": "CHI play action vs CAR"
-      },
-      {
-        "advantage_team": null,
-        "family": "rpo",
-        "sample_size": 62,
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Moderate",
-        "summary": "RPO is one of this matchup's clearest live signals.",
-        "title": "CAR RPOs vs CHI"
+        "summary": "Staff changes make current tendencies more useful than old franchise-level head-to-heads.",
+        "title": "CHI offense changed its decision-makers"
       }
     ],
     "matchup": "CHI @ CAR",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:12.726551+00:00",
-        "family": "qb_opponent_history",
-        "label": "QB history",
-        "leader": "CHI",
-        "source_name": "nflverse play-by-play",
-        "strength": "Weak",
-        "title": "Bryce Young vs CHI: player history"
+        "as_of": "2026-09-09T01:55:02.117698+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
+        "leader": "Watch",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "strength": "Strong",
+        "title": "What Press Taylor could change in CHI"
       },
       {
-        "as_of": "2026-09-09T00:52:05.512340+00:00",
+        "as_of": "2026-09-09T01:55:07.841254+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CHI",
@@ -698,7 +719,7 @@
         "title": "CAR explosives vs CHI prevention"
       },
       {
-        "as_of": "2026-09-09T00:51:35.677380+00:00",
+        "as_of": "2026-09-09T01:53:11.265724+00:00",
         "family": "play_action",
         "label": "Play action",
         "leader": "Watch",
@@ -707,18 +728,18 @@
         "title": "CHI play action vs CAR"
       },
       {
-        "as_of": "2026-09-09T00:51:35.679534+00:00",
-        "family": "rpo",
-        "label": "RPO",
+        "as_of": "2026-09-09T01:53:11.480245+00:00",
+        "family": "coaching",
+        "label": "Staff",
         "leader": "Watch",
-        "source_name": "FTN Data via nflverse",
-        "strength": "Moderate",
-        "title": "CAR RPOs vs CHI"
+        "source_name": "Wikipedia season staff records",
+        "strength": "Strong",
+        "title": "CHI offense changed its decision-makers"
       }
     ],
     "paragraphs": [
       "This is a geometry game. CHI has the cleaner way to make the field suddenly smaller, while CAR would rather turn CHI-CAR into a sequence of patient twelve-play drives. The case also has a second leg: quarterback history tilts CHI. That matters if the primary route gets neutralized.",
-      "The market is the other story in CHI-CAR: PURE is 12.1 percentage points more bullish on CAR. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
+      "The market is the other story in CHI-CAR: PURE is 12.7 percentage points more bullish on CAR. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "CHI to win; CAR 21.7 \u2013 CHI 22.0 is the central score projection.",
     "story_spine": {
@@ -765,6 +786,13 @@
         "title": "CLE offense changed its decision-makers"
       },
       {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Cleveland_Browns_season",
+        "strength": "Strong",
+        "title": "New defensive coordinator in CLE"
+      },
+      {
         "category": "scheme",
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -784,13 +812,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "JAX pre-snap motion vs CLE"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=30.3239&longitude=-81.6373&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in JAX"
       }
     ],
     "game_id": "2026_01_CLE_JAX",
@@ -831,7 +852,7 @@
     "matchup": "CLE @ JAX",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:38.027172+00:00",
+        "as_of": "2026-09-09T01:53:16.523079+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -840,7 +861,7 @@
         "title": "CLE offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T00:52:07.745592+00:00",
+        "as_of": "2026-09-09T01:55:10.795090+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "JAX",
@@ -849,7 +870,7 @@
         "title": "CLE explosives vs JAX prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:07.745138+00:00",
+        "as_of": "2026-09-09T01:55:10.794544+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "CLE",
@@ -858,7 +879,7 @@
         "title": "CLE protection vs JAX pass rush"
       },
       {
-        "as_of": "2026-09-09T00:51:37.977126+00:00",
+        "as_of": "2026-09-09T01:53:16.312467+00:00",
         "family": "motion",
         "label": "Motion",
         "leader": "Watch",
@@ -869,7 +890,7 @@
     ],
     "paragraphs": [
       "The fastest route through CLE-JAX belongs to JAX. One or two chunk plays can do more for the JAX case than a dozen tidy five-yard gains. The answer on the other side is CLE's pressure edge; if it becomes the dominant texture of CLE-JAX, the cleaner JAX path gets much narrower.",
-      "The market is the other story in CLE-JAX: PURE is 7.3 percentage points more bullish on CLE. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
+      "The market is the other story in CLE-JAX: PURE is 7.7 percentage points more bullish on CLE. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "JAX to win; JAX 27.1 \u2013 CLE 18.8 is the central score projection.",
     "story_spine": {
@@ -881,7 +902,7 @@
       "secondary_family": "pressure",
       "secondary_title": "CLE protection vs JAX pass rush"
     },
-    "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. CLE owns at least one real matchup counter-signal."
+    "what_could_make_us_wrong": "CLE owns at least one real matchup counter-signal."
   },
   "2026_01_DAL_NYG": {
     "brand": "Sunday Signal",
@@ -910,10 +931,17 @@
       },
       {
         "category": "coaching",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
         "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
         "strength": "Strong",
-        "title": "NYG offense changed its decision-makers"
+        "title": "What Matt Nagy could change in NYG"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
+        "strength": "Strong",
+        "title": "What Dennard Wilson could change in NYG"
       },
       {
         "category": "scheme",
@@ -952,6 +980,16 @@
         "title": "Dak Prescott vs NYG: player history"
       },
       {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 4645,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Matt Nagy could change in NYG"
+      },
+      {
         "advantage_team": "DAL",
         "family": "explosives",
         "sample_size": 676,
@@ -960,22 +998,12 @@
         "strength": "Strong",
         "summary": "The chunk-play path tilts DAL; the opponent's answer is forcing longer drives.",
         "title": "NYG explosives vs DAL prevention"
-      },
-      {
-        "advantage_team": "NYG",
-        "family": "pressure",
-        "sample_size": 676,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "The pressure matchup tilts NYG; obvious passing downs are where it can become decisive.",
-        "title": "NYG protection vs DAL pass rush"
       }
     ],
     "matchup": "DAL @ NYG",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:16.950074+00:00",
+        "as_of": "2026-09-09T01:55:23.702013+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -984,7 +1012,7 @@
         "title": "Dak Prescott vs NYG: player history"
       },
       {
-        "as_of": "2026-09-09T00:52:10.759553+00:00",
+        "as_of": "2026-09-09T01:55:14.884835+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -993,7 +1021,7 @@
         "title": "NYG explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:10.759085+00:00",
+        "as_of": "2026-09-09T01:55:14.884336+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -1002,13 +1030,13 @@
         "title": "NYG protection vs DAL pass rush"
       },
       {
-        "as_of": "2026-09-09T00:51:40.746353+00:00",
-        "family": "coaching",
-        "label": "Staff",
+        "as_of": "2026-09-09T01:55:02.124498+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
         "leader": "Watch",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
         "strength": "Strong",
-        "title": "NYG offense changed its decision-makers"
+        "title": "What Matt Nagy could change in NYG"
       }
     ],
     "paragraphs": [
@@ -1054,6 +1082,13 @@
       },
       {
         "category": "coaching",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Kansas_City_Chiefs_season",
+        "strength": "Strong",
+        "title": "What Eric Bieniemy could change in KC"
+      },
+      {
+        "category": "coaching",
         "source_name": "Wikipedia season staff records",
         "source_url": "https://en.wikipedia.org/wiki/2026_Denver_Broncos_season",
         "strength": "Strong",
@@ -1096,6 +1131,16 @@
         "title": "Patrick Mahomes vs DEN: player history"
       },
       {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 2831,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Kansas_City_Chiefs_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Eric Bieniemy could change in KC"
+      },
+      {
         "advantage_team": "DEN",
         "family": "pressure",
         "sample_size": 734,
@@ -1104,22 +1149,12 @@
         "strength": "Strong",
         "summary": "The pressure matchup tilts DEN; obvious passing downs are where it can become decisive.",
         "title": "KC protection vs DEN pass rush"
-      },
-      {
-        "advantage_team": "KC",
-        "family": "early_down",
-        "sample_size": 734,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "Early-down leverage tilts KC, which matters because it keeps the full playbook available.",
-        "title": "KC early-down approach vs DEN"
       }
     ],
     "matchup": "DEN @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:17.335489+00:00",
+        "as_of": "2026-09-09T01:55:24.246642+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "KC",
@@ -1128,7 +1163,7 @@
         "title": "Patrick Mahomes vs DEN: player history"
       },
       {
-        "as_of": "2026-09-09T00:52:11.200300+00:00",
+        "as_of": "2026-09-09T01:55:15.476488+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -1137,7 +1172,7 @@
         "title": "KC protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-09T00:52:11.200899+00:00",
+        "as_of": "2026-09-09T01:55:15.477294+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -1146,18 +1181,18 @@
         "title": "KC early-down approach vs DEN"
       },
       {
-        "as_of": "2026-09-09T00:51:41.187687+00:00",
-        "family": "coaching",
-        "label": "Staff",
+        "as_of": "2026-09-09T01:55:02.125279+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
         "leader": "Watch",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
         "strength": "Strong",
-        "title": "DEN offense changed its decision-makers"
+        "title": "What Eric Bieniemy could change in KC"
       }
     ],
     "paragraphs": [
       "Patrick Mahomes is not entering DEN-KC with a blank notebook. The prior tape gives both sides a real reference point; the KC case turns on what remains transferable after the surrounding system changed. The answer on the other side is DEN's pressure edge; if it becomes the dominant texture of DEN-KC, the cleaner KC path gets much narrower.",
-      "The market is the other story in DEN-KC: PURE is 9.2 percentage points more bullish on DEN. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
+      "The market is the other story in DEN-KC: PURE is 10.3 percentage points more bullish on DEN. The 25% market blend pulls LevLine toward consensus without erasing the disagreement."
     ],
     "prediction": "KC to win; KC 23.3 \u2013 DEN 25.6 is the central score projection.",
     "story_spine": {
@@ -1191,10 +1226,17 @@
       },
       {
         "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Kyler Murray vs GB: player history"
+        "source_name": "nflverse PBP + Wikipedia staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Minnesota_Vikings_season",
+        "strength": "Strong",
+        "title": "Jordan Love vs Brian Flores's MIN defense"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Green_Bay_Packers_season",
+        "strength": "Strong",
+        "title": "New defensive coordinator in GB"
       },
       {
         "category": "scheme",
@@ -1233,6 +1275,16 @@
         "title": "Jordan Love vs MIN: player history"
       },
       {
+        "advantage_team": null,
+        "family": "history",
+        "sample_size": 190,
+        "source_name": "nflverse PBP + Wikipedia staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Minnesota_Vikings_season",
+        "strength": "Strong",
+        "summary": "History is one of this matchup's clearest live signals.",
+        "title": "Jordan Love vs Brian Flores's MIN defense"
+      },
+      {
         "advantage_team": "GB",
         "family": "explosives",
         "sample_size": 608,
@@ -1241,22 +1293,12 @@
         "strength": "Strong",
         "summary": "The chunk-play path tilts GB; the opponent's answer is forcing longer drives.",
         "title": "GB explosives vs MIN prevention"
-      },
-      {
-        "advantage_team": "MIN",
-        "family": "pressure",
-        "sample_size": 608,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "The pressure matchup tilts MIN; obvious passing downs are where it can become decisive.",
-        "title": "MIN protection vs GB pass rush"
       }
     ],
     "matchup": "GB @ MIN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:16.190472+00:00",
+        "as_of": "2026-09-09T01:55:22.624695+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "GB",
@@ -1265,7 +1307,7 @@
         "title": "Jordan Love vs MIN: player history"
       },
       {
-        "as_of": "2026-09-09T00:52:09.885237+00:00",
+        "as_of": "2026-09-09T01:55:13.705175+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "GB",
@@ -1274,7 +1316,7 @@
         "title": "GB explosives vs MIN prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:09.885887+00:00",
+        "as_of": "2026-09-09T01:55:13.705973+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
@@ -1283,13 +1325,13 @@
         "title": "MIN protection vs GB pass rush"
       },
       {
-        "as_of": "2026-09-09T00:52:09.885472+00:00",
-        "family": "early_down",
-        "label": "Early downs",
-        "leader": "GB",
-        "source_name": "nflverse PBP + FTN charting",
+        "as_of": "2026-09-09T01:54:19.128634+00:00",
+        "family": "history",
+        "label": "History",
+        "leader": "Watch",
+        "source_name": "nflverse PBP + Wikipedia staff records",
         "strength": "Strong",
-        "title": "GB early-down approach vs MIN"
+        "title": "Jordan Love vs Brian Flores's MIN defense"
       }
     ],
     "paragraphs": [
@@ -1328,17 +1370,17 @@
       },
       {
         "category": "coaching",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
         "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
         "strength": "Strong",
-        "title": "MIA offense changed its decision-makers"
+        "title": "What Bobby Slowik could change in MIA"
       },
       {
         "category": "coaching",
         "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Las_Vegas_Raiders_season",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
         "strength": "Strong",
-        "title": "LV offense changed its decision-makers"
+        "title": "MIA offense changed its decision-makers"
       },
       {
         "category": "scheme",
@@ -1374,6 +1416,16 @@
     "headline": "The market and LevLine disagree on LV",
     "key_factors": [
       {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 3084,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Bobby Slowik could change in MIA"
+      },
+      {
         "advantage_team": "MIA",
         "family": "early_down",
         "sample_size": 558,
@@ -1392,31 +1444,21 @@
         "strength": "Strong",
         "summary": "The chunk-play path tilts MIA; the opponent's answer is forcing longer drives.",
         "title": "MIA explosives vs LV prevention"
-      },
-      {
-        "advantage_team": "LV",
-        "family": "pressure",
-        "sample_size": 558,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "The pressure matchup tilts LV; obvious passing downs are where it can become decisive.",
-        "title": "LV protection vs MIA pass rush"
       }
     ],
     "matchup": "MIA @ LV",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:39.812598+00:00",
-        "family": "coaching",
-        "label": "Staff",
+        "as_of": "2026-09-09T01:55:02.122656+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
         "leader": "Watch",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
         "strength": "Strong",
-        "title": "MIA offense changed its decision-makers"
+        "title": "What Bobby Slowik could change in MIA"
       },
       {
-        "as_of": "2026-09-09T00:52:09.462974+00:00",
+        "as_of": "2026-09-09T01:55:13.128532+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "MIA",
@@ -1425,7 +1467,7 @@
         "title": "LV early-down approach vs MIA"
       },
       {
-        "as_of": "2026-09-09T00:52:09.461732+00:00",
+        "as_of": "2026-09-09T01:55:13.126829+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "MIA",
@@ -1434,7 +1476,7 @@
         "title": "MIA explosives vs LV prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:09.462418+00:00",
+        "as_of": "2026-09-09T01:55:13.127734+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LV",
@@ -1528,7 +1570,7 @@
       },
       {
         "category": "personnel",
-        "source_name": "NFL.com official injury report",
+        "source_name": "NFL.com official injury report + nflverse usage",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
         "strength": "Strong",
         "title": "NE: TreVeyon Henderson \u2014 Out"
@@ -1586,7 +1628,7 @@
     "matchup": "NE @ SEA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:34.581256+00:00",
+        "as_of": "2026-09-09T01:53:09.765861+00:00",
         "family": "availability",
         "label": "Availability",
         "leader": "Watch",
@@ -1595,7 +1637,7 @@
         "title": "NE: Ben Brown \u2014 Out"
       },
       {
-        "as_of": "2026-09-09T00:52:04.608671+00:00",
+        "as_of": "2026-09-09T01:55:06.668065+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "SEA",
@@ -1604,7 +1646,7 @@
         "title": "SEA explosives vs NE prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:04.608879+00:00",
+        "as_of": "2026-09-09T01:55:06.668339+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "SEA",
@@ -1613,7 +1655,7 @@
         "title": "SEA early-down approach vs NE"
       },
       {
-        "as_of": "2026-09-09T00:52:04.607274+00:00",
+        "as_of": "2026-09-09T01:55:06.666294+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NE",
@@ -1657,6 +1699,20 @@
         "title": "Jared Goff vs NO: player history"
       },
       {
+        "category": "coaching",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Detroit_Lions_season",
+        "strength": "Strong",
+        "title": "What Drew Petzing could change in DET"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Detroit_Lions_season",
+        "strength": "Strong",
+        "title": "DET offense changed its decision-makers"
+      },
+      {
         "category": "scheme",
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -1683,6 +1739,16 @@
     "headline": "DET's edge lives in the explosive-play battle",
     "key_factors": [
       {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 4121,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Detroit_Lions_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Drew Petzing could change in DET"
+      },
+      {
         "advantage_team": "DET",
         "family": "explosives",
         "sample_size": 650,
@@ -1701,31 +1767,21 @@
         "strength": "Strong",
         "summary": "The pressure matchup tilts DET; obvious passing downs are where it can become decisive.",
         "title": "NO protection vs DET pass rush"
-      },
-      {
-        "advantage_team": "DET",
-        "family": "yac",
-        "sample_size": 650,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "The after-catch matchup tilts DET; routine completions can become the hidden explosives.",
-        "title": "DET YAC creation vs NO tackling"
       }
     ],
     "matchup": "NO @ DET",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:13.440430+00:00",
-        "family": "qb_opponent_history",
-        "label": "QB history",
-        "leader": "DET",
-        "source_name": "nflverse play-by-play",
-        "strength": "Weak",
-        "title": "Jared Goff vs NO: player history"
+        "as_of": "2026-09-09T01:55:02.118502+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
+        "leader": "Watch",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "strength": "Strong",
+        "title": "What Drew Petzing could change in DET"
       },
       {
-        "as_of": "2026-09-09T00:52:06.393709+00:00",
+        "as_of": "2026-09-09T01:55:09.007317+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DET",
@@ -1734,7 +1790,7 @@
         "title": "NO explosives vs DET prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:06.393295+00:00",
+        "as_of": "2026-09-09T01:55:09.006792+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DET",
@@ -1743,7 +1799,7 @@
         "title": "NO protection vs DET pass rush"
       },
       {
-        "as_of": "2026-09-09T00:52:06.394924+00:00",
+        "as_of": "2026-09-09T01:55:09.008857+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DET",
@@ -1789,16 +1845,16 @@
       {
         "category": "coaching",
         "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Tennessee_Titans_season",
+        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Jets_season",
         "strength": "Strong",
-        "title": "New defensive coordinator in TEN"
+        "title": "NYJ offense changed its decision-makers"
       },
       {
         "category": "coaching",
         "source_name": "Wikipedia season staff records",
         "source_url": "https://en.wikipedia.org/wiki/2026_Tennessee_Titans_season",
         "strength": "Strong",
-        "title": "TEN offense changed its decision-makers"
+        "title": "New defensive coordinator in TEN"
       },
       {
         "category": "scheme",
@@ -1820,13 +1876,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "TEN protection vs NYJ pass rush"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=36.1665&longitude=-86.7713&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in TEN"
       }
     ],
     "game_id": "2026_01_NYJ_TEN",
@@ -1867,16 +1916,16 @@
     "matchup": "NYJ @ TEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:51:39.314026+00:00",
+        "as_of": "2026-09-09T01:53:57.783245+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
         "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "title": "New defensive coordinator in TEN"
+        "title": "NYJ offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T00:52:08.614659+00:00",
+        "as_of": "2026-09-09T01:55:11.962925+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TEN",
@@ -1885,7 +1934,7 @@
         "title": "NYJ explosives vs TEN prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:08.615895+00:00",
+        "as_of": "2026-09-09T01:55:11.964548+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYJ",
@@ -1894,7 +1943,7 @@
         "title": "TEN early-down approach vs NYJ"
       },
       {
-        "as_of": "2026-09-09T00:52:08.615309+00:00",
+        "as_of": "2026-09-09T01:55:11.963733+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "TEN",
@@ -1917,7 +1966,7 @@
       "secondary_family": "early_down",
       "secondary_title": "TEN early-down approach vs NYJ"
     },
-    "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. NYJ owns at least one real matchup counter-signal."
+    "what_could_make_us_wrong": "NYJ owns at least one real matchup counter-signal."
   },
   "2026_01_SF_LA": {
     "brand": "Sunday Signal",
@@ -2039,7 +2088,7 @@
     "matchup": "SF @ LA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:12.384755+00:00",
+        "as_of": "2026-09-09T01:55:17.088023+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "LA",
@@ -2048,7 +2097,7 @@
         "title": "Matthew Stafford vs SF: player history"
       },
       {
-        "as_of": "2026-09-09T00:52:05.067329+00:00",
+        "as_of": "2026-09-09T01:55:07.260549+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LA",
@@ -2057,7 +2106,7 @@
         "title": "LA explosives vs SF prevention"
       },
       {
-        "as_of": "2026-09-09T00:51:35.383959+00:00",
+        "as_of": "2026-09-09T01:53:10.838831+00:00",
         "family": "motion",
         "label": "Motion",
         "leader": "Watch",
@@ -2066,7 +2115,7 @@
         "title": "SF pre-snap motion vs LA"
       },
       {
-        "as_of": "2026-09-09T00:51:35.667152+00:00",
+        "as_of": "2026-09-09T01:53:11.257262+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2077,7 +2126,7 @@
     ],
     "paragraphs": [
       "There is actual memory in this quarterback matchup. Matthew Stafford has seen this opponent's problems before, so the interesting part is not the old box score\u2014it is which answers still exist in 2026. The answer on the other side is SF's third down edge; if it becomes the dominant texture of SF-LA, the cleaner LA path gets much narrower.",
-      "Consensus pricing and the football-only model tell different versions of SF-LA. PURE is 8.2 points higher on LA, and LevLine keeps enough of that split visible to matter."
+      "Consensus pricing and the football-only model tell different versions of SF-LA. PURE is 7.4 points higher on LA, and LevLine keeps enough of that split visible to matter."
     ],
     "prediction": "LA to win; LA 26.5 \u2013 SF 20.2 is the central score projection.",
     "story_spine": {
@@ -2117,6 +2166,20 @@
         "title": "Joe Burrow vs TB: player history"
       },
       {
+        "category": "coaching",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Tampa_Bay_Buccaneers_season",
+        "strength": "Strong",
+        "title": "What Zac Robinson could change in TB"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Tampa_Bay_Buccaneers_season",
+        "strength": "Strong",
+        "title": "TB offense changed its decision-makers"
+      },
+      {
         "category": "scheme",
         "source_name": "nflverse PBP + FTN charting",
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -2143,6 +2206,16 @@
     "headline": "CIN's edge lives in the explosive-play battle",
     "key_factors": [
       {
+        "advantage_team": null,
+        "family": "staff_impact",
+        "sample_size": 2759,
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Tampa_Bay_Buccaneers_season",
+        "strength": "Strong",
+        "summary": "Staff Impact is one of this matchup's clearest live signals.",
+        "title": "What Zac Robinson could change in TB"
+      },
+      {
         "advantage_team": "CIN",
         "family": "explosives",
         "sample_size": 690,
@@ -2161,31 +2234,21 @@
         "strength": "Strong",
         "summary": "Early-down leverage tilts TB, which matters because it keeps the full playbook available.",
         "title": "CIN early-down approach vs TB"
-      },
-      {
-        "advantage_team": "CIN",
-        "family": "yac",
-        "sample_size": 690,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "The after-catch matchup tilts CIN; routine completions can become the hidden explosives.",
-        "title": "TB YAC creation vs CIN tackling"
       }
     ],
     "matchup": "TB @ CIN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:13.084990+00:00",
-        "family": "qb_opponent_history",
-        "label": "QB history",
-        "leader": "TB",
-        "source_name": "nflverse play-by-play",
-        "strength": "Weak",
-        "title": "Baker Mayfield vs CIN: player history"
+        "as_of": "2026-09-09T01:55:02.118125+00:00",
+        "family": "staff_impact",
+        "label": "Staff Impact",
+        "leader": "Watch",
+        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "strength": "Strong",
+        "title": "What Zac Robinson could change in TB"
       },
       {
-        "as_of": "2026-09-09T00:52:05.959481+00:00",
+        "as_of": "2026-09-09T01:55:08.438156+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CIN",
@@ -2194,7 +2257,7 @@
         "title": "TB explosives vs CIN prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:05.960667+00:00",
+        "as_of": "2026-09-09T01:55:08.439785+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "TB",
@@ -2203,7 +2266,7 @@
         "title": "CIN early-down approach vs TB"
       },
       {
-        "as_of": "2026-09-09T00:52:05.959719+00:00",
+        "as_of": "2026-09-09T01:55:08.438440+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "CIN",
@@ -2286,13 +2349,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "WAS early-down approach vs PHI"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.9008&longitude=-75.1675&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in PHI"
       }
     ],
     "game_id": "2026_01_WAS_PHI",
@@ -2333,7 +2389,7 @@
     "matchup": "WAS @ PHI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T00:52:16.612137+00:00",
+        "as_of": "2026-09-09T01:55:23.171463+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "PHI",
@@ -2342,7 +2398,7 @@
         "title": "Jalen Hurts vs WAS: player history"
       },
       {
-        "as_of": "2026-09-09T00:52:10.328106+00:00",
+        "as_of": "2026-09-09T01:55:14.301961+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "WAS",
@@ -2351,7 +2407,7 @@
         "title": "PHI YAC creation vs WAS tackling"
       },
       {
-        "as_of": "2026-09-09T00:52:10.327836+00:00",
+        "as_of": "2026-09-09T01:55:14.301626+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "WAS",
@@ -2360,7 +2416,7 @@
         "title": "PHI explosives vs WAS prevention"
       },
       {
-        "as_of": "2026-09-09T00:52:10.326992+00:00",
+        "as_of": "2026-09-09T01:55:14.300553+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "WAS",
@@ -2383,6 +2439,6 @@
       "secondary_family": "yac",
       "secondary_title": "PHI YAC creation vs WAS tackling"
     },
-    "what_could_make_us_wrong": "Weather, travel or another live scenario could change the shape of the game. WAS owns at least one real matchup counter-signal."
+    "what_could_make_us_wrong": "WAS owns at least one real matchup counter-signal."
   }
 }
