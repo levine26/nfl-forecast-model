@@ -5,6 +5,7 @@ on:
     branches: [feature/game-ready-dossiers-attribution]
     paths:
       - 'scripts/_apply_game_ready_patch.py'
+      - 'scripts/_run_game_ready_patch.py'
       - '.github/workflows/_apply-game-ready-patch.yml'
       - 'tests/test_game_ready_publication.py'
 
@@ -33,7 +34,7 @@ jobs:
           cache: npm
           cache-dependency-path: site/package.json
       - name: Apply guarded source patch
-        run: python scripts/_apply_game_ready_patch.py
+        run: python scripts/_run_game_ready_patch.py
       - name: Install model dependencies
         run: pip install '.[dev]'
       - name: Run full Python suite
