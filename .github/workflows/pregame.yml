@@ -58,6 +58,13 @@ jobs:
 
             PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/run_week.py --season 2026 --snapshot FINAL
+
+            # Fail closed if this run finishes inside the official T-120 window
+            # but the immutable history row was not actually created. This does
+            # not create or modify locks; write_outputs remains authoritative.
+            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+              python scripts/verify_pregame_lock.py
+
             git add outputs/
 
             if git diff --cached --quiet; then
