@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-"""Reporting-first Read compositor.
+"""Reporting-first deterministic fallback for Sunday Signal Reads.
 
-Current reporting supplies the story; LevLine evidence supplies a compact football
-check. The legacy template writer survives only as a no-reporting fallback. No
-function here changes predictions, features, market weights, locks or grades.
+Current reporting supplies the story; verified LevLine evidence supplies at most one
+compact football check. This module is editorial-only and cannot alter forecasts,
+features, market weights, locks or grading.
 """
 
 import re
@@ -34,13 +34,13 @@ def _family(item: dict[str, Any]) -> str:
     return str(meta.get("family") or item.get("family") or item.get("category") or "context").lower().replace(" ", "_")
 
 
-def _priority(item: dict[str, Any]) -> tuple[bool, float]:
+def _priority(item: dict[str, Any]) -> tuple[bool, bool, float]:
     meta = item.get("metadata") or {}
     try:
         score = float(meta.get("editorial_score") or meta.get("source_priority") or 0)
     except Exception:
         score = 0.0
-    return bool(meta.get("substantive")), score
+    return bool(meta.get("trusted_source")), bool(meta.get("substantive")), score
 
 
 def _full(code: Any) -> str:
@@ -62,7 +62,7 @@ def _matchup(away: Any, home: Any) -> str:
     return f"{_nick(away)}–{_nick(home)}"
 
 
-def _clean_title(title: Any, max_words: int = 20) -> str:
+def _clean_title(title: Any, max_words: int = 22) -> str:
     text = re.sub(r"\s+", " ", str(title or "")).strip().strip(" -|—")
     text = re.sub(r"\bHC\b", "coach", text)
     text = re.sub(r"\bQB\b", "quarterback", text)
@@ -88,12 +88,9 @@ def _clean_title(title: Any, max_words: int = 20) -> str:
 def _reported_sentence(away: str, home: str, item: dict[str, Any]) -> str:
     source = str(item.get("source_name") or "Current reporting").strip()
     fact = _clean_title(item.get("title"))
-    matchup = _matchup(away, home)
     if not fact:
-        return f"{source} has the lead {matchup} reporting."
+        return ""
 
-    # Turn common headline grammar into natural attributed prose rather than
-    # mechanically embedding a headline after a template phrase.
     expect = re.match(r"^(.+?)\s+expect(?:s)?\s+(.+?)\s+to\s+(.+)$", fact, flags=re.I)
     if expect:
         _, subject, action = expect.groups()
@@ -112,12 +109,8 @@ def _reported_sentence(away: str, home: str, item: dict[str, Any]) -> str:
         tail = f" {detail}" if detail else ""
         return f"{source} reports {subject} is ruled out{tail}."
 
-    return f"{source}'s {matchup} coverage highlights {fact}."
-
-
-def _second_report(away: str, home: str, item: dict[str, Any]) -> str:
-    sentence = _reported_sentence(away, home, item)
-    return sentence if sentence else ""
+    # Generic fallback deliberately avoids a reusable 'coverage highlights' wrapper.
+    return f"{fact}, according to {source}."
 
 
 def _quant_item(items: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -139,39 +132,50 @@ def _quant_sentence(away: str, home: str, item: dict[str, Any] | None) -> str:
         match = re.search(r"([A-Z]{2,4}) gave up sacks on ([0-9.]+)% of pass plays last season; ([A-Z]{2,4}) got home on ([0-9.]+)%", summary)
         if match:
             protected, allowed, rusher, created = match.groups()
-            return f"{matchup} pressure note: the {_nick(protected)} allowed an {allowed}% sack rate; the {_nick(rusher)} generated {created}%."
+            return (
+                f"In {matchup}, the {_nick(protected)} allowed a {allowed}% sack rate last season "
+                f"while the {_nick(rusher)} generated {created}%, making protection an immediate stress point."
+            )
         tilt = re.search(r"pressure matchup tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
-            team = tilt.group(1).upper()
-            return f"{matchup} pass-rush evidence favors the {_nick(team)}."
+            return f"The {matchup} pass-rush matchup leans toward the {_nick(tilt.group(1))}."
 
     if fam == "explosives":
         match = re.search(r"([A-Z]{2,4}) hit a 20\+ yard pass on ([0-9.]+)% of pass plays; ([A-Z]{2,4}) allowed one on ([0-9.]+)%", summary)
         if match:
             offense, created, defense, allowed = match.groups()
-            return f"{matchup} big-play note: the {_nick(offense)} created 20-plus gains on {created}% of passes; the {_nick(defense)} allowed {allowed}%."
+            return (
+                f"The {_nick(offense)} created 20-plus-yard completions on {created}% of passes last year; "
+                f"the {_nick(defense)} allowed them on {allowed}%, a real {matchup} big-play tension."
+            )
         tilt = re.search(r"chunk-play path tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
-            return f"{matchup} explosive-play evidence favors the {_nick(tilt.group(1))}."
+            return f"The {matchup} explosive-play evidence leans toward the {_nick(tilt.group(1))}."
 
     if fam == "early_down":
         match = re.search(r"([A-Z]{2,4}) threw on ([0-9.]+)% of first- and second-down plays and averaged ([+\-][0-9.]+) EPA per early-down pass", summary)
         if match:
             offense, rate, epa = match.groups()
-            return f"{matchup} early-down note: the {_nick(offense)} passed {rate}% of the time and produced {epa} EPA per pass."
+            return (
+                f"The {_nick(offense)} threw on {rate}% of early downs last year and produced {epa} EPA per pass, "
+                f"which gives {matchup} a clear pace-and-script question."
+            )
         tilt = re.search(r"early-down leverage tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
-            return f"{matchup} early-down evidence favors the {_nick(tilt.group(1))}."
+            return f"The {matchup} early-down profile leans toward the {_nick(tilt.group(1))}."
 
     if fam == "qb_opponent_history":
         qb = title.split(" vs ", 1)[0].strip() if " vs " in title else "The quarterback"
         match = re.search(r"([0-9]+) meaningful games.*?([0-9]+) charted dropbacks.*?([+\-][0-9.]+) EPA/dropback", summary)
         if match:
             games, drops, epa = match.groups()
-            return f"{matchup} history note: {qb} has {games} meaningful meetings, {drops} charted dropbacks and {epa} EPA per dropback."
+            return (
+                f"{qb}'s recent {matchup} sample covers {games} meaningful meetings and {drops} charted dropbacks "
+                f"at {epa} EPA per dropback."
+            )
 
     if title:
-        return f"{matchup}: {_clean_title(title, max_words=14)}."
+        return f"Another {matchup} factor is {_clean_title(title, max_words=14)}."
     return ""
 
 
@@ -184,13 +188,16 @@ def _market_sentence(row: pd.Series) -> str:
     if pd.isna(pure) or pd.isna(market):
         return ""
     gap = pure - market
-    if abs(gap) < 0.08:
+    if abs(gap) < 0.12:
         return ""
     home = str(row.get("home_team"))
     away = str(row.get("away_team"))
     team = home if gap > 0 else away
     points = abs(gap) * 100.0
-    return f"PURE has {_city(team)} {points:.1f} percentage points above consensus in {_matchup(away, home)}."
+    return (
+        f"LevLine is much more bullish on {_city(team)} in {_matchup(away, home)} than the broader consensus, "
+        f"a {points:.1f}-point probability gap."
+    )
 
 
 def rewrite_reads_with_media(
@@ -199,7 +206,7 @@ def rewrite_reads_with_media(
     evidence: dict[str, list[dict[str, Any]]],
     media_by_game: dict[str, list[dict[str, Any]]],
 ) -> dict[str, dict[str, Any]]:
-    """Replace legacy template Reads whenever fresh external reporting exists."""
+    """Replace legacy template Reads whenever current external reporting exists."""
     if not media_by_game:
         return previews
     prediction_rows = {str(row.get("game_id")): row for _, row in predictions.iterrows()}
@@ -215,19 +222,24 @@ def rewrite_reads_with_media(
         home = str(row.get("home_team"))
         preview = previews[game_id]
 
-        sentences = [_reported_sentence(away, home, media[0])]
-        first_key = re.sub(r"[^a-z0-9]+", " ", str(media[0].get("title") or "").lower()).strip()
+        first = media[0]
+        sentences = [_reported_sentence(away, home, first)]
+        first_key = re.sub(r"[^a-z0-9]+", " ", str(first.get("title") or "").lower()).strip()
+        first_source = re.sub(r"[^a-z0-9]+", " ", str(first.get("source_name") or "").lower()).strip()
+        first_trusted = bool((first.get("metadata") or {}).get("trusted_source"))
         second = next(
             (
                 item for item in media[1:]
                 if re.sub(r"[^a-z0-9]+", " ", str(item.get("title") or "").lower()).strip() != first_key
+                and re.sub(r"[^a-z0-9]+", " ", str(item.get("source_name") or "").lower()).strip() != first_source
+                and (not first_trusted or bool((item.get("metadata") or {}).get("trusted_source")))
             ),
             None,
         )
         if second:
-            second_sentence = _second_report(away, home, second)
-            if second_sentence:
-                sentences.append(second_sentence)
+            sentence = _reported_sentence(away, home, second)
+            if sentence:
+                sentences.append(sentence)
 
         quant = _quant_sentence(away, home, _quant_item(evidence.get(game_id, [])))
         if quant:
@@ -244,7 +256,7 @@ def rewrite_reads_with_media(
             paragraphs = [read]
         preview["paragraphs"] = paragraphs
 
-        headline_fact = _clean_title(media[0].get("title"), max_words=16)
+        headline_fact = _clean_title(first.get("title"), max_words=16)
         preview["headline"] = headline_fact or f"{_matchup(away, home)}: current reporting"
         preview["reported_sources"] = [
             {
@@ -253,7 +265,7 @@ def rewrite_reads_with_media(
                 "title": item.get("title"),
                 "as_of": item.get("as_of"),
             }
-            for item in media[:3]
+            for item in media[:4]
         ]
         voice = dict(preview.get("editorial_voice") or {})
         voice.update({
