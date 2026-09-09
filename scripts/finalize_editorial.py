@@ -35,6 +35,14 @@ def main() -> None:
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
     status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + "\n")
 
+    for game_id in sorted(previews):
+        preview = previews[game_id]
+        read = str((preview.get("paragraphs") or [""])[0])
+        sources = ", ".join(
+            str(item.get("source_name") or "") for item in (preview.get("reported_sources") or [])
+        )
+        print(f"FINAL READ {game_id} | media={bool((preview.get('editorial_voice') or {}).get('media_led'))} | sources={sources} | {read}")
+
 
 if __name__ == "__main__":
     main()
