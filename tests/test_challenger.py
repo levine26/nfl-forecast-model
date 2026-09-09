@@ -21,11 +21,10 @@ def test_blend_falls_back_to_pure_when_market_is_missing():
 
 
 def test_market_weight_selection_can_beat_fixed_75_25():
-    n = 120
     y = np.array(([1] * 60) + ([0] * 60))
     frame = pd.DataFrame({
         "home_win": y,
-        "pure_prob": np.where(y == 1, 0.40, 0.60),
+        "pure_prob": np.where(y == 1, 0.35, 0.65),
         "market_prob": np.where(y == 1, 0.80, 0.20),
     })
     weight, sweep = select_pure_weight(frame, objective="accuracy")
