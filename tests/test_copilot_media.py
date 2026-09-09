@@ -30,7 +30,7 @@ def _generated(path: Path):
     }))
 
 
-def test_copilot_read_applies_only_when_curated_read_is_absent(tmp_path: Path):
+def test_copilot_read_applies_when_validated_output_exists(tmp_path: Path):
     generated = tmp_path / "copilot.json"
     _generated(generated)
     previews = {"2026_01_A_B":{"headline":"old","paragraphs":["old read"],"editorial_voice":{},"story_spine":{}}}
@@ -42,7 +42,7 @@ def test_copilot_read_applies_only_when_curated_read_is_absent(tmp_path: Path):
     assert evidence["2026_01_A_B"][-1]["source_name"] == "ESPN"
 
 
-def test_curated_source_first_read_beats_copilot_output(tmp_path: Path):
+def test_validated_copilot_read_can_supersede_curated_baseline(tmp_path: Path):
     generated = tmp_path / "copilot.json"
     _generated(generated)
     previews = {
@@ -54,6 +54,8 @@ def test_curated_source_first_read_beats_copilot_output(tmp_path: Path):
         }
     }
     evidence = {"2026_01_A_B":[]}
-    result, _, status = apply_copilot_reads(previews, evidence, _predictions(), generated)
-    assert status["games_applied"] == 0
-    assert result["2026_01_A_B"]["headline"] == "curated"
+    result, evidence, status = apply_copilot_reads(previews, evidence, _predictions(), generated)
+    assert status["games_applied"] == 1
+    assert result["2026_01_A_B"]["headline"] == "A real reported storyline"
+    assert result["2026_01_A_B"]["editorial_voice"]["copilot_researched"] is True
+    assert evidence["2026_01_A_B"][-1]["source_name"] == "ESPN"
