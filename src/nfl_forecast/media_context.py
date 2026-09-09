@@ -47,10 +47,11 @@ SOURCE_PRIORITY = {
 # These are actual reporting developments, not generic content labels.
 SUBSTANTIVE_SIGNALS = {
     "injury", "injured", "questionable", "doubtful", "ruled out", "likely out",
-    "expected to play", "expected to start", "on track", "return", "returns", "practice",
-    "limited", "inactive", "suspended", "available", "availability", "starter", "starting",
-    "debut", "trade", "traded", "signed", "acquired", "coordinator", "play-caller",
-    "playcaller", "new coach", "scheme change", "left tackle", "right tackle",
+    "expect ", "expects ", "expected to play", "expected to start", "on track",
+    "return", "returns", "practice", "limited", "inactive", "suspended", "available",
+    "availability", "starter", "starting", "debut", "trade", "traded", "signed",
+    "acquired", "coordinator", "play-caller", "playcaller", "new coach", "scheme change",
+    "left tackle", "right tackle",
 }
 GENERIC_PREVIEW_SIGNALS = {
     "preview", "prediction", "predictions", "picks", "how to watch", "what to watch",
