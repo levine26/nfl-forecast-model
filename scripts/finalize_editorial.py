@@ -15,6 +15,11 @@ from nfl_forecast.media_editorial import rewrite_reads_with_media
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default="outputs")
+    parser.add_argument(
+        "--skip-copilot",
+        action="store_true",
+        help="Refresh deterministic current reporting without applying an older Copilot artifact.",
+    )
     args = parser.parse_args()
     out = Path(args.output_dir)
     predictions = pd.read_csv(out / "this_week.csv")
@@ -32,12 +37,16 @@ def main() -> None:
     status["media_reporting"] = media_status
 
     # Primary human-synthesis layer: only a separately validated Copilot artifact may
-    # supersede the deterministic fallback. It contains prose/source metadata only.
-    previews, copilot_status = apply_copilot_reads(
-        previews=previews,
-        predictions=predictions,
-        path=out / "copilot_media_reads.json",
-    )
+    # supersede the deterministic fallback. The media-writer uses --skip-copilot first
+    # so its prompt is always built from freshly discovered reporting, not old prose.
+    if args.skip_copilot:
+        copilot_status = {"status": "skipped_for_fresh_research", "games_applied": 0}
+    else:
+        previews, copilot_status = apply_copilot_reads(
+            previews=previews,
+            predictions=predictions,
+            path=out / "copilot_media_reads.json",
+        )
     status["copilot_media"] = copilot_status
 
     # Always run publication QA on the final text, regardless of which writer supplied it.
