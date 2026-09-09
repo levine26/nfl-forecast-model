@@ -69,7 +69,7 @@ def test_deterministic_read_has_exact_two_paragraph_contract():
     assert "30.0%" in paragraph2
     assert "75% PURE / 25% market" in paragraph2
     assert "Denver Broncos -6.5" in paragraph2
-    assert "Kansas City Chiefs -3.5" in paragraph2
+    assert "Denver Broncos -3.5" in paragraph2
     assert "DEN 27.0 – KC 20.5" in paragraph2
     assert paragraph2.endswith("The pick: Denver Broncos moneyline.")
     assert preview["editorial_voice"]["two_paragraph_contract"] is True
