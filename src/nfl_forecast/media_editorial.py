@@ -109,7 +109,6 @@ def _reported_sentence(away: str, home: str, item: dict[str, Any]) -> str:
         tail = f" {detail}" if detail else ""
         return f"{source} reports {subject} is ruled out{tail}."
 
-    # Generic fallback deliberately avoids a reusable 'coverage highlights' wrapper.
     return f"{fact}, according to {source}."
 
 
@@ -133,8 +132,8 @@ def _quant_sentence(away: str, home: str, item: dict[str, Any] | None) -> str:
         if match:
             protected, allowed, rusher, created = match.groups()
             return (
-                f"In {matchup}, the {_nick(protected)} allowed a {allowed}% sack rate last season "
-                f"while the {_nick(rusher)} generated {created}%, making protection an immediate stress point."
+                f"In {matchup}, the {_nick(protected)} were sacked on {allowed}% of pass plays last season "
+                f"while the {_nick(rusher)} got home on {created}%, making protection an immediate stress point."
             )
         tilt = re.search(r"pressure matchup tilts ([A-Z]{2,4})", summary, re.I)
         if tilt:
