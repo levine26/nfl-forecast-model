@@ -101,6 +101,13 @@ def _qb_subject(title: str, fallback: str) -> str:
     return fallback
 
 
+def _side_teams(away: str, home: str, item: dict[str, Any]) -> tuple[str, str]:
+    side = str(item.get("side") or "").strip().lower()
+    if side == "home":
+        return home, away
+    return away, home
+
+
 def _qb_offense_defense(away: str, home: str, item: dict[str, Any], title: str) -> tuple[str, str]:
     """Resolve which current offense owns a QB-history item without assuming away-team ownership."""
     side = str(item.get("side") or "").strip().lower()
@@ -167,10 +174,14 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
                 f"For {offense_name}, the key is keeping {subject} on schedule against {defense_name}; {defense_name}'s job is changing the look before {subject} can reuse earlier answers."
             )
         elif title:
+            focus, opponent = _side_teams(away, home, item)
+            focus_name = _nick(focus)
+            opponent_name = _nick(opponent)
+            title_phrase = title[0].lower() + title[1:] if len(title) > 1 else title.lower()
             headline = f"{matchup}: {title}"
             sentences.append(
-                f"{matchup} centers on {title[0].lower() + title[1:] if len(title) > 1 else title.lower()}. {summary.rstrip('.')} "
-                f"{_nick(away)} has to solve that issue without giving {_nick(home)} favorable down-and-distance, while {_nick(home)} wants to keep the game in that exact script."
+                f"{matchup} centers on {title_phrase}. {summary.rstrip('.')} "
+                f"For {focus_name}, that detail changes {focus_name}'s choices against {opponent_name}; {opponent_name} can exploit it only by forcing {focus_name} off schedule."
             )
 
     if not sentences:
