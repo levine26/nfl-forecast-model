@@ -1,0 +1,32 @@
+name: Validate raw-evidence compositor
+on:
+  push:
+    branches: [editorial/raw-evidence-compositor]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/raw-evidence-compositor
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python scripts/patch_raw_evidence_compositor.py
+      - run: pip install '.[dev]'
+      - name: Run unit suite
+        run: pytest -q
+      - name: Exercise contextual publication composer
+        run: python scripts/run_context.py --season 2026
+      - name: Commit validated source and tests only
+        run: |
+          git config user.name "sunday-signal-editorial-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm scripts/patch_raw_evidence_compositor.py .github/workflows/validate-raw-evidence-compositor.yml
+          git add src/nfl_forecast/editorial_voice.py scripts/run_context.py tests/test_editorial_evidence_compositor.py
+          git commit -m "Render public editorial from canonical matchup evidence"
+          git push origin HEAD:editorial/raw-evidence-compositor
