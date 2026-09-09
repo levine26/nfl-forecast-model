@@ -25,6 +25,7 @@ jobs:
           git fetch origin editorial/raw-evidence-compositor editorial/story-desk-preservation
           git diff c5669e1dc47c9f3daaa0abf39333e50abf0bd000..origin/editorial/raw-evidence-compositor -- src/nfl_forecast/editorial_voice.py scripts/run_context.py tests/test_editorial_evidence_compositor.py | git apply
           git diff c5669e1dc47c9f3daaa0abf39333e50abf0bd000..origin/editorial/story-desk-preservation -- scripts/polish_publication.py tests/test_publication_polish.py | git apply
+          python scripts/patch_history_public_copy.py
       - run: pip install '.[dev]'
       - name: Full test suite
         run: pytest -q
@@ -68,7 +69,7 @@ jobs:
         run: |
           git config user.name "sunday-signal-editorial-bot"
           git config user.email "actions@users.noreply.github.com"
-          git rm .github/workflows/build-publication-pipeline-v4.yml
+          git rm .github/workflows/build-publication-pipeline-v4.yml scripts/patch_history_public_copy.py
           git add src/nfl_forecast/editorial_voice.py scripts/run_context.py scripts/polish_publication.py tests/test_editorial_evidence_compositor.py tests/test_publication_polish.py
           git commit -m "Harden the full editorial publication pipeline"
           git push origin HEAD:editorial/publication-pipeline-v4
