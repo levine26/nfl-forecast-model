@@ -68,11 +68,15 @@ def _editorial_audit(previews: dict[str, dict]) -> dict:
     first_paragraphs = [str((p.get("paragraphs") or [""])[0]).strip() for p in previews.values() if p.get("paragraphs")]
     lead_sentences = []
     all_sentences = []
-    for paragraph in first_paragraphs:
+    counter_led = []
+    for game_id, preview in previews.items():
+        paragraph = str((preview.get("paragraphs") or [""])[0]).strip()
         sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", paragraph) if s.strip()]
         if sentences:
             lead_sentences.append(sentences[0])
-        all_sentences.extend(s for s in sentences if len(s) >= 36)
+        all_sentences.extend(sentence for sentence in sentences if len(sentence) >= 36)
+        if (preview.get("story_spine") or {}).get("primary_mode") == "counter":
+            counter_led.append(game_id)
     counts = Counter(all_sentences)
     repeats = {sentence: count for sentence, count in counts.items() if count > 1}
     return {
@@ -82,7 +86,27 @@ def _editorial_audit(previews: dict[str, dict]) -> dict:
         "read_count": len(first_paragraphs),
         "repeated_read_sentences": repeats,
         "repeated_read_sentence_count": len(repeats),
+        "counter_led_reads": sorted(counter_led),
     }
+
+
+def _require_editorial_quality(audit: dict, game_count: int) -> None:
+    """Fail closed on obvious template regression before publishing prose."""
+    if game_count <= 1:
+        return
+    failures = []
+    if int(audit.get("headline_count", 0)) != game_count:
+        failures.append("missing headlines")
+    if int(audit.get("read_count", 0)) != game_count:
+        failures.append("missing Reads")
+    if int(audit.get("unique_headlines", 0)) != game_count:
+        failures.append(f"headlines are not unique ({audit.get('unique_headlines')}/{game_count})")
+    if int(audit.get("unique_read_leads", 0)) != game_count:
+        failures.append(f"Read leads are not unique ({audit.get('unique_read_leads')}/{game_count})")
+    if int(audit.get("repeated_read_sentence_count", 0)):
+        failures.append(f"repeated Read sentences remain: {audit.get('repeated_read_sentences')}")
+    if failures:
+        raise SystemExit("Sunday Signal editorial quality gate failed: " + "; ".join(failures))
 
 
 def main():
@@ -129,16 +153,19 @@ def main():
     portable_count=sum(1 for items in evidence.values() for item in items if (item.get("metadata") or {}).get("family")=="qb_opponent_history" and (item.get("metadata") or {}).get("meetings"))
     previews=build_game_previews(predictions,evidence)
     editorial_audit=_editorial_audit(previews)
+    _require_editorial_quality(editorial_audit,len(previews))
+
     source_status.update(context_status); source_status["editorial_intelligence"]=editorial_status
     source_status["qb_history"]={"status":"healthy","games_with_player_opponent_history":portable_count,"game_level_meeting_metadata":True,"team_change_safe":True,"guardrail":"Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes."}
     source_status["evidence"]={"status":"healthy","games":len(evidence),"signals":sum(len(v) for v in evidence.values()),"generated_utc":generated,"guardrail":"Context is explanatory only unless a feature is separately validated and promoted into the numerical model."}
-    source_status["previews"]={"status":"healthy","games":len(previews),"generator":"Sunday Signal ranked story-spine composer","engine":"LevLine","editorial_audit":editorial_audit,"guardrail":"Written previews may synthesize verified context but do not alter numerical probabilities."}
+    source_status["previews"]={"status":"healthy","games":len(previews),"generator":"Sunday Signal ranked story-spine composer","engine":"LevLine","editorial_audit":editorial_audit,"guardrail":"Written previews synthesize verified context but do not alter numerical probabilities."}
     (out/"contextual_evidence.json").write_text(json.dumps(evidence,indent=2,sort_keys=True),encoding="utf-8"); (out/"game_previews.json").write_text(json.dumps(previews,indent=2,sort_keys=True),encoding="utf-8"); (out/"context_source_status.json").write_text(json.dumps(source_status,indent=2,sort_keys=True),encoding="utf-8")
     counts={gid:len(items) for gid,items in evidence.items()}; print(f"Sunday Signal context refresh complete: {sum(counts.values())} evidence signals across {len(counts)} games"); print(f"Written previews generated: {len(previews)}")
     print("Editorial diversity audit:",json.dumps(editorial_audit,sort_keys=True))
     for gid in sorted(previews):
         preview=previews[gid]; lead=(preview.get("paragraphs") or [""])[0]
-        print(f"EDITORIAL {gid} | {preview.get('headline','')} | {lead}")
+        spine=preview.get("story_spine") or {}
+        print(f"EDITORIAL {gid} | {preview.get('headline','')} | {spine.get('primary_mode')}:{spine.get('primary_family')} | {lead}")
     print(json.dumps(source_status,indent=2))
 
 
