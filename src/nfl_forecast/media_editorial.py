@@ -168,8 +168,9 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
                 headline = f"{matchup}: {rusher_name} pass rush vs. {protected_name} protection"
                 sentences.append(
                     f"{matchup} centers on the {rusher_name} rush against {protected_name} protection. "
-                    f"The {protected_name} allowed sacks on {sack_rate}% of pass plays last season; the {rusher_name} generated sacks on {pressure_rate}%. "
-                    f"The {protected_name} need clean early downs to keep the {rusher_name} out of favorable rush situations, while the {rusher_name} want to force the {protected_name} into obvious passing downs."
+                    f"For {protected_name}, sacks allowed were {sack_rate}% on {protected_name} pass plays last season. "
+                    f"For {rusher_name}, sacks generated were {pressure_rate}% on {rusher_name} opponent pass plays last season. "
+                    f"{protected_name} protection wants clean early downs. {rusher_name} pressure wants obvious passing downs."
                 )
         elif fam == "explosives":
             headline = f"{matchup}: explosive plays will set the terms"

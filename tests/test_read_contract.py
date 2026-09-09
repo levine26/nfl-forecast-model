@@ -65,8 +65,8 @@ def test_deterministic_read_has_exact_two_paragraph_contract():
     paragraph1, paragraph2 = preview["paragraphs"]
     assert "legacy" not in " ".join(preview["paragraphs"]).lower()
     assert "Chiefs" in paragraph1 and "Broncos" in paragraph1
-    assert "The Chiefs need clean early downs" in paragraph1
-    assert "the Broncos want to force the Chiefs" in paragraph1
+    assert "Chiefs protection wants clean early downs" in paragraph1
+    assert "Broncos pressure wants obvious passing downs" in paragraph1
     assert "Chiefs needs" not in paragraph1
     assert "LevLine" in paragraph2
     assert "60.0%" in paragraph2
@@ -186,3 +186,25 @@ def test_generic_fallback_uses_side_punctuation_and_avoids_shared_seven_word_spa
     assert "forecast. For Rams" in paragraphs[1]
     assert "Rams' choices against 49ers" in paragraphs[1]
     assert not _seven_grams(paragraphs[0]).intersection(_seven_grams(paragraphs[1]))
+
+
+
+def test_pressure_fallbacks_share_no_seven_word_template_spans():
+    cases = [
+        ("ARI", "LAC", "LAC gave up sacks on 6.2% of pass plays last season; ARI got home on 9.4%."),
+        ("ATL", "PIT", "ATL gave up sacks on 7.2% of pass plays last season; PIT got home on 10.4%."),
+        ("NYJ", "TEN", "NYJ gave up sacks on 5.2% of pass plays last season; TEN got home on 8.4%."),
+    ]
+    paragraphs = []
+    for away, home, summary in cases:
+        item = {
+            "title": f"{home} protection vs {away} pass rush",
+            "summary": summary,
+            "metadata": {"family": "pressure"},
+        }
+        paragraphs.append(_football_preview(away, home, item)[1])
+
+    grams = [_seven_grams(paragraph) for paragraph in paragraphs]
+    for i in range(len(grams)):
+        for j in range(i + 1, len(grams)):
+            assert not grams[i].intersection(grams[j])
