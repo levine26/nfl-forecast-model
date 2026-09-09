@@ -39,8 +39,9 @@ def main() -> None:
     )
     previews = apply_source_first_reads(previews, evidence, predictions)
 
-    # A validated Copilot research artifact is a fallback for slates without a
-    # hand-curated Read. Curated human copy always wins when both are present.
+    # Curated human copy is the safe baseline. A fully validated Copilot research
+    # artifact may supersede it when available, giving future slates a fresh,
+    # multi-source sportswriter pass without making publication depend on Copilot.
     previews, evidence, copilot_status = apply_copilot_reads(
         previews=previews,
         evidence=evidence,
