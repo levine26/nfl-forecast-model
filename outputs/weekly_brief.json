@@ -1,25 +1,25 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_NE_SEA",
-      "largest_driver": "Market movement",
-      "pick": "SEA",
-      "pick_delta_pp": -0.10295496534673543
-    },
-    {
-      "game_id": "2026_01_NO_DET",
-      "largest_driver": "No material move",
-      "pick": "DET",
-      "pick_delta_pp": -9.199581096908105e-08
-    },
-    {
       "game_id": "2026_01_DAL_NYG",
       "largest_driver": "No material move",
       "pick": "DAL",
-      "pick_delta_pp": 4.880856274702694e-08
+      "pick_delta_pp": 1.6653345369377348e-14
+    },
+    {
+      "game_id": "2026_01_ARI_LAC",
+      "largest_driver": "No material move",
+      "pick": "LAC",
+      "pick_delta_pp": -1.1102230246251565e-14
+    },
+    {
+      "game_id": "2026_01_CHI_CAR",
+      "largest_driver": "No material move",
+      "pick": "CHI",
+      "pick_delta_pp": 1.1102230246251565e-14
     }
   ],
-  "generated_utc": "2026-09-09T23:13:28.258588+00:00",
+  "generated_utc": "2026-09-09T23:27:49.254158+00:00",
   "market_disagreements": [
     {
       "confidence": "Solid",
@@ -37,16 +37,16 @@
       "pick": "MIA",
       "pick_prob": 0.577472878092628,
       "projected_score": "LV 19.9 \u2013 MIA 23.6",
-      "pure_market_gap_pp": 23.614886655577383
+      "pure_market_gap_pp": 23.61488665557739
     },
     {
       "confidence": "Lean",
       "game_id": "2026_01_NO_DET",
       "matchup": "NO @ DET",
       "pick": "DET",
-      "pick_prob": 0.6157327751081703,
+      "pick_prob": 0.6157327751081701,
       "projected_score": "DET 24.8 \u2013 NO 21.0",
-      "pure_market_gap_pp": 14.669297767071154
+      "pure_market_gap_pp": 14.669297767071177
     }
   ],
   "most_uncertain": [
@@ -63,7 +63,7 @@
       "game_id": "2026_01_DAL_NYG",
       "matchup": "DAL @ NYG",
       "pick": "DAL",
-      "pick_prob": 0.5435629057237764,
+      "pick_prob": 0.5435629057237765,
       "projected_score": "NYG 22.0 \u2013 DAL 21.4"
     },
     {
@@ -89,7 +89,7 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.69196392176441,
+      "pick_prob": 0.6919639217644099,
       "projected_score": "LAC 25.5 \u2013 ARI 18.8"
     },
     {
