@@ -39,12 +39,6 @@ def _is_generic_visible_title(item: dict) -> bool:
 
 
 def _display_media(media: dict[str, list[dict]]) -> tuple[dict[str, list[dict]], dict[str, int]]:
-    """Choose game-specific reporting for visible fallback prose.
-
-    Roundups and generic preview stories remain available as provenance, but the same
-    article can never be rendered into multiple game Reads. Prefer substantive,
-    trusted, unique stories; then relax those preferences only as needed for coverage.
-    """
     counts = Counter(
         key
         for items in media.values()
@@ -110,18 +104,12 @@ def main() -> None:
     evidence = json.loads(evidence_path.read_text())
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
 
-    # Deterministic fail-safe: discover current reporting, then allow only unique,
-    # game-specific stories into visible prose. Generic preview/roundup articles stay
-    # as research provenance but cannot become repeated public copy.
     media, media_status = fetch_media_context(predictions, timeout=8)
     display_media, display_status = _display_media(media)
     media_status.update(display_status)
     previews = rewrite_reads_with_media(previews, predictions, evidence, display_media)
     status["media_reporting"] = media_status
 
-    # Primary human-synthesis layer: only a separately validated Copilot artifact may
-    # supersede the deterministic fallback. The media-writer uses --skip-copilot first
-    # so its prompt is always built from freshly discovered reporting, not old prose.
     if args.skip_copilot:
         copilot_status = {"status": "skipped_for_fresh_research", "games_applied": 0}
     else:
@@ -132,7 +120,6 @@ def main() -> None:
         )
     status["copilot_media"] = copilot_status
 
-    # Always run publication QA on the final text, regardless of which writer supplied it.
     status["editorial_finalizer"] = finalize_previews(predictions, previews, evidence)
 
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
@@ -140,14 +127,17 @@ def main() -> None:
 
     for game_id in sorted(previews):
         preview = previews[game_id]
-        read = str((preview.get("paragraphs") or [""])[0])
+        paragraphs = [str(value) for value in (preview.get("paragraphs") or [])]
+        paragraph1 = paragraphs[0] if paragraphs else ""
+        paragraph2 = paragraphs[1] if len(paragraphs) > 1 else ""
         sources = ", ".join(
             str(item.get("source_name") or "") for item in (preview.get("reported_sources") or [])
         )
         voice = preview.get("editorial_voice") or {}
         print(
             f"FINAL READ {game_id} | media={bool(voice.get('media_led'))} "
-            f"| copilot={bool(voice.get('copilot_researched'))} | sources={sources} | {read}"
+            f"| copilot={bool(voice.get('copilot_researched'))} | sources={sources} "
+            f"| P1={paragraph1} | P2={paragraph2}"
         )
 
 

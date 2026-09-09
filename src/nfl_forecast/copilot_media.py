@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-"""Apply pre-validated Copilot-written Reads without touching LevLine math."""
+"""Apply pre-validated Copilot matchup/model/pick Reads without touching LevLine math."""
 
 from pathlib import Path
 import json
 from typing import Any
 
 import pandas as pd
-
 
 MAX_COPILOT_AGE_HOURS = 6.0
 NEW_REPORT_GRACE_MINUTES = 5.0
@@ -62,7 +61,7 @@ def apply_copilot_reads(
     predictions: pd.DataFrame,
     path: str | Path,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-    """Overlay only fresh, validated source-backed prose; numerical fields are untouched."""
+    """Overlay only fresh, validated prose; numerical forecast fields are untouched."""
     generated = load_copilot_reads(path)
     if not generated:
         return previews, {"status": "unavailable", "games_applied": 0, "skipped": {}}
@@ -71,6 +70,7 @@ def apply_copilot_reads(
     now = pd.Timestamp.now(tz="UTC")
     applied = 0
     skipped: dict[str, str] = {}
+
     for game_id, preview in previews.items():
         if str(game_id) not in expected:
             continue
@@ -78,24 +78,24 @@ def apply_copilot_reads(
         if not isinstance(entry, dict):
             skipped[str(game_id)] = "missing_entry"
             continue
+
         headline = str(entry.get("headline") or "").strip()
-        read = str(entry.get("read") or "").strip()
+        paragraph1 = str(entry.get("paragraph1") or "").strip()
+        paragraph2 = str(entry.get("paragraph2") or "").strip()
         sources = entry.get("sources") or []
-        if not headline or not read or not isinstance(sources, list) or not sources:
+        if not headline or not paragraph1 or not paragraph2 or not isinstance(sources, list) or not sources:
             skipped[str(game_id)] = "invalid_entry"
             continue
+
         is_fresh, reason = _fresh_enough(entry, preview, now)
         if not is_fresh:
             skipped[str(game_id)] = reason
             continue
 
-        paragraphs = list(preview.get("paragraphs") or [])
-        if paragraphs:
-            paragraphs[0] = read
-        else:
-            paragraphs = [read]
+        # The Copilot writer owns the entire Read. Never retain a legacy paragraph
+        # underneath a new lead; that was the source of the old mixed-template output.
         preview["headline"] = headline
-        preview["paragraphs"] = paragraphs
+        preview["paragraphs"] = [paragraph1, paragraph2]
         preview["reported_sources"] = [
             {
                 "title": str(source.get("title") or ""),
@@ -112,13 +112,16 @@ def apply_copilot_reads(
             "reporting_first": True,
             "copilot_researched": True,
             "game_specific": True,
+            "two_paragraph_contract": True,
+            "explicit_model_explanation": True,
+            "explicit_final_pick": True,
             "fallback_templates_used": False,
         })
         preview["editorial_voice"] = voice
-        preview["editorial_version"] = "media-copilot-v1"
+        preview["editorial_version"] = "matchup-model-pick-copilot-v1"
         preview["source_first_guardrail"] = (
-            "Copilot synthesized approved current reporting for the public Read; "
-            "LevLine numerical outputs were not modified."
+            "Copilot synthesized approved current reporting for the matchup preview and "
+            "explained already-published LevLine numbers; it did not modify the forecast."
         )
         applied += 1
 
