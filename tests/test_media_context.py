@@ -123,11 +123,8 @@ def test_media_led_read_uses_reporting_then_quantitative_mechanism():
     read = result["2026_01_DEN_KC"]["paragraphs"][0]
     assert "ESPN reports Patrick Mahomes is expected to start Week 1 against Broncos" in read
     assert "CBS Sports has Chiefs left tackle trending toward missing opener" in read
-    assert "In Broncos–Chiefs" in read
-    assert "Chiefs were sacked on 8.2% of pass plays last season" in read
-    assert "Broncos got home on 9.7%" in read
-    assert "LevLine is much more bullish on Denver in Broncos–Chiefs than the broader consensus" in read
-    assert "26.5-point probability gap" in read
+    assert "Broncos–Chiefs: the Chiefs were sacked on 8.2% of pass plays; the Broncos got home on 9.7%" in read
+    assert "Broncos–Chiefs market gap: LevLine rates Denver 26.5 percentage points above consensus" in read
     assert "coverage highlights" not in read
     assert "pressure note" not in read
     assert "PURE has" not in read
