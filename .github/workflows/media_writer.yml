@@ -1,0 +1,158 @@
+name: Sunday Signal Copilot media writer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/nfl_forecast/media_context.py"
+      - "src/nfl_forecast/media_editorial.py"
+      - "src/nfl_forecast/copilot_media.py"
+      - "scripts/finalize_editorial.py"
+      - "scripts/build_copilot_media_prompt.py"
+      - "scripts/validate_copilot_media_reads.py"
+      - "tests/test_media_context.py"
+      - "tests/test_copilot_media.py"
+      - ".github/workflows/media_writer.yml"
+  schedule:
+    # Twenty minutes after the three-hour contextual refresh cadence during NFL-season months.
+    - cron: "37 */3 * 1-2,9-12 *"
+
+permissions:
+  contents: write
+  actions: read
+  copilot-requests: write
+
+concurrency:
+  group: sunday-signal-media-writer
+  cancel-in-progress: true
+
+jobs:
+  write-media:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+
+      - name: Wait for merge-triggered context refresh
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 40); do
+            state=$(gh run list \
+              --workflow "Sunday Signal contextual intelligence" \
+              --commit "$GITHUB_SHA" \
+              --limit 1 \
+              --json status,conclusion \
+              --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
+            echo "context run: $state"
+            if [ "$state" = "completed:success" ]; then
+              break
+            fi
+            if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then
+              echo "Context refresh failed; refusing to write media on stale context."
+              exit 1
+            fi
+            if [ "$attempt" -eq 40 ]; then
+              echo "Timed out waiting for context refresh."
+              exit 1
+            fi
+            sleep 15
+          done
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Refresh latest main for scheduled/manual run
+        if: github.event_name != 'push'
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install editorial environment
+        run: pip install ".[dev]"
+
+      - name: Test media editorial guardrails
+        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_editorial_finalize.py
+
+      - name: Refresh deterministic reporting packet
+        run: |
+          python scripts/finalize_editorial.py --skip-copilot
+          python scripts/build_copilot_media_prompt.py --prompt-file /tmp/sunday-signal-media-prompt.txt
+
+      - name: Install GitHub Copilot CLI
+        run: npm install -g @github/copilot
+
+      - name: Research and write human game Reads
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          copilot -s -p "$(cat /tmp/sunday-signal-media-prompt.txt)" \
+            --no-ask-user \
+            --deny-tool='shell,write' \
+            --allow-tool='url' \
+            --allow-url='espn.com' \
+            --allow-url='nfl.com' \
+            --allow-url='nytimes.com' \
+            --allow-url='theathletic.com' \
+            --allow-url='apnews.com' \
+            --allow-url='cbssports.com' \
+            --allow-url='sports.yahoo.com' \
+            --allow-url='nbcsports.com' \
+            --allow-url='foxsports.com' \
+            --allow-url='si.com' \
+            --allow-url='x.com' \
+            --allow-url='twitter.com' \
+            > /tmp/copilot-media-raw.txt
+
+      - name: Validate before publication
+        run: |
+          python scripts/validate_copilot_media_reads.py \
+            --input /tmp/copilot-media-raw.txt \
+            --predictions outputs/this_week.csv \
+            --output outputs/copilot_media_reads.json
+          python scripts/finalize_editorial.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
+          media = status.get('media_reporting', {})
+          copilot = status.get('copilot_media', {})
+          finalizer = status.get('editorial_finalizer', {})
+          games = int(finalizer.get('games', 0))
+          if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
+              raise SystemExit(f'media reporting not launch-grade: {media}')
+          if copilot.get('status') != 'healthy' or int(copilot.get('games_applied', 0)) != games:
+              raise SystemExit(f'Copilot did not cover full slate: {copilot}')
+          if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
+              raise SystemExit(f'final editorial gate failed: {finalizer}')
+          print('Copilot media launch gate passed:', games, 'games')
+          PY
+
+      - name: Publish editorial-only outputs
+        run: |
+          set -euo pipefail
+          git config user.name "sunday-signal-media-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            outputs/copilot_media_reads.json \
+            outputs/game_previews.json \
+            outputs/context_source_status.json
+          if git diff --cached --quiet; then
+            echo "No media editorial changes to publish."
+            exit 0
+          fi
+          git commit -m "Refresh human Sunday Signal Reads"
+          git pull --rebase origin main
+          git push origin HEAD:main
