@@ -13,42 +13,42 @@ from typing import Any, Callable
 import nflreadpy as nfl
 
 
-OFFICIAL_TEAM_MEDIA_DOMAINS = frozenset(
-    {
-        "49ers.com",
-        "arizonacardinals.com",
-        "atlantafalcons.com",
-        "baltimoreravens.com",
-        "bengals.com",
-        "buffalobills.com",
-        "buccaneers.com",
-        "chargers.com",
-        "chicagobears.com",
-        "chiefs.com",
-        "clevelandbrowns.com",
-        "colts.com",
-        "commanders.com",
-        "dallascowboys.com",
-        "denverbroncos.com",
-        "detroitlions.com",
-        "houstontexans.com",
-        "jaguars.com",
-        "miamidolphins.com",
-        "neworleanssaints.com",
-        "newyorkjets.com",
-        "packers.com",
-        "panthers.com",
-        "patriots.com",
-        "philadelphiaeagles.com",
-        "raiders.com",
-        "seahawks.com",
-        "steelers.com",
-        "tennesseetitans.com",
-        "therams.com",
-        "vikings.com",
-        "giants.com",
-    }
-)
+OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE = {
+    "ARI": "arizonacardinals.com",
+    "ATL": "atlantafalcons.com",
+    "BAL": "baltimoreravens.com",
+    "BUF": "buffalobills.com",
+    "CAR": "panthers.com",
+    "CHI": "chicagobears.com",
+    "CIN": "bengals.com",
+    "CLE": "clevelandbrowns.com",
+    "DAL": "dallascowboys.com",
+    "DEN": "denverbroncos.com",
+    "DET": "detroitlions.com",
+    "GB": "packers.com",
+    "HOU": "houstontexans.com",
+    "IND": "colts.com",
+    "JAX": "jaguars.com",
+    "KC": "chiefs.com",
+    "LA": "therams.com",
+    "LAC": "chargers.com",
+    "LV": "raiders.com",
+    "MIA": "miamidolphins.com",
+    "MIN": "vikings.com",
+    "NE": "patriots.com",
+    "NO": "neworleanssaints.com",
+    "NYG": "giants.com",
+    "NYJ": "newyorkjets.com",
+    "PHI": "philadelphiaeagles.com",
+    "PIT": "steelers.com",
+    "SEA": "seahawks.com",
+    "SF": "49ers.com",
+    "TB": "buccaneers.com",
+    "TEN": "tennesseetitans.com",
+    "WAS": "commanders.com",
+}
+
+OFFICIAL_TEAM_MEDIA_DOMAINS = frozenset(OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE.values())
 
 APPROVED_MEDIA_DOMAINS = frozenset(
     {
