@@ -156,9 +156,11 @@ def _safe_rationale(entry: dict, preview: dict, pick: str, opponent: str) -> str
             break
     if not factor:
         factor = _clean_text(preview.get("case_for_pick")) or f"{_nick(pick)} execution against {_nick(opponent)}"
+    pick_nick = _nick(pick)
+    opponent_nick = _nick(opponent)
     return (
-        f"The football context for the {_nick(pick)} is {factor}; that gives {_nick(pick)} a concrete path against "
-        f"{_nick(opponent)} without turning the editorial evidence into a new model input."
+        f"{pick_nick} context: {factor}. For {pick_nick}, this evidence supports {pick_nick} against {opponent_nick}; "
+        f"{pick_nick} evidence stays editorial, not a {pick_nick} numerical input."
     )
 
 
@@ -178,22 +180,18 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
 
     sentences: list[str] = []
     if final_prob is not None:
-        sentences.append(f"LevLine gives the {pick_nick} a {final_prob * 100:.1f}% win probability.")
+        sentences.append(f"LevLine puts the {pick_nick} at {final_prob * 100:.1f}% to win.")
     if pure_prob is not None and market_prob is not None:
         sentences.append(
-            f"For the {pick_nick}, football-only PURE is {pure_prob * 100:.1f}% and the market view is "
-            f"{market_prob * 100:.1f}%; Sunday Signal's {pick_nick} blend is 75% PURE / 25% MARKET."
+            f"{pick_nick} football-only PURE is {pure_prob * 100:.1f}%; {pick_nick} market probability is {market_prob * 100:.1f}%. "
+            f"In the {pick_nick} blend, PURE carries 75%; for the {pick_nick}, MARKET carries 25%."
         )
-
-    line_bits: list[str] = []
     if model_line:
-        line_bits.append(f"LevLine's model line is {model_line}")
+        sentences.append(f"{pick_nick} LevLine model line is {model_line}.")
     if market_line:
-        line_bits.append(f"the market spread is {market_line}")
+        sentences.append(f"{pick_nick} market spread is {market_line}.")
     if projected:
-        line_bits.append(f"{_possessive(pick_nick)} projected score is {projected}")
-    if line_bits:
-        sentences.append(f"For {pick_nick}, " + "; ".join(line_bits) + ".")
+        sentences.append(f"{pick_nick} projected score: {projected}.")
 
     sentences.append(rationale)
     sentences.append(f"The pick: {pick_name} moneyline.")
