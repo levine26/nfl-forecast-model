@@ -2,8 +2,8 @@ from __future__ import annotations
 
 """Research-only T-120 market snapshot selection.
 
-This module never feeds LevLine probabilities. It reconstructs the latest observed
-MARKET snapshot at or before kickoff minus 120 minutes from the append-only run
+This module never feeds LevLine probabilities. It reconstructs the latest usable
+MARKET snapshot at or before kickoff minus 120 minutes from append-only run
 history so market research uses the same information horizon as the production
 lock without lookahead.
 """
@@ -36,16 +36,23 @@ def select_t120_market_snapshots(
     prediction_history: pd.DataFrame | None = None,
     target_minutes: float = T120_MINUTES,
 ) -> pd.DataFrame:
-    """Select the latest MARKET observation at or before each game's T-120 cutoff.
+    """Select the latest usable MARKET observation at or before each T-120 cutoff.
 
     A game with no eligible pre-cutoff observation is omitted rather than filled
-    from a later market snapshot. ``staleness_minutes_vs_t120`` is always >= 0 for
-    selected rows; this makes source cadence/coverage explicit for later research.
+    from a later market snapshot. Rows without a numeric ``market_home_prob`` are
+    not eligible, preventing a transient source outage from replacing an earlier
+    usable market observation. ``staleness_minutes_vs_t120`` is always >= 0 for
+    selected rows, making source cadence and coverage explicit for later research.
     """
     if run_history is None or run_history.empty:
         return pd.DataFrame(columns=RESEARCH_COLUMNS)
+    if float(target_minutes) <= 0:
+        raise ValueError("target_minutes must be positive")
 
-    required = {"game_id", "gameday", "gametime", "prediction_timestamp_utc", "snapshot_type"}
+    required = {
+        "game_id", "gameday", "gametime", "prediction_timestamp_utc",
+        "snapshot_type", "market_home_prob",
+    }
     missing = required - set(run_history.columns)
     if missing:
         raise ValueError(f"run history missing required T-120 fields: {sorted(missing)}")
@@ -53,19 +60,21 @@ def select_t120_market_snapshots(
     history = run_history.copy()
     history = history[history["snapshot_type"].astype(str).str.upper().eq("MARKET")].copy()
     history["_observed"] = _utc_series(history["prediction_timestamp_utc"])
-    history = history[history["_observed"].notna()].copy()
+    history["market_home_prob"] = pd.to_numeric(history["market_home_prob"], errors="coerce")
+    history = history[history["_observed"].notna() & history["market_home_prob"].notna()].copy()
     if history.empty:
         return pd.DataFrame(columns=RESEARCH_COLUMNS)
 
     rows: list[dict] = []
     for game_id, group in history.groupby("game_id", sort=True):
-        first = group.iloc[0]
+        group = group.sort_values("_observed", kind="stable")
+        schedule_row = group.iloc[-1]
         try:
-            kickoff = pd.Timestamp(kickoff_utc(first.get("gameday"), first.get("gametime")))
+            kickoff = pd.Timestamp(kickoff_utc(schedule_row.get("gameday"), schedule_row.get("gametime")))
         except Exception:
             continue
         target = kickoff - pd.Timedelta(minutes=float(target_minutes))
-        eligible = group[group["_observed"] <= target].sort_values("_observed")
+        eligible = group[group["_observed"] <= target]
         if eligible.empty:
             continue
         chosen = eligible.iloc[-1]
@@ -102,9 +111,11 @@ def select_t120_market_snapshots(
             selected = selected.drop(columns=["actual_home_score", "actual_away_score"]).merge(grades, on="game_id", how="left")
             hs = pd.to_numeric(selected["actual_home_score"], errors="coerce")
             aw = pd.to_numeric(selected["actual_away_score"], errors="coerce")
-            graded = hs.notna() & aw.notna()
-            selected["graded"] = graded
-            selected["actual_home_win"] = pd.array(np.where(graded, hs > aw, pd.NA), dtype="boolean")
+            binary_graded = hs.notna() & aw.notna() & hs.ne(aw)
+            selected["graded"] = binary_graded
+            selected["actual_home_win"] = pd.array(
+                np.where(binary_graded, hs > aw, pd.NA), dtype="boolean"
+            )
 
     for col in RESEARCH_COLUMNS:
         if col not in selected.columns:
