@@ -10,9 +10,11 @@ on:
       - "src/nfl_forecast/copilot_media.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_copilot_media_prompt.py"
+      - "scripts/compose_copilot_media_reads.py"
       - "scripts/validate_copilot_media_reads.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
+      - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
       - "tests/test_read_contract.py"
       - "pyproject.toml"
@@ -85,7 +87,7 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_json_handoff.py tests/test_read_contract.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_read_contract.py tests/test_editorial_finalize.py
 
       - name: Refresh deterministic reporting packet
         run: |
@@ -118,10 +120,16 @@ jobs:
             --allow-url='twitter.com' \
             > /tmp/copilot-media-raw.txt
 
-      - name: Validate before publication
+      - name: Compose and validate before publication
         run: |
-          python scripts/validate_copilot_media_reads.py \
+          python scripts/compose_copilot_media_reads.py \
             --input /tmp/copilot-media-raw.txt \
+            --predictions outputs/this_week.csv \
+            --previews outputs/game_previews.json \
+            --evidence outputs/contextual_evidence.json \
+            --output /tmp/copilot-media-composed.json
+          python scripts/validate_copilot_media_reads.py \
+            --input /tmp/copilot-media-composed.json \
             --predictions outputs/this_week.csv \
             --output outputs/copilot_media_reads.json
           python scripts/finalize_editorial.py
