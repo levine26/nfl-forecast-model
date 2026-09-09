@@ -182,7 +182,8 @@ def add_media_context(
         items = out.setdefault(gid, [])
 
         seed = curated.get(gid)
-        if isinstance(seed, dict) and seed.get("read"):
+        has_direct_seed = bool(isinstance(seed, dict) and seed.get("read"))
+        if has_direct_seed:
             games_with_curated += 1
             items.append({
                 "category":"reporting",
@@ -205,7 +206,10 @@ def add_media_context(
             })
 
         matching = [a for a in espn if _match_text(f"{a.get('headline','')} {a.get('description','')}", away, home)]
-        if len(matching) < 2:
+        # A curated human lead already has its source attached. Avoid sixteen
+        # redundant network searches on every refresh; broader discovery is the
+        # fallback for games that do not yet have an editor-written lead.
+        if not has_direct_seed and len(matching) < 2:
             matching.extend(_fetch_google_headlines(away, home, session=session, limit=6))
         seen: set[str] = set()
         added = 0
@@ -228,7 +232,7 @@ def add_media_context(
         "games_with_curated_read":games_with_curated,
         "games_with_live_reporting":games_with_reporting,
         "espn":espn_status,
-        "discovery":"ESPN API + Google News RSS headlines; curated source-backed Read takes precedence when present.",
+        "discovery":"Curated source-backed Read first; ESPN live reporting always checked; Google News discovery is used when a game lacks a curated lead.",
         "guardrail":"Media context is editorial only and cannot change LevLine probabilities or features.",
     }
     return out, status
