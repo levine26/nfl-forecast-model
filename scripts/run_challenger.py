@@ -2,10 +2,12 @@ from __future__ import annotations
 
 """Run the LevLine v0.5 challenger completely outside production outputs.
 
-The research contract is strict:
+Research contract:
 - 2026 outcomes are never used for fitting, tuning, or calibration.
 - Target-season backtests are nested by season.
-- The current production 75% PURE / 25% MARKET model is never modified here.
+- Production's 75% PURE / 25% MARKET model is never modified here.
+- The market-only model is a benchmark, never an eligible LevLine challenger.
+- A LevLine challenger must retain at least 25% PURE football signal.
 - Results are written only to challenger_outputs/.
 """
 
@@ -18,6 +20,7 @@ import pandas as pd
 
 from nfl_forecast.challenger import (
     BASE_MODEL_NAMES,
+    BlendBacktestResult,
     blend_probabilities,
     build_base_oof_predictions,
     build_nested_stack_oof,
@@ -25,7 +28,6 @@ from nfl_forecast.challenger import (
     fit_calibrator,
     fit_future_nested_stack,
     fixed_blend_backtest,
-    nested_blend_backtest,
     score_probabilities,
     select_pure_weight,
     weight_sweep,
@@ -46,6 +48,7 @@ LIVE_SEASON = 2026
 TARGET_SEASONS = (2022, 2023, 2024, 2025)
 BASE_OOF_START = 2018
 PRODUCTION_LABEL = "Nested 75% PURE / 25% MARKET"
+HYBRID_PURE_WEIGHTS = tuple(float(x) for x in np.linspace(0.25, 1.0, 16))
 
 
 def _metric_row(candidate: str, metrics: dict[str, float], **extra) -> dict:
@@ -64,7 +67,7 @@ def _jsonable_record(row: pd.Series | dict) -> dict:
     items = row.to_dict() if hasattr(row, "to_dict") else dict(row)
     out = {}
     for key, value in items.items():
-        if isinstance(value, (np.integer,)):
+        if isinstance(value, np.integer):
             out[key] = int(value)
         elif isinstance(value, (np.floating, float)):
             out[key] = _safe_float(value)
@@ -93,10 +96,10 @@ def build_research_frame(config_path: str):
     games = build_matchup_features(team_games, bundle.schedules, elo)
     games = add_vig_free_market_prob(games)
 
-    # This is the firewall that keeps the 2026 forward test sacred even after
-    # 2026 games start finishing and appear in the live schedule/PBP sources.
+    # Hard firewall: 2026 is forward-test only, even after games begin finishing.
     historical = games[
-        games["home_win"].notna() & (pd.to_numeric(games["season"], errors="coerce") < LIVE_SEASON)
+        games["home_win"].notna()
+        & (pd.to_numeric(games["season"], errors="coerce") < LIVE_SEASON)
     ].copy()
     current_pool = games[
         (pd.to_numeric(games["season"], errors="coerce") == LIVE_SEASON)
@@ -111,13 +114,61 @@ def build_research_frame(config_path: str):
     features = core_columns(historical)
     if not features:
         raise RuntimeError("No production-compatible football features available")
-    return cfg, games, historical, current, features
+    return cfg, historical, current, features
+
+
+def _nested_hybrid_backtest(
+    frame: pd.DataFrame,
+    *,
+    target_seasons=TARGET_SEASONS,
+    weight_objective: str,
+    calibrator: str,
+) -> BlendBacktestResult:
+    """Nested blend selection restricted to genuine hybrid LevLine weights."""
+    prediction_parts = []
+    weight_rows = []
+    for test_season in [int(x) for x in target_seasons]:
+        tune = frame[frame["season"] < test_season].copy()
+        test = frame[frame["season"] == test_season].copy()
+        if test.empty:
+            continue
+        pure_weight, _ = select_pure_weight(
+            tune,
+            objective=weight_objective,
+            weights=HYBRID_PURE_WEIGHTS,
+        )
+        tune_raw = blend_probabilities(tune.pure_prob, tune.market_prob, pure_weight)
+        calibration = fit_calibrator(tune.home_win, tune_raw, mode=calibrator)
+        test_raw = blend_probabilities(test.pure_prob, test.market_prob, pure_weight)
+        part = test[["season", "home_win", "pure_prob", "market_prob"]].copy()
+        part["raw_prob"] = test_raw
+        part["probability"] = calibration.predict(test_raw)
+        part["pure_weight"] = pure_weight
+        part["market_weight"] = 1.0 - pure_weight
+        part["calibrator"] = calibrator
+        prediction_parts.append(part)
+        weight_rows.append({
+            "season": test_season,
+            "pure_weight": pure_weight,
+            "market_weight": 1.0 - pure_weight,
+            "objective": weight_objective,
+            "calibrator": calibrator,
+            **score_probabilities(part.home_win, part.probability),
+        })
+    if not prediction_parts:
+        raise RuntimeError("No challenger target-season predictions generated")
+    predictions = pd.concat(prediction_parts).sort_index()
+    return BlendBacktestResult(
+        predictions=predictions,
+        weights=pd.DataFrame(weight_rows),
+        metrics=score_probabilities(predictions.home_win, predictions.probability),
+    )
 
 
 def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_outputs") -> dict:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
-    cfg, games, historical, current, feature_cols = build_research_frame(config_path)
+    cfg, historical, current, feature_cols = build_research_frame(config_path)
     seed = int(cfg["model"]["random_state"])
 
     base_oof = build_base_oof_predictions(
@@ -127,14 +178,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         validation_start=BASE_OOF_START,
         validation_end=max(TARGET_SEASONS),
     )
-    nested = build_nested_stack_oof(
-        base_oof,
-        target_seasons=TARGET_SEASONS,
-        seed=seed,
-    )
+    nested = build_nested_stack_oof(base_oof, target_seasons=TARGET_SEASONS, seed=seed)
 
-    # Attach market probabilities by the original game-row index.  This keeps
-    # the nested PURE forecast aligned with the exact same held-out game.
     research = base_oof[["home_win", "season"]].copy()
     research["market_prob"] = pd.to_numeric(
         historical.loc[research.index, "market_home_prob"], errors="coerce"
@@ -142,58 +187,61 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     research["pure_prob"] = np.nan
     research.loc[nested.target_oof.index, "pure_prob"] = nested.target_oof["pure_prob"]
 
-    # Earlier OOF seasons also need a leakage-safe PURE value so they can tune
-    # the 2022+ market blend. Build each such season's meta model only from OOF
-    # seasons before it. The first two OOF seasons may lack enough meta history;
-    # those rows are deliberately excluded from blend tuning.
-    early_target = sorted(int(s) for s in base_oof["season"].unique() if int(s) < min(TARGET_SEASONS))
+    # Build leakage-safe PURE probabilities for the earlier tuning seasons too.
+    from nfl_forecast.challenger import _meta_template
+
+    early_target = sorted(
+        int(s) for s in base_oof["season"].unique() if int(s) < min(TARGET_SEASONS)
+    )
     for season in early_target:
         meta_train = base_oof[base_oof["season"] < season]
         test = base_oof[base_oof["season"] == season]
         if len(meta_train) < 300 or test.empty:
             continue
-        from nfl_forecast.challenger import _meta_template
         meta = _meta_template(seed)
-        meta.fit(meta_train[list(BASE_MODEL_NAMES)], meta_train["home_win"].astype(int))
-        research.loc[test.index, "pure_prob"] = meta.predict_proba(test[list(BASE_MODEL_NAMES)])[:, 1]
+        meta.fit(meta_train[list(BASE_MODEL_NAMES)], meta_train.home_win.astype(int))
+        research.loc[test.index, "pure_prob"] = meta.predict_proba(
+            test[list(BASE_MODEL_NAMES)]
+        )[:, 1]
 
-    research = research[research["pure_prob"].notna()].copy()
-    if not set(TARGET_SEASONS).issubset(set(research["season"].astype(int).unique())):
-        raise RuntimeError("Challenger research frame is missing one or more 2022-25 target seasons")
+    research = research[research.pure_prob.notna()].copy()
+    if not set(TARGET_SEASONS).issubset(set(research.season.astype(int).unique())):
+        raise RuntimeError("Research frame missing one or more 2022-25 target seasons")
 
-    metrics_rows: list[dict] = []
-    target = research[research["season"].isin(TARGET_SEASONS)].copy()
-    metrics_rows.append(_metric_row("Nested PURE", score_probabilities(target.home_win, target.pure_prob)))
-
-    market_usable = target[target.market_prob.notna()]
-    metrics_rows.append(_metric_row(
-        "Market only",
-        score_probabilities(market_usable.home_win, market_usable.market_prob),
-    ))
-    metrics_rows.append(_metric_row(
-        PRODUCTION_LABEL,
-        fixed_blend_backtest(research, 0.75, target_seasons=TARGET_SEASONS),
-        pure_weight=0.75,
-        market_weight=0.25,
-        calibration="none",
-        weight_objective="fixed",
-    ))
+    target = research[research.season.isin(TARGET_SEASONS)].copy()
+    metrics_rows = [
+        _metric_row("Nested PURE", score_probabilities(target.home_win, target.pure_prob)),
+        _metric_row(
+            "Market only benchmark",
+            score_probabilities(
+                target.loc[target.market_prob.notna(), "home_win"],
+                target.loc[target.market_prob.notna(), "market_prob"],
+            ),
+            eligible_shadow=False,
+        ),
+        _metric_row(
+            PRODUCTION_LABEL,
+            fixed_blend_backtest(research, 0.75, target_seasons=TARGET_SEASONS),
+            pure_weight=0.75,
+            market_weight=0.25,
+            calibration="none",
+            weight_objective="fixed",
+            eligible_shadow=True,
+        ),
+    ]
 
     candidate_specs = [
-        ("Adaptive Brier blend", "brier", "none"),
-        ("Adaptive Brier + Platt", "brier", "platt"),
-        ("Adaptive Brier + Isotonic", "brier", "isotonic"),
-        ("Adaptive accuracy blend", "accuracy", "none"),
+        ("Hybrid adaptive Brier", "brier", "none"),
+        ("Hybrid adaptive Brier + Platt", "brier", "platt"),
+        ("Hybrid adaptive Brier + Isotonic", "brier", "isotonic"),
+        ("Hybrid adaptive accuracy", "accuracy", "none"),
     ]
-    backtests = {}
     for label, objective, calibration in candidate_specs:
-        result = nested_blend_backtest(
+        result = _nested_hybrid_backtest(
             research,
-            target_seasons=TARGET_SEASONS,
             weight_objective=objective,
             calibrator=calibration,
         )
-        backtests[label] = result
         metrics_rows.append(_metric_row(
             label,
             result.metrics,
@@ -201,43 +249,36 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
             market_weight=np.nan,
             calibration=calibration,
             weight_objective=objective,
+            eligible_shadow=True,
         ))
-        result.weights.to_csv(out / f"weights_{label.lower().replace(' ', '_').replace('+', 'plus')}.csv", index=False)
+        slug = label.lower().replace(" ", "_").replace("+", "plus")
+        result.weights.to_csv(out / f"weights_{slug}.csv", index=False)
 
     metrics = pd.DataFrame(metrics_rows)
-    metrics["winner_pct"] = pd.to_numeric(metrics["winner_pct"], errors="coerce")
-    metrics["brier"] = pd.to_numeric(metrics["brier"], errors="coerce")
-    metrics["log_loss"] = pd.to_numeric(metrics["log_loss"], errors="coerce")
-    selected = choose_shadow_candidate(metrics, PRODUCTION_LABEL)
+    for col in ["winner_pct", "brier", "log_loss"]:
+        metrics[col] = pd.to_numeric(metrics[col], errors="coerce")
+    eligible = metrics[metrics.get("eligible_shadow", True).fillna(True)].copy()
+    selected = choose_shadow_candidate(eligible, PRODUCTION_LABEL)
 
-    # Descriptive weight sweep on 2022-25. It is *not* used as the OOS score;
-    # nested per-season tuning above is the valid model-selection estimate.
+    # Descriptive only: full 0-100 market/PURE sweep, never used for challenger selection.
     weight_sweep(target).to_csv(out / "weight_sweep_2022_2025_descriptive.csv", index=False)
     base_oof.to_csv(out / "base_oof_2018_2025.csv", index=False)
     target.assign(game_index=target.index).to_csv(out / "nested_research_frame.csv", index=False)
     metrics.to_csv(out / "candidate_metrics.csv", index=False)
 
-    # Build a 2026 shadow candidate using only pre-2026 evidence. Candidate type
-    # is selected on 2022-25; its final weight/calibrator is then fitted using all
-    # eligible pre-2026 OOF rows. This remains research-only and never touches
-    # outputs/this_week.csv or the public site.
-    selected_label = str(selected["candidate"])
+    selected_label = str(selected.candidate)
     spec_lookup = {label: (objective, calibration) for label, objective, calibration in candidate_specs}
     if selected_label == PRODUCTION_LABEL:
-        shadow_weight = 0.75
-        shadow_calibration = "none"
-        shadow_objective = "fixed"
+        shadow_weight, shadow_calibration, shadow_objective = 0.75, "none", "fixed"
     elif selected_label == "Nested PURE":
-        shadow_weight = 1.0
-        shadow_calibration = "none"
-        shadow_objective = "fixed"
-    elif selected_label == "Market only":
-        shadow_weight = 0.0
-        shadow_calibration = "none"
-        shadow_objective = "fixed"
+        shadow_weight, shadow_calibration, shadow_objective = 1.0, "none", "fixed"
     else:
         shadow_objective, shadow_calibration = spec_lookup[selected_label]
-        shadow_weight, _ = select_pure_weight(research, objective=shadow_objective)
+        shadow_weight, _ = select_pure_weight(
+            research,
+            objective=shadow_objective,
+            weights=HYBRID_PURE_WEIGHTS,
+        )
 
     current_pure = fit_future_nested_stack(
         historical,
@@ -246,14 +287,17 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         feature_cols,
         seed=seed,
     )
-    current_market = pd.to_numeric(current["market_home_prob"], errors="coerce").to_numpy(dtype=float)
+    current_market = pd.to_numeric(current.market_home_prob, errors="coerce").to_numpy(dtype=float)
     current_raw = blend_probabilities(current_pure, current_market, shadow_weight)
     if shadow_calibration == "none":
         current_final = current_raw
     else:
         train_raw = blend_probabilities(research.pure_prob, research.market_prob, shadow_weight)
-        calibrator = fit_calibrator(research.home_win, train_raw, mode=shadow_calibration)
-        current_final = calibrator.predict(current_raw)
+        current_final = fit_calibrator(
+            research.home_win,
+            train_raw,
+            mode=shadow_calibration,
+        ).predict(current_raw)
 
     shadow = current[[
         "game_id", "season", "week", "gameday", "gametime", "away_team", "home_team",
@@ -274,12 +318,13 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     if leaderboard_path.exists():
         try:
             leaderboard = pd.read_csv(leaderboard_path)
-            final = leaderboard[leaderboard.model.eq("Final Ensemble")]
-            market = leaderboard[leaderboard.model.eq("Market")]
-            if len(final):
-                production_reference["published_final_ensemble"] = _jsonable_record(final.iloc[0])
-            if len(market):
-                production_reference["published_market"] = _jsonable_record(market.iloc[0])
+            for label, model_name in [
+                ("published_final_ensemble", "Final Ensemble"),
+                ("published_market", "Market"),
+            ]:
+                row = leaderboard[leaderboard.model.eq(model_name)]
+                if len(row):
+                    production_reference[label] = _jsonable_record(row.iloc[0])
         except Exception as exc:
             production_reference["read_error"] = str(exc)
 
@@ -291,6 +336,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         "live_season_firewall": LIVE_SEASON,
         "target_seasons": list(TARGET_SEASONS),
         "base_oof_start": BASE_OOF_START,
+        "minimum_pure_weight": min(HYBRID_PURE_WEIGHTS),
+        "market_only_is_benchmark_not_candidate": True,
         "features": feature_cols,
         "selected_shadow_candidate": selected_label,
         "selected_shadow_pure_weight": shadow_weight,
@@ -309,21 +356,26 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
             float(selected_metrics.log_loss) - float(reference.log_loss), 8
         ),
         "published_reference": production_reference,
+        "market_timing_caveat": (
+            "Historical nflverse market fields are closing-line benchmarks; a 2026 T-120 shadow "
+            "must prove any blend before production promotion."
+        ),
         "promotion_authorized": False,
         "promotion_policy": (
-            "No production change from this report. A challenger must first pass leakage-safe "
-            "pre-2026 OOS gates and then prove itself on immutable 2026 shadow forecasts."
+            "No production change from this report. A challenger must pass leakage-safe pre-2026 "
+            "OOS gates and then prove itself on immutable 2026 shadow forecasts."
         ),
         "current_shadow_games": int(len(shadow)),
     }
     (out / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 
-    print("\n=== LEVLINE CHALLENGER: LEAKAGE-SAFE 2022-25 ===")
+    print("\n=== LEVLINE HYBRID CHALLENGER: LEAKAGE-SAFE 2022-25 ===")
     print(metrics[["candidate", "games", "winner_pct", "brier", "log_loss"]].to_string(index=False))
     print("\nselected shadow candidate:", selected_label)
     print("selected 2026 shadow pure/market weight:", f"{shadow_weight:.2f}/{1-shadow_weight:.2f}")
     print("selected calibration:", shadow_calibration)
     print("accuracy gain vs nested 75/25 (pp):", report["accuracy_gain_pp_vs_nested_75_25"])
+    print("minimum allowed PURE weight:", min(HYBRID_PURE_WEIGHTS))
     print("2026 outcomes used in fitting/tuning: 0")
     print("production outputs modified: 0")
     return report
