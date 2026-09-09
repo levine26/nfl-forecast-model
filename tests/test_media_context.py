@@ -31,7 +31,7 @@ class _Session:
             return _Response(
                 """<?xml version='1.0'?><rss><channel>
                 <item><title>Chiefs left tackle trending toward missing opener</title>
-                <link>https://example.com/cbs</link><description>Latest Kansas City injury update.</description>
+                <link>https://example.com/cbs</link><description>Latest Kansas City injury update without a Broncos reference.</description>
                 <pubDate>Tue, 08 Sep 2026 21:00:00 GMT</pubDate><source>CBS Sports</source></item>
                 </channel></rss>"""
             )
@@ -55,16 +55,19 @@ def _predictions() -> pd.DataFrame:
     ])
 
 
-def test_media_context_prioritizes_major_reporting_over_betting_noise(monkeypatch):
+def test_media_context_prioritizes_major_reporting_and_rejects_noise(monkeypatch):
     monkeypatch.delenv("X_BEARER_TOKEN", raising=False)
     monkeypatch.delenv("TWITTER_BEARER_TOKEN", raising=False)
     media, status = fetch_media_context(_predictions(), session=_Session(), lookback_days=3650)
     items = media["2026_01_DEN_KC"]
     assert items[0]["source_name"] == "ESPN"
-    assert any(item["source_name"] == "CBS Sports" for item in items)
+    assert all("Betting Blog" != item["source_name"] for item in items)
+    assert all("CBS Sports" != item["source_name"] for item in items)
     assert items[0]["metadata"]["substantive"] is True
+    assert items[0]["metadata"]["trusted_source"] is True
     assert status["games_with_reporting"] == 1
     assert status["games_with_substantive_reporting"] == 1
+    assert status["games_with_trusted_reporting"] == 1
     assert status["providers"]["x_recent_search"]["status"] == "unavailable"
 
 
