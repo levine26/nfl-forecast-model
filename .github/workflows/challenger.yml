@@ -7,20 +7,28 @@ on:
     paths:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
+      - 'src/nfl_forecast/challenger_shadow.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
+      - 'scripts/lock_challenger_shadow.py'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
+      - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
+      - '.github/workflows/challenger_shadow_lock.yml'
   pull_request:
     paths:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
+      - 'src/nfl_forecast/challenger_shadow.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
+      - 'scripts/lock_challenger_shadow.py'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
+      - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
+      - '.github/workflows/challenger_shadow_lock.yml'
   schedule:
     # Weekly research refresh after the prior NFL week is normally complete.
     - cron: '47 16 * * 2'
@@ -46,7 +54,7 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
       - name: Test challenger research logic
-        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py
+        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_shadow_lock.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -57,12 +65,39 @@ jobs:
       - name: Run leakage-safe challenger backtest
         run: |
           set -euo pipefail
+          mkdir -p /tmp/challenger-immutable
+          if [ -f challenger_outputs/prediction_history_shadow.csv ]; then
+            cp challenger_outputs/prediction_history_shadow.csv /tmp/challenger-immutable/
+          fi
           rm -rf challenger_outputs
           PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v06.py
+          if [ -f /tmp/challenger-immutable/prediction_history_shadow.csv ]; then
+            cp /tmp/challenger-immutable/prediction_history_shadow.csv challenger_outputs/
+          fi
+      - name: Precommit shadow forecast before T-120
+        env:
+          SHADOW_SOURCE_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import os
+          from pathlib import Path
+          import pandas as pd
+
+          path = Path('challenger_outputs/this_week_shadow.csv')
+          frame = pd.read_csv(path)
+          generated = datetime.now(timezone.utc).isoformat()
+          frame['shadow_generated_utc'] = generated
+          frame['shadow_source_sha'] = os.environ['SHADOW_SOURCE_SHA']
+          frame.to_csv(path, index=False)
+          print(f'shadow_generated_utc={generated}')
+          print(f'shadow_source_sha={os.environ["SHADOW_SOURCE_SHA"]}')
+          PY
       - name: Verify research firewall
         run: |
           python - <<'PY'
           import json
+          import pandas as pd
           from pathlib import Path
           report = json.loads(Path('challenger_outputs/report.json').read_text())
           assert report['status'] == 'healthy'
@@ -74,6 +109,9 @@ jobs:
           assert report['minimum_pure_weight'] >= 0.25
           assert report['2026_outcomes_used_in_fitting'] == 0
           assert report['production_outputs_modified'] == 0
+          shadow = pd.read_csv('challenger_outputs/this_week_shadow.csv')
+          assert shadow['shadow_generated_utc'].notna().all()
+          assert shadow['shadow_source_sha'].notna().all()
           print(json.dumps(report, indent=2))
           PY
       - name: Upload challenger evidence

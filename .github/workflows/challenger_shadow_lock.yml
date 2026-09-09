@@ -1,0 +1,78 @@
+name: LevLine challenger T-120 shadow lock
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - 'Pregame NFL refresh'
+      - 'Daily NFL model refresh'
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-challenger-shadow-lock
+  cancel-in-progress: false
+
+jobs:
+  shadow-lock:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Record immutable challenger shadow from production locks
+        run: |
+          set -euo pipefail
+          git config user.name 'levline-challenger-bot'
+          git config user.email 'actions@users.noreply.github.com'
+
+          for attempt in 1 2 3; do
+            if [ "$attempt" -gt 1 ]; then
+              echo "main advanced during shadow publication; rebuilding from current main (attempt $attempt/3)"
+              git reset --hard origin/main
+              git clean -fd challenger_outputs/
+            fi
+
+            if [ ! -f challenger_outputs/this_week_shadow.csv ]; then
+              echo 'No precommitted challenger shadow exists yet; nothing to lock.'
+              exit 0
+            fi
+            if [ ! -f outputs/prediction_history.csv ]; then
+              echo 'No production prediction history exists yet; nothing to lock.'
+              exit 0
+            fi
+
+            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+              python scripts/lock_challenger_shadow.py
+
+            git add challenger_outputs/prediction_history_shadow.csv
+            if git diff --cached --quiet; then
+              echo 'No new challenger shadow lock or grade to publish.'
+              exit 0
+            fi
+
+            git commit -m 'Record LevLine challenger T-120 shadow'
+            base_sha=$(git rev-parse HEAD^)
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+
+            git fetch origin main
+            if [ "$(git rev-parse origin/main)" = "$base_sha" ]; then
+              echo 'Push failed although main did not advance; refusing to mask a publish error.'
+              exit 1
+            fi
+          done
+
+          echo 'main changed during all three shadow-lock attempts; leaving existing shadow history untouched.'
+          exit 1
