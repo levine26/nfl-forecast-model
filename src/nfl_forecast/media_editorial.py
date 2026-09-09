@@ -164,7 +164,7 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
             sentences.append(
                 f"{matchup} puts {subject}'s prior {defense_name} meetings in context for the {offense_name}. "
                 f"{subject} must show that {offense_name} protection can answer {defense_name} pressure without leaning on {subject}'s old results. "
-                f"For {offense_name}, the key is keeping {subject} on schedule against {defense_name}; for {defense_name}, it is changing the coverage picture before {subject} can reuse earlier answers."
+                f"For {offense_name}, the key is keeping {subject} on schedule against {defense_name}; {defense_name}'s job is changing the look before {subject} can reuse earlier answers."
             )
         elif title:
             headline = f"{matchup}: {title}"
