@@ -1,0 +1,93 @@
+/* Restore the actual Sunday Signal identity and keep the landing hero concise. */
+
+.pub-logo{
+  width:44px;
+  height:44px;
+  border:0;
+  border-radius:0;
+  background:transparent url('/nfl-forecast-model/brand/sunday-signal-icon.svg') center/contain no-repeat;
+  color:transparent;
+  font-size:0;
+  overflow:hidden;
+}
+
+.pub-brand{
+  gap:13px;
+}
+
+.pub-brand b{
+  letter-spacing:.12em;
+}
+
+.pub-hero{
+  grid-template-columns:minmax(0,1.2fr) minmax(420px,.8fr);
+  gap:34px;
+  padding:30px 22px 24px;
+}
+
+.pub-hero>div:first-child::before{
+  content:"";
+  display:block;
+  width:min(420px,82vw);
+  aspect-ratio:920 / 260;
+  margin:0 0 14px;
+  background:url('/nfl-forecast-model/brand/sunday-signal-lockup.svg') left center/contain no-repeat;
+}
+
+.pub-hero>div:first-child>span{
+  display:block;
+  margin-top:2px;
+}
+
+.pub-hero h1{
+  margin:8px 0 8px;
+  max-width:760px;
+  font-size:0;
+  line-height:1;
+  letter-spacing:0;
+}
+
+.pub-hero h1::after{
+  content:"Week 1 NFL Forecasts";
+  display:block;
+  color:var(--text);
+  font-size:clamp(34px,3.7vw,54px);
+  line-height:1;
+  letter-spacing:-.045em;
+  font-weight:850;
+}
+
+.pub-hero p{
+  max-width:720px;
+  margin:0;
+  font-size:0;
+  line-height:1.55;
+}
+
+.pub-hero p::after{
+  content:"LevLine probabilities, market edges, and matchup analysis for every game.";
+  display:block;
+  color:#91a3b2;
+  font-size:14px;
+  line-height:1.55;
+}
+
+@media (max-width: 900px){
+  .pub-hero{
+    grid-template-columns:1fr;
+    gap:20px;
+    padding-top:24px;
+  }
+
+  .pub-hero>div:first-child::before{
+    width:min(360px,88vw);
+  }
+}
+
+@media (max-width: 560px){
+  .pub-brand>span:last-child b{font-size:13px}
+  .pub-brand>span:last-child small{font-size:9px}
+  .pub-logo{width:38px;height:38px}
+  .pub-hero h1::after{font-size:36px}
+  .pub-hero p::after{font-size:13px}
+}
