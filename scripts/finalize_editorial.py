@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 from pathlib import Path
+import re
 
 import pandas as pd
 
@@ -10,6 +12,84 @@ from nfl_forecast.copilot_media import apply_copilot_reads
 from nfl_forecast.editorial_finalize import finalize_previews
 from nfl_forecast.media_context import fetch_media_context
 from nfl_forecast.media_editorial import rewrite_reads_with_media
+
+
+_GENERIC_VISIBLE_TITLE_SIGNALS = (
+    "preview",
+    "predictions",
+    "prediction",
+    "picks",
+    "how to watch",
+    "what to watch",
+    "sizing up",
+    "power rankings",
+    "week 1 matchup",
+    "week one matchup",
+    "starting lineup",
+)
+
+
+def _title_key(item: dict) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(item.get("title") or "").lower()).strip()
+
+
+def _is_generic_visible_title(item: dict) -> bool:
+    title = _title_key(item)
+    return any(signal in title for signal in _GENERIC_VISIBLE_TITLE_SIGNALS)
+
+
+def _display_media(media: dict[str, list[dict]]) -> tuple[dict[str, list[dict]], dict[str, int]]:
+    """Choose game-specific reporting for visible fallback prose.
+
+    Roundups and generic preview stories remain available as provenance, but the same
+    article can never be rendered into multiple game Reads. Prefer substantive,
+    trusted, unique stories; then relax those preferences only as needed for coverage.
+    """
+    counts = Counter(
+        key
+        for items in media.values()
+        for item in items
+        if (key := _title_key(item))
+    )
+    out: dict[str, list[dict]] = {}
+    generic_rejected = 0
+    cross_game_rejected = 0
+
+    for game_id, items in media.items():
+        candidates = []
+        for item in items:
+            key = _title_key(item)
+            if not key:
+                continue
+            if counts[key] > 1:
+                cross_game_rejected += 1
+                continue
+            if _is_generic_visible_title(item):
+                generic_rejected += 1
+                continue
+            candidates.append(item)
+
+        def rank(item: dict) -> tuple[bool, bool, float]:
+            meta = item.get("metadata") or {}
+            try:
+                score = float(meta.get("editorial_score") or meta.get("source_priority") or 0)
+            except Exception:
+                score = 0.0
+            return (
+                bool(meta.get("trusted_source")),
+                bool(meta.get("substantive")),
+                score,
+            )
+
+        candidates.sort(key=rank, reverse=True)
+        if candidates:
+            out[game_id] = candidates
+
+    return out, {
+        "games_with_display_reporting": len(out),
+        "generic_titles_rejected": generic_rejected,
+        "cross_game_titles_rejected": cross_game_rejected,
+    }
 
 
 def main() -> None:
@@ -30,10 +110,13 @@ def main() -> None:
     evidence = json.loads(evidence_path.read_text())
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
 
-    # Deterministic fail-safe: discover/filter current reporting and build a source-first
-    # Read. This layer remains available even if Copilot is unavailable or invalid.
+    # Deterministic fail-safe: discover current reporting, then allow only unique,
+    # game-specific stories into visible prose. Generic preview/roundup articles stay
+    # as research provenance but cannot become repeated public copy.
     media, media_status = fetch_media_context(predictions, timeout=8)
-    previews = rewrite_reads_with_media(previews, predictions, evidence, media)
+    display_media, display_status = _display_media(media)
+    media_status.update(display_status)
+    previews = rewrite_reads_with_media(previews, predictions, evidence, display_media)
     status["media_reporting"] = media_status
 
     # Primary human-synthesis layer: only a separately validated Copilot artifact may
