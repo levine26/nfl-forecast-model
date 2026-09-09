@@ -9,9 +9,17 @@ import pandas as pd
 
 def _num(value):
     try:
-        return round(float(value), 4)
+        value = float(value)
+        return None if pd.isna(value) else round(value, 4)
     except Exception:
         return None
+
+
+def _pick_probability(row: pd.Series, field: str) -> float | None:
+    value = _num(row.get(field))
+    if value is None:
+        return None
+    return round(value if str(row.get("pick")) == str(row.get("home_team")) else 1.0 - value, 4)
 
 
 def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
@@ -30,7 +38,7 @@ def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
 
     football = []
     for item in evidence.get(gid, []) if isinstance(evidence, dict) else []:
-        if len(football) >= 7:
+        if len(football) >= 8:
             break
         if not isinstance(item, dict):
             continue
@@ -44,6 +52,8 @@ def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
             "family": family,
             "title": item.get("title"),
             "summary": item.get("summary"),
+            "advantage_team": item.get("advantage_team"),
+            "strength": strength,
             "source_name": item.get("source_name"),
             "source_url": item.get("source_url"),
         })
@@ -57,10 +67,15 @@ def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
         "away_team": str(row.get("away_team")),
         "home_team": str(row.get("home_team")),
         "levline_pick": str(row.get("pick")),
-        "final_home_probability": _num(row.get("final_home_prob")),
-        "pure_home_probability": _num(row.get("pure_home_prob")),
-        "market_home_probability": _num(row.get("market_home_prob")),
+        "levline_pick_probability": _pick_probability(row, "final_home_prob"),
+        "pure_pick_probability": _pick_probability(row, "pure_home_prob"),
+        "market_pick_probability": _pick_probability(row, "market_home_prob"),
+        "expected_margin_home": _num(row.get("expected_margin")),
+        "market_spread_home": _num(row.get("spread_line")),
         "projected_score": str(row.get("projected_score") or ""),
+        "confidence": str(row.get("confidence") or ""),
+        "model_version": str(row.get("model_version") or ""),
+        "production_blend": "75% PURE / 25% MARKET",
         "discovered_reporting": reported[:6],
         "verified_football_context": football,
     }
@@ -77,34 +92,46 @@ def main() -> None:
     evidence = json.loads((out / "contextual_evidence.json").read_text())
     packets = [_packet(row, previews, evidence) for _, row in predictions.iterrows()]
 
-    prompt = """You are the senior NFL editor for Sunday Signal. Research and write the public pregame Read for every game in the packet below.
+    prompt = """You are the senior NFL preview writer for Sunday Signal. Research and write the public game preview for every game below.
 
-GOAL
-Write like a strong human NFL preview writer, not a model explaining itself and not a search-results summary. The opening sentence should identify the actual football/news story of the matchup: a quarterback change, injury, coaching transition, rivalry angle, schematic stress point, travel/event context, or another concrete reason a fan should care. Use the supplied reporting as a research lead, then verify and improve it with current approved-domain reporting. The LevLine probabilities are background context only.
+THIS IS A MATCHUP PREVIEW, NOT A NEWS ROUNDUP.
+Every Read must contain exactly TWO paragraphs with different jobs.
+
+PARAGRAPH 1 — THE MATCHUP
+Write 55-100 words explaining how the game is likely to be decided. Identify the actual football tension: quarterback situation, protection/pass rush, coverage matchup, explosive plays, early-down efficiency, run-game leverage, injuries, coaching changes, travel/weather, or another concrete factor. Current reporting should inform the paragraph, but NEVER copy article headlines into prose and NEVER write "according to [outlet]" sentence after sentence. Synthesize the reporting into one coherent preview. The paragraph must discuss both teams and explain what each side needs to do.
+
+PARAGRAPH 2 — WHY LEVLINE PICKS THIS SIDE
+Write 60-110 words explaining the model decision explicitly. State LevLine's win probability for the picked team. Explain the 75% PURE / 25% MARKET blend using the supplied PURE and market pick-side probabilities when both exist. State the projected margin/model line and projected score when supplied, and compare the model line with the market spread when useful. Tie those numbers to one or two verified football factors from the packet so the paragraph answers WHY the model lands where it does. Do not pretend a factor is a model feature unless the packet says it is; describe it as contextual support when appropriate. The FINAL SENTENCE MUST be exactly: "The pick: <picked team name> moneyline."
+
+VOICE
+- Human NFL analyst: clear, confident, conversational, specific.
+- No database labels such as "DEN-KC market gap" or "player history context."
+- No headline dumps, SEO language, TV/live-stream information, or generic betting-copy filler.
+- Avoid phrases such as "coverage highlights", "pressure note", "history note", "the cleanest lens", "the hinge", "the matchup file", "strip away the probability", "consensus pricing and the football-only model tell different versions", or "keeps enough of that split visible to matter".
+- Do not write raw source headlines followed by "according to".
+- Do not use PURE as a mysterious standalone noun. Explain it naturally as Sunday Signal's football-only model component.
+- Do not invent injuries, roster facts, statistics, model inputs, source URLs, or causal claims.
+- Paraphrase reporting. Quotes should be avoided unless necessary.
+- Vary sentence structure across the slate.
 
 RESEARCH PRIORITY
 1. ESPN / ESPN NFL Nation
 2. The Athletic / New York Times
-3. NFL.com and official NFL/team reporting available through approved domains
-4. Associated Press, CBS Sports, Yahoo Sports, NBC Sports, FOX Sports, Sports Illustrated
-5. Credible public X/Twitter reporting when accessible and attributable
-Prefer the last 7 days, and the last 48 hours for injuries, starters and availability. Use at least two independent current sources per game whenever possible. Never invent a fact, roster move, injury status, quote, statistic or source URL.
-
-WRITING RULES
-- 85-145 words per Read, normally 3-5 sentences.
-- Natural sportswriter voice with concrete people, stakes and tension.
-- Synthesize; never write phrases such as 'coverage highlights', 'pressure note', 'history note', 'PURE has', 'start with', 'the cleanest lens', 'the hinge', 'the case for', 'the matchup file', or 'strip away the probability'.
-- Do not dump EPA/sack/explosive rates. Use at most one compact quantitative sentence when it genuinely explains the story.
-- Do not mimic source prose or quote more than a few words; paraphrase.
-- Make uncertainty explicit: expected, questionable, competition, trending, etc.
-- Vary sentence structure and openings across the slate.
-- Mention LevLine only if its disagreement with the broader consensus materially sharpens the story; keep it to one natural closing clause.
-- Do not change, recalculate, or recommend changes to LevLine probabilities.
+3. NFL.com / official team reporting
+4. AP, CBS Sports, Yahoo Sports, NBC Sports, FOX Sports, Sports Illustrated
+5. Credible attributable public X/Twitter reporting when accessible
+Prefer the last 7 days, and the last 48 hours for injuries/starters/availability. Use at least two independent approved-domain sources per game whenever possible.
 
 OUTPUT
-Return ONLY valid JSON, no Markdown and no commentary, with exactly this schema:
-{"games":{"GAME_ID":{"headline":"...","read":"...","sources":[{"name":"ESPN","title":"article/report title","url":"https://..."},{"name":"NFL.com","title":"...","url":"https://..."}]}}}
-Every supplied game_id must appear exactly once. Source URLs must be real URLs you actually used. Use two or more approved-domain sources per game whenever available.
+Return ONLY one syntactically valid JSON object, no Markdown and no commentary, with exactly this schema:
+{"games":{"GAME_ID":{"headline":"matchup-oriented headline","paragraph1":"...","paragraph2":"...","sources":[{"name":"ESPN","title":"article/report title","url":"https://..."},{"name":"NFL.com","title":"...","url":"https://..."}]}}}
+Every supplied game_id must appear exactly once.
+
+CRITICAL SERIALIZATION RULES
+- The response must parse with a standard JSON parser exactly as returned.
+- Use JSON double quotes only as delimiters. Escape every literal double quote inside strings, or paraphrase/remove it.
+- Do not use trailing commas, comments, Markdown fences, concatenated objects, or truncated game objects.
+- Before returning, internally verify every object/array is closed and every property is comma-separated.
 
 GAME PACKET
 """ + json.dumps({"games": packets}, indent=2)
