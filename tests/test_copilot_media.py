@@ -14,13 +14,14 @@ def _predictions():
     ])
 
 
-def _generated(path: Path):
+def _generated(path: Path, generated_utc: str | None = None):
+    stamp = generated_utc or pd.Timestamp.now(tz="UTC").isoformat()
     path.write_text(json.dumps({
         "games": {
             "2026_01_DEN_KC": {
                 "headline": "Mahomes returns, but Denver can test Kansas City's protection immediately",
                 "read": "Patrick Mahomes is expected back for Kansas City, but the opener still starts with a protection question against Denver's front. The Broncos have enough pass-rush speed to make the Chiefs prove their line is settled before the rest of the offense can breathe. Kansas City still owns the higher-end quarterback answer, while Denver has a cleaner path to disruption than the public number suggests. That tension is the game, not a generic Week 1 power-rating argument.",
-                "generated_utc": "2026-09-09T12:00:00+00:00",
+                "generated_utc": stamp,
                 "sources": [
                     {"name": "ESPN", "title": "Mahomes expected to start", "url": "https://www.espn.com/nfl/story/example"},
                     {"name": "CBS Sports", "title": "Chiefs line update", "url": "https://www.cbssports.com/nfl/example"},
@@ -56,3 +57,27 @@ def test_missing_copilot_artifact_leaves_fallback_untouched(tmp_path: Path):
     assert status["status"] == "unavailable"
     assert status["games_applied"] == 0
     assert result["2026_01_DEN_KC"]["headline"] == "fallback"
+
+
+def test_newer_reporting_blocks_older_copilot_overlay(tmp_path: Path):
+    generated = tmp_path / "copilot.json"
+    now = pd.Timestamp.now(tz="UTC")
+    _generated(generated, (now - pd.Timedelta(minutes=30)).isoformat())
+    previews = {
+        "2026_01_DEN_KC": {
+            "headline": "fresh fallback headline",
+            "paragraphs": ["Fresh deterministic reporting says the starter situation changed."],
+            "reported_sources": [
+                {
+                    "source_name": "ESPN",
+                    "source_url": "https://www.espn.com/nfl/story/fresh",
+                    "title": "New starter update",
+                    "as_of": (now - pd.Timedelta(minutes=5)).isoformat(),
+                }
+            ],
+        }
+    }
+    result, status = apply_copilot_reads(previews, _predictions(), generated)
+    assert status["games_applied"] == 0
+    assert status["skipped"]["2026_01_DEN_KC"] == "newer_reporting_available"
+    assert result["2026_01_DEN_KC"]["headline"] == "fresh fallback headline"
