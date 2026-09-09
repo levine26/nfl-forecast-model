@@ -24,22 +24,6 @@ ALLOWED_DOMAINS = {
     "cbssports.com", "sports.yahoo.com", "yahoo.com", "nbcsports.com",
     "foxsports.com", "si.com", "x.com", "twitter.com",
 }
-SOURCE_HOMES = {
-    "espn": "https://www.espn.com/nfl/",
-    "nfl.com": "https://www.nfl.com/",
-    "nfl network": "https://www.nfl.com/",
-    "the athletic": "https://www.nytimes.com/athletic/nfl/",
-    "new york times": "https://www.nytimes.com/athletic/nfl/",
-    "nytimes": "https://www.nytimes.com/athletic/nfl/",
-    "associated press": "https://apnews.com/hub/nfl",
-    "ap news": "https://apnews.com/hub/nfl",
-    "cbs sports": "https://www.cbssports.com/nfl/",
-    "yahoo sports": "https://sports.yahoo.com/nfl/",
-    "nbc sports": "https://www.nbcsports.com/nfl",
-    "profootballtalk": "https://www.nbcsports.com/nfl/profootballtalk",
-    "fox sports": "https://www.foxsports.com/nfl",
-    "sports illustrated": "https://www.si.com/nfl",
-}
 
 
 def _extract_json(text: str) -> dict:
@@ -87,15 +71,14 @@ def _domain_family(url: str) -> str:
     return host
 
 
-def _source_home(name: str) -> str:
-    lowered = str(name or "").lower()
-    for needle, url in SOURCE_HOMES.items():
-        if needle in lowered:
-            return url
-    return ""
+def _canonical_url(url: str, name: str = "", publisher_url: str = "") -> str:
+    """Return only a direct approved URL or a resolvable Bing target.
 
-
-def _canonical_url(url: str, name: str, publisher_url: str = "") -> str:
+    Publisher homepages are intentionally not substituted for missing article URLs:
+    if provenance cannot be tied to a direct approved URL, it must fail closed in
+    the downstream two-independent-source gate.
+    """
+    del name, publisher_url  # retained in the signature for a stable call surface
     raw = str(url or "").strip()
     if _domain_allowed(raw):
         return raw
@@ -106,11 +89,7 @@ def _canonical_url(url: str, name: str, publisher_url: str = "") -> str:
         target = unquote(target)
         if _domain_allowed(target):
             return target
-
-    publisher = str(publisher_url or "").strip()
-    if _domain_allowed(publisher):
-        return publisher
-    return _source_home(name)
+    return ""
 
 
 def _team_name(code: str) -> str:
@@ -187,7 +166,6 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     away = str(row.get("away_team"))
     home = str(row.get("home_team"))
     pick = str(row.get("pick"))
-    opponent = away if pick == home else home
     pick_name = _team_name(pick)
     pick_nick = _nick(pick)
 
@@ -204,7 +182,7 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     if pure_prob is not None and market_prob is not None:
         sentences.append(
             f"For the {pick_nick}, football-only PURE is {pure_prob * 100:.1f}% and the market view is "
-            f"{market_prob * 100:.1f}%; Sunday Signal weights the {pick_nick} result at 75% PURE / 25% MARKET."
+            f"{market_prob * 100:.1f}%; Sunday Signal's {pick_nick} blend is 75% PURE / 25% MARKET."
         )
 
     line_bits: list[str] = []
@@ -230,7 +208,6 @@ def _source_candidates(entry: dict, preview: dict, evidence_items: list[dict]) -
                 "name": source.get("name"),
                 "title": source.get("title"),
                 "url": source.get("url"),
-                "publisher_url": source.get("publisher_url"),
             })
     for source in preview.get("reported_sources") or []:
         if isinstance(source, dict):
@@ -238,7 +215,6 @@ def _source_candidates(entry: dict, preview: dict, evidence_items: list[dict]) -
                 "name": source.get("source_name"),
                 "title": source.get("title"),
                 "url": source.get("source_url"),
-                "publisher_url": source.get("publisher_url"),
             })
     for source in evidence_items:
         if not isinstance(source, dict):
@@ -250,7 +226,6 @@ def _source_candidates(entry: dict, preview: dict, evidence_items: list[dict]) -
             "name": source.get("source_name"),
             "title": source.get("title"),
             "url": source.get("source_url"),
-            "publisher_url": meta.get("publisher_url"),
         })
     return rows
 
@@ -264,7 +239,7 @@ def _canonical_sources(entry: dict, preview: dict, evidence_items: list[dict]) -
         title = _clean_text(source.get("title"))
         if not name or not title:
             continue
-        url = _canonical_url(source.get("url") or "", name, source.get("publisher_url") or "")
+        url = _canonical_url(source.get("url") or "", name)
         if not url or not _domain_allowed(url):
             continue
         family = _domain_family(url)
