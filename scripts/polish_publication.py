@@ -181,6 +181,47 @@ def rewrite_previews(predictions: pd.DataFrame, previews: dict[str, dict], evide
         supporting = _best(items, lambda item: _advantage(item) == pick and _family(item) not in {"rivalry", "international_event", "international_travel"})
         counter = _best(items, lambda item: _advantage(item) == opponent and _family(item) not in {"rivalry", "international_event", "international_travel"})
 
+        # `run_context.py` now produces a slate-aware, game-specific public voice.
+        # Do not replace that copy downstream with raw evidence summaries, which
+        # can share template tails across games. Story-desk still owns genuinely
+        # special event/rivalry promotion and notebook enrichment.
+        if bool((preview.get("editorial_voice") or {}).get("game_specific")):
+            special_first = None
+            if event and {away, home} == {"SF", "LA"}:
+                preview["headline"] = "Rams-49ers takes a 154-game rivalry to Melbourne"
+                special_first = (
+                    "The Rams and 49ers have played 154 times, but never like this. Their season opens at the Melbourne Cricket Ground in the NFL's first regular-season game in Australia, "
+                    "after the longest single-game city-to-city travel haul in league history. San Francisco leads the all-time series 79-72-3, so the opponent is familiar even if almost everything around the game is new."
+                )
+            # Ordinary rivalry notes stay in the notebook/detail layer; only a
+            # genuinely exceptional event story may replace the slate-aware lead.
+
+            if special_first:
+                paragraphs = list(preview.get("paragraphs") or [])
+                if paragraphs:
+                    paragraphs[0] = special_first.strip()
+                else:
+                    paragraphs = [special_first.strip()]
+                preview["paragraphs"] = paragraphs
+
+            notebook = list(preview.get("notebook") or [])
+            existing_titles = {str(item.get("title") or "") for item in notebook}
+            for item in (event, rivalry, travel):
+                if not item:
+                    continue
+                title = _expand(item.get("title") or "Notebook")
+                if title in existing_titles:
+                    continue
+                notebook.append({
+                    "title": title,
+                    "summary": _expand(item.get("summary") or ""),
+                    "source_url": item.get("source_url"),
+                })
+                existing_titles.add(title)
+            preview["notebook"] = notebook[:5]
+            preview["editorial_version"] = "story-desk-v3"
+            continue
+
         final_pick = _pick_prob(row, "final_home_prob")
         pure_pick = _pick_prob(row, "pure_home_prob")
         market_pick = _pick_prob(row, "market_home_prob")

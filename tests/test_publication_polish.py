@@ -79,3 +79,55 @@ def test_provenance_grades_conflict_fails_closed():
     assert provenance_grade(official=True) == "B"
     assert provenance_grade(derived=True) == "C"
     assert provenance_grade(independent_sources=2, conflict=True) == "HOLD"
+
+
+def test_story_desk_preserves_game_specific_voice_outside_special_story():
+    predictions = pd.DataFrame([{
+        "game_id":"g","away_team":"AAA","home_team":"BBB","pick":"BBB",
+        "final_home_prob":.61,"pure_home_prob":.62,"market_home_prob":.58,"model_disagreement":.04,
+    }])
+    evidence = {"g": [
+        {"category":"scheme","title":"AAA protection vs BBB pass rush","summary":"AAA gave up sacks on 8.0% of pass plays; BBB got home on 9.0%. If this turns into an obvious-passing-down game, that matchup gets loud fast.","strength":"Strong","sample_size":400,"metadata":{"family":"pressure","advantage_team":"BBB"}},
+        {"category":"scheme","title":"BBB explosives vs AAA prevention","summary":"BBB owns a separate explosive-play edge.","strength":"Strong","sample_size":400,"metadata":{"family":"explosives","advantage_team":"BBB"}},
+    ]}
+    previews = {"g": {
+        "headline":"AAA protection vs BBB pass rush",
+        "paragraphs":["A deliberately game-specific Read.", "A market paragraph that must survive."],
+        "case_for_pick":"BBB's case is already composed for this matchup.",
+        "case_for_opponent":"AAA's countercase is already composed for this matchup.",
+        "what_could_make_us_wrong":"A matchup-specific failure mode.",
+        "editorial_voice":{"game_specific":True,"slate_aware":True},
+    }}
+    rewrite_previews(predictions, previews, evidence)
+    preview = previews["g"]
+    assert preview["paragraphs"] == ["A deliberately game-specific Read.", "A market paragraph that must survive."]
+    assert preview["case_for_pick"] == "BBB's case is already composed for this matchup."
+    assert preview["case_for_opponent"] == "AAA's countercase is already composed for this matchup."
+    assert "obvious-passing-down" not in " ".join([preview["case_for_pick"], preview["case_for_opponent"]])
+
+
+def test_story_desk_can_promote_special_event_without_overwriting_cases():
+    predictions = pd.DataFrame([{
+        "game_id":"2026_01_SF_LA","away_team":"SF","home_team":"LA","pick":"LA",
+        "final_home_prob":.70,"pure_home_prob":.72,"market_home_prob":.64,"model_disagreement":.04,
+    }])
+    evidence = {"2026_01_SF_LA": [
+        {"category":"travel","title":"Australia","summary":"First NFL regular-season game in Australia.","strength":"Strong","metadata":{"family":"international_event"}},
+        {"category":"history","title":"Rivalry","summary":"San Francisco leads the all-time series 79-72-3.","strength":"Strong","sample_size":154,"metadata":{"family":"rivalry"}},
+        {"category":"scheme","title":"LA explosives vs SF","summary":"LA created more explosive passes in the relevant sample.","strength":"Strong","sample_size":700,"metadata":{"family":"explosives","advantage_team":"LA"}},
+    ]}
+    previews = {"2026_01_SF_LA": {
+        "headline":"Matthew Stafford vs SF: player history",
+        "paragraphs":["Original game-specific lead.", "Original market paragraph."],
+        "case_for_pick":"Keep the LA case.",
+        "case_for_opponent":"Keep the SF case.",
+        "what_could_make_us_wrong":"Keep the failure mode.",
+        "editorial_voice":{"game_specific":True,"slate_aware":True},
+    }}
+    rewrite_previews(predictions, previews, evidence)
+    preview = previews["2026_01_SF_LA"]
+    assert preview["headline"] == "Rams-49ers takes a 154-game rivalry to Melbourne"
+    assert "Melbourne Cricket Ground" in preview["paragraphs"][0]
+    assert preview["paragraphs"][1] == "Original market paragraph."
+    assert preview["case_for_pick"] == "Keep the LA case."
+    assert preview["case_for_opponent"] == "Keep the SF case."
