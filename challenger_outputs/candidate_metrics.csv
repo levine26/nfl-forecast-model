@@ -1,18 +1,18 @@
 candidate,games,winner_pct,brier,log_loss,feature_set,eligible_shadow,method,pure_weight,market_weight,objective,calibration,shadow_exclusion
-Nested PURE,1087,0.6448942042318307,0.2238525684270264,0.6389457813116113,production_compatible,True,pure,,,,,
+Nested PURE,1087,0.6448942042318307,0.2238525683457865,0.638945781133835,production_compatible,True,pure,,,,,
 Market only benchmark,1087,0.6761729530818767,0.2101992905677052,0.6076472081285538,market,False,market,,,,,
-Nested 75% PURE / 25% MARKET,1087,0.6586936522539099,0.2185918793232553,0.6274023588149715,production_compatible,True,fixed,0.75,0.25,,,
-Opponent-adjusted Nested PURE,1087,0.6430542778288868,0.22436004224682152,0.6399735823331726,opponent_adjusted,True,pure,,,,,
-Opponent-adjusted 75% PURE / 25% MARKET,1087,0.6550137994480221,0.2188151399078269,0.6278347128261849,opponent_adjusted,True,fixed,0.75,0.25,,,
-Hybrid adaptive Brier,1087,0.6752529898804048,0.21176524039359468,0.6117693714209961,production_compatible,True,linear,,,brier,none,
-Logit hybrid adaptive Brier,1087,0.6761729530818767,0.2116090821408968,0.6112492763037187,production_compatible,True,logit,,,brier,none,
-Logit hybrid + Platt,1087,0.6678932842686293,0.21192391108331854,0.6119079930618045,production_compatible,False,logit,,,brier,platt,calibration transform not persisted for exact T-120 replay
-Logit hybrid adaptive accuracy,1087,0.6669733210671573,0.21349743821124692,0.6157063013941183,production_compatible,True,logit,,,accuracy,none,
-Market-confidence hybrid,1087,0.6734130634774609,0.21235328968310146,0.6130452561181584,production_compatible,False,confidence,,,brier,none,T-120 market regime can differ from precommit regime
-Agreement-aware hybrid,1087,0.6669733210671573,0.21196169061879452,0.6121618940166085,production_compatible,False,agreement,,,brier,none,T-120 agreement regime can differ from precommit regime
-Opponent-adjusted Hybrid adaptive Brier,1087,0.6761729530818767,0.21173476406826874,0.6117147413077004,opponent_adjusted,True,linear,,,brier,none,
-Opponent-adjusted Logit hybrid adaptive Brier,1087,0.6761729530818767,0.2115665482648626,0.6111674844349007,opponent_adjusted,True,logit,,,brier,none,
-Opponent-adjusted Logit hybrid + Platt,1087,0.6678932842686293,0.21187059833570426,0.6118138985773661,opponent_adjusted,False,logit,,,brier,platt,calibration transform not persisted for exact T-120 replay
-Opponent-adjusted Logit hybrid adaptive accuracy,1087,0.6651333946642134,0.21509457313490338,0.6191855866508451,opponent_adjusted,True,logit,,,accuracy,none,
-Opponent-adjusted Market-confidence hybrid,1087,0.6752529898804048,0.21265914825028634,0.6136784502377861,opponent_adjusted,False,confidence,,,brier,none,T-120 market regime can differ from precommit regime
-Opponent-adjusted Agreement-aware hybrid,1087,0.6734130634774609,0.21208706089397622,0.6124353082666476,opponent_adjusted,False,agreement,,,brier,none,T-120 agreement regime can differ from precommit regime
+Nested 75% PURE / 25% MARKET,1087,0.6586936522539099,0.21859187926590426,0.6274023586900879,production_compatible,True,fixed,0.75,0.25,,,
+Opponent-adjusted Nested PURE,1087,0.6430542778288868,0.22435969776062242,0.6399729951037921,opponent_adjusted,True,pure,,,,,
+Opponent-adjusted 75% PURE / 25% MARKET,1087,0.6550137994480221,0.21881491461301777,0.6278342329451788,opponent_adjusted,True,fixed,0.75,0.25,,,
+Hybrid adaptive Brier,1087,0.6752529898804048,0.21176524037686364,0.6117693713854481,production_compatible,True,linear,,,brier,none,
+Logit hybrid adaptive Brier,1087,0.6761729530818767,0.21160908212368731,0.6112492762671563,production_compatible,True,logit,,,brier,none,
+Logit hybrid + Platt,1087,0.6678932842686293,0.2119239110651913,0.6119079930235529,production_compatible,False,logit,,,brier,platt,calibration transform not persisted for exact T-120 replay
+Logit hybrid adaptive accuracy,1087,0.6669733210671573,0.21349743819444372,0.6157063013584744,production_compatible,True,logit,,,accuracy,none,
+Market-confidence hybrid,1087,0.6734130634774609,0.2123532896654219,0.613045256080518,production_compatible,False,confidence,,,brier,none,T-120 market regime can differ from precommit regime
+Agreement-aware hybrid,1087,0.6669733210671573,0.21196169060277403,0.6121618939824786,production_compatible,False,agreement,,,brier,none,T-120 agreement regime can differ from precommit regime
+Opponent-adjusted Hybrid adaptive Brier,1087,0.6761729530818767,0.21173471101655916,0.6117146097509125,opponent_adjusted,True,linear,,,brier,none,
+Opponent-adjusted Logit hybrid adaptive Brier,1087,0.6761729530818767,0.2115665236104425,0.6111674278225977,opponent_adjusted,True,logit,,,brier,none,
+Opponent-adjusted Logit hybrid + Platt,1087,0.6678932842686293,0.2118706101254656,0.6118139635215968,opponent_adjusted,False,logit,,,brier,platt,calibration transform not persisted for exact T-120 replay
+Opponent-adjusted Logit hybrid adaptive accuracy,1087,0.6651333946642134,0.21509443180190357,0.6191853149084591,opponent_adjusted,True,logit,,,accuracy,none,
+Opponent-adjusted Market-confidence hybrid,1087,0.6752529898804048,0.2126590041227415,0.613678160192334,opponent_adjusted,False,confidence,,,brier,none,T-120 market regime can differ from precommit regime
+Opponent-adjusted Agreement-aware hybrid,1087,0.6734130634774609,0.2120870566378421,0.6124352744010673,opponent_adjusted,False,agreement,,,brier,none,T-120 agreement regime can differ from precommit regime
