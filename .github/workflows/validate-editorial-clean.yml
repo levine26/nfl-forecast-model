@@ -1,0 +1,56 @@
+name: Validate clean editorial patch
+on:
+  push:
+    branches: [editorial/game-specific-voice-clean]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/game-specific-voice-clean
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install '.[dev]'
+      - name: Regenerate editorial layer from latest main outputs
+        run: |
+          PYTHONPATH="$PWD/src" python - <<'PY'
+          import json
+          from pathlib import Path
+          import pandas as pd
+          from nfl_forecast.editorial_voice import polish_preview_slate
+          from nfl_forecast.editorial_finalize import finalize_previews
+
+          previews_path = Path('outputs/game_previews.json')
+          previews = json.loads(previews_path.read_text())
+          evidence = json.loads(Path('outputs/contextual_evidence.json').read_text())
+          predictions = pd.read_csv('outputs/this_week.csv')
+          previews = polish_preview_slate(previews, predictions)
+          report = finalize_previews(predictions, previews, evidence)
+          previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + '\n')
+          print(report)
+          PY
+      - run: pytest -q
+      - name: Build dashboard with regenerated previews
+        run: |
+          mkdir -p site/public/data
+          cp outputs/game_previews.json site/public/data/game_previews.json
+          cd site
+          npm install
+          npm run build
+      - name: Commit only regenerated preview output
+        run: |
+          git config user.name "sunday-signal-editorial-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/validate-editorial-clean.yml
+          git add outputs/game_previews.json
+          git commit -m "Regenerate evidence-specific game previews"
+          git push origin HEAD:editorial/game-specific-voice-clean
