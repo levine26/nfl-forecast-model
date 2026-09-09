@@ -21,6 +21,7 @@ jobs:
           node-version: 20
       - run: pip install pandas
       - run: python scripts/patch_game_specific_voice.py
+      - run: python scripts/patch_qb_history_voice.py
       - name: Regenerate editorial layer and run uniqueness gate
         run: |
           PYTHONPATH="$PWD/src" python - <<'PY'
@@ -51,7 +52,7 @@ jobs:
         run: |
           git config user.name "sunday-signal-editorial-bot"
           git config user.email "actions@users.noreply.github.com"
-          rm scripts/patch_game_specific_voice.py .github/workflows/patch-game-specific-voice.yml
+          rm scripts/patch_game_specific_voice.py scripts/patch_qb_history_voice.py .github/workflows/patch-game-specific-voice.yml
           git add -A
           git commit -m "Make every game file evidence-specific"
           git push origin HEAD:editorial/game-specific-voice
