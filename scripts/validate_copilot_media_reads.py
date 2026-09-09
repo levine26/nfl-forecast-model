@@ -12,12 +12,8 @@ import pandas as pd
 import json_repair
 
 from nfl_forecast.context import TEAM_META
+from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
-ALLOWED_DOMAINS = {
-    "espn.com", "nfl.com", "nytimes.com", "theathletic.com", "apnews.com",
-    "cbssports.com", "sports.yahoo.com", "yahoo.com", "nbcsports.com",
-    "foxsports.com", "si.com", "x.com", "twitter.com",
-}
 BANNED = (
     "coverage highlights", "pressure note", "history note", "pure has",
     "start with", "the cleanest lens", "the hinge", "the case for",
@@ -80,7 +76,7 @@ def _host(url: str) -> str:
 
 def _domain_allowed(url: str) -> bool:
     host = _host(url)
-    return any(host == domain or host.endswith("." + domain) for domain in ALLOWED_DOMAINS)
+    return any(host == domain or host.endswith("." + domain) for domain in APPROVED_MEDIA_DOMAINS)
 
 
 def _domain_family(url: str) -> str:

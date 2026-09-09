@@ -8,6 +8,7 @@ on:
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/copilot_media.py"
+      - "src/nfl_forecast/source_policy.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_copilot_media_prompt.py"
       - "scripts/compose_copilot_media_reads.py"
@@ -102,26 +103,28 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          mapfile -t approved_domains < <(python - <<'PY'
+          from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
+          for domain in sorted(APPROVED_MEDIA_DOMAINS):
+              print(domain)
+          PY
+          )
+          copilot_args=(
+            -s
+            --no-ask-user
+            "--deny-tool=shell,write"
+            "--allow-tool=url"
+          )
+          for domain in "${approved_domains[@]}"; do
+            copilot_args+=("--allow-url=$domain")
+          done
+          echo "Copilot approved source domains: ${#approved_domains[@]}"
+
           validated=0
           for attempt in 1 2 3; do
             echo "Copilot editorial attempt $attempt/3"
             rm -f /tmp/copilot-media-raw.txt /tmp/copilot-media-composed.json outputs/copilot_media_reads.json
-            if copilot -s -p "$(cat /tmp/sunday-signal-media-prompt.txt)" \
-                --no-ask-user \
-                --deny-tool='shell,write' \
-                --allow-tool='url' \
-                --allow-url='espn.com' \
-                --allow-url='nfl.com' \
-                --allow-url='nytimes.com' \
-                --allow-url='theathletic.com' \
-                --allow-url='apnews.com' \
-                --allow-url='cbssports.com' \
-                --allow-url='sports.yahoo.com' \
-                --allow-url='nbcsports.com' \
-                --allow-url='foxsports.com' \
-                --allow-url='si.com' \
-                --allow-url='x.com' \
-                --allow-url='twitter.com' \
+            if copilot "${copilot_args[@]}" -p "$(cat /tmp/sunday-signal-media-prompt.txt)" \
                 > /tmp/copilot-media-raw.txt \
               && python scripts/compose_copilot_media_reads.py \
                 --input /tmp/copilot-media-raw.txt \

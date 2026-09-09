@@ -18,12 +18,7 @@ import json_repair
 import pandas as pd
 
 from nfl_forecast.context import TEAM_META
-
-ALLOWED_DOMAINS = {
-    "espn.com", "nfl.com", "nytimes.com", "theathletic.com", "apnews.com",
-    "cbssports.com", "sports.yahoo.com", "yahoo.com", "nbcsports.com",
-    "foxsports.com", "si.com", "x.com", "twitter.com",
-}
+from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 
 def _extract_json(text: str) -> dict:
@@ -59,7 +54,7 @@ def _host(url: str) -> str:
 
 def _domain_allowed(url: str) -> bool:
     host = _host(url)
-    return any(host == domain or host.endswith("." + domain) for domain in ALLOWED_DOMAINS)
+    return any(host == domain or host.endswith("." + domain) for domain in APPROVED_MEDIA_DOMAINS)
 
 
 def _domain_family(url: str) -> str:
@@ -168,8 +163,10 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     away = str(row.get("away_team"))
     home = str(row.get("home_team"))
     pick = str(row.get("pick"))
+    opponent = away if pick == home else home
     pick_name = _team_name(pick)
     pick_nick = _nick(pick)
+    opponent_nick = _nick(opponent)
 
     final_prob = _pick_probability(row, "final_home_prob")
     pure_prob = _pick_probability(row, "pure_home_prob")
@@ -180,18 +177,21 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
 
     sentences: list[str] = []
     if final_prob is not None:
-        sentences.append(f"LevLine puts the {pick_nick} at {final_prob * 100:.1f}% to win.")
+        sentences.append(
+            f"LevLine puts the {pick_nick} at {final_prob * 100:.1f}% to win against the {opponent_nick}."
+        )
     if pure_prob is not None and market_prob is not None:
         sentences.append(
-            f"{pick_nick} football-only PURE is {pure_prob * 100:.1f}%; {pick_nick} market probability is {market_prob * 100:.1f}%. "
-            f"In the {pick_nick} blend, PURE carries 75%; for the {pick_nick}, MARKET carries 25%."
+            f"{pick_nick} football-only PURE is {pure_prob * 100:.1f}%; against {opponent_nick}, "
+            f"{pick_nick} market probability is {market_prob * 100:.1f}%. "
+            f"For {pick_nick} versus {opponent_nick}, PURE carries 75%; {pick_nick} MARKET carries 25%."
         )
     if model_line:
-        sentences.append(f"{pick_nick} LevLine model line is {model_line}.")
+        sentences.append(f"{pick_nick} LevLine model line against {opponent_nick} is {model_line}.")
     if market_line:
-        sentences.append(f"{pick_nick} market spread is {market_line}.")
+        sentences.append(f"{pick_nick}-{opponent_nick} market spread is {market_line}.")
     if projected:
-        sentences.append(f"{pick_nick} projected score: {projected}.")
+        sentences.append(f"{pick_nick} projected score versus {opponent_nick}: {projected}.")
 
     sentences.append(rationale)
     sentences.append(f"The pick: {pick_name} moneyline.")

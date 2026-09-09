@@ -123,13 +123,13 @@ VOICE
 RESEARCH PRIORITY
 1. ESPN / ESPN NFL Nation
 2. The Athletic / New York Times
-3. NFL.com / official NFL reporting
+3. NFL.com and the two clubs' official team websites
 4. AP, CBS Sports, Yahoo Sports, NBC Sports, FOX Sports, Sports Illustrated
 5. Credible attributable public X/Twitter reporting when accessible
 Prefer the last 7 days, and the last 48 hours for injuries/starters/availability.
 
 SOURCE RULES — STRICT
-- Return at least two independent sources per game from the approved publishers above.
+- Return at least two independent sources per game from the approved publishers above. Official team reporting is approved and preferred when national coverage is thin.
 - Return DIRECT publisher URLs only. Never return news.google.com, bing.com, an RSS redirect, nflverse, GitHub, Wikipedia, or another aggregator/data URL in `sources`.
 - If the packet lists a discovered article, use its title/name only as a research lead; open/research the publisher and return a direct approved publisher URL.
 - Do not fabricate a URL. If a discovered item cannot be resolved, research another approved source.

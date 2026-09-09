@@ -13,6 +13,62 @@ from typing import Any, Callable
 import nflreadpy as nfl
 
 
+OFFICIAL_TEAM_MEDIA_DOMAINS = frozenset(
+    {
+        "49ers.com",
+        "arizonacardinals.com",
+        "atlantafalcons.com",
+        "baltimoreravens.com",
+        "bengals.com",
+        "buffalobills.com",
+        "buccaneers.com",
+        "chargers.com",
+        "chicagobears.com",
+        "chiefs.com",
+        "clevelandbrowns.com",
+        "colts.com",
+        "commanders.com",
+        "dallascowboys.com",
+        "denverbroncos.com",
+        "detroitlions.com",
+        "houstontexans.com",
+        "jaguars.com",
+        "miamidolphins.com",
+        "neworleanssaints.com",
+        "newyorkjets.com",
+        "packers.com",
+        "panthers.com",
+        "patriots.com",
+        "philadelphiaeagles.com",
+        "raiders.com",
+        "seahawks.com",
+        "steelers.com",
+        "tennesseetitans.com",
+        "therams.com",
+        "vikings.com",
+        "giants.com",
+    }
+)
+
+APPROVED_MEDIA_DOMAINS = frozenset(
+    {
+        "apnews.com",
+        "cbssports.com",
+        "espn.com",
+        "foxsports.com",
+        "nbcsports.com",
+        "nfl.com",
+        "nytimes.com",
+        "si.com",
+        "sports.yahoo.com",
+        "theathletic.com",
+        "twitter.com",
+        "x.com",
+        "yahoo.com",
+    }
+) | OFFICIAL_TEAM_MEDIA_DOMAINS
+
+
 SOURCE_MATRIX = [
     {
         "role": "quantitative_backbone",
