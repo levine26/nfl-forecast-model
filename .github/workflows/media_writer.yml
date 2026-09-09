@@ -44,33 +44,56 @@ jobs:
         with:
           fetch-depth: 3
 
-      - name: Wait for merge-triggered context refresh
+      - name: Synchronize with contextual intelligence
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 40); do
+          context_seen=0
+          # A media-only merge does not trigger context.yml. Give GitHub a short
+          # window to register a matching context run; if none exists, use the
+          # latest already-published context on main instead of timing out.
+          for discovery in 1 2 3 4; do
             state=$(gh run list \
               --workflow "Sunday Signal contextual intelligence" \
               --commit "$GITHUB_SHA" \
               --limit 1 \
               --json status,conclusion \
               --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
-            echo "context run: $state"
-            if [ "$state" = "completed:success" ]; then
+            echo "context discovery $discovery: $state"
+            if [ "$state" != "missing" ]; then
+              context_seen=1
               break
             fi
-            if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then
-              echo "Context refresh failed; refusing to write media on stale context."
-              exit 1
-            fi
-            if [ "$attempt" -eq 40 ]; then
-              echo "Timed out waiting for context refresh."
-              exit 1
-            fi
-            sleep 15
+            sleep 5
           done
+
+          if [ "$context_seen" -eq 1 ]; then
+            for attempt in $(seq 1 40); do
+              state=$(gh run list \
+                --workflow "Sunday Signal contextual intelligence" \
+                --commit "$GITHUB_SHA" \
+                --limit 1 \
+                --json status,conclusion \
+                --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
+              echo "context run: $state"
+              if [ "$state" = "completed:success" ]; then
+                break
+              fi
+              if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then
+                echo "Context refresh failed; refusing to write media on stale context."
+                exit 1
+              fi
+              if [ "$attempt" -eq 40 ]; then
+                echo "Timed out waiting for matching context refresh."
+                exit 1
+              fi
+              sleep 15
+            done
+          else
+            echo "No context workflow was triggered for this media-only push; using latest context committed on main."
+          fi
           git fetch origin main
           git reset --hard origin/main
 
