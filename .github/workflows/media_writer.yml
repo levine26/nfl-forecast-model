@@ -15,8 +15,8 @@ on:
       - "tests/test_copilot_media.py"
       - ".github/workflows/media_writer.yml"
   schedule:
-    # 7:15 AM and 5:15 PM Pacific during NFL-season months (PDT basis).
-    - cron: "15 0,14 * 1,9-12 *"
+    # Twenty minutes after the three-hour contextual refresh cadence during NFL-season months.
+    - cron: "37 */3 * 1-2,9-12 *"
 
 permissions:
   contents: write
@@ -47,7 +47,7 @@ jobs:
               --commit "$GITHUB_SHA" \
               --limit 1 \
               --json status,conclusion \
-              --jq 'if length == 0 then "missing" else .[0].status + ":" + (. [0].conclusion // "") end' 2>/dev/null || echo missing)
+              --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
             echo "context run: $state"
             if [ "$state" = "completed:success" ]; then
               break
