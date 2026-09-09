@@ -19,6 +19,7 @@ CURRENT_STAFF_TTL_SECONDS = 7 * 24 * 60 * 60
 REQUEST_INTERVAL_SECONDS = 0.12
 CURRENT_RETRY_DELAY_SECONDS = 0.4
 WIKIPEDIA_ROOT = "https://en.wikipedia.org/wiki/"
+COACHING_CACHE_VERSION = 2
 
 
 def _norm_team(team: str) -> str:
@@ -42,11 +43,69 @@ def _label(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def fetch_coaching_staff(team: str, season: int, session=requests) -> tuple[dict[str, Any] | None, str]:
-    """Read staff from the rendered season-page infobox.
+def _valid_staff_name(value: str | None) -> bool:
+    text = _clean_cell(str(value or ""))
+    if not text:
+        return False
+    lowered = text.lower()
+    if "=" in text or any(token in lowered for token in ("general_manager", "owner =", "president =")):
+        return False
+    return bool(re.search(r"[A-Za-z]", text))
 
-    The rendered table is materially more stable for this use than relying on raw
-    template parameter names from MediaWiki wikitext, which vary across season pages.
+
+def _extract_staff_table(soup: BeautifulSoup) -> dict[str, str | None]:
+    """Fill coordinator roles from rendered season-page staff tables.
+
+    Many NFL season-page infoboxes omit coordinators even though the rendered Staff
+    table contains them. We intentionally parse only explicit role lines such as
+    "Offensive coordinator – Name" rather than guessing from the surrounding prose.
+    """
+    result: dict[str, str | None] = {"head_coach": None, "off_coach": None, "def_coach": None}
+    patterns = [
+        ("head_coach", re.compile(r"^head coach\s*[-–—:]\s*(.+)$", re.I)),
+        ("off_coach", re.compile(r"^offensive coordinator\s*[-–—:]\s*(.+)$", re.I)),
+        ("def_coach", re.compile(r"^defensive coordinator\s*[-–—:]\s*(.+)$", re.I)),
+    ]
+
+    candidate_tables = []
+    for table in soup.find_all("table"):
+        text = _clean_cell(table.get_text(" ", strip=True))
+        if not text:
+            continue
+        lower = text.lower()
+        if "offensive coordinator" in lower or "defensive coordinator" in lower or " head coach " in f" {lower} ":
+            candidate_tables.append(table)
+
+    for table in candidate_tables:
+        # Individual list items/cells preserve the role/name line better than the
+        # table's concatenated text. Fall back to line-split table text if needed.
+        chunks = []
+        for node in table.find_all(["li", "td", "th"]):
+            text = _clean_cell(node.get_text(" ", strip=True))
+            if text and text not in chunks:
+                chunks.append(text)
+        chunks.extend(
+            line for line in (_clean_cell(x) for x in table.get_text("\n", strip=True).splitlines())
+            if line and line not in chunks
+        )
+        for chunk in chunks:
+            for key, pattern in patterns:
+                match = pattern.match(chunk)
+                if not match:
+                    continue
+                value = _clean_cell(match.group(1))
+                if _valid_staff_name(value) and result[key] is None:
+                    result[key] = value
+    return result
+
+
+def fetch_coaching_staff(team: str, season: int, session=requests) -> tuple[dict[str, Any] | None, str]:
+    """Read staff from rendered season pages, using explicit staff tables as fallback.
+
+    The infobox is preferred when it contains clean values. Historical pages often
+    omit coordinators there, so explicit rendered Staff-table role lines fill the
+    missing fields. This remains a staff-identity source; tactical impact is derived
+    separately from FTN/nflverse football data.
     """
     team = _norm_team(team)
     title = _page_title(team, season)
@@ -64,10 +123,6 @@ def fetch_coaching_staff(team: str, season: int, session=requests) -> tuple[dict
     except Exception:
         return None, source_url
 
-    table = soup.select_one("table.infobox")
-    if table is None:
-        return None, source_url
-
     result: dict[str, Any] = {
         "team": team,
         "season": season,
@@ -76,21 +131,29 @@ def fetch_coaching_staff(team: str, season: int, session=requests) -> tuple[dict
         "off_coach": None,
         "def_coach": None,
     }
-    for row in table.find_all("tr"):
-        th = row.find("th")
-        td = row.find("td")
-        if th is None or td is None:
-            continue
-        label = _label(th.get_text(" ", strip=True))
-        value = _clean_cell(td.get_text(" ", strip=True))
-        if not value:
-            continue
-        if label in {"coach", "head coach"} or label.endswith(" head coach"):
-            result["head_coach"] = value
-        elif label in {"off coach", "offensive coach", "offensive coordinator"}:
-            result["off_coach"] = value
-        elif label in {"def coach", "defensive coach", "defensive coordinator"}:
-            result["def_coach"] = value
+
+    table = soup.select_one("table.infobox")
+    if table is not None:
+        for row in table.find_all("tr"):
+            th = row.find("th")
+            td = row.find("td")
+            if th is None or td is None:
+                continue
+            label = _label(th.get_text(" ", strip=True))
+            value = _clean_cell(td.get_text(" ", strip=True))
+            if not _valid_staff_name(value):
+                continue
+            if label in {"coach", "head coach"} or label.endswith(" head coach"):
+                result["head_coach"] = value
+            elif label in {"off coach", "offensive coach", "offensive coordinator"}:
+                result["off_coach"] = value
+            elif label in {"def coach", "defensive coach", "defensive coordinator"}:
+                result["def_coach"] = value
+
+    table_staff = _extract_staff_table(soup)
+    for key in ("head_coach", "off_coach", "def_coach"):
+        if not _valid_staff_name(result.get(key)) and _valid_staff_name(table_staff.get(key)):
+            result[key] = table_staff[key]
 
     if not any(result.get(k) for k in ("head_coach", "off_coach", "def_coach")):
         return None, source_url
@@ -124,10 +187,9 @@ def load_coaching_history(
 ) -> tuple[dict[str, dict[int, dict[str, Any]]], dict[str, Any]]:
     """Load coaching history without letting transient source failures poison the cache.
 
-    Successful historical entries are immutable. Current-season successes are refreshed
-    weekly. Negative entries are retried after a short TTL, including historical pages,
-    because a prior request failure is not evidence that a season page does not exist.
-    Current-season misses get one paced retry in the same run.
+    Successful historical entries are immutable *within the current parser version*.
+    When parsing improves, successful older cache rows refresh once so previously
+    omitted coordinator roles can be recovered. Current-season successes refresh weekly.
     """
     cache_path = Path(cache_path)
     cache: dict[str, Any] = {}
@@ -145,6 +207,7 @@ def load_coaching_history(
     refresh_attempts = 0
     negative_entries_retried = 0
     current_retry_recoveries = 0
+    parser_version_refreshes = 0
     last_request_at: float | None = None
 
     def paced_fetch(team: str, year: int):
@@ -172,8 +235,13 @@ def load_coaching_history(
                 refresh = age >= negative_cache_ttl_seconds
                 if refresh:
                     negative_entries_retried += 1
-            elif entry is not None and data is not None and year == season and age is not None:
-                refresh = age >= current_staff_ttl_seconds
+            elif entry is not None and data is not None:
+                cached_version = int((entry or {}).get("parser_version") or 0)
+                if cached_version < COACHING_CACHE_VERSION:
+                    refresh = True
+                    parser_version_refreshes += 1
+                elif year == season and age is not None:
+                    refresh = age >= current_staff_ttl_seconds
 
             if refresh:
                 data, _ = paced_fetch(team, year)
@@ -184,7 +252,11 @@ def load_coaching_history(
                     if retry_data is not None:
                         data = retry_data
                         current_retry_recoveries += 1
-                cache[key] = {"fetched_at": utc_now(), "data": data}
+                cache[key] = {
+                    "fetched_at": utc_now(),
+                    "parser_version": COACHING_CACHE_VERSION,
+                    "data": data,
+                }
                 entry = cache[key]
                 changed = True
 
@@ -201,11 +273,13 @@ def load_coaching_history(
     status = {
         "status": "healthy" if pages_missing < max(2, len(teams)) else "degraded",
         "as_of": utc_now(),
-        "source": "Wikipedia season-page rendered infoboxes",
+        "source": "Wikipedia season-page rendered infoboxes + explicit staff tables",
         "pages_missing": pages_missing,
         "refresh_attempts": refresh_attempts,
         "negative_entries_retried": negative_entries_retried,
         "current_retry_recoveries": current_retry_recoveries,
+        "parser_version": COACHING_CACHE_VERSION,
+        "parser_version_refreshes": parser_version_refreshes,
         "negative_cache_ttl_minutes": int(negative_cache_ttl_seconds / 60),
     }
     return history, status
