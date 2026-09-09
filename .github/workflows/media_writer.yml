@@ -10,9 +10,11 @@ on:
       - "src/nfl_forecast/copilot_media.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_copilot_media_prompt.py"
+      - "scripts/compose_copilot_media_reads.py"
       - "scripts/validate_copilot_media_reads.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
+      - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
       - "tests/test_read_contract.py"
       - "pyproject.toml"
@@ -85,7 +87,7 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_json_handoff.py tests/test_read_contract.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_read_contract.py tests/test_editorial_finalize.py
 
       - name: Refresh deterministic reporting packet
         run: |
@@ -95,35 +97,55 @@ jobs:
       - name: Install GitHub Copilot CLI
         run: npm install -g @github/copilot
 
-      - name: Research and write human game Reads
+      - name: Research, compose and validate human game Reads
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          copilot -s -p "$(cat /tmp/sunday-signal-media-prompt.txt)" \
-            --no-ask-user \
-            --deny-tool='shell,write' \
-            --allow-tool='url' \
-            --allow-url='espn.com' \
-            --allow-url='nfl.com' \
-            --allow-url='nytimes.com' \
-            --allow-url='theathletic.com' \
-            --allow-url='apnews.com' \
-            --allow-url='cbssports.com' \
-            --allow-url='sports.yahoo.com' \
-            --allow-url='nbcsports.com' \
-            --allow-url='foxsports.com' \
-            --allow-url='si.com' \
-            --allow-url='x.com' \
-            --allow-url='twitter.com' \
-            > /tmp/copilot-media-raw.txt
+          validated=0
+          for attempt in 1 2 3; do
+            echo "Copilot editorial attempt $attempt/3"
+            rm -f /tmp/copilot-media-raw.txt /tmp/copilot-media-composed.json outputs/copilot_media_reads.json
+            if copilot -s -p "$(cat /tmp/sunday-signal-media-prompt.txt)" \
+                --no-ask-user \
+                --deny-tool='shell,write' \
+                --allow-tool='url' \
+                --allow-url='espn.com' \
+                --allow-url='nfl.com' \
+                --allow-url='nytimes.com' \
+                --allow-url='theathletic.com' \
+                --allow-url='apnews.com' \
+                --allow-url='cbssports.com' \
+                --allow-url='sports.yahoo.com' \
+                --allow-url='nbcsports.com' \
+                --allow-url='foxsports.com' \
+                --allow-url='si.com' \
+                --allow-url='x.com' \
+                --allow-url='twitter.com' \
+                > /tmp/copilot-media-raw.txt \
+              && python scripts/compose_copilot_media_reads.py \
+                --input /tmp/copilot-media-raw.txt \
+                --predictions outputs/this_week.csv \
+                --previews outputs/game_previews.json \
+                --evidence outputs/contextual_evidence.json \
+                --output /tmp/copilot-media-composed.json \
+              && python scripts/validate_copilot_media_reads.py \
+                --input /tmp/copilot-media-composed.json \
+                --predictions outputs/this_week.csv \
+                --output outputs/copilot_media_reads.json; then
+              validated=1
+              echo "Copilot editorial attempt $attempt passed all publication gates."
+              break
+            fi
+            echo "Copilot editorial attempt $attempt failed; no output will publish from this attempt."
+          done
+          if [ "$validated" -ne 1 ]; then
+            echo "All three Copilot editorial attempts failed strict publication validation."
+            exit 1
+          fi
 
-      - name: Validate before publication
+      - name: Finalize and enforce full-slate launch gate
         run: |
-          python scripts/validate_copilot_media_reads.py \
-            --input /tmp/copilot-media-raw.txt \
-            --predictions outputs/this_week.csv \
-            --output outputs/copilot_media_reads.json
           python scripts/finalize_editorial.py
           python - <<'PY'
           import json

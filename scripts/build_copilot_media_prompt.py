@@ -29,10 +29,13 @@ def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
     for item in preview.get("reported_sources") or []:
         if not isinstance(item, dict):
             continue
+        # Discovery URLs can be Google/Bing RSS redirects. They are deliberately
+        # omitted from the LLM packet so the writer cannot echo an aggregator URL
+        # as public provenance. The deterministic composer still has the original
+        # records and resolves/canonicalizes them after writing.
         reported.append({
             "name": item.get("source_name"),
             "title": item.get("title"),
-            "url": item.get("source_url"),
             "as_of": item.get("as_of"),
         })
 
@@ -55,7 +58,6 @@ def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
             "advantage_team": item.get("advantage_team"),
             "strength": strength,
             "source_name": item.get("source_name"),
-            "source_url": item.get("source_url"),
         })
 
     return {
@@ -67,6 +69,9 @@ def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
         "away_team": str(row.get("away_team")),
         "home_team": str(row.get("home_team")),
         "levline_pick": str(row.get("pick")),
+        # Numerical facts stay in the packet for reasoning context, but the LLM is
+        # explicitly forbidden from serializing them. Code owns the published
+        # percentages, lines, blend and projected score after this step.
         "levline_pick_probability": _pick_probability(row, "final_home_prob"),
         "pure_pick_probability": _pick_probability(row, "pure_home_prob"),
         "market_pick_probability": _pick_probability(row, "market_home_prob"),
@@ -92,39 +97,46 @@ def main() -> None:
     evidence = json.loads((out / "contextual_evidence.json").read_text())
     packets = [_packet(row, previews, evidence) for _, row in predictions.iterrows()]
 
-    prompt = """You are the senior NFL preview writer for Sunday Signal. Research and write the public game preview for every game below.
+    prompt = """You are the senior NFL preview writer for Sunday Signal. Research every supplied game and return the human editorial layer only. Deterministic code will add and verify every published LevLine number after your response.
 
 THIS IS A MATCHUP PREVIEW, NOT A NEWS ROUNDUP.
-Every Read must contain exactly TWO paragraphs with different jobs.
+For every game you write three human fields: a headline, one matchup paragraph, and one short model-rationale sentence. Do NOT write the final numerical model paragraph yourself.
+
+HEADLINE
+Write one matchup-oriented headline. It should identify the football tension, not repeat an article headline or use generic betting language.
 
 PARAGRAPH 1 — THE MATCHUP
-Write 55-100 words explaining how the game is likely to be decided. Identify the actual football tension: quarterback situation, protection/pass rush, coverage matchup, explosive plays, early-down efficiency, run-game leverage, injuries, coaching changes, travel/weather, or another concrete factor. Current reporting should inform the paragraph, but NEVER copy article headlines into prose and NEVER write "according to [outlet]" sentence after sentence. Synthesize the reporting into one coherent preview. The paragraph must discuss both teams and explain what each side needs to do.
+Write 55-100 words explaining how the game is likely to be decided. Identify the actual football tension: quarterback situation, protection/pass rush, coverage matchup, explosive plays, early-down efficiency, run-game leverage, injuries, coaching changes, travel/weather, or another concrete factor. Current reporting should inform the paragraph, but NEVER copy article headlines into prose and NEVER write "according to [outlet]" sentence after sentence. Synthesize the reporting into one coherent preview. Discuss both teams and explain what each side needs to do.
 
-PARAGRAPH 2 — WHY LEVLINE PICKS THIS SIDE
-Write 60-110 words explaining the model decision explicitly. State LevLine's win probability for the picked team. Explain the 75% PURE / 25% MARKET blend using the supplied PURE and market pick-side probabilities when both exist. State the projected margin/model line and projected score whenever supplied. State the market spread whenever supplied, and compare it directly with LevLine's model line so the disagreement or agreement is explicit. Tie those numbers to one or two verified football factors from the packet so the paragraph answers WHY the model lands where it does. Do not pretend a factor is a model feature unless the packet says it is; describe it as contextual support when appropriate. The FINAL SENTENCE MUST be exactly: "The pick: <picked team name> moneyline."
+MODEL_RATIONALE — CONTEXT ONLY
+Write 18-40 words tying one or two verified football factors to the LevLine side. This is contextual support only. Do NOT include any number, percentage, spread, projected score, PURE value, market value, model line, the word moneyline, or a final pick sentence. Deterministic code owns those facts and will build paragraph 2 after your response.
 
 VOICE
 - Human NFL analyst: clear, confident, conversational, specific.
 - No database labels such as "DEN-KC market gap" or "player history context."
 - No headline dumps, SEO language, TV/live-stream information, or generic betting-copy filler.
 - Avoid phrases such as "coverage highlights", "pressure note", "history note", "the cleanest lens", "the hinge", "the matchup file", "strip away the probability", "consensus pricing and the football-only model tell different versions", or "keeps enough of that split visible to matter".
-- Do not write raw source headlines followed by "according to".
-- Do not use PURE as a mysterious standalone noun. Explain it naturally as Sunday Signal's football-only model component.
 - Do not invent injuries, roster facts, statistics, model inputs, source URLs, or causal claims.
 - Paraphrase reporting. Quotes should be avoided unless necessary.
-- Vary sentence structure across the slate.
+- Vary sentence structure across the slate; no seven-word phrase should repeat across games.
 
 RESEARCH PRIORITY
 1. ESPN / ESPN NFL Nation
 2. The Athletic / New York Times
-3. NFL.com / official team reporting
+3. NFL.com / official NFL reporting
 4. AP, CBS Sports, Yahoo Sports, NBC Sports, FOX Sports, Sports Illustrated
 5. Credible attributable public X/Twitter reporting when accessible
-Prefer the last 7 days, and the last 48 hours for injuries/starters/availability. Use at least two independent approved-domain sources per game whenever possible.
+Prefer the last 7 days, and the last 48 hours for injuries/starters/availability.
+
+SOURCE RULES — STRICT
+- Return at least two independent sources per game from the approved publishers above.
+- Return DIRECT publisher URLs only. Never return news.google.com, bing.com, an RSS redirect, nflverse, GitHub, Wikipedia, or another aggregator/data URL in `sources`.
+- If the packet lists a discovered article, use its title/name only as a research lead; open/research the publisher and return a direct approved publisher URL.
+- Do not fabricate a URL. If a discovered item cannot be resolved, research another approved source.
 
 OUTPUT
 Return ONLY one syntactically valid JSON object, no Markdown and no commentary, with exactly this schema:
-{"games":{"GAME_ID":{"headline":"matchup-oriented headline","paragraph1":"...","paragraph2":"...","sources":[{"name":"ESPN","title":"article/report title","url":"https://..."},{"name":"NFL.com","title":"...","url":"https://..."}]}}}
+{"games":{"GAME_ID":{"headline":"matchup-oriented headline","paragraph1":"55-100 word matchup preview","model_rationale":"18-40 words, context only, no numbers","sources":[{"name":"ESPN","title":"article/report title","url":"https://www.espn.com/..."},{"name":"NFL.com","title":"article/report title","url":"https://www.nfl.com/..."}]}}}
 Every supplied game_id must appear exactly once.
 
 CRITICAL SERIALIZATION RULES

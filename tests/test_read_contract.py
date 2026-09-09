@@ -65,6 +65,9 @@ def test_deterministic_read_has_exact_two_paragraph_contract():
     paragraph1, paragraph2 = preview["paragraphs"]
     assert "legacy" not in " ".join(preview["paragraphs"]).lower()
     assert "Chiefs" in paragraph1 and "Broncos" in paragraph1
+    assert "Chiefs protection wants clean early downs" in paragraph1
+    assert "Broncos pressure wants obvious passing downs" in paragraph1
+    assert "Chiefs needs" not in paragraph1
     assert "LevLine" in paragraph2
     assert "60.0%" in paragraph2
     assert "70.0%" in paragraph2
@@ -73,6 +76,7 @@ def test_deterministic_read_has_exact_two_paragraph_contract():
     assert "Denver Broncos -6.5" in paragraph2
     assert "Denver Broncos -3.5" in paragraph2
     assert "DEN 27.0 – KC 20.5" in paragraph2
+    assert "KC protection vs DEN pass rush" in paragraph2
     assert paragraph2.endswith("The pick: Denver Broncos moneyline.")
     assert preview["editorial_voice"]["two_paragraph_contract"] is True
 
@@ -96,6 +100,8 @@ def test_qb_history_uses_item_side_for_home_quarterback():
     assert "Eagles protection" in paragraph
     assert "Commanders pressure" in paragraph
     assert "Commanders protection" not in paragraph
+    assert "Commanders' job" in paragraph
+    assert "Commanders's" not in paragraph
 
 
 def test_qb_history_infers_home_offense_from_opponent_when_side_missing():
@@ -110,6 +116,8 @@ def test_qb_history_infers_home_offense_from_opponent_when_side_missing():
     assert "49ers defense" in headline
     assert "Rams protection" in paragraph
     assert "49ers pressure" in paragraph
+    assert "49ers' job" in paragraph
+    assert "49ers's" not in paragraph
 
 
 def test_qb_history_fallbacks_share_no_seven_word_template_spans():
@@ -150,13 +158,13 @@ def test_qb_history_fallbacks_share_no_seven_word_template_spans():
             assert not grams[i].intersection(grams[j])
 
 
-def test_generic_fallback_uses_side_and_avoids_shared_seven_word_spans():
+def test_generic_fallback_uses_side_punctuation_and_avoids_shared_seven_word_spans():
     cases = [
         (
             "NE", "SEA",
             {
                 "title": "NE: Ben Brown — Out",
-                "summary": "New England has to account for an unavailable interior blocker.",
+                "summary": "New England has to account for an unavailable interior blocker",
                 "side": "away",
                 "metadata": {"family": "availability"},
             },
@@ -165,7 +173,7 @@ def test_generic_fallback_uses_side_and_avoids_shared_seven_word_spans():
             "SF", "LA",
             {
                 "title": "Matthew Stafford vs SF: career game ledger",
-                "summary": "The career sample supplies historical context without changing the forecast.",
+                "summary": "The career sample supplies historical context without changing the forecast",
                 "side": "home",
                 "metadata": {"family": "career_qb_opponent_ledger"},
             },
@@ -173,6 +181,30 @@ def test_generic_fallback_uses_side_and_avoids_shared_seven_word_spans():
     ]
     paragraphs = [_football_preview(away, home, item)[1] for away, home, item in cases]
 
+    assert "blocker. For Patriots" in paragraphs[0]
     assert "Patriots' choices against Seahawks" in paragraphs[0]
+    assert "forecast. For Rams" in paragraphs[1]
     assert "Rams' choices against 49ers" in paragraphs[1]
     assert not _seven_grams(paragraphs[0]).intersection(_seven_grams(paragraphs[1]))
+
+
+
+def test_pressure_fallbacks_share_no_seven_word_template_spans():
+    cases = [
+        ("ARI", "LAC", "LAC gave up sacks on 6.2% of pass plays last season; ARI got home on 9.4%."),
+        ("ATL", "PIT", "ATL gave up sacks on 7.2% of pass plays last season; PIT got home on 10.4%."),
+        ("NYJ", "TEN", "NYJ gave up sacks on 5.2% of pass plays last season; TEN got home on 8.4%."),
+    ]
+    paragraphs = []
+    for away, home, summary in cases:
+        item = {
+            "title": f"{home} protection vs {away} pass rush",
+            "summary": summary,
+            "metadata": {"family": "pressure"},
+        }
+        paragraphs.append(_football_preview(away, home, item)[1])
+
+    grams = [_seven_grams(paragraph) for paragraph in paragraphs]
+    for i in range(len(grams)):
+        for j in range(i + 1, len(grams)):
+            assert not grams[i].intersection(grams[j])
