@@ -106,6 +106,7 @@ jobs:
         if: github.ref != 'refs/heads/main' || github.event_name == 'pull_request'
         run: |
           python scripts/run_context.py --season 2026 --output-dir /tmp/nfl-context
+          cp outputs/this_week.csv /tmp/nfl-context/this_week.csv
           python scripts/polish_publication.py --season 2026 --output-dir /tmp/nfl-context
           python scripts/add_advanced_player_context.py --season 2026 --output-dir /tmp/nfl-context
           python scripts/add_career_qb_context.py --season 2026 --output-dir /tmp/nfl-context
