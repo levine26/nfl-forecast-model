@@ -1,6 +1,7 @@
 {
   "status": "healthy",
   "mode": "research_only",
+  "challenger_version": "0.6-market-aware",
   "live_season_firewall": 2026,
   "target_seasons": [
     2022,
@@ -57,11 +58,22 @@
     "home_elo",
     "rest_diff"
   ],
-  "selected_shadow_candidate": "Hybrid adaptive Brier",
-  "selected_shadow_pure_weight": 0.25,
-  "selected_shadow_market_weight": 0.75,
-  "selected_shadow_calibration": "none",
-  "selected_shadow_weight_objective": "brier",
+  "tested_candidate_count": 9,
+  "selected_shadow_candidate": "Logit hybrid adaptive Brier",
+  "selected_shadow_method": "logit",
+  "selected_metrics": {
+    "candidate": "Logit hybrid adaptive Brier",
+    "games": 1087,
+    "winner_pct": 0.6761729530818767,
+    "brier": 0.21160908212368731,
+    "log_loss": 0.6112492762671563,
+    "eligible_shadow": true,
+    "pure_weight": null,
+    "market_weight": null,
+    "method": "logit",
+    "objective": "brier",
+    "calibration": "none"
+  },
   "nested_production_like": {
     "candidate": "Nested 75% PURE / 25% MARKET",
     "games": 1087,
@@ -71,31 +83,20 @@
     "eligible_shadow": true,
     "pure_weight": 0.75,
     "market_weight": 0.25,
-    "calibration": "none",
-    "weight_objective": "fixed"
+    "method": "linear_fixed",
+    "objective": null,
+    "calibration": null
   },
-  "selected_metrics": {
-    "candidate": "Hybrid adaptive Brier",
-    "games": 1087,
-    "winner_pct": 0.6752529898804048,
-    "brier": 0.21176524037686364,
-    "log_loss": 0.6117693713854481,
-    "eligible_shadow": true,
-    "pure_weight": null,
-    "market_weight": null,
-    "calibration": "none",
-    "weight_objective": "brier"
-  },
-  "accuracy_gain_pp_vs_nested_75_25": 1.6559,
-  "brier_delta_vs_nested_75_25": -0.00682664,
-  "log_loss_delta_vs_nested_75_25": -0.01563299,
+  "accuracy_gain_pp_vs_nested_75_25": 1.7479,
+  "brier_delta_vs_nested_75_25": -0.0069828,
+  "log_loss_delta_vs_nested_75_25": -0.01615308,
   "published_reference": {
     "published_final_ensemble": {
       "model": "Final Ensemble",
       "games": 1087,
       "winner_pct": 0.6513339466421343,
-      "brier": 0.2182949881362064,
-      "log_loss": 0.6265595264621434,
+      "brier": 0.2182949881824533,
+      "log_loss": 0.6265595265643812,
       "margin_mae": 9.961987009785291,
       "total_mae": 10.853913707422718,
       "status": "PURE + market blend; OOS 2022\u201325",
@@ -113,8 +114,10 @@
       "brier_rank": 1
     }
   },
-  "market_timing_caveat": "Historical nflverse market fields are closing-line benchmarks; a 2026 T-120 shadow must prove any blend before production promotion.",
+  "market_timing_caveat": "Historical nflverse market fields are closing-line benchmarks. Production locks at T-120, so no challenger can be promoted from historical closing-line results alone.",
   "promotion_authorized": false,
-  "promotion_policy": "No production change from this report. A challenger must pass leakage-safe pre-2026 OOS gates and then prove itself on immutable 2026 shadow forecasts.",
-  "current_shadow_games": 16
+  "promotion_policy": "No production change from research. Challenger improvements must survive leakage-safe pre-2026 testing and immutable 2026 T-120 shadow scoring before promotion.",
+  "current_shadow_games": 16,
+  "2026_outcomes_used_in_fitting": 0,
+  "production_outputs_modified": 0
 }
