@@ -1,0 +1,93 @@
+name: Sunday Signal Copilot media writer
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Twice daily during the NFL regular-season/playoff months. This is intentionally
+    # much less frequent than market refreshes because editorial synthesis is not a
+    # numerical input and Copilot requests consume the repository owner's AI credits.
+    - cron: "12 14,21 * 1,9-12 *"
+
+permissions:
+  contents: write
+  copilot-requests: write
+
+concurrency:
+  group: sunday-signal-media-writer
+  cancel-in-progress: true
+
+jobs:
+  write-media:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install lightweight editorial dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "pandas>=2.2" "numpy>=2.0" "requests>=2.32" "beautifulsoup4>=4.12" "lxml>=5.0"
+          pip install -e . --no-deps
+
+      - name: Refresh reporting evidence and build research prompt
+        run: |
+          python scripts/finalize_editorial.py
+          python scripts/build_copilot_media_prompt.py --prompt-file /tmp/sunday-signal-media-prompt.txt
+
+      - name: Install GitHub Copilot CLI
+        run: npm install -g @github/copilot
+
+      - name: Research and write human game Reads
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          copilot -s -p "$(cat /tmp/sunday-signal-media-prompt.txt)" \
+            --no-ask-user \
+            --deny-tool='shell,write' \
+            --allow-tool='url' \
+            --allow-url='espn.com' \
+            --allow-url='nfl.com' \
+            --allow-url='nytimes.com' \
+            --allow-url='theathletic.com' \
+            --allow-url='apnews.com' \
+            --allow-url='cbssports.com' \
+            --allow-url='sports.yahoo.com' \
+            --allow-url='nbcsports.com' \
+            --allow-url='foxsports.com' \
+            --allow-url='si.com' \
+            --allow-url='x.com' \
+            --allow-url='twitter.com' \
+            > /tmp/copilot-media-raw.txt
+
+      - name: Validate Copilot output before publication
+        run: |
+          python scripts/validate_copilot_media_reads.py \
+            --input /tmp/copilot-media-raw.txt \
+            --predictions outputs/this_week.csv \
+            --output outputs/copilot_media_reads.json
+          python scripts/finalize_editorial.py
+
+      - name: Publish editorial-only outputs
+        run: |
+          set -euo pipefail
+          git config user.name "sunday-signal-media-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            outputs/copilot_media_reads.json \
+            outputs/game_previews.json \
+            outputs/contextual_evidence.json \
+            outputs/context_source_status.json
+          if git diff --cached --quiet; then
+            echo "No media editorial changes to publish."
+            exit 0
+          fi
+          git commit -m "Refresh source-first Sunday Signal Reads"
+          git pull --rebase origin main
+          git push origin HEAD:main
