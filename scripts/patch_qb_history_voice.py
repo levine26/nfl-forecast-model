@@ -12,4 +12,12 @@ insert = '''        if not summary:\n            return ""\n        if fam == "q
 if needle not in text:
     raise SystemExit('specific summary insertion point not found')
 text = text.replace(needle, insert)
+text = text.replace(
+    'return f"{protected} protection allowed a {allowed}% sack rate; {rusher}\'s rush produced {created}%."',
+    'return f"{protected} protection: {allowed}% sack rate; {rusher} pass rush: {created}% sack rate."',
+)
+text = text.replace(
+    'return f"{offense} generated a 20+ yard completion on {created}% of passes; {defense} allowed 20+ on {allowed}%."',
+    'return f"{offense} explosives: {created}% of passes gained 20+ yards; {defense} allowed 20+ on {allowed}%."',
+)
 path.write_text(text)
