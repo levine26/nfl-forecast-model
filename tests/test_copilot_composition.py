@@ -140,7 +140,7 @@ def test_composer_owns_exact_model_facts_and_sources():
     result = compose(payload, predictions, previews, {"2026_01_DEN_KC": []})
     entry = result["games"]["2026_01_DEN_KC"]
     p2 = entry["paragraph2"]
-    assert "LevLine gives the Broncos a 62.0% win probability" in p2
+    assert "LevLine's Broncos win probability is 62.0% against Chiefs" in p2
     assert "football-only PURE rates the Broncos at 68.0%" in p2
     assert "MARKET rates the Broncos at 52.0%" in p2
     assert "75% PURE for Broncos" in p2 and "25% MARKET" in p2
