@@ -148,3 +148,31 @@ def test_qb_history_fallbacks_share_no_seven_word_template_spans():
     for i in range(len(grams)):
         for j in range(i + 1, len(grams)):
             assert not grams[i].intersection(grams[j])
+
+
+def test_generic_fallback_uses_side_and_avoids_shared_seven_word_spans():
+    cases = [
+        (
+            "NE", "SEA",
+            {
+                "title": "NE: Ben Brown — Out",
+                "summary": "New England has to account for an unavailable interior blocker.",
+                "side": "away",
+                "metadata": {"family": "availability"},
+            },
+        ),
+        (
+            "SF", "LA",
+            {
+                "title": "Matthew Stafford vs SF: career game ledger",
+                "summary": "The career sample supplies historical context without changing the forecast.",
+                "side": "home",
+                "metadata": {"family": "career_qb_opponent_ledger"},
+            },
+        ),
+    ]
+    paragraphs = [_football_preview(away, home, item)[1] for away, home, item in cases]
+
+    assert "Patriots' choices against Seahawks" in paragraphs[0]
+    assert "Rams' choices against 49ers" in paragraphs[1]
+    assert not _seven_grams(paragraphs[0]).intersection(_seven_grams(paragraphs[1]))
