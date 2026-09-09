@@ -36,7 +36,13 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
         if not item:
             return False
         summary = str(item.get("summary") or "").strip()
-        return len(summary.split()) >= 7
+        if len(summary.split()) < 7:
+            return False
+        # Generic schedule-sample boilerplate can remain in the raw history file,
+        # but it should never become the public lead or a win-case paragraph.
+        if "nflverse schedule sample" in summary.lower():
+            return False
+        return True
 
     def beat(item: dict[str, Any]) -> str:
         title = str(item.get("title") or "").strip().rstrip('.:')
@@ -46,7 +52,7 @@ new_tail = r'''def polish_preview_slate(previews: dict[str, dict], predictions: 
         return f"{title}: {summary}"
 
     seen_lead_fingerprints: set[str] = set()
-    special_families = {"international_event", "rivalry", "international_travel", "recent_series"}
+    special_families = {"international_event", "rivalry", "international_travel"}
 
     for game_id in sorted(previews):
         preview = previews[game_id]
