@@ -1,0 +1,73 @@
+.vnext-history-cal{
+  overflow:hidden;
+}
+
+.vnext-history-cal>div{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+
+.vnext-history-cal>div>div{
+  min-width:0;
+  padding:12px;
+}
+
+.vnext-history-cal b{
+  font-size:11px;
+  line-height:1.2;
+}
+
+.vnext-history-cal span{
+  font-size:8px;
+}
+
+.vnext-history-cal em{
+  margin-top:7px;
+  font-size:18px;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.02em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.vnext-history-cal em::after{
+  content:' observed';
+  margin-left:4px;
+  color:#6d8495;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+@media (max-width:760px){
+  .vnext-history-cal{
+    padding:16px;
+  }
+
+  .vnext-history-cal h3{
+    margin-bottom:12px;
+    font-size:20px;
+    line-height:1.15;
+  }
+
+  .vnext-history-cal>div{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .vnext-history-cal>div>div{
+    padding:11px;
+  }
+
+  .vnext-history-cal em{
+    font-size:17px;
+  }
+}
+
+@media (max-width:360px){
+  .vnext-history-cal>div{
+    grid-template-columns:1fr;
+  }
+}
