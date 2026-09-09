@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import './publication.css'
+import './accountability.css'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -27,6 +28,7 @@ const num = value => {
 const pct = (value, digits = 1) => num(value) == null ? '—' : `${(num(value) * 100).toFixed(digits)}%`
 const signed = value => num(value) == null ? '—' : `${num(value) > 0 ? '+' : ''}${num(value).toFixed(1)}`
 const one = value => num(value) == null ? '—' : num(value).toFixed(1)
+const three = value => num(value) == null ? '—' : num(value).toFixed(3)
 
 function parseCSV(text) {
   const rows = []
@@ -126,56 +128,60 @@ function StateBadge({ game, locked }) {
   if (locked) return <span className="pub-state locked">🔒 OFFICIAL · LOCKED</span>
   if (minutes != null && minutes <= 120 && minutes > 0) return <span className="pub-state window">LOCK WINDOW</span>
   if (minutes != null && minutes <= 0) return <span className="pub-state started">STARTED</span>
-  return <span className="pub-state current">CURRENT FORECAST</span>
+  return <span className="pub-state current">CURRENT</span>
 }
 
-function Header({ tab, setTab, status, history, sources }) {
-  const tabs = [['week','Forecasts'],['teams','Teams'],['ratings','Power'],['models','Model Lab'],['history','History'],['method','Method']]
+function sourceProblems(sources) {
+  const ignore = new Set(['weather'])
+  return Object.entries(sources || {}).filter(([key,value]) => {
+    if (!value || typeof value !== 'object' || !value.status) return false
+    return value.status !== 'healthy' && !ignore.has(key)
+  })
+}
+
+function Header({ tab, setTab, status, history, sources, week }) {
+  const tabs = [['week','Forecasts'],['teams','Teams'],['ratings','Power'],['history','History'],['method','Method']]
   const locked = history.filter(row => row.lock_status === 'LOCKED')
-  const graded = locked.filter(row => ['true','false'].includes(String(row.winner_correct).toLowerCase()))
-  const wins = graded.filter(row => String(row.winner_correct).toLowerCase() === 'true').length
+  const problems = sourceProblems(sources)
   return <>
     <header className="pub-header">
       <button className="pub-brand" onClick={() => setTab('week')}>
         <span className="pub-logo">SS</span>
         <span><b>SUNDAY SIGNAL</b><small>powered by LevLine</small></span>
       </button>
-      <div className="pub-health"><i /><span><b>{status?.status === 'healthy' ? 'MODEL LIVE' : 'LEVLINE'}</b><small>{graded.length ? `Official 2026 · ${wins}-${graded.length-wins}` : 'Official record begins at first lock'}</small></span></div>
+      <div className="pub-health"><i className={problems.length ? 'warn-dot' : ''}/><span><b>{problems.length ? 'DATA NOTICE' : 'MODEL LIVE'}</b><small>{locked.length ? `${locked.length} official lock${locked.length===1?'':'s'}` : `Week ${week || '—'} · pre-lock`}</small></span></div>
     </header>
-    <nav className="pub-nav">{tabs.map(([key,label]) => <button key={key} className={tab===key?'active':''} onClick={() => setTab(key)}>{label}</button>)}</nav>
-    <div className="pub-fresh">
-      <span>LevLine <b>{age(status?.generated_utc || status?.prediction_timestamp_utc)}</b></span>
-      <span>Market <b>{age(status?.market_updated_utc || status?.generated_utc)}</b></span>
-      <span>Personnel <b>{age(sources?.injuries?.as_of)}</b></span>
-      <span>Context <b>{age(sources?.generated_utc)}</b></span>
-    </div>
+    <nav className="pub-nav">
+      {tabs.map(([key,label]) => <button key={key} className={tab===key?'active':''} onClick={() => setTab(key)}>{label}</button>)}
+      <span className="pub-week-chip">2026 · W{week || '—'}</span>
+    </nav>
+    {problems.length > 0 && <div className="pub-source-alert"><b>Analysis-source notice</b><span>{problems.map(([key])=>key.replaceAll('_',' ')).join(', ')} currently degraded. LevLine remains published from the validated numerical pipeline.</span></div>}
   </>
+}
+
+function Stat({ label, value, sub }) {
+  return <div className="pub-stat"><span>{label}</span><b>{value}</b>{sub && <small>{sub}</small>}</div>
 }
 
 function CompactHero({ games, history, status }) {
   const next = [...games].filter(g => easternKickoff(g) > new Date()).sort((a,b) => easternKickoff(a)-easternKickoff(b))[0]
   const strongest = [...games].sort((a,b) => (b.pickP||0)-(a.pickP||0))[0]
   const locked = history.filter(row => row.lock_status === 'LOCKED').length
-  return <section className="pub-hero">
-    <div><span>2026 · WEEK {games[0]?.week || '—'}</span><h1>The numbers, the matchup, and the part that could make us look stupid.</h1><p>LevLine makes the forecast. Sunday Signal explains why it makes sense, where the market disagrees, and what might break it.</p></div>
+  const week = games[0]?.week || '—'
+  return <section className="pub-hero pub-hero-clean">
+    <div><span>2026 · WEEK {week}</span><h1>Week {week} NFL Forecasts</h1><p>LevLine probabilities, market edges and matchup analysis for every game.</p></div>
     <div className="pub-hero-stats">
-      <Stat label="Next" value={next ? `${next.away_team} @ ${next.home_team}` : 'Slate complete'} sub={next ? kickoffText(next) : ''} />
-      <Stat label="Top signal" value={strongest ? `${strongest.pick} ${pct(strongest.pickP)}` : '—'} sub={strongest?.confidence || 'Current read'} />
-      <Stat label="Locked" value={`${locked}/${games.length || 0}`} sub="Never edited after lock" />
-      <Stat label="Fresh" value={age(status?.generated_utc)} sub="Latest model run" />
+      <Stat label="Next kickoff" value={next ? `${next.away_team} @ ${next.home_team}` : 'Slate complete'} sub={next ? kickoffText(next) : ''} />
+      <Stat label="Top signal" value={strongest ? `${strongest.pick} ${pct(strongest.pickP)}` : '—'} sub={strongest?.confidence || 'Current forecast'} />
+      <Stat label="Official locks" value={`${locked}/${games.length || 0}`} sub="Immutable after lock" />
+      <Stat label="Updated" value={age(status?.generated_utc || status?.prediction_timestamp_utc)} sub="ago" />
     </div>
   </section>
-}
-
-function Stat({ label, value, sub }) {
-  return <div className="pub-stat"><span>{label}</span><b>{value}</b><small>{sub}</small></div>
 }
 
 function probabilityAxisPosition(probability) {
   const p = num(probability)
   if (p == null) return null
-  // The visible axis is 40%–80% so small model/market gaps are readable. Values
-  // outside that range pin to the edge rather than lying about their position.
   return Math.max(0, Math.min(100, ((p * 100) - 40) / 40 * 100))
 }
 
@@ -184,28 +190,22 @@ function MarketGap({ game, compact = false }) {
   const market = probabilityAxisPosition(game.marketPickP)
   const gap = game.marketPickP == null || game.pickP == null ? null : (game.pickP-game.marketPickP)*100
   return <div className={`pub-gap ${compact?'compact':''}`}>
-    <div className="pub-gap-head"><span>WIN PROBABILITY</span><b>{gap == null ? 'Market unavailable' : `${gap>=0?'+':''}${gap.toFixed(1)} pts vs market`}</b></div>
-    <div className="pub-gap-track">
-      <i className="mid" />
-      {market != null && <i className="market" style={{ left:`${market}%` }}><em>Market</em></i>}
-      <i className="model" style={{ left:`${model}%` }}><em>LevLine</em></i>
-    </div>
+    <div className="pub-gap-head"><span>LEVLINE vs MARKET</span><b>{gap == null ? 'Market unavailable' : `${gap>=0?'+':''}${gap.toFixed(1)} pts`}</b></div>
+    <div className="pub-gap-track"><i className="mid" />{market != null && <i className="market" style={{ left:`${market}%` }}><em>Market</em></i>}<i className="model" style={{ left:`${model}%` }}><em>LevLine</em></i></div>
     <div className="pub-gap-scale"><span>40%</span><span>50</span><span>60</span><span>70</span><span>80%+</span></div>
   </div>
 }
 
-function GameCard({ game, runs, preview, evidence, locked, onOpen }) {
+function GameCard({ game, preview, evidence, locked, onOpen, compact = false }) {
   const teaser = preview?.headline || preview?.paragraphs?.[0] || `${game.pick} is the current side.`
-  return <button className={`pub-game-card ${locked?'is-locked':''}`} onClick={onOpen} style={{ '--away':teamColor(game.away_team), '--home':teamColor(game.home_team) }}>
+  return <button className={`pub-game-card ${locked?'is-locked':''} ${compact?'watch-card':''}`} onClick={onOpen} style={{ '--away':teamColor(game.away_team), '--home':teamColor(game.home_team) }}>
     <div className="pub-card-top"><span>{kickoffText(game)}</span><StateBadge game={game} locked={locked} /></div>
-    <div className="pub-matchup">
-      <span><TeamMark team={game.away_team} /><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} /><b>{game.home_team}</b></span>
-    </div>
+    <div className="pub-matchup"><span><TeamMark team={game.away_team} /><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} /><b>{game.home_team}</b></span></div>
     <div className="pub-pick"><span>LEVLINE</span><strong>{game.pick} <b>{pct(game.pickP)}</b></strong><small>{game.projected_score || 'Central score pending'}</small></div>
-    <MarketGap game={game} compact />
-    <div className="pub-card-lines"><span><small>Model line</small><b>{modelLine(game.margin,game.home_team,game.away_team)}</b></span><span><small>Market</small><b>{modelLine(game.market,game.home_team,game.away_team)}</b></span><span className="edge"><small>Edge</small><b>{signed(game.pickEdge)}</b></span></div>
+    <div className="pub-card-lines"><span><small>LevLine</small><b>{modelLine(game.margin,game.home_team,game.away_team)}</b></span><span><small>Market</small><b>{modelLine(game.market,game.home_team,game.away_team)}</b></span><span className="edge"><small>Edge</small><b>{signed(game.pickEdge)}</b></span></div>
+    {!compact && <MarketGap game={game} compact />}
     <p>{teaser}</p>
-    <div className="pub-card-foot"><span>{preview?.key_factors?.length || evidence?.length || 0} verified matchup signals</span><b>Read the game file →</b></div>
+    <div className="pub-card-foot"><span>{preview?.key_factors?.length || evidence?.length || 0} verified signals</span><b>Open game →</b></div>
   </button>
 }
 
@@ -216,16 +216,23 @@ function Spotlight({ games, previews, onOpen }) {
   const marketGap = strongest.marketPickP == null ? null : (strongest.pickP-strongest.marketPickP)*100
   return <section className="pub-spotlight" style={{ '--away':teamColor(strongest.away_team), '--home':teamColor(strongest.home_team) }}>
     <div className="pub-spot-copy"><span>SIGNAL OF THE WEEK</span><h2>{preview?.headline || `${strongest.pick} ${pct(strongest.pickP)}`}</h2><p>{preview?.paragraphs?.[0] || 'The strongest current probability on the slate.'}</p><button onClick={() => onOpen(strongest)}>Open the full case →</button></div>
-    <div className="pub-spot-board">
-      <div><TeamMark team={strongest.away_team} size="lg" /><b>{strongest.away_team}</b><em>@</em><TeamMark team={strongest.home_team} size="lg" /><b>{strongest.home_team}</b></div>
-      <strong>{strongest.pick} {pct(strongest.pickP)}</strong>
-      <small>{marketGap == null ? 'No market probability attached' : `${marketGap>=0?'+':''}${marketGap.toFixed(1)} percentage points vs market`}</small>
-      <MarketGap game={strongest} compact />
-    </div>
+    <div className="pub-spot-board"><div><TeamMark team={strongest.away_team} size="lg" /><b>{strongest.away_team}</b><em>@</em><TeamMark team={strongest.home_team} size="lg" /><b>{strongest.home_team}</b></div><strong>{strongest.pick} {pct(strongest.pickP)}</strong><small>{marketGap == null ? 'Market probability unavailable' : `${marketGap>=0?'+':''}${marketGap.toFixed(1)} percentage points vs market`}</small><MarketGap game={strongest} compact /></div>
   </section>
 }
 
-function WeekPage({ games, runs, evidence, previews, history, status, setSelected }) {
+function GamesToWatch({ games, previews, evidence, history, onOpen }) {
+  if (games.length < 2) return null
+  const signal = [...games].sort((a,b)=>(b.pickP||0)-(a.pickP||0))[0]?.game_id
+  const locked = new Set(history.filter(row=>row.lock_status==='LOCKED').map(row=>row.game_id))
+  const watch = [...games].filter(g=>g.game_id!==signal).sort((a,b)=>{
+    const aGap = a.marketPickP == null ? 0 : Math.abs((a.pickP||.5)-a.marketPickP)
+    const bGap = b.marketPickP == null ? 0 : Math.abs((b.pickP||.5)-b.marketPickP)
+    return (bGap + Math.abs(b.pickEdge||0)/20) - (aGap + Math.abs(a.pickEdge||0)/20)
+  }).slice(0,3)
+  return <section className="pub-watch"><div className="pub-section-head"><div><span>GAMES TO WATCH</span><h2>Where the board gets interesting.</h2></div></div><div className="pub-watch-grid">{watch.map(game=><GameCard key={game.game_id} game={game} preview={previews[game.game_id]} evidence={evidence[game.game_id]||[]} locked={locked.has(game.game_id)} onOpen={()=>onOpen(game)} compact />)}</div></section>
+}
+
+function WeekPage({ games, evidence, previews, history, status, setSelected }) {
   const [sortMode,setSortMode] = useState('kickoff')
   const locked = new Set(history.filter(row => row.lock_status==='LOCKED').map(row => row.game_id))
   const sorted = useMemo(() => {
@@ -235,21 +242,24 @@ function WeekPage({ games, runs, evidence, previews, history, status, setSelecte
     if (sortMode==='close') return copy.sort((a,b)=>Math.abs((a.pickP||.5)-.5)-Math.abs((b.pickP||.5)-.5))
     return copy.sort((a,b)=>(easternKickoff(a)?.getTime()||0)-(easternKickoff(b)?.getTime()||0))
   },[games,sortMode])
-  return <main className="pub-main">
-    <CompactHero games={games} history={history} status={status} />
-    <Spotlight games={games} previews={previews} onOpen={setSelected} />
-    <section className="pub-slate">
-      <div className="pub-section-head"><div><span>WEEK {games[0]?.week || '—'} FORECASTS</span><h2>The whole board, without making you hunt for the pick.</h2></div><div className="pub-sort">{[['kickoff','Kickoff'],['strength','Strongest'],['edge','Biggest edge'],['close','Closest']].map(([key,label])=><button key={key} className={sortMode===key?'active':''} onClick={()=>setSortMode(key)}>{label}</button>)}</div></div>
-      <div className="pub-card-grid">{sorted.map(game => <GameCard key={game.game_id} game={game} runs={runs} preview={previews[game.game_id]} evidence={evidence[game.game_id]||[]} locked={locked.has(game.game_id)} onOpen={()=>setSelected(game)} />)}</div>
-    </section>
-  </main>
+  return <main className="pub-main"><CompactHero games={games} history={history} status={status}/><Spotlight games={games} previews={previews} onOpen={setSelected}/><GamesToWatch games={games} previews={previews} evidence={evidence} history={history} onOpen={setSelected}/><section className="pub-slate"><div className="pub-section-head"><div><span>FULL WEEK {games[0]?.week || '—'} SLATE</span><h2>Every forecast, in one scan.</h2></div><div className="pub-sort">{[['kickoff','Kickoff'],['strength','Strongest'],['edge','Biggest edge'],['close','Closest']].map(([key,label])=><button key={key} className={sortMode===key?'active':''} onClick={()=>setSortMode(key)}>{label}</button>)}</div></div><div className="pub-card-grid">{sorted.map(game => <GameCard key={game.game_id} game={game} preview={previews[game.game_id]} evidence={evidence[game.game_id]||[]} locked={locked.has(game.game_id)} onOpen={()=>setSelected(game)} />)}</div></section></main>
 }
 
-function ModelStrip({ game }) {
-  const rows = [
-    ['Logistic',game.logistic_home_prob],['Extra Trees',game.extra_trees_home_prob],['XGBoost',game.xgboost_home_prob],['CatBoost',game.catboost_home_prob],['PURE',game.pure_home_prob],['Market',game.market_home_prob],['LevLine',game.final_home_prob],
-  ].map(([label,value]) => ({ label, value:num(value) })).filter(row=>row.value!=null)
-  return <div className="pub-model-strip">{rows.map(row => <div key={row.label} className={row.label==='LevLine'?'final':''}><span>{row.label}</span><div><i style={{ width:`${row.value*100}%` }} /></div><b>{pct(row.value,0)}</b></div>)}</div>
+function modelProbabilityRows(game) {
+  return [['Logistic',game.logistic_home_prob],['Extra Trees',game.extra_trees_home_prob],['XGBoost',game.xgboost_home_prob],['CatBoost',game.catboost_home_prob],['Elo',game.elo_home_prob]].map(([label,value])=>({label,value:num(value)})).filter(row=>row.value!=null)
+}
+
+function ModelConsensus({ game }) {
+  const engines = modelProbabilityRows(game)
+  const home = game.home_team
+  const away = game.away_team
+  const values = engines.map(row=>row.value)
+  const range = values.length ? (Math.max(...values)-Math.min(...values))*100 : null
+  const homeLeans = engines.filter(row=>row.value>=.5).length
+  const leanTeam = homeLeans >= Math.ceil(engines.length/2) ? home : away
+  const summary = engines.length ? `${homeLeans} of ${engines.length} component models lean ${home}; the model spread is ${range?.toFixed(1)} percentage points.` : 'Component-model probabilities are not available for this run.'
+  const pos = p => Math.max(0,Math.min(100,((p-.25)/.5)*100))
+  return <div className="consensus-panel"><div className="consensus-axis"><span>25%</span><span>50</span><span>75%</span>{engines.map(row=><i key={row.label} style={{left:`${pos(row.value)}%`}} title={`${row.label}: ${pct(row.value)}`}><em>{row.label}</em></i>)}</div><p>{summary} Majority lean: <b>{leanTeam}</b>.</p><div className="consensus-outcomes"><div><span>PURE</span><b>{pct(game.pure_home_prob)}</b><small>football-only</small></div><div><span>MARKET</span><b>{pct(game.market_home_prob)}</b><small>outside signal</small></div><div className="final"><span>LEVLINE</span><b>{pct(game.final_home_prob)}</b><small>published</small></div></div></div>
 }
 
 function EvidenceBlock({ title, items, empty }) {
@@ -263,121 +273,90 @@ function HistoryFeature({ items }) {
   return <div className="pub-history-feature"><span>BEEN HERE BEFORE</span><h3>{qb.title}</h3><p>{qb.summary}</p>{latest && <div><b>{latest.human_label || latest.label}</b>{latest.score && <em>{latest.score}</em>}{latest.date && <small>{latest.date}</small>}</div>}</div>
 }
 
-function MatchupMeter({ rows=[] }) {
-  if (!rows.length) return null
-  return <section className="pub-article-block"><div className="pub-block-head"><span>MATCHUP METER</span></div><div className="pub-meter">{rows.map((row,index)=><div key={`${row.label}-${index}`}><span>{row.label}</span><i /><b>{row.leader || 'Mixed'}</b><em>{row.strength || 'Context'}</em></div>)}</div></section>
+function meterPosition(row, away, home) {
+  const leader=row.leader
+  const strength=String(row.strength||'').toLowerCase()
+  const distance=strength==='strong'?34:strength==='moderate'?24:strength==='weak'?14:0
+  if (leader===away) return 50-distance
+  if (leader===home) return 50+distance
+  return 50
 }
 
-function GameModal({ game, runs, evidence=[], preview, locked, sources, onClose }) {
+function MatchupMeter({ rows=[], away, home }) {
+  if (!rows.length) return null
+  return <section className="pub-article-block"><div className="pub-block-head"><span>MATCHUP METER</span></div><div className="pub-meter-rich">{rows.map((row,index)=><div className="meter-row" key={`${row.label}-${index}`}><div className="meter-copy"><span>{row.label}</span><b>{row.leader || 'Watch'}</b><p>{row.title || 'Live matchup evidence'}</p></div><div className="meter-scale"><small>{away}</small><div><i className="mid"/><b style={{left:`${meterPosition(row,away,home)}%`}}/></div><small>{home}</small></div><em>{row.strength || 'Context'}</em></div>)}</div></section>
+}
+
+function QuickNumbers({ game }) {
+  return <div className="quick-grid"><Stat label="LevLine" value={`${game.pick} ${pct(game.pickP)}`} /><Stat label="Projected score" value={game.projected_score || '—'} /><Stat label="Model spread" value={modelLine(game.margin,game.home_team,game.away_team)} /><Stat label="Market spread" value={modelLine(game.market,game.home_team,game.away_team)} /><Stat label="Spread edge" value={`${game.pick} ${signed(game.pickEdge)}`} /><Stat label="Projected total" value={one(game.expected_total)} /><Stat label="Market total" value={one(game.total_line)} /><Stat label="Confidence" value={game.confidence || '—'} /></div>
+}
+
+function GameModal({ game, runs, evidence=[], preview, locked, onClose }) {
   const category = item => String(item.category||'').toLowerCase()
   const personnel=evidence.filter(item=>['injury','personnel'].includes(category(item)))
   const history=evidence.filter(item=>['history','coaching','coordinator','structural_change'].includes(category(item)))
   const scenarios=evidence.filter(item=>['scenario','weather','travel'].includes(category(item)))
   const scheme=evidence.filter(item=>['scheme','matchup'].includes(category(item)))
-  const trend=runs.filter(row=>row.game_id===game.game_id).sort((a,b)=>new Date(a.prediction_timestamp_utc)-new Date(b.prediction_timestamp_utc)).map((row,index)=>({run:index+1,p:num(row.final_home_prob)})).filter(row=>row.p!=null)
+  const trend=runs.filter(row=>row.game_id===game.game_id).sort((a,b)=>new Date(a.prediction_timestamp_utc)-new Date(b.prediction_timestamp_utc)).map((row,index)=>({run:index+1,p:num(row.final_home_prob),market:num(row.market_home_prob)})).filter(row=>row.p!=null)
   const paragraphs=preview?.paragraphs?.length ? preview.paragraphs : [`LevLine has ${game.pick} at ${pct(game.pickP)} to win.`]
   const opponent=game.pick===game.home_team?game.away_team:game.home_team
-  return <div className="pub-modal-backdrop" onClick={onClose}><div className="pub-modal" onClick={e=>e.stopPropagation()}>
-    <button className="pub-close" onClick={onClose}>×</button>
-    <div className="pub-modal-id"><span><TeamMark team={game.away_team} size="lg" /><b>{teamName(game.away_team)}</b></span><div><small>{kickoffText(game)}</small><strong>@</strong><StateBadge game={game} locked={locked} /></div><span><TeamMark team={game.home_team} size="lg" /><b>{teamName(game.home_team)}</b></span></div>
-    <div className="pub-story-kicker">SUNDAY SIGNAL · GAME FILE</div>
-    <h1>{preview?.headline || `${game.pick} ${pct(game.pickP)}`}</h1>
-    <div className={`pub-verdict ${locked?'locked':''}`}><div><span>{locked?'OFFICIAL FORECAST':'CURRENT FORECAST'}</span><strong>{game.pick} {pct(game.pickP)}</strong><small>{locked?'Locked. This forecast can no longer change.':'Updates until the official pregame lock.'}</small></div><div><b>{game.projected_score || 'Score projection pending'}</b><small>LevLine {modelLine(game.margin,game.home_team,game.away_team)} · Market {modelLine(game.market,game.home_team,game.away_team)} · Edge {signed(game.pickEdge)}</small></div></div>
-    <MarketGap game={game} />
-    <div className="pub-modal-grid"><article>
-      <section className="pub-article-block pub-prose"><div className="pub-block-head"><span>THE READ</span></div>{paragraphs.map((p,i)=><p key={i}>{p}</p>)}</section>
-      <HistoryFeature items={history} />
-      <section className="pub-article-block"><div className="pub-block-head"><span>THREE THINGS THAT MATTER</span></div><div className="pub-factors">{(preview?.key_factors||[]).slice(0,3).map((factor,index)=><div key={index}><span>0{index+1}</span><b>{factor.title || factor.family}</b><p>{factor.summary}</p><small>{factor.advantage_team?`Edge ${factor.advantage_team} · `:''}{factor.strength || 'Context'}</small></div>)}</div></section>
-      <div className="pub-case-grid"><div><span>CASE FOR {game.pick}</span><p>{preview?.case_for_pick || `The central estimates favor ${game.pick}.`}</p></div><div><span>CASE FOR {opponent}</span><p>{preview?.case_for_opponent || `${opponent} needs the volatile parts of the game to swing its way.`}</p></div></div>
-      <MatchupMeter rows={preview?.matchup_meter || []} />
-      <EvidenceBlock title="PERSONNEL" items={personnel} empty="Nothing material on the official availability report yet." />
-      <EvidenceBlock title="HISTORY & STAFF CHANGES" items={history} empty="No verified matchup history worth forcing into the story." />
-      <EvidenceBlock title="WEATHER, TRAVEL & SCENARIOS" items={scenarios} empty="No live situational issue is material enough to feature." />
-      <section className="pub-article-block pub-wrong"><div className="pub-block-head"><span>WHAT COULD MAKE THIS WRONG?</span></div><p>{preview?.what_could_make_us_wrong || 'Football remains annoyingly good at producing turnovers, busted coverages and weird fourth downs.'}</p></section>
-      <details className="pub-raw"><summary>Raw scheme evidence</summary><EvidenceBlock title="SCHEME NOTES" items={scheme} empty="No tactical item cleared the display threshold." /></details>
-    </article><aside>
-      <div className="pub-aside-card"><span>MODEL CONSENSUS</span><h3>Where the engines land</h3><ModelStrip game={game} /></div>
-      <div className="pub-aside-card"><span>QUICK NUMBERS</span><div className="pub-number-grid"><Stat label="Fair home" value={pct(game.homeP)} /><Stat label="PURE" value={pct(game.pure_home_prob)} /><Stat label="Market" value={pct(game.market_home_prob)} /><Stat label="Total" value={one(game.expected_total)} /><Stat label="Home cover" value={pct(game.cover_home_prob)} /><Stat label="Over" value={pct(game.over_prob)} /></div></div>
-      <div className="pub-source-card"><span>SOURCE HEALTH</span>{Object.entries(sources||{}).filter(([,v])=>v&&typeof v==='object'&&v.status).slice(0,10).map(([key,value])=><div key={key}><b>{key.replaceAll('_',' ')}</b><em className={value.status==='healthy'?'ok':'warn'}>{value.status}</em></div>)}</div>
-    </aside></div>
-    <section className="pub-trend"><div><span>FORECAST HISTORY</span><h3>How the probability moved</h3></div><div>{trend.length>1?<ResponsiveContainer width="100%" height={220}><AreaChart data={trend}><XAxis dataKey="run" tickLine={false} axisLine={false}/><YAxis domain={[0,1]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false} axisLine={false}/><Tooltip formatter={v=>pct(v)}/><Area dataKey="p" type="monotone" stroke="#68d8c7" fill="#68d8c722" strokeWidth={3}/></AreaChart></ResponsiveContainer>:<p className="pub-empty">Movement appears after the second comparable model run.</p>}</div></section>
-  </div></div>
+  return <div className="pub-modal-backdrop" onClick={onClose}><div className="pub-modal dossier" onClick={e=>e.stopPropagation()}><button className="pub-close" onClick={onClose}>×</button><div className="pub-modal-id"><span><TeamMark team={game.away_team} size="lg" /><b>{teamName(game.away_team)}</b></span><div><small>{kickoffText(game)}</small><strong>@</strong><StateBadge game={game} locked={locked}/></div><span><TeamMark team={game.home_team} size="lg" /><b>{teamName(game.home_team)}</b></span></div><div className="pub-story-kicker">SUNDAY SIGNAL · GAME FILE</div><h1>{preview?.headline || `${game.pick} ${pct(game.pickP)}`}</h1><div className={`pub-verdict ${locked?'locked':''}`}><div><span>{locked?'OFFICIAL FORECAST':'CURRENT FORECAST'}</span><strong>{game.pick} {pct(game.pickP)}</strong><small>{locked?'Locked. This forecast can no longer change.':'Updates until the official pregame lock.'}</small></div><div><b>{game.projected_score || 'Score projection pending'}</b><small>LevLine {modelLine(game.margin,game.home_team,game.away_team)} · Market {modelLine(game.market,game.home_team,game.away_team)} · Edge {signed(game.pickEdge)}</small></div></div><MarketGap game={game}/><div className="pub-modal-grid"><article><section className="pub-article-block pub-prose"><div className="pub-block-head"><span>THE READ</span></div>{paragraphs.map((p,i)=><p key={i}>{p}</p>)}</section><HistoryFeature items={history}/><MatchupMeter rows={preview?.matchup_meter || []} away={game.away_team} home={game.home_team}/><section className="pub-article-block"><div className="pub-block-head"><span>THREE THINGS THAT MATTER</span></div><div className="pub-factors">{(preview?.key_factors||[]).slice(0,3).map((factor,index)=><div key={index}><span>0{index+1}</span><b>{factor.title || factor.family}</b><p>{factor.summary}</p><small>{factor.advantage_team?`Edge ${factor.advantage_team} · `:''}{factor.strength || 'Context'}</small></div>)}</div></section><div className="pub-case-grid"><div><span>CASE FOR {game.pick}</span><p>{preview?.case_for_pick || `The central estimates favor ${game.pick}.`}</p></div><div><span>CASE FOR {opponent}</span><p>{preview?.case_for_opponent || `${opponent} needs the volatile parts of the game to swing its way.`}</p></div></div><EvidenceBlock title="PERSONNEL" items={personnel} empty="Nothing material on the official availability report yet."/><EvidenceBlock title="HISTORY, STAFF & IMPACT" items={history} empty="No verified staff or matchup history is material enough to feature."/><EvidenceBlock title="WEATHER, TRAVEL & SCENARIOS" items={scenarios} empty="No live situational issue is material enough to feature."/><section className="pub-article-block pub-wrong"><div className="pub-block-head"><span>WHAT COULD MAKE THIS WRONG?</span></div><p>{preview?.what_could_make_us_wrong || 'Turnovers, explosives and fourth-down variance remain the cleanest ways for the game to outrun a central forecast.'}</p></section><details className="pub-raw"><summary>Deeper scheme evidence</summary><EvidenceBlock title="SCHEME NOTES" items={scheme} empty="No tactical item cleared the display threshold."/></details></article><aside><div className="pub-aside-card"><span>MODEL CONSENSUS</span><h3>Five engines, then the blend</h3><ModelConsensus game={game}/></div><div className="pub-aside-card"><span>QUICK NUMBERS</span><QuickNumbers game={game}/></div></aside></div><section className="pub-trend"><div><span>FORECAST HISTORY</span><h3>How the probability moved</h3></div><div>{trend.length>1?<ResponsiveContainer width="100%" height={220}><AreaChart data={trend}><XAxis dataKey="run" tickLine={false} axisLine={false}/><YAxis domain={[0,1]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false} axisLine={false}/><Tooltip formatter={v=>pct(v)}/><Area dataKey="p" type="monotone" stroke="#68d8c7" fill="#68d8c722" strokeWidth={3}/></AreaChart></ResponsiveContainer>:<p className="pub-empty">Movement appears after the second comparable model run.</p>}</div></section></div></div>
 }
 
 function PageHead({ kicker,title,copy }) { return <div className="pub-page-head"><span>{kicker}</span><h1>{title}</h1><p>{copy}</p></div> }
 
 function TeamsPage({ profiles, setTeam }) {
   const rows=[...profiles].sort((a,b)=>(num(a.rank)||999)-(num(b.rank)||999))
-  return <main className="pub-inner"><PageHead kicker="32 TEAM PROFILES" title="The league, one team at a time." copy="Power, efficiency and the next forecast. The useful stuff, minus the press-conference fog."/><div className="pub-team-grid">{rows.map(row=><button key={row.team} onClick={()=>setTeam(row)}><TeamMark team={row.team}/><span>#{row.rank}</span><h3>{teamName(row.team)}</h3><div><small>Elo+</small><b>{num(row.elo_plus)==null?'—':Math.round(num(row.elo_plus))}</b></div><div><small>Next</small><b>{row.next_opponent?`${row.next_site==='HOME'?'vs':'@'} ${row.next_opponent}`:'TBD'}</b></div><div><small>Win</small><b>{pct(row.next_win_prob)}</b></div></button>)}</div></main>
+  return <main className="pub-inner"><PageHead kicker="32 TEAM PROFILES" title="The league, one team at a time." copy="Power, efficiency and the next LevLine forecast."/><div className="pub-team-grid">{rows.map(row=><button key={row.team} onClick={()=>setTeam(row)}><TeamMark team={row.team}/><span>#{row.rank}</span><h3>{teamName(row.team)}</h3><div><small>Elo+</small><b>{num(row.elo_plus)==null?'—':Math.round(num(row.elo_plus))}</b></div><div><small>Next</small><b>{row.next_opponent?`${row.next_site==='HOME'?'vs':'@'} ${row.next_opponent}`:'TBD'}</b></div><div><small>Win</small><b>{pct(row.next_win_prob)}</b></div></button>)}</div></main>
 }
 
-function TeamModal({ team,onClose }) { return <div className="pub-modal-backdrop" onClick={onClose}><div className="pub-team-modal" onClick={e=>e.stopPropagation()}><button className="pub-close" onClick={onClose}>×</button><TeamMark team={team.team} size="lg"/><span>POWER RANK #{team.rank}</span><h2>{teamName(team.team)}</h2><div className="pub-number-grid"><Stat label="Elo+" value={num(team.elo_plus)==null?'—':Math.round(num(team.elo_plus))}/><Stat label="Off EPA" value={num(team.off_epa)==null?'—':num(team.off_epa).toFixed(3)}/><Stat label="Def EPA allowed" value={num(team.def_epa_allowed)==null?'—':num(team.def_epa_allowed).toFixed(3)}/><Stat label="Pass EPA" value={num(team.pass_epa)==null?'—':num(team.pass_epa).toFixed(3)}/><Stat label="Recent" value={pct(team.recent_win_pct,0)}/><Stat label="Next win" value={pct(team.next_win_prob)}/></div></div></div> }
+function TeamModal({ team,onClose }) { return <div className="pub-modal-backdrop" onClick={onClose}><div className="pub-team-modal" onClick={e=>e.stopPropagation()}><button className="pub-close" onClick={onClose}>×</button><TeamMark team={team.team} size="lg"/><span>POWER RANK #{team.rank}</span><h2>{teamName(team.team)}</h2><div className="pub-number-grid"><Stat label="Elo+" value={num(team.elo_plus)==null?'—':Math.round(num(team.elo_plus))}/><Stat label="Off EPA" value={three(team.off_epa)}/><Stat label="Def EPA allowed" value={three(team.def_epa_allowed)}/><Stat label="Pass EPA" value={three(team.pass_epa)}/><Stat label="Recent" value={pct(team.recent_win_pct,0)}/><Stat label="Next win" value={pct(team.next_win_prob)}/></div></div></div> }
 
-function RatingsPage({ rows }) {
+function movementClass(text='') { return text.startsWith('▲') ? 'up' : text.startsWith('▼') ? 'down' : 'flat' }
+
+function RatingsPage({ rows, editorial }) {
   const sorted=[...rows].sort((a,b)=>(num(a.rank)||999)-(num(b.rank)||999))
-  return <main className="pub-inner"><PageHead kicker="POWER RATINGS" title="LevLine's current league table." copy="Elo+ is still the published spine. Anything fancier has to earn its way in out of sample."/><div className="pub-table"><table><thead><tr><th>Rank</th><th>Team</th><th>Elo+</th><th>Off EPA</th><th>Def EPA allowed</th><th>Pass EPA</th><th>Recent</th></tr></thead><tbody>{sorted.map(row=><tr key={row.team}><td>#{row.rank}</td><td><span className="pub-table-team"><TeamMark team={row.team} size="sm"/>{teamName(row.team)}</span></td><td><b>{Math.round(num(row.elo_plus)||0)}</b></td><td>{one(row.off_epa)}</td><td>{one(row.def_epa_allowed)}</td><td>{one(row.pass_epa)}</td><td>{pct(row.recent_win_pct,0)}</td></tr>)}</tbody></table></div></main>
+  const notes=new Map((editorial?.teams||[]).map(item=>[item.team,item]))
+  return <main className="pub-inner"><PageHead kicker="POWER RATINGS" title="The rankings, with an argument attached." copy="Elo+ sets the order. The notes explain what in the efficiency profile supports it—and what could move it next."/><div className="power-list">{sorted.map(row=>{const note=notes.get(row.team)||{};return <article key={row.team} className="power-row"><div className="power-rank"><b>#{row.rank}</b><span className={movementClass(row.movement)}>{row.movement || '→'}</span></div><TeamMark team={row.team}/><div className="power-copy"><h2>{teamName(row.team)}</h2><p>{note.why_here || `Elo+ currently places ${row.team} at No. ${row.rank}.`}</p><small><b>What could move them:</b> {note.what_moves_them || 'New game data will determine the next meaningful move.'}</small></div><div className="power-metrics"><span><small>Elo+</small><b>{Math.round(num(row.elo_plus)||0)}</b></span><span><small>Off EPA</small><b>{three(row.off_epa)}</b></span><span><small>Def EPA</small><b>{three(row.def_epa_allowed)}</b></span><span><small>Pass EPA</small><b>{three(row.pass_epa)}</b></span></div></article>})}</div></main>
 }
 
-function ModelsPage({ rows, calibration }) {
-  return <main className="pub-inner"><PageHead kicker="MODEL LAB" title="Confidence has to be earned." copy="Win percentage is the headline. Calibration, Brier score and log loss tell us whether the confidence underneath it is sane."/><div className="pub-lab"><div className="pub-table"><table><thead><tr><th>Model</th><th>Games</th><th>Winner%</th><th>Brier</th><th>Log loss</th><th>Margin MAE</th><th>Total MAE</th></tr></thead><tbody>{rows.map((row,index)=><tr key={`${row.model}-${index}`}><td><b>{row.model==='Final Ensemble'?'LevLine':row.model}</b></td><td>{row.games||'—'}</td><td>{row.winner_pct||row.winner_accuracy||'—'}</td><td>{row.brier||row.brier_score||'—'}</td><td>{row.log_loss||'—'}</td><td>{row.margin_mae||'—'}</td><td>{row.total_mae||'—'}</td></tr>)}</tbody></table></div><div className="pub-cal"><span>CALIBRATION</span><h3>When we say 70%, do we actually mean 70%?</h3>{calibration.length?calibration.map((row,index)=><div key={index}><b>{row.bucket||row.probability_bucket||`Bucket ${index+1}`}</b><span>{row.games||row.n||'—'} games</span><em>{row.actual_win_rate||row.observed_rate||'—'}</em></div>):<p>Calibration bins populate as official 2026 locks are graded.</p>}</div></div></main>
+function CalibrationPanel({ calibration }) {
+  return <section className="history-panel"><span>CALIBRATION</span><h2>When LevLine says 70%, does 70% behave like 70%?</h2>{calibration.length?<div className="cal-grid">{calibration.map((row,index)=><div key={index}><b>{row.bucket||row.probability_bucket||`Bucket ${index+1}`}</b><span>{row.games||row.n||'—'} games</span><em>{row.actual_win_rate||row.observed_rate||'—'}</em></div>)}</div>:<p className="pub-empty">Calibration bins populate as official 2026 locks are graded.</p>}</section>
 }
 
-function HistoryPage({ history, autopsies }) {
-  const graded=history.filter(row=>autopsies[row.game_id]?.correct!=null)
-  const wins=graded.filter(row=>String(autopsies[row.game_id]?.correct).toLowerCase()==='true').length
-  return <main className="pub-inner"><PageHead kicker="OFFICIAL HISTORY" title="The receipts stay on the table." copy="Only the first valid pregame lock is graded. No hindsight edit, no quiet probability swap, no pretending the miss was actually a win."/><div className="pub-history-summary"><Stat label="Official locks" value={history.length} sub="Immutable snapshots"/><Stat label="Record" value={graded.length?`${wins}-${graded.length-wins}`:'—'} sub={graded.length?`${pct(wins/graded.length,0)} winner accuracy`:'Starts after games finish'}/><Stat label="Policy" value="No edits" sub="After official lock"/></div>{history.length?<div className="pub-table"><table><thead><tr><th>Week</th><th>Matchup</th><th>Pick</th><th>Probability</th><th>Projected</th><th>Result</th></tr></thead><tbody>{history.map((row,index)=><tr key={`${row.game_id}-${index}`}><td>{row.week||'—'}</td><td>{row.away_team&&row.home_team?`${row.away_team} @ ${row.home_team}`:row.game_id}</td><td><b>{row.pick||'—'}</b></td><td>{pct(row.pick_prob||row.final_pick_prob||row.final_home_prob)}</td><td>{row.projected_score||'—'}</td><td>{autopsies[row.game_id]?.correct!=null?(String(autopsies[row.game_id].correct).toLowerCase()==='true'?'✓ Correct':'✕ Miss'):'Pending'}</td></tr>)}</tbody></table></div>:<div className="pub-empty-state">The ledger starts with the first official lock.</div>}</main>
+function HistoryPage({ history, autopsies, scoreboard, calibration }) {
+  const locked=history.filter(row=>row.lock_status==='LOCKED')
+  const board=scoreboard||{}
+  const brierDelta=num(board.brier_vs_market)
+  return <main className="pub-inner"><PageHead kicker="OFFICIAL HISTORY" title="The receipts stay on the table." copy="Only immutable T−120 locks count. The probability, pick and result remain visible after the game."/><section className="history-scoreboard"><Stat label="Record" value={board.graded ? board.record : '0-0'} sub={board.graded ? `${pct(board.winner_accuracy,0)} winner accuracy` : 'Waiting for graded games'}/><Stat label="Brier" value={num(board.brier)==null?'—':num(board.brier).toFixed(3)} sub="Lower is better"/><Stat label="vs market" value={brierDelta==null?'—':`${brierDelta>0?'+':''}${brierDelta.toFixed(3)}`} sub={brierDelta==null?'Common sample':brierDelta>0?'LevLine better':'Market better'}/><Stat label="Margin MAE" value={one(board.margin_mae)} sub="points"/><Stat label="Total MAE" value={one(board.total_mae)} sub="points"/></section><CalibrationPanel calibration={calibration}/>{locked.length?<div className="pub-table history-ledger"><table><thead><tr><th>Week</th><th>Matchup</th><th>Pick</th><th>Probability</th><th>Projected</th><th>Result</th></tr></thead><tbody>{locked.map((row,index)=><tr key={`${row.game_id}-${index}`}><td>{row.week||'—'}</td><td>{row.away_team&&row.home_team?`${row.away_team} @ ${row.home_team}`:row.game_id}</td><td><b>{row.pick||'—'}</b></td><td>{pct(row.pick_prob||row.final_pick_prob||row.final_home_prob)}</td><td>{row.projected_score||'—'}</td><td>{autopsies[row.game_id]?.correct!=null?(String(autopsies[row.game_id].correct).toLowerCase()==='true'?'✓ Correct':'✕ Miss'):'Pending'}</td></tr>)}</tbody></table></div>:<div className="pub-empty-state">The official ledger begins with the first T−120 lock.</div>}<p className="history-note">No ROI is displayed unless Sunday Signal defines and timestamps a betting rule before the games. Prediction performance and betting performance are not the same thing.</p></main>
 }
 
-function MethodPage() {
-  const nodes=[
-    ['FOOTBALL INPUTS','EPA · success rate · explosives · turnovers · Elo · rest · home field'],
-    ['FOUR MODELS','Logistic · Extra Trees · XGBoost · CatBoost'],
-    ['PURE','Football-only ensemble probability'],
-    ['+ MARKET','Separate consensus market-implied probability joins here'],
-    ['LEVLINE','75% PURE + 25% MARKET'],
-    ['LOCK','First valid forecast inside T−120 becomes official'],
-    ['AUDIT','Calibration · Brier · log loss · margin/total error'],
-  ]
-  return <main className="pub-inner"><PageHead kicker="METHODOLOGY" title="The thesis behind LevLine." copy="The goal is not to sound certain. The goal is to be well calibrated, explain the football underneath the number, and preserve exactly what the model believed before kickoff."/>
-    <section className="pub-thesis"><span>THE SHORT VERSION</span><h2>Start with football. Let different models disagree. Use the market as information, not scripture. Lock the answer before the game. Then keep score honestly.</h2><p>That is the entire philosophy. Everything else is implementation detail.</p></section>
-    <section className="pub-pipeline"><div className="pub-block-head"><span>HOW A FORECAST BECOMES OFFICIAL</span></div><div className="pub-pipeline-row">{nodes.map(([title,body],index)=><React.Fragment key={title}><div className={`pub-node n${index}`}><span>{title}</span><b>{body}</b></div>{index<nodes.length-1&&<i>→</i>}</React.Fragment>)}</div><p className="pub-empty">PURE and MARKET are parallel inputs to the published LevLine probability. The market is not produced by the football models; it joins the pipeline only at the 75/25 blend.</p></section>
-    <div className="pub-method-grid">
-      <div><span>1 · TRAIN WITHOUT PEEKING</span><h3>Chronological expanding-window validation</h3><p>Older seasons train the model; later seasons test it. The model does not get to study the answer key before taking the exam.</p></div>
-      <div><span>2 · KEEP 2026 SACRED</span><h3>The current season is a forward test</h3><p>2026 results are for measurement, not for choosing the architecture. Any upgrade has to prove itself on earlier held-out data first.</p></div>
-      <div><span>3 · SEPARATE NUMBER FROM STORY</span><h3>Context explains; it does not secretly move points</h3><p>Injuries, coaching, scheme, quarterback history, weather and travel appear in the written analysis. They enter the numerical model only after separate out-of-sample validation.</p></div>
-      <div><span>4 · RESPECT THE MARKET</span><h3>Useful information, not a veto</h3><p>PURE is the football-only forecast. LevLine's published probability blends 75% PURE with 25% market signal. Big disagreements stay visible instead of being averaged into oblivion.</p></div>
-      <div><span>5 · LOCK IT</span><h3>No moving the goalposts after kickoff</h3><p>The first valid forecast inside the T−120 window becomes immutable. That exact probability and pick are what Sunday Signal grades.</p></div>
-      <div><span>6 · GRADE THE PROBABILITY</span><h3>Being right is not enough</h3><p>A 51% call and a 90% call should not be judged the same way. Brier score, log loss and calibration punish confidence that was not deserved.</p></div>
-    </div>
-    <section className="pub-not-do"><span>WHAT LEVLINE DOES NOT DO</span><div><b>No hindsight edits.</b><b>No hand-entered tout picks.</b><b>No unvalidated injury-point guesses.</b><b>No tuning the architecture on 2026 outcomes.</b><b>No pretending a 50.1% game is a mortal lock.</b></div></section>
-  </main>
+function ValidationTable({ rows }) {
+  if (!rows.length) return <p className="pub-empty">Historical validation rows are not available.</p>
+  return <div className="pub-table"><table><thead><tr><th>Model</th><th>Games</th><th>Winner%</th><th>Brier</th><th>Log loss</th><th>Margin MAE</th><th>Total MAE</th></tr></thead><tbody>{rows.map((row,index)=><tr key={`${row.model}-${index}`}><td><b>{row.model==='Final Ensemble'?'LevLine':row.model}</b></td><td>{row.games||'—'}</td><td>{row.winner_pct||row.winner_accuracy||'—'}</td><td>{row.brier||row.brier_score||'—'}</td><td>{row.log_loss||'—'}</td><td>{row.margin_mae||'—'}</td><td>{row.total_mae||'—'}</td></tr>)}</tbody></table></div>
+}
+
+function MethodPage({ models }) {
+  const nodes=[['NFL DATA','EPA · success rate · explosives · turnovers · Elo · QB · rest'],['FEATURES','Rolling form · opponent-adjusted context · home/travel'],['ENSEMBLE','Logistic · Extra Trees · XGBoost · CatBoost · Elo reference'],['PURE','Football-only probability'],['MARKET','Independent consensus signal'],['LEVLINE','75% PURE + 25% MARKET'],['T−120 LOCK','First valid forecast becomes immutable'],['AUDIT','Brier · calibration · error · market comparison']]
+  return <main className="pub-inner method-page"><PageHead kicker="METHODOLOGY" title="The thesis behind LevLine." copy="A forecast should be reproducible before kickoff and accountable after it."/><section className="pub-pipeline pipeline-thesis"><div className="pub-block-head"><span>FROM RAW FOOTBALL TO AN OFFICIAL FORECAST</span></div><div className="method-flow">{nodes.map(([title,body],index)=><React.Fragment key={title}><div className="method-node"><span>{String(index+1).padStart(2,'0')}</span><h3>{title}</h3><p>{body}</p></div>{index<nodes.length-1&&<i>→</i>}</React.Fragment>)}</div><p className="method-callout"><b>Important:</b> PURE and Market are separate information streams. The market joins only at the published 75/25 blend; it is not fed into the football models.</p></section><div className="pub-method-grid"><div><span>TRAIN WITHOUT PEEKING</span><h3>Expanding-window validation</h3><p>Older seasons train the architecture; later seasons test it. Chronology prevents the model from learning from games it is supposed to predict.</p></div><div><span>KEEP 2026 SACRED</span><h3>The current season is a forward test</h3><p>2026 outcomes measure the system. They do not get used to choose a better-looking architecture after the fact.</p></div><div><span>SEPARATE NUMBER FROM STORY</span><h3>Context explains unless validated</h3><p>Injuries, staff, scheme, QB history, weather and travel enrich the analysis. They change LevLine only after separate chronological validation.</p></div><div><span>LOCK IT</span><h3>No moving the goalposts</h3><p>The first valid forecast inside T−120 is immutable. Later news can update explanatory context, not rewrite the official pick.</p></div></div><section className="history-panel validation-panel"><span>HISTORICAL VALIDATION</span><h2>The old Model Lab lives here now—for a reason.</h2><p>These are architecture-validation metrics, not a second consumer product.</p><ValidationTable rows={models}/></section><section className="pub-not-do"><span>WHAT LEVLINE DOES NOT DO</span><div><b>No hindsight edits.</b><b>No unvalidated injury-point guesses.</b><b>No tuning the architecture on 2026 outcomes.</b><b>No pretending winner accuracy is the same as calibration.</b></div></section></main>
 }
 
 export default function App() {
   const [tab,setTab]=useState('week')
   const [games,setGames]=useState([]), [runs,setRuns]=useState([]), [evidence,setEvidence]=useState({}), [previews,setPreviews]=useState({}), [sources,setSources]=useState({}), [status,setStatus]=useState({})
   const [ratings,setRatings]=useState([]), [models,setModels]=useState([]), [history,setHistory]=useState([]), [profiles,setProfiles]=useState([]), [calibration,setCalibration]=useState([]), [autopsies,setAutopsies]=useState({})
+  const [powerEditorial,setPowerEditorial]=useState({teams:[]}), [scoreboard,setScoreboard]=useState({})
   const [selected,setSelected]=useState(null), [team,setTeam]=useState(null), [error,setError]=useState('')
 
   useEffect(()=>{;(async()=>{try{
-    const [g,r,e,p,s,st,pr,ml,h,tp,cal,auto]=await Promise.all([
-      fetchCSV('this_week.csv'),fetchCSV('run_history.csv'),fetchJSON('contextual_evidence.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('context_source_status.json',{}),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchCSV('calibration.csv'),fetchJSON('postgame_autopsies.json',{}),
+    const [g,r,e,p,s,st,pr,ml,h,tp,cal,auto,pe,hs]=await Promise.all([
+      fetchCSV('this_week.csv'),fetchCSV('run_history.csv'),fetchJSON('contextual_evidence.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('context_source_status.json',{}),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchCSV('calibration.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchJSON('history_scoreboard.json',{}),
     ])
-    setGames(g.map(normalizeGame));setRuns(r);setEvidence(e);setPreviews(p);setSources(s);setStatus(st);setRatings(pr);setModels(ml);setHistory(h);setProfiles(tp);setCalibration(cal);setAutopsies(auto)
+    setGames(g.map(normalizeGame));setRuns(r);setEvidence(e);setPreviews(p);setSources(s);setStatus(st);setRatings(pr);setModels(ml);setHistory(h);setProfiles(tp);setCalibration(cal);setAutopsies(auto);setPowerEditorial(pe);setScoreboard(hs)
   }catch(err){setError(String(err))}})()},[])
 
   const locked=useMemo(()=>new Set(history.filter(row=>row.lock_status==='LOCKED').map(row=>row.game_id)),[history])
+  const week=games[0]?.week
   if(error) return <div className="pub-fatal"><b>Sunday Signal could not load.</b><span>{error}</span></div>
-  return <div className="pub-app">
-    <Header tab={tab} setTab={setTab} status={status} history={history} sources={sources}/>
-    {tab==='week'&&<WeekPage games={games} runs={runs} evidence={evidence} previews={previews} history={history} status={status} setSelected={setSelected}/>} 
-    {tab==='teams'&&<TeamsPage profiles={profiles} setTeam={setTeam}/>} 
-    {tab==='ratings'&&<RatingsPage rows={ratings}/>} 
-    {tab==='models'&&<ModelsPage rows={models} calibration={calibration}/>} 
-    {tab==='history'&&<HistoryPage history={history} autopsies={autopsies}/>} 
-    {tab==='method'&&<MethodPage/>}
-    {selected&&<GameModal game={selected} runs={runs} evidence={evidence[selected.game_id]||[]} preview={previews[selected.game_id]} locked={locked.has(selected.game_id)} sources={sources} onClose={()=>setSelected(null)}/>} 
-    {team&&<TeamModal team={team} onClose={()=>setTeam(null)}/>} 
-    <footer className="pub-footer"><b>SUNDAY SIGNAL</b><span>Built in public. Locked before kickoff. Graded after.</span></footer>
-  </div>
+  return <div className="pub-app"><Header tab={tab} setTab={setTab} status={status} history={history} sources={sources} week={week}/>{tab==='week'&&<WeekPage games={games} evidence={evidence} previews={previews} history={history} status={status} setSelected={setSelected}/>} {tab==='teams'&&<TeamsPage profiles={profiles} setTeam={setTeam}/>} {tab==='ratings'&&<RatingsPage rows={ratings} editorial={powerEditorial}/>} {tab==='history'&&<HistoryPage history={history} autopsies={autopsies} scoreboard={scoreboard} calibration={calibration}/>} {tab==='method'&&<MethodPage models={models}/>} {selected&&<GameModal game={selected} runs={runs} evidence={evidence[selected.game_id]||[]} preview={previews[selected.game_id]} locked={locked.has(selected.game_id)} onClose={()=>setSelected(null)}/>} {team&&<TeamModal team={team} onClose={()=>setTeam(null)}/>}<footer className="pub-footer"><b>SUNDAY SIGNAL</b><span>Built in public. Locked before kickoff. Graded after.</span></footer></div>
 }
