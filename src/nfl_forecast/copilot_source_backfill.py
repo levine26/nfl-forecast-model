@@ -10,6 +10,7 @@ aggregator URL as public provenance, and never touches LevLine inputs or output.
 """
 
 from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from html import unescape
 import re
 from urllib.parse import parse_qs, quote_plus, unquote, urlparse
@@ -19,45 +20,13 @@ import requests
 from bs4 import BeautifulSoup
 
 from nfl_forecast.context import TEAM_META
-from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
+from nfl_forecast.source_policy import (
+    APPROVED_MEDIA_DOMAINS,
+    OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE,
+)
 
 
 BING_NEWS_RSS = "https://www.bing.com/news/search"
-
-OFFICIAL_TEAM_DOMAIN_BY_CODE = {
-    "ARI": "arizonacardinals.com",
-    "ATL": "atlantafalcons.com",
-    "BAL": "baltimoreravens.com",
-    "BUF": "buffalobills.com",
-    "CAR": "panthers.com",
-    "CHI": "chicagobears.com",
-    "CIN": "bengals.com",
-    "CLE": "clevelandbrowns.com",
-    "DAL": "dallascowboys.com",
-    "DEN": "denverbroncos.com",
-    "DET": "detroitlions.com",
-    "GB": "packers.com",
-    "HOU": "houstontexans.com",
-    "IND": "colts.com",
-    "JAX": "jaguars.com",
-    "KC": "chiefs.com",
-    "LA": "therams.com",
-    "LAC": "chargers.com",
-    "LV": "raiders.com",
-    "MIA": "miamidolphins.com",
-    "MIN": "vikings.com",
-    "NE": "patriots.com",
-    "NO": "neworleanssaints.com",
-    "NYG": "giants.com",
-    "NYJ": "newyorkjets.com",
-    "PHI": "philadelphiaeagles.com",
-    "PIT": "steelers.com",
-    "SEA": "seahawks.com",
-    "SF": "49ers.com",
-    "TB": "buccaneers.com",
-    "TEN": "tennesseetitans.com",
-    "WAS": "commanders.com",
-}
 
 # Official team publishers are tried first because they are both authoritative and
 # highly likely to publish opponent-specific Week coverage. National publishers
@@ -145,8 +114,10 @@ def _parse_date(value: object) -> datetime | None:
     if not text:
         return None
     try:
-        parsed = datetime.strptime(text, "%a, %d %b %Y %H:%M:%S %Z").replace(tzinfo=timezone.utc)
-        return parsed
+        parsed = parsedate_to_datetime(text)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
     except Exception:
         return None
 
@@ -184,8 +155,8 @@ def _mentions(text: str, code: str) -> bool:
 
 
 def _matchup_relevant(text: str, away: str, home: str, domain: str) -> bool:
-    official_away = OFFICIAL_TEAM_DOMAIN_BY_CODE.get(away)
-    official_home = OFFICIAL_TEAM_DOMAIN_BY_CODE.get(home)
+    official_away = OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE.get(away)
+    official_home = OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE.get(home)
     if domain == official_away:
         return _mentions(text, home)
     if domain == official_home:
@@ -256,7 +227,7 @@ def backfill_direct_sources(
 
     domains: list[str] = []
     for code in (away, home):
-        domain = OFFICIAL_TEAM_DOMAIN_BY_CODE.get(code)
+        domain = OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE.get(code)
         if domain and domain not in domains:
             domains.append(domain)
     for domain in NATIONAL_BACKFILL_DOMAINS:
