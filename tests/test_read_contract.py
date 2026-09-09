@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 
-from nfl_forecast.media_editorial import rewrite_reads_with_media
+from nfl_forecast.media_editorial import _football_preview, rewrite_reads_with_media
 
 
 def test_deterministic_read_has_exact_two_paragraph_contract():
@@ -73,3 +75,76 @@ def test_deterministic_read_has_exact_two_paragraph_contract():
     assert "DEN 27.0 – KC 20.5" in paragraph2
     assert paragraph2.endswith("The pick: Denver Broncos moneyline.")
     assert preview["editorial_voice"]["two_paragraph_contract"] is True
+
+
+def _seven_grams(text: str) -> set[str]:
+    words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", text.lower())
+    return {" ".join(words[i:i + 7]) for i in range(max(0, len(words) - 6))}
+
+
+def test_qb_history_uses_item_side_for_home_quarterback():
+    item = {
+        "title": "Jalen Hurts vs WAS: player history",
+        "summary": "Historical quarterback evidence for the current matchup.",
+        "side": "home",
+        "metadata": {"family": "qb_opponent_history"},
+    }
+    headline, paragraph = _football_preview("WAS", "PHI", item)
+
+    assert "Jalen Hurts" in headline
+    assert "Commanders defense" in headline
+    assert "Eagles protection" in paragraph
+    assert "Commanders pressure" in paragraph
+    assert "Commanders protection" not in paragraph
+
+
+def test_qb_history_infers_home_offense_from_opponent_when_side_missing():
+    item = {
+        "title": "Matthew Stafford vs SF: player history",
+        "summary": "Historical quarterback evidence for the current matchup.",
+        "metadata": {"family": "qb_opponent_history"},
+    }
+    headline, paragraph = _football_preview("SF", "LA", item)
+
+    assert "Matthew Stafford" in headline
+    assert "49ers defense" in headline
+    assert "Rams protection" in paragraph
+    assert "49ers pressure" in paragraph
+
+
+def test_qb_history_fallbacks_share_no_seven_word_template_spans():
+    cases = [
+        (
+            "DAL", "NYG",
+            {
+                "title": "Dak Prescott vs NYG: player history",
+                "summary": "Historical quarterback evidence for the current matchup.",
+                "side": "away",
+                "metadata": {"family": "qb_opponent_history"},
+            },
+        ),
+        (
+            "SF", "LA",
+            {
+                "title": "Matthew Stafford vs SF: player history",
+                "summary": "Historical quarterback evidence for the current matchup.",
+                "side": "home",
+                "metadata": {"family": "qb_opponent_history"},
+            },
+        ),
+        (
+            "WAS", "PHI",
+            {
+                "title": "Jalen Hurts vs WAS: player history",
+                "summary": "Historical quarterback evidence for the current matchup.",
+                "side": "home",
+                "metadata": {"family": "qb_opponent_history"},
+            },
+        ),
+    ]
+    paragraphs = [_football_preview(away, home, item)[1] for away, home, item in cases]
+    grams = [_seven_grams(paragraph) for paragraph in paragraphs]
+
+    for i in range(len(grams)):
+        for j in range(i + 1, len(grams)):
+            assert not grams[i].intersection(grams[j])
