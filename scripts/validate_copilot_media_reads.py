@@ -6,8 +6,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 import json
 import re
+import sys
 
 import pandas as pd
+import json_repair
 
 from nfl_forecast.context import TEAM_META
 
@@ -25,17 +27,52 @@ BANNED = (
 
 
 def _extract_json(text: str) -> dict:
+    """Parse Copilot's response, repairing syntax only after strict JSON fails.
+
+    LLM output occasionally contains an unescaped quote, omitted comma or similar
+    serialization defect. Repair is intentionally limited to parsing: every repaired
+    object still has to pass exact slate coverage, team identity, word-count, source,
+    domain and cross-game uniqueness validation below.
+    """
     raw = str(text or "").strip()
     if raw.startswith("```"):
         raw = re.sub(r"^```(?:json)?\s*", "", raw, flags=re.I)
         raw = re.sub(r"\s*```$", "", raw)
+
+    candidates = [raw]
+    start, end = raw.find("{"), raw.rfind("}")
+    if start >= 0 and end > start and raw[start:end + 1] != raw:
+        candidates.append(raw[start:end + 1])
+
+    strict_errors: list[str] = []
+    for candidate in candidates:
+        try:
+            parsed = json.loads(candidate)
+        except json.JSONDecodeError as exc:
+            strict_errors.append(str(exc))
+            continue
+        if not isinstance(parsed, dict):
+            raise ValueError("Copilot output JSON root is not an object")
+        return parsed
+
+    if start < 0 or end <= start:
+        raise ValueError("Copilot output does not contain a JSON object")
+
+    candidate = raw[start:end + 1]
     try:
-        return json.loads(raw)
-    except Exception:
-        start, end = raw.find("{"), raw.rfind("}")
-        if start < 0 or end <= start:
-            raise ValueError("Copilot output does not contain a JSON object")
-        return json.loads(raw[start:end + 1])
+        repaired = json_repair.loads(candidate, skip_json_loads=True)
+    except Exception as exc:
+        detail = strict_errors[-1] if strict_errors else "strict JSON parse failed"
+        raise ValueError(f"Copilot JSON could not be repaired after {detail}: {exc}") from exc
+
+    if not isinstance(repaired, dict):
+        raise ValueError("Repaired Copilot output JSON root is not an object")
+    print(
+        "Copilot response required syntax repair before semantic validation; "
+        "all publication gates remain enforced.",
+        file=sys.stderr,
+    )
+    return repaired
 
 
 def _host(url: str) -> str:
