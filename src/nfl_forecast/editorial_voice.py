@@ -60,6 +60,10 @@ def _lead_pressure(slot: int, pick: str, leader: str, other: str, matchup: str) 
         f"There is a direct route for {pick} to control {matchup}: make the pocket shrink before the route concept has time to matter. {leader} has the better setup to do it.",
         f"Watch how often {other} gets a comfortable, on-schedule dropback. If the answer is 'not many,' the rest of the {pick} case gets much easier to understand.",
         f"The hidden scoreboard in {matchup} may be obvious passing downs. {leader} is better equipped to win those snaps, and {pick} benefits every time the game is forced into them.",
+        f"The most expensive mistake for {other} may be arriving at third down with only one credible answer. {leader}'s pressure edge is what gives {pick} a chance to turn predictable downs into possession swings.",
+        f"This matchup gets simpler for {pick} every time the down-and-distance gets harder for {other}. {leader} is built to make those predictable pass situations feel even more predictable.",
+        f"Pocket comfort is the resource to watch in {matchup}. {leader} has the better chance to ration it, and that can force {other} to play the game at a faster tempo than it wants.",
+        f"The pressure edge matters here because it changes the menu, not just the sack total. If {leader} consistently speeds up {other}, {pick} gets to defend a narrower version of the offense.",
     ]
     return options[slot % len(options)]
 
@@ -72,6 +76,8 @@ def _lead_explosives(slot: int, pick: str, leader: str, other: str, matchup: str
         f"The shortcut belongs to {leader}. {other} can defend well for ten snaps and still lose the drive on the eleventh, which is why the {pick} forecast is so sensitive to the big-play battle.",
         f"Field position can change violently in this matchup. {leader} is the side more likely to create that kind of swing, and {pick} does not need many of them before the game script tilts.",
         f"The {pick} forecast is betting on leverage, not volume. {leader}'s best plays are more capable of flipping the field in one shot; {other}'s job is to make every yard expensive.",
+        f"The possession count is secondary if {leader} keeps winning the high-value snaps. In {matchup}, the {pick} side has the cleaner path to scoring without needing a perfect drive.",
+        f"A defense can be right nine times and still be wrong once in a way that costs seven points. That asymmetry is the part of {matchup} that gives {leader} and the {pick} case their clearest leverage.",
     ]
     return options[slot % len(options)]
 
@@ -83,6 +89,9 @@ def _lead_early_down(slot: int, pick: str, leader: str, other: str, matchup: str
         f"Second-and-manageable is the quiet currency in {matchup}. {leader} is more likely to keep earning it, and that is how the {pick} case can become methodical instead of dramatic.",
         f"A lot of this forecast lives in down-and-distance. {leader} has the cleaner early-down profile, so {pick} is less likely to spend the afternoon asking its quarterback to rescue bad situations.",
         f"The easiest way for {pick} to make {matchup} look ordinary is to stay out of obvious passing downs. {leader} is better positioned to do that from the first series onward.",
+        f"First down is where the playbook either stays wide or starts collapsing. {leader} has the better chance to keep all of its answers available, which is the foundation of the {pick} case.",
+        f"The leverage in {matchup} can be built quietly: four useful yards here, a manageable second down there. {leader} is better positioned to stack those small wins until {other} has to defend everything.",
+        f"The {pick} path is less about one spectacular call than avoiding bad questions. {leader}'s early-down edge reduces how often {other} gets to dictate what comes next.",
     ]
     return options[slot % len(options)]
 
@@ -95,6 +104,9 @@ def _lead_qb_history(slot: int, pick: str, leader: str, other: str, matchup: str
         f"Prior meetings give {matchup} a useful baseline without turning it into a rerun. For {pick}, the value is in what {quarterback} already knows and what the current staff can still exploit.",
         f"This is one of the rare Week 1 games with meaningful quarterback history attached. {quarterback}'s old tape makes the matchup less hypothetical, while the current personnel keeps it from being predictive by itself.",
         f"The logos are only part of the familiarity here. {quarterback} has real experience in this matchup, and the {pick} read is about separating durable lessons from details that belonged to an older version of the teams.",
+        f"The opponent is familiar to {quarterback}, but the context is not frozen in time. That makes {matchup} useful as a recognition test for the {pick} case rather than a simple replay of prior results.",
+        f"Old meetings matter most when they reveal a problem that still exists. {quarterback} gives {pick} a head start on that search in {matchup}, while the current staff determines whether the old answer still fits.",
+        f"There is enough quarterback history here to inform the opening hypothesis, not enough to end the argument. {quarterback}'s experience gives the {pick} side a reference point that still has to survive the 2026 version of {matchup}.",
     ]
     return options[slot % len(options)]
 
@@ -105,6 +117,8 @@ def _lead_availability(slot: int, pick: str, leader: str, other: str, matchup: s
         f"The first thing to re-check in {matchup} is personnel, not formation. The official availability picture can change the football logic around {pick} without becoming an unvalidated manual adjustment.",
         f"There is a roster-level hinge in {matchup}. Sunday Signal treats it as a change in what the teams can reasonably ask of the matchup—not as a license to make up injury points.",
         f"This forecast has a personnel footnote worth watching all the way to kickoff. If the active list changes, the tactical route to a {pick} win can change with it.",
+        f"The matchup tree in {matchup} starts with who is actually available. That question can narrow or widen the {pick} path before any coordinator makes a call.",
+        f"Some games begin with formation; this one begins with the inactive list. The personnel answer changes what the {pick} side can reasonably expect to attack.",
     ]
     return options[slot % len(options)]
 
@@ -116,6 +130,10 @@ def _lead_generic(slot: int, family: str, pick: str, leader: str, other: str, ma
         f"For {pick}, {label} is the lever that matters most. If {leader} can keep that part of {matchup} on its terms, the rest of the forecast has room to breathe.",
         f"{matchup} has one matchup feature that keeps surfacing: {label}. It currently favors {leader}, and that is the thread connecting the football to the {pick} number.",
         f"The {pick} case becomes easiest to see through {label}. {leader} owns the better setup there, while {other} needs the game to be decided somewhere else.",
+        f"If one layer deserves the first look in {matchup}, it is {label}. That matchup currently belongs to {leader}, which gives the {pick} forecast its clearest football anchor.",
+        f"The argument for {pick} is not abstract here: it runs through {label}. {leader} has the better setup in that phase, while {other} needs to redirect the game toward a different question.",
+        f"The matchup lens that best explains {pick} is {label}. {leader} owns that piece, and the rest of the game is about whether {other} can move the fight elsewhere.",
+        f"One feature keeps the {pick} case grounded in football rather than probability alone: {label}. It tilts toward {leader} and gives {matchup} a specific pressure point.",
     ]
     return options[slot % len(options)]
 
