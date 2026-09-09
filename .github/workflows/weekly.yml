@@ -49,8 +49,10 @@ jobs:
           set -euo pipefail
           cp outputs/this_week.csv /tmp/baseline-this-week.csv
           cp outputs/power_ratings.csv /tmp/baseline-power.csv
+          cp outputs/model_leaderboard.csv /tmp/baseline-model-leaderboard.csv
           PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_week.py --season 2026 --snapshot EARLY
           python - <<'PY'
+          import numpy as np
           import pandas as pd
 
           before = pd.read_csv('/tmp/baseline-this-week.csv')
@@ -76,6 +78,35 @@ jobs:
           print(duplicated.to_string() if len(duplicated) else 'none')
           if len(duplicated):
               raise SystemExit('corrected rolling pipeline still produces exact multi-team efficiency-profile duplicates')
+
+          old_lb = pd.read_csv('/tmp/baseline-model-leaderboard.csv')
+          new_lb = pd.read_csv('outputs/model_leaderboard.csv')
+          cols = ['model','games','winner_pct','brier','log_loss','margin_mae','total_mae']
+          old_lb = old_lb[cols]
+          new_lb = new_lb[cols]
+          audit = old_lb.merge(new_lb, on='model', suffixes=('_before','_after'), validate='one_to_one')
+          for metric in ['winner_pct','brier','log_loss','margin_mae','total_mae']:
+              audit[f'{metric}_delta'] = audit[f'{metric}_after'] - audit[f'{metric}_before']
+          print('\n=== OOS 2022-25 LEADERBOARD DELTA ===')
+          print(audit.to_string(index=False))
+
+          if len(audit) != len(old_lb) or len(audit) != len(new_lb):
+              raise SystemExit('model leaderboard row set changed unexpectedly')
+          if not (audit.games_before == audit.games_after).all():
+              raise SystemExit('OOS evaluation sample size changed; investigate before merge')
+          key = audit[audit.model.eq('Final Ensemble')]
+          if len(key) != 1:
+              raise SystemExit('Final Ensemble row missing from corrected OOS leaderboard')
+          required = ['winner_pct_after','brier_after','log_loss_after','margin_mae_after','total_mae_after']
+          if not np.isfinite(key[required].to_numpy(dtype=float)).all():
+              raise SystemExit('corrected Final Ensemble OOS metrics contain non-finite values')
+          market = audit[audit.model.eq('Market')]
+          if len(market) == 1:
+              for metric in ['winner_pct','brier','log_loss','margin_mae','total_mae']:
+                  before_v = float(market.iloc[0][f'{metric}_before'])
+                  after_v = float(market.iloc[0][f'{metric}_after'])
+                  if abs(before_v - after_v) > 1e-12:
+                      raise SystemExit(f'market benchmark changed during football-feature repair: {metric}')
           PY
       - name: Generate and publish outputs
         if: github.event_name != 'pull_request'
