@@ -7,6 +7,7 @@ on:
     paths:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
+      - 'src/nfl_forecast/challenger_shadow.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/lock_challenger_shadow.py'
@@ -19,6 +20,7 @@ on:
     paths:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
+      - 'src/nfl_forecast/challenger_shadow.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/lock_challenger_shadow.py'
