@@ -289,6 +289,16 @@ def build_postgame_autopsies(official: pd.DataFrame) -> dict[str, Any]:
             (right if total_error <= 7.0 else missed).append(
                 f"The predicted total finished {total_error:.1f} points from the actual total."
             )
+        error_tags: list[str] = []
+        if winner_correct is False:
+            error_tags.append("winner_miss")
+        if margin_error is not None and margin_error > 7.0:
+            error_tags.append("margin_miss")
+        if total_error is not None and total_error > 7.0:
+            error_tags.append("total_miss")
+        if not error_tags:
+            error_tags.append("no_major_error_flag")
+
         gid = str(r.get("game_id"))
         out[gid] = {
             "game_id": gid,
@@ -302,6 +312,7 @@ def build_postgame_autopsies(official: pd.DataFrame) -> dict[str, Any]:
             "total_abs_error": total_error,
             "what_went_right": right,
             "what_missed": missed,
+            "error_tags": error_tags,
             "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
         }
     return out
