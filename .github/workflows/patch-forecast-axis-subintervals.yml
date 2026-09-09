@@ -1,0 +1,32 @@
+name: Patch forecast axis subintervals
+on:
+  push:
+    branches: [ui/forecast-axis-subintervals]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ui/forecast-axis-subintervals
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: python scripts/patch_forecast_axis_subintervals.py
+      - run: npm ci
+        working-directory: site
+      - run: npm run build
+        working-directory: site
+      - name: Commit final patch and remove helpers
+        run: |
+          git config user.name "sunday-signal-ui-bot"
+          git config user.email "actions@users.noreply.github.com"
+          rm scripts/patch_forecast_axis_subintervals.py .github/workflows/patch-forecast-axis-subintervals.yml
+          git add site/src/AppPublicationVNext.jsx scripts/patch_forecast_axis_subintervals.py .github/workflows/patch-forecast-axis-subintervals.yml
+          git commit -m "Add intraday intervals to forecast movement axis"
+          git push origin HEAD:ui/forecast-axis-subintervals
