@@ -1,0 +1,52 @@
+name: Apply game-ready publication patch
+
+on:
+  push:
+    branches: [feature/game-ready-dossiers-attribution]
+    paths:
+      - 'scripts/_apply_game_ready_patch.py'
+      - '.github/workflows/_apply-game-ready-patch.yml'
+      - 'tests/test_game_ready_publication.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-game-ready-publication
+  cancel-in-progress: true
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/game-ready-dossiers-attribution
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package.json
+      - name: Apply guarded source patch
+        run: python scripts/_apply_game_ready_patch.py
+      - name: Install model dependencies
+        run: pip install '.[dev]'
+      - name: Run full Python suite
+        run: pytest -q
+      - name: Build production frontend
+        working-directory: site
+        run: |
+          npm install
+          npm run build
+      - name: Commit validated product changes
+        run: |
+          git config user.name 'nfl-model-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A
+          git commit -m 'Make Sunday Signal game-ready for Week 1'
+          git push origin HEAD:feature/game-ready-dossiers-attribution
