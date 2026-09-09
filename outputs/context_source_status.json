@@ -102,9 +102,13 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "games_applied": 0,
+    "file": "outputs/copilot_media_reads.json",
+    "games_applied": 16,
+    "games_expected": 16,
+    "max_age_hours": 6.0,
+    "new_report_grace_minutes": 5.0,
     "skipped": {},
-    "status": "unavailable"
+    "status": "healthy"
   },
   "depth_charts": {
     "season": 2026,
@@ -164,14 +168,14 @@
     "teams_with_reported_players": 4
   },
   "media_reporting": {
-    "as_of": "2026-09-09T19:15:03.685491+00:00",
+    "as_of": "2026-09-09T21:24:08.791620+00:00",
     "cross_game_titles_rejected": 2,
     "games": 16,
     "games_with_display_reporting": 15,
     "games_with_reporting": 16,
     "games_with_substantive_reporting": 16,
     "games_with_trusted_reporting": 16,
-    "generic_titles_rejected": 17,
+    "generic_titles_rejected": 14,
     "providers": {
       "bing_news_rss": {
         "errors": 0
