@@ -73,17 +73,25 @@ def _ewma_shifted(s: pd.Series, alpha: float) -> pd.Series:
 
 
 def add_pregame_rolling(team_games: pd.DataFrame, windows=(3,5,8), alpha=0.15) -> pd.DataFrame:
-    """All rolling features are shifted one game, preventing same-game leakage."""
+    """All rolling features are shifted one game, preventing same-game leakage.
+
+    Grouped rolling results must retain the dataframe's row index. A previous
+    ``groupby.apply(...).reset_index(drop=True)`` assignment could silently
+    attach one team's rolling state to another row after sorting because the
+    sorted dataframe retained its original labels. ``transform`` is explicitly
+    index-aligned and makes the result invariant to the incoming row order/index.
+    """
     df = team_games.sort_values(["team", "season", "week", "gameday"], na_position="last").copy()
     base = [
         "off_epa","pass_epa","rush_epa","success_rate","neutral_epa",
         "def_epa_allowed","def_pass_epa_allowed","def_rush_epa_allowed","def_success_allowed","win"
     ]
     for col in [c for c in base if c in df.columns]:
-        g = df.groupby("team", group_keys=False)[col]
-        df[f"{col}_ewma"] = g.apply(lambda s: _ewma_shifted(s, alpha)).reset_index(level=0, drop=True)
+        df[f"{col}_ewma"] = df.groupby("team")[col].transform(lambda s: _ewma_shifted(s, alpha))
         for w in windows:
-            df[f"{col}_l{w}"] = g.apply(lambda s: s.shift(1).rolling(w, min_periods=1).mean()).reset_index(level=0, drop=True)
+            df[f"{col}_l{w}"] = df.groupby("team")[col].transform(
+                lambda s: s.shift(1).rolling(w, min_periods=1).mean()
+            )
     return df
 
 
