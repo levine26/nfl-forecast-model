@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from nfl_forecast.copilot_source_backfill import backfill_direct_sources, canonical_direct_url
+
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "compose_copilot_media_reads.py"
 spec = importlib.util.spec_from_file_location("compose_copilot_media_reads", SCRIPT)
@@ -42,6 +44,54 @@ def test_official_team_domains_are_approved_publishers():
 def test_unresolved_or_homepage_substitution_is_not_fabricated():
     assert _canonical_url("https://news.google.com/rss/articles/opaque", "ESPN") == ""
     assert _canonical_url("", "NFL.com", "https://www.nfl.com/") == ""
+
+
+class _Response:
+    def __init__(self, text: str):
+        self.text = text
+
+    def raise_for_status(self):
+        return None
+
+
+class _OfficialSourceSession:
+    def get(self, url, **kwargs):
+        del kwargs
+        if "baltimoreravens.com" in url:
+            return _Response(
+                """<?xml version='1.0'?><rss><channel>
+                <item>
+                  <title>Ravens prepare for Colts in Week 1</title>
+                  <description>Baltimore Ravens prepare to face the Indianapolis Colts.</description>
+                  <link>https://www.bing.com/news/apiclick.aspx?url=https%3A%2F%2Fwww.baltimoreravens.com%2Fnews%2Fravens-colts-week-1-preview</link>
+                  <source url='https://www.baltimoreravens.com/'>Baltimore Ravens</source>
+                </item>
+                </channel></rss>"""
+            )
+        if "colts.com" in url:
+            return _Response(
+                """<?xml version='1.0'?><rss><channel>
+                <item>
+                  <title>Colts set for opener against Ravens</title>
+                  <description>Indianapolis Colts host the Baltimore Ravens in Week 1.</description>
+                  <link>https://www.bing.com/news/apiclick.aspx?url=https%3A%2F%2Fwww.colts.com%2Fnews%2Fcolts-ravens-week-1-preview</link>
+                  <source url='https://www.colts.com/'>Indianapolis Colts</source>
+                </item>
+                </channel></rss>"""
+            )
+        raise AssertionError(f"unexpected backfill query: {url}")
+
+
+def test_source_backfill_uses_two_independent_direct_official_articles():
+    row = pd.Series({"away_team": "BAL", "home_team": "IND"})
+    sources = backfill_direct_sources(row, [], session=_OfficialSourceSession())
+    assert len(sources) == 2
+    assert {module._domain_family(source["url"]) for source in sources} == {
+        "baltimoreravens.com",
+        "colts.com",
+    }
+    assert all("bing.com" not in source["url"] for source in sources)
+    assert canonical_direct_url("https://www.baltimoreravens.com/") == ""
 
 
 def test_composer_owns_exact_model_facts_and_sources():
@@ -90,10 +140,10 @@ def test_composer_owns_exact_model_facts_and_sources():
     result = compose(payload, predictions, previews, {"2026_01_DEN_KC": []})
     entry = result["games"]["2026_01_DEN_KC"]
     p2 = entry["paragraph2"]
-    assert "Broncos at 62.0% to win" in p2
-    assert "Broncos football-only PURE is 68.0%" in p2
-    assert "Broncos market probability is 52.0%" in p2
-    assert "PURE carries 75%" in p2 and "MARKET carries 25%" in p2
+    assert "LevLine gives the Broncos a 62.0% win probability" in p2
+    assert "football-only PURE rates the Broncos at 68.0%" in p2
+    assert "MARKET rates the Broncos at 52.0%" in p2
+    assert "75% PURE for Broncos" in p2 and "25% MARKET" in p2
     assert "Denver Broncos -6.5" in p2
     assert "Kansas City Chiefs -3.5" in p2
     assert "DEN 27.0 – KC 20.5" in p2
@@ -139,16 +189,16 @@ def test_numeric_llm_rationale_is_discarded_instead_of_published():
     assert "ATL protection vs PIT pass rush" in entry["paragraph2"]
 
 
-def test_deterministic_model_paragraphs_do_not_share_seven_word_template_span_when_market_rounding_matches():
+def test_deterministic_model_paragraphs_do_not_share_seven_word_template_span_when_all_probabilities_match():
     predictions = pd.DataFrame([
         {
             "game_id": "g1", "away_team": "DEN", "home_team": "KC", "pick": "DEN",
-            "final_home_prob": 0.38, "pure_home_prob": 0.32, "market_home_prob": 0.407,
+            "final_home_prob": 0.384, "pure_home_prob": 0.473, "market_home_prob": 0.407,
             "expected_margin": -6.5, "spread_line": 3.5, "projected_score": "DEN 27.0 – KC 20.5",
         },
         {
             "game_id": "g2", "away_team": "ATL", "home_team": "PIT", "pick": "PIT",
-            "final_home_prob": 0.64, "pure_home_prob": 0.66, "market_home_prob": 0.593,
+            "final_home_prob": 0.616, "pure_home_prob": 0.527, "market_home_prob": 0.593,
             "expected_margin": 5.2, "spread_line": 3.5, "projected_score": "PIT 26.0 – ATL 20.8",
         },
     ])
@@ -174,6 +224,8 @@ def test_deterministic_model_paragraphs_do_not_share_seven_word_template_span_wh
     }}
     previews = {"g1": {}, "g2": {}}
     result = compose(payload, predictions, previews, {"g1": [], "g2": []})["games"]
-    assert "market probability is 59.3%" in result["g1"]["paragraph2"]
-    assert "market probability is 59.3%" in result["g2"]["paragraph2"]
+    for gid in ("g1", "g2"):
+        assert "61.6%" in result[gid]["paragraph2"]
+        assert "52.7%" in result[gid]["paragraph2"]
+        assert "59.3%" in result[gid]["paragraph2"]
     assert not (_ngrams(result["g1"]["paragraph2"]) & _ngrams(result["g2"]["paragraph2"]))
