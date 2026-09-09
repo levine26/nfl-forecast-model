@@ -262,7 +262,7 @@ def main():
     evidence=add_portable_qb_history(predictions=predictions,evidence=evidence,pbp=pbp,depth=depth,season=args.season)
     portable_count=sum(1 for items in evidence.values() for item in items if (item.get("metadata") or {}).get("family")=="qb_opponent_history" and (item.get("metadata") or {}).get("meetings"))
     previews=build_game_previews(predictions,evidence)
-    previews=polish_preview_slate(previews,predictions)
+    previews=polish_preview_slate(previews,predictions,evidence)
     editorial_audit=_editorial_audit(previews,predictions,evidence)
     _require_editorial_quality(editorial_audit,len(previews))
 
