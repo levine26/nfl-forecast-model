@@ -8,26 +8,38 @@ from nfl_forecast.challenger_v06 import logit_blend_probabilities
 from scripts.lock_challenger_shadow import HISTORY_COLUMNS, lock_shadow
 
 
-def _production(
+LOCK_TIME = "2026-09-10T22:00:00+00:00"
+KICKOFF = "2026-09-10T23:30:00+00:00"
+
+
+def _production_lock(
     *,
     game_id="2026_01_AWAY_HOME",
     snapshot="FINAL",
     market=0.60,
-    gameday="2026-09-10",
-    gametime="20:00",
+    status="LOCKED",
+    minutes=90.0,
+    home_score=np.nan,
+    away_score=np.nan,
 ):
     return pd.DataFrame([{
         "game_id": game_id,
         "season": 2026,
         "week": 1,
-        "gameday": gameday,
-        "gametime": gametime,
+        "gameday": "2026-09-10",
+        "gametime": "19:30",
         "away_team": "AWAY",
         "home_team": "HOME",
         "market_home_prob": market,
         "snapshot_type": snapshot,
         "model_version": "0.4.0-accountability",
-        "prediction_timestamp_utc": "2026-09-10T22:25:00+00:00",
+        "prediction_timestamp_utc": "2026-09-10T21:58:00+00:00",
+        "lock_status": status,
+        "lock_timestamp_utc": LOCK_TIME,
+        "kickoff_utc": KICKOFF,
+        "minutes_to_kickoff_at_lock": minutes,
+        "actual_home_score": home_score,
+        "actual_away_score": away_score,
     }])
 
 
@@ -39,6 +51,7 @@ def _challenger(
     stale_final=0.53,
     weight=0.25,
     method="logit",
+    generated="2026-09-10T18:00:00+00:00",
 ):
     return pd.DataFrame([{
         "game_id": game_id,
@@ -50,25 +63,21 @@ def _challenger(
         "effective_market_weight": 1.0 - weight,
         "research_candidate": "Logit hybrid adaptive Brier",
         "research_method": method,
+        "shadow_generated_utc": generated,
+        "shadow_source_sha": "abc123",
     }])
 
 
-def _now(minutes_before_kickoff: int):
-    # 2026-09-10 20:00 ET is 2026-09-11 00:00 UTC during EDT.
-    return datetime(2026, 9, 11, 0, 0, tzinfo=timezone.utc) - pd.Timedelta(
-        minutes=minutes_before_kickoff
-    )
-
-
-def test_locks_due_final_game_and_recomputes_from_t120_market():
-    production = _production(market=0.66)
+def test_locks_from_authoritative_production_row_and_recomputes_t120_market():
+    production = _production_lock(market=0.66)
     challenger = _challenger(pure=0.54, stale_market=0.51, stale_final=0.52, weight=0.25)
-    history, added = lock_shadow(
+    history, added, skipped = lock_shadow(
         production,
         challenger,
-        now_utc=_now(90),
+        now_utc=datetime(2026, 9, 10, 22, 1, tzinfo=timezone.utc),
     )
     assert added == 1
+    assert skipped == 0
     assert len(history) == 1
     row = history.iloc[0]
     expected = logit_blend_probabilities([0.54], [0.66], 0.25)[0]
@@ -76,36 +85,41 @@ def test_locks_due_final_game_and_recomputes_from_t120_market():
     assert np.isclose(row.market_home_prob_t120, 0.66)
     assert not np.isclose(row.challenger_final_home_prob, 0.52)
     assert row.production_snapshot_type == "FINAL"
+    assert row.production_lock_timestamp_utc == LOCK_TIME
+    assert row.shadow_generated_utc == "2026-09-10T18:00:00+00:00"
     assert row.lock_status == "LOCKED"
-    assert 0 < float(row.minutes_to_kickoff_at_shadow_lock) <= 120
 
 
-def test_does_not_lock_early_snapshot_or_outside_window_or_after_kickoff():
+def test_requires_final_locked_production_row():
     challenger = _challenger()
-    early, added_early = lock_shadow(
-        _production(snapshot="EARLY"), challenger, now_utc=_now(90)
+    not_final, added_final, _ = lock_shadow(
+        _production_lock(snapshot="EARLY"), challenger
     )
-    outside, added_outside = lock_shadow(
-        _production(snapshot="FINAL"), challenger, now_utc=_now(121)
+    not_locked, added_locked, _ = lock_shadow(
+        _production_lock(status="PENDING"), challenger
     )
-    after, added_after = lock_shadow(
-        _production(snapshot="FINAL"), challenger, now_utc=_now(-1)
-    )
-    assert added_early == added_outside == added_after == 0
-    assert early.empty and outside.empty and after.empty
+    assert added_final == added_locked == 0
+    assert not_final.empty and not_locked.empty
 
 
-def test_existing_lock_is_immutable_when_market_moves():
-    production = _production(market=0.61)
+def test_rejects_invalid_production_lock_window():
+    with pytest.raises(RuntimeError, match="outside authoritative T-120"):
+        lock_shadow(_production_lock(minutes=121.0), _challenger())
+
+
+def test_existing_shadow_lock_is_immutable_when_market_moves():
     challenger = _challenger(pure=0.56, weight=0.25)
-    first, added = lock_shadow(production, challenger, now_utc=_now(100))
+    first, added, _ = lock_shadow(_production_lock(market=0.61), challenger)
     assert added == 1
     first_prob = float(first.iloc[0].challenger_final_home_prob)
     first_market = float(first.iloc[0].market_home_prob_t120)
 
-    moved = _production(market=0.85)
-    second, added_again = lock_shadow(
-        moved, challenger, existing_history=first, now_utc=_now(60)
+    moved = _production_lock(market=0.85)
+    second, added_again, _ = lock_shadow(
+        moved,
+        challenger,
+        existing_history=first,
+        now_utc=datetime(2026, 9, 10, 22, 30, tzinfo=timezone.utc),
     )
     assert added_again == 0
     assert len(second) == 1
@@ -114,40 +128,40 @@ def test_existing_lock_is_immutable_when_market_moves():
 
 
 def test_missing_market_falls_back_to_pure_like_production():
-    production = _production(market=np.nan)
-    challenger = _challenger(pure=0.57, weight=0.25)
-    history, added = lock_shadow(production, challenger, now_utc=_now(80))
+    history, added, _ = lock_shadow(
+        _production_lock(market=np.nan), _challenger(pure=0.57, weight=0.25)
+    )
     assert added == 1
     assert np.isclose(float(history.iloc[0].challenger_final_home_prob), 0.57)
 
 
 def test_rejects_hybrid_below_pure_floor_and_unknown_method():
     with pytest.raises(RuntimeError, match="PURE floor"):
-        lock_shadow(
-            _production(), _challenger(weight=0.20), now_utc=_now(90)
-        )
+        lock_shadow(_production_lock(), _challenger(weight=0.20))
     with pytest.raises(RuntimeError, match="Unsupported challenger shadow method"):
-        lock_shadow(
-            _production(), _challenger(method="confidence", weight=0.25), now_utc=_now(90)
-        )
+        lock_shadow(_production_lock(), _challenger(method="confidence", weight=0.25))
+
+
+def test_never_retroactively_backfills_model_generated_after_production_lock():
+    history, added, skipped = lock_shadow(
+        _production_lock(),
+        _challenger(generated="2026-09-10T22:05:00+00:00"),
+    )
+    assert history.empty
+    assert added == 0
+    assert skipped == 1
 
 
 def test_grades_existing_lock_without_changing_forecast():
-    production = _production(market=0.65)
     challenger = _challenger(pure=0.55, weight=0.25)
-    history, _ = lock_shadow(production, challenger, now_utc=_now(90))
+    history, _, _ = lock_shadow(_production_lock(market=0.65), challenger)
     locked_prob = float(history.iloc[0].challenger_final_home_prob)
-    production_history = pd.DataFrame([{
-        "game_id": "2026_01_AWAY_HOME",
-        "actual_home_score": 24,
-        "actual_away_score": 17,
-    }])
-    graded, added = lock_shadow(
-        production,
+    completed = _production_lock(market=0.65, home_score=24, away_score=17)
+    graded, added, _ = lock_shadow(
+        completed,
         challenger,
         existing_history=history,
-        production_history=production_history,
-        now_utc=_now(60),
+        now_utc=datetime(2026, 9, 11, 4, 0, tzinfo=timezone.utc),
     )
     assert added == 0
     assert np.isclose(float(graded.iloc[0].challenger_final_home_prob), locked_prob)
