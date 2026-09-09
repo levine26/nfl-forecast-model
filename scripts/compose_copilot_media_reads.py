@@ -18,7 +18,7 @@ import json_repair
 import pandas as pd
 
 from nfl_forecast.context import TEAM_META
-from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
+from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS, is_substantive_media_source
 
 
 def _extract_json(text: str) -> dict:
@@ -238,7 +238,7 @@ def _canonical_sources(entry: dict, preview: dict, evidence_items: list[dict]) -
         if not name or not title:
             continue
         url = _canonical_url(source.get("url") or "", name)
-        if not url or not _domain_allowed(url):
+        if not url or not is_substantive_media_source(url, title):
             continue
         family = _domain_family(url)
         title_key = re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
