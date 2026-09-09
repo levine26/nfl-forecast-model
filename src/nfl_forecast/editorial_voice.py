@@ -256,19 +256,70 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
             if match:
                 offense, rate, epa, defense, allowed = match.groups()
                 return f"{offense} early downs: {rate}% pass rate and {epa} EPA per pass; {defense} allowed {allowed}."
+        title = str(item.get("title") or _label(fam)).strip().rstrip('.:')
+
+        # Some downstream evidence enrichers intentionally replace raw statistical
+        # summaries with short football interpretations. Those interpretations are
+        # useful in detail cards, but their reusable sentence tails must never leak
+        # back into the public game-file cases. Keep the public renderer anchored to
+        # the matchup title and the actual side of the evidence.
+        if fam == "pressure":
+            tilt = re.search(r"pressure matchup tilts ([A-Z]{2,4})", summary, re.I)
+            if tilt:
+                return f"{title}: pass-rush leverage favors {tilt.group(1).upper()}."
+        if fam == "explosives":
+            tilt = re.search(r"chunk-play path tilts ([A-Z]{2,4})", summary, re.I)
+            if tilt:
+                return f"{title}: explosive-pass leverage favors {tilt.group(1).upper()}."
+        if fam == "early_down":
+            tilt = re.search(r"early-down leverage tilts ([A-Z]{2,4})", summary, re.I)
+            if tilt:
+                return f"{title}: early-down leverage favors {tilt.group(1).upper()}."
+        if fam in {"staff_impact", "coaching", "personnel", "injury", "history", "qb_opponent_history"}:
+            return f"{title}: {_label(fam)} context."
+        if fam == "rivalry":
+            return f"{title}: rivalry history."
+
         sentences = [part.strip() for part in summary.split(". ") if part.strip()]
         if not sentences:
             return summary
-        kept = sentences[:2] if fam in {"international_event", "rivalry", "international_travel"} else sentences[:1]
-        result = ". ".join(kept)
-        if summary.endswith(".") and not result.endswith("."):
-            result += "."
-        return result
+        if fam in {"international_event", "international_travel"}:
+            kept = sentences[:2]
+            result = ". ".join(kept)
+            if summary.endswith(".") and not result.endswith("."):
+                result += "."
+            return result
+
+        # Fail closed on unparsed public evidence: use a compact title-anchored
+        # formulation instead of importing an arbitrary reusable source sentence.
+        return f"{title}: {_label(fam)} evidence."
 
     def beat(item: dict[str, Any]) -> str:
         title = str(item.get("title") or "").strip().rstrip('.:')
         summary = specific_summary(item)
         return summary if not title or title.lower() in summary.lower()[: max(90, len(title) + 15)] else f"{title}: {summary}"
+
+    def read_hook(slot: int, item: dict[str, Any], pick: str, opponent: str) -> str:
+        title = str(item.get("title") or _label(family(item))).strip().rstrip('.:')
+        hooks = [
+            f"{title} gets first billing in this file. It is the sourced matchup fact that most clearly explains why {pick} has a path to control the terms rather than merely survive them.",
+            f"The opening question is not the spread; it is {title}. That evidence tells us which part of the field {opponent} must solve before the broader forecast can be trusted.",
+            f"Build the football case from {title} outward. The number matters because this particular matchup can dictate play selection, down-and-distance, and the kind of possessions both staffs are forced to manage.",
+            f"{title} is the hinge worth isolating before anything else. If that edge shows up as the source data suggests, the {pick} projection has a concrete mechanism instead of a generic favorite's argument.",
+            f"This matchup file starts below the headline level with {title}. It gives the forecast a tactical center of gravity and identifies exactly where {opponent} has to keep the game from tilting.",
+            f"The most useful first read is {title}, not a broad power-rating story. That sourced detail narrows the game to a football problem the {pick} side can repeatedly test.",
+            f"There is one place to begin the film-room version of this forecast: {title}. Its value is that it connects the underlying data to a repeatable on-field question for both teams.",
+            f"{title} deserves the first paragraph because it can alter the menu available to each coordinator. That makes it more informative for this game than a generic statement about which roster is stronger.",
+            f"Strip away the win probability for a moment and look at {title}. This is the evidence thread most capable of turning the model's preference into a recognizable game script.",
+            f"The clearest route from data to football runs through {title}. It tells us what {pick} can press, what {opponent} must protect, and where the forecast is most likely to become visible.",
+            f"Treat {title} as the matchup's organizing fact. It does not decide the game by itself, but it gives the {pick} case a specific lever that can be checked snap by snap.",
+            f"Before the game branches into turnovers, fourth downs, and variance, {title} supplies the cleanest baseline. It is the part of this matchup where the evidence gives one side a defined structural advantage.",
+            f"The first layer of this forecast is {title}. That detail matters because it can force a response from {opponent}, and forced responses are where a pregame edge starts changing the rest of the call sheet.",
+            f"{title} is the best place to test whether the model's preference has real football substance. The evidence there creates a matchup-specific burden that {opponent} cannot solve with probability or reputation.",
+            f"Rather than start with the final percentage, start with {title}. It provides the most concrete explanation for how {pick} can create leverage and where the opposing plan has to be unusually clean.",
+            f"This read is anchored by {title} because it links source data to an identifiable coaching decision. If the matchup behaves that way, the {pick} side can make the game look like its preferred version.",
+        ]
+        return hooks[slot % len(hooks)]
 
     special_families = {"international_event", "rivalry", "international_travel"}
     for slate_index, game_id in enumerate(sorted(previews)):
@@ -297,7 +348,11 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
 
         if selected:
             preview["headline"] = str(selected[0].get("title") or f"{away}-{home}").strip()
-            lead = " ".join(beat(item) for item in selected[:2]).strip()
+            evidence_beats = " ".join(beat(item) for item in selected[:2]).strip()
+            if family(selected[0]) in special_families:
+                lead = evidence_beats
+            else:
+                lead = f"{read_hook(slate_index, selected[0], pick, opponent)} {evidence_beats}".strip()
         else:
             preview["headline"] = f"{away}-{home} matchup file"
             lead = f"{away}-{home}: sourced lead unavailable."
