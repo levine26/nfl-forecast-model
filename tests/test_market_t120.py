@@ -5,7 +5,7 @@ import pandas as pd
 from nfl_forecast.market_t120 import select_t120_market_snapshots
 
 
-def _row(ts: str, prob: float, game_id: str = "2026_01_A_B") -> dict:
+def _row(ts: str, prob: float | None, game_id: str = "2026_01_A_B") -> dict:
     return {
         "game_id": game_id,
         "season": 2026,
@@ -19,7 +19,7 @@ def _row(ts: str, prob: float, game_id: str = "2026_01_A_B") -> dict:
         "prediction_id": f"{game_id}__MARKET__{ts}",
         "market_home_prob": prob,
         "pure_home_prob": 0.60,
-        "final_home_prob": 0.75 * 0.60 + 0.25 * prob,
+        "final_home_prob": None if prob is None else 0.75 * 0.60 + 0.25 * prob,
         "spread_line": 2.5,
         "total_line": 44.5,
     }
@@ -48,6 +48,19 @@ def test_t120_selector_omits_game_when_only_post_cutoff_market_exists():
     assert result.empty
 
 
+def test_t120_selector_uses_prior_valid_market_when_latest_pre_cutoff_row_is_null():
+    runs = pd.DataFrame([
+        _row("2026-09-13T14:20:00+00:00", 0.52),
+        _row("2026-09-13T14:55:00+00:00", None),
+    ])
+    result = select_t120_market_snapshots(runs)
+    assert len(result) == 1
+    row = result.iloc[0]
+    assert row["market_home_prob"] == 0.52
+    assert row["snapshot_timestamp_utc"].startswith("2026-09-13T14:20:00")
+    assert row["staleness_minutes_vs_t120"] == 40.0
+
+
 def test_t120_selector_ignores_non_market_rows_and_can_attach_results():
     market = _row("2026-09-13T14:55:00+00:00", 0.54)
     early = dict(market)
@@ -65,3 +78,17 @@ def test_t120_selector_ignores_non_market_rows_and_can_attach_results():
     assert row["market_home_prob"] == 0.54
     assert bool(row["graded"]) is True
     assert bool(row["actual_home_win"]) is True
+
+
+def test_t120_selector_excludes_ties_from_binary_grading():
+    market = _row("2026-09-13T14:55:00+00:00", 0.54)
+    official = pd.DataFrame([{
+        "game_id": market["game_id"],
+        "actual_home_score": 20,
+        "actual_away_score": 20,
+    }])
+    result = select_t120_market_snapshots(pd.DataFrame([market]), official)
+    assert len(result) == 1
+    row = result.iloc[0]
+    assert bool(row["graded"]) is False
+    assert pd.isna(row["actual_home_win"])
