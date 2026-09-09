@@ -8,6 +8,7 @@ on:
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/copilot_media.py"
+      - "src/nfl_forecast/copilot_source_backfill.py"
       - "src/nfl_forecast/source_policy.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_copilot_media_prompt.py"
