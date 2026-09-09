@@ -44,6 +44,7 @@ jobs:
       - run: pytest -q
       - name: Build site with regenerated game files
         run: |
+          mkdir -p site/public/data
           cp outputs/game_previews.json site/public/data/game_previews.json
           cd site
           npm install
