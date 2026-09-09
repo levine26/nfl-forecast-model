@@ -92,6 +92,15 @@ def _pressure_details(summary: str) -> tuple[str, str, str, str] | None:
     return match.groups() if match else None
 
 
+def _qb_subject(title: str, fallback: str) -> str:
+    text = str(title or "")
+    if " vs " in text:
+        subject = text.split(" vs ", 1)[0].strip()
+        if subject:
+            return subject
+    return fallback
+
+
 def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tuple[str, str]:
     matchup = _matchup(away, home)
     sentences: list[str] = []
@@ -126,10 +135,11 @@ def _football_preview(away: str, home: str, item: dict[str, Any] | None) -> tupl
                 f"{_nick(away)} needs favorable second downs to keep its full call sheet available, while {_nick(home)} wants to create third-and-long and make the quarterback solve the game."
             )
         elif fam == "qb_opponent_history":
-            headline = f"{matchup}: quarterback answers under pressure"
+            subject = _qb_subject(title, f"the {_nick(away)} quarterback")
+            headline = f"{matchup}: {subject} against the {_nick(home)} defense"
             sentences.append(
-                f"{matchup} puts {_nick(away)} quarterback context against {_nick(home)}'s defensive plan. {summary.rstrip('.')} "
-                f"{_nick(away)} needs the passer to stay on schedule against {_nick(home)}, while {_nick(home)} wants to recreate the pressure or coverage problems that have shown up in this matchup before."
+                f"{matchup} brings {subject}'s history with the {_nick(home)} into the game plan, but the current matchup matters more than the old box scores. "
+                f"The {_nick(away)} need {subject} on schedule against {_nick(home)} coverage, while the {_nick(home)} want to speed up his decisions and recreate the pressure points they have shown they can reach."
             )
         elif title:
             headline = f"{matchup}: {title}"
