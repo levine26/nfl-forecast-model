@@ -19,9 +19,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: pip install '.[dev]'
+      - run: pip install pandas
       - run: python scripts/patch_game_specific_voice.py
-      - name: Regenerate editorial layer only
+      - name: Regenerate editorial layer and run uniqueness gate
         run: |
           PYTHONPATH="$PWD/src" python - <<'PY'
           import json
@@ -39,6 +39,7 @@ jobs:
           previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + '\n')
           print(report)
           PY
+      - run: pip install '.[dev]'
       - run: pytest -q
       - name: Build site with regenerated game files
         run: |
