@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from nfl_forecast.challenger_shadow import HISTORY_COLUMNS, lock_shadow
 from nfl_forecast.challenger_v06 import logit_blend_probabilities
-from scripts.lock_challenger_shadow import HISTORY_COLUMNS, lock_shadow
 
 
 LOCK_TIME = "2026-09-10T22:00:00+00:00"
