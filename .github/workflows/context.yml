@@ -16,6 +16,8 @@ on:
       - "src/nfl_forecast/editorial_voice.py"
       - "src/nfl_forecast/story_context.py"
       - "src/nfl_forecast/source_policy.py"
+      - "src/nfl_forecast/media_context.py"
+      - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/advanced_player_context.py"
       - "src/nfl_forecast/career_qb_context.py"
       - "src/nfl_forecast/editorial_finalize.py"
@@ -33,6 +35,7 @@ on:
       - "tests/test_staff_impact.py"
       - "tests/test_narrative.py"
       - "tests/test_publication_polish.py"
+      - "tests/test_media_context.py"
       - "tests/test_advanced_player_context.py"
       - "tests/test_career_qb_context.py"
       - "tests/test_editorial_finalize.py"
@@ -51,6 +54,8 @@ on:
       - "src/nfl_forecast/editorial_voice.py"
       - "src/nfl_forecast/story_context.py"
       - "src/nfl_forecast/source_policy.py"
+      - "src/nfl_forecast/media_context.py"
+      - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/advanced_player_context.py"
       - "src/nfl_forecast/career_qb_context.py"
       - "src/nfl_forecast/editorial_finalize.py"
@@ -68,6 +73,7 @@ on:
       - "tests/test_staff_impact.py"
       - "tests/test_narrative.py"
       - "tests/test_publication_polish.py"
+      - "tests/test_media_context.py"
       - "tests/test_advanced_player_context.py"
       - "tests/test_career_qb_context.py"
       - "tests/test_editorial_finalize.py"
@@ -94,7 +100,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py tests/test_publication_polish.py tests/test_advanced_player_context.py tests/test_career_qb_context.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py tests/test_publication_polish.py tests/test_media_context.py tests/test_advanced_player_context.py tests/test_career_qb_context.py tests/test_editorial_finalize.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -134,12 +140,14 @@ jobs:
           ngs = status.get('nextgen_qb_context', {})
           career = status.get('career_qb_verification', {})
           finalizer = status.get('editorial_finalizer', {})
+          media = status.get('media_reporting', {})
           print('staff impact:', json.dumps(staff, sort_keys=True))
           print('personnel usage:', json.dumps(personnel, sort_keys=True))
           print('story desk:', json.dumps(story, sort_keys=True))
           print('QB history verification:', json.dumps(qb, sort_keys=True))
           print('NGS quarterback context:', json.dumps(ngs, sort_keys=True))
           print('Career QB verification:', json.dumps(career, sort_keys=True))
+          print('Media reporting:', json.dumps(media, sort_keys=True))
           print('Editorial finalizer:', json.dumps(finalizer, sort_keys=True))
           if status.get('ftn', {}).get('status') == 'healthy' and status.get('pbp', {}).get('status') == 'healthy' and staff.get('status') != 'healthy':
               raise SystemExit(f'staff-impact layer failed despite healthy FTN/PBP: {staff}')
@@ -153,6 +161,8 @@ jobs:
               raise SystemExit(f'NGS reported healthy but enriched no current quarterbacks: {ngs}')
           if career.get('status') == 'healthy' and int(career.get('verified', 0)) < 1:
               raise SystemExit(f'career ledger reported healthy but verified no quarterbacks: {career}')
+          if media.get('status') not in {'healthy', 'partial', 'degraded'}:
+              raise SystemExit(f'media reporting layer returned invalid status: {media}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != int(finalizer.get('games', -1)):
               raise SystemExit(f'final editorial pass failed uniqueness/quality gate: {finalizer}')
           PY
