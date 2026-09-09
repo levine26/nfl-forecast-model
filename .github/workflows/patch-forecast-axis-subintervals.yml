@@ -15,10 +15,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: site/package-lock.json
       - run: python scripts/patch_forecast_axis_subintervals.py
-      - run: npm ci
+      - run: npm install
         working-directory: site
       - run: npm run build
         working-directory: site
