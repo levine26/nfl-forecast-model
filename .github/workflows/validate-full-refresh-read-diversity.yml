@@ -19,8 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: pip install '.[dev]'
       - run: python scripts/patch_full_refresh_read_diversity.py
+      - run: pip install '.[dev]'
       - name: Run unit suite
         run: pytest -q
       - name: Exercise complete production contextual publication path
