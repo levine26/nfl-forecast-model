@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Area, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import './publication.css'
 import './publication-vnext.css'
 
@@ -368,8 +368,19 @@ function ForecastMovement({ game, runs }) {
   const prior = [...prepared].filter(row=>row.x<0).pop()
   const trend = prepared.filter(row=>row.x>=0 && row.x<=axisEnd)
   if (prior && (!trend.length || trend[0].x>0)) trend.unshift({...prior,x:0,timestamp:null})
-  const ticks = [0,1,2,3,4,5,6].filter(value=>value<=axisEnd+0.001)
-  const labelForTick = value => DAY_LABELS[Math.round(value)] || ''
+  const majorTicks = [0,1,2,3,4,5,6].filter(value=>value<=axisEnd+0.001)
+  const ticks = []
+  for (let value=0; value<=axisEnd+0.001; value+=1/3) ticks.push(Number(value.toFixed(6)))
+  const minorTicks = ticks.filter(value=>Math.abs(value-Math.round(value))>0.01)
+  const axisTick = ({x,y,payload}) => {
+    const value = Number(payload?.value)
+    const day = Math.round(value)
+    const isDay = Math.abs(value-day) < 0.01
+    if (isDay) return <text x={x} y={y+16} textAnchor="middle" fill="#d7e4ec" fontSize="11" fontWeight="700">{DAY_LABELS[day] || ''}</text>
+    const fraction = value-Math.floor(value)
+    const label = Math.abs(fraction-1/3)<0.03 ? '8 AM' : Math.abs(fraction-2/3)<0.03 ? '4 PM' : ''
+    return <text x={x} y={y+15} textAnchor="middle" fill="#6f8796" fontSize="9">{label}</text>
+  }
   const tooltipTime = payload => {
     const timestamp = payload?.[0]?.payload?.timestamp
     if (!timestamp) return 'Monday · start of chart'
@@ -378,7 +389,7 @@ function ForecastMovement({ game, runs }) {
       weekday:'long', hour:'numeric', minute:'2-digit', timeZone:'America/Los_Angeles', timeZoneName:'short',
     }).format(date)
   }
-  return <section className="pub-trend vnext-trend"><div><span>FORECAST MOVEMENT</span><h3>How LevLine and the market moved through the week</h3></div><div>{trend.length>1?<ResponsiveContainer width="100%" height={230}><LineChart data={trend} margin={{top:10,right:10,left:-10,bottom:0}}><CartesianGrid stroke="#183041" strokeDasharray="3 5" vertical={false}/><XAxis type="number" dataKey="x" domain={[0,axisEnd]} ticks={ticks} tickFormatter={labelForTick} tickLine={false} axisLine={false}/><YAxis domain={[0.35,.85]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false} axisLine={false}/><Tooltip labelFormatter={(value,payload)=>tooltipTime(payload)} formatter={(v,name)=>[pct(v),name==='lev'?'LevLine':'Market']}/><Area dataKey="lev" type="stepAfter" fill="#68d8c718" stroke="none"/><Line dataKey="lev" type="stepAfter" stroke="#68d8c7" strokeWidth={3} dot={false}/><Line dataKey="market" type="stepAfter" stroke="#9caebb" strokeWidth={2} strokeDasharray="5 4" dot={false}/></LineChart></ResponsiveContainer>:<p className="pub-empty">Movement appears after the second comparable model run.</p>}</div></section>
+  return <section className="pub-trend vnext-trend"><div><span>FORECAST MOVEMENT</span><h3>How LevLine and the market moved through the week</h3></div><div>{trend.length>1?<ResponsiveContainer width="100%" height={230}><LineChart data={trend} margin={{top:10,right:10,left:-10,bottom:8}}><CartesianGrid stroke="#183041" strokeDasharray="3 5" vertical={false}/>{minorTicks.map(value=><ReferenceLine key={`minor-${value}`} x={value} stroke="#132b3a" strokeWidth={1}/>) }{majorTicks.map(value=><ReferenceLine key={`major-${value}`} x={value} stroke="#294759" strokeWidth={1.35}/>) }<XAxis type="number" dataKey="x" domain={[0,axisEnd]} ticks={ticks} interval={0} tick={axisTick} tickLine={false} axisLine={false} height={34}/><YAxis domain={[0.35,.85]} tickFormatter={v=>`${Math.round(v*100)}%`} tickLine={false} axisLine={false}/><Tooltip labelFormatter={(value,payload)=>tooltipTime(payload)} formatter={(v,name)=>[pct(v),name==='lev'?'LevLine':'Market']}/><Area dataKey="lev" type="stepAfter" fill="#68d8c718" stroke="none"/><Line dataKey="lev" type="stepAfter" stroke="#68d8c7" strokeWidth={3} dot={false}/><Line dataKey="market" type="stepAfter" stroke="#9caebb" strokeWidth={2} strokeDasharray="5 4" dot={false}/></LineChart></ResponsiveContainer>:<p className="pub-empty">Movement appears after the second comparable model run.</p>}</div></section>
 }
 
 function MovementAttribution({ movement }) {
