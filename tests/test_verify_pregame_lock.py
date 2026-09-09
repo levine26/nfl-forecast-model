@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import pandas as pd
 import pytest
 
-from scripts.verify_pregame_lock import verify_pregame_locks
+from nfl_forecast.lock_verify import verify_pregame_locks
 
 
 NOW = datetime(2026, 9, 9, 22, 25, tzinfo=timezone.utc)  # 115 min before 00:20 UTC kickoff
