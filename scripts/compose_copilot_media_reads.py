@@ -18,7 +18,11 @@ import json_repair
 import pandas as pd
 
 from nfl_forecast.context import TEAM_META
-from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
+from nfl_forecast.source_policy import (
+    is_direct_media_report_url,
+    media_domain_allowed,
+    media_domain_family,
+)
 
 
 def _extract_json(text: str) -> dict:
@@ -45,44 +49,31 @@ def _extract_json(text: str) -> dict:
     return repaired
 
 
-def _host(url: str) -> str:
-    try:
-        return (urlparse(str(url or "")).hostname or "").lower()
-    except Exception:
-        return ""
-
-
 def _domain_allowed(url: str) -> bool:
-    host = _host(url)
-    return any(host == domain or host.endswith("." + domain) for domain in APPROVED_MEDIA_DOMAINS)
+    return media_domain_allowed(url)
 
 
 def _domain_family(url: str) -> str:
-    host = _host(url)
-    if host.startswith("www."):
-        host = host[4:]
-    if host.endswith("sports.yahoo.com"):
-        return "yahoo.com"
-    return host
+    return media_domain_family(url)
 
 
 def _canonical_url(url: str, name: str = "", publisher_url: str = "") -> str:
-    """Return only a direct approved URL or a resolvable Bing target.
+    """Return only a direct approved report URL or a resolvable Bing target.
 
-    Publisher homepages are intentionally not substituted for missing article URLs:
-    if provenance cannot be tied to a direct approved URL, it must fail closed in
-    the downstream two-independent-source gate.
+    Publisher homepages, team/schedule/matchup shells, stats dashboards and search
+    pages are never substituted for direct attributable reporting. If provenance
+    cannot be tied to a direct approved report, downstream publication fails closed.
     """
     del name, publisher_url  # retained in the signature for a stable call surface
     raw = str(url or "").strip()
-    if _domain_allowed(raw):
+    if is_direct_media_report_url(raw):
         return raw
 
     parsed = urlparse(raw)
     if parsed.hostname and parsed.hostname.lower().endswith("bing.com"):
         target = (parse_qs(parsed.query).get("url") or [""])[0]
         target = unquote(target)
-        if _domain_allowed(target):
+        if is_direct_media_report_url(target):
             return target
     return ""
 
@@ -238,7 +229,7 @@ def _canonical_sources(entry: dict, preview: dict, evidence_items: list[dict]) -
         if not name or not title:
             continue
         url = _canonical_url(source.get("url") or "", name)
-        if not url or not _domain_allowed(url):
+        if not url or not is_direct_media_report_url(url):
             continue
         family = _domain_family(url)
         title_key = re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
