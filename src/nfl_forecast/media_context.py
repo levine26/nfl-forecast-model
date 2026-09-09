@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-"""Best-effort current reporting for human game previews.
+"""Fresh external reporting for human Sunday Signal game previews.
 
-This layer is editorial only. It discovers fresh public reporting from major outlets
-and optional X/Twitter signals, ranks it by source quality/recency/relevance, and
-returns compact metadata for the Sunday Signal Read. Nothing here is imported by
-LevLine's numerical pipeline.
+This module is editorial-only. It discovers public reporting, ranks substantive
+news above generic preview/betting content, and returns provenance-rich angles.
+Nothing here is imported by or fed into LevLine's numerical forecast.
 """
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from html import unescape
@@ -44,14 +44,22 @@ SOURCE_PRIORITY = {
     "sports illustrated": 80,
 }
 
-HIGH_SIGNAL_WORDS = {
-    "injury", "injured", "questionable", "doubtful", "out", "return", "returns",
-    "start", "starter", "expected", "practice", "limited", "debut", "trade", "traded",
-    "coordinator", "play-caller", "playcaller", "scheme", "preview", "matchup", "week 1",
-    "week one", "lineup", "inactive", "suspended", "available", "availability",
+# These are actual reporting developments, not generic content labels.
+SUBSTANTIVE_SIGNALS = {
+    "injury", "injured", "questionable", "doubtful", "ruled out", "likely out",
+    "expected to play", "expected to start", "on track", "return", "returns", "practice",
+    "limited", "inactive", "suspended", "available", "availability", "starter", "starting",
+    "debut", "trade", "traded", "signed", "acquired", "coordinator", "play-caller",
+    "playcaller", "new coach", "scheme change", "left tackle", "right tackle",
 }
-
-LOW_SIGNAL_WORDS = {"odds", "parlay", "prop bet", "best bet", "dfs", "fantasy", "same-game"}
+GENERIC_PREVIEW_SIGNALS = {
+    "preview", "prediction", "predictions", "picks", "how to watch", "what to watch",
+    "week 1", "week one", "matchup", "keys to the game",
+}
+BETTING_SIGNALS = {
+    "odds", "parlay", "prop bet", "best bet", "betting", "dfs", "fantasy", "same-game",
+    "spread pick", "moneyline pick",
+}
 
 
 def _now() -> datetime:
@@ -87,8 +95,7 @@ def _parse_date(value: Any) -> datetime | None:
         return parsed.astimezone(timezone.utc)
     except Exception:
         try:
-            parsed = pd.to_datetime(text, utc=True, errors="raise")
-            return parsed.to_pydatetime()
+            return pd.to_datetime(text, utc=True, errors="raise").to_pydatetime()
         except Exception:
             return None
 
@@ -110,12 +117,22 @@ def _source_priority(name: str) -> int:
     for needle, value in SOURCE_PRIORITY.items():
         if needle in lowered:
             return value
-    # Local beat outlets are useful but should not outrank national/league reporting
-    # simply because a generic feed happens to surface them first.
     return 72
 
 
-def _relevance_score(title: str, summary: str, away_name: str, home_name: str, source: str, published: datetime | None) -> float:
+def _has(text: str, signals: set[str]) -> bool:
+    lowered = text.lower()
+    return any(signal in lowered for signal in signals)
+
+
+def _relevance_score(
+    title: str,
+    summary: str,
+    away_name: str,
+    home_name: str,
+    source: str,
+    published: datetime | None,
+) -> float:
     text = f"{title} {summary}".lower()
     score = float(_source_priority(source))
     for team in (away_name, home_name):
@@ -124,10 +141,20 @@ def _relevance_score(title: str, summary: str, away_name: str, home_name: str, s
             score += 12
         elif nickname in text:
             score += 8
-    if any(word in text for word in HIGH_SIGNAL_WORDS):
-        score += 12
-    if any(word in text for word in LOW_SIGNAL_WORDS):
-        score -= 22
+
+    substantive = _has(text, SUBSTANTIVE_SIGNALS)
+    generic = _has(title, GENERIC_PREVIEW_SIGNALS)
+    if substantive:
+        score += 24
+    elif generic:
+        score -= 14
+    if _has(text, BETTING_SIGNALS):
+        score -= 34
+
+    # Headlines with an actual verb/event are generally more useful than labels
+    # such as "Week 1 preview" even when both are from reputable publishers.
+    if len(title.split()) >= 7:
+        score += 4
     if published is not None:
         age_hours = max(0.0, (_now() - published).total_seconds() / 3600.0)
         score += max(0.0, 12.0 - age_hours / 12.0)
@@ -143,16 +170,13 @@ def _parse_rss(xml_text: str, provider: str) -> list[dict[str, Any]]:
         title = _clean_title(fields.get("title"), source)
         if not title:
             continue
-        summary = _clean_html(fields.get("description") or fields.get("summary"))
-        link = fields.get("link") or fields.get("guid") or fields.get("source_url") or ""
-        published = _parse_date(fields.get("pubdate") or fields.get("date") or fields.get("published"))
         rows.append({
             "title": title,
-            "summary": summary,
+            "summary": _clean_html(fields.get("description") or fields.get("summary")),
             "source_name": source,
-            "source_url": link,
+            "source_url": fields.get("link") or fields.get("guid") or fields.get("source_url") or "",
             "publisher_url": fields.get("source_url"),
-            "published": published,
+            "published": _parse_date(fields.get("pubdate") or fields.get("date") or fields.get("published")),
             "provider": provider,
         })
     return rows
@@ -190,7 +214,7 @@ def _fetch_x(session, away_name: str, home_name: str, timeout: int) -> tuple[lis
     except Exception as exc:
         return [], {"status": "degraded", "error": str(exc)[:220]}
     users = {str(user.get("id")): user for user in (data.get("includes", {}).get("users") or [])}
-    rows = []
+    rows: list[dict[str, Any]] = []
     for tweet in data.get("data") or []:
         user = users.get(str(tweet.get("author_id")), {})
         username = str(user.get("username") or "unknown")
@@ -210,27 +234,41 @@ def _fetch_x(session, away_name: str, home_name: str, timeout: int) -> tuple[lis
     return rows, {"status": "healthy", "signals": len(rows)}
 
 
-def _dedupe_and_rank(rows: list[dict[str, Any]], away_name: str, home_name: str, lookback_days: int, max_items: int) -> list[dict[str, Any]]:
+def _dedupe_and_rank(
+    rows: list[dict[str, Any]],
+    away_name: str,
+    home_name: str,
+    lookback_days: int,
+    max_items: int,
+) -> list[dict[str, Any]]:
     cutoff = _now() - timedelta(days=lookback_days)
     ranked: list[dict[str, Any]] = []
     seen: set[str] = set()
-    for row in rows:
-        published = row.get("published")
+    for source_row in rows:
+        published = source_row.get("published")
         if published is not None and published < cutoff:
             continue
-        title = str(row.get("title") or "").strip()
-        summary = str(row.get("summary") or "").strip()
+        title = str(source_row.get("title") or "").strip()
+        summary = str(source_row.get("summary") or "").strip()
         key = re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
         if not key or key in seen:
             continue
-        score = _relevance_score(title, summary, away_name, home_name, str(row.get("source_name") or ""), published)
-        if row.get("provider") == "x" and not row.get("social_verified"):
-            score -= 18
-        row = dict(row)
+        score = _relevance_score(title, summary, away_name, home_name, str(source_row.get("source_name") or ""), published)
+        if source_row.get("provider") == "x" and not source_row.get("social_verified"):
+            score -= 22
+        row = dict(source_row)
         row["score"] = round(score, 3)
+        row["substantive"] = _has(f"{title} {summary}", SUBSTANTIVE_SIGNALS)
         ranked.append(row)
         seen.add(key)
-    ranked.sort(key=lambda item: (float(item.get("score") or 0), item.get("published") or datetime.min.replace(tzinfo=timezone.utc)), reverse=True)
+    ranked.sort(
+        key=lambda item: (
+            bool(item.get("substantive")),
+            float(item.get("score") or 0),
+            item.get("published") or datetime.min.replace(tzinfo=timezone.utc),
+        ),
+        reverse=True,
+    )
     return ranked[:max_items]
 
 
@@ -240,22 +278,42 @@ def _as_editorial_item(row: dict[str, Any]) -> dict[str, Any]:
         "category": "reported_angle",
         "title": str(row.get("title") or "").strip(),
         "summary": str(row.get("summary") or "").strip()[:500],
-        "strength": "Strong" if float(row.get("score") or 0) >= 105 else "Moderate",
+        "strength": "Strong" if bool(row.get("substantive")) else "Moderate",
         "source_name": str(row.get("source_name") or "Unknown source"),
         "source_url": str(row.get("source_url") or row.get("publisher_url") or ""),
         "as_of": published.isoformat() if isinstance(published, datetime) else _now().isoformat(),
         "side": "neutral",
-        "relevance": "Fresh external reporting used to choose the human preview angle; editorial only.",
+        "relevance": "Fresh external reporting selects the human preview angle; editorial only.",
         "metadata": {
             "family": "reported_angle",
             "provider": row.get("provider"),
             "source_priority": _source_priority(str(row.get("source_name") or "")),
             "editorial_score": float(row.get("score") or 0),
+            "substantive": bool(row.get("substantive")),
             "publisher_url": row.get("publisher_url"),
             "published_utc": published.isoformat() if isinstance(published, datetime) else None,
             "social_verified": row.get("social_verified"),
             "promoted_to_model": False,
         },
+    }
+
+
+def _fetch_game(game: pd.Series, session, lookback_days: int, max_items: int, timeout: int) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
+    gid = str(game.get("game_id"))
+    away_name = _team_name(game.get("away_team"))
+    home_name = _team_name(game.get("home_team"))
+    query = f'"{away_name}" "{home_name}" NFL'
+    encoded = quote_plus(query)
+    google_url = f"{GOOGLE_NEWS_RSS}?q={encoded}+when:{int(lookback_days)}d&hl=en-US&gl=US&ceid=US:en"
+    bing_url = f"{BING_NEWS_RSS}?q={encoded}&format=rss&mkt=en-US"
+    google_rows, google_error = _fetch_feed(session, google_url, "google_news", timeout)
+    bing_rows, bing_error = _fetch_feed(session, bing_url, "bing_news", timeout)
+    x_rows, x_status = _fetch_x(session, away_name, home_name, timeout)
+    ranked = _dedupe_and_rank(google_rows + bing_rows + x_rows, away_name, home_name, lookback_days, max_items)
+    return gid, [_as_editorial_item(row) for row in ranked], {
+        "google_error": bool(google_error),
+        "bing_error": bool(bing_error),
+        "x_status": str(x_status.get("status") or "unknown"),
     }
 
 
@@ -266,52 +324,48 @@ def fetch_media_context(
     max_items_per_game: int = 4,
     timeout: int = 15,
 ) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
-    """Discover fresh reporting for every matchup without making it a hard dependency."""
+    """Discover current reporting for every matchup; never block numerical output."""
     out: dict[str, list[dict[str, Any]]] = {}
-    provider_errors: dict[str, int] = {"google_news": 0, "bing_news": 0}
+    provider_errors = {"google_news": 0, "bing_news": 0}
     x_states: list[str] = []
-    games_with_reporting = 0
-    total_items = 0
+    rows = [row for _, row in predictions.iterrows()]
 
-    for _, game in predictions.iterrows():
-        gid = str(game.get("game_id"))
-        away_name = _team_name(game.get("away_team"))
-        home_name = _team_name(game.get("home_team"))
-        query = f'"{away_name}" "{home_name}" NFL'
-        encoded = quote_plus(query)
-        google_url = f"{GOOGLE_NEWS_RSS}?q={encoded}+when:{int(lookback_days)}d&hl=en-US&gl=US&ceid=US:en"
-        bing_url = f"{BING_NEWS_RSS}?q={encoded}&format=rss&mkt=en-US"
-        rows: list[dict[str, Any]] = []
-        google_rows, google_error = _fetch_feed(session, google_url, "google_news", timeout)
-        bing_rows, bing_error = _fetch_feed(session, bing_url, "bing_news", timeout)
-        rows.extend(google_rows)
-        rows.extend(bing_rows)
-        if google_error:
-            provider_errors["google_news"] += 1
-        if bing_error:
-            provider_errors["bing_news"] += 1
+    # The 16 matchups are independent editorial searches, so fetch them concurrently.
+    # Six workers keeps wall-clock time low without hammering public feeds.
+    with ThreadPoolExecutor(max_workers=min(6, max(1, len(rows)))) as pool:
+        futures = [
+            pool.submit(_fetch_game, row, session, lookback_days, max_items_per_game, timeout)
+            for row in rows
+        ]
+        for future in as_completed(futures):
+            try:
+                gid, items, provider = future.result()
+            except Exception:
+                continue
+            if items:
+                out[gid] = items
+            provider_errors["google_news"] += int(provider.get("google_error", False))
+            provider_errors["bing_news"] += int(provider.get("bing_error", False))
+            x_states.append(str(provider.get("x_status") or "unknown"))
 
-        x_rows, x_status = _fetch_x(session, away_name, home_name, timeout)
-        rows.extend(x_rows)
-        x_states.append(str(x_status.get("status") or "unknown"))
-
-        ranked = _dedupe_and_rank(rows, away_name, home_name, lookback_days, max_items_per_game)
-        if ranked:
-            out[gid] = [_as_editorial_item(row) for row in ranked]
-            games_with_reporting += 1
-            total_items += len(ranked)
-
+    games_with_reporting = len(out)
+    total_items = sum(len(items) for items in out.values())
+    substantive_games = sum(
+        1 for items in out.values()
+        if any(bool((item.get("metadata") or {}).get("substantive")) for item in items)
+    )
     status_name = "healthy" if games_with_reporting == len(predictions) and len(predictions) else "partial" if games_with_reporting else "degraded"
     return out, {
         "status": status_name,
         "as_of": _now().isoformat(),
         "games": int(len(predictions)),
         "games_with_reporting": games_with_reporting,
+        "games_with_substantive_reporting": substantive_games,
         "signals": total_items,
         "providers": {
             "google_news_rss": {"errors": provider_errors["google_news"]},
             "bing_news_rss": {"errors": provider_errors["bing_news"]},
             "x_recent_search": {"status": "healthy" if "healthy" in x_states else ("degraded" if "degraded" in x_states else "unavailable")},
         },
-        "source_policy": "Major current reporting chooses the editorial angle. X is optional and never outranks verified mainstream reporting by default. No media signal moves LevLine numerically.",
+        "source_policy": "Substantive current reporting outranks generic previews. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     }
