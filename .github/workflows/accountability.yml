@@ -5,16 +5,20 @@ on:
     branches: [main, diagnostics-v1]
     paths:
       - 'src/nfl_forecast/diagnostics.py'
+      - 'src/nfl_forecast/accountability_publication.py'
       - 'src/nfl_forecast/pipeline.py'
       - 'scripts/run_week.py'
       - 'tests/test_diagnostics.py'
+      - 'tests/test_accountability_publication.py'
       - '.github/workflows/accountability.yml'
   pull_request:
     paths:
       - 'src/nfl_forecast/diagnostics.py'
+      - 'src/nfl_forecast/accountability_publication.py'
       - 'src/nfl_forecast/pipeline.py'
       - 'scripts/run_week.py'
       - 'tests/test_diagnostics.py'
+      - 'tests/test_accountability_publication.py'
       - '.github/workflows/accountability.yml'
 
 permissions:
@@ -34,19 +38,25 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - run: pytest -q tests/test_diagnostics.py
+      - run: pytest -q tests/test_diagnostics.py tests/test_accountability_publication.py
       - name: Smoke-test published diagnostics from existing outputs
         run: |
           python - <<'PY'
           from pathlib import Path
           import pandas as pd
           from nfl_forecast.diagnostics import build_movement_attribution, build_postgame_autopsies, build_weekly_brief
+          from nfl_forecast.accountability_publication import build_history_scoreboard, build_power_editorial
           out = Path('outputs')
           runs = pd.read_csv(out/'run_history.csv') if (out/'run_history.csv').exists() else pd.DataFrame()
           current = pd.read_csv(out/'this_week.csv') if (out/'this_week.csv').exists() else pd.DataFrame()
           history = pd.read_csv(out/'prediction_history.csv') if (out/'prediction_history.csv').exists() else pd.DataFrame()
+          power = pd.read_csv(out/'power_ratings.csv') if (out/'power_ratings.csv').exists() else pd.DataFrame()
           movement = build_movement_attribution(runs)
           build_weekly_brief(current, movement)
           build_postgame_autopsies(history)
-          print(f'movement rows={len(movement)} current games={len(current)}')
+          board = build_history_scoreboard(history)
+          editorial = build_power_editorial(power)
+          assert len(editorial.get('teams', [])) in {0, len(power)}
+          assert board.get('locked', 0) >= 0
+          print(f'movement rows={len(movement)} current games={len(current)} power teams={len(editorial.get("teams", []))} official locks={board.get("locked", 0)}')
           PY

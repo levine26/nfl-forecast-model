@@ -12,6 +12,10 @@ from nfl_forecast.diagnostics import (
     build_weekly_brief,
     write_json,
 )
+from nfl_forecast.accountability_publication import (
+    build_history_scoreboard,
+    build_power_editorial,
+)
 
 
 def _read_csv(path: Path) -> pd.DataFrame:
@@ -52,6 +56,12 @@ def publish_accountability_feeds(artifacts, output_dir: str = "outputs") -> None
     official = _read_csv(out / "prediction_history.csv")
     autopsies = build_postgame_autopsies(official)
     write_json(out / "postgame_autopsies.json", autopsies)
+
+    # Publication-first accountability feeds. These summarize existing outputs;
+    # they do not create new model inputs or change any locked forecast.
+    published_power = _read_csv(out / "power_ratings.csv")
+    write_json(out / "power_editorial.json", build_power_editorial(published_power))
+    write_json(out / "history_scoreboard.json", build_history_scoreboard(official))
 
 
 def main():

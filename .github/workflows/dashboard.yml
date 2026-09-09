@@ -54,7 +54,8 @@ jobs:
           for f in \
             this_week.csv run_history.csv prediction_history.csv power_ratings.csv model_leaderboard.csv \
             calibration.csv confidence_diagnostics.csv movement_attribution.csv team_profiles.csv \
-            status.json contextual_evidence.json game_previews.json context_source_status.json weekly_brief.json postgame_autopsies.json; do
+            status.json contextual_evidence.json game_previews.json context_source_status.json weekly_brief.json postgame_autopsies.json \
+            power_editorial.json history_scoreboard.json; do
             if [ -f "outputs/$f" ]; then cp "outputs/$f" "site/public/data/$f"; fi
           done
       - name: Install dashboard dependencies
