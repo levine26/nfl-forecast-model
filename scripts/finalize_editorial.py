@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from nfl_forecast.copilot_media import apply_copilot_reads
 from nfl_forecast.editorial_finalize import finalize_previews
 from nfl_forecast.media_context import fetch_media_context
 from nfl_forecast.media_editorial import rewrite_reads_with_media
@@ -24,12 +25,22 @@ def main() -> None:
     evidence = json.loads(evidence_path.read_text())
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
 
-    # Editorial only: discover fresh public reporting and use it to choose/write the
-    # Read before the final uniqueness gate. This runs after every quantitative and
-    # contextual enrichment step, and no media value is passed back into LevLine.
+    # Deterministic fail-safe: discover/filter current reporting and build a source-first
+    # Read. This layer remains available even if Copilot is unavailable or invalid.
     media, media_status = fetch_media_context(predictions, timeout=8)
     previews = rewrite_reads_with_media(previews, predictions, evidence, media)
     status["media_reporting"] = media_status
+
+    # Primary human-synthesis layer: only a separately validated Copilot artifact may
+    # supersede the deterministic fallback. It contains prose/source metadata only.
+    previews, copilot_status = apply_copilot_reads(
+        previews=previews,
+        predictions=predictions,
+        path=out / "copilot_media_reads.json",
+    )
+    status["copilot_media"] = copilot_status
+
+    # Always run publication QA on the final text, regardless of which writer supplied it.
     status["editorial_finalizer"] = finalize_previews(predictions, previews, evidence)
 
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
@@ -41,7 +52,11 @@ def main() -> None:
         sources = ", ".join(
             str(item.get("source_name") or "") for item in (preview.get("reported_sources") or [])
         )
-        print(f"FINAL READ {game_id} | media={bool((preview.get('editorial_voice') or {}).get('media_led'))} | sources={sources} | {read}")
+        voice = preview.get("editorial_voice") or {}
+        print(
+            f"FINAL READ {game_id} | media={bool(voice.get('media_led'))} "
+            f"| copilot={bool(voice.get('copilot_researched'))} | sources={sources} | {read}"
+        )
 
 
 if __name__ == "__main__":
