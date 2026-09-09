@@ -34,24 +34,36 @@ SOURCE_PRIORITY = {
     "nytimes": 97,
     "associated press": 96,
     "ap news": 96,
-    "nfl.com": 94,
-    "nfl network": 94,
-    "cbs sports": 90,
-    "fox sports": 88,
-    "nbc sports": 88,
-    "yahoo sports": 86,
-    "usa today": 84,
-    "sports illustrated": 80,
+    "nfl.com": 95,
+    "nfl network": 95,
+    "cbs sports": 92,
+    "fox sports": 90,
+    "nbc sports": 90,
+    "profootballtalk": 89,
+    "yahoo sports": 87,
+    "usa today": 86,
+    "sports illustrated": 82,
+    "the ringer": 82,
 }
 
-# These are actual reporting developments, not generic content labels.
+LOW_TRUST_SOURCE_PATTERNS = {
+    "clutchpoints",
+    "heavy.com",
+    "sportskeeda",
+    "athlon sports",
+    "roundtable.io",
+    "a to z sports",
+    "the big lead",
+    "essentially sports",
+}
+
 SUBSTANTIVE_SIGNALS = {
     "injury", "injured", "questionable", "doubtful", "ruled out", "likely out",
     "expect ", "expects ", "expected to play", "expected to start", "on track",
     "return", "returns", "practice", "limited", "inactive", "suspended", "available",
     "availability", "starter", "starting", "debut", "trade", "traded", "signed",
     "acquired", "coordinator", "play-caller", "playcaller", "new coach", "scheme change",
-    "left tackle", "right tackle",
+    "left tackle", "right tackle", "activated", "waived", "released", "cleared",
 }
 GENERIC_PREVIEW_SIGNALS = {
     "preview", "prediction", "predictions", "picks", "how to watch", "what to watch",
@@ -59,7 +71,7 @@ GENERIC_PREVIEW_SIGNALS = {
 }
 BETTING_SIGNALS = {
     "odds", "parlay", "prop bet", "best bet", "betting", "dfs", "fantasy", "same-game",
-    "spread pick", "moneyline pick",
+    "spread pick", "moneyline pick", "against the spread", "ats pick",
 }
 
 
@@ -121,9 +133,28 @@ def _source_priority(name: str) -> int:
     return 72
 
 
+def _is_low_trust_source(name: str) -> bool:
+    lowered = str(name or "").lower()
+    return any(pattern in lowered for pattern in LOW_TRUST_SOURCE_PATTERNS)
+
+
 def _has(text: str, signals: set[str]) -> bool:
     lowered = text.lower()
     return any(signal in lowered for signal in signals)
+
+
+def _mentions_team(text: str, team_name: str) -> bool:
+    lowered = text.lower()
+    full = team_name.lower()
+    nickname = full.split()[-1]
+    return full in lowered or nickname in lowered
+
+
+def _matchup_relevant(title: str, summary: str, away_name: str, home_name: str) -> bool:
+    text = f"{title} {summary}"
+    # Require both sides somewhere in the article metadata. This rejects roundup
+    # articles that happen to surface for one team while discussing another game.
+    return _mentions_team(text, away_name) and _mentions_team(text, home_name)
 
 
 def _relevance_score(
@@ -150,10 +181,10 @@ def _relevance_score(
     elif generic:
         score -= 14
     if _has(text, BETTING_SIGNALS):
-        score -= 34
+        score -= 45
+    if _is_low_trust_source(source):
+        score -= 28
 
-    # Headlines with an actual verb/event are generally more useful than labels
-    # such as "Week 1 preview" even when both are from reputable publishers.
     if len(title.split()) >= 7:
         score += 4
     if published is not None:
@@ -244,33 +275,69 @@ def _dedupe_and_rank(
 ) -> list[dict[str, Any]]:
     cutoff = _now() - timedelta(days=lookback_days)
     ranked: list[dict[str, Any]] = []
-    seen: set[str] = set()
+    seen_titles: set[str] = set()
     for source_row in rows:
         published = source_row.get("published")
         if published is not None and published < cutoff:
             continue
         title = str(source_row.get("title") or "").strip()
         summary = str(source_row.get("summary") or "").strip()
+        source = str(source_row.get("source_name") or "")
         key = re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
-        if not key or key in seen:
+        if not key or key in seen_titles:
             continue
-        score = _relevance_score(title, summary, away_name, home_name, str(source_row.get("source_name") or ""), published)
+        if _has(f"{title} {summary}", BETTING_SIGNALS):
+            continue
+        if not _matchup_relevant(title, summary, away_name, home_name):
+            continue
+
+        substantive = _has(f"{title} {summary}", SUBSTANTIVE_SIGNALS)
+        source_priority = _source_priority(source)
+        # Unknown/low-trust sources may supplement a Read only when they contain
+        # a real development. Generic previews must come from established outlets.
+        if not substantive and source_priority < 84:
+            continue
+
+        score = _relevance_score(title, summary, away_name, home_name, source, published)
         if source_row.get("provider") == "x" and not source_row.get("social_verified"):
             score -= 22
         row = dict(source_row)
         row["score"] = round(score, 3)
-        row["substantive"] = _has(f"{title} {summary}", SUBSTANTIVE_SIGNALS)
+        row["substantive"] = substantive
+        row["trusted_source"] = source_priority >= 82 and not _is_low_trust_source(source)
         ranked.append(row)
-        seen.add(key)
+        seen_titles.add(key)
+
     ranked.sort(
         key=lambda item: (
+            bool(item.get("trusted_source")),
             bool(item.get("substantive")),
             float(item.get("score") or 0),
             item.get("published") or datetime.min.replace(tzinfo=timezone.utc),
         ),
         reverse=True,
     )
-    return ranked[:max_items]
+
+    # Prefer source diversity so a Read does not become two Yahoo/MSN versions of
+    # the same story when an independent second outlet is available.
+    selected: list[dict[str, Any]] = []
+    used_sources: set[str] = set()
+    for row in ranked:
+        source_key = re.sub(r"[^a-z0-9]+", " ", str(row.get("source_name") or "").lower()).strip()
+        if source_key in used_sources:
+            continue
+        selected.append(row)
+        used_sources.add(source_key)
+        if len(selected) >= max_items:
+            return selected
+    if len(selected) < max_items:
+        for row in ranked:
+            if row in selected:
+                continue
+            selected.append(row)
+            if len(selected) >= max_items:
+                break
+    return selected
 
 
 def _as_editorial_item(row: dict[str, Any]) -> dict[str, Any]:
@@ -279,7 +346,7 @@ def _as_editorial_item(row: dict[str, Any]) -> dict[str, Any]:
         "category": "reported_angle",
         "title": str(row.get("title") or "").strip(),
         "summary": str(row.get("summary") or "").strip()[:500],
-        "strength": "Strong" if bool(row.get("substantive")) else "Moderate",
+        "strength": "Strong" if bool(row.get("substantive")) and bool(row.get("trusted_source")) else "Moderate",
         "source_name": str(row.get("source_name") or "Unknown source"),
         "source_url": str(row.get("source_url") or row.get("publisher_url") or ""),
         "as_of": published.isoformat() if isinstance(published, datetime) else _now().isoformat(),
@@ -291,6 +358,7 @@ def _as_editorial_item(row: dict[str, Any]) -> dict[str, Any]:
             "source_priority": _source_priority(str(row.get("source_name") or "")),
             "editorial_score": float(row.get("score") or 0),
             "substantive": bool(row.get("substantive")),
+            "trusted_source": bool(row.get("trusted_source")),
             "publisher_url": row.get("publisher_url"),
             "published_utc": published.isoformat() if isinstance(published, datetime) else None,
             "social_verified": row.get("social_verified"),
@@ -331,8 +399,6 @@ def fetch_media_context(
     x_states: list[str] = []
     rows = [row for _, row in predictions.iterrows()]
 
-    # The 16 matchups are independent editorial searches, so fetch them concurrently.
-    # Six workers keeps wall-clock time low without hammering public feeds.
     with ThreadPoolExecutor(max_workers=min(6, max(1, len(rows)))) as pool:
         futures = [
             pool.submit(_fetch_game, row, session, lookback_days, max_items_per_game, timeout)
@@ -355,6 +421,10 @@ def fetch_media_context(
         1 for items in out.values()
         if any(bool((item.get("metadata") or {}).get("substantive")) for item in items)
     )
+    trusted_games = sum(
+        1 for items in out.values()
+        if any(bool((item.get("metadata") or {}).get("trusted_source")) for item in items)
+    )
     status_name = "healthy" if games_with_reporting == len(predictions) and len(predictions) else "partial" if games_with_reporting else "degraded"
     return out, {
         "status": status_name,
@@ -362,11 +432,12 @@ def fetch_media_context(
         "games": int(len(predictions)),
         "games_with_reporting": games_with_reporting,
         "games_with_substantive_reporting": substantive_games,
+        "games_with_trusted_reporting": trusted_games,
         "signals": total_items,
         "providers": {
             "google_news_rss": {"errors": provider_errors["google_news"]},
             "bing_news_rss": {"errors": provider_errors["bing_news"]},
             "x_recent_search": {"status": "healthy" if "healthy" in x_states else ("degraded" if "degraded" in x_states else "unavailable")},
         },
-        "source_policy": "Substantive current reporting outranks generic previews. X is optional and lower-trust by default. Media never moves LevLine numerically.",
+        "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     }
