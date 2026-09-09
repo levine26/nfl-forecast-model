@@ -213,9 +213,27 @@ def polish_preview_slate(previews: dict[str, dict], predictions: pd.DataFrame) -
             return False
         summary = str(item.get("summary") or "").strip()
         lowered = summary.lower()
-        if len(summary.split()) < 7:
-            return False
         fam = family(item)
+        title = str(item.get("title") or "").strip()
+
+        # Compact pressure summaries are intentionally produced by downstream
+        # evidence enrichment (for example, "pressure matchup tilts LAC").
+        # They are structured evidence, not empty/generic copy. Let the pressure
+        # renderer consume them instead of falling into the identical
+        # "sourced lead unavailable" fallback across several games.
+        compact_pressure = bool(
+            fam == "pressure"
+            and title
+            and (
+                re.search(r"pressure matchup tilts [A-Z]{2,4}", summary, re.I)
+                or re.search(
+                    r"^[A-Z]{2,4} gave up sacks on [0-9.]+% of pass plays last season; [A-Z]{2,4} got home on [0-9.]+%",
+                    summary,
+                )
+            )
+        )
+        if len(summary.split()) < 7 and not compact_pressure:
+            return False
         if ("nflverse schedule sample" in lowered and fam != "rivalry") or "need variance in the high-leverage parts" in lowered:
             return False
         return True
