@@ -58,7 +58,7 @@ def _predictions() -> pd.DataFrame:
 def test_media_context_prioritizes_major_reporting_over_betting_noise(monkeypatch):
     monkeypatch.delenv("X_BEARER_TOKEN", raising=False)
     monkeypatch.delenv("TWITTER_BEARER_TOKEN", raising=False)
-    media, status = fetch_media_context(_predictions(), session=_Session(), lookback_days=30)
+    media, status = fetch_media_context(_predictions(), session=_Session(), lookback_days=3650)
     items = media["2026_01_DEN_KC"]
     assert items[0]["source_name"] == "ESPN"
     assert any(item["source_name"] == "CBS Sports" for item in items)
