@@ -222,36 +222,36 @@ def _provenance_inputs():
     return historical, base_oof, training
 
 
+def _capture_reconstruction(historical, base_oof, training, output_dir):
+    return capture_fst_pre_fit_provenance(
+        historical,
+        base_oof,
+        training,
+        output_dir,
+        candidate_id=FROZEN_CANDIDATE_ID,
+        capture_context="prospective_shadow_reconstruction",
+    )
+
+
 def test_fst_provenance_persists_exact_order_and_canonical_keyed_identity(tmp_path):
     historical, base_oof, training = _provenance_inputs()
 
-    first = capture_fst_pre_fit_provenance(
-        historical,
-        base_oof,
-        training,
-        tmp_path / "first",
-        candidate_id=FROZEN_CANDIDATE_ID,
-    )
-    second = capture_fst_pre_fit_provenance(
-        historical,
-        base_oof,
-        training,
-        tmp_path / "second",
-        candidate_id=FROZEN_CANDIDATE_ID,
-    )
+    first = _capture_reconstruction(historical, base_oof, training, tmp_path / "first")
+    second = _capture_reconstruction(historical, base_oof, training, tmp_path / "second")
     assert first == second
+    assert first["schema_version"] == 2
+    assert first["capture_context"] == "prospective_shadow_reconstruction"
 
     keyed = pd.read_csv(tmp_path / "first" / "base_oof_keyed.csv")
     assert keyed["game_id"].tolist() == historical["game_id"].tolist()
     assert keyed["row_position"].tolist() == list(range(len(base_oof)))
     assert first["base_oof"]["raw_sha256"] == second["base_oof"]["raw_sha256"]
 
-    shuffled = capture_fst_pre_fit_provenance(
+    shuffled = _capture_reconstruction(
         historical,
         base_oof.iloc[::-1],
         training.iloc[::-1],
         tmp_path / "shuffled",
-        candidate_id=FROZEN_CANDIDATE_ID,
     )
     assert shuffled["base_oof"]["raw_sha256"] != first["base_oof"]["raw_sha256"]
     assert (
@@ -270,13 +270,7 @@ def test_fst_provenance_persists_exact_order_and_canonical_keyed_identity(tmp_pa
 
 def test_fst_fit_provenance_distinguishes_raw_input_hash_from_model_digest(tmp_path):
     historical, base_oof, training = _provenance_inputs()
-    inputs = capture_fst_pre_fit_provenance(
-        historical,
-        base_oof,
-        training,
-        tmp_path,
-        candidate_id=FROZEN_CANDIDATE_ID,
-    )
+    inputs = _capture_reconstruction(historical, base_oof, training, tmp_path)
     fit = FrozenStackFit(
         intercept=-0.1,
         market_logit_coefficient=1.1,
@@ -290,6 +284,7 @@ def test_fst_fit_provenance_distinguishes_raw_input_hash_from_model_digest(tmp_p
     assert manifest["model_training_data_sha256"] == "f" * 64
     assert manifest["training_frame_raw_sha256"] == inputs["training_frame"]["raw_sha256"]
     assert manifest["model_training_data_sha256"] != manifest["training_frame_raw_sha256"]
+    assert manifest["capture_context"] == "prospective_shadow_reconstruction"
     assert manifest["runtime"]["python_version"]
     assert manifest["runtime"]["numpy_version"]
     assert manifest["runtime"]["scipy_version"]
@@ -299,27 +294,60 @@ def test_fst_fit_provenance_distinguishes_raw_input_hash_from_model_digest(tmp_p
     assert (tmp_path / "fit_manifest.json").is_file()
 
 
+def test_fst_provenance_capture_context_is_explicit_and_cannot_launder_fst01(tmp_path):
+    historical, base_oof, training = _provenance_inputs()
+
+    with pytest.raises(ValueError, match="capture_context"):
+        capture_fst_pre_fit_provenance(
+            historical,
+            base_oof,
+            training,
+            tmp_path / "ambiguous",
+            candidate_id=FROZEN_CANDIDATE_ID,
+            capture_context="reconstruction",
+        )
+
+    with pytest.raises(ValueError, match="may not be relabeled as candidate_freeze"):
+        capture_fst_pre_fit_provenance(
+            historical,
+            base_oof,
+            training,
+            tmp_path / "laundered",
+            candidate_id=FROZEN_CANDIDATE_ID,
+            capture_context="candidate_freeze",
+        )
+
+    future = capture_fst_pre_fit_provenance(
+        historical,
+        base_oof,
+        training,
+        tmp_path / "future",
+        candidate_id="F-ST-02-FROZEN-2027",
+        capture_context="candidate_freeze",
+    )
+    assert future["candidate_id"] == "F-ST-02-FROZEN-2027"
+    assert future["capture_context"] == "candidate_freeze"
+
+
 def test_fst_provenance_fails_closed_on_ambiguous_or_post_cutoff_rows(tmp_path):
     historical, base_oof, training = _provenance_inputs()
 
     duplicate_ids = historical.copy()
     duplicate_ids.loc[205, "game_id"] = duplicate_ids.loc[101, "game_id"]
     with pytest.raises(ValueError, match="duplicate game_id"):
-        capture_fst_pre_fit_provenance(
+        _capture_reconstruction(
             duplicate_ids,
             base_oof,
             training,
             tmp_path / "duplicate",
-            candidate_id=FROZEN_CANDIDATE_ID,
         )
 
     contaminated = training.copy()
     contaminated.loc[412, "season"] = 2026
     with pytest.raises(ValueError, match="post-2025"):
-        capture_fst_pre_fit_provenance(
+        _capture_reconstruction(
             historical,
             base_oof,
             contaminated,
             tmp_path / "contaminated",
-            candidate_id=FROZEN_CANDIDATE_ID,
         )
