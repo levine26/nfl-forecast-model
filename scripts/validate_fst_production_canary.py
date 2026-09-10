@@ -10,13 +10,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from nfl_forecast.challenger import (
-    build_base_oof_predictions as research_build_base_oof,
-    fit_future_nested_stack as research_fit_future_nested_stack,
-)
+from nfl_forecast.challenger import fit_future_nested_stack as research_fit_future_nested_stack
 from nfl_forecast.challenger_fst import fit_frozen_2026_stack, frozen_stack_probability
 from nfl_forecast.features import core_columns
-from nfl_forecast.fst_nested_pure import build_base_oof_predictions, build_fst_training_frame
+from nfl_forecast.fst_nested_pure import build_fst_training_frame, load_frozen_base_oof
 from nfl_forecast.fst_production import load_fst_artifact
 from nfl_forecast.pipeline import run
 
@@ -40,11 +37,11 @@ def main() -> None:
     features = core_columns(historical)
     seed = 26
 
-    # Both implementations consume the exact same materialized games/current frames.
-    prod_oof = build_base_oof_predictions(
-        historical, features, seed=seed, validation_start=2018, validation_end=2025
-    )
-    training_frame = build_fst_training_frame(historical, prod_oof, seed=seed)
+    # Both implementations consume the exact immutable OOF matrix that was present in
+    # the successful frozen shadow artifact. The loader independently validates bytes,
+    # row universe, season/target sequence, and restores the original historical index.
+    frozen_oof = load_frozen_base_oof(historical=historical)
+    training_frame = build_fst_training_frame(historical, frozen_oof, seed=seed)
     research_fit = fit_frozen_2026_stack(training_frame)
     artifact = load_fst_artifact()
     for label, actual, expected in (
@@ -59,16 +56,11 @@ def main() -> None:
     if research_fit.training_games != artifact.training_games:
         raise SystemExit("Frozen research training game count differs from production artifact")
 
-    research_oof = research_build_base_oof(
-        historical,
-        features,
-        seed=seed,
-        validation_start=2018,
-        validation_end=2025,
-    )
+    # Exercise the research nested-PURE implementation against the proposed production
+    # implementation on the same historical/current snapshot and same frozen meta OOF.
     research_pure = research_fit_future_nested_stack(
         historical,
-        research_oof,
+        frozen_oof,
         proposed,
         features,
         seed=seed,
