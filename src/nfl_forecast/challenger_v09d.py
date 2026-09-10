@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Research-only fixed matchup interactions for LevLine V09D-MATCHUP-001.
+"""Research-only fixed matchup interactions for LevLine V09D-EWMA-INTERACTIONS-002.
 
 The four features below are pre-registered in issue #93. Every constituent is an
 existing pregame EWMA produced by the leakage-safe shifted feature pipeline. This
