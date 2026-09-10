@@ -39,11 +39,23 @@ def run(
     cfg, historical, _, feature_sets, _, _ = build_research_frame(config_path)
     seed = int(cfg["model"]["random_state"])
 
-    _, base = build_nested_research(historical, feature_sets["production_compatible"], seed)
-    _, combined = build_nested_research(historical, feature_sets["opponent_adjusted_qb"], seed)
-    base = base[base.season.isin(TARGET_SEASONS)].copy()
-    combined = combined[combined.season.isin(TARGET_SEASONS)].copy()
-    common = base.index.intersection(combined.index)
+    _, base_full = build_nested_research(historical, feature_sets["production_compatible"], seed)
+    _, combined_full = build_nested_research(historical, feature_sets["opponent_adjusted_qb"], seed)
+
+    # Nested blend tuning for each target season must retain all earlier OOF history.
+    # Score/compare only on the common 2022-25 target sample after candidate predictions
+    # have been generated from their full chronological research frames.
+    combined_linear = nested_linear_hybrid(combined_full, objective="brier").predictions
+    combined_logit = nested_logit_hybrid_backtest(
+        combined_full,
+        objective="brier",
+        calibrator="none",
+    ).predictions
+
+    base_target = base_full[base_full.season.isin(TARGET_SEASONS)].copy()
+    combined_target = combined_full[combined_full.season.isin(TARGET_SEASONS)].copy()
+    common = base_target.index.intersection(combined_target.index)
+    common = common.intersection(combined_linear.index).intersection(combined_logit.index)
     if len(common) < 1000:
         raise RuntimeError(f"Expected the paired 2022-25 sample; found only {len(common)} games")
 
@@ -56,17 +68,10 @@ def run(
         "home_qb_starter_changed",
         "away_qb_starter_changed",
     ]].copy()
-    frame["market_prob"] = pd.to_numeric(base.loc[common, "market_prob"], errors="coerce")
+    frame["market_prob"] = pd.to_numeric(base_target.loc[common, "market_prob"], errors="coerce")
     frame["production_75_25"] = blend_probabilities(
-        base.loc[common, "pure_prob"], frame.market_prob, 0.75
+        base_target.loc[common, "pure_prob"], frame.market_prob, 0.75
     )
-
-    combined_linear = nested_linear_hybrid(combined, objective="brier").predictions
-    combined_logit = nested_logit_hybrid_backtest(
-        combined,
-        objective="brier",
-        calibrator="none",
-    ).predictions
     frame["v08_combined_adaptive_brier"] = pd.to_numeric(
         combined_linear.loc[common, "probability"], errors="coerce"
     )
