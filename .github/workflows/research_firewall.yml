@@ -1,0 +1,29 @@
+name: LevLine research firewall
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-research-firewall-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  firewall:
+    if: startsWith(github.head_ref, 'research/') || startsWith(github.head_ref, 'challenger/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Enforce research path firewall
+        run: python scripts/check_research_firewall.py --base origin/${{ github.base_ref }} --head-ref '${{ github.head_ref }}'
+      - name: Verify static production import firewall
+        run: pytest -q tests/test_research_firewall.py tests/test_experiment_registry.py tests/test_challenger_evaluation.py
