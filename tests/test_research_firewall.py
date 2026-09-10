@@ -18,11 +18,18 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/challenger_evaluation.py",
         "src/nfl_forecast/challenger_v09.py",
         "src/nfl_forecast/player_state_research.py",
+        "src/nfl_forecast/player_impact_engine.py",
+        "src/nfl_forecast/availability_qualification.py",
         "scripts/run_challenger_v09.py",
+        "scripts/build_expected_lineup_impacts.py",
         "research/experiments.json",
+        "research/player_impact/EXPECTED_LINEUP_CONTRACT.md",
+        "research/availability/sources.json",
         "research_outputs/player_state_audit.json",
         "challenger_outputs/v09_report.json",
         "tests/test_challenger_evaluation.py",
+        "tests/test_player_impact_engine.py",
+        "tests/test_availability_qualification.py",
         ".github/workflows/research_firewall.yml",
         "docs/LEVLINE_RESEARCH.md",
     ]
@@ -59,6 +66,8 @@ def test_production_prediction_path_does_not_import_research_modules():
         "experiment_registry",
         "player_state_research",
         "player_impact_cards",
+        "player_impact_engine",
+        "availability_qualification",
     )
     for filename in protected:
         tree = ast.parse(Path(filename).read_text(encoding="utf-8"), filename=filename)
