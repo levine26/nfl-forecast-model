@@ -2,9 +2,9 @@
 
 ## Purpose
 
-LevLine should use the betting market as an external information source without becoming a market clone. The market is unusually strong in the NFL because it aggregates injuries, quarterback news, weather, matchup opinions and professional trading. The right question is therefore not whether to use the market, but how to measure whether PURE adds information that survives after the market is known, and how aggressively to regress toward the market without erasing real independent signal.
+LevLine should use the betting market as an external information source without becoming a market clone. The market is unusually strong in the NFL because it aggregates injuries, quarterback news, weather, matchup opinions and professional trading. The right question is therefore not whether to use the market, but how to measure whether football-only PURE adds information that survives after the market is known, and how to use that information without erasing real independent signal.
 
-This document is research guidance only. It does **not** change the production 75% PURE / 25% MARKET blend. Any numerical architecture change requires separate chronology-preserving validation and must never use 2026 outcomes for selection.
+**Production status:** beginning with version `0.9.0-fst`, the official winner probability is frozen `F-ST-01-FROZEN-2026`, not the former fixed 75% PURE / 25% MARKET blend. F-ST combines current vig-free market log-odds with the separately materialized nested `fst_pure_home_prob` using pinned coefficients. The former 75/25 rule remains computed and locked as `legacy_final_home_prob` for a clean counterfactual. Nothing in this research document authorizes changing the frozen F-ST coefficients or using 2026 outcomes to select a replacement architecture.
 
 ## What other public forecasting systems do
 
@@ -35,7 +35,7 @@ NoPunt takes the opposite product stance: the market is **not** an input to the 
 Source:
 - https://www.nopunt.com/methodology
 
-This is a useful benchmark for Sunday Signal: PURE should remain visible and independently scored even if LevLine continues to include market information.
+This is a useful benchmark for Sunday Signal: both legacy production PURE and F-ST nested PURE should remain visible as diagnostics even though official F-ST includes market information.
 
 ### Forecast-combination research
 
@@ -49,30 +49,26 @@ References:
 
 Sunday Signal should permanently report four separate questions:
 
-1. **Independence** — How correlated are PURE and the market? What is the average absolute probability gap? How often do they pick different winners?
-2. **Accuracy** — On the exact same games, what are PURE, MARKET and LEVLINE Brier score, log loss and winner accuracy?
-3. **Incremental value** — When PURE differs from market by 3, 5 or 10+ percentage points, does PURE improve or degrade probability accuracy? When they pick opposite favorites, which side is right more often?
-4. **Blend selection** — What market weight performs best when the weight is selected only from data available before the season being evaluated?
+1. **Independence** — How correlated are F-ST nested PURE and the market? What is the average absolute probability gap? How often do their implied winners differ?
+2. **Accuracy** — On the exact same games and market snapshot, what are official F-ST, legacy 75/25, MARKET and, where useful, F-ST nested PURE Brier score, log loss and winner accuracy?
+3. **Incremental value** — When F-ST differs materially from the market or from legacy LevLine, does the difference improve or degrade probability accuracy? Which model wins when implied winners differ?
+4. **Future candidate selection** — Can a separately registered, chronology-safe candidate improve on frozen F-ST without using its evaluation games for its own selection?
 
-The research harness tests both:
-
-- **Linear probability pooling:** `P = (1-w) * PURE + w * MARKET`
-- **Logit pooling:** `logit(P) = (1-w) * logit(PURE) + w * logit(MARKET)`
-
-It also records a descriptive full-sample optimum and an expanding-season walk-forward weight. The descriptive optimum is diagnostic only; the walk-forward result is the more credible architecture evidence.
+Historical research tested both linear probability pooling and logit pooling, including expanding-season walk-forward selection. Those experiments remain historical evidence; they are not runtime parameter searches for F-ST.
 
 ## Critical timing limitation
 
-Historical `market_home_prob` in the current nflverse schedule feed is effectively a closing-line benchmark. Sunday Signal's official forecast locks at **T-120**. A closing price contains information that may arrive after our lock, so a closing-market optimum is not a fair production-weight selector.
+Historical `market_home_prob` in the current nflverse schedule feed is effectively a closing-line benchmark. Sunday Signal's official forecast locks at **T-120**. A closing price contains information that may arrive after our lock, so a closing-market optimum is not a fair production selector.
 
-Starting with 2026, Sunday Signal's hourly `run_history.csv` and immutable `prediction_history.csv` preserve contemporaneous market probabilities. That means we can score **T-120 MARKET vs T-120 PURE vs T-120 LEVLINE** on a genuinely matched information horizon going forward.
+Starting with 2026, Sunday Signal's append-only run history and immutable prediction history preserve contemporaneous market probabilities. Post-promotion official locks therefore retain the exact market probability used by F-ST and compute the legacy counterfactual from that same snapshot. When an upstream source does not expose an independent quote timestamp, LevLine records the forecast/lock snapshot time rather than inventing bookmaker freshness metadata.
 
-Until a sufficient matched-horizon sample exists, closing-line diagnostics are an upper-bound market benchmark, not permission to increase the live market weight.
+A future market-quality/timing track may test sharper multi-book consensus or a different pregame horizon. Such work must be a separately registered research change and must not ad hoc alter F-ST-01 coefficients.
 
 ## Current policy
 
-- Keep PURE separately visible and separately scored.
-- Keep the current 75/25 production blend frozen unless a separate pre-2026 chronology-preserving study justifies a change.
-- Do not select a new weight from 2026 outcomes.
-- Track the matched T-120 market benchmark automatically throughout 2026.
-- Research disagreement-dependent regression and market-movement conditioning as future candidates, inspired by nfelo, but fit them only on data that respects the information timestamp.
+- Official winner probability is `F-ST-01-FROZEN-2026` whenever a usable current vig-free moneyline probability exists.
+- If market is missing/non-finite, use exact legacy production behavior for that game and record an explicit fallback reason; do not synthesize a moneyline probability or substitute a spread.
+- Keep `pure_home_prob`, `fst_pure_home_prob`, market, and exact legacy 75/25 counterfactual separately visible for evaluation.
+- Do not select or refit F-ST coefficients/architecture from 2026 outcomes.
+- Track matched-horizon official F-ST versus legacy LevLine and market automatically throughout 2026.
+- Research sharper market source/timing, availability, forward-only 2026 updating, and disagreement behavior only as separately registered follow-ups.
