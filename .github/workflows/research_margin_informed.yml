@@ -1,0 +1,68 @@
+name: LevLine F-MI-01 margin-informed research
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_historical.py'
+      - 'src/nfl_forecast/margin_informed_research.py'
+      - 'scripts/run_margin_informed_research.py'
+      - 'tests/test_margin_informed_research.py'
+      - '.github/workflows/research_margin_informed.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-margin-informed-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  historical-prototype:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test chronological margin contracts
+        run: pytest -q tests/test_margin_informed_research.py tests/test_challenger_v08.py
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-margin-informed-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-margin-informed-${{ runner.os }}-
+            nfl-market-residual-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Run F-MI-01 2022-25 season-forward prototype
+        run: |
+          rm -rf research_outputs/orthogonal/margin_informed
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_margin_informed_research.py
+          test -s research_outputs/orthogonal/margin_informed/report.json
+          test -s research_outputs/orthogonal/margin_informed/paired_predictions_2022_2025.csv
+          test -s research_outputs/orthogonal/margin_informed/calibration_oof_history.csv
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/orthogonal/margin_informed/report.json').read_text())
+          assert report['experiment_id'] == 'F-MI-01'
+          assert report['ridge_alpha_precommitted'] == 20.0
+          assert report['probability_mapper_c_precommitted'] == 1000.0
+          assert report['hyperparameter_search_performed'] is False
+          assert report['market_used_as_model_feature'] is False
+          assert report['2026_outcomes_used'] == 0
+          PY
+      - name: Prove production outputs and site are untouched
+        run: git diff --exit-code -- outputs/ site/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-margin-informed-${{ github.run_id }}
+          path: research_outputs/orthogonal/margin_informed/
+          retention-days: 30
