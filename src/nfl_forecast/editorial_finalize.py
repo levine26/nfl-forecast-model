@@ -28,8 +28,11 @@ STANDARDIZED_STATUS_PATTERNS = (
     ),
     re.compile(r"\blevline does not make up an injury point value for it\b", re.I),
 )
-STANDARDIZED_SEGMENT_FRAGMENTS = (
-    "not an automatic forecast adjustment",
+STANDARDIZED_PERSONNEL_PATTERNS = (
+    re.compile(
+        r"\b(?:(?:[a-z][a-z.'’-]*\s+){0,3}[a-z][a-z.'’-]*['’]s\s+prior\s+)?usage\s+is\s+context\s+for\s+the\s+role\s+at\s+risk\s*(?:[,;:—–-]\s*)?not\s+an\s+automatic\s+forecast\s+adjustment\b[.!?]?",
+        re.I,
+    ),
 )
 STAT_BOILERPLATE_TERMS = {
     "plays", "play", "attempts", "attempt", "dropbacks", "dropback", "snaps", "snap",
@@ -40,7 +43,6 @@ STANDARDIZED_EVIDENCE_FRAGMENTS = (
     "passing game backdrop",
     "relevant opponent side profile",
     "usage is context for the role",
-    "context for the role at risk",
 )
 
 
@@ -124,7 +126,7 @@ def _notebook_candidates(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def _editorial_uniqueness_text(text: str) -> str:
     """Remove standardized factual/status boilerplate before substantive prose QA."""
     scrubbed = str(text or "")
-    for pattern in STANDARDIZED_STATUS_PATTERNS:
+    for pattern in (*STANDARDIZED_STATUS_PATTERNS, *STANDARDIZED_PERSONNEL_PATTERNS):
         scrubbed = pattern.sub(" ", scrubbed)
     return scrubbed
 
@@ -132,15 +134,10 @@ def _editorial_uniqueness_text(text: str) -> str:
 def _uniqueness_segments(text: str) -> list[str]:
     """Never manufacture duplicate prose by sliding an n-gram across sentences."""
     scrubbed = _editorial_uniqueness_text(text)
-    segments = [
+    return [
         segment.strip()
         for segment in re.split(r"(?<=[.!?])\s+|(?<=;)\s+", scrubbed)
         if segment.strip()
-    ]
-    return [
-        segment
-        for segment in segments
-        if not any(fragment in segment.lower() for fragment in STANDARDIZED_SEGMENT_FRAGMENTS)
     ]
 
 
