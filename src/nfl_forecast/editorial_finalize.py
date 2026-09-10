@@ -37,6 +37,7 @@ STANDARDIZED_EVIDENCE_FRAGMENTS = (
     "passing game backdrop",
     "relevant opponent side profile",
     "usage is context for the role",
+    "context for the role at risk",
 )
 
 
