@@ -21,8 +21,12 @@ from nfl_forecast.challenger_fst import (
 from nfl_forecast.fst_provenance import (
     TRAINING_COLUMNS,
     capture_fst_pre_fit_provenance,
-    verify_fst_frozen_identity,
     write_fst_fit_provenance,
+)
+from nfl_forecast.fst_reconstruction import (
+    frozen_fit_from_identity,
+    require_fst_reconstruction_runtime,
+    verify_fst_reconstruction_identity,
 )
 from scripts.run_challenger_v08 import SHADOW_BASE_COLUMNS, build_nested_research, build_research_frame
 
@@ -40,18 +44,6 @@ def _load_spec() -> dict:
     return spec
 
 
-def _registered_runtime_fields(identity: dict) -> dict:
-    return {
-        "intercept": float(identity["intercept"]),
-        "market_logit_coefficient": float(identity["market_logit_coefficient"]),
-        "pure_logit_coefficient": float(identity["pure_logit_coefficient"]),
-        "training_games": int(identity["training_games"]),
-        "training_first_season": int(identity["training_first_season"]),
-        "training_last_season": int(identity["training_last_season"]),
-        "training_data_sha256": str(identity["training_data_sha256"]),
-    }
-
-
 def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_outputs") -> dict:
     out = Path(output_dir)
     slate_path = out / "candidate_shadow_slate.csv"
@@ -60,6 +52,9 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
 
     spec = _load_spec()
     registered = spec["frozen_identity"]
+    runtime_check = require_fst_reconstruction_runtime()
+    authoritative_fit = frozen_fit_from_identity(registered)
+
     cfg, historical, current, feature_sets, _, _ = build_research_frame(config_path)
     seed = int(cfg["model"]["random_state"])
     base_features = feature_sets["production_compatible"]
@@ -86,7 +81,7 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     fit_provenance = write_fst_fit_provenance(
         provenance_dir, input_provenance, reconstruction_fit
     )
-    identity_check = verify_fst_frozen_identity(
+    identity_check = verify_fst_reconstruction_identity(
         provenance_dir,
         input_provenance,
         reconstruction_fit,
@@ -104,9 +99,9 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     preview = frozen_stack_probability(
         current_market,
         current_pure,
-        intercept=float(registered["intercept"]),
-        market_logit_coefficient=float(registered["market_logit_coefficient"]),
-        pure_logit_coefficient=float(registered["pure_logit_coefficient"]),
+        intercept=authoritative_fit.intercept,
+        market_logit_coefficient=authoritative_fit.market_logit_coefficient,
+        pure_logit_coefficient=authoritative_fit.pure_logit_coefficient,
     )
 
     fst = current[SHADOW_BASE_COLUMNS].copy()
@@ -122,13 +117,13 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     fst["challenger_version"] = FROZEN_CANDIDATE_ID
     fst["selected_shadow_candidate"] = True
     fst["training_cutoff"] = "2025"
-    fst["training_games"] = int(registered["training_games"])
-    fst["training_first_season"] = int(registered["training_first_season"])
-    fst["training_last_season"] = int(registered["training_last_season"])
-    fst["training_data_sha256"] = str(registered["training_data_sha256"])
-    fst["stack_intercept"] = float(registered["intercept"])
-    fst["stack_market_logit_coefficient"] = float(registered["market_logit_coefficient"])
-    fst["stack_pure_logit_coefficient"] = float(registered["pure_logit_coefficient"])
+    fst["training_games"] = authoritative_fit.training_games
+    fst["training_first_season"] = authoritative_fit.training_first_season
+    fst["training_last_season"] = authoritative_fit.training_last_season
+    fst["training_data_sha256"] = authoritative_fit.training_data_sha256
+    fst["stack_intercept"] = authoritative_fit.intercept
+    fst["stack_market_logit_coefficient"] = authoritative_fit.market_logit_coefficient
+    fst["stack_pure_logit_coefficient"] = authoritative_fit.pure_logit_coefficient
     fst["candidate_freeze_utc"] = spec["freeze_timestamp_utc"]
     fst["candidate_code_sha"] = spec["freeze_implementation_sha"]
 
@@ -143,7 +138,7 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         raise RuntimeError("Frozen F-ST must be the sole selected research shadow per game")
 
     reconstruction_dict = reconstruction_fit.as_dict()
-    registered_runtime = _registered_runtime_fields(registered)
+    authoritative_dict = authoritative_fit.as_dict()
     runtime = {
         "candidate_id": FROZEN_CANDIDATE_ID,
         "mode": "research_only_frozen_shadow",
@@ -151,13 +146,10 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         "training_cutoff": 2025,
         "2026_outcomes_used_in_fitting": 0,
         "production_promotion_authorized": False,
-        **registered_runtime,
-        "C": reconstruction_dict["C"],
-        "penalty": reconstruction_dict["penalty"],
-        "solver": reconstruction_dict["solver"],
-        "max_iter": reconstruction_dict["max_iter"],
+        **authoritative_dict,
         "scoring_parameter_source": "registered_frozen_identity",
         "reconstruction_fit": reconstruction_dict,
+        "reconstruction_runtime": runtime_check,
         "freeze_timestamp_utc": spec["freeze_timestamp_utc"],
         "freeze_implementation_sha": spec["freeze_implementation_sha"],
         "provenance": {
@@ -168,8 +160,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
             "frozen_identity_check": "fst/provenance/frozen_identity_check.json",
             "frozen_identity_verified": bool(identity_check["matches"]),
             "frozen_identity_source": identity_check["expected_source"],
-            "numeric_abs_tolerance": identity_check["numeric_abs_tolerance"],
-            "numeric_absolute_deltas": identity_check["numeric_absolute_deltas"],
+            "numeric_abs_tolerance": identity_check["refit_abs_tolerance"],
+            "numeric_absolute_deltas": identity_check["numerical_absolute_deltas"],
             "base_oof_raw_sha256": input_provenance["base_oof"]["raw_sha256"],
             "training_frame_raw_sha256": input_provenance["training_frame"]["raw_sha256"],
             "training_frame_canonical_game_keyed_sha256": input_provenance["training_frame"][
