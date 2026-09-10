@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-"""Production-compatible final-probability strategy adapter.
+"""Legacy/experimental probability adapter retained for compatibility and rollback tests.
 
-The ordinary production path is intentionally pinned to ``current_production``.  The
-experimental F-ST formula is present only as disabled plumbing for a future explicitly
-authorized promotion; it has no research imports and cannot activate from configuration.
+Official production winner scoring now lives in ``fst_production.py`` because frozen
+F-ST must consume the distinct validated nested ``fst_pure_home_prob`` rather than the
+legacy pipeline PURE accepted by this older adapter.  The default here intentionally
+remains the exact pre-F-ST 75/25 expression for downstream compatibility; it is not the
+selector for the official production path.
 """
 
 from dataclasses import dataclass
@@ -34,7 +36,7 @@ def _current_production(
     pure_home_prob: pd.Series,
     market_home_prob: pd.Series,
 ) -> pd.Series:
-    """Preserve the existing 75% PURE / 25% MARKET production semantics exactly."""
+    """Preserve the exact pre-F-ST 75% legacy PURE / 25% MARKET semantics."""
     result = pure_home_prob.copy()
     has_market = market_home_prob.notna()
     result.loc[has_market] = (
@@ -49,6 +51,7 @@ def _fst_stack_v1(
     market_home_prob: pd.Series,
     parameters: FSTStackParameters,
 ) -> pd.Series:
+    """Historical single-PURE experiment helper; not the official F-ST production path."""
     if market_home_prob.isna().any():
         raise RuntimeError("fst_stack_v1 requires market probability for every scored game")
     score = (
@@ -68,11 +71,11 @@ def final_home_probability(
     experimental_enabled: bool = False,
     fst_parameters: FSTStackParameters | None = None,
 ) -> pd.Series:
-    """Select final probability behavior while failing closed around experimental F-ST.
+    """Compatibility adapter for legacy and historical experimental callers.
 
-    No configuration value can activate F-ST.  Callers must name ``fst_stack_v1``, set
-    ``experimental_enabled=True``, and supply the exact coefficient object in the same
-    call.  Ordinary production therefore remains current LevLine by construction.
+    This function deliberately cannot represent official F-ST production because its
+    ``pure_home_prob`` argument is the legacy PURE. Official scoring must use
+    ``fst_production.score_official_fst`` with the separately materialized nested PURE.
     """
     if not pure_home_prob.index.equals(market_home_prob.index):
         raise ValueError("PURE and market probabilities must have identical indexes")
