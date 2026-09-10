@@ -2,12 +2,18 @@ from __future__ import annotations
 
 """Production-safe reproduction of the frozen F-ST nested PURE architecture.
 
-This module intentionally contains no challenger/research imports.  It preserves the
+This module intentionally contains no challenger/research imports. It preserves the
 validated season-forward base OOF construction, four production model templates, nested
 meta-model, deterministic seed, and future/live inference semantics used by F-ST-01.
+
+The historical base-OOF matrix used by the frozen candidate is itself pinned as a
+production artifact. Runtime loads and validates that immutable matrix rather than
+silently regenerating a numerically different historical meta-model input.
 """
 
 from dataclasses import dataclass
+import hashlib
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -24,6 +30,13 @@ BASE_OOF_START = 2018
 HISTORICAL_END = 2025
 TARGET_SEASONS = (2022, 2023, 2024, 2025)
 MIN_META_GAMES = 300
+FROZEN_BASE_OOF_PATH = (
+    Path(__file__).resolve().parent / "artifacts" / "F-ST-01-FROZEN-2026-base-oof.csv"
+)
+FROZEN_BASE_OOF_SHA256 = "4e5a72f545982465b2401876dfb60c293403ceb89eac1f87778b85d9f5b988e7"
+FROZEN_BASE_OOF_ROWS = 2127
+FROZEN_BASE_OOF_FIRST_SEASON = 2018
+FROZEN_BASE_OOF_LAST_SEASON = 2025
 
 
 @dataclass(frozen=True)
@@ -49,6 +62,43 @@ def _assert_historical_cutoff(frame: pd.DataFrame, season_col: str = "season") -
     season = pd.to_numeric(frame[season_col], errors="coerce")
     if season.dropna().gt(HISTORICAL_END).any():
         raise ValueError("F-ST nested PURE fitting may not use outcomes after 2025")
+
+
+def load_frozen_base_oof(path: str | Path = FROZEN_BASE_OOF_PATH) -> pd.DataFrame:
+    """Load the exact base-OOF matrix used by the frozen F-ST research runtime."""
+    artifact_path = Path(path)
+    raw = artifact_path.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != FROZEN_BASE_OOF_SHA256:
+        raise RuntimeError(
+            f"Frozen F-ST base OOF digest changed: {digest} != {FROZEN_BASE_OOF_SHA256}"
+        )
+    frame = pd.read_csv(artifact_path)
+    required = [*BASE_MODEL_NAMES, "home_win", "season"]
+    if list(frame.columns) != required:
+        raise RuntimeError(
+            f"Frozen F-ST base OOF columns changed: {list(frame.columns)!r} != {required!r}"
+        )
+    if len(frame) != FROZEN_BASE_OOF_ROWS:
+        raise RuntimeError(
+            f"Frozen F-ST base OOF row count changed: {len(frame)} != {FROZEN_BASE_OOF_ROWS}"
+        )
+    season = pd.to_numeric(frame["season"], errors="coerce")
+    if season.isna().any():
+        raise RuntimeError("Frozen F-ST base OOF contains invalid season values")
+    if int(season.min()) != FROZEN_BASE_OOF_FIRST_SEASON:
+        raise RuntimeError("Frozen F-ST base OOF first season changed")
+    if int(season.max()) != FROZEN_BASE_OOF_LAST_SEASON:
+        raise RuntimeError("Frozen F-ST base OOF last season changed")
+    numeric = frame[[*BASE_MODEL_NAMES, "home_win"]].apply(pd.to_numeric, errors="coerce")
+    if not np.isfinite(numeric.to_numpy(dtype=float)).all():
+        raise RuntimeError("Frozen F-ST base OOF contains non-finite values")
+    if not numeric["home_win"].isin([0, 1]).all():
+        raise RuntimeError("Frozen F-ST base OOF target is not binary")
+    for name in BASE_MODEL_NAMES:
+        if ((numeric[name] <= 0.0) | (numeric[name] >= 1.0)).any():
+            raise RuntimeError(f"Frozen F-ST base OOF {name} probability outside (0, 1)")
+    return frame.copy()
 
 
 def build_base_oof_predictions(
@@ -177,8 +227,8 @@ def fit_future_nested_stack(
 ) -> np.ndarray:
     """Fit frozen-architecture nested PURE for a future/live slate.
 
-    Base models see all completed games through 2025.  The meta-model sees only
-    season-forward base OOF predictions and never in-sample base predictions.
+    Base models see all completed games through 2025. The meta-model sees only the
+    frozen season-forward base OOF predictions and never in-sample base predictions.
     """
     _assert_historical_cutoff(historical)
     if base_oof[target].nunique() < 2:
