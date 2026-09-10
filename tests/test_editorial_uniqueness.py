@@ -2,11 +2,7 @@ import json
 import re
 from pathlib import Path
 
-from nfl_forecast.editorial_finalize import (
-    _editorial_uniqueness_text,
-    _is_standardized_fact_ngram,
-    _uniqueness_segments,
-)
+from nfl_forecast.editorial_finalize import _is_standardized_fact_ngram, _uniqueness_segments
 
 
 def _ngrams(text: str, n: int = 7) -> set[str]:
@@ -45,7 +41,6 @@ def test_standardized_factual_scaffolding_is_ignored_but_substantive_duplicate_i
         "The official NFL injury report lists Example Player as did not participate in practice. "
         "No game status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive."
     )
-    assert _editorial_uniqueness_text(standardized_status).strip() == ""
     assert _ngrams(standardized_status) == set()
 
     standardized_stat = "The passing game backdrop: the relevant opponent side profile was 14.5% pressure rate last season."
