@@ -18,6 +18,7 @@ on:
       - 'scripts/run_challenger_fst_evaluation.py'
       - 'tests/test_fst_production.py'
       - 'tests/test_fst_market_refresh.py'
+      - 'pyproject.toml'
       - 'README.md'
       - 'docs/**'
       - '.github/workflows/fst_deployment.yml'
@@ -34,16 +35,45 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      OPENBLAS_CORETYPE: SKYLAKEX
+      OPENBLAS_NUM_THREADS: '4'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      NUMEXPR_NUM_THREADS: '4'
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.11.16'
           cache: pip
       - name: Install model and test dependencies
         run: pip install '.[dev]'
+      - name: Verify recovered numerical runtime
+        run: |
+          python - <<'PY'
+          import importlib.metadata as md
+          import platform
+          from threadpoolctl import threadpool_info
+          assert platform.python_version() == '3.11.16'
+          expected = {
+              'nflreadpy':'0.1.5','polars':'1.44.2','pandas':'3.0.5','numpy':'2.4.6',
+              'scipy':'1.17.1','scikit-learn':'1.9.0','xgboost':'3.2.0','catboost':'1.2.10',
+              'pyarrow':'25.0.1','duckdb':'1.5.5','joblib':'1.6.0','threadpoolctl':'3.6.0',
+          }
+          for package, wanted in expected.items():
+              actual = md.version(package)
+              assert actual == wanted, (package, actual, wanted)
+          import numpy  # noqa: F401
+          import scipy  # noqa: F401
+          pools = [p for p in threadpool_info() if p.get('internal_api') == 'openblas']
+          assert pools, 'No OpenBLAS runtime detected'
+          assert all(p.get('architecture') == 'SkylakeX' for p in pools), pools
+          assert all(int(p.get('num_threads', 0)) == 4 for p in pools), pools
+          print(pools)
+          PY
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
