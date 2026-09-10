@@ -161,3 +161,24 @@ def test_frozen_candidate_spec_is_non_promoting_and_architecture_locked():
     }
     assert spec["training_policy"]["2026_outcomes_allowed"] is False
     assert spec["promotion_evaluation_policy"]["automatic_promotion"] is False
+
+
+def test_training_cutoff_csv_roundtrip_is_compared_numerically(tmp_path):
+    mixed_path = tmp_path / "mixed.csv"
+    fst_path = tmp_path / "fst.csv"
+    pd.DataFrame({
+        "selected_shadow_candidate": [False, True],
+        "training_cutoff": [np.nan, "2025"],
+    }).to_csv(mixed_path, index=False)
+    pd.DataFrame({"training_cutoff": ["2025"]}).to_csv(fst_path, index=False)
+
+    mixed = pd.read_csv(mixed_path)
+    selected = mixed.loc[mixed.selected_shadow_candidate, "training_cutoff"].reset_index(drop=True)
+    fst = pd.read_csv(fst_path)["training_cutoff"].reset_index(drop=True)
+
+    assert not selected.astype(str).equals(fst.astype(str))
+    assert np.allclose(
+        pd.to_numeric(selected, errors="raise"),
+        pd.to_numeric(fst, errors="raise"),
+        equal_nan=False,
+    )
