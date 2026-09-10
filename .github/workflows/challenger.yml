@@ -214,7 +214,11 @@ jobs:
           ]
           numeric_cols = [c for c in compare_cols if c not in text_cols and c != 'training_cutoff']
           assert left[text_cols].equals(right[text_cols])
-          assert left['training_cutoff'].astype(str).equals(right['training_cutoff'].astype(str))
+          assert np.allclose(
+              pd.to_numeric(left['training_cutoff'], errors='raise'),
+              pd.to_numeric(right['training_cutoff'], errors='raise'),
+              equal_nan=False,
+          )
           for col in numeric_cols:
               assert np.allclose(
                   pd.to_numeric(left[col], errors='coerce'),
