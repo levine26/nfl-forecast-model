@@ -18,7 +18,12 @@ import json_repair
 import pandas as pd
 
 from nfl_forecast.context import TEAM_META
-from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
+from nfl_forecast.copilot_source_backfill import backfill_direct_sources
+from nfl_forecast.source_policy import (
+    is_direct_media_report_url,
+    media_domain_allowed,
+    media_domain_family,
+)
 
 
 def _extract_json(text: str) -> dict:
@@ -45,44 +50,32 @@ def _extract_json(text: str) -> dict:
     return repaired
 
 
-def _host(url: str) -> str:
-    try:
-        return (urlparse(str(url or "")).hostname or "").lower()
-    except Exception:
-        return ""
-
-
 def _domain_allowed(url: str) -> bool:
-    host = _host(url)
-    return any(host == domain or host.endswith("." + domain) for domain in APPROVED_MEDIA_DOMAINS)
+    return media_domain_allowed(url)
 
 
 def _domain_family(url: str) -> str:
-    host = _host(url)
-    if host.startswith("www."):
-        host = host[4:]
-    if host.endswith("sports.yahoo.com"):
-        return "yahoo.com"
-    return host
+    return media_domain_family(url)
 
 
 def _canonical_url(url: str, name: str = "", publisher_url: str = "") -> str:
-    """Return only a direct approved URL or a resolvable Bing target.
+    """Return only a direct approved report URL or a resolvable Bing target.
 
-    Publisher homepages are intentionally not substituted for missing article URLs:
-    if provenance cannot be tied to a direct approved URL, it must fail closed in
-    the downstream two-independent-source gate.
+    Publisher homepages, team/schedule/matchup shells, stats dashboards and search
+    pages are never substituted for direct attributable reporting. If provenance
+    cannot be tied to a direct approved report, downstream publication fails closed.
     """
-    del name, publisher_url  # retained in the signature for a stable call surface
+    del name, publisher_url
     raw = str(url or "").strip()
-    if _domain_allowed(raw):
+    if is_direct_media_report_url(raw):
         return raw
-
-    parsed = urlparse(raw)
+    try:
+        parsed = urlparse(raw)
+    except Exception:
+        return ""
     if parsed.hostname and parsed.hostname.lower().endswith("bing.com"):
-        target = (parse_qs(parsed.query).get("url") or [""])[0]
-        target = unquote(target)
-        if _domain_allowed(target):
+        target = unquote((parse_qs(parsed.query).get("url") or [""])[0])
+        if is_direct_media_report_url(target):
             return target
     return ""
 
@@ -167,6 +160,7 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     pick_name = _team_name(pick)
     pick_nick = _nick(pick)
     opponent_nick = _nick(opponent)
+    matchup = f"{_nick(away)}-{_nick(home)}"
 
     final_prob = _pick_probability(row, "final_home_prob")
     pure_prob = _pick_probability(row, "pure_home_prob")
@@ -178,20 +172,22 @@ def _model_paragraph(row: pd.Series, rationale: str) -> str:
     sentences: list[str] = []
     if final_prob is not None:
         sentences.append(
-            f"LevLine puts the {pick_nick} at {final_prob * 100:.1f}% to win against the {opponent_nick}."
+            f"For {matchup}, LevLine's {pick_nick} win probability is {final_prob * 100:.1f}% against {opponent_nick}."
         )
     if pure_prob is not None and market_prob is not None:
         sentences.append(
-            f"{pick_nick} football-only PURE is {pure_prob * 100:.1f}%; against {opponent_nick}, "
-            f"{pick_nick} market probability is {market_prob * 100:.1f}%. "
-            f"For {pick_nick} versus {opponent_nick}, PURE carries 75%; {pick_nick} MARKET carries 25%."
+            f"For {matchup}, football-only PURE rates the {pick_nick} at {pure_prob * 100:.1f}%; "
+            f"versus {opponent_nick}, MARKET rates the {pick_nick} at {market_prob * 100:.1f}%."
+        )
+        sentences.append(
+            f"{matchup} weighting is 75% PURE for {pick_nick} and 25% MARKET versus {opponent_nick}."
         )
     if model_line:
-        sentences.append(f"{pick_nick} LevLine model line against {opponent_nick} is {model_line}.")
+        sentences.append(f"For {matchup}, the {pick_nick} LevLine model line is {model_line}.")
     if market_line:
-        sentences.append(f"{pick_nick}-{opponent_nick} market spread is {market_line}.")
+        sentences.append(f"Against {opponent_nick} in {matchup}, the market spread is {market_line}.")
     if projected:
-        sentences.append(f"{pick_nick} projected score versus {opponent_nick}: {projected}.")
+        sentences.append(f"{matchup} projected score for {pick_nick} versus {opponent_nick}: {projected}.")
 
     sentences.append(rationale)
     sentences.append(f"The pick: {pick_name} moneyline.")
@@ -202,11 +198,7 @@ def _source_candidates(entry: dict, preview: dict, evidence_items: list[dict]) -
     rows: list[dict] = []
     for source in entry.get("sources") or []:
         if isinstance(source, dict):
-            rows.append({
-                "name": source.get("name"),
-                "title": source.get("title"),
-                "url": source.get("url"),
-            })
+            rows.append({"name": source.get("name"), "title": source.get("title"), "url": source.get("url")})
     for source in preview.get("reported_sources") or []:
         if isinstance(source, dict):
             rows.append({
@@ -238,7 +230,7 @@ def _canonical_sources(entry: dict, preview: dict, evidence_items: list[dict]) -
         if not name or not title:
             continue
         url = _canonical_url(source.get("url") or "", name)
-        if not url or not _domain_allowed(url):
+        if not url or not is_direct_media_report_url(url):
             continue
         family = _domain_family(url)
         title_key = re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
@@ -276,7 +268,10 @@ def compose(payload: dict, predictions: pd.DataFrame, previews: dict, evidence: 
         opponent = str(row.get("away_team")) if pick == str(row.get("home_team")) else str(row.get("home_team"))
         rationale = _safe_rationale(entry, preview, pick, opponent)
         paragraph2 = _model_paragraph(row, rationale)
-        sources = _canonical_sources(entry, preview, evidence.get(gid, []) if isinstance(evidence, dict) else [])
+        evidence_items = evidence.get(gid, []) if isinstance(evidence, dict) else []
+        sources = _canonical_sources(entry, preview, evidence_items)
+        if len({_domain_family(str(source.get("url") or "")) for source in sources}) < 2:
+            sources = backfill_direct_sources(row, sources)
         out[gid] = {
             "headline": headline,
             "paragraph1": paragraph1,
