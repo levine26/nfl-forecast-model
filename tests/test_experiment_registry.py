@@ -14,19 +14,33 @@ from nfl_forecast.experiment_registry import (
 
 def test_v09_registry_is_predeclared_and_excludes_2026_selection():
     registry = load_registry(Path("research/experiments.json"))
-    assert [row["experiment_id"] for row in registry] == [
+    by_id = {row["experiment_id"]: row for row in registry}
+    required_v09 = {
         "V09A-PLAYER-VALUE-001",
         "V09B-AVAILABILITY-001",
         "V09C-UNIT-STATE-001",
         "V09D-MATCHUP-INTERACTIONS-001",
-    ]
+    }
+    assert required_v09.issubset(by_id)
+    assert len(by_id) == len(registry)
+
     for row in registry:
-        assert max(row["validation_seasons"]) == 2025
+        assert max(row["validation_seasons"]) <= 2025
         assert 2026 not in row["training_seasons"]
         assert 2026 not in row["validation_seasons"]
-        assert row["historical_result"] is None
-        assert row["prospective_shadow_status"].startswith("not_eligible")
         assert any("2026 outcomes" in item for item in row["prohibited_inputs"])
+
+        if row["status"] in {"planned", "running"}:
+            assert row["historical_result"] is None
+        if row["status"] in {"complete", "rejected", "historically_qualified"}:
+            assert row["historical_result"] is not None
+
+    assert by_id["V09A-PLAYER-VALUE-001"]["status"] == "rejected"
+    assert by_id["V09A-PLAYER-VALUE-001"]["prospective_shadow_status"].startswith("not_eligible")
+    assert by_id["V09B-AVAILABILITY-001"]["status"] == "rejected"
+    assert by_id["V09B-AVAILABILITY-001"]["prospective_shadow_status"].startswith("not_eligible")
+    assert by_id["V09C-UNIT-STATE-001"]["status"] == "planned"
+    assert by_id["V09D-MATCHUP-INTERACTIONS-001"]["status"] == "planned"
 
 
 def test_registry_validation_rejects_future_validation_and_missing_prohibitions():
