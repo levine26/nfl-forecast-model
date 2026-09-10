@@ -7,6 +7,7 @@ import pandas as pd
 
 from .challenger_evaluation import calibration_diagnostics, forecast_metrics, paired_bootstrap
 from .challenger_fst import FROZEN_CANDIDATE_ID
+from .challenger_shadow import normalize_history
 
 MIN_GAMES = 200
 MIN_WEEKS = 14
@@ -16,6 +17,11 @@ BOOTSTRAP_SAMPLES = 10000
 
 
 def _prepare(history: pd.DataFrame) -> tuple[pd.DataFrame, int]:
+    # Existing v0.8 shadow ledgers predate the frozen F-ST columns. Normalize them
+    # before enforcing the new evaluator schema so a legitimate pre-first-FST-lock
+    # ledger returns awaiting_graded_games instead of failing CI. This normalization
+    # adds schema only; it never invents an F-ST candidate or backfills a forecast.
+    history = normalize_history(history)
     required = {
         "challenger_version", "candidate_freeze_utc", "production_lock_timestamp_utc",
         "season", "week", "actual_home_score", "actual_away_score",
