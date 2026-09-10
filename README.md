@@ -107,3 +107,10 @@ Historical nflverse schedule lines are generally closing-market information. V0.
 6. Weather through a free source such as Open-Meteo
 7. Empirical prediction intervals from walk-forward residuals
 8. Learned MARKET+ blending from contemporaneous 2026 snapshots rather than a fixed research blend
+
+
+## Official winner-probability model — F-ST-01-FROZEN-2026
+
+LevLine's official 2026 winner probability is the frozen two-input F-ST logit stack. Its inputs are the current vig-free market home-win probability and the separately materialized frozen nested-PURE probability. The exact registered coefficients are intercept `-0.06954359363166639`, market-logit coefficient `1.1939087340527093`, and nested-PURE-logit coefficient `-0.19342747983803402`. Frozen training identity is 1,615 games from 2020–2025 with canonical SHA-256 `6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0`; 2026 outcomes are excluded from fitting and model selection.
+
+The recovered keyed OOF and final training inputs are committed as immutable package artifacts and verified before scoring. Ordinary production does not force a CPU-specific OpenBLAS target. If the current market probability is unavailable for a game, that game falls back to the exact legacy 75% PURE / 25% market rule. The pre-F-ST production probability is retained as `legacy_final_home_prob` for counterfactual grading and rollback; changing `ACTIVE_PRODUCTION_STRATEGY` in `fst_production.py` to `LEGACY_PRODUCTION_STRATEGY` restores the legacy path without rewriting historical locks.

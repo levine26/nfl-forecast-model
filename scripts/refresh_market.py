@@ -43,7 +43,7 @@ def confidence(prob: float, disagreement: float, flag: str) -> str:
     return ["Coin Flip", "Lean", "Solid", "High"][max(0, min(3, level))]
 
 
-def _legacy_diagnostics(p: pd.DataFrame) -> None:
+def _winner_diagnostics(p: pd.DataFrame) -> None:
     p["legacy_consistency_flag"] = p.apply(
         lambda r: "NEUTRAL"
         if abs(float(r["legacy_final_home_prob"]) - 0.5) < 0.02
@@ -63,10 +63,31 @@ def _legacy_diagnostics(p: pd.DataFrame) -> None:
         ),
         axis=1,
     )
-    p["consistency_flag"] = p["legacy_consistency_flag"]
-    p["confidence"] = p["legacy_confidence"]
-    p["confidence_diagnostic_scope"] = "legacy_75_25_pure_ensemble"
-
+    p["consistency_flag"] = p.apply(
+        lambda r: "NEUTRAL"
+        if abs(float(r["final_home_prob"]) - 0.5) < 0.02
+        or abs(float(r["expected_margin"])) < 1.0
+        else (
+            "ALIGNED"
+            if (float(r["final_home_prob"]) - 0.5) * float(r["expected_margin"]) > 0
+            else "WIN-MARGIN SPLIT"
+        ),
+        axis=1,
+    )
+    p["confidence"] = p.apply(
+        lambda r: confidence(
+            r["final_home_prob"],
+            r.get("model_disagreement", 0.0),
+            r["consistency_flag"],
+        ),
+        axis=1,
+    )
+    strategy = p["final_probability_strategy"].astype(str) if "final_probability_strategy" in p else pd.Series("", index=p.index)
+    p["confidence_diagnostic_scope"] = np.where(
+        strategy.eq(CANDIDATE_ID),
+        "official_fst_probability",
+        "legacy_75_25_pure_ensemble",
+    )
 
 def _rescore_winner_probability(p: pd.DataFrame) -> None:
     if "pure_home_prob" not in p.columns:
@@ -174,7 +195,7 @@ def refresh(output_dir: str = "outputs", season: int = 2026) -> pd.DataFrame:
             axis=1,
         )
 
-    _legacy_diagnostics(p)
+    _winner_diagnostics(p)
     timestamp = datetime.now(timezone.utc).isoformat()
     previous_market_ts = (
         p["market_snapshot_timestamp_utc"].copy()

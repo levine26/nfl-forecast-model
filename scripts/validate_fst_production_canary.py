@@ -13,7 +13,7 @@ import pandas as pd
 from nfl_forecast.challenger import fit_future_nested_stack as research_fit_future_nested_stack
 from nfl_forecast.challenger_fst import fit_frozen_2026_stack, frozen_stack_probability
 from nfl_forecast.features import core_columns
-from nfl_forecast.fst_nested_pure import build_fst_training_frame, load_frozen_base_oof
+from nfl_forecast.fst_nested_pure import load_frozen_base_oof, load_frozen_training_frame
 from nfl_forecast.fst_production import load_fst_artifact
 from nfl_forecast.pipeline import run
 
@@ -41,7 +41,7 @@ def main() -> None:
     # frozen research path. The loader validates bytes, row universe, season/target
     # sequence, and restores the historical index.
     frozen_oof = load_frozen_base_oof(historical=historical)
-    training_frame = build_fst_training_frame(historical, frozen_oof, seed=seed)
+    training_frame = load_frozen_training_frame(historical=historical)
     research_refit = fit_frozen_2026_stack(training_frame)
     artifact = load_fst_artifact()
 

@@ -51,18 +51,9 @@ function patchConsensus(root) {
 }
 
 function patchLegacyDiagnosticLabels(root) {
-  replaceExactText(root, 'Confidence', 'Legacy confidence')
   for (const stat of root.querySelectorAll('.vnext-advanced-grid .pub-stat')) {
     const label = stat.querySelector('span')
     if (label?.textContent?.trim() === 'PURE') label.textContent = 'Legacy PURE'
-    if (label?.textContent?.trim() === 'Model disagreement') label.textContent = 'Legacy model disagreement'
-  }
-  for (const stat of root.querySelectorAll('.vnext-hero-stats .pub-stat')) {
-    const label = stat.querySelector('span')
-    const sub = stat.querySelector('small')
-    if (label?.textContent?.trim() === 'Top signal' && sub && !sub.textContent.startsWith('Legacy confidence:')) {
-      sub.textContent = `Legacy confidence: ${sub.textContent}`
-    }
   }
 }
 

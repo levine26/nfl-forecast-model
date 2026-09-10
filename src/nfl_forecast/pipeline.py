@@ -11,7 +11,7 @@ from .data import load_core_data, load_advanced_data
 from .diagnostics import add_confidence_diagnostics, build_calibration_table
 from .elo import build_pregame_elo
 from .features import aggregate_team_games, add_game_results, build_matchup_features, sujar_baseline_columns, core_columns
-from .fst_nested_pure import build_fst_training_frame, fit_future_nested_stack, load_frozen_base_oof
+from .fst_nested_pure import fit_future_nested_stack, load_frozen_base_oof, load_frozen_training_frame
 from .fst_production import (
     CANDIDATE_ID,
     FINAL_PROBABILITY_STRATEGY,
@@ -239,7 +239,7 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     fst_features = core_columns(fst_historical)
     artifact = load_fst_artifact()
     fst_base_oof = load_frozen_base_oof(historical=fst_historical)
-    fst_training = build_fst_training_frame(fst_historical, fst_base_oof, seed=seed)
+    fst_training = load_frozen_training_frame(historical=fst_historical)
     training_digest = validate_training_identity(fst_training, artifact)
     current["fst_pure_home_prob"] = fit_future_nested_stack(
         fst_historical,
@@ -292,9 +292,8 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     )
     current["pick"] = np.where(current["final_home_prob"] >= 0.5, current["home_team"], current["away_team"])
 
-    # The pre-existing confidence machinery was validated around the legacy PURE
-    # ensemble. Preserve it as an explicitly legacy diagnostic rather than silently
-    # inventing an F-ST confidence model.
+    # Legacy confidence remains available only as a counterfactual comparator.
+    # Official confidence/consistency are driven by the official F-ST probability.
     current["model_disagreement"] = base_probs.std(axis=1)
     current["legacy_consistency_flag"] = current.apply(
         lambda r: consistency_flag(r["legacy_final_home_prob"], r["expected_margin"]), axis=1
@@ -302,15 +301,14 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     current["legacy_confidence"] = current.apply(
         lambda r: confidence_label(r["legacy_final_home_prob"], r["model_disagreement"], r["legacy_consistency_flag"]), axis=1
     )
-    current["consistency_flag"] = current["legacy_consistency_flag"]
-    current["confidence"] = current["legacy_confidence"]
-    current["confidence_diagnostic_scope"] = "legacy_75_25_pure_ensemble"
-    # Feed the legacy probability through the legacy confidence-index implementation,
-    # then restore the official F-ST probability immediately after diagnostics return.
-    official_probability = current["final_home_prob"].copy()
-    current["final_home_prob"] = current["legacy_final_home_prob"]
+    current["consistency_flag"] = current.apply(
+        lambda r: consistency_flag(r["final_home_prob"], r["expected_margin"]), axis=1
+    )
+    current["confidence"] = current.apply(
+        lambda r: confidence_label(r["final_home_prob"], r["model_disagreement"], r["consistency_flag"]), axis=1
+    )
+    current["confidence_diagnostic_scope"] = "official_fst_probability"
     current = add_confidence_diagnostics(current)
-    current["final_home_prob"] = official_probability
 
     pbp_max = int(pd.to_numeric(bundle.pbp.get("season"), errors="coerce").max()) if len(bundle.pbp) else start
     if pbp_max >= season_to_predict:
