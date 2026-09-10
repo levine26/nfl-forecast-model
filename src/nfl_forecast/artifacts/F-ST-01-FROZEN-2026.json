@@ -22,16 +22,30 @@
     "base_oof_start_season": 2018,
     "base_oof_end_season": 2025,
     "base_oof_rows": 2127,
-    "base_oof_sha256": "4e5a72f545982465b2401876dfb60c293403ceb89eac1f87778b85d9f5b988e7",
-    "base_oof_git_blob_sha": "87eba962046fa2c5232ef3806a2d2ce50beeb0a2",
-    "base_oof_source": "GitHub Actions artifact from successful frozen shadow run 34482487521 at head 5b26693e5d97ec49543b1d778baef63a1d600311",
     "base_models": ["logistic", "extra_trees", "xgboost", "catboost"],
     "meta_model": "logistic_regression",
     "meta_C": 0.5,
     "meta_max_iter": 3000,
     "random_state": 26,
     "feature_set": "production_compatible_core",
-    "live_training_outcome_cutoff": 2025
+    "live_training_outcome_cutoff": 2025,
+    "authoritative_reconstruction": {
+      "capture_context": "prospective_shadow_reconstruction",
+      "forensic_workflow_run": 34538432305,
+      "forensic_skylakex_artifact_id": 10176440471,
+      "base_oof_sequence_sha256_float17": "5f4eda7d5df86ab13e4d6a6b90653be3160bd857e00eb1d412eae0e78eb2c7b3",
+      "game_id_sequence_sha256": "dff495fa86c9c53b1a76213afcb351c01ed691db9c225bdd911717ccd2ce236c",
+      "reconstruction_note": "Post-freeze forensic reconstruction; not relabeled as original freeze capture. Explicit SKYLAKEX and independent native SkylakeX executions reproduced the registered training digest.",
+      "python_version": "3.11.16",
+      "openblas_coretype": "SKYLAKEX",
+      "blas_threads": 4
+    },
+    "archived_generic_v08_oof": {
+      "authoritative_for_fst_fit": false,
+      "sha256": "4e5a72f545982465b2401876dfb60c293403ceb89eac1f87778b85d9f5b988e7",
+      "git_blob_sha": "87eba962046fa2c5232ef3806a2d2ce50beeb0a2",
+      "source": "Earlier generic v0.8 OOF from successful workflow run 34482487521; retained as evidence but not used as the F-ST fit input because the later F-ST step rebuilt OOF under a distinct numerical realization."
+    }
   },
   "freeze_timestamp_utc": "2026-09-10T05:08:04Z",
   "freeze_implementation_sha": "59830d23e406d32c34e74919b31d0dd9f85b16ca",
