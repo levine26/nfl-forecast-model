@@ -43,10 +43,9 @@ class OffsetLogitModel:
     converged: bool
 
     def _matrix(self, frame: pd.DataFrame) -> np.ndarray:
-        raw = frame.loc[:, list(self.features)].apply(pd.to_numeric, errors="coerce").to_numpy(dtype=float)
+        raw = frame.loc[:, list(self.features)].apply(pd.to_numeric, errors="coerce").to_numpy(dtype=float, copy=True)
         missing = ~np.isfinite(raw)
         if missing.any():
-            raw = raw.copy()
             rows, cols = np.where(missing)
             raw[rows, cols] = self.medians[cols]
         scaled = (raw - self.means) / self.scales
@@ -58,7 +57,7 @@ class OffsetLogitModel:
 
 
 def _prepare_training_matrix(frame: pd.DataFrame, features: list[str]) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    raw = frame.loc[:, features].apply(pd.to_numeric, errors="coerce").to_numpy(dtype=float)
+    raw = frame.loc[:, features].apply(pd.to_numeric, errors="coerce").to_numpy(dtype=float, copy=True)
     raw[~np.isfinite(raw)] = np.nan
     medians = np.nanmedian(raw, axis=0)
     medians = np.where(np.isfinite(medians), medians, 0.0)
@@ -100,8 +99,8 @@ def fit_offset_logistic(
     ].copy()
     if len(usable) < 300:
         raise ValueError(f"Need at least 300 market-covered training games; found {len(usable)}")
-    y = pd.to_numeric(usable[target_col], errors="coerce").to_numpy(dtype=float)
-    market = pd.to_numeric(usable[market_col], errors="coerce").to_numpy(dtype=float)
+    y = pd.to_numeric(usable[target_col], errors="coerce").to_numpy(dtype=float, copy=True)
+    market = pd.to_numeric(usable[market_col], errors="coerce").to_numpy(dtype=float, copy=True)
     if not set(np.unique(y)).issubset({0.0, 1.0}) or len(np.unique(y)) < 2:
         raise ValueError("Target must contain both binary classes")
 
