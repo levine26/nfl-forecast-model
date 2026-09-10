@@ -17,9 +17,17 @@ CURRENT_COLUMNS = [
     "spread_line","total_line","model_edge","cover_home_prob","over_prob","confidence",
     "model_disagreement","consistency_flag","market_available","data_state","snapshot_type",
     "model_version","prediction_timestamp_utc",
-    # Append-only diagnostic fields. Keeping them at the end preserves CSV compatibility.
+    # Append-only legacy diagnostics retained for backward-compatible consumers.
     "logistic_home_prob","extra_trees_home_prob","xgboost_home_prob","catboost_home_prob",
     "elo_home_prob","home_elo","away_elo",
+    # Append-only F-ST accountability fields. Old locked rows remain null here.
+    "legacy_pure_home_prob","legacy_final_home_prob","fst_pure_home_prob",
+    "final_probability_strategy","fst_artifact_id","fst_artifact_training_data_sha256",
+    "fst_artifact_freeze_implementation_sha","fst_fallback","fst_fallback_reason",
+    "fst_vs_market_delta","fst_vs_legacy_delta","legacy_confidence",
+    "legacy_consistency_flag","confidence_diagnostic_scope",
+    # Source freshness is recorded when the upstream snapshot time is observable.
+    "market_snapshot_timestamp_utc","market_snapshot_source","market_freshness_status",
 ]
 
 LOCK_META_COLUMNS = [
@@ -254,6 +262,9 @@ def write_outputs(
         future = [x for x in kos if x > now_utc]
         if future:
             next_kickoff = min(future).isoformat()
+    market_available = p.get("market_available", pd.Series(False, index=p.index)).fillna(False).astype(bool)
+    fallback = p.get("fst_fallback", pd.Series(False, index=p.index)).fillna(False).astype(bool)
+    freshness = p.get("market_freshness_status", pd.Series("unknown", index=p.index)).fillna("unknown").astype(str)
     status = {
         "status": "healthy",
         "generated_utc": now_utc.isoformat(),
@@ -262,6 +273,15 @@ def write_outputs(
         "power_rating_teams": int(len(getattr(artifacts, "power_ratings", []))),
         "next_kickoff_utc": next_kickoff,
         "model_version": str(p["model_version"].iloc[0]) if len(p) and "model_version" in p else None,
+        "final_probability_strategy": str(p["final_probability_strategy"].iloc[0]) if len(p) and "final_probability_strategy" in p else None,
+        "fst_artifact_id": str(p["fst_artifact_id"].iloc[0]) if len(p) and "fst_artifact_id" in p else None,
+        "fst_artifact_training_data_sha256": str(p["fst_artifact_training_data_sha256"].iloc[0]) if len(p) and "fst_artifact_training_data_sha256" in p else None,
+        "market_available_games": int(market_available.sum()),
+        "market_missing_or_invalid_games": int((~market_available).sum()),
+        "fst_fallback_count": int(fallback.sum()),
+        "market_snapshot_timestamp_utc": str(p["market_snapshot_timestamp_utc"].iloc[0]) if len(p) and "market_snapshot_timestamp_utc" in p else None,
+        "market_snapshot_source": str(p["market_snapshot_source"].iloc[0]) if len(p) and "market_snapshot_source" in p else None,
+        "market_freshness_status_counts": {str(k): int(v) for k, v in freshness.value_counts(dropna=False).items()},
         "data_state": str(p["data_state"].iloc[0]) if len(p) and "data_state" in p else None,
     }
     (out / "status.json").write_text(json.dumps(status, indent=2), encoding="utf-8")

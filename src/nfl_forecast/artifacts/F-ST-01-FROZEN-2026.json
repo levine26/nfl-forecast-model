@@ -1,0 +1,68 @@
+{
+  "candidate_id": "F-ST-01-FROZEN-2026",
+  "status": "production_frozen",
+  "production_promotion_authorized": true,
+  "production_authorization_scope": "F-ST-01-FROZEN-2026 only",
+  "target_season": 2026,
+  "training_cutoff": 2025,
+  "2026_outcomes_used_in_fitting": 0,
+  "intercept": -0.06954359363166639,
+  "market_logit_coefficient": 1.1939087340527093,
+  "pure_logit_coefficient": -0.19342747983803402,
+  "training_games": 1615,
+  "training_first_season": 2020,
+  "training_last_season": 2025,
+  "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+  "C": 1.0,
+  "penalty": "l2",
+  "solver": "lbfgs",
+  "max_iter": 3000,
+  "probability_clip": [
+    1e-06,
+    0.999999
+  ],
+  "nested_pure": {
+    "base_oof_start_season": 2018,
+    "base_oof_end_season": 2025,
+    "base_oof_rows": 2127,
+    "base_models": [
+      "logistic",
+      "extra_trees",
+      "xgboost",
+      "catboost"
+    ],
+    "meta_model": "logistic_regression",
+    "meta_C": 0.5,
+    "meta_max_iter": 3000,
+    "random_state": 26,
+    "feature_set": "production_compatible_core",
+    "live_training_outcome_cutoff": 2025
+  },
+  "immutable_recovered_inputs": {
+    "capture_context": "prospective_shadow_reconstruction",
+    "forensic_workflow_run": 34538432305,
+    "forensic_artifact_id": 10176440471,
+    "forensic_branch_head_sha": "31cea3037b0c4bb75364d78c072af9d4fb25a9dc",
+    "forensic_execution_sha": "9c4f45e15d27187c637002b3d4d8df2cc34c744e",
+    "base_oof_raw_sha256": "5563b2c9eeb193891ad0ae3809f3fcc9fac04b6451376fc28fa5888c070a78fa",
+    "training_frame_raw_sha256": "174be982d5ac7f3e9f93bda824641eae95c612ec0c1e9546472479a5f6cb55d5",
+    "base_oof_packaged_sha256": "ca0bcc0844e9e7272d687d8fc5a226c1dbb68e4aaf43b2ce2fab0313c894c713",
+    "training_frame_packaged_sha256": "28f3c2a0e479e95482e2989f172b143c8eb50ee18b14d15931b6641c9d54d10d",
+    "base_oof_serialized_sequence_sha256": "5f4eda7d5df86ab13e4d6a6b90653be3160bd857e00eb1d412eae0e78eb2c7b3",
+    "base_oof_game_id_sequence_sha256": "dff495fa86c9c53b1a76213afcb351c01ed691db9c225bdd911717ccd2ce236c",
+    "training_serialized_sequence_sha256": "0716b93e01eaba82c8b807b26d75a2b35558a4be162461b9d0bfd43d43d0a3ab",
+    "training_game_id_sequence_sha256": "d23d72a2c1226a3dd23ffab6dd2c783f96e76f772f73ca649e687a09b248f209",
+    "reconstruction_only": true,
+    "original_freeze_capture_claimed": false,
+    "reconstruction_note": "Post-freeze forensic reconstruction persisted as immutable production inputs; it is not relabeled as an original pre-fit freeze capture.",
+    "recovered_runtime_evidence": {
+      "python_version": "3.11.16",
+      "openblas_coretype": "SKYLAKEX",
+      "blas_threads": 4
+    }
+  },
+  "freeze_timestamp_utc": "2026-09-10T05:08:04Z",
+  "freeze_implementation_sha": "59830d23e406d32c34e74919b31d0dd9f85b16ca",
+  "research_runtime_artifact_sha": "f3299a595d3a8cee3a7fdd6b367c493c8420a08c",
+  "rollback_strategy": "current_production_75_25"
+}

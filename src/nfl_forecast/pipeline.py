@@ -11,6 +11,15 @@ from .data import load_core_data, load_advanced_data
 from .diagnostics import add_confidence_diagnostics, build_calibration_table
 from .elo import build_pregame_elo
 from .features import aggregate_team_games, add_game_results, build_matchup_features, sujar_baseline_columns, core_columns
+from .fst_nested_pure import build_fst_training_frame, fit_future_nested_stack, load_frozen_base_oof
+from .fst_production import (
+    CANDIDATE_ID,
+    FINAL_PROBABILITY_STRATEGY,
+    MODEL_VERSION,
+    load_fst_artifact,
+    score_official_fst,
+    validate_training_identity,
+)
 from .market import add_vig_free_market_prob
 from .models import fit_season_stacked_classifier, fit_weighted_regression, classification_metrics
 from .publish import write_outputs
@@ -61,18 +70,11 @@ def confidence_label(prob: float, disagreement: float = 0.0, consistency: str = 
 
 
 def _power_ratings(unresolved: pd.DataFrame, as_of: str) -> pd.DataFrame:
-    """Build one current team state per club. Rank is deliberately Elo+ only.
-
-    We avoid inventing an unvalidated composite. For teams on a bye, the earliest
-    future scheduled row carries their latest known pregame state forward.
-    """
+    """Build one current team state per club. Rank is deliberately Elo+ only."""
     df = unresolved.sort_values([c for c in ["gameday", "gametime", "week"] if c in unresolved.columns]).copy()
     rows: list[dict] = []
     seen: set[str] = set()
-    mappings = [
-        ("home", "home_team"),
-        ("away", "away_team"),
-    ]
+    mappings = [("home", "home_team"), ("away", "away_team")]
     for _, r in df.iterrows():
         for prefix, team_col in mappings:
             team = r.get(team_col)
@@ -159,13 +161,13 @@ def _leaderboard(historical, baseline, core, margin_model, total_model) -> pd.Da
             total_mae=market_total_mae,
         ))
 
-    final_prob = c["stack"].copy()
-    final_prob.loc[market_mask] = 0.75 * c.loc[market_mask, "stack"] + 0.25 * market.loc[market_mask]
+    legacy_prob = c["stack"].copy()
+    legacy_prob.loc[market_mask] = 0.75 * c.loc[market_mask, "stack"] + 0.25 * market.loc[market_mask]
     rows.append(_metric_row(
-        "Final Ensemble",
+        "Legacy Final Ensemble",
         c["home_win"],
-        final_prob,
-        "PURE + market blend; OOS 2022–25",
+        legacy_prob,
+        "Legacy 75% PURE / 25% market; OOS 2022–25",
         margin_mae=margin_model.validation_mae,
         total_mae=total_model.validation_mae,
     ))
@@ -211,7 +213,7 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
 
     validation_start = max(start + 1, season_to_predict - 4)
     validation_end = season_to_predict - 1
-    seed = cfg["model"]["random_state"]
+    seed = int(cfg["model"]["random_state"])
     baseline = fit_season_stacked_classifier(historical, baseline_cols, seed=seed, validation_start=validation_start, validation_end=validation_end)
     core = fit_season_stacked_classifier(historical, core_cols, seed=seed, validation_start=validation_start, validation_end=validation_end)
     margin = fit_weighted_regression(historical, core_cols, "margin", seed=seed, validation_start=validation_start, validation_end=validation_end)
@@ -229,13 +231,42 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     current["margin_sigma"] = float(margin.residual_std)
     current["total_sigma"] = float(total.residual_std)
 
-    has_market = current["market_home_prob"].notna()
-    current["market_available"] = has_market
-    current["final_home_prob"] = current["pure_home_prob"]
-    current.loc[has_market, "final_home_prob"] = (
-        0.75 * current.loc[has_market, "pure_home_prob"]
-        + 0.25 * current.loc[has_market, "market_home_prob"]
+    # F-ST architecture fitting is frozen at 2025. Completed 2026 games may update
+    # already-supported rolling pregame features in `games`, but never enter these fits.
+    fst_historical = historical[pd.to_numeric(historical["season"], errors="coerce").le(2025)].copy()
+    if fst_historical.empty or pd.to_numeric(fst_historical["season"], errors="coerce").max() > 2025:
+        raise RuntimeError("F-ST historical outcome cutoff enforcement failed")
+    fst_features = core_columns(fst_historical)
+    artifact = load_fst_artifact()
+    fst_base_oof = load_frozen_base_oof(historical=fst_historical)
+    fst_training = build_fst_training_frame(fst_historical, fst_base_oof, seed=seed)
+    training_digest = validate_training_identity(fst_training, artifact)
+    current["fst_pure_home_prob"] = fit_future_nested_stack(
+        fst_historical,
+        fst_base_oof,
+        current,
+        fst_features,
+        seed=seed,
     )
+
+    current["legacy_pure_home_prob"] = current["pure_home_prob"]
+    fst_score = score_official_fst(
+        current["legacy_pure_home_prob"],
+        current["fst_pure_home_prob"],
+        current["market_home_prob"],
+        artifact,
+    )
+    current["legacy_final_home_prob"] = fst_score.legacy_final_home_prob
+    current["final_home_prob"] = fst_score.final_home_prob
+    current["market_available"] = fst_score.market_eligible
+    current["fst_fallback"] = fst_score.fst_fallback
+    current["fst_fallback_reason"] = fst_score.fst_fallback_reason
+    current["fst_vs_market_delta"] = fst_score.fst_vs_market_delta
+    current["fst_vs_legacy_delta"] = fst_score.fst_vs_legacy_delta
+    current["final_probability_strategy"] = FINAL_PROBABILITY_STRATEGY
+    current["fst_artifact_id"] = CANDIDATE_ID
+    current["fst_artifact_training_data_sha256"] = training_digest
+    current["fst_artifact_freeze_implementation_sha"] = artifact.freeze_implementation_sha
 
     current["fair_home_moneyline"] = current["final_home_prob"].map(fair_american_odds)
     current["model_edge"] = np.where(
@@ -261,14 +292,25 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
     )
     current["pick"] = np.where(current["final_home_prob"] >= 0.5, current["home_team"], current["away_team"])
 
+    # The pre-existing confidence machinery was validated around the legacy PURE
+    # ensemble. Preserve it as an explicitly legacy diagnostic rather than silently
+    # inventing an F-ST confidence model.
     current["model_disagreement"] = base_probs.std(axis=1)
-    current["consistency_flag"] = current.apply(
-        lambda r: consistency_flag(r["final_home_prob"], r["expected_margin"]), axis=1
+    current["legacy_consistency_flag"] = current.apply(
+        lambda r: consistency_flag(r["legacy_final_home_prob"], r["expected_margin"]), axis=1
     )
-    current["confidence"] = current.apply(
-        lambda r: confidence_label(r["final_home_prob"], r["model_disagreement"], r["consistency_flag"]), axis=1
+    current["legacy_confidence"] = current.apply(
+        lambda r: confidence_label(r["legacy_final_home_prob"], r["model_disagreement"], r["legacy_consistency_flag"]), axis=1
     )
+    current["consistency_flag"] = current["legacy_consistency_flag"]
+    current["confidence"] = current["legacy_confidence"]
+    current["confidence_diagnostic_scope"] = "legacy_75_25_pure_ensemble"
+    # Feed the legacy probability through the legacy confidence-index implementation,
+    # then restore the official F-ST probability immediately after diagnostics return.
+    official_probability = current["final_home_prob"].copy()
+    current["final_home_prob"] = current["legacy_final_home_prob"]
     current = add_confidence_diagnostics(current)
+    current["final_home_prob"] = official_probability
 
     pbp_max = int(pd.to_numeric(bundle.pbp.get("season"), errors="coerce").max()) if len(bundle.pbp) else start
     if pbp_max >= season_to_predict:
@@ -277,7 +319,7 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
         data_state = f"{season_to_predict} schedule/results/Elo live; EPA/form through {pbp_max}"
     timestamp = datetime.now(timezone.utc).isoformat()
     current["data_state"] = data_state
-    current["model_version"] = "0.4.0-accountability"
+    current["model_version"] = MODEL_VERSION
     current["snapshot_type"] = snapshot_type
     current["prediction_timestamp_utc"] = timestamp
 
