@@ -9,46 +9,47 @@ cross-checks. StatMuse is deliberately *not* an automated production dependency.
 
 from datetime import datetime, timezone
 from typing import Any, Callable
+from urllib.parse import urlparse
 
 import nflreadpy as nfl
 
 
-OFFICIAL_TEAM_MEDIA_DOMAINS = frozenset(
-    {
-        "49ers.com",
-        "arizonacardinals.com",
-        "atlantafalcons.com",
-        "baltimoreravens.com",
-        "bengals.com",
-        "buffalobills.com",
-        "buccaneers.com",
-        "chargers.com",
-        "chicagobears.com",
-        "chiefs.com",
-        "clevelandbrowns.com",
-        "colts.com",
-        "commanders.com",
-        "dallascowboys.com",
-        "denverbroncos.com",
-        "detroitlions.com",
-        "houstontexans.com",
-        "jaguars.com",
-        "miamidolphins.com",
-        "neworleanssaints.com",
-        "newyorkjets.com",
-        "packers.com",
-        "panthers.com",
-        "patriots.com",
-        "philadelphiaeagles.com",
-        "raiders.com",
-        "seahawks.com",
-        "steelers.com",
-        "tennesseetitans.com",
-        "therams.com",
-        "vikings.com",
-        "giants.com",
-    }
-)
+OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE = {
+    "ARI": "arizonacardinals.com",
+    "ATL": "atlantafalcons.com",
+    "BAL": "baltimoreravens.com",
+    "BUF": "buffalobills.com",
+    "CAR": "panthers.com",
+    "CHI": "chicagobears.com",
+    "CIN": "bengals.com",
+    "CLE": "clevelandbrowns.com",
+    "DAL": "dallascowboys.com",
+    "DEN": "denverbroncos.com",
+    "DET": "detroitlions.com",
+    "GB": "packers.com",
+    "HOU": "houstontexans.com",
+    "IND": "colts.com",
+    "JAX": "jaguars.com",
+    "KC": "chiefs.com",
+    "LA": "therams.com",
+    "LAC": "chargers.com",
+    "LV": "raiders.com",
+    "MIA": "miamidolphins.com",
+    "MIN": "vikings.com",
+    "NE": "patriots.com",
+    "NO": "neworleanssaints.com",
+    "NYG": "giants.com",
+    "NYJ": "newyorkjets.com",
+    "PHI": "philadelphiaeagles.com",
+    "PIT": "steelers.com",
+    "SEA": "seahawks.com",
+    "SF": "49ers.com",
+    "TB": "buccaneers.com",
+    "TEN": "tennesseetitans.com",
+    "WAS": "commanders.com",
+}
+
+OFFICIAL_TEAM_MEDIA_DOMAINS = frozenset(OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE.values())
 
 APPROVED_MEDIA_DOMAINS = frozenset(
     {
@@ -67,6 +68,84 @@ APPROVED_MEDIA_DOMAINS = frozenset(
         "yahoo.com",
     }
 ) | OFFICIAL_TEAM_MEDIA_DOMAINS
+
+
+def media_domain_allowed(url: str) -> bool:
+    try:
+        host = (urlparse(str(url or "")).hostname or "").lower()
+    except Exception:
+        return False
+    return any(host == domain or host.endswith("." + domain) for domain in APPROVED_MEDIA_DOMAINS)
+
+
+def media_domain_family(url: str) -> str:
+    try:
+        host = (urlparse(str(url or "")).hostname or "").lower()
+    except Exception:
+        return ""
+    if host.startswith("www."):
+        host = host[4:]
+    if host.endswith("sports.yahoo.com"):
+        return "yahoo.com"
+    if host in {"twitter.com", "x.com"} or host.endswith(".twitter.com") or host.endswith(".x.com"):
+        return "x.com"
+    return host
+
+
+def is_direct_media_report_url(url: str) -> bool:
+    """Return True only for a direct article/report URL on an approved publisher.
+
+    Publication sources must point to attributable reporting, not publisher homepages,
+    team landing pages, schedules, matchup shells, rosters, statistics dashboards,
+    search results, or other generic navigation/data pages.
+    """
+    raw = str(url or "").strip()
+    if not raw or not media_domain_allowed(raw):
+        return False
+    try:
+        parsed = urlparse(raw)
+    except Exception:
+        return False
+    host = (parsed.hostname or "").lower()
+    segments = [segment.lower() for segment in (parsed.path or "").split("/") if segment]
+    if not segments:
+        return False
+
+    if host == "x.com" or host == "twitter.com" or host.endswith(".x.com") or host.endswith(".twitter.com"):
+        return len(segments) >= 3 and segments[1] == "status" and segments[2].isdigit()
+    if host == "nfl.com" or host.endswith(".nfl.com"):
+        return len(segments) >= 2 and segments[0] == "news"
+    if host == "espn.com" or host.endswith(".espn.com"):
+        return (
+            len(segments) >= 3 and segments[0] == "nfl" and segments[1] == "story"
+        ) or (
+            len(segments) >= 3 and segments[0] == "video" and segments[1] == "clip"
+        )
+    if host == "cbssports.com" or host.endswith(".cbssports.com"):
+        return len(segments) >= 3 and segments[0] == "nfl" and segments[1] == "news"
+    if host == "foxsports.com" or host.endswith(".foxsports.com"):
+        return len(segments) >= 3 and segments[0] == "stories" and segments[1] == "nfl"
+    if host == "sports.yahoo.com" or host.endswith(".sports.yahoo.com"):
+        return (
+            len(segments) >= 2 and segments[0] == "articles"
+        ) or (
+            len(segments) >= 3 and segments[0] == "nfl" and segments[1] in {"article", "news"}
+        )
+    if host == "yahoo.com" or host.endswith(".yahoo.com"):
+        return len(segments) >= 2 and segments[0] in {"articles", "sports"}
+    if any(host == domain or host.endswith("." + domain) for domain in OFFICIAL_TEAM_MEDIA_DOMAINS):
+        return len(segments) >= 2 and segments[0] in {"news", "video", "podcasts"}
+    if host == "apnews.com" or host.endswith(".apnews.com"):
+        return len(segments) >= 2 and segments[0] == "article"
+
+    generic = {
+        "team", "teams", "schedule", "schedules", "scores", "stats", "standings",
+        "roster", "players", "injuries", "transactions", "search", "tickets",
+        "fantasy", "odds", "watch", "live", "games", "game",
+    }
+    if any(segment in generic for segment in segments[:2]):
+        return False
+    return len(segments) >= 2
 
 
 SOURCE_MATRIX = [
