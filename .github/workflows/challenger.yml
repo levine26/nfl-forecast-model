@@ -9,17 +9,25 @@ on:
       - 'src/nfl_forecast/challenger_v06.py'
       - 'src/nfl_forecast/challenger_v07.py'
       - 'src/nfl_forecast/challenger_v08.py'
+      - 'src/nfl_forecast/challenger_stacking.py'
+      - 'src/nfl_forecast/challenger_fst.py'
       - 'src/nfl_forecast/challenger_shadow.py'
+      - 'src/nfl_forecast/challenger_prospective.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
       - 'scripts/run_challenger_v08.py'
+      - 'scripts/run_challenger_fst_shadow.py'
+      - 'scripts/run_challenger_fst_evaluation.py'
       - 'scripts/lock_challenger_shadow.py'
+      - 'research/fst/**'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
       - 'tests/test_challenger_v07.py'
       - 'tests/test_challenger_v08.py'
+      - 'tests/test_challenger_fst.py'
+      - 'tests/test_challenger_prospective.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
       - '.github/workflows/challenger_shadow_lock.yml'
@@ -29,22 +37,29 @@ on:
       - 'src/nfl_forecast/challenger_v06.py'
       - 'src/nfl_forecast/challenger_v07.py'
       - 'src/nfl_forecast/challenger_v08.py'
+      - 'src/nfl_forecast/challenger_stacking.py'
+      - 'src/nfl_forecast/challenger_fst.py'
       - 'src/nfl_forecast/challenger_shadow.py'
+      - 'src/nfl_forecast/challenger_prospective.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
       - 'scripts/run_challenger_v08.py'
+      - 'scripts/run_challenger_fst_shadow.py'
+      - 'scripts/run_challenger_fst_evaluation.py'
       - 'scripts/lock_challenger_shadow.py'
+      - 'research/fst/**'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
       - 'tests/test_challenger_v07.py'
       - 'tests/test_challenger_v08.py'
+      - 'tests/test_challenger_fst.py'
+      - 'tests/test_challenger_prospective.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
       - '.github/workflows/challenger_shadow_lock.yml'
   schedule:
-    # Weekly research refresh after the prior NFL week is normally complete.
     - cron: '47 16 * * 2'
 
 permissions:
@@ -68,7 +83,7 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
       - name: Test challenger research logic
-        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_v08.py tests/test_challenger_shadow_lock.py
+        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_v08.py tests/test_challenger_fst.py tests/test_challenger_prospective.py tests/test_challenger_shadow_lock.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -76,7 +91,7 @@ jobs:
           restore-keys: |
             nfl-challenger-${{ runner.os }}-
             nflreadpy-${{ runner.os }}-
-      - name: Run leakage-safe challenger backtest
+      - name: Run leakage-safe v0.8 challenger backtest
         run: |
           set -euo pipefail
           mkdir -p /tmp/challenger-immutable
@@ -87,6 +102,18 @@ jobs:
           PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v08.py
           if [ -f /tmp/challenger-immutable/prediction_history_shadow.csv ]; then
             cp /tmp/challenger-immutable/prediction_history_shadow.csv challenger_outputs/
+          fi
+      - name: Materialize frozen F-ST-01 prospective shadow
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_fst_shadow.py
+      - name: Refresh cumulative F-ST prospective evaluation
+        run: |
+          set -euo pipefail
+          if [ -f challenger_outputs/prediction_history_shadow.csv ]; then
+            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_fst_evaluation.py
+          else
+            echo 'No immutable shadow history yet; prospective evaluation has no graded rows.'
           fi
       - name: Precommit all shadow candidates before T-120
         env:
@@ -100,11 +127,10 @@ jobs:
 
           generated = datetime.now(timezone.utc).isoformat()
           source_sha = os.environ['SHADOW_SOURCE_SHA']
-          paths = [
+          for path in [
               Path('challenger_outputs/candidate_shadow_slate.csv'),
               Path('challenger_outputs/this_week_shadow.csv'),
-          ]
-          for path in paths:
+          ]:
               frame = pd.read_csv(path)
               frame['shadow_generated_utc'] = generated
               frame['shadow_source_sha'] = source_sha
@@ -113,7 +139,7 @@ jobs:
           print(f'shadow_generated_utc={generated}')
           print(f'shadow_source_sha={source_sha}')
           PY
-      - name: Verify research firewall
+      - name: Verify research firewall and frozen F-ST contract
         run: |
           python - <<'PY'
           import json
@@ -122,17 +148,24 @@ jobs:
           import pandas as pd
 
           report = json.loads(Path('challenger_outputs/report.json').read_text())
+          runtime = json.loads(Path('challenger_outputs/fst/runtime_model.json').read_text())
           assert report['status'] == 'healthy'
           assert report['mode'] == 'research_only'
-          assert report['challenger_version'] == '0.8-qb-starter'
           assert report['live_season_firewall'] == 2026
           assert report['promotion_authorized'] is False
           assert report['target_seasons'] == [2022, 2023, 2024, 2025]
-          assert report['minimum_pure_weight'] >= 0.25
-          assert len(report['opponent_adjusted_features']) == 32
-          assert len(report['qb_features']) >= 12
           assert report['2026_outcomes_used_in_fitting'] == 0
           assert report['production_outputs_modified'] == 0
+          assert report['selected_shadow_candidate'] == 'F-ST-01'
+          assert report['selected_shadow_method'] == 'stack'
+          assert report['selected_shadow_version'] == 'F-ST-01-FROZEN-2026'
+          assert runtime['candidate_id'] == 'F-ST-01-FROZEN-2026'
+          assert runtime['target_season'] == 2026
+          assert runtime['training_cutoff'] == 2025
+          assert runtime['training_last_season'] <= 2025
+          assert runtime['2026_outcomes_used_in_fitting'] == 0
+          assert runtime['production_promotion_authorized'] is False
+          assert len(runtime['training_data_sha256']) == 64
 
           slate = pd.read_csv('challenger_outputs/candidate_shadow_slate.csv')
           shadow = pd.read_csv('challenger_outputs/this_week_shadow.csv')
@@ -142,47 +175,57 @@ jobs:
           assert slate['shadow_source_sha'].notna().all()
           assert shadow['shadow_generated_utc'].notna().all()
           assert shadow['shadow_source_sha'].notna().all()
-          assert slate['research_method'].isin(['fixed', 'linear', 'logit', 'pure']).all()
-          assert slate['effective_pure_weight'].min() >= 0.25
-          assert slate['challenger_version'].eq('0.8-qb-starter').all()
-          assert shadow['challenger_version'].eq('0.8-qb-starter').all()
-          assert len(slate) == report['current_shadow_candidate_rows']
-          assert slate['research_candidate'].nunique() == report['shadow_candidate_count']
-          assert len(shadow) == report['current_shadow_games']
-          assert report['shadow_candidate_count'] > 1
-          assert report['tested_candidate_count'] == report['shadow_candidate_count'] + 1
+          assert slate['research_method'].isin(['fixed', 'linear', 'logit', 'pure', 'stack']).all()
+          weighted = slate[~slate['research_method'].eq('stack')]
+          assert weighted['effective_pure_weight'].min() >= 0.25
+          fst = slate[slate['challenger_version'].eq('F-ST-01-FROZEN-2026')]
+          assert len(fst) == len(shadow)
+          assert fst['research_candidate'].eq('F-ST-01').all()
+          assert fst['research_method'].eq('stack').all()
+          assert fst['training_last_season'].le(2025).all()
+          assert fst['training_data_sha256'].str.len().eq(64).all()
+          assert fst['stack_intercept'].notna().all()
+          assert fst['stack_market_logit_coefficient'].notna().all()
+          assert fst['stack_pure_logit_coefficient'].notna().all()
 
           selected_per_game = slate.groupby('game_id')['selected_shadow_candidate'].sum()
           assert selected_per_game.eq(1).all()
           selected = slate[slate['selected_shadow_candidate']].copy()
+          assert selected['challenger_version'].eq('F-ST-01-FROZEN-2026').all()
+          assert selected['research_candidate'].eq('F-ST-01').all()
           assert len(selected) == len(shadow)
-          assert selected['research_candidate'].eq(report['selected_shadow_candidate']).all()
-          assert selected['research_feature_set'].eq(report['selected_shadow_feature_set']).all()
-          assert selected['research_method'].eq(report['selected_shadow_method']).all()
 
           compare_cols = [
               'game_id', 'research_candidate', 'research_method', 'research_feature_set',
-              'challenger_version', 'challenger_pick', 'effective_pure_weight',
-              'effective_market_weight', 'challenger_pure_home_prob',
+              'challenger_version', 'challenger_pick', 'challenger_pure_home_prob',
               'challenger_final_home_prob', 'market_home_prob', 'shadow_generated_utc',
-              'shadow_source_sha',
+              'shadow_source_sha', 'training_cutoff', 'training_games',
+              'training_data_sha256', 'stack_intercept',
+              'stack_market_logit_coefficient', 'stack_pure_logit_coefficient',
+              'candidate_freeze_utc', 'candidate_code_sha',
           ]
           left = selected[compare_cols].sort_values('game_id').reset_index(drop=True)
           right = shadow[compare_cols].sort_values('game_id').reset_index(drop=True)
           text_cols = [
               'game_id', 'research_candidate', 'research_method', 'research_feature_set',
               'challenger_version', 'challenger_pick', 'shadow_generated_utc',
-              'shadow_source_sha',
+              'shadow_source_sha', 'training_data_sha256', 'candidate_freeze_utc',
+              'candidate_code_sha',
           ]
-          numeric_cols = [c for c in compare_cols if c not in text_cols]
+          numeric_cols = [c for c in compare_cols if c not in text_cols and c != 'training_cutoff']
           assert left[text_cols].equals(right[text_cols])
+          assert np.allclose(
+              pd.to_numeric(left['training_cutoff'], errors='raise'),
+              pd.to_numeric(right['training_cutoff'], errors='raise'),
+              equal_nan=False,
+          )
           for col in numeric_cols:
               assert np.allclose(
                   pd.to_numeric(left[col], errors='coerce'),
                   pd.to_numeric(right[col], errors='coerce'),
                   equal_nan=True,
               ), col
-          print(json.dumps(report, indent=2))
+          print(json.dumps(runtime, indent=2))
           PY
       - name: Upload challenger evidence
         uses: actions/upload-artifact@v4
