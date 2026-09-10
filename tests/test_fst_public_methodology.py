@@ -14,7 +14,8 @@ def test_public_fst_presentation_replaces_legacy_formula_and_labels_diagnostics(
     assert "0.19343 × logit(F-ST NESTED PURE)" in adapter
     assert "LEGACY PURE" in adapter
     assert "LEVLINE F-ST" in adapter
-    assert "Legacy confidence" in adapter
+    assert "Legacy confidence" not in adapter
+    assert "Legacy model disagreement" not in adapter
     assert "exact legacy 75/25 rule" in adapter
 
 
