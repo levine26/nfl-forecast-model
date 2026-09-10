@@ -7,7 +7,7 @@ on:
       - 'src/nfl_forecast/unit_state_research.py'
       - 'src/nfl_forecast/challenger_v09c.py'
       - 'scripts/run_challenger_v09c.py'
-      - 'scripts/run_v09c_uncertainty.py'
+      - 'scripts/run_challenger_v09c_uncertainty.py'
       - 'tests/test_unit_state_research.py'
       - '.github/workflows/research_v09c_unit_continuity.yml'
   workflow_dispatch:
@@ -62,7 +62,7 @@ jobs:
           PY
       - name: Run paired uncertainty audit without refitting candidate
         run: |
-          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_v09c_uncertainty.py
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v09c_uncertainty.py
           test -s challenger_outputs/v09c/uncertainty/report.json
           test -s challenger_outputs/v09c/uncertainty/adaptive_vs_v08_adaptive_bootstrap.csv
           test -s challenger_outputs/v09c/uncertainty/adaptive_vs_market_bootstrap.csv
