@@ -1,0 +1,66 @@
+name: LevLine F-MR-01 market residual research
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_historical.py'
+      - 'src/nfl_forecast/market_residual_research.py'
+      - 'scripts/run_market_residual_research.py'
+      - 'tests/test_market_residual_research.py'
+      - '.github/workflows/research_market_residual.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-market-residual-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  historical-prototype:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test fixed-offset and data-horizon contracts
+        run: pytest -q tests/test_market_residual_research.py tests/test_challenger_v08.py
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-market-residual-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-market-residual-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Run F-MR-01 2022-25 season-forward prototype
+        run: |
+          rm -rf research_outputs/orthogonal/market_residual
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_market_residual_research.py
+          test -s research_outputs/orthogonal/market_residual/report.json
+          test -s research_outputs/orthogonal/market_residual/paired_predictions_2022_2025.csv
+          test -s research_outputs/orthogonal/market_residual/overall_metrics.csv
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/orthogonal/market_residual/report.json').read_text())
+          assert report['experiment_id'] == 'F-MR-01'
+          assert report['l2_precommitted'] == 5.0
+          assert report['market_logit_offset_coefficient'] == 1.0
+          assert report['hyperparameter_search_performed'] is False
+          assert report['2026_outcomes_used'] == 0
+          PY
+      - name: Prove production outputs and site are untouched
+        run: git diff --exit-code -- outputs/ site/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-market-residual-${{ github.run_id }}
+          path: research_outputs/orthogonal/market_residual/
+          retention-days: 30
