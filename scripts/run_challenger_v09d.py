@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Run pre-registered V09D-MATCHUP-001 without loading 2026 data."""
+"""Run pre-registered V09D-EWMA-INTERACTIONS-002 without loading 2026 data."""
 
 import argparse
 from datetime import datetime, timezone
@@ -38,8 +38,8 @@ from run_challenger_v08 import build_nested_research, nested_linear_hybrid
 
 HISTORICAL_END = 2025
 TARGET_SEASONS = (2022, 2023, 2024, 2025)
-EXPERIMENT_ID = "V09D-MATCHUP-001"
-CANDIDATE_VERSION = "0.9D-fixed-matchup-interactions"
+EXPERIMENT_ID = "V09D-EWMA-INTERACTIONS-002"
+CANDIDATE_VERSION = "0.9D-fixed-ewma-matchup-interactions"
 BOOTSTRAP_SAMPLES = 2000
 
 
@@ -277,7 +277,7 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     confidence_set.to_csv(out / "brier_confidence_set.csv", index=False)
     (out / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 
-    print("\n=== V09D-MATCHUP-001 FIXED INTERACTIONS: 2022-25 OOS ===")
+    print("\n=== V09D-EWMA-INTERACTIONS-002 FIXED INTERACTIONS: 2022-25 OOS ===")
     print(overall.to_string(index=False))
     print("\nIncremental deltas (negative Brier/log-loss is better):")
     print(json.dumps(increments, indent=2))
