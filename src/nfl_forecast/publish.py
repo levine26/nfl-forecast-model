@@ -27,7 +27,7 @@ CURRENT_COLUMNS = [
     "fst_vs_market_delta","fst_vs_legacy_delta","legacy_confidence",
     "legacy_consistency_flag","confidence_diagnostic_scope",
     # Source freshness is recorded when the upstream snapshot time is observable.
-    "market_snapshot_timestamp_utc","market_snapshot_source",
+    "market_snapshot_timestamp_utc","market_snapshot_source","market_freshness_status",
 ]
 
 LOCK_META_COLUMNS = [
@@ -264,6 +264,7 @@ def write_outputs(
             next_kickoff = min(future).isoformat()
     market_available = p.get("market_available", pd.Series(False, index=p.index)).fillna(False).astype(bool)
     fallback = p.get("fst_fallback", pd.Series(False, index=p.index)).fillna(False).astype(bool)
+    freshness = p.get("market_freshness_status", pd.Series("unknown", index=p.index)).fillna("unknown").astype(str)
     status = {
         "status": "healthy",
         "generated_utc": now_utc.isoformat(),
@@ -280,6 +281,7 @@ def write_outputs(
         "fst_fallback_count": int(fallback.sum()),
         "market_snapshot_timestamp_utc": str(p["market_snapshot_timestamp_utc"].iloc[0]) if len(p) and "market_snapshot_timestamp_utc" in p else None,
         "market_snapshot_source": str(p["market_snapshot_source"].iloc[0]) if len(p) and "market_snapshot_source" in p else None,
+        "market_freshness_status_counts": {str(k): int(v) for k, v in freshness.value_counts(dropna=False).items()},
         "data_state": str(p["data_state"].iloc[0]) if len(p) and "data_state" in p else None,
     }
     (out / "status.json").write_text(json.dumps(status, indent=2), encoding="utf-8")
