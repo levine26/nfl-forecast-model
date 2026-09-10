@@ -12,7 +12,11 @@ import nfl_forecast.fst_production as fst_production
 from nfl_forecast.challenger import build_nested_stack_oof as research_nested_oof
 from nfl_forecast.fst_nested_pure import (
     BASE_MODEL_NAMES,
+    FROZEN_BASE_OOF_PATH,
+    FROZEN_BASE_OOF_ROWS,
+    FROZEN_BASE_OOF_SHA256,
     build_nested_stack_oof as production_nested_oof,
+    load_frozen_base_oof,
 )
 from nfl_forecast.fst_production import (
     CANDIDATE_ID,
@@ -50,6 +54,40 @@ def test_frozen_artifact_identity_is_exact():
     assert artifact.max_iter == 3000
     assert artifact.training_cutoff <= 2025
     assert artifact.outcomes_2026_used == 0
+
+
+def test_frozen_base_oof_artifact_identity_is_exact():
+    frame = load_frozen_base_oof()
+    assert FROZEN_BASE_OOF_PATH.exists()
+    assert len(frame) == FROZEN_BASE_OOF_ROWS == 2127
+    assert FROZEN_BASE_OOF_SHA256 == "4e5a72f545982465b2401876dfb60c293403ceb89eac1f87778b85d9f5b988e7"
+    assert list(frame.columns) == [*BASE_MODEL_NAMES, "home_win", "season"]
+    assert int(frame.season.min()) == 2018
+    assert int(frame.season.max()) == 2025
+
+
+def test_frozen_base_oof_rejects_byte_drift(tmp_path: Path):
+    path = tmp_path / "base-oof.csv"
+    path.write_bytes(FROZEN_BASE_OOF_PATH.read_bytes() + b"\n")
+    with pytest.raises(RuntimeError, match="base OOF digest changed"):
+        load_frozen_base_oof(path)
+
+
+def test_frozen_base_oof_alignment_restores_historical_index_fail_closed():
+    frozen = load_frozen_base_oof()
+    historical = frozen[["season", "home_win"]].copy()
+    historical.index = pd.Index(np.arange(50000, 50000 + len(historical)))
+    historical["market_home_prob"] = 0.5
+
+    aligned = load_frozen_base_oof(historical=historical)
+    assert aligned.index.equals(historical.index)
+    np.testing.assert_array_equal(aligned.season.to_numpy(), historical.season.to_numpy())
+    np.testing.assert_array_equal(aligned.home_win.to_numpy(), historical.home_win.to_numpy())
+
+    changed = historical.copy()
+    changed.iloc[0, changed.columns.get_loc("home_win")] = 1 - int(changed.iloc[0].home_win)
+    with pytest.raises(RuntimeError, match="historical target sequence changed"):
+        load_frozen_base_oof(historical=changed)
 
 
 def test_fst_matches_hand_computed_logit_fixture():
