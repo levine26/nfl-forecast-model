@@ -1,0 +1,60 @@
+name: F-ST preserved OOF diagnostic
+
+on:
+  push:
+    branches:
+      - feat/deploy-fst-production
+    paths:
+      - 'scripts/diagnose_fst_preserved_oof.py'
+      - 'src/nfl_forecast/artifacts/diagnostic-F-ST-preexisting-oof.csv'
+      - '.github/workflows/fst_preserved_oof_diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fst-preserved-oof-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install model dependencies
+        run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-fst-oof-diagnostic-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-fst-deploy-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Test preserved freeze-era OOF against frozen identity
+        run: |
+          rm -rf deployment_audits/preserved_oof_diagnostic
+          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/diagnose_fst_preserved_oof.py
+          test -s deployment_audits/preserved_oof_diagnostic/summary.json
+          test -s deployment_audits/preserved_oof_diagnostic/base_oof_keyed.csv
+          test -s deployment_audits/preserved_oof_diagnostic/training_frame_keyed.csv
+          {
+            echo '## Preserved freeze-era OOF diagnostic'
+            echo '```json'
+            cat deployment_audits/preserved_oof_diagnostic/summary.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload preserved OOF evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fst-preserved-oof-${{ github.run_id }}
+          path: deployment_audits/preserved_oof_diagnostic/
+          if-no-files-found: warn
+          retention-days: 90
