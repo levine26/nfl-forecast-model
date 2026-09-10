@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Immutable research-only challenger scoring against production T-120 locks."""
+"""Immutable research-only challenger scoring against authoritative production T-120 locks."""
 
 from datetime import datetime, timezone
 
@@ -8,19 +8,24 @@ import numpy as np
 import pandas as pd
 
 from .challenger import blend_probabilities
+from .challenger_fst import frozen_stack_probability
 from .challenger_v06 import logit_blend_probabilities
 
-SUPPORTED_METHODS = {"fixed", "linear", "logit", "pure"}
+SUPPORTED_METHODS = {"fixed", "linear", "logit", "pure", "stack"}
 LEGACY_VERSION = "legacy"
 LEGACY_FEATURE_SET = "legacy"
 LEGACY_CANDIDATE = "legacy-candidate"
 
 HISTORY_COLUMNS = [
     "game_id", "season", "week", "gameday", "gametime", "away_team", "home_team",
-    "challenger_pure_home_prob", "market_home_prob_t120", "challenger_final_home_prob",
-    "challenger_pick", "effective_pure_weight", "effective_market_weight",
-    "research_candidate", "research_method", "research_feature_set", "challenger_version",
-    "selected_shadow_candidate", "shadow_key", "shadow_generated_utc", "shadow_source_sha",
+    "production_final_home_prob", "challenger_pure_home_prob", "market_home_prob_t120",
+    "challenger_final_home_prob", "challenger_pick", "effective_pure_weight",
+    "effective_market_weight", "research_candidate", "research_method",
+    "research_feature_set", "challenger_version", "selected_shadow_candidate",
+    "training_cutoff", "training_games", "training_first_season", "training_last_season",
+    "training_data_sha256", "stack_intercept", "stack_market_logit_coefficient",
+    "stack_pure_logit_coefficient", "candidate_freeze_utc", "candidate_code_sha",
+    "shadow_key", "shadow_generated_utc", "shadow_source_sha",
     "production_snapshot_type", "production_model_version",
     "production_prediction_timestamp_utc", "production_lock_timestamp_utc",
     "kickoff_utc", "minutes_to_kickoff_at_production_lock", "shadow_recorded_timestamp_utc",
@@ -66,7 +71,6 @@ def _bool(value, default: bool = True) -> bool:
 
 
 def shadow_identity(game_id, challenger_version, research_candidate) -> str:
-    """Stable identity for one challenger version/candidate forecast of one game."""
     return "::".join([
         _text(game_id, "unknown-game"),
         _text(challenger_version, LEGACY_VERSION),
@@ -79,30 +83,19 @@ def empty_history() -> pd.DataFrame:
 
 
 def normalize_history(frame: pd.DataFrame | None) -> pd.DataFrame:
-    """Normalize old one-row-per-game ledgers into the multi-candidate schema."""
+    """Normalize legacy ledgers into the immutable multi-candidate schema."""
     if frame is None or frame.empty:
         return empty_history()
     out = frame.copy()
     for col in HISTORY_COLUMNS:
         if col not in out.columns:
             out[col] = pd.NA
-
-    out["challenger_version"] = out["challenger_version"].map(
-        lambda v: _text(v, LEGACY_VERSION)
-    )
-    out["research_feature_set"] = out["research_feature_set"].map(
-        lambda v: _text(v, LEGACY_FEATURE_SET)
-    )
-    out["research_candidate"] = out["research_candidate"].map(
-        lambda v: _text(v, LEGACY_CANDIDATE)
-    )
-    out["selected_shadow_candidate"] = out["selected_shadow_candidate"].map(
-        lambda v: _bool(v, True)
-    )
+    out["challenger_version"] = out["challenger_version"].map(lambda v: _text(v, LEGACY_VERSION))
+    out["research_feature_set"] = out["research_feature_set"].map(lambda v: _text(v, LEGACY_FEATURE_SET))
+    out["research_candidate"] = out["research_candidate"].map(lambda v: _text(v, LEGACY_CANDIDATE))
+    out["selected_shadow_candidate"] = out["selected_shadow_candidate"].map(lambda v: _bool(v, True))
     out["shadow_key"] = out.apply(
-        lambda row: shadow_identity(
-            row.get("game_id"), row.get("challenger_version"), row.get("research_candidate")
-        ),
+        lambda row: shadow_identity(row.get("game_id"), row.get("challenger_version"), row.get("research_candidate")),
         axis=1,
     )
     return out[HISTORY_COLUMNS].copy()
@@ -110,43 +103,29 @@ def normalize_history(frame: pd.DataFrame | None) -> pd.DataFrame:
 
 def _normalize_challenger_week(frame: pd.DataFrame) -> pd.DataFrame:
     out = frame.copy()
-    if "challenger_version" not in out.columns:
-        out["challenger_version"] = LEGACY_VERSION
-    if "research_feature_set" not in out.columns:
-        out["research_feature_set"] = LEGACY_FEATURE_SET
-    if "selected_shadow_candidate" not in out.columns:
-        out["selected_shadow_candidate"] = True
-    if "shadow_source_sha" not in out.columns:
-        out["shadow_source_sha"] = pd.NA
-
-    out["challenger_version"] = out["challenger_version"].map(
-        lambda v: _text(v, LEGACY_VERSION)
-    )
-    out["research_feature_set"] = out["research_feature_set"].map(
-        lambda v: _text(v, LEGACY_FEATURE_SET)
-    )
-    out["research_candidate"] = out["research_candidate"].map(
-        lambda v: _text(v, LEGACY_CANDIDATE)
-    )
-    out["selected_shadow_candidate"] = out["selected_shadow_candidate"].map(
-        lambda v: _bool(v, False)
-    )
+    defaults = {
+        "challenger_version": LEGACY_VERSION,
+        "research_feature_set": LEGACY_FEATURE_SET,
+        "selected_shadow_candidate": False,
+        "shadow_source_sha": pd.NA,
+    }
+    for column, value in defaults.items():
+        if column not in out.columns:
+            out[column] = value
+    out["challenger_version"] = out["challenger_version"].map(lambda v: _text(v, LEGACY_VERSION))
+    out["research_feature_set"] = out["research_feature_set"].map(lambda v: _text(v, LEGACY_FEATURE_SET))
+    out["research_candidate"] = out["research_candidate"].map(lambda v: _text(v, LEGACY_CANDIDATE))
+    out["selected_shadow_candidate"] = out["selected_shadow_candidate"].map(lambda v: _bool(v, False))
     out["shadow_key"] = out.apply(
-        lambda row: shadow_identity(
-            row.get("game_id"), row.get("challenger_version"), row.get("research_candidate")
-        ),
+        lambda row: shadow_identity(row.get("game_id"), row.get("challenger_version"), row.get("research_candidate")),
         axis=1,
     )
-    # A version/candidate pair must identify one forecast per game. If an upstream
-    # writer emits duplicates, the latest row in the published slate is authoritative.
     return out.drop_duplicates("shadow_key", keep="last").copy()
 
 
 def probability_for_method(pure: float, market: float, weight: float, method: str) -> float:
-    if method not in SUPPORTED_METHODS:
-        raise RuntimeError(
-            f"Unsupported challenger shadow method {method!r}; refusing to approximate T-120 forecast"
-        )
+    if method not in SUPPORTED_METHODS - {"stack"}:
+        raise RuntimeError(f"Unsupported challenger shadow method {method!r}; refusing to approximate T-120 forecast")
     if method == "pure":
         if not np.isclose(weight, 1.0):
             raise RuntimeError("PURE shadow method must carry effective_pure_weight=1.0")
@@ -158,8 +137,25 @@ def probability_for_method(pure: float, market: float, weight: float, method: st
     return float(blend_probabilities([pure], [market], weight)[0])
 
 
+def _stack_probability(shadow: pd.Series, pure: float, market: float) -> float:
+    coefficient_fields = {
+        "stack_intercept": "intercept",
+        "stack_market_logit_coefficient": "market_logit_coefficient",
+        "stack_pure_logit_coefficient": "pure_logit_coefficient",
+    }
+    values = {}
+    for source, target in coefficient_fields.items():
+        value = pd.to_numeric(shadow.get(source), errors="coerce")
+        if pd.isna(value):
+            raise RuntimeError(f"Frozen F-ST shadow missing required coefficient: {source}")
+        values[target] = float(value)
+    if pd.isna(market):
+        raise RuntimeError("Frozen F-ST requires authoritative T-120 market probability")
+    return float(frozen_stack_probability([market], [pure], **values)[0])
+
+
 def grade_existing(history: pd.DataFrame, production_locks: pd.DataFrame) -> pd.DataFrame:
-    """Grade every candidate row for a game without mutating its locked forecast."""
+    """Grade candidate rows without mutating any locked forecast field."""
     if history.empty or production_locks.empty or "game_id" not in production_locks.columns:
         return history
     if not {"actual_home_score", "actual_away_score"}.issubset(production_locks.columns):
@@ -189,25 +185,17 @@ def lock_shadow(
     *,
     now_utc: datetime | None = None,
 ) -> tuple[pd.DataFrame, int, int]:
-    """Append all eligible challenger candidates and grade old rows.
-
-    Returns ``(history, locks_added, precommit_skips)``. A precommit skip is counted
-    per candidate when its forecast was generated after the authoritative production
-    lock. Existing rows are immutable by ``(game_id, challenger_version,
-    research_candidate)`` rather than by game alone.
-    """
+    """Append eligible precommitted candidates at the authoritative production T-120 lock."""
     now = _utc(now_utc)
-    history = normalize_history(existing_history)
-    history = grade_existing(history, production_locks)
-
+    history = grade_existing(normalize_history(existing_history), production_locks)
     required_prod = {
         "game_id", "season", "week", "gameday", "gametime", "away_team", "home_team",
         "market_home_prob", "snapshot_type", "lock_status", "lock_timestamp_utc",
         "kickoff_utc", "minutes_to_kickoff_at_lock",
     }
     required_shadow = {
-        "game_id", "challenger_pure_home_prob", "effective_pure_weight",
-        "research_candidate", "research_method", "shadow_generated_utc",
+        "game_id", "challenger_pure_home_prob", "research_candidate", "research_method",
+        "shadow_generated_utc",
     }
     missing_prod = required_prod - set(production_locks.columns)
     missing_shadow = required_shadow - set(challenger_week.columns)
@@ -222,21 +210,13 @@ def lock_shadow(
     new_rows: list[dict] = []
     precommit_skips = 0
 
-    locked_rows = production_locks[
-        production_locks.lock_status.astype(str).str.upper().eq("LOCKED")
-    ].copy()
-    # The production ledger is authoritative and should contain one immutable lock per
-    # game. Keeping the first protects against an accidental later duplicate row.
+    locked_rows = production_locks[production_locks.lock_status.astype(str).str.upper().eq("LOCKED")].copy()
     locked_rows = locked_rows.drop_duplicates("game_id", keep="first")
-
     for _, prod in locked_rows.iterrows():
         gid = str(prod.get("game_id"))
         game_candidates = challenger[challenger.game_id.eq(gid)]
-        if game_candidates.empty:
+        if game_candidates.empty or str(prod.get("snapshot_type", "")).upper() != "FINAL":
             continue
-        if str(prod.get("snapshot_type", "")).upper() != "FINAL":
-            continue
-
         production_lock_time = _parse_utc(prod.get("lock_timestamp_utc"))
         if production_lock_time is None:
             raise RuntimeError(f"Production lock {gid} has invalid lock_timestamp_utc")
@@ -248,51 +228,63 @@ def lock_shadow(
             key = str(shadow.get("shadow_key"))
             if key in already:
                 continue
-
-            shadow_generated = _parse_utc(shadow.get("shadow_generated_utc"))
-            if shadow_generated is None:
+            generated = _parse_utc(shadow.get("shadow_generated_utc"))
+            if generated is None:
                 raise RuntimeError(f"Shadow row {key} has invalid shadow_generated_utc")
-            if shadow_generated > production_lock_time:
+            if generated > production_lock_time:
                 precommit_skips += 1
                 continue
 
             pure = pd.to_numeric(shadow.get("challenger_pure_home_prob"), errors="coerce")
             market = pd.to_numeric(prod.get("market_home_prob"), errors="coerce")
-            weight = pd.to_numeric(shadow.get("effective_pure_weight"), errors="coerce")
             method = str(shadow.get("research_method", ""))
-            if pd.isna(pure) or pd.isna(weight):
-                raise RuntimeError(f"Shadow inputs incomplete for {key}")
-            if pd.isna(market) and method != "pure":
-                final = float(np.clip(float(pure), 1e-6, 1.0 - 1e-6))
+            if pd.isna(pure):
+                raise RuntimeError(f"Shadow PURE input incomplete for {key}")
+            if method == "stack":
+                final = _stack_probability(shadow, float(pure), float(market))
+                pure_weight = np.nan
+                market_weight = np.nan
+                official = pd.to_numeric(prod.get("final_home_prob"), errors="coerce")
+                if pd.isna(official):
+                    raise RuntimeError("Frozen F-ST prospective ledger requires official final_home_prob")
             else:
-                final = probability_for_method(float(pure), float(market), float(weight), method)
+                weight = pd.to_numeric(shadow.get("effective_pure_weight"), errors="coerce")
+                if pd.isna(weight):
+                    raise RuntimeError(f"Shadow effective_pure_weight incomplete for {key}")
+                if pd.isna(market) and method != "pure":
+                    final = float(np.clip(float(pure), 1e-6, 1.0 - 1e-6))
+                else:
+                    final = probability_for_method(float(pure), float(market), float(weight), method)
+                pure_weight = float(weight)
+                market_weight = 1.0 - float(weight)
+                official = pd.to_numeric(prod.get("final_home_prob"), errors="coerce")
 
-            home = str(prod.get("home_team"))
-            away = str(prod.get("away_team"))
+            home, away = str(prod.get("home_team")), str(prod.get("away_team"))
             pick = home if final >= 0.5 else away
-            new_rows.append({
-                "game_id": gid,
-                "season": prod.get("season"),
-                "week": prod.get("week"),
-                "gameday": prod.get("gameday"),
-                "gametime": prod.get("gametime"),
-                "away_team": away,
-                "home_team": home,
+            row = {
+                "game_id": gid, "season": prod.get("season"), "week": prod.get("week"),
+                "gameday": prod.get("gameday"), "gametime": prod.get("gametime"),
+                "away_team": away, "home_team": home,
+                "production_final_home_prob": float(official) if pd.notna(official) else np.nan,
                 "challenger_pure_home_prob": float(pure),
                 "market_home_prob_t120": float(market) if pd.notna(market) else np.nan,
-                "challenger_final_home_prob": final,
-                "challenger_pick": pick,
-                "effective_pure_weight": float(weight),
-                "effective_market_weight": 1.0 - float(weight),
-                "research_candidate": shadow.get("research_candidate"),
-                "research_method": method,
+                "challenger_final_home_prob": final, "challenger_pick": pick,
+                "effective_pure_weight": pure_weight, "effective_market_weight": market_weight,
+                "research_candidate": shadow.get("research_candidate"), "research_method": method,
                 "research_feature_set": shadow.get("research_feature_set"),
                 "challenger_version": shadow.get("challenger_version"),
-                "selected_shadow_candidate": _bool(
-                    shadow.get("selected_shadow_candidate"), False
-                ),
-                "shadow_key": key,
-                "shadow_generated_utc": shadow_generated.isoformat(),
+                "selected_shadow_candidate": _bool(shadow.get("selected_shadow_candidate"), False),
+                "training_cutoff": shadow.get("training_cutoff", pd.NA),
+                "training_games": shadow.get("training_games", pd.NA),
+                "training_first_season": shadow.get("training_first_season", pd.NA),
+                "training_last_season": shadow.get("training_last_season", pd.NA),
+                "training_data_sha256": shadow.get("training_data_sha256", pd.NA),
+                "stack_intercept": shadow.get("stack_intercept", pd.NA),
+                "stack_market_logit_coefficient": shadow.get("stack_market_logit_coefficient", pd.NA),
+                "stack_pure_logit_coefficient": shadow.get("stack_pure_logit_coefficient", pd.NA),
+                "candidate_freeze_utc": shadow.get("candidate_freeze_utc", pd.NA),
+                "candidate_code_sha": shadow.get("candidate_code_sha", pd.NA),
+                "shadow_key": key, "shadow_generated_utc": generated.isoformat(),
                 "shadow_source_sha": shadow.get("shadow_source_sha", pd.NA),
                 "production_snapshot_type": str(prod.get("snapshot_type")),
                 "production_model_version": prod.get("model_version", pd.NA),
@@ -300,17 +292,15 @@ def lock_shadow(
                 "production_lock_timestamp_utc": production_lock_time.isoformat(),
                 "kickoff_utc": prod.get("kickoff_utc"),
                 "minutes_to_kickoff_at_production_lock": float(minutes),
-                "shadow_recorded_timestamp_utc": now.isoformat(),
-                "lock_status": "LOCKED",
+                "shadow_recorded_timestamp_utc": now.isoformat(), "lock_status": "LOCKED",
                 "actual_home_score": prod.get("actual_home_score", np.nan),
-                "actual_away_score": prod.get("actual_away_score", np.nan),
-                "winner_correct": pd.NA,
-            })
+                "actual_away_score": prod.get("actual_away_score", np.nan), "winner_correct": pd.NA,
+            }
+            new_rows.append(row)
             already.add(key)
 
     if new_rows:
         history = pd.concat([history, pd.DataFrame(new_rows)], ignore_index=True)
-    history = normalize_history(history)
-    history = grade_existing(history, production_locks)
+    history = grade_existing(normalize_history(history), production_locks)
     history = history.drop_duplicates("shadow_key", keep="first")
     return history[HISTORY_COLUMNS].copy(), len(new_rows), precommit_skips
