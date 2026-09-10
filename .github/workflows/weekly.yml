@@ -82,8 +82,11 @@ jobs:
           cols = ['model','games','winner_pct','brier','log_loss','margin_mae','total_mae']
           old_lb = old_lb[cols]
           new_lb = new_lb[cols]
-          # Promotion renames the former 75/25 production row as the legacy comparator.
-          old_lb['model'] = old_lb['model'].replace({'Final Ensemble': 'Legacy Final Ensemble'})
+          # Public output preserves the historical Final Ensemble key while the
+          # pipeline internally names it Legacy Final Ensemble. Canonicalize both
+          # snapshots to the semantic legacy-comparator name before comparison.
+          for frame in (old_lb, new_lb):
+              frame['model'] = frame['model'].replace({'Final Ensemble': 'Legacy Final Ensemble'})
           audit = old_lb.merge(new_lb, on='model', suffixes=('_before','_after'), validate='one_to_one')
           if len(audit) != len(old_lb) or len(audit) != len(new_lb):
               raise SystemExit('model leaderboard row set changed unexpectedly')
