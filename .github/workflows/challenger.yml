@@ -8,15 +8,18 @@ on:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
       - 'src/nfl_forecast/challenger_v07.py'
+      - 'src/nfl_forecast/challenger_v08.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
+      - 'scripts/run_challenger_v08.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
       - 'tests/test_challenger_v07.py'
+      - 'tests/test_challenger_v08.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
       - '.github/workflows/challenger_shadow_lock.yml'
@@ -25,15 +28,18 @@ on:
       - 'src/nfl_forecast/challenger.py'
       - 'src/nfl_forecast/challenger_v06.py'
       - 'src/nfl_forecast/challenger_v07.py'
+      - 'src/nfl_forecast/challenger_v08.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
+      - 'scripts/run_challenger_v08.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'tests/test_challenger.py'
       - 'tests/test_challenger_v06.py'
       - 'tests/test_challenger_v07.py'
+      - 'tests/test_challenger_v08.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
       - '.github/workflows/challenger_shadow_lock.yml'
@@ -62,7 +68,7 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
       - name: Test challenger research logic
-        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_shadow_lock.py
+        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_v08.py tests/test_challenger_shadow_lock.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -78,11 +84,11 @@ jobs:
             cp challenger_outputs/prediction_history_shadow.csv /tmp/challenger-immutable/
           fi
           rm -rf challenger_outputs
-          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v07.py
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v08.py
           if [ -f /tmp/challenger-immutable/prediction_history_shadow.csv ]; then
             cp /tmp/challenger-immutable/prediction_history_shadow.csv challenger_outputs/
           fi
-      - name: Precommit shadow forecast before T-120
+      - name: Precommit all shadow candidates before T-120
         env:
           SHADOW_SOURCE_SHA: ${{ github.sha }}
         run: |
@@ -92,38 +98,90 @@ jobs:
           from pathlib import Path
           import pandas as pd
 
-          path = Path('challenger_outputs/this_week_shadow.csv')
-          frame = pd.read_csv(path)
           generated = datetime.now(timezone.utc).isoformat()
-          frame['shadow_generated_utc'] = generated
-          frame['shadow_source_sha'] = os.environ['SHADOW_SOURCE_SHA']
-          frame.to_csv(path, index=False)
+          source_sha = os.environ['SHADOW_SOURCE_SHA']
+          paths = [
+              Path('challenger_outputs/candidate_shadow_slate.csv'),
+              Path('challenger_outputs/this_week_shadow.csv'),
+          ]
+          for path in paths:
+              frame = pd.read_csv(path)
+              frame['shadow_generated_utc'] = generated
+              frame['shadow_source_sha'] = source_sha
+              frame.to_csv(path, index=False)
+              print(f'precommitted={path} rows={len(frame)}')
           print(f'shadow_generated_utc={generated}')
-          print(f'shadow_source_sha={os.environ["SHADOW_SOURCE_SHA"]}')
+          print(f'shadow_source_sha={source_sha}')
           PY
       - name: Verify research firewall
         run: |
           python - <<'PY'
           import json
-          import pandas as pd
           from pathlib import Path
+          import numpy as np
+          import pandas as pd
+
           report = json.loads(Path('challenger_outputs/report.json').read_text())
           assert report['status'] == 'healthy'
           assert report['mode'] == 'research_only'
-          assert report['challenger_version'] == '0.7-opponent-adjusted'
+          assert report['challenger_version'] == '0.8-qb-starter'
           assert report['live_season_firewall'] == 2026
           assert report['promotion_authorized'] is False
           assert report['target_seasons'] == [2022, 2023, 2024, 2025]
           assert report['minimum_pure_weight'] >= 0.25
           assert len(report['opponent_adjusted_features']) == 32
+          assert len(report['qb_features']) >= 12
           assert report['2026_outcomes_used_in_fitting'] == 0
           assert report['production_outputs_modified'] == 0
+
+          slate = pd.read_csv('challenger_outputs/candidate_shadow_slate.csv')
           shadow = pd.read_csv('challenger_outputs/this_week_shadow.csv')
+          identity = ['game_id', 'challenger_version', 'research_candidate']
+          assert not slate.duplicated(identity).any()
+          assert slate['shadow_generated_utc'].notna().all()
+          assert slate['shadow_source_sha'].notna().all()
           assert shadow['shadow_generated_utc'].notna().all()
           assert shadow['shadow_source_sha'].notna().all()
-          assert shadow['research_method'].isin(['fixed', 'linear', 'logit', 'pure']).all()
-          assert shadow['effective_pure_weight'].min() >= 0.25
-          assert shadow['challenger_version'].eq('0.7-opponent-adjusted').all()
+          assert slate['research_method'].isin(['fixed', 'linear', 'logit', 'pure']).all()
+          assert slate['effective_pure_weight'].min() >= 0.25
+          assert slate['challenger_version'].eq('0.8-qb-starter').all()
+          assert shadow['challenger_version'].eq('0.8-qb-starter').all()
+          assert len(slate) == report['current_shadow_candidate_rows']
+          assert slate['research_candidate'].nunique() == report['shadow_candidate_count']
+          assert len(shadow) == report['current_shadow_games']
+          assert report['shadow_candidate_count'] > 1
+          assert report['tested_candidate_count'] == report['shadow_candidate_count'] + 1
+
+          selected_per_game = slate.groupby('game_id')['selected_shadow_candidate'].sum()
+          assert selected_per_game.eq(1).all()
+          selected = slate[slate['selected_shadow_candidate']].copy()
+          assert len(selected) == len(shadow)
+          assert selected['research_candidate'].eq(report['selected_shadow_candidate']).all()
+          assert selected['research_feature_set'].eq(report['selected_shadow_feature_set']).all()
+          assert selected['research_method'].eq(report['selected_shadow_method']).all()
+
+          compare_cols = [
+              'game_id', 'research_candidate', 'research_method', 'research_feature_set',
+              'challenger_version', 'challenger_pick', 'effective_pure_weight',
+              'effective_market_weight', 'challenger_pure_home_prob',
+              'challenger_final_home_prob', 'market_home_prob', 'shadow_generated_utc',
+              'shadow_source_sha',
+          ]
+          left = selected[compare_cols].sort_values('game_id').reset_index(drop=True)
+          right = shadow[compare_cols].sort_values('game_id').reset_index(drop=True)
+          text_cols = [
+              'game_id', 'research_candidate', 'research_method', 'research_feature_set',
+              'challenger_version', 'challenger_pick', 'shadow_generated_utc',
+              'shadow_source_sha',
+          ]
+          numeric_cols = [c for c in compare_cols if c not in text_cols]
+          assert left[text_cols].equals(right[text_cols])
+          for col in numeric_cols:
+              assert np.allclose(
+                  pd.to_numeric(left[col], errors='coerce'),
+                  pd.to_numeric(right[col], errors='coerce'),
+                  equal_nan=True,
+              ), col
           print(json.dumps(report, indent=2))
           PY
       - name: Upload challenger evidence
