@@ -23,9 +23,27 @@ For every candidate freeze, persist:
    the pre-fit artifacts have been persisted.
 9. The numerical runtime identity: Python, NumPy, pandas, SciPy, scikit-learn,
    thread-environment variables, and detected BLAS/threadpool backends.
+10. An explicit provenance `capture_context` describing whether the files were
+    captured during the actual candidate freeze or reconstructed later.
 
 The raw artifact hash and the model training-data digest are different contracts
 and must never be substituted for one another.
+
+## Capture-context semantics
+
+Every pre-fit manifest must declare exactly one of these contexts:
+
+- `candidate_freeze`: the input artifacts were persisted during the actual run
+  that established a newly versioned candidate's frozen identity, before its
+  optimizer executed.
+- `prospective_shadow_reconstruction`: the inputs were generated later while
+  materializing or evaluating an already frozen candidate. These artifacts may
+  be useful forensic evidence, but they are **not** original freeze evidence.
+
+`F-ST-01-FROZEN-2026` predates this contract and may never be labeled
+`candidate_freeze` by newly generated provenance tooling. Its current shadow
+materialization must use `prospective_shadow_reconstruction`. Any other or
+ambiguous context fails closed.
 
 ## Serialization
 
@@ -40,6 +58,10 @@ load the persisted pre-fit artifacts and reproduce the registered model identity
 under the candidate's declared tolerance policy. A mismatch must fail closed and
 must not be repaired by replacing the registered digest, relaxing equality
 requirements, or silently regenerating historical inputs.
+
+Only artifacts labeled `candidate_freeze` can satisfy the original-freeze
+provenance requirement. A `prospective_shadow_reconstruction` can diagnose or
+corroborate behavior, but cannot substitute for the missing original capture.
 
 Any architecture, feature, solver, hyperparameter, data-universe, or candidate
 identity change requires a new candidate ID. Current-season outcomes may not be
