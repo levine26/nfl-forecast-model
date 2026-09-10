@@ -26,6 +26,8 @@ CURRENT_COLUMNS = [
     "fst_artifact_freeze_implementation_sha","fst_fallback","fst_fallback_reason",
     "fst_vs_market_delta","fst_vs_legacy_delta","legacy_confidence",
     "legacy_consistency_flag","confidence_diagnostic_scope",
+    # Source freshness is recorded when the upstream snapshot time is observable.
+    "market_snapshot_timestamp_utc","market_snapshot_source",
 ]
 
 LOCK_META_COLUMNS = [
@@ -276,6 +278,8 @@ def write_outputs(
         "market_available_games": int(market_available.sum()),
         "market_missing_or_invalid_games": int((~market_available).sum()),
         "fst_fallback_count": int(fallback.sum()),
+        "market_snapshot_timestamp_utc": str(p["market_snapshot_timestamp_utc"].iloc[0]) if len(p) and "market_snapshot_timestamp_utc" in p else None,
+        "market_snapshot_source": str(p["market_snapshot_source"].iloc[0]) if len(p) and "market_snapshot_source" in p else None,
         "data_state": str(p["data_state"].iloc[0]) if len(p) and "data_state" in p else None,
     }
     (out / "status.json").write_text(json.dumps(status, indent=2), encoding="utf-8")
