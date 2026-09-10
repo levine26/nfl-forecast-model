@@ -1,0 +1,62 @@
+name: LevLine v0.9B availability source audit
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/availability_research.py'
+      - 'scripts/run_availability_research.py'
+      - 'tests/test_availability_research.py'
+      - '.github/workflows/research_availability.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-availability-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test fail-closed availability qualification
+        run: pytest -q tests/test_availability_research.py
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-availability-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-availability-${{ runner.os }}-
+            nfl-player-state-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Audit historical injury and 2025 timestamped depth-chart coverage
+        run: |
+          rm -rf research_outputs/availability
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_availability_research.py
+          test -s research_outputs/availability/v09b_source_qualification.json
+          test -s research_outputs/availability/injury_coverage_by_season.csv
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/availability/v09b_source_qualification.json').read_text())
+          assert report['status'] == 'blocked', report
+          assert report['p_active_model_built'] is False
+          assert report['2026_outcomes_used'] == 0
+          PY
+      - name: Prove production outputs and site are untouched
+        run: git diff --exit-code -- outputs/ site/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-v09b-availability-${{ github.run_id }}
+          path: research_outputs/availability/
+          retention-days: 30
