@@ -57,7 +57,7 @@ jobs:
 
             if [ -f challenger_outputs/prediction_history_shadow.csv ]; then
               PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
-                python scripts/evaluate_fst_shadow.py
+                python scripts/run_challenger_fst_evaluation.py
             fi
 
             git add challenger_outputs/prediction_history_shadow.csv
