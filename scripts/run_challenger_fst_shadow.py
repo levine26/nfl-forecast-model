@@ -49,9 +49,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     base_features = feature_sets["production_compatible"]
     base_oof, research = build_nested_research(historical, base_features, seed)
 
-    # Persist the exact model inputs before fitting. prepare_frozen_training_frame
-    # establishes the admissible row universe; the original columns/values and their
-    # order are then archived with stable game IDs before the optimizer is invoked.
+    # Persist the exact model inputs before fitting. This is a current prospective
+    # reconstruction of F-ST-01, not the missing original candidate-freeze capture.
     prepared = prepare_frozen_training_frame(research)
     training_for_fit = research.loc[prepared.index, list(TRAINING_COLUMNS)].copy()
     provenance_dir = out / "fst" / "provenance"
@@ -61,6 +60,7 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         training_for_fit,
         provenance_dir,
         candidate_id=FROZEN_CANDIDATE_ID,
+        capture_context="prospective_shadow_reconstruction",
     )
 
     # Target season 2026 may only train on earlier-season OOF rows. The fitter fails
@@ -129,6 +129,7 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         "freeze_implementation_sha": spec["freeze_implementation_sha"],
         "provenance": {
             "capture_stage": "pre_fit",
+            "capture_context": input_provenance["capture_context"],
             "inputs_manifest": "fst/provenance/inputs_manifest.json",
             "fit_manifest": "fst/provenance/fit_manifest.json",
             "base_oof_raw_sha256": input_provenance["base_oof"]["raw_sha256"],
