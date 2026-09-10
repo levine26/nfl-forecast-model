@@ -51,6 +51,26 @@ Provenance CSVs use UTF-8, LF line endings, no pandas index, and `%.17g` float
 serialization. The raw file preserves execution order. `row_position` makes that
 order explicit even after a downstream load or sort.
 
+## Registered identity gate
+
+An already frozen candidate may be rematerialized only if the completed fit
+matches its registered frozen identity **exactly** before any current-game
+probability is generated or scored. The checked identity consists of candidate
+ID, canonical training-data digest, training row count and season bounds, and the
+three fitted stack parameters.
+
+The identity source must itself be documented. For `F-ST-01-FROZEN-2026`, the
+registered values are corroborated by the surviving successful frozen-shadow
+artifact from workflow run `34482487521` at head
+`5b26693e5d97ec49543b1d778baef63a1d600311`. That artifact is evidence of the
+registered frozen identity; it is **not** the missing original pre-fit freeze
+provenance.
+
+Every post-freeze rematerialization writes `frozen_identity_check.json` after the
+fit and before scoring. A mismatch writes the expected and actual identities plus
+per-field results, then fails closed. The pre-fit and fit manifests therefore
+remain uploadable forensic evidence even when scoring is blocked.
+
 ## Promotion gate
 
 A candidate may not enter production review unless an independent clean run can

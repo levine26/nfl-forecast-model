@@ -21,6 +21,7 @@ from nfl_forecast.challenger_fst import (
 from nfl_forecast.fst_provenance import (
     TRAINING_COLUMNS,
     capture_fst_pre_fit_provenance,
+    verify_fst_frozen_identity,
     write_fst_fit_provenance,
 )
 from scripts.run_challenger_v08 import SHADOW_BASE_COLUMNS, build_nested_research, build_research_frame
@@ -34,6 +35,8 @@ def _load_spec() -> dict:
         raise RuntimeError("Frozen F-ST candidate spec identity mismatch")
     if spec.get("production_promotion_authorized") is not False:
         raise RuntimeError("Frozen F-ST spec must explicitly prohibit production promotion")
+    if not isinstance(spec.get("frozen_identity"), dict):
+        raise RuntimeError("Frozen F-ST spec must include the registered frozen identity")
     return spec
 
 
@@ -63,10 +66,17 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         capture_context="prospective_shadow_reconstruction",
     )
 
-    # Target season 2026 may only train on earlier-season OOF rows. The fitter fails
-    # closed if any 2026-or-later row reaches this boundary.
+    # Target season 2026 may only train on earlier-season OOF rows. Persist the
+    # completed fit, then require exact agreement with the registered frozen
+    # identity before generating any current-game PURE probabilities or scoring.
     fit = fit_frozen_2026_stack(training_for_fit)
     fit_provenance = write_fst_fit_provenance(provenance_dir, input_provenance, fit)
+    identity_check = verify_fst_frozen_identity(
+        provenance_dir,
+        input_provenance,
+        fit,
+        spec["frozen_identity"],
+    )
 
     current_pure = fit_future_nested_stack(
         historical,
@@ -132,6 +142,9 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
             "capture_context": input_provenance["capture_context"],
             "inputs_manifest": "fst/provenance/inputs_manifest.json",
             "fit_manifest": "fst/provenance/fit_manifest.json",
+            "frozen_identity_check": "fst/provenance/frozen_identity_check.json",
+            "frozen_identity_verified": bool(identity_check["matches"]),
+            "frozen_identity_source": identity_check["expected_source"],
             "base_oof_raw_sha256": input_provenance["base_oof"]["raw_sha256"],
             "training_frame_raw_sha256": input_provenance["training_frame"]["raw_sha256"],
             "training_frame_canonical_game_keyed_sha256": input_provenance["training_frame"][

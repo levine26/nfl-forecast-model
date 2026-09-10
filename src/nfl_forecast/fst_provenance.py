@@ -27,6 +27,16 @@ SERIALIZATION_VERSION = 2
 FLOAT_FORMAT = "%.17g"
 LINE_TERMINATOR = "\n"
 CAPTURE_CONTEXTS = frozenset({"candidate_freeze", "prospective_shadow_reconstruction"})
+FROZEN_IDENTITY_FIELDS = (
+    "candidate_id",
+    "training_data_sha256",
+    "training_games",
+    "training_first_season",
+    "training_last_season",
+    "intercept",
+    "market_logit_coefficient",
+    "pure_logit_coefficient",
+)
 BASE_OOF_COLUMNS = (
     "logistic",
     "extra_trees",
@@ -271,3 +281,68 @@ def write_fst_fit_provenance(
         encoding="utf-8",
     )
     return manifest
+
+
+def verify_fst_frozen_identity(
+    output_dir: str | Path,
+    input_manifest: dict[str, Any],
+    fit: FrozenStackFit,
+    expected_identity: dict[str, Any],
+) -> dict[str, Any]:
+    """Require exact registered frozen identity before any post-freeze scoring.
+
+    The check is written before a mismatch raises so CI can upload the forensic
+    evidence even when scoring is correctly blocked.
+    """
+
+    missing = [field for field in FROZEN_IDENTITY_FIELDS if field not in expected_identity]
+    if missing:
+        raise ValueError(f"F-ST frozen identity spec missing fields: {missing}")
+    if "source" not in expected_identity or not isinstance(expected_identity["source"], dict):
+        raise ValueError("F-ST frozen identity spec requires an evidence source")
+
+    actual = {
+        "candidate_id": str(input_manifest["candidate_id"]),
+        "training_data_sha256": str(fit.training_data_sha256),
+        "training_games": int(fit.training_games),
+        "training_first_season": int(fit.training_first_season),
+        "training_last_season": int(fit.training_last_season),
+        "intercept": float(fit.intercept),
+        "market_logit_coefficient": float(fit.market_logit_coefficient),
+        "pure_logit_coefficient": float(fit.pure_logit_coefficient),
+    }
+    expected = {
+        "candidate_id": str(expected_identity["candidate_id"]),
+        "training_data_sha256": str(expected_identity["training_data_sha256"]),
+        "training_games": int(expected_identity["training_games"]),
+        "training_first_season": int(expected_identity["training_first_season"]),
+        "training_last_season": int(expected_identity["training_last_season"]),
+        "intercept": float(expected_identity["intercept"]),
+        "market_logit_coefficient": float(expected_identity["market_logit_coefficient"]),
+        "pure_logit_coefficient": float(expected_identity["pure_logit_coefficient"]),
+    }
+    field_matches = {field: actual[field] == expected[field] for field in FROZEN_IDENTITY_FIELDS}
+    mismatched_fields = [field for field, matches in field_matches.items() if not matches]
+    check = {
+        "schema_version": SERIALIZATION_VERSION,
+        "check_stage": "post_fit_pre_scoring",
+        "capture_context": input_manifest["capture_context"],
+        "expected_source": expected_identity["source"],
+        "expected": expected,
+        "actual": actual,
+        "field_matches": field_matches,
+        "mismatched_fields": mismatched_fields,
+        "matches": not mismatched_fields,
+    }
+
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "frozen_identity_check.json").write_text(
+        json.dumps(check, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    if mismatched_fields:
+        raise RuntimeError(
+            "F-ST frozen identity mismatch before scoring: " + ", ".join(mismatched_fields)
+        )
+    return check
