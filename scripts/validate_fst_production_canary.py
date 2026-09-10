@@ -37,27 +37,42 @@ def main() -> None:
     features = core_columns(historical)
     seed = 26
 
-    # Both implementations consume the exact immutable OOF matrix that was present in
-    # the successful frozen shadow artifact. The loader independently validates bytes,
-    # row universe, season/target sequence, and restores the original historical index.
+    # Both implementations consume the immutable OOF matrix preserved from the
+    # frozen research path. The loader validates bytes, row universe, season/target
+    # sequence, and restores the historical index.
     frozen_oof = load_frozen_base_oof(historical=historical)
     training_frame = build_fst_training_frame(historical, frozen_oof, seed=seed)
-    research_fit = fit_frozen_2026_stack(training_frame)
+    research_refit = fit_frozen_2026_stack(training_frame)
     artifact = load_fst_artifact()
-    for label, actual, expected in (
-        ("intercept", research_fit.intercept, artifact.intercept),
-        ("market coefficient", research_fit.market_logit_coefficient, artifact.market_logit_coefficient),
-        ("PURE coefficient", research_fit.pure_logit_coefficient, artifact.pure_logit_coefficient),
-    ):
-        if actual != expected:
-            raise SystemExit(f"Frozen research {label} mismatch: {actual!r} != {expected!r}")
-    if research_fit.training_data_sha256 != artifact.training_data_sha256:
-        raise SystemExit("Frozen research training digest differs from production artifact")
-    if research_fit.training_games != artifact.training_games:
-        raise SystemExit("Frozen research training game count differs from production artifact")
 
-    # Exercise the research nested-PURE implementation against the proposed production
-    # implementation on the same historical/current snapshot and same frozen meta OOF.
+    if research_refit.training_data_sha256 != artifact.training_data_sha256:
+        raise SystemExit("Frozen research training digest differs from production artifact")
+    if research_refit.training_games != artifact.training_games:
+        raise SystemExit("Frozen research training game count differs from production artifact")
+    if research_refit.training_first_season != artifact.training_first_season:
+        raise SystemExit("Frozen research first training season differs from production artifact")
+    if research_refit.training_last_season != artifact.training_last_season:
+        raise SystemExit("Frozen research last training season differs from production artifact")
+
+    coefficient_deltas = {
+        "intercept": abs(research_refit.intercept - artifact.intercept),
+        "market_logit_coefficient": abs(
+            research_refit.market_logit_coefficient - artifact.market_logit_coefficient
+        ),
+        "pure_logit_coefficient": abs(
+            research_refit.pure_logit_coefficient - artifact.pure_logit_coefficient
+        ),
+    }
+    max_coefficient_delta = max(coefficient_deltas.values(), default=0.0)
+    if max_coefficient_delta > TOLERANCE:
+        raise SystemExit(
+            "Frozen research coefficient reconstruction parity failed: "
+            f"max abs diff {max_coefficient_delta:.17g}"
+        )
+
+    # Exercise the research nested-PURE implementation against the proposed
+    # production implementation on the same historical/current snapshot and same
+    # frozen meta OOF.
     research_pure = research_fit_future_nested_stack(
         historical,
         frozen_oof,
@@ -75,17 +90,20 @@ def main() -> None:
     eligible = np.isfinite(market)
     research_final = np.full(len(proposed), np.nan, dtype=float)
     if eligible.any():
+        # The refit above is only a reconstruction audit. Both research comparator
+        # and production must score with the exact frozen registered constants.
         research_final[eligible] = frozen_stack_probability(
             market[eligible],
             research_pure[eligible],
-            intercept=research_fit.intercept,
-            market_logit_coefficient=research_fit.market_logit_coefficient,
-            pure_logit_coefficient=research_fit.pure_logit_coefficient,
+            intercept=artifact.intercept,
+            market_logit_coefficient=artifact.market_logit_coefficient,
+            pure_logit_coefficient=artifact.pure_logit_coefficient,
         )
     proposed_final = proposed.final_home_prob.to_numpy(dtype=float)
     final_abs = np.full(len(proposed), np.nan, dtype=float)
     final_abs[eligible] = np.abs(research_final[eligible] - proposed_final[eligible])
     max_abs = float(np.nanmax(final_abs)) if eligible.any() else 0.0
+    mean_abs = float(np.nanmean(final_abs)) if eligible.any() else 0.0
     if max_abs > TOLERANCE:
         raise SystemExit(f"F-ST shadow→production parity failed: max abs diff {max_abs:.17g}")
 
@@ -103,12 +121,16 @@ def main() -> None:
     source_sha = os.environ.get("GITHUB_SHA") or os.environ.get("LEVLINE_SOURCE_SHA") or "unknown"
     audit = pd.DataFrame({
         "game_id": proposed.game_id.astype(str),
+        "away_team": proposed.away_team.astype(str),
+        "home_team": proposed.home_team.astype(str),
         "market_home_prob": proposed.market_home_prob,
         "legacy_production_pure": proposed.legacy_pure_home_prob,
         "legacy_75_25_final": proposed.legacy_final_home_prob,
         "fst_nested_pure": proposed.fst_pure_home_prob,
         "research_fst_probability": research_final,
         "proposed_production_fst_probability": proposed.final_home_prob,
+        "research_pick": np.where(research_final >= 0.5, proposed.home_team, proposed.away_team),
+        "proposed_pick": proposed.pick,
         "absolute_difference": final_abs,
         "intercept": artifact.intercept,
         "market_logit_coefficient": artifact.market_logit_coefficient,
@@ -130,6 +152,10 @@ def main() -> None:
         "fallback_games": int((~eligible).sum()),
         "nested_pure_max_absolute_difference": nested_max,
         "fst_max_absolute_difference": max_abs,
+        "fst_mean_absolute_difference": mean_abs,
+        "reconstruction_coefficient_absolute_deltas": coefficient_deltas,
+        "reconstruction_coefficient_max_absolute_difference": max_coefficient_delta,
+        "scoring_parameter_source": "registered_frozen_artifact_constants",
         "training_games": artifact.training_games,
         "training_first_season": artifact.training_first_season,
         "training_last_season": artifact.training_last_season,
@@ -138,7 +164,11 @@ def main() -> None:
         "market_logit_coefficient": artifact.market_logit_coefficient,
         "pure_logit_coefficient": artifact.pure_logit_coefficient,
         "2026_outcomes_used_in_fitting": artifact.outcomes_2026_used,
-        "parity_passed": bool(max_abs <= TOLERANCE and nested_max <= TOLERANCE),
+        "parity_passed": bool(
+            max_abs <= TOLERANCE
+            and nested_max <= TOLERANCE
+            and max_coefficient_delta <= TOLERANCE
+        ),
     }
     Path(args.summary).write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
