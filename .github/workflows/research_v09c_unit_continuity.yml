@@ -7,6 +7,7 @@ on:
       - 'src/nfl_forecast/unit_state_research.py'
       - 'src/nfl_forecast/challenger_v09c.py'
       - 'scripts/run_challenger_v09c.py'
+      - 'scripts/run_v09c_uncertainty.py'
       - 'tests/test_unit_state_research.py'
       - '.github/workflows/research_v09c_unit_continuity.yml'
   workflow_dispatch:
@@ -32,7 +33,7 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
       - name: Test chronology, identity, and production-import contracts
-        run: pytest -q tests/test_unit_state_research.py tests/test_player_state_research.py tests/test_challenger_v08.py
+        run: pytest -q tests/test_unit_state_research.py tests/test_player_state_research.py tests/test_challenger_v08.py tests/test_challenger_evaluation.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -56,6 +57,24 @@ jobs:
           assert report['paired_target_games'] >= 1000
           assert report['2026_outcomes_used'] == 0
           assert report['current_game_snaps_used'] == 0
+          assert report['promotion_authorized'] is False
+          assert report['shadow_authorized'] is False
+          PY
+      - name: Run paired uncertainty audit without refitting candidate
+        run: |
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_v09c_uncertainty.py
+          test -s challenger_outputs/v09c/uncertainty/report.json
+          test -s challenger_outputs/v09c/uncertainty/adaptive_vs_v08_adaptive_bootstrap.csv
+          test -s challenger_outputs/v09c/uncertainty/adaptive_vs_market_bootstrap.csv
+          test -s challenger_outputs/v09c/uncertainty/brier_confidence_set.csv
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('challenger_outputs/v09c/uncertainty/report.json').read_text())
+          assert report['candidate_version'] == '0.9C-unit-continuity'
+          assert report['paired_games'] >= 1000
+          assert report['2026_outcomes_used'] == 0
+          assert report['candidate_refit_or_tuning_performed'] is False
           assert report['promotion_authorized'] is False
           assert report['shadow_authorized'] is False
           PY
