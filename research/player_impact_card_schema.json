@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "mode": "research_only",
+  "public_site_integration": false,
+  "card_required_fields": [
+    "schema_version",
+    "research_only",
+    "game_id",
+    "team",
+    "player_id",
+    "player_name",
+    "position",
+    "observed_statistics",
+    "levline_impacts",
+    "data_quality"
+  ],
+  "observed_stat_kind": "source_observed",
+  "observed_stat_required_fields": [
+    "metric",
+    "value",
+    "unit",
+    "source_name",
+    "source_url",
+    "source_data_as_of",
+    "sample_size",
+    "redistribution_review_status"
+  ],
+  "levline_impact_kind": "levline_modeled_impact",
+  "levline_impact_required_fields": [
+    "metric",
+    "estimate",
+    "uncertainty",
+    "model_version",
+    "feature_data_horizon",
+    "interpretation"
+  ],
+  "allowed_observed_examples": [
+    "target_share",
+    "route_share",
+    "air_yard_share",
+    "epa_per_target",
+    "epa_per_dropback",
+    "cpoe",
+    "pressure_rate",
+    "separation",
+    "ryoe",
+    "snap_share",
+    "ol_continuity"
+  ],
+  "allowed_modeled_examples": [
+    "levline_qb_state",
+    "levline_skill_unit_state",
+    "levline_ol_state",
+    "levline_pass_rush_state",
+    "levline_secondary_state",
+    "levline_expected_lineup_value_lost",
+    "levline_player_impact"
+  ],
+  "prohibited_content": [
+    "projected player yardage",
+    "projected receptions",
+    "projected rushing totals",
+    "touchdown probability",
+    "fantasy points",
+    "modeled impact represented as an official NFL statistic"
+  ],
+  "licensing_policy": "Every observed metric carries a redistribution review status. Pending/restricted data remain research-only until a separate source-specific review."
+}
