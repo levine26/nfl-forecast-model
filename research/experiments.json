@@ -1,5 +1,5 @@
 {
-  "registry_version": 1,
+  "registry_version": 2,
   "policy": {
     "historical_selection_end": 2025,
     "live_shadow_season": 2026,
@@ -7,6 +7,39 @@
     "promotion_authorized": false
   },
   "experiments": [
+    {
+      "experiment_id": "BASELINE-V08-UNCERTAINTY-001",
+      "candidate_version": "0.8-qb-starter-statistical-audit",
+      "hypothesis": "The existing v0.8 opponent-adjusted + QB adaptive-Brier challenger improves materially over the production-like 75% PURE / 25% MARKET benchmark and must be tested against market-only with paired uncertainty before any qualification claim.",
+      "feature_family": "baseline_uncertainty_audit",
+      "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+      "validation_seasons": [2022, 2023, 2024, 2025],
+      "data_timestamp_policy": {
+        "v08_football_features": "historically_reconstructable",
+        "historical_market_probability": "known_before_game",
+        "2026_outcomes": "unknown_unsafe"
+      },
+      "allowed_inputs": ["v0.8 production-compatible features", "opponent-adjusted EPA features", "v0.8 QB state", "historical market probability"],
+      "prohibited_inputs": ["2026 outcomes", "post-kickoff information", "future starter identity", "later injury designation"],
+      "model_family": "existing v0.8 nested adaptive-Brier hybrid plus paired statistical audit",
+      "hyperparameter_search_policy": "No new candidate tuning; audit the already-selected v0.8 formulation with paired row/week/season bootstrap and paired loss diagnostics.",
+      "primary_metric": "brier",
+      "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "paired_bootstrap", "paired_loss_difference", "confidence_set_approximation"],
+      "candidate_created_at": "2026-09-10T02:06:00Z",
+      "git_sha": "825491421ef4e6817312eb373a6f4531d8ceef4b",
+      "status": "complete",
+      "historical_result": {
+        "paired_games": 1087,
+        "candidate": {"winner_accuracy": 0.678933, "brier": 0.211764, "log_loss": 0.611748},
+        "production_like_75_25": {"winner_accuracy": 0.658694, "brier": 0.218592, "log_loss": 0.627402},
+        "market_only": {"winner_accuracy": 0.676173, "brier": 0.210199, "log_loss": 0.607647},
+        "candidate_minus_production_like": {"winner_accuracy_pp": 2.0239, "brier_delta": -0.006828, "log_loss_delta": -0.015654},
+        "candidate_minus_market": {"winner_accuracy_pp": 0.2760, "brier_delta": 0.001565, "log_loss_delta": 0.004101},
+        "uncertainty_summary": "Row/week/season bootstrap intervals exclude zero for Brier and log-loss improvement over production-like 75/25. Against market-only, candidate probability loss is significantly worse; Brier confidence-set approximation contains market only.",
+        "promotion_conclusion": "not_qualified_for_promotion"
+      },
+      "prospective_shadow_status": "existing_v08_shadow_research_only_no_promotion"
+    },
     {
       "experiment_id": "V09A-PLAYER-VALUE-001",
       "candidate_version": "0.9A-player-value",
@@ -22,15 +55,23 @@
       },
       "allowed_inputs": ["completed prior-game PBP", "stable player IDs", "prior usage/opportunity", "v0.8 production-compatible and opponent-adjusted features", "v0.8 QB state", "historical market benchmark"],
       "prohibited_inputs": ["2026 outcomes", "current-game snap counts", "postgame workload", "future depth charts", "final starter identity learned after kickoff", "later injury designation"],
-      "model_family": "existing nested LevLine stack with compact player-state ablation",
-      "hyperparameter_search_policy": "Predeclared shrinkage grid; for target season S tune only on seasons before S; no 2026 outcomes.",
+      "model_family": "existing nested LevLine stack with compact target/rush player-state ablation",
+      "hyperparameter_search_policy": "Initial experiment used fixed strong role shrinkage from the player-state foundation (QB 150, target 45, rush 65 opportunities); no post-result hyperparameter or feature search is permitted to rescue the failed ablation.",
       "primary_metric": "brier",
       "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "paired_week_block_bootstrap"],
       "candidate_created_at": "2026-09-10T02:06:00Z",
-      "git_sha": "8f4a266152e9c92c2bdbcc3a5caa4bbd331006e3",
-      "status": "planned",
-      "historical_result": null,
-      "prospective_shadow_status": "not_eligible_pending_historical_qualification"
+      "git_sha": "194d2c876df4b808ddb38b282040c5fa01326392",
+      "status": "rejected",
+      "historical_result": {
+        "paired_games": 1087,
+        "v08_adaptive": {"winner_accuracy": 0.678933, "brier": 0.211764, "log_loss": 0.611748},
+        "v09a_player_only_adaptive": {"winner_accuracy": 0.671573, "brier": 0.211890, "log_loss": 0.612049},
+        "v09a_v08_plus_player_adaptive": {"winner_accuracy": 0.675253, "brier": 0.211860, "log_loss": 0.611946},
+        "player_over_v08_pure": {"winner_accuracy_pp": -0.8280, "brier_delta": 0.000558, "log_loss_delta": 0.001111},
+        "player_over_v08_adaptive": {"winner_accuracy_pp": -0.3680, "brier_delta": 0.000096, "log_loss_delta": 0.000197},
+        "conclusion": "Current lagged target/rush empirical-Bayes player-value formulation adds no incremental OOS signal and is rejected without post-hoc rescue tuning."
+      },
+      "prospective_shadow_status": "not_eligible_rejected_historically"
     },
     {
       "experiment_id": "V09B-AVAILABILITY-001",
@@ -45,17 +86,26 @@
         "actual_current_game_snaps": "only_available_after_kickoff",
         "unreconstructable_injury_status": "unknown_unsafe"
       },
-      "allowed_inputs": ["v0.9A latent value", "historically reconstructable pregame status", "probabilistic active estimate", "expected snap share from prior information"],
-      "prohibited_inputs": ["2026 outcomes", "actual current-game snaps", "final inactives when not historically timestamped by T-120", "postgame participation"],
-      "model_family": "v0.9A plus expected player contribution",
-      "hyperparameter_search_policy": "No availability feature enters OOS evaluation until its historical timestamp provenance is validated; any tuning is nested before target season.",
+      "allowed_inputs": ["v0.9A latent value infrastructure", "historically reconstructable pregame status", "probabilistic active estimate", "expected snap share from prior information"],
+      "prohibited_inputs": ["2026 outcomes", "actual current-game snaps", "final starter identity", "retrospective inactive status", "later injury designation", "postgame participation"],
+      "model_family": "expected player contribution = P(active) x expected snap share x latent value",
+      "hyperparameter_search_policy": "No availability feature or model fitting is permitted until every target season has validated timestamped pregame availability coverage.",
       "primary_metric": "brier",
       "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "availability-heavy slice"],
       "candidate_created_at": "2026-09-10T02:06:00Z",
-      "git_sha": "8f4a266152e9c92c2bdbcc3a5caa4bbd331006e3",
-      "status": "planned",
-      "historical_result": null,
-      "prospective_shadow_status": "not_eligible_pending_historical_qualification"
+      "git_sha": "3442ba25e02f0e0589f6e6062f5857f47aa173b2",
+      "status": "rejected",
+      "historical_result": {
+        "result_type": "source_qualification_blocker",
+        "injury_rows_by_target_season": {"2022": 5682, "2023": 5599, "2024": 6215, "2025": 0},
+        "historical_injury_rows_2009_2024": 84684,
+        "historical_injury_stable_id_missing_rate": 0.0,
+        "depth_2025_rows": 554215,
+        "depth_2025_timestamp_parse_rate": 1.0,
+        "depth_2025_stable_id_missing_rate": 0.010063,
+        "conclusion": "Full 2022-2025 P(active) backtest is blocked because the current source stack has no 2025 timestamped official injury/practice-report history. Timestamped depth charts are not a valid substitute."
+      },
+      "prospective_shadow_status": "not_eligible_data_coverage_blocked"
     },
     {
       "experiment_id": "V09C-UNIT-STATE-001",
@@ -69,7 +119,7 @@
         "pregame_lineup_expectation": "knowable_by_t120",
         "actual_game_participation": "only_available_after_kickoff"
       },
-      "allowed_inputs": ["validated v0.9A/B player state", "compact unit aggregates", "lineup uncertainty"],
+      "allowed_inputs": ["validated chronological player-state infrastructure", "compact unit aggregates", "lineup uncertainty"],
       "prohibited_inputs": ["2026 outcomes", "individual player IDs as classifier dummies", "actual current-game participation", "postgame snap continuity"],
       "model_family": "regularized compact game-level unit state",
       "hyperparameter_search_policy": "Predeclared compact feature sets and nested season-forward selection only.",
@@ -102,6 +152,30 @@
       "candidate_created_at": "2026-09-10T02:06:00Z",
       "git_sha": "8f4a266152e9c92c2bdbcc3a5caa4bbd331006e3",
       "status": "planned",
+      "historical_result": null,
+      "prospective_shadow_status": "not_eligible_pending_historical_qualification"
+    },
+    {
+      "experiment_id": "F-MR-01",
+      "candidate_version": "orthogonal-market-residual-v1",
+      "hypothesis": "Treating market logit as a fixed offset and learning only a regularized residual from leakage-safe football information may improve probability quality relative to market and v0.8 blending.",
+      "feature_family": "market_residual",
+      "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+      "validation_seasons": [2022, 2023, 2024, 2025],
+      "data_timestamp_policy": {
+        "historical_market_probability": "known_before_game",
+        "v08_football_features": "historically_reconstructable",
+        "2026_outcomes": "unknown_unsafe"
+      },
+      "allowed_inputs": ["historical market probability as fixed logit offset", "v0.8 opponent-adjusted football features", "v0.8 QB state"],
+      "prohibited_inputs": ["2026 outcomes", "v0.9 player features", "post-kickoff information", "future depth charts", "later injury designation"],
+      "model_family": "L2-regularized offset logistic regression with market-logit coefficient fixed at 1.0",
+      "hyperparameter_search_policy": "Initial prototype precommitted L2 lambda = 5.0; no grid or post-result lambda search.",
+      "primary_metric": "brier",
+      "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "paired_uncertainty"],
+      "candidate_created_at": "2026-09-10T02:48:00Z",
+      "git_sha": "d0f4750d42c2cdb03d30481f7cc69802087e499f",
+      "status": "running",
       "historical_result": null,
       "prospective_shadow_status": "not_eligible_pending_historical_qualification"
     }
