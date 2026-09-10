@@ -29,11 +29,17 @@ concurrency:
 jobs:
   forecast:
     runs-on: ubuntu-latest
+    env:
+      OPENBLAS_CORETYPE: SKYLAKEX
+      OPENBLAS_NUM_THREADS: '4'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      NUMEXPR_NUM_THREADS: '4'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.11.16"
           cache: pip
       - run: pip install ".[dev]"
       - run: pytest -q
