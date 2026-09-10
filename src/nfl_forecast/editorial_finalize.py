@@ -17,6 +17,16 @@ BANNED = (
     "there is actual memory in this quarterback matchup", "prior meetings give", "this is a geometry game",
     "the case also has a second leg", "the supporting thread is", "the extra wrinkle is",
 )
+STANDARDIZED_STATUS_FRAGMENTS = (
+    "official nfl injury report",
+    "limited participation in practice",
+    "did not participate in practice",
+    "full participation in practice",
+    "game status designation",
+    "treated as availability context",
+    "assumption the player will be inactive",
+    "does not make up an injury point value",
+)
 
 
 def _nick(team: Any) -> str:
@@ -95,6 +105,11 @@ def _notebook_candidates(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if len(selected) >= 5:
             break
     return selected
+
+
+def _is_standardized_status_ngram(gram: str) -> bool:
+    """Ignore unavoidable official status boilerplate, not substantive editorial copy."""
+    return any(fragment in gram for fragment in STANDARDIZED_STATUS_FRAGMENTS)
 
 
 def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, Any]], evidence: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
@@ -183,6 +198,8 @@ def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, A
         words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", " ".join(texts).lower())
         for index in range(max(0, len(words) - 6)):
             gram = " ".join(words[index:index+7])
+            if _is_standardized_status_ngram(gram):
+                continue
             ngram_games.setdefault(gram, set()).add(str(game_id))
     repeated = {gram: sorted(games) for gram, games in ngram_games.items() if len(games) > 1}
     if repeated:
