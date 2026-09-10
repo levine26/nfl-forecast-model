@@ -17,7 +17,7 @@ from nfl_forecast.challenger import blend_probabilities
 from nfl_forecast.challenger_evaluation import compare_forecasts, confidence_set_approximation
 from nfl_forecast.challenger_v06 import nested_logit_hybrid_backtest
 from nfl_forecast.experiment_registry import reproducibility_metadata
-from scripts.run_challenger_v08 import (
+from run_challenger_v08 import (
     TARGET_SEASONS,
     build_nested_research,
     build_research_frame,
