@@ -35,6 +35,10 @@ ALLOWED_IMPACT_METRICS = {
     "levline_run_defense_state",
     "levline_secondary_state",
     "levline_expected_lineup_value_lost",
+    "levline_expected_lineup_value_gained",
+    "levline_replacement_quality",
+    "levline_lineup_uncertainty",
+    "levline_matchup_risk",
     "levline_player_impact",
 }
 

@@ -20,15 +20,20 @@ ALLOWED_PREFIXES = (
     "scripts/run_challenger",
     "scripts/run_player_state_research.py",
     "scripts/build_player_impact_cards.py",
+    "scripts/build_expected_lineup_impacts.py",
     "src/nfl_forecast/challenger",
     "src/nfl_forecast/experiment_registry.py",
     "src/nfl_forecast/player_state_research.py",
     "src/nfl_forecast/player_impact_cards.py",
+    "src/nfl_forecast/player_impact_engine.py",
+    "src/nfl_forecast/availability_qualification.py",
     "tests/test_challenger",
     "tests/test_experiment_registry.py",
     "tests/test_research_firewall.py",
     "tests/test_player_state_research.py",
     "tests/test_player_impact_cards.py",
+    "tests/test_player_impact_engine.py",
+    "tests/test_availability_qualification.py",
 )
 
 PROTECTED_PREFIXES = (
