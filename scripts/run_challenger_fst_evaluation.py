@@ -12,6 +12,7 @@ import argparse
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from nfl_forecast.challenger_fst import FROZEN_CANDIDATE_ID
@@ -40,13 +41,19 @@ def _attach_production_regime(history: pd.DataFrame, official_path: Path) -> pd.
         "model_version": "_official_model_version",
     })
     merged = history.merge(official, on="game_id", how="left")
+
+    def numeric_series(name: str) -> pd.Series:
+        if name not in merged.columns:
+            return pd.Series(np.nan, index=merged.index, dtype=float)
+        return pd.to_numeric(merged[name], errors="coerce")
+
     promoted = merged.get(
         "_official_probability_strategy", pd.Series("", index=merged.index)
     ).astype(str).eq(FROZEN_CANDIDATE_ID)
-    legacy = pd.to_numeric(merged.get("_official_legacy_final_home_prob"), errors="coerce")
-    official_final = pd.to_numeric(merged.get("_official_final_home_prob"), errors="coerce")
-    official_market = pd.to_numeric(merged.get("_official_market_home_prob"), errors="coerce")
-    official_pure = pd.to_numeric(merged.get("_official_fst_pure_home_prob"), errors="coerce")
+    legacy = numeric_series("_official_legacy_final_home_prob")
+    official_final = numeric_series("_official_final_home_prob")
+    official_market = numeric_series("_official_market_home_prob")
+    official_pure = numeric_series("_official_fst_pure_home_prob")
     usable = promoted & legacy.notna() & official_final.notna()
 
     if usable.any():
