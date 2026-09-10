@@ -1,4 +1,4 @@
-name: LevLine V09D matchup interaction research
+name: LevLine V09D EWMA matchup interaction research
 
 on:
   pull_request:
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: levline-v09d-matchup-${{ github.event.pull_request.number || github.ref }}
+  group: levline-v09d-ewma-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -34,9 +34,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
-          key: nfl-v09d-matchup-${{ runner.os }}-${{ github.run_id }}
+          key: nfl-v09d-ewma-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            nfl-v09d-matchup-${{ runner.os }}-
+            nfl-v09d-ewma-${{ runner.os }}-
             nfl-challenger-${{ runner.os }}-
             nflreadpy-${{ runner.os }}-
       - name: Run pre-registered 2022-25 matchup ablation and uncertainty
@@ -53,7 +53,7 @@ jobs:
           import json
           from pathlib import Path
           report = json.loads(Path('challenger_outputs/v09d/report.json').read_text())
-          assert report['experiment_id'] == 'V09D-MATCHUP-001'
+          assert report['experiment_id'] == 'V09D-EWMA-INTERACTIONS-002'
           assert report['interaction_count'] == 4
           assert report['feature_subset_search_performed'] is False
           assert report['hyperparameter_search_performed'] is False
@@ -67,6 +67,6 @@ jobs:
         run: git diff --exit-code -- outputs/ site/
       - uses: actions/upload-artifact@v4
         with:
-          name: levline-v09d-matchup-${{ github.run_id }}
+          name: levline-v09d-ewma-${{ github.run_id }}
           path: challenger_outputs/v09d/
           retention-days: 30
