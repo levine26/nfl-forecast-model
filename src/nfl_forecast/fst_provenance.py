@@ -20,12 +20,13 @@ import scipy
 import sklearn
 from threadpoolctl import threadpool_info
 
-from .challenger_fst import FrozenStackFit
+from .challenger_fst import FROZEN_CANDIDATE_ID, FrozenStackFit
 from .challenger_stacking import HISTORICAL_END
 
-SERIALIZATION_VERSION = 1
+SERIALIZATION_VERSION = 2
 FLOAT_FORMAT = "%.17g"
 LINE_TERMINATOR = "\n"
+CAPTURE_CONTEXTS = frozenset({"candidate_freeze", "prospective_shadow_reconstruction"})
 BASE_OOF_COLUMNS = (
     "logistic",
     "extra_trees",
@@ -39,6 +40,20 @@ TRAINING_COLUMNS = ("season", "home_win", "market_prob", "pure_prob")
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _validated_capture_context(candidate_id: str, capture_context: str) -> str:
+    if capture_context not in CAPTURE_CONTEXTS:
+        raise ValueError(
+            "F-ST provenance capture_context must be one of "
+            f"{sorted(CAPTURE_CONTEXTS)}; got {capture_context!r}"
+        )
+    if candidate_id == FROZEN_CANDIDATE_ID and capture_context == "candidate_freeze":
+        raise ValueError(
+            "F-ST-01 predates durable pre-fit capture and may not be relabeled as "
+            "candidate_freeze; use prospective_shadow_reconstruction"
+        )
+    return capture_context
 
 
 def _require_exact_fit_frame(frame: pd.DataFrame) -> None:
@@ -150,9 +165,12 @@ def capture_fst_pre_fit_provenance(
     output_dir: str | Path,
     *,
     candidate_id: str,
+    capture_context: str,
 ) -> dict[str, Any]:
     """Persist exact F-ST model inputs before fitting and return their manifest."""
 
+    candidate_id = str(candidate_id)
+    capture_context = _validated_capture_context(candidate_id, capture_context)
     _require_base_oof(base_oof)
     _require_exact_fit_frame(training_frame)
 
@@ -174,7 +192,8 @@ def capture_fst_pre_fit_provenance(
     manifest = {
         "schema_version": SERIALIZATION_VERSION,
         "capture_stage": "pre_fit",
-        "candidate_id": str(candidate_id),
+        "capture_context": capture_context,
+        "candidate_id": candidate_id,
         "historical_outcome_cutoff_season": HISTORICAL_END,
         "serialization": {
             "format": "csv",
@@ -236,6 +255,7 @@ def write_fst_fit_provenance(
     manifest = {
         "schema_version": SERIALIZATION_VERSION,
         "candidate_id": input_manifest["candidate_id"],
+        "capture_context": input_manifest["capture_context"],
         "inputs_manifest_sha256": _sha256(input_manifest_path.read_bytes()),
         "base_oof_raw_sha256": input_manifest["base_oof"]["raw_sha256"],
         "training_frame_raw_sha256": input_manifest["training_frame"]["raw_sha256"],
