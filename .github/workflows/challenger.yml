@@ -11,6 +11,7 @@ on:
       - 'src/nfl_forecast/challenger_v08.py'
       - 'src/nfl_forecast/challenger_stacking.py'
       - 'src/nfl_forecast/challenger_fst.py'
+      - 'src/nfl_forecast/fst_provenance.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/challenger_prospective.py'
       - 'src/nfl_forecast/features.py'
@@ -39,6 +40,7 @@ on:
       - 'src/nfl_forecast/challenger_v08.py'
       - 'src/nfl_forecast/challenger_stacking.py'
       - 'src/nfl_forecast/challenger_fst.py'
+      - 'src/nfl_forecast/fst_provenance.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/challenger_prospective.py'
       - 'src/nfl_forecast/features.py'
@@ -142,6 +144,7 @@ jobs:
       - name: Verify research firewall and frozen F-ST contract
         run: |
           python - <<'PY'
+          import hashlib
           import json
           from pathlib import Path
           import numpy as np
@@ -149,6 +152,12 @@ jobs:
 
           report = json.loads(Path('challenger_outputs/report.json').read_text())
           runtime = json.loads(Path('challenger_outputs/fst/runtime_model.json').read_text())
+          provenance_dir = Path('challenger_outputs/fst/provenance')
+          inputs_manifest = json.loads((provenance_dir / 'inputs_manifest.json').read_text())
+          fit_manifest = json.loads((provenance_dir / 'fit_manifest.json').read_text())
+          base_oof_raw = (provenance_dir / 'base_oof_keyed.csv').read_bytes()
+          training_raw = (provenance_dir / 'training_frame_keyed.csv').read_bytes()
+
           assert report['status'] == 'healthy'
           assert report['mode'] == 'research_only'
           assert report['live_season_firewall'] == 2026
@@ -166,6 +175,14 @@ jobs:
           assert runtime['2026_outcomes_used_in_fitting'] == 0
           assert runtime['production_promotion_authorized'] is False
           assert len(runtime['training_data_sha256']) == 64
+          assert runtime['provenance']['capture_stage'] == 'pre_fit'
+          assert inputs_manifest['capture_stage'] == 'pre_fit'
+          assert inputs_manifest['candidate_id'] == 'F-ST-01-FROZEN-2026'
+          assert inputs_manifest['base_oof']['raw_sha256'] == hashlib.sha256(base_oof_raw).hexdigest()
+          assert inputs_manifest['training_frame']['raw_sha256'] == hashlib.sha256(training_raw).hexdigest()
+          assert fit_manifest['base_oof_raw_sha256'] == inputs_manifest['base_oof']['raw_sha256']
+          assert fit_manifest['training_frame_raw_sha256'] == inputs_manifest['training_frame']['raw_sha256']
+          assert fit_manifest['model_training_data_sha256'] == runtime['training_data_sha256']
 
           slate = pd.read_csv('challenger_outputs/candidate_shadow_slate.csv')
           shadow = pd.read_csv('challenger_outputs/this_week_shadow.csv')
@@ -228,10 +245,12 @@ jobs:
           print(json.dumps(runtime, indent=2))
           PY
       - name: Upload challenger evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: levline-challenger-${{ github.run_id }}
           path: challenger_outputs/
+          if-no-files-found: warn
           retention-days: 30
       - name: Publish research-only outputs
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
