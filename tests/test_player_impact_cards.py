@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 import pytest
 
 from nfl_forecast.player_impact_cards import build_payload, validate_card, validate_impact, validate_observed_stat
-from scripts.build_player_impact_cards import example_card
+
+_SCRIPT_PATH = Path("scripts/build_player_impact_cards.py")
+_SPEC = importlib.util.spec_from_file_location("build_player_impact_cards", _SCRIPT_PATH)
+assert _SPEC is not None and _SPEC.loader is not None
+_SCRIPT = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_SCRIPT)
+example_card = _SCRIPT.example_card
 
 
 def test_example_card_keeps_observed_and_modeled_information_separate():
