@@ -1,6 +1,12 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_01_SF_LA",
+      "largest_driver": "Market movement",
+      "pick": "LA",
+      "pick_delta_pp": -0.19562492765275996
+    },
+    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material move",
       "pick": "SEA",
@@ -10,16 +16,10 @@
       "game_id": "2026_01_CLE_JAX",
       "largest_driver": "No material move",
       "pick": "JAX",
-      "pick_delta_pp": 2.220446049250313e-14
-    },
-    {
-      "game_id": "2026_01_NYJ_TEN",
-      "largest_driver": "No material move",
-      "pick": "TEN",
-      "pick_delta_pp": 2.220446049250313e-14
+      "pick_delta_pp": -2.220446049250313e-14
     }
   ],
-  "generated_utc": "2026-09-10T22:41:08.296093+00:00",
+  "generated_utc": "2026-09-10T23:39:43.713836+00:00",
   "market_disagreements": [
     {
       "confidence": "Solid",
@@ -28,7 +28,7 @@
       "pick": "DEN",
       "pick_prob": 0.6172805970921112,
       "projected_score": "KC 19.7 \u2013 DEN 25.1",
-      "pure_market_gap_pp": 25.24536435367667
+      "pure_market_gap_pp": 25.245364353676674
     },
     {
       "confidence": "Lean",
@@ -44,9 +44,9 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.6912457767560689,
+      "pick_prob": 0.6912457767560688,
       "projected_score": "LAC 25.8 \u2013 ARI 18.6",
-      "pure_market_gap_pp": 14.5005630991908
+      "pure_market_gap_pp": 14.50056309919081
     }
   ],
   "most_uncertain": [
@@ -71,7 +71,7 @@
       "game_id": "2026_01_NYJ_TEN",
       "matchup": "NYJ @ TEN",
       "pick": "TEN",
-      "pick_prob": 0.5627071350561546,
+      "pick_prob": 0.5627071350561543,
       "projected_score": "TEN 24.0 \u2013 NYJ 22.3"
     }
   ],
@@ -81,7 +81,7 @@
       "game_id": "2026_01_CLE_JAX",
       "matchup": "CLE @ JAX",
       "pick": "JAX",
-      "pick_prob": 0.7860186316840906,
+      "pick_prob": 0.7860186316840904,
       "projected_score": "JAX 30.1 \u2013 CLE 15.9"
     },
     {
@@ -89,7 +89,7 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.6912457767560689,
+      "pick_prob": 0.6912457767560688,
       "projected_score": "LAC 25.8 \u2013 ARI 18.6"
     },
     {
