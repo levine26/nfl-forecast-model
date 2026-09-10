@@ -1,0 +1,43 @@
+name: LevLine player-card research
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/player_impact_cards.py'
+      - 'scripts/build_player_impact_cards.py'
+      - 'research/player_impact_card_schema.json'
+      - 'tests/test_player_impact_cards.py'
+      - '.github/workflows/research_player_cards.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-player-cards-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schema:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test card semantic and site firewall
+        run: pytest -q tests/test_player_impact_cards.py
+      - name: Generate mock research artifact
+        run: |
+          rm -rf research_outputs/player_cards
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/build_player_impact_cards.py
+          test -s research_outputs/player_cards/player_impact_cards.json
+      - name: Prove live site and production outputs are untouched
+        run: git diff --exit-code -- outputs/ site/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-player-cards-${{ github.run_id }}
+          path: research_outputs/player_cards/
+          retention-days: 30
