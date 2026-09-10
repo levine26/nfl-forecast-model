@@ -2,9 +2,13 @@ from __future__ import annotations
 
 """Frozen production scoring boundary for F-ST-01.
 
-The coefficient artifact is pinned in-package and validated before scoring.  Missing or
+The coefficient artifact is pinned in-package and validated before scoring. Missing or
 non-finite market values fall back per-game to exact legacy LevLine behavior; artifact,
 training-digest, or nested-PURE integrity failures remain fatal.
+
+Rollback is deliberately one line: set ``ACTIVE_PRODUCTION_STRATEGY`` to
+``LEGACY_PRODUCTION_STRATEGY``. F-ST and its legacy counterfactual continue to be
+computed and persisted, so rollback does not erase or rewrite prior official locks.
 """
 
 from dataclasses import dataclass
@@ -16,8 +20,14 @@ import numpy as np
 import pandas as pd
 
 CANDIDATE_ID = "F-ST-01-FROZEN-2026"
-MODEL_VERSION = "0.9.0-fst"
-FINAL_PROBABILITY_STRATEGY = CANDIDATE_ID
+LEGACY_PRODUCTION_STRATEGY = "current_production_75_25"
+ACTIVE_PRODUCTION_STRATEGY = CANDIDATE_ID
+FINAL_PROBABILITY_STRATEGY = ACTIVE_PRODUCTION_STRATEGY
+MODEL_VERSION = (
+    "0.9.0-fst"
+    if ACTIVE_PRODUCTION_STRATEGY == CANDIDATE_ID
+    else "0.9.0-legacy-rollback"
+)
 EPS = 1e-6
 ARTIFACT_PATH = Path(__file__).resolve().parent / "artifacts" / "F-ST-01-FROZEN-2026.json"
 EXPECTED_TRAINING_SHA256 = "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0"
@@ -147,7 +157,8 @@ def canonical_training_hash(frame: pd.DataFrame) -> str:
 
 def validate_training_identity(frame: pd.DataFrame, artifact: FSTArtifact) -> str:
     digest = canonical_training_hash(frame)
-    if len(frame.dropna(subset=["season", "home_win", "market_prob", "pure_prob"])) != artifact.training_games:
+    usable = frame.dropna(subset=["season", "home_win", "market_prob", "pure_prob"]).copy()
+    if len(usable) != artifact.training_games:
         raise RuntimeError(
             "Frozen F-ST training game count changed; refusing to use pinned coefficients"
         )
@@ -155,16 +166,10 @@ def validate_training_identity(frame: pd.DataFrame, artifact: FSTArtifact) -> st
         raise RuntimeError(
             f"Frozen F-ST historical training digest changed: {digest} != {artifact.training_data_sha256}"
         )
-    season = pd.to_numeric(frame["season"], errors="coerce")
-    usable = frame[
-        season.notna()
-        & pd.to_numeric(frame["home_win"], errors="coerce").notna()
-        & pd.to_numeric(frame["market_prob"], errors="coerce").notna()
-        & pd.to_numeric(frame["pure_prob"], errors="coerce").notna()
-    ]
-    if int(pd.to_numeric(usable["season"], errors="coerce").min()) != artifact.training_first_season:
+    season = pd.to_numeric(usable["season"], errors="coerce")
+    if int(season.min()) != artifact.training_first_season:
         raise RuntimeError("Frozen F-ST training first season changed")
-    if int(pd.to_numeric(usable["season"], errors="coerce").max()) != artifact.training_last_season:
+    if int(season.max()) != artifact.training_last_season:
         raise RuntimeError("Frozen F-ST training last season changed")
     return digest
 
@@ -218,6 +223,10 @@ def score_official_fst(
     market_home_prob: pd.Series,
     artifact: FSTArtifact,
 ) -> FSTScoreResult:
+    if ACTIVE_PRODUCTION_STRATEGY not in {CANDIDATE_ID, LEGACY_PRODUCTION_STRATEGY}:
+        raise RuntimeError(
+            f"Unknown production probability strategy: {ACTIVE_PRODUCTION_STRATEGY!r}"
+        )
     if not (
         legacy_pure_home_prob.index.equals(fst_pure_home_prob.index)
         and legacy_pure_home_prob.index.equals(market_home_prob.index)
@@ -232,17 +241,22 @@ def score_official_fst(
 
     legacy = legacy_final_home_probability(legacy_pure_home_prob, market_home_prob)
     eligible = pd.Series(np.isfinite(market.to_numpy(dtype=float)), index=market.index)
-    final = legacy.copy()
+    fst_candidate = legacy.copy()
     if eligible.any():
-        final.loc[eligible] = frozen_fst_probability(
+        fst_candidate.loc[eligible] = frozen_fst_probability(
             market.loc[eligible].to_numpy(dtype=float),
             fst_pure.loc[eligible].to_numpy(dtype=float),
             artifact,
         )
+    final = (
+        fst_candidate.copy()
+        if ACTIVE_PRODUCTION_STRATEGY == CANDIDATE_ID
+        else legacy.copy()
+    )
     if not np.isfinite(final.to_numpy(dtype=float)).all():
-        raise RuntimeError("Official F-ST scoring produced a non-finite probability")
+        raise RuntimeError("Official probability scoring produced a non-finite probability")
     if ((final <= 0.0) | (final >= 1.0)).any():
-        raise RuntimeError("Official F-ST probability is outside (0, 1)")
+        raise RuntimeError("Official probability is outside (0, 1)")
 
     missing = market.isna()
     reason = pd.Series("", index=market.index, dtype="object")
@@ -250,8 +264,8 @@ def score_official_fst(
     reason.loc[~eligible & ~missing] = "market_non_finite"
     fallback = ~eligible
     vs_market = pd.Series(np.nan, index=market.index, dtype=float)
-    vs_market.loc[eligible] = final.loc[eligible] - market.loc[eligible]
-    vs_legacy = final - legacy
+    vs_market.loc[eligible] = fst_candidate.loc[eligible] - market.loc[eligible]
+    vs_legacy = fst_candidate - legacy
     return FSTScoreResult(
         final_home_prob=final,
         legacy_final_home_prob=legacy,
