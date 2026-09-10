@@ -6,9 +6,10 @@ from pathlib import Path
 import pytest
 
 from nfl_forecast.challenger_fst import FROZEN_CANDIDATE_ID, FrozenStackFit
-from nfl_forecast.fst_provenance import (
-    FROZEN_NUMERIC_PARITY_TOLERANCE,
-    verify_fst_frozen_identity,
+from nfl_forecast.fst_reconstruction import (
+    REFIT_ABS_TOLERANCE,
+    frozen_fit_from_identity,
+    verify_fst_reconstruction_identity,
 )
 
 
@@ -54,15 +55,18 @@ def _input_manifest() -> dict:
 
 
 def test_registered_fst_identity_matches_and_writes_pre_scoring_check(tmp_path):
-    check = verify_fst_frozen_identity(tmp_path, _input_manifest(), _fit(), EXPECTED)
+    check = verify_fst_reconstruction_identity(
+        tmp_path, _input_manifest(), _fit(), EXPECTED
+    )
 
     assert check["matches"] is True
     assert check["mismatched_fields"] == []
-    assert check["check_stage"] == "post_fit_pre_scoring"
+    assert check["check_stage"] == "post_refit_pre_scoring"
     assert check["capture_context"] == "prospective_shadow_reconstruction"
     assert check["expected_source"] == EXPECTED["source"]
-    assert check["numeric_abs_tolerance"] == FROZEN_NUMERIC_PARITY_TOLERANCE
-    assert all(delta == 0.0 for delta in check["numeric_absolute_deltas"].values())
+    assert check["authoritative_scoring_source"] == "registered_frozen_identity_literals"
+    assert check["refit_abs_tolerance"] == REFIT_ABS_TOLERANCE
+    assert all(delta == 0.0 for delta in check["numerical_absolute_deltas"].values())
     persisted = json.loads((tmp_path / "frozen_identity_check.json").read_text())
     assert persisted == check
 
@@ -74,11 +78,13 @@ def test_registered_fst_tiny_numeric_reconstruction_delta_is_within_fixed_parity
         pure_logit_coefficient=EXPECTED["pure_logit_coefficient"] + 2e-16,
     )
 
-    check = verify_fst_frozen_identity(tmp_path, _input_manifest(), reconstructed, EXPECTED)
+    check = verify_fst_reconstruction_identity(
+        tmp_path, _input_manifest(), reconstructed, EXPECTED
+    )
 
     assert check["matches"] is True
     assert check["mismatched_fields"] == []
-    assert max(check["numeric_absolute_deltas"].values()) < 1e-12
+    assert max(check["numerical_absolute_deltas"].values()) < 1e-12
 
 
 def test_registered_fst_identity_mismatch_is_persisted_before_fail_closed(tmp_path):
@@ -88,7 +94,9 @@ def test_registered_fst_identity_mismatch_is_persisted_before_fail_closed(tmp_pa
     )
 
     with pytest.raises(RuntimeError, match="training_data_sha256, market_logit_coefficient"):
-        verify_fst_frozen_identity(tmp_path, _input_manifest(), drifted, EXPECTED)
+        verify_fst_reconstruction_identity(
+            tmp_path, _input_manifest(), drifted, EXPECTED
+        )
 
     check = json.loads((tmp_path / "frozen_identity_check.json").read_text())
     assert check["matches"] is False
@@ -98,9 +106,9 @@ def test_registered_fst_identity_mismatch_is_persisted_before_fail_closed(tmp_pa
     ]
     assert check["field_matches"]["intercept"] is True
     assert check["field_matches"]["training_games"] is True
-    assert check["actual"]["training_data_sha256"] == "3" * 64
+    assert check["actual_refit"]["training_data_sha256"] == "3" * 64
     assert check["expected"]["training_data_sha256"] == EXPECTED["training_data_sha256"]
-    assert check["numeric_absolute_deltas"]["market_logit_coefficient"] > 1e-12
+    assert check["numerical_absolute_deltas"]["market_logit_coefficient"] > 1e-12
 
 
 def test_registered_fst_identity_refuses_tolerance_relaxation(tmp_path):
@@ -108,7 +116,18 @@ def test_registered_fst_identity_refuses_tolerance_relaxation(tmp_path):
     relaxed["reconstruction_abs_tolerance"] = 1.0001e-12
 
     with pytest.raises(ValueError, match="<= 1e-12"):
-        verify_fst_frozen_identity(tmp_path, _input_manifest(), _fit(), relaxed)
+        verify_fst_reconstruction_identity(
+            tmp_path, _input_manifest(), _fit(), relaxed
+        )
+
+
+def test_frozen_fit_materializes_exact_registered_literals():
+    fit = frozen_fit_from_identity(EXPECTED)
+    assert fit.intercept == EXPECTED["intercept"]
+    assert fit.market_logit_coefficient == EXPECTED["market_logit_coefficient"]
+    assert fit.pure_logit_coefficient == EXPECTED["pure_logit_coefficient"]
+    assert fit.training_data_sha256 == EXPECTED["training_data_sha256"]
+    assert fit.training_games == EXPECTED["training_games"]
 
 
 def test_fst01_spec_pins_registered_identity_without_claiming_original_freeze_provenance():
