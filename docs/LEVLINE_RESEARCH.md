@@ -2,45 +2,50 @@
 
 ## Production firewall
 
-Production LevLine remains the official engine. Research code may not modify production `final_home_prob`, the 75% PURE / 25% MARKET production blend, T-120 locking, official prediction history or grading, `outputs/`, or `site/`. Research modules are not imported by the production prediction path. Research workflows are separate from normal forecast workflows and write only to `challenger_outputs/` or `research_outputs/`.
+Production LevLine remains the official engine. Research code may not modify production `final_home_prob`, the 75% PURE / 25% MARKET production blend, T-120 locking, official prediction history or grading, `outputs/`, `site/`, or Sunday Signal publication. Research modules are not imported by the production prediction path. Research workflows are separate from normal forecast workflows and write only to `challenger_outputs/` or `research_outputs/`.
 
-Research branches are checked by `scripts/check_research_firewall.py`. The policy is fail-closed: only explicitly isolated challenger/research source, scripts, tests, docs, and research workflows are permitted. Core model/data/publish/lock files, `outputs/`, `site/`, and undeclared repository surfaces are blocked.
+Research branches are checked by `scripts/check_research_firewall.py`. The policy is fail-closed: core model/data/publish/lock files, `outputs/`, `site/`, and undeclared repository surfaces remain protected. 2026 outcomes are prospective-only and are prohibited from feature, architecture, hyperparameter, coefficient, weighting, threshold, and candidate selection.
 
-## Current production and challenger architecture
+## Historical benchmark and completed evidence
 
-Production remains the existing football model plus the fixed 75% PURE / 25% MARKET behavior. No work in the v0.9 program authorizes promotion.
+The paired 2022-2025 comparison contains 1,087 games. The production-like 75% PURE / 25% MARKET benchmark was 65.8694% winner accuracy, Brier 0.218592, log loss 0.627402. Market was 67.6173%, 0.210199, and 0.607647. The v0.8 opponent-adjusted + QB adaptive-Brier research benchmark was 67.8933%, 0.211764, and 0.611748.
 
-The research stack already supports season-forward base-model OOF predictions, a nested stack, fixed and adaptive football/market blends, opponent-adjusted features, QB starter state, and immutable 2026 challenger shadow locking. v0.8 QB state uses schedule starter identity and only completed prior-start EPA/dropback, success, CPOE, experience, and continuity; rolling features are shifted before the current matchup.
+Completed v0.9 / Track F dispositions are recorded in `research/experiments.json`:
 
-## Historical benchmark evidence before v0.9
+- `V09A-PLAYER-VALUE-001`: rejected. The original lagged target/rush player-value formulation did not improve v0.8; it will not be rescued through post-result tuning.
+- `V09B-AVAILABILITY-001`: source-qualification blocked/rejected for historical probability testing because the current source stack has no qualifying 2025 official timestamped injury/practice-report rows. Depth charts and retrospective actual snaps are not substitutes.
+- `V09C-UNIT-STATE-001`: rejected. Its small point-estimate probability gain over v0.8 was not established under paired uncertainty and it was materially worse than market on Brier/log loss.
+- `V09D-MATCHUP-INTERACTIONS-001`: dependency-blocked, not an empirical failure. This exact registered design required validated v0.9C unit state; because v0.9C failed qualification, the registered v0.9D design was not historically executed.
+- `V09D-EWMA-INTERACTIONS-002`: rejected. The fixed four-interaction EWMA ablation did not establish incremental value and was significantly worse than market on probability quality.
+- `F-MR-01`, `F-MI-01`, and `F-LS-01`: rejected. Their registered market-residual, margin-informed, and latent-state hypotheses failed; no post-result parameter or architecture search is authorized to rescue them.
+- `F-ST-01`: leading historical next-generation candidate. It reached 68.0773% winner accuracy, Brier 0.210774, and log loss 0.608977. It clearly improved over production-like LevLine historically and largely closed the probability-quality gap to market. Its incremental probability-quality superiority over market was not established under the predeclared week-block gate, so this evidence is not a production-promotion claim.
 
-The fully nested 2022-2025 comparison contains 1,087 games. Current recorded v0.8 results are:
+## F-ST-01 frozen prospective direction
 
-| Candidate | Winner accuracy | Brier | Log loss |
-| --- | ---: | ---: | ---: |
-| Market-only benchmark | 67.6173% | 0.210199 | 0.607647 |
-| Production-compatible Nested PURE | 64.4894% | 0.223853 | 0.638946 |
-| Production-like 75% PURE / 25% MARKET | 65.8694% | 0.218592 | 0.627402 |
-| Production-compatible adaptive Brier | 67.5253% | 0.211765 | 0.611769 |
-| Opponent-adjusted + QB-aware 75/25 | 66.0534% | 0.218343 | 0.626741 |
-| Opponent-adjusted + QB-aware adaptive Brier | 67.8933% | 0.211764 | 0.611748 |
+The next research-only candidate is a frozen F-ST stack. Its architecture is immutable: exactly `logit(market_home_prob)` and `logit(v0.8 PURE)` feed one logistic regression with intercept, L2 regularization, `C=1.0`, `lbfgs`, and `max_iter=3000`. There are no interactions, splines, season indicators, coefficient/C grids, alternate model families, or post-result tuning. Historical meta-model fitting for a scored season uses only earlier-season OOF rows; 2026 outcomes may never enter training or selection.
 
-The current historical leader therefore has only a small accuracy edge over the market benchmark and remains worse than market on Brier and log loss. That is not sufficient evidence for promotion. v0.9 adds paired uncertainty analysis specifically so 0.2-0.3 percentage-point historical differences are not treated as deterministic superiority.
+The explicit prospective research-shadow authorization is separate from the original historical qualification decision. It does not authorize production promotion. Any architectural change must receive a new candidate/version identifier rather than silently modifying the frozen candidate.
 
-## Experiment registry
+## T-120 shadow semantics
 
-`research/experiments.json` pre-registers v0.9A through v0.9D before their results are known. Each record includes its hypothesis, feature family, historical seasons, timestamp policy, allowed and prohibited data, model family, tuning policy, metrics, creation SHA, status, historical result, and prospective shadow status.
+Current-main research shadow infrastructure supports immutable multi-candidate identity by `(game_id, challenger_version, research_candidate)`, authoritative alignment to FINAL production T-120 locks, rejection of challenger forecasts generated after the authoritative production lock, grading without mutating the locked forecast, and selected/non-selected research candidate markers. F-ST work extends this existing infrastructure rather than replacing production locking.
 
-2026 outcomes are prohibited from feature, architecture, hyperparameter, weight, and candidate selection. Candidates that qualify historically must be precommitted before grading in the immutable 2026 T-120 shadow system.
+For the frozen F-ST shadow, each prospective row must retain enough information to reproduce the probability: official production probability, market probability, v0.8 PURE probability, F-ST probability, generation/lock/kickoff timestamps, source SHA, training cutoff, applicable coefficients, candidate version, selection marker, and eventual outcome. A late challenger row is rejected for prospective scoring rather than backfilled.
 
-## v0.9 player-value methodology
+## Predeclared prospective evaluation
 
-The intended data flow is play/player history -> strongly shrunk player latent value -> compact unit/team state -> game-level challenger. Stable nflverse IDs are preferred; ambiguous identity fails closed. Small samples are regressed heavily toward role/position priors. Current-game realized snaps, postgame workload, future depth charts, and later injury information are prohibited from historical features.
+Primary metric: Brier score. Secondary evidence: log loss, winner accuracy, calibration intercept/slope, week-block paired bootstrap, season/week-aware uncertainty where appropriate, disagreement-game performance, high-confidence calibration, market disagreement, and production-LevLine disagreement.
 
-v0.9A tests player value without hindsight availability. v0.9B may add probabilistic availability only where historical T-120 provenance can be reconstructed. v0.9C compresses validated player state into a modest number of unit features. v0.9D tests only predeclared opponent interactions rather than searching arbitrary interaction space.
+The prospective review asks three distinct questions: (A) does frozen F-ST materially outperform current production LevLine, (B) is its probability quality at least competitive with market, and (C) is any improvement coherent across weeks rather than concentrated in a few games? The evaluation policy must remain fixed before prospective outcomes accumulate; no threshold may be invented after observing results.
 
-## Statistical qualification
+## Player Impact Engine
 
-Serious candidates are evaluated on accuracy, Brier, log loss, calibration slope/intercept, probability bins, season and regime slices, paired IID bootstrap, paired week-block and season-block bootstrap, and supplemental paired loss-difference tests. A conservative multiple-model confidence-set approximation retains candidates that cannot be shown to be worse than the empirical leader under block resampling.
+The player program continues as research/explainability infrastructure rather than a forced probability feature. Stable IDs, chronological prior-game state, player-game-role observations, snap/depth foundations, observed-vs-modeled separation, and player-impact card schemas remain useful even though V09A failed.
 
-Historical qualification does not imply production promotion. Promotion requires a separate explicit decision after historical OOS evidence, calibration, uncertainty, prospective 2026 shadow results, operational reliability, data availability, interpretability, and site implications are reviewed.
+Next work should estimate expected lineup value lost/gained, QB state and downgrade/upgrade, skill-player workload/value, OL continuity/availability, defensive-front contribution, secondary burden, replacement quality, uncertainty, and matchup-specific risk. Observed source statistics must remain explicitly separate from modeled LevLine impact.
+
+Player impact should first power research cards, Sunday Signal explanatory context, lineup-change diagnostics, injury/availability summaries, market-disagreement analysis, and “why the model moved” analysis. It may affect an official probability only through a separately pre-registered future candidate testing whether leakage-safe expected-lineup impact adds incremental Brier signal beyond frozen F-ST.
+
+## Availability qualification
+
+Historical availability is the main player-modeling bottleneck. The current source stack has historical official injury coverage through 2024 but zero qualifying 2025 rows. Any new source must have defensible timestamp semantics and stable IDs or a safe crosswalk. Do not fabricate 2025 injury state, infer final inactives from actual snaps, or treat depth charts as official pregame availability. If complete historical qualification remains impossible, availability can still be used prospectively from a later explicit freeze date but cannot be represented as historically validated.
