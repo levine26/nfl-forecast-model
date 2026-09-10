@@ -2,19 +2,22 @@
 name = "nfl-forecast-engine"
 version = "0.1.0"
 description = "Free, automated Sujar-inspired NFL forecasting ensemble"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"
 dependencies = [
-  # Model/data-sensitive versions are pinned to the environment that rematerialized
-  # F-ST-01-FROZEN-2026 exactly on 2026-09-10 (challenger run 34482487521).
+  # Model/data-sensitive versions are pinned to the environment that produced and
+  # independently rematerialized F-ST-01-FROZEN-2026 under SkylakeX OpenBLAS kernels.
   "nflreadpy==0.1.5",
   "polars==1.44.2",
   "pandas==3.0.5",
   "numpy==2.4.6",
+  "scipy==1.17.1",
   "scikit-learn==1.9.0",
   "xgboost==3.2.0",
   "catboost==1.2.10",
   "pyarrow==25.0.1",
   "duckdb==1.5.5",
+  "joblib==1.6.0",
+  "threadpoolctl==3.6.0",
   "pyyaml>=6.0",
   "requests>=2.32",
   "beautifulsoup4>=4.12",
