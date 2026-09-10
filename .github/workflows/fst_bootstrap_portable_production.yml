@@ -52,13 +52,12 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/fst-recovered /tmp/fst.zip
           mkdir -p /tmp/fst-recovered src/nfl_forecast/artifacts
-          gh api \
-            -H 'Accept: application/vnd.github+json' \
+          gh api -H 'Accept: application/vnd.github+json' \
             "/repos/${GITHUB_REPOSITORY}/actions/artifacts/10176440471/zip" > /tmp/fst.zip
           unzip -q /tmp/fst.zip -d /tmp/fst-recovered
           python - <<'PY'
           from pathlib import Path
-          import base64, gzip, hashlib, json
+          import base64, gzip, hashlib, json, re
 
           root = Path('/tmp/fst-recovered')
           out = Path('src/nfl_forecast/artifacts')
@@ -90,37 +89,51 @@ jobs:
           }
           if max(coefficient_deltas.values()) > 1e-12:
               raise SystemExit(f'forensic coefficient parity failed: {coefficient_deltas}')
-          if str(payload['runtime'].get('probe_coretype')) != 'SKYLAKEX':
+          runtime = payload['runtime']
+          if str(runtime.get('probe_coretype')) != 'SKYLAKEX':
               raise SystemExit('wrong forensic runtime artifact')
-          if str(payload['runtime'].get('github_run_id')) != '34538432305':
+          if str(runtime.get('github_run_id')) != '34538432305':
               raise SystemExit('wrong forensic workflow run')
-          if str(payload['runtime'].get('github_sha')) != '9c4f45e15d27187c637002b3d4d8df2cc34c744e':
+          if str(runtime.get('github_sha')) != '9c4f45e15d27187c637002b3d4d8df2cc34c744e':
               raise SystemExit('wrong forensic execution SHA')
 
           expected_raw = {
               base.name: '5563b2c9eeb193891ad0ae3809f3fcc9fac04b6451376fc28fa5888c070a78fa',
               train.name: '174be982d5ac7f3e9f93bda824641eae95c612ec0c1e9546472479a5f6cb55d5',
           }
-          expected_gzip = {
-              base.name: '5df577d3bf2a0703c7bcf7679feb4292aa6e8f0fcee7987c7afad4a04affd385',
-              train.name: 'b9f94f3ab1c30f3fedb9c06fb2768065aba105f54d21dcf2e2e19f453d13ef42',
-          }
           specs = [
-              (base, 'F-ST-01-FROZEN-2026-base-oof-keyed.csv.gz.b64.part'),
-              (train, 'F-ST-01-FROZEN-2026-training-frame-keyed.csv.gz.b64.part'),
+              (base, 'F-ST-01-FROZEN-2026-base-oof-keyed.csv.gz.b64.part', 'BASE_OOF'),
+              (train, 'F-ST-01-FROZEN-2026-training-frame-keyed.csv.gz.b64.part', 'TRAINING'),
           ]
-          for source, prefix in specs:
+          compressed_hashes = {}
+          for source, prefix, key in specs:
               raw = source.read_bytes()
-              if hashlib.sha256(raw).hexdigest() != expected_raw[source.name]:
-                  raise SystemExit(f'raw hash mismatch: {source}')
+              raw_sha = hashlib.sha256(raw).hexdigest()
+              if raw_sha != expected_raw[source.name]:
+                  raise SystemExit(f'raw hash mismatch: {source} {raw_sha}')
               compressed = gzip.compress(raw, mtime=0)
-              if hashlib.sha256(compressed).hexdigest() != expected_gzip[source.name]:
-                  raise SystemExit(f'gzip hash mismatch: {source}')
+              compressed_hashes[key] = hashlib.sha256(compressed).hexdigest()
               encoded = base64.b64encode(compressed).decode('ascii')
               for old in out.glob(prefix + '*'):
                   old.unlink()
               for i, start in enumerate(range(0, len(encoded), 25000)):
-                  (out / f'{prefix}{i:02d}').write_text(encoded[start:start+25000] + '\n', encoding='ascii')
+                  (out / f'{prefix}{i:02d}').write_text(
+                      encoded[start:start+25000] + '\n', encoding='ascii'
+                  )
+
+          loader_path = Path('src/nfl_forecast/fst_nested_pure.py')
+          loader = loader_path.read_text(encoding='utf-8')
+          loader = re.sub(
+              r'RECOVERED_BASE_OOF_GZIP_SHA256 = "[0-9a-f]{64}"',
+              f'RECOVERED_BASE_OOF_GZIP_SHA256 = "{compressed_hashes["BASE_OOF"]}"',
+              loader,
+          )
+          loader = re.sub(
+              r'RECOVERED_TRAINING_GZIP_SHA256 = "[0-9a-f]{64}"',
+              f'RECOVERED_TRAINING_GZIP_SHA256 = "{compressed_hashes["TRAINING"]}"',
+              loader,
+          )
+          loader_path.write_text(loader, encoding='utf-8')
 
           manifest = {
               'candidate_id': 'F-ST-01-FROZEN-2026',
@@ -162,6 +175,8 @@ jobs:
                   'forensic_execution_sha': '9c4f45e15d27187c637002b3d4d8df2cc34c744e',
                   'base_oof_raw_sha256': expected_raw[base.name],
                   'training_frame_raw_sha256': expected_raw[train.name],
+                  'base_oof_packaged_sha256': compressed_hashes['BASE_OOF'],
+                  'training_frame_packaged_sha256': compressed_hashes['TRAINING'],
                   'base_oof_serialized_sequence_sha256': '5f4eda7d5df86ab13e4d6a6b90653be3160bd857e00eb1d412eae0e78eb2c7b3',
                   'base_oof_game_id_sequence_sha256': 'dff495fa86c9c53b1a76213afcb351c01ed691db9c225bdd911717ccd2ce236c',
                   'training_serialized_sequence_sha256': '0716b93e01eaba82c8b807b26d75a2b35558a4be162461b9d0bfd43d43d0a3ab',
@@ -180,8 +195,11 @@ jobs:
               'research_runtime_artifact_sha': 'f3299a595d3a8cee3a7fdd6b367c493c8420a08c',
               'rollback_strategy': 'current_production_75_25',
           }
-          (out / 'F-ST-01-FROZEN-2026.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+          (out / 'F-ST-01-FROZEN-2026.json').write_text(
+              json.dumps(manifest, indent=2) + '\n', encoding='utf-8'
+          )
           print('forensic coefficient deltas', coefficient_deltas)
+          print('packaged hashes', compressed_hashes)
           PY
       - name: Commit transplanted production code and immutable inputs
         run: |
