@@ -16,6 +16,12 @@ from nfl_forecast.challenger_fst import (
     FROZEN_METHOD,
     fit_frozen_2026_stack,
     frozen_stack_probability,
+    prepare_frozen_training_frame,
+)
+from nfl_forecast.fst_provenance import (
+    TRAINING_COLUMNS,
+    capture_fst_pre_fit_provenance,
+    write_fst_fit_provenance,
 )
 from scripts.run_challenger_v08 import SHADOW_BASE_COLUMNS, build_nested_research, build_research_frame
 
@@ -43,9 +49,25 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     base_features = feature_sets["production_compatible"]
     base_oof, research = build_nested_research(historical, base_features, seed)
 
+    # Persist the exact model inputs before fitting. prepare_frozen_training_frame
+    # establishes the admissible row universe; the original columns/values and their
+    # order are then archived with stable game IDs before the optimizer is invoked.
+    prepared = prepare_frozen_training_frame(research)
+    training_for_fit = research.loc[prepared.index, list(TRAINING_COLUMNS)].copy()
+    provenance_dir = out / "fst" / "provenance"
+    input_provenance = capture_fst_pre_fit_provenance(
+        historical,
+        base_oof,
+        training_for_fit,
+        provenance_dir,
+        candidate_id=FROZEN_CANDIDATE_ID,
+    )
+
     # Target season 2026 may only train on earlier-season OOF rows. The fitter fails
     # closed if any 2026-or-later row reaches this boundary.
-    fit = fit_frozen_2026_stack(research)
+    fit = fit_frozen_2026_stack(training_for_fit)
+    fit_provenance = write_fst_fit_provenance(provenance_dir, input_provenance, fit)
+
     current_pure = fit_future_nested_stack(
         historical,
         base_oof,
@@ -105,6 +127,17 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         **fit.as_dict(),
         "freeze_timestamp_utc": spec["freeze_timestamp_utc"],
         "freeze_implementation_sha": spec["freeze_implementation_sha"],
+        "provenance": {
+            "capture_stage": "pre_fit",
+            "inputs_manifest": "fst/provenance/inputs_manifest.json",
+            "fit_manifest": "fst/provenance/fit_manifest.json",
+            "base_oof_raw_sha256": input_provenance["base_oof"]["raw_sha256"],
+            "training_frame_raw_sha256": input_provenance["training_frame"]["raw_sha256"],
+            "training_frame_canonical_game_keyed_sha256": input_provenance["training_frame"][
+                "canonical_game_keyed_sha256"
+            ],
+            "inputs_manifest_sha256": fit_provenance["inputs_manifest_sha256"],
+        },
     }
 
     slate.to_csv(slate_path, index=False)
