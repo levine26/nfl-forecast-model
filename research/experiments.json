@@ -1,0 +1,109 @@
+{
+  "registry_version": 1,
+  "policy": {
+    "historical_selection_end": 2025,
+    "live_shadow_season": 2026,
+    "live_outcomes_allowed_for_selection": false,
+    "promotion_authorized": false
+  },
+  "experiments": [
+    {
+      "experiment_id": "V09A-PLAYER-VALUE-001",
+      "candidate_version": "0.9A-player-value",
+      "hypothesis": "Chronologically estimated, strongly shrunk player value aggregated from prior role usage adds incremental signal beyond v0.8 team EPA, opponent adjustment, Elo, market and QB state.",
+      "feature_family": "player_value",
+      "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+      "validation_seasons": [2022, 2023, 2024, 2025],
+      "data_timestamp_policy": {
+        "completed_prior_game_pbp": "historically_reconstructable",
+        "stable_nflverse_player_ids": "historically_reconstructable",
+        "prior_role_usage": "historically_reconstructable",
+        "current_game_postgame_participation": "only_available_after_kickoff"
+      },
+      "allowed_inputs": ["completed prior-game PBP", "stable player IDs", "prior usage/opportunity", "v0.8 production-compatible and opponent-adjusted features", "v0.8 QB state", "historical market benchmark"],
+      "prohibited_inputs": ["2026 outcomes", "current-game snap counts", "postgame workload", "future depth charts", "final starter identity learned after kickoff", "later injury designation"],
+      "model_family": "existing nested LevLine stack with compact player-state ablation",
+      "hyperparameter_search_policy": "Predeclared shrinkage grid; for target season S tune only on seasons before S; no 2026 outcomes.",
+      "primary_metric": "brier",
+      "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "paired_week_block_bootstrap"],
+      "candidate_created_at": "2026-09-10T02:06:00Z",
+      "git_sha": "8f4a266152e9c92c2bdbcc3a5caa4bbd331006e3",
+      "status": "planned",
+      "historical_result": null,
+      "prospective_shadow_status": "not_eligible_pending_historical_qualification"
+    },
+    {
+      "experiment_id": "V09B-AVAILABILITY-001",
+      "candidate_version": "0.9B-player-value-availability",
+      "hypothesis": "Leakage-safe probabilistic availability and expected snap share improve player-value state when historical T-120 status can be reconstructed.",
+      "feature_family": "player_value_availability",
+      "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+      "validation_seasons": [2022, 2023, 2024, 2025],
+      "data_timestamp_policy": {
+        "prior_player_value": "historically_reconstructable",
+        "historical_pregame_availability": "knowable_by_t120",
+        "actual_current_game_snaps": "only_available_after_kickoff",
+        "unreconstructable_injury_status": "unknown_unsafe"
+      },
+      "allowed_inputs": ["v0.9A latent value", "historically reconstructable pregame status", "probabilistic active estimate", "expected snap share from prior information"],
+      "prohibited_inputs": ["2026 outcomes", "actual current-game snaps", "final inactives when not historically timestamped by T-120", "postgame participation"],
+      "model_family": "v0.9A plus expected player contribution",
+      "hyperparameter_search_policy": "No availability feature enters OOS evaluation until its historical timestamp provenance is validated; any tuning is nested before target season.",
+      "primary_metric": "brier",
+      "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "availability-heavy slice"],
+      "candidate_created_at": "2026-09-10T02:06:00Z",
+      "git_sha": "8f4a266152e9c92c2bdbcc3a5caa4bbd331006e3",
+      "status": "planned",
+      "historical_result": null,
+      "prospective_shadow_status": "not_eligible_pending_historical_qualification"
+    },
+    {
+      "experiment_id": "V09C-UNIT-STATE-001",
+      "candidate_version": "0.9C-unit-state",
+      "hypothesis": "Compressing validated player state into QB, skill, OL, pass-rush, run-defense, secondary, continuity and uncertainty units improves stability over sparse player-level features.",
+      "feature_family": "unit_aggregation",
+      "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+      "validation_seasons": [2022, 2023, 2024, 2025],
+      "data_timestamp_policy": {
+        "validated_player_state": "historically_reconstructable",
+        "pregame_lineup_expectation": "knowable_by_t120",
+        "actual_game_participation": "only_available_after_kickoff"
+      },
+      "allowed_inputs": ["validated v0.9A/B player state", "compact unit aggregates", "lineup uncertainty"],
+      "prohibited_inputs": ["2026 outcomes", "individual player IDs as classifier dummies", "actual current-game participation", "postgame snap continuity"],
+      "model_family": "regularized compact game-level unit state",
+      "hyperparameter_search_policy": "Predeclared compact feature sets and nested season-forward selection only.",
+      "primary_metric": "brier",
+      "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "feature_stability"],
+      "candidate_created_at": "2026-09-10T02:06:00Z",
+      "git_sha": "8f4a266152e9c92c2bdbcc3a5caa4bbd331006e3",
+      "status": "planned",
+      "historical_result": null,
+      "prospective_shadow_status": "not_eligible_pending_historical_qualification"
+    },
+    {
+      "experiment_id": "V09D-MATCHUP-INTERACTIONS-001",
+      "candidate_version": "0.9D-matchup-interactions",
+      "hypothesis": "A small predeclared set of opponent interactions provides more incremental information than isolated player/unit ratings, especially around pass rush, protection and QB pressure sensitivity.",
+      "feature_family": "matchup_interactions",
+      "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+      "validation_seasons": [2022, 2023, 2024, 2025],
+      "data_timestamp_policy": {
+        "validated_unit_state": "historically_reconstructable",
+        "opponent_interactions": "historically_reconstructable",
+        "current_game_realized_pressure_or_usage": "only_available_after_kickoff"
+      },
+      "allowed_inputs": ["validated v0.9C unit state", "pass-rush minus protection", "receiver/secondary", "run-profile/run-front", "QB pressure sensitivity interactions"],
+      "prohibited_inputs": ["2026 outcomes", "current-game realized pressure", "current-game realized routes/snaps", "unregistered interaction fishing"],
+      "model_family": "regularized v0.9C plus predeclared interaction terms",
+      "hyperparameter_search_policy": "Only registry-declared interactions; tune regularization chronologically before each target season.",
+      "primary_metric": "brier",
+      "secondary_metrics": ["winner_accuracy", "log_loss", "calibration", "high-disagreement slice"],
+      "candidate_created_at": "2026-09-10T02:06:00Z",
+      "git_sha": "8f4a266152e9c92c2bdbcc3a5caa4bbd331006e3",
+      "status": "planned",
+      "historical_result": null,
+      "prospective_shadow_status": "not_eligible_pending_historical_qualification"
+    }
+  ]
+}
