@@ -27,16 +27,20 @@ SERIALIZATION_VERSION = 2
 FLOAT_FORMAT = "%.17g"
 LINE_TERMINATOR = "\n"
 CAPTURE_CONTEXTS = frozenset({"candidate_freeze", "prospective_shadow_reconstruction"})
-FROZEN_IDENTITY_FIELDS = (
+FROZEN_NUMERIC_PARITY_TOLERANCE = 1e-12
+FROZEN_EXACT_IDENTITY_FIELDS = (
     "candidate_id",
     "training_data_sha256",
     "training_games",
     "training_first_season",
     "training_last_season",
+)
+FROZEN_NUMERIC_IDENTITY_FIELDS = (
     "intercept",
     "market_logit_coefficient",
     "pure_logit_coefficient",
 )
+FROZEN_IDENTITY_FIELDS = FROZEN_EXACT_IDENTITY_FIELDS + FROZEN_NUMERIC_IDENTITY_FIELDS
 BASE_OOF_COLUMNS = (
     "logistic",
     "extra_trees",
@@ -238,6 +242,7 @@ def _runtime_provenance() -> dict[str, Any]:
             for key in (
                 "OMP_NUM_THREADS",
                 "OPENBLAS_NUM_THREADS",
+                "OPENBLAS_CORETYPE",
                 "MKL_NUM_THREADS",
                 "NUMEXPR_NUM_THREADS",
                 "VECLIB_MAXIMUM_THREADS",
@@ -289,10 +294,13 @@ def verify_fst_frozen_identity(
     fit: FrozenStackFit,
     expected_identity: dict[str, Any],
 ) -> dict[str, Any]:
-    """Require exact registered frozen identity before any post-freeze scoring.
+    """Verify a post-freeze reconstruction before any current-game scoring.
 
-    The check is written before a mismatch raises so CI can upload the forensic
-    evidence even when scoring is correctly blocked.
+    Candidate identity, canonical training digest, row count, and season bounds
+    must reproduce exactly. Floating-point coefficients must reproduce the exact
+    registered constants within the fixed absolute 1e-12 parity bound used by the
+    production deployment contract. Scoring continues to use the registered
+    constants, never the reconstructed coefficients.
     """
 
     missing = [field for field in FROZEN_IDENTITY_FIELDS if field not in expected_identity]
@@ -300,6 +308,14 @@ def verify_fst_frozen_identity(
         raise ValueError(f"F-ST frozen identity spec missing fields: {missing}")
     if "source" not in expected_identity or not isinstance(expected_identity["source"], dict):
         raise ValueError("F-ST frozen identity spec requires an evidence source")
+
+    tolerance = float(
+        expected_identity.get("reconstruction_abs_tolerance", FROZEN_NUMERIC_PARITY_TOLERANCE)
+    )
+    if not np.isfinite(tolerance) or tolerance < 0.0 or tolerance > FROZEN_NUMERIC_PARITY_TOLERANCE:
+        raise ValueError(
+            "F-ST frozen identity reconstruction_abs_tolerance must be finite and <= 1e-12"
+        )
 
     actual = {
         "candidate_id": str(input_manifest["candidate_id"]),
@@ -321,8 +337,20 @@ def verify_fst_frozen_identity(
         "market_logit_coefficient": float(expected_identity["market_logit_coefficient"]),
         "pure_logit_coefficient": float(expected_identity["pure_logit_coefficient"]),
     }
-    field_matches = {field: actual[field] == expected[field] for field in FROZEN_IDENTITY_FIELDS}
-    mismatched_fields = [field for field, matches in field_matches.items() if not matches]
+
+    field_matches = {
+        field: actual[field] == expected[field] for field in FROZEN_EXACT_IDENTITY_FIELDS
+    }
+    numeric_absolute_deltas = {
+        field: abs(actual[field] - expected[field]) for field in FROZEN_NUMERIC_IDENTITY_FIELDS
+    }
+    field_matches.update(
+        {
+            field: numeric_absolute_deltas[field] <= tolerance
+            for field in FROZEN_NUMERIC_IDENTITY_FIELDS
+        }
+    )
+    mismatched_fields = [field for field in FROZEN_IDENTITY_FIELDS if not field_matches[field]]
     check = {
         "schema_version": SERIALIZATION_VERSION,
         "check_stage": "post_fit_pre_scoring",
@@ -330,6 +358,10 @@ def verify_fst_frozen_identity(
         "expected_source": expected_identity["source"],
         "expected": expected,
         "actual": actual,
+        "exact_identity_fields": list(FROZEN_EXACT_IDENTITY_FIELDS),
+        "numeric_identity_fields": list(FROZEN_NUMERIC_IDENTITY_FIELDS),
+        "numeric_abs_tolerance": tolerance,
+        "numeric_absolute_deltas": numeric_absolute_deltas,
         "field_matches": field_matches,
         "mismatched_fields": mismatched_fields,
         "matches": not mismatched_fields,
