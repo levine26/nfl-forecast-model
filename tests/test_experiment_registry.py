@@ -12,16 +12,22 @@ from nfl_forecast.experiment_registry import (
 )
 
 
-def test_v09_registry_is_predeclared_and_excludes_2026_selection():
+def test_registry_records_completed_evidence_and_excludes_2026_selection():
     registry = load_registry(Path("research/experiments.json"))
     by_id = {row["experiment_id"]: row for row in registry}
-    required_v09 = {
+    required = {
+        "BASELINE-V08-UNCERTAINTY-001",
         "V09A-PLAYER-VALUE-001",
         "V09B-AVAILABILITY-001",
         "V09C-UNIT-STATE-001",
         "V09D-MATCHUP-INTERACTIONS-001",
+        "V09D-EWMA-INTERACTIONS-002",
+        "F-MR-01",
+        "F-MI-01",
+        "F-LS-01",
+        "F-ST-01",
     }
-    assert required_v09.issubset(by_id)
+    assert required.issubset(by_id)
     assert len(by_id) == len(registry)
 
     for row in registry:
@@ -32,15 +38,27 @@ def test_v09_registry_is_predeclared_and_excludes_2026_selection():
 
         if row["status"] in {"planned", "running"}:
             assert row["historical_result"] is None
-        if row["status"] in {"complete", "rejected", "historically_qualified"}:
+        if row["status"] in {"complete", "rejected", "historically_qualified", "shadowing"}:
             assert row["historical_result"] is not None
 
     assert by_id["V09A-PLAYER-VALUE-001"]["status"] == "rejected"
-    assert by_id["V09A-PLAYER-VALUE-001"]["prospective_shadow_status"].startswith("not_eligible")
     assert by_id["V09B-AVAILABILITY-001"]["status"] == "rejected"
-    assert by_id["V09B-AVAILABILITY-001"]["prospective_shadow_status"].startswith("not_eligible")
-    assert by_id["V09C-UNIT-STATE-001"]["status"] == "planned"
-    assert by_id["V09D-MATCHUP-INTERACTIONS-001"]["status"] == "planned"
+    assert by_id["V09C-UNIT-STATE-001"]["status"] == "rejected"
+    assert by_id["V09D-EWMA-INTERACTIONS-002"]["status"] == "rejected"
+    assert by_id["F-MR-01"]["status"] == "rejected"
+    assert by_id["F-MI-01"]["status"] == "rejected"
+    assert by_id["F-LS-01"]["status"] == "rejected"
+
+    dependency_blocked = by_id["V09D-MATCHUP-INTERACTIONS-001"]
+    assert dependency_blocked["status"] == "complete"
+    assert dependency_blocked["historical_result"]["result_type"] == "dependency_blocked"
+    assert dependency_blocked["historical_result"]["blocked_by"] == "V09C-UNIT-STATE-001"
+
+    fst = by_id["F-ST-01"]
+    assert fst["status"] == "complete"
+    assert fst["primary_metric"] == "brier"
+    assert fst["historical_result"]["historical_qualification"].startswith("promising_but_not_established")
+    assert "frozen_prospective_research_shadow" in fst["prospective_shadow_status"]
 
 
 def test_registry_validation_rejects_future_validation_and_missing_prohibitions():
