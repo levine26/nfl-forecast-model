@@ -8,12 +8,14 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 
-from nfl_forecast.fst_production import CANDIDATE_ID, load_fst_artifact, legacy_final_home_probability
-from nfl_forecast.fst_strategy import (
+from nfl_forecast.fst_production import (
     ACTIVE_PRODUCTION_STRATEGY,
+    CANDIDATE_ID,
     LEGACY_PRODUCTION_STRATEGY,
-    model_version_for_strategy,
-    score_for_strategy,
+    MODEL_VERSION,
+    load_fst_artifact,
+    legacy_final_home_probability,
+    score_official_fst,
 )
 from nfl_forecast.market import add_vig_free_market_prob
 from nfl_forecast.market_t120 import write_t120_market_research
@@ -75,17 +77,15 @@ def _rescore_winner_probability(p: pd.DataFrame) -> None:
     legacy = legacy_final_home_probability(p["legacy_pure_home_prob"], p["market_home_prob"])
     p["legacy_final_home_prob"] = legacy
 
-    strategy = ACTIVE_PRODUCTION_STRATEGY
-    if strategy == CANDIDATE_ID and "fst_pure_home_prob" in p.columns:
+    if ACTIVE_PRODUCTION_STRATEGY == CANDIDATE_ID and "fst_pure_home_prob" in p.columns:
         fst_pure = pd.to_numeric(p["fst_pure_home_prob"], errors="coerce")
         if np.isfinite(fst_pure.to_numpy(dtype=float)).all():
             artifact = load_fst_artifact()
-            scored = score_for_strategy(
+            scored = score_official_fst(
                 p["legacy_pure_home_prob"],
                 p["fst_pure_home_prob"],
                 p["market_home_prob"],
                 artifact,
-                strategy=strategy,
             )
             p["final_home_prob"] = scored.final_home_prob
             p["legacy_final_home_prob"] = scored.legacy_final_home_prob
@@ -98,27 +98,29 @@ def _rescore_winner_probability(p: pd.DataFrame) -> None:
             p["fst_artifact_id"] = CANDIDATE_ID
             p["fst_artifact_training_data_sha256"] = artifact.training_data_sha256
             p["fst_artifact_freeze_implementation_sha"] = artifact.freeze_implementation_sha
-            p["model_version"] = model_version_for_strategy(strategy)
+            p["model_version"] = MODEL_VERSION
             return
 
-    if strategy not in {CANDIDATE_ID, LEGACY_PRODUCTION_STRATEGY}:
-        raise RuntimeError(f"Unknown production probability strategy: {strategy!r}")
+    if ACTIVE_PRODUCTION_STRATEGY not in {CANDIDATE_ID, LEGACY_PRODUCTION_STRATEGY}:
+        raise RuntimeError(
+            f"Unknown production probability strategy: {ACTIVE_PRODUCTION_STRATEGY!r}"
+        )
 
     # Safe bridge for a market refresh that races the first full F-ST materialization,
-    # and the explicit one-line rollback regime. Never apply F-ST coefficients to the
-    # legacy production PURE merely because the nested PURE is absent.
+    # and for the explicit one-line rollback regime. Never apply the frozen F-ST
+    # coefficients to legacy pipeline PURE merely because nested PURE is absent.
     market = pd.to_numeric(p["market_home_prob"], errors="coerce")
     p["final_home_prob"] = legacy
     p["market_available"] = np.isfinite(market.to_numpy(dtype=float))
     p["fst_fallback"] = True
-    if strategy == CANDIDATE_ID:
+    if ACTIVE_PRODUCTION_STRATEGY == CANDIDATE_ID:
         p["fst_fallback_reason"] = "fst_nested_pure_not_materialized"
         p["final_probability_strategy"] = LEGACY_PRODUCTION_STRATEGY
         p["model_version"] = "0.9.0-pre-fst-materialization-fallback"
     else:
         p["fst_fallback_reason"] = "legacy_rollback_strategy_active"
         p["final_probability_strategy"] = LEGACY_PRODUCTION_STRATEGY
-        p["model_version"] = model_version_for_strategy(strategy)
+        p["model_version"] = MODEL_VERSION
     p["fst_vs_market_delta"] = np.nan
     p["fst_vs_legacy_delta"] = 0.0
 
