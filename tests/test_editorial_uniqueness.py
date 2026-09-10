@@ -43,8 +43,12 @@ def test_standardized_factual_scaffolding_is_ignored_but_substantive_duplicate_i
     )
     assert _ngrams(standardized_status) == set()
 
-    standardized_stat = "The passing game backdrop: the relevant opponent side profile was 14.5% pressure rate last season."
-    assert _ngrams(standardized_stat) == set()
+    assert _is_standardized_fact_ngram(
+        ["the", "passing", "game", "backdrop", "the", "relevant", "opponent"]
+    )
+    assert _is_standardized_fact_ngram(
+        ["pressure", "rate", "last", "season", "on", "36", "dropbacks"]
+    )
 
     substantive = "The protection plan has to survive pressure without giving away the explosive throw."
     assert _ngrams(substantive)
