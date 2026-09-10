@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-10T09:31:14.650475+00:00",
+    "as_of": "2026-09-10T12:36:15.046608+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-10T09:31:20.794389+00:00",
+    "as_of": "2026-09-10T12:36:20.520981+00:00",
     "conflicts": 0,
     "evidence_items_added": 26,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 26
   },
   "coaching": {
-    "as_of": "2026-09-10T09:29:14.450037+00:00",
+    "as_of": "2026-09-10T12:34:44.608408+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 30,
     "negative_cache_ttl_minutes": 60,
@@ -138,7 +138,7 @@
     "unique_headlines": 15
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-10T09:31:05.139585+00:00",
+    "as_of": "2026-09-10T12:36:07.894869+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -159,9 +159,9 @@
   },
   "evidence": {
     "games": 15,
-    "generated_utc": "2026-09-10T09:29:14.110359+00:00",
+    "generated_utc": "2026-09-10T12:34:44.077509+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 193,
+    "signals": 194,
     "status": "healthy"
   },
   "ftn": {
@@ -174,9 +174,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-10T09:29:14.110359+00:00",
+  "generated_utc": "2026-09-10T12:34:44.077509+00:00",
   "injuries": {
-    "as_of": "2026-09-10T09:29:14.267453+00:00",
+    "as_of": "2026-09-10T12:34:44.356685+00:00",
     "players": 139,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -184,14 +184,14 @@
     "teams_with_reported_players": 30
   },
   "media_reporting": {
-    "as_of": "2026-09-10T09:31:28.603062+00:00",
-    "cross_game_titles_rejected": 2,
+    "as_of": "2026-09-10T12:36:27.817615+00:00",
+    "cross_game_titles_rejected": 4,
     "games": 15,
     "games_with_display_reporting": 15,
     "games_with_reporting": 15,
     "games_with_substantive_reporting": 15,
     "games_with_trusted_reporting": 15,
-    "generic_titles_rejected": 14,
+    "generic_titles_rejected": 12,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -208,7 +208,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-10T09:31:19.883636+00:00",
+    "as_of": "2026-09-10T12:36:19.383924+00:00",
     "evidence_items_added": 25,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 25,
@@ -281,7 +281,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-10T09:29:18.656334+00:00",
+    "as_of": "2026-09-10T12:34:47.873063+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -314,7 +314,7 @@
     "story_items_added": 18
   },
   "weather": {
-    "as_of": "2026-09-10T09:30:50.982205+00:00",
+    "as_of": "2026-09-10T12:35:57.524297+00:00",
     "games_checked": 10,
     "status": "degraded"
   }
