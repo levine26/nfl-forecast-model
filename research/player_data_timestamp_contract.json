@@ -1,0 +1,59 @@
+{
+  "contract_version": 1,
+  "live_shadow_season": 2026,
+  "selection_uses_2026_outcomes": false,
+  "fields": {
+    "stable_nflverse_player_id": {
+      "classification": "historically_reconstructable",
+      "historical_model_use": "allowed",
+      "notes": "Use ID columns from the play/participation record; never infer a stable ID from fuzzy name matching."
+    },
+    "completed_prior_game_pbp": {
+      "classification": "historically_reconstructable",
+      "historical_model_use": "allowed",
+      "notes": "Only games completed before the matchup may update latent player state."
+    },
+    "prior_role_opportunity": {
+      "classification": "historically_reconstructable",
+      "historical_model_use": "allowed",
+      "notes": "Lagged target/rush/dropback opportunity only."
+    },
+    "prior_snap_count": {
+      "classification": "historically_reconstructable",
+      "historical_model_use": "conditional",
+      "notes": "Allowed only after source coverage and publication timing are audited; never use the current game's final snaps."
+    },
+    "historical_depth_chart": {
+      "classification": "knowable_by_t120",
+      "historical_model_use": "conditional",
+      "notes": "Must have a historical as-of/timestamp policy. A later corrected/final depth chart is unsafe."
+    },
+    "historical_injury_designation": {
+      "classification": "knowable_by_t120",
+      "historical_model_use": "conditional",
+      "notes": "v0.9B cannot use it until the designation is reconstructable at or before the historical T-120 forecast horizon."
+    },
+    "current_game_snap_count": {
+      "classification": "only_available_after_kickoff",
+      "historical_model_use": "prohibited"
+    },
+    "current_game_actual_workload": {
+      "classification": "only_available_after_kickoff",
+      "historical_model_use": "prohibited"
+    },
+    "current_game_realized_starter": {
+      "classification": "unknown_unsafe",
+      "historical_model_use": "prohibited_unless_separately_timestamped",
+      "notes": "Do not use starter identity learned from postgame PBP to reconstruct a historical pregame forecast."
+    },
+    "future_depth_chart_or_later_injury_status": {
+      "classification": "unknown_unsafe",
+      "historical_model_use": "prohibited"
+    },
+    "ngs_tracking_stat": {
+      "classification": "historically_reconstructable",
+      "historical_model_use": "conditional",
+      "notes": "Use only a prior published period; current editorial NGS context is not automatically a challenger feature."
+    }
+  }
+}
