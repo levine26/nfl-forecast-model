@@ -63,9 +63,7 @@ def require_fst_reconstruction_runtime() -> dict[str, Any]:
     failures: list[str] = []
     actual_python = platform.python_version()
     if actual_python != REQUIRED_PYTHON_VERSION:
-        failures.append(
-            f"python={actual_python} (required {REQUIRED_PYTHON_VERSION})"
-        )
+        failures.append(f"python={actual_python} (required {REQUIRED_PYTHON_VERSION})")
 
     package_versions: dict[str, str] = {}
     for package, expected in REQUIRED_PACKAGE_VERSIONS.items():
@@ -89,13 +87,9 @@ def require_fst_reconstruction_runtime() -> dict[str, Any]:
     for pool in blas_pools:
         architecture = str(pool.get("architecture") or "")
         if architecture.lower() != "skylakex":
-            failures.append(
-                f"BLAS architecture={architecture!r} (required 'SkylakeX')"
-            )
+            failures.append(f"BLAS architecture={architecture!r} (required 'SkylakeX')")
         if int(pool.get("num_threads") or 0) != 4:
-            failures.append(
-                f"BLAS num_threads={pool.get('num_threads')!r} (required 4)"
-            )
+            failures.append(f"BLAS num_threads={pool.get('num_threads')!r} (required 4)")
 
     report = {
         "python_version": actual_python,
@@ -133,6 +127,15 @@ def frozen_fit_from_identity(expected_identity: dict[str, Any]) -> FrozenStackFi
     )
 
 
+def _validated_tolerance(expected_identity: dict[str, Any]) -> float:
+    value = float(expected_identity.get("reconstruction_abs_tolerance", REFIT_ABS_TOLERANCE))
+    if not math.isfinite(value) or value < 0.0 or value > REFIT_ABS_TOLERANCE:
+        raise ValueError(
+            "F-ST frozen identity reconstruction_abs_tolerance must be finite and <= 1e-12"
+        )
+    return value
+
+
 def verify_fst_reconstruction_identity(
     output_dir: str | Path,
     input_manifest: dict[str, Any],
@@ -153,6 +156,7 @@ def verify_fst_reconstruction_identity(
         raise ValueError(f"F-ST frozen identity spec missing fields: {missing}")
     if "source" not in expected_identity or not isinstance(expected_identity["source"], dict):
         raise ValueError("F-ST frozen identity spec requires an evidence source")
+    tolerance = _validated_tolerance(expected_identity)
 
     actual = {
         "candidate_id": str(input_manifest["candidate_id"]),
@@ -179,28 +183,29 @@ def verify_fst_reconstruction_identity(
         field: actual[field] == expected[field] for field in EXACT_IDENTITY_FIELDS
     }
     numerical_deltas: dict[str, float] = {}
+    numerical_absolute_deltas: dict[str, float] = {}
     for field in NUMERICAL_REFIT_FIELDS:
-        numerical_deltas[field] = float(actual[field] - expected[field])
+        delta = float(actual[field] - expected[field])
+        numerical_deltas[field] = delta
+        numerical_absolute_deltas[field] = abs(delta)
         field_matches[field] = math.isclose(
-            actual[field],
-            expected[field],
-            rel_tol=0.0,
-            abs_tol=REFIT_ABS_TOLERANCE,
+            actual[field], expected[field], rel_tol=0.0, abs_tol=tolerance
         )
 
     mismatched_fields = [field for field in required if not field_matches[field]]
     check = {
-        "schema_version": 1,
+        "schema_version": 2,
         "check_stage": "post_refit_pre_scoring",
         "capture_context": input_manifest["capture_context"],
         "expected_source": expected_identity["source"],
         "authoritative_scoring_source": "registered_frozen_identity_literals",
         "exact_identity_fields": list(EXACT_IDENTITY_FIELDS),
         "numerical_refit_fields": list(NUMERICAL_REFIT_FIELDS),
-        "refit_abs_tolerance": REFIT_ABS_TOLERANCE,
+        "refit_abs_tolerance": tolerance,
         "expected": expected,
         "actual_refit": actual,
         "numerical_deltas": numerical_deltas,
+        "numerical_absolute_deltas": numerical_absolute_deltas,
         "field_matches": field_matches,
         "mismatched_fields": mismatched_fields,
         "matches": not mismatched_fields,
@@ -209,8 +214,7 @@ def verify_fst_reconstruction_identity(
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     (out / "frozen_identity_check.json").write_text(
-        json.dumps(check, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+        json.dumps(check, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     if mismatched_fields:
         raise RuntimeError(
