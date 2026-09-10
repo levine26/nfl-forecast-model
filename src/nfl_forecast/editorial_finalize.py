@@ -28,6 +28,9 @@ STANDARDIZED_STATUS_PATTERNS = (
     ),
     re.compile(r"\blevline does not make up an injury point value for it\b", re.I),
 )
+STANDARDIZED_SEGMENT_FRAGMENTS = (
+    "not an automatic forecast adjustment",
+)
 STAT_BOILERPLATE_TERMS = {
     "plays", "play", "attempts", "attempt", "dropbacks", "dropback", "snaps", "snap",
     "targets", "target", "yards", "yard", "sacks", "sack", "rate", "epa", "pressure",
@@ -129,10 +132,15 @@ def _editorial_uniqueness_text(text: str) -> str:
 def _uniqueness_segments(text: str) -> list[str]:
     """Never manufacture duplicate prose by sliding an n-gram across sentences."""
     scrubbed = _editorial_uniqueness_text(text)
-    return [
+    segments = [
         segment.strip()
         for segment in re.split(r"(?<=[.!?])\s+|(?<=;)\s+", scrubbed)
         if segment.strip()
+    ]
+    return [
+        segment
+        for segment in segments
+        if not any(fragment in segment.lower() for fragment in STANDARDIZED_SEGMENT_FRAGMENTS)
     ]
 
 
