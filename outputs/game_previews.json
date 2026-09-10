@@ -5,7 +5,6 @@
     "case_for_pick": "LAC protection vs ARI pass rush: pass-rush leverage favors LAC.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -73,11 +72,32 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "ARI early-down approach vs LAC"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "ARI: Isaiah Adams \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "ARI: Josh Sweat \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "LAC: Deane Leonard \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_01_ARI_LAC",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Arizona\u2019s Big-Play Hunt Meets Los Angeles\u2019 Protection Test",
+    "headline": "Cardinals\u2013Chargers: ARI: Isaiah Adams \u2014 Did Not Participate In Practice",
     "key_factors": [
       {
         "advantage_team": null,
@@ -113,7 +133,7 @@
     "matchup": "ARI @ LAC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:08.347577+00:00",
+        "as_of": "2026-09-10T01:57:55.245533+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -123,7 +143,7 @@
         "title": "What Nathaniel Hackett could change in ARI"
       },
       {
-        "as_of": "2026-09-09T21:28:14.536511+00:00",
+        "as_of": "2026-09-10T01:58:05.867647+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LAC",
@@ -133,7 +153,7 @@
         "title": "LAC protection vs ARI pass rush"
       },
       {
-        "as_of": "2026-09-09T21:28:14.535999+00:00",
+        "as_of": "2026-09-10T01:58:05.866762+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "ARI",
@@ -143,7 +163,7 @@
         "title": "ARI explosives vs LAC prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:14.536163+00:00",
+        "as_of": "2026-09-10T01:58:05.867100+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ARI",
@@ -188,31 +208,30 @@
       }
     ],
     "paragraphs": [
-      "Arizona\u2019s offense will need to create explosive gains without letting Los Angeles dictate obvious passing downs. A more controlled early-down plan under Nathaniel Hackett can keep the Cardinals balanced, but stalled possessions would expose protection issues against a Chargers front that generated pressure last season. Los Angeles, with a new offensive coordinator, should lean on efficient sequencing and force Arizona to defend sustained drives rather than chase deep shots. The deciding swing is whether the Cardinals\u2019 coverage can survive those longer possessions while limiting chunk plays.",
-      "In Chargers-Cardinals, LevLine assigns Chargers a 69.2% win probability over Cardinals. For Chargers-Cardinals, football-only PURE puts Chargers at 65.6%, while Chargers-Cardinals market probability puts Chargers at 80.0%. The Chargers-Cardinals production blend weights Chargers PURE at 75% and Chargers MARKET at 25%. The Chargers-Cardinals LevLine model line is Los Angeles Chargers -6.7; the Chargers-Cardinals market spread is Los Angeles Chargers -9.5. The Chargers-Cardinals projected score is LAC 25.5 \u2013 ARI 18.8. The Chargers-Cardinals football context is What Nathaniel Hackett could change in ARI; that evidence supports Chargers without changing LevLine for Chargers-Cardinals. The pick: Los Angeles Chargers moneyline."
+      "Cardinals\u2013Chargers centers on ARI: Isaiah Adams \u2014 Did Not Participate In Practice. The official NFL injury report lists Isaiah Adams (G) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. That matters a little more against LAC, which generated sacks on 7.5% of opponent pass plays last season. For Cardinals, that detail changes Cardinals' choices against Chargers; Chargers can exploit it only by forcing Cardinals off schedule.",
+      "LevLine makes the Chargers the winner at 69.2%. Its football-only PURE component is Chargers 65.6%, while the market-derived probability is 80.0%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Los Angeles Chargers -6.7, a market line of Los Angeles Chargers -9.5, a projected score of LAC 25.5 \u2013 ARI 18.8. The matchup evidence that best supports the forecast is ARI: Isaiah Adams \u2014 Did Not Participate In Practice. The pick: Los Angeles Chargers moneyline."
     ],
     "prediction": "LAC to win; LAC 25.5 \u2013 ARI 18.8 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/teams/los-angeles-chargers/",
-        "title": "Los Angeles Chargers News, Scores, Stats, Schedule"
-      },
-      {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "Los Angeles Chargers",
-        "source_url": "https://www.chargers.com/schedule/",
-        "title": "Chargers 2026 Schedule"
-      },
-      {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
+        "as_of": "2026-09-09T12:38:42+00:00",
         "source_name": "Yahoo Sports",
-        "source_url": "https://sports.yahoo.com/articles/los-angeles-chargers-news-bolts-135000415.html",
-        "title": "Los Angeles Chargers news: Bolts release unofficial depth chart for Week One"
+        "source_url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOUFpzU0w5U1dyTGNZMXlyNjg5Y2NibVNxMzVrdTlCa2hKdlQzeTNaRFpTZ25ZbkY5TGtNTzYyYWQyU3VfOW9xdVdKei1ObDNJakt0NnQ1R3hoY3RHZjVfbEFIVUh2RDBlekNEX2NoeVVCUzlCTmM2UG8yMGVzTG5fcTExcHU?oc=5",
+        "title": "Is Cameron Dicker Playing in Week 1? Latest on Chargers Kicker\u2019s Mysterious Injury and Whether He\u2019ll Suit Up vs. Cardinals"
+      },
+      {
+        "as_of": "2026-09-08T23:46:00+00:00",
+        "source_name": "USA Today",
+        "source_url": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxOR0szQ25ESnBOdjNUbkZyX3B0b2N0bFFLMVVvYzZrT3lvXzMzLTZ6M1FPUFY3QTFreHZlbGo2NWtaWmctRWVYaGJoXzkxUnJlRndSdjRiU0tpLWh0Z1pSdE9wVTRZQ2dEbDRYRDB6V25wa1ZLRzZHbGk5RzFtcFJSdU55VEpiZEpjTG1odlJFYjlndl9UQnZkbVQxY0pMVEgtS3c0SElUTzBSYk5JQVM5YnpnLThNeS1jbkZGd2NWcGdjdkJCb2E2RHlnYkp0X0lhOThKajRDcjlJUQ?oc=5",
+        "title": "Arizona Cardinals Week 1 depth chart vs. Los Angeles Chargers"
+      },
+      {
+        "as_of": "2026-09-10T01:44:46+00:00",
+        "source_name": "si.com",
+        "source_url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOUzdVNE9NdV9QNXJidDZaXzhkbDZyd0pNZUNYM2VOMEtLTUdMZzFlRWZVX1dtQ19rVC1rVi1SS3RnWGRGUk9vN3dHN3RwWWJJYm9na19CLVkzOGZtRk8yLWloaU40Ry15VW5QajRaSFJiQzhBUGZxbHFnYUxmVzg3SUZmNWJaTEhnZGJlWVNnTzBkYmExWE5zMG11am1JT2Y0WVo4U1J3NkNBRE5uSnRRbWduYzhEM2RwTDRMak10UVBlMldZZTJ6dw?oc=5",
+        "title": "Jeremiyah Love Headlines Loaded Cardinals-Chargers Week 1 Injury Report"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "LAC",
       "primary_family": "pressure",
@@ -230,7 +249,6 @@
     "case_for_pick": "ATL protection vs PIT pass rush: pass-rush leverage favors PIT.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -316,7 +334,7 @@
     ],
     "game_id": "2026_01_ATL_PIT",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Atlanta\u2019s New Quarterback Must Solve Pittsburgh\u2019s Pressure Puzzle",
+    "headline": "Falcons\u2013Steelers: ATL: Zachariah Branch \u2014 Limited Participation in Practice",
     "key_factors": [
       {
         "advantage_team": null,
@@ -352,7 +370,7 @@
     "matchup": "ATL @ PIT",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:08.346781+00:00",
+        "as_of": "2026-09-10T01:57:55.244344+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -362,7 +380,7 @@
         "title": "What Patrick Graham could change in PIT"
       },
       {
-        "as_of": "2026-09-09T21:28:13.839993+00:00",
+        "as_of": "2026-09-10T01:58:04.674617+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "PIT",
@@ -372,7 +390,7 @@
         "title": "ATL protection vs PIT pass rush"
       },
       {
-        "as_of": "2026-09-09T21:28:13.841189+00:00",
+        "as_of": "2026-09-10T01:58:04.676676+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "PIT",
@@ -382,7 +400,7 @@
         "title": "PIT YAC creation vs ATL tackling"
       },
       {
-        "as_of": "2026-09-09T21:28:13.840466+00:00",
+        "as_of": "2026-09-10T01:58:04.675412+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ATL",
@@ -435,25 +453,36 @@
       }
     ],
     "paragraphs": [
-      "Atlanta\u2019s decision to start Tua Tagovailoa puts immediate stress on an offense learning Kevin Stefanski and Tommy Rees\u2019 system, especially against Pittsburgh\u2019s pass rush. The Falcons need efficient early-down throws, disciplined protection and enough vertical threat to prevent the Steelers from squeezing the field. Pittsburgh, with Patrick Graham calling the defense, can stay patient, vary its pressure looks and force Tagovailoa into hurried decisions. On the other side, the Steelers\u2019 offense should attack after the catch and make Atlanta tackle cleanly before the Falcons can settle into coverage.",
-      "In Steelers-Falcons, LevLine assigns Steelers a 63.5% win probability over Falcons. For Steelers-Falcons, football-only PURE puts Steelers at 63.9%, while Steelers-Falcons market probability puts Steelers at 62.2%. The Steelers-Falcons production blend weights Steelers PURE at 75% and Steelers MARKET at 25%. The Steelers-Falcons LevLine model line is Pittsburgh Steelers -5.2; the Steelers-Falcons market spread is Pittsburgh Steelers -3.5. The Steelers-Falcons projected score is PIT 25.9 \u2013 ATL 20.7. The Steelers-Falcons football context is What Patrick Graham could change in PIT; that evidence supports Steelers without changing LevLine for Steelers-Falcons. The pick: Pittsburgh Steelers moneyline."
+      "Falcons\u2013Steelers centers on ATL: Zachariah Branch \u2014 Limited Participation in Practice. The official NFL injury report lists Zachariah Branch (WR) as Limited Participation in Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. The passing-game backdrop: the relevant opponent-side profile was +0.06 EPA/play last season. For Falcons, that detail changes Falcons' choices against Steelers; Steelers can exploit it only by forcing Falcons off schedule.",
+      "LevLine makes the Steelers the winner at 63.5%. Its football-only PURE component is Steelers 63.9%, while the market-derived probability is 62.2%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Pittsburgh Steelers -5.2, a market line of Pittsburgh Steelers -3.5, a projected score of PIT 25.9 \u2013 ATL 20.7. The matchup evidence that best supports the forecast is ATL: Zachariah Branch \u2014 Limited Participation in Practice. The pick: Pittsburgh Steelers moneyline."
     ],
     "prediction": "PIT to win; PIT 25.9 \u2013 ATL 20.7 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "CBS Sports",
-        "source_url": "https://www.cbssports.com/nfl/news/tua-tagovailoa-dolphins-exit-signing-with-falcons/",
-        "title": "Tua Tagovailoa breaks silence on Dolphins exit, addresses lingering questions after signing with Falcons"
+        "as_of": "2026-09-07T12:23:02+00:00",
+        "source_name": "NFL.com",
+        "source_url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNR25XbzYtOUJ1d2pVYnJmUjgyM3VNcWdRaE9uZENTREFHdmpmWWo3YzVJcTFiS2F1N0tSYTFVOTZ6Y3UzdXZlMU9DakxNYW9JZ3ZSdm1sM3Z3LURIMlNnd2RteVkyWE5NbXRzc0xTLXktMGRsd2ZDUzl6U0JMTy1zMlZtT1RiSDNLdGFlRA?oc=5",
+        "title": "Falcons name Tua Tagovailoa starting QB for Week 1 vs. Steelers; Michael Penix Jr. to be inactive"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "Atlanta Falcons",
-        "source_url": "https://www.atlantafalcons.com/team/players-roster/tua-tagovailoa/",
-        "title": "Tua Tagovailoa - Atlanta Falcons Quarterback"
+        "as_of": "2026-09-09T13:16:00+00:00",
+        "source_name": "The Falcons Wire",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6aa20ec678c3473f8fcc6f45c9267de1&url=https%3a%2f%2fthefalconswire.usatoday.com%2fstory%2fsports%2fnfl%2ffalcons%2f2026%2f09%2f09%2ffalcons-steelers-week-1-injury-report%2f91678177007%2f&c=7564130107095507359&mkt=en-us",
+        "title": "Falcons Week 1 injury report: Zachariah Branch, Brandon Dorlus limited"
+      },
+      {
+        "as_of": "2026-09-09T05:57:00+00:00",
+        "source_name": "Yardbarker",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6aa20ec678c3473f8fcc6f45c9267de1&url=https%3a%2f%2fwww.yardbarker.com%2fnfl%2farticles%2fsteelers_pine_for_vintage_aaron_rodgers_lead_off_with_atlanta_reboot%2fs1_17049_44284159&c=12960564117323705805&mkt=en-us",
+        "title": "Steelers pine for vintage Aaron Rodgers, lead off with Atlanta reboot"
+      },
+      {
+        "as_of": "2026-09-10T00:54:00+00:00",
+        "source_name": "si.com",
+        "source_url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNRGx3WUJQb21hM1MtaXA3M092cXA0MFNicHFlS0NJRXoxSXRPeXZSVGJIMHU3aUkxN0oyYzRjbExCUEVlZzFDOVBNOFdMNmdCNjNraDNoNVZXTk9NOHVGVGlLc0hDelRfM0FBU3l6Wm0zdWUzS09wWk91NjVLcGo5aDFfakVNUXVQMjktd1VOR0ZfSzQ4WnpKajRhMkRTUQ?oc=5",
+        "title": "Several Key Names on Atlanta Falcons 1st Injury Report ahead of Steelers Game"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "PIT",
       "primary_family": "pressure",
@@ -600,7 +629,7 @@
     "matchup": "BAL @ IND",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:26:43.469942+00:00",
+        "as_of": "2026-09-10T01:56:08.572794+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -610,7 +639,7 @@
         "title": "BAL offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T21:28:13.147457+00:00",
+        "as_of": "2026-09-10T01:58:03.484061+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "BAL",
@@ -620,7 +649,7 @@
         "title": "BAL protection vs IND pass rush"
       },
       {
-        "as_of": "2026-09-09T21:28:13.147943+00:00",
+        "as_of": "2026-09-10T01:58:03.484850+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "IND",
@@ -630,7 +659,7 @@
         "title": "BAL early-down approach vs IND"
       },
       {
-        "as_of": "2026-09-09T21:28:13.148509+00:00",
+        "as_of": "2026-09-10T01:58:03.485867+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BAL",
@@ -722,7 +751,7 @@
         "BUF early-down approach vs HOU"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 3,
       "reporting_first": true,
       "secondary_variant": 3,
@@ -781,6 +810,27 @@
         "title": "HOU explosives vs BUF prevention"
       },
       {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "BUF: Jordan Hancock \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report + nflverse usage",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "BUF: Ty Johnson \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Weak",
+        "title": "BUF: T.J. Sanders \u2014 Limited Participation in Practice"
+      },
+      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
@@ -826,7 +876,7 @@
     "matchup": "BUF @ HOU",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:26:42.616882+00:00",
+        "as_of": "2026-09-10T01:56:07.495453+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -836,7 +886,7 @@
         "title": "BUF offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T21:28:12.802716+00:00",
+        "as_of": "2026-09-10T01:58:02.877850+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BUF",
@@ -846,7 +896,7 @@
         "title": "BUF early-down approach vs HOU"
       },
       {
-        "as_of": "2026-09-09T21:28:12.802201+00:00",
+        "as_of": "2026-09-10T01:58:02.877072+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "HOU",
@@ -856,7 +906,7 @@
         "title": "BUF protection vs HOU pass rush"
       },
       {
-        "as_of": "2026-09-09T21:28:12.803340+00:00",
+        "as_of": "2026-09-10T01:58:02.878914+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "HOU",
@@ -948,7 +998,7 @@
         "What Press Taylor could change in CHI"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 3,
       "primary_variant": 4,
       "reporting_first": true,
       "secondary_variant": 4,
@@ -1073,7 +1123,7 @@
     "matchup": "CHI @ CAR",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:08.344725+00:00",
+        "as_of": "2026-09-10T01:57:55.241404+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1083,7 +1133,7 @@
         "title": "What Press Taylor could change in CHI"
       },
       {
-        "as_of": "2026-09-09T21:28:11.758345+00:00",
+        "as_of": "2026-09-10T01:58:01.083251+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CHI",
@@ -1093,7 +1143,7 @@
         "title": "CAR explosives vs CHI prevention"
       },
       {
-        "as_of": "2026-09-09T21:26:40.296851+00:00",
+        "as_of": "2026-09-10T01:56:04.309846+00:00",
         "family": "play_action",
         "label": "Play action",
         "leader": "Watch",
@@ -1103,7 +1153,7 @@
         "title": "CHI play action vs CAR"
       },
       {
-        "as_of": "2026-09-09T21:26:40.341072+00:00",
+        "as_of": "2026-09-10T01:56:04.529267+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1320,7 +1370,7 @@
     "matchup": "CLE @ JAX",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:26:44.311537+00:00",
+        "as_of": "2026-09-10T01:56:09.667446+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1330,7 +1380,7 @@
         "title": "CLE offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T21:28:13.501304+00:00",
+        "as_of": "2026-09-10T01:58:04.074339+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "JAX",
@@ -1340,7 +1390,7 @@
         "title": "CLE explosives vs JAX prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:13.500962+00:00",
+        "as_of": "2026-09-10T01:58:04.073767+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "CLE",
@@ -1350,7 +1400,7 @@
         "title": "CLE protection vs JAX pass rush"
       },
       {
-        "as_of": "2026-09-09T21:26:44.268056+00:00",
+        "as_of": "2026-09-10T01:56:09.432958+00:00",
         "family": "motion",
         "label": "Motion",
         "leader": "Watch",
@@ -1423,7 +1473,6 @@
     "case_for_pick": "Dak Prescott vs NYG: player history: quarterback history context.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -1502,7 +1551,7 @@
     ],
     "game_id": "2026_01_DAL_NYG",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Dallas Wants a Grind; New York Needs the Game to Break Open",
+    "headline": "Cowboys\u2013Giants: DAL: Ajani Cornelius \u2014 Limited Participation in Practice",
     "key_factors": [
       {
         "advantage_team": "DAL",
@@ -1538,7 +1587,7 @@
     "matchup": "DAL @ NYG",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:20.829997+00:00",
+        "as_of": "2026-09-10T01:58:17.216866+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -1548,7 +1597,7 @@
         "title": "Dak Prescott vs NYG: player history"
       },
       {
-        "as_of": "2026-09-09T21:28:15.942934+00:00",
+        "as_of": "2026-09-10T01:58:08.292147+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -1558,7 +1607,7 @@
         "title": "NYG explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:15.942643+00:00",
+        "as_of": "2026-09-10T01:58:08.291610+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -1568,7 +1617,7 @@
         "title": "NYG protection vs DAL pass rush"
       },
       {
-        "as_of": "2026-09-09T21:28:08.349291+00:00",
+        "as_of": "2026-09-10T01:57:55.248032+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1618,25 +1667,24 @@
       }
     ],
     "paragraphs": [
-      "New York\u2019s best path is to manufacture explosive gains before Dallas can turn the game into a protection test. Matt Nagy\u2019s motion-heavy, early-down approach should help the Giants identify coverage and keep the Cowboys from teeing off, but the offensive line must survive obvious passing downs. Dallas, meanwhile, needs disciplined coverage and steady pressure while forcing long drives instead of conceding chunks. The Cowboys\u2019 RPO defense will be tested by New York\u2019s new scheme, making early-down leverage and quarterback comfort decisive.",
-      "In Cowboys-Giants, LevLine assigns Cowboys a 54.4% win probability over Giants. For Cowboys-Giants, football-only PURE puts Cowboys at 52.7%, while Cowboys-Giants market probability puts Cowboys at 59.3%. The Cowboys-Giants production blend weights Cowboys PURE at 75% and Cowboys MARKET at 25%. The Cowboys-Giants LevLine model line is New York Giants -0.6; the Cowboys-Giants market spread is Dallas Cowboys -3.0. The Cowboys-Giants projected score is NYG 22.0 \u2013 DAL 21.4. The Cowboys-Giants football context is Dak Prescott vs NYG: player history; that evidence supports Cowboys without changing LevLine for Cowboys-Giants. The pick: Dallas Cowboys moneyline."
+      "Cowboys\u2013Giants centers on DAL: Ajani Cornelius \u2014 Limited Participation in Practice. The official NFL injury report lists Ajani Cornelius (T) as Limited Participation in Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. That matters a little more against NYG, which generated sacks on 5.8% of opponent pass plays last season. For Cowboys, that detail changes Cowboys' choices against Giants; Giants can exploit it only by forcing Cowboys off schedule.",
+      "LevLine makes the Cowboys the winner at 54.4%. Its football-only PURE component is Cowboys 52.7%, while the market-derived probability is 59.3%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of New York Giants -0.6, a market line of Dallas Cowboys -3.0, a projected score of NYG 22.0 \u2013 DAL 21.4. The matchup evidence that best supports the forecast is DAL: Ajani Cornelius \u2014 Limited Participation in Practice. The pick: Dallas Cowboys moneyline."
     ],
     "prediction": "DAL to win; NYG 22.0 \u2013 DAL 21.4 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/games/cowboys-at-giants-2026-reg-1",
-        "title": "Dallas Cowboys at New York Giants, 2026 Week 1"
+        "as_of": "2026-09-09T22:32:04+00:00",
+        "source_name": "FOX Sports",
+        "source_url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOOHlGdFdtdWlGRUJYVjRxdHkxaEhtcWRlYW5JbVl0R0ZQNS1DcF9yT19Icmo2RWhLRVRMSEY0X2FqeERmWWR3cU5oblo0Ykt1LVNqMlNNWXJibUdaM1lmVnhDVHlpQzN4cE9BSTNfX21wdmgwVi02RW9yOGdpYzVpZ0t1UFlUSmVucTRQMEFvYWxSdWxFb0RJVF8tVlloRmV2MGZiMTVyVk53UTYwZU5Gdm5pU3VWRG1zLVZFemJnaUEyS1p1WTRpcURiNHgwemFx?oc=5",
+        "title": "Giants say Malik Nabers fully participated in practice, but not sure if he'll play against Cowboys"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "ESPN",
-        "source_url": "https://www.espn.com/nfl/team/_/name/nyg/new-york-giants",
-        "title": "New York Giants Team Page"
+        "as_of": "2026-09-09T12:00:00+00:00",
+        "source_name": "Yahoo Sports",
+        "source_url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNX1FQcW5SMDJOS1hPMXlKOEJwSGNNMlZmN1hEM3lsaHY2b3BEQjhtSi1CalZwekhreHpWUFloQkp2YWltalZxd25NOGFoU3VvbkwyZ0J5VWl2VFdkMnlhV3VUM0RXbHBMVTdEMVFvVlZ1T2hXb1l6am1vNGgyalFKWVJzRTY?oc=5",
+        "title": "Survey: Will the NY Giants beat the Cowboys?"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "DAL",
       "primary_family": "qb_opponent_history",
@@ -1762,7 +1810,7 @@
     "matchup": "DEN @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:21.161946+00:00",
+        "as_of": "2026-09-10T01:58:17.806873+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "KC",
@@ -1772,7 +1820,7 @@
         "title": "Patrick Mahomes vs DEN: player history"
       },
       {
-        "as_of": "2026-09-09T21:28:16.287170+00:00",
+        "as_of": "2026-09-10T01:58:08.880949+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -1782,7 +1830,7 @@
         "title": "KC protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-09T21:28:16.287648+00:00",
+        "as_of": "2026-09-10T01:58:08.881774+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -1792,7 +1840,7 @@
         "title": "KC early-down approach vs DEN"
       },
       {
-        "as_of": "2026-09-09T21:28:08.349819+00:00",
+        "as_of": "2026-09-10T01:57:55.248793+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1884,7 +1932,6 @@
     "case_for_pick": "Jordan Love vs MIN: player history: quarterback history context.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -1895,7 +1942,7 @@
         "Jordan Love vs Brian Flores's MIN defense"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 8,
       "reporting_first": true,
       "secondary_variant": 8,
@@ -1964,13 +2011,13 @@
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Weak",
-        "title": "GB: Jordan Morgan \u2014 Limited Participation in Practice"
+        "strength": "Moderate",
+        "title": "MIN: Jakobe Thomas \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_01_GB_MIN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Can Minnesota Turn Green Bay\u2019s Big-Play Hunt Into a Long March?",
+    "headline": "Packers\u2013Vikings: GB: Warren Brinson \u2014 Did Not Participate In Practice",
     "key_factors": [
       {
         "advantage_team": "GB",
@@ -2006,7 +2053,7 @@
     "matchup": "GB @ MIN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:20.242150+00:00",
+        "as_of": "2026-09-10T01:58:16.148314+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "GB",
@@ -2016,7 +2063,7 @@
         "title": "Jordan Love vs MIN: player history"
       },
       {
-        "as_of": "2026-09-09T21:28:15.245751+00:00",
+        "as_of": "2026-09-10T01:58:07.077388+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "GB",
@@ -2026,7 +2073,7 @@
         "title": "GB explosives vs MIN prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:15.246247+00:00",
+        "as_of": "2026-09-10T01:58:07.078248+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
@@ -2036,7 +2083,7 @@
         "title": "MIN protection vs GB pass rush"
       },
       {
-        "as_of": "2026-09-09T21:27:06.703153+00:00",
+        "as_of": "2026-09-10T01:56:52.666639+00:00",
         "family": "history",
         "label": "History",
         "leader": "Watch",
@@ -2078,25 +2125,30 @@
       }
     ],
     "paragraphs": [
-      "Minnesota\u2019s quarterback reshuffle puts immediate pressure on the Vikings to stay ahead of the chains and protect a vulnerable passing game. Green Bay will want Jordan Love attacking downfield, but the Packers must avoid becoming predictable when Minnesota\u2019s defense forces obvious passing downs. The Vikings\u2019 answer is to limit explosive completions, lean on sustained drives and make Green Bay tackle repeatedly. If the Packers\u2019 revamped defense can create pressure without sacrificing coverage, Minnesota\u2019s protection and unsettled quarterback hierarchy could decide the rivalry opener.",
-      "In Vikings-Packers, LevLine assigns Vikings a 58.1% win probability over Packers. For Vikings-Packers, football-only PURE puts Vikings at 60.1%, while Vikings-Packers market probability puts Vikings at 52.2%. The Vikings-Packers production blend weights Vikings PURE at 75% and Vikings MARKET at 25%. The Vikings-Packers LevLine model line is Minnesota Vikings -4.0; the Vikings-Packers market spread is Minnesota Vikings -1.5. The Vikings-Packers projected score is MIN 24.5 \u2013 GB 20.5. The Vikings-Packers football context is Jordan Love vs MIN: player history; that evidence supports Vikings without changing LevLine for Vikings-Packers. The pick: Minnesota Vikings moneyline."
+      "Packers\u2013Vikings centers on GB: Warren Brinson \u2014 Did Not Participate In Practice. The official NFL injury report lists Warren Brinson (DT) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. For Packers, that detail changes Packers' choices against Vikings; Vikings can exploit it only by forcing Packers off schedule.",
+      "LevLine makes the Vikings the winner at 58.2%. Its football-only PURE component is Vikings 60.1%, while the market-derived probability is 52.6%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Minnesota Vikings -4.0, a market line of Minnesota Vikings -1.5, a projected score of MIN 24.5 \u2013 GB 20.5. The matchup evidence that best supports the forecast is GB: Warren Brinson \u2014 Did Not Participate In Practice. The pick: Minnesota Vikings moneyline."
     ],
     "prediction": "MIN to win; MIN 24.5 \u2013 GB 20.5 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
+        "as_of": "2026-09-09T23:08:17+00:00",
         "source_name": "Yahoo Sports",
-        "source_url": "https://sports.yahoo.com/nfl/article/green-bay-packers-make-decision-on-77-million-starter-ahead-of-vikings-opener-133500000.html",
-        "title": "Green Bay Packers Make Decision on $77 Million Starter Ahead of Vikings Opener"
+        "source_url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPVy1Ud1gzTWswcHF6V0NHTmpuNWwyM1V1RmNsNGVua2NfZG15ellWVnVYQ3YzSVJhVzNvcXctS0JvX19BSmdYNW5hYXNrQ2FzRUh6MUZ2MUhXWFQwbGJNcGtZWmdYcm1OVFhxRjRiX3pudWtJUDQ2OXY0eXlDN2dEV0RNQQ?oc=5",
+        "title": "Green Bay Packers: 3 starting offensive linemen limited in practice on initial injury report ahead of Week 1 vs Vikings"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
+        "as_of": "2026-09-09T19:49:23+00:00",
         "source_name": "FOX Sports",
-        "source_url": "https://www.foxsports.com/stories/nfl/vikings-name-carson-wentz-qb2-sliding-jj-mccarthy-to-third-string-vs-packers",
+        "source_url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQNnVjTE9zWS02WGZoWnpUQmNXeVd3aFVNZGtRUXdXU3ptWWdTbFBkcnA1Rlh2NlBDZnZ6WElFOWJNWHdaTTRnTjNGSU1Fa3h1eVI1UlB0VThSZHd6eE55eUxZUWJjNlA0VU5oTnZudHVrLTVHU012SklCbGtqcG50dnpydmNobmxhUUh3UGI4QmxYSl9XcE9EQnFqUXFoSGJyOC1HUTV2UFNzQUM3bU81QWFB0gGyAUFVX3lxTE9qZi1KMGtqRUNWaG1FbDRlNXVRRGp5d0JmT0lDOFluUDdicXIwRnpTU1JZVlJZc3ZzZHVUQmJteERJTUoydXJjdnZBSnI5QkFsZ0I4NlRVbGJBWFlGX0xjYTJiRHlIWWVuTEZhV21ESHdxcV9QcHI2Vl9mdjMtZ01zd3h1RU45b19LbVQyOWt5VzZ4UlVXdks5aFRXeWpxc3otdGtObzVvY211UXpONnFDUGc?oc=5",
         "title": "Vikings Name Carson Wentz QB2, Sliding J.J. McCarthy To Third String vs. Packers"
+      },
+      {
+        "as_of": "2026-09-09T22:19:47+00:00",
+        "source_name": "Pioneer Press",
+        "source_url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPcGRlNjU4Vjh2N0Z5dndYcXVxeTlIWTA1WF93eGlBd0RFdjlZNktaaUxmTW1HRVdXcV96RExOMGxFMTdDaG9EdnNBNmFEMk1kSUp0em1Wa0JMbkhYbk4xbFlBMDRoTWdxbHo1TkFIOFhpa1hZTmpxdzkwUnh6RWotSzBLemNaUDRwWWd6SnhmdU9oQ0RMU1hDRXJqdmNFYVU?oc=5",
+        "title": "Vikings-Packers injury report: Jakobe Thomas misses practice"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "MIN",
       "primary_family": "pressure",
@@ -2114,7 +2166,6 @@
     "case_for_pick": "LV early-down approach vs MIA: early-down leverage favors MIA.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -2177,6 +2228,27 @@
         "title": "LV protection vs MIA pass rush"
       },
       {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report + nflverse usage",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Moderate",
+        "title": "LV: Brock Bowers \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Weak",
+        "title": "MIA: Will Kacmarek \u2014 Limited Participation in Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Weak",
+        "title": "MIA: Ronnie Harrison \u2014 Limited Participation in Practice"
+      },
+      {
         "category": "travel",
         "source_name": "nflverse schedule + venue geography",
         "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
@@ -2186,7 +2258,7 @@
     ],
     "game_id": "2026_01_MIA_LV",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Miami\u2019s Speed Meets Las Vegas\u2019 Protection Test",
+    "headline": "Dolphins\u2013Raiders: LV: Brock Bowers \u2014 Did Not Participate In Practice",
     "key_factors": [
       {
         "advantage_team": null,
@@ -2222,7 +2294,7 @@
     "matchup": "MIA @ LV",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:08.348048+00:00",
+        "as_of": "2026-09-10T01:57:55.246232+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2232,7 +2304,7 @@
         "title": "What Bobby Slowik could change in MIA"
       },
       {
-        "as_of": "2026-09-09T21:28:14.908001+00:00",
+        "as_of": "2026-09-10T01:58:06.481951+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "MIA",
@@ -2242,7 +2314,7 @@
         "title": "LV early-down approach vs MIA"
       },
       {
-        "as_of": "2026-09-09T21:28:14.907016+00:00",
+        "as_of": "2026-09-10T01:58:06.480276+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "MIA",
@@ -2252,7 +2324,7 @@
         "title": "MIA explosives vs LV prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:14.907557+00:00",
+        "as_of": "2026-09-10T01:58:06.481166+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LV",
@@ -2297,25 +2369,36 @@
       }
     ],
     "paragraphs": [
-      "Las Vegas needs to keep Kirk Cousins out of obvious passing situations, because Miami\u2019s pressure can turn a one-dimensional script into a long afternoon behind a vulnerable front. The Dolphins, meanwhile, must convert their speed into explosives without letting the Raiders force them into patient, mistake-free drives. Miami\u2019s new offensive approach should challenge coverage declarations, while Las Vegas needs early-down efficiency and enough run-game credibility to give its pass protection a chance. The team that controls those early exchanges will dictate the matchup.",
-      "In Dolphins-Raiders, LevLine assigns Dolphins a 57.7% win probability over Raiders. For Dolphins-Raiders, football-only PURE puts Dolphins at 63.7%, while Dolphins-Raiders market probability puts Dolphins at 40.0%. The Dolphins-Raiders production blend weights Dolphins PURE at 75% and Dolphins MARKET at 25%. The Dolphins-Raiders LevLine model line is Miami Dolphins -3.6; the Dolphins-Raiders market spread is Las Vegas Raiders -3.0. The Dolphins-Raiders projected score is LV 19.9 \u2013 MIA 23.6. The Dolphins-Raiders football context is What Bobby Slowik could change in MIA; that evidence supports Dolphins without changing LevLine for Dolphins-Raiders. The pick: Miami Dolphins moneyline."
+      "Dolphins\u2013Raiders centers on LV: Brock Bowers \u2014 Did Not Participate In Practice. The official NFL injury report lists Brock Bowers (TE) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. In 2025, he accounted for 18% of the team's recorded targets (87). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was +0.17 EPA/play last season. For Raiders, that detail changes Raiders' choices against Dolphins; Dolphins can exploit it only by forcing Raiders off schedule.",
+      "LevLine makes the Dolphins the winner at 57.7%. Its football-only PURE component is Dolphins 63.7%, while the market-derived probability is 40.0%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Miami Dolphins -3.6, a market line of Las Vegas Raiders -3.0, a projected score of LV 19.9 \u2013 MIA 23.6. The matchup evidence that best supports the forecast is LV: Brock Bowers \u2014 Did Not Participate In Practice. The pick: Miami Dolphins moneyline."
     ],
     "prediction": "MIA to win; LV 19.9 \u2013 MIA 23.6 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "Miami Dolphins",
-        "source_url": "https://www.miamidolphins.com/news/transcript-edge-chop-robinson-press-conference-september-3",
-        "title": "Transcript: EDGE Chop Robinson Press Conference - September 3"
+        "as_of": "2026-09-09T22:42:00+00:00",
+        "source_name": "USA Today",
+        "source_url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxQSzJOS2o4eURBMTk0WXZxQXBzd2dtR1BzMTFiVXEydG9kdzVTeG1meVNjZjA4SVJpYmVnQ29TMURkLTg3YWVIakNHZGxDSDJIVDI4VERwZy1WcTJSaHVLWmRFQTRMRXQwVTFSUU4tOEFPNExkaUhoU0lOMlpzSmhMa1d0aVFIb3FWMVRuYVg0Q0tHRnNrYTRwdEQ5VC1scGQxWHFRS0hlSWN3c0pUbHR6Q3FLVGZCY2pLY0Vtd1luYldkTnhNQjNleGxB?oc=5",
+        "title": "Miami Dolphins won't have to face Raiders Pro Bowl TE Brock Bowers"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "CBS Sports",
-        "source_url": "https://www.cbssports.com/nfl/teams/MIA/miami-dolphins/",
-        "title": "Miami Dolphins News, Scores and Stats 2026-27"
+        "as_of": "2026-09-09T11:43:04+00:00",
+        "source_name": "Yahoo Sports",
+        "source_url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNcjVKcXRtTUhfWEE0akpQSFNYSXAyX2RQNDMtOU13UjZyU0hYSzN1Y0lXZUR4RFdqMXd2bE1zSkVHYnFTdE1GMmFQS3pBN1M3bW5SaUc1Y2hneU9PdXZCUk9rNENOc0dnM2xrM2pOdk95VU1TWF9Dek1oR1o1ZV9nSkl5dENIWmM?oc=5",
+        "title": "Dolphins news: De\u2019Von Achane\u2019s impact vs. Raiders, depth chart release, more"
+      },
+      {
+        "as_of": "2026-09-09T20:03:00+00:00",
+        "source_name": "New York Post",
+        "source_url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPTGhveTV5bHJKTjlpWk11X3pNd0h4aTFFdEthRFVqd0J6ZVVDTVFsSkN0aXpqVFEwR3JLa2ZHMWg1RVgxbFpZM29hY3dIZnlPTU5sZG1HZGFCZWUtX3hwekxTUDlXSzgtQXZjRUcyZkI4YnNTZ0tIXzh6Q1QwMXU3Wm52Zk5zODRaQkpDZGNtU0E?oc=5",
+        "title": "Brock Bowers\u2019 stunning injury has Raiders without Pro Bowler for Dolphins game"
+      },
+      {
+        "as_of": "2026-09-02T17:08:39+00:00",
+        "source_name": "The Phinsider",
+        "source_url": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxOcVNMOE85d0xqSzJPbDA1UTVCS1BSUjdtWHBXc3lITFNJc2NSUVZSeTYtblJGWkI0dWZQak5jWmNwS1VnUEJPT0hSQnpib0tUZHRvbWFpWlY0c3c5VUtNcXhiT2xocTRhbGRvSXZaOXRmanNRWmpqdVo3RUVOQ1dNQWozVTNueTN4SzlQMUR1THFaa2pNMmw1dXdhWVRpd0FvNlpxR3pGQl9Xdzd4amNUR1ZCZjhIY0RUQzZYUWdKU0NWUmQxNnVJcmlmZUpyTmk1LTRoRV9fSnB4Q3l2Z0xfYlc3R1JlMGt6RzhKTVRmdXRhY0p2VUZFa2EtSG4?oc=5",
+        "title": "Dolphins vs. Raiders: Kirk Cousins named starter for Las Vegas in Week 1"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "MIA",
       "primary_family": "early_down",
@@ -2333,7 +2416,6 @@
     "case_for_pick": "SEA explosives vs NE prevention: explosive-pass leverage favors SEA.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -2344,7 +2426,7 @@
         "NE: Ben Brown \u2014 Out"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 4,
       "primary_variant": 10,
       "reporting_first": true,
       "secondary_variant": 10,
@@ -2433,7 +2515,7 @@
     ],
     "game_id": "2026_01_NE_SEA",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Seattle's chunk-play ambition meets New England's long-drive trap",
+    "headline": "Patriots\u2013Seahawks: NE: Ben Brown \u2014 Out",
     "key_factors": [
       {
         "advantage_team": null,
@@ -2469,7 +2551,7 @@
     "matchup": "NE @ SEA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:26:39.200218+00:00",
+        "as_of": "2026-09-10T01:56:02.797945+00:00",
         "family": "availability",
         "label": "Availability",
         "leader": "Watch",
@@ -2479,7 +2561,7 @@
         "title": "NE: Ben Brown \u2014 Out"
       },
       {
-        "as_of": "2026-09-09T21:28:11.055751+00:00",
+        "as_of": "2026-09-10T01:57:59.867677+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "SEA",
@@ -2489,7 +2571,7 @@
         "title": "SEA explosives vs NE prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:11.055912+00:00",
+        "as_of": "2026-09-10T01:57:59.867945+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "SEA",
@@ -2499,7 +2581,7 @@
         "title": "SEA early-down approach vs NE"
       },
       {
-        "as_of": "2026-09-09T21:28:11.054678+00:00",
+        "as_of": "2026-09-10T01:57:59.865857+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NE",
@@ -2536,31 +2618,36 @@
       }
     ],
     "paragraphs": [
-      "Seattle will try to turn its early-down passing efficiency into sudden chunks, forcing New England's new defensive structure to defend the whole field instead of settling into predictable passing situations. The Patriots' answer is disciplined coverage and a steadier run game, especially with TreVeyon Henderson unavailable, while protecting a center spot affected by Ben Brown's absence. Seattle's pass rush can punish obvious downs, but the Seahawks also need to account for Ty Okada's absence in coverage. At home, the Seahawks' explosive-play hunt faces a Patriots team built to make every possession laborious.",
-      "In Seahawks-Patriots, LevLine assigns Seahawks a 60.3% win probability over Patriots. For Seahawks-Patriots, football-only PURE puts Seahawks at 60.4%, while Seahawks-Patriots market probability puts Seahawks at 60.0%. The Seahawks-Patriots production blend weights Seahawks PURE at 75% and Seahawks MARKET at 25%. The Seahawks-Patriots LevLine model line is Seattle Seahawks -3.1; the Seahawks-Patriots market spread is Seattle Seahawks -3.0. The Seahawks-Patriots projected score is SEA 23.9 \u2013 NE 20.8. The Seahawks-Patriots football context is NE: Ben Brown \u2014 Out; that evidence supports Seahawks without changing LevLine for Seahawks-Patriots. The pick: Seattle Seahawks moneyline."
+      "Patriots\u2013Seahawks centers on NE: Ben Brown \u2014 Out. The official NFL injury report lists Ben Brown (C) as Out. Knee LevLine does not make up an injury point value for it. That matters a little more against SEA, which generated sacks on 6.5% of opponent pass plays last season. For Patriots, that detail changes Patriots' choices against Seahawks; Seahawks can exploit it only by forcing Patriots off schedule.",
+      "LevLine makes the Seahawks the winner at 60.3%. Its football-only PURE component is Seahawks 60.4%, while the market-derived probability is 60.0%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Seattle Seahawks -3.1, a market line of Seattle Seahawks -3.0, a projected score of SEA 23.9 \u2013 NE 20.8. The matchup evidence that best supports the forecast is NE: Ben Brown \u2014 Out. The pick: Seattle Seahawks moneyline."
     ],
     "prediction": "SEA to win; SEA 23.9 \u2013 NE 20.8 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "NBC Sports",
-        "source_url": "https://www.nbcsports.com/nfl/news/what-nfl-game-is-on-today-patriots-vs-seahawks-time-tv-channel-live-stream-for-2026-nfl-season-opener",
-        "title": "What NFL game is on today? Patriots vs. Seahawks time, TV channel, live stream for 2026 NFL season opener"
-      },
-      {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
+        "as_of": "2026-09-09T22:55:02+00:00",
         "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/games/patriots-at-seahawks-2026-reg-1",
-        "title": "Patriots at Seahawks - 2026 REG 1"
+        "source_url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNaTJ3anFRMmlxbTdXLVNZM3ZLWkYtYjBWOGZJUnNhUUhWMjdqUTJfbjRDbTVOTUN4N0Fka0N6UV9oYmw0cW9BemcwM1VyOHZJaVpjbzdKWU9hX2FuajRGdU9nY1k3ZFM2WXI1cFpzRGtQZE1KUzdzLUtxRXgwWmd3YkFTd3pybEl3RExqNUlrS1daOVhaVXl3?oc=5",
+        "title": "NFL Kickoff Game inactives: New England Patriots at Seattle Seahawks"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
+        "as_of": "2026-09-09T11:59:00+00:00",
+        "source_name": "The New York Times",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6aa20ec5b6464cfba5d7bac33c50afce&url=https%3a%2f%2fwww.nytimes.com%2fathletic%2flive-blogs%2fpatriots-vs-seahawks-live-score-updates-nfl-kickoff%2fZT4QP4nbrkc1%2f&c=7919619922755378270&mkt=en-us",
+        "title": "Patriots vs. Seahawks score, live updates: Sam Darnold ruled out after hip injury; New England leads 7-0"
+      },
+      {
+        "as_of": "2026-09-09T14:20:00+00:00",
+        "source_name": "USA TODAY",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6aa20ec5b6464cfba5d7bac33c50afce&url=https%3a%2f%2fwww.usatoday.com%2fstory%2fsports%2fnfl%2f2026%2f09%2f09%2fwhere-to-watch-patriots-seahawks-game-today-live-time-tv-schedule-streaming%2f91674037007%2f&c=16846777225499763332&mkt=en-us",
+        "title": "What channel is Patriots vs Seahawks game on tonight? Start time, NFL schedule"
+      },
+      {
+        "as_of": "2026-09-09T23:15:00+00:00",
         "source_name": "CBS Sports",
-        "source_url": "https://www.cbssports.com/betting/news/fanduel-promo-code-350-bonus-bets-patriots-seahawks-2026-nfl-kickoff-game/",
-        "title": "FanDuel promo code: $350 bonus bets for Patriots vs. Seahawks, 2026 NFL Kickoff Game"
+        "source_url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOaWtVSi1PMDJ0aFFJT0xPTG9mRGluSE9rRFVkR2pJNnpqUjltZFpmQ0FCQ3RxTjFWUksyZnlsTEw1VFRFVWpSUEgyX2NiZDY0eWhLWGptQ1NvSGhoeWQ3ajM5bVVWdm5zMEZqa3ZSYmpFUDRwbU1QZDV4SFZxZG9yelVrX3RDU0NvV2s2eUptVDVndWxNU3FFU3hRRmRKZ2ktUlE?oc=5",
+        "title": "Seahawks vs. Patriots: Super Bowl LX rematch kicks off 2026 season as Seattle begins defense of title"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "SEA",
       "primary_family": "explosives",
@@ -2578,7 +2665,6 @@
     "case_for_pick": "NO explosives vs DET prevention: explosive-pass leverage favors DET.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -2664,7 +2750,7 @@
     ],
     "game_id": "2026_01_NO_DET",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Detroit's Familiar Firepower Meets New Orleans' Pressure Test",
+    "headline": "Saints\u2013Lions: NO: Oscar Delp \u2014 Did Not Participate In Practice",
     "key_factors": [
       {
         "advantage_team": null,
@@ -2700,7 +2786,7 @@
     "matchup": "NO @ DET",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:08.345290+00:00",
+        "as_of": "2026-09-10T01:57:55.242192+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2710,7 +2796,7 @@
         "title": "What Drew Petzing could change in DET"
       },
       {
-        "as_of": "2026-09-09T21:28:12.459985+00:00",
+        "as_of": "2026-09-10T01:58:02.290171+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DET",
@@ -2720,7 +2806,7 @@
         "title": "NO explosives vs DET prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:12.459664+00:00",
+        "as_of": "2026-09-10T01:58:02.289632+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DET",
@@ -2730,7 +2816,7 @@
         "title": "NO protection vs DET pass rush"
       },
       {
-        "as_of": "2026-09-09T21:28:12.460968+00:00",
+        "as_of": "2026-09-10T01:58:02.291750+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DET",
@@ -2775,25 +2861,30 @@
       }
     ],
     "paragraphs": [
-      "Detroit's offense still has its proven core, but Drew Petzing's arrival adds a layer of uncertainty for New Orleans to diagnose. The Lions need Jared Goff protected long enough to let Amon-Ra St. Brown and Jahmyr Gibbs turn short completions into field-flipping gains, while avoiding stalled drives against a Saints defense eager to test the new system. New Orleans, meanwhile, must protect its quarterback and manufacture explosive plays without living in obvious passing situations, because Detroit's rush can turn long-yardage downs into a game-changing problem.",
-      "In Lions-Saints, LevLine assigns Lions a 61.6% win probability over Saints. For Lions-Saints, football-only PURE puts Lions at 57.9%, while Lions-Saints market probability puts Lions at 72.6%. The Lions-Saints production blend weights Lions PURE at 75% and Lions MARKET at 25%. The Lions-Saints LevLine model line is Detroit Lions -3.8; the Lions-Saints market spread is Detroit Lions -7.0. The Lions-Saints projected score is DET 24.8 \u2013 NO 21.0. The Lions-Saints football context is What Drew Petzing could change in DET; that evidence supports Lions without changing LevLine for Lions-Saints. The pick: Detroit Lions moneyline."
+      "Saints\u2013Lions centers on NO: Oscar Delp \u2014 Did Not Participate In Practice. The official NFL injury report lists Oscar Delp (TE) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. The passing-game backdrop: the relevant opponent-side profile was +0.04 EPA/play last season. For Saints, that detail changes Saints' choices against Lions; Lions can exploit it only by forcing Saints off schedule.",
+      "LevLine makes the Lions the winner at 61.6%. Its football-only PURE component is Lions 57.9%, while the market-derived probability is 72.6%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Detroit Lions -3.8, a market line of Detroit Lions -7.0, a projected score of DET 24.8 \u2013 NO 21.0. The matchup evidence that best supports the forecast is NO: Oscar Delp \u2014 Did Not Participate In Practice. The pick: Detroit Lions moneyline."
     ],
     "prediction": "DET to win; DET 24.8 \u2013 NO 21.0 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "Detroit Lions",
-        "source_url": "https://www.detroitlions.com/news/lions-vs-saints-practice-report-sept-9-rolder-rakestraw-moore",
-        "title": "Lions vs. Saints practice report: Sept. 9"
+        "as_of": "2026-09-09T21:54:00+00:00",
+        "source_name": "ESPN",
+        "source_url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNUVdUSGY0dkkyT2FFZS1WTHpvQnl0eXBNS1AyTVl2c25hTWRPeDdQaks4MzFuYnpSTjNqSG1BZTVXajdaMGhfU0hjaWEzUTNjVFFpcWkyN0NoeTRBMDc3OTgwenRZNWc3WnZRaTlTT0R3M0wwTllIU2JRdU1nR2FoeDd6aDhwTEU0N2NheXhmdlpmUkhtZDlISGVNNUtfQ0wwSXc?oc=5",
+        "title": "Saints DE Jordan (hamstring) to miss opener vs. Lions"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
+        "as_of": "2026-09-09T16:40:00+00:00",
+        "source_name": "Yahoo Sports",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6aa20ec509a44592841a33ca64541f74&url=https%3a%2f%2fsports.yahoo.com%2farticles%2forleans-saints-final-decision-132-234038891.html&c=9771638827823321146&mkt=en-us",
+        "title": "New Orleans Saints Make Final Decision on 132-Sack Star Before Lions Game"
+      },
+      {
+        "as_of": "2026-09-09T20:42:47+00:00",
         "source_name": "New Orleans Saints",
-        "source_url": "https://www.neworleanssaints.com/news/new-orleans-saints-prepare-for-high-octane-lions-in-regular-season-opener",
-        "title": "New Orleans Saints prepare for high-octane Lions in regular season opener"
+        "source_url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOVTFzMG1RUkRnQVR4ekFNbkZtQXNnREVndEdNenRRNVkzTVdMb3JwMWxlbHA5cTYwREJKVTB0c0UzMnQ1czAxazMxYkd6WDhlRW1zcDRWRnhWRDdkc1lkNGZSVFFTbUFMazZxSnFsSktKNkpqbXVUQWtQX2I5R0tMTGtXbEozcU5jRHZwd3JjMXZ6dVRBQzNmbGRVNVdTUnNHa3hCUUdDTDBlcXdjNnJUS2VqOA?oc=5",
+        "title": "Saints Wednesday Injury Report: 2026 Week 1 vs. Detroit Lions"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "DET",
       "primary_family": "explosives",
@@ -2811,7 +2902,6 @@
     "case_for_pick": "NYJ explosives vs TEN prevention: explosive-pass leverage favors TEN.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -2822,7 +2912,7 @@
         "TEN early-down approach vs NYJ"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 3,
       "primary_variant": 12,
       "reporting_first": true,
       "secondary_variant": 12,
@@ -2897,7 +2987,7 @@
     ],
     "game_id": "2026_01_NYJ_TEN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Can Tennessee force the Jets to win the long way?",
+    "headline": "Jets\u2013Titans: NYJ: Tim Patrick \u2014 Did Not Participate In Practice",
     "key_factors": [
       {
         "advantage_team": "TEN",
@@ -2933,7 +3023,7 @@
     "matchup": "NYJ @ TEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:26:46.013957+00:00",
+        "as_of": "2026-09-10T01:56:31.373862+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2943,7 +3033,7 @@
         "title": "NYJ offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-09T21:28:14.183027+00:00",
+        "as_of": "2026-09-10T01:58:05.266411+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TEN",
@@ -2953,7 +3043,7 @@
         "title": "NYJ explosives vs TEN prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:14.183960+00:00",
+        "as_of": "2026-09-10T01:58:05.268051+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYJ",
@@ -2963,7 +3053,7 @@
         "title": "TEN early-down approach vs NYJ"
       },
       {
-        "as_of": "2026-09-09T21:28:14.183530+00:00",
+        "as_of": "2026-09-10T01:58:05.267277+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "TEN",
@@ -3000,25 +3090,30 @@
       }
     ],
     "paragraphs": [
-      "The Jets need their revamped offense to manufacture explosive gains before Tennessee can turn the game into a slog. That puts pressure on Aaron Glenn\u2019s group to protect the quarterback, create space for Breece Hall if available, and punish a Titans defense adjusting to Gus Bradley. Tennessee\u2019s answer is to stay efficient on early downs with Cam Ward, then avoid obvious passing situations where New York\u2019s rush can attack a vulnerable protection unit. If the Titans prevent chunk plays, their methodical approach should control the game.",
-      "In Titans-Jets, LevLine assigns Titans a 56.0% win probability over Jets. For Titans-Jets, football-only PURE puts Titans at 57.1%, while Titans-Jets market probability puts Titans at 52.6%. The Titans-Jets production blend weights Titans PURE at 75% and Titans MARKET at 25%. The Titans-Jets LevLine model line is Tennessee Titans -2.0; the Titans-Jets market spread is Tennessee Titans -1.5. The Titans-Jets projected score is TEN 24.0 \u2013 NYJ 22.1. The Titans-Jets football context is NYJ explosives vs TEN prevention; that evidence supports Titans without changing LevLine for Titans-Jets. The pick: Tennessee Titans moneyline."
+      "Jets\u2013Titans centers on NYJ: Tim Patrick \u2014 Did Not Participate In Practice. The official NFL injury report lists Tim Patrick (WR) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. The passing-game backdrop: the relevant opponent-side profile was +0.20 EPA/play last season. For Jets, that detail changes Jets' choices against Titans; Titans can exploit it only by forcing Jets off schedule.",
+      "LevLine makes the Titans the winner at 56.0%. Its football-only PURE component is Titans 57.1%, while the market-derived probability is 52.6%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Tennessee Titans -2.0, a market line of Tennessee Titans -1.5, a projected score of TEN 24.0 \u2013 NYJ 22.1. The matchup evidence that best supports the forecast is NYJ: Tim Patrick \u2014 Did Not Participate In Practice. The pick: Tennessee Titans moneyline."
     ],
     "prediction": "TEN to win; TEN 24.0 \u2013 NYJ 22.1 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/games/jets-at-titans-2026-reg-1",
-        "title": "New York Jets at Tennessee Titans 2026 REG 1"
+        "as_of": "2026-09-09T22:06:37+00:00",
+        "source_name": "FOX Sports",
+        "source_url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOSnhBdXNaaDAtRndYU1prYkpQeEpvZi1UZzZEMmNHNnhScThfODJfQTRWMFM2NmdlR1BRcHdZaDhRVW1sNjc5VUNOaWx0R1YzZlJvOUxpdzlLSkhZS192TDd2RnRxZlhPdWRLSXpXUkw2TWpIdGdWUTdkYngxcW5ZVklCV3ZTNi1NREVNREpCUmp5WkFOdWd1VTVzT1hlQjlvVFVNbEpSY0hzWGwtR1BHTThZU0RMY2c?oc=5",
+        "title": "Saleh bets big on Cam Ward: 'This kid's not going to fail' as Titans open vs Jets"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "ESPN",
-        "source_url": "https://www.espn.com/nfl/game/_/gameId/401772000/jets-titans",
-        "title": "New York Jets vs. Tennessee Titans (September 13, 2026)"
+        "as_of": "2026-09-09T22:13:41+00:00",
+        "source_name": "Tennessee Titans",
+        "source_url": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5oSEVQLWtzSXNyR0E1NTdUeWhLaEVUa3F2RmhsSGV0Z3h6SXJhRkxZZEt1N2Z3b01BazdLT2x6RENTbk1uMmdJWFo1ZFFGQUdDaDQ1QkhSdXlBUTcwYXBRcmMxdUJXdVlwTlJYZkVsOW5UYTZoU3JHUU5CbDk?oc=5",
+        "title": "Week 1 Injury Report | Titans vs Jets"
+      },
+      {
+        "as_of": "2026-09-09T23:37:00+00:00",
+        "source_name": "New York Post",
+        "source_url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPVW9IUHMzWTFCd2tIV3NEWkI4a19rVEh3d1RnNUtvdnZFMldtSFdCUURBdXJ0WUkzRHExNVpYLTZxMlJHVmIyZnRKX1JYd2RIYlRGLW4zNGdueFZtX1Atb1hvR3NFblVCOG9PbnVfZUs1bHFHOE1NR3lrdjlMeDYzdWpvOUlhX0gtRDBfMjBrSEs?oc=5",
+        "title": "Jets looking healthy for Week 1 clash with Titans after positive injury report"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "TEN",
       "primary_family": "explosives",
@@ -3032,7 +3127,7 @@
   },
   "2026_01_SF_LA": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "LA explosives vs SF prevention: explosive-pass leverage favors LA.",
+    "case_for_opponent": "LA: Aaron Donald \u2014 Out: availability evidence.",
     "case_for_pick": "Matthew Stafford vs SF: player history: quarterback history context.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
@@ -3044,7 +3139,7 @@
       "game_specific": true,
       "lead_items": [
         "Matthew Stafford vs SF: player history",
-        "LA explosives vs SF prevention"
+        "LA: Aaron Donald \u2014 Out"
       ],
       "media_led": true,
       "media_source_count": 4,
@@ -3109,22 +3204,22 @@
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "SF: James Thompson Jr. \u2014 Did Not Participate In Practice"
+        "strength": "Strong",
+        "title": "LA: Aaron Donald \u2014 Out"
       },
       {
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
         "strength": "Moderate",
-        "title": "LA: Alaric Jackson \u2014 Did Not Participate In Practice"
+        "title": "SF: Alfred Collins \u2014 Did Not Participate In Practice"
       },
       {
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "LA: Jaylen Watson \u2014 Did Not Participate In Practice"
+        "strength": "Weak",
+        "title": "SF: Renardo Green \u2014 Limited Participation in Practice"
       }
     ],
     "game_id": "2026_01_SF_LA",
@@ -3142,6 +3237,16 @@
         "title": "Matthew Stafford vs SF: player history"
       },
       {
+        "advantage_team": null,
+        "family": "availability",
+        "sample_size": null,
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Strong",
+        "summary": "The official NFL injury report lists Aaron Donald (DE) as Out. Not injury related - resting player LevLine does not make up an injury point value for it.",
+        "title": "LA: Aaron Donald \u2014 Out"
+      },
+      {
         "advantage_team": "LA",
         "family": "explosives",
         "sample_size": 732,
@@ -3150,22 +3255,12 @@
         "strength": "Strong",
         "summary": "LA hit a 20+ yard pass on 10.9% of pass plays; SF allowed one on 6.5%. The short version: LA wants chunks, and SF would rather make it earn twelve-play drives.",
         "title": "LA explosives vs SF prevention"
-      },
-      {
-        "advantage_team": null,
-        "family": "motion",
-        "sample_size": 734,
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "SF used pre-snap motion on 55% of charted plays in 2025, versus a league median of 43%, and produced +0.03 EPA/play on those snaps. LA allowed -0.05 EPA/play against the same concept. The offense and defense are good at the same thing. Something has to give; for now this stays in the scouting report, not the formula.",
-        "title": "SF pre-snap motion vs LA"
       }
     ],
     "matchup": "SF @ LA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:17.202039+00:00",
+        "as_of": "2026-09-10T01:58:10.522395+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "LA",
@@ -3175,7 +3270,7 @@
         "title": "Matthew Stafford vs SF: player history"
       },
       {
-        "as_of": "2026-09-09T21:28:11.412576+00:00",
+        "as_of": "2026-09-10T01:58:00.474215+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LA",
@@ -3185,7 +3280,7 @@
         "title": "LA explosives vs SF prevention"
       },
       {
-        "as_of": "2026-09-09T21:26:40.079301+00:00",
+        "as_of": "2026-09-10T01:56:03.872978+00:00",
         "family": "motion",
         "label": "Motion",
         "leader": "Watch",
@@ -3195,14 +3290,14 @@
         "title": "SF pre-snap motion vs LA"
       },
       {
-        "as_of": "2026-09-09T21:26:40.290602+00:00",
-        "family": "coaching",
-        "label": "Staff",
+        "as_of": "2026-09-10T01:56:03.870698+00:00",
+        "family": "availability",
+        "label": "Availability",
         "leader": "Watch",
-        "source_name": "Wikipedia season staff records",
+        "source_name": "NFL.com official injury report",
         "strength": "Strong",
-        "summary": "LA enters 2026 with offensive coordinator Nathan Scheelhaase. Older matchup history gets a haircut here: the people calling the offense are different.",
-        "title": "LA offense changed its decision-makers"
+        "summary": "The official NFL injury report lists Aaron Donald (DE) as Out. Not injury related - resting player LevLine does not make up an injury point value for it.",
+        "title": "LA: Aaron Donald \u2014 Out"
       }
     ],
     "notebook": [
@@ -3281,7 +3376,6 @@
     "case_for_pick": "TB explosives vs CIN prevention: explosive-pass leverage favors CIN.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
-      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -3370,18 +3464,11 @@
         "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
         "strength": "Weak",
         "title": "TB: Jalen McMillan \u2014 Limited Participation in Practice"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0955&longitude=-84.5161&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in CIN"
       }
     ],
     "game_id": "2026_01_TB_CIN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Burrow\u2019s timing meets Tampa\u2019s rebuilt front in a battle for clean pockets",
+    "headline": "Buccaneers\u2013Bengals: TB: Sean Tucker \u2014 Did Not Participate In Practice",
     "key_factors": [
       {
         "advantage_team": null,
@@ -3417,7 +3504,7 @@
     "matchup": "TB @ CIN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:08.345021+00:00",
+        "as_of": "2026-09-10T01:57:55.241803+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3427,7 +3514,7 @@
         "title": "What Zac Robinson could change in TB"
       },
       {
-        "as_of": "2026-09-09T21:28:12.105822+00:00",
+        "as_of": "2026-09-10T01:58:01.684946+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CIN",
@@ -3437,7 +3524,7 @@
         "title": "TB explosives vs CIN prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:12.106743+00:00",
+        "as_of": "2026-09-10T01:58:01.686555+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "TB",
@@ -3447,7 +3534,7 @@
         "title": "CIN early-down approach vs TB"
       },
       {
-        "as_of": "2026-09-09T21:28:12.106009+00:00",
+        "as_of": "2026-09-10T01:58:01.685313+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "CIN",
@@ -3492,25 +3579,30 @@
       }
     ],
     "paragraphs": [
-      "Cincinnati\u2019s best path is to keep Joe Burrow comfortable early, using Ja\u2019Marr Chase and Tee Higgins\u2014both listed as full participants Wednesday\u2014to punish Tampa Bay\u2019s aggressive coverage before the pass rush settles in. The Buccaneers want their rebuilt edge group, including a limited Rueben Bain Jr., to disrupt that rhythm without constant blitzing. Zac Robinson\u2019s new offense must stay balanced, create play-action answers and turn Baker Mayfield\u2019s intermediate throws into yards after catch, especially with Sean Tucker missing Wednesday\u2019s practice.",
-      "In Bengals-Buccaneers, LevLine assigns Bengals a 65.2% win probability over Buccaneers. For Bengals-Buccaneers, football-only PURE puts Bengals at 65.7%, while Bengals-Buccaneers market probability puts Bengals at 63.7%. The Bengals-Buccaneers production blend weights Bengals PURE at 75% and Bengals MARKET at 25%. The Bengals-Buccaneers LevLine model line is Cincinnati Bengals -4.9; the Bengals-Buccaneers market spread is Cincinnati Bengals -3.5. The Bengals-Buccaneers projected score is CIN 25.2 \u2013 TB 20.3. The Bengals-Buccaneers football context is What Zac Robinson could change in TB; that evidence supports Bengals without changing LevLine for Bengals-Buccaneers. The pick: Cincinnati Bengals moneyline."
+      "Buccaneers\u2013Bengals centers on TB: Sean Tucker \u2014 Did Not Participate In Practice. The official NFL injury report lists Sean Tucker (RB) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. In 2025, he represented 18% of team rushes (86). Usage is context for the role at risk, not an automatic forecast adjustment. The run-game backdrop is CIN at +0.07 rushing EPA allowed per play last season. For Buccaneers, that detail changes Buccaneers' choices against Bengals; Bengals can exploit it only by forcing Buccaneers off schedule.",
+      "LevLine makes the Bengals the winner at 65.2%. Its football-only PURE component is Bengals 65.7%, while the market-derived probability is 63.7%; the production 75% PURE / 25% market blend lands at the published number. That forecast corresponds to a model line of Cincinnati Bengals -4.9, a market line of Cincinnati Bengals -3.5, a projected score of CIN 25.2 \u2013 TB 20.3. The matchup evidence that best supports the forecast is TB: Sean Tucker \u2014 Did Not Participate In Practice. The pick: Cincinnati Bengals moneyline."
     ],
     "prediction": "CIN to win; CIN 25.2 \u2013 TB 20.3 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "Bengals.com",
-        "source_url": "https://www.bengals.com/news/buccaneers-bengals-injury-report-week-1-2026",
-        "title": "Week 1 Injury Report | Buccaneers vs Bengals"
+        "as_of": "2026-09-09T12:28:00+00:00",
+        "source_name": "Yahoo Sports",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6aa20ec5f477433a94ca929c98d78366&url=https%3a%2f%2fsports.yahoo.com%2farticles%2fbuccaneers-news-todd-bowles-truth-192703238.html&c=12374814723900125455&mkt=en-us",
+        "title": "Buccaneers news: Todd Bowles' truth bomb on facing Bengals star receivers"
       },
       {
-        "as_of": "2026-09-09T21:24:05.785411+00:00",
-        "source_name": "Tampa Bay Buccaneers",
-        "source_url": "https://www.buccaneers.com/news/buccaneers-bengals-top-storylines-key-matchups-week-1-2026",
-        "title": "Buccaneers-Bengals: Top Storylines & Key Matchups in Week One"
+        "as_of": "2026-09-02T18:01:58+00:00",
+        "source_name": "USA Today",
+        "source_url": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxOM0RFNHFPTnlhV3k4MGdyYTRyN3l1NkREWnRfWmtOT3V0dEplRFhBeFJERXhhbFlsNEV5b0dVVlFPVUhGcTNaUDUwWHVlQl83SkZhVHppZ1RBMkNsNEhRUjFra2RUYkQ3NGpxSy03T2RFSmpsbDA2RHl1anlEQ2pMeFRndDZEdWJNUks4QVlsZFlwNV9wX3R3d3NieXBOdXduVDdPS2xwdWhwY0RDTi1fN0JhNFdSb2ppSi14cGJPU0JMMFFQeFI0S1RiVkNVbVNHai02ZmFONTNZWE9ZYmsxQVNTbm5fdjBy?oc=5",
+        "title": "Tampa Bay Buccaneers at Cincinnati Bengals - NFL Game Summary - Sep 13, 2026"
+      },
+      {
+        "as_of": "2026-09-10T00:57:29+00:00",
+        "source_name": "sports.yahoo.com",
+        "source_url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNNWV4RUN5UnZ0bWNlTTQ1MWtpVHpxd1Y1aENhaFQyTVhLSmtZTlRpWnpwTmVBQm5yTWpXVmVkVkg4UzhoUWJ2N044TkZRSy1XV01DdlEwUm1FSXpEdWxhUldkdDNRSlVDaTBTS1AwX1E2NUdMVUtEdWlVaVNWdkEwSmtXa0xjeW1oSnUxUHBNRjFna00?oc=5",
+        "title": "Buccaneers at Bengals: Initial injury report for Week 1"
       }
     ],
-    "source_first_guardrail": "Copilot synthesized approved current reporting for the matchup preview and explained already-published LevLine numbers; it did not modify the forecast.",
     "story_spine": {
       "primary_advantage_team": "CIN",
       "primary_family": "explosives",
@@ -3539,7 +3631,7 @@
         "PHI YAC creation vs WAS tackling"
       ],
       "media_led": true,
-      "media_source_count": 1,
+      "media_source_count": 2,
       "primary_variant": 15,
       "reporting_first": true,
       "secondary_variant": 15,
@@ -3596,6 +3688,27 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "WAS early-down approach vs PHI"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Weak",
+        "title": "WAS: K'Lavon Chaisson \u2014 Limited Participation in Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Weak",
+        "title": "WAS: Odafe Oweh \u2014 Limited Participation in Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report + nflverse usage",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+        "strength": "Weak",
+        "title": "WAS: Jacory Croskey-Merritt \u2014 Limited Participation in Practice"
       }
     ],
     "game_id": "2026_01_WAS_PHI",
@@ -3636,7 +3749,7 @@
     "matchup": "WAS @ PHI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-09T21:28:20.551794+00:00",
+        "as_of": "2026-09-10T01:58:16.713322+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "PHI",
@@ -3646,7 +3759,7 @@
         "title": "Jalen Hurts vs WAS: player history"
       },
       {
-        "as_of": "2026-09-09T21:28:15.601693+00:00",
+        "as_of": "2026-09-10T01:58:07.680271+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "WAS",
@@ -3656,7 +3769,7 @@
         "title": "PHI YAC creation vs WAS tackling"
       },
       {
-        "as_of": "2026-09-09T21:28:15.601483+00:00",
+        "as_of": "2026-09-10T01:58:07.679895+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "WAS",
@@ -3666,7 +3779,7 @@
         "title": "PHI explosives vs WAS prevention"
       },
       {
-        "as_of": "2026-09-09T21:28:15.600847+00:00",
+        "as_of": "2026-09-10T01:58:07.678794+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "WAS",
