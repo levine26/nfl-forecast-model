@@ -43,8 +43,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     base_features = feature_sets["production_compatible"]
     base_oof, research = build_nested_research(historical, base_features, seed)
 
-    # The target is 2026, so every meta-model training row must be an earlier-season
-    # OOF row. fit_frozen_2026_stack hard-fails if any 2026+ row is supplied.
+    # Target season 2026 may only train on earlier-season OOF rows. The fitter fails
+    # closed if any 2026-or-later row reaches this boundary.
     fit = fit_frozen_2026_stack(research)
     current_pure = fit_future_nested_stack(
         historical,
@@ -95,10 +95,6 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     if not selected_per_game.eq(1).all():
         raise RuntimeError("Frozen F-ST must be the sole selected research shadow per game")
 
-    slate.to_csv(slate_path, index=False)
-    fst.to_csv(out / "this_week_shadow.csv", index=False)
-    model_dir = out / "fst"
-    model_dir.mkdir(parents=True, exist_ok=True)
     runtime = {
         "candidate_id": FROZEN_CANDIDATE_ID,
         "mode": "research_only_frozen_shadow",
@@ -110,7 +106,29 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         "freeze_timestamp_utc": spec["freeze_timestamp_utc"],
         "freeze_implementation_sha": spec["freeze_implementation_sha"],
     }
+
+    slate.to_csv(slate_path, index=False)
+    fst.to_csv(out / "this_week_shadow.csv", index=False)
+    model_dir = out / "fst"
+    model_dir.mkdir(parents=True, exist_ok=True)
     (model_dir / "runtime_model.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+    report_path = out / "report.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    report.update({
+        "selected_shadow_candidate": "F-ST-01",
+        "selected_shadow_method": FROZEN_METHOD,
+        "selected_shadow_feature_set": FROZEN_FEATURE_SET,
+        "selected_shadow_version": FROZEN_CANDIDATE_ID,
+        "shadow_candidate_count": int(slate.research_candidate.nunique()),
+        "current_shadow_candidate_rows": int(len(slate)),
+        "current_shadow_games": int(len(fst)),
+        "frozen_fst": runtime,
+        "2026_outcomes_used_in_fitting": 0,
+        "production_outputs_modified": 0,
+        "promotion_authorized": False,
+    })
+    report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(runtime, indent=2))
     return runtime
 
