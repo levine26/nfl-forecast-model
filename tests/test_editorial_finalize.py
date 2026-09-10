@@ -39,9 +39,9 @@ def _status_preview(headline: str, player: str, team_copy: str) -> dict:
             "No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. "
             f"{team_copy}"
         ],
-        "case_for_pick": f"{headline} has a matchup-specific case.",
-        "case_for_opponent": f"The opponent in {headline} has a distinct countercase.",
-        "what_could_make_us_wrong": f"Variance could change {headline} in a different way.",
+        "case_for_pick": f"{player} leverage.",
+        "case_for_opponent": f"{headline} counter.",
+        "what_could_make_us_wrong": f"{player} variance.",
         "editorial_voice": {"game_specific": True},
         "key_factors": [],
         "matchup_meter": [],
