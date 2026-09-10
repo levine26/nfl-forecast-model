@@ -139,6 +139,16 @@ def refresh(output_dir: str = "outputs", season: int = 2026) -> pd.DataFrame:
     live = add_vig_free_market_prob(live)
     idx = live.drop_duplicates("game_id", keep="last").set_index("game_id")
 
+    fresh_market = (
+        p["game_id"].map(idx["market_home_prob"])
+        if "market_home_prob" in idx.columns
+        else pd.Series(np.nan, index=p.index, dtype=float)
+    )
+    fresh_market_num = pd.to_numeric(fresh_market, errors="coerce")
+    observed_market = pd.Series(
+        np.isfinite(fresh_market_num.to_numpy(dtype=float)), index=p.index
+    )
+
     for col in ["market_home_prob", "spread_line", "total_line"]:
         if col in idx.columns:
             fresh = p["game_id"].map(idx[col])
@@ -166,8 +176,27 @@ def refresh(output_dir: str = "outputs", season: int = 2026) -> pd.DataFrame:
 
     _legacy_diagnostics(p)
     timestamp = datetime.now(timezone.utc).isoformat()
-    p["market_snapshot_timestamp_utc"] = timestamp
-    p["market_snapshot_source"] = "nflverse_games.csv_moneyline"
+    previous_market_ts = (
+        p["market_snapshot_timestamp_utc"].copy()
+        if "market_snapshot_timestamp_utc" in p.columns
+        else pd.Series(np.nan, index=p.index, dtype=object)
+    )
+    previous_market_source = (
+        p["market_snapshot_source"].copy()
+        if "market_snapshot_source" in p.columns
+        else pd.Series(np.nan, index=p.index, dtype=object)
+    )
+    p["market_snapshot_timestamp_utc"] = previous_market_ts
+    p.loc[observed_market, "market_snapshot_timestamp_utc"] = timestamp
+    p["market_snapshot_source"] = previous_market_source
+    p.loc[observed_market, "market_snapshot_source"] = "nflverse_games.csv_moneyline"
+    usable_market = pd.Series(
+        np.isfinite(pd.to_numeric(p["market_home_prob"], errors="coerce").to_numpy(dtype=float)),
+        index=p.index,
+    )
+    p["market_freshness_status"] = "missing_or_invalid"
+    p.loc[usable_market & ~observed_market, "market_freshness_status"] = "carried_forward_previous_snapshot"
+    p.loc[observed_market, "market_freshness_status"] = "refreshed_this_run"
     p["snapshot_type"] = "MARKET"
     p["prediction_timestamp_utc"] = timestamp
     write_outputs(SimpleNamespace(predictions=p, games=schedules), output_dir)
