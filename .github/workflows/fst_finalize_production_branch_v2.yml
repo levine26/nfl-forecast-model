@@ -23,11 +23,15 @@ jobs:
         run: git fetch origin feat/deploy-fst-production:refs/remotes/origin/feat/deploy-fst-production
       - name: Apply deterministic finalizer
         run: python scripts/finalize_fst_production_branch.py
-      - name: Commit finalized production branch
+      - name: Keep workflow mutation out of bot push
+        run: |
+          git restore .github/workflows/weekly.yml .github/workflows/market_refresh.yml
+          rm -f .github/workflows/fst_deployment.yml
+      - name: Commit finalized production semantics
         run: |
           set -euo pipefail
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add src/nfl_forecast/pipeline.py scripts/validate_fst_production_canary.py scripts/refresh_market.py site/src/fst-production-presentation.js pyproject.toml tests/test_fst_production.py .github/workflows/weekly.yml .github/workflows/market_refresh.yml .github/workflows/fst_deployment.yml README.md
+          git add src/nfl_forecast/pipeline.py scripts/validate_fst_production_canary.py scripts/refresh_market.py site/src/fst-production-presentation.js pyproject.toml tests/test_fst_production.py README.md
           git commit -m 'Finalize portable F-ST production deployment contract'
           git push origin HEAD:feat/deploy-fst-production-current
