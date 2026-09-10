@@ -1,0 +1,56 @@
+name: LevLine player-state research
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/player_state_research.py'
+      - 'scripts/run_player_state_research.py'
+      - 'research/player_data_timestamp_contract.json'
+      - 'tests/test_player_state_research.py'
+      - '.github/workflows/research_player_state.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-player-state-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  player-state:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test chronological state and leakage controls
+        run: pytest -q tests/test_player_state_research.py tests/test_challenger_v08.py
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-player-state-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-player-state-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Build historical player-state artifact
+        run: |
+          rm -rf research_outputs/player_state
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_player_state_research.py
+          test -s research_outputs/player_state/player_data_audit.json
+          test -s research_outputs/player_state/manifest.json
+          test -s research_outputs/player_state/v09a_game_features.parquet
+      - name: Prove production outputs and site are untouched
+        run: git diff --exit-code -- outputs/ site/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-player-state-${{ github.run_id }}
+          path: research_outputs/player_state/
+          retention-days: 30
