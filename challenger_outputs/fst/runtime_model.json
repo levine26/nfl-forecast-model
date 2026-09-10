@@ -1,0 +1,21 @@
+{
+  "candidate_id": "F-ST-01-FROZEN-2026",
+  "mode": "research_only_frozen_shadow",
+  "target_season": 2026,
+  "training_cutoff": 2025,
+  "2026_outcomes_used_in_fitting": 0,
+  "production_promotion_authorized": false,
+  "intercept": -0.06954359363166639,
+  "market_logit_coefficient": 1.1939087340527093,
+  "pure_logit_coefficient": -0.19342747983803402,
+  "training_games": 1615,
+  "training_first_season": 2020,
+  "training_last_season": 2025,
+  "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+  "C": 1.0,
+  "penalty": "l2",
+  "solver": "lbfgs",
+  "max_iter": 3000,
+  "freeze_timestamp_utc": "2026-09-10T05:08:04Z",
+  "freeze_implementation_sha": "59830d23e406d32c34e74919b31d0dd9f85b16ca"
+}
