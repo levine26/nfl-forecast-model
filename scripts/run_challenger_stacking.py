@@ -16,6 +16,11 @@ import sklearn
 
 from nfl_forecast.challenger import blend_probabilities, score_probabilities
 from nfl_forecast.challenger_evaluation import compare_forecasts, confidence_set_approximation
+from nfl_forecast.challenger_stacking import (
+    STACK_C,
+    TARGET_SEASONS,
+    build_chronological_logit_stack,
+)
 from nfl_forecast.challenger_v07 import (
     build_opponent_adjusted_matchup_features,
     opponent_adjusted_feature_columns,
@@ -31,11 +36,6 @@ from nfl_forecast.features import (
     core_columns,
 )
 from nfl_forecast.market import add_vig_free_market_prob
-from nfl_forecast.stacking_research import (
-    STACK_C,
-    TARGET_SEASONS,
-    build_chronological_logit_stack,
-)
 from run_challenger_v08 import build_nested_research, nested_linear_hybrid
 
 HISTORICAL_END = 2025
