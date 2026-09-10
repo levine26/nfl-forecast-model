@@ -33,6 +33,11 @@ STAT_BOILERPLATE_TERMS = {
     "targets", "target", "yards", "yard", "sacks", "sack", "rate", "epa", "pressure",
     "pressures", "blitz", "blitzes", "passes", "pass", "rushes", "rush",
 }
+STANDARDIZED_EVIDENCE_FRAGMENTS = (
+    "passing game backdrop",
+    "relevant opponent side profile",
+    "usage is context for the role",
+)
 
 
 def _nick(team: Any) -> str:
@@ -131,9 +136,11 @@ def _uniqueness_segments(text: str) -> list[str]:
 
 
 def _is_standardized_fact_ngram(words: list[str]) -> bool:
-    """Exempt repeated stat scaffolding while keeping editorial interpretation gated."""
+    """Exempt evidence-reporting scaffolds while keeping interpretation prose gated."""
     gram = " ".join(words)
     if "last season" in gram and any(token in STAT_BOILERPLATE_TERMS for token in words):
+        return True
+    if any(fragment in gram for fragment in STANDARDIZED_EVIDENCE_FRAGMENTS):
         return True
     return False
 
