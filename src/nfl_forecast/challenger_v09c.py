@@ -15,12 +15,12 @@ import pandas as pd
 
 from .challenger_v07 import build_opponent_adjusted_matchup_features, opponent_adjusted_feature_columns
 from .challenger_v08 import build_qb_matchup_features, qb_feature_columns
+from .challenger_v09c_unit_state import build_game_unit_features, build_unit_state, v09c_feature_columns
 from .config import load_config
 from .data import load_advanced_data, load_core_data
 from .elo import build_pregame_elo
 from .features import add_game_results, aggregate_team_games, build_matchup_features, core_columns
 from .market import add_vig_free_market_prob
-from .unit_state_research import build_game_unit_features, build_unit_state, v09c_feature_columns
 
 HISTORICAL_END = 2025
 TARGET_SEASONS = (2022, 2023, 2024, 2025)
