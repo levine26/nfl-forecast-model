@@ -40,7 +40,9 @@ def _status_preview(headline: str, player: str, team: str, rate: str, team_copy:
             f"Later, {player} was limited in practice. That matters a little more against {team}'s specific plan. "
             f"Pressure reached {rate}% of opponent pass plays last season for {team}. "
             f"For the passing game backdrop, the relevant opponent-side profile was {team}'s coverage structure. "
-            f"{player} usage is context for the role at {team}, not an injury point value. {team_copy}"
+            f"{player} usage is context for the role at {team}, not an injury point value. "
+            f"{player}'s prior usage is context for the role at risk, not an automatic forecast adjustment. "
+            f"{team_copy}"
         ],
         "case_for_pick": f"{player} leverage.",
         "case_for_opponent": f"{headline} counter.",
