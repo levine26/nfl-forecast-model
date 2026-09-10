@@ -27,7 +27,7 @@ dev = ["pytest>=8.0", "ruff>=0.8"]
 nfl_forecast = ["artifacts/*.json"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 
 [tool.ruff]
 line-length = 100
