@@ -61,3 +61,18 @@ def test_games_locked_before_freeze_are_excluded_from_prospective_evidence():
     report, _ = evaluate_frozen_fst(combined, bootstrap_samples=100)
     assert report["excluded_prefreeze_rows"] == 1
     assert report["games"] == 4
+
+
+def test_legacy_pre_fst_shadow_ledger_normalizes_to_awaiting_without_backfill():
+    legacy = pd.DataFrame([{
+        "game_id": "legacy_game",
+        "research_candidate": "Old challenger",
+        "challenger_pick": "HOME",
+    }])
+    report, weekly = evaluate_frozen_fst(legacy, bootstrap_samples=100)
+    assert report["status"] == "awaiting_graded_games"
+    assert report["games"] == 0
+    assert report["weeks"] == 0
+    assert report["promotion_gate_passed"] is False
+    assert report["promotion_authorized"] is False
+    assert weekly.empty
