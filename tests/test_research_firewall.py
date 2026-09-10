@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 import ast
+import importlib.util
 from pathlib import Path
 
-from scripts.check_research_firewall import path_allowed, validate_changed_paths
+_FIREWALL_PATH = Path("scripts/check_research_firewall.py")
+_SPEC = importlib.util.spec_from_file_location("check_research_firewall", _FIREWALL_PATH)
+assert _SPEC is not None and _SPEC.loader is not None
+_FIREWALL = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_FIREWALL)
+path_allowed = _FIREWALL.path_allowed
+validate_changed_paths = _FIREWALL.validate_changed_paths
 
 
 def test_research_allowlist_accepts_isolated_surfaces():
