@@ -19,6 +19,9 @@ EXPECTED_INTERCEPT = -0.06954359363166639
 EXPECTED_MARKET_COEF = 1.1939087340527093
 EXPECTED_PURE_COEF = -0.19342747983803402
 EXPECTED_GAMES = 1615
+EXPECTED_FIRST_SEASON = 2020
+EXPECTED_LAST_SEASON = 2025
+NUMERIC_TOLERANCE = 1e-12
 
 
 def main() -> None:
@@ -36,6 +39,20 @@ def main() -> None:
     base_oof, research = build_nested_research(historical, base_features, seed)
     fit = fit_frozen_2026_stack(research)
 
+    coefficient_deltas = {
+        "intercept": abs(fit.intercept - EXPECTED_INTERCEPT),
+        "market_logit_coefficient": abs(fit.market_logit_coefficient - EXPECTED_MARKET_COEF),
+        "pure_logit_coefficient": abs(fit.pure_logit_coefficient - EXPECTED_PURE_COEF),
+    }
+    exact_identity_matches = bool(
+        fit.training_data_sha256 == EXPECTED_DIGEST
+        and fit.training_games == EXPECTED_GAMES
+        and fit.training_first_season == EXPECTED_FIRST_SEASON
+        and fit.training_last_season == EXPECTED_LAST_SEASON
+    )
+    numeric_parity_matches = bool(
+        max(coefficient_deltas.values(), default=0.0) <= NUMERIC_TOLERANCE
+    )
     summary = {
         "training_data_sha256": fit.training_data_sha256,
         "training_games": fit.training_games,
@@ -44,17 +61,16 @@ def main() -> None:
         "intercept": fit.intercept,
         "market_logit_coefficient": fit.market_logit_coefficient,
         "pure_logit_coefficient": fit.pure_logit_coefficient,
+        "coefficient_absolute_deltas": coefficient_deltas,
+        "numeric_parity_tolerance": NUMERIC_TOLERANCE,
         "base_oof_rows": int(len(base_oof)),
         "base_oof_first_season": int(pd.to_numeric(base_oof.season).min()),
         "base_oof_last_season": int(pd.to_numeric(base_oof.season).max()),
         "feature_count": int(len(base_features)),
-        "frozen_identity_matches": bool(
-            fit.training_data_sha256 == EXPECTED_DIGEST
-            and fit.training_games == EXPECTED_GAMES
-            and fit.intercept == EXPECTED_INTERCEPT
-            and fit.market_logit_coefficient == EXPECTED_MARKET_COEF
-            and fit.pure_logit_coefficient == EXPECTED_PURE_COEF
-        ),
+        "exact_training_identity_matches": exact_identity_matches,
+        "numeric_refit_parity_matches": numeric_parity_matches,
+        "frozen_identity_matches": bool(exact_identity_matches and numeric_parity_matches),
+        "authoritative_scoring_source": "registered_frozen_artifact_constants",
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
 
@@ -84,9 +100,14 @@ def main() -> None:
     keyed_training.to_csv(out / "training_frame_keyed.csv", index=False)
 
     print(json.dumps(summary, indent=2))
-    if not summary["frozen_identity_matches"]:
+    if not exact_identity_matches:
         raise SystemExit(
-            "Current research path does not reproduce the frozen F-ST identity; "
+            "Current research path does not reproduce the frozen F-ST training identity; "
+            "do not promote a reconstructed mapping"
+        )
+    if not numeric_parity_matches:
+        raise SystemExit(
+            "Current research refit exceeds the fixed 1e-12 coefficient parity bound; "
             "do not promote a reconstructed mapping"
         )
 
