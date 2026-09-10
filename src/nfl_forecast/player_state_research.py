@@ -382,13 +382,15 @@ def audit_player_data(
         rookies = int(len(first_season))
 
     qb = roles[roles.role.eq("qb")].copy() if not roles.empty else pd.DataFrame()
-    relief_games = 0
-    starter_ambiguous_games = 0
+    relief_team_games = 0
+    ambiguous_games = 0
     if not qb.empty:
         meaningful = qb[qb.opportunities.ge(5)]
-        passers = meaningful.groupby("game_id").player_id.nunique()
-        relief_games = int(passers.gt(1).sum())
-        starter_ambiguous_games = relief_games
+        passers = meaningful.groupby(["game_id", "team"]).player_id.nunique()
+        multi = passers[passers.gt(1)]
+        relief_team_games = int(len(multi))
+        if relief_team_games:
+            ambiguous_games = int(multi.reset_index().game_id.nunique())
 
     game_plays = work.groupby("game_id").size()
     partial_candidates = int(game_plays.lt(80).sum())
@@ -409,8 +411,9 @@ def audit_player_data(
         "midseason_team_transition_events": transitions,
         "players_with_multi_team_season": transition_players,
         "players_first_observed_in_dataset": rookies,
-        "backup_qb_relief_or_multi_passer_games": relief_games,
-        "starter_ambiguity_games_from_pbp": starter_ambiguous_games,
+        "backup_qb_relief_or_multi_passer_games": ambiguous_games,
+        "backup_qb_relief_or_multi_passer_team_games": relief_team_games,
+        "starter_ambiguity_team_games_from_pbp": relief_team_games,
         "low_play_count_partial_game_candidates": partial_candidates,
         "snap_counts": {"status": "available" if snap_counts is not None and not snap_counts.empty else "missing", "rows": int(len(snap_counts)) if snap_counts is not None else 0},
         "depth_charts": {"status": "available" if depth_charts is not None and not depth_charts.empty else "missing", "rows": int(len(depth_charts)) if depth_charts is not None else 0},
