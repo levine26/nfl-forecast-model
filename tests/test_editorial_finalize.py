@@ -31,13 +31,14 @@ def test_finalizer_replaces_generic_factor_copy_and_builds_notebook():
     assert previews["g"]["editorial_version"] == "story-desk-v3"
 
 
-def _status_preview(headline: str, player: str, team_copy: str) -> dict:
+def _status_preview(headline: str, player: str, team: str, rate: str, team_copy: str) -> dict:
     return {
         "headline": headline,
         "paragraphs": [
             f"The official NFL injury report lists {player} (WR) as Limited Participation In Practice. "
             "No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. "
-            f"{team_copy}"
+            f"Later, {player} was limited in practice. That matters a little more against {team}'s specific plan. "
+            f"Pressure reached {rate}% of opponent pass plays last season for {team}. {team_copy}"
         ],
         "case_for_pick": f"{player} leverage.",
         "case_for_opponent": f"{headline} counter.",
@@ -49,14 +50,20 @@ def _status_preview(headline: str, player: str, team_copy: str) -> dict:
     }
 
 
-def test_finalizer_exempts_standardized_injury_language_but_keeps_substantive_uniqueness_gate():
+def test_finalizer_exempts_standardized_facts_without_weakening_substantive_uniqueness_gate():
     predictions = pd.DataFrame([
         {"game_id":"g1","away_team":"ATL","home_team":"PIT","pick":"PIT"},
         {"game_id":"g2","away_team":"BAL","home_team":"IND","pick":"BAL"},
     ])
     previews = {
-        "g1": _status_preview("Falcons-Steelers pressure test", "Drake London", "Pittsburgh must win the protection battle on passing downs."),
-        "g2": _status_preview("Ravens-Colts coverage test", "Zay Flowers", "Baltimore must create clean answers against disguised coverage."),
+        "g1": _status_preview(
+            "Falcons-Steelers pressure test", "Drake London", "Pittsburgh", "4.5",
+            "Pittsburgh must win the protection battle on passing downs.",
+        ),
+        "g2": _status_preview(
+            "Ravens-Colts coverage test", "Zay Flowers", "Baltimore", "5.5",
+            "Baltimore must create clean answers against disguised coverage.",
+        ),
     }
 
     status = finalize_previews(predictions, previews, {"g1": [], "g2": []})
