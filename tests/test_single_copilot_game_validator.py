@@ -40,6 +40,39 @@ def test_source_gate_requires_two_independent_direct_domains():
     assert not failures
 
 
+def test_source_gate_rejects_generic_team_schedule_game_and_stats_pages():
+    generic = [
+        {"name": "NFL", "title": "Chargers team", "url": "https://www.nfl.com/teams/los-angeles-chargers/"},
+        {"name": "Chargers", "title": "Schedule", "url": "https://www.chargers.com/schedule/"},
+        {"name": "NFL", "title": "Game", "url": "https://www.nfl.com/games/bills-at-texans-2026-reg-1"},
+        {"name": "ESPN", "title": "Giants team page", "url": "https://www.espn.com/nfl/team/_/name/nyg/new-york-giants"},
+        {"name": "NGS", "title": "Passing stats", "url": "https://nextgenstats.nfl.com/stats/quarterbacks/2025/REG/all"},
+    ]
+    valid, families, failures = module._valid_sources(generic)
+    assert not valid
+    assert not families
+    assert sum("not a direct approved article/report" in failure for failure in failures) == len(generic)
+
+
+def test_official_team_news_article_counts_as_direct_reporting():
+    valid, families, failures = module._valid_sources([
+        {"name": "Colts", "title": "Colts report", "url": "https://www.colts.com/news/example-report"},
+        {"name": "NFL", "title": "NFL report", "url": "https://www.nfl.com/news/example-report"},
+    ])
+    assert len(valid) == 2
+    assert len(families) == 2
+    assert not failures
+
+
+def test_x_and_twitter_are_one_source_family():
+    _, families, failures = module._valid_sources([
+        {"name": "Reporter A", "title": "One", "url": "https://x.com/reporter/status/123456789"},
+        {"name": "Reporter B", "title": "Two", "url": "https://twitter.com/reporter2/status/987654321"},
+    ])
+    assert families == {"x.com"}
+    assert any("two independent" in failure for failure in failures)
+
+
 def test_seven_word_human_phrase_collision_is_detectable():
     a = "turn its explosive play threat into steady production now"
     b = "Miami can turn its explosive play threat into steady drives"

@@ -17,6 +17,33 @@ BANNED = (
     "there is actual memory in this quarterback matchup", "prior meetings give", "this is a geometry game",
     "the case also has a second leg", "the supporting thread is", "the extra wrinkle is",
 )
+STANDARDIZED_STATUS_PATTERNS = (
+    re.compile(
+        r"\bthe official nfl injury report lists\b.*?\b(?:did not participate in practice|limited participation in practice|full participation in practice|out|doubtful|questionable)\b",
+        re.I,
+    ),
+    re.compile(
+        r"\bno game[- ]status designation is posted yet,?\s+so this is treated as availability context rather than an assumption the player will be inactive\b",
+        re.I,
+    ),
+    re.compile(r"\blevline does not make up an injury point value for it\b", re.I),
+)
+STANDARDIZED_PERSONNEL_PATTERNS = (
+    re.compile(
+        r"\b(?:(?:[a-z][a-z.'’-]*\s+){0,3}[a-z][a-z.'’-]*['’]s\s+prior\s+)?usage\s+is\s+context\s+for\s+the\s+role\s+at\s+risk\s*(?:[,;:—–-]\s*)?not\s+an\s+automatic\s+forecast\s+adjustment\b[.!?]?",
+        re.I,
+    ),
+)
+STAT_BOILERPLATE_TERMS = {
+    "plays", "play", "attempts", "attempt", "dropbacks", "dropback", "snaps", "snap",
+    "targets", "target", "yards", "yard", "sacks", "sack", "rate", "epa", "pressure",
+    "pressures", "blitz", "blitzes", "passes", "pass", "rushes", "rush",
+}
+STANDARDIZED_EVIDENCE_FRAGMENTS = (
+    "passing game backdrop",
+    "relevant opponent side profile",
+    "usage is context for the role",
+)
 
 
 def _nick(team: Any) -> str:
@@ -86,7 +113,6 @@ def _notebook_candidates(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     used_family_count: dict[str, int] = {}
     for item in candidates:
         family = _family(item)
-        # At most two QB/player facts; leave room for team/event/coaching context.
         if family in {"career_qb_opponent_ledger", "ngs_qb_profile"} and used_family_count.get("players", 0) >= 2:
             continue
         selected.append(item)
@@ -95,6 +121,34 @@ def _notebook_candidates(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if len(selected) >= 5:
             break
     return selected
+
+
+def _editorial_uniqueness_text(text: str) -> str:
+    """Remove standardized factual/status boilerplate before substantive prose QA."""
+    scrubbed = str(text or "")
+    for pattern in (*STANDARDIZED_STATUS_PATTERNS, *STANDARDIZED_PERSONNEL_PATTERNS):
+        scrubbed = pattern.sub(" ", scrubbed)
+    return scrubbed
+
+
+def _uniqueness_segments(text: str) -> list[str]:
+    """Never manufacture duplicate prose by sliding an n-gram across sentences."""
+    scrubbed = _editorial_uniqueness_text(text)
+    return [
+        segment.strip()
+        for segment in re.split(r"(?<=[.!?])\s+|(?<=;)\s+", scrubbed)
+        if segment.strip()
+    ]
+
+
+def _is_standardized_fact_ngram(words: list[str]) -> bool:
+    """Exempt evidence-reporting scaffolds while keeping interpretation prose gated."""
+    gram = " ".join(words)
+    if "last season" in gram and any(token in STAT_BOILERPLATE_TERMS for token in words):
+        return True
+    if any(fragment in gram for fragment in STANDARDIZED_EVIDENCE_FRAGMENTS):
+        return True
+    return False
 
 
 def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, Any]], evidence: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
@@ -109,8 +163,6 @@ def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, A
         pick = str(row.get("pick")); home = str(row.get("home_team")); away = str(row.get("away_team"))
         opponent = away if pick == home else home
 
-        # Three Things should deepen the Read with the actual sourced sentence,
-        # not an abstract placeholder such as "Staff Impact is a live signal."
         for factor in preview.get("key_factors") or []:
             match = by_title.get(str(factor.get("title") or ""))
             if match and match.get("summary"):
@@ -118,7 +170,6 @@ def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, A
                 factor["source_url"] = match.get("source_url")
                 factor["source_name"] = match.get("source_name")
 
-        # Give each matchup-meter row a real sentence for future UI consumers.
         for meter in preview.get("matchup_meter") or []:
             match = by_title.get(str(meter.get("title") or ""))
             if match and match.get("summary"):
@@ -141,8 +192,6 @@ def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, A
             existing.add(title)
         preview["notebook"] = notebook[:5]
 
-        # Preserve genuinely special event/rivalry headlines. Replace generic
-        # model-language headlines with a football headline tied to the lead fact.
         current = str(preview.get("headline") or "")
         is_special = bool(re.search(r"Melbourne|Australia|rivalry", current, re.I))
         is_game_specific = bool((preview.get("editorial_voice") or {}).get("game_specific"))
@@ -180,10 +229,15 @@ def finalize_previews(predictions: pd.DataFrame, previews: dict[str, dict[str, A
             str(preview.get("case_for_opponent") or ""),
             str(preview.get("what_could_make_us_wrong") or ""),
         ])
-        words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", " ".join(texts).lower())
-        for index in range(max(0, len(words) - 6)):
-            gram = " ".join(words[index:index+7])
-            ngram_games.setdefault(gram, set()).add(str(game_id))
+        for text in texts:
+            for segment in _uniqueness_segments(text):
+                words = re.findall(r"\d+(?:\.\d+)?|[a-z]+(?:'[a-z]+)?", segment.lower())
+                for index in range(max(0, len(words) - 6)):
+                    window = words[index:index+7]
+                    if _is_standardized_fact_ngram(window):
+                        continue
+                    gram = " ".join(window)
+                    ngram_games.setdefault(gram, set()).add(str(game_id))
     repeated = {gram: sorted(games) for gram, games in ngram_games.items() if len(games) > 1}
     if repeated:
         sample = list(repeated.items())[:5]

@@ -8,6 +8,7 @@ on:
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/copilot_media.py"
+      - "src/nfl_forecast/copilot_source_backfill.py"
       - "src/nfl_forecast/source_policy.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_copilot_media_prompt.py"
@@ -24,6 +25,8 @@ on:
       - "tests/test_levline_paragraph_renderer.py"
       - "tests/test_single_copilot_game_validator.py"
       - "tests/test_read_contract.py"
+      - "tests/test_editorial_finalize.py"
+      - "tests/test_source_policy_direct_reports.py"
       - "pyproject.toml"
       - ".github/workflows/media_writer.yml"
   schedule:
@@ -114,7 +117,7 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py
 
       - name: Refresh deterministic reporting packet
         run: python scripts/finalize_editorial.py --skip-copilot
