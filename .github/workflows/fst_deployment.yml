@@ -1,0 +1,119 @@
+name: F-ST production deployment validation
+
+on:
+  push:
+    branches:
+      - feat/deploy-fst-production
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/fst_*.py'
+      - 'src/nfl_forecast/artifacts/**'
+      - 'src/nfl_forecast/pipeline.py'
+      - 'src/nfl_forecast/publish.py'
+      - 'src/nfl_forecast/probability_strategy.py'
+      - 'scripts/validate_fst_production_canary.py'
+      - 'scripts/run_challenger_fst_evaluation.py'
+      - 'tests/test_fst_production.py'
+      - 'README.md'
+      - 'docs/**'
+      - '.github/workflows/fst_deployment.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fst-production-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install model and test dependencies
+        run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-fst-deploy-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-fst-deploy-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Full Python test suite
+        run: pytest -q
+      - name: Same-snapshot frozen F-ST canary
+        env:
+          LEVLINE_SOURCE_SHA: ${{ github.sha }}
+        run: |
+          rm -rf deployment_audits
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/validate_fst_production_canary.py
+          test -s deployment_audits/fst_predeploy_canary.csv
+          test -s deployment_audits/fst_predeploy_canary.json
+      - name: Regenerate production outputs without committing
+        run: |
+          cp outputs/prediction_history.csv /tmp/prediction_history.before.csv
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_week.py --season 2026 --snapshot EARLY
+          python - <<'PY'
+          import json
+          import numpy as np
+          import pandas as pd
+          from pathlib import Path
+
+          p = pd.read_csv('outputs/this_week.csv')
+          required = {
+              'final_home_prob', 'fst_pure_home_prob', 'market_home_prob',
+              'legacy_pure_home_prob', 'legacy_final_home_prob',
+              'final_probability_strategy', 'fst_artifact_id',
+              'fst_artifact_training_data_sha256', 'fst_fallback', 'fst_fallback_reason',
+          }
+          missing = required - set(p.columns)
+          assert not missing, missing
+          assert set(p.final_probability_strategy.astype(str)) == {'F-ST-01-FROZEN-2026'}
+          assert set(p.fst_artifact_id.astype(str)) == {'F-ST-01-FROZEN-2026'}
+          assert np.isfinite(pd.to_numeric(p.final_home_prob, errors='coerce')).all()
+          assert ((p.final_home_prob > 0) & (p.final_home_prob < 1)).all()
+          eligible = ~p.fst_fallback.fillna(False).astype(bool)
+          assert np.allclose(
+              p.loc[eligible, 'final_home_prob'],
+              1 / (1 + np.exp(-(
+                  -0.06954359363166639
+                  + 1.1939087340527093 * np.log(np.clip(p.loc[eligible, 'market_home_prob'], 1e-6, 1-1e-6) / (1-np.clip(p.loc[eligible, 'market_home_prob'], 1e-6, 1-1e-6)))
+                  - 0.19342747983803402 * np.log(np.clip(p.loc[eligible, 'fst_pure_home_prob'], 1e-6, 1-1e-6) / (1-np.clip(p.loc[eligible, 'fst_pure_home_prob'], 1e-6, 1-1e-6)))
+              ))),
+              atol=1e-12, rtol=0,
+          )
+          status = json.loads(Path('outputs/status.json').read_text())
+          assert status['model_version'] == '0.9.0-fst'
+          assert status['final_probability_strategy'] == 'F-ST-01-FROZEN-2026'
+          PY
+          python - <<'PY'
+          import pandas as pd
+          before = pd.read_csv('/tmp/prediction_history.before.csv')
+          after = pd.read_csv('outputs/prediction_history.csv')
+          old = after[after.game_id.astype(str).isin(before.game_id.astype(str))].copy()
+          merged = before.merge(old, on='game_id', suffixes=('_before','_after'))
+          for col in ['pure_home_prob','market_home_prob','final_home_prob','pick','model_version','lock_status']:
+              a = merged[f'{col}_before'].astype(str).tolist()
+              b = merged[f'{col}_after'].astype(str).tolist()
+              assert a == b, col
+          PY
+      - name: Build public site
+        working-directory: site
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+      - name: Upload canary evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: fst-production-canary-${{ github.run_id }}
+          path: deployment_audits/
+          retention-days: 90
