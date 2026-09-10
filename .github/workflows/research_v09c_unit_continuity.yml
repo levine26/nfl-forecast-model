@@ -4,11 +4,11 @@ on:
   pull_request:
     paths:
       - 'src/nfl_forecast/player_state_research.py'
-      - 'src/nfl_forecast/unit_state_research.py'
+      - 'src/nfl_forecast/challenger_v09c_unit_state.py'
       - 'src/nfl_forecast/challenger_v09c.py'
       - 'scripts/run_challenger_v09c.py'
       - 'scripts/run_challenger_v09c_uncertainty.py'
-      - 'tests/test_unit_state_research.py'
+      - 'tests/test_challenger_v09c_unit_state.py'
       - '.github/workflows/research_v09c_unit_continuity.yml'
   workflow_dispatch:
 
@@ -33,7 +33,7 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
       - name: Test chronology, identity, and production-import contracts
-        run: pytest -q tests/test_unit_state_research.py tests/test_player_state_research.py tests/test_challenger_v08.py tests/test_challenger_evaluation.py
+        run: pytest -q tests/test_challenger_v09c_unit_state.py tests/test_player_state_research.py tests/test_challenger_v08.py tests/test_challenger_evaluation.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
