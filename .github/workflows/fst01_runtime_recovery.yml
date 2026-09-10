@@ -1,0 +1,121 @@
+name: F-ST-01 runtime recovery forensic matrix
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/forensic_fst_runtime_probe.py'
+      - '.github/workflows/fst01_runtime_recovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: probe-${{ matrix.coretype }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        coretype:
+          - NATIVE
+          - HASWELL
+          - SKYLAKEX
+          - COOPERLAKE
+          - SAPPHIRERAPIDS
+          - ZEN
+          - ZEN2
+          - ZEN3
+          - ZEN4
+    env:
+      OPENBLAS_NUM_THREADS: '4'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      NUMEXPR_NUM_THREADS: '4'
+      PROBE_CORETYPE: ${{ matrix.coretype }}
+      OPENBLAS_VERBOSE: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install exact successful-run numerical stack
+        run: >-
+          pip install '.[dev]'
+          'nflreadpy==0.1.5'
+          'polars==1.44.2'
+          'pandas==3.0.5'
+          'numpy==2.4.6'
+          'scikit-learn==1.9.0'
+          'scipy==1.17.1'
+          'xgboost==3.2.0'
+          'catboost==1.2.10'
+          'pyarrow==25.0.1'
+          'duckdb==1.5.5'
+          'joblib==1.6.0'
+          'threadpoolctl==3.6.0'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: fst01-runtime-${{ runner.os }}-${{ matrix.coretype }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Reconstruct frozen historical fit only
+        run: |
+          set -euo pipefail
+          if [ "$PROBE_CORETYPE" = 'NATIVE' ]; then
+            unset OPENBLAS_CORETYPE
+          else
+            export OPENBLAS_CORETYPE="$PROBE_CORETYPE"
+          fi
+          mkdir -p "forensic_outputs/$PROBE_CORETYPE"
+          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/forensic_fst_runtime_probe.py \
+              --output-dir "forensic_outputs/$PROBE_CORETYPE"
+      - name: Upload exact reconstruction evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fst01-runtime-${{ matrix.coretype }}-${{ github.run_id }}
+          path: forensic_outputs/${{ matrix.coretype }}/
+          if-no-files-found: warn
+          retention-days: 30
+
+  summarize:
+    if: always()
+    needs: probe
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: fst01-runtime-*-${{ github.run_id }}
+          path: recovered
+          merge-multiple: true
+      - name: Summarize registered-identity matches
+        run: |
+          python - <<'PY'
+          import glob, json
+          rows = []
+          for path in sorted(glob.glob('recovered/result_*.json')):
+              data = json.load(open(path))
+              rows.append({
+                  'coretype': data['runtime']['probe_coretype'],
+                  'reported_openblas_coretype': data['runtime']['openblas_coretype'],
+                  'digest': data['actual']['training_data_sha256'],
+                  'matches': data['matches_registered_identity'],
+                  'mismatches': data['mismatched_fields'],
+              })
+          print(json.dumps(rows, indent=2))
+          matches = [r for r in rows if r['matches']]
+          with open('runtime_recovery_summary.json', 'w') as f:
+              json.dump({'results': rows, 'exact_matches': matches}, f, indent=2)
+              f.write('\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fst01-runtime-summary-${{ github.run_id }}
+          path: runtime_recovery_summary.json
+          retention-days: 30
