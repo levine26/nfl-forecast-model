@@ -55,9 +55,15 @@ jobs:
             PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/lock_challenger_shadow.py
 
+            if [ -f challenger_outputs/prediction_history_shadow.csv ]; then
+              PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+                python scripts/evaluate_fst_shadow.py
+            fi
+
             git add challenger_outputs/prediction_history_shadow.csv
+            git add challenger_outputs/fst/prospective_evaluation.json challenger_outputs/fst/prospective_weekly.csv
             if git diff --cached --quiet; then
-              echo 'No new challenger shadow lock or grade to publish.'
+              echo 'No new challenger shadow lock, grade, or prospective evaluation to publish.'
               exit 0
             fi
 
