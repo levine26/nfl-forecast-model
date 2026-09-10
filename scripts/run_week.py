@@ -25,6 +25,19 @@ def _read_csv(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def _preserve_leaderboard_schema(artifacts) -> None:
+    """Keep the historical `Final Ensemble` row key stable for public/CI consumers.
+
+    Its status text identifies it as the legacy 75/25 comparator. The official live
+    winner-probability strategy is carried independently on each prediction row.
+    """
+    leaderboard = getattr(artifacts, "leaderboard", None)
+    if leaderboard is None or leaderboard.empty or "model" not in leaderboard.columns:
+        return
+    mask = leaderboard["model"].eq("Legacy Final Ensemble")
+    leaderboard.loc[mask, "model"] = "Final Ensemble"
+
+
 def publish_accountability_feeds(artifacts, output_dir: str = "outputs") -> None:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -71,6 +84,7 @@ def main():
     parser.add_argument("--config", default="config/model.yaml")
     args = parser.parse_args()
     artifacts = run(args.config, args.season, args.snapshot)
+    _preserve_leaderboard_schema(artifacts)
     write_outputs(artifacts, "outputs")
     publish_accountability_feeds(artifacts, "outputs")
     print(artifacts.predictions[["away_team","home_team","final_home_prob","pick","expected_margin","expected_total","confidence"]].to_string(index=False))
