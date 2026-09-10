@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from typing import Iterable
 
@@ -33,6 +34,40 @@ def configure_cache(cache_dir: str) -> None:
     os.environ.setdefault("NFLREADPY_VERBOSE", "False")
 
 
+def _load_pbp_with_live_fallback(seasons: list[int]):
+    """Load PBP, tolerating only a not-yet-published newest-season asset.
+
+    nflreadpy has used two behaviors when its data backend lags the live season:
+    an up-front ValueError guard and, more recently, a 404 from the nflverse PBP
+    release URL. Both mean the schedule/results layer can be live while EPA/form
+    remains through the latest published PBP season. Other download failures and
+    missing historical seasons remain fatal.
+    """
+    try:
+        return _pandas(nfl.load_pbp(seasons))
+    except ValueError as exc:
+        match = re.search(r"between 1999 and (\d{4})", str(exc))
+        if not match:
+            raise
+        supported_max = int(match.group(1))
+        supported = [season for season in seasons if season <= supported_max]
+        if not supported:
+            raise
+        return _pandas(nfl.load_pbp(supported))
+    except ConnectionError as exc:
+        message = str(exc)
+        match = re.search(r"play_by_play_(\d{4})\.parquet", message)
+        if not match or "404" not in message:
+            raise
+        missing_season = int(match.group(1))
+        if not seasons or missing_season != max(seasons):
+            raise
+        supported = [season for season in seasons if season < missing_season]
+        if not supported:
+            raise
+        return _pandas(nfl.load_pbp(supported))
+
+
 def load_core_data(seasons: Iterable[int], cache_dir: str = ".cache/nflreadpy") -> NFLDataBundle:
     seasons = list(seasons)
     configure_cache(cache_dir)
@@ -41,22 +76,9 @@ def load_core_data(seasons: Iterable[int], cache_dir: str = ".cache/nflreadpy") 
     schedules = pd.read_csv("https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv", low_memory=False)
     schedules = schedules[schedules["season"].isin(seasons)].copy()
 
-    # Prefer nflreadpy for PBP. If its package-level current-season guard lags,
-    # retry only the seasons it currently supports; the schedule/results/Elo layer
-    # still remains live and the next package/data refresh automatically restores PBP.
-    try:
-        pbp = _pandas(nfl.load_pbp(seasons))
-    except ValueError as exc:
-        msg = str(exc)
-        import re
-        m = re.search(r"between 1999 and (\d{4})", msg)
-        if not m:
-            raise
-        supported_max = int(m.group(1))
-        supported = [y for y in seasons if y <= supported_max]
-        if not supported:
-            raise
-        pbp = _pandas(nfl.load_pbp(supported))
+    # Keep the live schedule even when the newest PBP asset has not been published.
+    # The pipeline records the resulting EPA/form horizon in data_state.
+    pbp = _load_pbp_with_live_fallback(seasons)
     try:
         team_stats = _pandas(nfl.load_team_stats(seasons))
     except Exception:
