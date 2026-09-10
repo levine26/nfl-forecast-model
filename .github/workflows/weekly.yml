@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.11.16"
           cache: pip
       - run: pip install ".[dev]"
       - run: pytest -q
@@ -64,7 +64,7 @@ jobs:
           merged['final_delta_pp'] = (merged.final_home_prob_after - merged.final_home_prob_before) * 100
           merged['pure_delta_pp'] = (merged.pure_home_prob_after - merged.pure_home_prob_before) * 100
           merged['margin_delta'] = merged.expected_margin_after - merged.expected_margin_before
-          print('\n=== CORRECTED FEATURE OUTPUT DELTA ===')
+          print('\n=== F-ST PRODUCTION OUTPUT DELTA ===')
           print(merged[['game_id','pick_before','pick_after','final_delta_pp','pure_delta_pp','margin_delta']].to_string(index=False))
           print('max abs final probability delta (pp):', round(merged.final_delta_pp.abs().max(), 3))
           print('pick changes:', int((merged.pick_before != merged.pick_after).sum()))
@@ -74,39 +74,34 @@ jobs:
           signatures = power[metrics].round(12).astype(str).agg('|'.join, axis=1)
           duplicated = power.assign(signature=signatures).groupby('signature').team.apply(list)
           duplicated = duplicated[duplicated.map(len) > 1]
-          print('\n=== EXACT POWER PROFILE DUPLICATES AFTER FIX ===')
-          print(duplicated.to_string() if len(duplicated) else 'none')
           if len(duplicated):
-              raise SystemExit('corrected rolling pipeline still produces exact multi-team efficiency-profile duplicates')
+              raise SystemExit('production pipeline produces exact multi-team efficiency-profile duplicates')
 
           old_lb = pd.read_csv('/tmp/baseline-model-leaderboard.csv')
           new_lb = pd.read_csv('outputs/model_leaderboard.csv')
           cols = ['model','games','winner_pct','brier','log_loss','margin_mae','total_mae']
           old_lb = old_lb[cols]
           new_lb = new_lb[cols]
+          # Promotion renames the former 75/25 production row as the legacy comparator.
+          old_lb['model'] = old_lb['model'].replace({'Final Ensemble': 'Legacy Final Ensemble'})
           audit = old_lb.merge(new_lb, on='model', suffixes=('_before','_after'), validate='one_to_one')
-          for metric in ['winner_pct','brier','log_loss','margin_mae','total_mae']:
-              audit[f'{metric}_delta'] = audit[f'{metric}_after'] - audit[f'{metric}_before']
-          print('\n=== OOS 2022-25 LEADERBOARD DELTA ===')
-          print(audit.to_string(index=False))
-
           if len(audit) != len(old_lb) or len(audit) != len(new_lb):
               raise SystemExit('model leaderboard row set changed unexpectedly')
           if not (audit.games_before == audit.games_after).all():
               raise SystemExit('OOS evaluation sample size changed; investigate before merge')
-          key = audit[audit.model.eq('Final Ensemble')]
+          key = audit[audit.model.eq('Legacy Final Ensemble')]
           if len(key) != 1:
-              raise SystemExit('Final Ensemble row missing from corrected OOS leaderboard')
+              raise SystemExit('Legacy Final Ensemble row missing from OOS leaderboard')
           required = ['winner_pct_after','brier_after','log_loss_after','margin_mae_after','total_mae_after']
           if not np.isfinite(key[required].to_numpy(dtype=float)).all():
-              raise SystemExit('corrected Final Ensemble OOS metrics contain non-finite values')
+              raise SystemExit('Legacy Final Ensemble OOS metrics contain non-finite values')
           market = audit[audit.model.eq('Market')]
           if len(market) == 1:
               for metric in ['winner_pct','brier','log_loss','margin_mae','total_mae']:
                   before_v = float(market.iloc[0][f'{metric}_before'])
                   after_v = float(market.iloc[0][f'{metric}_after'])
                   if abs(before_v - after_v) > 1e-12:
-                      raise SystemExit(f'market benchmark changed during football-feature repair: {metric}')
+                      raise SystemExit(f'market benchmark changed during F-ST promotion: {metric}')
           PY
       - name: Generate and publish outputs
         if: github.event_name != 'pull_request'
