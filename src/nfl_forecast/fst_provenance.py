@@ -9,11 +9,16 @@ the semantic game-keyed content independent of row order.
 
 import hashlib
 import json
+import os
+import platform
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+import scipy
+import sklearn
+from threadpoolctl import threadpool_info
 
 from .challenger_fst import FrozenStackFit
 from .challenger_stacking import HISTORICAL_END
@@ -190,6 +195,29 @@ def capture_fst_pre_fit_provenance(
     return manifest
 
 
+def _runtime_provenance() -> dict[str, Any]:
+    return {
+        "python_version": platform.python_version(),
+        "python_implementation": platform.python_implementation(),
+        "platform": platform.platform(),
+        "numpy_version": np.__version__,
+        "pandas_version": pd.__version__,
+        "scipy_version": scipy.__version__,
+        "scikit_learn_version": sklearn.__version__,
+        "thread_environment": {
+            key: os.environ.get(key)
+            for key in (
+                "OMP_NUM_THREADS",
+                "OPENBLAS_NUM_THREADS",
+                "MKL_NUM_THREADS",
+                "NUMEXPR_NUM_THREADS",
+                "VECLIB_MAXIMUM_THREADS",
+            )
+        },
+        "threadpools": threadpool_info(),
+    }
+
+
 def write_fst_fit_provenance(
     output_dir: str | Path,
     input_manifest: dict[str, Any],
@@ -216,6 +244,7 @@ def write_fst_fit_provenance(
         ],
         "model_training_data_sha256": fit.training_data_sha256,
         "fit": fit.as_dict(),
+        "runtime": _runtime_provenance(),
     }
     (out / "fit_manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n",

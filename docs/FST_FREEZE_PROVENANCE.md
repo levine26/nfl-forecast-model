@@ -21,6 +21,8 @@ For every candidate freeze, persist:
 7. A game-ID-sequence SHA-256 for row-order identity.
 8. The model's own canonical training-data digest and fitted coefficients after
    the pre-fit artifacts have been persisted.
+9. The numerical runtime identity: Python, NumPy, pandas, SciPy, scikit-learn,
+   thread-environment variables, and detected BLAS/threadpool backends.
 
 The raw artifact hash and the model training-data digest are different contracts
 and must never be substituted for one another.

@@ -290,6 +290,11 @@ def test_fst_fit_provenance_distinguishes_raw_input_hash_from_model_digest(tmp_p
     assert manifest["model_training_data_sha256"] == "f" * 64
     assert manifest["training_frame_raw_sha256"] == inputs["training_frame"]["raw_sha256"]
     assert manifest["model_training_data_sha256"] != manifest["training_frame_raw_sha256"]
+    assert manifest["runtime"]["python_version"]
+    assert manifest["runtime"]["numpy_version"]
+    assert manifest["runtime"]["scipy_version"]
+    assert manifest["runtime"]["scikit_learn_version"]
+    assert isinstance(manifest["runtime"]["threadpools"], list)
     assert (tmp_path / "inputs_manifest.json").is_file()
     assert (tmp_path / "fit_manifest.json").is_file()
 
