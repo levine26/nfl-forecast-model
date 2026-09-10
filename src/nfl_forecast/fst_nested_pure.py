@@ -64,8 +64,48 @@ def _assert_historical_cutoff(frame: pd.DataFrame, season_col: str = "season") -
         raise ValueError("F-ST nested PURE fitting may not use outcomes after 2025")
 
 
-def load_frozen_base_oof(path: str | Path = FROZEN_BASE_OOF_PATH) -> pd.DataFrame:
-    """Load the exact base-OOF matrix used by the frozen F-ST research runtime."""
+def _align_frozen_base_oof(frame: pd.DataFrame, historical: pd.DataFrame) -> pd.DataFrame:
+    """Restore the archived OOF row identity from the authoritative historical frame.
+
+    The research CSV intentionally omitted its pandas index. Alignment is permitted only
+    when the completed 2018-2025 historical row universe has exactly the same season and
+    target sequence as the archived OOF matrix. Any ambiguity or row drift fails closed.
+    """
+    _assert_historical_cutoff(historical)
+    if "home_win" not in historical.columns:
+        raise ValueError("F-ST historical frame missing 'home_win'")
+    historical_season = pd.to_numeric(historical["season"], errors="coerce")
+    historical_target = pd.to_numeric(historical["home_win"], errors="coerce")
+    mask = (
+        historical_season.between(FROZEN_BASE_OOF_FIRST_SEASON, FROZEN_BASE_OOF_LAST_SEASON)
+        & historical_target.notna()
+    )
+    reference = historical.loc[mask, ["season", "home_win"]].sort_index().copy()
+    if not reference.index.is_unique:
+        raise RuntimeError("Frozen F-ST historical alignment index is not unique")
+    if len(reference) != len(frame):
+        raise RuntimeError(
+            f"Frozen F-ST historical alignment row count changed: {len(reference)} != {len(frame)}"
+        )
+    expected_season = pd.to_numeric(frame["season"], errors="raise").astype(int).to_numpy()
+    actual_season = pd.to_numeric(reference["season"], errors="raise").astype(int).to_numpy()
+    if not np.array_equal(actual_season, expected_season):
+        raise RuntimeError("Frozen F-ST historical season sequence changed")
+    expected_target = pd.to_numeric(frame["home_win"], errors="raise").astype(int).to_numpy()
+    actual_target = pd.to_numeric(reference["home_win"], errors="raise").astype(int).to_numpy()
+    if not np.array_equal(actual_target, expected_target):
+        raise RuntimeError("Frozen F-ST historical target sequence changed")
+    aligned = frame.copy()
+    aligned.index = reference.index
+    return aligned
+
+
+def load_frozen_base_oof(
+    path: str | Path = FROZEN_BASE_OOF_PATH,
+    *,
+    historical: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """Load and optionally row-align the exact OOF matrix used by frozen F-ST research."""
     artifact_path = Path(path)
     raw = artifact_path.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
@@ -98,6 +138,8 @@ def load_frozen_base_oof(path: str | Path = FROZEN_BASE_OOF_PATH) -> pd.DataFram
     for name in BASE_MODEL_NAMES:
         if ((numeric[name] <= 0.0) | (numeric[name] >= 1.0)).any():
             raise RuntimeError(f"Frozen F-ST base OOF {name} probability outside (0, 1)")
+    if historical is not None:
+        frame = _align_frozen_base_oof(frame, historical)
     return frame.copy()
 
 
