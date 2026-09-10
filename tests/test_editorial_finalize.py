@@ -69,6 +69,7 @@ def test_finalizer_exempts_standardized_facts_without_weakening_substantive_uniq
             "Baltimore must create clean answers against disguised coverage.",
         ),
     }
+    previews["g2"]["paragraphs"][0] = previews["g2"]["paragraphs"][0].replace("risk, not", "risk —   not")
 
     status = finalize_previews(predictions, previews, {"g1": [], "g2": []})
     assert status["status"] == "healthy"
