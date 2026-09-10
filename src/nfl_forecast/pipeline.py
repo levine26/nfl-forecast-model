@@ -11,7 +11,7 @@ from .data import load_core_data, load_advanced_data
 from .diagnostics import add_confidence_diagnostics, build_calibration_table
 from .elo import build_pregame_elo
 from .features import aggregate_team_games, add_game_results, build_matchup_features, sujar_baseline_columns, core_columns
-from .fst_nested_pure import build_base_oof_predictions, build_fst_training_frame, fit_future_nested_stack
+from .fst_nested_pure import build_fst_training_frame, fit_future_nested_stack, load_frozen_base_oof
 from .fst_production import (
     CANDIDATE_ID,
     FINAL_PROBABILITY_STRATEGY,
@@ -238,13 +238,7 @@ def run(config_path="config/model.yaml", season_to_predict=2026, snapshot_type="
         raise RuntimeError("F-ST historical outcome cutoff enforcement failed")
     fst_features = core_columns(fst_historical)
     artifact = load_fst_artifact()
-    fst_base_oof = build_base_oof_predictions(
-        fst_historical,
-        fst_features,
-        seed=seed,
-        validation_start=2018,
-        validation_end=2025,
-    )
+    fst_base_oof = load_frozen_base_oof(historical=fst_historical)
     fst_training = build_fst_training_frame(fst_historical, fst_base_oof, seed=seed)
     training_digest = validate_training_identity(fst_training, artifact)
     current["fst_pure_home_prob"] = fit_future_nested_stack(
