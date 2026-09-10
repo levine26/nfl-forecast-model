@@ -176,8 +176,11 @@ jobs:
           assert runtime['production_promotion_authorized'] is False
           assert len(runtime['training_data_sha256']) == 64
           assert runtime['provenance']['capture_stage'] == 'pre_fit'
+          assert runtime['provenance']['capture_context'] == 'prospective_shadow_reconstruction'
           assert inputs_manifest['capture_stage'] == 'pre_fit'
+          assert inputs_manifest['capture_context'] == 'prospective_shadow_reconstruction'
           assert inputs_manifest['candidate_id'] == 'F-ST-01-FROZEN-2026'
+          assert fit_manifest['capture_context'] == 'prospective_shadow_reconstruction'
           assert inputs_manifest['base_oof']['raw_sha256'] == hashlib.sha256(base_oof_raw).hexdigest()
           assert inputs_manifest['training_frame']['raw_sha256'] == hashlib.sha256(training_raw).hexdigest()
           assert fit_manifest['base_oof_raw_sha256'] == inputs_manifest['base_oof']['raw_sha256']
