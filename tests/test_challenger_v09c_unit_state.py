@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from nfl_forecast.unit_state_research import (
+from nfl_forecast.challenger_v09c_unit_state import (
     attach_stable_snap_ids,
     build_game_unit_features,
     build_unit_state,
@@ -139,7 +139,7 @@ def test_production_prediction_modules_do_not_import_v09c_unit_state():
         "src/nfl_forecast/publish.py",
         "scripts/run_week.py",
     ]
-    forbidden = ("challenger_v09c", "unit_state_research")
+    forbidden = ("challenger_v09c",)
     for filename in protected:
         tree = ast.parse(Path(filename).read_text(encoding="utf-8"), filename=filename)
         imports: list[str] = []
