@@ -1,0 +1,69 @@
+name: Bootstrap recovered F-ST artifacts
+
+on:
+  push:
+    branches:
+      - feat/deploy-fst-production-current
+    paths:
+      - '.github/workflows/fst_artifact_bootstrap.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  persist:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download exact forensic SkylakeX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: fst01-runtime-SKYLAKEX-34538432305
+          path: recovered
+          repository: levine26/nfl-forecast-model
+          run-id: 34538432305
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify and persist immutable keyed inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s recovered/base_oof_keyed.csv
+          test -s recovered/training_frame_keyed.csv
+          echo '5563b2c9eeb193891ad0ae3809f3fcc9fac04b6451376fc28fa5888c070a78fa  recovered/base_oof_keyed.csv' | sha256sum -c -
+          echo '174be982d5ac7f3e9f93bda824641eae95c612ec0c1e9546472479a5f6cb55d5  recovered/training_frame_keyed.csv' | sha256sum -c -
+          mkdir -p src/nfl_forecast/artifacts
+          cp recovered/base_oof_keyed.csv src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026-base-oof-keyed.csv
+          cp recovered/training_frame_keyed.csv src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026-training-frame-keyed.csv
+          python - <<'PY'
+          import pandas as pd
+          base = pd.read_csv('src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026-base-oof-keyed.csv')
+          train = pd.read_csv('src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026-training-frame-keyed.csv')
+          assert len(base) == 2127
+          assert len(train) == 1615
+          assert tuple(base.columns) == ('game_id','row_position','logistic','extra_trees','xgboost','catboost','home_win','season')
+          assert tuple(train.columns) == ('game_id','row_position','season','home_win','market_prob','pure_prob')
+          assert base.game_id.is_unique and train.game_id.is_unique
+          assert base.row_position.tolist() == list(range(2127))
+          assert train.row_position.tolist() == list(range(1615))
+          assert (int(base.season.min()), int(base.season.max())) == (2018, 2025)
+          assert (int(train.season.min()), int(train.season.max())) == (2020, 2025)
+          assert int(base.season.max()) <= 2025 and int(train.season.max()) <= 2025
+          PY
+      - name: Commit exact artifacts to deployment branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026-base-oof-keyed.csv \
+                  src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026-training-frame-keyed.csv
+          if git diff --cached --quiet; then
+            echo 'Artifacts already persisted exactly.'
+            exit 0
+          fi
+          git commit -m 'Persist exact recovered F-ST keyed inputs'
+          git push origin HEAD:${GITHUB_REF_NAME}
