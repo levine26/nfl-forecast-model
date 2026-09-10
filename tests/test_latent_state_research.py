@@ -54,7 +54,12 @@ def _team_games() -> pd.DataFrame:
 def test_week_state_is_frozen_before_same_week_observation():
     base = _team_games()
     changed = base.copy()
-    changed.loc[(changed.season.eq(2023)) & (changed.week.eq(3)), "neutral_epa"] += 10.0
+    # Mutate only one team's realized Week 3 observation. A common-mode shift to both
+    # teams is intentionally removed by the pre-registered state-centering step.
+    changed.loc[
+        (changed.season.eq(2023)) & (changed.week.eq(3)) & changed.team.eq("A"),
+        "neutral_epa",
+    ] += 10.0
 
     original_state = build_latent_team_state(base).pregame_state
     changed_state = build_latent_team_state(changed).pregame_state
