@@ -1,0 +1,71 @@
+{
+  "candidate_id": "F-ST-01-FROZEN-2026",
+  "research_experiment": "F-ST-01",
+  "status": "frozen_prospective_shadow",
+  "freeze_timestamp_utc": "2026-09-10T05:08:04Z",
+  "freeze_implementation_sha": "59830d23e406d32c34e74919b31d0dd9f85b16ca",
+  "prospective_evaluation_start": "first eligible authoritative FINAL T-120 production lock after 2026-09-10T05:08:04Z",
+  "architecture": {
+    "inputs": ["logit(market_home_prob)", "logit(v0.8 PURE home probability)"],
+    "meta_model": "logistic_regression",
+    "fit_intercept": true,
+    "penalty": "l2",
+    "C": 1.0,
+    "solver": "lbfgs",
+    "max_iter": 3000,
+    "probability_clip": [0.000001, 0.999999]
+  },
+  "training_policy": {
+    "target_season": 2026,
+    "training_rows": "leakage-safe earlier-season out-of-fold market and v0.8 PURE probabilities only",
+    "eligible_historical_end_season": 2025,
+    "2026_outcomes_allowed": false,
+    "post_freeze_refit_policy": "the exact frozen architecture is deterministically rematerialized from the same eligible OOF history through 2025; any data digest change is recorded in the runtime manifest and must be investigated before scoring",
+    "future_architecture_change_policy": "new candidate ID required"
+  },
+  "historical_evidence": {
+    "paired_games_2022_2025": 1087,
+    "production_like_75_25": {"winner_accuracy": 0.658694, "brier": 0.218592, "log_loss": 0.627402},
+    "market": {"winner_accuracy": 0.676173, "brier": 0.210199, "log_loss": 0.607647},
+    "fst_01": {"winner_accuracy": 0.680773, "brier": 0.210774, "log_loss": 0.608977},
+    "conclusion": "leading historical next-generation LevLine candidate; probability-quality superiority over market was not established under the registered historical gate"
+  },
+  "primary_metric": "brier",
+  "secondary_metrics": [
+    "log_loss",
+    "winner_accuracy",
+    "calibration_intercept",
+    "calibration_slope",
+    "week_block_paired_bootstrap",
+    "season_week_aware_uncertainty",
+    "disagreement_game_performance",
+    "high_confidence_calibration",
+    "market_disagreement",
+    "production_levline_disagreement"
+  ],
+  "promotion_evaluation_policy": {
+    "minimum_evidence": "no decision before at least 200 eligible prospectively locked and graded games spanning at least 14 distinct NFL weeks",
+    "A_vs_current_production": "F-ST minus production Brier must be negative and the 95% week-block paired-bootstrap upper bound must be below 0",
+    "B_vs_market": "F-ST minus market Brier must satisfy a predeclared non-inferiority margin of +0.0025; the 95% week-block paired-bootstrap upper bound must be <= 0.0025",
+    "C_week_coherence": "median weekly paired Brier delta versus production must be negative and the aggregate Brier advantage versus production must remain negative under every leave-one-week-out recomputation",
+    "secondary_metrics_role": "diagnostic and corroborative; they cannot rescue a failure of the primary Brier gates",
+    "automatic_promotion": false,
+    "explicit_authorization_required": true
+  },
+  "prohibited_inputs": [
+    "2026 outcomes for feature/model/architecture/hyperparameter/coefficient/threshold selection",
+    "post-kickoff information",
+    "retrospective final starter status",
+    "actual current-game snap counts",
+    "later injury designations",
+    "interaction terms",
+    "splines",
+    "season indicators",
+    "coefficient grid",
+    "C grid",
+    "alternate model family",
+    "post-result tuning or candidate rescue"
+  ],
+  "production_promotion_authorized": false,
+  "production_behavior_must_remain_unchanged": true
+}
