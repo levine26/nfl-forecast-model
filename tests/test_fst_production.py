@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import nfl_forecast.fst_production as fst_production
 from nfl_forecast.challenger import build_nested_stack_oof as research_nested_oof
 from nfl_forecast.fst_nested_pure import (
     BASE_MODEL_NAMES,
@@ -22,12 +23,15 @@ from nfl_forecast.fst_production import (
     EXPECTED_PURE_COEF,
     EXPECTED_TRAINING_GAMES,
     EXPECTED_TRAINING_SHA256,
+    LEGACY_PRODUCTION_STRATEGY,
+    canonical_training_hash,
     frozen_fst_probability,
     legacy_final_home_probability,
     load_fst_artifact,
     score_official_fst,
 )
 from nfl_forecast.publish import CURRENT_COLUMNS, _load_official
+from scripts.run_challenger_fst_evaluation import _attach_production_regime
 
 
 def test_frozen_artifact_identity_is_exact():
@@ -91,6 +95,32 @@ def test_legacy_counterfactual_is_previous_production_expression():
     np.testing.assert_array_equal(actual.to_numpy(), expected.to_numpy())
 
 
+def test_one_line_rollback_switch_restores_exact_legacy_probability(monkeypatch):
+    artifact = load_fst_artifact()
+    pure = pd.Series([0.2, 0.5, 0.8])
+    fst_pure = pd.Series([0.3, 0.6, 0.7])
+    market = pd.Series([0.4, np.nan, 0.65])
+    expected = legacy_final_home_probability(pure, market)
+    monkeypatch.setattr(
+        fst_production,
+        "ACTIVE_PRODUCTION_STRATEGY",
+        LEGACY_PRODUCTION_STRATEGY,
+    )
+    scored = fst_production.score_official_fst(pure, fst_pure, market, artifact)
+    np.testing.assert_array_equal(scored.final_home_prob.to_numpy(), expected.to_numpy())
+
+
+def test_training_digest_rejects_2026_outcomes():
+    frame = pd.DataFrame({
+        "season": [2025, 2026],
+        "home_win": [1, 0],
+        "market_prob": [0.6, 0.4],
+        "pure_prob": [0.55, 0.45],
+    })
+    with pytest.raises(RuntimeError, match="2026-or-later"):
+        canonical_training_hash(frame)
+
+
 def test_unknown_or_modified_artifact_is_rejected(tmp_path: Path):
     source = Path("src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json")
     payload = json.loads(source.read_text(encoding="utf-8"))
@@ -150,6 +180,52 @@ def test_old_locked_rows_keep_official_values_when_new_schema_is_loaded(tmp_path
     assert pd.isna(loaded.loc[0, "legacy_final_home_prob"])
 
 
+def test_evaluator_tolerates_predeployment_history_schema(tmp_path: Path):
+    history = pd.DataFrame([{
+        "game_id": "g1",
+        "challenger_final_home_prob": 0.60,
+        "production_final_home_prob": 0.55,
+    }])
+    official = pd.DataFrame([{
+        "game_id": "g1",
+        "final_home_prob": 0.55,
+        "market_home_prob": 0.52,
+        "model_version": "0.4.0-accountability",
+    }])
+    path = tmp_path / "official.csv"
+    official.to_csv(path, index=False)
+    result = _attach_production_regime(history, path)
+    assert result.loc[0, "challenger_final_home_prob"] == pytest.approx(0.60)
+    assert result.loc[0, "production_final_home_prob"] == pytest.approx(0.55)
+
+
+def test_evaluator_uses_locked_legacy_counterfactual_after_promotion(tmp_path: Path):
+    history = pd.DataFrame([{
+        "game_id": "g1",
+        "challenger_final_home_prob": 0.61,
+        "production_final_home_prob": 0.61,
+        "challenger_pure_home_prob": 0.57,
+        "market_home_prob_t120": 0.62,
+    }])
+    official = pd.DataFrame([{
+        "game_id": "g1",
+        "final_home_prob": 0.61,
+        "legacy_final_home_prob": 0.56,
+        "fst_pure_home_prob": 0.57,
+        "market_home_prob": 0.62,
+        "final_probability_strategy": CANDIDATE_ID,
+        "model_version": "0.9.0-fst",
+    }])
+    path = tmp_path / "official.csv"
+    official.to_csv(path, index=False)
+    result = _attach_production_regime(history, path)
+    assert result.loc[0, "challenger_final_home_prob"] == pytest.approx(0.61)
+    assert result.loc[0, "production_final_home_prob"] == pytest.approx(0.56)
+    assert result.loc[0, "market_home_prob_t120"] == pytest.approx(0.62)
+    assert result.loc[0, "challenger_pure_home_prob"] == pytest.approx(0.57)
+    assert result.loc[0, "evaluation_reference"] == "locked_legacy_75_25_counterfactual"
+
+
 def test_production_path_has_no_research_imports():
     import ast
 
@@ -157,6 +233,7 @@ def test_production_path_has_no_research_imports():
         "src/nfl_forecast/pipeline.py",
         "src/nfl_forecast/fst_nested_pure.py",
         "src/nfl_forecast/fst_production.py",
+        "src/nfl_forecast/fst_diagnostics.py",
         "src/nfl_forecast/publish.py",
     ):
         tree = ast.parse(Path(filename).read_text(encoding="utf-8"), filename=filename)
