@@ -14,6 +14,7 @@ on:
       - 'scripts/refresh_market.py'
       - 'scripts/run_week.py'
       - 'scripts/validate_fst_production_canary.py'
+      - 'scripts/capture_fst_research_provenance.py'
       - 'scripts/run_challenger_fst_evaluation.py'
       - 'tests/test_fst_production.py'
       - 'tests/test_fst_market_refresh.py'
@@ -53,11 +54,24 @@ jobs:
             nflreadpy-${{ runner.os }}-
       - name: Full Python test suite
         run: pytest -q
+      - name: Capture exact keyed research provenance
+        run: |
+          rm -rf deployment_audits/research_provenance
+          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/capture_fst_research_provenance.py
+          test -s deployment_audits/research_provenance/summary.json
+          test -s deployment_audits/research_provenance/base_oof_keyed.csv
+          test -s deployment_audits/research_provenance/training_frame_keyed.csv
+          {
+            echo '## F-ST research provenance reproduction'
+            echo '```json'
+            cat deployment_audits/research_provenance/summary.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Same-snapshot frozen F-ST canary
         env:
           LEVLINE_SOURCE_SHA: ${{ github.sha }}
         run: |
-          rm -rf deployment_audits
+          rm -f deployment_audits/fst_predeploy_canary.csv deployment_audits/fst_predeploy_canary.json
           PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/validate_fst_production_canary.py
           test -s deployment_audits/fst_predeploy_canary.csv
           test -s deployment_audits/fst_predeploy_canary.json
@@ -150,9 +164,11 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npm run build
-      - name: Upload canary evidence
+      - name: Upload F-ST deployment evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: fst-production-canary-${{ github.run_id }}
+          name: fst-production-evidence-${{ github.run_id }}
           path: deployment_audits/
+          if-no-files-found: warn
           retention-days: 90
