@@ -18,8 +18,8 @@ on:
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
       - 'scripts/run_challenger_v08.py'
-      - 'scripts/run_fst_shadow.py'
-      - 'scripts/evaluate_fst_shadow.py'
+      - 'scripts/run_challenger_fst_shadow.py'
+      - 'scripts/run_challenger_fst_evaluation.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'research/fst/**'
       - 'tests/test_challenger.py'
@@ -46,8 +46,8 @@ on:
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
       - 'scripts/run_challenger_v08.py'
-      - 'scripts/run_fst_shadow.py'
-      - 'scripts/evaluate_fst_shadow.py'
+      - 'scripts/run_challenger_fst_shadow.py'
+      - 'scripts/run_challenger_fst_evaluation.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'research/fst/**'
       - 'tests/test_challenger.py'
@@ -106,12 +106,12 @@ jobs:
       - name: Materialize frozen F-ST-01 prospective shadow
         run: |
           set -euo pipefail
-          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_fst_shadow.py
+          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_fst_shadow.py
       - name: Refresh cumulative F-ST prospective evaluation
         run: |
           set -euo pipefail
           if [ -f challenger_outputs/prediction_history_shadow.csv ]; then
-            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/evaluate_fst_shadow.py
+            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_fst_evaluation.py
           else
             echo 'No immutable shadow history yet; prospective evaluation has no graded rows.'
           fi
