@@ -7,6 +7,7 @@ on:
     paths:
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
+      - "src/nfl_forecast/editorial_model_read.py"
       - "src/nfl_forecast/copilot_media.py"
       - "src/nfl_forecast/copilot_source_backfill.py"
       - "src/nfl_forecast/source_policy.py"
@@ -36,6 +37,7 @@ on:
     paths:
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
+      - "src/nfl_forecast/editorial_model_read.py"
       - "src/nfl_forecast/copilot_media.py"
       - "src/nfl_forecast/copilot_source_backfill.py"
       - "src/nfl_forecast/source_policy.py"
@@ -181,7 +183,7 @@ jobs:
           python scripts/compose_copilot_media_reads.py --input /tmp/groq-media-raw.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --evidence outputs/contextual_evidence.json --output /tmp/groq-media-composed.json
           python scripts/render_levline_paragraphs.py --input /tmp/groq-media-composed.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --output /tmp/groq-media-rendered.json
           python scripts/validate_copilot_media_reads.py --input /tmp/groq-media-rendered.json --predictions outputs/this_week.csv --output outputs/copilot_media_reads.json
-          echo "All Groq responses passed the unchanged full-slate publication validator."
+          echo "All Groq responses passed the LevLine 3.0 full-slate publication validator."
 
       - name: PR provider migration gate
         if: github.event_name == 'pull_request'
@@ -192,11 +194,14 @@ jobs:
           import re
 
           text = Path('.github/workflows/groq_media_writer.yml').read_text(encoding='utf-8')
+          runner = Path('scripts/run_groq_media_prompt.py').read_text(encoding='utf-8')
           assert not re.search(r'^\s*copilot-requests\s*:', text, flags=re.M)
           assert not re.search(r'^\s*run:\s*npm\s+install\s+-g\s+@github/copilot\s*$', text, flags=re.M)
           assert 'secrets.GROQ_API_KEY' in text
           assert 'scripts/run_groq_media_prompt.py' in text
-          print('Groq provider migration wiring validated without consuming repository secrets on PR.')
+          assert 'src/nfl_forecast/editorial_model_read.py' in text
+          assert 'executed_tools' in runner and 'web_search' in runner and 'visit_website' in runner
+          print('Groq provider migration and web-research wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
