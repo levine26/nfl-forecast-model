@@ -24,6 +24,28 @@ BANNED = (
     "according to cbs sports", "live stream", "tv map",
 )
 
+# Official availability/status language is inherently standardized and may repeat across
+# games without indicating recycled editorial analysis. The uniqueness gate still applies
+# to every other substantive seven-word span.
+STANDARDIZED_STATUS_PHRASES = (
+    "did not participate in practice",
+    "did not practice",
+    "limited participant in practice",
+    "was limited in practice",
+    "limited in practice",
+    "full participant in practice",
+    "full practice participant",
+    "listed as questionable",
+    "listed as doubtful",
+    "listed as out",
+    "ruled out",
+    "placed on injured reserve",
+    "activated from injured reserve",
+    "designated to return",
+    "cleared to return",
+    "returned to practice",
+)
+
 
 def _extract_json(text: str) -> dict:
     raw = str(text or "").strip()
@@ -44,23 +66,23 @@ def _extract_json(text: str) -> dict:
             strict_errors.append(str(exc))
             continue
         if not isinstance(parsed, dict):
-            raise ValueError("Copilot output JSON root is not an object")
+            raise ValueError("Editorial output JSON root is not an object")
         return parsed
 
     if start < 0 or end <= start:
-        raise ValueError("Copilot output does not contain a JSON object")
+        raise ValueError("Editorial output does not contain a JSON object")
 
     candidate = raw[start:end + 1]
     try:
         repaired = json_repair.loads(candidate, skip_json_loads=True)
     except Exception as exc:
         detail = strict_errors[-1] if strict_errors else "strict JSON parse failed"
-        raise ValueError(f"Copilot JSON could not be repaired after {detail}: {exc}") from exc
+        raise ValueError(f"Editorial JSON could not be repaired after {detail}: {exc}") from exc
 
     if not isinstance(repaired, dict):
-        raise ValueError("Repaired Copilot output JSON root is not an object")
+        raise ValueError("Repaired editorial output JSON root is not an object")
     print(
-        "Copilot response required syntax repair before semantic validation; "
+        "Editorial response required syntax repair before semantic validation; "
         "all publication gates remain enforced.",
         file=sys.stderr,
     )
@@ -91,6 +113,16 @@ def _domain_family(url: str) -> str:
 def _ngrams(text: str, n: int = 7) -> set[str]:
     words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", str(text or "").lower())
     return {" ".join(words[i:i+n]) for i in range(max(0, len(words) - n + 1))}
+
+
+def _standardized_status_gram(gram: str) -> bool:
+    normalized = re.sub(r"\s+", " ", str(gram or "").lower()).strip()
+    return any(phrase in normalized for phrase in STANDARDIZED_STATUS_PHRASES)
+
+
+def _unique_ngrams(text: str, n: int = 7) -> set[str]:
+    """Return substantive n-grams while exempting standardized status boilerplate."""
+    return {gram for gram in _ngrams(text, n=n) if not _standardized_status_gram(gram)}
 
 
 def _team_name(code: str) -> str:
@@ -195,14 +227,14 @@ def main() -> None:
     payload = _extract_json(Path(args.input).read_text(encoding="utf-8"))
     games = payload.get("games") if isinstance(payload, dict) else None
     if not isinstance(games, dict):
-        raise SystemExit("Copilot media output missing games object")
+        raise SystemExit("Editorial media output missing games object")
 
     predictions = pd.read_csv(args.predictions)
     expected = set(predictions["game_id"].astype(str))
     actual = set(str(x) for x in games)
     if actual != expected:
         raise SystemExit(
-            f"Copilot media game coverage mismatch: missing={sorted(expected-actual)}, extra={sorted(actual-expected)}"
+            f"Editorial media game coverage mismatch: missing={sorted(expected-actual)}, extra={sorted(actual-expected)}"
         )
 
     rows = {str(row.get("game_id")): row for _, row in predictions.iterrows()}
@@ -314,20 +346,20 @@ def main() -> None:
             "sources": valid_sources,
             "generated_utc": generated,
         }
-        for gram in _ngrams(combined):
+        for gram in _unique_ngrams(combined):
             grams.setdefault(gram, set()).add(gid)
 
     repeated = {gram: sorted(gids) for gram, gids in grams.items() if len(gids) > 1}
     if repeated:
-        failures.append(f"cross-game seven-word repetition: {list(repeated.items())[:8]}")
+        failures.append(f"cross-game substantive seven-word repetition: {list(repeated.items())[:8]}")
     if failures:
-        raise SystemExit("Copilot media validation failed: " + "; ".join(failures))
+        raise SystemExit("Editorial media validation failed: " + "; ".join(failures))
 
     Path(args.output).write_text(
         json.dumps({"generated_utc": generated, "games": cleaned}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    print(f"validated {len(cleaned)} two-paragraph Copilot Reads -> {args.output}")
+    print(f"validated {len(cleaned)} two-paragraph editorial Reads -> {args.output}")
 
 
 if __name__ == "__main__":
