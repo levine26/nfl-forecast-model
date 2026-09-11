@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "candidate_id": "F-ST-01-FROZEN-2026",
+  "evidence_role": "durable_compatible_hardware_forensic_reconstruction",
+  "original_freeze_provenance": false,
+  "forensic_workflow": {
+    "workflow_run_id": 34538432305,
+    "pull_request": 106,
+    "head_branch": "forensic/fst01-runtime-recovery",
+    "head_sha": "31cea3037b0c4bb75364d78c072af9d4fb25a9dc",
+    "workflow_github_sha": "9c4f45e15d27187c637002b3d4d8df2cc34c744e",
+    "artifact_id": 10176440471,
+    "artifact_name": "fst01-runtime-SKYLAKEX-34538432305",
+    "artifact_zip_sha256": "92aa93082345f2090dae7d753094b3b61b3848e26c74897a8e62af89d2f42402",
+    "result_path": "result_SKYLAKEX.json",
+    "result_sha256": "c673d089a3caa3e8c0d9439597cec53fde50b37127ca32daa5edcd795564524a",
+    "created_at_utc": "2026-09-10T22:43:07Z"
+  },
+  "immutable_inputs": {
+    "base_oof_raw_sha256": "5563b2c9eeb193891ad0ae3809f3fcc9fac04b6451376fc28fa5888c070a78fa",
+    "base_oof_rows": 2127,
+    "training_frame_raw_sha256": "174be982d5ac7f3e9f93bda824641eae95c612ec0c1e9546472479a5f6cb55d5",
+    "training_frame_gzip_sha256": "28f3c2a0e479e95482e2989f172b143c8eb50ee18b14d15931b6641c9d54d10d",
+    "training_games": 1615,
+    "training_first_season": 2020,
+    "training_last_season": 2025,
+    "canonical_training_digest": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0"
+  },
+  "reconstruction_fit": {
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527095,
+    "pure_logit_coefficient": -0.19342747983803427,
+    "training_games": 1615,
+    "training_first_season": 2020,
+    "training_last_season": 2025,
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "C": 1.0,
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "max_iter": 3000
+  },
+  "registered_identity_at_forensic_run": {
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527093,
+    "pure_logit_coefficient": -0.19342747983803402,
+    "training_games": 1615,
+    "training_first_season": 2020,
+    "training_last_season": 2025,
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0"
+  },
+  "forensic_exact_equality_result": {
+    "matches_registered_identity": false,
+    "mismatched_fields": [
+      "market_logit_coefficient",
+      "pure_logit_coefficient"
+    ]
+  },
+  "registered_tolerance_interpretation": {
+    "numeric_abs_tolerance": 1e-12,
+    "matches": true,
+    "numeric_absolute_deltas": {
+      "intercept": 0.0,
+      "market_logit_coefficient": 2.220446049250313e-16,
+      "pure_logit_coefficient": 2.498001805406602e-16
+    }
+  },
+  "runtime": {
+    "python_version": "3.11.16",
+    "package_versions": {
+      "nflreadpy": "0.1.5",
+      "polars": "1.44.2",
+      "pandas": "3.0.5",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.17.1",
+      "xgboost": "3.2.0",
+      "catboost": "1.2.10",
+      "pyarrow": "25.0.1",
+      "duckdb": "1.5.5",
+      "joblib": "1.6.0",
+      "threadpoolctl": "3.6.0"
+    },
+    "environment": {
+      "OPENBLAS_CORETYPE": "SKYLAKEX",
+      "OPENBLAS_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "MKL_NUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4"
+    },
+    "runner_cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "runner_cpu_flags_include_avx512": true,
+    "threadpools": [
+      {
+        "user_api": "blas",
+        "internal_api": "openblas",
+        "architecture": "SkylakeX",
+        "num_threads": 4,
+        "version": "0.3.31.188.0"
+      },
+      {
+        "user_api": "blas",
+        "internal_api": "openblas",
+        "architecture": "SkylakeX",
+        "num_threads": 4,
+        "version": "0.3.30"
+      },
+      {
+        "user_api": "openmp",
+        "internal_api": "openmp",
+        "num_threads": 4
+      }
+    ]
+  },
+  "research_only": true,
+  "production_authorized": false,
+  "completed_2026_outcomes_used": 0,
+  "note": "The original forensic script compared floating-point coefficients by exact equality, so its exact-equality flag was false. Under the already-registered absolute 1e-12 reconstruction tolerance, the maximum coefficient delta is 2.498001805406602e-16 and the reconstruction passes."
+}
