@@ -1,0 +1,79 @@
+name: LevLine research venue resolution v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/venue_source_qualification_v1.json'
+      - 'research/venue_resolution_v1.py'
+      - 'research/test_venue_resolution_v1.py'
+      - 'research/run_venue_resolution_v1.py'
+      - '.github/workflows/research_venue_resolution_v1.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 12 * * 1'
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Validate strict venue identity and coordinate rules
+        run: python -m pytest -q research/test_venue_resolution_v1.py
+
+  resolve:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-research-venue-resolution-v1
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install free source clients
+        run: python -m pip install 'nflreadpy==0.1.5' 'requests>=2.32'
+      - name: Resolve upcoming 2026 game venues
+        run: python -m research.run_venue_resolution_v1 --season 2026 --output research_outputs/venues/game_venues_2026.json
+      - name: Persist venue receipts away from main
+        run: |
+          set -euo pipefail
+          if [ ! -s research_outputs/venues/game_venues_2026.json ]; then
+            echo 'No venue registry produced.'
+            exit 1
+          fi
+          rm -rf /tmp/levline-venues
+          cp -R research_outputs/venues /tmp/levline-venues
+          rm -rf research_outputs/venues
+          git fetch origin research-data/venues:refs/remotes/origin/research-data/venues || true
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/venues; then
+            git checkout -B venue-data origin/research-data/venues
+          else
+            git checkout -B venue-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/venues
+          cp -R /tmp/levline-venues research_outputs/venues
+          git add research_outputs/venues/
+          if git diff --cached --quiet; then
+            echo 'Venue registry unchanged.'
+            exit 0
+          fi
+          git commit -m 'Refresh LevLine game venue receipts'
+          git push origin HEAD:research-data/venues

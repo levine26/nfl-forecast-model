@@ -1,0 +1,60 @@
+{
+  "qualification_version": 1,
+  "status": "QUALIFIED_RESEARCH_RESOLVER",
+  "production_effect": "none",
+  "sources": [
+    {
+      "source_id": "nflverse_schedules_stadium_identity",
+      "provider": "nflverse / nfldata",
+      "cost": "$0",
+      "license": "CC-BY-4.0 for nflverse schedule data, subject to source-specific attribution",
+      "role": "canonical game_id, gameday, designated teams, location, stadium name and schedule roof field when populated",
+      "point_in_time_semantics": "Use the schedule row retrieved at resolver runtime and persist retrieval time. Stadium identity is attached to the game rather than inferred from home team.",
+      "neutral_site_policy": "Use the schedule stadium value for the specific game. Never infer a neutral venue from the designated home team.",
+      "documentation": [
+        "https://nflreadr.nflverse.com/reference/load_schedules.html",
+        "https://nflreadr.nflverse.com/articles/dictionary_schedules.html"
+      ]
+    },
+    {
+      "source_id": "wikidata_venue_coordinates",
+      "provider": "Wikidata",
+      "cost": "$0",
+      "license": "CC0 structured data",
+      "role": "resolve an exact schedule stadium name or exact returned alias to a Wikidata entity and P625 coordinate",
+      "access_policy": "Use the MediaWiki Action API with a descriptive User-Agent, maxlag, low request volume and stop/retry behavior for provider rate limits.",
+      "identity_rule": "A candidate is accepted only when the normalized nflverse stadium string exactly equals the normalized Wikidata label or the exact matched alias/text returned by entity search. Multiple exact QIDs fail closed.",
+      "coordinate_rule": "Require a non-deprecated P625 statement with finite WGS84 latitude/longitude. Prefer preferred-rank statements; otherwise require an unambiguous normal-rank coordinate.",
+      "redistribution": "Wikidata structured data is CC0. Retain QID and source URL for auditability even though attribution is not required.",
+      "documentation": [
+        "https://www.wikidata.org/wiki/Wikidata:Licensing",
+        "https://www.wikidata.org/wiki/Wikidata:Data_access/en"
+      ]
+    }
+  ],
+  "resolver_contract": {
+    "unit": "game-specific venue receipt",
+    "required_fields": [
+      "game_id",
+      "gameday",
+      "stadium_name",
+      "schedule_location",
+      "schedule_roof",
+      "schedule_retrieved_at_utc",
+      "wikidata_qid",
+      "wikidata_label",
+      "latitude",
+      "longitude",
+      "wikidata_retrieved_at_utc",
+      "resolution_match_type",
+      "coordinate_rank",
+      "research_only",
+      "production_authorized"
+    ],
+    "home_team_fallback": false,
+    "city_centroid_fallback": false,
+    "fuzzy_match_allowed": false,
+    "manual_silent_override_allowed": false,
+    "unresolved_game_policy": "Persist an explicit unresolved record and block weather collection for that game until independently resolved."
+  }
+}

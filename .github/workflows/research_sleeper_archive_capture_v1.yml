@@ -1,0 +1,122 @@
+name: LevLine research Sleeper archive capture v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/sleeper_archive_qualification_v1.json'
+      - 'research/sleeper_archive_audit_v1.py'
+      - 'research/sleeper_archive_capture_v1.py'
+      - 'research/run_sleeper_archive_capture_v1.py'
+      - 'research/test_sleeper_archive_audit_v1.py'
+      - 'research/test_sleeper_archive_capture_v1.py'
+      - '.github/workflows/research_sleeper_archive_capture_v1.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '30 9 * * *'
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Validate verified archive audit and capture semantics
+        run: >-
+          python -m pytest -q
+          research/test_sleeper_archive_audit_v1.py
+          research/test_sleeper_archive_capture_v1.py
+
+  capture:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-research-sleeper-archive-capture-v1
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore prior off-main capture index
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/sleeper-player-state:refs/remotes/origin/research-data/sleeper-player-state || true
+          mkdir -p /tmp/levline-sleeper-state/snapshots
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/sleeper-player-state; then
+            git show origin/research-data/sleeper-player-state:research_outputs/sleeper_player_state/index.json \
+              > /tmp/levline-sleeper-state/index.json 2>/dev/null || true
+          fi
+
+      - name: Resolve latest verified upstream player snapshot
+        id: upstream
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/declan-fantasy-football
+          git clone --quiet --filter=blob:none --no-checkout \
+            https://github.com/edgecdec/declan-fantasy-football.git \
+            /tmp/declan-fantasy-football
+          SOURCE_COMMIT=$(git -C /tmp/declan-fantasy-football log -1 --format=%H -- data/sleeper_players.json)
+          if [ -z "$SOURCE_COMMIT" ]; then
+            echo 'No upstream player snapshot commit found.' >&2
+            exit 1
+          fi
+          SOURCE_TIME=$(git -C /tmp/declan-fantasy-football show -s --format=%cI "$SOURCE_COMMIT")
+          git -C /tmp/declan-fantasy-football show \
+            "$SOURCE_COMMIT:data/sleeper_players.json" \
+            > /tmp/levline-sleeper-state/sleeper_players.json
+          test -s /tmp/levline-sleeper-state/sleeper_players.json
+          echo "source_commit=$SOURCE_COMMIT" >> "$GITHUB_OUTPUT"
+          echo "source_time=$SOURCE_TIME" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build slim point-in-time player-state capture
+        run: |
+          set -euo pipefail
+          python -m research.run_sleeper_archive_capture_v1 \
+            --input /tmp/levline-sleeper-state/sleeper_players.json \
+            --output-dir /tmp/levline-sleeper-state/snapshots \
+            --index /tmp/levline-sleeper-state/index.json \
+            --source-commit '${{ steps.upstream.outputs.source_commit }}' \
+            --source-commit-time '${{ steps.upstream.outputs.source_time }}' \
+            | tee /tmp/levline-sleeper-state/status.json
+          rm -f /tmp/levline-sleeper-state/sleeper_players.json
+
+      - name: Persist compressed research snapshots away from main
+        run: |
+          set -euo pipefail
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/sleeper-player-state; then
+            git checkout -B sleeper-player-state-data origin/research-data/sleeper-player-state
+          else
+            git checkout -B sleeper-player-state-data
+          fi
+          mkdir -p research_outputs/sleeper_player_state/snapshots
+          if [ -s /tmp/levline-sleeper-state/index.json ]; then
+            cp /tmp/levline-sleeper-state/index.json research_outputs/sleeper_player_state/index.json
+          fi
+          cp /tmp/levline-sleeper-state/status.json research_outputs/sleeper_player_state/status.json
+          shopt -s nullglob
+          for file in /tmp/levline-sleeper-state/snapshots/*.json.gz; do
+            cp "$file" research_outputs/sleeper_player_state/snapshots/
+          done
+          git add research_outputs/sleeper_player_state/
+          if git diff --cached --quiet; then
+            echo 'Sleeper player-state research archive unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture verified Sleeper player-state snapshot'
+          git push origin HEAD:research-data/sleeper-player-state
