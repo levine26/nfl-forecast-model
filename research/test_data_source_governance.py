@@ -21,9 +21,11 @@ def _advanced_payload() -> dict:
     return _load(ADVANCED_REGISTRY)
 
 
-def test_every_source_has_explicit_family_rights_and_production_status() -> None:
+def test_every_source_has_explicit_family_rights_metadata_and_production_status() -> None:
     payload = _payload()
     assert payload["status"] == "research_governance"
+    assert payload["qualification_basis"] == "DATA_INTEGRITY_ONLY"
+    assert payload["rights_qualification_blocker"] is False
     sources = payload["sources"]
     assert sources
     ids = [row["source_id"] for row in sources]
@@ -32,6 +34,7 @@ def test_every_source_has_explicit_family_rights_and_production_status() -> None
         assert row.get("family")
         assert row.get("provider")
         assert row.get("rights_status")
+        assert row.get("rights_qualification_blocker") is False
         assert row.get("production_eligibility")
 
 
@@ -54,12 +57,14 @@ def test_market_families_cannot_be_silently_conflated() -> None:
     assert by_id["polymarket"]["family"] == "prediction_exchange"
     assert by_id["kalshi"]["family"] == "prediction_exchange"
     assert "Never mix" in payload["family_rules"]["prediction_exchanges"]
+    assert "data_integrity_audit" in by_id["kalshi"]["production_eligibility"]
+    assert "rights" not in by_id["kalshi"]["production_eligibility"]
     for source_id in ("sportsbook_fanduel", "sportsbook_draftkings", "sportsbook_betmgm"):
         assert by_id[source_id]["family"] == "sportsbook"
         assert "De-vig" in by_id[source_id]["combination_policy"]
 
 
-def test_availability_and_advanced_player_sources_remain_firewalled() -> None:
+def test_availability_and_advanced_player_sources_remain_firewalled_for_data_reasons() -> None:
     payload = _payload()
     sources = payload["sources"]
     availability = [row for row in sources if row["family"] == "availability"]
@@ -68,24 +73,31 @@ def test_availability_and_advanced_player_sources_remain_firewalled() -> None:
     assert advanced
     assert all(row["production_eligibility"] != "authorized" for row in availability + advanced)
     assert payload["current_decisions"]["recommended_first_availability_audit"] == "sportradar_weekly_injuries_v7"
-    assert payload["current_decisions"]["pff_public_use"] == "not_authorized_under_consumer_api_terms"
+    assert payload["current_decisions"]["pff_active_research_status"] == "excluded_by_zero_cost_policy"
+    assert payload["current_decisions"]["rights_qualification_blocker"] is False
 
 
-def test_advanced_source_registry_prefers_clear_rights_and_never_authorizes_production() -> None:
+def test_advanced_source_registry_qualifies_on_integrity_and_never_authorizes_production() -> None:
     payload = _advanced_payload()
     assert payload["status"] == "research_governance"
     assert payload["production_authorized"] is False
+    assert payload["qualification_basis"] == "DATA_INTEGRITY_ONLY"
+    assert payload["rights_qualification_blocker"] is False
+    assert payload["zero_cost_active_research_only"] is True
     sources = payload["sources"]
     ids = [row["source_id"] for row in sources]
     assert len(ids) == len(set(ids))
     assert all(row.get("provider") and row.get("family") for row in sources)
+    assert all(row.get("rights_qualification_blocker") is False for row in sources)
     assert all(row.get("production_eligibility") == "not_authorized" for row in sources)
     assert all(row.get("documentation") for row in sources)
     by_id = {row["source_id"]: row for row in sources}
     assert "CC-BY-SA-4.0" in by_id["ftn_charting_via_nflverse"]["license_status"]
-    assert "commercial license" in by_id["sis_football_commercial"]["rights_status"].lower()
-    assert "not a storage" in by_id["sumersports_subscription_stats"]["rights_status"]
-    assert "proprietary" in by_id["direct_nfl_ngs_tracking"]["rights_status"].lower()
+    assert by_id["ftn_charting_via_nflverse"]["technical_qualification_status"].startswith("qualified")
+    assert by_id["sis_football_commercial"]["zero_cost_eligible"] is False
+    assert by_id["sumersports_subscription_stats"]["technical_qualification_status"] == "blocked_by_missing_reproducible_data_interface"
+    assert by_id["direct_nfl_ngs_tracking"]["technical_qualification_status"] == "unavailable_to_current_zero_cost_pipeline"
+    assert "rights/licensing metadata never blocks" in payload["selection_policy"].lower()
 
 
 def test_availability_source_contract_fails_closed_on_missing_point_in_time_evidence() -> None:
