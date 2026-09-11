@@ -1,0 +1,81 @@
+{
+  "experiment_id": "PHASE6-FTN-PROCESS-001",
+  "status": "pre_registered_before_fitting",
+  "created_at": "2026-09-11",
+  "candidate_version": "ftn-market-conditional-v1",
+  "mode": "research_only",
+  "production_authorized": false,
+  "promotion_authorized": false,
+  "2026_outcomes_used_for_selection": false,
+  "hypothesis": "A compact point-in-time-safe vector of prior FTN scheme/process state contains incremental home-win probability information conditional on the contemporaneous historical market benchmark.",
+  "source": {
+    "name": "FTN Data via nflverse",
+    "cost": "$0",
+    "license": "CC-BY-SA-4.0 with required attribution",
+    "historical_start": 2022,
+    "point_in_time_field": "date_pulled",
+    "same_game_rows_allowed": false
+  },
+  "decision_horizon": "pregame; for every target game, only prior-game FTN rows with date_pulled earlier than that target game's modeled pregame decision timestamp are eligible",
+  "target_seasons": [2023, 2024, 2025],
+  "walk_forward_training": {
+    "2023": [2022],
+    "2024": [2022, 2023],
+    "2025": [2022, 2023, 2024]
+  },
+  "prohibited": [
+    "completed 2026 outcomes",
+    "same-game FTN charting",
+    "FTN rows whose date_pulled is after the tested game's decision horizon",
+    "post-result feature subset search",
+    "hyperparameter grid search",
+    "retrospective injury or participation state",
+    "market-source timing represented as T-120 when only late/closing historical market is actually available"
+  ],
+  "team_game_feature_definitions": {
+    "off_motion_rate": "mean is_motion on offensive plays with non-null charting",
+    "off_play_action_rate": "mean is_play_action on charted offensive pass/dropback plays",
+    "off_rpo_rate": "mean is_rpo on charted offensive plays",
+    "off_screen_rate": "mean is_screen_pass on charted offensive pass plays",
+    "off_qb_out_of_pocket_rate": "mean is_qb_out_of_pocket on eligible offensive dropbacks",
+    "off_interception_worthy_rate": "mean is_interception_worthy on eligible pass attempts",
+    "off_qb_fault_sack_rate": "mean is_qb_fault_sack on eligible dropbacks",
+    "def_blitz_rate": "mean indicator n_blitzers > 0 while defending on eligible opponent dropbacks",
+    "def_mean_pass_rushers": "mean n_pass_rushers while defending on eligible opponent dropbacks",
+    "def_mean_box_count": "mean n_defense_box while defending on eligible charted plays"
+  },
+  "pregame_state": {
+    "aggregation": "team-level EWMA of completed eligible prior games",
+    "alpha": 0.20,
+    "shift": "one completed game before the target game",
+    "matchup_representation": "home minus away for each of the exactly ten predeclared state variables",
+    "missingness": "prior-season training median learned inside each walk-forward training fold plus an explicit missing indicator per feature family; no future-season imputation statistics"
+  },
+  "models": {
+    "market_only_calibration": "L2 logistic regression on historical market logit, fit only on prior seasons",
+    "market_plus_ftn": "L2 logistic regression on historical market logit plus exactly the ten FTN matchup differences and predeclared missing indicators",
+    "regularization": "C=0.1, solver=lbfgs, max_iter=5000; fixed before results",
+    "feature_scaling": "training-fold standardization for FTN feature columns only; market logit remains on logit scale"
+  },
+  "benchmarks": [
+    "raw historical market probability",
+    "walk-forward market-only calibration",
+    "existing v0.8/F-ST research outputs as descriptive context only when samples align"
+  ],
+  "primary_metric": "Brier score delta: market_plus_ftn minus walk-forward market_only_calibration",
+  "secondary_metrics": [
+    "log loss delta",
+    "winner accuracy delta",
+    "calibration slope/intercept",
+    "blocked season+week paired bootstrap uncertainty",
+    "per-season stability",
+    "feature missingness and eligible-date coverage"
+  ],
+  "qualification_rule": {
+    "probability_quality": "Brier must improve market-only calibration with a season+week blocked 95% interval excluding zero in the favorable direction; log loss may not show statistically supported degradation.",
+    "stability": "point improvement should not be driven by one target season with sign reversal in the others",
+    "coverage": "date_pulled eligibility and missingness must be reported; no target season may silently use later charting",
+    "production_effect": "none regardless of historical result; any next step requires a separate shadow preregistration and user authorization"
+  },
+  "rejection_rule": "If primary qualification fails, record rejection and do not rescue via alternate C values, feature subsets, transformations, interactions or model families within this experiment."
+}
