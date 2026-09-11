@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0B0B0B" />
+    <meta name="theme-color" content="#071019" />
     <meta name="color-scheme" content="dark" />
     <meta name="application-name" content="Sunday Signal" />
     <meta name="apple-mobile-web-app-title" content="Sunday Signal" />
@@ -23,6 +23,15 @@
     <link rel="mask-icon" href="/nfl-forecast-model/brand/sunday-signal-mark.svg" color="#9E1B32" />
     <link rel="manifest" href="/nfl-forecast-model/brand/manifest.webmanifest" />
     <title>Sunday Signal — powered by LevLine</title>
+    <script>
+      (function restoreSundaySignalRoute(){
+        var params=new URLSearchParams(window.location.search)
+        var route=params.get('__route')
+        if(!route)return
+        var safe=route.charAt(0)==='/'?route:'/'+route
+        window.history.replaceState(null,'','/nfl-forecast-model'+safe)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
