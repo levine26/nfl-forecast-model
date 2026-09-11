@@ -2,16 +2,19 @@ from __future__ import annotations
 
 """Materialize the frozen F-ST-01 candidate into the research-only live shadow slate.
 
-The original candidate's recovered numerical runtime is retained as immutable forensic
-metadata, but current shadow scoring is deliberately portable: immutable recovered OOF
-and training artifacts are validated byte-for-byte, the frozen stack is reconstructed
-on the native runner only as a <=1e-12 parity audit, and current games are always scored
-with the registered frozen coefficient literals.
+Historical reconstruction is verified under the recovered frozen-candidate runtime.
+Current-game nested-PURE scoring is isolated into a native-CPU subprocess because a
+forced historical OpenBLAS core type is not a safe execution target on heterogeneous
+hosted runners. Final F-ST scoring always uses registered frozen coefficient literals.
 """
 
 import argparse
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -23,11 +26,7 @@ from nfl_forecast.challenger_fst import (
     fit_frozen_2026_stack,
     frozen_stack_probability,
 )
-from nfl_forecast.fst_nested_pure import (
-    fit_future_nested_stack,
-    load_frozen_base_oof,
-    load_frozen_training_frame,
-)
+from nfl_forecast.fst_nested_pure import load_frozen_base_oof, load_frozen_training_frame
 from nfl_forecast.fst_provenance import (
     TRAINING_COLUMNS,
     capture_fst_pre_fit_provenance,
@@ -35,6 +34,7 @@ from nfl_forecast.fst_provenance import (
 )
 from nfl_forecast.fst_reconstruction import (
     frozen_fit_from_identity,
+    require_fst_reconstruction_runtime,
     verify_fst_reconstruction_identity,
 )
 from scripts.run_challenger_v08 import SHADOW_BASE_COLUMNS, build_research_frame
@@ -79,6 +79,59 @@ def _training_frame_on_historical_index(
     return aligned
 
 
+def _score_current_pure_native(
+    historical: pd.DataFrame,
+    base_oof: pd.DataFrame,
+    current: pd.DataFrame,
+    feature_cols: list[str],
+    *,
+    seed: int,
+) -> np.ndarray:
+    """Run only live base-model fitting outside the forced forensic CPU architecture."""
+
+    with tempfile.TemporaryDirectory(prefix="levline-fst-native-") as raw_tmp:
+        tmp = Path(raw_tmp)
+        historical_path = tmp / "historical.pkl"
+        base_oof_path = tmp / "base_oof.pkl"
+        current_path = tmp / "current.pkl"
+        features_path = tmp / "features.json"
+        output_path = tmp / "current_pure.npy"
+        historical.to_pickle(historical_path)
+        base_oof.to_pickle(base_oof_path)
+        current.to_pickle(current_path)
+        features_path.write_text(json.dumps(feature_cols), encoding="utf-8")
+
+        env = os.environ.copy()
+        # OPENBLAS_CORETYPE selects an instruction-set implementation. Retain benign
+        # thread-count controls but let OpenBLAS detect the actual hosted CPU.
+        env.pop("OPENBLAS_CORETYPE", None)
+        subprocess.run(
+            [
+                sys.executable,
+                "scripts/run_fst_native_pure_score.py",
+                "--historical",
+                str(historical_path),
+                "--base-oof",
+                str(base_oof_path),
+                "--current",
+                str(current_path),
+                "--features",
+                str(features_path),
+                "--output",
+                str(output_path),
+                "--seed",
+                str(seed),
+            ],
+            check=True,
+            env=env,
+        )
+        probability = np.load(output_path, allow_pickle=False)
+    values = np.asarray(probability, dtype=float)
+    if len(values) != len(current) or not np.isfinite(values).all():
+        raise RuntimeError("Native F-ST current PURE subprocess returned invalid probabilities")
+    return values
+
+
 def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_outputs") -> dict:
     out = Path(output_dir)
     slate_path = out / "candidate_shadow_slate.csv"
@@ -87,22 +140,20 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
 
     spec = _load_spec()
     registered = spec["frozen_identity"]
+    runtime_check = require_fst_reconstruction_runtime()
     authoritative_fit = frozen_fit_from_identity(registered)
 
     cfg, historical, current, feature_sets, _, _ = build_research_frame(config_path)
     seed = int(cfg["model"]["random_state"])
     base_features = feature_sets["production_compatible"]
 
-    # Use the immutable forensic artifacts recovered from the successful frozen-candidate
-    # workflow instead of regenerating base OOF under a forced CPU architecture. Their
-    # loaders verify compressed/raw hashes, row identity/order, outcomes and season bounds.
+    # Use immutable forensic artifacts recovered from the successful frozen-candidate
+    # workflow rather than regenerating base OOF. Their loaders verify compressed/raw
+    # hashes, row identity/order, outcomes, training digest and historical season bounds.
     base_oof = load_frozen_base_oof(historical=historical)
     frozen_training = load_frozen_training_frame(historical=historical)
     training_for_fit = _training_frame_on_historical_index(historical, frozen_training)
 
-    # Persist a fresh game-keyed provenance bundle before the parity refit. This remains
-    # explicitly a prospective reconstruction audit, not a claim that F-ST-01 had durable
-    # pre-fit capture at the original freeze time.
     provenance_dir = out / "fst" / "provenance"
     input_provenance = capture_fst_pre_fit_provenance(
         historical,
@@ -113,10 +164,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         capture_context="prospective_shadow_reconstruction",
     )
 
-    # Refit only as a numerical identity check. The immutable training digest/rows/seasons
-    # must match exactly and coefficients must reproduce within <=1e-12. The native runner
-    # is used intentionally: forcing SKYLAKEX on a heterogeneous hosted CPU can SIGILL and
-    # is unnecessary because scoring never consumes these reconstructed coefficients.
+    # This small two-input refit remains under the recovered reconstruction runtime and
+    # exists only to verify historical identity. It is never used to score current games.
     reconstruction_fit = fit_frozen_2026_stack(training_for_fit)
     fit_provenance = write_fst_fit_provenance(
         provenance_dir, input_provenance, reconstruction_fit
@@ -128,9 +177,9 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         registered,
     )
 
-    # Current nested PURE uses the portable frozen OOF matrix and through-2025 fits.
-    # Registered F-ST literals remain the sole final-scoring parameters.
-    current_pure = fit_future_nested_stack(
+    # CPU-heavy current base-model fitting is portable and isolated from the historical
+    # architecture pin. The frozen OOF matrix is still the meta-model input universe.
+    current_pure = _score_current_pure_native(
         historical,
         base_oof,
         current,
@@ -193,9 +242,9 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         "base_oof_source": "immutable_recovered_forensic_artifact",
         "training_frame_source": "immutable_recovered_forensic_artifact",
         "reconstruction_fit": reconstruction_dict,
-        "reconstruction_execution_policy": "native_runner_against_immutable_recovered_inputs",
-        "reconstruction_runtime": fit_provenance["runtime"],
-        "recovered_original_runtime": spec["reproduction_runtime"],
+        "reconstruction_execution_policy": "recovered_runtime_against_immutable_inputs",
+        "current_pure_execution_policy": "native_cpu_subprocess_with_frozen_oof",
+        "reconstruction_runtime": runtime_check,
         "freeze_timestamp_utc": spec["freeze_timestamp_utc"],
         "freeze_implementation_sha": spec["freeze_implementation_sha"],
         "provenance": {
