@@ -1,0 +1,105 @@
+{
+  "preregistration_id": "LEVLINE-POST100-OPT-V1",
+  "status": "INACTIVE_UNTIL_CURRENT_ROADMAP_100_PERCENT",
+  "research_only": true,
+  "production_authorized": false,
+  "selection_firewall": {
+    "completed_2026_outcomes_allowed_for_selection": false,
+    "completed_2026_outcomes_allowed_for_tuning": false,
+    "completed_2026_outcomes_allowed_for_calibration_fit": false,
+    "completed_2026_outcomes_allowed_for_feature_selection": false,
+    "completed_2026_outcomes_allowed_for_architecture_selection": false,
+    "prospective_2026_evidence_may_be_observed_after_freeze": true,
+    "prospective_2026_evidence_may_trigger_automatic_promotion": false
+  },
+  "primary_metrics": [
+    "brier_score",
+    "log_loss"
+  ],
+  "secondary_metrics": [
+    "calibration_intercept",
+    "calibration_slope",
+    "expected_calibration_error",
+    "accuracy",
+    "market_relative_skill",
+    "season_stability",
+    "bootstrap_uncertainty"
+  ],
+  "distributional_metrics": [
+    "crps",
+    "interval_score"
+  ],
+  "validation": {
+    "outer_scheme": "chronological_rolling_origin_or_season_held_out",
+    "all_tuning_inside_training_window": true,
+    "random_shuffled_cv_for_selection": false,
+    "point_in_time_features_required": true,
+    "revision_aware_sources_required_where_material": true,
+    "paired_candidate_baseline_comparison_required": true
+  },
+  "benchmark_ladder": [
+    "devigged_market_probability",
+    "frozen_production_fst",
+    "pure_non_market_model",
+    "elo_or_srs_baseline",
+    "simple_regularized_logistic_baseline"
+  ],
+  "candidate_model_families": [
+    "regularized_logistic",
+    "elastic_net",
+    "xgboost",
+    "lightgbm",
+    "catboost",
+    "hist_gradient_boosting",
+    "extra_trees",
+    "random_forest",
+    "monotonic_gradient_boosting",
+    "ngboost_distributional",
+    "bayesian_or_shrinkage_ratings",
+    "glicko2",
+    "mlp_only_after_tabular_saturation",
+    "sequence_models_only_with_incremental_evidence"
+  ],
+  "calibration_candidates": [
+    "identity",
+    "platt_logistic",
+    "beta_calibration",
+    "isotonic",
+    "calibration_tree_experimental"
+  ],
+  "ensemble_candidates": [
+    "arithmetic_weighted_average",
+    "logit_weighted_average",
+    "nonnegative_simplex",
+    "regularized_logistic_stacking",
+    "constrained_market_pure_stacking",
+    "bayesian_model_averaging_experimental",
+    "regime_mixture_only_if_nested_and_robust"
+  ],
+  "feature_families": [
+    "opponent_adjusted_team_efficiency",
+    "qb_strength_and_starter_uncertainty",
+    "all_position_availability",
+    "ol_continuity_and_pressure_matchup",
+    "pace_and_offensive_process",
+    "rest_travel_timezone_altitude",
+    "weather_and_roof_state",
+    "coaching_staff_and_tactical_change",
+    "point_in_time_market_state_and_movement",
+    "special_teams_and_field_position"
+  ],
+  "advancement_gates": {
+    "integrity_failures_allowed": 0,
+    "completed_2026_selection_usage_allowed": 0,
+    "proper_score_improvement_required": true,
+    "material_calibration_degradation_allowed": false,
+    "single_season_dependency_allowed": false,
+    "complexity_must_be_justified_by_incremental_value": true,
+    "automatic_production_promotion": false
+  },
+  "production_freeze": {
+    "fst_coefficients_frozen": true,
+    "fst_architecture_frozen": true,
+    "requires_separate_authorization_after_prospective_evidence": true
+  }
+}
