@@ -1,7 +1,10 @@
 {
-  "registry_version": 1,
+  "registry_version": 2,
   "status": "research_governance",
   "production_authorized": false,
+  "qualification_basis": "DATA_INTEGRITY_ONLY",
+  "rights_qualification_blocker": false,
+  "zero_cost_active_research_only": true,
   "sources": [
     {
       "source_id": "ftn_charting_via_nflverse",
@@ -10,9 +13,11 @@
       "historical_coverage": "2022 onward",
       "freshness": "nflverse documents four update checks per day in season; FTN charting is generally published after games rather than as a live pregame source",
       "useful_fields": ["motion", "play_action", "screen", "RPO", "QB out of pocket", "catchable/contested ball", "box count", "formation context"],
-      "license_status": "CC-BY-SA-4.0 via nflverse with attribution to FTN Data via nflverse",
-      "public_display_policy": "eligible only with required attribution and share-alike handling; metrics must still be source_observed and separate from LevLine modeled impact",
+      "license_status": "metadata_only: CC-BY-SA-4.0 via nflverse with attribution to FTN Data via nflverse",
+      "rights_qualification_blocker": false,
+      "public_display_policy": "record attribution/share-alike metadata separately; metrics must remain source_observed and separate from LevLine modeled impact",
       "pregame_model_role": "prior-completed-game feature research only; never use same-game charting",
+      "technical_qualification_status": "qualified_for_preregistered_research_subject_to_point_in_time_rules",
       "production_eligibility": "not_authorized",
       "documentation": ["https://nflreadr.nflverse.com/reference/load_ftn_charting.html", "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html"]
     },
@@ -21,8 +26,10 @@
       "provider": "NFL Next Gen Stats through 2022 / FTN Data from 2023 onward via nflverse",
       "family": "participation",
       "historical_coverage": "2016 onward in loader; 2023+ FTN participation is released after the full postseason rather than in-season",
-      "license_status": "CC-BY-SA-4.0 with source-specific attribution through nflverse",
+      "license_status": "metadata_only: CC-BY-SA-4.0 with source-specific attribution through nflverse",
+      "rights_qualification_blocker": false,
       "pregame_model_role": "historical prior-season/previous-season research only where chronology permits; 2023+ feed is not an in-season availability source",
+      "technical_qualification_status": "limited_by_publication_timing",
       "production_eligibility": "not_authorized",
       "documentation": ["https://nflreadr.nflverse.com/reference/load_participation.html", "https://nflreadr.nflverse.com/articles/nflverse_data_schedule.html"]
     },
@@ -32,8 +39,11 @@
       "family": "commercial_advanced_charting",
       "technical_status": "commercial data feeds and API-capable products are advertised",
       "coverage_note": "SIS advertises full NFL/FBS coverage, universal player IDs, participation, raw data and advanced analytics including pressure and blocking measures",
-      "rights_status": "commercial license required; no public redistribution right inferred from product availability",
-      "research_value": "high for line play, pressure, participation, injury and replacement-quality research if contract permits",
+      "rights_status": "metadata_only: commercial terms recorded separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": false,
+      "research_value": "high for line play, pressure, participation, injury and replacement-quality research if technically audited",
+      "technical_qualification_status": "not_audited",
       "production_eligibility": "not_authorized",
       "documentation": ["https://www.sportsinfosolutions.com/football/"]
     },
@@ -41,10 +51,13 @@
       "source_id": "sumersports_subscription_stats",
       "provider": "SumerSports",
       "family": "commercial_advanced_charting",
-      "technical_status": "subscription product exposes live charting and advanced stat tables; no public LevLine API entitlement established",
-      "coverage_note": "SumerSports advertises pressure, route and coverage charting plus advanced statistics generated from licensed tracking data",
-      "rights_status": "subscription/interface availability is not a storage, API, modeling or redistribution license; contractual review required",
-      "research_value": "potentially high as a benchmark/reference, but automation is not approved without an explicit data agreement",
+      "technical_status": "subscription product exposes live charting and advanced stat tables; no stable automated LevLine data interface has been established",
+      "coverage_note": "SumerSports advertises pressure, route and coverage charting plus advanced statistics generated from tracking data",
+      "rights_status": "metadata_only: subscription/data-use terms recorded separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": false,
+      "research_value": "potentially high as a benchmark/reference, but an automated point-in-time feed and reproducibility contract have not been established",
+      "technical_qualification_status": "blocked_by_missing_reproducible_data_interface",
       "production_eligibility": "not_authorized",
       "documentation": ["https://sumersports.com/features/sumerlive/", "https://sumersports.com/the-zone/how-sumerlive-tracks-the-game/"]
     },
@@ -52,12 +65,15 @@
       "source_id": "direct_nfl_ngs_tracking",
       "provider": "NFL Next Gen Stats / official distribution ecosystem",
       "family": "raw_tracking",
-      "technical_status": "NFL captures player location/speed/acceleration at 10 Hz; raw proprietary NGS distribution is not treated as an open public feed",
-      "rights_status": "proprietary official-data rights; no open redistribution or automation right inferred",
-      "research_value": "very high for separation, pass rush/protection, route, coverage and run-blocking research if licensed",
+      "technical_status": "NFL captures player location/speed/acceleration at 10 Hz; no zero-cost reproducible raw tracking feed is available to the current research pipeline",
+      "rights_status": "metadata_only: proprietary distribution posture recorded separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": false,
+      "research_value": "very high for separation, pass rush/protection, route, coverage and run-blocking research if a reproducible feed becomes available",
+      "technical_qualification_status": "unavailable_to_current_zero_cost_pipeline",
       "production_eligibility": "not_authorized",
       "documentation": ["https://operations.nfl.com/game-operations-logistics/technology/performance-tracking-data-next-gen-stats"]
     }
   ],
-  "selection_policy": "Prefer legally clear nflverse/CC-licensed historical features first. Paid proprietary feeds may be evaluated only after contract terms expressly permit LevLine's intended storage, modeling and publication behavior."
+  "selection_policy": "Rank sources for technical qualification only on data integrity, chronology, identity, coverage, reliability and reproducibility. Rights/licensing metadata never blocks technical qualification. Active LevLine research remains zero-cost, so paid feeds are not used by the current pipeline; production promotion remains a separate explicit decision."
 }

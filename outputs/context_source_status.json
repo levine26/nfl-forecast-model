@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-11T03:28:57.949741+00:00",
+    "as_of": "2026-09-11T06:34:45.530483+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,36 +75,36 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-11T03:29:02.934617+00:00",
+    "as_of": "2026-09-11T06:34:50.603430+00:00",
     "conflicts": 0,
-    "evidence_items_added": 26,
+    "evidence_items_added": 24,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
     "seasons_loaded_end": 2025,
-    "seasons_loaded_start": 2009,
+    "seasons_loaded_start": 2012,
     "source": "nflverse weekly player stats",
     "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
     "status": "healthy",
-    "targets": 26,
-    "verified": 26
+    "targets": 24,
+    "verified": 24
   },
   "coaching": {
-    "as_of": "2026-09-11T03:28:09.638968+00:00",
+    "as_of": "2026-09-11T06:33:39.656497+00:00",
     "current_retry_recoveries": 0,
-    "current_team_coverage": 30,
+    "current_team_coverage": 28,
     "negative_cache_ttl_minutes": 60,
     "negative_entries_retried": 0,
     "pages_missing": 0,
     "parser_version": 2,
     "parser_version_refreshes": 0,
     "refresh_attempts": 0,
-    "requested_teams": 30,
+    "requested_teams": 28,
     "source": "Wikipedia season-page rendered infoboxes + explicit staff tables",
     "status": "healthy"
   },
   "copilot_media": {
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 0,
-    "games_expected": 15,
+    "games_expected": 14,
     "max_age_hours": 6.0,
     "new_report_grace_minutes": 5.0,
     "skipped": {
@@ -120,7 +120,6 @@
       "2026_01_MIA_LV": "copilot_artifact_stale",
       "2026_01_NO_DET": "copilot_artifact_stale",
       "2026_01_NYJ_TEN": "copilot_artifact_stale",
-      "2026_01_SF_LA": "copilot_artifact_stale",
       "2026_01_TB_CIN": "copilot_artifact_stale",
       "2026_01_WAS_PHI": "copilot_artifact_stale"
     },
@@ -132,13 +131,13 @@
   },
   "editorial_finalizer": {
     "editorial_version": "story-desk-v3",
-    "games": 15,
+    "games": 14,
     "guardrail": "Final editorial pass changes only public explanation and story hierarchy, never LevLine probabilities.",
     "status": "healthy",
-    "unique_headlines": 15
+    "unique_headlines": 14
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-11T03:28:51.630637+00:00",
+    "as_of": "2026-09-11T06:34:39.816611+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -152,16 +151,16 @@
       "rpo",
       "screen"
     ],
-    "games": 15,
+    "games": 14,
     "guardrail": "Diversity ranking changes only explanatory evidence, never LevLine probabilities.",
-    "signals_added_before_diversity_filter": 103,
+    "signals_added_before_diversity_filter": 99,
     "status": "healthy"
   },
   "evidence": {
-    "games": 15,
-    "generated_utc": "2026-09-11T03:28:08.844885+00:00",
+    "games": 14,
+    "generated_utc": "2026-09-11T06:33:39.259077+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 199,
+    "signals": 186,
     "status": "healthy"
   },
   "ftn": {
@@ -174,9 +173,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-11T03:28:08.844885+00:00",
+  "generated_utc": "2026-09-11T06:33:39.259077+00:00",
   "injuries": {
-    "as_of": "2026-09-11T03:28:09.231626+00:00",
+    "as_of": "2026-09-11T06:33:39.419935+00:00",
     "players": 167,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -184,14 +183,14 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-11T03:29:10.205524+00:00",
+    "as_of": "2026-09-11T06:34:56.303613+00:00",
     "cross_game_titles_rejected": 2,
-    "games": 15,
-    "games_with_display_reporting": 15,
-    "games_with_reporting": 15,
+    "games": 14,
+    "games_with_display_reporting": 14,
+    "games_with_reporting": 14,
     "games_with_substantive_reporting": 13,
-    "games_with_trusted_reporting": 15,
-    "generic_titles_rejected": 8,
+    "games_with_trusted_reporting": 14,
+    "generic_titles_rejected": 14,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -203,15 +202,15 @@
         "status": "unavailable"
       }
     },
-    "signals": 60,
+    "signals": 56,
     "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-11T03:29:02.001692+00:00",
-    "evidence_items_added": 25,
+    "as_of": "2026-09-11T06:34:49.740233+00:00",
+    "evidence_items_added": 23,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
-    "qb_profiles_matched": 25,
+    "qb_profiles_matched": 23,
     "season": 2025,
     "source": "NFL Next Gen Stats via nflverse",
     "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
@@ -230,10 +229,10 @@
   },
   "personnel_usage": {
     "ambiguous_player_keys_discarded": 2,
-    "eligible_skill_injuries": 46,
-    "evidence_items_enriched": 5,
+    "eligible_skill_injuries": 44,
+    "evidence_items_enriched": 4,
     "guardrail": "Prior usage clarifies role importance but is not converted into an unvalidated point-value injury adjustment; ambiguous abbreviated-name matches are discarded.",
-    "matched_injured_players": 23,
+    "matched_injured_players": 22,
     "season": 2025,
     "source": "NFL.com official injury report + nflverse PBP usage",
     "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
@@ -242,28 +241,28 @@
   "previews": {
     "editorial_audit": {
       "counter_led_reads": [],
-      "headline_count": 15,
+      "headline_count": 14,
       "high_similarity_read_pair_count": 0,
       "high_similarity_read_pairs": [],
       "normalized_read_similarity_limit": 0.78,
-      "read_count": 15,
+      "read_count": 14,
       "read_evidence_overlap": [],
       "read_evidence_overlap_count": 0,
       "read_evidence_similarity_limit": 0.9,
       "repeated_read_sentence_count": 0,
       "repeated_read_sentences": {},
-      "unique_headlines": 15,
-      "unique_read_leads": 15
+      "unique_headlines": 14,
+      "unique_read_leads": 14
     },
     "engine": "LevLine",
-    "games": 15,
+    "games": 14,
     "generator": "Sunday Signal ranked story-spine + slate-aware voice composer",
     "guardrail": "The Read synthesizes verified context; detailed modules below retain the underlying facts and sources. Neither layer alters LevLine probabilities.",
     "status": "healthy"
   },
   "qb_history": {
     "game_level_meeting_metadata": true,
-    "games_with_player_opponent_history": 26,
+    "games_with_player_opponent_history": 24,
     "guardrail": "Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes.",
     "status": "healthy",
     "team_change_safe": true
@@ -272,7 +271,7 @@
     "career_counts_published": false,
     "guardrail": "Displayed counts are explicitly recent nflverse PBP samples; short cameos do not count as meaningful games and no limited sample is presented as a career total.",
     "meaningful_game_threshold_dropbacks": 10,
-    "recent_samples_audited": 26,
+    "recent_samples_audited": 24,
     "status": "healthy"
   },
   "schedule": {
@@ -281,7 +280,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-11T03:28:12.780125+00:00",
+    "as_of": "2026-09-11T06:33:42.836559+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -290,7 +289,7 @@
   "staff_impact": {
     "guardrail": "Coordinator impact is a historical tendency projection for explanation only; it does not alter LevLine unless separately validated out of sample.",
     "impacts_added": 12,
-    "new_coordinator_roles": 34,
+    "new_coordinator_roles": 32,
     "profile_status": {
       "seasons": [
         2022,
@@ -308,13 +307,13 @@
   },
   "story_desk": {
     "editorial_version": "story-desk-v2",
-    "games_with_notebook": 5,
+    "games_with_notebook": 4,
     "guardrail": "Rivalry, event, history and fun-fact context is explanatory only and never changes LevLine numerically.",
     "status": "healthy",
-    "story_items_added": 18
+    "story_items_added": 14
   },
   "weather": {
-    "as_of": "2026-09-11T03:28:42.867702+00:00",
+    "as_of": "2026-09-11T06:34:31.524450+00:00",
     "games_checked": 10,
     "status": "degraded"
   }
