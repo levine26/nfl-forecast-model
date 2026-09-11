@@ -1,0 +1,126 @@
+name: LevLine research Sleeper Impact Monitor v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/sleeper_impact_monitor_v1.py'
+      - 'research/test_sleeper_impact_monitor_v1.py'
+      - 'research/sleeper_archive_capture_v1.py'
+      - 'src/nfl_forecast/player_impact_monitor.py'
+      - 'src/nfl_forecast/player_impact_cards.py'
+      - '.github/workflows/research_sleeper_impact_monitor_v1.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['LevLine research Sleeper archive capture v1']
+    types: [completed]
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - name: Validate qualified all-position state and point-in-time guards
+        run: python -m pytest -q research/test_sleeper_impact_monitor_v1.py
+
+  derive-monitor:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-research-sleeper-impact-monitor-v1
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Restore latest two verified off-main player-state captures
+        id: captures
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/sleeper-player-state:refs/remotes/origin/research-data/sleeper-player-state || true
+          if ! git show-ref --verify --quiet refs/remotes/origin/research-data/sleeper-player-state; then
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mkdir -p /tmp/levline-sleeper-impact
+          git show origin/research-data/sleeper-player-state:research_outputs/sleeper_player_state/index.json \
+            > /tmp/levline-sleeper-impact/index.json
+          python - <<'PY' > /tmp/levline-sleeper-impact/files.env
+          import json
+          from pathlib import Path
+          index = json.loads(Path('/tmp/levline-sleeper-impact/index.json').read_text())
+          captures = index.get('captures') or []
+          if not captures:
+              raise SystemExit('No verified Sleeper captures available')
+          print('CURRENT=' + str(captures[-1]['filename']))
+          print('PREVIOUS=' + (str(captures[-2]['filename']) if len(captures) > 1 else ''))
+          PY
+          source /tmp/levline-sleeper-impact/files.env
+          git show "origin/research-data/sleeper-player-state:research_outputs/sleeper_player_state/snapshots/$CURRENT" \
+            > /tmp/levline-sleeper-impact/current.json.gz
+          if [ -n "$PREVIOUS" ]; then
+            git show "origin/research-data/sleeper-player-state:research_outputs/sleeper_player_state/snapshots/$PREVIOUS" \
+              > /tmp/levline-sleeper-impact/previous.json.gz
+            echo 'previous=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'previous=false' >> "$GITHUB_OUTPUT"
+          fi
+          echo 'available=true' >> "$GITHUB_OUTPUT"
+
+      - name: Build qualified research-only Impact Monitor payload
+        if: steps.captures.outputs.available == 'true'
+        run: |
+          set -euo pipefail
+          PREVIOUS_ARGS=()
+          if [ '${{ steps.captures.outputs.previous }}' = 'true' ]; then
+            PREVIOUS_ARGS=(--previous-capture /tmp/levline-sleeper-impact/previous.json.gz)
+          fi
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python -m research.sleeper_impact_monitor_v1 \
+              --capture /tmp/levline-sleeper-impact/current.json.gz \
+              "${PREVIOUS_ARGS[@]}" \
+              --schedule outputs/this_week.csv \
+              --output /tmp/levline-sleeper-impact/current_impact_monitor.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('/tmp/levline-sleeper-impact/current_impact_monitor.json').read_text())
+          assert payload['probability_feature_authorized'] is False
+          assert payload['live_site_consumes_this_file'] is False
+          assert payload['capture_audit']['completed_2026_outcomes_used'] == 0
+          assert payload['capture_audit']['modeled_player_impacts_created'] == 0
+          PY
+
+      - name: Persist derivative on research-data branch only
+        if: steps.captures.outputs.available == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git checkout -B sleeper-player-state-data origin/research-data/sleeper-player-state
+          mkdir -p research_outputs/sleeper_player_state/impact_monitor
+          cp /tmp/levline-sleeper-impact/current_impact_monitor.json \
+            research_outputs/sleeper_player_state/impact_monitor/current.json
+          git add research_outputs/sleeper_player_state/impact_monitor/current.json
+          if git diff --cached --quiet; then
+            echo 'Sleeper Impact Monitor derivative unchanged.'
+            exit 0
+          fi
+          git commit -m 'Refresh qualified Sleeper Impact Monitor context'
+          git push origin HEAD:research-data/sleeper-player-state
