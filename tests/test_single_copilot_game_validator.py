@@ -73,7 +73,13 @@ def test_x_and_twitter_are_one_source_family():
     assert any("two independent" in failure for failure in failures)
 
 
-def test_seven_word_human_phrase_collision_is_detectable():
+def test_seven_word_substantive_phrase_collision_is_detectable():
     a = "turn its explosive play threat into steady production now"
-    b = "Miami can turn its explosive play threat into steady drives"
-    assert module._ngrams(a) & module._ngrams(b)
+    b = "Miami can turn its explosive play threat into steady production now"
+    assert module._unique_ngrams(a) & module._unique_ngrams(b)
+
+
+def test_standardized_injury_report_phrase_is_exempt_from_uniqueness_collision():
+    a = "The receiver did not participate in practice on Wednesday because of a hamstring issue."
+    b = "The tackle did not participate in practice on Wednesday because of an ankle issue."
+    assert not (module._unique_ngrams(a) & module._unique_ngrams(b))
