@@ -1,0 +1,104 @@
+name: LevLine research market horizons
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Five-minute trigger. A stdlib-only preflight runs first, so there is no
+    # dependency install or external odds request unless a kickoff cluster is due.
+    - cron: "*/5 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-research-market-horizons
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cheap local kickoff gate
+        id: gate
+        run: |
+          RESULT=$(python scripts/pregame_due.py --min-minutes 10 --max-minutes 65)
+          echo "$RESULT"
+          if echo "$RESULT" | grep -q '^due=true'; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "due=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore cumulative research ledger
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/market-horizons:refs/remotes/origin/research-data/market-horizons || true
+          mkdir -p research_outputs/phase2_market_reliance
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-horizons; then
+            git show origin/research-data/market-horizons:research_outputs/phase2_market_reliance/live_market_history.csv \
+              > research_outputs/phase2_market_reliance/live_market_history.csv 2>/dev/null || true
+            git show origin/research-data/market-horizons:research_outputs/phase2_market_reliance/live_market_status.json \
+              > research_outputs/phase2_market_reliance/live_market_status.json 2>/dev/null || true
+          fi
+
+      - uses: actions/setup-python@v5
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install lightweight research dependencies
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          pip install "pandas==3.0.5" "numpy==2.4.6" "requests>=2.32"
+          pip install -e . --no-deps
+
+      - name: Capture due multi-book snapshots
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        env:
+          THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+        run: |
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/run_challenger_market_capture.py \
+              --min-minutes 10 \
+              --max-minutes 65 \
+              --quota-reserve 50
+
+      - name: Persist research ledger off main
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/phase2_market_reliance
+          if [ ! -s "$DATA_DIR/live_market_history.csv" ] && [ ! -s "$DATA_DIR/live_market_status.json" ]; then
+            echo "No research data to persist."
+            exit 0
+          fi
+
+          rm -rf /tmp/phase2_market_reliance
+          cp -R "$DATA_DIR" /tmp/phase2_market_reliance
+          rm -rf "$DATA_DIR"
+
+          git config user.name "levline-research-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-horizons; then
+            git checkout -B market-horizon-data origin/research-data/market-horizons
+          else
+            git checkout -B market-horizon-data
+          fi
+
+          mkdir -p research_outputs
+          rm -rf research_outputs/phase2_market_reliance
+          cp -R /tmp/phase2_market_reliance research_outputs/phase2_market_reliance
+          git add research_outputs/phase2_market_reliance/
+          if git diff --cached --quiet; then
+            echo "Research ledger unchanged."
+            exit 0
+          fi
+          git commit -m "Capture LevLine research market horizon"
+          git push origin HEAD:research-data/market-horizons
