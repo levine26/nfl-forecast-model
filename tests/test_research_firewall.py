@@ -24,22 +24,28 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/player_impact_engine.py",
         "src/nfl_forecast/player_impact_monitor.py",
         "src/nfl_forecast/availability_qualification.py",
+        "src/nfl_forecast/availability_2025_reconstruction.py",
         "scripts/run_challenger_v09.py",
         "scripts/run_fst_reconstruction_probe.py",
         "scripts/verify_fst_reconstruction_evidence.py",
         "scripts/build_expected_lineup_impacts.py",
+        "scripts/reconstruct_2025_availability.py",
         "research/experiments.json",
         "research/fst/F-ST-01-FROZEN-2026.json",
         "research/player_impact/EXPECTED_LINEUP_CONTRACT.md",
         "research/availability/sources.json",
+        "research/availability/2025_reconstruction_contract.json",
         "research_outputs/player_state_audit.json",
+        "research_outputs/availability_2025_reconstruction/qualification.json",
         "challenger_outputs/v09_report.json",
         "tests/test_challenger_evaluation.py",
         "tests/test_fst_frozen_identity.py",
         "tests/test_player_impact_engine.py",
         "tests/test_player_impact_monitor.py",
         "tests/test_availability_qualification.py",
+        "tests/test_availability_2025_reconstruction.py",
         ".github/workflows/research_firewall.yml",
+        ".github/workflows/research_2025_availability_reconstruction.yml",
         "docs/LEVLINE_RESEARCH.md",
         "docs/IMPACT_MONITOR_GAP_ANALYSIS.md",
         "docs/FST_FREEZE_PROVENANCE.md",
@@ -76,6 +82,10 @@ def test_research_scope_is_detected_from_changed_surfaces_not_only_branch_name()
     assert research_scope_triggered(
         ["src/nfl_forecast/unregistered_player_research.py"],
         "fix/new-player-research",
+    )
+    assert research_scope_triggered(
+        ["src/nfl_forecast/availability_2025_reconstruction.py"],
+        "fix/availability-history",
     )
     assert research_scope_triggered(["src/nfl_forecast/pipeline.py"], "research/prototype")
     assert not research_scope_triggered(["src/nfl_forecast/pipeline.py"], "fix/production-bug")
@@ -120,8 +130,8 @@ def test_production_prediction_path_does_not_import_research_modules():
         "scripts/run_week.py",
     ]
     # The deployed production F-ST path legitimately imports fst_production and
-    # fst_nested_pure. The research-only provenance/reconstruction modules must remain
-    # isolated from production prediction code.
+    # fst_nested_pure. Research-only provenance/reconstruction/availability modules must
+    # remain isolated from production prediction code.
     forbidden_tokens = (
         "challenger",
         "fst_provenance",
@@ -132,6 +142,7 @@ def test_production_prediction_path_does_not_import_research_modules():
         "player_impact_engine",
         "player_impact_monitor",
         "availability_qualification",
+        "availability_2025_reconstruction",
     )
     for filename in protected:
         tree = ast.parse(Path(filename).read_text(encoding="utf-8"), filename=filename)

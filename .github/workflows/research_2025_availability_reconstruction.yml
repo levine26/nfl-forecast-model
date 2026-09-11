@@ -1,0 +1,71 @@
+name: LevLine 2025 availability reconstruction
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_2025_availability_reconstruction.yml'
+      - 'research/availability/**'
+      - 'src/nfl_forecast/availability_2025_reconstruction.py'
+      - 'scripts/reconstruct_2025_availability.py'
+      - 'scripts/check_research_firewall.py'
+      - 'tests/test_availability_2025_reconstruction.py'
+      - 'tests/test_research_firewall.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconstruct-2025:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install research runtime
+        run: pip install '.[dev]'
+
+      - name: Validate reconstruction and firewall contracts
+        run: pytest -q tests/test_availability_2025_reconstruction.py tests/test_research_firewall.py tests/test_availability_qualification.py
+
+      - name: Collect immutable 2025 source history and reconstruct T-120 state
+        run: python scripts/reconstruct_2025_availability.py --output-dir research_outputs/availability_2025_reconstruction
+
+      - name: Prove reconstruction did not modify production surfaces
+        run: |
+          git diff --exit-code -- \
+            src/nfl_forecast/pipeline.py \
+            src/nfl_forecast/models.py \
+            src/nfl_forecast/features.py \
+            src/nfl_forecast/fst_production.py \
+            src/nfl_forecast/fst_nested_pure.py \
+            outputs/ \
+            site/
+
+      - name: Upload raw sources, canonical rows, and unresolved diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: availability-2025-reconstruction
+          path: research_outputs/availability_2025_reconstruction/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Enforce preregistered reconstruction gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import sys
+
+          path = Path('research_outputs/availability_2025_reconstruction/qualification.json')
+          result = json.loads(path.read_text())
+          print(json.dumps(result, indent=2, sort_keys=True))
+          if not result.get('qualified', False):
+              print('2025 availability reconstruction remains unresolved; refusing model authorization.')
+              sys.exit(2)
+          PY

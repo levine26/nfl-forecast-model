@@ -31,6 +31,7 @@ ALLOWED_PREFIXES = (
     "scripts/run_player_state_research.py",
     "scripts/build_player_impact_cards.py",
     "scripts/build_expected_lineup_impacts.py",
+    "scripts/reconstruct_2025_availability.py",
     "src/nfl_forecast/challenger",
     "src/nfl_forecast/experiment_registry.py",
     "src/nfl_forecast/player_state_research.py",
@@ -38,6 +39,7 @@ ALLOWED_PREFIXES = (
     "src/nfl_forecast/player_impact_engine.py",
     "src/nfl_forecast/player_impact_monitor.py",
     "src/nfl_forecast/availability_qualification.py",
+    "src/nfl_forecast/availability_2025_reconstruction.py",
     "tests/test_challenger",
     "tests/test_fst_",
     "tests/test_experiment_registry.py",
@@ -47,6 +49,7 @@ ALLOWED_PREFIXES = (
     "tests/test_player_impact_engine.py",
     "tests/test_player_impact_monitor.py",
     "tests/test_availability_qualification.py",
+    "tests/test_availability_2025_reconstruction.py",
 )
 
 ALLOWED_EXACT = {
@@ -89,6 +92,8 @@ RESEARCH_PATH_HINTS = (
     "player_state_research",
     "player_impact",
     "availability_qualification",
+    "availability_2025_reconstruction",
+    "reconstruct_2025_availability",
     "_research.",
     "research_",
 )
