@@ -1,0 +1,161 @@
+{
+  "registry_version": 1,
+  "status": "research_governance",
+  "generated_for": "LevLine / Sunday Signal",
+  "governance_principle": "Technical accessibility does not imply permission to persist, redistribute, publish, or use a source in production. Each source must separately pass identity, timestamp, point-in-time, reliability, cost, and rights review for its intended use.",
+  "sources": [
+    {
+      "source_id": "nflverse_games",
+      "family": "football_public_dataset",
+      "provider": "nflverse",
+      "intended_role": ["schedule", "results", "elo_inputs", "opaque_market_benchmark"],
+      "current_levline_use": true,
+      "technical_status": "available",
+      "freshness_note": "nflverse documents game/schedule data updates about every five minutes during the season",
+      "market_provenance_status": "opaque_bookmaker_provenance",
+      "market_use_policy": "Treat home_moneyline/away_moneyline as an upstream benchmark, not as a named sportsbook or a verified multi-book consensus.",
+      "historical_point_in_time_status": "closing_or_late_benchmark_not_matched_to_levline_lock_horizon",
+      "rights_status": "existing_project_source; preserve source attribution and review any underlying-source redistribution constraints before expanding publication",
+      "production_eligibility": "existing_use_only",
+      "documentation": [
+        "https://nflreadr.nflverse.com/",
+        "https://nflreadr.nflverse.com/articles/nflverse_data_schedule.html",
+        "https://github.com/nflverse/nfldata/blob/master/DATASETS.md"
+      ]
+    },
+    {
+      "source_id": "the_odds_api_us_h2h",
+      "family": "sportsbook_aggregator",
+      "provider": "The Odds API",
+      "intended_role": ["prospective_multibook_moneyline_capture", "lock_horizon_research"],
+      "current_levline_use": false,
+      "technical_status": "implemented_research_collector_pending_runtime_credentials",
+      "coverage": "US-region NFL h2h endpoint can return multiple bookmaker objects in one request, including bookmaker key/title and last_update metadata when supplied by the provider.",
+      "quota_model": "1 usage credit per market per region; the planned NFL h2h + US request costs 1 credit",
+      "free_tier_note": "Provider currently advertises a 500-credit/month Starter plan.",
+      "collection_policy": "Query only inside the research near-kickoff window; one request services the whole due-game cluster. Track x-requests-used, x-requests-remaining, and x-requests-last; stop at a configured reserve.",
+      "book_policy": "De-vig each book separately; retain per-book values and timestamps; derive a robust logit consensus. Do not silently collapse FanDuel, DraftKings, BetMGM, or other books into an unattributed number.",
+      "historical_point_in_time_status": "prospective_capture_only_for_lock_horizon_selection",
+      "rights_status": "research_use_pending_source_specific_terms_and_redistribution_review",
+      "production_eligibility": "not_authorized",
+      "documentation": [
+        "https://the-odds-api.com/liveapi/guides/v4/",
+        "https://the-odds-api.com/"
+      ]
+    },
+    {
+      "source_id": "sportsbook_fanduel",
+      "family": "sportsbook",
+      "provider": "FanDuel via approved aggregator feed",
+      "intended_role": ["component_market_probability"],
+      "technical_status": "research_candidate",
+      "ingestion_policy": "Use provider/aggregator API data rather than direct site scraping unless separately reviewed.",
+      "combination_policy": "De-vig independently and retain source identity; eligible for sportsbook-family consensus only.",
+      "rights_status": "inherits_feed_contract_and_requires_publication_review",
+      "production_eligibility": "not_authorized"
+    },
+    {
+      "source_id": "sportsbook_draftkings",
+      "family": "sportsbook",
+      "provider": "DraftKings via approved aggregator feed",
+      "intended_role": ["component_market_probability"],
+      "technical_status": "research_candidate",
+      "ingestion_policy": "Use provider/aggregator API data rather than direct site scraping unless separately reviewed.",
+      "combination_policy": "De-vig independently and retain source identity; eligible for sportsbook-family consensus only.",
+      "rights_status": "inherits_feed_contract_and_requires_publication_review",
+      "production_eligibility": "not_authorized"
+    },
+    {
+      "source_id": "sportsbook_betmgm",
+      "family": "sportsbook",
+      "provider": "BetMGM via approved aggregator feed",
+      "intended_role": ["component_market_probability"],
+      "technical_status": "research_candidate",
+      "ingestion_policy": "Use provider/aggregator API data rather than direct site scraping unless separately reviewed.",
+      "combination_policy": "De-vig independently and retain source identity; eligible for sportsbook-family consensus only.",
+      "rights_status": "inherits_feed_contract_and_requires_publication_review",
+      "production_eligibility": "not_authorized"
+    },
+    {
+      "source_id": "polymarket",
+      "family": "prediction_exchange",
+      "provider": "Polymarket",
+      "intended_role": ["separate_exchange_probability_research"],
+      "current_levline_use": false,
+      "technical_status": "public_api_available",
+      "data_note": "Polymarket documents APIs for market discovery and market/exchange data; research access is technically feasible.",
+      "combination_policy": "Keep separate from sportsbook consensus. Test event identity, liquidity, spread/depth, timestamp alignment, calibration, and incremental value before any ensemble use.",
+      "historical_point_in_time_status": "requires_separate_audit",
+      "rights_status": "api_access_confirmed; persistence_and_redistribution_review_pending",
+      "production_eligibility": "not_authorized",
+      "documentation": [
+        "https://help.polymarket.com/en/articles/13364254-does-polymarket-have-an-api",
+        "https://docs.polymarket.com/"
+      ]
+    },
+    {
+      "source_id": "kalshi",
+      "family": "prediction_exchange",
+      "provider": "Kalshi",
+      "intended_role": ["possible_separate_exchange_probability_research"],
+      "current_levline_use": false,
+      "technical_status": "api_market_data_exists_but_not_approved_for_levline_collection",
+      "combination_policy": "Do not include in sportsbook consensus. Any future test must separately establish event identity, liquidity, timestamp alignment, and incremental value.",
+      "rights_status": "specific_developer_data_use_and_redistribution_review_required_before_collection_or_storage",
+      "production_eligibility": "excluded_pending_rights_review",
+      "documentation": [
+        "https://docs.kalshi.com/",
+        "https://kalshi.com/regulatory/agreement"
+      ]
+    },
+    {
+      "source_id": "nfl_official_injury_reports",
+      "family": "availability",
+      "provider": "NFL.com",
+      "intended_role": ["prospective_availability_reference", "player_impact_explainability"],
+      "current_levline_use": false,
+      "technical_status": "prospective_reference_available",
+      "identity_status": "rendered historical tables do not satisfy the existing stable-ID research contract by themselves",
+      "point_in_time_status": "retrospective T-minus reconstruction not qualified from rendered historical pages alone",
+      "rights_status": "public_reference; automated persistence/redistribution requires source-specific review",
+      "production_eligibility": "explainability_reference_only_not_probability_feature"
+    },
+    {
+      "source_id": "sportradar_weekly_injuries_v7",
+      "family": "availability",
+      "provider": "Sportradar",
+      "intended_role": ["candidate_historical_and_prospective_availability_feed"],
+      "current_levline_use": false,
+      "technical_status": "credentialed_candidate",
+      "point_in_time_status": "requires credentialed audit of historical revisions/status_date and deterministic identity crosswalk",
+      "rights_status": "commercial_contract_required_and_must_match_storage_publication_use",
+      "production_eligibility": "not_authorized_until_audit_and_contract_review"
+    },
+    {
+      "source_id": "sportsdataio_injuries",
+      "family": "availability",
+      "provider": "SportsDataIO",
+      "intended_role": ["secondary_availability_feed_candidate"],
+      "current_levline_use": false,
+      "technical_status": "credentialed_candidate",
+      "point_in_time_status": "historical revision reconstruction and stable-ID crosswalk remain unproven",
+      "rights_status": "commercial_contract_required_and_must_match_storage_publication_use",
+      "production_eligibility": "not_authorized_until_audit_and_contract_review"
+    }
+  ],
+  "family_rules": {
+    "sportsbooks": "May be aggregated only after each source is independently de-vigged and timestamped. Preserve per-book provenance and source count.",
+    "prediction_exchanges": "Never mix into sportsbook consensus by default. Evaluate as a separate information family with liquidity and microstructure controls.",
+    "availability": "Pregame player availability must be point-in-time reproducible, stable-ID mapped, and known by the tested forecast horizon. Actual snaps/participation are prohibited proxies.",
+    "historical_vs_prospective": "Closing historical markets may benchmark information quality but cannot establish the best T-minus lock horizon. Lock-horizon selection requires prospective matched-horizon observations."
+  },
+  "current_decisions": {
+    "recommended_first_multimarket_research_source": "the_odds_api_us_h2h",
+    "recommended_first_market_family": "sportsbook_consensus",
+    "current_nflverse_market_role": "opaque_upstream_benchmark",
+    "polymarket_role": "separate_research_candidate",
+    "kalshi_role": "excluded_pending_rights_review",
+    "player_availability_probability_feature_authorized": false,
+    "production_market_source_change_authorized": false
+  }
+}
