@@ -1,0 +1,59 @@
+{
+  "status": "research_only",
+  "as_of": "2026-09-11",
+  "production_authorized": false,
+  "additions": [
+    {
+      "source_id": "nflverse_officials",
+      "provider": "nflverse",
+      "cost": "$0",
+      "historical_coverage": "2015 onward",
+      "current_2026": "unverified; latest documented example update is 2026-02-05, so live 2026 regular-season freshness must be established before use",
+      "fields": ["game_id", "official_name", "position", "jersey_number", "official_id", "season", "season_type", "week"],
+      "research_value": "Potential low-dimensional environment/control variable for penalty tendency, pace/administration and totals/margin residual research. Any crew-tendency feature must be built only from prior assigned games, never current-game outcomes.",
+      "current_decision": "P3 freshness/schema audit only; do not prioritize ahead of FTN, NGS, market or personnel-state work",
+      "priority": "P3"
+    },
+    {
+      "source_id": "open_meteo_single_runs",
+      "provider": "Open-Meteo",
+      "cost": "$0 for non-commercial use within service limits",
+      "current_2026": true,
+      "coverage": "ECMWF IFS HRES individual runs from March 2024; most other archived individual model runs from 2026-04-02",
+      "research_value": "Reconstruct an actual forecast model run issued before an NFL game's T-120 cutoff rather than substituting realized weather. Useful for 2024-2026 weather-horizon studies and prospective audit.",
+      "timing_rule": "Model initialisation time is not public-availability time; apply the documented computation/distribution lag before considering a run knowable.",
+      "priority": "P0_WEATHER_RESEARCH"
+    },
+    {
+      "source_id": "open_meteo_previous_runs",
+      "provider": "Open-Meteo",
+      "cost": "$0 for non-commercial use within service limits",
+      "current_2026": true,
+      "coverage": "most models from January 2024; selected models longer",
+      "research_value": "Fixed lead-time weather forecasts make it practical to evaluate weather-variable forecast skill and choose robust lead-time features without realized-weather leakage.",
+      "priority": "P1_WEATHER_RESEARCH"
+    },
+    {
+      "source_id": "polymarket_nfl_exchange",
+      "provider": "Polymarket",
+      "cost": "$0 public/open developer APIs",
+      "current_2026": true,
+      "family": "prediction_exchange",
+      "research_value": "Independent NFL moneyline/spread/total market family with price, volume/liquidity and trade history. Useful for exchange-vs-sportsbook disagreement, movement and liquidity-aware diagnostics.",
+      "combination_policy": "Never pool directly into sportsbook consensus. Match event/market identity, timestamp and liquidity separately; decompose as an independent exchange signal.",
+      "current_decision": "P1 source/rights/identity audit and prospective diagnostics; no production use",
+      "priority": "P1_MARKET"
+    },
+    {
+      "source_id": "kalshi_public_market_data",
+      "provider": "Kalshi",
+      "cost": "$0 public API access to market data is technically available",
+      "current_2026": true,
+      "family": "prediction_exchange",
+      "research_value": "Possible second exchange-family benchmark if NFL markets and terms are suitable.",
+      "current_decision": "Remain excluded from LevLine data use pending explicit data-use/storage/redistribution terms review. Technical accessibility alone does not qualify the source.",
+      "priority": "BLOCKED_RIGHTS"
+    }
+  ],
+  "priority_note": "These additions do not alter the current build order: point-in-time source capture, FTN process experiment, NGS, free multi-market sportsbook capture, and validated personnel-state work remain ahead of officials or contract/trade-style features."
+}
