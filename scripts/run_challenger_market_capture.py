@@ -19,7 +19,7 @@ import requests
 
 from nfl_forecast.challenger_market_reliance import kickoff_utc
 from nfl_forecast.challenger_market_sources import devig_two_way, robust_logit_consensus
-from nfl_forecast.fst_production import load_fst_artifact
+from nfl_forecast.fst_production import frozen_fst_probability, load_fst_artifact
 
 API_URL = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
 TEAM_ABBR = {
@@ -37,19 +37,14 @@ TEAM_ABBR = {
 }
 
 
-def _logit(probability: float) -> float:
-    p = float(np.clip(probability, 1e-6, 1.0 - 1e-6))
-    return float(np.log(p / (1.0 - p)))
-
-
 def _fst_probability(pure_probability: float, market_probability: float) -> float:
     artifact = load_fst_artifact()
-    z = (
-        float(artifact.intercept)
-        + float(artifact.market_logit_coefficient) * _logit(market_probability)
-        + float(artifact.pure_logit_coefficient) * _logit(pure_probability)
+    probability = frozen_fst_probability(
+        np.asarray([market_probability], dtype=float),
+        np.asarray([pure_probability], dtype=float),
+        artifact,
     )
-    return float(1.0 / (1.0 + np.exp(-z)))
+    return float(probability[0])
 
 
 def _due_games(
@@ -203,10 +198,12 @@ def capture(
             consensus = robust_logit_consensus(source_probabilities)
             pure = pd.to_numeric(slate_row.get("fst_pure_home_prob"), errors="coerce")
             research_levline = _fst_probability(float(pure), consensus) if pd.notna(pure) else np.nan
-            max_age_minutes = np.nan
+            freshest_source_age_minutes = np.nan
             if source_updates:
                 freshest = max(source_updates)
-                max_age_minutes = max(0.0, (pd.Timestamp(now) - freshest).total_seconds() / 60.0)
+                freshest_source_age_minutes = max(
+                    0.0, (pd.Timestamp(now) - freshest).total_seconds() / 60.0
+                )
             rows.append(
                 {
                     "request_timestamp_utc": request_timestamp,
@@ -226,7 +223,7 @@ def capture(
                     "football_home_prob": pure,
                     "source_count": len(source_probabilities),
                     "source_names": "|".join(sorted(source_names)),
-                    "freshest_source_age_minutes": max_age_minutes,
+                    "freshest_source_age_minutes": freshest_source_age_minutes,
                     "research_only": True,
                     "production_authorized": False,
                 }
