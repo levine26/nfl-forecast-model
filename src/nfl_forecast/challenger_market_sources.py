@@ -2,9 +2,10 @@ from __future__ import annotations
 
 """Research-only normalization and aggregation for multiple market sources.
 
-This module never feeds production LevLine.  It keeps sportsbook and prediction-exchange
+This module never feeds production LevLine. It keeps sportsbook and prediction-exchange
 probabilities separately identifiable so source quality, freshness and aggregation methods
-can be evaluated before any production use is considered.
+can be evaluated before any production use is considered. Derived consensus rows remain
+explicitly typed and are never recursively included when building a new consensus.
 """
 
 from typing import Mapping, Sequence
@@ -13,7 +14,8 @@ import numpy as np
 import pandas as pd
 
 EPS = 1e-6
-ALLOWED_SOURCE_TYPES = {"sportsbook", "prediction_exchange"}
+RAW_SOURCE_TYPES = {"sportsbook", "prediction_exchange"}
+ALLOWED_SOURCE_TYPES = RAW_SOURCE_TYPES | {"derived_consensus"}
 
 
 def american_to_probability(value: float) -> float:
@@ -146,10 +148,11 @@ def build_family_composites(
         return pd.DataFrame()
     rows: list[dict] = []
     for game_id, game in latest.groupby("game_id", sort=True):
+        raw = game[game.source_type.isin(RAW_SOURCE_TYPES)].copy()
         families = {
-            "sportsbook_consensus": game[game.source_type.eq("sportsbook")],
-            "exchange_consensus": game[game.source_type.eq("prediction_exchange")],
-            "all_source_consensus": game,
+            "sportsbook_consensus": raw[raw.source_type.eq("sportsbook")],
+            "exchange_consensus": raw[raw.source_type.eq("prediction_exchange")],
+            "all_source_consensus": raw,
         }
         for label, part in families.items():
             if len(part) < int(min_sources):
