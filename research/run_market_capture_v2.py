@@ -60,15 +60,30 @@ def _header_int(response: requests.Response, name: str) -> int | None:
 
 
 def _captured_pairs(path: Path) -> set[tuple[str, str]]:
+    """Return only horizons closed by a qualifying multi-book consensus row.
+
+    Book rows, one-book consensus rows, and legacy ledgers without a source_count
+    field never close a horizon.  They remain append-only evidence and the collector
+    may retry while the preregistered timing window is still open.
+    """
     if not path.exists():
         return set()
     try:
-        frame = pd.read_csv(path, usecols=lambda c: c in {"game_id", "horizon", "row_type"})
+        frame = pd.read_csv(
+            path,
+            usecols=lambda c: c in {"game_id", "horizon", "row_type", "source_count"},
+        )
     except Exception:
         return set()
-    if "row_type" in frame:
-        frame = frame[frame.row_type.eq(QUALIFYING_CLOSE_ROW_TYPE)]
-    return set(zip(frame.get("game_id", []), frame.get("horizon", [])))
+    required = {"game_id", "horizon", "row_type", "source_count"}
+    if not required.issubset(frame.columns):
+        return set()
+    source_count = pd.to_numeric(frame["source_count"], errors="coerce")
+    frame = frame[
+        frame["row_type"].eq(QUALIFYING_CLOSE_ROW_TYPE)
+        & source_count.ge(MIN_CONSENSUS_BOOKS)
+    ]
+    return set(zip(frame["game_id"].astype(str), frame["horizon"].astype(str)))
 
 
 def due_pairs(slate: pd.DataFrame, now_utc: datetime, captured: set[tuple[str, str]]) -> list[dict]:
