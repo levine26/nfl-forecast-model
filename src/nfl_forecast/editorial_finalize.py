@@ -142,9 +142,12 @@ def _uniqueness_segments(text: str) -> list[str]:
 
 
 def _is_standardized_fact_ngram(words: list[str]) -> bool:
-    """Exempt evidence-reporting scaffolds while keeping interpretation prose gated."""
+    """Exempt machine-owned factual scaffolds while keeping interpretation prose gated."""
     gram = " ".join(words)
-    if "last season" in gram and any(token in STAT_BOILERPLATE_TERMS for token in words):
+    has_metric = any(re.fullmatch(r"\d+(?:\.\d+)?", token) for token in words) and any(
+        token in STAT_BOILERPLATE_TERMS for token in words
+    )
+    if has_metric and ("last season" in gram or "side profile" in gram):
         return True
     if any(fragment in gram for fragment in STANDARDIZED_EVIDENCE_FRAGMENTS):
         return True
