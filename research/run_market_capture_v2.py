@@ -183,7 +183,12 @@ def capture(
         except Exception:
             pass
     if not new.empty:
-        identity = ["game_id", "horizon", "row_type", "sportsbook_key"]
+        # The ledger is append-only at the request-attempt level. A horizon can be
+        # retried after an insufficient-book capture, so request_timestamp_utc is
+        # part of row identity; otherwise a later snapshot from the same book would
+        # be silently discarded. Once a consensus row exists, _captured_pairs closes
+        # that game/horizon and no further request is scheduled.
+        identity = ["game_id", "horizon", "row_type", "sportsbook_key", "request_timestamp_utc"]
         new = new.drop_duplicates(identity, keep="first")
         new.to_csv(ledger_file, index=False)
 
