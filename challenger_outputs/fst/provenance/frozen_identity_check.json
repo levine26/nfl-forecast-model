@@ -1,0 +1,74 @@
+{
+  "actual_refit": {
+    "candidate_id": "F-ST-01-FROZEN-2026",
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527095,
+    "pure_logit_coefficient": -0.19342747983803427,
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "training_first_season": 2020,
+    "training_games": 1615,
+    "training_last_season": 2025
+  },
+  "authoritative_scoring_source": "registered_frozen_identity_literals",
+  "capture_context": "prospective_shadow_reconstruction",
+  "check_stage": "post_refit_pre_scoring",
+  "exact_identity_fields": [
+    "candidate_id",
+    "training_data_sha256",
+    "training_games",
+    "training_first_season",
+    "training_last_season"
+  ],
+  "expected": {
+    "candidate_id": "F-ST-01-FROZEN-2026",
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527093,
+    "pure_logit_coefficient": -0.19342747983803402,
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "training_first_season": 2020,
+    "training_games": 1615,
+    "training_last_season": 2025
+  },
+  "expected_source": {
+    "artifact_name": "levline-challenger-34482487521",
+    "artifact_path": "fst/runtime_model.json",
+    "evidence_role": "surviving successful frozen-shadow identity evidence; not original pre-fit freeze provenance",
+    "head_sha": "5b26693e5d97ec49543b1d778baef63a1d600311",
+    "workflow_run_id": 34482487521
+  },
+  "field_matches": {
+    "candidate_id": true,
+    "intercept": true,
+    "market_logit_coefficient": true,
+    "pure_logit_coefficient": true,
+    "training_data_sha256": true,
+    "training_first_season": true,
+    "training_games": true,
+    "training_last_season": true
+  },
+  "matches": true,
+  "mismatched_fields": [],
+  "numeric_abs_tolerance": 1e-12,
+  "numeric_absolute_deltas": {
+    "intercept": 0.0,
+    "market_logit_coefficient": 2.220446049250313e-16,
+    "pure_logit_coefficient": 2.498001805406602e-16
+  },
+  "numerical_absolute_deltas": {
+    "intercept": 0.0,
+    "market_logit_coefficient": 2.220446049250313e-16,
+    "pure_logit_coefficient": 2.498001805406602e-16
+  },
+  "numerical_deltas": {
+    "intercept": 0.0,
+    "market_logit_coefficient": 2.220446049250313e-16,
+    "pure_logit_coefficient": -2.498001805406602e-16
+  },
+  "numerical_refit_fields": [
+    "intercept",
+    "market_logit_coefficient",
+    "pure_logit_coefficient"
+  ],
+  "refit_abs_tolerance": 1e-12,
+  "schema_version": 2
+}

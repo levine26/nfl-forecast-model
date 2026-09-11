@@ -1,0 +1,51 @@
+{
+  "base_oof": {
+    "canonical_game_keyed_sha256": "2c8bfcf24391dcb3dd73ca2fb4ee7ec6d528c5dc0a6e05bc95d71324072cfb63",
+    "columns": [
+      "game_id",
+      "row_position",
+      "logistic",
+      "extra_trees",
+      "xgboost",
+      "catboost",
+      "home_win",
+      "season"
+    ],
+    "first_season": 2018,
+    "game_id_sequence_sha256": "dff495fa86c9c53b1a76213afcb351c01ed691db9c225bdd911717ccd2ce236c",
+    "last_season": 2025,
+    "path": "base_oof_keyed.csv",
+    "raw_sha256": "5f4eda7d5df86ab13e4d6a6b90653be3160bd857e00eb1d412eae0e78eb2c7b3",
+    "rows": 2127
+  },
+  "candidate_id": "F-ST-01-FROZEN-2026",
+  "capture_context": "prospective_shadow_reconstruction",
+  "capture_stage": "pre_fit",
+  "historical_outcome_cutoff_season": 2025,
+  "schema_version": 2,
+  "serialization": {
+    "encoding": "utf-8",
+    "float_format": "%.17g",
+    "format": "csv",
+    "line_terminator": "LF",
+    "row_order_preserved": true,
+    "row_position_explicit": true
+  },
+  "training_frame": {
+    "canonical_game_keyed_sha256": "e1733246289a1fa2c1e7e75d43ee8079b64ec45dc1548dfa1304f7fb8f74320d",
+    "columns": [
+      "game_id",
+      "row_position",
+      "season",
+      "home_win",
+      "market_prob",
+      "pure_prob"
+    ],
+    "first_season": 2020,
+    "game_id_sequence_sha256": "d23d72a2c1226a3dd23ffab6dd2c783f96e76f772f73ca649e687a09b248f209",
+    "last_season": 2025,
+    "path": "training_frame_keyed.csv",
+    "raw_sha256": "0716b93e01eaba82c8b807b26d75a2b35558a4be162461b9d0bfd43d43d0a3ab",
+    "rows": 1615
+  }
+}

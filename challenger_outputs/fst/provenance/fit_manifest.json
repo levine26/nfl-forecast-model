@@ -1,0 +1,110 @@
+{
+  "base_oof_raw_sha256": "5f4eda7d5df86ab13e4d6a6b90653be3160bd857e00eb1d412eae0e78eb2c7b3",
+  "candidate_id": "F-ST-01-FROZEN-2026",
+  "capture_context": "prospective_shadow_reconstruction",
+  "fit": {
+    "C": 1.0,
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527095,
+    "max_iter": 3000,
+    "penalty": "l2",
+    "pure_logit_coefficient": -0.19342747983803427,
+    "solver": "lbfgs",
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "training_first_season": 2020,
+    "training_games": 1615,
+    "training_last_season": 2025
+  },
+  "inputs_manifest_sha256": "f5ab9eecd9fac0487c22cc6910c2e9eef2edcfa1c34f62c8b4e0eb0a225b36eb",
+  "model_training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+  "reconstruction_execution_policy": "durable_forensic_evidence_verification",
+  "reconstruction_forensic_evidence_sha256": "69ba37a2353a20c9db6392f38af2a799b9c91e167706deb1942eb64b9046d3c1",
+  "reconstruction_probe_receipt": "challenger_outputs/fst/reconstruction_probe/receipt.json",
+  "reconstruction_probe_receipt_sha256": "9ec2c0f889e0f2c109e64932ea86a90705ae965b98d37e7e8aa4339257694e8d",
+  "runtime": {
+    "environment": {
+      "MKL_NUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_CORETYPE": "SKYLAKEX",
+      "OPENBLAS_NUM_THREADS": "4"
+    },
+    "failures": [],
+    "forensic_source": {
+      "artifact_id": 10176440471,
+      "artifact_name": "fst01-runtime-SKYLAKEX-34538432305",
+      "artifact_zip_sha256": "92aa93082345f2090dae7d753094b3b61b3848e26c74897a8e62af89d2f42402",
+      "created_at_utc": "2026-09-10T22:43:07Z",
+      "head_branch": "forensic/fst01-runtime-recovery",
+      "head_sha": "31cea3037b0c4bb75364d78c072af9d4fb25a9dc",
+      "pull_request": 106,
+      "result_path": "result_SKYLAKEX.json",
+      "result_sha256": "c673d089a3caa3e8c0d9439597cec53fde50b37127ca32daa5edcd795564524a",
+      "workflow_github_sha": "9c4f45e15d27187c637002b3d4d8df2cc34c744e",
+      "workflow_run_id": 34538432305
+    },
+    "matches": true,
+    "package_versions": {
+      "catboost": "1.2.10",
+      "duckdb": "1.5.5",
+      "joblib": "1.6.0",
+      "nflreadpy": "0.1.5",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "polars": "1.44.2",
+      "pyarrow": "25.0.1",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.17.1",
+      "threadpoolctl": "3.6.0",
+      "xgboost": "3.2.0"
+    },
+    "python_version": "3.11.16",
+    "required_environment": {
+      "MKL_NUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_CORETYPE": "SKYLAKEX",
+      "OPENBLAS_NUM_THREADS": "4"
+    },
+    "required_package_versions": {
+      "catboost": "1.2.10",
+      "duckdb": "1.5.5",
+      "joblib": "1.6.0",
+      "nflreadpy": "0.1.5",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "polars": "1.44.2",
+      "pyarrow": "25.0.1",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.17.1",
+      "threadpoolctl": "3.6.0",
+      "xgboost": "3.2.0"
+    },
+    "required_python_version": "3.11.16",
+    "threadpools": [
+      {
+        "architecture": "SkylakeX",
+        "internal_api": "openblas",
+        "num_threads": 4,
+        "user_api": "blas",
+        "version": "0.3.31.188.0"
+      },
+      {
+        "architecture": "SkylakeX",
+        "internal_api": "openblas",
+        "num_threads": 4,
+        "user_api": "blas",
+        "version": "0.3.30"
+      },
+      {
+        "internal_api": "openmp",
+        "num_threads": 4,
+        "user_api": "openmp"
+      }
+    ]
+  },
+  "schema_version": 4,
+  "shadow_scoring_execution_policy": "native_cpu_registered_literals",
+  "training_frame_canonical_game_keyed_sha256": "e1733246289a1fa2c1e7e75d43ee8079b64ec45dc1548dfa1304f7fb8f74320d",
+  "training_frame_raw_sha256": "0716b93e01eaba82c8b807b26d75a2b35558a4be162461b9d0bfd43d43d0a3ab"
+}

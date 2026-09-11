@@ -16,6 +16,131 @@
   "penalty": "l2",
   "solver": "lbfgs",
   "max_iter": 3000,
+  "scoring_parameter_source": "registered_frozen_identity",
+  "base_oof_source": "immutable_recovered_forensic_artifact",
+  "training_frame_source": "immutable_recovered_forensic_artifact",
+  "reconstruction_fit": {
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527095,
+    "pure_logit_coefficient": -0.19342747983803427,
+    "training_games": 1615,
+    "training_first_season": 2020,
+    "training_last_season": 2025,
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "C": 1.0,
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "max_iter": 3000
+  },
+  "reconstruction_execution_policy": "recovered_runtime_against_immutable_inputs",
+  "current_pure_execution_policy": "native_cpu_subprocess_with_frozen_oof",
+  "reconstruction_runtime": {
+    "environment": {
+      "MKL_NUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_CORETYPE": "SKYLAKEX",
+      "OPENBLAS_NUM_THREADS": "4"
+    },
+    "failures": [],
+    "forensic_source": {
+      "artifact_id": 10176440471,
+      "artifact_name": "fst01-runtime-SKYLAKEX-34538432305",
+      "artifact_zip_sha256": "92aa93082345f2090dae7d753094b3b61b3848e26c74897a8e62af89d2f42402",
+      "created_at_utc": "2026-09-10T22:43:07Z",
+      "head_branch": "forensic/fst01-runtime-recovery",
+      "head_sha": "31cea3037b0c4bb75364d78c072af9d4fb25a9dc",
+      "pull_request": 106,
+      "result_path": "result_SKYLAKEX.json",
+      "result_sha256": "c673d089a3caa3e8c0d9439597cec53fde50b37127ca32daa5edcd795564524a",
+      "workflow_github_sha": "9c4f45e15d27187c637002b3d4d8df2cc34c744e",
+      "workflow_run_id": 34538432305
+    },
+    "matches": true,
+    "package_versions": {
+      "catboost": "1.2.10",
+      "duckdb": "1.5.5",
+      "joblib": "1.6.0",
+      "nflreadpy": "0.1.5",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "polars": "1.44.2",
+      "pyarrow": "25.0.1",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.17.1",
+      "threadpoolctl": "3.6.0",
+      "xgboost": "3.2.0"
+    },
+    "python_version": "3.11.16",
+    "required_environment": {
+      "MKL_NUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_CORETYPE": "SKYLAKEX",
+      "OPENBLAS_NUM_THREADS": "4"
+    },
+    "required_package_versions": {
+      "catboost": "1.2.10",
+      "duckdb": "1.5.5",
+      "joblib": "1.6.0",
+      "nflreadpy": "0.1.5",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "polars": "1.44.2",
+      "pyarrow": "25.0.1",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.17.1",
+      "threadpoolctl": "3.6.0",
+      "xgboost": "3.2.0"
+    },
+    "required_python_version": "3.11.16",
+    "threadpools": [
+      {
+        "architecture": "SkylakeX",
+        "internal_api": "openblas",
+        "num_threads": 4,
+        "user_api": "blas",
+        "version": "0.3.31.188.0"
+      },
+      {
+        "architecture": "SkylakeX",
+        "internal_api": "openblas",
+        "num_threads": 4,
+        "user_api": "blas",
+        "version": "0.3.30"
+      },
+      {
+        "internal_api": "openmp",
+        "num_threads": 4,
+        "user_api": "openmp"
+      }
+    ]
+  },
   "freeze_timestamp_utc": "2026-09-10T05:08:04Z",
-  "freeze_implementation_sha": "59830d23e406d32c34e74919b31d0dd9f85b16ca"
+  "freeze_implementation_sha": "59830d23e406d32c34e74919b31d0dd9f85b16ca",
+  "provenance": {
+    "capture_stage": "pre_fit",
+    "capture_context": "prospective_shadow_reconstruction",
+    "inputs_manifest": "fst/provenance/inputs_manifest.json",
+    "fit_manifest": "fst/provenance/fit_manifest.json",
+    "frozen_identity_check": "fst/provenance/frozen_identity_check.json",
+    "frozen_identity_verified": true,
+    "frozen_identity_source": {
+      "workflow_run_id": 34482487521,
+      "head_sha": "5b26693e5d97ec49543b1d778baef63a1d600311",
+      "artifact_name": "levline-challenger-34482487521",
+      "artifact_path": "fst/runtime_model.json",
+      "evidence_role": "surviving successful frozen-shadow identity evidence; not original pre-fit freeze provenance"
+    },
+    "numeric_abs_tolerance": 1e-12,
+    "numeric_absolute_deltas": {
+      "intercept": 0.0,
+      "market_logit_coefficient": 2.220446049250313e-16,
+      "pure_logit_coefficient": 2.498001805406602e-16
+    },
+    "base_oof_raw_sha256": "5f4eda7d5df86ab13e4d6a6b90653be3160bd857e00eb1d412eae0e78eb2c7b3",
+    "training_frame_raw_sha256": "0716b93e01eaba82c8b807b26d75a2b35558a4be162461b9d0bfd43d43d0a3ab",
+    "training_frame_canonical_game_keyed_sha256": "e1733246289a1fa2c1e7e75d43ee8079b64ec45dc1548dfa1304f7fb8f74320d",
+    "inputs_manifest_sha256": "f5ab9eecd9fac0487c22cc6910c2e9eef2edcfa1c34f62c8b4e0eb0a225b36eb"
+  }
 }

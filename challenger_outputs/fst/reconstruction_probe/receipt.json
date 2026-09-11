@@ -1,0 +1,185 @@
+{
+  "candidate_id": "F-ST-01-FROZEN-2026",
+  "completed_2026_outcomes_used": 0,
+  "execution_policy": "verify_immutable_compatible_hardware_evidence_then_score_registered_literals_natively",
+  "forensic_evidence_sha256": "69ba37a2353a20c9db6392f38af2a799b9c91e167706deb1942eb64b9046d3c1",
+  "forensic_source": {
+    "artifact_id": 10176440471,
+    "artifact_name": "fst01-runtime-SKYLAKEX-34538432305",
+    "artifact_zip_sha256": "92aa93082345f2090dae7d753094b3b61b3848e26c74897a8e62af89d2f42402",
+    "created_at_utc": "2026-09-10T22:43:07Z",
+    "head_branch": "forensic/fst01-runtime-recovery",
+    "head_sha": "31cea3037b0c4bb75364d78c072af9d4fb25a9dc",
+    "pull_request": 106,
+    "result_path": "result_SKYLAKEX.json",
+    "result_sha256": "c673d089a3caa3e8c0d9439597cec53fde50b37127ca32daa5edcd795564524a",
+    "workflow_github_sha": "9c4f45e15d27187c637002b3d4d8df2cc34c744e",
+    "workflow_run_id": 34538432305
+  },
+  "identity_check": {
+    "actual_refit": {
+      "candidate_id": "F-ST-01-FROZEN-2026",
+      "intercept": -0.06954359363166639,
+      "market_logit_coefficient": 1.1939087340527095,
+      "pure_logit_coefficient": -0.19342747983803427,
+      "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+      "training_first_season": 2020,
+      "training_games": 1615,
+      "training_last_season": 2025
+    },
+    "authoritative_scoring_source": "registered_frozen_identity_literals",
+    "capture_context": "prospective_shadow_reconstruction",
+    "check_stage": "durable_forensic_evidence_pre_scoring",
+    "exact_identity_fields": [
+      "candidate_id",
+      "training_data_sha256",
+      "training_games",
+      "training_first_season",
+      "training_last_season"
+    ],
+    "expected": {
+      "candidate_id": "F-ST-01-FROZEN-2026",
+      "intercept": -0.06954359363166639,
+      "market_logit_coefficient": 1.1939087340527093,
+      "pure_logit_coefficient": -0.19342747983803402,
+      "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+      "training_first_season": 2020,
+      "training_games": 1615,
+      "training_last_season": 2025
+    },
+    "forensic_result_exact_equality_flag": false,
+    "matches": true,
+    "mismatched_fields": [],
+    "numeric_abs_tolerance": 1e-12,
+    "numeric_absolute_deltas": {
+      "intercept": 0.0,
+      "market_logit_coefficient": 2.220446049250313e-16,
+      "pure_logit_coefficient": 2.498001805406602e-16
+    },
+    "numerical_absolute_deltas": {
+      "intercept": 0.0,
+      "market_logit_coefficient": 2.220446049250313e-16,
+      "pure_logit_coefficient": 2.498001805406602e-16
+    },
+    "numerical_deltas": {
+      "intercept": 0.0,
+      "market_logit_coefficient": 2.220446049250313e-16,
+      "pure_logit_coefficient": -2.498001805406602e-16
+    },
+    "numerical_refit_fields": [
+      "intercept",
+      "market_logit_coefficient",
+      "pure_logit_coefficient"
+    ],
+    "refit_abs_tolerance": 1e-12,
+    "schema_version": 3
+  },
+  "immutable_training_artifact": {
+    "canonical_training_digest": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "gzip_sha256": "28f3c2a0e479e95482e2989f172b143c8eb50ee18b14d15931b6641c9d54d10d",
+    "raw_sha256": "174be982d5ac7f3e9f93bda824641eae95c612ec0c1e9546472479a5f6cb55d5",
+    "rows": 1615
+  },
+  "production_authorized": false,
+  "receipt_scope": "durable_forensic_evidence_verification",
+  "reconstruction_fit": {
+    "C": 1.0,
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527095,
+    "max_iter": 3000,
+    "penalty": "l2",
+    "pure_logit_coefficient": -0.19342747983803427,
+    "solver": "lbfgs",
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "training_first_season": 2020,
+    "training_games": 1615,
+    "training_last_season": 2025
+  },
+  "research_only": true,
+  "runtime": {
+    "environment": {
+      "MKL_NUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_CORETYPE": "SKYLAKEX",
+      "OPENBLAS_NUM_THREADS": "4"
+    },
+    "failures": [],
+    "forensic_source": {
+      "artifact_id": 10176440471,
+      "artifact_name": "fst01-runtime-SKYLAKEX-34538432305",
+      "artifact_zip_sha256": "92aa93082345f2090dae7d753094b3b61b3848e26c74897a8e62af89d2f42402",
+      "created_at_utc": "2026-09-10T22:43:07Z",
+      "head_branch": "forensic/fst01-runtime-recovery",
+      "head_sha": "31cea3037b0c4bb75364d78c072af9d4fb25a9dc",
+      "pull_request": 106,
+      "result_path": "result_SKYLAKEX.json",
+      "result_sha256": "c673d089a3caa3e8c0d9439597cec53fde50b37127ca32daa5edcd795564524a",
+      "workflow_github_sha": "9c4f45e15d27187c637002b3d4d8df2cc34c744e",
+      "workflow_run_id": 34538432305
+    },
+    "matches": true,
+    "package_versions": {
+      "catboost": "1.2.10",
+      "duckdb": "1.5.5",
+      "joblib": "1.6.0",
+      "nflreadpy": "0.1.5",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "polars": "1.44.2",
+      "pyarrow": "25.0.1",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.17.1",
+      "threadpoolctl": "3.6.0",
+      "xgboost": "3.2.0"
+    },
+    "python_version": "3.11.16",
+    "required_environment": {
+      "MKL_NUM_THREADS": "4",
+      "NUMEXPR_NUM_THREADS": "4",
+      "OMP_NUM_THREADS": "4",
+      "OPENBLAS_CORETYPE": "SKYLAKEX",
+      "OPENBLAS_NUM_THREADS": "4"
+    },
+    "required_package_versions": {
+      "catboost": "1.2.10",
+      "duckdb": "1.5.5",
+      "joblib": "1.6.0",
+      "nflreadpy": "0.1.5",
+      "numpy": "2.4.6",
+      "pandas": "3.0.5",
+      "polars": "1.44.2",
+      "pyarrow": "25.0.1",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.17.1",
+      "threadpoolctl": "3.6.0",
+      "xgboost": "3.2.0"
+    },
+    "required_python_version": "3.11.16",
+    "threadpools": [
+      {
+        "architecture": "SkylakeX",
+        "internal_api": "openblas",
+        "num_threads": 4,
+        "user_api": "blas",
+        "version": "0.3.31.188.0"
+      },
+      {
+        "architecture": "SkylakeX",
+        "internal_api": "openblas",
+        "num_threads": 4,
+        "user_api": "blas",
+        "version": "0.3.30"
+      },
+      {
+        "internal_api": "openmp",
+        "num_threads": 4,
+        "user_api": "openmp"
+      }
+    ]
+  },
+  "schema_version": 2,
+  "source_sha": "37f8a9f523f60694bf7f2e8aa2e65a3d101a5635",
+  "spec_sha256": "c3c3dd5f06580b1598c183c0852baa189246cd2ca1278ed59e3db110e0fb3dcd",
+  "status": "verified"
+}
