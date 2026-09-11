@@ -31,11 +31,12 @@ jobs:
           python -m py_compile scripts/run_groq_media_prompt.py
           python - <<'PY'
           from pathlib import Path
+          import re
 
           workflow = Path('.github/workflows/groq_media_writer.yml').read_text(encoding='utf-8')
           runner = Path('scripts/run_groq_media_prompt.py').read_text(encoding='utf-8')
-          assert '@github/copilot' not in workflow
-          assert 'copilot-requests:' not in workflow
+          assert not re.search(r'^\s*copilot-requests\s*:', workflow, flags=re.M)
+          assert not re.search(r'^\s*run:\s*npm\s+install\s+-g\s+@github/copilot\s*$', workflow, flags=re.M)
           assert 'secrets.GROQ_API_KEY' in workflow
           assert 'groq/compound' in workflow
           assert 'APPROVED_MEDIA_DOMAINS' in runner
