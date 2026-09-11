@@ -94,6 +94,10 @@ def normalize_history(frame: pd.DataFrame | None) -> pd.DataFrame:
     out["research_feature_set"] = out["research_feature_set"].map(lambda v: _text(v, LEGACY_FEATURE_SET))
     out["research_candidate"] = out["research_candidate"].map(lambda v: _text(v, LEGACY_CANDIDATE))
     out["selected_shadow_candidate"] = out["selected_shadow_candidate"].map(lambda v: _bool(v, True))
+    # Pandas 3 infers an all-empty winner_correct CSV column as float64. Keep
+    # this nullable ledger field object-typed so postgame grading can write a
+    # boolean without mutating any locked forecast field.
+    out["winner_correct"] = out["winner_correct"].astype("object")
     out["shadow_key"] = out.apply(
         lambda row: shadow_identity(row.get("game_id"), row.get("challenger_version"), row.get("research_candidate")),
         axis=1,
