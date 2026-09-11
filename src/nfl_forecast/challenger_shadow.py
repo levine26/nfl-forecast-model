@@ -262,3 +262,49 @@ def lock_shadow(
                 pure_weight = float(weight)
                 market_weight = 1.0 - float(weight)
                 official = pd.to_numeric(prod.get("final_home_prob"), errors="coerce")
+
+            home, away = str(prod.get("home_team")), str(prod.get("away_team"))
+            pick = home if final >= 0.5 else away
+            row = {
+                "game_id": gid, "season": prod.get("season"), "week": prod.get("week"),
+                "gameday": prod.get("gameday"), "gametime": prod.get("gametime"),
+                "away_team": away, "home_team": home,
+                "production_final_home_prob": float(official) if pd.notna(official) else np.nan,
+                "challenger_pure_home_prob": float(pure),
+                "market_home_prob_t120": float(market) if pd.notna(market) else np.nan,
+                "challenger_final_home_prob": final, "challenger_pick": pick,
+                "effective_pure_weight": pure_weight, "effective_market_weight": market_weight,
+                "research_candidate": shadow.get("research_candidate"), "research_method": method,
+                "research_feature_set": shadow.get("research_feature_set"),
+                "challenger_version": shadow.get("challenger_version"),
+                "selected_shadow_candidate": _bool(shadow.get("selected_shadow_candidate"), False),
+                "training_cutoff": shadow.get("training_cutoff", pd.NA),
+                "training_games": shadow.get("training_games", pd.NA),
+                "training_first_season": shadow.get("training_first_season", pd.NA),
+                "training_last_season": shadow.get("training_last_season", pd.NA),
+                "training_data_sha256": shadow.get("training_data_sha256", pd.NA),
+                "stack_intercept": shadow.get("stack_intercept", pd.NA),
+                "stack_market_logit_coefficient": shadow.get("stack_market_logit_coefficient", pd.NA),
+                "stack_pure_logit_coefficient": shadow.get("stack_pure_logit_coefficient", pd.NA),
+                "candidate_freeze_utc": shadow.get("candidate_freeze_utc", pd.NA),
+                "candidate_code_sha": shadow.get("candidate_code_sha", pd.NA),
+                "shadow_key": key, "shadow_generated_utc": generated.isoformat(),
+                "shadow_source_sha": shadow.get("shadow_source_sha", pd.NA),
+                "production_snapshot_type": str(prod.get("snapshot_type")),
+                "production_model_version": prod.get("model_version", pd.NA),
+                "production_prediction_timestamp_utc": prod.get("prediction_timestamp_utc", pd.NA),
+                "production_lock_timestamp_utc": production_lock_time.isoformat(),
+                "kickoff_utc": prod.get("kickoff_utc"),
+                "minutes_to_kickoff_at_production_lock": float(minutes),
+                "shadow_recorded_timestamp_utc": now.isoformat(), "lock_status": "LOCKED",
+                "actual_home_score": prod.get("actual_home_score", np.nan),
+                "actual_away_score": prod.get("actual_away_score", np.nan), "winner_correct": pd.NA,
+            }
+            new_rows.append(row)
+            already.add(key)
+
+    if new_rows:
+        history = pd.concat([history, pd.DataFrame(new_rows)], ignore_index=True)
+    history = grade_existing(normalize_history(history), production_locks)
+    history = history.drop_duplicates("shadow_key", keep="first")
+    return history[HISTORY_COLUMNS].copy(), len(new_rows), precommit_skips
