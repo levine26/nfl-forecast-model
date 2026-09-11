@@ -1,4 +1,4 @@
-name: Sunday Signal Copilot media writer
+name: Sunday Signal Groq media writer
 
 on:
   workflow_dispatch:
@@ -14,6 +14,7 @@ on:
       - "scripts/build_canonical_editorial_predictions.py"
       - "scripts/build_copilot_media_prompt.py"
       - "scripts/build_single_game_copilot_prompt.py"
+      - "scripts/run_groq_read_writer.py"
       - "scripts/merge_copilot_game_payloads.py"
       - "scripts/compose_copilot_media_reads.py"
       - "scripts/render_levline_paragraphs.py"
@@ -24,6 +25,7 @@ on:
       - "tests/test_copilot_media.py"
       - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
+      - "tests/test_groq_read_writer.py"
       - "tests/test_levline_paragraph_renderer.py"
       - "tests/test_single_copilot_game_validator.py"
       - "tests/test_read_contract.py"
@@ -37,7 +39,6 @@ on:
 permissions:
   contents: write
   actions: read
-  copilot-requests: write
 
 concurrency:
   group: sunday-signal-media-writer
@@ -111,15 +112,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
 
       - name: Install editorial environment
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py
+        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_read_writer.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py
 
       - name: Canonicalize editorial forecast source
         run: |
@@ -130,46 +128,29 @@ jobs:
       - name: Refresh deterministic reporting packet
         run: python scripts/finalize_editorial.py --skip-copilot
 
-      - name: Install GitHub Copilot CLI
-        run: npm install -g @github/copilot
-
       - name: Research, compose and validate human game Reads
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: openai/gpt-oss-120b
         run: |
           set -euo pipefail
-          mapfile -t approved_domains < <(python - <<'PY'
-          from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
-          for domain in sorted(APPROVED_MEDIA_DOMAINS):
-              print(domain)
-          PY
-          )
           mapfile -t game_ids < <(python - <<'PY'
           import pandas as pd
           for gid in pd.read_csv('outputs/this_week.csv')['game_id'].astype(str):
               print(gid)
           PY
           )
-          copilot_args=(
-            -s
-            --no-ask-user
-            "--deny-tool=shell,write"
-            "--allow-tool=url"
-          )
-          for domain in "${approved_domains[@]}"; do
-            copilot_args+=("--allow-url=$domain")
-          done
 
-          parts=/tmp/copilot-game-parts
-          prompts=/tmp/copilot-game-prompts
+          parts=/tmp/read-writer-game-parts
+          prompts=/tmp/read-writer-game-prompts
           rm -rf "$parts" "$prompts"
           mkdir -p "$parts" "$prompts"
           rm -f /tmp/copilot-media-raw.json /tmp/copilot-media-composed.json /tmp/copilot-media-rendered.json outputs/copilot_media_reads.json
-          echo "Copilot approved source domains: ${#approved_domains[@]}"
+          echo "Groq writer model: $GROQ_MODEL"
           echo "Focused matchups: ${#game_ids[@]}"
 
           for gid in "${game_ids[@]}"; do
-            feedback="/tmp/copilot-${gid}-feedback.txt"
+            feedback="/tmp/read-writer-${gid}-feedback.txt"
             : > "$feedback"
             accepted=0
             for attempt in 1 2 3; do
@@ -179,8 +160,10 @@ jobs:
                 --game-id "$gid" \
                 --prompt-file "$prompt" \
                 --feedback-file "$feedback"
-              if ! copilot "${copilot_args[@]}" -p "$(cat "$prompt")" > "$parts/$gid.txt"; then
-                echo "$gid: Copilot research call failed" > "$feedback"
+              if ! python scripts/run_groq_read_writer.py \
+                  --prompt-file "$prompt" \
+                  --output "$parts/$gid.txt"; then
+                echo "$gid: Groq research/writer call failed" > "$feedback"
                 cat "$feedback"
                 continue
               fi
@@ -257,16 +240,16 @@ jobs:
           from pathlib import Path
           status = json.loads(Path('outputs/context_source_status.json').read_text())
           media = status.get('media_reporting', {})
-          copilot = status.get('copilot_media', {})
+          writer = status.get('copilot_media', {})
           finalizer = status.get('editorial_finalizer', {})
           games = int(finalizer.get('games', 0))
           if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
               raise SystemExit(f'media reporting not launch-grade: {media}')
-          if copilot.get('status') != 'healthy' or int(copilot.get('games_applied', 0)) != games:
-              raise SystemExit(f'Copilot did not cover full slate: {copilot}')
+          if writer.get('status') != 'healthy' or int(writer.get('games_applied', 0)) != games:
+              raise SystemExit(f'human Read writer did not cover full slate: {writer}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
               raise SystemExit(f'final editorial gate failed: {finalizer}')
-          print('Copilot matchup/model/pick launch gate passed:', games, 'games')
+          print('Groq matchup/model/pick launch gate passed:', games, 'games')
           PY
 
       - name: Publish editorial-only outputs
