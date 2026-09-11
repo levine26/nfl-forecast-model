@@ -20,8 +20,49 @@
     "training_rows": "leakage-safe earlier-season out-of-fold market and v0.8 PURE probabilities only",
     "eligible_historical_end_season": 2025,
     "2026_outcomes_allowed": false,
-    "post_freeze_refit_policy": "the exact frozen architecture is deterministically rematerialized from the same eligible OOF history through 2025; any data digest change is recorded in the runtime manifest and must be investigated before scoring",
+    "post_freeze_refit_policy": "the frozen architecture is rematerialized only as a provenance check: candidate/digest/row/season identity must match exactly and reconstructed coefficients must be within absolute 1e-12 of the registered constants before scoring; scoring always uses the exact registered constants, never reconstructed coefficients",
     "future_architecture_change_policy": "new candidate ID required"
+  },
+  "frozen_identity": {
+    "candidate_id": "F-ST-01-FROZEN-2026",
+    "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "training_games": 1615,
+    "training_first_season": 2020,
+    "training_last_season": 2025,
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527093,
+    "pure_logit_coefficient": -0.19342747983803402,
+    "reconstruction_abs_tolerance": 1e-12,
+    "source": {
+      "workflow_run_id": 34482487521,
+      "head_sha": "5b26693e5d97ec49543b1d778baef63a1d600311",
+      "artifact_name": "levline-challenger-34482487521",
+      "artifact_path": "fst/runtime_model.json",
+      "evidence_role": "surviving successful frozen-shadow identity evidence; not original pre-fit freeze provenance"
+    }
+  },
+  "reproduction_runtime": {
+    "python": "3.11.16",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "scipy": "1.17.1",
+    "scikit_learn": "1.9.0",
+    "xgboost": "3.2.0",
+    "catboost": "1.2.10",
+    "nflreadpy": "0.1.5",
+    "polars": "1.44.2",
+    "pyarrow": "25.0.1",
+    "duckdb": "1.5.5",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.6.0",
+    "openblas_coretype": "SKYLAKEX",
+    "openblas_num_threads": 4,
+    "omp_num_threads": 4,
+    "forensic_evidence": {
+      "workflow_run_id": 34538432305,
+      "pr": 106,
+      "result": "explicit SKYLAKEX independently reproduced the exact registered canonical training digest; non-SkylakeX forced modes reproduced 329c6477f7b80895056b25773bb65da805c12c1a99c68b6c3e04215771c8fa1f"
+    }
   },
   "historical_evidence": {
     "paired_games_2022_2025": 1087,
