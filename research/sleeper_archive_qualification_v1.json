@@ -1,0 +1,42 @@
+{
+  "qualification_version": 1,
+  "source_id": "sleeper_historical_player_archive_candidate",
+  "canonical_repository": "edgecdec/declan-fantasy-football",
+  "technical_status": "VERIFIED",
+  "research_classification": "QUALIFIED_RESEARCH_2026_ONLY",
+  "treat_source_as_valid_unless_data_audit_fails": true,
+  "supersedes_registry_block_for_technical_research": true,
+  "effective_scope": {
+    "historical_coverage_start_utc": "2026-02-01T10:24:49Z",
+    "supports_2025_reconstruction": false,
+    "supports_2026_point_in_time_research": true,
+    "supports_prospective_shadow_capture": true,
+    "supports_completed_2026_outcome_model_selection": false,
+    "supports_public_raw_redistribution": false,
+    "supports_production_dependency": false
+  },
+  "verified_provenance": {
+    "snapshot_path": "data/sleeper_players.json",
+    "collector_script": "scripts/update_players.py",
+    "scheduled_workflow": ".github/workflows/daily_update.yml",
+    "workflow_schedule": "0 8 * * *",
+    "collector_endpoint": "https://api.sleeper.app/v1/players/nfl",
+    "commit_behavior": "The workflow commits data/sleeper_players.json when the generated player database changes.",
+    "earliest_verified_snapshot_commit": "68d8ee2f7a27355f0b6d37236b9c3ad03de08817",
+    "earliest_verified_snapshot_commit_utc": "2026-02-01T10:24:49Z"
+  },
+  "data_quality_gates": [
+    "Verify injury_status, practice_participation, depth_chart_order and related fields are present at the historical commit being used.",
+    "Measure field-level missingness and semantic continuity before constructing any feature.",
+    "Require >=99.5% unambiguous player identity resolution for quantitative player-state work.",
+    "Use the Git commit timestamp as a conservative persistence bound; never claim it is Sleeper's official publication timestamp.",
+    "Reject any snapshot whose commit time is after the simulated forecast decision timestamp.",
+    "Do not use completed 2026 game outcomes to choose fields, coefficients, architectures or thresholds."
+  ],
+  "rights_separation": {
+    "source_validity_depends_on_repository_license": false,
+    "raw_public_redistribution_requires_separate_clearance": true,
+    "production_or_commercial_dependency_requires_separate_clearance": true,
+    "note": "Technical validity and point-in-time research usability are evaluated independently from public redistribution or production-rights questions."
+  }
+}
