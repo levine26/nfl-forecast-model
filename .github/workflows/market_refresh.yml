@@ -15,9 +15,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.11.16"
           cache: pip
-      - run: pip install "pandas>=2.2" "numpy>=2.0"
+      - run: pip install "pandas==3.0.5" "numpy==2.4.6"
       - run: pip install -e . --no-deps
       - name: Refresh and publish market outputs
         run: |
