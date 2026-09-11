@@ -1,0 +1,116 @@
+name: LevLine availability V4 identity-source preflight
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_availability_v4_source_pin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pin-v4-weekly-roster-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install source-audit runtime
+        run: pip install pandas
+
+      - name: Capture exact weekly-roster assets and verify postseason coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p research_outputs/availability_v4_source_pin/raw
+          curl --fail --location --retry 3 \
+            'https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2023.csv' \
+            -o research_outputs/availability_v4_source_pin/raw/roster_weekly_2023.csv
+          curl --fail --location --retry 3 \
+            'https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2024.csv' \
+            -o research_outputs/availability_v4_source_pin/raw/roster_weekly_2024.csv
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          import pandas as pd
+
+          out = Path('research_outputs/availability_v4_source_pin')
+          raw = out / 'raw'
+          required = {
+              2023: {
+                  20: {'BAL','HOU','BUF','KC','DET','TB','GB','SF'},
+                  21: {'BAL','KC','DET','SF'},
+                  22: {'KC','SF'},
+              },
+              2024: {
+                  20: {'KC','HOU','DET','WAS','PHI','LAR','BUF','BAL'},
+              },
+          }
+          asset_ids = {2023: 156614676, 2024: 237398162}
+          urls = {
+              s: f'https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_{s}.csv'
+              for s in required
+          }
+          receipts = {}
+          identity_slices = []
+          for season in sorted(required):
+              path = raw / f'roster_weekly_{season}.csv'
+              payload = path.read_bytes()
+              frame = pd.read_csv(path, low_memory=False)
+              must = {'season','week','team','gsis_id','full_name','first_name','last_name','football_name'}
+              missing = sorted(must - set(frame.columns))
+              if missing:
+                  raise SystemExit(f'{season} weekly roster missing required identity columns: {missing}')
+              frame = frame.loc[pd.to_numeric(frame['season'], errors='coerce').eq(season)].copy()
+              frame['week'] = pd.to_numeric(frame['week'], errors='coerce').astype('Int64')
+              coverage = {}
+              for week, teams in sorted(required[season].items()):
+                  week_rows = frame.loc[frame['week'].eq(week)].copy()
+                  present = set(week_rows['team'].dropna().astype(str))
+                  missing_teams = sorted(teams - present)
+                  if missing_teams:
+                      raise SystemExit(f'{season} week {week} weekly roster missing teams: {missing_teams}')
+                  coverage[str(week)] = {
+                      team: int((week_rows['team'].astype(str) == team).sum())
+                      for team in sorted(teams)
+                  }
+                  keep = week_rows.loc[
+                      week_rows['team'].astype(str).isin(teams),
+                      ['season','week','team','gsis_id','full_name','first_name','last_name','football_name'],
+                  ].copy()
+                  keep['source_asset_id'] = asset_ids[season]
+                  identity_slices.append(keep)
+              receipts[str(season)] = {
+                  'release_tag': 'weekly_rosters',
+                  'asset_id': asset_ids[season],
+                  'asset_name': path.name,
+                  'url': urls[season],
+                  'bytes': len(payload),
+                  'sha256': hashlib.sha256(payload).hexdigest(),
+                  'required_team_week_counts': coverage,
+              }
+          combined = pd.concat(identity_slices, ignore_index=True)
+          combined.to_csv(out / 'postseason_identity_slice.csv', index=False)
+          receipt = {
+              'purpose': 'Pre-execution source pin only. No availability qualification, model fitting, outcomes, snaps, or production behavior are evaluated.',
+              'allowed_identity_fields': ['season','week','team','gsis_id','full_name','first_name','last_name','football_name'],
+              'forbidden_for_v4_identity_decisions': ['status','position','depth_chart_position','snaps','participation','game_outcomes'],
+              'sources': receipts,
+          }
+          (out / 'source_pin_receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload V4 source-pin receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: availability-v4-weekly-roster-source-pin
+          path: research_outputs/availability_v4_source_pin/
+          if-no-files-found: error
+          retention-days: 90
