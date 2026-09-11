@@ -46,12 +46,12 @@ Completed:
 Historical cross-season audit status:
 
 - V1 reached its real 2022 identity gate and **failed** rather than hiding unresolved evidence: 5,543 of 5,683 distinct official rows resolved to unique GSIS IDs (`97.5365%`), below the frozen `99.5%` minimum. The V1 threshold was not relaxed and its failure artifact/receipt is retained.
-- V2 is separately preregistered in PR #146. It adds the pinned nflverse GSIS-keyed player master solely as a deterministic alias dictionary; historical team/week membership and all injury/practice state still come from the original historical sources.
+- V2 is separately preregistered in PR #147. It adds the pinned nflverse GSIS-keyed player master solely as a deterministic alias dictionary; historical team/week membership and all injury/practice state still come from the original historical sources.
 - V2 prohibits fuzzy/edit-distance matching, manual result-informed aliases, current/latest-team inference, and use of status/position/outcomes to choose an identity.
 - All V1 chronology/state gates remain unchanged: 22 official pages per season, 100% schedule matching, >=99.5% bidirectional identity resolution, >=98.5% practice-status agreement, 100% matched-row T-120 chronology, >=99% fully qualified practice state, and the legacy timestamp integrity gate.
 - Passing V2 would qualify only the common 2022-2025 source/state contract. It would not retroactively change V09B's historical disposition, fit V09B, authorize a probability feature, or change production.
 
-**Roadmap status:** pending PR #146 exact-head qualification and merge, or an honest fail-closed disposition if V2 does not satisfy the frozen gates.
+**Roadmap status:** pending PR #147 exact-head qualification and merge, or an honest fail-closed disposition if V2 does not satisfy the frozen gates.
 
 ## Depth charts / personnel / player-state infrastructure — COMPLETE FOR CURRENT ROADMAP
 
