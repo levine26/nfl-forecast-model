@@ -22,9 +22,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11'
       - name: Install Python package
         run: pip install '.[dev]'
+      - name: Validate public Impact Monitor contract
+        run: python -m pytest -q tests/test_public_impact_monitor.py tests/test_player_impact_monitor.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
