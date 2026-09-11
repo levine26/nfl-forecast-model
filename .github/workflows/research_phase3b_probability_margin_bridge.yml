@@ -1,0 +1,52 @@
+name: LevLine Phase 3B probability margin bridge
+
+on:
+  pull_request:
+    paths:
+      - 'research/phase3b_probability_margin_bridge_prereg.json'
+      - 'src/nfl_forecast/challenger_probability_margin_bridge.py'
+      - 'scripts/run_challenger_probability_margin_bridge.py'
+      - 'tests/test_challenger_probability_margin_bridge.py'
+      - '.github/workflows/research_phase3b_probability_margin_bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test bridge contract and historical cutoff
+        run: pytest -q tests/test_challenger_probability_margin_bridge.py tests/test_research_firewall.py
+      - name: Run pre-registered probability-margin bridge audit
+        run: |
+          rm -rf research_outputs/phase3b_probability_margin_bridge
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/run_challenger_probability_margin_bridge.py --bootstrap-samples 1000
+          test -s research_outputs/phase3b_probability_margin_bridge/phase3b_report.json
+          test -s research_outputs/phase3b_probability_margin_bridge/phase3b_bridge_predictions_2022_2025.csv
+      - name: Prove production surfaces unchanged
+        run: |
+          set -euo pipefail
+          BASE="origin/${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only "$BASE...HEAD")
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -E '^(outputs/|site/|src/nfl_forecast/(pipeline|models|features|data|publish|market|market_t120|lock_verify|public_forecast)\.py$|scripts/(run_week|refresh_market|pregame_due|verify_pregame_lock|build_public_forecasts)\.py$)'; then
+            echo 'Phase 3B research touched a production surface.' >&2
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-phase3b-bridge-${{ github.run_id }}
+          path: research_outputs/phase3b_probability_margin_bridge/
+          retention-days: 30
