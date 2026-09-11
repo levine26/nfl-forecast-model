@@ -42,7 +42,7 @@ test('LevLine 3.0 launch identity and immutable history are public', async ({ pa
   await expect(page.locator('.co-brand small')).toContainText('powered by LevLine')
   await expect(page.locator('.co-header-state b')).toContainText('LevLine')
 
-  await page.getByRole('button', { name: 'History' }).click()
+  await page.getByRole('button', { name: 'History', exact: true }).click()
   await expect(page.getByText('OFFICIAL HISTORY')).toBeVisible()
   await expect(page.getByText('Immutable pregame receipts.')).toBeVisible()
   await expect(page.getByText('official locks')).toBeVisible()
