@@ -23,6 +23,7 @@ REQUIRED_FIELDS = {
     "cost",
     "license_usage_rights",
     "redistribution_rights",
+    "rights_qualification_blocker",
     "historical_coverage",
     "current_2026_support",
     "refresh_cadence",
@@ -51,14 +52,21 @@ def _sleeper_qualification() -> dict:
     return json.loads(SLEEPER_QUALIFICATION.read_text(encoding="utf-8"))
 
 
-def test_registry_is_zero_cost_and_effective_policy_fails_closed_only_on_integrity() -> None:
+def test_registry_is_zero_cost_and_fails_closed_only_on_data_integrity() -> None:
     registry = _registry()
+    raw = registry["policy"]
     policy = effective_policy()
-    assert registry["policy"]["cost_ceiling_usd"] == 0
-    assert registry["policy"]["source_availability_does_not_authorize_features"] is True
-    assert registry["policy"]["completed_2026_outcomes_for_selection"] is False
-    # v2 is retained as the historical registry record; the effective policy is
-    # authoritative for qualification and supersedes the old combined rights/PIT flag.
+    assert raw["cost_ceiling_usd"] == 0
+    assert raw["qualification_basis"] == "DATA_INTEGRITY_ONLY"
+    assert raw["rights_qualification_blocker"] is False
+    assert raw["rights_metadata_only"] is True
+    assert raw["source_availability_does_not_authorize_features"] is True
+    assert raw["completed_2026_outcomes_for_selection"] is False
+    assert raw["fail_closed_on_data_integrity_failure"] is True
+    assert raw["fail_closed_on_point_in_time_failure"] is True
+    assert raw["fail_closed_on_rights_failure"] is False
+    assert "fail_closed_on_rights_or_point_in_time_failure" not in raw
+
     assert policy["qualification_basis"] == "DATA_INTEGRITY_ONLY"
     assert policy["fail_closed_on_rights_failure"] is False
     assert policy["fail_closed_on_point_in_time_failure"] is True
@@ -73,16 +81,18 @@ def test_every_source_has_complete_qualification_record_and_unique_id() -> None:
         assert REQUIRED_FIELDS.issubset(row)
         assert row["classification"] in VALID
         assert str(row["cost"]).startswith("$0")
+        assert row["rights_qualification_blocker"] is False
 
 
 def test_verified_sleeper_archive_is_qualified_for_2026_research_only() -> None:
     qualification = _sleeper_qualification()
+    raw = next(r for r in _sources() if r["source_id"] == "sleeper_historical_player_archive_candidate")
     effective = effective_source("sleeper_historical_player_archive_candidate")
+
     assert qualification["source_id"] == "sleeper_historical_player_archive_candidate"
     assert qualification["technical_status"] == "VERIFIED"
     assert qualification["research_classification"] == "QUALIFIED_RESEARCH_2026_ONLY"
     assert qualification["treat_source_as_valid_unless_data_audit_fails"] is True
-    assert qualification["supersedes_registry_block_for_technical_research"] is True
     scope = qualification["effective_scope"]
     assert scope["supports_2025_reconstruction"] is False
     assert scope["supports_2026_point_in_time_research"] is True
@@ -95,8 +105,17 @@ def test_verified_sleeper_archive_is_qualified_for_2026_research_only() -> None:
     assert provenance["workflow_schedule"] == "0 8 * * *"
     assert provenance["earliest_verified_snapshot_commit_utc"].startswith("2026-02-01")
     assert any(">=99.5%" in gate for gate in qualification["data_quality_gates"])
+
+    assert raw["classification"] == "QUALIFIED_RESEARCH"
+    assert raw["historical_research"] is True
+    assert raw["prospective_use"] is True
+    assert raw["rights_qualification_blocker"] is False
+    assert all("license" not in failure.lower() for failure in raw["known_source_failures"])
+    assert all("rights" not in failure.lower() for failure in raw["known_source_failures"])
+
     assert effective["classification"] == "QUALIFIED_RESEARCH"
     assert effective["rights_qualification_blocker"] is False
+    assert effective["supports_2025_reconstruction"] is False
 
 
 def test_sleeper_live_context_limit_is_point_in_time_not_rights() -> None:
