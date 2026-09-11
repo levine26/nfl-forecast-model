@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import datetime, timezone
 import math
 from statistics import NormalDist
-from typing import Any
-
-import pandas as pd
+from typing import Any, Iterable, Mapping
+from zoneinfo import ZoneInfo
 
 PUBLIC_CONTRACT_VERSION = "1.0"
 _MIN_PROBABILITY = 1e-6
 
 
 class PublicForecastError(RuntimeError):
-    """Raised when a public forecast cannot be made coherent without inventing data."""
+    """Raised when a public forecast cannot be published without inventing data."""
 
 
 def _number(value: Any) -> float | None:
@@ -25,10 +23,12 @@ def _number(value: Any) -> float | None:
 
 
 def _text(value: Any) -> str | None:
-    if value is None or (isinstance(value, float) and math.isnan(value)):
+    if value is None:
         return None
     text = str(value).strip()
-    return text or None
+    if not text or text.lower() in {"nan", "none", "null", "<na>"}:
+        return None
+    return text
 
 
 def _iso(value: Any) -> str | None:
@@ -44,13 +44,22 @@ def _iso(value: Any) -> str | None:
     return parsed.astimezone(timezone.utc).isoformat()
 
 
-def _kickoff_utc(row: pd.Series) -> datetime | None:
-    try:
-        from .publish import kickoff_utc
+def _bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "y"}
 
-        return kickoff_utc(row.get("gameday"), row.get("gametime"))
-    except Exception:
+
+def kickoff_utc(row: Mapping[str, Any]) -> datetime | None:
+    gameday = _text(row.get("gameday"))
+    gametime = _text(row.get("gametime"))
+    if not gameday or not gametime:
         return None
+    try:
+        dt = datetime.strptime(f"{gameday[:10]} {gametime[:5]}", "%Y-%m-%d %H:%M")
+    except ValueError:
+        return None
+    return dt.replace(tzinfo=ZoneInfo("America/New_York")).astimezone(timezone.utc)
 
 
 def fair_moneyline(probability: float) -> int:
@@ -61,10 +70,11 @@ def fair_moneyline(probability: float) -> int:
 
 
 def probability_implied_margin(home_probability: float, margin_sigma: float) -> float:
-    """Map win probability to a coherent home margin using existing margin uncertainty.
+    """Map the official probability to a coherent home margin for public presentation.
 
-    This is a presentation bridge, not a replacement fit for the independent margin model.
-    Under a Normal(margin, sigma) approximation, P(home margin > 0) = home_probability.
+    This is a deterministic presentation bridge, not a replacement fit for the independent
+    margin model. Under a Normal(margin, sigma) approximation,
+    P(home margin > 0) = home_probability.
     """
     probability = min(1.0 - _MIN_PROBABILITY, max(_MIN_PROBABILITY, float(home_probability)))
     sigma = float(margin_sigma)
@@ -79,8 +89,7 @@ def _integer_score_pair(total: float, margin: float, home_probability: float) ->
     home = max(0, int(round(raw_home)))
     away = max(0, int(round(raw_away)))
 
-    # Reader-facing whole-number scores must preserve the official winner even when
-    # a tiny coherent margin would otherwise round to a tie.
+    # Whole-number display scores must not round a non-pick'em official forecast into a tie.
     if home_probability > 0.5 and home <= away:
         home = away + 1
     elif home_probability < 0.5 and away <= home:
@@ -91,7 +100,7 @@ def _integer_score_pair(total: float, margin: float, home_probability: float) ->
     return home, away
 
 
-def _winner_for_probability(row: pd.Series, home_probability: float) -> str:
+def _winner_for_probability(row: Mapping[str, Any], home_probability: float) -> str:
     home = _text(row.get("home_team"))
     away = _text(row.get("away_team"))
     if not home or not away:
@@ -101,13 +110,12 @@ def _winner_for_probability(row: pd.Series, home_probability: float) -> str:
     return home if home_probability > 0.5 else away
 
 
-def _lifecycle(row: pd.Series, *, locked: bool, now_utc: datetime) -> str:
+def _lifecycle(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> str:
     actual_home = _number(row.get("actual_home_score"))
     actual_away = _number(row.get("actual_away_score"))
     if locked and actual_home is not None and actual_away is not None:
         return "GRADED"
-
-    kickoff = _kickoff_utc(row)
+    kickoff = kickoff_utc(row)
     if kickoff and now_utc >= kickoff:
         return "IN_PROGRESS"
     if locked:
@@ -115,7 +123,7 @@ def _lifecycle(row: pd.Series, *, locked: bool, now_utc: datetime) -> str:
     return "LIVE_FORECAST"
 
 
-def _football_signal(row: pd.Series) -> tuple[float | None, str | None]:
+def _football_signal(row: Mapping[str, Any]) -> tuple[float | None, str | None]:
     fst = _number(row.get("fst_pure_home_prob"))
     if fst is not None:
         return fst, "F_ST_NESTED_FOOTBALL"
@@ -125,14 +133,14 @@ def _football_signal(row: pd.Series) -> tuple[float | None, str | None]:
     return None, None
 
 
-def _market_probability_for_winner(home_probability: float | None, winner: str, row: pd.Series) -> float | None:
-    if home_probability is None or winner == "PICKEM":
+def _probability_for_team(home_probability: float | None, team: str, row: Mapping[str, Any]) -> float | None:
+    if home_probability is None or team == "PICKEM":
         return None
     home = _text(row.get("home_team"))
-    return home_probability if winner == home else 1.0 - home_probability
+    return home_probability if team == home else 1.0 - home_probability
 
 
-def _public_row(row: pd.Series, *, locked: bool, now_utc: datetime) -> dict[str, Any]:
+def _public_row(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> dict[str, Any]:
     game_id = _text(row.get("game_id"))
     if not game_id:
         raise PublicForecastError("game_id is required")
@@ -143,7 +151,7 @@ def _public_row(row: pd.Series, *, locked: bool, now_utc: datetime) -> dict[str,
 
     sigma = _number(row.get("margin_sigma"))
     if sigma is None:
-        raise PublicForecastError(f"{game_id}: margin_sigma is required for the public fair-margin bridge")
+        raise PublicForecastError(f"{game_id}: margin_sigma is required for the fair-margin bridge")
     fair_margin_home = probability_implied_margin(home_probability, sigma)
     fair_spread_home = -fair_margin_home
 
@@ -157,17 +165,13 @@ def _public_row(row: pd.Series, *, locked: bool, now_utc: datetime) -> dict[str,
     home = _text(row.get("home_team"))
     away = _text(row.get("away_team"))
     winner = _winner_for_probability(row, home_probability)
-    winner_probability = max(home_probability, 1.0 - home_probability)
-    if winner == "PICKEM":
-        winner_probability = 0.5
+    winner_probability = 0.5 if winner == "PICKEM" else max(home_probability, 1.0 - home_probability)
 
     football_home_probability, football_signal_kind = _football_signal(row)
     market_home_probability = _number(row.get("market_home_prob"))
-    market_winner_probability = _market_probability_for_winner(market_home_probability, winner, row)
+    market_winner_probability = _probability_for_team(market_home_probability, winner, row)
     probability_difference_pp = (
-        None
-        if market_winner_probability is None
-        else (winner_probability - market_winner_probability) * 100.0
+        None if market_winner_probability is None else (winner_probability - market_winner_probability) * 100.0
     )
 
     independent_margin = _number(row.get("expected_margin"))
@@ -205,6 +209,8 @@ def _public_row(row: pd.Series, *, locked: bool, now_utc: datetime) -> dict[str,
         "levline_vs_market_winner_probability_pp": probability_difference_pp,
         "forecast_timestamp_utc": _iso(row.get("prediction_timestamp_utc")),
         "market_timestamp_utc": _iso(row.get("market_snapshot_timestamp_utc")),
+        "lock_timestamp_utc": _iso(row.get("lock_timestamp_utc")),
+        "kickoff_utc": kickoff_utc(row).isoformat() if kickoff_utc(row) else None,
         "lifecycle_status": _lifecycle(row, locked=locked, now_utc=now_utc),
         "immutable": bool(locked),
         "source_snapshot": "LOCKED" if locked else "LIVE",
@@ -238,7 +244,7 @@ def _public_row(row: pd.Series, *, locked: bool, now_utc: datetime) -> dict[str,
             "artifact_id": _text(row.get("fst_artifact_id")),
             "artifact_training_data_sha256": _text(row.get("fst_artifact_training_data_sha256")),
             "artifact_freeze_implementation_sha": _text(row.get("fst_artifact_freeze_implementation_sha")),
-            "fst_fallback": bool(row.get("fst_fallback")) if pd.notna(row.get("fst_fallback")) else False,
+            "fst_fallback": _bool(row.get("fst_fallback")),
             "fst_fallback_reason": _text(row.get("fst_fallback_reason")),
         },
     }
@@ -246,7 +252,7 @@ def _public_row(row: pd.Series, *, locked: bool, now_utc: datetime) -> dict[str,
     return forecast
 
 
-def validate_public_forecast(forecast: dict[str, Any]) -> None:
+def validate_public_forecast(forecast: Mapping[str, Any]) -> None:
     game_id = forecast.get("game_id", "unknown")
     p = float(forecast["official_home_win_probability"])
     winner = forecast["official_winner"]
@@ -273,16 +279,15 @@ def validate_public_forecast(forecast: dict[str, Any]) -> None:
         if not math.isclose(margin, 0.0, abs_tol=1e-9) or home_score != away_score:
             raise PublicForecastError(f"{game_id}: pick'em public forecast is contradictory")
 
-    football = forecast.get("football_only_home_win_probability")
-    market = forecast.get("market_home_win_probability")
-    for label, value in (("football", football), ("market", market)):
+    for label in ("football_only_home_win_probability", "market_home_win_probability"):
+        value = forecast.get(label)
         if value is not None and not 0.0 <= float(value) <= 1.0:
-            raise PublicForecastError(f"{game_id}: {label} probability must be in [0, 1]")
+            raise PublicForecastError(f"{game_id}: {label} must be in [0, 1]")
 
 
 def build_public_forecasts(
-    current: pd.DataFrame,
-    official: pd.DataFrame,
+    current: Iterable[Mapping[str, Any]],
+    official: Iterable[Mapping[str, Any]],
     *,
     now_utc: datetime | None = None,
 ) -> dict[str, Any]:
@@ -292,18 +297,19 @@ def build_public_forecasts(
     else:
         now_utc = now_utc.astimezone(timezone.utc)
 
-    locked_by_game: dict[str, pd.Series] = {}
-    if official is not None and not official.empty and "game_id" in official.columns:
-        locked = official[official.get("lock_status", pd.Series("", index=official.index)).eq("LOCKED")]
-        for _, row in locked.iterrows():
+    locked_by_game: dict[str, Mapping[str, Any]] = {}
+    for row in official:
+        if _text(row.get("lock_status")) == "LOCKED" and _text(row.get("game_id")):
             locked_by_game[str(row.get("game_id"))] = row
 
     games: list[dict[str, Any]] = []
-    for _, current_row in current.iterrows():
-        game_id = str(current_row.get("game_id"))
+    for current_row in current:
+        game_id = _text(current_row.get("game_id"))
+        if not game_id:
+            raise PublicForecastError("current forecast row is missing game_id")
         locked_row = locked_by_game.get(game_id)
         source = locked_row if locked_row is not None else current_row
-        kickoff = _kickoff_utc(source)
+        kickoff = kickoff_utc(source)
         if locked_row is None and kickoff is not None and now_utc >= kickoff:
             raise PublicForecastError(
                 f"{game_id}: kickoff has passed without an immutable pregame lock; refusing to publish a live replacement"
