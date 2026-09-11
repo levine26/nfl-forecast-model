@@ -3,6 +3,7 @@ name: LevLine research market capture v2
 on:
   pull_request:
     paths:
+      - 'research/market_capture_contract_v2.py'
       - 'research/market_capture_v2.py'
       - 'research/test_market_capture_v2.py'
       - 'research/run_market_capture_v2.py'
