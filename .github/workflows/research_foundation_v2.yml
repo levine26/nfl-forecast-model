@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'research/source_qualification_registry_v2.json'
+      - 'research/sleeper_archive_qualification_v1.json'
       - 'research/test_source_qualification_registry_v2.py'
       - 'research/point_in_time_store.py'
       - 'research/test_point_in_time_store.py'
