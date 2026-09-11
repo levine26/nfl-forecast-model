@@ -8,6 +8,7 @@ import pytest
 
 from nfl_forecast.challenger_fst import FROZEN_CANDIDATE_ID
 import scripts.run_challenger_fst_shadow_portable as portable
+from scripts.verify_fst_reconstruction_evidence import build_receipt
 
 
 def _spec() -> dict:
@@ -31,9 +32,10 @@ def _receipt(spec_path: Path, *, source_sha: str = "abc123") -> dict:
         "max_iter": 3000,
     }
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "candidate_id": FROZEN_CANDIDATE_ID,
         "status": "verified",
+        "receipt_scope": "fresh_compatible_runtime_probe",
         "source_sha": source_sha,
         "research_only": True,
         "production_authorized": False,
@@ -41,7 +43,7 @@ def _receipt(spec_path: Path, *, source_sha: str = "abc123") -> dict:
         "runtime": {
             "matches": True,
             "environment": {"OPENBLAS_CORETYPE": "SKYLAKEX"},
-            "threadpools": [{"internal_api": "openblas", "architecture": "SkylakeX", "num_threads": 4}],
+            "threadpools": [{"user_api": "blas", "internal_api": "openblas", "architecture": "SkylakeX", "num_threads": 4}],
         },
         "reconstruction_fit": fit,
         "identity_check": {
@@ -53,7 +55,8 @@ def _receipt(spec_path: Path, *, source_sha: str = "abc123") -> dict:
             "rows": registered["training_games"],
         },
         "spec_sha256": hashlib.sha256(spec_path.read_bytes()).hexdigest(),
-        "execution_policy": "strict_reconstruction_only_no_current_week_scoring",
+        "forensic_evidence_sha256": None,
+        "execution_policy": "fresh_compatible_hardware_reconstruction_only_no_current_week_scoring",
     }
 
 
@@ -71,14 +74,33 @@ def _install_receipt(tmp_path: Path, monkeypatch, *, mutate=None):
     return receipt_path
 
 
-def test_portable_shadow_accepts_only_verified_bound_receipt(tmp_path, monkeypatch):
+def test_portable_shadow_accepts_only_verified_bound_fresh_receipt(tmp_path, monkeypatch):
     _install_receipt(tmp_path, monkeypatch)
     receipt, fit = portable._load_verified_receipt()
     registered = _spec()["frozen_identity"]
+    assert receipt["receipt_scope"] == "fresh_compatible_runtime_probe"
     assert receipt["runtime"]["matches"] is True
     assert fit.training_data_sha256 == registered["training_data_sha256"]
     assert fit.training_games == registered["training_games"]
     assert fit.intercept == registered["intercept"]
+
+
+def test_portable_shadow_accepts_durable_forensic_receipt(tmp_path, monkeypatch):
+    spec_path = Path("research/fst/F-ST-01-FROZEN-2026.json")
+    evidence_path = Path("research/fst/F-ST-01-reconstruction-evidence.json")
+    monkeypatch.setenv("GITHUB_SHA", "a" * 40)
+    receipt = build_receipt()
+    receipt_path = tmp_path / "receipt.json"
+    receipt_path.write_text(json.dumps(receipt))
+    monkeypatch.setattr(portable, "RECEIPT_PATH", receipt_path)
+    monkeypatch.setattr(portable, "SPEC_PATH", spec_path)
+    monkeypatch.setattr(portable, "FORENSIC_EVIDENCE_PATH", evidence_path)
+    monkeypatch.delenv("OPENBLAS_CORETYPE", raising=False)
+
+    loaded, fit = portable._load_verified_receipt()
+    assert loaded["receipt_scope"] == "durable_forensic_evidence_verification"
+    assert loaded["forensic_evidence_sha256"] == hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+    assert fit.training_data_sha256 == _spec()["frozen_identity"]["training_data_sha256"]
 
 
 def test_portable_shadow_refuses_forced_cpu_target(tmp_path, monkeypatch):
@@ -105,7 +127,17 @@ def test_portable_shadow_refuses_cross_sha_receipt(tmp_path, monkeypatch):
         portable._load_verified_receipt()
 
 
-def test_probe_bound_fit_manifest_preserves_reconstruction_runtime(tmp_path, monkeypatch):
+def test_portable_shadow_refuses_unknown_receipt_scope(tmp_path, monkeypatch):
+    _install_receipt(
+        tmp_path,
+        monkeypatch,
+        mutate=lambda receipt: receipt.update({"receipt_scope": "unregistered_scope"}),
+    )
+    with pytest.raises(RuntimeError, match="scope invalid"):
+        portable._load_verified_receipt()
+
+
+def test_receipt_bound_fit_manifest_preserves_reconstruction_provenance(tmp_path, monkeypatch):
     receipt_path = _install_receipt(tmp_path, monkeypatch)
     receipt, fit = portable._load_verified_receipt()
     out = tmp_path / "provenance"
@@ -123,6 +155,6 @@ def test_probe_bound_fit_manifest_preserves_reconstruction_runtime(tmp_path, mon
     write = portable._probe_bound_fit_provenance(receipt)
     manifest = write(out, input_manifest, fit)
     assert manifest["runtime"] == receipt["runtime"]
-    assert manifest["reconstruction_execution_policy"] == "isolated_strict_probe"
-    assert manifest["shadow_scoring_execution_policy"] == "native_cpu"
+    assert manifest["reconstruction_execution_policy"] == "fresh_compatible_runtime_probe"
+    assert manifest["shadow_scoring_execution_policy"] == "native_cpu_registered_literals"
     assert manifest["reconstruction_probe_receipt_sha256"] == hashlib.sha256(receipt_path.read_bytes()).hexdigest()
