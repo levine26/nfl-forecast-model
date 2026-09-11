@@ -10,6 +10,7 @@ on:
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger*.py'
       - 'scripts/run_fst_*.py'
+      - 'scripts/verify_fst_*.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'research/fst/**'
       - 'tests/test_challenger*.py'
@@ -23,6 +24,7 @@ on:
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger*.py'
       - 'scripts/run_fst_*.py'
+      - 'scripts/verify_fst_*.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'research/fst/**'
       - 'tests/test_challenger*.py'
@@ -63,6 +65,7 @@ jobs:
           tests/test_challenger_fst.py
           tests/test_fst_frozen_identity.py
           tests/test_fst_portable_shadow.py
+          tests/test_fst_reconstruction_evidence.py
           tests/test_challenger_prospective.py
           tests/test_challenger_shadow_lock.py
 
@@ -87,28 +90,24 @@ jobs:
             cp /tmp/challenger-immutable/prediction_history_shadow.csv challenger_outputs/
           fi
 
-      - name: Pin recovered F-ST-01 reconstruction packages
-        run: |
-          set -euo pipefail
-          pip install --no-deps --force-reinstall -r research/fst/F-ST-01-runtime-requirements.txt
-
-      - name: Run strict isolated F-ST reconstruction probe
+      - name: Verify durable F-ST reconstruction evidence
         env:
-          OPENBLAS_CORETYPE: SKYLAKEX
-          OPENBLAS_NUM_THREADS: '4'
-          OMP_NUM_THREADS: '4'
-          MKL_NUM_THREADS: '4'
-          NUMEXPR_NUM_THREADS: '4'
           PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/src
         run: |
           set -euo pipefail
-          python scripts/run_fst_reconstruction_probe.py
+          test -z "${OPENBLAS_CORETYPE:-}"
+          python scripts/verify_fst_reconstruction_evidence.py
           test -s challenger_outputs/fst/reconstruction_probe/receipt.json
           python - <<'PY'
+          import hashlib
           import json
           from pathlib import Path
-          receipt = json.loads(Path('challenger_outputs/fst/reconstruction_probe/receipt.json').read_text())
+          receipt_path = Path('challenger_outputs/fst/reconstruction_probe/receipt.json')
+          evidence_path = Path('research/fst/F-ST-01-reconstruction-evidence.json')
+          receipt = json.loads(receipt_path.read_text())
           assert receipt['status'] == 'verified'
+          assert receipt['receipt_scope'] == 'durable_forensic_evidence_verification'
+          assert receipt['forensic_evidence_sha256'] == hashlib.sha256(evidence_path.read_bytes()).hexdigest()
           assert receipt['runtime']['matches'] is True
           assert receipt['identity_check']['matches'] is True
           assert receipt['identity_check']['numeric_abs_tolerance'] == 1e-12
@@ -179,6 +178,8 @@ jobs:
           identity_check = json.loads((provenance_dir / 'frozen_identity_check.json').read_text())
           receipt_path = Path('challenger_outputs/fst/reconstruction_probe/receipt.json')
           receipt = json.loads(receipt_path.read_text())
+          evidence_path = Path('research/fst/F-ST-01-reconstruction-evidence.json')
+          evidence_sha = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
           base_oof_raw = (provenance_dir / 'base_oof_keyed.csv').read_bytes()
           training_raw = (provenance_dir / 'training_frame_keyed.csv').read_bytes()
 
@@ -207,6 +208,8 @@ jobs:
           assert runtime['current_pure_execution_policy'] == 'native_cpu_subprocess_with_frozen_oof'
 
           assert receipt['status'] == 'verified'
+          assert receipt['receipt_scope'] == 'durable_forensic_evidence_verification'
+          assert receipt['forensic_evidence_sha256'] == evidence_sha
           assert receipt['identity_check']['matches'] is True
           assert receipt['identity_check']['numeric_abs_tolerance'] == 1e-12
           assert max(receipt['identity_check']['numeric_absolute_deltas'].values()) <= 1e-12
@@ -228,8 +231,9 @@ jobs:
           assert inputs_manifest['capture_context'] == 'prospective_shadow_reconstruction'
           assert inputs_manifest['candidate_id'] == 'F-ST-01-FROZEN-2026'
           assert fit_manifest['capture_context'] == 'prospective_shadow_reconstruction'
-          assert fit_manifest['reconstruction_execution_policy'] == 'isolated_strict_probe'
-          assert fit_manifest['shadow_scoring_execution_policy'] == 'native_cpu'
+          assert fit_manifest['reconstruction_execution_policy'] == 'durable_forensic_evidence_verification'
+          assert fit_manifest['reconstruction_forensic_evidence_sha256'] == evidence_sha
+          assert fit_manifest['shadow_scoring_execution_policy'] == 'native_cpu_registered_literals'
           assert fit_manifest['reconstruction_probe_receipt_sha256'] == hashlib.sha256(receipt_path.read_bytes()).hexdigest()
           assert inputs_manifest['base_oof']['raw_sha256'] == hashlib.sha256(base_oof_raw).hexdigest()
           assert inputs_manifest['training_frame']['raw_sha256'] == hashlib.sha256(training_raw).hexdigest()
@@ -263,7 +267,7 @@ jobs:
           selected = slate[slate['selected_shadow_candidate']]
           assert selected['challenger_version'].eq('F-ST-01-FROZEN-2026').all()
           assert selected.groupby('game_id').size().eq(1).all()
-          print(json.dumps({'candidate': runtime['candidate_id'], 'probe_verified': True}, indent=2))
+          print(json.dumps({'candidate': runtime['candidate_id'], 'durable_evidence_verified': True}, indent=2))
           PY
 
       - name: Upload challenger evidence
