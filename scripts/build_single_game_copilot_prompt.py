@@ -56,7 +56,7 @@ PARAGRAPH 1 — THE MATCHUP
 Write 55-100 words explaining how the game is likely to be decided. Discuss BOTH teams and what each side needs to do. Use current reporting to inform the football analysis, but synthesize it instead of writing outlet-led notes. Focus on concrete factors such as quarterback situation, protection/pass rush, coverage, explosive plays, early-down efficiency, run-game leverage, injuries, coaching changes, travel or weather.
 
 MODEL_RATIONALE — CONTEXT ONLY
-Write 18-40 words tying one or two verified football factors to the LevLine side. Do NOT include any number, percentage, spread, projected score, PURE value, MARKET value, F-ST value, model line, blend/weight formula, the word moneyline, or a final pick sentence. The packet intentionally contains no LevLine numerical internals.
+Write 18-40 words tying one or two verified football factors to the selected side. Do NOT use the word LevLine in this field. Do NOT include any number, percentage, spread, projected score, PURE value, MARKET value, F-ST value, model line, blend/weight formula, the word moneyline, or a final pick sentence. The packet intentionally contains no LevLine numerical internals.
 
 VOICE
 - Human NFL analyst: clear, confident, conversational, specific.
@@ -83,7 +83,7 @@ SOURCE RULES — STRICT
 
 OUTPUT
 Return ONLY one syntactically valid JSON object, with exactly this schema and exactly this game id:
-{{"games":{{"{args.game_id}":{{"headline":"matchup-oriented headline","paragraph1":"55-100 word matchup preview","model_rationale":"18-40 words, context only, no numbers","sources":[{{"name":"publisher","title":"article/report title","url":"https://direct.publisher/article"}},{{"name":"second publisher","title":"article/report title","url":"https://direct.second/article"}}]}}}}}}
+{{"games":{{"{args.game_id}":{{"headline":"matchup-oriented headline","paragraph1":"55-100 word matchup preview","model_rationale":"18-40 words, context only, no numbers or model terms","sources":[{{"name":"publisher","title":"article/report title","url":"https://direct.publisher/article"}},{{"name":"second publisher","title":"article/report title","url":"https://direct.second/article"}}]}}}}}}
 No Markdown, comments, trailing commas, extra game ids, or commentary.
 {feedback}
 GAME PACKET
