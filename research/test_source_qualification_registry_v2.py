@@ -38,6 +38,14 @@ REQUIRED_FIELDS = {
     "public_display",
     "probability_features",
 }
+RIGHTS_ONLY_MARKERS = (
+    "license",
+    "licensing",
+    "rights",
+    "redistribution",
+    "commercial use",
+    "terms of use",
+)
 
 
 def _registry() -> dict:
@@ -82,6 +90,23 @@ def test_every_source_has_complete_qualification_record_and_unique_id() -> None:
         assert row["classification"] in VALID
         assert str(row["cost"]).startswith("$0")
         assert row["rights_qualification_blocker"] is False
+
+
+def test_rights_metadata_can_never_be_a_technical_failure_or_sole_block_reason() -> None:
+    for row in _sources():
+        technical_failures = [str(item) for item in row["known_source_failures"]]
+        for failure in technical_failures:
+            lowered = failure.lower()
+            assert not any(marker in lowered for marker in RIGHTS_ONLY_MARKERS), (
+                row["source_id"],
+                failure,
+            )
+
+        if row["classification"] in {"BLOCKED", "REJECTED"}:
+            assert technical_failures, row["source_id"]
+            # A blocked/rejected source must be blocked for an actual data-integrity
+            # reason recorded on the technical failure axis, never for rights metadata.
+            assert row["rights_qualification_blocker"] is False
 
 
 def test_verified_sleeper_archive_is_qualified_for_2026_research_only() -> None:
