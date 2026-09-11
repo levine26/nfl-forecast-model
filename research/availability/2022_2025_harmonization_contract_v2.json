@@ -1,0 +1,104 @@
+{
+  "contract_version": 2,
+  "audit_id": "AVAILABILITY-HARMONIZATION-V2",
+  "status": "preregistered_before_first_v2_execution",
+  "supersedes_for_future_audit_only": "AVAILABILITY-HARMONIZATION-V1",
+  "v1_failure_receipt": "research/availability/2022_2025_harmonization_v1_failure_receipt.json",
+  "purpose": "Determine whether 2022-2025 can share one leakage-safe player-week practice-state contract after adding a deterministic stable-identity dictionary for official-name aliases. This remains source qualification only and does not fit or score V09B.",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "target_seasons": [2022, 2023, 2024, 2025],
+  "target_horizon_minutes": 120,
+  "completed_2026_outcomes_allowed": false,
+  "game_outcomes_allowed": false,
+  "probability_feature_authorized": false,
+  "v09b_execution_authorized": false,
+  "production_authorized": false,
+  "historical_game_status_feature_authorized": false,
+  "reason_for_new_version": "V1 failed its frozen 2022 bidirectional stable-identity gate at 97.5365% because exact official/canonical names differed for recurring players. V2 does not lower that gate. It adds nflverse's dedicated player master, whose primary key is GSIS and whose documented name fields include display_name, football_name, common_first_name, first_name, last_name and short_name. No v2 audit metrics were observed before this contract was written.",
+  "source_contract": {
+    "historical_state_sources": {
+      "nflverse_injuries": "unchanged from v1: canonical stable player-week injury/practice state",
+      "nfl_com_historical_pages": "unchanged from v1: all 22 official NFL pages per season as independent all-position cross-check",
+      "nfl_reporting_policy": "unchanged from v1: conservative official filing-day chronology",
+      "nflverse_schedule": "unchanged from v1: game identity, kickoff and T-120 cutoff"
+    },
+    "identity_dictionary_v2": {
+      "provider": "nflverse players",
+      "release_repository": "nflverse/nflverse-data",
+      "release_tag": "players",
+      "asset_name": "players.csv",
+      "release_asset_id": 557226328,
+      "expected_sha256": "6f896e1134757efe09761ae81280f89d9604d8ce611a888a56d9e7d49e80eeb9",
+      "asset_updated_at": "2026-09-11T12:38:43Z",
+      "primary_key": "gsis_id",
+      "required_fields": ["gsis_id", "display_name", "common_first_name", "first_name", "last_name", "short_name", "football_name"],
+      "allowed_aliases": [
+        "display_name",
+        "football_name",
+        "first_name + last_name",
+        "common_first_name + last_name"
+      ],
+      "role_restriction": "entity resolution only. Do not use latest_team, status, position, biographical fields, or any player-master field as historical availability state or model input.",
+      "chronology_note": "The master is allowed only as a non-outcome identity dictionary. Historical team/week membership and all availability state must still come from the target-season injury/report sources. A GSIS alias match is accepted only if that GSIS appears exactly once in the same historical season/week/team canonical injury rows.",
+      "cost": 0
+    }
+  },
+  "identity_resolution_v2": {
+    "normalization": "same conservative suffix/punctuation/diacritic normalization already used by the qualified 2025 reconstruction",
+    "step_1": "Attempt the original v1 exact-full-name or unique abbreviated-name stable-ID match.",
+    "step_2": "For v1-unmatched rows only, normalize the official full name and compare it exactly against the allowed player-master alias strings.",
+    "step_3": "Intersect every alias-matched GSIS candidate with GSIS IDs actually present in the same historical season/week/team nflverse injury rows.",
+    "acceptance": "Exactly one GSIS may remain. Otherwise identity is unresolved and fails closed.",
+    "prohibited_matching": [
+      "edit-distance or fuzzy similarity",
+      "manual player-specific alias overrides chosen after seeing the audit",
+      "practice status, game status or injury text used to pick between identities",
+      "current/latest team used to infer historical team membership",
+      "position used as the deciding identity key",
+      "game outcomes, snaps, participation or completed-2026 outcomes"
+    ],
+    "ambiguous_policy": "unknown/unresolved; never pick the closest candidate"
+  },
+  "canonical_state_contract": {
+    "identity_key": ["season", "week", "team", "gsis_id"],
+    "allowed_practice_states": ["full", "limited", "dnp", "unknown"],
+    "unknown_policy": "missing, unrecognized, late, ambiguous, or otherwise unqualified state remains unknown; never infer healthy/active",
+    "source_effective_time": "official Game Status Report filing day at 23:59:59 America/New_York, derived from scheduled game weekday",
+    "known_by_t120_rule": "report_deadline_eod_utc <= kickoff_utc - 120 minutes",
+    "date_modified_role": "diagnostic parseability/source-integrity evidence for legacy 2022-2024 only",
+    "game_status_in_feature": false,
+    "actual_snaps_in_feature": false,
+    "postgame_participation_in_feature": false,
+    "final_inactive_status_in_feature": false
+  },
+  "qualification_gates": {
+    "required_seasons_exact": [2022, 2023, 2024, 2025],
+    "official_nfl_pages_required_per_season": 22,
+    "player_master_sha256_must_equal_expected": true,
+    "stable_gsis_missing_rate_max": 0.0,
+    "schedule_match_rate_min": 1.0,
+    "unique_identity_match_rate_min": 0.995,
+    "official_identity_resolution_rate_min": 0.995,
+    "practice_status_agreement_rate_min": 0.985,
+    "diagnostic_game_status_agreement_rate_min": 0.985,
+    "known_by_t120_rate_required_among_matched_rows": 1.0,
+    "fully_qualified_practice_state_rate_min": 0.99,
+    "legacy_date_modified_parse_rate_min": 0.995,
+    "duplicate_identity_rows_allowed": 0,
+    "actual_snaps_used": 0,
+    "postgame_participation_used": 0,
+    "completed_2026_outcomes_used": 0
+  },
+  "missingness_reporting": {
+    "required_dimensions": ["season", "week", "team", "position"],
+    "must_report_unknown_reason": true,
+    "missing_status_means_healthy": false,
+    "nflverse_absence_means_healthy": false,
+    "official_page_absence_means_healthy": false,
+    "unresolved_alias_means_healthy": false
+  },
+  "decision_rule": "V2 qualifies only if every frozen gate passes in every target season. Passing qualifies only the shared source/state contract. It does not retroactively change V09B's historical disposition, fit V09B, authorize a probability feature, or change production.",
+  "no_rescue_policy": "Do not lower gates, add fuzzy/manual aliases after seeing v2 results, use source status fields to choose identities, reinterpret absence as healthy, or inspect model/game/completed-2026 outcomes to rescue v2. Any materially different identity/state design requires v3.",
+  "outcome_information_consulted_before_preregistration": false,
+  "completed_2026_outcomes_consulted_before_preregistration": false
+}
