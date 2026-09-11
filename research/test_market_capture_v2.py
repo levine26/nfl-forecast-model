@@ -17,14 +17,19 @@ from research.market_capture_v2 import (
     normalize_bookmaker,
     two_way_metrics,
 )
-from research.run_market_capture_v2 import _captured_pairs
+from research.run_market_capture_v2 import (
+    MAX_EVENT_KICKOFF_DELTA_MINUTES,
+    _captured_pairs,
+    _match_event,
+)
 
 
-def _event():
+def _event(event_id: str = "evt-1", commence_time: str = "2026-09-13T17:00:00Z"):
     return {
-        "id": "evt-1",
+        "id": event_id,
         "home_team": "Chicago Bears",
         "away_team": "Carolina Panthers",
+        "commence_time": commence_time,
     }
 
 
@@ -65,7 +70,38 @@ def test_due_horizons_only_fire_near_preregistered_targets() -> None:
     assert due_horizons(kickoff, datetime(2026, 9, 13, 15, 30, tzinfo=timezone.utc)) == []
 
 
-def test_book_snapshot_keeps_moneyline_spread_total_and_freshness() -> None:
+def test_event_identity_requires_matchup_and_kickoff_proximity() -> None:
+    kickoff = datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc)
+    current = _event("current", "2026-09-13T17:00:00Z")
+    rematch = _event("future-rematch", "2026-11-15T18:00:00Z")
+    resolved = _match_event(
+        [rematch, current],
+        away_team="CAR",
+        home_team="CHI",
+        kickoff_timestamp_utc=kickoff,
+    )
+    assert resolved is not None
+    assert resolved["id"] == "current"
+    assert MAX_EVENT_KICKOFF_DELTA_MINUTES == 30.0
+
+    too_far = _event("shifted", "2026-09-13T17:31:00Z")
+    assert _match_event(
+        [too_far],
+        away_team="CAR",
+        home_team="CHI",
+        kickoff_timestamp_utc=kickoff,
+    ) is None
+
+    duplicate = _event("duplicate", "2026-09-13T17:00:00Z")
+    assert _match_event(
+        [current, duplicate],
+        away_team="CAR",
+        home_team="CHI",
+        kickoff_timestamp_utc=kickoff,
+    ) is None
+
+
+def test_book_snapshot_keeps_moneyline_spread_total_freshness_and_event_time() -> None:
     now = datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
     row = normalize_bookmaker(
         event=_event(), bookmaker=_book("book-a", -150, 130, -3.0, 44.5),
@@ -79,11 +115,13 @@ def test_book_snapshot_keeps_moneyline_spread_total_and_freshness() -> None:
     assert row["total_points"] == 44.5
     assert row["h2h_overround"] > 0
     assert row["freshness_minutes"] == 2.0
+    assert row["provider_commence_time_utc"] == "2026-09-13T17:00:00+00:00"
+    assert row["provider_kickoff_delta_minutes"] == 0.0
     assert row["research_only"] is True
     assert row["production_authorized"] is False
 
 
-def test_consensus_retains_source_count_and_market_dispersion() -> None:
+def test_consensus_retains_source_count_market_dispersion_and_event_identity() -> None:
     now = datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
     rows = [normalize_bookmaker(
         event=_event(), bookmaker=_book(key, home, away, spread, total),
@@ -99,6 +137,9 @@ def test_consensus_retains_source_count_and_market_dispersion() -> None:
     assert consensus is not None
     assert consensus["source_count"] == 3
     assert consensus["sportsbook_key"] == "sportsbook_consensus"
+    assert consensus["event_id"] == "evt-1"
+    assert consensus["provider_commence_time_utc"] == "2026-09-13T17:00:00+00:00"
+    assert consensus["provider_kickoff_delta_minutes"] == 0.0
     assert consensus["probability_range"] > 0
     assert consensus["home_spread"] == -3.0
     assert consensus["total_points"] == 44.5
