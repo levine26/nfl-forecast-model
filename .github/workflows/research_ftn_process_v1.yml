@@ -8,8 +8,10 @@ on:
       - 'research/ftn_identity_v1.py'
       - 'research/run_ftn_process_v1.py'
       - 'research/run_ftn_process_v1_identityfix.py'
+      - 'research/run_ftn_source_preflight_v1.py'
       - 'research/test_ftn_process_v1.py'
       - 'research/test_ftn_identity_v1.py'
+      - 'research/test_ftn_schedule_scope_v1.py'
       - '.github/workflows/research_ftn_process_v1.yml'
   push:
     branches: [main]
@@ -19,8 +21,10 @@ on:
       - 'research/ftn_identity_v1.py'
       - 'research/run_ftn_process_v1.py'
       - 'research/run_ftn_process_v1_identityfix.py'
+      - 'research/run_ftn_source_preflight_v1.py'
       - 'research/test_ftn_process_v1.py'
       - 'research/test_ftn_identity_v1.py'
+      - 'research/test_ftn_schedule_scope_v1.py'
       - '.github/workflows/research_ftn_process_v1.yml'
   workflow_dispatch:
     inputs:
@@ -51,7 +55,7 @@ jobs:
       - name: Verify frozen preregistration and synthetic leakage controls
         run: |
           set -euo pipefail
-          pytest -q research/test_ftn_process_v1.py research/test_ftn_identity_v1.py
+          pytest -q research/test_ftn_process_v1.py research/test_ftn_identity_v1.py research/test_ftn_schedule_scope_v1.py
           python - <<'PY'
           import json
           from pathlib import Path
@@ -63,11 +67,68 @@ jobs:
           text = Path('research/run_ftn_process_v1.py').read_text()
           assert 'SEASONS = (2022, 2023, 2024, 2025)' in text
           assert 'completed_2026_outcomes_used' in text
+          assert 'team_games = aggregate_ftn_team_games(joined, schedule_scope)' in text
+          assert 'schedule_scope_games' in text
+          preflight = Path('research/run_ftn_source_preflight_v1.py').read_text()
+          assert 'model_fit": False' in preflight
+          assert 'historical_evaluation_executed": False' in preflight
           identity = Path('research/ftn_identity_v1.py').read_text()
           assert 'MIN_IDENTITY_RATE' in identity
           assert 'exact_game_id_plus_play_id_merge' in identity
           assert 'model_or_threshold_changed' in identity
           PY
+
+  source-preflight:
+    if: github.event_name == 'pull_request'
+    needs: contract-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: ftn-source-preflight-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ftn-source-preflight-${{ runner.os }}-
+            ftn-process-v1-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Run real 2022-2025 source preflight without model fitting
+        env:
+          PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          rm -rf research_outputs/ftn_source_preflight_v1
+          python research/run_ftn_source_preflight_v1.py
+      - name: Verify preflight stopped before evaluation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          audit = json.loads(Path('research_outputs/ftn_source_preflight_v1/audit.json').read_text())
+          assert audit['status'] == 'passed'
+          assert audit['identity_audit']['identity_join_rate'] >= 0.995
+          assert audit['identity_audit']['model_or_threshold_changed'] is False
+          assert audit['missing_schedule_game_count'] == 0
+          assert audit['team_game_missing_kickoff_rows'] == 0
+          assert audit['team_game_missing_availability_rows'] == 0
+          assert audit['model_fit'] is False
+          assert audit['historical_evaluation_executed'] is False
+          assert audit['completed_2026_outcomes_used'] == 0
+          assert audit['production_authorized'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ftn-source-preflight-v1-${{ github.run_id }}
+          path: research_outputs/ftn_source_preflight_v1/
+          if-no-files-found: warn
+          retention-days: 30
 
   historical-evaluation:
     needs: contract-tests
@@ -111,6 +172,7 @@ jobs:
           assert report['source_audit']['identity_join_rate'] >= 0.995
           assert report['source_audit']['identity_definition'] == 'exact_game_id_plus_play_id_merge'
           assert report['source_audit']['model_or_threshold_changed'] is False
+          assert report['input_scope']['schedule_scope_games'] >= report['input_scope']['completed_market_games']
           assert manifest['research_only'] is True
           assert manifest['production_authorized'] is False
           assert manifest['completed_2026_outcomes_used'] == 0
