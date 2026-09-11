@@ -62,6 +62,13 @@ def _require_equal(label: str, actual: Any, expected: Any) -> None:
         _fail(f"{label}={actual!r} expected {expected!r}")
 
 
+def _require_lower_hex(label: str, value: Any, length: int) -> str:
+    text = str(value or "")
+    if len(text) != length or any(ch not in "0123456789abcdef" for ch in text):
+        _fail(f"{label} is not a {length}-character lowercase hex identity")
+    return text
+
+
 def verify_durable_evidence(
     evidence_path: str | Path = EVIDENCE_PATH,
     spec_path: str | Path = SPEC_PATH,
@@ -142,10 +149,10 @@ def verify_durable_evidence(
             _fail(f"forensic BLAS thread count drifted: {pool.get('num_threads')!r}")
 
     source = evidence["forensic_workflow"]
-    for field in ("artifact_zip_sha256", "result_sha256", "head_sha", "workflow_github_sha"):
-        value = str(source.get(field) or "")
-        if len(value) != 64 or any(ch not in "0123456789abcdef" for ch in value):
-            _fail(f"forensic source {field} is not a lowercase SHA-256/SHA identity")
+    _require_lower_hex("forensic source artifact_zip_sha256", source.get("artifact_zip_sha256"), 64)
+    _require_lower_hex("forensic source result_sha256", source.get("result_sha256"), 64)
+    _require_lower_hex("forensic source head_sha", source.get("head_sha"), 40)
+    _require_lower_hex("forensic source workflow_github_sha", source.get("workflow_github_sha"), 40)
     if int(source.get("workflow_run_id", 0)) != 34538432305:
         _fail("forensic workflow run identity drifted")
     if int(source.get("artifact_id", 0)) != 10176440471:
