@@ -60,8 +60,13 @@ def _validate_historical(frame: pd.DataFrame) -> pd.DataFrame:
     if missing:
         raise ValueError(f"joint-distribution frame missing fields: {sorted(missing)}")
     out = frame.copy()
-    for col in ("season", "home_win", "margin", "game_total", "spread_line", "total_line", "market_home_prob"):
-        out[col] = pd.to_numeric(out[col], errors="coerce")
+    numeric = [
+        "season", "home_win", "margin", "game_total", "spread_line", "total_line",
+        "market_home_prob", "home_score", "away_score",
+    ]
+    for col in numeric:
+        if col in out.columns:
+            out[col] = pd.to_numeric(out[col], errors="coerce")
     if out.loc[out.margin.notna() | out.game_total.notna(), "season"].ge(2026).any():
         raise ValueError("Phase 3 historical fitting refuses 2026-or-later outcomes")
     return out
@@ -73,6 +78,30 @@ def normal_crps(y: np.ndarray, mean: np.ndarray, sigma: np.ndarray) -> np.ndarra
     sigma = np.clip(np.asarray(sigma, dtype=float), 1e-6, None)
     z = (y - mean) / sigma
     return sigma * (z * (2.0 * norm.cdf(z) - 1.0) + 2.0 * norm.pdf(z) - 1.0 / sqrt(pi))
+
+
+def bivariate_normal_nll(
+    margin: np.ndarray,
+    total: np.ndarray,
+    margin_mean: np.ndarray,
+    total_mean: np.ndarray,
+    margin_sigma: float,
+    total_sigma: float,
+    rho: float,
+) -> np.ndarray:
+    margin = np.asarray(margin, dtype=float)
+    total = np.asarray(total, dtype=float)
+    margin_mean = np.asarray(margin_mean, dtype=float)
+    total_mean = np.asarray(total_mean, dtype=float)
+    sm = max(float(margin_sigma), 1e-6)
+    st = max(float(total_sigma), 1e-6)
+    r = float(np.clip(rho, -0.95, 0.95))
+    denom = max(1.0 - r * r, 1e-6)
+    zm = (margin - margin_mean) / sm
+    zt = (total - total_mean) / st
+    quadratic = (zm * zm - 2.0 * r * zm * zt + zt * zt) / denom
+    normalizer = np.log(2.0 * pi * sm * st * np.sqrt(denom))
+    return normalizer + 0.5 * quadratic
 
 
 def season_forward_joint_distribution(
@@ -132,18 +161,23 @@ def season_forward_joint_distribution(
             rho = 0.0
         rho = float(np.clip(rho, -0.95, 0.95))
 
-        margin_mean = test.spread_line.to_numpy(float) + margin_correction
-        total_mean = test.total_line.to_numpy(float) + total_correction
+        market_margin_mean = test.spread_line.to_numpy(float)
+        market_total_mean = test.total_line.to_numpy(float)
+        margin_mean = market_margin_mean + margin_correction
+        total_mean = market_total_mean + total_correction
         probability = np.clip(norm.cdf(margin_mean / margin_sigma), EPS, 1.0 - EPS)
-        market_spread_probability = np.clip(norm.cdf(test.spread_line.to_numpy(float) / margin_sigma), EPS, 1.0 - EPS)
+        market_spread_probability = np.clip(norm.cdf(market_margin_mean / margin_sigma), EPS, 1.0 - EPS)
         home_score_mean = (total_mean + margin_mean) / 2.0
         away_score_mean = (total_mean - margin_mean) / 2.0
+        market_home_score_mean = (market_total_mean + market_margin_mean) / 2.0
+        market_away_score_mean = (market_total_mean - market_margin_mean) / 2.0
         z80 = float(norm.ppf(0.9))
 
         keep = [
             c for c in (
                 "game_id", "season", "week", "gameday", "away_team", "home_team",
-                "home_win", "margin", "game_total", "spread_line", "total_line", "market_home_prob",
+                "home_win", "home_score", "away_score", "margin", "game_total",
+                "spread_line", "total_line", "market_home_prob",
             ) if c in test.columns
         ]
         part = test[keep].copy()
@@ -151,6 +185,8 @@ def season_forward_joint_distribution(
         part["candidate_total_mean"] = total_mean
         part["candidate_home_score_mean"] = home_score_mean
         part["candidate_away_score_mean"] = away_score_mean
+        part["market_home_score_mean"] = market_home_score_mean
+        part["market_away_score_mean"] = market_away_score_mean
         part["candidate_home_win_prob"] = probability
         part["market_spread_home_win_prob"] = market_spread_probability
         part["margin_sigma"] = margin_sigma
@@ -174,13 +210,25 @@ def season_forward_joint_distribution(
         part["market_margin_crps"] = normal_crps(part.margin, part.spread_line, margin_sigma)
         part["candidate_total_crps"] = normal_crps(part.game_total, part.candidate_total_mean, total_sigma)
         part["market_total_crps"] = normal_crps(part.game_total, part.total_line, total_sigma)
+        part["candidate_joint_nll"] = bivariate_normal_nll(
+            part.margin, part.game_total, part.candidate_margin_mean, part.candidate_total_mean,
+            margin_sigma, total_sigma, rho,
+        )
+        part["market_joint_nll"] = bivariate_normal_nll(
+            part.margin, part.game_total, part.spread_line, part.total_line,
+            margin_sigma, total_sigma, rho,
+        )
+        if {"home_score", "away_score"}.issubset(part.columns):
+            part["candidate_home_score_abs_error"] = np.abs(part.home_score - part.candidate_home_score_mean)
+            part["candidate_away_score_abs_error"] = np.abs(part.away_score - part.candidate_away_score_mean)
+            part["market_home_score_abs_error"] = np.abs(part.home_score - part.market_home_score_mean)
+            part["market_away_score_abs_error"] = np.abs(part.away_score - part.market_away_score_mean)
         part["margin_low_80"] = part.candidate_margin_mean - z80 * margin_sigma
         part["margin_high_80"] = part.candidate_margin_mean + z80 * margin_sigma
         part["total_low_80"] = part.candidate_total_mean - z80 * total_sigma
         part["total_high_80"] = part.candidate_total_mean + z80 * total_sigma
         part["margin_covered_80"] = part.margin.between(part.margin_low_80, part.margin_high_80)
         part["total_covered_80"] = part.game_total.between(part.total_low_80, part.total_high_80)
-        # Algebraic identities for downstream executable coherence checks.
         part["score_margin_identity_error"] = (
             (part.candidate_home_score_mean - part.candidate_away_score_mean) - part.candidate_margin_mean
         ).abs()
@@ -219,7 +267,7 @@ def summarize_joint_distribution(predictions: pd.DataFrame) -> dict[str, float]:
     market_prob = np.clip(p.market_home_prob.to_numpy(float), EPS, 1.0 - EPS)
     candidate_log_loss = -np.mean(y * np.log(candidate_prob) + (1 - y) * np.log(1 - candidate_prob))
     market_log_loss = -np.mean(y * np.log(market_prob) + (1 - y) * np.log(1 - market_prob))
-    return {
+    result = {
         "games": int(len(p)),
         "candidate_winner_accuracy": float(np.mean((candidate_prob >= 0.5) == y)),
         "market_winner_accuracy": float(np.mean((market_prob >= 0.5) == y)),
@@ -243,6 +291,9 @@ def summarize_joint_distribution(predictions: pd.DataFrame) -> dict[str, float]:
         "market_margin_crps": float(p.market_margin_crps.mean()),
         "candidate_total_crps": float(p.candidate_total_crps.mean()),
         "market_total_crps": float(p.market_total_crps.mean()),
+        "candidate_joint_nll": float(p.candidate_joint_nll.mean()),
+        "market_joint_nll": float(p.market_joint_nll.mean()),
+        "candidate_minus_market_joint_nll": float((p.candidate_joint_nll - p.market_joint_nll).mean()),
         "margin_80_coverage": float(p.margin_covered_80.mean()),
         "total_80_coverage": float(p.total_covered_80.mean()),
         "margin_cap_rate": float(p.margin_cap_hit.mean()),
@@ -251,6 +302,19 @@ def summarize_joint_distribution(predictions: pd.DataFrame) -> dict[str, float]:
             ((p.score_margin_identity_error > 1e-10) | (p.score_total_identity_error > 1e-10) | (p.probability_identity_error > 1e-12)).sum()
         ),
     }
+    if {
+        "candidate_home_score_abs_error", "candidate_away_score_abs_error",
+        "market_home_score_abs_error", "market_away_score_abs_error",
+    }.issubset(p.columns):
+        result.update(
+            {
+                "candidate_home_score_mae": float(p.candidate_home_score_abs_error.mean()),
+                "candidate_away_score_mae": float(p.candidate_away_score_abs_error.mean()),
+                "market_home_score_mae": float(p.market_home_score_abs_error.mean()),
+                "market_away_score_mae": float(p.market_away_score_abs_error.mean()),
+            }
+        )
+    return result
 
 
 def blocked_continuous_bootstrap(
