@@ -9,6 +9,8 @@ on:
       - 'research/test_point_in_time_store.py'
       - 'research/ftn_process_prereg_v1.json'
       - 'research/test_ftn_process_prereg_v1.py'
+      - 'research/weather_capture_contract_v1.json'
+      - 'research/test_weather_capture_contract_v1.py'
       - '.github/workflows/research_foundation_v2.yml'
   workflow_dispatch:
 
@@ -31,3 +33,4 @@ jobs:
           research/test_source_qualification_registry_v2.py
           research/test_point_in_time_store.py
           research/test_ftn_process_prereg_v1.py
+          research/test_weather_capture_contract_v1.py
