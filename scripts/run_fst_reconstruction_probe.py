@@ -4,8 +4,10 @@ from __future__ import annotations
 
 The probe is deliberately tiny. It validates the immutable recovered training artifact,
 refits the frozen two-input stack, enforces the <=1e-12 identity contract, and emits a
-cryptographically bound receipt. Long-lived current-week shadow scoring must consume this
-receipt from a native-CPU process rather than inherit a forced historical CPU target.
+cryptographically bound receipt. Long-lived current-week shadow scoring must consume a
+verified reconstruction receipt from a native-CPU process rather than inherit a forced
+historical CPU target. This fresh probe is intended only for compatible hardware; routine
+shadow CI may instead verify the durable compatible-hardware forensic evidence.
 """
 
 import hashlib
@@ -61,9 +63,10 @@ def run(output_dir: str | Path = DEFAULT_OUT) -> dict:
         raise RuntimeError("F-ST reconstruction probe did not reproduce frozen identity")
 
     receipt = {
-        "schema_version": 1,
+        "schema_version": 2,
         "candidate_id": FROZEN_CANDIDATE_ID,
         "status": "verified",
+        "receipt_scope": "fresh_compatible_runtime_probe",
         "source_sha": os.environ.get("GITHUB_SHA"),
         "research_only": True,
         "production_authorized": False,
@@ -78,7 +81,8 @@ def run(output_dir: str | Path = DEFAULT_OUT) -> dict:
             "rows": int(len(training)),
         },
         "spec_sha256": _sha256(SPEC_PATH),
-        "execution_policy": "strict_reconstruction_only_no_current_week_scoring",
+        "forensic_evidence_sha256": None,
+        "execution_policy": "fresh_compatible_hardware_reconstruction_only_no_current_week_scoring",
     }
     receipt_path = out / "receipt.json"
     receipt_path.write_text(
