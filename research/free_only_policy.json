@@ -1,0 +1,72 @@
+{
+  "policy_version": 1,
+  "status": "binding_research_constraint",
+  "effective_date": "2026-09-10",
+  "scope": "All future LevLine/Sunday Signal research, data collection, model development, compute and public deployment.",
+  "cost_policy": "free_only",
+  "monthly_paid_service_budget_usd": 0,
+  "paid_data_services_authorized": false,
+  "paid_compute_authorized": false,
+  "automatic_paid_upgrade_authorized": false,
+  "supersedes_legacy_paid_source_recommendations": true,
+  "principles": [
+    "Technical availability never overrides the zero-cost rule.",
+    "Source rights, point-in-time validity and reliability remain independent gates even when a source is free.",
+    "If no free point-in-time-qualified source exists, the feature remains blocked rather than substituted with hindsight data or a paid feed.",
+    "Completed 2026 game outcomes remain prohibited for model or architecture selection under the existing research firewall."
+  ],
+  "approved_zero_cost_paths": [
+    {
+      "source_id": "nflverse_open_data",
+      "roles": ["play_by_play", "rosters", "depth_charts", "weekly_ngs", "team_and_player_stats"],
+      "cost_status": "free",
+      "rights_note": "Retain source-specific attribution and redistribution controls."
+    },
+    {
+      "source_id": "ftn_charting_via_nflverse",
+      "roles": ["historical_scheme_and_execution_research"],
+      "cost_status": "free",
+      "rights_note": "CC-BY-SA-4.0 via nflverse; attribution to FTN Data via nflverse required."
+    },
+    {
+      "source_id": "nws_api",
+      "roles": ["prospective_weather_capture"],
+      "cost_status": "free",
+      "rights_note": "U.S. National Weather Service open data; preserve source attribution and do not imply endorsement."
+    },
+    {
+      "source_id": "the_odds_api_free_tier",
+      "roles": ["prospective_multibook_market_research"],
+      "cost_status": "free_tier_only",
+      "quota_policy": "Never exceed the free allocation; retain a reserve and fail closed when depleted.",
+      "endpoint_policy": "Current/live endpoints only. Paid historical endpoints are prohibited.",
+      "redistribution_policy": "Persist analytical/derived research features rather than repackaging the raw feed as a standalone data product."
+    },
+    {
+      "source_id": "github_public_standard_runners_and_pages",
+      "roles": ["research_compute", "ci", "public_static_site"],
+      "cost_status": "free_for_public_repository",
+      "compute_policy": "Standard GitHub-hosted runners only; no paid larger runners."
+    }
+  ],
+  "explicitly_excluded_paid_paths": [
+    "sportradar_weekly_injuries_v7",
+    "sportsdataio_injuries",
+    "sis_football_commercial",
+    "pff_pro_api",
+    "sumersports_subscription_stats",
+    "paid_the_odds_api_historical",
+    "paid_github_larger_runners"
+  ],
+  "availability_policy": {
+    "injury_probability_feature_status": "blocked_until_free_point_in_time_source_qualifies",
+    "free_personnel_state_path": "timestamped_nflverse_depth_charts_plus_rosters",
+    "personnel_state_is_not_injury_status": true,
+    "realized_snap_or_postgame_participation_proxy_allowed": false
+  },
+  "production_policy": {
+    "new_source_production_authorized": false,
+    "new_model_production_authorized": false,
+    "explicit_user_authorization_still_required": true
+  }
+}
