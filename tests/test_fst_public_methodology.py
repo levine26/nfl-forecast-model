@@ -1,36 +1,67 @@
 from pathlib import Path
 
 
-def test_active_site_installs_fst_production_presentation_adapter():
-    main = Path('site/src/main.jsx').read_text(encoding='utf-8')
-    assert "./fst-production-presentation.js" in main
-    assert "installFstProductionPresentationAdapter()" in main
+def _active_app() -> str:
+    return Path("site/src/AppCoherent.jsx").read_text(encoding="utf-8")
 
 
-def test_public_fst_presentation_replaces_legacy_formula_and_labels_diagnostics():
-    adapter = Path('site/src/fst-production-presentation.js').read_text(encoding='utf-8')
-    assert "Frozen F-ST-01 market + nested-PURE logit stack" in adapter
-    assert "1.19391 × logit(MARKET)" in adapter
-    assert "0.19343 × logit(F-ST NESTED PURE)" in adapter
-    assert "LEGACY PURE" in adapter
-    assert '<small>LEVLINE</small>' in adapter
-    assert '<small>LEVLINE F-ST</small>' not in adapter
-    assert "Legacy confidence" not in adapter
-    assert "Legacy model disagreement" not in adapter
-    assert "exact legacy 75/25 rule" in adapter
+def test_active_site_uses_canonical_consumer_surface_without_dom_patchers():
+    main = Path("site/src/main.jsx").read_text(encoding="utf-8")
+    assert "./AppCoherent.jsx" in main
+    assert "fst-production-presentation" not in main
+    assert "installFstProductionPresentationAdapter" not in main
+    assert "calibration-presentation" not in main
 
 
-def test_public_methodology_does_not_claim_legacy_formula_is_current_after_adapter():
-    adapter = Path('site/src/fst-production-presentation.js').read_text(encoding='utf-8')
-    assert "replaceExactText(root, '75% PURE + 25% MARKET'" in adapter
-    assert "LevLine blends 75% PURE with 25% market signal" in adapter
+def test_consumer_surface_reads_canonical_public_forecast_contract():
+    app = _active_app()
+    assert "public_forecasts.json" in app
+    assert "LEVLINE FORECAST" in app
+    assert "FOOTBALL SIGNAL" in app
+    assert "MARKET SIGNAL" in app
+    assert "coherent_fair_margin_home" in app
+    assert "official_winner_probability" in app
+    assert "FINAL PREGAME" in app
+    assert "LIVE FORECAST" in app
+    assert "IN PROGRESS" in app
+    assert "GRADED" in app
 
 
-def test_public_presentation_separates_probability_from_conflicting_margin_model():
-    adapter = Path('site/src/fst-production-presentation.js').read_text(encoding='utf-8')
-    assert "scoreWinnerFromText" in adapter
-    assert "Official pick ${pick} · separate margin model favors ${marginWinner}" in adapter
-    assert "Separate margin model favors ${marginWinner}" in adapter
-    assert "Margin-model score" in adapter
-    assert "Margin-model spread" in adapter
-    assert "The official Sunday Signal pick is the LevLine win probability shown above." in adapter
+def test_consumer_surface_retires_ambiguous_confidence_and_legacy_pure_labels():
+    app = _active_app()
+    assert "Confidence" not in app
+    assert "Coin Flip" not in app
+    assert "Solid" not in app
+    assert "High" not in app
+    assert "Legacy PURE" not in app
+    assert "LEVLINE F-ST" not in app
+    assert "F-ST LevLine" not in app
+
+
+def test_methodology_contains_current_frozen_architecture_only_in_technical_context():
+    app = _active_app()
+    assert "1.19391 × logit(P_market)" in app
+    assert "0.19343 × logit(P_nested_football)" in app
+    assert "F-ST-01-FROZEN-2026" in app
+    assert "75% PURE + 25% MARKET" not in app
+    assert "2026 outcomes" in app
+    assert "cannot select, tune or refit" in app
+    assert "fair_margin = margin_sigma × Φ⁻¹(P_home)" in app
+
+
+def test_forecast_movement_has_market_lock_and_context_markers():
+    app = _active_app()
+    assert 'name="LevLine"' in app
+    assert 'name="Market"' in app
+    assert "lock_timestamp_utc" in app
+    assert "CONTEXT ALONGSIDE MOVEMENT" in app
+    assert "not claimed as the cause" in app
+    assert "ReferenceLine" in app
+
+
+def test_model_consensus_is_progressively_disclosed_and_diagnostic():
+    app = _active_app()
+    assert "Model Consensus" in app
+    assert "component diagnostics" in app
+    assert "Component diagnostics are supporting views, not competing official forecasts." in app
+    assert "<details><summary>Model Consensus" in app
