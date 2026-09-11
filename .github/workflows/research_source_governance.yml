@@ -22,8 +22,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
       - name: Validate machine-readable source policy
-        run: pytest -q tests/test_data_source_governance.py
+        run: python -m pytest -q tests/test_data_source_governance.py
       - name: Prove source-policy PR does not modify production surfaces
         if: github.event_name == 'pull_request'
         run: |
