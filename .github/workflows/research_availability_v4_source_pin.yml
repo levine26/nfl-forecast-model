@@ -21,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install source-audit runtime
-        run: pip install pandas
+        run: pip install pandas beautifulsoup4
 
       - name: Capture exact weekly-roster assets and verify postseason coverage
         shell: bash
@@ -38,11 +38,15 @@ jobs:
           import hashlib
           import json
           from pathlib import Path
+          import sys
           import pandas as pd
+
+          sys.path.insert(0, 'src')
+          from nfl_forecast.availability_2025_reconstruction import normalize_team
 
           out = Path('research_outputs/availability_v4_source_pin')
           raw = out / 'raw'
-          required = {
+          required_schedule = {
               2023: {
                   20: {'BAL','HOU','BUF','KC','DET','TB','GB','SF'},
                   21: {'BAL','KC','DET','SF'},
@@ -51,6 +55,13 @@ jobs:
               2024: {
                   20: {'KC','HOU','DET','WAS','PHI','LAR','BUF','BAL'},
               },
+          }
+          required = {
+              season: {
+                  week: {normalize_team(team) for team in teams}
+                  for week, teams in weeks.items()
+              }
+              for season, weeks in required_schedule.items()
           }
           asset_ids = {2023: 156614676, 2024: 237398162}
           urls = {
@@ -69,20 +80,22 @@ jobs:
                   raise SystemExit(f'{season} weekly roster missing required identity columns: {missing}')
               frame = frame.loc[pd.to_numeric(frame['season'], errors='coerce').eq(season)].copy()
               frame['week'] = pd.to_numeric(frame['week'], errors='coerce').astype('Int64')
+              frame['source_team'] = frame['team'].astype('string')
+              frame['team'] = frame['team'].map(normalize_team)
               coverage = {}
               for week, teams in sorted(required[season].items()):
                   week_rows = frame.loc[frame['week'].eq(week)].copy()
                   present = set(week_rows['team'].dropna().astype(str))
                   missing_teams = sorted(teams - present)
                   if missing_teams:
-                      raise SystemExit(f'{season} week {week} weekly roster missing teams: {missing_teams}')
+                      raise SystemExit(f'{season} week {week} weekly roster missing normalized teams: {missing_teams}')
                   coverage[str(week)] = {
                       team: int((week_rows['team'].astype(str) == team).sum())
                       for team in sorted(teams)
                   }
                   keep = week_rows.loc[
                       week_rows['team'].astype(str).isin(teams),
-                      ['season','week','team','gsis_id','full_name','first_name','last_name','football_name'],
+                      ['season','week','source_team','team','gsis_id','full_name','first_name','last_name','football_name'],
                   ].copy()
                   keep['source_asset_id'] = asset_ids[season]
                   identity_slices.append(keep)
@@ -99,7 +112,16 @@ jobs:
           combined.to_csv(out / 'postseason_identity_slice.csv', index=False)
           receipt = {
               'purpose': 'Pre-execution source pin only. No availability qualification, model fitting, outcomes, snaps, or production behavior are evaluated.',
-              'allowed_identity_fields': ['season','week','team','gsis_id','full_name','first_name','last_name','football_name'],
+              'team_normalization': 'nfl_forecast.availability_2025_reconstruction.normalize_team applied to both schedule expectations and roster source teams',
+              'schedule_expected_team_codes': {
+                  str(season): {str(week): sorted(teams) for week, teams in weeks.items()}
+                  for season, weeks in required_schedule.items()
+              },
+              'normalized_expected_team_codes': {
+                  str(season): {str(week): sorted(teams) for week, teams in weeks.items()}
+                  for season, weeks in required.items()
+              },
+              'allowed_identity_fields': ['season','week','source_team','team','gsis_id','full_name','first_name','last_name','football_name'],
               'forbidden_for_v4_identity_decisions': ['status','position','depth_chart_position','snaps','participation','game_outcomes'],
               'sources': receipts,
           }
