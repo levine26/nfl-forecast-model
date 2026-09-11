@@ -39,6 +39,20 @@ def _schedule() -> pd.DataFrame:
                 "away_moneyline": None,
             },
             {
+                "game_id": "2025_19_GGG_HHH",
+                "season": 2025,
+                "week": 19,
+                "game_type": "WC",
+                "gameday": "2026-01-10",
+                "gametime": "20:00",
+                "home_team": "HHH",
+                "away_team": "GGG",
+                "home_score": 27,
+                "away_score": 17,
+                "home_moneyline": -150,
+                "away_moneyline": 130,
+            },
+            {
                 "game_id": "2025_00_EEE_FFF",
                 "season": 2025,
                 "week": 0,
@@ -59,8 +73,15 @@ def _schedule() -> pd.DataFrame:
 def test_source_schedule_scope_does_not_require_market_benchmark_eligibility() -> None:
     schedule_scope, evaluation_games = prepare_schedule_frames(_schedule())
 
-    assert set(schedule_scope["game_id"]) == {"2025_01_AAA_BBB", "2025_02_CCC_DDD"}
-    assert set(evaluation_games["game_id"]) == {"2025_01_AAA_BBB"}
+    assert set(schedule_scope["game_id"]) == {
+        "2025_01_AAA_BBB",
+        "2025_02_CCC_DDD",
+        "2025_19_GGG_HHH",
+    }
+    assert set(evaluation_games["game_id"]) == {
+        "2025_01_AAA_BBB",
+        "2025_19_GGG_HHH",
+    }
     assert "market_home_prob" not in schedule_scope.columns
     assert evaluation_games["market_home_prob"].notna().all()
 
@@ -114,3 +135,23 @@ def test_ftn_history_game_without_moneyline_still_has_chronology_identity() -> N
     # schedule would orphan an otherwise valid prior FTN source game.
     with pytest.raises(RuntimeError, match="missing schedule identity"):
         aggregate_ftn_team_games(joined, evaluation_games)
+
+
+@pytest.mark.parametrize("source_game_type", ["WC", "DIV", "CON", "SB", "POST"])
+def test_postseason_source_labels_map_to_preregistered_post(source_game_type: str) -> None:
+    row = _schedule().iloc[[0]].copy()
+    row.loc[:, "game_id"] = f"2025_19_AAA_BBB_{source_game_type}"
+    row.loc[:, "week"] = 19
+    row.loc[:, "game_type"] = source_game_type
+
+    schedule_scope, evaluation_games = prepare_schedule_frames(row)
+
+    assert len(schedule_scope) == 1
+    assert len(evaluation_games) == 1
+    assert schedule_scope.iloc[0]["game_type"] == source_game_type
+
+
+def test_preseason_remains_outside_preregistered_scope() -> None:
+    preseason = _schedule()[_schedule()["game_type"].eq("PRE")].copy()
+    with pytest.raises(RuntimeError, match="no 2022-2025 REG/POST schedule identity rows"):
+        prepare_schedule_frames(preseason)
