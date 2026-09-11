@@ -1,6 +1,6 @@
 # LevLine 3.0 — Production Release Contract
 
-LevLine 3.0 is the public-product release of the canonical coherent forecast layer used by Sunday Signal.
+LevLine 3.0 is the production release of the canonical coherent forecast and publication layer used by Sunday Signal. This launch lane is deliberately non-visual: it does not redesign, restyle, rebrand, or otherwise change the Sunday Signal UI. UI/UX work is isolated to a separate effort.
 
 ## Production invariants
 
@@ -13,21 +13,22 @@ LevLine 3.0 is the public-product release of the canonical coherent forecast lay
 - Independent margin-model output remains diagnostic and is not relabeled as the official public expected margin.
 - Research-only player/impact signals remain explainability-only unless separately authorized for probability production.
 
-## Public product
+## Publication/runtime scope
 
-Sunday Signal is the publication surface, powered by LevLine 3.0. The active site exposes:
+Sunday Signal remains the existing publication surface. LevLine 3.0 changes only the forecast/publication contract and editorial research runtime behind that surface:
 
-- weekly canonical forecasts;
-- per-game signal decomposition and market comparison;
-- forecast movement and timestamp provenance;
-- methodology and technical provenance;
-- team and power-rating context; and
-- immutable 2026 forecast history and grading.
+- weekly canonical forecast semantics remain coherent and fail closed;
+- deterministic numerical explanation uses the frozen F-ST signal, vig-free market signal, official probability, probability-implied presentation line, and coherent score;
+- stale fixed 75% PURE / 25% market wording is removed from the publication path;
+- qualitative media research moves from GitHub Copilot runtime to Groq Compound with approved-domain web research and strict source validation; and
+- existing immutable 2026 history, grading, locks, methodology, and data-contract behavior are preserved.
+
+No `site/` source, style, component, asset, or responsive-test file is part of this release diff.
 
 ## Version semantics
 
-`LevLine 3.0` is the product/release version. The canonical public forecast payload's `contract_version` is a separate schema version and is intentionally not changed by this launch.
+`LevLine 3.0` is the backend/publication release version. The canonical public forecast payload's `contract_version` is a separate schema version and is intentionally not changed by this launch.
 
 ## Release gate
 
-The launch is eligible to merge only after the existing GitHub Pages build and responsive Playwright workflow pass against the launch branch. Those workflows rebuild the canonical public forecast artifact from production outputs before testing the site.
+The launch is eligible to merge only after the existing model, research-firewall, dashboard-build, responsive, contextual-intelligence, editorial-provider, and production-deployment workflows pass against the launch branch. After merge, the existing site must still deploy successfully without any visual-source changes, and a real Groq-powered full-slate editorial refresh on `main` must clear the publication gates before LevLine 3.0 is considered fully launched.
