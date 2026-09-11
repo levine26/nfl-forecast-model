@@ -6,10 +6,14 @@ on:
     paths:
       - 'site/**'
       - 'outputs/**'
+      - 'src/nfl_forecast/public_forecast.py'
+      - 'scripts/build_public_forecasts.py'
       - '.github/workflows/dashboard.yml'
   pull_request:
     paths:
       - 'site/**'
+      - 'src/nfl_forecast/public_forecast.py'
+      - 'scripts/build_public_forecasts.py'
       - '.github/workflows/dashboard.yml'
   workflow_run:
     workflows:
@@ -58,6 +62,8 @@ jobs:
             power_editorial.json history_scoreboard.json; do
             if [ -f "outputs/$f" ]; then cp "outputs/$f" "site/public/data/$f"; fi
           done
+      - name: Build and validate canonical public forecasts
+        run: python scripts/build_public_forecasts.py --output site/public/data/public_forecasts.json
       - name: Install dashboard dependencies
         working-directory: site
         run: npm install
