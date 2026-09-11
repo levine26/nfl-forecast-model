@@ -1,10 +1,110 @@
 {
   "candidate_id": "F-ST-01-FROZEN-2026",
-  "status": "awaiting_graded_games",
-  "games": 0,
-  "weeks": 0,
+  "status": "accumulating_prospective_evidence",
+  "primary_metric": "brier",
+  "games": 1,
+  "weeks": 1,
   "excluded_prefreeze_rows": 0,
+  "metrics": {
+    "fst": {
+      "games": 1,
+      "winner_pct": 0.0,
+      "brier": 0.39467477445431853,
+      "log_loss": 0.9894838379033009
+    },
+    "production": {
+      "games": 1,
+      "winner_pct": 0.0,
+      "brier": 0.3803582419382764,
+      "log_loss": 0.9590205462381374
+    },
+    "market": {
+      "games": 1,
+      "winner_pct": 0.0,
+      "brier": 0.4056469366594596,
+      "log_loss": 1.0130885172740531
+    },
+    "pure": {
+      "games": 1,
+      "winner_pct": 0.0,
+      "brier": 0.3574874602664102,
+      "log_loss": 0.911060808822213
+    }
+  },
+  "calibration": {
+    "fst": {
+      "games": 1,
+      "calibration_intercept": NaN,
+      "calibration_slope": NaN
+    },
+    "production": {
+      "games": 1,
+      "calibration_intercept": NaN,
+      "calibration_slope": NaN
+    },
+    "market": {
+      "games": 1,
+      "calibration_intercept": NaN,
+      "calibration_slope": NaN
+    },
+    "pure": {
+      "games": 1,
+      "calibration_intercept": NaN,
+      "calibration_slope": NaN
+    }
+  },
+  "paired": {
+    "fst_minus_production_brier": 0.014316532516042146,
+    "fst_minus_market_brier": -0.010972162205141078,
+    "production_week_block_bootstrap": {
+      "metric": "brier",
+      "candidate": "challenger_final_home_prob",
+      "reference": "production_final_home_prob",
+      "block": "season+week",
+      "observed_delta": 0.014316532516042146,
+      "ci_lower": 0.014316532516042146,
+      "ci_upper": 0.014316532516042146,
+      "probability_better": 0.0,
+      "samples": 10000
+    },
+    "market_week_block_bootstrap": {
+      "metric": "brier",
+      "candidate": "challenger_final_home_prob",
+      "reference": "market_home_prob_t120",
+      "block": "season+week",
+      "observed_delta": -0.010972162205141078,
+      "ci_lower": -0.010972162205141078,
+      "ci_upper": -0.010972162205141078,
+      "probability_better": 1.0,
+      "samples": 10000
+    }
+  },
+  "diagnostic_slices": {
+    "fst_market_pick_disagreement": {
+      "games": 0
+    },
+    "fst_production_pick_disagreement": {
+      "games": 0
+    },
+    "fst_high_confidence": {
+      "games": 0
+    },
+    "mean_abs_probability_disagreement_vs_market": 0.008672716026953964,
+    "mean_abs_probability_disagreement_vs_production": 0.011499561240069345
+  },
+  "promotion_gate": {
+    "minimum_games": 200,
+    "minimum_weeks": 14,
+    "minimum_evidence_met": false,
+    "A_vs_production_pass": false,
+    "B_market_noninferiority_margin": 0.0025,
+    "B_vs_market_pass": true,
+    "C_median_weekly_delta": 0.014316532516042146,
+    "C_leave_one_week_out_all_negative": false,
+    "C_week_coherence_pass": false
+  },
   "promotion_gate_passed": false,
   "promotion_authorized": false,
+  "secondary_metrics_can_rescue_primary_failure": false,
   "2026_outcomes_used_for_model_tuning": 0
 }
