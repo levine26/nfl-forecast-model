@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "experiment": "2022-2025 availability harmonization V4 official-club postseason source audit",
+  "disposition": "FAIL_CLOSED_COMPLETE",
+  "qualification_executed": false,
+  "production_authorized": false,
+  "closed_utc": "2026-09-11T22:15:00Z",
+  "closeout_reason": "The identity source is fully pinned and covers every preregistered postseason team-week, but a deterministic complete official-club final injury-report row source could not be established for every affected matchup. The contract forbids inferring healthy status from absence, mixing incomplete narrative pages into row-level state, or relaxing the 1.0 fallback qualification requirement. Therefore V4 terminates before any model fitting or availability qualification.",
+  "identity_source": {
+    "status": "PASS",
+    "workflow_run_id": 34651572686,
+    "artifact_id": 10283897946,
+    "artifact_name": "availability-v4-weekly-roster-source-pin",
+    "allowed_fields": [
+      "season",
+      "week",
+      "source_team",
+      "team",
+      "gsis_id",
+      "full_name",
+      "first_name",
+      "last_name",
+      "football_name"
+    ],
+    "forbidden_identity_decision_fields": [
+      "status",
+      "position",
+      "depth_chart_position",
+      "snaps",
+      "participation",
+      "game_outcomes"
+    ],
+    "team_normalization": "nfl_forecast.availability_2025_reconstruction.normalize_team applied to schedule expectations and roster source teams",
+    "sources": {
+      "2023": {
+        "release_tag": "weekly_rosters",
+        "asset_id": 156614676,
+        "asset_name": "roster_weekly_2023.csv",
+        "bytes": 14612235,
+        "sha256": "1433f1f239784dde7fcb35349d211a9b83abfc0156337b72ec4f923abf715bd3",
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2023.csv"
+      },
+      "2024": {
+        "release_tag": "weekly_rosters",
+        "asset_id": 237398162,
+        "asset_name": "roster_weekly_2024.csv",
+        "bytes": 14926918,
+        "sha256": "074ecaeb9325de943c11f7bbc941425626985090ef8386f90cd837fa5cb5d4b3",
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2024.csv"
+      }
+    },
+    "required_team_week_coverage": {
+      "2023": {
+        "20": ["BAL", "BUF", "DET", "GB", "HOU", "KC", "SF", "TB"],
+        "21": ["BAL", "DET", "KC", "SF"],
+        "22": ["KC", "SF"]
+      },
+      "2024": {
+        "20": ["BAL", "BUF", "DET", "HOU", "KC", "LA", "PHI", "WAS"]
+      }
+    }
+  },
+  "official_club_source_audit": {
+    "required_rule": "Every affected matchup must have complete official-club final injury-report state for both teams, with source publication available before that game's T-120 boundary. Complementary official team pages are allowed; narrative-only or partial pages are not row-complete evidence.",
+    "verified_complete_examples": [
+      {
+        "season": 2023,
+        "week": 20,
+        "matchup": "GB-SF",
+        "url": "https://www.packers.com/news/packers-49ers-injury-report-jan-18-2024",
+        "note": "Official Packers final report exposes both Green Bay and San Francisco row tables."
+      },
+      {
+        "season": 2023,
+        "week": 20,
+        "matchup": "TB-DET",
+        "url": "https://www.buccaneers.com/news/buccaneers-lions-injury-report-jan-19-divisional-round-2023-2024-playoffs",
+        "note": "Official Buccaneers final report exposes both Tampa Bay and Detroit rows."
+      },
+      {
+        "season": 2023,
+        "week": 20,
+        "matchup": "KC-BUF",
+        "url": "https://www.chiefs.com/news/divisional-playoff-injury-report-chiefs-vs-bills",
+        "note": "Official Chiefs report exposes both Kansas City and Buffalo rows."
+      },
+      {
+        "season": 2023,
+        "week": 21,
+        "matchup": "KC-BAL",
+        "url": "https://www.chiefs.com/news/afc-championship-injury-report-chiefs-vs-ravens",
+        "note": "Official Chiefs final report exposes both Kansas City and Baltimore row tables."
+      },
+      {
+        "season": 2023,
+        "week": 22,
+        "matchup": "KC-SF",
+        "url": "https://www.chiefs.com/news/super-bowl-lviii-injury-report-chiefs-vs-49ers",
+        "note": "Official Chiefs final report exposes both Kansas City and San Francisco row tables."
+      },
+      {
+        "season": 2024,
+        "week": 20,
+        "matchup": "KC-HOU",
+        "url": "https://www.chiefs.com/news/divisional-round-injury-report-chiefs-vs-texans",
+        "note": "Official Chiefs final report exposes both Kansas City and Houston row tables."
+      }
+    ],
+    "blocking_matchups": [
+      {
+        "season": 2023,
+        "week": 20,
+        "matchup": "HOU-BAL",
+        "reason": "The official Texans game page exposes an injury-report surface but the audited public text did not provide a deterministic complete final row table for both clubs, and no complementary row-complete official-club source was established under the source audit."
+      },
+      {
+        "season": 2024,
+        "week": 20,
+        "matchup": "WAS-DET",
+        "reason": "The audited Lions final page is Detroit-only; the Commanders material found during the source audit did not provide a deterministically captured complete final row table suitable for the row-level contract."
+      },
+      {
+        "season": 2024,
+        "week": 20,
+        "matchup": "BAL-BUF",
+        "reason": "The audited Bills final injury-report article is narrative/embedded-report oriented rather than a complete machine-readable row table, and no complementary complete official-club row source was established."
+      }
+    ],
+    "nonblocking_complementary_case": {
+      "season": 2023,
+      "week": 21,
+      "matchup": "DET-SF",
+      "note": "Official Lions and 49ers final pages can be complementary, but V4 is already fail-closed because other required matchups lack deterministic complete sources."
+    }
+  },
+  "safety_assertions": {
+    "no_2026_outcomes_used": true,
+    "no_realized_snap_or_postgame_participation_used": true,
+    "no_threshold_relaxed": true,
+    "no_production_model_change": true,
+    "no_fst_change": true,
+    "no_site_or_generated_forecast_change": true,
+    "no_healthy_from_absence_inference": true
+  },
+  "terminal_policy": "This V4 failure is a completed research result. Do not create V5/V6 solely to force qualification. Reopen only if a new, independently verifiable, complete official historical source is identified for every blocking matchup before any downstream qualification metrics are inspected."
+}
