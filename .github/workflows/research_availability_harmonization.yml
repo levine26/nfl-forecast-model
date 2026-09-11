@@ -8,7 +8,9 @@ on:
       - 'research/availability/2025_reconstruction_qualification_v1.json'
       - 'research/availability_harmonization_v1.py'
       - 'research/run_availability_harmonization_v1.py'
+      - 'research/run_availability_harmonization_repaired_v1.py'
       - 'research/test_availability_harmonization_v1.py'
+      - 'research/test_availability_harmonization_repaired_v1.py'
       - 'scripts/reconstruct_2025_availability.py'
       - 'src/nfl_forecast/availability_2025_reconstruction.py'
   workflow_dispatch:
@@ -34,6 +36,7 @@ jobs:
         run: >-
           pytest -q
           research/test_availability_harmonization_v1.py
+          research/test_availability_harmonization_repaired_v1.py
           tests/test_availability_2025_reconstruction.py
           tests/test_availability_qualification.py
 
@@ -45,7 +48,7 @@ jobs:
 
       - name: Audit harmonized 2022-2025 source contract
         run: >-
-          python -m research.run_availability_harmonization_v1
+          python -m research.run_availability_harmonization_repaired_v1
           --output-dir research_outputs/availability_2022_2025_harmonization
           --reconstruction-2025-dir research_outputs/availability_2025_reconstruction
           --require-qualified
