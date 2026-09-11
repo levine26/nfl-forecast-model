@@ -1,0 +1,50 @@
+name: Sunday Signal responsive validation
+
+on:
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'outputs/**'
+      - 'src/nfl_forecast/public_forecast.py'
+      - 'scripts/build_public_forecasts.py'
+      - '.github/workflows/responsive.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package.json
+      - name: Stage published data
+        run: |
+          mkdir -p site/public/data
+          cp outputs/*.csv site/public/data/ 2>/dev/null || true
+          cp outputs/*.json site/public/data/ 2>/dev/null || true
+          python scripts/build_public_forecasts.py --output site/public/data/public_forecasts.json
+      - name: Install dashboard dependencies
+        working-directory: site
+        run: npm install
+      - name: Install browser
+        working-directory: site
+        run: npx playwright install --with-deps chromium
+      - name: Build dashboard
+        working-directory: site
+        run: npm run build
+      - name: Test first-class viewports
+        working-directory: site
+        run: npm run test:responsive
+      - name: Upload browser diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-browser-diagnostics
+          path: site/test-results
+          if-no-files-found: ignore
