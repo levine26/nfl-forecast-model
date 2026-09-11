@@ -1,7 +1,8 @@
 import { readdir, stat } from 'node:fs/promises'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const DIST=new URL('../dist/assets/',import.meta.url)
+const DIST=fileURLToPath(new URL('../dist/assets/',import.meta.url))
 const LIMITS={js:350*1024,css:100*1024}
 
 async function files(dir){
