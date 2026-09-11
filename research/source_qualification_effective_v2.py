@@ -8,15 +8,73 @@ from typing import Any
 
 REGISTRY_PATH = Path("research/source_qualification_registry_v2.json")
 SLEEPER_OVERRIDE_PATH = Path("research/sleeper_archive_qualification_v1.json")
+INTEGRITY_POLICY_PATH = Path("research/source_integrity_qualification_policy_v1.json")
+
+_RIGHTS_MARKERS = (
+    "license",
+    "licensing",
+    "rights boundary",
+    "redistribution",
+    "commercial use",
+    "commercial/public",
+    "public product use",
+    "public display",
+    "declared license",
+)
 
 
 def _load(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def effective_policy() -> dict[str, Any]:
+    """Return the qualification policy actually enforced by research code.
+
+    The raw registry remains an auditable historical record.  This effective policy
+    supersedes its old combined rights/point-in-time fail-closed flag: licensing and
+    redistribution constraints are metadata, never technical qualification blockers.
+    Point-in-time and other data-integrity failures remain fail-closed.
+    """
+
+    registry = _load(REGISTRY_PATH)
+    overlay = _load(INTEGRITY_POLICY_PATH)
+    policy = copy.deepcopy(registry["policy"])
+    policy["qualification_basis"] = overlay["qualification_basis"]
+    policy["rights_and_licensing"] = copy.deepcopy(overlay["rights_and_licensing"])
+    policy["technical_blocker_categories"] = list(overlay["technical_blocker_categories"])
+    policy["non_qualification_constraints"] = list(overlay["non_qualification_constraints"])
+    policy["completed_2026_outcome_model_selection_allowed"] = overlay[
+        "completed_2026_outcome_model_selection_allowed"
+    ]
+    policy["zero_cost_research_policy_preserved"] = overlay["zero_cost_research_policy_preserved"]
+    policy["fail_closed_on_rights_or_point_in_time_failure"] = False
+    policy["fail_closed_on_rights_failure"] = False
+    policy["fail_closed_on_point_in_time_failure"] = True
+    return policy
+
+
+def _rights_governance_note(text: str) -> bool:
+    lowered = text.lower()
+    return any(marker in lowered for marker in _RIGHTS_MARKERS)
+
+
+def _apply_integrity_policy(row: dict[str, Any]) -> dict[str, Any]:
+    effective = copy.deepcopy(row)
+    known_failures = [str(item) for item in (effective.get("known_source_failures") or [])]
+    rights_notes = [item for item in known_failures if _rights_governance_note(item)]
+    technical_failures = [item for item in known_failures if not _rights_governance_note(item)]
+
+    effective["qualification_basis"] = "DATA_INTEGRITY_ONLY"
+    effective["rights_qualification_blocker"] = False
+    effective["rights_metadata_retained"] = True
+    effective["technical_known_source_failures"] = technical_failures
+    effective["rights_governance_notes"] = rights_notes
+    return effective
+
+
 def effective_sources() -> list[dict[str, Any]]:
     registry = _load(REGISTRY_PATH)
-    sources = copy.deepcopy(registry["sources"])
+    sources = [_apply_integrity_policy(item) for item in registry["sources"]]
     override = _load(SLEEPER_OVERRIDE_PATH)
     if override.get("supersedes_registry_block_for_technical_research") is not True:
         return sources
@@ -45,6 +103,17 @@ def effective_sources() -> list[dict[str, Any]]:
     ]
     row["supports_production_dependency"] = scope["supports_production_dependency"]
     row["qualification_override"] = str(SLEEPER_OVERRIDE_PATH)
+    row["qualification_basis"] = "DATA_INTEGRITY_ONLY"
+    row["rights_qualification_blocker"] = False
+    row["technical_known_source_failures"] = [
+        "no 2025 historical coverage",
+        "collector commit time is a conservative persistence bound rather than an official provider publication timestamp",
+    ]
+    row["technical_limitations"] = [
+        "2025 reconstruction is unsupported",
+        "snapshot commit time must be no later than the simulated decision timestamp",
+        "completed-2026 outcomes may not be used for model, feature, architecture, hyperparameter or threshold selection",
+    ]
     return sources
 
 
