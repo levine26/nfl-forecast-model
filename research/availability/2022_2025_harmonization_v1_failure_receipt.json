@@ -1,0 +1,32 @@
+{
+  "record_version": 1,
+  "audit_id": "AVAILABILITY-HARMONIZATION-V1",
+  "status": "failed_identity_gate",
+  "source_contract": "research/availability/2022_2025_harmonization_contract_v1.json",
+  "authoritative_pr": 145,
+  "head_sha": "7330a9fb569e64faa3ea45bcc292920d9fb54ea3",
+  "workflow_run_id": 34646328171,
+  "artifact_id": 10281944671,
+  "artifact_zip_sha256": "65ef4096c41d0f8e47391b61a1e7749243c0999db3e1d844696940cda6e2a337",
+  "result": {
+    "season": 2022,
+    "gate": "official_to_nflverse_stable_identity_resolution",
+    "official_distinct_rows": 5683,
+    "official_unique_stable_identity_rows": 5543,
+    "official_unresolved_identity_rows": 140,
+    "unresolved_unique_official_names": 46,
+    "observed_rate": 0.9753651240541967,
+    "required_minimum": 0.995,
+    "qualified": false
+  },
+  "interpretation": "The v1 source/state contract failed before model fitting or scoring because exact-full-name / unique-abbreviated-name matching could not resolve enough official NFL rows to stable GSIS IDs. Inspection of unresolved evidence showed many deterministic name variants (for example Foley/Folorunso Fatukasi, Kam/Kamren Curl, Riq/Tariq Woolen, Joe/Joseph Noteboom), but the v1 contract did not authorize a broader alias source. The threshold is not relaxed and v1 remains failed.",
+  "what_did_not_happen": {
+    "v09b_fitted": false,
+    "model_or_game_outcome_metrics_used_to_rescue": false,
+    "completed_2026_outcomes_consulted": false,
+    "probability_feature_authorized": false,
+    "production_authorized": false,
+    "threshold_changed": false
+  },
+  "next_allowed_step": "A separately versioned preregistration may add a technically qualified stable identity dictionary. It must preserve the original source-state and chronology gates, use exact deterministic alias-to-GSIS resolution only, and fail closed on ambiguous identity."
+}

@@ -1,0 +1,84 @@
+name: LevLine availability harmonization research
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_availability_harmonization.yml'
+      - 'research/availability/2022_2025_harmonization_contract_v1.json'
+      - 'research/availability/2022_2025_harmonization_contract_v2.json'
+      - 'research/availability/2022_2025_harmonization_v1_failure_receipt.json'
+      - 'research/availability/2022_2025_harmonization_implementation_repairs_v1.json'
+      - 'research/availability/2025_reconstruction_qualification_v1.json'
+      - 'research/availability_harmonization_v1.py'
+      - 'research/availability_identity_v2.py'
+      - 'research/run_availability_harmonization_v1.py'
+      - 'research/run_availability_harmonization_repaired_v1.py'
+      - 'research/run_availability_harmonization_v2.py'
+      - 'research/test_availability_harmonization_v1.py'
+      - 'research/test_availability_harmonization_repaired_v1.py'
+      - 'research/test_availability_identity_v2.py'
+      - 'scripts/reconstruct_2025_availability.py'
+      - 'src/nfl_forecast/availability_2025_reconstruction.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  harmonize-availability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install research runtime
+        run: pip install '.[dev]'
+
+      - name: Test preregistered harmonization and identity semantics
+        run: >-
+          pytest -q
+          research/test_availability_harmonization_v1.py
+          research/test_availability_harmonization_repaired_v1.py
+          research/test_availability_identity_v2.py
+          tests/test_availability_2025_reconstruction.py
+          tests/test_availability_qualification.py
+
+      - name: Reconstruct already-qualified 2025 state
+        run: >-
+          python scripts/reconstruct_2025_availability.py
+          --output-dir research_outputs/availability_2025_reconstruction
+          --require-qualified
+
+      - name: Audit harmonized 2022-2025 source contract v2
+        run: >-
+          python -m research.run_availability_harmonization_v2
+          --output-dir research_outputs/availability_2022_2025_harmonization
+          --reconstruction-2025-dir research_outputs/availability_2025_reconstruction
+          --require-qualified
+
+      - name: Prove harmonization did not modify production surfaces
+        run: |
+          git diff --exit-code -- \
+            src/nfl_forecast/pipeline.py \
+            src/nfl_forecast/models.py \
+            src/nfl_forecast/features.py \
+            src/nfl_forecast/fst_production.py \
+            src/nfl_forecast/fst_nested_pure.py \
+            outputs/ \
+            challenger_outputs/ \
+            site/
+
+      - name: Upload source captures and harmonization diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: availability-2022-2025-harmonization-v2
+          path: |
+            research_outputs/availability_2025_reconstruction/
+            research_outputs/availability_2022_2025_harmonization/
+          if-no-files-found: warn
+          retention-days: 90
