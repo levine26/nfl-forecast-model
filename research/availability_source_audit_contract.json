@@ -1,7 +1,7 @@
 {
-  "contract_version": 2,
+  "contract_version": 3,
   "status": "research_governance",
-  "purpose": "Define the minimum data-integrity evidence a player-availability source must provide before LevLine may consider historical or prospective model research at a pregame horizon.",
+  "purpose": "Define the minimum data-integrity evidence a player-availability source must provide before LevLine may consider historical or prospective model research at a pregame horizon, and record the currently qualified narrow scopes without conflating source qualification with model authorization.",
   "qualification_basis": "DATA_INTEGRITY_ONLY",
   "rights_qualification_blocker": false,
   "zero_cost_active_research_only": true,
@@ -26,27 +26,50 @@
   ],
   "qualification_tests": {
     "stable_identity": "At least 99.5% of status rows in each validation season map unambiguously to stable LevLine/nflverse player IDs; unresolved identities remain missing rather than name-guessed.",
-    "target_season_coverage": "Point-in-time evidence must cover every intended validation season, including 2025, before a 2022-2025 backtest is allowed. A source may still qualify for a narrower prospective or 2026-only scope when its actual coverage supports that scope.",
-    "revision_semantics": "The source must prove whether historical queries expose the status that existed at T-120 rather than only the latest/final retrospective status. If revisions cannot be reconstructed, fail closed for that historical scope.",
-    "timestamp_parseability": "At least 99.5% of rows used for horizon qualification must have a parseable source-effective/update timestamp or equivalent versioned snapshot timestamp.",
+    "target_season_coverage": "Point-in-time evidence must cover every intended validation season, including 2025, before a 2022-2025 backtest is allowed. A source may still qualify for a narrower historical, prospective, or 2026-only scope when its actual coverage supports that scope.",
+    "cross_season_harmonization": "Narrow per-season source qualification is insufficient for a multi-season probability experiment. One preregistered 2022-2025 contract must prove consistent chronology, identity, missingness, status normalization, and feature construction before fitting or scoring V09B or any successor availability candidate.",
+    "revision_semantics": "The source must prove whether historical queries expose the status that existed at T-120 rather than only the latest/final retrospective status. If revisions cannot be reconstructed, fail closed for that historical scope or restrict the qualified target to fields independently proven known by T-120.",
+    "timestamp_parseability": "At least 99.5% of rows used for horizon qualification must have a parseable source-effective/update timestamp or equivalent versioned snapshot timestamp, or a conservative official filing-time bound that is itself documented and reproducible.",
     "pregame_only": "Rows learned after the tested game kickoff cannot be used to construct that game's availability feature.",
     "no_realized_participation_proxy": "Actual snaps, actual participation, postgame workload and final inactive status learned after kickoff are prohibited substitutes.",
     "missingness_reporting": "Per-season/team/position missingness and source outages must be reported; missing status cannot silently mean healthy/active.",
     "revision_audit_sample": "For a manually reviewed sample spanning multiple teams/weeks/seasons, reconstruct source states at several pregame times and compare with archived/versioned evidence.",
     "reproducibility": "The exact source revision or immutable local capture used by a research row must be recoverable and independently auditable."
   },
-  "active_zero_cost_candidate_priority": [
+  "qualified_zero_cost_scopes": [
     {
-      "source_id": "sleeper_historical_player_archive_candidate",
-      "priority": 1,
-      "scope": "2026_only_point_in_time_and_prospective_shadow",
-      "reason": "Verified public snapshot history begins 2026-02-01 and supports all-position player-state auditing with conservative Git-commit availability bounds. It cannot reconstruct 2025 and therefore cannot unlock a 2022-2025 historical availability backtest."
+      "source_id": "availability_2025_composite_reconstruction",
+      "scope": "2025_weeks_1_22_historical_practice_state_known_before_t120",
+      "technical_status": "VERIFIED",
+      "qualification_record": "research/availability/2025_reconstruction_qualification_v1.json",
+      "probability_feature_authorized": false,
+      "production_dependency_authorized": false,
+      "supports_2022_2025_unified_backtest": false,
+      "note": "Qualified target is injury listing plus final practice state conservatively known before T-120. Final game designation remains diagnostic-only; four unresolved player-week rows fail closed."
     },
     {
-      "source_id": "nfl_official_injury_reports",
+      "source_id": "sleeper_historical_player_archive_candidate",
+      "scope": "2026_only_point_in_time_and_prospective_shadow",
+      "technical_status": "VERIFIED",
+      "qualification_record": "research/sleeper_archive_qualification_v1.json",
+      "probability_feature_authorized": false,
+      "production_dependency_authorized": false,
+      "supports_2025_reconstruction": false,
+      "note": "Verified public snapshot history begins 2026-02-01. This source remains 2026-only and is not retroactively reinterpreted as a 2025 archive."
+    }
+  ],
+  "active_zero_cost_candidate_priority": [
+    {
+      "source_id": "cross_season_availability_harmonization_2022_2025",
+      "priority": 1,
+      "scope": "research_contract_only_before_any_v09b_execution",
+      "reason": "The former 2025 source-coverage blocker is resolved, but a single 2022-2025 chronology/identity/missingness/status-normalization contract has not yet been proven. No model fitting is authorized until that contract passes."
+    },
+    {
+      "source_id": "sleeper_historical_player_archive_candidate",
       "priority": 2,
-      "scope": "prospective_reference_and_explainability",
-      "reason": "Strong current reference, but rendered historical pages alone do not establish stable IDs or exact T-120 revision state."
+      "scope": "2026_only_point_in_time_and_prospective_shadow",
+      "reason": "Continue prospective all-position player-state auditing under conservative Git-commit availability bounds without using completed-2026 outcomes for selection."
     }
   ],
   "inactive_nonzero_cost_candidates": [
@@ -60,11 +83,17 @@
     }
   ],
   "fail_closed_outcomes": [
-    "no historical availability model fitting when target-season point-in-time evidence is incomplete",
+    "no multi-season historical availability model fitting until the intended validation seasons share one proven point-in-time feature contract",
     "no availability probability feature when identity/timing/reproducibility gates fail",
     "no imputation from realized current-game snaps",
+    "no retroactive execution or rewriting of a previously blocked experiment merely because a later source qualification resolves one blocker",
     "current status may remain explanatory context when its data integrity supports that narrower role"
   ],
+  "historical_resolution_records": [
+    "research/availability/V09B_source_blocker_resolution_v1.json"
+  ],
   "rights_metadata_policy": "Licensing, usage-rights and redistribution metadata may be recorded for governance but never changes technical qualification.",
-  "production_authorized": false
+  "player_availability_probability_feature_authorized": false,
+  "production_authorized": false,
+  "completed_2026_outcome_model_selection_allowed": false
 }

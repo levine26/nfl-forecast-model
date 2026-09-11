@@ -1,0 +1,83 @@
+{
+  "record_version": 1,
+  "source_id": "availability_2025_composite_reconstruction",
+  "technical_status": "VERIFIED",
+  "research_classification": "QUALIFIED_RESEARCH_2025_ONLY",
+  "qualification_basis": "DATA_INTEGRITY_ONLY",
+  "cost": "$0",
+  "research_source_qualified": true,
+  "probability_feature_authorized": false,
+  "production_dependency_authorized": false,
+  "historical_game_status_feature_authorized": false,
+  "completed_2026_outcome_model_selection_allowed": false,
+  "supports_2025_reconstruction": true,
+  "supports_2022_2025_unified_backtest": false,
+  "supports_prospective_2026_capture": false,
+  "qualification_scope": "2025 Weeks 1-22 injury listing plus final practice-report state conservatively proven known before T-120",
+  "chronology_policy": "official_game_status_report_day_eod_eastern_before_t120",
+  "identity_policy": "stable GSIS identity from pinned nflverse 2025 injury asset; exact normalized full-name cross-check with unique initial+surname fallback only for genuinely abbreviated external names; ambiguous or failed identities remain unresolved",
+  "source_set": [
+    {
+      "source": "nflverse_injuries_2025",
+      "role": "stable identity and canonical weekly injury/practice state",
+      "sha256": "873ca1606dd575bd01152508a243ef6b3a0f8f97b90b707217e62ee8c7ceb735",
+      "rows": 6068
+    },
+    {
+      "source": "nfl_com_official_historical_injury_pages",
+      "role": "primary independent all-22-week cross-check",
+      "regular_pages": 18,
+      "postseason_pages": 4,
+      "rows": 6068
+    },
+    {
+      "source": "nflverse_schedule_capture",
+      "role": "game identity and kickoff chronology",
+      "sha256": "ec2c893f5cdc891af343020de0ced12cd0849fda8a6ab398e2f84f54afe5d36e"
+    },
+    {
+      "source": "footballdb_regular_github_mirror_supplemental",
+      "role": "supplemental immutable day-by-day evidence only; not a completeness dependency",
+      "observed_2025_weeks": [1,2,3,4,5,6,7,8,9,10,11,12],
+      "git_blob_sha1": "24568d807792e04739d17b2421e5e6f62cc74d68",
+      "sha256": "82f7c4beeaa21112a2da20a2961af24834cfd01df5ced253ad8b93cb9a6a26ef"
+    }
+  ],
+  "qualification_metrics": {
+    "nflverse_rows": 6068,
+    "external_crosscheck_rows": 6068,
+    "identity_match_rows": 6064,
+    "identity_match_rate": 0.999340804218853,
+    "practice_status_agreement_rate": 1.0,
+    "diagnostic_game_status_agreement_rate": 1.0,
+    "known_by_t120_rate_among_matched_rows": 1.0,
+    "fully_qualified_practice_state_rate": 0.999340804218853,
+    "unresolved_practice_state_rows": 4,
+    "actual_snaps_used": 0,
+    "postgame_participation_used": 0,
+    "completed_2026_outcomes_used": 0
+  },
+  "exact_head_evidence": {
+    "pull_request": 142,
+    "validated_head_sha": "75a4a901a6273b1312e89129d24cda1988727101",
+    "merged_main_sha": "e89c368c2d0d829a118b263283930157b543f0c6",
+    "workflow_run_id": 34641207110,
+    "artifact_id": 10279962642,
+    "artifact_zip_sha256": "8f5a0c5a98602de857d9823133797a52e3f92a8fd8a387ffbd41fd00995dcf44",
+    "canonical_csv_sha256": "02b8cb8214fcfa95e649ccbf46a07988211a275008fcb86820f89caceabb5e2a",
+    "unresolved_csv_sha256": "2e0741851ab93cbbc036362b83755c3b7fa2d001c303a6553cb352da2d0935cf",
+    "official_crosscheck_csv_sha256": "4ab53908425829b2809749689b77bd8f5d8c0b11f40bb7295230e8fe384867ad",
+    "qualification_json_sha256": "7d8b817d9f391ecc18ac7b834af467baf290c245bfc3b1ab87b3d6ad3fc32a1b",
+    "source_manifest_sha256": "521910458d2f2af34b03d1a1019c9e5a00564c5c73ad03dc433ca3b20037e7df"
+  },
+  "technical_limitations": [
+    "The qualified historical target is injury listing plus final practice-report state known before T-120; final game designation is diagnostic only and is not authorized as a model feature.",
+    "Four player-week rows remain unresolved and fail closed rather than using unsafe identity guesses.",
+    "This receipt qualifies 2025 only. A single harmonized 2022-2025 chronology, identity, missingness, and feature-construction contract must be proven before any cross-season availability probability experiment is executed.",
+    "Source qualification does not authorize a probability feature, production dependency, candidate promotion, or any use of completed-2026 outcomes for selection."
+  ],
+  "contracts": [
+    "research/availability/2025_reconstruction_contract.json",
+    "research/availability_source_audit_contract.json"
+  ]
+}

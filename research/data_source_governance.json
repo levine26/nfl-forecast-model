@@ -1,5 +1,5 @@
 {
-  "registry_version": 2,
+  "registry_version": 3,
   "status": "research_governance",
   "generated_for": "LevLine / Sunday Signal",
   "qualification_basis": "DATA_INTEGRITY_ONLY",
@@ -103,6 +103,25 @@
       "documentation": ["https://docs.kalshi.com/"]
     },
     {
+      "source_id": "availability_2025_composite_reconstruction",
+      "family": "availability",
+      "provider": "Pinned nflverse 2025 injuries + official NFL.com historical injury pages; FootballDB-derived GitHub mirror supplemental",
+      "intended_role": ["2025_historical_pregame_practice_state", "cross_season_availability_harmonization_input"],
+      "current_levline_use": true,
+      "technical_status": "verified_2025_only",
+      "identity_status": "6064 of 6068 canonical player-week rows resolve unambiguously; four unresolved rows fail closed",
+      "point_in_time_status": "official filing day conservatively bounded at 23:59:59 America/New_York and required to precede T-120; matched-row chronology rate is 1.0",
+      "coverage_note": "2025 Weeks 1-22; 18 official regular-season pages plus four postseason pages; final game designation is diagnostic-only and not feature-authorized",
+      "rights_status": "metadata_only: source-specific rights and public-display decisions remain separate from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": true,
+      "production_eligibility": "not_authorized_research_source_only",
+      "probability_feature_authorized": false,
+      "supports_2022_2025_unified_backtest": false,
+      "qualification_record": "research/availability/2025_reconstruction_qualification_v1.json",
+      "documentation": ["research/availability/2025_reconstruction_contract.json", "research/availability/2025_reconstruction_qualification_v1.json"]
+    },
+    {
       "source_id": "sleeper_historical_player_archive_candidate",
       "family": "availability",
       "provider": "edgecdec/declan-fantasy-football public GitHub snapshot archive",
@@ -111,7 +130,7 @@
       "technical_status": "verified_2026_only",
       "identity_status": "all-position audit requires >=99.5% unambiguous identity resolution",
       "point_in_time_status": "Git commit time is a conservative persistence bound and must not exceed the simulated decision timestamp",
-      "coverage_note": "Snapshot history begins 2026-02-01; no 2025 reconstruction is supported.",
+      "coverage_note": "Snapshot history begins 2026-02-01; this source itself supports no 2025 reconstruction.",
       "rights_status": "metadata_only: repository/API rights metadata retained separately from technical qualification",
       "rights_qualification_blocker": false,
       "zero_cost_eligible": true,
@@ -122,14 +141,14 @@
       "source_id": "nfl_official_injury_reports",
       "family": "availability",
       "provider": "NFL.com",
-      "intended_role": ["prospective_availability_reference", "player_impact_explainability"],
-      "current_levline_use": false,
-      "technical_status": "prospective_reference_available",
-      "identity_status": "rendered historical tables do not satisfy the existing stable-ID research contract by themselves",
-      "point_in_time_status": "retrospective T-minus reconstruction not qualified from rendered historical pages alone",
+      "intended_role": ["2025_composite_primary_crosscheck", "prospective_availability_reference", "player_impact_explainability"],
+      "current_levline_use": true,
+      "technical_status": "qualified_component_of_2025_composite_and_prospective_reference",
+      "identity_status": "historical page rows are crosswalked fail-closed to pinned GSIS identity inside the 2025 composite; standalone rendered pages do not supply stable IDs",
+      "point_in_time_status": "2025 final practice state is qualified under conservative official filing-day chronology; final game designation remains diagnostic-only rather than a revision-aware historical feature",
       "rights_status": "metadata_only: public-reference redistribution posture recorded separately",
       "rights_qualification_blocker": false,
-      "production_eligibility": "explainability_reference_only_until_identity_and_point_in_time_audit_pass"
+      "production_eligibility": "not_authorized_research_component_and_explainability_reference_only"
     },
     {
       "source_id": "sportradar_weekly_injuries_v7",
@@ -198,7 +217,7 @@
   "family_rules": {
     "sportsbooks": "May be aggregated only after each source is independently de-vigged and timestamped. Preserve per-book provenance and source count.",
     "prediction_exchanges": "Never mix into sportsbook consensus by default. Evaluate as a separate information family with liquidity and microstructure controls.",
-    "availability": "Pregame player availability must be point-in-time reproducible, stable-ID mapped, and known by the tested forecast horizon. Actual snaps/participation are prohibited proxies.",
+    "availability": "Pregame player availability must be point-in-time reproducible, stable-ID mapped, and known by the tested forecast horizon. Actual snaps/participation are prohibited proxies. Narrow source qualification does not authorize cross-season feature equivalence or model use.",
     "advanced_player_statistics": "Observed player metrics require explicit source provenance, point-in-time validity and reproducibility before quantitative use. Rights metadata is non-blocking for technical qualification and remains separate display/governance metadata.",
     "historical_vs_prospective": "Closing historical markets may benchmark information quality but cannot establish the best T-minus lock horizon. Lock-horizon selection requires prospective matched-horizon observations."
   },
@@ -208,11 +227,15 @@
     "current_nflverse_market_role": "opaque_upstream_benchmark",
     "polymarket_role": "separate_research_candidate",
     "kalshi_role": "separate_research_candidate_pending_data_integrity_audit",
-    "recommended_first_availability_audit": "sleeper_historical_player_archive_candidate",
-    "availability_scope_note": "Sleeper archive is 2026-only; no zero-cost source currently qualifies a 2022-2025 availability backtest.",
+    "recommended_first_availability_audit": "cross_season_availability_harmonization_2022_2025",
+    "availability_scope_note": "The 2025 composite is technically qualified for research and the Sleeper archive remains 2026-only. A unified 2022-2025 availability backtest is still blocked pending one harmonized chronology/identity/missingness/status-normalization contract.",
+    "availability_2025_source_qualified": true,
+    "availability_2022_2025_unified_backtest_authorized": false,
+    "v09b_execution_authorized": false,
     "pff_active_research_status": "excluded_by_zero_cost_policy",
     "rights_qualification_blocker": false,
     "player_availability_probability_feature_authorized": false,
+    "completed_2026_outcome_model_selection_allowed": false,
     "production_market_source_change_authorized": false
   }
 }
