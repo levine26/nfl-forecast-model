@@ -1,0 +1,39 @@
+name: LevLine Impact Monitor research
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/player_impact_monitor.py'
+      - 'tests/test_player_impact_monitor.py'
+      - 'docs/IMPACT_MONITOR_GAP_ANALYSIS.md'
+      - '.github/workflows/research_impact_monitor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test Impact Monitor publication contract
+        run: pytest -q tests/test_player_impact_cards.py tests/test_player_impact_engine.py tests/test_player_impact_monitor.py
+      - name: Prove probability and public production surfaces are untouched
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          BASE="origin/${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only "$BASE...HEAD")
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -E '^(outputs/|site/|src/nfl_forecast/(pipeline|models|features|fst_production|probability_strategy|public_forecast|publish|market|market_t120|lock_verify)\.py$|scripts/(run_week|refresh_market|pregame_due|verify_pregame_lock)\.py$)'; then
+            echo 'Impact Monitor research touched a production surface.' >&2
+            exit 1
+          fi
