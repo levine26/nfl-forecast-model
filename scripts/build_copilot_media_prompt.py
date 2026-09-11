@@ -96,7 +96,7 @@ PARAGRAPH 1 — THE MATCHUP
 Write 55-100 words explaining how the game is likely to be decided. Identify the actual football tension: quarterback situation, protection/pass rush, coverage matchup, explosive plays, early-down efficiency, run-game leverage, injuries, coaching changes, travel/weather, or another concrete factor. Current reporting should inform the paragraph, but NEVER copy article headlines into prose and NEVER write "according to [outlet]" sentence after sentence. Synthesize the reporting into one coherent preview. Discuss both teams and explain what each side needs to do.
 
 MODEL_RATIONALE — CONTEXT ONLY
-Write 18-40 words tying one or two verified football factors to the LevLine side. This is contextual support only. Do NOT include any number, percentage, spread, projected score, PURE value, market value, F-ST value, model line, blend/weight formula, the word moneyline, or a final pick sentence. The research packet intentionally contains no LevLine numerical internals. Deterministic code owns those facts and will build paragraph 2 after your response.
+Write 18-40 words tying one or two verified football factors to the selected side. Do NOT use the word LevLine in this field. This is contextual support only. Do NOT include any number, percentage, spread, projected score, PURE value, market value, F-ST value, model line, blend/weight formula, the word moneyline, or a final pick sentence. The research packet intentionally contains no LevLine numerical internals. Deterministic code owns those facts and will build paragraph 2 after your response.
 
 VOICE
 - Human NFL analyst: clear, confident, conversational, specific.
@@ -123,7 +123,7 @@ SOURCE RULES — STRICT
 
 OUTPUT
 Return ONLY one syntactically valid JSON object, no Markdown and no commentary, with exactly this schema:
-{"games":{"GAME_ID":{"headline":"matchup-oriented headline","paragraph1":"55-100 word matchup preview","model_rationale":"18-40 words, context only, no numbers","sources":[{"name":"ESPN","title":"article/report title","url":"https://www.espn.com/..."},{"name":"NFL.com","title":"article/report title","url":"https://www.nfl.com/..."}]}}}
+{"games":{"GAME_ID":{"headline":"matchup-oriented headline","paragraph1":"55-100 word matchup preview","model_rationale":"18-40 words, context only, no numbers or model terms","sources":[{"name":"ESPN","title":"article/report title","url":"https://www.espn.com/..."},{"name":"NFL.com","title":"article/report title","url":"https://www.nfl.com/..."}]}}}
 Every supplied game_id must appear exactly once.
 
 CRITICAL SERIALIZATION RULES
