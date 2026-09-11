@@ -5,10 +5,15 @@ from pathlib import Path
 
 
 REGISTRY = Path("research/data_source_governance.json")
+ADVANCED_REGISTRY = Path("research/advanced_player_source_governance.json")
 
 
 def _payload() -> dict:
     return json.loads(REGISTRY.read_text(encoding="utf-8"))
+
+
+def _advanced_payload() -> dict:
+    return json.loads(ADVANCED_REGISTRY.read_text(encoding="utf-8"))
 
 
 def test_every_source_has_explicit_family_rights_and_production_status() -> None:
@@ -59,3 +64,19 @@ def test_availability_and_advanced_player_sources_remain_firewalled() -> None:
     assert all(row["production_eligibility"] != "authorized" for row in availability + advanced)
     assert payload["current_decisions"]["recommended_first_availability_audit"] == "sportradar_weekly_injuries_v7"
     assert payload["current_decisions"]["pff_public_use"] == "not_authorized_under_consumer_api_terms"
+
+
+def test_advanced_source_registry_prefers_clear_rights_and_never_authorizes_production() -> None:
+    payload = _advanced_payload()
+    assert payload["status"] == "research_governance"
+    assert payload["production_authorized"] is False
+    sources = payload["sources"]
+    ids = [row["source_id"] for row in sources]
+    assert len(ids) == len(set(ids))
+    assert all(row.get("provider") and row.get("family") for row in sources)
+    assert all(row.get("production_eligibility") == "not_authorized" for row in sources)
+    by_id = {row["source_id"]: row for row in sources}
+    assert "CC-BY-SA-4.0" in by_id["ftn_charting_via_nflverse"]["license_status"]
+    assert "commercial license" in by_id["sis_football_commercial"]["rights_status"].lower()
+    assert "not a storage" in by_id["sumersports_subscription_stats"]["rights_status"]
+    assert "proprietary" in by_id["direct_nfl_ngs_tracking"]["rights_status"].lower()
