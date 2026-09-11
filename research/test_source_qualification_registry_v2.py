@@ -62,12 +62,17 @@ def test_every_source_has_complete_qualification_record_and_unique_id() -> None:
         assert str(row["cost"]).startswith("$0")
 
 
-def test_sleeper_archive_remains_blocked_until_independently_verified() -> None:
+def test_sleeper_archive_remains_blocked_after_locating_short_unlicensed_candidate() -> None:
     row = next(r for r in _sources() if r["source_id"] == "sleeper_historical_player_archive_candidate")
     assert row["classification"] == "BLOCKED"
     assert row["historical_research"] is False
+    assert row["prospective_use"] is False
     assert row["probability_features"] is False
+    assert row["current_2026_support"] is True
+    assert "2026-02-01" in row["historical_coverage"]
+    assert "no declared license" in " ".join(row["known_source_failures"]).lower()
     assert ">=99.5%" in row["reopen_condition"]
+    assert "different archive" in row["reopen_condition"].lower()
 
 
 def test_sleeper_live_rights_boundary_prevents_probability_or_public_use() -> None:
