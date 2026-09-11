@@ -290,9 +290,18 @@ jobs:
           assert fst['research_method'].eq('stack').all()
           assert fst['training_last_season'].le(2025).all()
           assert fst['training_data_sha256'].eq(registered['training_data_sha256']).all()
-          assert fst['stack_intercept'].eq(registered['intercept']).all()
-          assert fst['stack_market_logit_coefficient'].eq(registered['market_logit_coefficient']).all()
-          assert fst['stack_pure_logit_coefficient'].eq(registered['pure_logit_coefficient']).all()
+          csv_float_atol = 1e-15
+          for col, key in [
+              ('stack_intercept', 'intercept'),
+              ('stack_market_logit_coefficient', 'market_logit_coefficient'),
+              ('stack_pure_logit_coefficient', 'pure_logit_coefficient'),
+          ]:
+              assert np.allclose(
+                  pd.to_numeric(fst[col], errors='raise'),
+                  registered[key],
+                  rtol=0.0,
+                  atol=csv_float_atol,
+              ), col
 
           selected_per_game = slate.groupby('game_id')['selected_shadow_candidate'].sum()
           assert selected_per_game.eq(1).all()
