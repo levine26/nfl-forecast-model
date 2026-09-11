@@ -10,6 +10,10 @@ import numpy as np
 import pandas as pd
 
 from nfl_forecast.challenger_evaluation import calibration_diagnostics, forecast_metrics
+from nfl_forecast.challenger_market_incremental import (
+    incremental_uncertainty,
+    walk_forward_incremental_stack,
+)
 from nfl_forecast.challenger_market_reliance import (
     DEFAULT_MARKET_WEIGHTS,
     TARGET_SEASONS,
@@ -24,6 +28,7 @@ from nfl_forecast.challenger_market_reliance import (
     walk_forward_weight_backtest,
 )
 from nfl_forecast.fst_nested_pure import load_frozen_training_frame
+from nfl_forecast.fst_production import frozen_fst_probability, load_fst_artifact
 
 
 def _json_records(frame: pd.DataFrame) -> list[dict]:
@@ -49,11 +54,41 @@ def _fixed_grid(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
                     "pooling": pooling,
                     "market_weight": float(market_weight),
                     "pure_weight": float(1.0 - market_weight),
+                    "chronology_status": "fixed_rule_descriptive",
                     **metrics,
                     **calibration,
                 }
             )
+
+    # Exact deployed F-ST is a necessary comparator, but its coefficients were frozen from
+    # the full eligible 2020-25 OOF training frame. Scoring those same historical seasons
+    # with those coefficients is therefore descriptive, not a walk-forward meta-model test.
+    artifact = load_fst_artifact()
+    predictions["fst_frozen_descriptive"] = frozen_fst_probability(
+        target.market_prob.to_numpy(dtype=float),
+        target.pure_prob.to_numpy(dtype=float),
+        artifact,
+    )
+    metrics = forecast_metrics(predictions, "fst_frozen_descriptive")
+    calibration, _ = calibration_diagnostics(predictions, "fst_frozen_descriptive")
+    rows.append(
+        {
+            "candidate": "fst_frozen_descriptive",
+            "pooling": "frozen_logistic_stack",
+            "market_weight": np.nan,
+            "pure_weight": np.nan,
+            "chronology_status": "descriptive_not_out_of_sample_meta_fit",
+            **metrics,
+            **calibration,
+        }
+    )
     return predictions, pd.DataFrame(rows).sort_values(["brier", "log_loss", "candidate"])
+
+
+def _metric_row(frame: pd.DataFrame, label: str, column: str) -> dict:
+    metrics = forecast_metrics(frame, column)
+    calibration, _ = calibration_diagnostics(frame, column)
+    return {"candidate": label, **metrics, **calibration}
 
 
 def run(output_dir: str, bootstrap_samples: int = 2000) -> dict:
@@ -68,8 +103,14 @@ def run(output_dir: str, bootstrap_samples: int = 2000) -> dict:
     fixed_predictions, fixed_metrics = _fixed_grid(historical)
     fixed_predictions.to_csv(out / "fixed_candidate_predictions_2022_2025.csv", index=False)
     fixed_metrics.to_csv(out / "fixed_candidate_metrics.csv", index=False)
+    fst_vs_market = compare_candidate_to_market(
+        historical,
+        fixed_predictions["fst_frozen_descriptive"],
+        bootstrap_samples=bootstrap_samples,
+        seed=326,
+    )
+    fst_vs_market.to_csv(out / "fst_frozen_descriptive_vs_market_uncertainty.csv", index=False)
 
-    wf_predictions: dict[str, pd.DataFrame] = {}
     wf_selections: list[pd.DataFrame] = []
     wf_metrics: list[dict] = []
     uncertainty: list[pd.DataFrame] = []
@@ -78,7 +119,6 @@ def run(output_dir: str, bootstrap_samples: int = 2000) -> dict:
         pred, selections = walk_forward_weight_backtest(historical, pooling=pooling)
         pred.to_csv(out / f"walk_forward_{pooling}_predictions.csv", index=False)
         selections.to_csv(out / f"walk_forward_{pooling}_selections.csv", index=False)
-        wf_predictions[pooling] = pred
         wf_selections.append(selections)
         metrics = forecast_metrics(pred, "probability")
         calibration, _ = calibration_diagnostics(pred, "probability")
@@ -99,10 +139,51 @@ def run(output_dir: str, bootstrap_samples: int = 2000) -> dict:
         buckets.insert(0, "candidate", f"walk_forward_{pooling}")
         bucket_tables.append(buckets)
 
-    pd.concat(wf_selections, ignore_index=True).to_csv(out / "walk_forward_weight_selections.csv", index=False)
-    pd.DataFrame(wf_metrics).sort_values("brier").to_csv(out / "walk_forward_metrics.csv", index=False)
+    all_wf_selections = pd.concat(wf_selections, ignore_index=True)
+    all_wf_selections.to_csv(out / "walk_forward_weight_selections.csv", index=False)
+    wf_metric_frame = pd.DataFrame(wf_metrics).sort_values("brier")
+    wf_metric_frame.to_csv(out / "walk_forward_metrics.csv", index=False)
     pd.concat(uncertainty, ignore_index=True).to_csv(out / "walk_forward_vs_market_uncertainty.csv", index=False)
     pd.concat(bucket_tables, ignore_index=True).to_csv(out / "disagreement_buckets.csv", index=False)
+
+    # Direct incremental-information test: calibrate market alone on earlier seasons, then
+    # compare it with a market+football stack fit on exactly the same earlier seasons.
+    incremental_predictions, incremental_coefficients = walk_forward_incremental_stack(historical)
+    incremental_predictions.to_csv(out / "incremental_signal_predictions.csv", index=False)
+    incremental_coefficients.to_csv(out / "incremental_signal_coefficients.csv", index=False)
+    incremental_metrics = pd.DataFrame(
+        [
+            _metric_row(incremental_predictions, "raw_market", "market_prob"),
+            _metric_row(
+                incremental_predictions,
+                "walk_forward_calibrated_market",
+                "market_calibrated_prob",
+            ),
+            _metric_row(
+                incremental_predictions,
+                "walk_forward_market_plus_football",
+                "market_plus_pure_prob",
+            ),
+            _metric_row(incremental_predictions, "football_only", "pure_prob"),
+        ]
+    ).sort_values("brier")
+    incremental_metrics.to_csv(out / "incremental_signal_metrics.csv", index=False)
+    incremental_bootstrap = incremental_uncertainty(
+        incremental_predictions,
+        bootstrap_samples=bootstrap_samples,
+        seed=526,
+    )
+    incremental_bootstrap.to_csv(out / "incremental_signal_uncertainty.csv", index=False)
+    incremental_buckets = disagreement_buckets(
+        incremental_predictions,
+        [
+            "pure_prob",
+            "market_prob",
+            "market_calibrated_prob",
+            "market_plus_pure_prob",
+        ],
+    )
+    incremental_buckets.to_csv(out / "incremental_signal_disagreement_buckets.csv", index=False)
 
     run_history_path = Path("outputs/run_history.csv")
     lock_history_path = Path("outputs/prediction_history.csv")
@@ -137,8 +218,18 @@ def run(output_dir: str, bootstrap_samples: int = 2000) -> dict:
         "historical_games": int(len(historical)),
         "target_seasons": list(TARGET_SEASONS),
         "fixed_candidates": _json_records(fixed_metrics),
-        "walk_forward_candidates": wf_metrics,
-        "walk_forward_weight_selections": _json_records(pd.concat(wf_selections, ignore_index=True)),
+        "frozen_fst_historical_status": "descriptive_not_out_of_sample_meta_fit",
+        "frozen_fst_vs_market_uncertainty": _json_records(fst_vs_market),
+        "walk_forward_candidates": _json_records(wf_metric_frame),
+        "walk_forward_weight_selections": _json_records(all_wf_selections),
+        "incremental_information_test": {
+            "purpose": (
+                "Test whether football adds out-of-sample information after a market-only calibration model is already fit on the same earlier seasons."
+            ),
+            "metrics": _json_records(incremental_metrics),
+            "season_coefficients": _json_records(incremental_coefficients),
+            "uncertainty": _json_records(incremental_bootstrap),
+        },
         "forecast_horizon_research": {
             "tracked_horizons_minutes": [120, 90, 60, 45, 30, 25, 15],
             "preserve_preweek_pick": True,
@@ -149,7 +240,7 @@ def run(output_dir: str, bootstrap_samples: int = 2000) -> dict:
             "lock_policy_changed": False,
         },
         "decision_rule": (
-            "Do not change F-ST or the official lock horizon from 120 minutes unless chronology-preserving historical evidence and prospective matched-horizon evidence show a material, uncertainty-supported accuracy improvement without unacceptable missing/stale data risk."
+            "Do not change F-ST, its market source, or the official lock horizon from 120 minutes unless chronology-preserving historical evidence and prospective matched-horizon/source evidence show a material, uncertainty-supported accuracy improvement without unacceptable missing/stale data risk."
         ),
     }
     (out / "phase2_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
