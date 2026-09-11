@@ -89,22 +89,24 @@ jobs:
         run: |
           set -euo pipefail
           context_seen=0
-          for discovery in 1 2 3 4; do
+          for discovery in $(seq 1 12); do
             state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
             echo "context discovery $discovery: $state"
             if [ "$state" != "missing" ]; then context_seen=1; break; fi
             sleep 5
           done
-          if [ "$context_seen" -eq 1 ]; then
-            for attempt in $(seq 1 40); do
-              state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
-              echo "context run: $state"
-              if [ "$state" = "completed:success" ]; then break; fi
-              if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then echo "Context refresh failed; refusing stale media research."; exit 1; fi
-              if [ "$attempt" -eq 40 ]; then echo "Timed out waiting for matching context refresh."; exit 1; fi
-              sleep 15
-            done
+          if [ "$context_seen" -ne 1 ]; then
+            echo "Matching contextual-intelligence run was not discovered; refusing to research against stale context."
+            exit 1
           fi
+          for attempt in $(seq 1 40); do
+            state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
+            echo "context run: $state"
+            if [ "$state" = "completed:success" ]; then break; fi
+            if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then echo "Context refresh failed; refusing stale media research."; exit 1; fi
+            if [ "$attempt" -eq 40 ]; then echo "Timed out waiting for matching context refresh."; exit 1; fi
+            sleep 15
+          done
           git fetch origin main
           git reset --hard origin/main
 
@@ -201,7 +203,9 @@ jobs:
           assert 'scripts/run_groq_media_prompt.py' in text
           assert 'src/nfl_forecast/editorial_model_read.py' in text
           assert 'executed_tools' in runner and 'web_search' in runner and 'visit_website' in runner
-          print('Groq provider migration and web-research wiring validated without consuming repository secrets on PR.')
+          assert 'refusing to research against stale context' in text
+          assert 'unexpected_main_changes' in text
+          print('Groq provider migration, freshness, and web-research wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
@@ -210,7 +214,16 @@ jobs:
           set -euo pipefail
           git fetch origin main
           if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
-            echo "Main advanced during Groq research; rebuilding deterministic editorial facts on latest main."
+            echo "Main advanced during Groq research; auditing whether only market-owned outputs changed."
+            changed_main_files=$(git diff --name-only HEAD..origin/main)
+            printf '%s\n' "$changed_main_files"
+            unexpected_main_changes=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(outputs/this_week\.csv|outputs/run_history\.csv|outputs/status\.json|outputs/market_t120_research\.csv)$' || true)
+            if [ -n "$unexpected_main_changes" ]; then
+              echo "Main advanced in non-market files; refusing to reuse stale Groq research:"
+              printf '%s\n' "$unexpected_main_changes"
+              exit 1
+            fi
+            echo "Only market-owned outputs advanced; rebuilding deterministic editorial facts on latest main."
             git reset --hard origin/main
             python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
             cp /tmp/editorial_predictions.csv outputs/this_week.csv
