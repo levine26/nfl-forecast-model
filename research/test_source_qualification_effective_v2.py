@@ -30,7 +30,7 @@ def test_sleeper_archive_effective_qualification_is_verified_2026_research() -> 
     assert row["rights_qualification_blocker"] is False
     assert "2026-02-01+" in row["historical_coverage"]
     assert "shadow research" in row["probability_features"]
-    assert "no declared license" in row["license_usage_rights"]
+    assert "no license" in row["license_usage_rights"].lower()
     assert all("license" not in failure.lower() for failure in row["technical_known_source_failures"])
     assert any("2025" in limitation for limitation in row["technical_limitations"])
 
