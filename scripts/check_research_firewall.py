@@ -16,6 +16,7 @@ ALLOWED_PREFIXES = (
     "research_outputs/",
     "research/",
     "docs/LEVLINE_RESEARCH",
+    "docs/IMPACT_MONITOR_GAP_ANALYSIS.md",
     "scripts/check_research_firewall.py",
     "scripts/run_challenger",
     "scripts/run_player_state_research.py",
@@ -26,6 +27,7 @@ ALLOWED_PREFIXES = (
     "src/nfl_forecast/player_state_research.py",
     "src/nfl_forecast/player_impact_cards.py",
     "src/nfl_forecast/player_impact_engine.py",
+    "src/nfl_forecast/player_impact_monitor.py",
     "src/nfl_forecast/availability_qualification.py",
     "tests/test_challenger",
     "tests/test_experiment_registry.py",
@@ -33,6 +35,7 @@ ALLOWED_PREFIXES = (
     "tests/test_player_state_research.py",
     "tests/test_player_impact_cards.py",
     "tests/test_player_impact_engine.py",
+    "tests/test_player_impact_monitor.py",
     "tests/test_availability_qualification.py",
 )
 
