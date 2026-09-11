@@ -20,6 +20,7 @@ from research.market_capture_v2 import consensus_row, due_horizons, normalize_bo
 
 API_URL = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
 EXPECTED_REQUEST_COST = 3  # h2h + spreads + totals in one region
+MAX_EVENT_KICKOFF_DELTA_MINUTES = 30.0
 TEAM_ABBR = {
     "Arizona Cardinals": "ARI", "Atlanta Falcons": "ATL", "Baltimore Ravens": "BAL",
     "Buffalo Bills": "BUF", "Carolina Panthers": "CAR", "Chicago Bears": "CHI",
@@ -40,6 +41,50 @@ def kickoff_utc(gameday: object, gametime: object) -> datetime:
         f"{str(gameday)[:10]} {str(gametime)[:5]}", "%Y-%m-%d %H:%M"
     ).replace(tzinfo=ZoneInfo("America/New_York"))
     return local.astimezone(timezone.utc)
+
+
+def _parse_provider_kickoff(value: object) -> datetime | None:
+    if value is None:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _match_event(
+    events: list[dict],
+    *,
+    away_team: str,
+    home_team: str,
+    kickoff_timestamp_utc: datetime,
+) -> dict | None:
+    """Resolve one provider event by team identity and kickoff-time proximity.
+
+    Team identity alone is insufficient because the endpoint can contain a later
+    rematch. Missing provider kickoff times and ambiguous candidates fail closed.
+    """
+    target = kickoff_timestamp_utc.astimezone(timezone.utc)
+    candidates: list[tuple[float, dict]] = []
+    for event in events:
+        matchup = (
+            TEAM_ABBR.get(str(event.get("away_team"))),
+            TEAM_ABBR.get(str(event.get("home_team"))),
+        )
+        if matchup != (away_team, home_team):
+            continue
+        provider_kickoff = _parse_provider_kickoff(event.get("commence_time"))
+        if provider_kickoff is None:
+            continue
+        delta_minutes = abs((provider_kickoff - target).total_seconds()) / 60.0
+        if delta_minutes <= MAX_EVENT_KICKOFF_DELTA_MINUTES:
+            candidates.append((delta_minutes, event))
+    if len(candidates) != 1:
+        return None
+    return candidates[0][1]
 
 
 def _status(path: Path) -> dict:
@@ -63,7 +108,7 @@ def _captured_pairs(path: Path) -> set[tuple[str, str]]:
     """Return only horizons closed by a qualifying multi-book consensus row.
 
     Book rows, one-book consensus rows, and legacy ledgers without a source_count
-    field never close a horizon.  They remain append-only evidence and the collector
+    field never close a horizon. They remain append-only evidence and the collector
     may retry while the preregistered timing window is still open.
     """
     if not path.exists():
@@ -159,18 +204,20 @@ def capture(
     )
     response.raise_for_status()
     events = response.json()
-    event_map = {}
-    for event in events:
-        matchup = (TEAM_ABBR.get(str(event.get("away_team"))), TEAM_ABBR.get(str(event.get("home_team"))))
-        if None not in matchup:
-            event_map[matchup] = event
+    if not isinstance(events, list):
+        raise RuntimeError("The Odds API response must be a list of events")
 
     rows: list[dict] = []
     missed: list[str] = []
     for item in due:
-        event = event_map.get((item["away_team"], item["home_team"]))
+        event = _match_event(
+            events,
+            away_team=item["away_team"],
+            home_team=item["home_team"],
+            kickoff_timestamp_utc=item["kickoff_timestamp_utc"],
+        )
         if not event:
-            missed.append(f"{item['game_id']}:{item['horizon']}:event_not_found")
+            missed.append(f"{item['game_id']}:{item['horizon']}:event_identity_unresolved")
             continue
         book_rows = []
         for bookmaker in event.get("bookmakers", []):
