@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-"""Launch F-ST-01 shadow scoring natively after a strict reconstruction probe passes.
+"""Launch F-ST-01 shadow scoring natively after reconstruction evidence verifies.
 
-The underlying shadow materializer remains the authoritative implementation for current
-week scoring. This launcher substitutes only the already-verified historical reconstruction
-result/runtime so the long process never inherits OPENBLAS_CORETYPE=SKYLAKEX.
+The underlying shadow materializer remains authoritative for current-week scoring. This
+launcher accepts either a fresh compatible-hardware reconstruction receipt or a current-run
+receipt produced by verifying the immutable compatible-hardware forensic evidence. In both
+cases, the long process stays on the native CPU and scores only with registered frozen
+coefficient literals.
 """
 
 import hashlib
@@ -18,6 +20,11 @@ import scripts.run_challenger_fst_shadow as shadow
 
 RECEIPT_PATH = Path("challenger_outputs/fst/reconstruction_probe/receipt.json")
 SPEC_PATH = Path("research/fst/F-ST-01-FROZEN-2026.json")
+FORENSIC_EVIDENCE_PATH = Path("research/fst/F-ST-01-reconstruction-evidence.json")
+ALLOWED_RECEIPT_SCOPES = {
+    "fresh_compatible_runtime_probe",
+    "durable_forensic_evidence_verification",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -40,7 +47,7 @@ def _fit_from_receipt(receipt: dict) -> FrozenStackFit:
 def _load_verified_receipt() -> tuple[dict, FrozenStackFit]:
     if os.environ.get("OPENBLAS_CORETYPE"):
         raise RuntimeError(
-            "Portable F-ST shadow must not inherit OPENBLAS_CORETYPE; reconstruction belongs in the probe"
+            "Portable F-ST shadow must not inherit OPENBLAS_CORETYPE; reconstruction belongs in isolated evidence generation"
         )
     if not RECEIPT_PATH.exists():
         raise RuntimeError("Portable F-ST shadow requires a verified reconstruction receipt")
@@ -50,6 +57,9 @@ def _load_verified_receipt() -> tuple[dict, FrozenStackFit]:
 
     if receipt.get("candidate_id") != FROZEN_CANDIDATE_ID or receipt.get("status") != "verified":
         raise RuntimeError("F-ST reconstruction receipt identity/status invalid")
+    scope = receipt.get("receipt_scope")
+    if scope not in ALLOWED_RECEIPT_SCOPES:
+        raise RuntimeError(f"F-ST reconstruction receipt scope invalid: {scope!r}")
     if receipt.get("research_only") is not True or receipt.get("production_authorized") is not False:
         raise RuntimeError("F-ST reconstruction receipt crossed research/production boundary")
     if int(receipt.get("completed_2026_outcomes_used", -1)) != 0:
@@ -66,6 +76,15 @@ def _load_verified_receipt() -> tuple[dict, FrozenStackFit]:
         raise RuntimeError("F-ST reconstruction receipt widened the fixed 1e-12 tolerance")
     if receipt.get("runtime", {}).get("matches") is not True:
         raise RuntimeError("F-ST reconstruction receipt runtime was not verified")
+
+    if scope == "durable_forensic_evidence_verification":
+        if not FORENSIC_EVIDENCE_PATH.exists():
+            raise RuntimeError("F-ST durable forensic evidence file is missing")
+        expected_evidence_sha = _sha256(FORENSIC_EVIDENCE_PATH)
+        if receipt.get("forensic_evidence_sha256") != expected_evidence_sha:
+            raise RuntimeError("F-ST reconstruction receipt is not bound to current forensic evidence")
+        if not isinstance(receipt.get("forensic_source"), dict):
+            raise RuntimeError("F-ST durable reconstruction receipt lacks forensic source identity")
 
     fit = _fit_from_receipt(receipt)
     exact = {
@@ -93,14 +112,14 @@ def _probe_bound_fit_provenance(receipt: dict):
         out = Path(output_dir)
         input_path = out / "inputs_manifest.json"
         if not input_path.exists():
-            raise RuntimeError("F-ST probe-bound provenance requires persisted pre-fit inputs")
+            raise RuntimeError("F-ST receipt-bound provenance requires persisted pre-fit inputs")
         persisted = json.loads(input_path.read_text(encoding="utf-8"))
         if persisted != input_manifest:
-            raise RuntimeError("F-ST pre-fit inputs changed before probe binding")
+            raise RuntimeError("F-ST pre-fit inputs changed before reconstruction-evidence binding")
         if fit != _fit_from_receipt(receipt):
-            raise RuntimeError("F-ST fit passed to probe-bound provenance differs from receipt")
+            raise RuntimeError("F-ST fit passed to receipt-bound provenance differs from receipt")
         manifest = {
-            "schema_version": 3,
+            "schema_version": 4,
             "candidate_id": input_manifest["candidate_id"],
             "capture_context": input_manifest["capture_context"],
             "inputs_manifest_sha256": _sha256(input_path),
@@ -112,8 +131,9 @@ def _probe_bound_fit_provenance(receipt: dict):
             "runtime": receipt["runtime"],
             "reconstruction_probe_receipt": str(RECEIPT_PATH),
             "reconstruction_probe_receipt_sha256": _sha256(RECEIPT_PATH),
-            "reconstruction_execution_policy": "isolated_strict_probe",
-            "shadow_scoring_execution_policy": "native_cpu",
+            "reconstruction_execution_policy": receipt["receipt_scope"],
+            "reconstruction_forensic_evidence_sha256": receipt.get("forensic_evidence_sha256"),
+            "shadow_scoring_execution_policy": "native_cpu_registered_literals",
         }
         (out / "fit_manifest.json").write_text(
             json.dumps(manifest, indent=2, sort_keys=True) + "\n",
