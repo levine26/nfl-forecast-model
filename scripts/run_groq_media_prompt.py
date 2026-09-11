@@ -19,6 +19,7 @@ from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
 DEFAULT_MODEL = "groq/compound"
+_WEB_TOOL_TYPES = {"search", "visit", "web_search", "visit_website"}
 
 
 def _request(prompt: str, *, model: str, timeout: int) -> str:
@@ -31,7 +32,9 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.35,
         "response_format": {"type": "json_object"},
-        "citation_options": "enabled",
+        # We require explicit source URLs in the JSON payload and validate them ourselves;
+        # disabling automatic citation markers keeps user-facing prose clean.
+        "citation_options": "disabled",
         "search_settings": {
             "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
         },
@@ -58,9 +61,22 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
     choices = body.get("choices") or []
     if not choices:
         raise RuntimeError("Groq response contained no choices")
-    content = (((choices[0] or {}).get("message") or {}).get("content") or "").strip()
+
+    message = (choices[0] or {}).get("message") or {}
+    content = str(message.get("content") or "").strip()
     if not content:
         raise RuntimeError("Groq response contained no message content")
+
+    executed_tools = message.get("executed_tools") or []
+    tool_types = {
+        str(tool.get("type") or "").strip().lower()
+        for tool in executed_tools
+        if isinstance(tool, dict)
+    }
+    if not (tool_types & _WEB_TOOL_TYPES):
+        raise RuntimeError("Groq response used no web-search or website-visit tool")
+
+    print("Groq research tools used:", ", ".join(sorted(tool_types & _WEB_TOOL_TYPES)))
     return content
 
 
