@@ -33,7 +33,7 @@ def _event(event_id: str = "evt-1", commence_time: str = "2026-09-13T17:00:00Z")
     }
 
 
-def _book(key: str, home_ml: int, away_ml: int, spread: float, total: float):
+def _book(key: str, home_ml: object, away_ml: object, spread: object, total: object):
     return {
         "key": key,
         "title": key.upper(),
@@ -45,7 +45,7 @@ def _book(key: str, home_ml: int, away_ml: int, spread: float, total: float):
             ]},
             {"key": "spreads", "outcomes": [
                 {"name": "Chicago Bears", "price": -110, "point": spread},
-                {"name": "Carolina Panthers", "price": -110, "point": -spread},
+                {"name": "Carolina Panthers", "price": -110, "point": -float(spread) if isinstance(spread, (int, float)) else spread},
             ]},
             {"key": "totals", "outcomes": [
                 {"name": "Over", "price": -108, "point": total},
@@ -55,12 +55,32 @@ def _book(key: str, home_ml: int, away_ml: int, spread: float, total: float):
     }
 
 
+def _normalized(key: str = "book-a", *, event: dict | None = None, request_time: datetime | None = None):
+    now = request_time or datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
+    return normalize_bookmaker(
+        event=event or _event(), bookmaker=_book(key, -150, 130, -3.0, 44.5),
+        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
+        horizon="T-120m", target_timestamp_utc=datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc),
+        request_timestamp_utc=now, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
+    )
+
+
 def test_american_and_devig_metrics_preserve_overround() -> None:
     assert round(american_implied(-110), 6) == round(110 / 210, 6)
     metrics = two_way_metrics(-110, -110)
     assert metrics["overround"] > 0
     assert abs(metrics["first_no_vig"] - 0.5) < 1e-12
     assert abs(metrics["first_no_vig"] + metrics["second_no_vig"] - 1) < 1e-12
+
+
+def test_american_odds_reject_zero_nan_and_infinity() -> None:
+    for value in (0, float("nan"), float("inf"), float("-inf")):
+        try:
+            american_implied(value)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"expected malformed odds to fail: {value!r}")
 
 
 def test_due_horizons_only_fire_near_preregistered_targets() -> None:
@@ -102,13 +122,7 @@ def test_event_identity_requires_matchup_and_kickoff_proximity() -> None:
 
 
 def test_book_snapshot_keeps_moneyline_spread_total_freshness_and_event_time() -> None:
-    now = datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
-    row = normalize_bookmaker(
-        event=_event(), bookmaker=_book("book-a", -150, 130, -3.0, 44.5),
-        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
-        horizon="T-120m", target_timestamp_utc=now,
-        request_timestamp_utc=now, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
-    )
+    row = _normalized()
     assert row is not None
     assert row["home_moneyline"] == -150
     assert row["home_spread"] == -3.0
@@ -119,6 +133,27 @@ def test_book_snapshot_keeps_moneyline_spread_total_freshness_and_event_time() -
     assert row["provider_kickoff_delta_minutes"] == 0.0
     assert row["research_only"] is True
     assert row["production_authorized"] is False
+
+
+def test_malformed_h2h_book_is_skipped_and_optional_markets_degrade_to_missing() -> None:
+    now = datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
+    bad_h2h = normalize_bookmaker(
+        event=_event(), bookmaker=_book("bad", "not-a-price", 130, -3.0, 44.5),
+        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
+        horizon="T-120m", target_timestamp_utc=now,
+        request_timestamp_utc=now, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
+    )
+    assert bad_h2h is None
+
+    optional_bad = normalize_bookmaker(
+        event=_event(), bookmaker=_book("partial", -150, 130, "bad-spread", "bad-total"),
+        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
+        horizon="T-120m", target_timestamp_utc=now,
+        request_timestamp_utc=now, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
+    )
+    assert optional_bad is not None
+    assert optional_bad["home_spread"] is None
+    assert optional_bad["total_points"] is None
 
 
 def test_consensus_retains_source_count_market_dispersion_and_event_identity() -> None:
@@ -147,21 +182,28 @@ def test_consensus_retains_source_count_market_dispersion_and_event_identity() -
     assert MIN_CONSENSUS_BOOKS == 2
 
 
+def test_consensus_rejects_duplicate_books_or_mixed_event_identity() -> None:
+    first = _normalized("book-a")
+    second = _normalized("book-b")
+    assert first is not None and second is not None
+    duplicate = dict(first)
+    duplicate["h2h_home_no_vig"] = 0.6
+    assert consensus_row([first, duplicate]) is None
+
+    mixed_event = dict(second)
+    mixed_event["event_id"] = "different-event"
+    assert consensus_row([first, mixed_event]) is None
+
+    mixed_request = dict(second)
+    mixed_request["request_timestamp_utc"] = "2026-09-13T15:01:00+00:00"
+    assert consensus_row([first, mixed_request]) is None
+
+
 def test_retry_attempts_have_distinct_append_only_identity() -> None:
     first_time = datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
     second_time = first_time + timedelta(minutes=5)
-    first = normalize_bookmaker(
-        event=_event(), bookmaker=_book("book-a", -150, 130, -3.0, 44.5),
-        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
-        horizon="T-120m", target_timestamp_utc=first_time,
-        request_timestamp_utc=first_time, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
-    )
-    second = normalize_bookmaker(
-        event=_event(), bookmaker=_book("book-a", -160, 140, -3.5, 45.0),
-        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
-        horizon="T-120m", target_timestamp_utc=first_time,
-        request_timestamp_utc=second_time, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
-    )
+    first = _normalized("book-a", request_time=first_time)
+    second = _normalized("book-a", request_time=second_time)
     assert first is not None and second is not None
     assert "request_timestamp_utc" in LEDGER_IDENTITY_COLUMNS
     assert attempt_identity(first) != attempt_identity(second)
