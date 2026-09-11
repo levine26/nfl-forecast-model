@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
+from research.run_sleeper_archive_capture_v1 import capture_once
 from research.sleeper_archive_capture_v1 import (
     build_capture,
     capture_filename,
@@ -107,3 +109,35 @@ def test_source_commit_after_retrieval_is_rejected() -> None:
         assert "after retrieval time" in str(exc)
     else:
         raise AssertionError("future source commit must fail closed")
+
+
+def test_capture_runner_is_idempotent_by_upstream_commit(tmp_path: Path) -> None:
+    source = tmp_path / "sleeper_players.json"
+    source.write_text(json.dumps(_snapshot()), encoding="utf-8")
+    output = tmp_path / "snapshots"
+    index = tmp_path / "index.json"
+    first = capture_once(
+        input_path=str(source),
+        output_dir=str(output),
+        index_path=str(index),
+        source_commit_sha="d" * 40,
+        source_commit_timestamp_utc="2026-09-10T08:05:00Z",
+        retrieval_timestamp_utc="2026-09-10T09:30:00Z",
+    )
+    second = capture_once(
+        input_path=str(source),
+        output_dir=str(output),
+        index_path=str(index),
+        source_commit_sha="d" * 40,
+        source_commit_timestamp_utc="2026-09-10T08:05:00Z",
+        retrieval_timestamp_utc="2026-09-10T10:30:00Z",
+    )
+    assert first["status"] == "captured"
+    assert second == {
+        "status": "skipped",
+        "reason": "source_commit_already_captured",
+        "source_commit_sha": "d" * 40,
+    }
+    entries = json.loads(index.read_text(encoding="utf-8"))["captures"]
+    assert len(entries) == 1
+    assert len(list(output.glob("*.json.gz"))) == 1
