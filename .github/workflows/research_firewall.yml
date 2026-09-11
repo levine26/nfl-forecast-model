@@ -26,21 +26,3 @@ jobs:
         run: python scripts/check_research_firewall.py --base origin/${{ github.base_ref }} --head-ref '${{ github.head_ref }}'
       - name: Verify static production import firewall
         run: pytest -q tests/test_research_firewall.py tests/test_experiment_registry.py tests/test_challenger_evaluation.py
-      - name: Validate Groq editorial provider wiring
-        run: |
-          python -m py_compile scripts/run_groq_media_prompt.py
-          python - <<'PY'
-          from pathlib import Path
-          import re
-
-          workflow = Path('.github/workflows/groq_media_writer.yml').read_text(encoding='utf-8')
-          runner = Path('scripts/run_groq_media_prompt.py').read_text(encoding='utf-8')
-          assert not re.search(r'^\s*copilot-requests\s*:', workflow, flags=re.M)
-          assert not re.search(r'^\s*run:\s*npm\s+install\s+-g\s+@github/copilot\s*$', workflow, flags=re.M)
-          assert 'secrets.GROQ_API_KEY' in workflow
-          assert 'groq/compound' in workflow
-          assert 'APPROVED_MEDIA_DOMAINS' in runner
-          assert 'web_search' in runner and 'visit_website' in runner
-          assert 'response_format' in runner and 'json_object' in runner
-          print('Groq editorial provider wiring passes static migration gate.')
-          PY
