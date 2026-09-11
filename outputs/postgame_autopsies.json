@@ -20,5 +20,28 @@
       "The predicted margin finished 0.1 points from the actual margin."
     ],
     "winner_correct": true
+  },
+  "2026_01_SF_LA": {
+    "actual_score": "LA 7 \u2013 SF 27",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "winner_miss",
+      "margin_miss",
+      "total_miss"
+    ],
+    "game_id": "2026_01_SF_LA",
+    "margin_abs_error": 24.774445680689222,
+    "matchup": "SF @ LA",
+    "official_home_prob": 0.616731904427099,
+    "official_pick": "LA",
+    "projected_score": "LA 26.2 \u2013 SF 21.4",
+    "total_abs_error": 13.54243467052266,
+    "what_missed": [
+      "The locked forecast missed the outright winner.",
+      "The predicted margin finished 24.8 points from the actual margin.",
+      "The predicted total finished 13.5 points from the actual total."
+    ],
+    "what_went_right": [],
+    "winner_correct": false
   }
 }

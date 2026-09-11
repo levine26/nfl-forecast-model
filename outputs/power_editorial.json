@@ -1,6 +1,6 @@
 {
   "editorial_version": "power-v2",
-  "generated_utc": "2026-09-11T03:17:01.437348+00:00",
+  "generated_utc": "2026-09-11T03:56:45.946487+00:00",
   "teams": [
     {
       "average_efficiency_rank": 6.0,
@@ -39,7 +39,7 @@
       "why_here": "Elo+ still has DEN at No. 2, while the recent efficiency profile is much shakier. The biggest warning is 14th in offensive EPA."
     },
     {
-      "average_efficiency_rank": 5.5,
+      "average_efficiency_rank": 5.75,
       "elo_plus": 1609.4716454468794,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
       "movement": "\u2192",
@@ -49,7 +49,7 @@
         "defensive EPA allowed": 12,
         "offensive EPA": 2,
         "passing EPA": 3,
-        "recent win rate": 5
+        "recent win rate": 6
       },
       "team": "BUF",
       "tension": "aligned",
@@ -57,30 +57,12 @@
       "why_here": "Elo+ and the supporting profile are broadly aligned at No. 3; the clearest strength is 2nd in offensive EPA."
     },
     {
-      "average_efficiency_rank": 6.75,
-      "elo_plus": 1604.7782831159154,
-      "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
-      "movement": "\u2192",
-      "movement_text": "steady",
-      "rank": 4,
-      "supporting_metric_ranks": {
-        "defensive EPA allowed": 13,
-        "offensive EPA": 3,
-        "passing EPA": 2,
-        "recent win rate": 9
-      },
-      "team": "LA",
-      "tension": "aligned",
-      "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
-      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 4; the clearest strength is 2nd in passing EPA."
-    },
-    {
       "average_efficiency_rank": 9.75,
       "elo_plus": 1598.2722788376063,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
-      "movement": "\u2192",
-      "movement_text": "steady",
-      "rank": 5,
+      "movement": "\u25b21",
+      "movement_text": "up 1",
+      "rank": 4,
       "supporting_metric_ranks": {
         "defensive EPA allowed": 4,
         "offensive EPA": 18,
@@ -90,10 +72,28 @@
       "team": "HOU",
       "tension": "aligned",
       "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
-      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 5; the clearest strength is 2nd in recent win rate."
+      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 4; the clearest strength is 2nd in recent win rate."
     },
     {
-      "average_efficiency_rank": 12.75,
+      "average_efficiency_rank": 8.75,
+      "elo_plus": 1591.7276429612673,
+      "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
+      "movement": "\u25b25",
+      "movement_text": "up 5",
+      "rank": 5,
+      "supporting_metric_ranks": {
+        "defensive EPA allowed": 20,
+        "offensive EPA": 5,
+        "passing EPA": 5,
+        "recent win rate": 5
+      },
+      "team": "SF",
+      "tension": "aligned",
+      "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
+      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 5; the clearest strength is 5th in offensive EPA."
+    },
+    {
+      "average_efficiency_rank": 12.5,
       "elo_plus": 1576.226311965056,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
       "movement": "\u2192",
@@ -103,7 +103,7 @@
         "defensive EPA allowed": 7,
         "offensive EPA": 20,
         "passing EPA": 12,
-        "recent win rate": 12
+        "recent win rate": 11
       },
       "team": "PHI",
       "tension": "efficiency_weaker_than_elo",
@@ -129,12 +129,30 @@
       "why_here": "Elo+ and the supporting profile are broadly aligned at No. 7; the clearest strength is 3rd in defensive EPA allowed."
     },
     {
+      "average_efficiency_rank": 7.75,
+      "elo_plus": 1567.015863169545,
+      "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
+      "movement": "\u25bc4",
+      "movement_text": "down 4",
+      "rank": 8,
+      "supporting_metric_ranks": {
+        "defensive EPA allowed": 13,
+        "offensive EPA": 3,
+        "passing EPA": 2,
+        "recent win rate": 13
+      },
+      "team": "LA",
+      "tension": "aligned",
+      "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
+      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 8; the clearest strength is 2nd in passing EPA."
+    },
+    {
       "average_efficiency_rank": 13.25,
       "elo_plus": 1565.2647620435189,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
-      "movement": "\u2192",
-      "movement_text": "steady",
-      "rank": 8,
+      "movement": "\u25bc1",
+      "movement_text": "down 1",
+      "rank": 9,
       "supporting_metric_ranks": {
         "defensive EPA allowed": 19,
         "offensive EPA": 11,
@@ -144,46 +162,28 @@
       "team": "DET",
       "tension": "aligned",
       "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
-      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 8; the clearest strength is 6th in passing EPA."
+      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 9; the clearest strength is 6th in passing EPA."
     },
     {
-      "average_efficiency_rank": 16.25,
+      "average_efficiency_rank": 16.5,
       "elo_plus": 1558.3570208580538,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
-      "movement": "\u2192",
-      "movement_text": "steady",
-      "rank": 9,
+      "movement": "\u25bc1",
+      "movement_text": "down 1",
+      "rank": 10,
       "supporting_metric_ranks": {
         "defensive EPA allowed": 2,
         "offensive EPA": 27,
         "passing EPA": 29,
-        "recent win rate": 7
+        "recent win rate": 8
       },
       "team": "MIN",
       "tension": "efficiency_weaker_than_elo",
       "what_moves_them": "The next few games will tell us whether Elo is carrying stale strength or the efficiency dip is temporary.",
-      "why_here": "Elo+ still has MIN at No. 9, while the recent efficiency profile is much shakier. The biggest warning is 29th in passing EPA."
+      "why_here": "Elo+ still has MIN at No. 10, while the recent efficiency profile is much shakier. The biggest warning is 29th in passing EPA."
     },
     {
-      "average_efficiency_rank": 9.5,
-      "elo_plus": 1553.9652230148963,
-      "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
-      "movement": "\u2192",
-      "movement_text": "steady",
-      "rank": 10,
-      "supporting_metric_ranks": {
-        "defensive EPA allowed": 20,
-        "offensive EPA": 5,
-        "passing EPA": 5,
-        "recent win rate": 8
-      },
-      "team": "SF",
-      "tension": "aligned",
-      "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
-      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 10; the clearest strength is 5th in offensive EPA."
-    },
-    {
-      "average_efficiency_rank": 4.5,
+      "average_efficiency_rank": 4.75,
       "elo_plus": 1552.771269025891,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
       "movement": "\u2192",
@@ -193,7 +193,7 @@
         "defensive EPA allowed": 10,
         "offensive EPA": 1,
         "passing EPA": 1,
-        "recent win rate": 6
+        "recent win rate": 7
       },
       "team": "NE",
       "tension": "efficiency_stronger_than_elo",
@@ -237,7 +237,7 @@
       "why_here": "Elo+ puts GB at No. 13, and the efficiency profile is split: 8th in offensive EPA, but 28th in defensive EPA allowed."
     },
     {
-      "average_efficiency_rank": 17.5,
+      "average_efficiency_rank": 17.25,
       "elo_plus": 1543.256695074842,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
       "movement": "\u2192",
@@ -247,7 +247,7 @@
         "defensive EPA allowed": 6,
         "offensive EPA": 25,
         "passing EPA": 26,
-        "recent win rate": 13
+        "recent win rate": 12
       },
       "team": "LAC",
       "tension": "mixed",
@@ -255,7 +255,7 @@
       "why_here": "Elo+ puts LAC at No. 14, and the efficiency profile is split: 6th in defensive EPA allowed, but 26th in passing EPA."
     },
     {
-      "average_efficiency_rank": 15.5,
+      "average_efficiency_rank": 15.25,
       "elo_plus": 1533.060331967252,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
       "movement": "\u2192",
@@ -265,12 +265,12 @@
         "defensive EPA allowed": 17,
         "offensive EPA": 17,
         "passing EPA": 17,
-        "recent win rate": 11
+        "recent win rate": 10
       },
       "team": "PIT",
       "tension": "aligned",
       "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
-      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 15; the clearest strength is 11th in recent win rate."
+      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 15; the clearest strength is 10th in recent win rate."
     },
     {
       "average_efficiency_rank": 13.25,
@@ -345,7 +345,7 @@
       "why_here": "Elo+ and the supporting profile are broadly aligned at No. 19; the clearest strength is 9th in offensive EPA."
     },
     {
-      "average_efficiency_rank": 16.0,
+      "average_efficiency_rank": 15.75,
       "elo_plus": 1465.6651799542783,
       "guardrail": "Elo+ alone sets the published rank; efficiency is shown as supporting or conflicting context, never retrofitted into a hidden composite.",
       "movement": "\u2192",
@@ -355,12 +355,12 @@
         "defensive EPA allowed": 15,
         "offensive EPA": 23,
         "passing EPA": 16,
-        "recent win rate": 10
+        "recent win rate": 9
       },
       "team": "ATL",
       "tension": "aligned",
       "what_moves_them": "There is no single extreme metric pulling against the ranking; new game data should drive the next move.",
-      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 20; the clearest strength is 10th in recent win rate."
+      "why_here": "Elo+ and the supporting profile are broadly aligned at No. 20; the clearest strength is 9th in recent win rate."
     },
     {
       "average_efficiency_rank": 23.0,
