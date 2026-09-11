@@ -26,6 +26,7 @@ function patchMethodology(root) {
     'PURE is the football-only forecast. LevLine blends 75% PURE with 25% market signal. Big disagreements stay visible.',
     'Official LevLine uses frozen F-ST-01: current vig-free MARKET and a separately generated nested PURE enter a fixed two-input logit model. If MARKET is unavailable, that game falls back to the exact legacy 75/25 rule.',
   )
+  replaceExactText(root, 'LEVLINE F-ST', 'LEVLINE')
 }
 
 function patchConsensus(root) {
@@ -41,7 +42,7 @@ function patchConsensus(root) {
       <i>compare</i>
       <span><small>MARKET</small><b>${marketValue}</b><em>vig-free F-ST input</em></span>
       <i>→</i>
-      <span class="final"><small>LEVLINE F-ST</small><b>${finalValue}</b><em>official published probability</em></span>
+      <span class="final"><small>LEVLINE</small><b>${finalValue}</b><em>official published probability</em></span>
     `
     block.dataset.fstPresentation = '1'
     const section = block.closest('.vnext-consensus')
@@ -57,10 +58,75 @@ function patchLegacyDiagnosticLabels(root) {
   }
 }
 
+function pickTeamFromText(text) {
+  const match = String(text || '').trim().match(/^([A-Z]{2,3})\b/)
+  return match?.[1] || null
+}
+
+function scoreWinnerFromText(text) {
+  const match = String(text || '').trim().match(/^([A-Z]{2,3})\s+(-?\d+(?:\.\d+)?)\s+[–-]\s+([A-Z]{2,3})\s+(-?\d+(?:\.\d+)?)$/)
+  if (!match) return null
+  const first = Number(match[2])
+  const second = Number(match[4])
+  if (!Number.isFinite(first) || !Number.isFinite(second) || Math.abs(first - second) < 0.05) return null
+  return first > second ? match[1] : match[3]
+}
+
+function patchWinnerMarginConsistency(root) {
+  for (const card of root.querySelectorAll('.vnext-game-card')) {
+    const pick = pickTeamFromText(card.querySelector('.pub-pick strong')?.textContent)
+    const scoreNode = card.querySelector('.pub-pick small')
+    if (!pick || !scoreNode) continue
+    if (!scoreNode.dataset.originalMarginScore) scoreNode.dataset.originalMarginScore = scoreNode.textContent?.trim() || ''
+    const marginWinner = scoreWinnerFromText(scoreNode.dataset.originalMarginScore)
+    if (!marginWinner || marginWinner === pick) continue
+    const replacement = `Official pick ${pick} · separate margin model favors ${marginWinner}`
+    if (scoreNode.textContent !== replacement) scoreNode.textContent = replacement
+    scoreNode.dataset.winnerMarginSplit = '1'
+  }
+
+  for (const verdict of root.querySelectorAll('.vnext-verdict')) {
+    const official = verdict.querySelector(':scope > div:first-child > strong')
+    const marginBlock = verdict.querySelector(':scope > div:last-child')
+    const scoreNode = marginBlock?.querySelector('b')
+    const detailNode = marginBlock?.querySelector('small')
+    const pick = pickTeamFromText(official?.textContent)
+    if (!pick || !scoreNode) continue
+    if (!scoreNode.dataset.originalMarginScore) scoreNode.dataset.originalMarginScore = scoreNode.textContent?.trim() || ''
+    const marginWinner = scoreWinnerFromText(scoreNode.dataset.originalMarginScore)
+    if (!marginWinner || marginWinner === pick) continue
+    const replacement = `Separate margin model favors ${marginWinner}`
+    if (scoreNode.textContent !== replacement) scoreNode.textContent = replacement
+    if (detailNode && !detailNode.dataset.marginSplitLabeled) {
+      detailNode.textContent = `Winner probability and margin projection disagree · ${detailNode.textContent}`
+      detailNode.dataset.marginSplitLabeled = '1'
+    }
+    verdict.dataset.winnerMarginSplit = '1'
+  }
+
+  for (const quick of root.querySelectorAll('.vnext-quick')) {
+    const cells = [...quick.querySelectorAll('.vnext-quick-grid > div')]
+    const projectedScore = cells.find(cell => cell.querySelector('span')?.textContent?.trim() === 'Projected score')
+    const modelSpread = cells.find(cell => cell.querySelector('span')?.textContent?.trim() === 'Model spread')
+    if (projectedScore) projectedScore.querySelector('span').textContent = 'Margin-model score'
+    if (modelSpread) modelSpread.querySelector('span').textContent = 'Margin-model spread'
+
+    const split = quick.closest('.vnext-modal')?.querySelector('.vnext-verdict')?.dataset.winnerMarginSplit === '1'
+    const existing = quick.querySelector('.fst-margin-split-note')
+    if (split && !existing) {
+      const note = document.createElement('p')
+      note.className = 'vnext-consensus-note fst-margin-split-note'
+      note.textContent = 'Winner probability and margin projection are separate models and disagree on this game. The official Sunday Signal pick is the LevLine win probability shown above.'
+      quick.appendChild(note)
+    }
+  }
+}
+
 function patch(root = document.body) {
   patchMethodology(root)
   patchConsensus(root)
   patchLegacyDiagnosticLabels(root)
+  patchWinnerMarginConsistency(root)
 }
 
 export function installFstProductionPresentationAdapter() {
