@@ -1,25 +1,25 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_01_NO_DET",
+      "largest_driver": "Market movement",
+      "pick": "DET",
+      "pick_delta_pp": 1.7591444954669244
+    },
+    {
+      "game_id": "2026_01_NYJ_TEN",
+      "largest_driver": "Market movement",
+      "pick": "TEN",
+      "pick_delta_pp": -0.7643704208126878
+    },
+    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material input move",
       "pick": "SEA",
       "pick_delta_pp": -1.260265225511148e-08
-    },
-    {
-      "game_id": "2026_01_GB_MIN",
-      "largest_driver": "No material input move",
-      "pick": "MIN",
-      "pick_delta_pp": 1.4698242623012447e-10
-    },
-    {
-      "game_id": "2026_01_MIA_LV",
-      "largest_driver": "No material input move",
-      "pick": "LV",
-      "pick_delta_pp": 1.34825484110479e-10
     }
   ],
-  "generated_utc": "2026-09-11T20:12:31.635166+00:00",
+  "generated_utc": "2026-09-11T22:32:43.409082+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
@@ -46,25 +46,25 @@
       "pick": "DET",
       "pick_prob": 0.7525022608076984,
       "projected_score": "DET 24.7 \u2013 NO 21.1",
-      "pure_market_gap_pp": 17.454524928133164
+      "pure_market_gap_pp": 17.454524928133186
     }
   ],
   "most_uncertain": [
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_01_GB_MIN",
-      "matchup": "GB @ MIN",
-      "pick": "MIN",
-      "pick_prob": 0.5019722639431534,
-      "projected_score": "MIN 23.8 \u2013 GB 19.5"
-    },
-    {
-      "confidence": "Coin Flip",
       "game_id": "2026_01_NYJ_TEN",
       "matchup": "NYJ @ TEN",
       "pick": "TEN",
-      "pick_prob": 0.5087103320763638,
+      "pick_prob": 0.501066627868237,
       "projected_score": "TEN 23.7 \u2013 NYJ 22.1"
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_01_GB_MIN",
+      "matchup": "GB @ MIN",
+      "pick": "MIN",
+      "pick_prob": 0.5019722639431533,
+      "projected_score": "MIN 23.8 \u2013 GB 19.5"
     },
     {
       "confidence": "Coin Flip",
