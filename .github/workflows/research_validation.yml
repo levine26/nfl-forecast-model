@@ -40,7 +40,17 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
       - name: Test research foundation
-        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_v08.py tests/test_challenger_shadow_lock.py tests/test_challenger_evaluation.py tests/test_experiment_registry.py tests/test_research_firewall.py
+        run: |
+          pytest -q \
+            tests/test_challenger.py \
+            tests/test_challenger_v06.py \
+            tests/test_challenger_v07.py \
+            tests/test_challenger_v08.py \
+            tests/test_challenger_shadow_lock.py \
+            tests/test_challenger_evaluation.py \
+            tests/test_challenger_market_reliance.py \
+            tests/test_experiment_registry.py \
+            tests/test_research_firewall.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -61,14 +71,22 @@ jobs:
           PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_uncertainty.py --bootstrap-samples 2000
           test -s research_outputs/statistical_validation/v08_uncertainty_report.json
           test -s research_outputs/statistical_validation/v08_model_confidence_set.csv
+      - name: Run Phase 2 market reliance and horizon study
+        run: |
+          rm -rf research_outputs/phase2_market_reliance
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_market_reliance.py --bootstrap-samples 1000
+          test -s research_outputs/phase2_market_reliance/phase2_report.json
+          test -s research_outputs/phase2_market_reliance/fixed_candidate_metrics.csv
+          test -s research_outputs/phase2_market_reliance/walk_forward_weight_selections.csv
       - name: Prove production surfaces were untouched
         run: |
           git diff --exit-code -- outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
       - name: Upload research evidence
         uses: actions/upload-artifact@v4
         with:
-          name: levline-v09-foundation-${{ github.run_id }}
+          name: levline-research-${{ github.run_id }}
           path: |
             /tmp/v08-challenger/
             research_outputs/statistical_validation/
+            research_outputs/phase2_market_reliance/
           retention-days: 30
