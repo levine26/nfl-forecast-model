@@ -13,13 +13,20 @@ on:
       - 'src/nfl_forecast/challenger_fst.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/challenger_prospective.py'
+      - 'src/nfl_forecast/fst_nested_pure.py'
+      - 'src/nfl_forecast/fst_provenance.py'
+      - 'src/nfl_forecast/fst_reconstruction.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
       - 'scripts/run_challenger_v08.py'
       - 'scripts/run_challenger_fst_shadow.py'
+      - 'scripts/run_challenger_fst_shadow_portable.py'
       - 'scripts/run_challenger_fst_evaluation.py'
+      - 'scripts/run_fst_native_pure_score.py'
+      - 'scripts/run_fst_reconstruction_probe.py'
+      - 'scripts/verify_fst_reconstruction_evidence.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'research/fst/**'
       - 'tests/test_challenger.py'
@@ -27,6 +34,9 @@ on:
       - 'tests/test_challenger_v07.py'
       - 'tests/test_challenger_v08.py'
       - 'tests/test_challenger_fst.py'
+      - 'tests/test_fst_frozen_identity.py'
+      - 'tests/test_fst_portable_shadow.py'
+      - 'tests/test_fst_reconstruction_evidence.py'
       - 'tests/test_challenger_prospective.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
@@ -41,13 +51,20 @@ on:
       - 'src/nfl_forecast/challenger_fst.py'
       - 'src/nfl_forecast/challenger_shadow.py'
       - 'src/nfl_forecast/challenger_prospective.py'
+      - 'src/nfl_forecast/fst_nested_pure.py'
+      - 'src/nfl_forecast/fst_provenance.py'
+      - 'src/nfl_forecast/fst_reconstruction.py'
       - 'src/nfl_forecast/features.py'
       - 'scripts/run_challenger.py'
       - 'scripts/run_challenger_v06.py'
       - 'scripts/run_challenger_v07.py'
       - 'scripts/run_challenger_v08.py'
       - 'scripts/run_challenger_fst_shadow.py'
+      - 'scripts/run_challenger_fst_shadow_portable.py'
       - 'scripts/run_challenger_fst_evaluation.py'
+      - 'scripts/run_fst_native_pure_score.py'
+      - 'scripts/run_fst_reconstruction_probe.py'
+      - 'scripts/verify_fst_reconstruction_evidence.py'
       - 'scripts/lock_challenger_shadow.py'
       - 'research/fst/**'
       - 'tests/test_challenger.py'
@@ -55,6 +72,9 @@ on:
       - 'tests/test_challenger_v07.py'
       - 'tests/test_challenger_v08.py'
       - 'tests/test_challenger_fst.py'
+      - 'tests/test_fst_frozen_identity.py'
+      - 'tests/test_fst_portable_shadow.py'
+      - 'tests/test_fst_reconstruction_evidence.py'
       - 'tests/test_challenger_prospective.py'
       - 'tests/test_challenger_shadow_lock.py'
       - '.github/workflows/challenger.yml'
@@ -79,11 +99,22 @@ jobs:
           fetch-depth: 3
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.11.16'
           cache: pip
       - run: pip install '.[dev]'
       - name: Test challenger research logic
-        run: pytest -q tests/test_challenger.py tests/test_challenger_v06.py tests/test_challenger_v07.py tests/test_challenger_v08.py tests/test_challenger_fst.py tests/test_challenger_prospective.py tests/test_challenger_shadow_lock.py
+        run: >-
+          pytest -q
+          tests/test_challenger.py
+          tests/test_challenger_v06.py
+          tests/test_challenger_v07.py
+          tests/test_challenger_v08.py
+          tests/test_challenger_fst.py
+          tests/test_fst_frozen_identity.py
+          tests/test_fst_portable_shadow.py
+          tests/test_fst_reconstruction_evidence.py
+          tests/test_challenger_prospective.py
+          tests/test_challenger_shadow_lock.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -103,10 +134,43 @@ jobs:
           if [ -f /tmp/challenger-immutable/prediction_history_shadow.csv ]; then
             cp /tmp/challenger-immutable/prediction_history_shadow.csv challenger_outputs/
           fi
-      - name: Materialize frozen F-ST-01 prospective shadow
+      - name: Verify durable F-ST reconstruction evidence
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/src
         run: |
           set -euo pipefail
-          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_fst_shadow.py
+          test -z "${OPENBLAS_CORETYPE:-}"
+          python scripts/verify_fst_reconstruction_evidence.py
+          test -s challenger_outputs/fst/reconstruction_probe/receipt.json
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          receipt_path = Path('challenger_outputs/fst/reconstruction_probe/receipt.json')
+          evidence_path = Path('research/fst/F-ST-01-reconstruction-evidence.json')
+          receipt = json.loads(receipt_path.read_text())
+          assert receipt['status'] == 'verified'
+          assert receipt['receipt_scope'] == 'durable_forensic_evidence_verification'
+          assert receipt['forensic_evidence_sha256'] == hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+          assert receipt['runtime']['matches'] is True
+          assert receipt['identity_check']['matches'] is True
+          assert receipt['identity_check']['numeric_abs_tolerance'] == 1e-12
+          assert max(receipt['identity_check']['numeric_absolute_deltas'].values()) <= 1e-12
+          assert receipt['completed_2026_outcomes_used'] == 0
+          assert receipt['production_authorized'] is False
+          PY
+      - name: Materialize frozen F-ST-01 prospective shadow
+        env:
+          OPENBLAS_NUM_THREADS: '4'
+          OMP_NUM_THREADS: '4'
+          MKL_NUM_THREADS: '4'
+          NUMEXPR_NUM_THREADS: '4'
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/src
+        run: |
+          set -euo pipefail
+          test -z "${OPENBLAS_CORETYPE:-}"
+          python scripts/run_challenger_fst_shadow_portable.py
       - name: Refresh cumulative F-ST prospective evaluation
         run: |
           set -euo pipefail
@@ -142,13 +206,29 @@ jobs:
       - name: Verify research firewall and frozen F-ST contract
         run: |
           python - <<'PY'
+          import hashlib
           import json
+          import os
           from pathlib import Path
           import numpy as np
           import pandas as pd
 
+          assert not os.environ.get('OPENBLAS_CORETYPE'), 'long-lived verification must be CPU portable'
           report = json.loads(Path('challenger_outputs/report.json').read_text())
           runtime = json.loads(Path('challenger_outputs/fst/runtime_model.json').read_text())
+          spec = json.loads(Path('research/fst/F-ST-01-FROZEN-2026.json').read_text())
+          registered = spec['frozen_identity']
+          provenance_dir = Path('challenger_outputs/fst/provenance')
+          inputs_manifest = json.loads((provenance_dir / 'inputs_manifest.json').read_text())
+          fit_manifest = json.loads((provenance_dir / 'fit_manifest.json').read_text())
+          identity_check = json.loads((provenance_dir / 'frozen_identity_check.json').read_text())
+          receipt_path = Path('challenger_outputs/fst/reconstruction_probe/receipt.json')
+          receipt = json.loads(receipt_path.read_text())
+          evidence_path = Path('research/fst/F-ST-01-reconstruction-evidence.json')
+          evidence_sha = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+          base_oof_raw = (provenance_dir / 'base_oof_keyed.csv').read_bytes()
+          training_raw = (provenance_dir / 'training_frame_keyed.csv').read_bytes()
+
           assert report['status'] == 'healthy'
           assert report['mode'] == 'research_only'
           assert report['live_season_firewall'] == 2026
@@ -165,7 +245,46 @@ jobs:
           assert runtime['training_last_season'] <= 2025
           assert runtime['2026_outcomes_used_in_fitting'] == 0
           assert runtime['production_promotion_authorized'] is False
-          assert len(runtime['training_data_sha256']) == 64
+          assert runtime['scoring_parameter_source'] == 'registered_frozen_identity'
+          assert runtime['training_data_sha256'] == registered['training_data_sha256']
+          assert runtime['intercept'] == registered['intercept']
+          assert runtime['market_logit_coefficient'] == registered['market_logit_coefficient']
+          assert runtime['pure_logit_coefficient'] == registered['pure_logit_coefficient']
+          assert runtime['current_pure_execution_policy'] == 'native_cpu_subprocess_with_frozen_oof'
+
+          assert receipt['status'] == 'verified'
+          assert receipt['receipt_scope'] == 'durable_forensic_evidence_verification'
+          assert receipt['forensic_evidence_sha256'] == evidence_sha
+          assert receipt['identity_check']['matches'] is True
+          assert receipt['identity_check']['numeric_abs_tolerance'] == 1e-12
+          assert max(receipt['identity_check']['numeric_absolute_deltas'].values()) <= 1e-12
+          assert receipt['runtime']['matches'] is True
+          assert receipt['runtime']['environment']['OPENBLAS_CORETYPE'] == 'SKYLAKEX'
+          assert receipt['runtime']['environment']['OPENBLAS_NUM_THREADS'] == '4'
+          strict_blas = [p for p in receipt['runtime']['threadpools'] if p.get('user_api') == 'blas']
+          assert strict_blas and all(str(p.get('architecture')).lower() == 'skylakex' for p in strict_blas)
+          assert all(int(p.get('num_threads', 0)) == 4 for p in strict_blas)
+          assert runtime['reconstruction_runtime'] == receipt['runtime']
+
+          assert runtime['provenance']['capture_stage'] == 'pre_fit'
+          assert runtime['provenance']['capture_context'] == 'prospective_shadow_reconstruction'
+          assert runtime['provenance']['frozen_identity_verified'] is True
+          assert identity_check['matches'] is True
+          assert identity_check['numeric_abs_tolerance'] == 1e-12
+          assert max(identity_check['numeric_absolute_deltas'].values()) <= 1e-12
+          assert inputs_manifest['capture_stage'] == 'pre_fit'
+          assert inputs_manifest['capture_context'] == 'prospective_shadow_reconstruction'
+          assert inputs_manifest['candidate_id'] == 'F-ST-01-FROZEN-2026'
+          assert fit_manifest['capture_context'] == 'prospective_shadow_reconstruction'
+          assert fit_manifest['reconstruction_execution_policy'] == 'durable_forensic_evidence_verification'
+          assert fit_manifest['reconstruction_forensic_evidence_sha256'] == evidence_sha
+          assert fit_manifest['shadow_scoring_execution_policy'] == 'native_cpu_registered_literals'
+          assert fit_manifest['reconstruction_probe_receipt_sha256'] == hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+          assert inputs_manifest['base_oof']['raw_sha256'] == hashlib.sha256(base_oof_raw).hexdigest()
+          assert inputs_manifest['training_frame']['raw_sha256'] == hashlib.sha256(training_raw).hexdigest()
+          assert fit_manifest['base_oof_raw_sha256'] == inputs_manifest['base_oof']['raw_sha256']
+          assert fit_manifest['training_frame_raw_sha256'] == inputs_manifest['training_frame']['raw_sha256']
+          assert fit_manifest['model_training_data_sha256'] == registered['training_data_sha256']
 
           slate = pd.read_csv('challenger_outputs/candidate_shadow_slate.csv')
           shadow = pd.read_csv('challenger_outputs/this_week_shadow.csv')
@@ -183,10 +302,13 @@ jobs:
           assert fst['research_candidate'].eq('F-ST-01').all()
           assert fst['research_method'].eq('stack').all()
           assert fst['training_last_season'].le(2025).all()
-          assert fst['training_data_sha256'].str.len().eq(64).all()
-          assert fst['stack_intercept'].notna().all()
-          assert fst['stack_market_logit_coefficient'].notna().all()
-          assert fst['stack_pure_logit_coefficient'].notna().all()
+          assert fst['training_data_sha256'].eq(registered['training_data_sha256']).all()
+          for col, key in [
+              ('stack_intercept', 'intercept'),
+              ('stack_market_logit_coefficient', 'market_logit_coefficient'),
+              ('stack_pure_logit_coefficient', 'pure_logit_coefficient'),
+          ]:
+              assert np.allclose(pd.to_numeric(fst[col], errors='raise'), registered[key], rtol=0.0, atol=1e-15), col
 
           selected_per_game = slate.groupby('game_id')['selected_shadow_candidate'].sum()
           assert selected_per_game.eq(1).all()
@@ -228,10 +350,12 @@ jobs:
           print(json.dumps(runtime, indent=2))
           PY
       - name: Upload challenger evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: levline-challenger-${{ github.run_id }}
           path: challenger_outputs/
+          if-no-files-found: warn
           retention-days: 30
       - name: Publish research-only outputs
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

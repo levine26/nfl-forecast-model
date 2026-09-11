@@ -10,10 +10,15 @@ import pytest
 
 from nfl_forecast.challenger_fst import (
     FROZEN_CANDIDATE_ID,
+    FrozenStackFit,
     fit_frozen_2026_stack,
     frozen_stack_probability,
 )
 from nfl_forecast.challenger_shadow import lock_shadow
+from nfl_forecast.fst_provenance import (
+    capture_fst_pre_fit_provenance,
+    write_fst_fit_provenance,
+)
 
 
 def _training_frame() -> pd.DataFrame:
@@ -182,3 +187,167 @@ def test_training_cutoff_csv_roundtrip_is_compared_numerically(tmp_path):
         pd.to_numeric(fst, errors="raise"),
         equal_nan=False,
     )
+
+
+def _provenance_inputs():
+    idx = pd.Index([101, 205, 309, 412])
+    historical = pd.DataFrame(
+        {
+            "game_id": ["2019_01_A_B", "2020_02_C_D", "2024_03_E_F", "2025_04_G_H"],
+            "season": [2019, 2020, 2024, 2025],
+            "home_win": [0, 1, 0, 1],
+        },
+        index=idx,
+    )
+    base_oof = pd.DataFrame(
+        {
+            "logistic": [0.5000000000000001, 0.61, 0.42, 0.77],
+            "extra_trees": [0.49, 0.63, 0.40, 0.74],
+            "xgboost": [0.47, 0.62, 0.41, 0.76],
+            "catboost": [0.51, 0.60, 0.43, 0.75],
+            "home_win": [0, 1, 0, 1],
+            "season": [2019, 2020, 2024, 2025],
+        },
+        index=idx,
+    )
+    training = pd.DataFrame(
+        {
+            "season": [2020, 2024, 2025],
+            "home_win": [1, 0, 1],
+            "market_prob": [0.58, 0.44, 0.71],
+            "pure_prob": [0.57, 0.46, 0.69],
+        },
+        index=idx[1:],
+    )
+    return historical, base_oof, training
+
+
+def _capture_reconstruction(historical, base_oof, training, output_dir):
+    return capture_fst_pre_fit_provenance(
+        historical,
+        base_oof,
+        training,
+        output_dir,
+        candidate_id=FROZEN_CANDIDATE_ID,
+        capture_context="prospective_shadow_reconstruction",
+    )
+
+
+def test_fst_provenance_persists_exact_order_and_canonical_keyed_identity(tmp_path):
+    historical, base_oof, training = _provenance_inputs()
+
+    first = _capture_reconstruction(historical, base_oof, training, tmp_path / "first")
+    second = _capture_reconstruction(historical, base_oof, training, tmp_path / "second")
+    assert first == second
+    assert first["schema_version"] == 2
+    assert first["capture_context"] == "prospective_shadow_reconstruction"
+
+    keyed = pd.read_csv(tmp_path / "first" / "base_oof_keyed.csv")
+    assert keyed["game_id"].tolist() == historical["game_id"].tolist()
+    assert keyed["row_position"].tolist() == list(range(len(base_oof)))
+    assert first["base_oof"]["raw_sha256"] == second["base_oof"]["raw_sha256"]
+
+    shuffled = _capture_reconstruction(
+        historical,
+        base_oof.iloc[::-1],
+        training.iloc[::-1],
+        tmp_path / "shuffled",
+    )
+    assert shuffled["base_oof"]["raw_sha256"] != first["base_oof"]["raw_sha256"]
+    assert (
+        shuffled["base_oof"]["game_id_sequence_sha256"]
+        != first["base_oof"]["game_id_sequence_sha256"]
+    )
+    assert (
+        shuffled["base_oof"]["canonical_game_keyed_sha256"]
+        == first["base_oof"]["canonical_game_keyed_sha256"]
+    )
+    assert (
+        shuffled["training_frame"]["canonical_game_keyed_sha256"]
+        == first["training_frame"]["canonical_game_keyed_sha256"]
+    )
+
+
+def test_fst_fit_provenance_distinguishes_raw_input_hash_from_model_digest(tmp_path):
+    historical, base_oof, training = _provenance_inputs()
+    inputs = _capture_reconstruction(historical, base_oof, training, tmp_path)
+    fit = FrozenStackFit(
+        intercept=-0.1,
+        market_logit_coefficient=1.1,
+        pure_logit_coefficient=-0.2,
+        training_games=len(training),
+        training_first_season=2020,
+        training_last_season=2025,
+        training_data_sha256="f" * 64,
+    )
+    manifest = write_fst_fit_provenance(tmp_path, inputs, fit)
+    assert manifest["model_training_data_sha256"] == "f" * 64
+    assert manifest["training_frame_raw_sha256"] == inputs["training_frame"]["raw_sha256"]
+    assert manifest["model_training_data_sha256"] != manifest["training_frame_raw_sha256"]
+    assert manifest["capture_context"] == "prospective_shadow_reconstruction"
+    assert manifest["runtime"]["python_version"]
+    assert manifest["runtime"]["numpy_version"]
+    assert manifest["runtime"]["scipy_version"]
+    assert manifest["runtime"]["scikit_learn_version"]
+    assert isinstance(manifest["runtime"]["threadpools"], list)
+    assert (tmp_path / "inputs_manifest.json").is_file()
+    assert (tmp_path / "fit_manifest.json").is_file()
+
+
+def test_fst_provenance_capture_context_is_explicit_and_cannot_launder_fst01(tmp_path):
+    historical, base_oof, training = _provenance_inputs()
+
+    with pytest.raises(ValueError, match="capture_context"):
+        capture_fst_pre_fit_provenance(
+            historical,
+            base_oof,
+            training,
+            tmp_path / "ambiguous",
+            candidate_id=FROZEN_CANDIDATE_ID,
+            capture_context="reconstruction",
+        )
+
+    with pytest.raises(ValueError, match="may not be relabeled as candidate_freeze"):
+        capture_fst_pre_fit_provenance(
+            historical,
+            base_oof,
+            training,
+            tmp_path / "laundered",
+            candidate_id=FROZEN_CANDIDATE_ID,
+            capture_context="candidate_freeze",
+        )
+
+    future = capture_fst_pre_fit_provenance(
+        historical,
+        base_oof,
+        training,
+        tmp_path / "future",
+        candidate_id="F-ST-02-FROZEN-2027",
+        capture_context="candidate_freeze",
+    )
+    assert future["candidate_id"] == "F-ST-02-FROZEN-2027"
+    assert future["capture_context"] == "candidate_freeze"
+
+
+def test_fst_provenance_fails_closed_on_ambiguous_or_post_cutoff_rows(tmp_path):
+    historical, base_oof, training = _provenance_inputs()
+
+    duplicate_ids = historical.copy()
+    duplicate_ids.loc[205, "game_id"] = duplicate_ids.loc[101, "game_id"]
+    with pytest.raises(ValueError, match="duplicate game_id"):
+        _capture_reconstruction(
+            duplicate_ids,
+            base_oof,
+            training,
+            tmp_path / "duplicate",
+        )
+
+    contaminated = training.copy()
+    contaminated.loc[412, "season"] = 2026
+    with pytest.raises(ValueError, match="post-2025"):
+        _capture_reconstruction(
+            historical,
+            base_oof,
+            contaminated,
+            tmp_path / "contaminated",
+        )
