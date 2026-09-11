@@ -1,0 +1,62 @@
+{
+  "contract_version": 1,
+  "status": "pre_registered_source_audit",
+  "source_id": "qubone_sleeper_daily_git_archive",
+  "source_repository": "qubone/sleeper_fetch_players",
+  "target_use": "research-only reconstruction of 2025 pregame player status/depth state",
+  "target_horizon_minutes": 120,
+  "production_authorized": false,
+  "model_fitting_authorized_before_audit_pass": false,
+  "2026_outcomes_allowed": false,
+  "observed_archive_boundary": {
+    "first_verified_nfl_payload_commit_utc": "2025-01-19T21:42:29Z",
+    "latest_verified_2026_daily_updates": true,
+    "storage_mechanism": "daily replacement of nfl/sleeper_data_latest.json preserved through Git commit history"
+  },
+  "qualification_tests": {
+    "regular_season_continuity": {
+      "rule": "Every 2025 regular-season game must have at least one archive snapshot no later than its T-120 cutoff and no more than 36 hours before that cutoff, unless explicitly marked missing.",
+      "pass_threshold": "at least 99% of games satisfy the window; all misses enumerated"
+    },
+    "snapshot_timestamp_integrity": {
+      "rule": "Use Git commit/author timestamp as archive-observation time; never infer a source-effective time later than the commit. Commit timestamp must be parseable for every used snapshot.",
+      "pass_threshold": "100%"
+    },
+    "field_schema_stability": {
+      "required_fields": ["player_id", "team", "status", "injury_status", "practice_participation", "injury_start_date", "depth_chart_position"],
+      "rule": "Report field existence and non-null rates by snapshot/month/position; any midseason schema disappearance is a blocker until explained.",
+      "pass_threshold": "player_id/team/status present where applicable; injury/practice missingness reported, never silently imputed"
+    },
+    "stable_identity": {
+      "rule": "Crosswalk Sleeper player_id to GSIS using nflverse roster/player crosswalks or DynastyProcess IDs; unresolved and duplicate mappings remain missing.",
+      "pass_threshold": "at least 99.5% of status-bearing NFL players used in evaluation map unambiguously"
+    },
+    "official_report_concordance": {
+      "rule": "For a stratified manual sample across at least six 2025 weeks and 12 teams, compare archived injury_status/practice_participation with contemporaneous NFL official injury-report evidence available before kickoff.",
+      "pass_threshold": "No evidence of systematic hindsight/final-status substitution; all disagreements categorized"
+    },
+    "revision_semantics": {
+      "rule": "Demonstrate at least several player-week status transitions across consecutive daily commits. A snapshot must reflect the state visible on that archive date rather than a later retrospectively rewritten value.",
+      "pass_threshold": "verified on sampled changing statuses"
+    },
+    "coverage_bias": {
+      "rule": "Report snapshot/status availability by team, position and week. Missingness cannot mean healthy or active.",
+      "pass_threshold": "no unexplained team/position coverage hole that would systematically bias the validation set"
+    },
+    "rights_and_cost": {
+      "rule": "Use remains $0 and non-commercial. Sleeper documents its API as free for non-commercial use; repository code is GPL-3.0, but archived API-output reuse must still be treated as requiring a specific data/terms review before redistribution.",
+      "pass_threshold": "research storage/analysis judged permissible; no raw archive republishing by LevLine"
+    }
+  },
+  "if_passes": {
+    "next_step": "pre-register a narrow 2025-only availability/status predictive audit; passing this source audit does not itself authorize model fitting on 2022-2024 with a different source family or production promotion",
+    "allowed_features_for_next_prereg": ["status category", "practice participation", "days since injury start when trustworthy", "depth-chart rank", "roster status", "explicit missingness"],
+    "prohibited_features": ["actual game snaps", "final inactive list learned after T-120", "postgame participation", "2026 results", "retrospective name matching"]
+  },
+  "if_fails": [
+    "archive remains explainability/source-research only",
+    "no P(active) model fit",
+    "no production probability feature",
+    "continue prospective LevLine-owned snapshots for future seasons"
+  ]
+}
