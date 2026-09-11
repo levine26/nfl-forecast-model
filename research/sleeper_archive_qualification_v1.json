@@ -5,7 +5,7 @@
   "technical_status": "VERIFIED",
   "research_classification": "QUALIFIED_RESEARCH_2026_ONLY",
   "treat_source_as_valid_unless_data_audit_fails": true,
-  "supersedes_registry_block_for_technical_research": true,
+  "supplements_registry_scope_for_technical_research": true,
   "effective_scope": {
     "historical_coverage_start_utc": "2026-02-01T10:24:49Z",
     "supports_2025_reconstruction": false,
@@ -35,8 +35,8 @@
   ],
   "rights_separation": {
     "source_validity_depends_on_repository_license": false,
-    "raw_public_redistribution_requires_separate_clearance": true,
-    "production_or_commercial_dependency_requires_separate_clearance": true,
-    "note": "Technical validity and point-in-time research usability are evaluated independently from public redistribution or production-rights questions."
+    "rights_are_technical_qualification_input": false,
+    "rights_metadata_retained": true,
+    "note": "Technical validity and point-in-time research usability are determined only by the data and integrity of the source. Rights/licensing information is metadata and never changes technical qualification."
   }
 }

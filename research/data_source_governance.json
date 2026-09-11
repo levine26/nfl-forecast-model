@@ -1,8 +1,10 @@
 {
-  "registry_version": 1,
+  "registry_version": 2,
   "status": "research_governance",
   "generated_for": "LevLine / Sunday Signal",
-  "governance_principle": "Technical accessibility does not imply permission to persist, redistribute, publish, or use a source in production. Each source must separately pass identity, timestamp, point-in-time, reliability, cost, and rights review for its intended use.",
+  "qualification_basis": "DATA_INTEGRITY_ONLY",
+  "rights_qualification_blocker": false,
+  "governance_principle": "Technical source qualification is determined only by data integrity: identity, timestamp semantics, point-in-time reproducibility, coverage, reliability, availability and reproducibility. Licensing, usage-rights and redistribution information is retained as metadata and never blocks technical qualification. Active research additionally preserves LevLine's zero-cost policy, and production use always requires explicit production authorization independent of source qualification.",
   "sources": [
     {
       "source_id": "nflverse_games",
@@ -15,7 +17,8 @@
       "market_provenance_status": "opaque_bookmaker_provenance",
       "market_use_policy": "Treat home_moneyline/away_moneyline as an upstream benchmark, not as a named sportsbook or a verified multi-book consensus.",
       "historical_point_in_time_status": "closing_or_late_benchmark_not_matched_to_levline_lock_horizon",
-      "rights_status": "existing_project_source; preserve source attribution and review any underlying-source redistribution constraints before expanding publication",
+      "rights_status": "metadata_only: existing project source; preserve attribution and record underlying-source redistribution notes",
+      "rights_qualification_blocker": false,
       "production_eligibility": "existing_use_only",
       "documentation": ["https://nflreadr.nflverse.com/", "https://nflreadr.nflverse.com/articles/nflverse_data_schedule.html"]
     },
@@ -31,13 +34,47 @@
       "collection_policy": "Query only inside the research near-kickoff window; one request services the due-game cluster; stop at a configured reserve.",
       "book_policy": "De-vig each book separately; retain per-book values and timestamps; derive a robust logit consensus.",
       "historical_point_in_time_status": "prospective_capture_only_for_lock_horizon_selection",
-      "rights_status": "research_use_pending_source_specific_terms_and_redistribution_review",
-      "production_eligibility": "not_authorized",
+      "rights_status": "metadata_only: provider terms and redistribution posture are recorded separately from qualification",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_prospective_data_quality_evidence",
       "documentation": ["https://the-odds-api.com/liveapi/guides/v4/", "https://the-odds-api.com/"]
     },
-    {"source_id":"sportsbook_fanduel","family":"sportsbook","provider":"FanDuel via approved aggregator feed","intended_role":["component_market_probability"],"technical_status":"research_candidate","ingestion_policy":"Use provider/aggregator API data rather than direct site scraping unless separately reviewed.","combination_policy":"De-vig independently and retain source identity; eligible for sportsbook-family consensus only.","rights_status":"inherits_feed_contract_and_requires_publication_review","production_eligibility":"not_authorized"},
-    {"source_id":"sportsbook_draftkings","family":"sportsbook","provider":"DraftKings via approved aggregator feed","intended_role":["component_market_probability"],"technical_status":"research_candidate","ingestion_policy":"Use provider/aggregator API data rather than direct site scraping unless separately reviewed.","combination_policy":"De-vig independently and retain source identity; eligible for sportsbook-family consensus only.","rights_status":"inherits_feed_contract_and_requires_publication_review","production_eligibility":"not_authorized"},
-    {"source_id":"sportsbook_betmgm","family":"sportsbook","provider":"BetMGM via approved aggregator feed","intended_role":["component_market_probability"],"technical_status":"research_candidate","ingestion_policy":"Use provider/aggregator API data rather than direct site scraping unless separately reviewed.","combination_policy":"De-vig independently and retain source identity; eligible for sportsbook-family consensus only.","rights_status":"inherits_feed_contract_and_requires_publication_review","production_eligibility":"not_authorized"},
+    {
+      "source_id": "sportsbook_fanduel",
+      "family": "sportsbook",
+      "provider": "FanDuel via aggregator feed",
+      "intended_role": ["component_market_probability"],
+      "technical_status": "research_candidate",
+      "ingestion_policy": "Use structured aggregator data and preserve source/timestamp provenance.",
+      "combination_policy": "De-vig independently and retain source identity; eligible for sportsbook-family consensus only.",
+      "rights_status": "metadata_only: inherits feed metadata",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_prospective_data_quality_evidence"
+    },
+    {
+      "source_id": "sportsbook_draftkings",
+      "family": "sportsbook",
+      "provider": "DraftKings via aggregator feed",
+      "intended_role": ["component_market_probability"],
+      "technical_status": "research_candidate",
+      "ingestion_policy": "Use structured aggregator data and preserve source/timestamp provenance.",
+      "combination_policy": "De-vig independently and retain source identity; eligible for sportsbook-family consensus only.",
+      "rights_status": "metadata_only: inherits feed metadata",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_prospective_data_quality_evidence"
+    },
+    {
+      "source_id": "sportsbook_betmgm",
+      "family": "sportsbook",
+      "provider": "BetMGM via aggregator feed",
+      "intended_role": ["component_market_probability"],
+      "technical_status": "research_candidate",
+      "ingestion_policy": "Use structured aggregator data and preserve source/timestamp provenance.",
+      "combination_policy": "De-vig independently and retain source identity; eligible for sportsbook-family consensus only.",
+      "rights_status": "metadata_only: inherits feed metadata",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_prospective_data_quality_evidence"
+    },
     {
       "source_id": "polymarket",
       "family": "prediction_exchange",
@@ -47,8 +84,9 @@
       "technical_status": "public_api_available",
       "combination_policy": "Keep separate from sportsbook consensus; require event identity, liquidity, spread/depth, timestamp alignment and incremental-value audit.",
       "historical_point_in_time_status": "requires_separate_audit",
-      "rights_status": "api_access_confirmed; persistence_and_redistribution_review_pending",
-      "production_eligibility": "not_authorized",
+      "rights_status": "metadata_only: persistence/redistribution posture recorded separately",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_data_integrity_audit",
       "documentation": ["https://docs.polymarket.com/"]
     },
     {
@@ -57,11 +95,28 @@
       "provider": "Kalshi",
       "intended_role": ["possible_separate_exchange_probability_research"],
       "current_levline_use": false,
-      "technical_status": "api_market_data_exists_but_not_approved_for_levline_collection",
+      "technical_status": "public_market_data_api_candidate_pending_event_identity_liquidity_timestamp_and_coverage_audit",
       "combination_policy": "Do not include in sportsbook consensus.",
-      "rights_status": "specific_developer_data_use_and_redistribution_review_required_before_collection_or_storage",
-      "production_eligibility": "excluded_pending_rights_review",
+      "rights_status": "metadata_only: developer/data-use terms recorded separately",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_data_integrity_audit",
       "documentation": ["https://docs.kalshi.com/"]
+    },
+    {
+      "source_id": "sleeper_historical_player_archive_candidate",
+      "family": "availability",
+      "provider": "edgecdec/declan-fantasy-football public GitHub snapshot archive",
+      "intended_role": ["2026_point_in_time_player_state", "prospective_availability_shadow_research"],
+      "current_levline_use": true,
+      "technical_status": "verified_2026_only",
+      "identity_status": "all-position audit requires >=99.5% unambiguous identity resolution",
+      "point_in_time_status": "Git commit time is a conservative persistence bound and must not exceed the simulated decision timestamp",
+      "coverage_note": "Snapshot history begins 2026-02-01; no 2025 reconstruction is supported.",
+      "rights_status": "metadata_only: repository/API rights metadata retained separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": true,
+      "production_eligibility": "not_authorized_2026_shadow_research_only",
+      "documentation": ["https://github.com/edgecdec/declan-fantasy-football", "https://docs.sleeper.com/"]
     },
     {
       "source_id": "nfl_official_injury_reports",
@@ -72,8 +127,9 @@
       "technical_status": "prospective_reference_available",
       "identity_status": "rendered historical tables do not satisfy the existing stable-ID research contract by themselves",
       "point_in_time_status": "retrospective T-minus reconstruction not qualified from rendered historical pages alone",
-      "rights_status": "public_reference; automated persistence/redistribution requires source-specific review",
-      "production_eligibility": "explainability_reference_only_not_probability_feature"
+      "rights_status": "metadata_only: public-reference redistribution posture recorded separately",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "explainability_reference_only_until_identity_and_point_in_time_audit_pass"
     },
     {
       "source_id": "sportradar_weekly_injuries_v7",
@@ -84,8 +140,10 @@
       "technical_status": "credentialed_candidate",
       "coverage_note": "Official v7 documentation exposes player GUIDs, injury/practice status and status_date; historical NFL API access is documented back to 2000 for regular/postseason feeds.",
       "point_in_time_status": "past weekly snapshots are addressable, but exact revision history as-of a LevLine horizon still requires credentialed proof rather than assumption from current historical payloads",
-      "rights_status": "commercial_contract_required_and_must_match_storage_publication_use",
-      "production_eligibility": "not_authorized_until_audit_and_contract_review"
+      "rights_status": "metadata_only: commercial terms recorded separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": false,
+      "production_eligibility": "not_authorized_pending_point_in_time_audit_and_explicit_production_authorization"
     },
     {
       "source_id": "sportsdataio_injuries",
@@ -95,8 +153,10 @@
       "current_levline_use": false,
       "technical_status": "credentialed_candidate",
       "point_in_time_status": "historical revision reconstruction and stable-ID crosswalk remain unproven",
-      "rights_status": "commercial_contract_required_and_must_match_storage_publication_use",
-      "production_eligibility": "not_authorized_until_audit_and_contract_review"
+      "rights_status": "metadata_only: commercial terms recorded separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": false,
+      "production_eligibility": "not_authorized_pending_identity_and_point_in_time_audit"
     },
     {
       "source_id": "nfl_next_gen_stats_via_nflverse",
@@ -106,8 +166,9 @@
       "current_levline_use": false,
       "technical_status": "historical_player_weekly_data_available_through_existing_nflverse_stack",
       "freshness_note": "nflverse documents player-level weekly NGS updates nightly during the season, subject to upstream availability",
-      "rights_status": "research candidate; confirm upstream and redistribution terms before any public player-level display",
-      "production_eligibility": "not_authorized"
+      "rights_status": "metadata_only: upstream/redistribution posture recorded for display governance",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_point_in_time_and_incremental_value_audit"
     },
     {
       "source_id": "pfr_via_nflverse",
@@ -117,8 +178,9 @@
       "current_levline_use": false,
       "technical_status": "available_through_nflverse_refresh_paths",
       "freshness_note": "nflverse documents PFR snap-count refreshes four times daily and advanced-stat refreshes daily during the season",
-      "rights_status": "do not direct-scrape or publicly redistribute without a source-specific rights review; Sports Reference terms constrain automated access",
-      "production_eligibility": "not_authorized"
+      "rights_status": "metadata_only: source access/redistribution posture recorded separately",
+      "rights_qualification_blocker": false,
+      "production_eligibility": "not_authorized_pending_point_in_time_and_incremental_value_audit"
     },
     {
       "source_id": "pff_pro_api",
@@ -127,15 +189,17 @@
       "intended_role": ["potential_private_research_features"],
       "current_levline_use": false,
       "technical_status": "paid_api_available_to_eligible_consumer_tier",
-      "rights_status": "consumer API license is personal-use only and does not grant commercial use or public distribution; broader use would require separate written rights",
-      "production_eligibility": "not_authorized_for_public_or_commercial_levline_use"
+      "rights_status": "metadata_only: consumer API terms recorded separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": false,
+      "production_eligibility": "excluded_from_active_research_by_zero_cost_policy"
     }
   ],
   "family_rules": {
     "sportsbooks": "May be aggregated only after each source is independently de-vigged and timestamped. Preserve per-book provenance and source count.",
     "prediction_exchanges": "Never mix into sportsbook consensus by default. Evaluate as a separate information family with liquidity and microstructure controls.",
     "availability": "Pregame player availability must be point-in-time reproducible, stable-ID mapped, and known by the tested forecast horizon. Actual snaps/participation are prohibited proxies.",
-    "advanced_player_statistics": "Observed player metrics require explicit source provenance and redistribution approval before public display; technical or paid access alone is insufficient.",
+    "advanced_player_statistics": "Observed player metrics require explicit source provenance, point-in-time validity and reproducibility before quantitative use. Rights metadata is non-blocking for technical qualification and remains separate display/governance metadata.",
     "historical_vs_prospective": "Closing historical markets may benchmark information quality but cannot establish the best T-minus lock horizon. Lock-horizon selection requires prospective matched-horizon observations."
   },
   "current_decisions": {
@@ -143,9 +207,11 @@
     "recommended_first_market_family": "sportsbook_consensus",
     "current_nflverse_market_role": "opaque_upstream_benchmark",
     "polymarket_role": "separate_research_candidate",
-    "kalshi_role": "excluded_pending_rights_review",
-    "recommended_first_availability_audit": "sportradar_weekly_injuries_v7",
-    "pff_public_use": "not_authorized_under_consumer_api_terms",
+    "kalshi_role": "separate_research_candidate_pending_data_integrity_audit",
+    "recommended_first_availability_audit": "sleeper_historical_player_archive_candidate",
+    "availability_scope_note": "Sleeper archive is 2026-only; no zero-cost source currently qualifies a 2022-2025 availability backtest.",
+    "pff_active_research_status": "excluded_by_zero_cost_policy",
+    "rights_qualification_blocker": false,
     "player_availability_probability_feature_authorized": false,
     "production_market_source_change_authorized": false
   }
