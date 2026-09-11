@@ -1,0 +1,205 @@
+{
+  "registry_version": 1,
+  "status": "research_only",
+  "as_of": "2026-09-11",
+  "hard_constraint": "zero_recurring_paid_cost",
+  "production_authorized": false,
+  "2026_outcomes_allowed_for_selection": false,
+  "sources": [
+    {
+      "source_id": "nflverse_games_schedule",
+      "provider": "nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "about every 5 minutes in season",
+      "useful_for": ["schedule", "kickoff", "results scaffold", "rest", "market benchmark fields when present"],
+      "point_in_time_quality": "good for prospective snapshots; preserve our own retrieval timestamp",
+      "candidate_role": "existing production scaffold and prospective research archive",
+      "priority": "P0"
+    },
+    {
+      "source_id": "nflverse_pbp_player_team_stats",
+      "provider": "nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "nightly after game days plus specific game-day updates; raw PBP usually within about 15 minutes after a game ends",
+      "useful_for": ["EPA", "success", "situational efficiency", "QB/dropback state", "player usage", "team state"],
+      "point_in_time_quality": "strong for prior-completed-game state; never same-game pregame information",
+      "candidate_role": "historical and rolling football-state research",
+      "priority": "P0"
+    },
+    {
+      "source_id": "nflverse_depth_charts_2025plus",
+      "provider": "nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "daily around 07:00 UTC",
+      "useful_for": ["depth rank", "position group", "starter/backup topology", "personnel continuity"],
+      "point_in_time_quality": "high from 2025 onward because each appended update has an ISO8601 timestamp",
+      "candidate_role": "personnel-state and expected-lineup research only; not an injury-status substitute",
+      "priority": "P0"
+    },
+    {
+      "source_id": "nflverse_rosters",
+      "provider": "nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "daily around 07:00 UTC",
+      "useful_for": ["team membership", "active/reserve roster state", "position", "player metadata"],
+      "point_in_time_quality": "prospective snapshots recommended; weekly roster history available",
+      "candidate_role": "roster-state research and identity support",
+      "priority": "P0"
+    },
+    {
+      "source_id": "nflverse_players",
+      "provider": "nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "automated overnight updates",
+      "useful_for": ["GSIS primary identity", "ESPN/PFR/PFF/OTC crosswalks", "position", "status", "bio metadata"],
+      "point_in_time_quality": "identity foundation rather than game-state source",
+      "candidate_role": "canonical player identity spine",
+      "priority": "P0"
+    },
+    {
+      "source_id": "dynastyprocess_player_ids",
+      "provider": "DynastyProcess open-data repository",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "weekly",
+      "useful_for": ["GSIS-to-Sleeper crosswalk", "multi-provider player IDs"],
+      "point_in_time_quality": "identity only; validate missing/duplicate IDs and never join by name when ambiguous",
+      "candidate_role": "bridge Sleeper current state to GSIS/nflverse",
+      "priority": "P0"
+    },
+    {
+      "source_id": "sleeper_players_nfl",
+      "provider": "Sleeper documented public API",
+      "cost": "$0 for non-commercial use",
+      "current_2026": true,
+      "cadence": "official docs recommend at most once daily",
+      "useful_for": ["current team", "active status", "depth chart order", "injury status", "practice participation", "injury start date"],
+      "point_in_time_quality": "current-state endpoint, not a historical revision archive; LevLine must snapshot prospectively with retrieved_at_utc",
+      "candidate_role": "prospective 2026 personnel/status ledger and explainability source; any modeled availability use requires separate validation",
+      "rights_note": "Sleeper documents the API as free for non-commercial use; if LevLine becomes commercial this source must fail closed or be replaced, not upgraded automatically",
+      "priority": "P0_PROSPECTIVE"
+    },
+    {
+      "source_id": "nfl_official_injury_page",
+      "provider": "NFL.com",
+      "cost": "$0 public web page",
+      "current_2026": true,
+      "cadence": "updated through weekly practice/game-status cycle",
+      "useful_for": ["official practice status", "game status", "injury body area", "human-auditable current context"],
+      "point_in_time_quality": "current page is authoritative context but rendered history does not establish exact revision-as-of semantics or stable IDs",
+      "candidate_role": "current explainability/reference and prospective snapshot audit; not yet qualified for historical P(active) fitting",
+      "priority": "P0_CONTEXT"
+    },
+    {
+      "source_id": "nflverse_ngs_weekly",
+      "provider": "NFL Next Gen Stats via nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "nightly during season, source dependent",
+      "useful_for": ["QB process", "passing", "rushing", "receiving", "air yards", "time-to-throw and other published NGS aggregates"],
+      "point_in_time_quality": "prior-completed-week/game features only; preserve retrieval timestamp and publication lag",
+      "candidate_role": "orthogonal football-process ablation",
+      "priority": "P1"
+    },
+    {
+      "source_id": "nflverse_ftn_charting",
+      "provider": "FTN Data via nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "checked at 00/06/12/18 UTC in season, source dependent",
+      "historical_coverage": "2022 onward",
+      "useful_for": ["motion", "play action", "RPO", "screens", "QB out of pocket", "box count", "blitzers", "pass rushers", "catchable/contested", "interception-worthy", "QB-fault sacks"],
+      "point_in_time_quality": "excellent for leakage control because rows include date_pulled; only rows actually available before the tested decision time may roll forward",
+      "candidate_role": "highest-priority new historical scheme/process feature family",
+      "license": "CC-BY-SA-4.0 via nflverse with attribution",
+      "priority": "P1"
+    },
+    {
+      "source_id": "nflverse_snap_counts",
+      "provider": "PFR via nflverse",
+      "cost": "$0 access through nflverse",
+      "current_2026": true,
+      "cadence": "checked at 00/06/12/18 UTC in season",
+      "useful_for": ["prior-game participation", "unit rotation", "continuity", "role concentration"],
+      "point_in_time_quality": "postgame realized participation only; may roll into later games but must never reconstruct current-game availability",
+      "candidate_role": "supporting prior-participation state only",
+      "priority": "P2"
+    },
+    {
+      "source_id": "nflverse_pfr_advanced",
+      "provider": "PFR via nflverse",
+      "cost": "$0 access through nflverse",
+      "current_2026": true,
+      "cadence": "daily around 07:00 UTC in season",
+      "useful_for": ["published advanced passing/rushing/receiving/defensive summaries"],
+      "point_in_time_quality": "prior-completed-game/week use only; source-rights and publication-lag audit required before public redistribution",
+      "candidate_role": "secondary advanced-stat ablation",
+      "priority": "P2"
+    },
+    {
+      "source_id": "nws_api",
+      "provider": "NOAA National Weather Service",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "live official grid forecasts/observations with cache-aware API",
+      "useful_for": ["temperature", "wind", "precipitation", "weather alerts", "stadium-point hourly/grid forecast"],
+      "point_in_time_quality": "prospective snapshots at T-120 and earlier should be persisted by LevLine; API is official US Government open data",
+      "candidate_role": "preferred zero-cost live US weather source",
+      "priority": "P0_WEATHER"
+    },
+    {
+      "source_id": "open_meteo",
+      "provider": "Open-Meteo",
+      "cost": "$0 for non-commercial use within free limits",
+      "current_2026": true,
+      "cadence": "live models update from roughly hourly to six-hourly depending on model",
+      "useful_for": ["historical forecasts", "previous model runs", "single-run archives", "weather backtesting without look-ahead"],
+      "point_in_time_quality": "very strong for historical forecast reconstruction; archived model runs preserve issuance horizon",
+      "candidate_role": "weather research/backtest complement to NWS; fail closed if project use no longer qualifies for free access",
+      "license": "API data CC BY 4.0 with attribution",
+      "priority": "P1_WEATHER"
+    },
+    {
+      "source_id": "nflverse_data_archives",
+      "provider": "nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "cadence": "periodic archive releases; additional in-season archive process exists upstream",
+      "useful_for": ["reproducibility", "historical source-state recovery", "data drift audits"],
+      "point_in_time_quality": "coarser than LevLine decision snapshots but valuable independent archive evidence",
+      "candidate_role": "time-machine validation and recovery layer",
+      "priority": "P1_INFRA"
+    },
+    {
+      "source_id": "the_odds_api_free_tier",
+      "provider": "The Odds API",
+      "cost": "$0 only while within free monthly credits",
+      "current_2026": true,
+      "useful_for": ["named sportsbook h2h", "spread", "total", "per-book timestamps", "de-vigged consensus"],
+      "point_in_time_quality": "prospective snapshots only under zero-cost policy; paid historical endpoint prohibited",
+      "candidate_role": "pre-registered horizon collector with hard quota reserve; no automatic paid upgrade",
+      "priority": "P0_MARKET"
+    }
+  ],
+  "explicit_blocks": [
+    "nflverse injury dataset as a 2025/2026 source because upstream injury data ended after 2024",
+    "same-game snaps or participation as pregame availability",
+    "Sleeper current status treated as historical status without a LevLine snapshot",
+    "paid historical odds",
+    "paid injury/charting feeds",
+    "2026 completed outcomes for feature/model selection"
+  ],
+  "recommended_build_order": [
+    "prospective T-120 data time-machine snapshots",
+    "FTN date_pulled historical scheme/process ablation",
+    "NGS process-state ablation",
+    "free multi-market horizon collector redesign",
+    "2026 outcome-free market-movement diagnostic",
+    "only then consider historically qualified feature promotion research"
+  ]
+}
