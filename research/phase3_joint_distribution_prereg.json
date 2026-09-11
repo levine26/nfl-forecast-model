@@ -1,0 +1,72 @@
+{
+  "experiment_id": "PHASE3-JOINT-DIST-001",
+  "candidate_version": "market-anchored-joint-distribution-v1",
+  "status": "planned",
+  "created_before_result_generation": true,
+  "hypothesis": "A coherent market-anchored score distribution with strongly shrunk chronology-trained football residual corrections can improve margin and total forecasts without materially degrading winner-probability quality relative to the market.",
+  "historical_selection_end": 2025,
+  "training_policy": "For each validation season S in 2022-2025, fit only on completed seasons < S. Never use 2026 outcomes.",
+  "validation_seasons": [2022, 2023, 2024, 2025],
+  "market_anchors": {
+    "margin": "pregame spread_line, home-margin sign convention",
+    "total": "pregame total_line",
+    "winner_probability_benchmark": "vig-free market_home_prob"
+  },
+  "football_residual_models": {
+    "family": "median-imputed standardized ridge regression",
+    "margin_target": "actual_margin - market_spread",
+    "total_target": "actual_total - market_total",
+    "alpha_margin": 100.0,
+    "alpha_total": 100.0,
+    "margin_correction_cap_points": 3.0,
+    "total_correction_cap_points": 4.0,
+    "hyperparameter_search": "none"
+  },
+  "distribution": {
+    "family": "bivariate normal over home-minus-away margin and game total",
+    "margin_sigma": "estimated on prior-season market margin residuals only",
+    "total_sigma": "estimated on prior-season market total residuals only",
+    "residual_correlation": "estimated on prior-season market margin/total residual pairs only",
+    "winner_probability": "Phi(candidate_margin_mean / prior-season margin_sigma)",
+    "home_score_mean": "(candidate_total_mean + candidate_margin_mean) / 2",
+    "away_score_mean": "(candidate_total_mean - candidate_margin_mean) / 2"
+  },
+  "large_disagreement_guardrail": {
+    "rationale": "Phase 2 found historical model-vs-market margin gaps >=6 points had materially worse MAE than market.",
+    "policy": "The residual candidate may move market margin by at most 3 points and market total by at most 4 points. No exception or post-result rescue search is allowed in this experiment."
+  },
+  "primary_metrics": [
+    "winner_brier_vs_raw_market_moneyline",
+    "margin_mae_vs_market_spread",
+    "total_mae_vs_market_total"
+  ],
+  "secondary_metrics": [
+    "winner_log_loss",
+    "winner_accuracy",
+    "margin_rmse",
+    "total_rmse",
+    "normal_margin_crps",
+    "normal_total_crps",
+    "80pct_margin_interval_coverage",
+    "80pct_total_interval_coverage",
+    "coherence_failures",
+    "correction_cap_rate"
+  ],
+  "qualification_rule": {
+    "winner_probability": "Candidate must not have statistically supported degradation vs raw market on Brier or log loss.",
+    "margin": "Candidate must improve market-spread MAE with season+week blocked uncertainty supporting improvement.",
+    "total": "Candidate must improve market-total MAE with season+week blocked uncertainty supporting improvement.",
+    "coherence": "Zero algebraic coherence failures between probability distribution, fair margin, total and score means.",
+    "promotion": "No production promotion is authorized by historical qualification alone."
+  },
+  "prohibited_inputs": [
+    "2026 outcomes",
+    "post-kickoff information",
+    "current-game realized snaps",
+    "future injury status",
+    "closing-line information unavailable at the tested forecast horizon when later matched-horizon testing begins",
+    "post-result hyperparameter search"
+  ],
+  "production_changed": false,
+  "promotion_authorized": false
+}
