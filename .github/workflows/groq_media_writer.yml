@@ -189,9 +189,11 @@ jobs:
           python -m py_compile scripts/run_groq_media_prompt.py
           python - <<'PY'
           from pathlib import Path
-          text = Path('.github/workflows/groq_media_writer.yml').read_text()
-          assert '@github/copilot' not in text
-          assert 'copilot-requests:' not in text
+          import re
+
+          text = Path('.github/workflows/groq_media_writer.yml').read_text(encoding='utf-8')
+          assert not re.search(r'^\s*copilot-requests\s*:', text, flags=re.M)
+          assert not re.search(r'^\s*run:\s*npm\s+install\s+-g\s+@github/copilot\s*$', text, flags=re.M)
           assert 'secrets.GROQ_API_KEY' in text
           assert 'scripts/run_groq_media_prompt.py' in text
           print('Groq provider migration wiring validated without consuming repository secrets on PR.')
