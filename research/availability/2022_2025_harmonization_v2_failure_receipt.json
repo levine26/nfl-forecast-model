@@ -1,0 +1,41 @@
+{
+  "record_version": 1,
+  "status": "failed_before_v3_live_execution",
+  "candidate_id": "availability_harmonization_v2",
+  "pr": 146,
+  "head_sha": "32c587be495c77f0b9b427f084761f8c936d28fa",
+  "artifact_id": 10283026249,
+  "artifact_zip_sha256": "4313387c79cfe965388c56b517ad8287e4b9289eccab16c599fc30eae78f8641",
+  "v2_identity_2022": {
+    "official_distinct_rows": 5683,
+    "official_unique_stable_identity_rows": 5681,
+    "official_unresolved_identity_rows": 2,
+    "official_identity_resolution_rate": 0.9996480732007742,
+    "frozen_minimum": 0.995,
+    "passed": true
+  },
+  "v2_2025_inherited_identity": {
+    "official_distinct_rows": 6068,
+    "official_unique_stable_identity_rows": 6064,
+    "official_unresolved_identity_rows": 4,
+    "official_identity_resolution_rate": 0.999340804218853,
+    "frozen_minimum": 0.995,
+    "passed": true
+  },
+  "halt": {
+    "season": 2023,
+    "nfl_week": 20,
+    "league_archive_url": "https://www.nfl.com/injuries/league/2023/post2",
+    "exception": "official NFL archive page parsed zero injury rows",
+    "observed_archive_behavior": "page lists all eight divisional-round teams but renders every team as No Injuries Reported",
+    "identity_v2_failure": false,
+    "source_archive_failure": true
+  },
+  "firewall": {
+    "v09b_fitted_or_scored": false,
+    "game_outcomes_consulted": false,
+    "completed_2026_outcomes_consulted": false,
+    "production_changed": false,
+    "fst_changed": false
+  }
+}

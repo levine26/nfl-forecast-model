@@ -1,18 +1,21 @@
 {
   "contract_version": 3,
   "candidate_id": "availability_postseason_archive_fallback_v3",
-  "status": "preregistered_after_v2_archive_failure_before_v3_execution",
+  "status": "preregistered_with_pre_execution_implementation_repair",
   "purpose": "Complete the chronology-safe 2022-2025 availability source audit when NFL.com's historical postseason archive is demonstrably defective for specific rounds, without lowering any identity/state/chronology threshold or using outcomes.",
-  "v2_failure": {
-    "pr": 146,
-    "head": "32c587be495c77f0b9b427f084761f8c936d28fa",
-    "artifact_id": 10283026249,
-    "artifact_sha256": "4313387c79cfe965388c56b517ad8287e4b9289eccab16c599fc30eae78f8641",
-    "failure": "NFL.com 2023 post2 archive page parsed zero injury rows while the rendered archive labels all participating teams No Injuries Reported and nflverse contains historical injury rows.",
-    "identity_bridge_result_observed": false,
-    "model_results_observed": false,
-    "game_outcomes_consulted": false,
-    "completed_2026_outcomes_consulted": false
+  "v2_failure_receipt": "research/availability/2022_2025_harmonization_v2_failure_receipt.json",
+  "v2_identity_result": {
+    "season_2022_official_identity_resolution_rate": 0.9996480732007742,
+    "frozen_minimum": 0.995,
+    "passed": true,
+    "interpretation": "V2 deterministic player-master identity bridge cleared the 2022 identity gate; V2 halted later on a defective NFL.com postseason archive page."
+  },
+  "v3_execution_history": {
+    "first_ci_attempt_reached_live_source_audit": false,
+    "first_ci_attempt_failure": "unit fixtures supplied fallback evidence for 2023 week 20 only while the module correctly registered weeks 20-22 as defective; live V3 collection never started",
+    "repair_scope": "test-fixture isolation plus stronger pre-execution source chronology/signature assertions only",
+    "numeric_threshold_relaxation": false,
+    "v3_source_metrics_observed_before_repair": false
   },
   "known_archive_defects_fixed_before_v3_execution": [
     {"season": 2023, "nfl_week": 20, "nfl_archive_path": "post2"},
@@ -21,16 +24,19 @@
     {"season": 2024, "nfl_week": 20, "nfl_archive_path": "post2"}
   ],
   "fallback_rule": {
-    "scope": "Only a preregistered defective archive week may use fallback mode, and only if the raw NFL.com page is retained and its normal parser returns zero rows.",
+    "scope": "Only a preregistered defective archive week may use fallback mode, and only if the raw NFL.com page is retained, its normal parser returns zero rows, and the rendered page contains the preregistered No Injuries Reported defect signature.",
     "state_source": "nflverse injury row for the same season/week/team/GSIS identity",
     "chronology_proof": "Each fallback row must have a parseable nflverse date_modified timestamp no later than that game's T-120 cutoff.",
     "schedule_proof": "Each fallback row must map unambiguously to one scheduled team-week game.",
     "identity_proof": "Stable GSIS must be present; V2 deterministic player-master alias rules remain unchanged for normal official cross-check rows.",
     "official_reporting_presence": "Every matchup in a defective archive week must have a registered zero-cost pregame official-team injury/practice report source fetched successfully and content-addressed.",
+    "official_reporting_chronology": "Each registered official-team source has a publication timestamp frozen before live V3 execution; every such timestamp must be no later than the earliest T-120 cutoff in its affected league week.",
     "row_level_independent_practice_crosscheck": "Not claimed for fallback rows. Normal non-defective rows retain the unchanged >=0.985 independent NFL.com practice-status agreement gate.",
     "fallback_fully_qualified_rate_required": 1.0,
     "fallback_date_modified_parse_rate_required": 1.0,
     "fallback_date_modified_by_t120_rate_required": 1.0,
+    "fallback_official_source_presence_rate_required": 1.0,
+    "fallback_official_source_by_t120_rate_required": 1.0,
     "manual_state_imputation_allowed": false,
     "healthy_default_allowed": false,
     "game_status_as_practice_state_substitute_allowed": false,
@@ -38,23 +44,23 @@
   },
   "registered_matchup_evidence": {
     "2023-20": [
-      {"matchup": "HOU@BAL", "url": "https://www.baltimoreravens.com/news/mark-andrews-marlon-humphrey-injury-report-ravens-texans-divisional-playoffs", "expected_tokens": ["Texans", "Ravens", "injury"]},
-      {"matchup": "GB@SF", "url": "https://www.packers.com/news/packers-49ers-injury-report-jan-18-2024", "expected_tokens": ["Packers", "49ers", "injury"]},
-      {"matchup": "TB@DET", "url": "https://www.buccaneers.com/news/buccaneers-lions-injury-report-jan-19-divisional-round-2023-2024-playoffs", "expected_tokens": ["Buccaneers", "Lions", "injury"]},
-      {"matchup": "KC@BUF", "url": "https://www.chiefs.com/news/divisional-playoff-injury-report-chiefs-vs-bills", "expected_tokens": ["Chiefs", "Bills", "Injury Report"]}
+      {"matchup":"HOU@BAL","url":"https://www.baltimoreravens.com/news/mark-andrews-marlon-humphrey-injury-report-ravens-texans-divisional-playoffs","published_at_utc":"2024-01-18T19:51:00Z","expected_tokens":["Texans","Ravens","injury"]},
+      {"matchup":"GB@SF","url":"https://www.packers.com/news/packers-49ers-injury-report-jan-18-2024","published_at_utc":"2024-01-18T23:05:00Z","expected_tokens":["Packers","49ers","injury"]},
+      {"matchup":"TB@DET","url":"https://www.buccaneers.com/news/buccaneers-lions-injury-report-jan-19-divisional-round-2023-2024-playoffs","published_at_utc":"2024-01-20T14:58:00Z","expected_tokens":["Buccaneers","Lions","injury"]},
+      {"matchup":"KC@BUF","url":"https://www.buffalobills.com/news/buffalo-bills-injury-report-vs-kansas-city-chiefs-afc-divisional","published_at_utc":"2024-01-19T16:41:00Z","expected_tokens":["Bills","Chiefs","injury"]}
     ],
     "2023-21": [
-      {"matchup": "KC@BAL", "url": "https://www.chiefs.com/news/afc-championship-injury-report-chiefs-vs-ravens", "expected_tokens": ["Chiefs", "Ravens", "Injury Report"]},
-      {"matchup": "DET@SF", "url": "https://www.detroitlions.com/news/lions-at-49ers-injury-report-jan-26", "expected_tokens": ["Lions", "49ers", "injury report"]}
+      {"matchup":"KC@BAL","url":"https://www.chiefs.com/news/afc-championship-injury-report-chiefs-vs-ravens","published_at_utc":"2024-01-26T21:19:00Z","expected_tokens":["Chiefs","Ravens","Injury Report"]},
+      {"matchup":"DET@SF","url":"https://www.detroitlions.com/news/lions-at-49ers-injury-report-jan-26","published_at_utc":"2024-01-26T21:00:00Z","expected_tokens":["Lions","49ers","injury report"]}
     ],
     "2023-22": [
-      {"matchup": "SF@KC", "url": "https://www.chiefs.com/news/super-bowl-lviii-injury-report-chiefs-vs-49ers", "expected_tokens": ["Chiefs", "49ers", "Injury Report"]}
+      {"matchup":"SF@KC","url":"https://www.chiefs.com/news/super-bowl-lviii-injury-report-chiefs-vs-49ers","published_at_utc":"2024-02-11T14:56:00Z","expected_tokens":["Chiefs","49ers","Injury Report"]}
     ],
     "2024-20": [
-      {"matchup": "HOU@KC", "url": "https://www.chiefs.com/news/divisional-round-injury-report-chiefs-vs-texans", "expected_tokens": ["Chiefs", "Texans", "Injury Report"]},
-      {"matchup": "WAS@DET", "url": "https://www.detroitlions.com/news/lions-vs-commanders-injury-report-jan-16-arnold-montgomery-zeitler", "expected_tokens": ["Lions", "Commanders", "injury report"]},
-      {"matchup": "LAR@PHI", "url": "https://www.philadelphiaeagles.com/news/rams-vs-eagles-injury-report-divisional-round-2024-nfl-playoffs", "expected_tokens": ["Rams", "Eagles", "Injury Report"]},
-      {"matchup": "BAL@BUF", "url": "https://www.buffalobills.com/news/buffalo-bills-injury-report-vs-ravens-afc-divisional-round", "expected_tokens": ["Bills", "Ravens", "injury report"]}
+      {"matchup":"HOU@KC","url":"https://www.chiefs.com/news/divisional-round-injury-report-chiefs-vs-texans","published_at_utc":"2025-01-17T22:30:00Z","expected_tokens":["Chiefs","Texans","Injury Report"]},
+      {"matchup":"WAS@DET","url":"https://www.detroitlions.com/news/lions-vs-commanders-injury-report-jan-16-arnold-montgomery-zeitler","published_at_utc":"2025-01-16T20:55:00Z","expected_tokens":["Lions","Commanders","injury report"]},
+      {"matchup":"LAR@PHI","url":"https://www.philadelphiaeagles.com/news/rams-vs-eagles-injury-report-divisional-round-2024-nfl-playoffs","published_at_utc":"2025-01-17T20:54:00Z","expected_tokens":["Rams","Eagles","Injury Report"]},
+      {"matchup":"BAL@BUF","url":"https://www.buffalobills.com/news/buffalo-bills-injury-report-vs-ravens-afc-divisional-round","published_at_utc":"2025-01-17T19:09:00Z","expected_tokens":["Bills","Ravens","injury report"]}
     ]
   },
   "unchanged_v1_v2_gates": {

@@ -8,8 +8,9 @@ Injuries Reported" despite contemporaneous reports and nflverse injury rows. For
 preregistered rounds only, the canonical nflverse row may qualify when its own
 `date_modified` timestamp is no later than T-120, the schedule link is exact, the
 practice state is recognized, and registered pregame official-team report evidence for
-every matchup was successfully captured. No game outcome, snap, participation, final
-inactive, model-fit, or production information is used.
+every matchup was successfully captured and published before the round's earliest T-120.
+No game outcome, snap, participation, final inactive, model-fit, or production
+information is used.
 """
 
 from dataclasses import replace
@@ -17,10 +18,10 @@ import json
 from pathlib import Path
 import time
 
+from bs4 import BeautifulSoup
 import pandas as pd
 
 from nfl_forecast.availability_2025_reconstruction import parse_nfl_postseason_page
-from research import availability_harmonization_v1 as core
 from research import run_availability_harmonization_repaired_v1 as repaired
 from research import run_availability_harmonization_v1 as base_runner
 from research import run_availability_harmonization_v2 as v2_runner
@@ -48,6 +49,13 @@ def _evidence_key(season: int, week: int) -> str:
     return f"{season}-{week}"
 
 
+def _as_utc(value: object) -> pd.Timestamp:
+    stamp = pd.Timestamp(value)
+    if stamp.tzinfo is None:
+        stamp = stamp.tz_localize("UTC")
+    return stamp.tz_convert("UTC")
+
+
 def _capture_registered_evidence(session, *, season: int, week: int, raw_dir: Path, manifest: dict) -> dict:
     records = _CONTRACT["registered_matchup_evidence"].get(_evidence_key(season, week), [])
     if not records:
@@ -55,12 +63,13 @@ def _capture_registered_evidence(session, *, season: int, week: int, raw_dir: Pa
     captured: list[dict] = []
     for index, spec in enumerate(records, start=1):
         payload = base_runner._fetch(session, spec["url"])
-        text = payload.decode("utf-8", errors="replace").lower()
+        text = BeautifulSoup(payload.decode("utf-8", errors="replace"), "html.parser").get_text(" ", strip=True).lower()
         missing_tokens = [token for token in spec["expected_tokens"] if token.lower() not in text]
         if missing_tokens:
             raise ValueError(
                 f"fallback source content drift for {spec['matchup']}: missing expected tokens {missing_tokens}"
             )
+        published_at = _as_utc(spec["published_at_utc"])
         record = base_runner._write_bytes(
             raw_dir / "official_team_fallback" / str(season) / f"week_{week}_{index:02d}.html",
             payload,
@@ -71,6 +80,7 @@ def _capture_registered_evidence(session, *, season: int, week: int, raw_dir: Pa
             "season": season,
             "nfl_week": week,
             "matchup": spec["matchup"],
+            "published_at_utc": published_at.isoformat(),
             "expected_tokens_verified": True,
         })
         manifest["sources"].append(record)
@@ -107,13 +117,17 @@ def _collect_official_v3(session, *, season: int, raw_dir: Path, manifest: dict)
         record = base_runner._write_bytes(raw_dir / "nfl_com" / str(season) / f"post_{page_week}.html", payload)
         record.update({"source": "nfl_com_official_injury_page", "url": url, "season": season, "nfl_week": nfl_week})
         manifest["sources"].append(record)
+        html = payload.decode("utf-8", errors="replace")
         try:
-            frame = parse_nfl_postseason_page(
-                payload.decode("utf-8", errors="replace"), nfl_week=nfl_week, source_url=url
-            )
+            frame = parse_nfl_postseason_page(html, nfl_week=nfl_week, source_url=url)
         except ValueError as exc:
             if (season, nfl_week) not in _DEFECTIVE or "parsed zero injury rows" not in str(exc):
                 raise
+            visible = BeautifulSoup(html, "html.parser").get_text(" ", strip=True).lower()
+            if "no injuries reported" not in visible:
+                raise ValueError(
+                    f"preregistered archive defect signature missing for {season} week {nfl_week}: {url}"
+                ) from exc
             evidence = _capture_registered_evidence(
                 session, season=season, week=nfl_week, raw_dir=raw_dir, manifest=manifest
             )
@@ -121,6 +135,7 @@ def _collect_official_v3(session, *, season: int, raw_dir: Path, manifest: dict)
                 "nfl_archive_url": url,
                 "nfl_archive_sha256": record["sha256"],
                 "nfl_archive_parser_rows": 0,
+                "archive_defect_signature_verified": True,
                 "archive_defect_expected_by_contract": True,
             })
             _FALLBACK_EVIDENCE[(season, nfl_week)] = evidence
@@ -145,6 +160,8 @@ def _build_season_v3(nflverse: pd.DataFrame, official_reports: pd.DataFrame, sch
     canonical = _ORIGINAL_BUILD(nflverse, official_reports, schedules, season=season)
     canonical["fallback_archive_defect"] = False
     canonical["independent_practice_crosscheck"] = canonical["identity_matched"].astype(bool)
+    canonical["fallback_official_source_presence"] = False
+    canonical["fallback_official_source_by_t120"] = False
     fallback_rows = 0
     qualified_rows = 0
     late_or_unknown = 0
@@ -152,46 +169,73 @@ def _build_season_v3(nflverse: pd.DataFrame, official_reports: pd.DataFrame, sch
     for defect_season, week in sorted(_DEFECTIVE):
         if defect_season != season:
             continue
-        evidence = _FALLBACK_EVIDENCE.get((season, week))
-        if not evidence or not evidence.get("source_presence_gate_passed"):
-            raise ValueError(f"missing preregistered official-team fallback evidence for {season} week {week}")
         mask = pd.to_numeric(canonical["week"], errors="coerce").eq(week)
         week_frame = canonical.loc[mask]
         if week_frame.empty:
             raise ValueError(f"nflverse contains no rows for preregistered archive-defective {season} week {week}")
+        evidence = _FALLBACK_EVIDENCE.get((season, week))
+        if not evidence or not evidence.get("source_presence_gate_passed"):
+            raise ValueError(f"missing preregistered official-team fallback evidence for {season} week {week}")
 
-        # Every row in a preregistered defective archive week belongs to the fallback
-        # population, including rows that subsequently fail chronology/state gates. This
-        # prevents unsafe rows from disappearing from the denominator merely because they
-        # were not qualified.
+        earliest_t120 = canonical.loc[mask, "t120_utc"].dropna().min()
+        if pd.isna(earliest_t120):
+            raise ValueError(f"missing T-120 schedule chronology for fallback {season} week {week}")
+        evidence_times = [_as_utc(item["published_at_utc"]) for item in evidence["sources"]]
+        sources_by_t120 = bool(evidence_times) and all(stamp <= earliest_t120 for stamp in evidence_times)
+        evidence["earliest_t120_utc"] = pd.Timestamp(earliest_t120).isoformat()
+        evidence["official_source_publication_by_t120_gate_passed"] = sources_by_t120
+
         canonical.loc[mask, "fallback_archive_defect"] = True
         canonical.loc[mask, "independent_practice_crosscheck"] = False
+        canonical.loc[mask, "fallback_official_source_presence"] = True
+        canonical.loc[mask, "fallback_official_source_by_t120"] = sources_by_t120
 
         fallback_rows += int(mask.sum())
         source_known = canonical.loc[mask, "date_modified_utc"].notna()
-        by_t120 = source_known & canonical.loc[mask, "t120_utc"].notna() & canonical.loc[mask, "date_modified_utc"].le(canonical.loc[mask, "t120_utc"])
+        by_t120 = (
+            source_known
+            & canonical.loc[mask, "t120_utc"].notna()
+            & canonical.loc[mask, "date_modified_utc"].le(canonical.loc[mask, "t120_utc"])
+        )
         recognized = canonical.loc[mask, "recognized_practice_state"].astype(bool)
         scheduled = canonical.loc[mask, "schedule_matched"].astype(bool)
         stable = canonical.loc[mask, "gsis_id"].notna() & canonical.loc[mask, "gsis_id"].astype(str).str.strip().ne("")
-        qualify = source_known & by_t120 & recognized & scheduled & stable
+        qualify = source_known & by_t120 & recognized & scheduled & stable & sources_by_t120
         qualified_rows += int(qualify.sum())
         late_or_unknown += int((~qualify).sum())
         qindex = qualify[qualify].index
         canonical.loc[qindex, "identity_matched"] = True
-        canonical.loc[qindex, "practice_status_agrees"] = True
-        canonical.loc[qindex, "game_status_agrees"] = True
         canonical.loc[qindex, "known_by_t120"] = True
         canonical.loc[qindex, "fully_qualified_practice_state"] = True
         canonical.loc[qindex, "canonical_practice_state"] = canonical.loc[qindex, "nflverse_practice_normalized"]
         canonical.loc[qindex, "external_player"] = canonical.loc[qindex, "full_name"]
-        canonical.loc[qindex, "external_practice_status"] = canonical.loc[qindex, "practice_status"]
-        canonical.loc[qindex, "external_game_status"] = canonical.loc[qindex, "report_status"]
+        canonical.loc[qindex, "external_practice_status"] = pd.NA
+        canonical.loc[qindex, "external_game_status"] = pd.NA
         canonical.loc[qindex, "external_source"] = "nflverse_row_timestamp+official_team_report_presence_fallback"
         canonical.loc[qindex, "source_url"] = ";".join(item["url"] for item in evidence["sources"])
         canonical.loc[qindex, "identity_match_method"] = "intrinsic_gsis_archive_defect_fallback"
         canonical.loc[qindex, "availability_source"] = "nflverse_timestamp+official_team_report_presence"
-        canonical.loc[qindex, "chronology_policy"] = "row_date_modified_at_or_before_t120_for_preregistered_archive_defect"
+        canonical.loc[qindex, "chronology_policy"] = "row_date_modified_and_official_team_reports_at_or_before_t120"
         canonical.loc[qindex, "unresolved_reason"] = ""
+
+        failed_index = qualify[~qualify].index
+        for idx in failed_index:
+            reasons: list[str] = []
+            if not bool(source_known.loc[idx]):
+                reasons.append("fallback_date_modified_unparseable")
+            elif not bool(by_t120.loc[idx]):
+                reasons.append("fallback_date_modified_after_t120")
+            if not bool(recognized.loc[idx]):
+                reasons.append("practice_state_unrecognized")
+            if not bool(scheduled.loc[idx]):
+                reasons.append("schedule_unmatched")
+            if not bool(stable.loc[idx]):
+                reasons.append("stable_identity_missing")
+            if not sources_by_t120:
+                reasons.append("fallback_official_source_not_by_t120")
+            canonical.at[idx, "unresolved_reason"] = ";".join(reasons)
+            canonical.at[idx, "canonical_practice_state"] = "unknown"
+            canonical.at[idx, "fully_qualified_practice_state"] = False
 
     if fallback_rows:
         _FALLBACK_EVIDENCE[(season, -1)] = {
@@ -229,12 +273,18 @@ def _summarize_v3(canonical: pd.DataFrame, *, season: int, official_crosscheck_r
         fallback_rate = float(fallback["fully_qualified_practice_state"].mean())
         parse_rate = float(fallback["date_modified_utc"].notna().mean())
         by_t120_rate = float((fallback["date_modified_utc"].notna() & fallback["t120_utc"].notna() & fallback["date_modified_utc"].le(fallback["t120_utc"])).mean())
+        source_presence_rate = float(fallback["fallback_official_source_presence"].astype(bool).mean())
+        source_by_t120_rate = float(fallback["fallback_official_source_by_t120"].astype(bool).mean())
         if fallback_rate < float(_CONTRACT["fallback_rule"]["fallback_fully_qualified_rate_required"]):
             reasons.append("archive_fallback_fully_qualified_rate_below_gate")
         if parse_rate < float(_CONTRACT["fallback_rule"]["fallback_date_modified_parse_rate_required"]):
             reasons.append("archive_fallback_date_modified_parse_rate_below_gate")
         if by_t120_rate < float(_CONTRACT["fallback_rule"]["fallback_date_modified_by_t120_rate_required"]):
             reasons.append("archive_fallback_date_modified_by_t120_rate_below_gate")
+        if source_presence_rate < float(_CONTRACT["fallback_rule"]["fallback_official_source_presence_rate_required"]):
+            reasons.append("archive_fallback_official_source_presence_rate_below_gate")
+        if source_by_t120_rate < float(_CONTRACT["fallback_rule"]["fallback_official_source_by_t120_rate_required"]):
+            reasons.append("archive_fallback_official_source_by_t120_rate_below_gate")
         _FALLBACK_EVIDENCE[(season, -2)] = {
             "season": season,
             "normal_independent_crosscheck_rows": int(len(normal)),
@@ -244,6 +294,8 @@ def _summarize_v3(canonical: pd.DataFrame, *, season: int, official_crosscheck_r
             "fallback_fully_qualified_rate": fallback_rate,
             "fallback_date_modified_parse_rate": parse_rate,
             "fallback_date_modified_by_t120_rate": by_t120_rate,
+            "fallback_official_source_presence_rate": source_presence_rate,
+            "fallback_official_source_by_t120_rate": source_by_t120_rate,
         }
     return replace(
         summary,
