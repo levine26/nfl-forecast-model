@@ -10,6 +10,11 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 import requests
 
+from research.market_capture_contract_v2 import (
+    LEDGER_IDENTITY_COLUMNS,
+    MIN_CONSENSUS_BOOKS,
+    QUALIFYING_CLOSE_ROW_TYPE,
+)
 from research.market_capture_v2 import consensus_row, due_horizons, normalize_bookmaker
 
 
@@ -62,7 +67,7 @@ def _captured_pairs(path: Path) -> set[tuple[str, str]]:
     except Exception:
         return set()
     if "row_type" in frame:
-        frame = frame[frame.row_type.eq("consensus")]
+        frame = frame[frame.row_type.eq(QUALIFYING_CLOSE_ROW_TYPE)]
     return set(zip(frame.get("game_id", []), frame.get("horizon", [])))
 
 
@@ -169,7 +174,7 @@ def capture(
                 book_rows.append(row)
         rows.extend(book_rows)
         consensus = consensus_row(book_rows)
-        if consensus and int(consensus.get("source_count", 0)) >= 2:
+        if consensus and int(consensus.get("source_count", 0)) >= MIN_CONSENSUS_BOOKS:
             rows.append(consensus)
         else:
             missed.append(f"{item['game_id']}:{item['horizon']}:insufficient_books")
@@ -183,13 +188,10 @@ def capture(
         except Exception:
             pass
     if not new.empty:
-        # The ledger is append-only at the request-attempt level. A horizon can be
-        # retried after an insufficient-book capture, so request_timestamp_utc is
-        # part of row identity; otherwise a later snapshot from the same book would
-        # be silently discarded. Once a consensus row exists, _captured_pairs closes
-        # that game/horizon and no further request is scheduled.
-        identity = ["game_id", "horizon", "row_type", "sportsbook_key", "request_timestamp_utc"]
-        new = new.drop_duplicates(identity, keep="first")
+        # Append-only at the request-attempt level. A horizon may be retried after
+        # an insufficient-book attempt; request_timestamp_utc therefore belongs in
+        # identity. Once a qualified consensus exists, _captured_pairs closes it.
+        new = new.drop_duplicates(list(LEDGER_IDENTITY_COLUMNS), keep="first")
         new.to_csv(ledger_file, index=False)
 
     result = {
