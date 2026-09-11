@@ -1,0 +1,246 @@
+name: Sunday Signal Groq media writer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src/nfl_forecast/media_context.py"
+      - "src/nfl_forecast/media_editorial.py"
+      - "src/nfl_forecast/copilot_media.py"
+      - "src/nfl_forecast/copilot_source_backfill.py"
+      - "src/nfl_forecast/source_policy.py"
+      - "scripts/finalize_editorial.py"
+      - "scripts/build_canonical_editorial_predictions.py"
+      - "scripts/build_copilot_media_prompt.py"
+      - "scripts/build_single_game_copilot_prompt.py"
+      - "scripts/run_groq_media_prompt.py"
+      - "scripts/merge_copilot_game_payloads.py"
+      - "scripts/compose_copilot_media_reads.py"
+      - "scripts/render_levline_paragraphs.py"
+      - "scripts/validate_single_copilot_game.py"
+      - "scripts/validate_copilot_media_reads.py"
+      - "tests/test_canonical_editorial_predictions.py"
+      - "tests/test_media_context.py"
+      - "tests/test_copilot_media.py"
+      - "tests/test_copilot_composition.py"
+      - "tests/test_copilot_json_handoff.py"
+      - "tests/test_levline_paragraph_renderer.py"
+      - "tests/test_single_copilot_game_validator.py"
+      - "tests/test_read_contract.py"
+      - "tests/test_editorial_finalize.py"
+      - "tests/test_source_policy_direct_reports.py"
+      - "pyproject.toml"
+      - ".github/workflows/groq_media_writer.yml"
+  pull_request:
+    paths:
+      - "src/nfl_forecast/media_context.py"
+      - "src/nfl_forecast/media_editorial.py"
+      - "src/nfl_forecast/copilot_media.py"
+      - "src/nfl_forecast/copilot_source_backfill.py"
+      - "src/nfl_forecast/source_policy.py"
+      - "scripts/finalize_editorial.py"
+      - "scripts/build_canonical_editorial_predictions.py"
+      - "scripts/build_copilot_media_prompt.py"
+      - "scripts/build_single_game_copilot_prompt.py"
+      - "scripts/run_groq_media_prompt.py"
+      - "scripts/merge_copilot_game_payloads.py"
+      - "scripts/compose_copilot_media_reads.py"
+      - "scripts/render_levline_paragraphs.py"
+      - "scripts/validate_single_copilot_game.py"
+      - "scripts/validate_copilot_media_reads.py"
+      - "tests/test_canonical_editorial_predictions.py"
+      - "tests/test_media_context.py"
+      - "tests/test_copilot_media.py"
+      - "tests/test_copilot_composition.py"
+      - "tests/test_copilot_json_handoff.py"
+      - "tests/test_levline_paragraph_renderer.py"
+      - "tests/test_single_copilot_game_validator.py"
+      - "tests/test_read_contract.py"
+      - "tests/test_editorial_finalize.py"
+      - "tests/test_source_policy_direct_reports.py"
+      - "pyproject.toml"
+      - ".github/workflows/groq_media_writer.yml"
+  schedule:
+    - cron: "37 */3 * 1-2,9-12 *"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: sunday-signal-media-writer
+  cancel-in-progress: true
+
+jobs:
+  write-media:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+
+      - name: Synchronize with contextual intelligence
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          context_seen=0
+          for discovery in 1 2 3 4; do
+            state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
+            echo "context discovery $discovery: $state"
+            if [ "$state" != "missing" ]; then context_seen=1; break; fi
+            sleep 5
+          done
+          if [ "$context_seen" -eq 1 ]; then
+            for attempt in $(seq 1 40); do
+              state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
+              echo "context run: $state"
+              if [ "$state" = "completed:success" ]; then break; fi
+              if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then echo "Context refresh failed; refusing stale media research."; exit 1; fi
+              if [ "$attempt" -eq 40 ]; then echo "Timed out waiting for matching context refresh."; exit 1; fi
+              sleep 15
+            done
+          fi
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Refresh latest main for scheduled/manual run
+        if: github.event_name != 'push' && github.event_name != 'pull_request'
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install editorial environment
+        run: pip install ".[dev]"
+
+      - name: Test media editorial guardrails
+        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py
+
+      - name: Canonicalize editorial forecast source
+        run: |
+          set -euo pipefail
+          python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
+          cp /tmp/editorial_predictions.csv outputs/this_week.csv
+
+      - name: Refresh deterministic reporting packet
+        run: python scripts/finalize_editorial.py --skip-copilot
+
+      - name: Research, compose and validate human game Reads with Groq
+        if: github.event_name != 'pull_request'
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MEDIA_MODEL: groq/compound
+        run: |
+          set -euo pipefail
+          test -n "${GROQ_API_KEY:-}" || { echo "GROQ_API_KEY secret is missing"; exit 1; }
+          mapfile -t game_ids < <(python - <<'PY'
+          import pandas as pd
+          for gid in pd.read_csv('outputs/this_week.csv')['game_id'].astype(str):
+              print(gid)
+          PY
+          )
+
+          parts=/tmp/groq-game-parts
+          prompts=/tmp/groq-game-prompts
+          rm -rf "$parts" "$prompts"
+          mkdir -p "$parts" "$prompts"
+          rm -f /tmp/groq-media-raw.json /tmp/groq-media-composed.json /tmp/groq-media-rendered.json outputs/copilot_media_reads.json
+          echo "Groq focused matchups: ${#game_ids[@]}"
+
+          for gid in "${game_ids[@]}"; do
+            feedback="/tmp/groq-${gid}-feedback.txt"
+            : > "$feedback"
+            accepted=0
+            for attempt in 1 2 3; do
+              echo "$gid focused Groq research attempt $attempt/3"
+              prompt="$prompts/$gid.txt"
+              python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
+              if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt"; then
+                echo "$gid: Groq research call failed" > "$feedback"
+                cat "$feedback"
+                continue
+              fi
+              if python scripts/validate_single_copilot_game.py --input "$parts/$gid.txt" --game-id "$gid" --predictions outputs/this_week.csv --accepted-dir "$parts" 2> "$feedback"; then
+                accepted=1
+                echo "$gid passed focused source/prose validation on attempt $attempt."
+                break
+              fi
+              cat "$feedback"
+            done
+            if [ "$accepted" -ne 1 ]; then echo "$gid failed all three focused validation attempts."; exit 1; fi
+          done
+
+          python scripts/merge_copilot_game_payloads.py --input-dir "$parts" --predictions outputs/this_week.csv --output /tmp/groq-media-raw.json
+          python scripts/compose_copilot_media_reads.py --input /tmp/groq-media-raw.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --evidence outputs/contextual_evidence.json --output /tmp/groq-media-composed.json
+          python scripts/render_levline_paragraphs.py --input /tmp/groq-media-composed.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --output /tmp/groq-media-rendered.json
+          python scripts/validate_copilot_media_reads.py --input /tmp/groq-media-rendered.json --predictions outputs/this_week.csv --output outputs/copilot_media_reads.json
+          echo "All Groq responses passed the unchanged full-slate publication validator."
+
+      - name: PR provider migration gate
+        if: github.event_name == 'pull_request'
+        run: |
+          python -m py_compile scripts/run_groq_media_prompt.py
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('.github/workflows/groq_media_writer.yml').read_text()
+          assert '@github/copilot' not in text
+          assert 'copilot-requests:' not in text
+          assert 'secrets.GROQ_API_KEY' in text
+          assert 'scripts/run_groq_media_prompt.py' in text
+          print('Groq provider migration wiring validated without consuming repository secrets on PR.')
+          PY
+
+      - name: Reconcile candidate with latest main snapshot
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "Main advanced during Groq research; rebuilding deterministic editorial facts on latest main."
+            git reset --hard origin/main
+            python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
+            cp /tmp/editorial_predictions.csv outputs/this_week.csv
+            python scripts/compose_copilot_media_reads.py --input /tmp/groq-media-raw.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --evidence outputs/contextual_evidence.json --output /tmp/groq-media-composed.json
+            python scripts/render_levline_paragraphs.py --input /tmp/groq-media-composed.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --output /tmp/groq-media-rendered.json
+            python scripts/validate_copilot_media_reads.py --input /tmp/groq-media-rendered.json --predictions outputs/this_week.csv --output outputs/copilot_media_reads.json
+          fi
+
+      - name: Finalize and enforce full-slate launch gate
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/finalize_editorial.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
+          media = status.get('media_reporting', {})
+          provider = status.get('copilot_media', {})
+          finalizer = status.get('editorial_finalizer', {})
+          games = int(finalizer.get('games', 0))
+          if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
+              raise SystemExit(f'media reporting not launch-grade: {media}')
+          if provider.get('status') != 'healthy' or int(provider.get('games_applied', 0)) != games:
+              raise SystemExit(f'Groq editorial provider did not cover full slate: {provider}')
+          if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
+              raise SystemExit(f'final editorial gate failed: {finalizer}')
+          print('Groq matchup/model/pick launch gate passed:', games, 'games')
+          PY
+
+      - name: Publish editorial-only outputs
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git config user.name "sunday-signal-media-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/context_source_status.json
+          if git diff --cached --quiet; then echo "No media editorial changes to publish."; exit 0; fi
+          git commit -m "Refresh Groq-powered Sunday Signal Reads"
+          git pull --rebase origin main
+          git push origin HEAD:main
