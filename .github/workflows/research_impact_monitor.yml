@@ -5,7 +5,11 @@ on:
     paths:
       - 'src/nfl_forecast/player_impact_monitor.py'
       - 'tests/test_player_impact_monitor.py'
+      - 'research/impact_monitor_capture.py'
+      - 'research/test_impact_monitor_capture.py'
       - 'docs/IMPACT_MONITOR_GAP_ANALYSIS.md'
+      - 'scripts/check_research_firewall.py'
+      - 'tests/test_research_firewall.py'
       - '.github/workflows/research_impact_monitor.yml'
   workflow_dispatch:
 
@@ -24,8 +28,8 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - name: Test Impact Monitor publication contract
-        run: pytest -q tests/test_player_impact_cards.py tests/test_player_impact_engine.py tests/test_player_impact_monitor.py
+      - name: Test Impact Monitor publication and capture contracts
+        run: pytest -q tests/test_player_impact_cards.py tests/test_player_impact_engine.py tests/test_player_impact_monitor.py research/test_impact_monitor_capture.py tests/test_research_firewall.py
       - name: Prove probability and public production surfaces are untouched
         if: github.event_name == 'pull_request'
         run: |
