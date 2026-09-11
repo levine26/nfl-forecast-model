@@ -1,0 +1,127 @@
+{
+  "experiment_id": "FTN-PROCESS-01",
+  "status": "PREREGISTERED_NOT_RUN",
+  "registered_at_utc": "2026-09-11T05:05:00Z",
+  "production_effect": "none",
+  "research_question": "Do lagged FTN process/scheme variables improve NFL winner-probability prediction after conditioning on market probability?",
+  "hypothesis": "A compact, preregistered set of prior-game FTN process variables contains incremental team-state information beyond the market-conditioned baseline, with the strongest plausible contribution coming from changes in offensive process and pressure structure rather than raw descriptive volume.",
+  "source": {
+    "source_id": "nflverse_ftn_charting",
+    "coverage": "2022+",
+    "license": "CC-BY-SA-4.0; attribute FTN Data via nflverse",
+    "availability_field": "date_pulled",
+    "availability_rule": "A charted row is eligible for a simulated forecast only when date_pulled is no later than the simulated forecast decision timestamp. No row from the game being forecast may be used.",
+    "documentation": [
+      "https://nflreadr.nflverse.com/reference/load_ftn_charting.html",
+      "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html"
+    ]
+  },
+  "outcome_firewall": {
+    "latest_outcome_season_allowed_for_model_selection": 2025,
+    "completed_2026_outcomes_allowed": false,
+    "same_game_ftn_rows_allowed": false,
+    "realized_same_game_participation_allowed": false
+  },
+  "candidate_raw_fields": [
+    "n_defense_box",
+    "is_motion",
+    "is_play_action",
+    "is_screen_pass",
+    "is_rpo",
+    "is_qb_out_of_pocket",
+    "is_interception_worthy",
+    "n_blitzers",
+    "n_pass_rushers",
+    "is_qb_fault_sack"
+  ],
+  "feature_construction": {
+    "unit": "team-game aggregates constructed only from previously completed games whose FTN rows passed the date_pulled availability gate",
+    "windows": [3, 6],
+    "weighting": "equal-weight rolling means; no post-result selection of decay parameters",
+    "minimum_games": 2,
+    "offense_features": [
+      "motion_rate",
+      "play_action_rate",
+      "screen_rate",
+      "rpo_rate",
+      "qb_out_of_pocket_rate",
+      "interception_worthy_rate",
+      "qb_fault_sack_rate"
+    ],
+    "defense_features": [
+      "mean_defenders_in_box",
+      "mean_blitzers",
+      "mean_pass_rushers"
+    ],
+    "change_features": "For each rolling metric, include 3-game minus 6-game value only when both windows satisfy minimum history; otherwise mark missing rather than impute from future information.",
+    "missingness": "Use explicit availability/missingness indicators. Numeric missing values are imputed from training-fold medians only."
+  },
+  "benchmarks": {
+    "primary": "market-conditioned baseline using the project's chronology-clean historical market probability available for the research frame",
+    "secondary": [
+      "raw historical market probability",
+      "existing football-only signal where chronology-clean and frozen independently of this experiment"
+    ],
+    "market_alignment_gate": "If the available historical market probability cannot be shown to be chronology-clean for the evaluated research frame, do not interpret the experiment as a T-120 production simulation. It may be retained only as a conservative benchmark screen and must be labeled accordingly."
+  },
+  "model_family": {
+    "primary": "logistic regression with standardized continuous FTN features and fixed L2 regularization",
+    "regularization": "C=1.0 fixed before results",
+    "interactions": "none in v1",
+    "nonlinear_models": "not allowed in v1",
+    "hyperparameter_search": "none"
+  },
+  "chronology": {
+    "evaluation": "expanding-window season-forward",
+    "minimum_training_seasons": 1,
+    "test_seasons": [2023, 2024, 2025],
+    "rule": "For each test season, fit only on eligible rows from earlier seasons; preprocessing statistics are fit inside the training fold only.",
+    "2022_role": "earliest training season only",
+    "2025_role": "last permitted prospective-style historical test season",
+    "2026_role": "no outcome-based evaluation or tuning"
+  },
+  "metrics": {
+    "primary": "Brier score",
+    "secondary": ["log loss", "calibration intercept", "calibration slope", "winner accuracy"],
+    "stability": ["coefficient sign and magnitude by fold", "season-by-season metrics"],
+    "uncertainty": "team/game-block bootstrap over held-out predictions with a preregistered seed; report 95% intervals for metric differences",
+    "missingness": "report coverage and metric behavior for complete vs missing-feature rows",
+    "ablations": [
+      "offense process family removed",
+      "defense structure family removed",
+      "short-minus-long change features removed",
+      "interception-worthy and QB-fault-sack quality-control fields removed"
+    ]
+  },
+  "decision_rule": {
+    "qualify_for_shadow_candidate": "Primary held-out Brier difference versus the market-conditioned baseline must be < 0, the 95% block-bootstrap upper bound for that difference must be < 0, aggregate log loss must not worsen, and no individual held-out season may worsen Brier by more than 0.010.",
+    "otherwise": "Record as negative/inconclusive and do not rescue-tune FTN-PROCESS-01. A materially different follow-up requires a new preregistration."
+  },
+  "required_report": [
+    "research question",
+    "preregistered hypothesis",
+    "candidate definition",
+    "data source",
+    "historical availability logic",
+    "leakage protections",
+    "training/test chronology",
+    "benchmark",
+    "sample size",
+    "overall metrics",
+    "season-level metrics",
+    "uncertainty",
+    "coefficient stability",
+    "missing-data behavior",
+    "ablation results",
+    "failure modes",
+    "qualification decision",
+    "exact conclusion"
+  ],
+  "prohibitions": [
+    "No 2026 completed-game outcomes for feature/model/hyperparameter selection.",
+    "No same-game FTN charting rows.",
+    "No manual feature removal or coefficient rescue after viewing held-out results.",
+    "No production promotion from this experiment alone.",
+    "No change to F-ST-01-FROZEN-2026 or the T-120 production lock."
+  ]
+}
