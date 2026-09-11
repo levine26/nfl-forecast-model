@@ -1,0 +1,59 @@
+{
+  "contract_version": 1,
+  "status": "research_governance",
+  "purpose": "Define the minimum evidence a player-availability source must provide before LevLine may consider historical model research at a pregame horizon.",
+  "target_horizon_minutes": 120,
+  "required_identity_fields": [
+    "source_player_id",
+    "source_team_id_or_abbreviation",
+    "source_game_or_week_identity",
+    "player_name_for_human_audit"
+  ],
+  "required_status_fields": [
+    "injury_or_practice_status",
+    "game_status_when_available",
+    "status_effective_or_update_timestamp"
+  ],
+  "required_retrieval_provenance": [
+    "source_name",
+    "source_endpoint_or_dataset",
+    "retrieved_at_utc",
+    "requested_season",
+    "requested_week_or_game"
+  ],
+  "qualification_tests": {
+    "stable_identity": "At least 99.5% of status rows in each validation season map unambiguously to stable LevLine/nflverse player IDs; unresolved identities remain missing rather than name-guessed.",
+    "target_season_coverage": "Point-in-time evidence must cover every intended validation season, including 2025, before a 2022-2025 backtest is allowed.",
+    "revision_semantics": "The source must prove whether historical queries expose the status that existed at T-120 rather than only the latest/final retrospective status. If revisions cannot be reconstructed, fail closed.",
+    "timestamp_parseability": "At least 99.5% of rows used for horizon qualification must have a parseable source-effective/update timestamp or equivalent versioned snapshot timestamp.",
+    "pregame_only": "Rows learned after the tested game kickoff cannot be used to construct that game's availability feature.",
+    "no_realized_participation_proxy": "Actual snaps, actual participation, postgame workload and final inactive status learned after kickoff are prohibited substitutes.",
+    "missingness_reporting": "Per-season/team/position missingness and source outages must be reported; missing status cannot silently mean healthy/active.",
+    "revision_audit_sample": "For a manually reviewed sample spanning multiple teams/weeks/seasons, reconstruct source states at several pregame times and compare with archived/versioned evidence.",
+    "rights_gate": "Contract/license must expressly permit the intended automated retrieval, persistence and modeling use before credentialed bulk collection. Public display requires a separate redistribution decision."
+  },
+  "candidate_source_priority": [
+    {
+      "source_id": "sportradar_weekly_injuries_v7",
+      "priority": 1,
+      "reason": "Current documentation exposes stable player GUIDs, injury/practice fields and status_date, with historical NFL endpoints; exact revision-as-of semantics still require credentialed proof."
+    },
+    {
+      "source_id": "sportsdataio_injuries",
+      "priority": 2,
+      "reason": "Commercial alternative; historical revision semantics and crosswalk quality remain unproven."
+    },
+    {
+      "source_id": "nfl_official_injury_reports",
+      "priority": 3,
+      "reason": "Strong current explainability reference but rendered historical pages alone do not establish stable IDs or exact T-120 revision state."
+    }
+  ],
+  "fail_closed_outcomes": [
+    "no historical availability model fitting",
+    "no availability probability feature",
+    "no imputation from realized current-game snaps",
+    "current status may remain explanatory context if source/rights permit"
+  ],
+  "production_authorized": false
+}

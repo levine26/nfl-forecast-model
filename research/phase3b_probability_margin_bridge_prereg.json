@@ -1,0 +1,52 @@
+{
+  "experiment_id": "PHASE3B-PROB-MARGIN-BRIDGE-001",
+  "candidate_version": "chronological-probability-margin-bridge-v1",
+  "status": "completed_not_qualified",
+  "created_before_result_generation": true,
+  "historical_selection_end": 2025,
+  "validation_seasons": [2022, 2023, 2024, 2025],
+  "hypothesis": "A probability-derived fair margin is useful only if a chronology-estimated margin scale maps pregame win probabilities to realized margins competitively. The audit will test the bridge directly rather than infer quality from winner accuracy.",
+  "probabilities_to_test": [
+    "raw vig-free market_home_prob",
+    "Phase 2 chronology-clean walk-forward market-plus-football probability"
+  ],
+  "bridge_rule": "For validation season S, estimate sigma_margin as the standard deviation of actual home margin minus market spread using only completed seasons < S. Then fair_margin = sigma_margin * Phi^-1(P_home). No sigma tuning or scale multiplier search.",
+  "comparators": [
+    "market spread_line",
+    "raw-market probability bridge",
+    "chronology-clean market-plus-football probability bridge"
+  ],
+  "primary_metric": "margin_mae",
+  "secondary_metrics": [
+    "margin_rmse",
+    "favorite_direction_accuracy",
+    "six_plus_point_disagreement_slice",
+    "season_plus_week_blocked_mae_uncertainty"
+  ],
+  "qualification_rule": "A probability bridge may be described as a predictive fair-margin model only if its MAE is not materially worse than market spread with blocked uncertainty. The market-plus-football bridge must additionally improve the raw-market bridge with uncertainty support to justify football-driven movement in the public fair line.",
+  "interpretation_guardrail": "Failure does not invalidate winner probabilities; it means probability-to-points is a presentation transform rather than a validated margin forecast and must be labeled accordingly.",
+  "prohibited_inputs": [
+    "2026 outcomes",
+    "post-kickoff information",
+    "full-sample sigma estimated using validation outcomes",
+    "post-result sigma tuning",
+    "post-result feature or scale search"
+  ],
+  "production_changed": false,
+  "promotion_authorized": false,
+  "completed_evidence": {
+    "games": 1087,
+    "market_spread_mae": 9.494480220791168,
+    "raw_market_probability_bridge_mae": 9.541706192656022,
+    "market_plus_football_probability_bridge_mae": 9.577266563214867,
+    "raw_market_bridge_minus_market_spread_mae": 0.04722597186485478,
+    "raw_market_bridge_minus_market_spread_ci95": [-0.0066943351972463825, 0.09870543165589457],
+    "market_plus_football_bridge_minus_market_spread_mae": 0.0827863424236975,
+    "market_plus_football_bridge_minus_market_spread_ci95": [0.007613509186094003, 0.15883295852321394],
+    "market_plus_football_bridge_minus_raw_market_bridge_mae": 0.03556037055884274,
+    "market_plus_football_bridge_minus_raw_market_bridge_ci95": [-0.013018451248963149, 0.08090922673313326],
+    "2026_outcomes_used": 0,
+    "public_interpretation": "presentation_transform_not_validated_margin_forecast"
+  },
+  "final_decision": "Not qualified as a predictive margin model. Preserve only as an explicitly labeled probability-consistent presentation transform unless a separately pre-registered future experiment demonstrates predictive margin qualification. Do not tune sigma after this result."
+}
