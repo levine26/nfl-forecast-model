@@ -12,6 +12,12 @@ import pandas as pd
 import json_repair
 
 from nfl_forecast.context import TEAM_META
+from nfl_forecast.editorial_model_read import (
+    coherent_fair_margin_home,
+    coherent_score_text,
+    football_pick_probability,
+    pick_side_probability,
+)
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 BANNED = (
@@ -22,28 +28,35 @@ BANNED = (
     "consensus pricing and the football-only model tell different versions",
     "keeps enough of that split visible to matter", "according to yahoo sports",
     "according to cbs sports", "live stream", "tv map",
+    "75% pure / 25% market", "75% pure and 25% market",
+    "weighting is 75% pure", "production blend weights",
 )
 
 # Official availability/status language is inherently standardized and may repeat across
 # games without indicating recycled editorial analysis. The uniqueness gate still applies
-# to every other substantive seven-word span.
+# to every other substantive seven-word span in the human-written headline/matchup copy.
 STANDARDIZED_STATUS_PHRASES = (
     "did not participate in practice",
+    "participate in practice",
     "did not practice",
     "limited participant in practice",
     "was limited in practice",
     "limited in practice",
     "full participant in practice",
     "full practice participant",
+    "practice on",
     "listed as questionable",
     "listed as doubtful",
     "listed as out",
+    "listed as",
     "ruled out",
     "placed on injured reserve",
     "activated from injured reserve",
+    "injured reserve",
     "designated to return",
     "cleared to return",
     "returned to practice",
+    "return to practice",
 )
 
 
@@ -147,16 +160,6 @@ def _mentions_any(text: str, aliases: set[str]) -> bool:
     return any(re.search(rf"\b{re.escape(alias)}\b", lowered) for alias in aliases)
 
 
-def _pick_side_probability(row: pd.Series, field: str) -> float | None:
-    try:
-        value = float(row.get(field))
-    except Exception:
-        return None
-    if pd.isna(value):
-        return None
-    return value if str(row.get("pick")) == str(row.get("home_team")) else 1.0 - value
-
-
 def _contains_pct(text: str, value: float | None) -> bool:
     if value is None:
         return True
@@ -185,7 +188,7 @@ def _contains_labeled_line(
     away: str,
     labels: tuple[str, ...],
 ) -> bool:
-    """Verify a rounded line value, its favored team, and a nearby model/market label."""
+    """Verify a rounded line value, its favored team, and a nearby semantic label."""
     number = _float_or_none(value)
     if number is None:
         return True
@@ -205,12 +208,10 @@ def _contains_labeled_line(
     for candidate in candidates:
         if not candidate:
             continue
-        # Disallow embedding in another number, but allow ordinary punctuation
-        # immediately after a valid decimal (for example: "Chiefs -3.5.").
         pattern = rf"(?<![\d.]){re.escape(candidate)}(?!\d)"
         for match in re.finditer(pattern, lowered):
-            left = max(0, match.start() - 100)
-            right = min(len(lowered), match.end() + 100)
+            left = max(0, match.start() - 120)
+            right = min(len(lowered), match.end() + 120)
             window = lowered[left:right]
             if any(label in window for label in labels) and _mentions_any(window, aliases):
                 return True
@@ -267,7 +268,7 @@ def main() -> None:
         low = combined.lower()
         for phrase in BANNED:
             if phrase in low:
-                failures.append(f"{gid}: banned/template phrase '{phrase}'")
+                failures.append(f"{gid}: banned/stale phrase '{phrase}'")
 
         row = rows[gid]
         away = str(row.get("away_team"))
@@ -281,29 +282,30 @@ def main() -> None:
             failures.append(f"{gid}: paragraph1 must explain both teams")
         if "levline" not in paragraph2.lower():
             failures.append(f"{gid}: paragraph2 must explicitly explain LevLine")
+        if "f-st" not in paragraph2.lower():
+            failures.append(f"{gid}: paragraph2 must identify the frozen F-ST production engine")
         if not _mentions_any(paragraph2, pick_aliases):
             failures.append(f"{gid}: paragraph2 must identify the LevLine pick")
 
-        final_prob = _pick_side_probability(row, "final_home_prob")
-        pure_prob = _pick_side_probability(row, "pure_home_prob")
-        market_prob = _pick_side_probability(row, "market_home_prob")
+        final_prob = pick_side_probability(row, "final_home_prob")
+        football_prob = football_pick_probability(row)
+        market_prob = pick_side_probability(row, "market_home_prob")
         if not _contains_pct(paragraph2, final_prob):
             failures.append(f"{gid}: paragraph2 missing LevLine pick probability")
-        if pure_prob is not None and market_prob is not None:
-            if "75" not in paragraph2 or "25" not in paragraph2:
-                failures.append(f"{gid}: paragraph2 must explain the 75/25 blend")
-            if not _contains_pct(paragraph2, pure_prob):
-                failures.append(f"{gid}: paragraph2 missing PURE pick-side probability")
-            if not _contains_pct(paragraph2, market_prob):
-                failures.append(f"{gid}: paragraph2 missing market pick-side probability")
+        if football_prob is not None and not _contains_pct(paragraph2, football_prob):
+            failures.append(f"{gid}: paragraph2 missing F-ST football-only pick-side probability")
+        if market_prob is not None and not _contains_pct(paragraph2, market_prob):
+            failures.append(f"{gid}: paragraph2 missing market pick-side probability")
+
+        fair_margin = coherent_fair_margin_home(row)
         if not _contains_labeled_line(
             paragraph2,
-            row.get("expected_margin"),
+            fair_margin,
             home,
             away,
-            ("levline", "model", "project", "margin"),
+            ("probability-implied", "presentation line", "implied", "levline"),
         ):
-            failures.append(f"{gid}: paragraph2 missing correct LevLine model line/projected margin")
+            failures.append(f"{gid}: paragraph2 missing correct probability-implied presentation line")
         if not _contains_labeled_line(
             paragraph2,
             row.get("spread_line"),
@@ -312,8 +314,9 @@ def main() -> None:
             ("market", "spread", "consensus"),
         ):
             failures.append(f"{gid}: paragraph2 missing correct market spread")
-        if not _contains_score(paragraph2, str(row.get("projected_score") or "")):
-            failures.append(f"{gid}: paragraph2 missing projected score")
+        expected_score = coherent_score_text(row)
+        if not _contains_score(paragraph2, expected_score):
+            failures.append(f"{gid}: paragraph2 missing coherent public projected score")
 
         expected_final = f"The pick: {_team_name(pick)} moneyline."
         if not paragraph2.endswith(expected_final):
@@ -346,7 +349,11 @@ def main() -> None:
             "sources": valid_sources,
             "generated_utc": generated,
         }
-        for gram in _unique_ngrams(combined):
+
+        # The deterministic model paragraph intentionally uses standardized factual
+        # language. Uniqueness is enforced against the human editorial layer only.
+        human_unique_text = f"{headline} {paragraph1}"
+        for gram in _unique_ngrams(human_unique_text):
             grams.setdefault(gram, set()).add(gid)
 
     repeated = {gram: sorted(gids) for gram, gids in grams.items() if len(gids) > 1}
@@ -359,7 +366,7 @@ def main() -> None:
         json.dumps({"generated_utc": generated, "games": cleaned}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    print(f"validated {len(cleaned)} two-paragraph editorial Reads -> {args.output}")
+    print(f"validated {len(cleaned)} two-paragraph LevLine 3.0 editorial Reads -> {args.output}")
 
 
 if __name__ == "__main__":
