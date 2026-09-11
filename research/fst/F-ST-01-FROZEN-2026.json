@@ -20,7 +20,7 @@
     "training_rows": "leakage-safe earlier-season out-of-fold market and v0.8 PURE probabilities only",
     "eligible_historical_end_season": 2025,
     "2026_outcomes_allowed": false,
-    "post_freeze_refit_policy": "the frozen architecture is rematerialized only as a provenance check: candidate/digest/row/season identity must match exactly and reconstructed coefficients must be within absolute 1e-12 of the registered constants before scoring; scoring always uses the exact registered constants, never reconstructed coefficients",
+    "post_freeze_refit_policy": "before shadow scoring, a reconstruction gate must verify exact candidate/digest/row/season identity and coefficient agreement within absolute 1e-12. The gate may be satisfied by a fresh refit on compatible recovered-runtime hardware or by verifying the immutable compatible-hardware forensic reconstruction evidence against this current frozen spec. Scoring always uses the exact registered constants, never reconstructed coefficients.",
     "future_architecture_change_policy": "new candidate ID required"
   },
   "frozen_identity": {
@@ -61,8 +61,13 @@
     "forensic_evidence": {
       "workflow_run_id": 34538432305,
       "pr": 106,
-      "result": "explicit SKYLAKEX independently reproduced the exact registered canonical training digest; non-SkylakeX forced modes reproduced 329c6477f7b80895056b25773bb65da805c12c1a99c68b6c3e04215771c8fa1f"
-    }
+      "artifact_id": 10176440471,
+      "artifact_name": "fst01-runtime-SKYLAKEX-34538432305",
+      "artifact_zip_sha256": "92aa93082345f2090dae7d753094b3b61b3848e26c74897a8e62af89d2f42402",
+      "result_sha256": "c673d089a3caa3e8c0d9439597cec53fde50b37127ca32daa5edcd795564524a",
+      "result": "explicit SKYLAKEX independently reproduced the exact registered canonical training digest; coefficient absolute deltas were <=2.498001805406602e-16, inside the frozen 1e-12 tolerance; non-SkylakeX forced modes reproduced 329c6477f7b80895056b25773bb65da805c12c1a99c68b6c3e04215771c8fa1f"
+    },
+    "routine_shadow_policy": "do not force SKYLAKEX on arbitrary hosted runners. Verify research/fst/F-ST-01-reconstruction-evidence.json against this frozen spec, emit a current-run receipt, then score natively with registered frozen literals. Fresh refit probes are reserved for compatible hardware."
   },
   "historical_evidence": {
     "paired_games_2022_2025": 1087,
