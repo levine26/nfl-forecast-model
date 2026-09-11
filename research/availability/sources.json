@@ -1,68 +1,91 @@
 {
-  "registry_version": 1,
-  "purpose": "Qualification registry for leakage-safe pregame player availability data; no source is authorized for historical probability modeling until explicitly marked qualified.",
+  "registry_version": 4,
+  "purpose": "Qualification registry for leakage-safe pregame player availability data; source availability is distinct from authorization for probability modeling.",
   "target_validation_seasons": [2022, 2023, 2024, 2025],
-  "t120_rule": "Historical status used for a game must be demonstrably known no later than the authoritative production T-120 boundary. Later corrections, final inactives learned inside the boundary, actual participation, and snaps are prohibited substitutes.",
+  "t120_rule": "Historical state used for a game must be demonstrably known no later than the authoritative production T-120 boundary. Later corrections, final inactives learned inside the boundary, actual participation, and snaps are prohibited substitutes.",
   "sources": [
     {
       "source_id": "nflverse_injuries",
       "name": "nflverse weekly injuries",
       "documentation": "https://nflreadr.nflverse.com/articles/nflverse_data_schedule.html",
-      "historical_coverage_claim": "2009 onward in loader documentation, but the upstream injury source died after the 2024 season and nflverse currently has no 2025 injury data.",
-      "stable_identity": "historical rows can carry stable nflverse/GSIS-compatible player identity",
-      "timestamp_semantics": "weekly injury report fields; insufficient because target-season coverage is absent for 2025",
-      "qualification_status": "disqualified_for_2022_2025_complete_validation",
-      "blocking_reason": "zero qualifying 2025 injury rows in the current source stack; no complete 2022-2025 validation horizon",
-      "permitted_use": "2022-2024 descriptive/research diagnostics only; not a complete historical availability feature for a 2022-2025 probability backtest"
+      "2025_asset": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_2025.csv",
+      "2025_asset_sha256": "873ca1606dd575bd01152508a243ef6b3a0f8f97b90b707217e62ee8c7ceb735",
+      "2025_observed_schema_audit": {
+        "rows": 6068,
+        "weeks": [1, 22],
+        "position_count": 16,
+        "stable_gsis_id_missing_rate": 0.0
+      },
+      "historical_coverage_claim": "The source now includes 2025: 6,068 rows, weeks 1-22, all-position coverage, and stable GSIS identity.",
+      "stable_identity": "GSIS player ID is present on the 2025 injury rows.",
+      "timestamp_semantics": "The weekly file supplies final practice/report state but no per-row publication timestamp, so chronology is established independently from NFL reporting policy and official historical report pages.",
+      "qualification_status": "2025_coverage_confirmed_composite_chronology_audit_in_progress",
+      "permitted_use": "Stable identity, injury listing, and weekly report state in the preregistered 2025 reconstruction; no probability-model authorization by itself."
     },
     {
       "source_id": "nfl_com_official_injury_pages",
-      "name": "NFL.com official weekly injury report pages",
+      "name": "NFL.com official historical injury report pages",
       "documentation": "https://www.nfl.com/injuries/league/2025/reg1",
-      "historical_coverage_claim": "Official 2025 weekly pages are publicly retrievable and expose player, position, injury, practice status, and game status.",
-      "stable_identity": "public rendered table does not expose the stable player identifier required by the current research contract",
-      "timestamp_semantics": "the rendered historical page does not expose a per-record publication/update timestamp or historical revision sequence",
-      "qualification_status": "unqualified_for_historical_t120_reconstruction",
-      "blocking_reason": "cannot prove from the rendered page alone exactly which row state was present at T-120 or safely crosswalk every player by stable ID",
-      "permitted_use": "prospective manual/reference validation when captured before T-120; not currently authorized as a retrospective 2022-2025 modeling source"
+      "regular_template": "https://www.nfl.com/injuries/league/2025/reg{1-18}",
+      "postseason_template": "https://www.nfl.com/injuries/league/2025/post{1-4}",
+      "historical_coverage_claim": "Official historical pages expose all-position player, position, injury, final practice status, and game status for all 18 regular-season weeks and four postseason rounds.",
+      "stable_identity": "Rendered names are deterministically crosswalked to nflverse GSIS rows within the same team/week; ambiguity remains unresolved.",
+      "timestamp_semantics": "The page render is not used as chronology proof. NFL Personnel (Injury) Report Policy filing day establishes the conservative pregame time boundary. All 22 raw HTML pages are hashed and retained as evidence.",
+      "qualification_status": "primary_all_22_week_crosscheck_under_preregistered_audit",
+      "permitted_use": "Practice-state and injury-listing cross-check for all 2025 weeks. Final game designation remains diagnostic, not an authorized historical feature, absent revision-aware evidence."
+    },
+    {
+      "source_id": "footballdb_2025_regular_github_mirror",
+      "name": "Pinned GitHub mirror of FootballDB 2021-2025 injury reports",
+      "upstream_origin": "https://www.footballdb.com/transactions/injuries.html",
+      "mirror_repository": "Zinkelburger/Fantasy-Football-Tool",
+      "mirror_commit": "44d48a9afc33130897030ac1c47eb6ad32b14513",
+      "mirror_path": "research/injury_predictor/nfl_injuries_2021_2025.csv",
+      "expected_git_blob_sha1": "24568d807792e04739d17b2421e5e6f62cc74d68",
+      "url": "https://raw.githubusercontent.com/Zinkelburger/Fantasy-Football-Tool/44d48a9afc33130897030ac1c47eb6ad32b14513/research/injury_predictor/nfl_injuries_2021_2025.csv",
+      "observed_2025_weeks": [1,2,3,4,5,6,7,8,9,10,11,12],
+      "historical_coverage_claim": "The pinned mirror contains dated daily practice statuses through 2025 Week 12 only.",
+      "qualification_status": "supplemental_partial_corroboration_only",
+      "permitted_use": "Extra immutable day-by-day corroboration for its observed weeks. It is explicitly not a completeness dependency and cannot substitute for missing official pages."
+    },
+    {
+      "source_id": "nfl_personnel_injury_report_policy",
+      "name": "NFL Personnel (Injury) Report Policy schedule",
+      "documentation": "https://operations.nfl.com/calendar-events/nfl-important-dates",
+      "timestamp_semantics": "Game Status Report is due Saturday for a Monday game; Tuesday for Wednesday; Wednesday for Thursday; Thursday for Friday; Thursday for Saturday; Friday for Sunday, normally by 4:00 p.m. New York time or after practice. LevLine conservatively uses 23:59:59 New York time on that required day.",
+      "qualification_status": "chronology_authority",
+      "permitted_use": "Derive the latest conservative time by which the final practice/game-status report was already required to exist; compare against T-120."
     },
     {
       "source_id": "sportradar_nfl_weekly_injuries_v7",
       "name": "Sportradar NFL API v7 Weekly Injuries",
-      "documentation": "https://developer.sportradar.com/football/reference/nfl-weekly-injuries",
-      "historical_documentation": "https://developer.sportradar.com/football/docs/nfl-ig-historical-data",
-      "change_log_documentation": "https://developer.sportradar.com/football/reference/nfl-daily-change-log",
-      "historical_coverage_claim": "Sportradar documents historical Weekly Injuries retrieval by season/week and broader NFL historical API coverage; post-2020 data are collected by Sportradar operators.",
-      "stable_identity": "player GUID plus Sportsradar player ID where available",
-      "timestamp_semantics": "Weekly Injuries exposes injury status_date; Daily Change Log exposes entity-change timestamps and remains queryable for historical dates.",
-      "qualification_status": "candidate_requires_credentialed_point_in_time_audit",
-      "blocking_reason": "documentation is promising but a current historical response may reflect later corrections; LevLine must verify whether status_date/change-log history is sufficient to reconstruct the exact state known by T-120 and must validate ID crosswalk coverage before use",
-      "required_audit": [
-        "retrieve representative 2022-2025 weekly injury payloads",
-        "measure target-season/week coverage",
-        "validate all status_date values against kickoff/T-120",
-        "audit Daily Change Log around representative report revisions",
-        "confirm whether later corrections overwrite or can be reconstructed",
-        "build deterministic Sportradar-to-GSIS crosswalk and report missing/ambiguous rate",
-        "compare representative rows against archived official NFL reports"
-      ],
-      "permitted_use": "research source qualification only until audit passes"
+      "qualification_status": "not_required_for_current_zero_cost_reconstruction",
+      "permitted_use": "Do not incur cost or credential dependency without explicit authorization."
     },
     {
       "source_id": "sportsdataio_nfl_injuries",
       "name": "SportsDataIO NFL injuries",
-      "documentation": "https://sportsdata.io/developers/data-dictionary/nfl",
-      "historical_coverage_claim": "NFL injury objects expose status/body part and an Updated datetime; product-level historical endpoint/access semantics require subscription verification.",
-      "stable_identity": "provider PlayerID/TeamID; deterministic crosswalk to GSIS would still be required",
-      "timestamp_semantics": "Updated is documented as the injury-status update time in US Eastern time; DeclaredInactive is updated near game time and is only populated for offensive skill positions.",
-      "qualification_status": "candidate_requires_credentialed_historical_audit",
-      "blocking_reason": "public documentation does not by itself establish complete 2022-2025 point-in-time revision history or stable-ID crosswalk quality for LevLine",
-      "permitted_use": "research source qualification only until historical/revision audit passes"
+      "qualification_status": "not_required_for_current_zero_cost_reconstruction",
+      "permitted_use": "Do not incur cost without explicit authorization."
     }
   ],
+  "composite_2025_reconstruction": {
+    "contract": "research/availability/2025_reconstruction_contract.json",
+    "stable_identity_source": "nflverse_injuries",
+    "primary_crosscheck_source": "nfl_com_official_injury_pages",
+    "supplemental_crosscheck_source": "footballdb_2025_regular_github_mirror",
+    "chronology_source": "nfl_personnel_injury_report_policy",
+    "qualification_status": "preregistered_collection_and_audit_in_progress",
+    "historical_practice_state_target": "injury listing plus final practice status known before T-120",
+    "historical_game_status_feature_authorized": false,
+    "production_authorized": false,
+    "probability_feature_authorized": false,
+    "postgame_participation_allowed": false,
+    "actual_snaps_allowed": false
+  },
   "current_conclusion": {
     "historically_qualified_complete_source": null,
-    "best_next_source_to_audit": "sportradar_nfl_weekly_injuries_v7",
+    "best_next_source_to_audit": "nflverse_plus_all_22_official_nfl_pages",
     "historical_player_availability_probability_feature_authorized": false,
     "prospective_capture_allowed": true,
     "actual_snaps_as_availability_imputation_allowed": false,
