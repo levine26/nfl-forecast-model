@@ -1,28 +1,28 @@
-# LevLine Data Source & Rights Matrix
+# LevLine Data Source & Integrity Matrix
 
-Status: **research governance**. This document does not authorize a new production data source, probability feature, lock rule, or public redistribution right.
+Status: **research governance**. This document does not authorize a new production data source, probability feature, lock rule, or model promotion.
 
 ## Decision rule
 
-Technical accessibility is not permission. LevLine treats **identity**, **timestamp semantics**, **point-in-time reproducibility**, **coverage/reliability**, **cost/operability**, and **rights/redistribution** as separate gates. A source must pass the gates required for its specific use before crossing the research firewall.
+LevLine qualifies a source **only on the data and integrity of the source itself**: identity quality, timestamp semantics, point-in-time reproducibility, coverage, missingness, reliability, publication/persistence timing, availability, and reproducibility. Licensing, usage-rights, and redistribution information may be retained as metadata, but **never blocks technical qualification** and never changes a technical pass/fail decision.
 
-| Source | Family | Intended role | Timing / coverage | Rights posture | Current decision |
+Active automated research separately follows the existing **$0 cost policy**. Production remains a separate explicit authorization decision: a technically qualified research source does not automatically become a production dependency.
+
+| Source | Family | Intended role | Data-integrity status | Rights metadata (non-blocking) | Current decision |
 |---|---|---|---|---|---|
-| nflverse game/schedule data | Public football dataset | Schedule/results/Elo scaffold; existing opaque moneyline benchmark | Game/schedule data refresh about every five minutes in season; current injury dataset has no 2025 coverage | Existing project source; preserve attribution and review underlying-source restrictions before expanding redistribution | **Keep existing production use; market remains opaque upstream benchmark.** |
-| The Odds API US `h2h` | Sportsbook aggregator | Prospective multi-book moneyline and lock-horizon research | Near-kickoff collector retains per-book timestamps and provider quota headers | API access does not itself grant public redistribution | **Preferred first multi-book research feed; not production-authorized.** |
-| FanDuel / DraftKings / BetMGM via approved aggregator | Sportsbooks | Components of sportsbook consensus | De-vig and timestamp each book separately | Inherits feed contract; no direct-site scraping assumption | **Research components only.** |
-| Polymarket | Prediction exchange | Independent exchange-information candidate | Requires event mapping plus liquidity/depth/staleness controls | API availability does not settle persistence/redistribution | **Keep separate from sportsbook consensus; research only.** |
-| Kalshi | Prediction exchange | Possible independent exchange signal | Not yet cleared for LevLine collection/storage | Specific developer/data-use review required | **Exclude pending rights review.** |
-| NFL.com injury reports | Availability | Prospective reference and explainability | Current report useful; rendered history alone does not establish exact T-minus revision state or stable IDs | Public reference; automated persistence/redistribution requires separate review | **Explainability reference only.** |
-| Sportradar NFL Weekly Injuries v7 | Availability | Leading historical/prospective availability audit candidate | Weekly Injuries exposes player GUID, practice/injury status and `status_date`; NFL historical feeds are documented back to 2000 REG/PST | Commercial contract must cover intended storage, modeling and publication | **Audit first; not yet qualified.** |
-| SportsDataIO injuries | Availability | Secondary availability candidate | Historical revision reconstruction and stable-ID crosswalk remain unproven | Commercial contract required | **Secondary audit candidate.** |
-| NFL Next Gen Stats via nflverse | Advanced player statistics | Research player context | nflverse documents nightly player-week NGS refreshes during season, subject to upstream availability | Confirm upstream/redistribution terms before public player-level display | **Research only.** |
-| PFR-derived data via nflverse | Advanced player statistics | Snap counts / advanced-stat research | nflverse documents multiple daily snap refreshes and daily advanced-stat refreshes | Do not assume direct automated access or redistribution rights | **Research only.** |
-| FTN charting via nflverse | Manual charting | Prior-completed-game player/context research | Available 2022+; nflverse checks for updates four times daily; charting is generally completed after games | CC BY-SA 4.0 via nflverse with attribution to FTN Data via nflverse | **Best clear-rights charting candidate; research only.** |
-| SIS commercial football data | Advanced charting | Line play, pressure, participation, injury, IDs, replacement research | SIS advertises full NFL/FBS coverage and multiple feeds | Commercial license required; no redistribution right inferred | **High-value paid candidate; contract-gated.** |
-| SumerSports subscription stats | Advanced charting | Pressure/route/coverage benchmark research | Live charting/advanced-stat subscription product; no LevLine API entitlement established | Subscription access is not a storage/modeling/redistribution license | **Reference candidate only unless separately licensed.** |
-| Raw NFL NGS tracking | Raw tracking | Separation, coverage, pass-rush/protection and route research | Official system captures tracking at high frequency | Proprietary official-data distribution; no open reuse right inferred | **High-value but proprietary; not authorized.** |
-| PFF Pro API | Advanced player statistics | Potential private research features | Paid API/CLI access is currently offered | Current consumer API terms limit use to personal use and do not grant public distribution/commercial use | **Not eligible for public/commercial LevLine use under consumer terms.** |
+| nflverse game/schedule data | Public football dataset | Schedule/results/Elo scaffold; existing opaque moneyline benchmark | Frequent in-season refresh; market provenance remains opaque and not horizon-matched | Attribution/source metadata retained | **Keep existing production use; market remains opaque upstream benchmark.** |
+| The Odds API US markets | Sportsbook aggregator | Prospective multi-book moneyline/spread/total capture | Prospective only; retain per-book timestamps, freshness, source count and quota state | Provider metadata retained | **Preferred first multi-book research feed; not production-authorized.** |
+| FanDuel / DraftKings / BetMGM via aggregator | Sportsbooks | Components of sportsbook consensus | Each book must be de-vigged and timestamped independently | Feed metadata retained | **Research components only.** |
+| Polymarket | Prediction exchange | Independent exchange-information candidate | Event mapping, liquidity/depth, staleness and point-in-time audit required | Terms metadata retained | **Separate research family; not sportsbook consensus.** |
+| Kalshi | Prediction exchange | Possible independent exchange signal | Public market-data API candidate; event identity, liquidity, timestamp and coverage audit pending | Terms metadata retained | **Research candidate pending data-integrity audit.** |
+| `edgecdec/declan-fantasy-football` Sleeper archive | Availability / player state | 2026 point-in-time player-state and prospective shadow research | **Verified for 2026-only scope.** Archive starts 2026-02-01; all-position audit requires >=99.5% identity/schema gates; commit time is conservative availability bound | Repository/API metadata retained | **Qualified for 2026 point-in-time/shadow research; cannot reconstruct 2025.** |
+| NFL.com injury reports | Availability | Prospective reference and explainability | Current reference useful; rendered history alone does not prove stable IDs or exact T-minus revision state | Reference metadata retained | **Explainability/reference until identity + PIT audit passes.** |
+| Sportradar Weekly Injuries | Availability | Potential historical/prospective availability feed | Stable IDs/status fields look promising, but exact revision-as-of semantics require proof | Commercial metadata retained | **Inactive under $0 policy; cataloged as technical candidate only.** |
+| SportsDataIO injuries | Availability | Secondary availability candidate | Historical revision reconstruction and stable-ID crosswalk remain unproven | Commercial metadata retained | **Inactive under $0 policy.** |
+| NFL Next Gen Stats via nflverse | Advanced player statistics | Research player context | Weekly observed data; only prior-completed-game rows may enter a forecast | Source metadata retained | **Research only pending PIT/incremental-value audit.** |
+| PFR-derived data via nflverse | Advanced player statistics | Snap counts / advanced-stat research | Refreshable observed data; chronology and missingness must be enforced | Source metadata retained | **Research only pending PIT/incremental-value audit.** |
+| FTN charting via nflverse | Manual charting | Prior-completed-game process research | 2022+ and preregistered for chronology-aware testing; never same-game pregame information | CC BY-SA metadata retained | **Qualified research candidate under preregistered process test.** |
+| SIS / SumerSports / raw NGS / PFF Pro | Advanced / tracking | High-value advanced-player research candidates | Some feeds lack a reproducible automated interface; others are paid | Rights metadata retained but non-blocking | **Not active in the current $0 pipeline; technical qualification remains distinct.** |
 
 ## Sportsbook consensus contract
 
@@ -34,40 +34,35 @@ The nflverse moneyline remains a separate comparator because its bookmaker-level
 
 The prospective collector targets information arrival rather than rerunning the football stack. PURE remains fixed between substantive football-data changes; near kickoff only the market feed is refreshed and the frozen F-ST equation can be rescored in research.
 
-The collector uses a local due-game gate before external requests and persists to the off-main research ledger. Runtime provider quota headers, not a hard-coded plan assumption, control whether collection continues. The official lock remains T-120 unless matched-horizon evidence later supports another rule.
+The collector uses a local due-game gate before external requests and persists to the off-main research ledger. Runtime quota evidence controls whether collection continues. The official production lock remains T-120 unless matched-horizon evidence later supports another rule and an explicit production change is authorized.
 
 ## Exchange policy
 
-Prediction exchanges are not sportsbooks. Polymarket, and any future-cleared Kalshi feed, must remain a separate information family with event-identity, liquidity, bid/ask, depth, stale-quote and resolution-rule controls. No exchange is folded into sportsbook consensus by default.
+Prediction exchanges are not sportsbooks. Polymarket, Kalshi, and any future exchange feed remain a separate information family with event-identity, liquidity, bid/ask, depth, stale-quote and resolution-rule controls. No exchange is folded into sportsbook consensus by default.
 
 ## Player / availability policy
 
-The Expected Lineup Impact Engine and Impact Monitor are research/explainability layers. Availability used for a probability feature must be stable-ID mapped, genuinely known by the tested horizon and point-in-time reproducible. Actual current-game snaps, participation or hindsight-based inactive status are prohibited proxies.
+The Expected Lineup Impact Engine and Impact Monitor remain research/explainability layers. Availability used quantitatively must be stable-ID mapped, genuinely known by the tested horizon, and point-in-time reproducible. Actual current-game snaps, participation, or hindsight-based inactive status are prohibited proxies.
 
-The current open-source stack still lacks a complete 2022-2025 historically qualified availability source. nflverse explicitly reports that its injury source ended after 2024 and that there is presently no 2025 injury data. This is why current NFL.com injury context may be displayed conservatively while probability integration remains prohibited.
+The verified Sleeper archive is the first active zero-cost player-state source for 2026 point-in-time work. Its history begins February 1, 2026, so it **does not** unlock a 2022-2025 historical availability backtest. That limitation is a coverage fact, not a rights decision.
 
-Sportradar is the strongest availability audit candidate identified so far because its current NFL Weekly Injuries documentation exposes stable player GUIDs, injury/practice status and a `status_date`, and its historical-data documentation says season-addressable NFL feeds extend back to 2000 for regular/postseason data. That still does **not** prove an exact historical T-120 revision snapshot: a credentialed audit must establish whether later revisions can be reconstructed without hindsight.
+No zero-cost source currently supplies qualified 2025 point-in-time injury state for a full 2022-2025 availability backtest. Until such data exists, historical availability model fitting fails closed for that scope while 2026 prospective/shadow collection proceeds.
 
 ## Advanced player data
 
-Use legally clear open/redistributed paths first. FTN charting through nflverse is particularly attractive because the subset is explicitly CC BY-SA 4.0 and carries a defined attribution requirement; it remains prior-completed-game data, not a live availability feed.
+Advanced-player sources are ranked on chronology, identity, coverage, missingness, reliability and reproducibility. Rights/license fields are descriptive metadata only. Under the active $0 research constraint, paid feeds are not automated even if technically promising; this is an operating-budget policy, not a technical data-quality judgment.
 
-SIS is the strongest identified commercial advanced-data candidate for line play, pressure, participation, injury and universal IDs, but product availability does not establish LevLine's storage or public-redistribution rights. SumerSports similarly offers useful live charting and advanced-stat products, but no API/modeling entitlement is assumed from a subscription interface. Raw NGS tracking is analytically valuable but remains proprietary official-data territory.
-
-nflverse can automate useful NGS and PFR-derived research data, but source-level publication rights still matter. Sports Reference’s terms restrict unauthorized automated access, so LevLine should use already-approved/contracted data paths rather than building a direct scraper.
-
-PFF offers API/CLI access with a paid PFF Pro tier, but its current consumer API terms describe the license as personal-use and expressly withhold commercial/public-distribution rights. PFF therefore may be technically attractive for private experimentation but is not an eligible public LevLine source under those consumer terms; broader rights would require a separate written agreement.
+FTN charting through nflverse remains attractive because it is available at $0 and provides prior-completed-game process variables. Same-game charting is never used as pregame information. nflverse NGS/PFR-derived data may be studied only with explicit chronology and missingness controls.
 
 ## Current decisions
 
-1. Keep the production F-ST market source and T-120 lock unchanged while the prospective multi-book ledger grows.
-2. Use The Odds API as the first multi-book research feed and preserve constituent books before consensus.
-3. Keep prediction exchanges separate from sportsbook consensus; Polymarket remains research-only and Kalshi remains excluded pending rights review.
-4. Audit Sportradar first for historically reproducible player availability; treat current NFL.com injury reports as explainability context only.
-5. Prefer FTN-via-nflverse for shareable historical charting research; preserve CC BY-SA attribution/share-alike obligations.
-6. Treat SIS as the leading paid advanced-data candidate; do not automate SumerSports or raw NGS without explicit data rights.
-7. Use NGS/PFR-derived data only through appropriately reviewed data paths; do not create a direct Sports Reference scraper.
-8. Treat PFF consumer API data as ineligible for public/commercial LevLine use absent broader written rights.
-9. Do not promote any player-impact or availability feature from this matrix. Source qualification and model qualification are separate decisions.
+1. Keep production F-ST semantics and the T-120 lock unchanged while research evidence accumulates.
+2. Use The Odds API free tier as the first prospective multi-book research feed; preserve constituent books and timestamps.
+3. Keep exchanges separate from sportsbook consensus; qualify them on event identity, timing, liquidity and reproducibility—not rights.
+4. Use the verified Sleeper archive as the first active zero-cost availability/player-state source for **2026-only** point-in-time and shadow work.
+5. Do not claim 2025 reconstruction from the Sleeper archive; no zero-cost availability source currently unlocks a 2022-2025 availability backtest.
+6. Keep paid advanced/availability feeds inactive under the $0 research policy, while recording their technical potential separately.
+7. Do not promote any player-impact, availability, market, weather, or advanced-player feature solely because its source is technically qualified. Source qualification and model qualification are separate decisions.
+8. Completed 2026 outcomes remain prohibited for choosing model fields, coefficients, architecture, hyperparameters, or thresholds.
 
-This matrix is deliberately conservative: when a license, historical revision property or redistribution right is not proven, the status remains pending/restricted rather than inferred from technical accessibility.
+The operative rule is simple: **rights never determine technical source qualification; the data does.**
