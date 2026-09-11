@@ -89,7 +89,7 @@ def build_capture(
         commit_timestamp_utc=commit_time.isoformat(),
         decision_timestamp_utc=retrieval_time.isoformat(),
         resolved_player_ids=None,
-        state_fields=[field for field in fields if field not in {"player_id"}],
+        state_fields=[field for field in fields if field != "player_id"],
     )
     payload = {
         "schema_version": SCHEMA_VERSION,
@@ -112,8 +112,7 @@ def build_capture(
 
 
 def capture_filename(payload: dict[str, Any]) -> str:
-    stamp = str(payload["source_commit_timestamp_utc"]).replace("-", "").replace(":", "").replace("+00:00", "Z")
-    stamp = stamp.replace("T", "T")
+    stamp = str(payload["source_commit_timestamp_utc"]).replace("-", "").replace(":", "")
     commit = str(payload["source_commit_sha"])[:12]
     return f"{stamp}__{commit}.json.gz"
 
@@ -121,8 +120,9 @@ def capture_filename(payload: dict[str, Any]) -> str:
 def write_capture(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-    with gzip.open(path, "wb", compresslevel=9, mtime=0) as handle:
-        handle.write(encoded)
+    with path.open("wb") as raw:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, compresslevel=9, mtime=0) as handle:
+            handle.write(encoded)
 
 
 def read_capture(path: Path) -> dict[str, Any]:
