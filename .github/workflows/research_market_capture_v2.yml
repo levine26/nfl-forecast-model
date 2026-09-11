@@ -37,7 +37,7 @@ jobs:
       contents: write
     concurrency:
       group: levline-research-market-capture-v2
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
