@@ -6,9 +6,15 @@ on:
       - 'research/data_source_governance.json'
       - 'research/advanced_player_source_governance.json'
       - 'research/availability_source_audit_contract.json'
+      - 'research/availability/**'
       - 'research/LEVLINE_DATA_SOURCE_MATRIX.md'
       - 'research/free_only_policy.json'
+      - 'research/source_qualification_effective_v2.py'
+      - 'research/source_qualification_registry_v2.json'
+      - 'research/sleeper_archive_qualification_v1.json'
       - 'research/test_data_source_governance.py'
+      - 'research/test_source_qualification_effective_v2.py'
+      - 'research/test_source_qualification_registry_v2.py'
       - 'research/test_free_only_policy.py'
       - 'scripts/check_research_firewall.py'
       - '.github/workflows/research_source_governance.yml'
@@ -30,7 +36,12 @@ jobs:
       - name: Install test runner
         run: python -m pip install pytest
       - name: Validate machine-readable source policy
-        run: python -m pytest -q research/test_data_source_governance.py research/test_free_only_policy.py
+        run: >-
+          python -m pytest -q
+          research/test_data_source_governance.py
+          research/test_source_qualification_effective_v2.py
+          research/test_source_qualification_registry_v2.py
+          research/test_free_only_policy.py
       - name: Enforce canonical research/production firewall
         if: github.event_name == 'pull_request'
         run: python scripts/check_research_firewall.py --base "origin/${{ github.base_ref }}" --head-ref "${{ github.head_ref }}"

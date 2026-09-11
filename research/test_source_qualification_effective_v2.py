@@ -40,6 +40,37 @@ def test_sleeper_archive_effective_qualification_is_verified_2026_research() -> 
     assert any("2025" in limitation for limitation in row["technical_limitations"])
 
 
+def test_2025_availability_composite_is_verified_research_only() -> None:
+    row = effective_source("availability_2025_composite_reconstruction")
+    assert row["classification"] == "QUALIFIED_RESEARCH"
+    assert row["technical_status"] == "VERIFIED"
+    assert row["historical_coverage"] == "2025 NFL Weeks 1-22"
+    assert row["historical_research"] is True
+    assert row["prospective_use"] is False
+    assert row["supports_2025_reconstruction"] is True
+    assert row["supports_2022_2025_unified_backtest"] is False
+    assert row["supports_completed_2026_outcome_model_selection"] is False
+    assert row["supports_production_dependency"] is False
+    assert row["historical_game_status_feature_authorized"] is False
+    assert row["probability_features"] is False
+    assert row["public_display"] is False
+    assert row["qualification_basis"] == "DATA_INTEGRITY_ONLY"
+    assert row["rights_qualification_blocker"] is False
+    assert row["rights_metadata_retained"] is True
+    assert row["qualification_record"].endswith("2025_reconstruction_qualification_v1.json")
+    assert any("four player-week" in failure.lower() for failure in row["technical_known_source_failures"])
+    assert any("2022-2025" in limitation for limitation in row["technical_limitations"])
+
+
+def test_2025_composite_does_not_rewrite_sleeper_scope() -> None:
+    sleeper = effective_source("sleeper_historical_player_archive_candidate")
+    availability = effective_source("availability_2025_composite_reconstruction")
+    assert sleeper["supports_2025_reconstruction"] is False
+    assert "no 2025 reconstruction" in sleeper["historical_coverage"]
+    assert availability["supports_2025_reconstruction"] is True
+    assert sleeper["source_id"] != availability["source_id"]
+
+
 def test_rights_metadata_never_enters_the_technical_failure_axis() -> None:
     row = effective_source("sleeper_live_players")
     assert row["classification"] == "CONTEXT_ONLY"

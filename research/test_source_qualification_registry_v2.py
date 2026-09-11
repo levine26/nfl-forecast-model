@@ -8,6 +8,8 @@ from research.source_qualification_effective_v2 import effective_policy, effecti
 
 REGISTRY = Path("research/source_qualification_registry_v2.json")
 SLEEPER_QUALIFICATION = Path("research/sleeper_archive_qualification_v1.json")
+AVAILABILITY_2025_QUALIFICATION = Path("research/availability/2025_reconstruction_qualification_v1.json")
+V09B_RESOLUTION = Path("research/availability/V09B_source_blocker_resolution_v1.json")
 VALID = {
     "QUALIFIED_RESEARCH",
     "PROSPECTIVE_ONLY",
@@ -60,6 +62,10 @@ def _sleeper_qualification() -> dict:
     return json.loads(SLEEPER_QUALIFICATION.read_text(encoding="utf-8"))
 
 
+def _availability_qualification() -> dict:
+    return json.loads(AVAILABILITY_2025_QUALIFICATION.read_text(encoding="utf-8"))
+
+
 def test_registry_is_zero_cost_and_fails_closed_only_on_data_integrity() -> None:
     registry = _registry()
     raw = registry["policy"]
@@ -81,7 +87,7 @@ def test_registry_is_zero_cost_and_fails_closed_only_on_data_integrity() -> None
     assert policy["rights_and_licensing"]["qualification_blocker"] is False
 
 
-def test_every_source_has_complete_qualification_record_and_unique_id() -> None:
+def test_every_registry_source_has_complete_qualification_record_and_unique_id() -> None:
     sources = _sources()
     ids = [row["source_id"] for row in sources]
     assert len(ids) == len(set(ids))
@@ -104,8 +110,6 @@ def test_rights_metadata_can_never_be_a_technical_failure_or_sole_block_reason()
 
         if row["classification"] in {"BLOCKED", "REJECTED"}:
             assert technical_failures, row["source_id"]
-            # A blocked/rejected source must be blocked for an actual data-integrity
-            # reason recorded on the technical failure axis, never for rights metadata.
             assert row["rights_qualification_blocker"] is False
 
 
@@ -141,6 +145,49 @@ def test_verified_sleeper_archive_is_qualified_for_2026_research_only() -> None:
     assert effective["classification"] == "QUALIFIED_RESEARCH"
     assert effective["rights_qualification_blocker"] is False
     assert effective["supports_2025_reconstruction"] is False
+
+
+def test_verified_2025_availability_receipt_is_narrow_and_fail_closed() -> None:
+    qualification = _availability_qualification()
+    assert qualification["source_id"] == "availability_2025_composite_reconstruction"
+    assert qualification["technical_status"] == "VERIFIED"
+    assert qualification["research_classification"] == "QUALIFIED_RESEARCH_2025_ONLY"
+    assert qualification["research_source_qualified"] is True
+    assert qualification["supports_2025_reconstruction"] is True
+    assert qualification["supports_2022_2025_unified_backtest"] is False
+    assert qualification["probability_feature_authorized"] is False
+    assert qualification["production_dependency_authorized"] is False
+    assert qualification["historical_game_status_feature_authorized"] is False
+    assert qualification["completed_2026_outcome_model_selection_allowed"] is False
+    metrics = qualification["qualification_metrics"]
+    assert metrics["nflverse_rows"] == 6068
+    assert metrics["external_crosscheck_rows"] == 6068
+    assert metrics["identity_match_rows"] == 6064
+    assert metrics["identity_match_rate"] >= 0.995
+    assert metrics["practice_status_agreement_rate"] == 1.0
+    assert metrics["known_by_t120_rate_among_matched_rows"] == 1.0
+    assert metrics["unresolved_practice_state_rows"] == 4
+    assert metrics["actual_snaps_used"] == 0
+    assert metrics["postgame_participation_used"] == 0
+    assert metrics["completed_2026_outcomes_used"] == 0
+    evidence = qualification["exact_head_evidence"]
+    assert evidence["pull_request"] == 142
+    assert evidence["validated_head_sha"] == "75a4a901a6273b1312e89129d24cda1988727101"
+    assert evidence["artifact_zip_sha256"] == "8f5a0c5a98602de857d9823133797a52e3f92a8fd8a387ffbd41fd00995dcf44"
+
+
+def test_v09b_blocker_resolution_does_not_rewrite_or_authorize_experiment() -> None:
+    record = json.loads(V09B_RESOLUTION.read_text(encoding="utf-8"))
+    assert record["experiment_id"] == "V09B-AVAILABILITY-001"
+    assert record["original_disposition_preserved"] is True
+    assert record["original_status"] == "rejected"
+    assert record["original_result_type"] == "source_qualification_blocker"
+    assert record["experiment_retroactively_run"] is False
+    assert record["historical_result_rewritten"] is False
+    assert record["current_authorization"]["source_research_qualified"] is True
+    assert record["current_authorization"]["v09b_execution_authorized"] is False
+    assert record["current_authorization"]["probability_feature_authorized"] is False
+    assert record["current_authorization"]["production_dependency_authorized"] is False
 
 
 def test_sleeper_live_context_limit_is_point_in_time_not_rights() -> None:

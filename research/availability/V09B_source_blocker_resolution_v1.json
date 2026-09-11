@@ -1,0 +1,29 @@
+{
+  "record_version": 1,
+  "experiment_id": "V09B-AVAILABILITY-001",
+  "original_experiment_registry": "research/experiments.json",
+  "original_disposition_preserved": true,
+  "original_status": "rejected",
+  "original_result_type": "source_qualification_blocker",
+  "experiment_retroactively_run": false,
+  "historical_result_rewritten": false,
+  "source_blocker_resolution": {
+    "resolved_component": "2025 historical pregame availability source coverage",
+    "resolved_by": "availability_2025_composite_reconstruction",
+    "qualification_record": "research/availability/2025_reconstruction_qualification_v1.json",
+    "merged_main_sha": "e89c368c2d0d829a118b263283930157b543f0c6",
+    "resolved_at_utc": "2026-09-11T20:04:07Z"
+  },
+  "remaining_pre_execution_requirements": [
+    "Prove one harmonized 2022-2025 availability-state contract with consistent chronology, stable identity, missingness semantics, and feature construction across all validation seasons.",
+    "Confirm the original V09B preregistration remains executable without changing model family, feature definitions, hyperparameters, thresholds, or acceptance criteria in response to observed results.",
+    "Do not use completed-2026 outcomes for feature, architecture, hyperparameter, coefficient, threshold, or candidate selection.",
+    "Keep production F-ST probabilities, coefficients, architecture, and T-120 semantics unchanged unless separately authorized after prospective evidence."
+  ],
+  "current_authorization": {
+    "source_research_qualified": true,
+    "v09b_execution_authorized": false,
+    "probability_feature_authorized": false,
+    "production_dependency_authorized": false
+  }
+}

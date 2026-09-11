@@ -15,8 +15,9 @@ Active automated research separately follows the existing **$0 cost policy**. Pr
 | FanDuel / DraftKings / BetMGM via aggregator | Sportsbooks | Components of sportsbook consensus | Each book must be de-vigged and timestamped independently | Feed metadata retained | **Research components only.** |
 | Polymarket | Prediction exchange | Independent exchange-information candidate | Event mapping, liquidity/depth, staleness and point-in-time audit required | Terms metadata retained | **Separate research family; not sportsbook consensus.** |
 | Kalshi | Prediction exchange | Possible independent exchange signal | Public market-data API candidate; event identity, liquidity, timestamp and coverage audit pending | Terms metadata retained | **Research candidate pending data-integrity audit.** |
-| `edgecdec/declan-fantasy-football` Sleeper archive | Availability / player state | 2026 point-in-time player-state and prospective shadow research | **Verified for 2026-only scope.** Archive starts 2026-02-01; all-position audit requires >=99.5% identity/schema gates; commit time is conservative availability bound | Repository/API metadata retained | **Qualified for 2026 point-in-time/shadow research; cannot reconstruct 2025.** |
-| NFL.com injury reports | Availability | Prospective reference and explainability | Current reference useful; rendered history alone does not prove stable IDs or exact T-minus revision state | Reference metadata retained | **Explainability/reference until identity + PIT audit passes.** |
+| `availability_2025_composite_reconstruction` | Availability / player state | 2025 historical injury listing + final practice state known before T-120 | **Verified for 2025 Weeks 1-22.** 6,064/6,068 rows map cleanly; practice-state agreement and matched-row T-120 chronology are 100%; four rows fail closed | Source-specific rights metadata retained separately | **Qualified research source for 2025 only; not a probability feature, production dependency, or unified 2022-2025 backtest authorization.** |
+| `edgecdec/declan-fantasy-football` Sleeper archive | Availability / player state | 2026 point-in-time player-state and prospective shadow research | **Verified for 2026-only scope.** Archive starts 2026-02-01; all-position audit requires >=99.5% identity/schema gates; commit time is conservative availability bound | Repository/API metadata retained | **Qualified for 2026 point-in-time/shadow research; this source itself cannot reconstruct 2025.** |
+| NFL.com injury reports | Availability | Primary independent 2025 historical cross-check; prospective reference and explainability | Official 2025 pages now participate in the qualified composite with stable-ID crosswalk and conservative filing-day chronology; rendered pages alone are still not treated as a standalone revision-aware game-status feed | Reference metadata retained | **Qualified as a component of the 2025 composite practice-state reconstruction; standalone final game-status feature remains unauthorized.** |
 | Sportradar Weekly Injuries | Availability | Potential historical/prospective availability feed | Stable IDs/status fields look promising, but exact revision-as-of semantics require proof | Commercial metadata retained | **Inactive under $0 policy; cataloged as technical candidate only.** |
 | SportsDataIO injuries | Availability | Secondary availability candidate | Historical revision reconstruction and stable-ID crosswalk remain unproven | Commercial metadata retained | **Inactive under $0 policy.** |
 | NFL Next Gen Stats via nflverse | Advanced player statistics | Research player context | Weekly observed data; only prior-completed-game rows may enter a forecast | Source metadata retained | **Research only pending PIT/incremental-value audit.** |
@@ -44,9 +45,11 @@ Prediction exchanges are not sportsbooks. Polymarket, Kalshi, and any future exc
 
 The Expected Lineup Impact Engine and Impact Monitor remain research/explainability layers. Availability used quantitatively must be stable-ID mapped, genuinely known by the tested horizon, and point-in-time reproducible. Actual current-game snaps, participation, or hindsight-based inactive status are prohibited proxies.
 
-The verified Sleeper archive is the first active zero-cost player-state source for 2026 point-in-time work. Its history begins February 1, 2026, so it **does not** unlock a 2022-2025 historical availability backtest. That limitation is a coverage fact, not a rights decision.
+The 2025 source gap is now narrowly closed by `availability_2025_composite_reconstruction`. Its exact-head qualification receipt is `research/availability/2025_reconstruction_qualification_v1.json`: 6,064 of 6,068 canonical player-week rows resolve cleanly, matched-row chronology is fully before T-120 under the conservative filing-day bound, and four rows remain unresolved rather than guessed. Final game designation is retained only as a diagnostic cross-check and is **not** an authorized historical feature.
 
-No zero-cost source currently supplies qualified 2025 point-in-time injury state for a full 2022-2025 availability backtest. Until such data exists, historical availability model fitting fails closed for that scope while 2026 prospective/shadow collection proceeds.
+The verified Sleeper archive remains a separate 2026-only source. Its history begins February 1, 2026; qualifying the 2025 composite does not rewrite Sleeper history or turn Sleeper into a 2025 archive.
+
+A full 2022-2025 availability probability experiment is **still not authorized**. Before any V09B execution, LevLine must prove one harmonized cross-season contract for chronology, stable identity, missingness, status normalization, and feature construction. The original V09B source-blocked result remains historically unchanged; `research/availability/V09B_source_blocker_resolution_v1.json` records only that the 2025 source-coverage component of that blocker has since been resolved.
 
 ## Advanced player data
 
@@ -59,10 +62,11 @@ FTN charting through nflverse remains attractive because it is available at $0 a
 1. Keep production F-ST semantics and the T-120 lock unchanged while research evidence accumulates.
 2. Use The Odds API free tier as the first prospective multi-book research feed; preserve constituent books and timestamps.
 3. Keep exchanges separate from sportsbook consensus; qualify them on event identity, timing, liquidity and reproducibility—not rights.
-4. Use the verified Sleeper archive as the first active zero-cost availability/player-state source for **2026-only** point-in-time and shadow work.
-5. Do not claim 2025 reconstruction from the Sleeper archive; no zero-cost availability source currently unlocks a 2022-2025 availability backtest.
-6. Keep paid advanced/availability feeds inactive under the $0 research policy, while recording their technical potential separately.
-7. Do not promote any player-impact, availability, market, weather, or advanced-player feature solely because its source is technically qualified. Source qualification and model qualification are separate decisions.
-8. Completed 2026 outcomes remain prohibited for choosing model fields, coefficients, architecture, hyperparameters, or thresholds.
+4. Treat `availability_2025_composite_reconstruction` as a technically qualified **2025-only** research source; do not infer probability-feature or production authorization from that qualification.
+5. Keep the verified Sleeper archive scoped to **2026-only** point-in-time and shadow work; do not rewrite it as a 2025 source.
+6. Make 2022-2025 availability harmonization the next historical availability gate before any V09B execution; preserve the original V09B blocked disposition until a separately validated execution occurs.
+7. Keep paid advanced/availability feeds inactive under the $0 research policy, while recording their technical potential separately.
+8. Do not promote any player-impact, availability, market, weather, or advanced-player feature solely because its source is technically qualified. Source qualification and model qualification are separate decisions.
+9. Completed 2026 outcomes remain prohibited for choosing model fields, coefficients, architecture, hyperparameters, or thresholds.
 
 The operative rule is simple: **rights never determine technical source qualification; the data does.**
