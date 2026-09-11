@@ -2,15 +2,20 @@
   "experiment_id": "FTN-PROCESS-01",
   "status": "PREREGISTERED_NOT_RUN",
   "registered_at_utc": "2026-09-11T05:05:00Z",
+  "implementation_contract_completed_at_utc": "2026-09-11T06:30:00Z",
+  "implementation_contract_completed_before_results": true,
   "production_effect": "none",
   "research_question": "Do lagged FTN process/scheme variables improve NFL winner-probability prediction after conditioning on market probability?",
   "hypothesis": "A compact, preregistered set of prior-game FTN process variables contains incremental team-state information beyond the market-conditioned baseline, with the strongest plausible contribution coming from changes in offensive process and pressure structure rather than raw descriptive volume.",
   "source": {
     "source_id": "nflverse_ftn_charting",
     "coverage": "2022+",
-    "license": "CC-BY-SA-4.0; attribute FTN Data via nflverse",
+    "qualification_basis": "DATA_INTEGRITY_ONLY",
+    "rights_qualification_blocker": false,
+    "license": "CC-BY-SA-4.0; metadata only for technical qualification",
     "availability_field": "date_pulled",
-    "availability_rule": "A charted row is eligible for a simulated forecast only when date_pulled is no later than the simulated forecast decision timestamp. No row from the game being forecast may be used.",
+    "availability_rule": "A team-game aggregate is eligible for a simulated forecast only when every FTN row used by that aggregate has date_pulled no later than the simulated forecast decision timestamp. No row from the game being forecast may be used.",
+    "identity_rule": "Join nflverse_game_id + nflverse_play_id to PBP game_id + play_id; require >=99.5% unambiguous join coverage before the experiment may run.",
     "documentation": [
       "https://nflreadr.nflverse.com/reference/load_ftn_charting.html",
       "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html"
@@ -36,9 +41,14 @@
   ],
   "feature_construction": {
     "unit": "team-game aggregates constructed only from previously completed games whose FTN rows passed the date_pulled availability gate",
+    "boolean_rate_denominator": "For each boolean FTN field, take the arithmetic mean over non-null charted values for that team-game. Null values do not enter the denominator.",
+    "numeric_mean_denominator": "For n_defense_box, n_blitzers and n_pass_rushers, take the arithmetic mean over non-null charted values for that team-game.",
+    "team_game_availability": "The aggregate availability timestamp is the maximum date_pulled among FTN rows used by that team-game aggregate. An aggregate is ineligible if this timestamp is after the target decision time.",
     "windows": [3, 6],
-    "weighting": "equal-weight rolling means; no post-result selection of decay parameters",
+    "weighting": "equal-weight rolling means across the most recent eligible team-games; no post-result selection of decay parameters",
     "minimum_games": 2,
+    "cross_season_history": "allowed; the most recent eligible games may cross season boundaries because no offseason decay parameter is permitted in v1",
+    "eligible_game_types": ["REG", "POST"],
     "offense_features": [
       "motion_rate",
       "play_action_rate",
@@ -54,19 +64,32 @@
       "mean_pass_rushers"
     ],
     "change_features": "For each rolling metric, include 3-game minus 6-game value only when both windows satisfy minimum history; otherwise mark missing rather than impute from future information.",
-    "missingness": "Use explicit availability/missingness indicators. Numeric missing values are imputed from training-fold medians only."
+    "matchup_encoding": "For every 3-game, 6-game and 3-minus-6 metric, use home-team value minus away-team value. No cross-unit interactions are permitted in v1.",
+    "missingness": "For each matchup feature, set an explicit missing indicator when either side is unavailable. Numeric missing values are imputed from training-fold medians only. If a numeric feature has no finite training-fold observations, fail the fold rather than invent an imputation value."
+  },
+  "decision_clock": {
+    "simulated_forecast_horizon_minutes": 120,
+    "schedule_clock": "nflverse gametime interpreted in America/New_York",
+    "target_decision_timestamp": "scheduled kickoff minus 120 minutes",
+    "prior_game_rule": "A source game must have scheduled kickoff strictly earlier than the target decision timestamp and may not share the target game_id."
   },
   "benchmarks": {
-    "primary": "market-conditioned baseline using the project's chronology-clean historical market probability available for the research frame",
+    "primary": "market-conditioned baseline using vig-free home probability from the historical nflverse schedule moneylines",
+    "primary_encoding": "logit(market_home_prob) in a fixed-C logistic regression with intercept",
     "secondary": [
-      "raw historical market probability",
-      "existing football-only signal where chronology-clean and frozen independently of this experiment"
+      "raw historical market probability"
     ],
-    "market_alignment_gate": "If the available historical market probability cannot be shown to be chronology-clean for the evaluated research frame, do not interpret the experiment as a T-120 production simulation. It may be retained only as a conservative benchmark screen and must be labeled accordingly."
+    "market_alignment_gate": "The schedule moneyline has no historical T-120 timestamp proof. Therefore FTN-PROCESS-01 is labeled a conservative historical market-conditioned benchmark screen, not a T-120 production simulation. No result may override this label."
   },
   "model_family": {
-    "primary": "logistic regression with standardized continuous FTN features and fixed L2 regularization",
+    "baseline": "logistic regression on logit(market_home_prob)",
+    "primary": "logistic regression on logit(market_home_prob) plus standardized continuous FTN matchup features and explicit missing indicators",
     "regularization": "C=1.0 fixed before results",
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "max_iter": 3000,
+    "ftn_scaling": "For every fold, impute each FTN numeric feature with the training-fold median, then standardize using the training-fold mean and population standard deviation after imputation. Zero-variance features use scale=1. Missing indicators are not standardized.",
+    "market_scaling": "market logit is not standardized",
     "interactions": "none in v1",
     "nonlinear_models": "not allowed in v1",
     "hyperparameter_search": "none"
@@ -84,7 +107,14 @@
     "primary": "Brier score",
     "secondary": ["log loss", "calibration intercept", "calibration slope", "winner accuracy"],
     "stability": ["coefficient sign and magnitude by fold", "season-by-season metrics"],
-    "uncertainty": "team/game-block bootstrap over held-out predictions with a preregistered seed; report 95% intervals for metric differences",
+    "uncertainty": "stratified game-block bootstrap over held-out predictions",
+    "bootstrap": {
+      "replicates": 5000,
+      "seed": 20260911,
+      "stratification": "test season",
+      "block": "game_id row; each game is indivisible so both teams remain together",
+      "interval": "2.5th and 97.5th percentiles of candidate-minus-baseline Brier differences"
+    },
     "missingness": "report coverage and metric behavior for complete vs missing-feature rows",
     "ablations": [
       "offense process family removed",
