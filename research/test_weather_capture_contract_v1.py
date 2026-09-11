@@ -11,14 +11,15 @@ def _contract() -> dict:
     return json.loads(CONTRACT.read_text(encoding="utf-8"))
 
 
-def test_weather_capture_fails_closed_without_qualified_venue_resolution() -> None:
+def test_weather_capture_fails_closed_until_game_venue_receipts_exist() -> None:
     contract = _contract()
-    assert contract["status"] == "BLOCKED_ON_QUALIFIED_VENUE_RESOLUTION"
+    assert contract["status"] == "BLOCKED_PENDING_QUALIFIED_VENUE_RECEIPTS"
     venue = contract["venue_resolution"]
-    assert venue["status"] == "BLOCKING_DEPENDENCY"
+    assert venue["status"] == "RESOLVER_IMPLEMENTED_REGISTRY_REQUIRED"
+    assert venue["resolver"] == "research/run_venue_resolution_v1.py"
     assert venue["home_team_centroid_allowed"] is False
     assert venue["city_centroid_allowed"] is False
-    assert "Fail closed" in venue["neutral_site_policy"]
+    assert "game-specific schedule stadium receipt" in venue["neutral_site_policy"]
 
 
 def test_nws_capture_is_prospective_but_not_a_probability_feature() -> None:
@@ -41,6 +42,7 @@ def test_historical_weather_requires_publication_lag_not_run_initialization() ->
 def test_weather_contract_preserves_2026_and_production_firewalls() -> None:
     prohibitions = _contract()["prohibitions"]
     assert any("realized same-game weather" in item for item in prohibitions)
+    assert any("fuzzy or ambiguous venue" in item.lower() for item in prohibitions)
     assert any("completed 2026" in item.lower() for item in prohibitions)
     assert any("F-ST-01-FROZEN-2026" in item for item in prohibitions)
     assert any("T-120" in item for item in prohibitions)
