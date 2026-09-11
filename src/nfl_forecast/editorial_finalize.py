@@ -144,10 +144,14 @@ def _uniqueness_segments(text: str) -> list[str]:
 def _is_standardized_fact_ngram(words: list[str]) -> bool:
     """Exempt machine-owned factual scaffolds while keeping interpretation prose gated."""
     gram = " ".join(words)
-    has_metric = any(re.fullmatch(r"\d+(?:\.\d+)?", token) for token in words) and any(
-        token in STAT_BOILERPLATE_TERMS for token in words
-    )
-    if has_metric and ("last season" in gram or "side profile" in gram):
+    has_stat_term = any(token in STAT_BOILERPLATE_TERMS for token in words)
+    has_number = any(re.fullmatch(r"\d+(?:\.\d+)?", token) for token in words)
+    # Existing deterministic season-stat sentence scaffolds are factual, not authored prose.
+    if "last season" in gram and has_stat_term:
+        return True
+    # The opponent-side profile sentence can repeat when rounded EPA values match; require
+    # a numeric statistic so ordinary analytical prose containing "side profile" is not exempted.
+    if "side profile" in gram and has_number and has_stat_term:
         return True
     if any(fragment in gram for fragment in STANDARDIZED_EVIDENCE_FRAGMENTS):
         return True
