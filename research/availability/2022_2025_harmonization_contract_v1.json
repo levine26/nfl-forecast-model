@@ -1,0 +1,155 @@
+{
+  "contract_version": 3,
+  "status": "preregistered_with_post_first_execution_implementation_repair_before_any_season_metrics",
+  "purpose": "Determine whether the original V09B validation seasons can share one leakage-safe player-week practice-state contract before any availability model fitting or scoring is allowed.",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "execution_scope": "source integrity and feature-state harmonization only; no P(active) fitting, no expected-snap model, no game-outcome scoring",
+  "target_seasons": [2022, 2023, 2024, 2025],
+  "target_horizon_minutes": 120,
+  "completed_2026_outcomes_allowed": false,
+  "game_outcomes_allowed": false,
+  "probability_feature_authorized": false,
+  "v09b_execution_authorized": false,
+  "production_authorized": false,
+  "historical_game_status_feature_authorized": false,
+  "amendment_record": [
+    {
+      "stage": "before_first_execution",
+      "reason": "Review of the original V09B source audit showed that 2022-2024 row coverage and stable IDs were checked, but row-level T-120 chronology was not proven. Before any new cross-season audit metrics were observed, the source design was strengthened to mirror the already-qualified 2025 method: nflverse supplies stable identity/state, official NFL historical injury pages provide the independent weekly cross-check, and the official Game Status Report filing day provides the conservative chronology bound. Row-level nflverse date_modified remains a required diagnostic integrity field rather than the sole chronology proof.",
+      "changes": [
+        "Require official NFL.com historical injury pages for all 22 league weeks in each target season as the primary independent cross-check.",
+        "Use the official Game Status Report filing day, conservatively treated as 23:59:59 America/New_York, as the known-time bound for the final practice-report state across 2022-2025.",
+        "Retain nflverse date_modified parseability as a diagnostic source-integrity gate but do not use it to bypass the uniform official filing-day chronology contract.",
+        "Apply the same exact-name/unique-abbreviated-name stable-ID crosswalk and fail-closed practice-status disagreement policy used by the qualified 2025 reconstruction.",
+        "Require every canonical player-week row to map to one unambiguous scheduled team-week game before chronology can qualify."
+      ],
+      "first_live_2022_2024_audit_had_run": false,
+      "numeric_threshold_relaxation": false,
+      "completed_2026_outcomes_consulted": false,
+      "game_outcomes_consulted": false
+    },
+    {
+      "stage": "after_first_execution_halted_before_any_season_qualification_metrics",
+      "reason": "The first live harmonization execution stopped during 2022 source plumbing before summarize_season produced any qualification rates. The official NFL 2022 Week 9 Detroit page rendered Brock Wright twice with identical player, position, injury, practice status, game status, source, and URL. The original implementation treated any duplicate stable player-week as a hard conflict and therefore stopped before season metrics. This amendment repairs source rendering only and adds symmetric official-to-nflverse identity accounting that had been identified as an integrity requirement before accepting the first source result.",
+      "observed_failure": {
+        "season": 2022,
+        "week": 9,
+        "team": "DET",
+        "player": "Brock Wright",
+        "exception": "official reports contain 1 duplicate stable player-week rows",
+        "season_qualification_metrics_observed": false,
+        "model_or_game_outcome_metrics_observed": false
+      },
+      "changes": [
+        "Collapse only complete semantic duplicates from the same official source evidence. Every field in the official row contract must match; otherwise the rows remain distinct.",
+        "Keep the original stable-key duplicate gate unchanged after exact deduplication, so conflicting duplicate evidence still fails closed.",
+        "Add reverse official-to-nflverse stable-identity accounting so an official row cannot silently disappear merely because no nflverse canonical row matched it.",
+        "Require official-to-nflverse stable identity resolution rate >= 0.995 for each target season. This is an added integrity gate, not a relaxed threshold.",
+        "Persist exact duplicate and unresolved reverse-identity diagnostics in the audit artifact."
+      ],
+      "first_live_2022_2024_audit_had_run": true,
+      "numeric_threshold_relaxation": false,
+      "new_gate_is_stricter_than_prior_contract": true,
+      "completed_2026_outcomes_consulted": false,
+      "game_outcomes_consulted": false,
+      "model_results_consulted": false
+    }
+  ],
+  "source_contract": {
+    "nflverse_injuries": {
+      "provider": "nflverse injury reports",
+      "release_tag": "injuries",
+      "assets": {
+        "2022": {"name": "injuries_2022.csv", "release_asset_id": 123900172},
+        "2023": {"name": "injuries_2023.csv", "release_asset_id": 190301559},
+        "2024": {"name": "injuries_2024.csv", "release_asset_id": 228754161},
+        "2025": {"name": "injuries_2025.csv", "expected_sha256": "873ca1606dd575bd01152508a243ef6b3a0f8f97b90b707217e62ee8c7ceb735"}
+      },
+      "required_fields": [
+        "season", "week", "team", "gsis_id", "position", "full_name", "first_name", "last_name",
+        "practice_status", "report_status", "date_modified"
+      ],
+      "role": "canonical stable identity plus weekly injury/practice state",
+      "date_modified_semantics": "source row injury-information update time; naive values use nflverse's documented standard timezone America/Toronto before conversion to UTC",
+      "date_modified_role": "diagnostic_integrity_only_not_uniform_chronology_authorization"
+    },
+    "nfl_com_historical_pages": {
+      "regular_url_template": "https://www.nfl.com/injuries/league/{season}/reg{week}",
+      "postseason_url_template": "https://www.nfl.com/injuries/league/{season}/post{page_week}",
+      "regular_weeks": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],
+      "postseason_page_to_nfl_week": {"1": 19, "2": 20, "3": 21, "4": 22},
+      "role": "primary independent all-position player/injury/final-practice/game-status cross-check for every target-season league week; raw HTML must be retained and content-addressed",
+      "exact_duplicate_policy": "complete semantic duplicates may collapse only when season, week, team, player, position, injury, practice status, game status, source, and source URL are identical; any non-identical stable player-week duplicate remains fail-closed"
+    },
+    "nfl_reporting_policy": {
+      "game_status_due_days": {
+        "Monday": "Saturday",
+        "Wednesday": "Tuesday",
+        "Thursday": "Wednesday",
+        "Friday": "Thursday",
+        "Saturday": "Thursday",
+        "Sunday": "Friday"
+      },
+      "role": "uniform chronology rule establishing when the final practice/game-status report is required before each game"
+    },
+    "nflverse_schedule": {
+      "provider": "nflverse nfldata games.csv",
+      "role": "game identity, kickoff timestamp, and T-120 cutoff",
+      "canonical_hash_scope": "only sorted 2022-2025 rows and fields required by the audit; raw capture also retained"
+    },
+    "qualified_2025_receipt": {
+      "source_id": "availability_2025_composite_reconstruction",
+      "qualification_record": "research/availability/2025_reconstruction_qualification_v1.json",
+      "reconstruction_contract": "research/availability/2025_reconstruction_contract.json",
+      "role": "independent proof that the uniform reconstruction method already passed the preregistered 2025 gates"
+    }
+  },
+  "canonical_state_contract": {
+    "identity_key": ["season", "week", "team", "gsis_id"],
+    "allowed_practice_states": ["full", "limited", "dnp", "unknown"],
+    "unknown_policy": "missing, unrecognized, late, ambiguous, or otherwise unqualified source state remains unknown; never infer healthy/active",
+    "source_effective_time": "official Game Status Report filing day at 23:59:59 America/New_York, derived from scheduled game weekday",
+    "known_by_t120_rule": "report_deadline_eod_utc <= kickoff_utc - 120 minutes",
+    "date_modified_role": "diagnostic parseability and source-audit evidence only",
+    "cross_source_policy": "official NFL practice-status disagreement or ambiguous stable identity is not silently resolved; exact duplicate source renderings may collapse only under the complete semantic-identity rule, and unresolved official rows are separately accounted for in the reverse identity gate",
+    "game_status_in_feature": false,
+    "actual_snaps_in_feature": false,
+    "postgame_participation_in_feature": false,
+    "final_inactive_status_in_feature": false
+  },
+  "qualification_gates": {
+    "required_seasons_exact": [2022, 2023, 2024, 2025],
+    "official_nfl_pages_required_per_season": 22,
+    "stable_gsis_missing_rate_max": 0.0,
+    "schedule_match_rate_min": 1.0,
+    "unique_identity_match_rate_min": 0.995,
+    "official_identity_resolution_rate_min": 0.995,
+    "practice_status_agreement_rate_min": 0.985,
+    "diagnostic_game_status_agreement_rate_min": 0.985,
+    "known_by_t120_rate_required_among_matched_rows": 1.0,
+    "fully_qualified_practice_state_rate_min": 0.99,
+    "legacy_date_modified_parse_rate_min": 0.995,
+    "duplicate_identity_rows_allowed": 0,
+    "actual_snaps_used": 0,
+    "postgame_participation_used": 0,
+    "completed_2026_outcomes_used": 0
+  },
+  "missingness_reporting": {
+    "required_dimensions": ["season", "week", "team", "position"],
+    "must_report_unknown_reason": true,
+    "missing_status_means_healthy": false,
+    "nflverse_absence_means_healthy": false,
+    "official_page_absence_means_healthy": false,
+    "official_row_without_nflverse_identity_must_be_reported": true
+  },
+  "decision_rule": "The cross-season source contract qualifies only if every preregistered gate passes in every target season without changing thresholds after observing the audit. Failure leaves V09B execution unauthorized. Passing qualifies only the harmonized source/state contract and still does not fit or score V09B.",
+  "no_rescue_policy": "If a gate fails, do not tune thresholds, redefine the state, add final game status, use realized snaps, reinterpret absence as healthy, or inspect model outcomes to rescue the audit. Any materially different source/state design requires a new versioned contract.",
+  "documentation_evidence": [
+    "nflreadr injury dictionary defines date_modified as the date/time injury information was updated",
+    "nflreadr defines nflverse_data_timezone as America/Toronto",
+    "2022 and current NFL injury-report policy use the same game-status filing-day structure needed for conservative pregame chronology",
+    "research/availability/2025_reconstruction_contract.json documents and validates the conservative filing-day method for 2025",
+    "research/availability/V09B_source_blocker_resolution_v1.json preserves the original V09B disposition",
+    "first live harmonization artifact sha256 e120dc711cd118519632d63362fde36a59965604829ce0458d5d5cce5c35cd39 stopped before season qualification metrics on one exact duplicated official row"
+  ]
+}
