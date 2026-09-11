@@ -10,6 +10,7 @@ gate, T-120 lock, and publication decision.
 import argparse
 import os
 from pathlib import Path
+import re
 import time
 
 import requests
@@ -45,6 +46,25 @@ def _retry_delay(response: requests.Response, attempt: int) -> float:
     except (TypeError, ValueError):
         pass
     return min(2.0 ** attempt, 12.0)
+
+
+def isolate_final_json(text: str) -> str:
+    """Drop browser-search preamble while leaving schema repair to validators.
+
+    Groq browser search may prepend research snippets to message.content even when
+    the requested final answer is JSON. Sunday Signal accepts only the last object
+    whose root begins with a `games` key; everything else is discarded before the
+    existing strict validator sees the candidate.
+    """
+    raw = str(text or "").strip()
+    matches = list(re.finditer(r'\{\s*"games"\s*:', raw))
+    if not matches:
+        return raw
+    start = matches[-1].start()
+    end = raw.rfind("}")
+    if end <= start:
+        return raw[start:]
+    return raw[start:end + 1].strip()
 
 
 def generate(
@@ -83,7 +103,7 @@ def generate(
                 raise RuntimeError(f"Groq returned an invalid completion payload: {exc}") from exc
             if not isinstance(content, str) or not content.strip():
                 raise RuntimeError("Groq returned an empty completion")
-            return content.strip()
+            return isolate_final_json(content)
 
         body = response.text.strip().replace("\n", " ")[:1200]
         last_error = f"HTTP {response.status_code}: {body}"
