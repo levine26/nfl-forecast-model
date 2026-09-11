@@ -6,7 +6,9 @@ on:
       - 'site/**'
       - 'outputs/**'
       - 'src/nfl_forecast/public_forecast.py'
+      - 'src/nfl_forecast/player_impact_monitor.py'
       - 'scripts/build_public_forecasts.py'
+      - 'scripts/build_public_impact_monitor.py'
       - '.github/workflows/responsive.yml'
   workflow_dispatch:
 
@@ -18,6 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python package
+        run: pip install '.[dev]'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -29,6 +36,7 @@ jobs:
           cp outputs/*.csv site/public/data/ 2>/dev/null || true
           cp outputs/*.json site/public/data/ 2>/dev/null || true
           python scripts/build_public_forecasts.py --output site/public/data/public_forecasts.json
+          python scripts/build_public_impact_monitor.py --output site/public/data/impact_monitor.json
       - name: Install dashboard dependencies
         working-directory: site
         run: npm install
