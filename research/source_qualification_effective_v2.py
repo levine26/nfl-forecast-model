@@ -7,7 +7,7 @@ from typing import Any
 
 
 REGISTRY_PATH = Path("research/source_qualification_registry_v2.json")
-SLEEPER_OVERRIDE_PATH = Path("research/sleeper_archive_qualification_v1.json")
+SLEEPER_QUALIFICATION_PATH = Path("research/sleeper_archive_qualification_v1.json")
 INTEGRITY_POLICY_PATH = Path("research/source_integrity_qualification_policy_v1.json")
 
 _RIGHTS_MARKERS = (
@@ -28,12 +28,11 @@ def _load(path: Path) -> dict[str, Any]:
 
 
 def effective_policy() -> dict[str, Any]:
-    """Return the qualification policy actually enforced by research code.
+    """Return the source-qualification policy enforced by research code.
 
-    The raw registry remains an auditable historical record.  This effective policy
-    supersedes its old combined rights/point-in-time fail-closed flag: licensing and
-    redistribution constraints are metadata, never technical qualification blockers.
-    Point-in-time and other data-integrity failures remain fail-closed.
+    Rights/licensing fields remain governance metadata.  Only data-integrity failures
+    can fail technical qualification; point-in-time failures remain explicitly
+    fail-closed.
     """
 
     registry = _load(REGISTRY_PATH)
@@ -47,9 +46,9 @@ def effective_policy() -> dict[str, Any]:
         "completed_2026_outcome_model_selection_allowed"
     ]
     policy["zero_cost_research_policy_preserved"] = overlay["zero_cost_research_policy_preserved"]
-    policy["fail_closed_on_rights_or_point_in_time_failure"] = False
     policy["fail_closed_on_rights_failure"] = False
     policy["fail_closed_on_point_in_time_failure"] = True
+    policy["fail_closed_on_data_integrity_failure"] = True
     return policy
 
 
@@ -75,16 +74,16 @@ def _apply_integrity_policy(row: dict[str, Any]) -> dict[str, Any]:
 def effective_sources() -> list[dict[str, Any]]:
     registry = _load(REGISTRY_PATH)
     sources = [_apply_integrity_policy(item) for item in registry["sources"]]
-    override = _load(SLEEPER_OVERRIDE_PATH)
-    if override.get("supersedes_registry_block_for_technical_research") is not True:
+    qualification = _load(SLEEPER_QUALIFICATION_PATH)
+    if qualification.get("supplements_registry_scope_for_technical_research") is not True:
         return sources
 
-    source_id = override["source_id"]
+    source_id = qualification["source_id"]
     row = next((item for item in sources if item.get("source_id") == source_id), None)
     if row is None:
-        raise KeyError(f"override source not present in registry: {source_id}")
+        raise KeyError(f"qualification source not present in registry: {source_id}")
 
-    scope = override["effective_scope"]
+    scope = qualification["effective_scope"]
     row["classification"] = "QUALIFIED_RESEARCH"
     row["provider"] = "edgecdec/declan-fantasy-football verified public GitHub snapshot archive"
     row["historical_coverage"] = "2026-02-01+ point-in-time snapshots; no 2025 reconstruction"
@@ -96,13 +95,13 @@ def effective_sources() -> list[dict[str, Any]]:
         "2026 point-in-time and prospective shadow research after snapshot data-quality gates; "
         "completed-2026 outcome-based selection remains prohibited"
     )
-    row["technical_status"] = override["technical_status"]
+    row["technical_status"] = qualification["technical_status"]
     row["supports_2025_reconstruction"] = scope["supports_2025_reconstruction"]
     row["supports_completed_2026_outcome_model_selection"] = scope[
         "supports_completed_2026_outcome_model_selection"
     ]
     row["supports_production_dependency"] = scope["supports_production_dependency"]
-    row["qualification_override"] = str(SLEEPER_OVERRIDE_PATH)
+    row["qualification_record"] = str(SLEEPER_QUALIFICATION_PATH)
     row["qualification_basis"] = "DATA_INTEGRITY_ONLY"
     row["rights_qualification_blocker"] = False
     row["technical_known_source_failures"] = [
