@@ -63,7 +63,7 @@ test('governance-approved Impact Monitor renders as explainability-only context'
             observed_statistics: [],
             suppressed_observed_statistics: 1,
             levline_impacts: [{
-              metric: 'levline_player_impact',
+              metric: 'research_modeled_context',
               interpretation: 'Research-only modeled player context.',
               research_only: true,
               probability_feature_authorized: false,
