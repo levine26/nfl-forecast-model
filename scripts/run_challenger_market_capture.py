@@ -160,6 +160,7 @@ def capture(
         slate_row = by_matchup[matchup]
         source_probabilities: list[float] = []
         source_names: list[str] = []
+        source_updates: list[pd.Timestamp] = []
         for bookmaker in event.get("bookmakers", []):
             h2h = next((m for m in bookmaker.get("markets", []) if m.get("key") == "h2h"), None)
             if not h2h:
@@ -170,11 +171,17 @@ def capture(
                 continue
             probability = devig_two_way(home_odds, away_odds)
             source_name = str(bookmaker.get("key") or bookmaker.get("title") or "unknown")
+            last_update = pd.to_datetime(bookmaker.get("last_update"), utc=True, errors="coerce")
+            if pd.notna(last_update):
+                source_updates.append(last_update)
             source_probabilities.append(probability)
             source_names.append(source_name)
             rows.append(
                 {
                     "request_timestamp_utc": request_timestamp,
+                    # Information becomes observable to this research ledger at request time;
+                    # the provider's own update time is recorded separately for freshness.
+                    "snapshot_timestamp_utc": request_timestamp,
                     "game_id": slate_row.game_id,
                     "kickoff_utc": slate_row.kickoff_utc,
                     "minutes_to_kickoff": float(slate_row.minutes_to_kickoff),
@@ -196,14 +203,19 @@ def capture(
             consensus = robust_logit_consensus(source_probabilities)
             pure = pd.to_numeric(slate_row.get("fst_pure_home_prob"), errors="coerce")
             research_levline = _fst_probability(float(pure), consensus) if pd.notna(pure) else np.nan
+            max_age_minutes = np.nan
+            if source_updates:
+                freshest = max(source_updates)
+                max_age_minutes = max(0.0, (pd.Timestamp(now) - freshest).total_seconds() / 60.0)
             rows.append(
                 {
                     "request_timestamp_utc": request_timestamp,
+                    "snapshot_timestamp_utc": request_timestamp,
                     "game_id": slate_row.game_id,
                     "kickoff_utc": slate_row.kickoff_utc,
                     "minutes_to_kickoff": float(slate_row.minutes_to_kickoff),
                     "source_name": "sportsbook_consensus",
-                    "source_type": "sportsbook_consensus",
+                    "source_type": "derived_consensus",
                     "source_last_update_utc": request_timestamp,
                     "home_probability": consensus,
                     "home_moneyline": np.nan,
@@ -214,6 +226,7 @@ def capture(
                     "football_home_prob": pure,
                     "source_count": len(source_probabilities),
                     "source_names": "|".join(sorted(source_names)),
+                    "freshest_source_age_minutes": max_age_minutes,
                     "research_only": True,
                     "production_authorized": False,
                 }
