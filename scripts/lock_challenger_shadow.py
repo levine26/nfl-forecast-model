@@ -13,7 +13,11 @@ from nfl_forecast.challenger_shadow import lock_shadow, normalize_history
 def _read_csv(path: Path) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
-    return pd.read_csv(path)
+    # Pandas 3 infers an all-empty winner_correct column as float64, which then
+    # rejects a later boolean grade. Keep the ledger field object-typed at the
+    # CSV boundary so immutable historical rows can be graded without touching
+    # any locked forecast field.
+    return pd.read_csv(path, dtype={"winner_correct": "object"})
 
 
 def _challenger_week_path(explicit: str | None) -> Path:
