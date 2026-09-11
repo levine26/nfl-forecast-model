@@ -72,9 +72,13 @@ def test_availability_and_advanced_player_sources_remain_firewalled_for_data_rea
     assert availability
     assert advanced
     assert all(row["production_eligibility"] != "authorized" for row in availability + advanced)
-    assert payload["current_decisions"]["recommended_first_availability_audit"] == "sportradar_weekly_injuries_v7"
+    assert payload["current_decisions"]["recommended_first_availability_audit"] == "sleeper_historical_player_archive_candidate"
+    assert "2026-only" in payload["current_decisions"]["availability_scope_note"]
     assert payload["current_decisions"]["pff_active_research_status"] == "excluded_by_zero_cost_policy"
     assert payload["current_decisions"]["rights_qualification_blocker"] is False
+    sleeper = next(row for row in availability if row["source_id"] == "sleeper_historical_player_archive_candidate")
+    assert sleeper["technical_status"] == "verified_2026_only"
+    assert sleeper["zero_cost_eligible"] is True
 
 
 def test_advanced_source_registry_qualifies_on_integrity_and_never_authorizes_production() -> None:
@@ -100,16 +104,24 @@ def test_advanced_source_registry_qualifies_on_integrity_and_never_authorizes_pr
     assert "rights/licensing metadata never blocks" in payload["selection_policy"].lower()
 
 
-def test_availability_source_contract_fails_closed_on_missing_point_in_time_evidence() -> None:
+def test_availability_source_contract_fails_closed_on_data_integrity_not_rights() -> None:
     payload = _load(AVAILABILITY_CONTRACT)
     assert payload["status"] == "research_governance"
     assert payload["target_horizon_minutes"] == 120
     assert payload["production_authorized"] is False
+    assert payload["qualification_basis"] == "DATA_INTEGRITY_ONLY"
+    assert payload["rights_qualification_blocker"] is False
+    assert payload["zero_cost_active_research_only"] is True
     tests = payload["qualification_tests"]
     assert "2025" in tests["target_season_coverage"]
     assert "fail closed" in tests["revision_semantics"].lower()
     assert "Actual snaps" in tests["no_realized_participation_proxy"]
+    assert "rights_gate" not in tests
     outcomes = set(payload["fail_closed_outcomes"])
-    assert "no historical availability model fitting" in outcomes
-    assert "no availability probability feature" in outcomes
-    assert payload["candidate_source_priority"][0]["source_id"] == "sportradar_weekly_injuries_v7"
+    assert any("no historical availability model fitting" in outcome for outcome in outcomes)
+    assert any("no availability probability feature" in outcome for outcome in outcomes)
+    assert payload["active_zero_cost_candidate_priority"][0]["source_id"] == "sleeper_historical_player_archive_candidate"
+    assert {row["source_id"] for row in payload["inactive_nonzero_cost_candidates"]} == {
+        "sportradar_weekly_injuries_v7",
+        "sportsdataio_injuries",
+    }
