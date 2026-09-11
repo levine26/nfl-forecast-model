@@ -1,22 +1,22 @@
 candidate,games,winner_pct,brier,log_loss,feature_set,method,eligible_shadow,pure_weight,market_weight,objective,calibration
 Market only benchmark,1087,0.6761729530818767,0.2101992905677052,0.6076472081285538,market,market,False,,,,
-Nested PURE,1087,0.6448942042318307,0.2238525683457865,0.638945781133835,production_compatible,pure,True,,,,
-Nested 75% PURE / 25% MARKET,1087,0.6586936522539099,0.21859187926590426,0.6274023586900879,production_compatible,fixed,True,0.75,0.25,,
-Hybrid adaptive Brier,1087,0.6752529898804048,0.21176524037686364,0.6117693713854481,production_compatible,linear,True,,,brier,none
-Logit hybrid adaptive Brier,1087,0.6761729530818767,0.21160908212368731,0.6112492762671563,production_compatible,logit,True,,,brier,none
-Logit hybrid adaptive accuracy,1087,0.6669733210671573,0.21349743819444372,0.6157063013584744,production_compatible,logit,True,,,accuracy,none
-Opponent-adjusted Nested PURE,1087,0.6430542778288868,0.22435969776062245,0.6399729951037921,opponent_adjusted,pure,True,,,,
-Opponent-adjusted 75% PURE / 25% MARKET,1087,0.6550137994480221,0.21881491461301777,0.6278342329451788,opponent_adjusted,fixed,True,0.75,0.25,,
-Opponent-adjusted Hybrid adaptive Brier,1087,0.6761729530818767,0.21173471101655916,0.6117146097509125,opponent_adjusted,linear,True,,,brier,none
-Opponent-adjusted Logit hybrid adaptive Brier,1087,0.6761729530818767,0.2115665236104425,0.6111674278225977,opponent_adjusted,logit,True,,,brier,none
-Opponent-adjusted Logit hybrid adaptive accuracy,1087,0.6651333946642134,0.21509443180190357,0.6191853149084591,opponent_adjusted,logit,True,,,accuracy,none
-QB-aware Nested PURE,1087,0.6421343146274149,0.22295652031347918,0.6368665130373485,qb_aware,pure,True,,,,
-QB-aware 75% PURE / 25% MARKET,1087,0.6632934682612696,0.2181645409833501,0.6263816764070259,qb_aware,fixed,True,0.75,0.25,,
-QB-aware Hybrid adaptive Brier,1087,0.6752529898804048,0.2117859261104631,0.6117739104669538,qb_aware,linear,True,,,brier,none
-QB-aware Logit hybrid adaptive Brier,1087,0.6761729530818767,0.21163730638804187,0.6112839830997782,qb_aware,logit,True,,,brier,none
-QB-aware Logit hybrid adaptive accuracy,1087,0.6642134314627415,0.21558721242004933,0.6204408974029552,qb_aware,logit,True,,,accuracy,none
-Opponent-adjusted + QB-aware Nested PURE,1087,0.6513339466421343,0.22335572899113545,0.6376609331875436,opponent_adjusted_qb,pure,True,,,,
-Opponent-adjusted + QB-aware 75% PURE / 25% MARKET,1087,0.6605335786568537,0.2183420622157009,0.6267393988576271,opponent_adjusted_qb,fixed,True,0.75,0.25,,
-Opponent-adjusted + QB-aware Hybrid adaptive Brier,1087,0.6789328426862925,0.21176384300398582,0.6117478561188701,opponent_adjusted_qb,linear,True,,,brier,none
-Opponent-adjusted + QB-aware Logit hybrid adaptive Brier,1087,0.6770929162833487,0.21160065408594644,0.6112189078859845,opponent_adjusted_qb,logit,True,,,brier,none
-Opponent-adjusted + QB-aware Logit hybrid adaptive accuracy,1087,0.6632934682612696,0.21677298432372197,0.6227597341848335,opponent_adjusted_qb,logit,True,,,accuracy,none
+Nested PURE,1087,0.6448942042318307,0.22385256842702636,0.6389457813116114,production_compatible,pure,True,,,,
+Nested 75% PURE / 25% MARKET,1087,0.6586936522539099,0.2185918793232553,0.6274023588149715,production_compatible,fixed,True,0.75,0.25,,
+Hybrid adaptive Brier,1087,0.6752529898804048,0.21176524039359468,0.6117693714209961,production_compatible,linear,True,,,brier,none
+Logit hybrid adaptive Brier,1087,0.6761729530818767,0.2116090821408968,0.6112492763037188,production_compatible,logit,True,,,brier,none
+Logit hybrid adaptive accuracy,1087,0.6669733210671573,0.21349743821124695,0.6157063013941183,production_compatible,logit,True,,,accuracy,none
+Opponent-adjusted Nested PURE,1087,0.6430542778288868,0.2243600422468215,0.6399735823331725,opponent_adjusted,pure,True,,,,
+Opponent-adjusted 75% PURE / 25% MARKET,1087,0.6550137994480221,0.2188151399078269,0.6278347128261849,opponent_adjusted,fixed,True,0.75,0.25,,
+Opponent-adjusted Hybrid adaptive Brier,1087,0.6761729530818767,0.21173476406826874,0.6117147413077004,opponent_adjusted,linear,True,,,brier,none
+Opponent-adjusted Logit hybrid adaptive Brier,1087,0.6761729530818767,0.2115665482648626,0.6111674844349007,opponent_adjusted,logit,True,,,brier,none
+Opponent-adjusted Logit hybrid adaptive accuracy,1087,0.6651333946642134,0.21509457313490338,0.6191855866508452,opponent_adjusted,logit,True,,,accuracy,none
+QB-aware Nested PURE,1087,0.6421343146274149,0.22295652032859967,0.6368665130700115,qb_aware,pure,True,,,,
+QB-aware 75% PURE / 25% MARKET,1087,0.6632934682612696,0.2181645409949934,0.6263816764337412,qb_aware,fixed,True,0.75,0.25,,
+QB-aware Hybrid adaptive Brier,1087,0.6752529898804048,0.2117859261145462,0.6117739104766476,qb_aware,linear,True,,,brier,none
+QB-aware Logit hybrid adaptive Brier,1087,0.6761729530818767,0.21163730639171052,0.6112839831081051,qb_aware,logit,True,,,brier,none
+QB-aware Logit hybrid adaptive accuracy,1087,0.6642134314627415,0.21558721242923998,0.6204408974233998,qb_aware,logit,True,,,accuracy,none
+Opponent-adjusted + QB-aware Nested PURE,1087,0.6513339466421343,0.2233568645243233,0.6376631301094078,opponent_adjusted_qb,pure,True,,,,
+Opponent-adjusted + QB-aware 75% PURE / 25% MARKET,1087,0.6605335786568537,0.21834289906615756,0.6267409888055563,opponent_adjusted_qb,fixed,True,0.75,0.25,,
+Opponent-adjusted + QB-aware Hybrid adaptive Brier,1087,0.6789328426862925,0.2117641120878485,0.6117483588456614,opponent_adjusted_qb,linear,True,,,brier,none
+Opponent-adjusted + QB-aware Logit hybrid adaptive Brier,1087,0.6770929162833487,0.21160092784938397,0.6112194246743204,opponent_adjusted_qb,logit,True,,,brier,none
+Opponent-adjusted + QB-aware Logit hybrid adaptive accuracy,1087,0.6632934682612696,0.21677403539497325,0.6227617845578415,opponent_adjusted_qb,logit,True,,,accuracy,none
