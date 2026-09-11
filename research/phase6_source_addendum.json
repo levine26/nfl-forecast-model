@@ -1,0 +1,88 @@
+{
+  "status": "research_only",
+  "as_of": "2026-09-11",
+  "production_authorized": false,
+  "additions": [
+    {
+      "source_id": "qubone_sleeper_daily_git_archive",
+      "provider": "Community GitHub archive of Sleeper /players/nfl payload",
+      "repository": "qubone/sleeper_fetch_players",
+      "cost": "$0",
+      "coverage_verified": {
+        "first_tracked_nfl_latest_commit": "2025-01-19T21:42:29Z",
+        "daily_2025_regular_season_coverage_observed": true,
+        "current_2026_updates_observed": true
+      },
+      "mechanism": "The repository overwrites nfl/sleeper_data_latest.json daily, while Git commits preserve prior blob versions. Historical state is therefore recoverable by commit timestamp even though the working tree exposes only latest.json.",
+      "potential_fields": ["injury_status", "practice_participation", "injury_start_date", "status", "team", "depth_chart_position", "depth_chart_order", "player_id"],
+      "research_value": "Potentially fills the exact 2025 point-in-time status gap that blocked V09B, but only if historical blobs prove field completeness/stability and player IDs can be crosswalked safely.",
+      "qualification_needed": [
+        "audit snapshot continuity around every 2025 regular-season week",
+        "measure population/missingness of injury_status and practice_participation by date and position",
+        "verify update time precedes each tested T-120 cutoff",
+        "crosswalk Sleeper player_id to GSIS with quantified unresolved/duplicate rate",
+        "compare a manual sample with contemporaneous official NFL injury reports",
+        "review whether using archived API output for non-commercial model research is compatible with Sleeper terms and repository/data rights"
+      ],
+      "current_decision": "high-priority source audit; not qualified for model fitting yet",
+      "priority": "P0_AUDIT"
+    },
+    {
+      "source_id": "nflverse_weekly_rosters",
+      "provider": "nflverse",
+      "cost": "$0",
+      "historical_coverage": "2002 onward",
+      "current_2026": true,
+      "useful_for": ["weekly team membership", "roster status", "ACT/INA/PUP/RES/DEV state", "GSIS/Sleeper/ESPN/PFR crosswalk fields"],
+      "research_value": "Stronger historical roster-state spine than season-level rosters. Useful for roster churn and personnel topology; roster status must not be treated as a practice-report injury probability.",
+      "priority": "P0_PERSONNEL"
+    },
+    {
+      "source_id": "nflverse_espn_qbr",
+      "provider": "ESPN QBR via nflverse/espnscrapeR-data",
+      "cost": "$0 access",
+      "historical_coverage": "2006 onward",
+      "current_2026": "requires current-season freshness audit before use",
+      "useful_for": ["QBR", "points added", "QB plays", "EPA components", "sack/pass/run components"],
+      "research_value": "Potential compact QB-quality benchmark that is distinct from LevLine's current PBP QB state, but may overlap heavily and depends on publication/freshness and rights review.",
+      "current_decision": "P2 schema/freshness audit only; lower priority than NGS because current 2026 publication status is not yet established",
+      "priority": "P2"
+    },
+    {
+      "source_id": "nflverse_contracts",
+      "provider": "OverTheCap via nflverse",
+      "cost": "$0 access",
+      "current_2026": true,
+      "latest_update_observed": "2026-08-31",
+      "stable_id": "gsis_id available",
+      "useful_for": ["active contract state", "APY cap percentage", "contract-year history", "transaction/acquisition context"],
+      "research_value": "Possible slowly moving talent/investment prior and useful team/player dossier context. Not expected to carry enough orthogonal game-level signal to outrank FTN/NGS research.",
+      "rights_note": "Derived/model research and public redistribution need separate OverTheCap/nflverse rights review before any public display.",
+      "priority": "P3"
+    },
+    {
+      "source_id": "nflverse_trades",
+      "provider": "Lee Sharpe/PFR-maintained trades via nflverse",
+      "cost": "$0",
+      "current_2026": true,
+      "latest_update_observed": "2026-09-01",
+      "useful_for": ["trade date", "team gave/received", "player identity when available"],
+      "research_value": "Useful event/context signal and roster-churn audit, not a standalone forecast feature.",
+      "priority": "P2_CONTEXT"
+    },
+    {
+      "source_id": "rookie_prior_nflverse",
+      "provider": "nflverse draft/combine/player registry",
+      "cost": "$0",
+      "current_2026": true,
+      "useful_for": ["draft capital", "position", "age", "combine measurements", "stable GSIS identity"],
+      "research_value": "Potential hierarchical prior for low-NFL-sample rookies/young players, especially early season. Must be tested as a compact prior rather than a broad feature fishing exercise.",
+      "priority": "P2_MODEL"
+    }
+  ],
+  "important_non_candidates": [
+    "Fantasy rankings/ADP and trending-player popularity are not proposed as football-strength features.",
+    "Undocumented ESPN endpoints are not proposed as production dependencies.",
+    "Community archives are evidence sources, not automatically trusted authoritative sources."
+  ]
+}
