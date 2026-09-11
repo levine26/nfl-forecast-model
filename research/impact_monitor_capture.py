@@ -3,7 +3,7 @@ from __future__ import annotations
 """Research-only current availability capture for the LevLine Impact Monitor.
 
 This adapter resolves current NFL.com injury-report names to nflverse roster GSIS IDs by
-strict normalized team+name matching.  Ambiguous or unresolved identities are skipped.
+strict normalized team+name matching. Ambiguous or unresolved identities are skipped.
 It creates availability-only cards: no observed advanced statistic and no modeled impact
 is fabricated merely to populate the monitor.
 """
@@ -19,7 +19,7 @@ from typing import Any
 import nflreadpy as nfl
 import pandas as pd
 
-from nfl_forecast.injuries import load_official_injury_report
+from nfl_forecast.injuries import fetch_nfl_injuries
 from nfl_forecast.player_impact_monitor import build_impact_monitor_payload
 
 
@@ -31,6 +31,31 @@ def normalize_name(value: object) -> str:
     text = unicodedata.normalize("NFKD", str(value or ""))
     text = "".join(ch for ch in text if not unicodedata.combining(ch))
     return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
+def _official_injury_frame(season: int, week: int) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Flatten the repository's canonical NFL.com injury response for identity resolution."""
+    injuries, metadata = fetch_nfl_injuries(int(season), int(week))
+    rows: list[dict[str, Any]] = []
+    report_as_of = str(metadata.get("as_of") or "")
+    for team, players in injuries.items():
+        for player in players:
+            rows.append(
+                {
+                    "team": str(team),
+                    "player": player.get("name"),
+                    "position": player.get("position"),
+                    "practice_status": player.get("practice_status"),
+                    "game_status": player.get("game_status"),
+                    "report_date": report_as_of,
+                    "source_url": player.get("source_url") or metadata.get("source"),
+                }
+            )
+    columns = [
+        "team", "player", "position", "practice_status", "game_status",
+        "report_date", "source_url",
+    ]
+    return pd.DataFrame(rows, columns=columns), metadata
 
 
 def _game_lookup(schedule: pd.DataFrame, season: int, week: int) -> dict[str, str]:
@@ -172,7 +197,7 @@ def capture_current_monitor(
 ) -> dict[str, Any]:
     retrieved = datetime.now(timezone.utc).isoformat()
     schedule = pd.read_csv(schedule_path)
-    injury_report = load_official_injury_report()
+    injury_report, injury_metadata = _official_injury_frame(season, week)
     roster = _pandas(nfl.load_rosters([int(season)]))
     cards, audit = resolve_availability_cards(
         injury_report,
@@ -182,6 +207,7 @@ def capture_current_monitor(
         week=int(week),
         retrieved_at_utc=retrieved,
     )
+    audit["injury_source_health"] = injury_metadata
     payload = build_impact_monitor_payload(cards, generated_utc=retrieved)
     payload["capture_audit"] = audit
     payload["live_site_consumes_this_file"] = False
