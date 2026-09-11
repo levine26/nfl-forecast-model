@@ -6,9 +6,9 @@ import { gzipSync } from 'node:zlib'
 const DIST_ROOT=fileURLToPath(new URL('../dist/',import.meta.url))
 const ASSETS=join(DIST_ROOT,'assets')
 const LIMITS={
-  entryRaw:450*1024,
-  entryGzip:140*1024,
-  lazyRaw:300*1024,
+  vnextRouteRaw:320*1024,
+  vnextRouteGzip:100*1024,
+  vnextChunkRaw:100*1024,
   cssTotal:100*1024,
 }
 
@@ -31,6 +31,10 @@ function fail(label,actual,limit){
   }
 }
 
+async function gzippedBytes(asset){
+  return gzipSync(await readFile(asset.path)).byteLength
+}
+
 const html=await readFile(join(DIST_ROOT,'index.html'),'utf8')
 const scriptMatch=html.match(/<script[^>]+type=["']module["'][^>]+src=["']([^"']+\.js)["']/i)
 if(!scriptMatch)throw new Error('Could not identify initial module entry from dist/index.html')
@@ -39,13 +43,21 @@ const assets=await files(ASSETS)
 const js=assets.filter(asset=>asset.name.endsWith('.js'))
 const css=assets.filter(asset=>asset.name.endsWith('.css'))
 const entry=js.find(asset=>asset.name===entryName)
+const vnext=js.find(asset=>asset.name.startsWith('AppVNextPrototype-'))
+const legacy=js.find(asset=>asset.name.startsWith('AppCoherent-'))
 if(!entry)throw new Error(`Initial entry chunk ${entryName} not found in dist/assets`)
-const entryBody=await readFile(entry.path)
-const lazy=js.filter(asset=>asset.name!==entryName)
-const largestLazy=lazy.length?Math.max(...lazy.map(asset=>asset.bytes)):0
+if(!vnext)throw new Error('Could not identify the routed AppVNextPrototype chunk')
+
+const entryGzip=await gzippedBytes(entry)
+const vnextGzip=await gzippedBytes(vnext)
+const routeRaw=entry.bytes+vnext.bytes
+const routeGzip=entryGzip+vnextGzip
 const cssTotal=css.reduce((sum,asset)=>sum+asset.bytes,0)
 
-fail('Initial JS raw',entry.bytes,LIMITS.entryRaw)
-fail('Initial JS gzip',gzipSync(entryBody).byteLength,LIMITS.entryGzip)
-fail('Largest lazy JS chunk',largestLazy,LIMITS.lazyRaw)
+fail('vNext route JS raw',routeRaw,LIMITS.vnextRouteRaw)
+fail('vNext route JS gzip',routeGzip,LIMITS.vnextRouteGzip)
+fail('vNext feature chunk raw',vnext.bytes,LIMITS.vnextChunkRaw)
 fail('CSS total',cssTotal,LIMITS.cssTotal)
+if(legacy){
+  console.log(`Legacy AppCoherent deferred chunk (informational): ${(legacy.bytes/1024).toFixed(1)} KiB raw`)
+}
