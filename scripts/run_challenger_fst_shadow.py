@@ -1,6 +1,13 @@
 from __future__ import annotations
 
-"""Materialize the frozen F-ST-01 candidate into the research-only live shadow slate."""
+"""Materialize the frozen F-ST-01 candidate into the research-only live shadow slate.
+
+The original candidate's recovered numerical runtime is retained as immutable forensic
+metadata, but current shadow scoring is deliberately portable: immutable recovered OOF
+and training artifacts are validated byte-for-byte, the frozen stack is reconstructed
+on the native runner only as a <=1e-12 parity audit, and current games are always scored
+with the registered frozen coefficient literals.
+"""
 
 import argparse
 import json
@@ -9,14 +16,17 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from nfl_forecast.challenger import fit_future_nested_stack
 from nfl_forecast.challenger_fst import (
     FROZEN_CANDIDATE_ID,
     FROZEN_FEATURE_SET,
     FROZEN_METHOD,
     fit_frozen_2026_stack,
     frozen_stack_probability,
-    prepare_frozen_training_frame,
+)
+from nfl_forecast.fst_nested_pure import (
+    fit_future_nested_stack,
+    load_frozen_base_oof,
+    load_frozen_training_frame,
 )
 from nfl_forecast.fst_provenance import (
     TRAINING_COLUMNS,
@@ -25,10 +35,9 @@ from nfl_forecast.fst_provenance import (
 )
 from nfl_forecast.fst_reconstruction import (
     frozen_fit_from_identity,
-    require_fst_reconstruction_runtime,
     verify_fst_reconstruction_identity,
 )
-from scripts.run_challenger_v08 import SHADOW_BASE_COLUMNS, build_nested_research, build_research_frame
+from scripts.run_challenger_v08 import SHADOW_BASE_COLUMNS, build_research_frame
 
 SPEC_PATH = Path("research/fst/F-ST-01-FROZEN-2026.json")
 
@@ -44,6 +53,32 @@ def _load_spec() -> dict:
     return spec
 
 
+def _training_frame_on_historical_index(
+    historical: pd.DataFrame,
+    frozen_training: pd.DataFrame,
+) -> pd.DataFrame:
+    """Restore frozen training rows to the current historical frame's game-keyed index."""
+
+    if "game_id" not in historical.columns or not historical.index.is_unique:
+        raise RuntimeError("Historical frame cannot support frozen F-ST game-key alignment")
+    historical_ids = historical["game_id"].astype(str)
+    if historical_ids.duplicated().any():
+        raise RuntimeError("Historical frame contains duplicate game IDs")
+    lookup = pd.Series(historical.index.to_numpy(), index=historical_ids.to_numpy())
+
+    game_ids = frozen_training["game_id"].astype(str)
+    missing = sorted(set(game_ids) - set(lookup.index))
+    if missing:
+        raise RuntimeError(
+            f"Frozen F-ST training frame is missing {len(missing)} games from historical data"
+        )
+    aligned = frozen_training.loc[:, list(TRAINING_COLUMNS)].copy()
+    aligned.index = pd.Index([lookup.at[game_id] for game_id in game_ids])
+    if not aligned.index.is_unique:
+        raise RuntimeError("Frozen F-ST training alignment produced duplicate historical indexes")
+    return aligned
+
+
 def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_outputs") -> dict:
     out = Path(output_dir)
     slate_path = out / "candidate_shadow_slate.csv"
@@ -52,18 +87,22 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
 
     spec = _load_spec()
     registered = spec["frozen_identity"]
-    runtime_check = require_fst_reconstruction_runtime()
     authoritative_fit = frozen_fit_from_identity(registered)
 
     cfg, historical, current, feature_sets, _, _ = build_research_frame(config_path)
     seed = int(cfg["model"]["random_state"])
     base_features = feature_sets["production_compatible"]
-    base_oof, research = build_nested_research(historical, base_features, seed)
 
-    # Persist the exact model inputs before fitting. This is a current prospective
-    # reconstruction of F-ST-01, not the missing original candidate-freeze capture.
-    prepared = prepare_frozen_training_frame(research)
-    training_for_fit = research.loc[prepared.index, list(TRAINING_COLUMNS)].copy()
+    # Use the immutable forensic artifacts recovered from the successful frozen-candidate
+    # workflow instead of regenerating base OOF under a forced CPU architecture. Their
+    # loaders verify compressed/raw hashes, row identity/order, outcomes and season bounds.
+    base_oof = load_frozen_base_oof(historical=historical)
+    frozen_training = load_frozen_training_frame(historical=historical)
+    training_for_fit = _training_frame_on_historical_index(historical, frozen_training)
+
+    # Persist a fresh game-keyed provenance bundle before the parity refit. This remains
+    # explicitly a prospective reconstruction audit, not a claim that F-ST-01 had durable
+    # pre-fit capture at the original freeze time.
     provenance_dir = out / "fst" / "provenance"
     input_provenance = capture_fst_pre_fit_provenance(
         historical,
@@ -74,9 +113,10 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         capture_context="prospective_shadow_reconstruction",
     )
 
-    # Refit only to verify the frozen historical identity. Exact candidate/digest/
-    # row/season fields and <=1e-12 coefficient parity are required before any
-    # current-game scoring. The reconstructed coefficients are never used to score.
+    # Refit only as a numerical identity check. The immutable training digest/rows/seasons
+    # must match exactly and coefficients must reproduce within <=1e-12. The native runner
+    # is used intentionally: forcing SKYLAKEX on a heterogeneous hosted CPU can SIGILL and
+    # is unnecessary because scoring never consumes these reconstructed coefficients.
     reconstruction_fit = fit_frozen_2026_stack(training_for_fit)
     fit_provenance = write_fst_fit_provenance(
         provenance_dir, input_provenance, reconstruction_fit
@@ -88,6 +128,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         registered,
     )
 
+    # Current nested PURE uses the portable frozen OOF matrix and through-2025 fits.
+    # Registered F-ST literals remain the sole final-scoring parameters.
     current_pure = fit_future_nested_stack(
         historical,
         base_oof,
@@ -148,8 +190,12 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         "production_promotion_authorized": False,
         **authoritative_dict,
         "scoring_parameter_source": "registered_frozen_identity",
+        "base_oof_source": "immutable_recovered_forensic_artifact",
+        "training_frame_source": "immutable_recovered_forensic_artifact",
         "reconstruction_fit": reconstruction_dict,
-        "reconstruction_runtime": runtime_check,
+        "reconstruction_execution_policy": "native_runner_against_immutable_recovered_inputs",
+        "reconstruction_runtime": fit_provenance["runtime"],
+        "recovered_original_runtime": spec["reproduction_runtime"],
         "freeze_timestamp_utc": spec["freeze_timestamp_utc"],
         "freeze_implementation_sha": spec["freeze_implementation_sha"],
         "provenance": {
