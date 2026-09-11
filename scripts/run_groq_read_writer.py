@@ -25,7 +25,10 @@ def build_payload(prompt: str, model: str = DEFAULT_MODEL) -> dict:
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.6,
         "top_p": 1,
-        "max_completion_tokens": 2400,
+        # A one-game response is intentionally compact: headline + 55-100 word
+        # matchup paragraph + 18-40 word rationale + two direct source records.
+        # Keeping this bounded materially reduces free-tier TPM pressure.
+        "max_completion_tokens": 1600,
         "stream": False,
         # Browser search is server-side on Groq. We deliberately do not request
         # structured output because Groq does not support structured outputs and
@@ -42,10 +45,12 @@ def _retry_delay(response: requests.Response, attempt: int) -> float:
     try:
         delay = float(raw)
         if delay >= 0:
-            return min(delay, 30.0)
+            # Groq's free tier is constrained primarily by tokens/minute. Honor
+            # the server's reset window instead of retrying too aggressively.
+            return min(delay, 120.0)
     except (TypeError, ValueError):
         pass
-    return min(2.0 ** attempt, 12.0)
+    return min(2.0 ** attempt, 20.0)
 
 
 def isolate_final_json(text: str) -> str:
@@ -91,7 +96,7 @@ def generate(
         except requests.RequestException as exc:
             last_error = f"network error: {exc}"
             if attempt < attempts:
-                time.sleep(min(2.0 ** attempt, 12.0))
+                time.sleep(min(2.0 ** attempt, 20.0))
                 continue
             break
 
