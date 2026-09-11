@@ -1,0 +1,84 @@
+{
+  "contract_version": 1,
+  "status": "research_only",
+  "production_authorized": false,
+  "primary_user_questions": [
+    "Who does LevLine favor?",
+    "What is the official win probability?",
+    "How does that compare with the market?",
+    "What materially changed?"
+  ],
+  "default_week_card_required": [
+    "matchup",
+    "kickoff",
+    "lifecycle_or_lock_state",
+    "official_winner",
+    "official_winner_probability"
+  ],
+  "default_week_card_preferred_secondary": [
+    "levline_vs_market_probability_delta",
+    "one_what_changed_or_context_line"
+  ],
+  "progressive_disclosure": [
+    "probability_implied_line",
+    "approximate_score",
+    "football_market_signal_breakdown",
+    "movement_chart",
+    "component_model_diagnostics",
+    "source_freshness_ledger",
+    "technical_methodology"
+  ],
+  "semantic_guardrails": {
+    "single_official_forecast": true,
+    "probability_is_confidence_statement": true,
+    "categorical_confidence_labels_authorized": false,
+    "probability_implied_line_is_expected_margin": false,
+    "context_events_may_be_claimed_causal_without_evidence": false,
+    "in_progress_display_may_replace_locked_pregame_forecast": false,
+    "sportsbook_call_to_action_ui": false
+  },
+  "accountability_requirements": [
+    "immutable receipt",
+    "winner accuracy as secondary metric",
+    "Brier score",
+    "log loss",
+    "calibration/reliability with sample size",
+    "same-game market comparison only when time-aligned market evidence exists"
+  ],
+  "freshness_requirements": [
+    "forecast timestamp",
+    "market timestamp",
+    "per-source degraded or missing state",
+    "source-specific as-of time when context is displayed"
+  ],
+  "routing_research": {
+    "deep_link_game": true,
+    "deep_link_team": true,
+    "browser_back_restores_state": true,
+    "shareable_immutable_receipt": true
+  },
+  "time_display_research": {
+    "hardcoded_owner_timezone_as_public_default": false,
+    "browser_local_default_candidate": true,
+    "ET_toggle_candidate": true
+  },
+  "performance_research": {
+    "minimal_first_paint": ["public_forecasts", "minimal_status"],
+    "lazy_load_candidates": ["run_history", "contextual_evidence", "team_profiles", "power_ratings", "history", "autopsies", "model_diagnostics", "impact_monitor"]
+  },
+  "accessibility": {
+    "color_only_state": false,
+    "keyboard_navigation": true,
+    "dialog_focus_management": true,
+    "text_equivalent_for_charts": true,
+    "reduced_motion": true,
+    "min_supported_width_px": 320
+  },
+  "prototype_order": [
+    "scan_first_week_board",
+    "deep_link_game_dossier",
+    "source_health_and_what_changed",
+    "accountability_calibration",
+    "team_dossier"
+  ]
+}
