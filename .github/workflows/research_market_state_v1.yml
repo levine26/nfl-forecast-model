@@ -1,0 +1,106 @@
+name: LevLine research market state v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/market_state_v1.py'
+      - 'research/test_market_state_v1.py'
+      - 'research/market_capture_v2.py'
+      - 'research/market_capture_contract_v2.py'
+      - '.github/workflows/research_market_state_v1.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['LevLine research market capture v2']
+    types: [completed]
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - name: Validate market-state selection, movement and missingness semantics
+        run: python -m pytest -q research/test_market_state_v1.py
+
+  derive-state:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-research-market-state-v1
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Restore append-only market ledger
+        id: ledger
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/market-capture-v2:refs/remotes/origin/research-data/market-capture-v2 || true
+          if ! git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mkdir -p /tmp/levline-market-state
+          if ! git show origin/research-data/market-capture-v2:research_outputs/market_capture_v2/market_snapshots.csv \
+            > /tmp/levline-market-state/market_snapshots.csv 2>/dev/null; then
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ ! -s /tmp/levline-market-state/market_snapshots.csv ]; then
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo 'available=true' >> "$GITHUB_OUTPUT"
+
+      - name: Derive point-in-time market movement state
+        if: steps.ledger.outputs.available == 'true'
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python -m research.market_state_v1 \
+              --ledger /tmp/levline-market-state/market_snapshots.csv \
+              --output /tmp/levline-market-state/market_state.csv \
+              --audit /tmp/levline-market-state/audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          audit = json.loads(Path('/tmp/levline-market-state/audit.json').read_text())
+          assert audit['production_authorized'] is False
+          assert audit['completed_2026_outcomes_used'] == 0
+          assert audit['missingness_policy'] == 'preserve_missing_no_imputation'
+          PY
+
+      - name: Persist market-state derivative away from main
+        if: steps.ledger.outputs.available == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git checkout -B market-capture-v2-data origin/research-data/market-capture-v2
+          mkdir -p research_outputs/market_state_v1
+          cp /tmp/levline-market-state/market_state.csv research_outputs/market_state_v1/market_state.csv
+          cp /tmp/levline-market-state/audit.json research_outputs/market_state_v1/audit.json
+          git add research_outputs/market_state_v1/
+          if git diff --cached --quiet; then
+            echo 'Market-state derivative unchanged.'
+            exit 0
+          fi
+          git commit -m 'Refresh LevLine research market state'
+          git push origin HEAD:research-data/market-capture-v2

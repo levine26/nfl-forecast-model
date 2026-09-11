@@ -26,10 +26,18 @@ concurrency:
   group: levline-research-validation-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py
+    scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
+
 jobs:
-  validation:
+  foundation:
+    name: foundation
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,51 +60,99 @@ jobs:
             tests/test_challenger_margin_forensics.py \
             tests/test_experiment_registry.py \
             tests/test_research_firewall.py
+      - name: Prove foundation tests did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+
+  analysis:
+    name: ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: v08
+            label: v0.8 isolated regeneration
+            command: >-
+              rm -rf /tmp/v08-challenger &&
+              PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v08.py --output-dir /tmp/v08-challenger &&
+              test -s /tmp/v08-challenger/report.json &&
+              test -s /tmp/v08-challenger/candidate_shadow_slate.csv
+            artifact_name: levline-research-v08
+            artifact_path: /tmp/v08-challenger/
+          - id: uncertainty
+            label: paired statistical uncertainty audit
+            command: >-
+              rm -rf research_outputs/statistical_validation &&
+              PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_uncertainty.py --bootstrap-samples 2000 &&
+              test -s research_outputs/statistical_validation/v08_uncertainty_report.json &&
+              test -s research_outputs/statistical_validation/v08_model_confidence_set.csv
+            artifact_name: levline-research-uncertainty
+            artifact_path: research_outputs/statistical_validation/
+          - id: market-reliance
+            label: Phase 2 market reliance and horizon study
+            command: >-
+              rm -rf research_outputs/phase2_market_reliance &&
+              PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_market_reliance.py --bootstrap-samples 1000 &&
+              test -s research_outputs/phase2_market_reliance/phase2_report.json &&
+              test -s research_outputs/phase2_market_reliance/fixed_candidate_metrics.csv &&
+              test -s research_outputs/phase2_market_reliance/walk_forward_weight_selections.csv &&
+              test -s research_outputs/phase2_market_reliance/incremental_signal_metrics.csv
+            artifact_name: levline-research-market-reliance
+            artifact_path: research_outputs/phase2_market_reliance/
+          - id: margin
+            label: margin disagreement forensics
+            command: >-
+              rm -rf research_outputs/margin_forensics &&
+              PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_margin_forensics.py --bootstrap-samples 1000 &&
+              test -s research_outputs/margin_forensics/margin_forensics_report.json &&
+              test -s research_outputs/margin_forensics/margin_gap_buckets.csv &&
+              test -s research_outputs/margin_forensics/current_large_margin_disagreements.csv
+            artifact_name: levline-research-margin-forensics
+            artifact_path: research_outputs/margin_forensics/
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
-          key: nfl-research-${{ runner.os }}-${{ github.run_id }}
+          key: nfl-research-${{ matrix.id }}-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
+            nfl-research-${{ matrix.id }}-${{ runner.os }}-
             nfl-research-${{ runner.os }}-
             nfl-challenger-${{ runner.os }}-
             nflreadpy-${{ runner.os }}-
-      - name: Regenerate v0.8 challenger in isolated workspace
-        run: |
-          rm -rf /tmp/v08-challenger
-          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_v08.py --output-dir /tmp/v08-challenger
-          test -s /tmp/v08-challenger/report.json
-          test -s /tmp/v08-challenger/candidate_shadow_slate.csv
-      - name: Run paired statistical uncertainty audit
-        run: |
-          rm -rf research_outputs/statistical_validation
-          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_uncertainty.py --bootstrap-samples 2000
-          test -s research_outputs/statistical_validation/v08_uncertainty_report.json
-          test -s research_outputs/statistical_validation/v08_model_confidence_set.csv
-      - name: Run Phase 2 market reliance and horizon study
-        run: |
-          rm -rf research_outputs/phase2_market_reliance
-          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_market_reliance.py --bootstrap-samples 1000
-          test -s research_outputs/phase2_market_reliance/phase2_report.json
-          test -s research_outputs/phase2_market_reliance/fixed_candidate_metrics.csv
-          test -s research_outputs/phase2_market_reliance/walk_forward_weight_selections.csv
-          test -s research_outputs/phase2_market_reliance/incremental_signal_metrics.csv
-      - name: Run margin disagreement forensics
-        run: |
-          rm -rf research_outputs/margin_forensics
-          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_margin_forensics.py --bootstrap-samples 1000
-          test -s research_outputs/margin_forensics/margin_forensics_report.json
-          test -s research_outputs/margin_forensics/margin_gap_buckets.csv
-          test -s research_outputs/margin_forensics/current_large_margin_disagreements.csv
-      - name: Prove production surfaces were untouched
-        run: |
-          git diff --exit-code -- outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
-      - name: Upload research evidence
+      - name: Run ${{ matrix.label }}
+        shell: bash
+        run: ${{ matrix.command }}
+      - name: Prove analysis did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+      - name: Upload ${{ matrix.label }} evidence
         uses: actions/upload-artifact@v4
         with:
-          name: levline-research-${{ github.run_id }}
-          path: |
-            /tmp/v08-challenger/
-            research_outputs/statistical_validation/
-            research_outputs/phase2_market_reliance/
-            research_outputs/margin_forensics/
+          name: ${{ matrix.artifact_name }}-${{ github.run_id }}
+          path: ${{ matrix.artifact_path }}
           retention-days: 30
+
+  gate:
+    name: research validation gate
+    if: always()
+    needs: [foundation, analysis]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every parallel validation lane
+        env:
+          FOUNDATION_RESULT: ${{ needs.foundation.result }}
+          ANALYSIS_RESULT: ${{ needs.analysis.result }}
+        run: |
+          set -euo pipefail
+          echo "foundation=$FOUNDATION_RESULT"
+          echo "analysis=$ANALYSIS_RESULT"
+          test "$FOUNDATION_RESULT" = success
+          test "$ANALYSIS_RESULT" = success
