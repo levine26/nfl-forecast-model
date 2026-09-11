@@ -31,6 +31,16 @@ from research.ftn_process_v1 import (
 
 SEASONS = (2022, 2023, 2024, 2025)
 GAME_TYPES = ("REG", "POST")
+# FTN-PROCESS-01 preregisters semantic REG/POST eligibility. nflverse schedules use
+# round-specific postseason labels rather than the literal value "POST".
+SOURCE_GAME_TYPE_TO_PREREG = {
+    "REG": "REG",
+    "POST": "POST",
+    "WC": "POST",
+    "DIV": "POST",
+    "CON": "POST",
+    "SB": "POST",
+}
 PREREG_PATH = Path("research/ftn_process_prereg_v1.json")
 DEFAULT_OUTPUT = Path("research_outputs/ftn_process_v1")
 
@@ -71,6 +81,13 @@ def _runtime_versions() -> dict[str, str]:
     return {name: metadata.version(name) for name in packages}
 
 
+def _preregistered_game_type(game_type: pd.Series) -> pd.Series:
+    """Map source-native schedule labels onto the frozen REG/POST semantic scope."""
+
+    normalized = game_type.astype("string").str.upper()
+    return normalized.map(SOURCE_GAME_TYPE_TO_PREREG)
+
+
 def prepare_schedule_frames(schedules: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Separate chronology identity from market-benchmark eligibility.
 
@@ -79,6 +96,10 @@ def prepare_schedule_frames(schedules: pd.DataFrame) -> tuple[pd.DataFrame, pd.D
     probability is only required for target games entering the benchmark/evaluation
     sample. Conflating those domains can orphan legitimate source-history games merely
     because their schedule moneyline is missing.
+
+    nflverse encodes postseason rounds as WC/DIV/CON/SB. Those are source-schema
+    values for the preregistered semantic type POST; mapping them here is an input
+    normalization step and does not alter the frozen experiment scope.
     """
 
     required = {
@@ -100,8 +121,9 @@ def prepare_schedule_frames(schedules: pd.DataFrame) -> tuple[pd.DataFrame, pd.D
         raise RuntimeError(f"FTN-PROCESS-01 schedule missing required fields: {sorted(missing)}")
 
     season = pd.to_numeric(schedules["season"], errors="coerce")
+    prereg_game_type = _preregistered_game_type(schedules["game_type"])
     schedule_scope = schedules[
-        season.isin(SEASONS) & schedules["game_type"].isin(GAME_TYPES)
+        season.isin(SEASONS) & prereg_game_type.isin(GAME_TYPES)
     ].copy()
     if schedule_scope.empty:
         raise RuntimeError("FTN-PROCESS-01 has no 2022-2025 REG/POST schedule identity rows")
@@ -174,6 +196,9 @@ def run(
         "input_scope": {
             "seasons": list(SEASONS),
             "game_types": list(GAME_TYPES),
+            "schedule_source_game_types": sorted(
+                schedule_scope["game_type"].dropna().astype(str).str.upper().unique().tolist()
+            ),
             "ftn_rows": int(len(ftn)),
             "pbp_rows": int(len(pbp)),
             "schedule_scope_games": int(len(schedule_scope)),
