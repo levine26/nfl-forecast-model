@@ -1,0 +1,41 @@
+name: LevLine source governance
+
+on:
+  pull_request:
+    paths:
+      - 'research/data_source_governance.json'
+      - 'research/advanced_player_source_governance.json'
+      - 'research/availability_source_audit_contract.json'
+      - 'research/LEVLINE_DATA_SOURCE_MATRIX.md'
+      - 'research/test_data_source_governance.py'
+      - '.github/workflows/research_source_governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Validate machine-readable source policy
+        run: python -m pytest -q research/test_data_source_governance.py
+      - name: Prove source-policy PR does not modify production surfaces
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          BASE="origin/${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only "$BASE...HEAD")
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -E '^(outputs/|site/|src/nfl_forecast/|scripts/run_week\.py$|scripts/refresh_market\.py$)'; then
+            echo 'Source governance PR touched executable production/model surfaces.' >&2
+            exit 1
+          fi
