@@ -1,0 +1,76 @@
+{
+  "contract_version": 1,
+  "candidate_id": "availability_identity_bridge_v2",
+  "status": "preregistered_before_v2_execution",
+  "purpose": "Resolve official-NFL-to-nflverse historical player identity variants deterministically without changing any source-quality threshold, football state, model architecture, or probability output.",
+  "supersedes_for_identity_resolution_only": "the exact-name reverse-identity method exercised by PR #145",
+  "v1_observed_source_result": {
+    "season": 2022,
+    "official_rows_after_exact_dedupe": 5683,
+    "official_unique_stable_identity_rows": 5543,
+    "official_unresolved_identity_rows": 140,
+    "official_identity_resolution_rate": 0.9753651240541967,
+    "frozen_gate": 0.995,
+    "gate_passed": false,
+    "model_results_consulted": false,
+    "game_outcomes_consulted": false,
+    "completed_2026_outcomes_consulted": false
+  },
+  "selection_basis": "The v1 failure exposed identity aliases only. The v2 bridge is a generic source-identity rule chosen before any v2 qualification result: exact normalized aliases from nflverse's GSIS-keyed player master may resolve an official row only when exactly one alias-matched GSIS ID is also present in the canonical nflverse injury table for that same season, week, and team.",
+  "source": {
+    "provider": "nflverse player master",
+    "release_tag": "players",
+    "asset_name": "players.csv",
+    "release_asset_id": 557226328,
+    "asset_updated_at_utc": "2026-09-11T12:38:43Z",
+    "url": "https://github.com/nflverse/nflverse-data/releases/download/players/players.csv",
+    "expected_sha256": "6f896e1134757efe09761ae81280f89d9604d8ce611a888a56d9e7d49e80eeb9",
+    "primary_key": "gsis_id",
+    "allowed_alias_fields": [
+      "display_name",
+      "football_name",
+      "first_name + last_name",
+      "common_first_name + last_name"
+    ],
+    "required_fields": [
+      "gsis_id",
+      "display_name",
+      "football_name",
+      "common_first_name",
+      "first_name",
+      "last_name"
+    ]
+  },
+  "identity_rule": {
+    "stage_1": "Run the existing exact full-name / unique initial-surname matcher against same-season/week/team nflverse injury rows.",
+    "stage_2": "Only for rows not uniquely resolved in stage 1, normalize the complete official player name with the existing LevLine name normalizer and look it up against the fixed nflverse player-master alias fields.",
+    "candidate_intersection": "Intersect alias-matched GSIS IDs with GSIS IDs actually present in the canonical nflverse injury rows for the same season, week, and normalized team.",
+    "unique_only": true,
+    "manual_alias_overrides_allowed": false,
+    "fuzzy_matching_allowed": false,
+    "edit_distance_matching_allowed": false,
+    "phonetic_matching_allowed": false,
+    "cross_team_matching_allowed": false,
+    "cross_week_state_imputation_allowed": false,
+    "ambiguity_policy": "If zero or more than one GSIS ID remains after same-team/week injury-presence intersection, keep the row unresolved/ambiguous and fail closed through the unchanged aggregate gate.",
+    "identity_only": "The player master may supply identity aliases only. It may not supply availability, participation, lineup, injury, outcome, or forecast state."
+  },
+  "qualification_policy": {
+    "official_identity_resolution_rate_min": 0.995,
+    "threshold_changed_from_v1": false,
+    "all_other_2022_2025_harmonization_gates_unchanged": true,
+    "legacy_date_modified_gate_unchanged": true,
+    "exact_duplicate_policy_unchanged": true,
+    "conflicting_duplicate_policy_unchanged": true
+  },
+  "firewall": {
+    "probability_feature_authorized": false,
+    "v09b_execution_authorized": false,
+    "production_authorized": false,
+    "production_fst_change_authorized": false,
+    "game_outcomes_allowed": false,
+    "completed_2026_outcomes_allowed": false,
+    "actual_current_game_snaps_allowed": false,
+    "postgame_participation_allowed": false
+  }
+}

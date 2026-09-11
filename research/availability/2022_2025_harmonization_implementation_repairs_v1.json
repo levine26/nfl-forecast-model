@@ -1,0 +1,41 @@
+{
+  "record_version": 1,
+  "scope": "implementation_repairs_only",
+  "contract": "research/availability/2022_2025_harmonization_contract_v1.json",
+  "probability_feature_authorized": false,
+  "v09b_execution_authorized": false,
+  "production_authorized": false,
+  "numeric_threshold_relaxation": false,
+  "game_outcomes_consulted": false,
+  "completed_2026_outcomes_consulted": false,
+  "repairs": [
+    {
+      "sequence": 1,
+      "head": "f125c48346f089758b3c786f43000585fd24672b",
+      "artifact_sha256": "e120dc711cd118519632d63362fde36a59965604829ce0458d5d5cce5c35cd39",
+      "failure_stage": "2022 source plumbing before season qualification metrics",
+      "failure": "one duplicate stable player-week row",
+      "evidence": "The official NFL 2022 Week 9 Detroit page rendered Brock Wright twice with identical player, position, injury, practice status, game status, source, and URL.",
+      "repair": "Collapse complete semantic duplicates only; keep conflicting duplicates fail-closed; add symmetric official-to-nflverse identity accounting with the frozen >=0.995 gate.",
+      "season_qualification_metrics_observed_before_repair": false,
+      "model_metrics_observed_before_repair": false
+    },
+    {
+      "sequence": 2,
+      "head": "2160d88eb983682f2c7e38efaf1f1b909a9f240d",
+      "artifact_sha256": "8cd255947860a64441d8589c4e78aa0eb45fb18a1ab8785807d89046d8a51b8f",
+      "failure_stage": "2025 reverse-identity preflight before any 2022-2024 audit",
+      "failure": "reverse identity reused the legacy date_modified schema validator against the separately-qualified 2025 asset",
+      "evidence": "The qualified 2025 nflverse injury asset intentionally lacks the legacy date_modified field; stable reverse identity needs only season/week/team/GSIS/name fields. The legacy 2022-2024 builder continues to require date_modified separately.",
+      "repair": "Separate stable identity schema validation from legacy chronology-diagnostic schema validation; retain the original 2022-2024 date_modified >=0.995 gate unchanged.",
+      "legacy_season_qualification_metrics_observed_before_repair": false,
+      "model_metrics_observed_before_repair": false
+    }
+  ],
+  "invariants": [
+    "Exact duplicate collapse never reconciles conflicting source evidence.",
+    "Official rows without unique stable identity remain explicit unresolved evidence.",
+    "Legacy 2022-2024 date_modified requirements remain unchanged.",
+    "No actual snaps, postgame participation, game outcomes, or completed-2026 outcomes may rescue source qualification."
+  ]
+}
