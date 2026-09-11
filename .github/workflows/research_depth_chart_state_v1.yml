@@ -1,0 +1,87 @@
+name: LevLine research depth-chart state v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/depth_chart_state_contract_v1.json'
+      - 'research/depth_chart_state_v1.py'
+      - 'research/run_depth_chart_state_v1.py'
+      - 'research/test_depth_chart_state_v1.py'
+      - '.github/workflows/research_depth_chart_state_v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/depth_chart_state_contract_v1.json'
+      - 'research/depth_chart_state_v1.py'
+      - 'research/run_depth_chart_state_v1.py'
+      - 'research/test_depth_chart_state_v1.py'
+      - '.github/workflows/research_depth_chart_state_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-depth-chart-state-v1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate point-in-time personnel-state semantics
+        run: pytest -q research/test_depth_chart_state_v1.py
+      - name: Prove production surfaces are untouched
+        run: git diff --exit-code -- outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py src/nfl_forecast/features.py scripts/run_week.py scripts/refresh_market.py
+
+  source-audit:
+    if: github.event_name != 'pull_request'
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-depth-state-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-depth-state-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Build 2025 T-120 personnel-state audit
+        run: |
+          rm -rf research_outputs/depth_chart_state_v1
+          PYTHONPATH="$PWD:$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python -m research.run_depth_chart_state_v1
+          test -s research_outputs/depth_chart_state_v1/audit.json
+          test -s research_outputs/depth_chart_state_v1/team_game_depth_state.csv
+          test -s research_outputs/depth_chart_state_v1/game_depth_features.csv
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/depth_chart_state_v1/audit.json').read_text())
+          assert report['completed_2026_outcomes_used'] == 0
+          assert report['outcome_columns_loaded_into_builder'] == []
+          assert report['future_snapshot_violations'] == 0
+          assert report['injury_status_inferred'] is False
+          assert report['model_fit'] is False
+          assert report['production_authorized'] is False
+          PY
+      - name: Prove source audit did not modify production surfaces
+        run: git diff --exit-code -- outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py src/nfl_forecast/features.py scripts/run_week.py scripts/refresh_market.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-depth-chart-state-v1-${{ github.run_id }}
+          path: research_outputs/depth_chart_state_v1/
+          retention-days: 60

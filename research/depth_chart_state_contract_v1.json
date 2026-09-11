@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "experiment_id": "DEPTH-STATE-01",
+  "status": "SOURCE_FOUNDATION_NOT_MODEL_EVALUATION",
+  "source": {
+    "provider": "nflverse depth charts via nflreadpy",
+    "season_scope": [2025],
+    "loader": "nflreadpy.load_depth_charts",
+    "point_in_time_field": "dt",
+    "stable_identity_field": "gsis_id",
+    "source_semantics": "2025+ depth-chart updates are appended with ISO8601 timestamps",
+    "rights_qualification_blocker": false
+  },
+  "decision_clock": {
+    "horizon_minutes_before_kickoff": 120,
+    "snapshot_rule": "for each team-game, use only the latest team snapshot with dt <= T-120",
+    "future_snapshot_use_prohibited": true,
+    "same_game_post_decision_snapshot_use_prohibited": true
+  },
+  "allowed_state": [
+    "rank-1 player identity by position slot",
+    "QB1 identity and QB1 change",
+    "offense rank-1 continuity/churn",
+    "defense rank-1 continuity/churn",
+    "offensive-line rank-1 continuity/churn",
+    "snapshot age",
+    "stable-ID coverage"
+  ],
+  "prohibited_inferences": [
+    "injury status inferred from depth-chart movement",
+    "practice participation inferred from depth-chart movement",
+    "final starter identity learned after T-120",
+    "postgame snaps or participation",
+    "completed-2026 outcomes"
+  ],
+  "historical_outcomes_used": 0,
+  "production_authorized": false,
+  "probability_feature_authorized": false,
+  "automatic_model_evaluation": false,
+  "automatic_promotion": false
+}
