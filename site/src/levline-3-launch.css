@@ -1,0 +1,47 @@
+/* LevLine 3.0 launch layer.
+   Product identity only: no forecast values, model inputs, locks, or data semantics are changed here. */
+
+:root {
+  --levline-release-label: "3.0";
+}
+
+.co-brand small::after,
+.co-header-state b::after {
+  content: " 3.0";
+  font-variant-numeric: tabular-nums;
+}
+
+.co-footer b::after {
+  content: " · LEVLINE 3.0";
+}
+
+.co-header-state b::after {
+  display: inline-block;
+  margin-left: .35rem;
+  padding: .14rem .36rem;
+  border: 1px solid color-mix(in srgb, var(--levline) 55%, transparent);
+  border-radius: 999px;
+  font-size: .58em;
+  line-height: 1;
+  letter-spacing: .08em;
+  vertical-align: .2em;
+}
+
+@media (max-width: 560px) {
+  .co-header-state b::after {
+    margin-left: .2rem;
+    padding: .1rem .28rem;
+    letter-spacing: .05em;
+  }
+
+  .co-footer b::after {
+    display: block;
+    margin-top: .2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+  }
+}
