@@ -30,6 +30,12 @@ def test_payload_keeps_browser_research_and_deterministic_schema_boundary():
     assert "response_format" not in payload
 
 
+def test_isolate_final_json_drops_browser_search_preamble():
+    raw = 'research snippet {not the answer}\nFinal answer:\n{\n  "games": {"G": {"headline": "x"}}\n}\ntrailing note'
+    isolated = writer.isolate_final_json(raw)
+    assert json.loads(isolated) == {"games": {"G": {"headline": "x"}}}
+
+
 def test_generate_returns_model_content(monkeypatch):
     seen = {}
 
