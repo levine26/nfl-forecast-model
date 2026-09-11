@@ -45,7 +45,7 @@ jobs:
       - name: Cheap local horizon gate
         id: gate
         run: |
-          RESULT=$(python research/market_capture_due_v2.py)
+          RESULT=$(python -m research.market_capture_due_v2)
           echo "$RESULT"
           if echo "$RESULT" | grep -q '^due=true'; then
             echo 'due=true' >> "$GITHUB_OUTPUT"
@@ -81,7 +81,7 @@ jobs:
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
         run: >-
-          python research/run_market_capture_v2.py
+          python -m research.run_market_capture_v2
           --quota-reserve 50
 
       - name: Persist ledger away from main
