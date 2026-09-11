@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
+import pandas as pd
+
 from research.market_capture_contract_v2 import (
     LEDGER_IDENTITY_COLUMNS,
     MIN_CONSENSUS_BOOKS,
@@ -15,6 +17,7 @@ from research.market_capture_v2 import (
     normalize_bookmaker,
     two_way_metrics,
 )
+from research.run_market_capture_v2 import _captured_pairs
 
 
 def _event():
@@ -121,3 +124,42 @@ def test_retry_attempts_have_distinct_append_only_identity() -> None:
     assert first is not None and second is not None
     assert "request_timestamp_utc" in LEDGER_IDENTITY_COLUMNS
     assert attempt_identity(first) != attempt_identity(second)
+
+
+def test_only_qualified_multibook_consensus_closes_a_horizon(tmp_path) -> None:
+    ledger = tmp_path / "ledger.csv"
+    pd.DataFrame([
+        {
+            "game_id": "game-a",
+            "horizon": "T-120m",
+            "row_type": "book",
+            "sportsbook_key": "book-a",
+            "source_count": None,
+        },
+        {
+            "game_id": "game-a",
+            "horizon": "T-120m",
+            "row_type": "consensus",
+            "sportsbook_key": "sportsbook_consensus",
+            "source_count": 1,
+        },
+        {
+            "game_id": "game-b",
+            "horizon": "T-60m",
+            "row_type": "consensus",
+            "sportsbook_key": "sportsbook_consensus",
+            "source_count": MIN_CONSENSUS_BOOKS,
+        },
+    ]).to_csv(ledger, index=False)
+
+    assert _captured_pairs(ledger) == {("game-b", "T-60m")}
+
+    legacy = tmp_path / "legacy.csv"
+    pd.DataFrame([
+        {
+            "game_id": "game-c",
+            "horizon": "T-30m",
+            "row_type": "consensus",
+        }
+    ]).to_csv(legacy, index=False)
+    assert _captured_pairs(legacy) == set()
