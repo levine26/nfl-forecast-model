@@ -43,13 +43,15 @@ Completed:
 - 2025 qualification achieved 6,064 / 6,068 clean canonical player-week mappings; matched practice-state agreement and matched-row T-120 chronology were 100%; four rows remain unresolved rather than guessed.
 - Historical game designation remains diagnostic-only; actual current-game snaps, postgame participation, and hindsight inactive state are prohibited substitutes.
 
-Pending exact-head validation:
+Historical cross-season audit status:
 
-- PR #145 audits one uniform 2022-2025 practice-state contract for stable identity, official cross-source agreement, schedule linkage, chronology, missingness, normalization, and reverse source coverage.
-- Frozen per-season gates include 22 official NFL pages, 100% schedule matching, >=99.5% bidirectional identity resolution, >=98.5% practice-status agreement, 100% matched-row T-120 chronology, and >=99% fully qualified practice state.
-- No V09B fitting/scoring or production authorization occurs merely because the source contract passes.
+- V1 reached its real 2022 identity gate and **failed** rather than hiding unresolved evidence: 5,543 of 5,683 distinct official rows resolved to unique GSIS IDs (`97.5365%`), below the frozen `99.5%` minimum. The V1 threshold was not relaxed and its failure artifact/receipt is retained.
+- V2 is separately preregistered in PR #146. It adds the pinned nflverse GSIS-keyed player master solely as a deterministic alias dictionary; historical team/week membership and all injury/practice state still come from the original historical sources.
+- V2 prohibits fuzzy/edit-distance matching, manual result-informed aliases, current/latest-team inference, and use of status/position/outcomes to choose an identity.
+- All V1 chronology/state gates remain unchanged: 22 official pages per season, 100% schedule matching, >=99.5% bidirectional identity resolution, >=98.5% practice-status agreement, 100% matched-row T-120 chronology, >=99% fully qualified practice state, and the legacy timestamp integrity gate.
+- Passing V2 would qualify only the common 2022-2025 source/state contract. It would not retroactively change V09B's historical disposition, fit V09B, authorize a probability feature, or change production.
 
-**Roadmap status:** pending #145 exact-head qualification and merge.
+**Roadmap status:** pending PR #146 exact-head qualification and merge, or an honest fail-closed disposition if V2 does not satisfy the frozen gates.
 
 ## Depth charts / personnel / player-state infrastructure — COMPLETE FOR CURRENT ROADMAP
 
@@ -81,7 +83,7 @@ Pending exact-head validation:
 - Production F-ST modules are protected from research-scoped modification.
 - Source qualification registry separates technical qualification, redistribution metadata, research authorization, and production authorization.
 - Durable F-ST identity/reconstruction evidence and 2025 availability qualification receipts are committed.
-- Implementation repairs are append-only and regression-tested; gates are not weakened to make CI pass.
+- Implementation repairs and failed source contracts are append-only and regression-tested; gates are not weakened to make CI pass.
 
 ## Challenger / validation infrastructure — COMPLETE FOR CURRENT ROADMAP
 
@@ -119,10 +121,12 @@ The next design phase will optimize for progressive disclosure: a novice should 
 
 The currently defined implementation / validation / data-capture / research-infrastructure roadmap reaches **100% only after**:
 
-1. the chronology-safe 2022-2025 availability source/state contract clears its frozen exact-head gates and is merged; and
-2. this ledger and related high-level documentation are reconciled to the resulting authoritative repository state.
+1. the chronology-safe 2022-2025 availability source/state program reaches a defensible terminal state under frozen gates — either qualification and merge, or a documented fail-closed result demonstrating that the current $0 historical evidence cannot safely support the intended state; and
+2. this ledger and related high-level documentation are reconciled to that authoritative result.
 
-Until those two items are complete, do not declare the roadmap 100% and do not activate the post-100 model-optimization tournament.
+A failed source hypothesis does not make the software roadmap incomplete forever; hiding or weakening a failed gate would. The roadmap is complete when the infrastructure can reach and preserve the truthful scientific disposition.
+
+Until those items are complete, do not declare the roadmap 100% and do not activate the post-100 model-optimization tournament.
 
 ## What happens at 100%
 
