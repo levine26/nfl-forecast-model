@@ -3,8 +3,8 @@ name: LevLine research market horizons
 on:
   workflow_dispatch:
   schedule:
-    # Five-minute trigger, but the collector makes no external request unless a
-    # kickoff cluster is between T-65 and T-10 and free-tier quota remains.
+    # Five-minute trigger. A stdlib-only preflight runs first, so there is no
+    # dependency install or external odds request unless a kickoff cluster is due.
     - cron: "*/5 * * * *"
 
 permissions:
@@ -23,7 +23,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Cheap local kickoff gate
+        id: gate
+        run: |
+          RESULT=$(python scripts/pregame_due.py --min-minutes 10 --max-minutes 65)
+          echo "$RESULT"
+          if echo "$RESULT" | grep -q '^due=true'; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "due=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Restore cumulative research ledger
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
           set -euo pipefail
           git fetch origin research-data/market-horizons:refs/remotes/origin/research-data/market-horizons || true
@@ -36,16 +48,19 @@ jobs:
           fi
 
       - uses: actions/setup-python@v5
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         with:
           python-version: "3.11"
           cache: pip
 
       - name: Install lightweight research dependencies
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
           pip install "pandas==3.0.5" "numpy==2.4.6" "requests>=2.32"
           pip install -e . --no-deps
 
       - name: Capture due multi-book snapshots
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
         run: |
@@ -56,6 +71,7 @@ jobs:
               --quota-reserve 50
 
       - name: Persist research ledger off main
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/phase2_market_reliance
