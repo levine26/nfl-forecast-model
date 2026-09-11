@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'research/data_source_governance.json'
+      - 'research/advanced_player_source_governance.json'
       - 'docs/LEVLINE_DATA_SOURCE_MATRIX.md'
       - 'tests/test_data_source_governance.py'
       - '.github/workflows/research_source_governance.yml'
