@@ -64,7 +64,7 @@ jobs:
 
           out = Path('research_outputs/availability_v4_source_pin')
           raw = out / 'raw'
-          required = {
+          required_schedule = {
               2023: {
                   20: {'BAL','HOU','BUF','KC','DET','TB','GB','SF'},
                   21: {'BAL','KC','DET','SF'},
@@ -73,6 +73,13 @@ jobs:
               2024: {
                   20: {'KC','HOU','DET','WAS','PHI','LAR','BUF','BAL'},
               },
+          }
+          required = {
+              season: {
+                  week: {normalize_team(team) for team in teams}
+                  for week, teams in weeks.items()
+              }
+              for season, weeks in required_schedule.items()
           }
           asset_ids = {2023: 156614676, 2024: 237398162}
           urls = {
@@ -123,7 +130,15 @@ jobs:
           combined.to_csv(out / 'postseason_identity_slice.csv', index=False)
           receipt = {
               'purpose': 'Pre-execution source pin only. No availability qualification, model fitting, outcomes, snaps, or production behavior are evaluated.',
-              'team_normalization': 'nfl_forecast.availability_2025_reconstruction.normalize_team',
+              'team_normalization': 'nfl_forecast.availability_2025_reconstruction.normalize_team applied to both schedule expectations and roster source teams',
+              'schedule_expected_team_codes': {
+                  str(season): {str(week): sorted(teams) for week, teams in weeks.items()}
+                  for season, weeks in required_schedule.items()
+              },
+              'normalized_expected_team_codes': {
+                  str(season): {str(week): sorted(teams) for week, teams in weeks.items()}
+                  for season, weeks in required.items()
+              },
               'allowed_identity_fields': ['season','week','source_team','team','gsis_id','full_name','first_name','last_name','football_name'],
               'forbidden_for_v4_identity_decisions': ['status','position','depth_chart_position','snaps','participation','game_outcomes'],
               'sources': receipts,
