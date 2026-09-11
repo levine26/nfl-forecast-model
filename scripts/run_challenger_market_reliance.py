@@ -129,7 +129,7 @@ def run(output_dir: str, bootstrap_samples: int = 2000) -> dict:
             bootstrap_samples=bootstrap_samples,
             seed=26 if pooling == "linear" else 126,
         )
-        comparison.insert(0, "candidate", f"walk_forward_{pooling}")
+        comparison.insert(0, "candidate_variant", f"walk_forward_{pooling}")
         uncertainty.append(comparison)
         bucket_input = pred.rename(columns={"probability": "candidate_prob"})
         buckets = disagreement_buckets(
