@@ -134,10 +134,19 @@ def normalize_bookmaker(
     if last_update:
         freshness = max(0.0, (request_timestamp_utc - last_update).total_seconds() / 60.0)
 
+    provider_kickoff = _parse_time(event.get("commence_time"))
+    provider_kickoff_delta = None
+    if provider_kickoff:
+        provider_kickoff_delta = (
+            provider_kickoff - kickoff_timestamp_utc.astimezone(timezone.utc)
+        ).total_seconds() / 60.0
+
     return {
         "row_type": "book",
         "game_id": game_id,
         "event_id": event.get("id"),
+        "provider_commence_time_utc": provider_kickoff.isoformat() if provider_kickoff else None,
+        "provider_kickoff_delta_minutes": provider_kickoff_delta,
         "home_team": home_team,
         "away_team": away_team,
         "kickoff_timestamp_utc": kickoff_timestamp_utc.isoformat(),
@@ -184,6 +193,8 @@ def consensus_row(book_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
         "row_type": "consensus",
         "game_id": template["game_id"],
         "event_id": template.get("event_id"),
+        "provider_commence_time_utc": template.get("provider_commence_time_utc"),
+        "provider_kickoff_delta_minutes": template.get("provider_kickoff_delta_minutes"),
         "home_team": template["home_team"],
         "away_team": template["away_team"],
         "kickoff_timestamp_utc": template["kickoff_timestamp_utc"],
