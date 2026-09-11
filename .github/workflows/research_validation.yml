@@ -29,7 +29,7 @@ concurrency:
 jobs:
   validation:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,6 +49,7 @@ jobs:
             tests/test_challenger_shadow_lock.py \
             tests/test_challenger_evaluation.py \
             tests/test_challenger_market_reliance.py \
+            tests/test_challenger_margin_forensics.py \
             tests/test_experiment_registry.py \
             tests/test_research_firewall.py
       - uses: actions/cache@v4
@@ -78,6 +79,14 @@ jobs:
           test -s research_outputs/phase2_market_reliance/phase2_report.json
           test -s research_outputs/phase2_market_reliance/fixed_candidate_metrics.csv
           test -s research_outputs/phase2_market_reliance/walk_forward_weight_selections.csv
+          test -s research_outputs/phase2_market_reliance/incremental_signal_metrics.csv
+      - name: Run margin disagreement forensics
+        run: |
+          rm -rf research_outputs/margin_forensics
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" python scripts/run_challenger_margin_forensics.py --bootstrap-samples 1000
+          test -s research_outputs/margin_forensics/margin_forensics_report.json
+          test -s research_outputs/margin_forensics/margin_gap_buckets.csv
+          test -s research_outputs/margin_forensics/current_large_margin_disagreements.csv
       - name: Prove production surfaces were untouched
         run: |
           git diff --exit-code -- outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
@@ -89,4 +98,5 @@ jobs:
             /tmp/v08-challenger/
             research_outputs/statistical_validation/
             research_outputs/phase2_market_reliance/
+            research_outputs/margin_forensics/
           retention-days: 30
