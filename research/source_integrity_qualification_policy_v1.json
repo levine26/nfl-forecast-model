@@ -1,0 +1,30 @@
+{
+  "policy_version": 1,
+  "qualification_basis": "DATA_INTEGRITY_ONLY",
+  "rights_and_licensing": {
+    "qualification_blocker": false,
+    "technical_validity_input": false,
+    "retain_as_metadata": true,
+    "may_limit_raw_public_redistribution": true,
+    "may_limit_production_or_commercial_dependency": true,
+    "note": "Licensing, usage-rights and redistribution metadata never determine whether a source is technically qualified. Qualification is determined only by the data and integrity of the source itself."
+  },
+  "technical_blocker_categories": [
+    "point_in_time_integrity",
+    "identity_integrity",
+    "schema_integrity",
+    "coverage",
+    "missingness",
+    "semantic_continuity",
+    "publication_or_persistence_timing",
+    "source_availability",
+    "reproducibility"
+  ],
+  "non_qualification_constraints": [
+    "raw_public_redistribution",
+    "production_dependency",
+    "commercial_dependency"
+  ],
+  "completed_2026_outcome_model_selection_allowed": false,
+  "zero_cost_research_policy_preserved": true
+}
