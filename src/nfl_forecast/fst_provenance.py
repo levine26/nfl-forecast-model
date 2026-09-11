@@ -1,0 +1,380 @@
+from __future__ import annotations
+
+"""Durable, game-keyed provenance capture for F-ST research inputs.
+
+The capture happens before the frozen stack is fit. Raw artifact hashes preserve
+exact serialization and row order; canonical keyed hashes separately identify
+the semantic game-keyed content independent of row order.
+"""
+
+import hashlib
+import json
+import os
+import platform
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+import scipy
+import sklearn
+from threadpoolctl import threadpool_info
+
+from .challenger_fst import FROZEN_CANDIDATE_ID, FrozenStackFit
+from .challenger_stacking import HISTORICAL_END
+
+SERIALIZATION_VERSION = 2
+FLOAT_FORMAT = "%.17g"
+LINE_TERMINATOR = "\n"
+CAPTURE_CONTEXTS = frozenset({"candidate_freeze", "prospective_shadow_reconstruction"})
+FROZEN_NUMERIC_PARITY_TOLERANCE = 1e-12
+FROZEN_EXACT_IDENTITY_FIELDS = (
+    "candidate_id",
+    "training_data_sha256",
+    "training_games",
+    "training_first_season",
+    "training_last_season",
+)
+FROZEN_NUMERIC_IDENTITY_FIELDS = (
+    "intercept",
+    "market_logit_coefficient",
+    "pure_logit_coefficient",
+)
+FROZEN_IDENTITY_FIELDS = FROZEN_EXACT_IDENTITY_FIELDS + FROZEN_NUMERIC_IDENTITY_FIELDS
+BASE_OOF_COLUMNS = (
+    "logistic",
+    "extra_trees",
+    "xgboost",
+    "catboost",
+    "home_win",
+    "season",
+)
+TRAINING_COLUMNS = ("season", "home_win", "market_prob", "pure_prob")
+
+
+def _sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _validated_capture_context(candidate_id: str, capture_context: str) -> str:
+    if capture_context not in CAPTURE_CONTEXTS:
+        raise ValueError(
+            "F-ST provenance capture_context must be one of "
+            f"{sorted(CAPTURE_CONTEXTS)}; got {capture_context!r}"
+        )
+    if candidate_id == FROZEN_CANDIDATE_ID and capture_context == "candidate_freeze":
+        raise ValueError(
+            "F-ST-01 predates durable pre-fit capture and may not be relabeled as "
+            "candidate_freeze; use prospective_shadow_reconstruction"
+        )
+    return capture_context
+
+
+def _require_exact_fit_frame(frame: pd.DataFrame) -> None:
+    required = set(TRAINING_COLUMNS)
+    missing = required - set(frame.columns)
+    if missing:
+        raise ValueError(f"F-ST provenance training frame missing fields: {sorted(missing)}")
+    numeric = frame[list(TRAINING_COLUMNS)].apply(pd.to_numeric, errors="coerce")
+    if not np.isfinite(numeric.to_numpy(dtype=float)).all():
+        raise ValueError("F-ST provenance training frame contains non-finite values")
+    if not numeric["home_win"].isin([0, 1]).all():
+        raise ValueError("F-ST provenance training target is not binary")
+    if numeric["season"].ge(HISTORICAL_END + 1).any():
+        raise ValueError("F-ST provenance training frame may not contain post-2025 rows")
+    for col in ("market_prob", "pure_prob"):
+        if ((numeric[col] <= 0.0) | (numeric[col] >= 1.0)).any():
+            raise ValueError(f"F-ST provenance {col} must be strictly between 0 and 1")
+
+
+def _require_base_oof(frame: pd.DataFrame) -> None:
+    missing = set(BASE_OOF_COLUMNS) - set(frame.columns)
+    if missing:
+        raise ValueError(f"F-ST provenance base OOF missing fields: {sorted(missing)}")
+    numeric = frame[list(BASE_OOF_COLUMNS)].apply(pd.to_numeric, errors="coerce")
+    if not np.isfinite(numeric.to_numpy(dtype=float)).all():
+        raise ValueError("F-ST provenance base OOF contains non-finite values")
+    if not numeric["home_win"].isin([0, 1]).all():
+        raise ValueError("F-ST provenance base OOF target is not binary")
+    if numeric["season"].ge(HISTORICAL_END + 1).any():
+        raise ValueError("F-ST provenance base OOF may not contain post-2025 rows")
+    for col in ("logistic", "extra_trees", "xgboost", "catboost"):
+        if ((numeric[col] <= 0.0) | (numeric[col] >= 1.0)).any():
+            raise ValueError(f"F-ST provenance base OOF {col} must be strictly between 0 and 1")
+
+
+def _keyed(
+    historical: pd.DataFrame,
+    frame: pd.DataFrame,
+    columns: tuple[str, ...],
+    *,
+    label: str,
+) -> pd.DataFrame:
+    if "game_id" not in historical.columns:
+        raise ValueError("F-ST provenance historical frame missing 'game_id'")
+    if not historical.index.is_unique:
+        raise ValueError("F-ST provenance historical index is not unique")
+    if not frame.index.is_unique:
+        raise ValueError(f"F-ST provenance {label} index is not unique")
+
+    missing_index = frame.index.difference(historical.index)
+    if len(missing_index):
+        raise ValueError(
+            f"F-ST provenance {label} contains {len(missing_index)} rows absent from historical frame"
+        )
+
+    game_id = historical.loc[frame.index, "game_id"]
+    if game_id.isna().any() or game_id.astype(str).str.strip().eq("").any():
+        raise ValueError(f"F-ST provenance {label} contains missing game_id")
+    game_id = game_id.astype(str)
+    if game_id.duplicated().any():
+        duplicates = sorted(game_id[game_id.duplicated(keep=False)].unique().tolist())
+        raise ValueError(f"F-ST provenance {label} contains duplicate game_id: {duplicates[:5]}")
+
+    keyed = frame.loc[:, list(columns)].copy()
+    keyed.insert(0, "row_position", np.arange(len(keyed), dtype=int))
+    keyed.insert(0, "game_id", game_id.to_numpy())
+    return keyed
+
+
+def _csv_bytes(frame: pd.DataFrame) -> bytes:
+    text = frame.to_csv(
+        index=False,
+        float_format=FLOAT_FORMAT,
+        lineterminator=LINE_TERMINATOR,
+    )
+    return text.encode("utf-8")
+
+
+def _canonical_keyed_sha(frame: pd.DataFrame) -> str:
+    canonical = frame.drop(columns=["row_position"]).sort_values(
+        "game_id", kind="mergesort"
+    )
+    return _sha256(_csv_bytes(canonical))
+
+
+def _sequence_sha(frame: pd.DataFrame) -> str:
+    text = LINE_TERMINATOR.join(frame["game_id"].astype(str).tolist()) + LINE_TERMINATOR
+    return _sha256(text.encode("utf-8"))
+
+
+def _artifact_summary(path: Path, frame: pd.DataFrame, raw: bytes) -> dict[str, Any]:
+    season = pd.to_numeric(frame["season"], errors="raise")
+    return {
+        "path": path.name,
+        "rows": int(len(frame)),
+        "first_season": int(season.min()),
+        "last_season": int(season.max()),
+        "columns": list(frame.columns),
+        "raw_sha256": _sha256(raw),
+        "canonical_game_keyed_sha256": _canonical_keyed_sha(frame),
+        "game_id_sequence_sha256": _sequence_sha(frame),
+    }
+
+
+def capture_fst_pre_fit_provenance(
+    historical: pd.DataFrame,
+    base_oof: pd.DataFrame,
+    training_frame: pd.DataFrame,
+    output_dir: str | Path,
+    *,
+    candidate_id: str,
+    capture_context: str,
+) -> dict[str, Any]:
+    """Persist exact F-ST model inputs before fitting and return their manifest."""
+
+    candidate_id = str(candidate_id)
+    capture_context = _validated_capture_context(candidate_id, capture_context)
+    _require_base_oof(base_oof)
+    _require_exact_fit_frame(training_frame)
+
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    keyed_oof = _keyed(historical, base_oof, BASE_OOF_COLUMNS, label="base OOF")
+    keyed_training = _keyed(
+        historical, training_frame, TRAINING_COLUMNS, label="training frame"
+    )
+
+    oof_path = out / "base_oof_keyed.csv"
+    training_path = out / "training_frame_keyed.csv"
+    oof_raw = _csv_bytes(keyed_oof)
+    training_raw = _csv_bytes(keyed_training)
+    oof_path.write_bytes(oof_raw)
+    training_path.write_bytes(training_raw)
+
+    manifest = {
+        "schema_version": SERIALIZATION_VERSION,
+        "capture_stage": "pre_fit",
+        "capture_context": capture_context,
+        "candidate_id": candidate_id,
+        "historical_outcome_cutoff_season": HISTORICAL_END,
+        "serialization": {
+            "format": "csv",
+            "encoding": "utf-8",
+            "float_format": FLOAT_FORMAT,
+            "line_terminator": "LF",
+            "row_order_preserved": True,
+            "row_position_explicit": True,
+        },
+        "base_oof": _artifact_summary(oof_path, keyed_oof, oof_raw),
+        "training_frame": _artifact_summary(training_path, keyed_training, training_raw),
+    }
+    manifest_path = out / "inputs_manifest.json"
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return manifest
+
+
+def _runtime_provenance() -> dict[str, Any]:
+    return {
+        "python_version": platform.python_version(),
+        "python_implementation": platform.python_implementation(),
+        "platform": platform.platform(),
+        "numpy_version": np.__version__,
+        "pandas_version": pd.__version__,
+        "scipy_version": scipy.__version__,
+        "scikit_learn_version": sklearn.__version__,
+        "thread_environment": {
+            key: os.environ.get(key)
+            for key in (
+                "OMP_NUM_THREADS",
+                "OPENBLAS_NUM_THREADS",
+                "OPENBLAS_CORETYPE",
+                "MKL_NUM_THREADS",
+                "NUMEXPR_NUM_THREADS",
+                "VECLIB_MAXIMUM_THREADS",
+            )
+        },
+        "threadpools": threadpool_info(),
+    }
+
+
+def write_fst_fit_provenance(
+    output_dir: str | Path,
+    input_manifest: dict[str, Any],
+    fit: FrozenStackFit,
+) -> dict[str, Any]:
+    """Bind a completed fit to the already-persisted pre-fit input artifacts."""
+
+    out = Path(output_dir)
+    input_manifest_path = out / "inputs_manifest.json"
+    if not input_manifest_path.exists():
+        raise RuntimeError("F-ST fit provenance requires persisted pre-fit inputs")
+    persisted = json.loads(input_manifest_path.read_text(encoding="utf-8"))
+    if persisted != input_manifest:
+        raise RuntimeError("F-ST pre-fit manifest changed before fit provenance was recorded")
+
+    manifest = {
+        "schema_version": SERIALIZATION_VERSION,
+        "candidate_id": input_manifest["candidate_id"],
+        "capture_context": input_manifest["capture_context"],
+        "inputs_manifest_sha256": _sha256(input_manifest_path.read_bytes()),
+        "base_oof_raw_sha256": input_manifest["base_oof"]["raw_sha256"],
+        "training_frame_raw_sha256": input_manifest["training_frame"]["raw_sha256"],
+        "training_frame_canonical_game_keyed_sha256": input_manifest["training_frame"][
+            "canonical_game_keyed_sha256"
+        ],
+        "model_training_data_sha256": fit.training_data_sha256,
+        "fit": fit.as_dict(),
+        "runtime": _runtime_provenance(),
+    }
+    (out / "fit_manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return manifest
+
+
+def verify_fst_frozen_identity(
+    output_dir: str | Path,
+    input_manifest: dict[str, Any],
+    fit: FrozenStackFit,
+    expected_identity: dict[str, Any],
+) -> dict[str, Any]:
+    """Verify a post-freeze reconstruction before any current-game scoring.
+
+    Candidate identity, canonical training digest, row count, and season bounds
+    must reproduce exactly. Floating-point coefficients must reproduce the exact
+    registered constants within the fixed absolute 1e-12 parity bound used by the
+    production deployment contract. Scoring continues to use the registered
+    constants, never the reconstructed coefficients.
+    """
+
+    missing = [field for field in FROZEN_IDENTITY_FIELDS if field not in expected_identity]
+    if missing:
+        raise ValueError(f"F-ST frozen identity spec missing fields: {missing}")
+    if "source" not in expected_identity or not isinstance(expected_identity["source"], dict):
+        raise ValueError("F-ST frozen identity spec requires an evidence source")
+
+    tolerance = float(
+        expected_identity.get("reconstruction_abs_tolerance", FROZEN_NUMERIC_PARITY_TOLERANCE)
+    )
+    if not np.isfinite(tolerance) or tolerance < 0.0 or tolerance > FROZEN_NUMERIC_PARITY_TOLERANCE:
+        raise ValueError(
+            "F-ST frozen identity reconstruction_abs_tolerance must be finite and <= 1e-12"
+        )
+
+    actual = {
+        "candidate_id": str(input_manifest["candidate_id"]),
+        "training_data_sha256": str(fit.training_data_sha256),
+        "training_games": int(fit.training_games),
+        "training_first_season": int(fit.training_first_season),
+        "training_last_season": int(fit.training_last_season),
+        "intercept": float(fit.intercept),
+        "market_logit_coefficient": float(fit.market_logit_coefficient),
+        "pure_logit_coefficient": float(fit.pure_logit_coefficient),
+    }
+    expected = {
+        "candidate_id": str(expected_identity["candidate_id"]),
+        "training_data_sha256": str(expected_identity["training_data_sha256"]),
+        "training_games": int(expected_identity["training_games"]),
+        "training_first_season": int(expected_identity["training_first_season"]),
+        "training_last_season": int(expected_identity["training_last_season"]),
+        "intercept": float(expected_identity["intercept"]),
+        "market_logit_coefficient": float(expected_identity["market_logit_coefficient"]),
+        "pure_logit_coefficient": float(expected_identity["pure_logit_coefficient"]),
+    }
+
+    field_matches = {
+        field: actual[field] == expected[field] for field in FROZEN_EXACT_IDENTITY_FIELDS
+    }
+    numeric_absolute_deltas = {
+        field: abs(actual[field] - expected[field]) for field in FROZEN_NUMERIC_IDENTITY_FIELDS
+    }
+    field_matches.update(
+        {
+            field: numeric_absolute_deltas[field] <= tolerance
+            for field in FROZEN_NUMERIC_IDENTITY_FIELDS
+        }
+    )
+    mismatched_fields = [field for field in FROZEN_IDENTITY_FIELDS if not field_matches[field]]
+    check = {
+        "schema_version": SERIALIZATION_VERSION,
+        "check_stage": "post_fit_pre_scoring",
+        "capture_context": input_manifest["capture_context"],
+        "expected_source": expected_identity["source"],
+        "expected": expected,
+        "actual": actual,
+        "exact_identity_fields": list(FROZEN_EXACT_IDENTITY_FIELDS),
+        "numeric_identity_fields": list(FROZEN_NUMERIC_IDENTITY_FIELDS),
+        "numeric_abs_tolerance": tolerance,
+        "numeric_absolute_deltas": numeric_absolute_deltas,
+        "field_matches": field_matches,
+        "mismatched_fields": mismatched_fields,
+        "matches": not mismatched_fields,
+    }
+
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "frozen_identity_check.json").write_text(
+        json.dumps(check, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    if mismatched_fields:
+        raise RuntimeError(
+            "F-ST frozen identity mismatch before scoring: " + ", ".join(mismatched_fields)
+        )
+    return check

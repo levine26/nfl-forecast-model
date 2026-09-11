@@ -1,0 +1,14 @@
+# Exact numerical/runtime package set used by successful frozen-shadow run 34482487521
+# and independently recovered under OPENBLAS_CORETYPE=SKYLAKEX in forensic run 34538432305.
+nflreadpy==0.1.5
+polars==1.44.2
+pandas==3.0.5
+numpy==2.4.6
+scikit-learn==1.9.0
+scipy==1.17.1
+xgboost==3.2.0
+catboost==1.2.10
+pyarrow==25.0.1
+duckdb==1.5.5
+joblib==1.6.0
+threadpoolctl==3.6.0
