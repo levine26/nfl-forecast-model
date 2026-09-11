@@ -1,7 +1,7 @@
 {
   "experiment_id": "PHASE3B-PROB-MARGIN-BRIDGE-001",
   "candidate_version": "chronological-probability-margin-bridge-v1",
-  "status": "planned",
+  "status": "completed_not_qualified",
   "created_before_result_generation": true,
   "historical_selection_end": 2025,
   "validation_seasons": [2022, 2023, 2024, 2025],
@@ -33,5 +33,20 @@
     "post-result feature or scale search"
   ],
   "production_changed": false,
-  "promotion_authorized": false
+  "promotion_authorized": false,
+  "completed_evidence": {
+    "games": 1087,
+    "market_spread_mae": 9.494480220791168,
+    "raw_market_probability_bridge_mae": 9.541706192656022,
+    "market_plus_football_probability_bridge_mae": 9.577266563214867,
+    "raw_market_bridge_minus_market_spread_mae": 0.04722597186485478,
+    "raw_market_bridge_minus_market_spread_ci95": [-0.0066943351972463825, 0.09870543165589457],
+    "market_plus_football_bridge_minus_market_spread_mae": 0.0827863424236975,
+    "market_plus_football_bridge_minus_market_spread_ci95": [0.007613509186094003, 0.15883295852321394],
+    "market_plus_football_bridge_minus_raw_market_bridge_mae": 0.03556037055884274,
+    "market_plus_football_bridge_minus_raw_market_bridge_ci95": [-0.013018451248963149, 0.08090922673313326],
+    "2026_outcomes_used": 0,
+    "public_interpretation": "presentation_transform_not_validated_margin_forecast"
+  },
+  "final_decision": "Not qualified as a predictive margin model. Preserve only as an explicitly labeled probability-consistent presentation transform unless a separately pre-registered future experiment demonstrates predictive margin qualification. Do not tune sigma after this result."
 }
