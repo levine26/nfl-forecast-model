@@ -1,0 +1,56 @@
+name: LevLine Phase 3 joint distribution
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_joint_distribution.py'
+      - 'scripts/run_challenger_joint_distribution.py'
+      - 'research/phase3_joint_distribution_prereg.json'
+      - 'research/experiments.json'
+      - 'tests/test_challenger_joint_distribution.py'
+      - '.github/workflows/research_phase3_joint_distribution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test Phase 3 contract and leakage guard
+        run: pytest -q tests/test_challenger_joint_distribution.py tests/test_research_firewall.py
+      - name: Run pre-registered historical experiment
+        run: |
+          rm -rf research_outputs/phase3_joint_distribution
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/run_challenger_joint_distribution.py --bootstrap-samples 1000
+          test -s research_outputs/phase3_joint_distribution/phase3_report.json
+          test -s research_outputs/phase3_joint_distribution/phase3_oof_predictions_2022_2025.csv
+          test -s research_outputs/phase3_joint_distribution/phase3_probability_uncertainty.csv
+          test -s research_outputs/phase3_joint_distribution/phase3_continuous_uncertainty.csv
+      - name: Prove branch does not modify production surfaces
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          BASE="origin/${{ github.base_ref }}"
+          CHANGED=$(git diff --name-only "$BASE...HEAD")
+          echo "$CHANGED"
+          if echo "$CHANGED" | grep -E '^(outputs/|site/|src/nfl_forecast/(pipeline|models|features|data|publish|market|market_t120|lock_verify)\.py$|scripts/(run_week|refresh_market|pregame_due|verify_pregame_lock)\.py$)'; then
+            echo 'Phase 3 research branch touched a production surface.' >&2
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-phase3-joint-${{ github.run_id }}
+          path: research_outputs/phase3_joint_distribution/
+          retention-days: 30

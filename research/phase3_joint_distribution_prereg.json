@@ -1,0 +1,117 @@
+{
+  "experiment_id": "PHASE3-JOINT-DIST-001",
+  "candidate_version": "market-anchored-joint-distribution-v1",
+  "status": "rejected",
+  "created_before_result_generation": true,
+  "result_generated_utc": "2026-09-11T02:35:20Z",
+  "hypothesis": "A coherent market-anchored score distribution with strongly shrunk chronology-trained football residual corrections can improve margin and total forecasts without materially degrading winner-probability quality relative to the market.",
+  "historical_selection_end": 2025,
+  "training_policy": "For each validation season S in 2022-2025, fit only on completed seasons < S. Never use 2026 outcomes.",
+  "validation_seasons": [2022, 2023, 2024, 2025],
+  "market_anchors": {
+    "margin": "pregame spread_line, home-margin sign convention",
+    "total": "pregame total_line",
+    "winner_probability_benchmark": "vig-free market_home_prob"
+  },
+  "football_residual_models": {
+    "family": "median-imputed standardized ridge regression",
+    "margin_target": "actual_margin - market_spread",
+    "total_target": "actual_total - market_total",
+    "alpha_margin": 100.0,
+    "alpha_total": 100.0,
+    "margin_correction_cap_points": 3.0,
+    "total_correction_cap_points": 4.0,
+    "hyperparameter_search": "none"
+  },
+  "distribution": {
+    "family": "bivariate normal over home-minus-away margin and game total",
+    "margin_sigma": "estimated on prior-season market margin residuals only",
+    "total_sigma": "estimated on prior-season market total residuals only",
+    "residual_correlation": "estimated on prior-season market margin/total residual pairs only",
+    "winner_probability": "Phi(candidate_margin_mean / prior-season margin_sigma)",
+    "home_score_mean": "(candidate_total_mean + candidate_margin_mean) / 2",
+    "away_score_mean": "(candidate_total_mean - candidate_margin_mean) / 2"
+  },
+  "large_disagreement_guardrail": {
+    "rationale": "Phase 2 found historical model-vs-market margin gaps >=6 points had materially worse MAE than market.",
+    "policy": "The residual candidate may move market margin by at most 3 points and market total by at most 4 points. No exception or post-result rescue search is allowed in this experiment."
+  },
+  "primary_metrics": [
+    "winner_brier_vs_raw_market_moneyline",
+    "margin_mae_vs_market_spread",
+    "total_mae_vs_market_total"
+  ],
+  "secondary_metrics": [
+    "winner_log_loss",
+    "winner_accuracy",
+    "margin_rmse",
+    "total_rmse",
+    "normal_margin_crps",
+    "normal_total_crps",
+    "bivariate_margin_total_negative_log_likelihood",
+    "home_score_mae",
+    "away_score_mae",
+    "80pct_margin_interval_coverage",
+    "80pct_total_interval_coverage",
+    "coherence_failures",
+    "correction_cap_rate"
+  ],
+  "qualification_rule": {
+    "winner_probability": "Candidate must not have statistically supported degradation vs raw market on Brier or log loss.",
+    "margin": "Candidate must improve market-spread MAE with season+week blocked uncertainty supporting improvement.",
+    "total": "Candidate must improve market-total MAE with season+week blocked uncertainty supporting improvement.",
+    "coherence": "Zero algebraic coherence failures between probability distribution, fair margin, total and score means.",
+    "promotion": "No production promotion is authorized by historical qualification alone."
+  },
+  "historical_result": {
+    "games": 1087,
+    "candidate_winner_accuracy": 0.6826126955,
+    "market_winner_accuracy": 0.6761729531,
+    "candidate_brier": 0.2108664235,
+    "market_brier": 0.2101992906,
+    "brier_delta_candidate_minus_market": 0.0006671329,
+    "brier_week_block_95_ci": [-0.0012691184, 0.0027211215],
+    "candidate_log_loss": 0.6090394298,
+    "market_log_loss": 0.6076472081,
+    "log_loss_delta_candidate_minus_market": 0.0013922216,
+    "log_loss_week_block_95_ci": [-0.0025368232, 0.0056817214],
+    "candidate_margin_mae": 9.5896979305,
+    "market_margin_mae": 9.4944802208,
+    "margin_mae_delta_candidate_minus_market": 0.0952177097,
+    "margin_mae_week_block_95_ci": [0.0285005706, 0.1674442368],
+    "candidate_total_mae": 10.1929183802,
+    "market_total_mae": 10.1890524379,
+    "total_mae_delta_candidate_minus_market": 0.0038659423,
+    "total_mae_week_block_95_ci": [-0.0794485998, 0.0832565475],
+    "candidate_margin_crps": 6.9668705848,
+    "market_margin_crps": 6.9162383399,
+    "candidate_joint_nll": 7.9292109717,
+    "market_joint_nll": 7.9227254945,
+    "candidate_home_score_mae": 7.1918503094,
+    "market_home_score_mae": 7.2166513339,
+    "candidate_away_score_mae": 7.1369668236,
+    "market_away_score_mae": 7.0616375345,
+    "away_score_mae_week_block_95_ci": [0.0261824810, 0.1217052473],
+    "margin_80_coverage": 0.8178472861,
+    "total_80_coverage": 0.8242870285,
+    "coherence_failures": 0,
+    "qualification_gates": {
+      "probability_not_statistically_supported_worse": true,
+      "margin_mae_supported_better": false,
+      "total_mae_supported_better": false,
+      "zero_coherence_failures": true,
+      "historically_qualified": false
+    },
+    "conclusion": "Rejected as pre-registered. The coherent distribution mechanics worked, but broad football residual corrections significantly worsened margin MAE and did not establish total-MAE improvement. No alpha/cap rescue tuning is permitted."
+  },
+  "prohibited_inputs": [
+    "2026 outcomes",
+    "post-kickoff information",
+    "current-game realized snaps",
+    "future injury status",
+    "closing-line information unavailable at the tested forecast horizon when later matched-horizon testing begins",
+    "post-result hyperparameter search"
+  ],
+  "production_changed": false,
+  "promotion_authorized": false
+}
