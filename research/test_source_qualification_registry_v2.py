@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 REGISTRY = Path("research/source_qualification_registry_v2.json")
+SLEEPER_QUALIFICATION = Path("research/sleeper_archive_qualification_v1.json")
 VALID = {
     "QUALIFIED_RESEARCH",
     "PROSPECTIVE_ONLY",
@@ -44,6 +45,10 @@ def _sources() -> list[dict]:
     return _registry()["sources"]
 
 
+def _sleeper_qualification() -> dict:
+    return json.loads(SLEEPER_QUALIFICATION.read_text(encoding="utf-8"))
+
+
 def test_registry_is_zero_cost_and_fail_closed() -> None:
     registry = _registry()
     assert registry["policy"]["cost_ceiling_usd"] == 0
@@ -62,17 +67,25 @@ def test_every_source_has_complete_qualification_record_and_unique_id() -> None:
         assert str(row["cost"]).startswith("$0")
 
 
-def test_sleeper_archive_remains_blocked_after_locating_short_unlicensed_candidate() -> None:
-    row = next(r for r in _sources() if r["source_id"] == "sleeper_historical_player_archive_candidate")
-    assert row["classification"] == "BLOCKED"
-    assert row["historical_research"] is False
-    assert row["prospective_use"] is False
-    assert row["probability_features"] is False
-    assert row["current_2026_support"] is True
-    assert "2026-02-01" in row["historical_coverage"]
-    assert "no declared license" in " ".join(row["known_source_failures"]).lower()
-    assert ">=99.5%" in row["reopen_condition"]
-    assert "different archive" in row["reopen_condition"].lower()
+def test_verified_sleeper_archive_is_qualified_for_2026_research_only() -> None:
+    qualification = _sleeper_qualification()
+    assert qualification["source_id"] == "sleeper_historical_player_archive_candidate"
+    assert qualification["technical_status"] == "VERIFIED"
+    assert qualification["research_classification"] == "QUALIFIED_RESEARCH_2026_ONLY"
+    assert qualification["treat_source_as_valid_unless_data_audit_fails"] is True
+    assert qualification["supersedes_registry_block_for_technical_research"] is True
+    scope = qualification["effective_scope"]
+    assert scope["supports_2025_reconstruction"] is False
+    assert scope["supports_2026_point_in_time_research"] is True
+    assert scope["supports_prospective_shadow_capture"] is True
+    assert scope["supports_completed_2026_outcome_model_selection"] is False
+    assert scope["supports_public_raw_redistribution"] is False
+    assert scope["supports_production_dependency"] is False
+    provenance = qualification["verified_provenance"]
+    assert provenance["snapshot_path"] == "data/sleeper_players.json"
+    assert provenance["workflow_schedule"] == "0 8 * * *"
+    assert provenance["earliest_verified_snapshot_commit_utc"].startswith("2026-02-01")
+    assert any(">=99.5%" in gate for gate in qualification["data_quality_gates"])
 
 
 def test_sleeper_live_rights_boundary_prevents_probability_or_public_use() -> None:
