@@ -17,7 +17,6 @@ DEFAULT_STATE_FIELDS = (
     "team",
     "position",
 )
-FANTASY_POSITIONS = {"QB", "RB", "WR", "TE", "K", "DEF"}
 
 
 class SleeperArchiveAuditError(ValueError):
@@ -58,11 +57,16 @@ def player_map(snapshot: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 def _research_population(players: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    # LevLine is an NFL game model, not a fantasy model. Preserve every individual
+    # player currently attached to an NFL team so OL/DL/LB/DB/special-teams state can
+    # be studied alongside offensive skill positions. Team-defense pseudo players and
+    # clearly retired records are excluded from the player-level population.
     relevant = {
         player_id: payload
         for player_id, payload in players.items()
-        if str(payload.get("position") or "").upper() in FANTASY_POSITIONS
-        and str(payload.get("status") or "").lower() not in {"inactive", "retired"}
+        if str(payload.get("team") or "").strip()
+        and str(payload.get("position") or "").upper() != "DEF"
+        and str(payload.get("status") or "").lower() != "retired"
     }
     return relevant or players
 
