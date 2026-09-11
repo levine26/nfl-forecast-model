@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install lightweight test dependencies
-        run: python -m pip install pytest
+        run: python -m pip install pytest 'pandas==3.0.5' 'requests>=2.32'
       - name: Validate market normalization and horizon semantics
         run: python -m pytest -q research/test_market_capture_v2.py
 
