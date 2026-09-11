@@ -5,8 +5,8 @@ on:
     paths:
       - 'research/market_capture_v2.py'
       - 'research/test_market_capture_v2.py'
-      - 'scripts/run_research_market_capture_v2.py'
-      - 'scripts/research_market_due_v2.py'
+      - 'research/run_market_capture_v2.py'
+      - 'research/market_capture_due_v2.py'
       - '.github/workflows/research_market_capture_v2.yml'
   workflow_dispatch:
   schedule:
@@ -45,7 +45,7 @@ jobs:
       - name: Cheap local horizon gate
         id: gate
         run: |
-          RESULT=$(python scripts/research_market_due_v2.py)
+          RESULT=$(python research/market_capture_due_v2.py)
           echo "$RESULT"
           if echo "$RESULT" | grep -q '^due=true'; then
             echo 'due=true' >> "$GITHUB_OUTPUT"
@@ -81,7 +81,7 @@ jobs:
         env:
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
         run: >-
-          python scripts/run_research_market_capture_v2.py
+          python research/run_market_capture_v2.py
           --quota-reserve 50
 
       - name: Persist ledger away from main
