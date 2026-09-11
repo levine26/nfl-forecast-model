@@ -1,0 +1,37 @@
+{
+  "archive_audit": {
+    "archive_id": "NFL-INJURY-SNAPSHOT-2026-V1",
+    "captured_observations": 1,
+    "completed_2026_outcomes_used": 0,
+    "failed_observations": 0,
+    "failures": [],
+    "integrity_ok": true,
+    "observations": 1,
+    "production_authorized": false,
+    "unique_raw_objects": 1,
+    "unique_snapshot_objects": 1
+  },
+  "observation": {
+    "archive_id": "NFL-INJURY-SNAPSHOT-2026-V1",
+    "canonical_snapshot_sha256": "a21f6ae2b8e5cc76fd5574f8fb37e35b9e83f461ccb09efa6b0ecc5dcb015217",
+    "captured_at_utc": "2026-09-11T18:18:08.386794Z",
+    "completed_2026_outcomes_used": 0,
+    "http_status": 200,
+    "object_created": true,
+    "object_relpath": "objects/a21f6ae2b8e5cc76fd5574f8fb37e35b9e83f461ccb09efa6b0ecc5dcb015217.json.gz",
+    "parser_table_count": 32,
+    "players": 167,
+    "production_authorized": false,
+    "raw_body_sha256": "b324896894b13fc3142561a2992d483b62f9b85923e1eb4c0d932449f8fc1fdf",
+    "raw_object_created": true,
+    "raw_object_relpath": "raw/b324896894b13fc3142561a2992d483b62f9b85923e1eb4c0d932449f8fc1fdf.html.gz",
+    "research_only": true,
+    "schema_version": 1,
+    "season": 2026,
+    "source_name": "NFL.com official injury report",
+    "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
+    "status": "captured",
+    "teams_with_reported_players": 32,
+    "week": 1
+  }
+}
