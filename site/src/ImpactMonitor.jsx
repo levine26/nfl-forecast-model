@@ -1,9 +1,9 @@
 import React from 'react'
+import './impact-monitor.css'
 
-export default function ImpactMonitor({ gameId, payload }) {
-  const games = Array.isArray(payload?.games) ? payload.games : []
-  const game = games.find(row => String(row?.game_id) === String(gameId))
-  if (!game || !Array.isArray(game.players) || game.players.length === 0) return null
+export default function ImpactMonitor({ gameMonitor }) {
+  const players = Array.isArray(gameMonitor?.players) ? gameMonitor.players : []
+  if (!players.length) return null
 
   return (
     <section className="co-section co-impact-monitor" aria-label="Impact Monitor">
@@ -12,15 +12,15 @@ export default function ImpactMonitor({ gameId, payload }) {
         <small>Player context · explainability only · does not change the forecast</small>
       </div>
       <div className="co-impact-list">
-        {game.players.map(player => (
+        {players.map(player => (
           <article key={`${player.team}-${player.player_id}`} className="co-impact-card">
-            <div>
+            <div className="co-impact-player">
               <b>{player.player_name}</b>
               <span>{player.team} · {player.position}</span>
             </div>
             {player.availability && (
               <p>
-                Availability: {player.availability.game_status || player.availability.practice_status || 'status unavailable'}
+                <strong>Availability:</strong> {player.availability.game_status || player.availability.practice_status || 'status unavailable'}
                 {player.availability.source_name ? ` · ${player.availability.source_name}` : ''}
               </p>
             )}
