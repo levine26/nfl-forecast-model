@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import './coherent.css'
+import ImpactMonitor from './ImpactMonitor.jsx'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -172,7 +173,7 @@ function ForecastSummary({game,large=false}) {
       <p>{interpretation(game)}</p>
     </div>
     <div className="co-forecast-numbers">
-      <div><span>Fair line</span><b>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</b></div>
+      <div><span>Probability-implied line</span><b>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</b><small>presentation translation · not expected margin</small></div>
       <div><span>Approx. score</span><b>{scoreText(game)}</b></div>
       <div><span>Market</span><b>{lineText(game.market_margin_home,game.home_team,game.away_team)}</b><small>{pct(probabilityForTeam(game.market_home_win_probability,game.official_winner,game))} on {game.official_winner}</small></div>
     </div>
@@ -201,7 +202,7 @@ function WeekPage({games,previews,onOpen}) {
   const locked=sorted.filter(g=>g.immutable).length
   return <main className="co-page">
     <section className="co-page-hero">
-      <div><span>WEEK {games[0]?.week||'—'} · NFL</span><h1>One forecast. Clear signals.</h1><p>Who LevLine favors, the fair line implied by that probability, the score environment, and where the market differs.</p></div>
+      <div><span>WEEK {games[0]?.week||'—'} · NFL</span><h1>One forecast. Clear signals.</h1><p>Who LevLine favors, the probability-implied line for that forecast, the score environment, and where the market differs.</p></div>
       <div className="co-slate-status"><b>{games.length}</b><span>games</span><b>{live}</b><span>live forecasts</span><b>{locked}</b><span>immutable locks</span></div>
     </section>
     <div className="co-game-grid">{sorted.map(game=><GameCard key={game.game_id} game={game} preview={previews[game.game_id]} onOpen={()=>onOpen(game)}/>)}</div>
@@ -330,7 +331,7 @@ function AdvancedNumbers({game,diagnostic}) {
   const independent=num(game.diagnostics?.independent_margin_home)
   const independentScore=independent==null?null:`${game.home_team} ${one(game.diagnostics?.independent_projected_home_score)} – ${game.away_team} ${one(game.diagnostics?.independent_projected_away_score)}`
   const rows=[
-    ['Fair moneyline',moneyline(game.probability_derived_fair_home_moneyline)],
+    ['Probability-implied home ML',moneyline(game.probability_derived_fair_home_moneyline)],
     ['Projected total',one(game.public_projected_total)],
     ['Market total',one(game.market_total)],
     ['Market probability',pct(probabilityForTeam(game.market_home_win_probability,game.official_winner,game))],
@@ -338,10 +339,10 @@ function AdvancedNumbers({game,diagnostic}) {
     ['Independent margin score',independentScore||'—'],
     ['Model disagreement',pct(diagnostic?.model_disagreement)],
   ]
-  return <div className="co-advanced-grid">{rows.map(([label,value])=><div key={label}><span>{label}</span><b>{value}</b></div>)}<p>The independent margin model remains preserved for research and diagnostics. It does not override the coherent public fair line or official winner.</p></div>
+  return <div className="co-advanced-grid">{rows.map(([label,value])=><div key={label}><span>{label}</span><b>{value}</b></div>)}<p>The independent margin model remains preserved for research and diagnostics. It does not override the probability-implied presentation line or official winner.</p></div>
 }
 
-function GameModal({game,runs,evidence,preview,diagnostic,onClose,onMethod}) {
+function GameModal({game,runs,evidence,preview,diagnostic,gameMonitor,onClose,onMethod}) {
   return <div className="co-modal-backdrop" onMouseDown={event=>{if(event.target===event.currentTarget)onClose()}}>
     <article className="co-modal" role="dialog" aria-modal="true" aria-label={`${game.away_team} at ${game.home_team} LevLine forecast`}>
       <button className="co-close" onClick={onClose} aria-label="Close">×</button>
@@ -353,6 +354,7 @@ function GameModal({game,runs,evidence,preview,diagnostic,onClose,onMethod}) {
       <div className="co-time-row"><span><b>{game.immutable?'Forecast locked':'Forecast updated'}</b> {formatTime(game.lock_timestamp_utc||game.forecast_timestamp_utc)}</span><span><b>Market updated</b> {formatTime(game.market_timestamp_utc)}</span></div>
       <SignalBreakdown game={game}/>
       <KeyDevelopments evidence={evidence} preview={preview}/>
+      <ImpactMonitor gameMonitor={gameMonitor}/>
       <ForecastMovement game={game} runs={runs} evidence={evidence}/>
       <WhyLevLine game={game} evidence={evidence} preview={preview}/>
       {preview?.paragraphs?.length>0 && <section className="co-section co-read"><div className="co-section-head"><span>THE READ</span><small>Editorial context</small></div>{preview.paragraphs.slice(0,4).map((text,index)=><p key={index}>{text}</p>)}</section>}
@@ -361,7 +363,7 @@ function GameModal({game,runs,evidence,preview,diagnostic,onClose,onMethod}) {
         <details><summary>Advanced Numbers <span>separate prediction targets</span></summary><AdvancedNumbers game={game} diagnostic={diagnostic}/></details>
         <details><summary>Technical Details <span>provenance and semantics</span></summary><div className="co-tech">
           <p><b>Official probability:</b> {pct(game.official_winner_probability,2)} on {game.official_winner}. This is the only public winner probability.</p>
-          <p><b>Public fair line:</b> a deterministic probability-to-margin bridge using the forecast's existing margin uncertainty. The independently trained margin estimate remains diagnostic-only.</p>
+          <p><b>Probability-implied line:</b> a deterministic probability-to-margin presentation bridge using the forecast's existing margin uncertainty. Phase 3B did not validate this transform as an expected-margin predictor; the independently trained margin estimate remains diagnostic-only.</p>
           <p><b>Contract:</b> v{game.contract_version} · source {game.source_snapshot} · signal {game.signals?.football?.kind||'unavailable'}.</p>
           {game.provenance?.artifact_id && <p><b>Reproducibility:</b> {game.provenance.artifact_id} · model {game.provenance.model_version||'—'}.</p>}
           <button onClick={onMethod}>How LevLine works →</button>
@@ -406,10 +408,10 @@ function HistoryPage({history,autopsies}) {
 
 function MethodPage({models}) {
   return <main className="co-page co-method"><PageHead kicker="METHODOLOGY" title="How LevLine works." copy="A football forecast, a market signal, one official probability, and an immutable pregame record—with each role kept explicit."/>
-    <section className="co-method-intro"><span>THE SHORT VERSION</span><h2>LevLine combines a leakage-safe football-only signal with the current vig-free market through a frozen two-input probability model. That official probability determines the published winner and a coherent public fair line.</h2></section>
-    <section className="co-method-flow"><article><i>01</i><b>Football-only signal</b><p>Pregame team efficiency, opponent-adjusted football state, Elo and component models produce a nested football probability without using the current game's market as a feature.</p></article><article><i>02</i><b>Market signal</b><p>Current moneyline prices are converted to a vig-free home-win probability and timestamped independently from the football forecast.</p></article><article><i>03</i><b>Official LevLine probability</b><p>The frozen 2026 architecture combines those two inputs. Market information is an input—not the entirety of the analysis—and football/market disagreements remain visible.</p></article><article><i>04</i><b>Coherent public line</b><p>The official probability is mapped to a fair margin using the existing margin uncertainty under a normal-margin bridge. The projected total then yields an approximate whole-number score.</p></article><article><i>05</i><b>Pregame lock</b><p>The first valid forecast inside the T−120 window is immutable. Once kickoff passes, Sunday Signal refuses to substitute a newer live row for that locked forecast.</p></article><article><i>06</i><b>Grade and audit</b><p>Winner accuracy is secondary to probability quality. Calibration, Brier score and log loss measure whether LevLine's confidence was deserved.</p></article></section>
-    <section className="co-method-principles"><article><span>NO LEAKAGE</span><h3>Chronological validation</h3><p>Training and validation move forward through time. Later outcomes never flow backward into an earlier evaluation window.</p></article><article><span>2026 FORWARD TEST</span><h3>No architecture selection on completed 2026 outcomes</h3><p>Completed 2026 games may update ordinary rolling pregame football state, but they cannot select, tune or refit the frozen 2026 probability architecture.</p></article><article><span>SEPARATE TARGETS</span><h3>Winner, margin and total are not secretly the same model</h3><p>The independent margin model remains preserved for research and diagnostics. Sunday Signal's consumer fair line is probability-coherent; a true joint score distribution remains a research question.</p></article><article><span>FALLBACK</span><h3>Missing market information is explicit</h3><p>If the current market is unavailable or invalid, the production system records the fallback state rather than pretending fresh market information existed.</p></article></section>
-    <details className="co-method-tech"><summary>Technical details</summary><div><h3>Frozen production probability architecture</h3><p><code>logit(P_home) = -0.06954 + 1.19391 × logit(P_market) − 0.19343 × logit(P_nested_football)</code></p><p>The production artifact is versioned as <code>F-ST-01-FROZEN-2026</code>. The architecture name is provenance metadata, not consumer-facing model branding.</p><h3>Probability-to-margin bridge</h3><p><code>fair_margin = margin_sigma × Φ⁻¹(P_home)</code></p><p>This bridge enforces directional and probabilistic coherence for the public fair line without rewriting the separately trained independent margin model. A future joint win/margin/score model would require separate research evidence and explicit promotion authorization.</p></div></details>
+    <section className="co-method-intro"><span>THE SHORT VERSION</span><h2>LevLine combines a leakage-safe football-only signal with the current vig-free market through a frozen two-input probability model. That official probability determines the published winner and a probability-implied presentation line.</h2></section>
+    <section className="co-method-flow"><article><i>01</i><b>Football-only signal</b><p>Pregame team efficiency, opponent-adjusted football state, Elo and component models produce a nested football probability without using the current game's market as a feature.</p></article><article><i>02</i><b>Market signal</b><p>Current moneyline prices are converted to a vig-free home-win probability and timestamped independently from the football forecast.</p></article><article><i>03</i><b>Official LevLine probability</b><p>The frozen 2026 architecture combines those two inputs. Market information is an input—not the entirety of the analysis—and football/market disagreements remain visible.</p></article><article><i>04</i><b>Probability-implied line</b><p>The official probability is mapped to a presentation margin using the existing margin uncertainty under a normal-margin bridge. Phase 3B found that this transform should not be interpreted as a validated expected-margin forecast. The projected total then yields an approximate score.</p></article><article><i>05</i><b>Pregame lock</b><p>The first valid forecast inside the T−120 window is immutable. Once kickoff passes, Sunday Signal refuses to substitute a newer live row for that locked forecast.</p></article><article><i>06</i><b>Grade and audit</b><p>Winner accuracy is secondary to probability quality. Calibration, Brier score and log loss measure whether LevLine's confidence was deserved.</p></article></section>
+    <section className="co-method-principles"><article><span>NO LEAKAGE</span><h3>Chronological validation</h3><p>Training and validation move forward through time. Later outcomes never flow backward into an earlier evaluation window.</p></article><article><span>2026 FORWARD TEST</span><h3>No architecture selection on completed 2026 outcomes</h3><p>Completed 2026 games may update ordinary rolling pregame football state, but they cannot select, tune or refit the frozen 2026 probability architecture.</p></article><article><span>SEPARATE TARGETS</span><h3>Winner, margin and total are not secretly the same model</h3><p>The independent margin model remains preserved for research and diagnostics. Sunday Signal's consumer probability-implied line is a coherence/presentation translation, not a validated expected-margin forecast.</p></article><article><span>FALLBACK</span><h3>Missing market information is explicit</h3><p>If the current market is unavailable or invalid, the production system records the fallback state rather than pretending fresh market information existed.</p></article></section>
+    <details className="co-method-tech"><summary>Technical details</summary><div><h3>Frozen production probability architecture</h3><p><code>logit(P_home) = -0.06954 + 1.19391 × logit(P_market) − 0.19343 × logit(P_nested_football)</code></p><p>The production artifact is versioned as <code>F-ST-01-FROZEN-2026</code>. The architecture name is provenance metadata, not consumer-facing model branding.</p><h3>Probability-to-margin bridge</h3><p><code>presentation_margin = margin_sigma × Φ⁻¹(P_home)</code></p><p>This bridge enforces directional and probabilistic coherence for the displayed probability-implied line without rewriting the separately trained independent margin model. The pre-registered Phase 3B audit did not qualify the bridge as a predictive expected-margin model.</p></div></details>
     {models.length>0&&<details className="co-method-tech"><summary>Historical validation table</summary><div className="co-table-wrap"><table><thead><tr><th>Model</th><th>Games</th><th>Winner%</th><th>Brier</th><th>Log loss</th><th>Margin MAE</th></tr></thead><tbody>{models.map((row,index)=><tr key={`${row.model}-${index}`}><td>{row.model==='Final Ensemble'?'LevLine':row.model}</td><td>{row.games||'—'}</td><td>{row.winner_pct||row.winner_accuracy||'—'}</td><td>{row.brier||row.brier_score||'—'}</td><td>{row.log_loss||'—'}</td><td>{row.margin_mae||'—'}</td></tr>)}</tbody></table></div></details>}
   </main>
 }
@@ -423,22 +425,24 @@ function diagnosticMap(current,history) {
 export default function App() {
   const [tab,setTab]=useState('week')
   const [forecastPayload,setForecastPayload]=useState({games:[]})
+  const [impactMonitor,setImpactMonitor]=useState({games:[]})
   const [runs,setRuns]=useState([]), [evidence,setEvidence]=useState({}), [previews,setPreviews]=useState({}), [status,setStatus]=useState({})
   const [ratings,setRatings]=useState([]), [models,setModels]=useState([]), [history,setHistory]=useState([]), [profiles,setProfiles]=useState([]), [autopsies,setAutopsies]=useState({}), [editorial,setEditorial]=useState({teams:[]}), [currentRaw,setCurrentRaw]=useState([])
   const [selected,setSelected]=useState(null), [error,setError]=useState('')
 
   useEffect(()=>{;(async()=>{try{
-    const [publicForecasts,runRows,context,previewRows,statusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows]=await Promise.all([
-      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchJSON('contextual_evidence.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),
+    const [publicForecasts,runRows,context,previewRows,statusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows,impactRows]=await Promise.all([
+      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchJSON('contextual_evidence.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),fetchJSON('impact_monitor.json',{games:[]}),
     ])
     if (!Array.isArray(publicForecasts.games) || !publicForecasts.games.length) throw new Error('Canonical public forecast contract is unavailable.')
-    setForecastPayload(publicForecasts);setRuns(runRows);setEvidence(context);setPreviews(previewRows);setStatus(statusRows);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
+    setForecastPayload(publicForecasts);setImpactMonitor(impactRows);setRuns(runRows);setEvidence(context);setPreviews(previewRows);setStatus(statusRows);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
   }catch(err){setError(String(err?.message||err))}})()},[])
 
   const games=forecastPayload.games||[]
   const week=Number(games[0]?.week||0)
   const diagnostics=useMemo(()=>diagnosticMap(currentRaw,history),[currentRaw,history])
   const navigate=key=>{setSelected(null);setTab(key);window.scrollTo({top:0,behavior:'smooth'})}
+  const selectedMonitor=selected ? (impactMonitor?.games||[]).find(row=>row.game_id===selected.game_id) : null
 
   if (error) return <div className="co-fatal"><b>Sunday Signal could not publish this slate.</b><span>{error}</span><small>The public forecast contract fails closed rather than showing contradictory or post-lock values.</small></div>
   return <div className="co-app">
@@ -448,7 +452,7 @@ export default function App() {
     {tab==='power'&&<PowerPage ratings={ratings} editorial={editorial}/>} 
     {tab==='history'&&<HistoryPage history={history} autopsies={autopsies}/>} 
     {tab==='method'&&<MethodPage models={models}/>} 
-    {selected&&<GameModal game={selected} runs={runs} evidence={evidence[selected.game_id]||[]} preview={previews[selected.game_id]} diagnostic={diagnostics[selected.game_id]} onClose={()=>setSelected(null)} onMethod={()=>navigate('method')}/>} 
+    {selected&&<GameModal game={selected} runs={runs} evidence={evidence[selected.game_id]||[]} preview={previews[selected.game_id]} diagnostic={diagnostics[selected.game_id]} gameMonitor={selectedMonitor} onClose={()=>setSelected(null)} onMethod={()=>navigate('method')}/>} 
     <footer className="co-footer"><b>SUNDAY SIGNAL</b><span>One LevLine forecast per game · locked before kickoff · graded after</span></footer>
   </div>
 }

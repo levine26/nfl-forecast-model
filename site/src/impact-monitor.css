@@ -1,0 +1,11 @@
+.co-impact-monitor{border-top:1px solid var(--line,#d7dde6)}
+.co-impact-list{display:grid;gap:12px}
+.co-impact-card{padding:14px 16px;border:1px solid var(--line,#d7dde6);border-radius:14px;background:var(--panel,#fff)}
+.co-impact-player{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.co-impact-player b{font-size:1rem}
+.co-impact-player span,.co-impact-card p,.co-impact-note{color:var(--muted,#667085);font-size:.88rem}
+.co-impact-card p{margin:6px 0;line-height:1.45}
+.co-impact-card strong{color:var(--ink,#172033)}
+.co-impact-modeled,.co-impact-observed{padding-top:2px}
+.co-impact-note{margin:12px 0 0}
+@media(max-width:520px){.co-impact-player{align-items:flex-start;flex-direction:column;gap:2px}.co-impact-card{padding:12px}}
