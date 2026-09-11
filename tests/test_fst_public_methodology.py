@@ -46,7 +46,9 @@ def test_methodology_contains_current_frozen_architecture_only_in_technical_cont
     assert "75% PURE + 25% MARKET" not in app
     assert "2026 outcomes" in app
     assert "cannot select, tune or refit" in app
-    assert "fair_margin = margin_sigma × Φ⁻¹(P_home)" in app
+    assert "presentation_margin = margin_sigma × Φ⁻¹(P_home)" in app
+    assert "Probability-implied line" in app
+    assert "not expected margin" in app
 
 
 def test_forecast_movement_has_market_lock_and_context_markers():
