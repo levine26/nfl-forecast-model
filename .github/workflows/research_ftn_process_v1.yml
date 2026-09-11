@@ -1,0 +1,109 @@
+name: LevLine FTN process research v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/ftn_process_prereg_v1.json'
+      - 'research/ftn_process_v1.py'
+      - 'research/run_ftn_process_v1.py'
+      - 'research/test_ftn_process_v1.py'
+      - '.github/workflows/research_ftn_process_v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/ftn_process_prereg_v1.json'
+      - 'research/ftn_process_v1.py'
+      - 'research/run_ftn_process_v1.py'
+      - 'research/test_ftn_process_v1.py'
+      - '.github/workflows/research_ftn_process_v1.yml'
+  workflow_dispatch:
+    inputs:
+      run_historical:
+        description: 'Run the frozen 2022-2025 FTN-PROCESS-01 evaluation'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-ftn-process-v1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Verify frozen preregistration and synthetic leakage controls
+        run: |
+          set -euo pipefail
+          pytest -q research/test_ftn_process_v1.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          prereg = json.loads(Path('research/ftn_process_prereg_v1.json').read_text())
+          assert prereg['experiment_id'] == 'FTN-PROCESS-01'
+          assert prereg['status'] == 'PREREGISTERED_NOT_RUN'
+          assert prereg['implementation_contract_completed_before_results'] is True
+          text = Path('research/run_ftn_process_v1.py').read_text()
+          assert 'SEASONS = (2022, 2023, 2024, 2025)' in text
+          assert 'completed_2026_outcomes_used' in text
+          PY
+
+  historical-evaluation:
+    needs: contract-tests
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_historical)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: ftn-process-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ftn-process-v1-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Run frozen historical FTN-PROCESS-01
+        env:
+          PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          rm -rf research_outputs/ftn_process_v1
+          python research/run_ftn_process_v1.py
+      - name: Verify research-only output contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('research_outputs/ftn_process_v1/report.json').read_text())
+          manifest = json.loads(Path('research_outputs/ftn_process_v1/run_manifest.json').read_text())
+          assert report['experiment_id'] == 'FTN-PROCESS-01'
+          assert report['completed_2026_outcomes_used'] == 0
+          assert report['production_effect'] == 'none'
+          assert manifest['research_only'] is True
+          assert manifest['production_authorized'] is False
+          assert manifest['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ftn-process-v1-${{ github.run_id }}
+          path: research_outputs/ftn_process_v1/
+          retention-days: 90
