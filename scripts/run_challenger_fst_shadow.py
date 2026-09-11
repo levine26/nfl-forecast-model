@@ -16,6 +16,17 @@ from nfl_forecast.challenger_fst import (
     FROZEN_METHOD,
     fit_frozen_2026_stack,
     frozen_stack_probability,
+    prepare_frozen_training_frame,
+)
+from nfl_forecast.fst_provenance import (
+    TRAINING_COLUMNS,
+    capture_fst_pre_fit_provenance,
+    write_fst_fit_provenance,
+)
+from nfl_forecast.fst_reconstruction import (
+    frozen_fit_from_identity,
+    require_fst_reconstruction_runtime,
+    verify_fst_reconstruction_identity,
 )
 from scripts.run_challenger_v08 import SHADOW_BASE_COLUMNS, build_nested_research, build_research_frame
 
@@ -28,6 +39,8 @@ def _load_spec() -> dict:
         raise RuntimeError("Frozen F-ST candidate spec identity mismatch")
     if spec.get("production_promotion_authorized") is not False:
         raise RuntimeError("Frozen F-ST spec must explicitly prohibit production promotion")
+    if not isinstance(spec.get("frozen_identity"), dict):
+        raise RuntimeError("Frozen F-ST spec must include the registered frozen identity")
     return spec
 
 
@@ -38,14 +51,43 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         raise RuntimeError("v0.8 candidate shadow slate must exist before F-ST materialization")
 
     spec = _load_spec()
+    registered = spec["frozen_identity"]
+    runtime_check = require_fst_reconstruction_runtime()
+    authoritative_fit = frozen_fit_from_identity(registered)
+
     cfg, historical, current, feature_sets, _, _ = build_research_frame(config_path)
     seed = int(cfg["model"]["random_state"])
     base_features = feature_sets["production_compatible"]
     base_oof, research = build_nested_research(historical, base_features, seed)
 
-    # Target season 2026 may only train on earlier-season OOF rows. The fitter fails
-    # closed if any 2026-or-later row reaches this boundary.
-    fit = fit_frozen_2026_stack(research)
+    # Persist the exact model inputs before fitting. This is a current prospective
+    # reconstruction of F-ST-01, not the missing original candidate-freeze capture.
+    prepared = prepare_frozen_training_frame(research)
+    training_for_fit = research.loc[prepared.index, list(TRAINING_COLUMNS)].copy()
+    provenance_dir = out / "fst" / "provenance"
+    input_provenance = capture_fst_pre_fit_provenance(
+        historical,
+        base_oof,
+        training_for_fit,
+        provenance_dir,
+        candidate_id=FROZEN_CANDIDATE_ID,
+        capture_context="prospective_shadow_reconstruction",
+    )
+
+    # Refit only to verify the frozen historical identity. Exact candidate/digest/
+    # row/season fields and <=1e-12 coefficient parity are required before any
+    # current-game scoring. The reconstructed coefficients are never used to score.
+    reconstruction_fit = fit_frozen_2026_stack(training_for_fit)
+    fit_provenance = write_fst_fit_provenance(
+        provenance_dir, input_provenance, reconstruction_fit
+    )
+    identity_check = verify_fst_reconstruction_identity(
+        provenance_dir,
+        input_provenance,
+        reconstruction_fit,
+        registered,
+    )
+
     current_pure = fit_future_nested_stack(
         historical,
         base_oof,
@@ -57,9 +99,9 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     preview = frozen_stack_probability(
         current_market,
         current_pure,
-        intercept=fit.intercept,
-        market_logit_coefficient=fit.market_logit_coefficient,
-        pure_logit_coefficient=fit.pure_logit_coefficient,
+        intercept=authoritative_fit.intercept,
+        market_logit_coefficient=authoritative_fit.market_logit_coefficient,
+        pure_logit_coefficient=authoritative_fit.pure_logit_coefficient,
     )
 
     fst = current[SHADOW_BASE_COLUMNS].copy()
@@ -75,13 +117,13 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     fst["challenger_version"] = FROZEN_CANDIDATE_ID
     fst["selected_shadow_candidate"] = True
     fst["training_cutoff"] = "2025"
-    fst["training_games"] = fit.training_games
-    fst["training_first_season"] = fit.training_first_season
-    fst["training_last_season"] = fit.training_last_season
-    fst["training_data_sha256"] = fit.training_data_sha256
-    fst["stack_intercept"] = fit.intercept
-    fst["stack_market_logit_coefficient"] = fit.market_logit_coefficient
-    fst["stack_pure_logit_coefficient"] = fit.pure_logit_coefficient
+    fst["training_games"] = authoritative_fit.training_games
+    fst["training_first_season"] = authoritative_fit.training_first_season
+    fst["training_last_season"] = authoritative_fit.training_last_season
+    fst["training_data_sha256"] = authoritative_fit.training_data_sha256
+    fst["stack_intercept"] = authoritative_fit.intercept
+    fst["stack_market_logit_coefficient"] = authoritative_fit.market_logit_coefficient
+    fst["stack_pure_logit_coefficient"] = authoritative_fit.pure_logit_coefficient
     fst["candidate_freeze_utc"] = spec["freeze_timestamp_utc"]
     fst["candidate_code_sha"] = spec["freeze_implementation_sha"]
 
@@ -95,6 +137,8 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
     if not selected_per_game.eq(1).all():
         raise RuntimeError("Frozen F-ST must be the sole selected research shadow per game")
 
+    reconstruction_dict = reconstruction_fit.as_dict()
+    authoritative_dict = authoritative_fit.as_dict()
     runtime = {
         "candidate_id": FROZEN_CANDIDATE_ID,
         "mode": "research_only_frozen_shadow",
@@ -102,9 +146,29 @@ def run(config_path: str = "config/model.yaml", output_dir: str = "challenger_ou
         "training_cutoff": 2025,
         "2026_outcomes_used_in_fitting": 0,
         "production_promotion_authorized": False,
-        **fit.as_dict(),
+        **authoritative_dict,
+        "scoring_parameter_source": "registered_frozen_identity",
+        "reconstruction_fit": reconstruction_dict,
+        "reconstruction_runtime": runtime_check,
         "freeze_timestamp_utc": spec["freeze_timestamp_utc"],
         "freeze_implementation_sha": spec["freeze_implementation_sha"],
+        "provenance": {
+            "capture_stage": "pre_fit",
+            "capture_context": input_provenance["capture_context"],
+            "inputs_manifest": "fst/provenance/inputs_manifest.json",
+            "fit_manifest": "fst/provenance/fit_manifest.json",
+            "frozen_identity_check": "fst/provenance/frozen_identity_check.json",
+            "frozen_identity_verified": bool(identity_check["matches"]),
+            "frozen_identity_source": identity_check["expected_source"],
+            "numeric_abs_tolerance": identity_check["refit_abs_tolerance"],
+            "numeric_absolute_deltas": identity_check["numerical_absolute_deltas"],
+            "base_oof_raw_sha256": input_provenance["base_oof"]["raw_sha256"],
+            "training_frame_raw_sha256": input_provenance["training_frame"]["raw_sha256"],
+            "training_frame_canonical_game_keyed_sha256": input_provenance["training_frame"][
+                "canonical_game_keyed_sha256"
+            ],
+            "inputs_manifest_sha256": fit_provenance["inputs_manifest_sha256"],
+        },
     }
 
     slate.to_csv(slate_path, index=False)
