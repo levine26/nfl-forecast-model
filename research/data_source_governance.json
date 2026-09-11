@@ -103,6 +103,22 @@
       "documentation": ["https://docs.kalshi.com/"]
     },
     {
+      "source_id": "sleeper_historical_player_archive_candidate",
+      "family": "availability",
+      "provider": "edgecdec/declan-fantasy-football public GitHub snapshot archive",
+      "intended_role": ["2026_point_in_time_player_state", "prospective_availability_shadow_research"],
+      "current_levline_use": true,
+      "technical_status": "verified_2026_only",
+      "identity_status": "all-position audit requires >=99.5% unambiguous identity resolution",
+      "point_in_time_status": "Git commit time is a conservative persistence bound and must not exceed the simulated decision timestamp",
+      "coverage_note": "Snapshot history begins 2026-02-01; no 2025 reconstruction is supported.",
+      "rights_status": "metadata_only: repository/API rights metadata retained separately from technical qualification",
+      "rights_qualification_blocker": false,
+      "zero_cost_eligible": true,
+      "production_eligibility": "not_authorized_2026_shadow_research_only",
+      "documentation": ["https://github.com/edgecdec/declan-fantasy-football", "https://docs.sleeper.com/"]
+    },
+    {
       "source_id": "nfl_official_injury_reports",
       "family": "availability",
       "provider": "NFL.com",
@@ -192,7 +208,8 @@
     "current_nflverse_market_role": "opaque_upstream_benchmark",
     "polymarket_role": "separate_research_candidate",
     "kalshi_role": "separate_research_candidate_pending_data_integrity_audit",
-    "recommended_first_availability_audit": "sportradar_weekly_injuries_v7",
+    "recommended_first_availability_audit": "sleeper_historical_player_archive_candidate",
+    "availability_scope_note": "Sleeper archive is 2026-only; no zero-cost source currently qualifies a 2022-2025 availability backtest.",
     "pff_active_research_status": "excluded_by_zero_cost_policy",
     "rights_qualification_blocker": false,
     "player_availability_probability_feature_authorized": false,
