@@ -1,0 +1,52 @@
+{
+  "archive_id": "NFL-INJURY-SNAPSHOT-2026-V1",
+  "status": "PROSPECTIVE_CAPTURE_ONLY",
+  "season": 2026,
+  "source": "NFL.com official injury report",
+  "source_url_pattern": "https://www.nfl.com/injuries/league/{season}/reg{week}",
+  "purpose": [
+    "preserve point-in-time practice participation and game-status revisions",
+    "support future leakage-safe availability research",
+    "support explanation-only personnel change timelines"
+  ],
+  "capture_policy": {
+    "cadence": "every_3_hours_all_week_during_regular_season",
+    "reason_for_all_week_capture": "Monday-night status revisions and Monday/Tuesday reporting for Thursday games must not be missed",
+    "week_identity_source": "outputs/this_week.csv season+week columns only",
+    "observation_log": "append_only_jsonl",
+    "raw_source_storage": "content_addressed_original_http_body_gzip",
+    "snapshot_storage": "content_addressed_canonical_json_gzip",
+    "unchanged_poll_behavior": "append observation referencing existing raw and canonical objects",
+    "failed_poll_behavior": "append failed observation; preserve raw source bytes when HTTP retrieval succeeded even if parsing failed"
+  },
+  "integrity": {
+    "raw_http_body_sha256": true,
+    "raw_http_body_preserved": true,
+    "canonical_snapshot_sha256": true,
+    "deterministic_gzip_mtime": 0,
+    "duplicate_observation_identity": "fail_closed",
+    "raw_object_hash_verification": "required_when_raw_source_exists",
+    "canonical_object_hash_verification": "required_for_captured_observations"
+  },
+  "identity_policy": {
+    "archived_fields": [
+      "team",
+      "name",
+      "position",
+      "injuries",
+      "practice_status",
+      "game_status"
+    ],
+    "stable_player_id_inferred": false,
+    "future_crosswalk_policy": "only separately audited unambiguous stable-ID crosswalks may be attached"
+  },
+  "research_firewall": {
+    "completed_2026_outcomes_used": 0,
+    "probability_feature_authorized": false,
+    "production_authorized": false,
+    "production_model_import": false,
+    "production_forecast_dependency": false,
+    "historical_2025_backfill_claimed": false
+  },
+  "historical_availability_note": "This archive starts prospectively in 2026 and does not unblock the missing revision-aware 2025 history required for the preregistered V09B retrospective model."
+}
