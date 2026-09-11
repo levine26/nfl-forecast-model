@@ -1,7 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
+from research.market_capture_contract_v2 import (
+    LEDGER_IDENTITY_COLUMNS,
+    MIN_CONSENSUS_BOOKS,
+    QUALIFYING_CLOSE_ROW_TYPE,
+    attempt_identity,
+)
 from research.market_capture_v2 import (
     american_implied,
     consensus_row,
@@ -93,3 +99,25 @@ def test_consensus_retains_source_count_and_market_dispersion() -> None:
     assert consensus["probability_range"] > 0
     assert consensus["home_spread"] == -3.0
     assert consensus["total_points"] == 44.5
+    assert QUALIFYING_CLOSE_ROW_TYPE == "consensus"
+    assert MIN_CONSENSUS_BOOKS == 2
+
+
+def test_retry_attempts_have_distinct_append_only_identity() -> None:
+    first_time = datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
+    second_time = first_time + timedelta(minutes=5)
+    first = normalize_bookmaker(
+        event=_event(), bookmaker=_book("book-a", -150, 130, -3.0, 44.5),
+        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
+        horizon="T-120m", target_timestamp_utc=first_time,
+        request_timestamp_utc=first_time, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
+    )
+    second = normalize_bookmaker(
+        event=_event(), bookmaker=_book("book-a", -160, 140, -3.5, 45.0),
+        game_id="2026_01_CAR_CHI", home_team="CHI", away_team="CAR",
+        horizon="T-120m", target_timestamp_utc=first_time,
+        request_timestamp_utc=second_time, kickoff_timestamp_utc=datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc),
+    )
+    assert first is not None and second is not None
+    assert "request_timestamp_utc" in LEDGER_IDENTITY_COLUMNS
+    assert attempt_identity(first) != attempt_identity(second)
