@@ -19,6 +19,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/challenger_v09.py",
         "src/nfl_forecast/player_state_research.py",
         "src/nfl_forecast/player_impact_engine.py",
+        "src/nfl_forecast/player_impact_monitor.py",
         "src/nfl_forecast/availability_qualification.py",
         "scripts/run_challenger_v09.py",
         "scripts/build_expected_lineup_impacts.py",
@@ -29,9 +30,11 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "challenger_outputs/v09_report.json",
         "tests/test_challenger_evaluation.py",
         "tests/test_player_impact_engine.py",
+        "tests/test_player_impact_monitor.py",
         "tests/test_availability_qualification.py",
         ".github/workflows/research_firewall.yml",
         "docs/LEVLINE_RESEARCH.md",
+        "docs/IMPACT_MONITOR_GAP_ANALYSIS.md",
     ]
     assert all(path_allowed(path) for path in allowed)
     assert validate_changed_paths(allowed) == []
@@ -43,6 +46,7 @@ def test_research_allowlist_rejects_production_surfaces():
         "src/nfl_forecast/models.py",
         "src/nfl_forecast/features.py",
         "src/nfl_forecast/data.py",
+        "src/nfl_forecast/unregistered_player_research.py",
         "scripts/run_week.py",
         "outputs/this_week.csv",
         "outputs/prediction_history.csv",
@@ -67,6 +71,7 @@ def test_production_prediction_path_does_not_import_research_modules():
         "player_state_research",
         "player_impact_cards",
         "player_impact_engine",
+        "player_impact_monitor",
         "availability_qualification",
     )
     for filename in protected:
