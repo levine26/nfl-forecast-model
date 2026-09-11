@@ -1,0 +1,138 @@
+name: LevLine research injury snapshot archive v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/injury_snapshot_archive_contract_v1.json'
+      - 'research/injury_snapshot_archive_v1.py'
+      - 'research/run_injury_snapshot_archive_v1.py'
+      - 'research/test_injury_snapshot_archive_v1.py'
+      - '.github/workflows/research_injury_snapshot_archive_v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/injury_snapshot_archive_contract_v1.json'
+      - 'research/injury_snapshot_archive_v1.py'
+      - 'research/run_injury_snapshot_archive_v1.py'
+      - 'research/test_injury_snapshot_archive_v1.py'
+      - '.github/workflows/research_injury_snapshot_archive_v1.yml'
+  workflow_dispatch:
+    inputs:
+      season:
+        description: 'Optional explicit season (v1 only accepts 2026)'
+        required: false
+        type: string
+      week:
+        description: 'Optional explicit regular-season week (must be paired with season)'
+        required: false
+        type: string
+  schedule:
+    - cron: '17 */3 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-research-injury-snapshot-archive-v1
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate content addressing, raw-source preservation, chronology and fail-closed semantics
+        run: pytest -q research/test_injury_snapshot_archive_v1.py
+      - name: Verify frozen research-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/injury_snapshot_archive_contract_v1.json').read_text())
+          assert contract['archive_id'] == 'NFL-INJURY-SNAPSHOT-2026-V1'
+          assert contract['season'] == 2026
+          assert contract['capture_policy']['cadence'] == 'every_3_hours_all_week_during_regular_season'
+          assert contract['integrity']['raw_http_body_preserved'] is True
+          assert contract['research_firewall']['completed_2026_outcomes_used'] == 0
+          assert contract['research_firewall']['probability_feature_authorized'] is False
+          assert contract['research_firewall']['production_authorized'] is False
+          assert contract['research_firewall']['historical_2025_backfill_claimed'] is False
+          PY
+
+  capture:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore append-only archive from research data branch
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/injury-snapshots-v1:refs/remotes/origin/research-data/injury-snapshots-v1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/injury-snapshots-v1; then
+            if git ls-tree -d --name-only origin/research-data/injury-snapshots-v1 research_outputs/injury_snapshot_archive_v1 | grep -q '^research_outputs/injury_snapshot_archive_v1$'; then
+              git archive origin/research-data/injury-snapshots-v1 research_outputs/injury_snapshot_archive_v1 | tar -xf -
+            fi
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Capture current official injury report snapshot
+        id: capture
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          args=()
+          if [ -n "${{ inputs.season || '' }}" ] || [ -n "${{ inputs.week || '' }}" ]; then
+            test -n "${{ inputs.season || '' }}"
+            test -n "${{ inputs.week || '' }}"
+            args+=(--season "${{ inputs.season }}" --week "${{ inputs.week }}")
+          fi
+          PYTHONPATH="$PWD/src:$PWD" python -m research.run_injury_snapshot_archive_v1 "${args[@]}"
+      - name: Persist archive away from main
+        if: always()
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/injury_snapshot_archive_v1
+          if [ ! -s "$DATA_DIR/observations.jsonl" ]; then
+            echo 'No injury archive observations to persist.'
+            exit 0
+          fi
+          rm -rf /tmp/injury_snapshot_archive_v1
+          cp -R "$DATA_DIR" /tmp/injury_snapshot_archive_v1
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/injury-snapshots-v1; then
+            git checkout -B injury-snapshots-v1-data origin/research-data/injury-snapshots-v1
+          else
+            git checkout -B injury-snapshots-v1-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/injury_snapshot_archive_v1
+          cp -R /tmp/injury_snapshot_archive_v1 research_outputs/injury_snapshot_archive_v1
+          git add research_outputs/injury_snapshot_archive_v1/
+          if git diff --cached --quiet; then
+            echo 'Injury archive unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture official injury report snapshot'
+          git push origin HEAD:research-data/injury-snapshots-v1
+      - name: Surface capture failure after preserving evidence
+        if: always()
+        run: |
+          if [ "${{ steps.capture.outcome }}" != 'success' ]; then
+            echo 'Official injury snapshot capture failed; evidence was preserved.' >&2
+            exit 1
+          fi
