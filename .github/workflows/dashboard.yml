@@ -83,6 +83,17 @@ jobs:
       - name: Build dashboard
         working-directory: site
         run: npm run build
+      - name: Enforce frontend performance budget
+        working-directory: site
+        run: node scripts/check-performance-budget.mjs
+      - name: Install Chromium for browser QA
+        if: github.event_name == 'pull_request'
+        working-directory: site
+        run: npx playwright install --with-deps chromium
+      - name: Run responsive, routing and lazy-loading browser tests
+        if: github.event_name == 'pull_request'
+        working-directory: site
+        run: npm run test:responsive
       - name: Upload build artifact
         if: (github.ref == 'refs/heads/main' || github.event_name == 'workflow_run') && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
