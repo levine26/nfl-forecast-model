@@ -1,0 +1,128 @@
+name: LevLine research weather capture v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/weather_capture_contract_v1.json'
+      - 'research/weather_capture_v1.py'
+      - 'research/test_weather_capture_v1.py'
+      - 'research/run_weather_capture_v1.py'
+      - 'research/weather_due_v1.py'
+      - 'research/venue_resolution_v1.py'
+      - '.github/workflows/research_weather_capture_v1.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Validate point-in-time weather normalization
+        run: python -m pytest -q research/test_weather_capture_v1.py research/test_weather_capture_contract_v1.py
+
+  capture:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-research-weather-capture-v1
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cheap local weather horizon gate
+        id: gate
+        run: |
+          RESULT=$(python -m research.weather_due_v1)
+          echo "$RESULT"
+          if echo "$RESULT" | grep -q '^due=true'; then
+            echo 'due=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'due=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore qualified game venue receipts
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/venues:refs/remotes/origin/research-data/venues || true
+          mkdir -p research_outputs/venues
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/venues; then
+            git show origin/research-data/venues:research_outputs/venues/game_venues_2026.json \
+              > research_outputs/venues/game_venues_2026.json 2>/dev/null || true
+          fi
+
+      - name: Restore append-only weather ledger
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/weather:refs/remotes/origin/research-data/weather || true
+          mkdir -p research_outputs/weather
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/weather; then
+            git show origin/research-data/weather:research_outputs/weather/weather_snapshots.jsonl \
+              > research_outputs/weather/weather_snapshots.jsonl 2>/dev/null || true
+            git show origin/research-data/weather:research_outputs/weather/status.json \
+              > research_outputs/weather/status.json 2>/dev/null || true
+          fi
+
+      - uses: actions/setup-python@v5
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install free source clients
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: python -m pip install 'nflreadpy==0.1.5' 'requests>=2.32'
+
+      - name: Capture NWS forecast snapshots for due horizons
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: >-
+          python -m research.run_weather_capture_v1
+          --season 2026
+          --venues research_outputs/venues/game_venues_2026.json
+          --ledger research_outputs/weather/weather_snapshots.jsonl
+          --status research_outputs/weather/status.json
+
+      - name: Persist weather ledger away from main
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          if [ ! -s research_outputs/weather/status.json ]; then
+            echo 'No weather status produced.'
+            exit 1
+          fi
+          rm -rf /tmp/levline-weather
+          cp -R research_outputs/weather /tmp/levline-weather
+          rm -rf research_outputs/weather
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/weather; then
+            git checkout -B weather-data origin/research-data/weather
+          else
+            git checkout -B weather-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/weather
+          cp -R /tmp/levline-weather research_outputs/weather
+          git add research_outputs/weather/
+          if git diff --cached --quiet; then
+            echo 'Weather ledger unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture point-in-time LevLine weather research'
+          git push origin HEAD:research-data/weather

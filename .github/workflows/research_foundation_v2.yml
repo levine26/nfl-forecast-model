@@ -1,0 +1,47 @@
+name: LevLine research foundation v2
+
+on:
+  pull_request:
+    paths:
+      - 'research/source_qualification_registry_v2.json'
+      - 'research/source_qualification_effective_v2.py'
+      - 'research/test_source_qualification_effective_v2.py'
+      - 'research/sleeper_archive_qualification_v1.json'
+      - 'research/sleeper_archive_audit_v1.py'
+      - 'research/sleeper_archive_capture_v1.py'
+      - 'research/run_sleeper_archive_capture_v1.py'
+      - 'research/test_sleeper_archive_audit_v1.py'
+      - 'research/test_sleeper_archive_capture_v1.py'
+      - 'research/test_source_qualification_registry_v2.py'
+      - 'research/point_in_time_store.py'
+      - 'research/test_point_in_time_store.py'
+      - 'research/ftn_process_prereg_v1.json'
+      - 'research/test_ftn_process_prereg_v1.py'
+      - 'research/weather_capture_contract_v1.json'
+      - 'research/test_weather_capture_contract_v1.py'
+      - '.github/workflows/research_foundation_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install test runner
+        run: python -m pip install pytest
+      - name: Validate source qualification, snapshot integrity and preregistration
+        run: >-
+          python -m pytest -q
+          research/test_source_qualification_registry_v2.py
+          research/test_source_qualification_effective_v2.py
+          research/test_sleeper_archive_audit_v1.py
+          research/test_sleeper_archive_capture_v1.py
+          research/test_point_in_time_store.py
+          research/test_ftn_process_prereg_v1.py
+          research/test_weather_capture_contract_v1.py

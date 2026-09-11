@@ -1,0 +1,97 @@
+{
+  "contract_version": 1,
+  "status": "BLOCKED_PENDING_QUALIFIED_VENUE_RECEIPTS",
+  "production_effect": "none",
+  "cost_policy": "$0 only",
+  "research_question": "Can forecast weather known at a pregame horizon add stable incremental value beyond market-conditioned LevLine baselines?",
+  "prospective_source": {
+    "source_id": "nws_api",
+    "role": "prospective forecast snapshots",
+    "authorized_for_collection": true,
+    "authorized_as_probability_feature": false,
+    "required_horizons": ["T-72h", "T-24h", "T-6h", "T-120m"],
+    "research_only_horizons": ["T-60m", "T-30m"],
+    "required_fields": [
+      "retrieval_timestamp_utc",
+      "provider_updated_timestamp_utc",
+      "provider_generated_timestamp_utc",
+      "forecast_period_start_utc",
+      "forecast_period_end_utc",
+      "temperature_f",
+      "wind_speed_mph_low",
+      "wind_speed_mph_high",
+      "wind_direction",
+      "precipitation_probability_pct",
+      "short_forecast"
+    ],
+    "point_in_time_rule": "Persist the forecast payload as retrieved at the simulated/real decision time. Never replace it with realized weather or a later forecast revision.",
+    "documentation": "https://www.weather.gov/documentation/services-web-api"
+  },
+  "historical_source": {
+    "source_id": "open_meteo_archived_runs",
+    "role": "historical archived forecast research only",
+    "authorized_for_collection": true,
+    "authorized_as_probability_feature": false,
+    "availability_rule": "A model run is eligible only after its documented public availability lag, not merely from model initialization time.",
+    "required_fields": [
+      "model",
+      "run_initialization_utc",
+      "assumed_available_at_utc",
+      "retrieval_or_archive_query_utc",
+      "forecast_valid_time_utc",
+      "temperature_2m",
+      "precipitation_probability",
+      "wind_speed_10m",
+      "wind_gusts_10m"
+    ]
+  },
+  "venue_resolution": {
+    "status": "RESOLVER_IMPLEMENTED_REGISTRY_REQUIRED",
+    "resolver": "research/run_venue_resolution_v1.py",
+    "qualification": "research/venue_source_qualification_v1.json",
+    "registry_path": "research_outputs/venues/game_venues_2026.json on research-data/venues",
+    "reason": "The resolver now uses each nflverse schedule row's own stadium identity and accepts only an exact Wikidata label/alias plus unambiguous P625 coordinate. Weather capture remains blocked for a game until that game has a resolved receipt in the off-main registry.",
+    "required_registry_fields": [
+      "game_id",
+      "gameday",
+      "stadium_name",
+      "schedule_location",
+      "schedule_roof",
+      "schedule_retrieved_at_utc",
+      "wikidata_qid",
+      "wikidata_label",
+      "latitude",
+      "longitude",
+      "wikidata_retrieved_at_utc",
+      "resolution_match_type",
+      "coordinate_rank"
+    ],
+    "neutral_site_policy": "Use only the game-specific schedule stadium receipt. Never infer a neutral-site venue from the designated home team.",
+    "relocation_policy": "The registry is game-specific rather than team-based, so venue changes are represented by that game's actual schedule stadium identity instead of projecting a current home venue across dates.",
+    "resolution_threshold": "exact named schedule venue plus exact Wikidata label/alias and one qualified Earth coordinate",
+    "home_team_centroid_allowed": false,
+    "city_centroid_allowed": false
+  },
+  "candidate_features": {
+    "status": "PREREGISTRATION_REQUIRED_BEFORE_RESULTS",
+    "examples_not_yet_authorized": [
+      "wind_speed",
+      "wind_gust",
+      "precipitation_probability",
+      "temperature",
+      "extreme_heat_or_cold_indicator",
+      "wind_x_precipitation_interaction"
+    ],
+    "indoor_policy": "Roof/indoor state must be modeled explicitly. Weather must not be treated as field exposure when a game is known to be fully enclosed."
+  },
+  "prohibitions": [
+    "No realized same-game weather as a pregame feature.",
+    "No current forecast substituted for a historical forecast revision.",
+    "No home-team or city-centroid coordinate approximation.",
+    "No neutral-site inference from designated home team.",
+    "No fuzzy or ambiguous venue match accepted as a resolved receipt.",
+    "No production feature authorization from source availability alone.",
+    "No completed 2026 game outcomes for weather feature selection or tuning.",
+    "No change to F-ST-01-FROZEN-2026 or the official T-120 lock."
+  ]
+}
