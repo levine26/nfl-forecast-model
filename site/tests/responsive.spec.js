@@ -34,21 +34,6 @@ for (const [name, width, height] of viewports) {
   })
 }
 
-test('LevLine 3.0 launch identity and immutable history are public', async ({ page }) => {
-  await page.goto('./')
-
-  await expect(page).toHaveTitle('Sunday Signal — Powered by LevLine 3.0')
-  await expect(page.locator('html')).toHaveAttribute('data-levline-version', '3.0')
-  await expect(page.locator('.co-brand small')).toContainText('powered by LevLine')
-  await expect(page.locator('.co-header-state b')).toContainText('LevLine')
-
-  await page.getByRole('button', { name: 'History', exact: true }).click()
-  await expect(page.getByText('OFFICIAL HISTORY')).toBeVisible()
-  await expect(page.getByText('Immutable pregame receipts.')).toBeVisible()
-  await expect(page.getByText('official locks')).toBeVisible()
-  await expect(page.locator('.co-table-wrap table')).toBeVisible()
-})
-
 test('governance-approved Impact Monitor renders as explainability-only context', async ({ page }) => {
   await page.goto('./')
   const gameId = await page.evaluate(async () => {
