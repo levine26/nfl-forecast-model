@@ -1,25 +1,25 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_01_NO_DET",
+      "largest_driver": "Market movement",
+      "pick": "DET",
+      "pick_delta_pp": 1.7591444954680902
+    },
+    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material input move",
       "pick": "SEA",
       "pick_delta_pp": -1.260265225511148e-08
     },
     {
-      "game_id": "2026_01_GB_MIN",
+      "game_id": "2026_01_ARI_LAC",
       "largest_driver": "No material input move",
-      "pick": "GB",
-      "pick_delta_pp": 1.4696022176963197e-10
-    },
-    {
-      "game_id": "2026_01_MIA_LV",
-      "largest_driver": "No material input move",
-      "pick": "LV",
-      "pick_delta_pp": -1.34825484110479e-10
+      "pick": "LAC",
+      "pick_delta_pp": 0.0
     }
   ],
-  "generated_utc": "2026-09-11T14:22:06.298692+00:00",
+  "generated_utc": "2026-09-11T19:20:51.879381+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
@@ -28,7 +28,7 @@
       "pick": "KC",
       "pick_prob": 0.6049617039591412,
       "projected_score": "KC 19.7 \u2013 DEN 25.3",
-      "pure_market_gap_pp": 24.523370222481688
+      "pure_market_gap_pp": 24.523370222481695
     },
     {
       "confidence": "Lean",
@@ -37,16 +37,16 @@
       "pick": "LV",
       "pick_prob": 0.63385995281401,
       "projected_score": "LV 20.0 \u2013 MIA 23.5",
-      "pure_market_gap_pp": 23.725225456094932
+      "pure_market_gap_pp": 23.725225456094947
     },
     {
       "confidence": "Solid",
       "game_id": "2026_01_NO_DET",
       "matchup": "NO @ DET",
       "pick": "DET",
-      "pick_prob": 0.7349108158527651,
+      "pick_prob": 0.752502260807446,
       "projected_score": "DET 24.7 \u2013 NO 21.1",
-      "pure_market_gap_pp": 15.942614528074127
+      "pure_market_gap_pp": 17.454525058267055
     }
   ],
   "most_uncertain": [
@@ -54,8 +54,8 @@
       "confidence": "Coin Flip",
       "game_id": "2026_01_GB_MIN",
       "matchup": "GB @ MIN",
-      "pick": "GB",
-      "pick_prob": 0.5056720663853685,
+      "pick": "MIN",
+      "pick_prob": 0.5019722639416836,
       "projected_score": "MIN 23.8 \u2013 GB 19.5"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_01_NO_DET",
       "matchup": "NO @ DET",
       "pick": "DET",
-      "pick_prob": 0.7349108158527651,
+      "pick_prob": 0.752502260807446,
       "projected_score": "DET 24.7 \u2013 NO 21.1"
     }
   ],
