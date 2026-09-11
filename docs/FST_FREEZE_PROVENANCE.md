@@ -82,25 +82,54 @@ per-field results, the coefficient absolute deltas, and the active tolerance,
 then fails closed. The pre-fit and fit manifests therefore remain uploadable
 forensic evidence even when scoring is blocked.
 
-## F-ST-01 recovered numerical runtime
+## F-ST-01 recovered numerical runtime and durable evidence
 
 Forensic workflow run `34538432305` (draft PR `#106`) tested a predeclared
 OpenBLAS CPU-dispatch matrix using the successful freeze-era package versions and
 four threads. Explicit `SKYLAKEX`, and a `NATIVE` runner that auto-selected the
-same SkylakeX kernels, reproduced the exact registered canonical training digest.
+same SkylakeX kernels, reproduced the registered canonical training digest.
 Forced non-SkylakeX modes reproduced the previously observed alternate digest
 `329c6477f7b80895056b25773bb65da805c12c1a99c68b6c3e04215771c8fa1f`.
 
-F-ST-01 rematerialization therefore pins Python `3.11.16`, NumPy `2.4.6`, pandas
-`3.0.5`, SciPy `1.17.1`, scikit-learn `1.9.0`, XGBoost `3.2.0`, CatBoost
-`1.2.10`, and the remaining data/runtime package versions recorded in
-`research/fst/F-ST-01-runtime-requirements.txt`. It also sets
-`OPENBLAS_CORETYPE=SKYLAKEX`, `OPENBLAS_NUM_THREADS=4`, and `OMP_NUM_THREADS=4`.
-The emitted fit provenance records and verifies this runtime.
+The compatible forensic artifact is retained as immutable evidence in
+`research/fst/F-ST-01-reconstruction-evidence.json`. It binds the successful
+workflow/artifact identity, recovered input hashes, runtime/package fingerprint,
+registered frozen identity, reconstructed coefficients, and the original
+forensic comparison result. The original forensic script used exact floating
+comparison and therefore reported two coefficient mismatches at machine-epsilon
+scale; the recorded absolute deltas are approximately `2.22e-16` and `2.50e-16`,
+well inside the already-registered `1e-12` reconstruction tolerance. This does
+not widen or reinterpret the frozen tolerance.
 
-This recovered runtime is a reproducibility constraint for the already frozen
-candidate. It is not a hyperparameter search, new model selection, re-freeze, or
-use of 2026 outcomes.
+Routine CI must not force `OPENBLAS_CORETYPE=SKYLAKEX` on arbitrary hosted
+hardware: some current runners cannot execute that instruction path and terminate
+with `SIGILL`. Instead, the frozen identity gate may be satisfied in either of two
+predeclared ways:
+
+1. a fresh reconstruction probe on compatible hardware that reproduces the
+   registered training identity within the frozen tolerance; or
+2. verification of the immutable compatible-hardware forensic evidence against
+   the current frozen specification, including exact evidence/spec hashes,
+   candidate identity, rows/seasons, training digest, runtime fingerprint, input
+   hashes, and coefficient deltas within `1e-12`.
+
+`scripts/verify_fst_reconstruction_evidence.py` produces the second form of
+receipt. The receipt is bound to the current frozen-spec SHA, evidence-file SHA,
+and current workflow commit and declares
+`receipt_scope=durable_forensic_evidence_verification`. A fresh compatible-hardware
+probe declares `receipt_scope=fresh_compatible_runtime_probe`. Unknown scopes,
+stale hashes, identity drift, or tolerance widening fail closed.
+
+After either valid receipt is established, current prospective shadow
+materialization runs on the runner's native CPU and independently rechecks the
+registered training identity. Scoring still uses the exact registered frozen
+coefficient literals. The durable evidence path therefore removes a hosted-runner
+hardware dependency without changing the model, coefficients, training universe,
+probability calculation, or frozen tolerance.
+
+This recovered runtime and evidence are reproducibility constraints for the
+already frozen candidate. They are not a hyperparameter search, new model
+selection, re-freeze, or use of 2026 outcomes.
 
 ## Promotion gate
 
@@ -125,7 +154,9 @@ them.
 `F-ST-01-FROZEN-2026` predates this persistence contract. Its surviving original
 freeze artifacts did not include the complete pre-fit provenance now required for
 future candidates. The forensic recovery above identifies a deterministic
-runtime that reproduces its registered canonical training identity and now
-persists exact keyed reconstruction inputs before fitting. Those later artifacts
-must remain labeled `prospective_shadow_reconstruction`; they do not retroactively
-become original freeze captures.
+compatible runtime that reproduced its registered canonical training identity,
+and the immutable evidence plus fresh-probe alternatives provide a fail-closed
+way to verify that identity without requiring unsupported CPU instructions on
+every current runner. Later reconstruction artifacts must remain labeled
+`prospective_shadow_reconstruction`; they do not retroactively become original
+freeze captures.
