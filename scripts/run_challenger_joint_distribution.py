@@ -6,7 +6,6 @@ import argparse
 import json
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from nfl_forecast.challenger_evaluation import paired_bootstrap
@@ -40,6 +39,26 @@ def _bootstrap_dict(result) -> dict:
         "probability_better": float(result.probability_better),
         "samples": int(result.samples),
     }
+
+
+def _continuous(
+    predictions: pd.DataFrame,
+    candidate: str,
+    reference: str,
+    metric: str,
+    samples: int,
+    seed: int,
+) -> dict:
+    return result_dict(
+        blocked_continuous_bootstrap(
+            predictions,
+            candidate,
+            reference,
+            metric=metric,
+            samples=samples,
+            seed=seed,
+        )
+    )
 
 
 def run(
@@ -91,7 +110,7 @@ def run(
     summary = summarize_joint_distribution(predictions)
 
     probability_uncertainty = []
-    for metric in ("brier", "log_loss", "accuracy"):
+    for offset, metric in enumerate(("brier", "log_loss", "accuracy")):
         probability_uncertainty.append(
             _bootstrap_dict(
                 paired_bootstrap(
@@ -102,53 +121,28 @@ def run(
                     target_col="home_win",
                     block_cols=("season", "week"),
                     samples=bootstrap_samples,
-                    seed=303,
+                    seed=303 + offset,
                 )
             )
         )
 
     continuous_uncertainty = [
-        result_dict(
-            blocked_continuous_bootstrap(
-                predictions,
-                "candidate_margin_abs_error",
-                "market_margin_abs_error",
-                metric="margin_mae",
-                samples=bootstrap_samples,
-                seed=304,
-            )
-        ),
-        result_dict(
-            blocked_continuous_bootstrap(
-                predictions,
-                "candidate_total_abs_error",
-                "market_total_abs_error",
-                metric="total_mae",
-                samples=bootstrap_samples,
-                seed=305,
-            )
-        ),
-        result_dict(
-            blocked_continuous_bootstrap(
-                predictions,
-                "candidate_margin_crps",
-                "market_margin_crps",
-                metric="margin_crps",
-                samples=bootstrap_samples,
-                seed=306,
-            )
-        ),
-        result_dict(
-            blocked_continuous_bootstrap(
-                predictions,
-                "candidate_total_crps",
-                "market_total_crps",
-                metric="total_crps",
-                samples=bootstrap_samples,
-                seed=307,
-            )
-        ),
+        _continuous(predictions, "candidate_margin_abs_error", "market_margin_abs_error", "margin_mae", bootstrap_samples, 310),
+        _continuous(predictions, "candidate_total_abs_error", "market_total_abs_error", "total_mae", bootstrap_samples, 311),
+        _continuous(predictions, "candidate_margin_crps", "market_margin_crps", "margin_crps", bootstrap_samples, 312),
+        _continuous(predictions, "candidate_total_crps", "market_total_crps", "total_crps", bootstrap_samples, 313),
+        _continuous(predictions, "candidate_joint_nll", "market_joint_nll", "joint_nll", bootstrap_samples, 314),
     ]
+    if {
+        "candidate_home_score_abs_error", "market_home_score_abs_error",
+        "candidate_away_score_abs_error", "market_away_score_abs_error",
+    }.issubset(predictions.columns):
+        continuous_uncertainty.extend(
+            [
+                _continuous(predictions, "candidate_home_score_abs_error", "market_home_score_abs_error", "home_score_mae", bootstrap_samples, 315),
+                _continuous(predictions, "candidate_away_score_abs_error", "market_away_score_abs_error", "away_score_mae", bootstrap_samples, 316),
+            ]
+        )
 
     brier = next(x for x in probability_uncertainty if x["metric"] == "brier")
     logloss = next(x for x in probability_uncertainty if x["metric"] == "log_loss")
