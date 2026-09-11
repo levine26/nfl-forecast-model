@@ -7,7 +7,8 @@ from pathlib import Path
 import pandas as pd
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "build_copilot_media_prompt.py"
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "scripts" / "build_copilot_media_prompt.py"
 spec = importlib.util.spec_from_file_location("build_groq_media_prompt", SCRIPT)
 assert spec and spec.loader
 module = importlib.util.module_from_spec(spec)
@@ -87,3 +88,13 @@ def test_groq_packet_contains_pick_and_context_but_no_model_numerics():
     assert "0.316" not in serialized
     assert "0.572" not in serialized
     assert "-5.5" not in serialized
+
+
+def test_groq_rationale_prompt_matches_validator_model_term_rule():
+    single = (ROOT / "scripts" / "build_single_game_copilot_prompt.py").read_text(encoding="utf-8")
+    slate = (ROOT / "scripts" / "build_copilot_media_prompt.py").read_text(encoding="utf-8")
+    validator = (ROOT / "scripts" / "validate_single_copilot_game.py").read_text(encoding="utf-8")
+
+    assert "Do NOT use the word LevLine in this field." in single
+    assert "Do NOT use the word LevLine in this field." in slate
+    assert r"\blevline\b" in validator
