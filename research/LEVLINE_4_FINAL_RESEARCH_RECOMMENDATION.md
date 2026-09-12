@@ -1,228 +1,229 @@
-# LevLine 4.0 — Final Research Recommendation
+# LevLine 4.0 — Accuracy-Primary Architecture Recommendation
 
-Status: **architecture conclusion / research-only / no production promotion authorization**  
+Status: **research-only / no production promotion authorization**  
 Date: **2026-09-12**
 
-This document is a synthesis, not a rewrite of the preregistration. The frozen production model `F-ST-01-FROZEN-2026` remains unchanged. No completed 2026 outcome was used to invent, tune, rescue, or select a LevLine 4 candidate in reaching this architecture conclusion.
+This document supersedes the earlier proper-score-first architecture conclusion for the LevLine 4 research program. It does **not** rewrite historical preregistrations or authorize any production change. The frozen production model `F-ST-01-FROZEN-2026` remains immutable. No completed 2026 outcome was used to invent, tune, rescue, or select the architecture below.
 
-## 1. Final conclusion
+## 1. Objective and selection rule
 
-LevLine 4 should **not** be a larger football-first model.
+LevLine 4's primary objective is **sustainable out-of-sample straight-up NFL winner accuracy**.
 
-The highest-evidence architecture is a point-in-time market-first forecasting system whose principal research question is **when the NFL market is most informative**, followed by narrowly gated tests of whether LevLine adds residual information that the same-horizon market has not already incorporated.
+Training may use smooth classification-calibrated objectives, regularization, Bayesian shrinkage, chronological fitting, and probability-oriented losses. Final winner-model selection, however, is driven primarily by paired winner accuracy and the quality of the model's decision-changing switches.
 
-The recommended probability path is:
+Brier score, log loss, calibration, margin accuracy, and probability coherence remain important diagnostics and guardrails. They are not the primary winner-selection criterion. Grossly incoherent or catastrophically overconfident probabilities remain unacceptable.
 
-`strict-PIT multi-book market consensus at horizon h`
+The architecture should separate:
 
-then, **only when prospectively additive**,
-
-`+ sparse same-horizon residual information`
-
-then, **only when independently justified**,
-
-`+ conservative calibration`.
-
-The raw market is allowed to remain the final probability if no proprietary transform beats it on proper scoring rules. LevLine should prefer an honest strong benchmark to a branded degradation.
-
-The architecture question is therefore sufficiently resolved. What is **not** resolved is the empirical promotion question: no T-120/T-60/T-45/T-30 winner may be declared before the prospective gate and family-level inference are satisfied.
+- a **pick layer**, selected primarily for winner correctness; and
+- a **confidence layer**, selected for probability quality while preserving the pick unless a separately registered winner candidate authorizes a side change.
 
 ## 2. Production remains frozen
 
-`F-ST-01-FROZEN-2026` remains the immutable production/accountability forecast at T-120. Its coefficients, training digest, historical locks, Sunday Signal behavior, grading, and rollback boundary are not modified by LevLine 4 research.
+`F-ST-01-FROZEN-2026` remains the immutable T-120 production/accountability forecast. LevLine 4 remains shadow research unless explicit later promotion is authorized.
 
-LevLine 4 operates as a shadow program. It may grade completed games but may not rewrite official historical locks or silently replace production.
+Research code may not alter production coefficients, imports, runtime configuration, prediction locks, Sunday Signal behavior, grading, rollback boundaries, or production workflows.
 
-## 3. The canonical horizon experiment
+## 3. Empirical starting point
 
-The primary timing family is:
+On the common 2022–2025 historical sample of 1,087 games:
 
-- raw market T-120;
-- raw market T-60;
-- raw market T-45;
-- raw market T-30.
+- raw market: 735/1,087 = 67.62%;
+- chronology-clean aggregate F-ST architecture: 741/1,087 = 68.17%;
+- component-resolved L2 stack using market logit plus `logistic`, `extra_trees`, `xgboost`, and `catboost` logits: 744/1,087 = 68.45%.
 
-All four must use the **same market-construction definition** for the primary timing comparison. This isolates the value of waiting from the value of changing the model.
+The component-resolved stack beat aggregate F-ST only 10–7 on 17 disagreement games. Its week-block uncertainty interval includes no advantage, so 68.45% is a promising point estimate rather than established superiority.
 
-### Strict information-set rule
+The architectural finding is stronger than the statistical superiority claim: **component resolution should be preserved through the winner-decision layer.** Collapsing football information into a single PURE value discards useful disagreement structure.
 
-A nominal T-X forecast is an information cutoff, not a symmetric timing window.
+## 4. The decisive historical constraint: useful football overrides are boundary-local
 
-A qualified observation may be captured at or before the T-X cutoff within the preregistered early tolerance. An observation captured after the cutoff is later information and is ineligible for the nominal horizon even if it is only seconds late.
+The historical proprietary edge over the raw market is concentrated near the winner decision boundary.
 
-Accordingly:
+The component-resolved stack's strongest market favorite override was only about 55.1%. It did not discover a general ability to fade clear favorites.
 
-- valid timing error is `[-7.5, 0]` minutes;
-- positive timing error is excluded from canonical grading;
-- missing timing provenance fails closed;
-- a missed horizon remains missing;
-- T-30 cannot backfill T-45;
-- closing prices cannot reconstruct T-60/T-45/T-30;
-- later inactive states cannot reconstruct earlier player state;
-- post-kickoff information is prohibited.
+Generic contrarian rules fail:
 
-Actual request timestamp and timing error remain part of provenance. The horizon label should therefore be interpreted as an **as-of cutoff** with exact timing retained, not as a claim that every request occurred at the identical second.
+- old production-like `75% PURE / 25% market` switched away from the market 131 times and lost those switches 56–75;
+- all four football components unanimously opposing the market went 38–58 on those upset switches;
+- adding strong preseason reputation to the favorite did not rescue the rule.
 
-### Primary sample
+Therefore LevLine 4 must **not** be another universal football/market blend and must **not** use football unanimity, reputation, or team identity as a standalone upset trigger.
 
-The canonical timing comparison uses the complete-case intersection of games having strict-PIT valid forecasts at all four horizons. Larger pairwise samples are sensitivity analyses only.
+## 5. Recommended architecture: incumbent + two conditional gates
 
-Capture completeness is reported separately so an apparently strong complete-case result cannot hide selective data loss. No imputation is permitted.
+The strongest defensible architecture is an incumbent-preserving two-regime winner system.
 
-## 4. Horizon selection rule
+### 5.1 Incumbent winner
 
-The minimum 200-game / 14-NFL-week gate is **eligibility for formal inference**, not permission to choose the lowest observed Brier score.
+Begin with the strongest qualified incumbent winner, anchored to frozen T-120 F-ST for production-accountability comparisons.
 
-The four raw market horizons are one forecast-comparison family. The frozen inference contract requires:
+### 5.2 Boundary Gate
 
-- Brier score as the primary loss;
-- 95% Model Confidence Set logic across T-120/T-60/T-45/T-30;
-- 10,000 week-block bootstrap draws preserving within-week dependence;
-- log loss and calibration as corroboration;
-- leave-one-week-out stability diagnostics;
-- explicit capture-completeness/source-integrity review.
+The Boundary Gate handles games where the market is near the decision boundary and the cost of a small probability error can change the winner pick.
 
-A later horizon may replace T-120 only if T-120 is excluded from the 95% confidence set, a later horizon survives, the paired Brier improvement versus T-120 has a week-block 95% upper bound below zero, and the secondary diagnostics do not materially contradict the conclusion.
+This is currently the **only gate with affirmative historical evidence of useful side changes**.
 
-If multiple later horizons remain statistically indistinguishable, select the **earliest surviving later horizon** that meets all product/integrity requirements. This maximizes retry, validation, and publication margin without pretending the data distinguish T-60 from T-45 or T-30 when they do not.
+Candidate inputs should remain compact and theory-driven:
 
-T-45 remains an operationally attractive hypothesis because it follows the game-day inactive information event while retaining more operational buffer than T-30. It is **not** a selected statistical winner.
+- contemporaneous market logit;
+- each qualified football component probability/logit;
+- component vote count and sign agreement;
+- mean football residual versus market;
+- component dispersion/variance;
+- maximum component residual;
+- later strict-PIT market/player information only after those feature families are prospectively qualified.
 
-## 5. Market construction
+Preferred model classes are sparse/L2 logistic gates, Bayesian shrinkage gates, monotonic/GAM variants, or similarly regularized classifiers. Avoid brute-force zero-one threshold mining and unconstrained trees on the small NFL sample.
 
-The current baseline is robust multi-book consensus with book-level provenance and median aggregation in logit space.
+The historical 68.45% component-resolved stack is a leading Boundary Gate candidate, not a production promotion.
 
-The de-vig family is frozen separately as:
+### 5.3 Selective Upset Gate
 
-- `L4-MKT-DEVIG-PROP-V1` — proportional normalization;
-- `L4-MKT-DEVIG-SHIN2-V1` — two-outcome Shin/additive equivalent;
-- `L4-MKT-DEVIG-POWER-V1` — power transform.
+The Upset Gate handles clear market favorites. Its default action is **preserve the incumbent**.
 
-A key final finding is that for a **two-outcome** NFL moneyline, Shin is algebraically equivalent to additive margin removal. It is therefore not an independent insider-information model in this setting and its fitted parameter must not be interpreted as a measurement of hidden player news or “smart money.”
+A stronger favorite requires stronger independent evidence before an override. The conceptual evidence burden should rise with market log-odds, for example monotonically with `abs(logit(P_market))`, rather than by mining arbitrary favorite bins.
 
-De-vig and consensus choices are a separate candidate family from horizon selection. No method is assumed superior from cross-sport evidence alone.
+A qualified upset signal should combine football disagreement with one or more plausibly orthogonal contemporaneous channels. Candidate channels are:
 
-A temporal line-movement correction is scientifically worth shadowing because published NFL evidence reports significant negative autocorrelation in pregame moneyline changes. But that evidence does not identify a Brier-optimal fade coefficient. Any movement/shrinkage model therefore requires its own frozen candidate ID and either genuinely prior fitting data or a fresh prospective evaluation start.
+1. **same-book market-path corroboration** — movement toward the challenger across independent books, source overlap, dispersion/freshness, and movement breadth;
+2. **authoritative player-state residual** — QB/role-weighted availability shock, replacement burden, uncertainty, time since publication, and the market response since that information arrived;
+3. **dynamic-strength/regime evidence** — only if it adds winner-decision value after controlling for the contemporaneous market;
+4. **circadian/travel or game-variance modifiers** — only as small interactions after historical/prospective qualification;
+5. **reputation/anchoring** — interaction only, never a direct fade trigger.
 
-## 6. Player state
+No generic upset gate is currently qualified. Until orthogonal evidence wins prospective switches, the correct clear-favorite behavior is conservative incumbent preservation.
 
-Player availability is **not a prerequisite for LevLine 4.0 promotion**.
+## 6. Disagreement-set evaluation is mandatory
 
-The 2025 historical source-coverage blocker has been technically resolved, and the repository now prospectively archives richer official NFL inactive/news evidence around the T-90 event. However, the multi-season player probability feature remains unauthorized because one unified 2022–2025 chronology/identity/missingness/status-normalization contract has not yet passed.
+For every challenger C versus incumbent I, report:
 
-This is the correct fail-closed state.
+- challenger-only correct;
+- incumbent-only correct;
+- total disagreements;
+- disagreement rate;
+- switch win rate;
+- overall accuracy delta;
+- week-cluster uncertainty;
+- season and leave-one-week-out stability.
 
-If the player lane later qualifies, the appropriate estimand is not “how many points is this player worth?” It is:
+The identity
 
-> Does point-in-time player/role state improve win-probability proper scores **conditional on the contemporaneous same-horizon market and its response to the information release?**
+`accuracy gain = disagreement rate × (2 × switch win rate - 1)`
 
-The recommended player model is therefore a small regularized market-offset residual. It may use as-of availability, modeled role share, replacement burden, lineup value lost/gained, uncertainty, market movement, and time since the official status observation. It may not use current-game realized snaps, later inactive information, post-kickoff participation, or postgame value.
+must remain explicit. High overall agreement cannot hide bad switches, and a small number of excellent switches can be valuable even when aggregate metrics look nearly identical.
 
-If historical harmonization is not complete before a player candidate is frozen, the player feature waits for a later prospective candidate cycle rather than being retrofitted into LevLine 4 using already-seen 2026 outcomes.
+McNemar-style discordant inference and week/block bootstrap are preferred paired tools. A higher point estimate is not equivalent to established superiority.
 
-## 7. Dynamic team strength
+## 7. Strict-PIT horizon and market-path research
 
-Dynamic latent strength remains a **diagnostic/challenger lane**, not part of the core LevLine 4 probability backbone.
+Canonical horizons remain T-120, T-60, T-45, and T-30.
 
-The statistical literature supports dynamic Bradley–Terry/state-space modeling, and recent work supports adaptive innovation variance capable of reacting to abrupt roster/regime changes. That establishes methodological plausibility, not incremental NFL value beyond the betting market.
+A nominal T-X state may use only information available **at or before** that cutoff. Valid timing error is early-only; positive timing error is ineligible. A missed horizon remains missing. Later horizons, closing prices, and later player states may not backfill earlier states.
 
-LevLine's own historical research has repeatedly found that plausible football-rich states either fail to establish incremental gain or remain materially worse than raw market probability. Therefore any future dynamic-strength candidate must enter as a same-horizon residual and beat the contemporaneous market on paired Brier before receiving weight.
+The market-state research layer now preserves all four horizons and derives same-book microstructure features only from sportsbook rows belonging to the exact selected PIT consensus requests. This prevents changing sportsbook composition or retry mixing from masquerading as broad movement.
 
-If revisited, the preferred form is adaptive state evolution rather than another fixed-decay rating system.
+The key winner question is not whether a later probability has a better Brier score. It is:
 
-## 8. Score distributions
+> When later information changes the T-120 incumbent pick, does the later decision win the switch?
 
-The score-distribution lane is scientifically useful but should remain **separate from winner-probability production**.
+Report accuracy, switches versus T-120 F-ST, challenger-only wins, incumbent-only wins, switch win rate, accuracy delta, and week-cluster uncertainty at every horizon. Brier/log loss remain secondary diagnostics.
 
-LevLine's preregistered coherent joint margin/total model produced higher winner accuracy than the market but worse Brier/log loss and significantly worse margin MAE. This is a concrete demonstration of why winner accuracy cannot override proper-score and distributional evidence.
+T-45 remains an operational hypothesis, not a selected winner.
 
-Score models remain appropriate for:
+Published NFL-inclusive evidence that pregame moneyline price changes exhibit negative autocorrelation (Simon, 2025, DOI `10.1177/15586235251394815`) justifies testing overreaction/reversal features, but does not justify an automatic line-movement fade.
 
-- expected margin;
-- total;
-- score intervals;
-- exact-score/tail simulation;
-- derivative market analysis.
+## 8. Player-state lane
 
-Their implied win probability receives no ensemble weight unless it independently beats the same-horizon raw market. Better score realism does not imply better event probability.
+Point-in-time player capture is now sufficiently mature to support prospective residual research, but not outcome-tuned thresholds.
 
-## 9. Calibration
+The target estimand is:
 
-Identity calibration is the default.
+> What authoritative player-state information remains unpriced by the market at this exact horizon?
 
-Beta calibration is the first serious parametric challenger because the beta family can retain the identity mapping, unlike ordinary logistic/Platt calibration. It must be fitted only on chronologically prior out-of-sample forecasts.
+Do not double-count injury information already embedded in the price. The highest-value interaction is likely:
 
-Flexible isotonic calibration is deferred until there is materially more independent data and explicit overfitting control. Calibration is not mandatory post-processing; an already well-calibrated market should be left alone.
+`football/player thesis × market response × elapsed time since authoritative news`.
 
-## 10. Ensemble policy
+Player information may change a pick only through a frozen candidate evaluated prospectively or through genuinely prior historical data that satisfy the same chronology contract.
 
-Do not create an ensemble merely because multiple research components exist.
+## 9. Travel/rest/circadian lane is demoted to modifier status
 
-Recent forecast-combination research reinforces the combination puzzle: theoretical gains from estimated optimal weights can be small relative to estimation error, and discarding weak forecasts then averaging/shrinking the remainder can dominate elaborate weight estimation.
+Generic rest differential should not be a core upset trigger.
 
-LevLine 4 therefore defaults to:
+Lopez & Bliss (2024, DOI `10.3389/frbhe.2024.1479832`) find no significant modern bye or mini-bye competitive advantage and estimate that the historical bye advantage largely disappeared after the 2011 CBA. This makes a large universal rest adjustment scientifically difficult to justify.
 
-1. raw same-horizon market;
-2. at most a sparse/shrunken residual if it has demonstrated incremental value;
-3. no unrestricted optimized weights on a small NFL sample.
+Circadian/travel effects remain plausible but heterogeneous. Roy & Forest (2018, DOI `10.1111/jsr.12565`) report a westward evening-game disadvantage across major leagues but only a trend in the NFL subset. Treat time-zone/body-clock state as a small interaction candidate, not an automatic side switch.
 
-Every component must earn inclusion prospectively. A rejected player, dynamic-strength, or score model does not become useful merely because an optimizer can assign it a nonzero coefficient in-sample.
+## 10. Reputation/anchoring lane remains interaction-only
 
-## 11. Validation and governance
+Fodor, Patterson & Shank (2025, DOI `10.1016/j.econlet.2025.112288`) provide NFL-specific evidence that preseason Super Bowl expectations influence bettor behavior and sportsbook closing lines through the season.
 
-Brier is the primary probability metric. Log loss and calibration corroborate. Winner accuracy remains descriptive.
+That supports preserving preseason reputation features. LevLine's own switch audit rejects a generic super-team fade, so reputation may only modify a richer upset-risk state.
 
-Hard governance rules:
+## 11. Dynamic strength, score distributions, variance, and coaching
 
-- strict same-game pairing;
-- week-aware dependence handling;
-- invalid probabilities fail closed rather than being clipped into validity;
-- NFL ties are excluded from the binary home-win target rather than silently graded as away wins;
-- duplicate forecast identities fail closed;
-- raw T-120/T-60/T-45/T-30 timing is evaluated before model-adjustment claims;
-- every adjustment is benchmarked against the raw market at the **same horizon**;
-- horizon, de-vig, player, dynamic-strength, score, calibration, and ensemble searches are separate candidate families;
-- family-level multiplicity is respected;
-- material specification changes require a new candidate ID and prospective start;
-- completed 2026 outcomes may grade frozen candidates but may not be repeatedly reused to invent rescue features or thresholds;
-- promotion is explicit and never automatic.
+These remain challenger/diagnostic families rather than default winner-engine inputs.
 
-## 12. What LevLine 4 should ship if the evidence supports it
+A latent team-strength model can be valuable as a favorite-vulnerability detector even if its raw probabilities are inferior. A score model can be useful if variance/tail shape predicts when the incumbent favorite is fragile even when its mean win probability does not improve. Coaching/schematic features should be small, theory-driven interactions rather than a feature explosion.
 
-The preferred eventual product architecture is two clocks:
+Every such family must answer the same question: **does it improve the winner decision after controlling for the contemporaneous market/incumbent?**
 
-### Accountability clock
+## 12. 2026 firewall
 
-- T-120;
-- immutable `F-ST-01-FROZEN-2026` historical forecast of record.
+Completed 2026 outcomes may grade only candidates frozen before the relevant games. They may not be used to invent thresholds, add features, select interactions, rescue failed candidates, or manufacture subgroups.
 
-### Final-probability clock
+A theory inspired by a 2026 result receives a new candidate ID, frozen logic, and a fresh prospective start before it contributes promotion evidence.
 
-- horizon selected prospectively from T-60/T-45/T-30 only if the timing family establishes a genuine improvement over T-120;
-- robust multi-book market consensus as the default probability backbone;
-- F-ST-at-horizon, player residual, calibration, or any other adjustment included only when it beats the identical-horizon raw market under the frozen promotion rules.
+## 13. Current research ranking
 
-If no later horizon establishes superiority, LevLine should **not promote a later clock merely because it sounds more informed**. If a later raw market wins and every proprietary adjustment fails, LevLine should publish the later raw market probability as the final probability and retain proprietary models for diagnostics, distributions, explanation, and editorial intelligence.
+### Strengthened
 
-## 13. Research stopping rule
+1. **Component-resolved Boundary Gate** — strongest current historical point estimate; all useful changes remain boundary-local.
+2. **Strict-PIT later market microstructure** — high-value prospective corroborator; now instrumented at T-120/T-60/T-45/T-30 with exact-request same-book breadth features.
+3. **Player-state × market-digestion interaction** — data capture is viable; causal estimand is appropriately residual rather than raw injury value.
 
-The LevLine 4 conceptual architecture is now considered **settled**.
+### Demoted or rejected
 
-Further architecture expansion has lower expected value than collecting uncontaminated prospective evidence. New model families should not be added to the active LevLine 4 search merely because the current slate is small or because an early result is disappointing.
+1. universal PURE/market weighting;
+2. generic football-unanimity upset switches;
+3. generic super-team/reputation fades;
+4. generic modern rest advantage as a large standalone feature;
+5. score-derived win probability as an automatic winner-engine input;
+6. complexity added without demonstrated switch value.
 
-From this point, the program should primarily:
+### Unresolved
 
-- collect strict-PIT T-120/T-60/T-45/T-30 snapshots;
-- preserve official player/news provenance;
-- shadow the frozen de-vig family;
-- audit capture completeness and source quality;
-- grade only frozen candidates;
-- wait for the formal evidence gate;
-- apply the frozen family-level inference contract;
-- promote only with explicit authorization.
+1. a true Selective Upset Gate for clear favorites;
+2. whether T-60, T-45, or T-30 adds winner value over T-120;
+3. whether market movement should be followed, faded, or interpreted conditionally;
+4. whether player information creates residual winner value after market digestion;
+5. whether dynamic strength, variance, circadian, or coaching interactions improve favorite-vulnerability detection.
 
-A genuinely new architecture discovered later should normally be treated as a **new prospective candidate cycle (or LevLine 4.1)** rather than silently extending the search space of LevLine 4.0.
+## 14. Immediate experiments
 
-## 14. Final recommendation in one sentence
+The next evidence cycle should prioritize uncontaminated prospective collection rather than more arbitrary model families:
 
-**Keep frozen F-ST at T-120 in production; make LevLine 4 a strictly point-in-time, prospectively selected multi-book market-timing system, and permit player state, dynamic strength, score distributions, calibration, or ensembles into the win-probability path only when they prove incremental proper-score value against the same-horizon market.**
+1. collect strict-PIT market snapshots at all four horizons with book identity and freshness;
+2. evaluate consensus movement **and same-book breadth** on disagreement/switch games;
+3. join authoritative player-state timestamps to market movement and elapsed-time features;
+4. freeze compact Boundary Gate and Upset Gate candidate families before grading future games;
+5. continue historical work only where genuinely prior chronology can validate a theory without reusing 2022–2025 as both discovery and proof;
+6. rank candidates by paired winner improvement, with Brier/log loss/calibration as guardrails;
+7. preserve the frozen production firewall until explicit promotion criteria are met.
+
+## 15. Current conclusion
+
+The best realistic path above the current ~68.2% incumbent is **not broader contrarianism**. It is selective decision replacement:
+
+`frozen incumbent winner`
+
+`+ component-resolved Boundary Gate`
+
+`+ strict-PIT later market/player corroboration`
+
+`+ default-off Selective Upset Gate whose evidence burden rises with favorite strength`
+
+`+ separate confidence/calibration layer`.
+
+The Boundary Gate is historically supported but not statistically proven superior. The Upset Gate remains intentionally conservative because historical generic upset logic loses. LevLine 4 should earn additional wins by making **fewer, better switches**, not by finding more reasons to disagree with the market.

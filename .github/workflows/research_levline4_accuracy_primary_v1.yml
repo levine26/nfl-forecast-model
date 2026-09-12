@@ -1,0 +1,103 @@
+name: LevLine 4 accuracy-primary research v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/LEVLINE_4_ACCURACY_FIRST_THESIS.md'
+      - 'research/levline4_accuracy_primary_contract_v1.json'
+      - 'research/levline4_accuracy_switch_contract_v1.json'
+      - 'research/levline3_fst_market_accuracy_audit_v1.json'
+      - 'research/levline3_chronological_accuracy_audit_v1.py'
+      - 'research/test_levline3_chronological_accuracy_audit_v1.py'
+      - 'research/levline4_accuracy_primary_v1.py'
+      - 'research/test_levline4_accuracy_primary_v1.py'
+      - 'research/run_levline4_accuracy_primary_v1.py'
+      - 'research/test_run_levline4_accuracy_primary_v1.py'
+      - '.github/workflows/research_levline4_accuracy_primary_v1.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '52 */6 * * *'
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen research dependencies
+        run: python -m pip install pytest 'pandas==3.0.5' 'numpy==2.4.6' 'scikit-learn==1.9.0'
+      - name: Install LevLine package without dependency drift
+        run: python -m pip install -e . --no-deps
+      - name: Validate accuracy-first paired evaluation and chronological audit
+        run: >-
+          python -m pytest -q
+          research/test_levline4_accuracy_primary_v1.py
+          research/test_levline3_chronological_accuracy_audit_v1.py
+          research/test_run_levline4_accuracy_primary_v1.py
+      - name: Prove production surfaces remain untouched
+        run: |
+          git diff --exit-code -- src/nfl_forecast .github/workflows/pregame.yml .github/workflows/weekly.yml
+
+  evaluate:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-research-market-capture-v2
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore immutable market and shadow research ledger
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/market-capture-v2:refs/remotes/origin/research-data/market-capture-v2 || true
+          mkdir -p research_outputs/market_capture_v2
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
+            git archive origin/research-data/market-capture-v2 research_outputs/market_capture_v2 2>/dev/null | tar -xf - || true
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install frozen lightweight dependencies
+        run: |
+          python -m pip install 'pandas==3.0.5' 'numpy==2.4.6'
+          python -m pip install -e . --no-deps
+
+      - name: Score prospective winner accuracy without fitting
+        run: python -m research.run_levline4_accuracy_primary_v1
+
+      - name: Persist accuracy scoreboard away from main
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/market_capture_v2
+          test -s "$DATA_DIR/levline4_accuracy_primary_v1.json"
+          cp "$DATA_DIR/levline4_accuracy_primary_v1.json" /tmp/levline4_accuracy_primary_v1.json
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
+            git checkout -B market-capture-v2-data origin/research-data/market-capture-v2
+          else
+            git checkout -B market-capture-v2-data
+          fi
+          mkdir -p research_outputs/market_capture_v2
+          cp /tmp/levline4_accuracy_primary_v1.json "$DATA_DIR/levline4_accuracy_primary_v1.json"
+          git add "$DATA_DIR/levline4_accuracy_primary_v1.json"
+          if git diff --cached --quiet; then
+            echo 'Accuracy-primary scoreboard unchanged.'
+            exit 0
+          fi
+          git commit -m 'Score LevLine 4 accuracy-primary shadows'
+          git push origin HEAD:research-data/market-capture-v2

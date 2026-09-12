@@ -11,7 +11,7 @@ def _row(
     *,
     game_id: str = "2026_01_ARI_LAC",
     event_id: str = "event-1",
-    timing_error: float = 0.5,
+    timing_error: float = 0.0,
     source_count: int = 3,
     spread: float = -2.5,
     total: float = 45.5,
@@ -22,6 +22,7 @@ def _row(
     targets = {
         "T-120m": "2026-09-13T18:25:00+00:00",
         "T-60m": "2026-09-13T19:25:00+00:00",
+        "T-45m": "2026-09-13T19:40:00+00:00",
         "T-30m": "2026-09-13T19:55:00+00:00",
     }
     if request is None:
@@ -51,10 +52,35 @@ def _row(
     }
 
 
-def test_market_state_derives_three_horizon_movement_without_outcomes() -> None:
+def _book(
+    horizon: str,
+    book: str,
+    probability: float,
+    *,
+    request: str | None = None,
+    timing_error: float = 0.0,
+) -> dict:
+    row = _row(
+        horizon,
+        probability,
+        request=request,
+        timing_error=timing_error,
+        row_type="book",
+    )
+    row["sportsbook_key"] = book
+    row["sportsbook_title"] = book.upper()
+    row.pop("source_count", None)
+    row.pop("source_names", None)
+    row.pop("max_freshness_minutes", None)
+    row.pop("probability_range", None)
+    return row
+
+
+def test_market_state_derives_four_horizon_movement_without_outcomes() -> None:
     rows = [
         _row("T-120m", 0.55, spread=-2.5, total=45.5, probability_range=0.06),
         _row("T-60m", 0.58, spread=-3.0, total=46.0, probability_range=0.05),
+        _row("T-45m", 0.59, spread=-3.0, total=46.0, probability_range=0.04),
         _row("T-30m", 0.60, spread=-3.5, total=46.5, probability_range=0.03),
     ]
     states, audit = build_market_state(rows)
@@ -64,41 +90,105 @@ def test_market_state_derives_three_horizon_movement_without_outcomes() -> None:
     assert state["complete_horizons"] is True
     assert state["missing_horizons"] == []
     assert state["market_home_prob_t120"] == pytest.approx(0.55)
+    assert state["market_home_prob_t45"] == pytest.approx(0.59)
     assert state["market_home_prob_t30"] == pytest.approx(0.60)
+    assert state["home_probability_pp_t45_minus_t120"] == pytest.approx(4.0)
+    assert state["home_probability_pp_t30_minus_t45"] == pytest.approx(1.0)
     assert state["home_probability_pp_t30_minus_t120"] == pytest.approx(5.0)
     assert state["home_spread_t30_minus_t120"] == pytest.approx(-1.0)
     assert state["total_points_t30_minus_t120"] == pytest.approx(1.0)
     assert state["probability_range_t30_minus_t120"] == pytest.approx(-0.03)
     assert state["home_logit_t30_minus_t120"] > 0
+    assert state["strict_no_later_than_cutoff"] is True
     assert state["completed_2026_outcomes_used"] == 0
     assert state["production_authorized"] is False
-    assert audit["games_with_all_three_horizons"] == 1
+    assert audit["games_with_all_four_horizons"] == 1
+    assert audit["strict_no_later_than_cutoff"] is True
+    assert audit["book_microstructure_features"] is True
     assert audit["completed_2026_outcomes_used"] == 0
 
 
-def test_horizon_retry_selects_closest_qualifying_request() -> None:
+def test_horizon_retry_selects_closest_eligible_pre_cutoff_request() -> None:
     rows = [
-        _row("T-120m", 0.51, timing_error=6.0, request="2026-09-13T18:31:00+00:00"),
+        _row("T-120m", 0.51, timing_error=-6.0, request="2026-09-13T18:19:00+00:00"),
         _row("T-120m", 0.54, timing_error=1.0, request="2026-09-13T18:26:00+00:00"),
         _row("T-120m", 0.57, timing_error=-2.0, request="2026-09-13T18:23:00+00:00"),
     ]
     selected = select_consensus_horizons(rows)
-    assert selected["2026_01_ARI_LAC"]["T-120m"]["h2h_home_no_vig"] == 0.54
+    assert selected["2026_01_ARI_LAC"]["T-120m"]["h2h_home_no_vig"] == 0.57
+
+
+def test_post_cutoff_request_is_ineligible_even_inside_capture_tolerance() -> None:
+    rows = [
+        _row("T-45m", 0.58, timing_error=-2.0, request="2026-09-13T19:38:00+00:00"),
+        _row("T-45m", 0.62, timing_error=1.0, request="2026-09-13T19:41:00+00:00"),
+    ]
+    selected = select_consensus_horizons(rows)
+    assert selected["2026_01_ARI_LAC"]["T-45m"]["h2h_home_no_vig"] == 0.58
+
+
+def test_request_timestamp_after_target_fails_closed_even_if_timing_field_claims_early() -> None:
+    rows = [
+        _row("T-45m", 0.62, timing_error=-1.0, request="2026-09-13T19:41:00+00:00"),
+    ]
+    assert select_consensus_horizons(rows) == {}
+
+
+def test_book_breadth_pairs_same_books_from_selected_requests_only() -> None:
+    rows = [
+        _row("T-120m", 0.50),
+        _row("T-45m", 0.54),
+        _book("T-120m", "a", 0.49),
+        _book("T-120m", "b", 0.50),
+        _book("T-120m", "c", 0.51),
+        _book("T-45m", "a", 0.52),
+        _book("T-45m", "b", 0.51),
+        _book("T-45m", "c", 0.50),
+        _book("T-45m", "d", 0.60),
+        # This retry is not the selected T-45 consensus request and must not affect breadth.
+        _book("T-45m", "a", 0.90, request="2026-09-13T19:39:00+00:00", timing_error=-1.0),
+    ]
+    states, audit = build_market_state(rows)
+    state = states[0]
+    assert state["book_common_count_t45_minus_t120"] == 3
+    assert state["book_overlap_fraction_t45_minus_t120"] == pytest.approx(0.75)
+    assert state["book_home_move_share_t45_minus_t120"] == pytest.approx(2 / 3)
+    assert state["book_away_move_share_t45_minus_t120"] == pytest.approx(1 / 3)
+    assert state["book_unchanged_share_t45_minus_t120"] == 0.0
+    assert state["book_movement_breadth_t45_minus_t120"] == pytest.approx(1 / 3)
+    assert state["book_median_probability_change_pp_t45_minus_t120"] == pytest.approx(1.0)
+    assert state["book_median_logit_change_t45_minus_t120"] > 0
+    assert audit["book_pairing_policy"] == "same_sportsbook_exact_selected_consensus_request_only"
+
+
+def test_post_cutoff_book_cannot_enter_microstructure() -> None:
+    rows = [
+        _row("T-120m", 0.50),
+        _row("T-45m", 0.54),
+        _book("T-120m", "a", 0.49),
+        _book("T-45m", "a", 0.60, request="2026-09-13T19:41:00+00:00", timing_error=1.0),
+    ]
+    states, _ = build_market_state(rows)
+    state = states[0]
+    assert state["book_common_count_t45_minus_t120"] == 0
+    assert state["book_movement_breadth_t45_minus_t120"] is None
 
 
 def test_nonqualifying_rows_cannot_close_or_influence_state() -> None:
     rows = [
         _row("T-120m", 0.55),
         _row("T-60m", 0.99, source_count=1),
+        _row("T-45m", 0.96, timing_error=0.5, request="2026-09-13T19:40:30+00:00"),
         _row("T-30m", 0.98, row_type="book"),
-        _row("T-30m", 0.97, timing_error=9.0),
+        _row("T-30m", 0.97, timing_error=-9.0, request="2026-09-13T19:46:00+00:00"),
     ]
     states, audit = build_market_state(rows)
     state = states[0]
 
     assert state["available_horizons"] == ["T-120m"]
-    assert state["missing_horizons"] == ["T-60m", "T-30m"]
+    assert state["missing_horizons"] == ["T-60m", "T-45m", "T-30m"]
     assert state["market_home_prob_t60"] is None
+    assert state["market_home_prob_t45"] is None
     assert state["market_home_prob_t30"] is None
     assert state["home_probability_t30_minus_t120"] is None
     assert audit["games_with_missing_horizons"] == 1
@@ -128,8 +218,8 @@ def test_cross_horizon_event_identity_mismatch_fails_closed() -> None:
 
 def test_retry_identity_mismatch_within_horizon_fails_closed() -> None:
     rows = [
-        _row("T-120m", 0.55, event_id="event-current", timing_error=1.0),
-        _row("T-120m", 0.56, event_id="event-rematch", timing_error=2.0),
+        _row("T-120m", 0.55, event_id="event-current", timing_error=-1.0, request="2026-09-13T18:24:00+00:00"),
+        _row("T-120m", 0.56, event_id="event-rematch", timing_error=-2.0, request="2026-09-13T18:23:00+00:00"),
     ]
     with pytest.raises(ValueError, match="retries disagree on event identity"):
         select_consensus_horizons(rows)

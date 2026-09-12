@@ -1,0 +1,52 @@
+{
+  "audit_id": "LEVLINE3-FST-CHRONOLOGICAL-ACCURACY-AUDIT-V1",
+  "status": "chronology_clean_historical_architecture_evaluation",
+  "method": "For each target season 2022-2025, fit the fixed two-input L2 logistic stack only on earlier-season OOF market and PURE probabilities, then score the held-out season. No target-season outcomes enter its fit.",
+  "games": 1087,
+  "overall": {
+    "chronological_fst_correct": 741,
+    "chronological_fst_accuracy": 0.6816927322907084,
+    "market_correct": 735,
+    "market_accuracy": 0.6761729530818767,
+    "accuracy_gain_games": 6,
+    "accuracy_gain_percentage_points": 0.55197792088317,
+    "chronological_fst_brier": 0.21065334840485694,
+    "market_brier": 0.2101992905677052,
+    "chronological_fst_log_loss": 0.6087126266444343,
+    "market_log_loss": 0.6076472081285538
+  },
+  "paired_disagreement": {
+    "disagreement_games": 34,
+    "disagreement_rate": 0.031278748850045996,
+    "chronological_fst_only_correct": 20,
+    "market_only_correct": 14,
+    "switch_win_rate": 0.5882352941176471,
+    "mcnemar_exact_two_sided_p_diagnostic": 0.39152830513194203,
+    "switch_win_rate_wilson_95_ci": [0.422215938788125, 0.7363403163612885],
+    "week_block_accuracy_delta_95_ci": [-0.005560704607046071, 0.016890187316031406],
+    "week_block_accuracy_delta_95_ci_percentage_points": [-0.5560704607046071, 1.6890187316031406]
+  },
+  "by_season": [
+    {"season": 2022, "games": 271, "chronological_fst_correct": 182, "market_correct": 178, "net_correct_gain": 4, "disagreements": 12, "fst_only_correct": 8, "market_only_correct": 4, "switch_win_rate": 0.6666666666666666},
+    {"season": 2023, "games": 272, "chronological_fst_correct": 185, "market_correct": 184, "net_correct_gain": 1, "disagreements": 7, "fst_only_correct": 4, "market_only_correct": 3, "switch_win_rate": 0.5714285714285714},
+    {"season": 2024, "games": 272, "chronological_fst_correct": 195, "market_correct": 195, "net_correct_gain": 0, "disagreements": 6, "fst_only_correct": 3, "market_only_correct": 3, "switch_win_rate": 0.5},
+    {"season": 2025, "games": 272, "chronological_fst_correct": 179, "market_correct": 178, "net_correct_gain": 1, "disagreements": 9, "fst_only_correct": 5, "market_only_correct": 4, "switch_win_rate": 0.5555555555555556}
+  ],
+  "stability": {
+    "season_net_correct_gains": [4, 1, 0, 1],
+    "leave_one_season_out_net_correct_advantage": [2, 5, 6, 5],
+    "leave_one_season_week_out_checks": 72,
+    "leave_one_season_week_out_positive_accuracy_delta_checks": 72
+  },
+  "relationship_to_frozen_reconstruction": {
+    "frozen_final_coefficient_backscore_correct": 740,
+    "frozen_final_coefficient_backscore_accuracy": 0.6807727690892365,
+    "chronological_architecture_correct": 741,
+    "chronological_architecture_accuracy": 0.6816927322907084,
+    "interpretation": "The season-forward architecture estimate is the cleaner historical generalization estimate. The final-coefficient backscore is useful reconstruction evidence but uses coefficients ultimately fit on all 2020-2025 training rows."
+  },
+  "scientific_interpretation": "Under an accuracy-first objective, the chronology-clean F-ST architecture is descriptively stronger than market by six games and never worse at the season level in 2022-2025. The paired uncertainty interval still includes no advantage, so this is evidence worth preserving rather than proof of superiority.",
+  "2026_outcomes_used": 0,
+  "production_changed": false,
+  "promotion_authorized": false
+}
