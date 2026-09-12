@@ -2,7 +2,23 @@
   "contract_version": 2,
   "contract_id": "V09B-AVAILABILITY-REGULAR-SEASON-HARMONIZATION-V2",
   "experiment_dependency": "V09B-AVAILABILITY-001",
+  "status": "preregistered_before_first_strict_v2_execution",
   "purpose": "Prove a leakage-safe 2022-2025 availability-state contract for the exact regular-season game universe consumed by LevLine before V09B may execute.",
+  "amendment_record": [
+    {
+      "stage": "before_first_strict_v2_execution",
+      "reason": "The first contract draft carried stale 2022-2024 nflverse injury digests copied from an earlier source snapshot. The immediately subsequent v1 source-only CI pass fetched the exact current release bytes and exposed the mismatch before any strict v2 official-page, identity, practice-agreement, chronology, or model metrics were executed. The source pins are corrected here to those observed bytes; no threshold, state definition, model universe, or acceptance criterion changes.",
+      "strict_v2_metrics_observed": false,
+      "model_metrics_observed": false,
+      "completed_2026_outcomes_consulted": false,
+      "threshold_relaxation": false,
+      "observed_current_release_sha256": {
+        "2022": "5f0d60324e597edd1a2ced8540b04e40b51dd440591dd1df11b8d96343387c9e",
+        "2023": "16b04e21da5aa3944cfa9c22cafcc84ed7e6d9866eaddf0344e9b8cbf2f63afe",
+        "2024": "498bce8e13cb64b2ab9bb0ad6cb81d0a63c2ddb24016c9fc90c2de2126fae449"
+      }
+    }
+  ],
   "scope_basis": {
     "preexisting_model_invariant": "src/nfl_forecast/features.py filters both PBP and schedule scaffolds to regular season before matchup features and home_win are built.",
     "game_type": "REG",
@@ -17,6 +33,12 @@
   "primary_state_source": {
     "source_id": "nflverse_injuries",
     "url_template": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv",
+    "release_assets": {
+      "2022": {"asset_id": 123900172, "name": "injuries_2022.csv"},
+      "2023": {"asset_id": 190301559, "name": "injuries_2023.csv"},
+      "2024": {"asset_id": 228754161, "name": "injuries_2024.csv"},
+      "2025": {"name": "injuries_2025.csv"}
+    },
     "expected_full_asset_rows": {
       "2022": 5682,
       "2023": 5599,
@@ -24,9 +46,9 @@
       "2025": 6068
     },
     "expected_sha256": {
-      "2022": "2acf24185367a11efc15cd509d6d3e0c641907cafbb05ba852e1eba95b16e213",
-      "2023": "5a24568570fd889b822a94f3a7b3bf5265d025a34ddd28deb512cb91cd19a80c",
-      "2024": "76ae5f49da249d6fde3fb85573f3a887517941b309609f8756374f3de6f67f30",
+      "2022": "5f0d60324e597edd1a2ced8540b04e40b51dd440591dd1df11b8d96343387c9e",
+      "2023": "16b04e21da5aa3944cfa9c22cafcc84ed7e6d9866eaddf0344e9b8cbf2f63afe",
+      "2024": "498bce8e13cb64b2ab9bb0ad6cb81d0a63c2ddb24016c9fc90c2de2126fae449",
       "2025": "873ca1606dd575bd01152508a243ef6b3a0f8f97b90b707217e62ee8c7ceb735"
     }
   },
@@ -47,14 +69,16 @@
       "2024": null,
       "2025": null
     },
-    "hash_policy": "Qualification is audit-only until the exact concatenated regular-season official-page bundle SHA-256 is pinned for every season after a successful strict collection pass."
+    "bundle_hash_definition": "SHA-256 over the ordered sequence week=1..18 encoded as ASCII week number, 8-byte big-endian payload length, then exact response bytes.",
+    "hash_policy": "Qualification is audit-only until the exact regular-season official-page bundle SHA-256 is pinned for every season after a successful strict collection pass."
   },
   "schedule_source": {
     "source_id": "nflverse_schedule",
     "url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
-    "filter": "season in 2022-2025 and game_type == REG",
+    "filter": "season in 2022-2025 and game_type == REG, with preregistered model-universe exceptions excluded from the model-eligible linkage subset",
+    "hash_columns": ["season", "week", "game_id", "gameday", "gametime", "home_team", "away_team", "game_type"],
     "expected_derived_subset_sha256": null,
-    "hash_policy": "Hash a deterministic CSV serialization of the 2022-2025 REG schedule subset used by this audit. Qualification is audit-only until that derived subset hash is pinned."
+    "hash_policy": "Hash UTF-8 CSV with LF line endings, no index, sorted by season/week/game_id, over exactly hash_columns after the model-eligible filter. Qualification is audit-only until that derived subset hash is pinned."
   },
   "chronology": {
     "authority": "NFL Personnel (Injury) Report Policy filing day",
@@ -75,7 +99,7 @@
       "season": 2022,
       "week": 17,
       "teams": ["BUF", "CIN"],
-      "reason": "NFL-cancelled Bills at Bengals game; no completed game enters the LevLine REG outcome/evaluation frame.",
+      "reason": "NFL-cancelled Bills at Bengals game; no completed game enters the LevLine historical outcome/evaluation frame.",
       "source": "NFL official 2022 Week 17 schedule/game center",
       "outcome_information_used": false
     }
