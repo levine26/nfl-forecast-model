@@ -31,9 +31,15 @@ FALLBACK_MODEL = "openai/gpt-oss-120b"
 # retrieves more context; basic search is intentionally used here to stay inside the
 # tighter Free-tier limits inherited from Compound Mini's underlying models.
 DEFAULT_COMPOUND_VERSION = "2025-07-23"
-# Keep the reserved generation budget far below the 8K TPM ceiling of the routed
-# Free-tier research models. The focused JSON contract is comfortably smaller.
-MAX_COMPLETION_TOKENS = 600
+# Compound's focused JSON response fits comfortably in 600 tokens. GPT-OSS browser
+# search needs additional agentic reasoning/tool-call headroom; Groq's browser-search
+# quick start uses 2048 completion tokens. Both remain below the direct GPT-OSS
+# Free-tier 8K TPM ceiling for our compact per-game prompt.
+PRIMARY_MAX_COMPLETION_TOKENS = 600
+FALLBACK_MAX_COMPLETION_TOKENS = 2048
+# Backward-compatible alias retained for diagnostics/tests that refer to the primary
+# Compound completion budget.
+MAX_COMPLETION_TOKENS = PRIMARY_MAX_COMPLETION_TOKENS
 _WEB_TOOL_TYPES = {"search", "web_search", "browser_search"}
 _RATE_LIMIT_HEADER_NAMES = (
     "retry-after",
@@ -219,17 +225,21 @@ def _is_gpt_oss_model(model: str) -> bool:
     return model.startswith("openai/gpt-oss")
 
 
+def _completion_budget(model: str) -> int:
+    return FALLBACK_MAX_COMPLETION_TOKENS if _is_gpt_oss_model(model) else PRIMARY_MAX_COMPLETION_TOKENS
+
+
 def _build_payload(prompt: str, *, model: str) -> dict:
     """Build one bounded research request for the configured Groq provider."""
     base = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "max_completion_tokens": MAX_COMPLETION_TOKENS,
+        "max_completion_tokens": _completion_budget(model),
     }
     if _is_gpt_oss_model(model):
         return {
             **base,
-            "reasoning_effort": "low",
+            "reasoning_effort": "medium",
             "tool_choice": "required",
             "tools": [{"type": "browser_search"}],
         }
