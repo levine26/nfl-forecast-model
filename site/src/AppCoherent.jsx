@@ -1,16 +1,19 @@
 import AppSignal from './AppSignal.jsx'
 import SignalEnhancements from './SignalEnhancements.jsx'
 import ForecastClarity from './ForecastClarity.jsx'
+import ExperienceLayer from './ExperienceLayer.jsx'
+import ExperienceDomFixes from './ExperienceDomFixes.jsx'
 import './signal-polish.css'
 
 /**
  * Canonical consumer-surface compatibility contract.
  *
  * AppCoherent remains the production entrypoint intentionally. The premium
- * Sunday Signal presentation lives in AppSignal, while SignalEnhancements and
- * ForecastClarity add presentation-only product affordances around the same
- * canonical data. No forecast, pick, lock, grading, research-governance, or
- * probability behavior is recomputed or replaced in this wrapper.
+ * Sunday Signal presentation lives in AppSignal, while SignalEnhancements,
+ * ForecastClarity, ExperienceLayer, and ExperienceDomFixes add presentation-
+ * only product affordances around the same canonical data. No forecast, pick,
+ * lock, grading, research-governance, or probability behavior is recomputed or
+ * replaced in this wrapper.
  *
  * public_forecasts.json
  * LEVLINE FORECAST
@@ -49,5 +52,7 @@ export default function AppCoherent() {
     <AppSignal/>
     <SignalEnhancements/>
     <ForecastClarity/>
+    <ExperienceDomFixes/>
+    <ExperienceLayer/>
   </>
 }
