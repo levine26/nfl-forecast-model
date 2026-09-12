@@ -184,7 +184,7 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GROQ_MEDIA_MODEL: groq/compound
+          GROQ_MEDIA_MODEL: groq/compound-mini
         run: |
           set -euo pipefail
           test -n "${GROQ_API_KEY:-}" || { echo "GROQ_API_KEY secret is missing"; exit 1; }
@@ -202,7 +202,10 @@ jobs:
           rm -f /tmp/groq-media-raw.json /tmp/groq-media-composed.json /tmp/groq-media-rendered.json outputs/copilot_media_reads.json
           echo "Groq focused matchups: ${#game_ids[@]}"
 
+          total_games=${#game_ids[@]}
+          game_index=0
           for gid in "${game_ids[@]}"; do
+            game_index=$((game_index + 1))
             feedback="/tmp/groq-${gid}-feedback.txt"
             : > "$feedback"
             accepted=0
@@ -210,7 +213,7 @@ jobs:
               echo "$gid focused Groq editorial attempt $attempt/3"
               prompt="$prompts/$gid.txt"
               python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
-              if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 4; then
+              if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 3; then
                 echo "$gid: Groq provider transport/rate-limit retries exhausted; failing closed without multiplying provider calls across editorial retries."
                 exit 1
               fi
@@ -220,11 +223,18 @@ jobs:
                 break
               fi
               cat "$feedback"
-              if [ "$attempt" -lt 3 ]; then sleep 3; fi
+              if [ "$attempt" -lt 3 ]; then
+                echo "$gid needs a prose/source retry; waiting for the underlying-model token window to reset."
+                sleep 65
+              fi
             done
             if [ "$accepted" -ne 1 ]; then echo "$gid failed all three focused editorial validation attempts."; exit 1; fi
-            # Keep even a free-plan Compound organization comfortably below RPM burst limits.
-            sleep 3
+            if [ "$game_index" -lt "$total_games" ]; then
+              # Compound Mini inherits limits from its underlying models. On the
+              # current Free-tier key a web-search call can consume nearly one full
+              # underlying-model TPM window, so pace accepted games one per minute.
+              sleep 65
+            fi
           done
 
           python scripts/merge_copilot_game_payloads.py --input-dir "$parts" --predictions outputs/this_week.csv --output /tmp/groq-media-raw.json
@@ -236,26 +246,33 @@ jobs:
       - name: PR provider migration gate
         if: github.event_name == 'pull_request'
         run: |
-          python -m py_compile scripts/run_groq_media_prompt.py
+          python -m py_compile scripts/run_groq_media_prompt.py scripts/build_single_game_copilot_prompt.py
           python - <<'PY'
           from pathlib import Path
           import re
 
           text = Path('.github/workflows/groq_media_writer.yml').read_text(encoding='utf-8')
           runner = Path('scripts/run_groq_media_prompt.py').read_text(encoding='utf-8')
+          prompt = Path('scripts/build_single_game_copilot_prompt.py').read_text(encoding='utf-8')
           assert not re.search(r'^\s*copilot-requests\s*:', text, flags=re.M)
           assert not re.search(r'^\s*run:\s*npm\s+install\s+-g\s+@github/copilot\s*$', text, flags=re.M)
           assert 'secrets.GROQ_API_KEY' in text
-          assert 'scripts/run_groq_media_prompt.py' in text
+          assert 'GROQ_MEDIA_MODEL: groq/compound-mini' in text
+          assert 'DEFAULT_MODEL = "groq/compound-mini"' in runner
+          assert '"enabled_tools": ["web_search"]' in runner
+          assert '"service_tier": "auto"' in runner
+          assert 'max_completion_tokens' in runner
+          assert 'sleep 65' in text
+          assert '_compact_packet' in prompt and 'len(reporting) >= 4' in prompt and 'len(football) >= 4' in prompt
           assert 'src/nfl_forecast/editorial_model_read.py' in text
-          assert 'executed_tools' in runner and 'web_search' in runner and 'visit_website' in runner
+          assert 'executed_tools' in runner and 'web_search' in runner
           assert 'retry-after' in runner and 'x-ratelimit-remaining-tokens' in runner
           assert 'transport/rate-limit retries exhausted' in text
           assert 'inherits latest successful contextual intelligence' in text
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
           assert 'unexpected_main_changes' in text
-          print('Groq provider migration, rate-limit handling, exact-or-fresh context sync, and web-research wiring validated without consuming repository secrets on PR.')
+          print('Groq Compound Mini free-tier research, pacing, context freshness, and publication wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
