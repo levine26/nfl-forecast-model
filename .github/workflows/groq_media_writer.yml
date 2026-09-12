@@ -26,6 +26,7 @@ on:
       - "tests/test_copilot_media.py"
       - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
+      - "tests/test_groq_media_runner.py"
       - "tests/test_levline_paragraph_renderer.py"
       - "tests/test_single_copilot_game_validator.py"
       - "tests/test_read_contract.py"
@@ -56,6 +57,7 @@ on:
       - "tests/test_copilot_media.py"
       - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
+      - "tests/test_groq_media_runner.py"
       - "tests/test_levline_paragraph_renderer.py"
       - "tests/test_single_copilot_game_validator.py"
       - "tests/test_read_contract.py"
@@ -125,7 +127,7 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py
+        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py
 
       - name: Canonicalize editorial forecast source
         run: |
@@ -163,22 +165,24 @@ jobs:
             : > "$feedback"
             accepted=0
             for attempt in 1 2 3; do
-              echo "$gid focused Groq research attempt $attempt/3"
+              echo "$gid focused Groq editorial attempt $attempt/3"
               prompt="$prompts/$gid.txt"
               python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
-              if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt"; then
-                echo "$gid: Groq research call failed" > "$feedback"
-                cat "$feedback"
-                continue
+              if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 4; then
+                echo "$gid: Groq provider transport/rate-limit retries exhausted; failing closed without multiplying provider calls across editorial retries."
+                exit 1
               fi
               if python scripts/validate_single_copilot_game.py --input "$parts/$gid.txt" --game-id "$gid" --predictions outputs/this_week.csv --accepted-dir "$parts" 2> "$feedback"; then
                 accepted=1
-                echo "$gid passed focused source/prose validation on attempt $attempt."
+                echo "$gid passed focused source/prose validation on editorial attempt $attempt."
                 break
               fi
               cat "$feedback"
+              if [ "$attempt" -lt 3 ]; then sleep 3; fi
             done
-            if [ "$accepted" -ne 1 ]; then echo "$gid failed all three focused validation attempts."; exit 1; fi
+            if [ "$accepted" -ne 1 ]; then echo "$gid failed all three focused editorial validation attempts."; exit 1; fi
+            # Keep even a free-plan Compound organization comfortably below RPM burst limits.
+            sleep 3
           done
 
           python scripts/merge_copilot_game_payloads.py --input-dir "$parts" --predictions outputs/this_week.csv --output /tmp/groq-media-raw.json
@@ -203,9 +207,11 @@ jobs:
           assert 'scripts/run_groq_media_prompt.py' in text
           assert 'src/nfl_forecast/editorial_model_read.py' in text
           assert 'executed_tools' in runner and 'web_search' in runner and 'visit_website' in runner
+          assert 'retry-after' in runner and 'x-ratelimit-remaining-tokens' in runner
+          assert 'transport/rate-limit retries exhausted' in text
           assert 'refusing to research against stale context' in text
           assert 'unexpected_main_changes' in text
-          print('Groq provider migration, freshness, and web-research wiring validated without consuming repository secrets on PR.')
+          print('Groq provider migration, rate-limit handling, freshness, and web-research wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot

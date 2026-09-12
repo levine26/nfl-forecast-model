@@ -11,6 +11,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import sys
 import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -20,6 +21,57 @@ from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
 DEFAULT_MODEL = "groq/compound"
 _WEB_TOOL_TYPES = {"search", "visit", "web_search", "visit_website"}
+_RATE_LIMIT_HEADER_NAMES = (
+    "retry-after",
+    "x-ratelimit-limit-requests",
+    "x-ratelimit-limit-tokens",
+    "x-ratelimit-remaining-requests",
+    "x-ratelimit-remaining-tokens",
+    "x-ratelimit-reset-requests",
+    "x-ratelimit-reset-tokens",
+)
+MAX_RATE_LIMIT_WAIT_SECONDS = 180.0
+
+
+def _parse_retry_after(value: str | None) -> float | None:
+    if value is None:
+        return None
+    try:
+        seconds = float(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    if seconds < 0:
+        return None
+    return seconds
+
+
+def _safe_rate_limit_headers(exc: HTTPError) -> dict[str, str]:
+    headers = getattr(exc, "headers", None)
+    if headers is None:
+        return {}
+    safe: dict[str, str] = {}
+    for name in _RATE_LIMIT_HEADER_NAMES:
+        value = headers.get(name)
+        if value is not None:
+            safe[name] = str(value).strip()
+    return safe
+
+
+def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
+    """Return a bounded retry delay, or None when the provider says to wait too long.
+
+    Groq documents `retry-after` as seconds for 429 responses. A very long retry
+    window usually indicates an account/day quota rather than a transient burst;
+    the workflow should fail closed and allow a later scheduled run instead of
+    occupying a runner for an extended period.
+    """
+    retry_after = _parse_retry_after(_safe_rate_limit_headers(exc).get("retry-after"))
+    if retry_after is not None:
+        if retry_after > MAX_RATE_LIMIT_WAIT_SECONDS:
+            return None
+        return max(1.0, retry_after + 1.0)
+    # Conservative fallback when a 429 omits Retry-After.
+    return min(15.0 * (2 ** max(0, attempt - 1)), 60.0)
 
 
 def _request(prompt: str, *, model: str, timeout: int) -> str:
@@ -87,15 +139,28 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
             return _request(prompt, model=model, timeout=timeout)
         except HTTPError as exc:
             # Never print response bodies: provider errors may echo request metadata.
-            last_error = RuntimeError(f"Groq HTTP {exc.code}")
             retryable = exc.code in {408, 409, 429, 500, 502, 503, 504}
+            if exc.code == 429:
+                safe_headers = _safe_rate_limit_headers(exc)
+                detail = ", ".join(f"{key}={value}" for key, value in safe_headers.items()) or "no rate-limit headers"
+                print(f"Groq HTTP 429 rate limit ({detail})", file=sys.stderr)
+                delay = _rate_limit_delay(exc, attempt)
+                last_error = RuntimeError(f"Groq HTTP 429 ({detail})")
+                if attempt == attempts or delay is None:
+                    break
+                print(f"Groq rate-limited; waiting {delay:.1f}s before provider retry {attempt + 1}/{attempts}.", file=sys.stderr)
+                time.sleep(delay)
+                continue
+
+            last_error = RuntimeError(f"Groq HTTP {exc.code}")
             if not retryable or attempt == attempts:
                 break
+            time.sleep(min(2 ** attempt, 8))
         except (URLError, TimeoutError, RuntimeError, json.JSONDecodeError) as exc:
             last_error = exc
             if attempt == attempts:
                 break
-        time.sleep(min(2 ** attempt, 8))
+            time.sleep(min(2 ** attempt, 8))
     raise RuntimeError(f"Groq media request failed after {attempts} attempts: {last_error}")
 
 
@@ -105,7 +170,7 @@ def main() -> None:
     parser.add_argument("--output-file", required=True)
     parser.add_argument("--model", default=os.environ.get("GROQ_MEDIA_MODEL", DEFAULT_MODEL))
     parser.add_argument("--timeout", type=int, default=120)
-    parser.add_argument("--attempts", type=int, default=3)
+    parser.add_argument("--attempts", type=int, default=4)
     args = parser.parse_args()
 
     prompt = Path(args.prompt_file).read_text(encoding="utf-8")
