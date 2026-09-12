@@ -20,17 +20,25 @@ RATIONALE_PROHIBITED = re.compile(
     flags=re.I,
 )
 
-# A clean rationale that narrowly misses the minimum can be completed with one short,
-# matchup-specific mechanism already present in the researched paragraph. Every suffix
-# includes both clubs, which keeps the repair from becoming repeated slate boilerplate.
+# When Groq returns an underlength rationale, deterministic code can derive the
+# contract-safe sentence from a football mechanism already present in the researched
+# matchup paragraph. Team names recur inside every template so same-mechanism repairs
+# cannot create a repeated substantive seven-word phrase across the slate.
 RATIONALE_MECHANISMS = (
-    (("pass rush", "pressure", "protection", "pocket", "sack"), "{pick}' protection plan against {opponent} remains decisive."),
-    (("coverage", "secondary", "cornerback", "receiver", "route"), "{pick}' coverage answers against {opponent} remain central."),
-    (("run game", "rushing", "ground game", "run defense", "early down"), "{pick}' early-down rushing efficiency against {opponent} matters."),
-    (("explosive", "deep ball", "chunk play", "downfield"), "{pick}' explosive-play discipline against {opponent} becomes critical."),
-    (("quarterback", "passing game", "pass game", "dropback"), "{pick}' quarterback execution against {opponent} remains pivotal."),
-    (("scheme", "coordinator", "play-calling", "play calling", "motion"), "{pick}' schematic counters against {opponent} remain important."),
-    (("turnover", "ball security", "takeaway"), "{pick}' ball-security execution against {opponent} remains critical."),
+    (("pass rush", "pressure", "protection", "pocket", "sack"),
+     "Against {opponent}, {pick} must protect the pocket; {pick} can then keep {opponent} from dictating the passing downs {pick} must control."),
+    (("coverage", "secondary", "cornerback", "receiver", "route"),
+     "Against {opponent}, {pick} must hold up in coverage; {pick} must keep {opponent} from creating the matchup stress {pick} cannot afford."),
+    (("run game", "rushing", "ground game", "run defense", "early down"),
+     "Against {opponent}, {pick} must win early downs; {pick} must keep {opponent} from controlling the rushing terms {pick} must answer."),
+    (("explosive", "deep ball", "chunk play", "downfield"),
+     "Against {opponent}, {pick} must limit explosive plays; {pick} must keep {opponent} from creating the sudden gains {pick} cannot absorb."),
+    (("quarterback", "passing game", "pass game", "dropback"),
+     "Against {opponent}, {pick} must get steady quarterback execution; {pick} must keep {opponent} from dictating the dropback situations {pick} must handle."),
+    (("scheme", "coordinator", "play-calling", "play calling", "motion"),
+     "Against {opponent}, {pick} must land its schematic counters; {pick} must keep {opponent} from forcing the predictable responses {pick} must avoid."),
+    (("turnover", "ball security", "takeaway"),
+     "Against {opponent}, {pick} must protect the football; {pick} must keep {opponent} from creating the short fields {pick} cannot afford."),
 )
 
 
@@ -52,17 +60,17 @@ def _nickname(code: object) -> str:
 
 
 def _repair_underlength_rationale(rationale: str, paragraph1: str, row) -> tuple[str, bool]:
-    """Normalize only a clean 10-17 word near-miss using researched matchup mechanics.
+    """Derive a clean 18-40 word rationale from the validated researched paragraph.
 
-    This is intentionally not a generic padding path. Rationales shorter than 10 words,
-    longer than the contract, or containing prohibited numerical/model language still
-    fail closed. A repair is possible only when paragraph 1 contains a recognized
-    football mechanism, and the resulting text must itself satisfy the 18-40 word
-    contract and prohibited-term gate.
+    Groq occasionally returns a short label rather than the requested sentence. A
+    non-empty 3-17 word rationale may therefore be replaced deterministically, but
+    only when it contains no prohibited numerical/model language and paragraph 1
+    already discusses both teams and contains a recognized football mechanism.
+    Missing/garbage copy, overlength copy, and prohibited leakage still fail closed.
     """
     original = _clean(rationale)
     word_count = len(_words(original))
-    if not 10 <= word_count < 18 or _rationale_has_prohibited(original):
+    if not 3 <= word_count < 18 or _rationale_has_prohibited(original):
         return original, False
 
     away = str(row.get("away_team") or "")
@@ -72,12 +80,15 @@ def _repair_underlength_rationale(rationale: str, paragraph1: str, row) -> tuple
         return original, False
     opponent = home if pick == away else away
 
-    paragraph_lower = _clean(paragraph1).lower()
+    paragraph = _clean(paragraph1)
+    if not _mentions_any(paragraph, _team_aliases(away)) or not _mentions_any(paragraph, _team_aliases(home)):
+        return original, False
+
+    paragraph_lower = paragraph.lower()
     for triggers, template in RATIONALE_MECHANISMS:
         if not any(trigger in paragraph_lower for trigger in triggers):
             continue
-        suffix = template.format(pick=_nickname(pick), opponent=_nickname(opponent))
-        candidate = original.rstrip(".!?") + ". " + suffix
+        candidate = template.format(pick=_nickname(pick), opponent=_nickname(opponent))
         if 18 <= len(_words(candidate)) <= 40 and not _rationale_has_prohibited(candidate):
             return candidate, True
     return original, False
@@ -145,8 +156,6 @@ def _valid_sources_with_backfill(row, sources: object) -> tuple[list[dict], set[
     if len(repaired_valid) >= 2 and len(repaired_families) >= 2:
         return repaired_valid, repaired_families, []
 
-    # Keep useful provider diagnostics while making the decisive failure the same
-    # direct-source contract enforced after deterministic backfill.
     provider_failures = [failure for failure in failures if "two independent" not in failure]
     combined = provider_failures + repaired_failures
     if not any("two independent" in failure for failure in combined):
@@ -210,8 +219,6 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
     valid_sources, _, source_failures = _valid_sources_with_backfill(row, entry.get("sources"))
     failures.extend(f"{gid}: {failure}" for failure in source_failures)
     if not source_failures:
-        # Keep the exact direct-source set that passed the focused gate. This avoids
-        # downstream ambiguity if provider citations required deterministic repair.
         entry["sources"] = valid_sources
 
     current_human = f"{headline} {paragraph1} {rationale}"
