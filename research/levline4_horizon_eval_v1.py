@@ -2,14 +2,13 @@ from __future__ import annotations
 
 """Prospective scoring for frozen LevLine 4 horizon forecasts.
 
-The evaluator is deliberately descriptive until the preregistered evidence gate is met.
-It never fits or changes a candidate. All comparisons are paired on the same games, and
-horizon comparisons use the common-game intersection required by the LevLine 4 contract.
+This evaluator is descriptive until the preregistered evidence gate is met. It never
+fits or changes a candidate. Comparisons are paired on identical games and horizon
+comparisons use only the common-game intersection required by the research contract.
 """
 
 from dataclasses import dataclass
-import math
-from typing import Any, Iterable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -41,7 +40,10 @@ def _clip_probability(values: pd.Series) -> pd.Series:
 def _home_outcome(history: pd.DataFrame) -> pd.DataFrame:
     required = {"game_id", "actual_home_score", "actual_away_score"}
     if history.empty or not required.issubset(history.columns):
-        return pd.DataFrame(columns=["game_id", "season", "week", "home_win", "incumbent_home_prob"])
+        return pd.DataFrame(
+            columns=["game_id", "season", "week", "home_win", "incumbent_home_prob"]
+        )
+
     work = history.copy()
     if "lock_status" in work.columns:
         work = work[work["lock_status"].astype(str).eq("LOCKED")].copy()
@@ -52,11 +54,19 @@ def _home_outcome(history: pd.DataFrame) -> pd.DataFrame:
     hs = hs.loc[graded]
     aw = aw.loc[graded]
     if work.empty:
-        return pd.DataFrame(columns=["game_id", "season", "week", "home_win", "incumbent_home_prob"])
+        return pd.DataFrame(
+            columns=["game_id", "season", "week", "home_win", "incumbent_home_prob"]
+        )
     if work["game_id"].astype(str).duplicated().any():
         raise ValueError("official graded history contains duplicate game_id rows")
+
     work["home_win"] = (hs > aw).astype(float).to_numpy()
-    work["incumbent_home_prob"] = pd.to_numeric(work.get("final_home_prob"), errors="coerce")
+    if "final_home_prob" in work.columns:
+        work["incumbent_home_prob"] = pd.to_numeric(
+            work["final_home_prob"], errors="coerce"
+        )
+    else:
+        work["incumbent_home_prob"] = np.nan
     columns = ["game_id", "home_win", "incumbent_home_prob"]
     for optional in ("season", "week"):
         if optional in work.columns:
@@ -75,7 +85,12 @@ def score_rows(shadows: pd.DataFrame, history: pd.DataFrame) -> ScoredRows:
         raise ValueError("shadow ledger contains duplicate forecast identities")
 
     outcomes = _home_outcome(history)
-    merged = shadows.merge(outcomes, on="game_id", how="left", suffixes=("", "_official"))
+    merged = shadows.merge(
+        outcomes,
+        on="game_id",
+        how="left",
+        suffixes=("", "_official"),
+    )
     ungraded = int(merged["home_win"].isna().sum())
     merged = merged[merged["home_win"].notna()].copy()
     if merged.empty:
@@ -98,37 +113,57 @@ def score_rows(shadows: pd.DataFrame, history: pd.DataFrame) -> ScoredRows:
     return ScoredRows(merged.reset_index(drop=True), ungraded, invalid)
 
 
+def _metadata_series(frame: pd.DataFrame, name: str) -> pd.Series:
+    official_name = f"{name}_official"
+    base = (
+        pd.to_numeric(frame[name], errors="coerce")
+        if name in frame.columns
+        else pd.Series(np.nan, index=frame.index, dtype=float)
+    )
+    if official_name not in frame.columns:
+        return base
+    official = pd.to_numeric(frame[official_name], errors="coerce")
+    return official.where(official.notna(), base)
+
+
 def _week_key(frame: pd.DataFrame) -> pd.Series:
-    season = pd.to_numeric(frame.get("season_official", frame.get("season")), errors="coerce")
-    week = pd.to_numeric(frame.get("week_official", frame.get("week")), errors="coerce")
-    if season.notna().any() and week.notna().any():
-        return season.fillna(-1).astype(int).astype(str) + "-W" + week.fillna(-1).astype(int).astype(str)
-    return pd.Series(["unknown"] * len(frame), index=frame.index, dtype=object)
+    season = _metadata_series(frame, "season")
+    week = _metadata_series(frame, "week")
+    valid = season.notna() & week.notna()
+    result = pd.Series("unknown", index=frame.index, dtype=object)
+    result.loc[valid] = (
+        season.loc[valid].astype(int).astype(str)
+        + "-W"
+        + week.loc[valid].astype(int).astype(str)
+    )
+    return result
 
 
-def _calibration_fit(probability: np.ndarray, outcome: np.ndarray) -> tuple[float | None, float | None]:
+def _calibration_fit(
+    probability: np.ndarray,
+    outcome: np.ndarray,
+) -> tuple[float | None, float | None]:
     """Two-parameter logistic recalibration via deterministic Newton iterations."""
     if len(probability) < 20 or np.unique(outcome).size < 2:
         return None, None
     p = np.clip(probability.astype(float), EPS, 1.0 - EPS)
     x = np.log(p / (1.0 - p))
-    X = np.column_stack([np.ones(len(x)), x])
+    design = np.column_stack([np.ones(len(x)), x])
     beta = np.asarray([0.0, 1.0], dtype=float)
     for _ in range(100):
-        eta = X @ beta
-        eta = np.clip(eta, -35.0, 35.0)
+        eta = np.clip(design @ beta, -35.0, 35.0)
         mu = 1.0 / (1.0 + np.exp(-eta))
-        w = np.clip(mu * (1.0 - mu), 1e-8, None)
-        score = X.T @ (outcome - mu)
-        info = X.T @ (w[:, None] * X)
+        weights = np.clip(mu * (1.0 - mu), 1e-8, None)
+        score = design.T @ (outcome - mu)
+        information = design.T @ (weights[:, None] * design)
         try:
-            step = np.linalg.solve(info, score)
+            step = np.linalg.solve(information, score)
         except np.linalg.LinAlgError:
             return None, None
-        beta_next = beta + step
-        if not np.isfinite(beta_next).all():
+        next_beta = beta + step
+        if not np.isfinite(next_beta).all():
             return None, None
-        beta = beta_next
+        beta = next_beta
         if float(np.max(np.abs(step))) < 1e-10:
             break
     return float(beta[0]), float(beta[1])
@@ -150,9 +185,10 @@ def metric_summary(frame: pd.DataFrame) -> dict[str, Any]:
     y = frame["home_win"].to_numpy(dtype=float)
     intercept, slope = _calibration_fit(p, y)
     week_keys = _week_key(frame)
+    known_weeks = week_keys[week_keys.ne("unknown")]
     return {
         "games": int(len(frame)),
-        "weeks": int(week_keys.nunique()),
+        "weeks": int(known_weeks.nunique()),
         "brier": float(frame["brier_loss"].mean()),
         "log_loss": float(frame["log_loss"].mean()),
         "winner_accuracy": float(frame["winner_correct_eval"].mean()),
@@ -166,15 +202,28 @@ def _block_bootstrap_mean_delta(
     frame: pd.DataFrame,
     delta_column: str,
     *,
-    draws: int = BOOTSTRAP_DRAWS,
+    draws: int | None = None,
     seed: int = BOOTSTRAP_SEED,
 ) -> dict[str, Any]:
     if frame.empty:
         return {"mean_delta": None, "ci95_low": None, "ci95_high": None, "draws": 0}
+    draws = int(BOOTSTRAP_DRAWS if draws is None else draws)
     work = frame.copy()
     work["week_key"] = _week_key(work)
-    blocks = [group[delta_column].to_numpy(dtype=float) for _, group in work.groupby("week_key", sort=True)]
-    observed = float(work[delta_column].mean())
+    work = work[work["week_key"].ne("unknown")].copy()
+    observed = float(frame[delta_column].mean())
+    if work.empty:
+        return {
+            "mean_delta": observed,
+            "ci95_low": None,
+            "ci95_high": None,
+            "draws": 0,
+            "reason": "missing_week_metadata",
+        }
+    blocks = [
+        group[delta_column].to_numpy(dtype=float)
+        for _, group in work.groupby("week_key", sort=True)
+    ]
     if len(blocks) < 2:
         return {
             "mean_delta": observed,
@@ -184,9 +233,9 @@ def _block_bootstrap_mean_delta(
             "reason": "fewer_than_two_week_blocks",
         }
     rng = np.random.default_rng(seed)
-    sampled_means = np.empty(int(draws), dtype=float)
+    sampled_means = np.empty(draws, dtype=float)
     n_blocks = len(blocks)
-    for i in range(int(draws)):
+    for i in range(draws):
         choices = rng.integers(0, n_blocks, size=n_blocks)
         values = np.concatenate([blocks[int(j)] for j in choices])
         sampled_means[i] = float(values.mean())
@@ -195,7 +244,7 @@ def _block_bootstrap_mean_delta(
         "mean_delta": observed,
         "ci95_low": float(low),
         "ci95_high": float(high),
-        "draws": int(draws),
+        "draws": draws,
         "week_blocks": int(n_blocks),
         "seed": int(seed),
     }
@@ -203,9 +252,15 @@ def _block_bootstrap_mean_delta(
 
 def _leave_one_week_out(frame: pd.DataFrame, delta_column: str) -> dict[str, Any]:
     if frame.empty:
-        return {"weeks": 0, "deltas": {}, "all_remaining_negative": None, "max_remaining_delta": None}
+        return {
+            "weeks": 0,
+            "deltas": {},
+            "all_remaining_negative": None,
+            "max_remaining_delta": None,
+        }
     work = frame.copy()
     work["week_key"] = _week_key(work)
+    work = work[work["week_key"].ne("unknown")].copy()
     keys = sorted(work["week_key"].unique())
     deltas: dict[str, float] = {}
     for key in keys:
@@ -228,24 +283,58 @@ def paired_comparison(
     *,
     label: str,
 ) -> dict[str, Any]:
-    left = candidate[["game_id", "horizon", "brier_loss", "log_loss", "prob", "home_win"]].copy()
-    right = benchmark[["game_id", "horizon", "brier_loss", "log_loss", "prob"]].copy()
-    paired = left.merge(right, on=["game_id", "horizon"], suffixes=("_candidate", "_benchmark"))
+    left_columns = [
+        "game_id",
+        "horizon",
+        "brier_loss",
+        "log_loss",
+        "prob",
+        "home_win",
+    ]
+    right_columns = ["game_id", "horizon", "brier_loss", "log_loss", "prob"]
+    left = candidate[left_columns].copy()
+    right = benchmark[right_columns].copy()
+    paired = left.merge(
+        right,
+        on=["game_id", "horizon"],
+        suffixes=("_candidate", "_benchmark"),
+    )
     if paired.empty:
-        return {"benchmark": label, "games": 0, "brier_delta": None, "log_loss_delta": None}
-    # Attach official season/week only after pairing so bootstrap blocks match exact games.
-    meta_cols = [column for column in ("game_id", "season_official", "week_official", "season", "week") if column in candidate.columns]
-    if len(meta_cols) > 1:
-        meta = candidate[meta_cols].drop_duplicates("game_id")
+        return {
+            "benchmark": label,
+            "games": 0,
+            "brier_delta": None,
+            "log_loss_delta": None,
+        }
+
+    meta_columns = [
+        column
+        for column in (
+            "game_id",
+            "season_official",
+            "week_official",
+            "season",
+            "week",
+        )
+        if column in candidate.columns
+    ]
+    if len(meta_columns) > 1:
+        meta = candidate[meta_columns].drop_duplicates("game_id")
         paired = paired.merge(meta, on="game_id", how="left")
-    paired["brier_delta"] = paired["brier_loss_candidate"] - paired["brier_loss_benchmark"]
-    paired["log_loss_delta"] = paired["log_loss_candidate"] - paired["log_loss_benchmark"]
+    paired["brier_delta"] = (
+        paired["brier_loss_candidate"] - paired["brier_loss_benchmark"]
+    )
+    paired["log_loss_delta"] = (
+        paired["log_loss_candidate"] - paired["log_loss_benchmark"]
+    )
     return {
         "benchmark": label,
         "games": int(len(paired)),
         "brier_delta": float(paired["brier_delta"].mean()),
         "log_loss_delta": float(paired["log_loss_delta"].mean()),
-        "brier_week_block_bootstrap": _block_bootstrap_mean_delta(paired, "brier_delta"),
+        "brier_week_block_bootstrap": _block_bootstrap_mean_delta(
+            paired, "brier_delta"
+        ),
         "leave_one_week_out_brier": _leave_one_week_out(paired, "brier_delta"),
     }
 
@@ -259,7 +348,9 @@ def incumbent_comparison(candidate: pd.DataFrame) -> dict[str, Any]:
         "benchmark": "official_T-120_F-ST",
         "games": int(len(paired)),
         "brier_delta": float(paired["brier_delta"].mean()),
-        "brier_week_block_bootstrap": _block_bootstrap_mean_delta(paired, "brier_delta"),
+        "brier_week_block_bootstrap": _block_bootstrap_mean_delta(
+            paired, "brier_delta"
+        ),
         "leave_one_week_out_brier": _leave_one_week_out(paired, "brier_delta"),
     }
 
@@ -270,9 +361,17 @@ def _common_horizon_metrics(scored: pd.DataFrame, candidate_id: str) -> dict[str
         & scored["horizon"].astype(str).isin(FINAL_HORIZONS)
     ].copy()
     if subset.empty:
-        return {"candidate_id": candidate_id, "common_games": 0, "horizons": {}}
+        return {
+            "candidate_id": candidate_id,
+            "common_games": 0,
+            "required_horizons": list(FINAL_HORIZONS),
+            "horizons": {},
+            "selection_authorized": False,
+        }
     presence = subset.groupby("game_id")["horizon"].agg(lambda s: set(map(str, s)))
-    eligible_games = presence[presence.map(lambda values: set(FINAL_HORIZONS).issubset(values))].index
+    eligible_games = presence[
+        presence.map(lambda values: set(FINAL_HORIZONS).issubset(values))
+    ].index
     common = subset[subset["game_id"].isin(eligible_games)].copy()
     metrics = {
         horizon: metric_summary(common[common["horizon"].astype(str).eq(horizon)])
@@ -284,7 +383,10 @@ def _common_horizon_metrics(scored: pd.DataFrame, candidate_id: str) -> dict[str
         "required_horizons": list(FINAL_HORIZONS),
         "horizons": metrics,
         "selection_authorized": False,
-        "note": "Descriptive only; no preferred horizon may be selected before the prospective evidence gate is satisfied.",
+        "note": (
+            "Descriptive only; no preferred horizon may be selected before the "
+            "prospective evidence gate is satisfied."
+        ),
     }
 
 
@@ -297,10 +399,14 @@ def evaluate(shadows: pd.DataFrame, history: pd.DataFrame) -> dict[str, Any]:
         "primary_metric": "brier",
         "graded_shadow_rows": int(len(scored)),
         "excluded_ungraded_rows": int(scored_result.excluded_ungraded),
-        "excluded_invalid_probability_rows": int(scored_result.excluded_invalid_probability),
+        "excluded_invalid_probability_rows": int(
+            scored_result.excluded_invalid_probability
+        ),
         "minimum_games": MIN_GAMES,
         "minimum_weeks": MIN_WEEKS,
         "automatic_promotion": False,
+        "horizon_selection_authorized": False,
+        "promotion_authorized": False,
         "production_authorized": False,
         "candidate_horizon_metrics": {},
         "paired_model_vs_same_horizon_market": {},
@@ -311,8 +417,9 @@ def evaluate(shadows: pd.DataFrame, history: pd.DataFrame) -> dict[str, Any]:
         report["gate_status"] = "WAITING_FOR_GRADED_SHADOWS"
         return report
 
-    scored["week_key"] = _week_key(scored)
-    for (candidate_id, horizon), group in scored.groupby(["candidate_id", "horizon"], sort=True):
+    for (candidate_id, horizon), group in scored.groupby(
+        ["candidate_id", "horizon"], sort=True
+    ):
         key = f"{candidate_id}__{horizon}"
         metrics = metric_summary(group)
         metrics["gate_sample_ready"] = bool(
@@ -338,8 +445,8 @@ def evaluate(shadows: pd.DataFrame, history: pd.DataFrame) -> dict[str, Any]:
             )
 
     for candidate_id in (MARKET_CANDIDATE_ID, FST_HORIZON_CANDIDATE_ID):
-        report["common_game_horizon_comparison"][candidate_id] = _common_horizon_metrics(
-            scored, candidate_id
+        report["common_game_horizon_comparison"][candidate_id] = (
+            _common_horizon_metrics(scored, candidate_id)
         )
 
     eligible = [
@@ -352,6 +459,4 @@ def evaluate(shadows: pd.DataFrame, history: pd.DataFrame) -> dict[str, Any]:
         if eligible
         else "ACCUMULATING_PROSPECTIVE_EVIDENCE"
     )
-    report["horizon_selection_authorized"] = False
-    report["promotion_authorized"] = False
     return report
