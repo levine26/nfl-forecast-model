@@ -32,7 +32,7 @@ RATIONALE_MECHANISMS = (
     ),
     (
         ("coverage", "secondary", "cornerback", "receiver", "route"),
-        "{pick}' coverage answers against {opponent}' receivers determine whether {pick} can stay structurally sound; if coverage favors {pick}, {opponent}' easy completions become harder.",
+        "{pick}' coverage answers against {opponent}' receivers determine whether {pick} can stay structurally sound against {opponent}; if coverage favors {pick}, {opponent}' easy completions become harder.",
     ),
     (
         ("run game", "rushing", "ground game", "run defense", "early down", "early-down"),
@@ -40,7 +40,7 @@ RATIONALE_MECHANISMS = (
     ),
     (
         ("explosive", "deep ball", "chunk play", "downfield"),
-        "{pick}' explosive-play discipline against {opponent} determines whether {pick} can avoid sudden swings; if discipline favors {pick}, {opponent}' shortcut scoring chances shrink.",
+        "{pick}' explosive-play discipline against {opponent} determines whether {pick} can avoid sudden swings against {opponent}; if discipline favors {pick}, {opponent}' shortcut scoring chances shrink.",
     ),
     (
         ("quarterback", "passing game", "pass game", "dropback"),
@@ -48,7 +48,7 @@ RATIONALE_MECHANISMS = (
     ),
     (
         ("scheme", "coordinator", "play-calling", "play calling", "motion"),
-        "{pick}' schematic answers to {opponent}' adjustments determine whether {pick} can create favorable looks; if the chess match favors {pick}, {opponent} must react instead of dictate.",
+        "{pick}' schematic answers to {opponent}' adjustments determine whether {pick} can create favorable looks against {opponent}; if the chess match favors {pick}, {opponent} must react instead of dictate.",
     ),
     (
         ("turnover", "ball security", "takeaway"),
