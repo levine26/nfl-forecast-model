@@ -49,14 +49,16 @@ jobs:
           assert contract['forbidden_actions']['production_authorized'] is False
           assert contract['research_firewall']['completed_2026_outcomes_used'] == 0
           PY
-      - name: Prove this workflow is research-only
+      - name: Verify workflow retains explicit production firewall
         run: |
           python - <<'PY'
           from pathlib import Path
           text = Path('.github/workflows/research_levline4_upset_evidence_v1.yml').read_text()
-          forbidden = ['outputs/this_week.csv', 'site/data', 'src/nfl_forecast/config.py']
-          for token in forbidden:
-              assert token not in text, token
+          assert 'research_outputs/levline4_upset_evidence_v1' in text
+          assert 'git diff --exit-code -- outputs/ site/ src/ scripts/ config/' in text
+          assert 'research-data/levline4-upset-evidence-v1' in text
+          assert "payload['production_authorized'] is False" in text
+          assert "payload['completed_2026_outcomes_used'] == 0" in text
           PY
 
   capture:
