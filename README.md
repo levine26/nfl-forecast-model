@@ -52,7 +52,7 @@ Not every research idea is a production TODO.
 - Historical 2022–2025 availability qualification remains **fail-closed**. PR #148 is the terminal V3/V4 evidence receipt: the historical official postseason source could not be made complete enough without inference, so downstream availability qualification was not authorized. Do not treat that research lane as production-ready and do not infer healthy status from missing historical rows.
 - Issue #4 remains the valid future backlog item for a numerically validated conditional-scenario engine. Sunday Signal must not invent injury/weather probability deltas before those features clear chronological OOS validation.
 - Issue #104 remains the canonical record of the F-ST-01 legacy original-freeze provenance exception. Later reconstruction evidence must not be relabeled as original candidate-freeze evidence, and the registered frozen identity/tolerance must not be rewritten to make the exception disappear.
-- Draft PR #141 is retained only as a future leakage-safe research/preregistration workspace. It is not a production/UI release candidate.
+- Issue #178 now holds the future leakage-safe post-100 optimization/preregistration program. Draft PR #141 was closed after its surviving research scope was transferred there; it is not a production/UI release candidate.
 
 ## Repository layout
 
