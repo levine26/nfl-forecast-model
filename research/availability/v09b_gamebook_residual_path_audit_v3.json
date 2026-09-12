@@ -1,0 +1,62 @@
+{
+  "contract_version": 3,
+  "contract_id": "V09B-GAMEBOOK-RESIDUAL-PATH-AUDIT-V3",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "predecessor_receipt": "research/availability/v09b_gamebook_training_label_coverage_receipt_v2.json",
+  "status": "POST_V2_SOURCE_DIAGNOSTIC_PREREGISTERED",
+  "purpose": "Determine whether V2's residual 70 unmapped games are artifacts of the frozen _Gamebook.pdf CDX filename filter or path spelling on the same two already-audited official NFL hosts, without adding a new source class or weakening any qualification gate.",
+  "authorized_hosts_exact": ["www.nfl.com", "nflcdns.nfl.com"],
+  "source_families": [
+    {"family": "legacy_www", "prefix": "www.nfl.com/liveupdate/gamecenter/"},
+    {"family": "nfl_cdn", "prefix": "nflcdns.nfl.com/liveupdate/gamecenter/"}
+  ],
+  "residual_universe": {
+    "derive_from": "fresh reproduction of V2 source map under its frozen contract",
+    "expected_v2_missing_games": 70,
+    "expected_v2_coverage_games": 2506,
+    "expected_total_games": 2576,
+    "do_not_add_or_remove_games_by_hand": true
+  },
+  "directory_query": {
+    "pattern": "{source_family_prefix}{gsis}/",
+    "match_type": "prefix",
+    "statuscode_filter": 200,
+    "collapse": "urlkey",
+    "no_gamebook_filename_filter": true,
+    "required_fields": ["timestamp", "original", "statuscode", "digest", "mimetype", "length"],
+    "candidate_rule": "URL remains on an authorized host, directory GSIS equals the scheduled game GSIS, and final path basename contains gamebook case-insensitively and ends in .pdf before optional query/fragment.",
+    "diagnostic_pdf_rule": "also record all other PDF basenames in the directory to expose alternate official naming conventions"
+  },
+  "alias_conflict_diagnostic": {
+    "v2_alias_conflict_games_expected": 1,
+    "query_same_directories": true,
+    "record_all_gamebook_candidates_and_digests": true,
+    "do_not_resolve_alias_conflict_by_assumption": true
+  },
+  "interpretation_policy": {
+    "candidate_found_does_not_reclassify_v2": true,
+    "candidate_found_does_not_qualify_coverage": true,
+    "candidate_found_may_justify_separately_frozen_coverage_contract": true,
+    "no_candidate_found_on_known_hosts_does_not_prove_no_other_official_host_exists": true,
+    "network_or_cdx_error_is_inconclusive_not_negative_evidence": true
+  },
+  "non_authorizations": {
+    "new_host_family_authorized": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "per_game_manual_label_invention": false,
+    "game_outcome_use": false,
+    "completed_2026_outcomes": false,
+    "production_changes": false
+  },
+  "governance": {
+    "research_only": true,
+    "labels_constructed": false,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "diagnostic_scope_frozen_before_execution": true,
+    "production_dependency_authorized": false
+  }
+}
