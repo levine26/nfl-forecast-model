@@ -6,7 +6,7 @@ from statistics import median
 from typing import Any, Iterable
 
 
-HORIZONS = {"T-120m": 120, "T-60m": 60, "T-30m": 30}
+HORIZONS = {"T-120m": 120, "T-60m": 60, "T-45m": 45, "T-30m": 30}
 CAPTURE_TOLERANCE_MINUTES = 7.5
 EPS = 1e-9
 
