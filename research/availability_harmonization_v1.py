@@ -58,6 +58,14 @@ CANONICAL_COLUMNS = [
     "known_by_t120",
     "source_sha256",
 ]
+DUPLICATE_KEY = ["season", "week", "team", "gsis_id"]
+DUPLICATE_EQUIVALENCE_COLUMNS = [
+    "position",
+    "full_name",
+    "practice_primary_injury",
+    "practice_secondary_injury",
+    "practice_status_normalized",
+]
 
 EXPECTED_V09B = {
     "candidate_version": "0.9B-player-value-availability",
@@ -79,7 +87,9 @@ class SeasonAudit:
     full_asset_rows: int
     regular_rows: int
     missing_id_rate: float
-    duplicate_player_team_week_rows: int
+    raw_duplicate_excess_rows: int
+    identical_duplicate_rows_collapsed: int
+    conflicting_duplicate_groups: int
     schedule_join_missing_rate: float
     known_by_t120_rate: float
     unknown_practice_status_rate: float
@@ -91,7 +101,9 @@ class SeasonAudit:
             "full_asset_rows": self.full_asset_rows,
             "regular_rows": self.regular_rows,
             "missing_id_rate": self.missing_id_rate,
-            "duplicate_player_team_week_rows": self.duplicate_player_team_week_rows,
+            "raw_duplicate_excess_rows": self.raw_duplicate_excess_rows,
+            "identical_duplicate_rows_collapsed": self.identical_duplicate_rows_collapsed,
+            "conflicting_duplicate_groups": self.conflicting_duplicate_groups,
             "schedule_join_missing_rate": self.schedule_join_missing_rate,
             "known_by_t120_rate": self.known_by_t120_rate,
             "unknown_practice_status_rate": self.unknown_practice_status_rate,
@@ -120,6 +132,12 @@ def normalize_practice_status(value: object) -> str:
     if text == "dnp" or "did not participate" in text:
         return "dnp"
     return "unknown"
+
+
+def _normalized_text(value: object) -> str:
+    if value is None or pd.isna(value):
+        return ""
+    return " ".join(str(value).strip().lower().split())
 
 
 def validate_injury_asset(
@@ -200,6 +218,43 @@ def build_schedule_index(schedules: pd.DataFrame, *, season: int) -> pd.DataFram
     return out
 
 
+def _collapse_equivalent_duplicates(frame: pd.DataFrame, *, season: int) -> tuple[pd.DataFrame, int, int]:
+    """Collapse only duplicate player-week rows that are feature-equivalent.
+
+    nflverse historical assets can contain repeated player/team/week rows. Because these
+    files do not carry revision timestamps, a duplicate group is safe to collapse only
+    when every field used by the practice-state feature is equivalent. Differences in
+    report/game status are intentionally ignored because game status is not authorized as
+    a historical feature in this lane. Any identity/practice-state disagreement fails closed.
+    """
+    duplicate_mask = frame.duplicated(DUPLICATE_KEY, keep=False)
+    if not duplicate_mask.any():
+        return frame, 0, 0
+
+    duplicate_rows = frame.loc[duplicate_mask].copy()
+    raw_excess = int(len(duplicate_rows) - duplicate_rows[DUPLICATE_KEY].drop_duplicates().shape[0])
+    conflicting_groups = 0
+
+    for _, group in duplicate_rows.groupby(DUPLICATE_KEY, dropna=False, sort=False):
+        comparisons = pd.DataFrame(index=group.index)
+        comparisons["position"] = group["position"].map(_normalized_text)
+        comparisons["full_name"] = group["full_name"].map(_normalized_text)
+        comparisons["practice_primary_injury"] = group["practice_primary_injury"].map(_normalized_text)
+        comparisons["practice_secondary_injury"] = group["practice_secondary_injury"].map(_normalized_text)
+        comparisons["practice_status_normalized"] = group["practice_status_normalized"]
+        if any(comparisons[column].nunique(dropna=False) > 1 for column in DUPLICATE_EQUIVALENCE_COLUMNS):
+            conflicting_groups += 1
+
+    if conflicting_groups:
+        raise ValueError(
+            f"{season} contains {conflicting_groups} conflicting duplicate player-team-week groups"
+        )
+
+    collapsed = frame.drop_duplicates(DUPLICATE_KEY, keep="first").copy()
+    collapsed_count = int(len(frame) - len(collapsed))
+    return collapsed, raw_excess, collapsed_count
+
+
 def harmonize_season(
     injury_frame: pd.DataFrame,
     schedules: pd.DataFrame,
@@ -218,12 +273,15 @@ def harmonize_season(
     ids = frame["gsis_id"].astype("string").fillna("").str.strip()
     missing_ids = ids.eq("") | ids.str.lower().eq("nan") | ids.eq("<NA>")
     missing_id_rate = float(missing_ids.mean())
-
-    duplicate_count = int(frame.duplicated(["season", "week", "team", "gsis_id"]).sum())
-    if duplicate_count:
-        raise ValueError(f"{season} contains duplicate player-team-week injury rows")
+    if missing_id_rate:
+        raise ValueError(f"{season} injury rows contain missing stable GSIS identity")
 
     frame["practice_status_normalized"] = frame["practice_status"].map(normalize_practice_status)
+    frame, raw_duplicate_excess_rows, identical_duplicate_rows_collapsed = (
+        _collapse_equivalent_duplicates(frame, season=season)
+    )
+    conflicting_duplicate_groups = 0
+
     frame["listed_on_injury_report"] = True
     frame["source_sha256"] = source_sha256
 
@@ -253,7 +311,9 @@ def harmonize_season(
         full_asset_rows=int(len(injury_frame)),
         regular_rows=int(len(canonical)),
         missing_id_rate=missing_id_rate,
-        duplicate_player_team_week_rows=duplicate_count,
+        raw_duplicate_excess_rows=raw_duplicate_excess_rows,
+        identical_duplicate_rows_collapsed=identical_duplicate_rows_collapsed,
+        conflicting_duplicate_groups=conflicting_duplicate_groups,
         schedule_join_missing_rate=schedule_join_missing_rate,
         known_by_t120_rate=known_rate,
         unknown_practice_status_rate=unknown_rate,
@@ -314,8 +374,8 @@ def evaluate_harmonization(
             reasons.append(f"source row count mismatch: {season}")
         if audit.missing_id_rate != float(gates["stable_identity_missing_rate"]):
             reasons.append(f"stable identity missingness failed: {season}")
-        if audit.duplicate_player_team_week_rows != int(gates["duplicate_player_team_week_rows"]):
-            reasons.append(f"duplicate player-team-week rows failed: {season}")
+        if audit.conflicting_duplicate_groups != int(gates["conflicting_duplicate_groups"]):
+            reasons.append(f"conflicting duplicate practice-state groups failed: {season}")
         if audit.schedule_join_missing_rate != float(gates["schedule_join_missing_rate"]):
             reasons.append(f"schedule join missingness failed: {season}")
         if audit.known_by_t120_rate != float(gates["known_by_t120_rate"]):
@@ -359,6 +419,10 @@ def evaluate_harmonization(
         "completed_2026_outcomes_used": 0,
         "missing_row_semantics": (
             "absence means not injury-listed in this source; it is not an active/healthy imputation"
+        ),
+        "duplicate_policy": (
+            "feature-equivalent duplicate player-team-week rows may collapse deterministically; "
+            "any identity/practice-state disagreement fails closed"
         ),
         "historical_game_status_feature_authorized": False,
         "actual_snaps_used": 0,
