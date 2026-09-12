@@ -1,0 +1,57 @@
+{
+  "automatic_promotion": false,
+  "candidate_horizon_metrics": {},
+  "candidate_vs_incumbent": {},
+  "common_game_horizon_comparison": {},
+  "evaluation_version": "LEVLINE4-HORIZON-EVAL-V1-PIT-HARDENED",
+  "excluded_invalid_probability_rows": 0,
+  "excluded_tie_rows": 0,
+  "excluded_ungraded_rows": 0,
+  "gate_status": "WAITING_FOR_GRADED_SHADOWS",
+  "generated_at_utc": "2026-09-12T18:44:17.287285+00:00",
+  "graded_shadow_rows": 0,
+  "horizon_completeness_audit": {
+    "games_with_all_four_eligible_horizons": 0,
+    "games_with_any_eligible_horizon": 0,
+    "horizon_presence_rate": {
+      "T-120m": null,
+      "T-30m": null,
+      "T-45m": null,
+      "T-60m": null
+    },
+    "presence_patterns": {}
+  },
+  "horizon_selection_authorized": false,
+  "invalid_incumbent_probability_rows": 0,
+  "minimum_games": 200,
+  "minimum_gate_interpretation": "eligibility_for_formal_inference_not_automatic_selection",
+  "minimum_weeks": 14,
+  "official_history_rows_available": 2,
+  "paired_model_vs_same_horizon_market": {},
+  "primary_metric": "brier",
+  "primary_timing_horizons": [
+    "T-120m",
+    "T-60m",
+    "T-45m",
+    "T-30m"
+  ],
+  "primary_timing_sample": "complete_case_intersection_of_all_four_horizons",
+  "primary_timing_sample_ready": false,
+  "probability_validity_rule": "finite_and_strictly_between_zero_and_one_no_clipping_into_validity",
+  "production_authorized": false,
+  "program": "LEVLINE-4-RESEARCH-V1",
+  "promotion_authorized": false,
+  "raw_shadow_rows_available": 0,
+  "research_only": true,
+  "shadow_rows_available": 0,
+  "strict_horizon_eligibility_audit": {
+    "eligible_rows": 0,
+    "excluded_missing_timing_rows": 0,
+    "excluded_post_cutoff_rows": 0,
+    "excluded_too_early_rows": 0,
+    "input_rows": 0,
+    "strict_cutoff": true
+  },
+  "strict_pit_shadow_rows_available": 0,
+  "tie_policy": "exclude_from_binary_win_probability_scoring_and_report_separately"
+}
