@@ -20,17 +20,46 @@ RATIONALE_PROHIBITED = re.compile(
     flags=re.I,
 )
 
-# A clean rationale that narrowly misses the minimum can be completed with one short,
-# matchup-specific mechanism already present in the researched paragraph. Every suffix
-# includes both clubs, which keeps the repair from becoming repeated slate boilerplate.
+# Each mechanism carries both a short suffix for clean 10-17 word near-misses and a
+# complete replacement for clean 4-9 word fragments. Both forms are matchup-specific,
+# name both clubs, and are derived only from a mechanism already present in the
+# researched paragraph1. The final 18-40 word and prohibited-language gates still run.
 RATIONALE_MECHANISMS = (
-    (("pass rush", "pressure", "protection", "pocket", "sack"), "{pick}' protection plan against {opponent} remains decisive."),
-    (("coverage", "secondary", "cornerback", "receiver", "route"), "{pick}' coverage answers against {opponent} remain central."),
-    (("run game", "rushing", "ground game", "run defense", "early down"), "{pick}' early-down rushing efficiency against {opponent} matters."),
-    (("explosive", "deep ball", "chunk play", "downfield"), "{pick}' explosive-play discipline against {opponent} becomes critical."),
-    (("quarterback", "passing game", "pass game", "dropback"), "{pick}' quarterback execution against {opponent} remains pivotal."),
-    (("scheme", "coordinator", "play-calling", "play calling", "motion"), "{pick}' schematic counters against {opponent} remain important."),
-    (("turnover", "ball security", "takeaway"), "{pick}' ball-security execution against {opponent} remains critical."),
+    (
+        ("pass rush", "pressure", "protection", "pocket", "sack"),
+        "{pick}' protection plan against {opponent} remains decisive.",
+        "For {pick}, protection must answer {opponent} pressure; keeping {pick} on schedule denies {opponent} the obvious passing situations {opponent}' rush wants.",
+    ),
+    (
+        ("coverage", "secondary", "cornerback", "receiver", "route"),
+        "{pick}' coverage answers against {opponent} remain central.",
+        "For {pick}, route spacing must stress {opponent} coverage; clean separation lets {pick} stay efficient while forcing {opponent} defenders to tackle in space.",
+    ),
+    (
+        ("run game", "rushing", "ground game", "run defense", "early down"),
+        "{pick}' early-down rushing efficiency against {opponent} matters.",
+        "For {pick}, early-down rushing efficiency can move {opponent} backward; that keeps {pick} balanced and makes {opponent} defend the full playbook.",
+    ),
+    (
+        ("explosive", "deep ball", "chunk play", "downfield"),
+        "{pick}' explosive-play discipline against {opponent} becomes critical.",
+        "For {pick}, explosive-play discipline matters against {opponent}; forcing {opponent} to drive the field gives {pick} more chances to control possession.",
+    ),
+    (
+        ("quarterback", "passing game", "pass game", "dropback"),
+        "{pick}' quarterback execution against {opponent} remains pivotal.",
+        "For {pick}, quarterback execution must stay clean against {opponent}; decisive reads keep {pick} on schedule and prevent {opponent} from dictating obvious passing downs.",
+    ),
+    (
+        ("scheme", "coordinator", "play-calling", "play calling", "motion"),
+        "{pick}' schematic counters against {opponent} remain important.",
+        "For {pick}, schematic counters must anticipate {opponent} adjustments; giving {pick} clear answers makes {opponent} react instead of setting the terms.",
+    ),
+    (
+        ("turnover", "ball security", "takeaway"),
+        "{pick}' ball-security execution against {opponent} remains critical.",
+        "For {pick}, ball security has to hold against {opponent}; protecting possessions keeps {pick} in control and forces {opponent} to earn every short field.",
+    ),
 )
 
 
@@ -52,17 +81,18 @@ def _nickname(code: object) -> str:
 
 
 def _repair_underlength_rationale(rationale: str, paragraph1: str, row) -> tuple[str, bool]:
-    """Normalize only a clean 10-17 word near-miss using researched matchup mechanics.
+    """Normalize clean 4-17 word rationale failures from researched paragraph1.
 
-    This is intentionally not a generic padding path. Rationales shorter than 10 words,
-    longer than the contract, or containing prohibited numerical/model language still
-    fail closed. A repair is possible only when paragraph 1 contains a recognized
-    football mechanism, and the resulting text must itself satisfy the 18-40 word
-    contract and prohibited-term gate.
+    Clean 10-17 word near-misses keep the provider's text and receive one short,
+    matchup-specific mechanism sentence. Clean 4-9 word fragments are too small to
+    preserve coherently, so they are replaced by a complete 18-40 word rationale built
+    from a recognized football mechanism already present in paragraph1. Blank/1-3 word
+    fragments, prohibited numerical/model language, invalid picks, or paragraphs with no
+    recognized mechanism still fail closed.
     """
     original = _clean(rationale)
     word_count = len(_words(original))
-    if not 10 <= word_count < 18 or _rationale_has_prohibited(original):
+    if not 4 <= word_count < 18 or _rationale_has_prohibited(original):
         return original, False
 
     away = str(row.get("away_team") or "")
@@ -71,13 +101,18 @@ def _repair_underlength_rationale(rationale: str, paragraph1: str, row) -> tuple
     if pick not in {away, home}:
         return original, False
     opponent = home if pick == away else away
+    pick_name = _nickname(pick)
+    opponent_name = _nickname(opponent)
 
     paragraph_lower = _clean(paragraph1).lower()
-    for triggers, template in RATIONALE_MECHANISMS:
+    for triggers, suffix_template, full_template in RATIONALE_MECHANISMS:
         if not any(trigger in paragraph_lower for trigger in triggers):
             continue
-        suffix = template.format(pick=_nickname(pick), opponent=_nickname(opponent))
-        candidate = original.rstrip(".!?") + ". " + suffix
+        if word_count >= 10:
+            suffix = suffix_template.format(pick=pick_name, opponent=opponent_name)
+            candidate = original.rstrip(".!?") + ". " + suffix
+        else:
+            candidate = full_template.format(pick=pick_name, opponent=opponent_name)
         if 18 <= len(_words(candidate)) <= 40 and not _rationale_has_prohibited(candidate):
             return candidate, True
     return original, False
