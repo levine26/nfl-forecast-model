@@ -1,0 +1,53 @@
+{
+  "contract_id": "LEVLINE4-ACCURACY-SWITCH-V1",
+  "status": "prospective_research_governance",
+  "incumbent_pick_engine": "F-ST-01-FROZEN-2026 at T-120",
+  "production_changed": false,
+  "purpose": "Evaluate later information by whether it improves the incumbent winner decision, not by whether it produces a cosmetically different probability.",
+  "candidate_horizons": ["T-60m", "T-45m", "T-30m"],
+  "strict_point_in_time_required": true,
+  "core_identity": {
+    "statement": "Relative winner accuracy can change only on games where challenger and incumbent choose different winners.",
+    "overall_accuracy_delta": "disagreement_rate * (2 * switch_win_rate - 1)",
+    "switch_win_rate": "challenger_only_correct / disagreement_games",
+    "implication": "A late horizon that rarely changes the pick can only create a small overall accuracy gain even with a strong switch win rate."
+  },
+  "evaluation": {
+    "primary": [
+      "paired winner accuracy delta versus T-120 F-ST",
+      "challenger-only-correct count",
+      "incumbent-only-correct count",
+      "disagreement rate",
+      "switch win rate",
+      "week-block uncertainty for paired zero-one loss"
+    ],
+    "secondary": ["brier", "log_loss", "calibration"],
+    "same_pick_games": "cannot affect relative winner accuracy; may still inform confidence-layer evaluation",
+    "disagreement_games": "decisive sample for whether later information should change the published winner pick"
+  },
+  "decision_policy": {
+    "default": "retain the T-120 F-ST winner pick",
+    "later_information_role": "potential switch evidence, not automatic replacement",
+    "promotion_condition": "A later horizon may become the winner-pick engine only after prospectively paired accuracy evidence supports a genuine positive accuracy delta versus T-120 F-ST. Better Brier alone is insufficient.",
+    "if_accuracy_unresolved": "keep T-120 F-ST pick; later probability information may be used only in a separately validated confidence layer",
+    "conditional_switch_subgroups": "not authorized in V1; any injury/QB/line-movement conditional switch rule requires a new preregistered candidate and fresh prospective start"
+  },
+  "historical_motivation": {
+    "frozen_fst_vs_market_2022_2025": {
+      "games": 1087,
+      "disagreements": 25,
+      "fst_only_correct": 15,
+      "market_only_correct": 10,
+      "switch_win_rate": 0.6,
+      "overall_accuracy_gain_percentage_points": 0.45998160073598
+    },
+    "interpretation": "The entire observed 3.0 winner-accuracy advantage over market came from a very small disagreement set, demonstrating why switch quality rather than global probability movement is the key accuracy-first object."
+  },
+  "research_firewall": {
+    "completed_2026_outcomes_used_to_define_rule": 0,
+    "no_post_result_switch_threshold_tuning": true,
+    "no_post_hoc_conditional_subgroups": true,
+    "new_switch_logic_requires_new_candidate_id": true,
+    "production_authorized": false
+  }
+}
