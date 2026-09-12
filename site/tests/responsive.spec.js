@@ -25,8 +25,9 @@ for (const [name, width, height] of viewports) {
       await expect(page.locator('.ss-exp-board-labels:visible').getByText('LEVLINE FAIR SPREAD', { exact: true })).toBeVisible()
       await expect(page.locator('.ss-exp-board-labels:visible').getByText('SPORTSBOOK SPREAD', { exact: true })).toBeVisible()
     } else {
-      await expect(page.locator('.ss-exp-mobile-board:visible').first()).toBeVisible()
-      await expect(page.locator('.ss-exp-mobile-board:visible').first().getByText('Fair spread', { exact: true })).toBeVisible()
+      const mobileRows=page.locator('.ss-exp-mobile-board:visible > button')
+      await expect(mobileRows.first()).toBeVisible()
+      await expect(mobileRows.first().getByText('Fair spread', { exact: true })).toBeVisible()
     }
     await expect(page.getByText('Fair line', { exact: true })).toHaveCount(0)
     await expect(page.getByText('Model Line', { exact: true })).toHaveCount(0)
@@ -36,8 +37,10 @@ for (const [name, width, height] of viewports) {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBeLessThanOrEqual(1)
 
-    const openRows = width <= 768 ? page.locator('.ss-exp-mobile-board:visible button') : page.locator('.ss-exp-board-rows:visible button')
+    const openRows = width <= 768 ? page.locator('.ss-exp-mobile-board:visible > button') : page.locator('.ss-exp-board-rows:visible > button')
+    await expect(openRows.first()).toBeVisible()
     await openRows.first().click()
+    await expect(page).toHaveURL(/#\/game\//)
     await expect(page.locator('.ss-matchup-page')).toBeVisible()
     const clarity = page.locator('.ss-clarity-shell:visible').first()
     await expect(clarity).toBeVisible()
@@ -52,7 +55,6 @@ for (const [name, width, height] of viewports) {
     await expect(page.locator('.ss-exp-movement-context:visible')).toBeVisible()
     await expect(clarity.locator('.ss-clarity-share')).toBeVisible()
     await expect(page.getByText('WHY LEVLINE?', { exact: true })).toHaveCount(0)
-    await expect(page).toHaveURL(/#\/game\//)
 
     const matchupOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(matchupOverflow).toBeLessThanOrEqual(1)
