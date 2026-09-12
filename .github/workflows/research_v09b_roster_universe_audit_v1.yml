@@ -1,0 +1,121 @@
+name: LevLine V09B roster universe source audit
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_roster_universe_audit_contract_v1.json'
+      - 'research/availability/v09b_roster_universe_source_preflight_v1.json'
+      - 'research/v09b_roster_universe_audit_v1.py'
+      - 'research/test_v09b_roster_universe_audit_v1.py'
+      - '.github/workflows/research_v09b_roster_universe_audit_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen source-audit semantics
+        run: pytest -q research/test_v09b_roster_universe_audit_v1.py
+      - name: Validate source-era and no-label contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/availability/v09b_roster_universe_audit_contract_v1.json').read_text())
+          preflight = json.loads(Path('research/availability/v09b_roster_universe_source_preflight_v1.json').read_text())
+          assert contract['status'] == 'PREREGISTERED_DIAGNOSTIC_SOURCE_AUDIT'
+          assert contract['seasons'] == list(range(2012, 2022))
+          assert contract['source']['source_eras']['2012_2015'] == 'NFL Data Exchange getRoster lineage'
+          assert contract['source']['source_eras']['2016_2021'] == 'NFL NGS weekly roster API lineage'
+          assert contract['canonical_universe']['canonical_team_game_week_coverage_rate_required'] == 1.0
+          assert contract['explicitly_non_authoritative_fields']['status'].startswith('generic season-roster status')
+          assert contract['not_yet_qualification_gates']['eligible_status_values'] is None
+          assert contract['not_yet_qualification_gates']['game_day_roster_universe_coverage_rate'] is None
+          assert contract['authorization']['source_era_status_semantics_qualified'] is False
+          assert contract['authorization']['game_day_roster_universe_qualified'] is False
+          assert contract['authorization']['v09b_model_fit_authorized'] is False
+          assert contract['governance']['completed_2026_outcomes_used'] == 0
+          assert preflight['candidate_source']['source_eras']['2012_2015']['upstream'] == 'NFL Data Exchange getRoster'
+          assert preflight['candidate_source']['source_eras']['2016_2021']['upstream'] == 'NFL NGS weekly roster API'
+          assert preflight['current_disposition']['source_era_semantics_transfer_authorized'] is False
+          PY
+
+  source-audit:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Audit raw weekly-roster artifact and canonical team-game-week coverage
+        run: |
+          mkdir -p research_outputs/v09b_roster_universe_audit_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_roster_universe_audit_v1.py \
+              --season ${{ matrix.season }} \
+              --output research_outputs/v09b_roster_universe_audit_v1/${{ matrix.season }}.json
+      - name: Assert diagnostic remains source-only
+        if: always()
+        run: |
+          if test -s research_outputs/v09b_roster_universe_audit_v1/${{ matrix.season }}.json; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          result = json.loads(Path(f'research_outputs/v09b_roster_universe_audit_v1/{season}.json').read_text())
+          assert result['generic_status_used_for_audit_membership'] is False
+          assert result['source_era_status_semantics_qualified'] is False
+          assert result['game_day_roster_universe_qualified'] is False
+          assert result['player_team_game_identity_qualified'] is False
+          assert result['training_label_semantics_qualified'] is False
+          assert result['training_source_chronology_qualified'] is False
+          assert result['v09b_model_fit_authorized'] is False
+          assert result['model_fit_performed'] is False
+          assert result['game_outcomes_used'] == 0
+          assert result['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-roster-universe-audit-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_roster_universe_audit_v1/${{ matrix.season }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

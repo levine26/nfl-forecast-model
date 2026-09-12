@@ -1,0 +1,114 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-ROSTER-UNIVERSE-SOURCE-AUDIT-V1",
+  "experiment_dependency": "V09B-GAMEBOOK-LABEL-COVERAGE-V1",
+  "status": "PREREGISTERED_DIAGNOSTIC_SOURCE_AUDIT",
+  "purpose": "Audit the historical weekly-roster corpus needed to bound the positive P(active) class without assigning active/inactive labels or fitting V09B.",
+  "seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+  "source": {
+    "release_pattern": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_{season}.parquet",
+    "raw_artifact_sha256_required": true,
+    "parquet_magic_required": true,
+    "canonical_schedule_authority": "nflverse schedules",
+    "source_eras": {
+      "2012_2015": "NFL Data Exchange getRoster lineage",
+      "2016_2021": "NFL NGS weekly roster API lineage"
+    }
+  },
+  "canonical_universe": {
+    "game_type": "REG",
+    "team_game_week_definition": "one home-team and one away-team key for every canonical regular-season game",
+    "expected_games_by_season": {
+      "2012": 256,
+      "2013": 256,
+      "2014": 256,
+      "2015": 256,
+      "2016": 256,
+      "2017": 256,
+      "2018": 256,
+      "2019": 256,
+      "2020": 256,
+      "2021": 272
+    },
+    "expected_team_game_weeks_by_season": {
+      "2012": 512,
+      "2013": 512,
+      "2014": 512,
+      "2015": 512,
+      "2016": 512,
+      "2017": 512,
+      "2018": 512,
+      "2019": 512,
+      "2020": 512,
+      "2021": 544
+    },
+    "canonical_team_game_week_coverage_rate_required": 1.0,
+    "silent_missing_team_game_weeks_allowed": 0
+  },
+  "required_source_fields": [
+    "season",
+    "game_type",
+    "week",
+    "team",
+    "gsis_id",
+    "status_description_abbr"
+  ],
+  "optional_source_fields": ["status_short_description"],
+  "explicitly_non_authoritative_fields": {
+    "status": "generic season-roster status may be present but may not define week-specific roster membership or active/inactive truth"
+  },
+  "diagnostics": {
+    "canonical_team_game_week_row_counts": true,
+    "source_native_status_description_abbr_distribution": true,
+    "source_native_status_short_description_distribution_where_present": true,
+    "missing_gsis_id_rate": true,
+    "duplicate_non_null_gsis_player_team_week_keys": true,
+    "rows_outside_canonical_team_game_weeks": true,
+    "generic_status_field_presence_only": true,
+    "normalized_release_row_digest": true
+  },
+  "frozen_fail_closed_gates_for_this_audit": {
+    "raw_parquet_download_required": true,
+    "raw_parquet_sha256_required": true,
+    "required_fields_must_exist": true,
+    "canonical_schedule_count_must_match": true,
+    "canonical_team_game_week_coverage_rate_required": 1.0,
+    "duplicate_non_null_gsis_player_team_week_keys_allowed": 0
+  },
+  "not_yet_qualification_gates": {
+    "missing_gsis_id_rate_threshold": null,
+    "eligible_status_values": null,
+    "promoted_or_elevated_player_semantics": null,
+    "practice_squad_semantics": null,
+    "reserve_list_semantics": null,
+    "game_day_roster_universe_coverage_rate": null,
+    "player_team_game_identity_resolution_rate": null
+  },
+  "prohibited_shortcuts": [
+    "treat generic status as week-specific roster state",
+    "treat status_description_abbr INA as official game-specific inactive truth",
+    "infer active from snaps or play-by-play participation",
+    "infer active from final starters",
+    "drop canonical games or team-game-weeks with missing roster rows",
+    "transfer status semantics across source eras without independent proof",
+    "fit V09B from this diagnostic",
+    "use completed 2026 outcomes"
+  ],
+  "authorization": {
+    "weekly_roster_raw_source_coverage_qualified": false,
+    "source_era_status_semantics_qualified": false,
+    "game_day_roster_universe_qualified": false,
+    "player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
