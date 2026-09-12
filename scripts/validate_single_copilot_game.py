@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import re
 
@@ -11,6 +12,7 @@ import pandas as pd
 
 from compose_copilot_media_reads import _domain_family, _extract_json
 from nfl_forecast.copilot_source_backfill import backfill_direct_sources
+from nfl_forecast.editorial_provider_fallback import recover_focused_payload
 from nfl_forecast.source_policy import is_direct_media_report_url
 from validate_copilot_media_reads import _mentions_any, _team_aliases, _team_name, _unique_ngrams
 
@@ -275,6 +277,15 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
     return failures
 
 
+def _groq_step_active() -> bool:
+    """Only provider CI may auto-recover invalid Groq prose.
+
+    ChatGPT ingestion and ordinary tests must retain their normal fail-closed behavior.
+    The Groq workflow exports GROQ_API_KEY to the focused writer/validator step.
+    """
+    return bool(os.environ.get("GROQ_API_KEY"))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -283,15 +294,29 @@ def main() -> None:
     parser.add_argument("--accepted-dir", default="")
     args = parser.parse_args()
 
-    failures = validate(
-        Path(args.input),
-        str(args.game_id),
-        pd.read_csv(args.predictions),
-        Path(args.accepted_dir) if args.accepted_dir else None,
-    )
+    path = Path(args.input)
+    gid = str(args.game_id)
+    predictions = pd.read_csv(args.predictions)
+    accepted_dir = Path(args.accepted_dir) if args.accepted_dir else None
+    failures = validate(path, gid, predictions, accepted_dir)
+
+    if failures and _groq_step_active():
+        reason = "focused_validation_failed: " + " | ".join(failures[:4])
+        recovered, source = recover_focused_payload(
+            game_id=gid,
+            output_path=path,
+            reason=reason,
+        )
+        if recovered:
+            fallback_failures = validate(path, gid, predictions, accepted_dir)
+            if not fallback_failures:
+                print(f"{gid}: Groq prose failed focused validation; recovered this game through {source}.")
+                return
+            failures = failures + [f"fallback {source} also failed: {failure}" for failure in fallback_failures]
+
     if failures:
         raise SystemExit("Focused editorial game validation failed: " + "; ".join(failures))
-    print(f"validated focused editorial response for {args.game_id}")
+    print(f"validated focused editorial response for {gid}")
 
 
 if __name__ == "__main__":
