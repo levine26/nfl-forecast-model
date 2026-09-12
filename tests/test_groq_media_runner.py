@@ -30,9 +30,9 @@ def test_compound_mini_is_default_provider_with_gpt_oss_long_window_fallback():
     assert module.DEFAULT_MODEL == "groq/compound-mini"
     assert module.FALLBACK_MODEL == "openai/gpt-oss-120b"
     assert module.DEFAULT_COMPOUND_VERSION == "2025-07-23"
-    assert module.PRIMARY_MAX_COMPLETION_TOKENS == 600
+    assert module.MAX_COMPLETION_TOKENS == 600
     assert module.FALLBACK_MAX_COMPLETION_TOKENS == 2048
-    assert module.MAX_COMPLETION_TOKENS == module.PRIMARY_MAX_COMPLETION_TOKENS
+    assert module.FALLBACK_TOOL_TEMPERATURES == (0.6, 0.2)
 
 
 def test_compound_mini_payload_bounds_reserved_output_budget():
@@ -52,27 +52,36 @@ def test_compound_mini_payload_bounds_reserved_output_budget():
         "temperature",
         "tool_choice",
         "tools",
+        "top_p",
     ):
         assert optional not in payload
 
 
-def test_gpt_oss_fallback_uses_documented_browser_search_headroom():
+def test_gpt_oss_fallback_uses_documented_browser_search_budget_and_controls():
     payload = module._build_payload("research this game", model=module.FALLBACK_MODEL)
     assert payload == {
         "model": "openai/gpt-oss-120b",
         "messages": [{"role": "user", "content": "research this game"}],
         "max_completion_tokens": 2048,
-        "reasoning_effort": "medium",
+        "reasoning_effort": "low",
+        "reasoning_format": "hidden",
+        "temperature": 0.6,
+        "top_p": 0.95,
         "tool_choice": "required",
         "tools": [{"type": "browser_search"}],
     }
     assert "search_settings" not in payload
-    assert payload["max_completion_tokens"] < 8000
 
 
-def test_completion_budget_is_provider_specific():
-    assert module._completion_budget(module.DEFAULT_MODEL) == 600
-    assert module._completion_budget(module.FALLBACK_MODEL) == 2048
+def test_gpt_oss_fallback_accepts_lower_tool_retry_temperature():
+    payload = module._build_payload(
+        "research this game",
+        model=module.FALLBACK_MODEL,
+        tool_temperature=0.2,
+    )
+    assert payload["temperature"] == 0.2
+    assert payload["max_completion_tokens"] == 2048
+    assert payload["tool_choice"] == "required"
 
 
 def test_browser_search_is_recognized_as_web_research():
@@ -130,10 +139,16 @@ def test_safe_rate_limit_reason_classifies_without_echoing_body():
 
 
 def test_run_switches_compound_tpd_to_gpt_oss_browser_fallback(monkeypatch):
-    calls: list[str] = []
+    calls: list[tuple[str, float | None]] = []
 
-    def fake_request(prompt: str, *, model: str, timeout: int) -> str:
-        calls.append(model)
+    def fake_request(
+        prompt: str,
+        *,
+        model: str,
+        timeout: int,
+        tool_temperature: float | None = None,
+    ) -> str:
+        calls.append((model, tool_temperature))
         if len(calls) == 1:
             raise _http_429(
                 body='{"error":{"message":"Rate limit reached for model meta-llama/llama-4-scout-17b-16e-instruct: tokens per day exceeded"}}'
@@ -143,14 +158,56 @@ def test_run_switches_compound_tpd_to_gpt_oss_browser_fallback(monkeypatch):
     monkeypatch.setattr(module, "_request", fake_request)
     result = module.run("prompt", model=module.DEFAULT_MODEL, timeout=10, attempts=3)
     assert result == "accepted researched payload"
-    assert calls == [module.DEFAULT_MODEL, module.FALLBACK_MODEL]
+    assert calls == [
+        (module.DEFAULT_MODEL, None),
+        (module.FALLBACK_MODEL, 0.6),
+    ]
+
+
+def test_run_retries_gpt_oss_tool_use_failure_at_lower_temperature(monkeypatch):
+    calls: list[tuple[str, float | None]] = []
+
+    def fake_request(
+        prompt: str,
+        *,
+        model: str,
+        timeout: int,
+        tool_temperature: float | None = None,
+    ) -> str:
+        calls.append((model, tool_temperature))
+        if len(calls) == 1:
+            raise _http_429(
+                body='{"error":{"message":"Rate limit reached for model meta-llama/llama-4-scout-17b-16e-instruct: tokens per day exceeded"}}'
+            )
+        if len(calls) == 2:
+            raise _http_error(
+                400,
+                body='{"error":{"message":"Invalid tool call generated",'
+                '"type":"invalid_request_error","code":"tool_use_failed"}}',
+            )
+        return "accepted researched payload"
+
+    monkeypatch.setattr(module, "_request", fake_request)
+    result = module.run("prompt", model=module.DEFAULT_MODEL, timeout=10, attempts=3)
+    assert result == "accepted researched payload"
+    assert calls == [
+        (module.DEFAULT_MODEL, None),
+        (module.FALLBACK_MODEL, 0.6),
+        (module.FALLBACK_MODEL, 0.2),
+    ]
 
 
 def test_run_does_not_loop_when_fallback_hits_long_window_quota(monkeypatch):
-    calls: list[str] = []
+    calls: list[tuple[str, float | None]] = []
 
-    def fake_request(prompt: str, *, model: str, timeout: int) -> str:
-        calls.append(model)
+    def fake_request(
+        prompt: str,
+        *,
+        model: str,
+        timeout: int,
+        tool_temperature: float | None = None,
+    ) -> str:
+        calls.append((model, tool_temperature))
         if model == module.DEFAULT_MODEL:
             raise _http_429(
                 body='{"error":{"message":"Rate limit reached for model meta-llama/llama-4-scout-17b-16e-instruct: tokens per day exceeded"}}'
@@ -166,7 +223,10 @@ def test_run_does_not_loop_when_fallback_hits_long_window_quota(monkeypatch):
         assert "tpd" in str(exc)
     else:
         raise AssertionError("expected long-window quota failure")
-    assert calls == [module.DEFAULT_MODEL, module.FALLBACK_MODEL]
+    assert calls == [
+        (module.DEFAULT_MODEL, None),
+        (module.FALLBACK_MODEL, 0.6),
+    ]
 
 
 def test_safe_bad_request_reason_exposes_only_allowlisted_diagnostics():
@@ -180,6 +240,19 @@ def test_safe_bad_request_reason_exposes_only_allowlisted_diagnostics():
     assert "type=invalid_request_error" in reason
     assert "code=unsupported_parameter" in reason
     assert "response_format" in reason
+    assert "secret-do-not-log" not in reason
+
+
+def test_safe_bad_request_reason_classifies_tool_use_failed_without_failed_generation_leak():
+    exc = _http_error(
+        400,
+        body='{"error":{"message":"Invalid tool call generated",'
+        '"type":"invalid_request_error","code":"tool_use_failed",'
+        '"failed_generation":{"attempted_arguments":"secret-do-not-log"}}}',
+    )
+    reason = module._safe_bad_request_reason(exc)
+    assert "code=tool_use_failed" in reason
+    assert "type=invalid_request_error" in reason
     assert "secret-do-not-log" not in reason
 
 

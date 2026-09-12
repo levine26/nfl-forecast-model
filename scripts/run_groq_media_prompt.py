@@ -31,15 +31,13 @@ FALLBACK_MODEL = "openai/gpt-oss-120b"
 # retrieves more context; basic search is intentionally used here to stay inside the
 # tighter Free-tier limits inherited from Compound Mini's underlying models.
 DEFAULT_COMPOUND_VERSION = "2025-07-23"
-# Compound's focused JSON response fits comfortably in 600 tokens. GPT-OSS browser
-# search needs additional agentic reasoning/tool-call headroom; Groq's browser-search
-# quick start uses 2048 completion tokens. Both remain below the direct GPT-OSS
-# Free-tier 8K TPM ceiling for our compact per-game prompt.
-PRIMARY_MAX_COMPLETION_TOKENS = 600
+# Compound Mini needs a tight budget to stay within the routed Free-tier model's
+# minute window. Groq's browser-search quick start reserves 2K output tokens for
+# GPT-OSS; the fallback gets that larger budget because tool reasoning consumes part
+# of the completion allowance before the final compact JSON is emitted.
+MAX_COMPLETION_TOKENS = 600
 FALLBACK_MAX_COMPLETION_TOKENS = 2048
-# Backward-compatible alias retained for diagnostics/tests that refer to the primary
-# Compound completion budget.
-MAX_COMPLETION_TOKENS = PRIMARY_MAX_COMPLETION_TOKENS
+FALLBACK_TOOL_TEMPERATURES = (0.6, 0.2)
 _WEB_TOOL_TYPES = {"search", "web_search", "browser_search"}
 _RATE_LIMIT_HEADER_NAMES = (
     "retry-after",
@@ -64,6 +62,7 @@ _SAFE_ERROR_PARAMS = {
     "temperature",
     "tool_choice",
     "tools",
+    "top_p",
 }
 MAX_RATE_LIMIT_WAIT_SECONDS = 180.0
 _LONG_WINDOW_QUOTA_CLASSES = {"tpd", "rpd"}
@@ -163,6 +162,7 @@ def _safe_bad_request_reason(exc: HTTPError) -> str:
         ("temperature", "temperature"),
         ("tool_choice", "tool_choice"),
         ("tools", "tools"),
+        ("top_p", "top_p"),
         ("invalid", "invalid_request"),
         ("unsupported", "unsupported_parameter"),
     ):
@@ -225,26 +225,29 @@ def _is_gpt_oss_model(model: str) -> bool:
     return model.startswith("openai/gpt-oss")
 
 
-def _completion_budget(model: str) -> int:
-    return FALLBACK_MAX_COMPLETION_TOKENS if _is_gpt_oss_model(model) else PRIMARY_MAX_COMPLETION_TOKENS
+def _fallback_temperature(tool_failure_count: int) -> float:
+    index = min(max(0, int(tool_failure_count)), len(FALLBACK_TOOL_TEMPERATURES) - 1)
+    return FALLBACK_TOOL_TEMPERATURES[index]
 
 
-def _build_payload(prompt: str, *, model: str) -> dict:
+def _build_payload(prompt: str, *, model: str, tool_temperature: float | None = None) -> dict:
     """Build one bounded research request for the configured Groq provider."""
-    base = {
-        "model": model,
-        "messages": [{"role": "user", "content": prompt}],
-        "max_completion_tokens": _completion_budget(model),
-    }
     if _is_gpt_oss_model(model):
         return {
-            **base,
-            "reasoning_effort": "medium",
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_completion_tokens": FALLBACK_MAX_COMPLETION_TOKENS,
+            "reasoning_effort": "low",
+            "reasoning_format": "hidden",
+            "temperature": _fallback_temperature(0) if tool_temperature is None else float(tool_temperature),
+            "top_p": 0.95,
             "tool_choice": "required",
             "tools": [{"type": "browser_search"}],
         }
     return {
-        **base,
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_completion_tokens": MAX_COMPLETION_TOKENS,
         "search_settings": {
             "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
         },
@@ -267,7 +270,7 @@ def _used_web_research(message: dict) -> tuple[bool, set[str]]:
     return used, markers
 
 
-def _request(prompt: str, *, model: str, timeout: int) -> str:
+def _request(prompt: str, *, model: str, timeout: int, tool_temperature: float | None = None) -> str:
     api_key = os.environ.get("GROQ_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("GROQ_API_KEY is not configured")
@@ -283,7 +286,7 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
 
     request = Request(
         API_URL,
-        data=json.dumps(_build_payload(prompt, model=model)).encode("utf-8"),
+        data=json.dumps(_build_payload(prompt, model=model, tool_temperature=tool_temperature)).encode("utf-8"),
         headers=headers,
         method="POST",
     )
@@ -311,9 +314,16 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
 def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
     last_error: Exception | None = None
     active_model = model
+    fallback_tool_failures = 0
     for attempt in range(1, attempts + 1):
         try:
-            return _request(prompt, model=active_model, timeout=timeout)
+            tool_temperature = _fallback_temperature(fallback_tool_failures) if _is_gpt_oss_model(active_model) else None
+            return _request(
+                prompt,
+                model=active_model,
+                timeout=timeout,
+                tool_temperature=tool_temperature,
+            )
         except HTTPError as exc:
             retryable = exc.code in {408, 409, 429, 498, 500, 502, 503, 504}
             if exc.code == 429:
@@ -326,6 +336,7 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
                 quota_classes = _rate_limit_classes(reason)
                 if quota_classes & _LONG_WINDOW_QUOTA_CLASSES and active_model != FALLBACK_MODEL:
                     active_model = os.environ.get("GROQ_MEDIA_FALLBACK_MODEL", FALLBACK_MODEL).strip() or FALLBACK_MODEL
+                    fallback_tool_failures = 0
                     print(
                         f"Groq long-window quota reached; switching provider retry to {active_model} with required browser search.",
                         file=sys.stderr,
@@ -345,6 +356,19 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
                 reason = _safe_bad_request_reason(exc)
                 print(f"Groq HTTP 400 bad request class={reason}", file=sys.stderr)
                 last_error = RuntimeError(f"Groq HTTP 400 class={reason}")
+                if (
+                    _is_gpt_oss_model(active_model)
+                    and "code=tool_use_failed" in reason
+                    and attempt < attempts
+                ):
+                    fallback_tool_failures += 1
+                    next_temperature = _fallback_temperature(fallback_tool_failures)
+                    print(
+                        "Groq browser-search tool call was malformed; retrying GPT-OSS "
+                        f"with lower temperature {next_temperature:.1f}.",
+                        file=sys.stderr,
+                    )
+                    continue
                 break
 
             if exc.code == 413:
