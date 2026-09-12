@@ -1,0 +1,91 @@
+{
+  "record_version": 1,
+  "record_id": "V09B-LEGACY-GAMEBOOK-LOCATOR-V1-RECEIPT",
+  "experiment_dependency": "V09B-GAMEBOOK-LABEL-COVERAGE-V1",
+  "purpose": "Permanently preserve the corrected 2012-2016 legacy NFLGSIS Game Book locator execution. This qualifies locator coverage only, not historical labels or V09B fitting.",
+  "execution": {
+    "head_sha": "2b0a909dca512995169607f4a1688af068e22156",
+    "workflow_run_id": 34724408374,
+    "prior_invalid_diagnostic_run_id": 34724037391,
+    "prior_invalid_run_reason": "collector iterated the top-level archived schedule object rather than its list-valued games member, producing an empty discovery crosswalk; that 0% result was an implementation defect and is not source-availability evidence",
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0
+  },
+  "source_semantics": {
+    "canonical_universe": "nflverse regular-season schedule",
+    "discovery_crosswalk": "archived BurntSushi/nflgame schedule.json; gamekey discovery only",
+    "discovery_crosswalk_is_label_authority": false,
+    "official_document_pattern": "https://www.nflgsis.com/{season}/Reg/{week_zero_padded}/{gamekey}/Gamebook.pdf",
+    "required_http_status": 200,
+    "required_content_type": "application/pdf"
+  },
+  "observed_by_season": {
+    "2012": {
+      "canonical_games": 256,
+      "crosswalk_matches": 256,
+      "crosswalk_coverage_rate": 1.0,
+      "qualified_gamebook_locators": 256,
+      "locator_coverage_rate": 1.0,
+      "source_row_errors": 0,
+      "artifact_digest": "sha256:d331effc385b35b852493013a6f7a6eb89b2e72f054fdf6e852c18e3a57898fb"
+    },
+    "2013": {
+      "canonical_games": 256,
+      "crosswalk_matches": 256,
+      "crosswalk_coverage_rate": 1.0,
+      "qualified_gamebook_locators": 256,
+      "locator_coverage_rate": 1.0,
+      "source_row_errors": 0,
+      "artifact_digest": "sha256:5550abacb483070b24513151aafd7a4d14a096f80f81057501cfbc9bfd7de782"
+    },
+    "2014": {
+      "canonical_games": 256,
+      "crosswalk_matches": 256,
+      "crosswalk_coverage_rate": 1.0,
+      "qualified_gamebook_locators": 256,
+      "locator_coverage_rate": 1.0,
+      "source_row_errors": 0,
+      "artifact_digest": "sha256:cffae74a65c0776ce87684c41d472828a4ef808f6842b458f437acdfb0e0e41f"
+    },
+    "2015": {
+      "canonical_games": 256,
+      "crosswalk_matches": 256,
+      "crosswalk_coverage_rate": 1.0,
+      "qualified_gamebook_locators": 256,
+      "locator_coverage_rate": 1.0,
+      "source_row_errors": 0,
+      "artifact_digest": "sha256:90c8a6a544c4fce1f08f3329b885ad845cb75421c00d3161fa562e92b252b104"
+    },
+    "2016": {
+      "canonical_games": 256,
+      "crosswalk_matches": 256,
+      "crosswalk_coverage_rate": 1.0,
+      "qualified_gamebook_locators": 256,
+      "locator_coverage_rate": 1.0,
+      "source_row_errors": 0,
+      "artifact_digest": "sha256:75fd3e5db6996cf6b89d64d6ce2f168922538842c12cd7623cb3ccad1ced6c7b"
+    }
+  },
+  "aggregate": {
+    "canonical_games": 1280,
+    "crosswalk_matches": 1280,
+    "qualified_gamebook_locators": 1280,
+    "crosswalk_coverage_rate": 1.0,
+    "locator_coverage_rate": 1.0,
+    "http_200_pdf_rows": 1280,
+    "source_row_errors": 0
+  },
+  "scientific_disposition": {
+    "legacy_2012_2016_locator_coverage_qualified": true,
+    "raw_source_bytes_archived_and_content_addressed": false,
+    "not_active_parser_coverage_qualified": false,
+    "did_not_play_semantic_distinction_qualified_at_scale": false,
+    "player_team_game_identity_qualified": false,
+    "game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "reason": "All 1,280 canonical 2012-2016 regular-season games resolve to an official NFLGSIS PDF, but locator coverage is only the first source layer. The frozen downstream gates remain mandatory."
+  }
+}

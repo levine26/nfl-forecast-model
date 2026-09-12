@@ -1,0 +1,112 @@
+name: LevLine V09B legacy gamebook locator audit
+
+on:
+  pull_request:
+    paths:
+      - 'research/v09b_legacy_gamebook_locator_audit_v1.py'
+      - 'research/test_v09b_legacy_gamebook_locator_audit_v1.py'
+      - 'research/availability/v09b_legacy_gamebook_locator_v1_receipt.json'
+      - '.github/workflows/research_v09b_legacy_gamebook_locator_audit_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - run: pytest -q research/test_v09b_legacy_gamebook_locator_audit_v1.py
+      - name: Validate permanent locator receipt and authorization boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          receipt = json.loads(Path('research/availability/v09b_legacy_gamebook_locator_v1_receipt.json').read_text())
+          aggregate = receipt['aggregate']
+          disposition = receipt['scientific_disposition']
+          assert aggregate['canonical_games'] == 1280
+          assert aggregate['crosswalk_matches'] == 1280
+          assert aggregate['qualified_gamebook_locators'] == 1280
+          assert aggregate['crosswalk_coverage_rate'] == 1.0
+          assert aggregate['locator_coverage_rate'] == 1.0
+          assert aggregate['http_200_pdf_rows'] == 1280
+          assert aggregate['source_row_errors'] == 0
+          assert disposition['legacy_2012_2016_locator_coverage_qualified'] is True
+          assert disposition['raw_source_bytes_archived_and_content_addressed'] is False
+          assert disposition['not_active_parser_coverage_qualified'] is False
+          assert disposition['did_not_play_semantic_distinction_qualified_at_scale'] is False
+          assert disposition['game_day_roster_universe_qualified'] is False
+          assert disposition['training_label_semantics_qualified'] is False
+          assert disposition['training_source_chronology_qualified'] is False
+          assert disposition['v09b_model_fit_authorized'] is False
+          assert receipt['execution']['completed_2026_outcomes_used'] == 0
+          PY
+
+  locator-audit:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015, 2016]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Resolve canonical legacy Game Books
+        run: |
+          mkdir -p research_outputs/v09b_legacy_gamebook_locator
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_locator_audit_v1.py \
+              --season ${{ matrix.season }} \
+              --output research_outputs/v09b_legacy_gamebook_locator/${{ matrix.season }}.json
+      - name: Assert source-only governance
+        if: always()
+        run: |
+          if test -s research_outputs/v09b_legacy_gamebook_locator/${{ matrix.season }}.json; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          result = json.loads(Path(f'research_outputs/v09b_legacy_gamebook_locator/{season}.json').read_text())
+          assert result['discovery_crosswalk_is_label_authority'] is False
+          assert result['model_fit_performed'] is False
+          assert result['game_outcomes_used'] == 0
+          assert result['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-legacy-gamebook-locator-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_locator/${{ matrix.season }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
