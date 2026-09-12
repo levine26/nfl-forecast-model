@@ -31,7 +31,7 @@ for (const [name, width, height] of viewports) {
     await expect(page.getByText('Probability-Implied Line').first()).toBeVisible()
     await expect(page.locator('.ss-flow:visible').getByText('Football Signal')).toBeVisible()
     await expect(page.locator('.ss-flow:visible').getByText('Market Signal')).toBeVisible()
-    await expect(page.getByText('THE SIGNAL').first()).toBeVisible()
+    await expect(page.locator('.ss-the-signal:visible').getByText('THE SIGNAL', { exact: true })).toBeVisible()
     await expect(page.getByText('WHY LEVLINE?', { exact: true })).toHaveCount(0)
     await expect(page).toHaveURL(/#\/game\//)
 
