@@ -234,9 +234,6 @@ jobs:
             done
             if [ "$accepted" -ne 1 ]; then echo "$gid failed all three focused editorial validation attempts."; exit 1; fi
             if [ "$game_index" -lt "$total_games" ]; then
-              # Compound Mini inherits limits from its underlying models. On the
-              # current Free-tier key a web-search call can consume nearly one full
-              # underlying-model TPM window, so pace accepted games one per minute.
               sleep 65
             fi
           done
@@ -278,7 +275,10 @@ jobs:
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
           assert 'audit_groq_main_advance.py' in text
-          assert 'group: sunday-signal-media-writer-${{ github.ref }}' in text
+          concurrency_block = text.split('concurrency:', 1)[1].split('jobs:', 1)[0]
+          assert 'group: sunday-signal-media-writer-' in concurrency_block
+          assert 'github.ref' in concurrency_block
+          assert 'cancel-in-progress: true' in concurrency_block
           print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, race reconciliation, isolated concurrency, and publication wiring validated without consuming repository secrets on PR.')
           PY
 
