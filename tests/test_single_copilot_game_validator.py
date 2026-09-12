@@ -139,21 +139,15 @@ def test_rationale_reconstruction_refuses_prohibited_or_unknown_mechanism_copy()
     assert repaired == no_mechanism
 
 
-def test_reconstructed_rationales_do_not_share_substantive_seven_word_template():
-    first_row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
-    second_row = pd.Series({"away_team": "CHI", "home_team": "CAR", "pick": "CHI"})
-    first, first_changed = module._repair_underlength_rationale(
-        "Pressure matters.",
-        "Tampa Bay protection must handle Cincinnati pressure while the Bengals keep the Buccaneers behind schedule.",
-        first_row,
-    )
-    second, second_changed = module._repair_underlength_rationale(
-        "Pressure matters.",
-        "Carolina protection must handle Chicago pressure while the Bears keep the Panthers behind schedule.",
-        second_row,
-    )
-    assert first_changed and second_changed
-    assert not (module._unique_ngrams(first) & module._unique_ngrams(second))
+def test_every_reconstruction_template_is_contract_safe_and_cross_game_unique():
+    for _, template in module.RATIONALE_MECHANISMS:
+        first = template.format(pick="Bengals", opponent="Buccaneers")
+        second = template.format(pick="Bears", opponent="Panthers")
+        assert 18 <= len(module._words(first)) <= 40
+        assert 18 <= len(module._words(second)) <= 40
+        assert not module._rationale_has_prohibited(first)
+        assert not module._rationale_has_prohibited(second)
+        assert not (module._unique_ngrams(first) & module._unique_ngrams(second))
 
 
 def test_validate_persists_reconstructed_rationale_and_exact_passing_sources(tmp_path):
