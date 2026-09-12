@@ -107,9 +107,9 @@ def test_focused_source_backfill_still_fails_closed_without_two_families(monkeyp
     assert any("two independent" in failure for failure in failures)
 
 
-def test_underlength_rationale_repair_is_narrow_matchup_specific_and_contract_safe():
+def test_underlength_rationale_reconstructs_from_researched_matchup_mechanism():
     row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
-    rationale = "Cincinnati can control the game if its offense stays ahead of pressure."
+    rationale = "Pressure must get home."
     paragraph1 = (
         "Tampa Bay must manage Cincinnati pressure with a disciplined protection plan, "
         "while the Bengals need their front to keep the Buccaneers behind schedule."
@@ -119,25 +119,38 @@ def test_underlength_rationale_repair_is_narrow_matchup_specific_and_contract_sa
     assert 18 <= len(module._words(repaired)) <= 40
     assert "Bengals" in repaired
     assert "Buccaneers" in repaired
+    assert "Pressure must get home" not in repaired
     assert not module._rationale_has_prohibited(repaired)
 
 
-def test_rationale_repair_refuses_too_short_or_prohibited_copy():
+def test_rationale_reconstruction_refuses_prohibited_or_unknown_mechanism_copy():
     row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
-    paragraph1 = "The Bengals pressure Tampa Bay while the Buccaneers adjust their protection."
+    pressure_paragraph = "The Bengals pressure Tampa Bay while the Buccaneers adjust their protection."
 
-    too_short = "Cincinnati needs pressure to win."
-    repaired, changed = module._repair_underlength_rationale(too_short, paragraph1, row)
-    assert not changed
-    assert repaired == too_short
-
-    prohibited = "Cincinnati has a market edge if its pressure plan works against Tampa Bay."
-    repaired, changed = module._repair_underlength_rationale(prohibited, paragraph1, row)
+    prohibited = "Cincinnati has a market edge."
+    repaired, changed = module._repair_underlength_rationale(prohibited, pressure_paragraph, row)
     assert not changed
     assert repaired == prohibited
 
+    no_mechanism = "Cincinnati needs execution."
+    neutral_paragraph = "The Bengals and Buccaneers both need discipline and consistency throughout the matchup."
+    repaired, changed = module._repair_underlength_rationale(no_mechanism, neutral_paragraph, row)
+    assert not changed
+    assert repaired == no_mechanism
 
-def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path):
+
+def test_every_reconstruction_template_is_contract_safe_and_cross_game_unique():
+    for _, template in module.RATIONALE_MECHANISMS:
+        first = template.format(pick="Bengals", opponent="Buccaneers")
+        second = template.format(pick="Bears", opponent="Panthers")
+        assert 18 <= len(module._words(first)) <= 40
+        assert 18 <= len(module._words(second)) <= 40
+        assert not module._rationale_has_prohibited(first)
+        assert not module._rationale_has_prohibited(second)
+        assert not (module._unique_ngrams(first) & module._unique_ngrams(second))
+
+
+def test_validate_persists_reconstructed_rationale_and_exact_passing_sources(tmp_path):
     gid = "2026_01_TB_CIN"
     paragraph1 = (
         "Buccaneers protection has to handle Cincinnati pressure without forcing rushed throws, while Tampa Bay can help with motion and quick-game answers. "
@@ -149,7 +162,7 @@ def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path
             gid: {
                 "headline": "Bengals pressure tests Buccaneers protection plan",
                 "paragraph1": paragraph1,
-                "model_rationale": "Cincinnati can control the game if its offense stays ahead of pressure.",
+                "model_rationale": "Pressure must get home.",
                 "sources": [
                     {
                         "name": "ESPN",
@@ -178,6 +191,7 @@ def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path
     repaired = saved["model_rationale"]
     assert 18 <= len(re.findall(r"\b[\w'-]+\b", repaired)) <= 40
     assert "Bengals" in repaired and "Buccaneers" in repaired
+    assert "Pressure must get home" not in repaired
     assert not module._rationale_has_prohibited(repaired)
     assert [source["name"] for source in saved["sources"]] == ["ESPN", "NFL.com"]
 
