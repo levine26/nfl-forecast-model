@@ -18,10 +18,16 @@ for (const [name, width, height] of viewports) {
     await expect(page.locator('.ss-brand-lockup:visible').first().getByText('SUNDAY SIGNAL')).toBeVisible()
     await expect(page.getByText(/BETTER INFORMATION/i)).toBeVisible()
     await expect(page.getByText('FIND YOUR GAME')).toBeVisible()
-    await expect(page.locator('.ss-plus-top-signals').getByText('TOP SIGNALS')).toBeVisible()
-    await expect(page.getByText('MODEL VS MARKET').first()).toBeVisible()
-    if (width > 1024) await expect(page.locator('.ss-board-labels:visible').getByText('LEVLINE PICK', { exact: true })).toBeVisible()
-    else await expect(page.locator('.ss-mobile-card:visible').first().getByText('LEVLINE FORECAST')).toBeVisible()
+    await expect(page.locator('.ss-exp-top-signals:visible').getByText('TOP SIGNALS')).toBeVisible()
+    await expect(page.getByText('Largest Edge vs Market', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Win Probability', exact: true })).toBeVisible()
+    if (width > 768) {
+      await expect(page.locator('.ss-exp-board-labels:visible').getByText('LEVLINE FAIR SPREAD', { exact: true })).toBeVisible()
+      await expect(page.locator('.ss-exp-board-labels:visible').getByText('SPORTSBOOK SPREAD', { exact: true })).toBeVisible()
+    } else {
+      await expect(page.locator('.ss-exp-mobile-board:visible').first()).toBeVisible()
+      await expect(page.locator('.ss-exp-mobile-board:visible').first().getByText('Fair spread', { exact: true })).toBeVisible()
+    }
     await expect(page.getByText('Fair line', { exact: true })).toHaveCount(0)
     await expect(page.getByText('Model Line', { exact: true })).toHaveCount(0)
     await expect(page.getByText(/BIGGEST EDGE/i)).toHaveCount(0)
@@ -30,7 +36,8 @@ for (const [name, width, height] of viewports) {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBeLessThanOrEqual(1)
 
-    await page.locator('[data-game-open]:visible').first().click()
+    const openRows = width <= 768 ? page.locator('.ss-exp-mobile-board:visible button') : page.locator('.ss-exp-board-rows:visible button')
+    await openRows.first().click()
     await expect(page.locator('.ss-matchup-page')).toBeVisible()
     const clarity = page.locator('.ss-clarity-shell:visible').first()
     await expect(clarity).toBeVisible()
@@ -40,7 +47,9 @@ for (const [name, width, height] of viewports) {
     await expect(clarity.getByText('WIN-PROBABILITY EDGE', { exact: true })).toBeVisible()
     await expect(clarity.getByText('FORECAST TIER', { exact: true })).toBeVisible()
     await expect(clarity.getByText('SINCE LAST FORECAST', { exact: true })).toBeVisible()
-    await expect(page.locator('.ss-plus-signal:visible').getByText('THE SIGNAL', { exact: true })).toBeVisible()
+    await expect(page.locator('.ss-exp-lifecycle:visible')).toBeVisible()
+    await expect(page.locator('.ss-exp-signal:visible').getByText('THE SIGNAL', { exact: true })).toBeVisible()
+    await expect(page.locator('.ss-exp-movement-context:visible')).toBeVisible()
     await expect(clarity.locator('.ss-clarity-share')).toBeVisible()
     await expect(page.getByText('WHY LEVLINE?', { exact: true })).toHaveCount(0)
     await expect(page).toHaveURL(/#\/game\//)
@@ -56,7 +65,7 @@ for (const [name, width, height] of viewports) {
 test('desktop slate values use readable non-condensed UI typography', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto('./')
-  const team = page.locator('.ss-game-row:visible .ss-row-matchup > span > b').first()
+  const team = page.locator('.ss-exp-board-rows:visible .ss-exp-team-pair b').first()
   await expect(team).toBeVisible()
   const typography = await team.evaluate(element => {
     const style = getComputedStyle(element)
@@ -135,11 +144,12 @@ test('matchup presentation reads the canonical official probability and official
   await expect(clarity).toContainText(game.official_winner)
 })
 
-test('History remains a first-class 2026 receipts surface with signal-tier accountability', async ({ page }) => {
+test('History remains a first-class 2026 receipts surface with calibration and signal-tier accountability', async ({ page }) => {
   await page.goto('./#/history')
   await expect(page.getByText(/2026 PICKS OF RECORD/i)).toBeVisible()
   await expect(page.getByText(/Immutable pregame receipts/i)).toBeVisible()
   await expect(page.getByText('PERFORMANCE BY SIGNAL TIER')).toBeVisible()
+  await expect(page.getByText('PROBABILITY CALIBRATION')).toBeVisible()
   await expect(page.getByText('THE SUNDAY SIGNAL STANDARD')).toBeVisible()
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBeLessThanOrEqual(1)
