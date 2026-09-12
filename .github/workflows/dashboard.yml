@@ -24,7 +24,9 @@ on:
       - 'Daily NFL model refresh'
       - 'Hourly NFL market refresh'
       - 'Sunday Signal contextual intelligence'
+      - 'Sunday Signal Groq media writer'
       - 'Sunday Signal ChatGPT free ingestion'
+      - 'Sunday Signal ChatGPT failed-game fallback'
       - 'Pregame NFL refresh'
     types: [completed]
   workflow_dispatch:
