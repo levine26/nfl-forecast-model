@@ -279,7 +279,9 @@ jobs:
           assert 'group: sunday-signal-media-writer-' in concurrency_block
           assert 'github.ref' in concurrency_block
           assert 'cancel-in-progress: true' in concurrency_block
-          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, race reconciliation, isolated concurrency, and publication wiring validated without consuming repository secrets on PR.')
+          publish_block = text.split('- name: Publish editorial-only outputs', 1)[1]
+          assert 'git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json' in publish_block
+          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, race reconciliation, isolated concurrency, sanitized-evidence publication, and publication wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
@@ -330,7 +332,7 @@ jobs:
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/context_source_status.json
+          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
           if git diff --cached --quiet; then echo "No media editorial changes to publish."; exit 0; fi
           git commit -m "Refresh Groq-powered Sunday Signal Reads"
           git pull --rebase origin main
