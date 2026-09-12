@@ -6,6 +6,7 @@ on:
       - 'research/market_capture_contract_v2.py'
       - 'research/market_capture_v2.py'
       - 'research/test_market_capture_v2.py'
+      - 'research/test_market_capture_t45.py'
       - 'research/run_market_capture_v2.py'
       - 'research/market_capture_due_v2.py'
       - '.github/workflows/research_market_capture_v2.yml'
@@ -27,7 +28,7 @@ jobs:
       - name: Install lightweight test dependencies
         run: python -m pip install pytest 'pandas==3.0.5' 'requests>=2.32'
       - name: Validate market normalization and horizon semantics
-        run: python -m pytest -q research/test_market_capture_v2.py
+        run: python -m pytest -q research/test_market_capture_v2.py research/test_market_capture_t45.py
 
   capture:
     if: github.event_name != 'pull_request'
@@ -95,6 +96,8 @@ jobs:
             exit 0
           fi
           rm -rf /tmp/market_capture_v2
+          cp -R "$DATA_DIR" /tmp/phase2_market_reliance 2>/dev/null || true
+          rm -rf /tmp/phase2_market_reliance
           cp -R "$DATA_DIR" /tmp/market_capture_v2
           rm -rf "$DATA_DIR"
           git config user.name 'levline-research-bot'
