@@ -11,6 +11,7 @@ import pandas as pd
 from nfl_forecast.copilot_media import apply_copilot_reads
 from nfl_forecast.editorial_finalize import finalize_previews
 from nfl_forecast.editorial_model_read import render_model_paragraph
+from nfl_forecast.editorial_provider_fallback import merge_current_run_provider_status
 from nfl_forecast.editorial_text_safety import sanitize_public_evidence, sanitize_preview_text
 from nfl_forecast.media_context import fetch_media_context
 from nfl_forecast.media_editorial import rewrite_reads_with_media
@@ -131,6 +132,14 @@ def main() -> None:
     previews = json.loads(previews_path.read_text())
     evidence = json.loads(evidence_path.read_text())
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
+
+    # A real Groq production job owns a runner-local provider ledger in /tmp. It
+    # survives `git reset --hard origin/main` during deterministic-output reconciliation
+    # and also clears stale prior-run fallback flags when the current run succeeds.
+    status = merge_current_run_provider_status(
+        status,
+        predictions.get("game_id", pd.Series(dtype=str)).astype(str),
+    )
 
     # Repair only mechanical punctuation artifacts at the public boundary. Facts,
     # standardized injury/status language, and all model values remain unchanged.
