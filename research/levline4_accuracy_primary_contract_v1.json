@@ -55,10 +55,17 @@
     "checkpoint_is_not_automatic_promotion": true,
     "accuracy_superiority_required": "candidate paired winner-accuracy advantage must be positive and supported by week-aware uncertainty before claiming superior accuracy",
     "if_accuracy_is_statistically_unresolved": "do not replace a higher-accuracy incumbent merely because Brier is better",
-    "secondary_probability_guardrail": {
-      "brier_noninferiority_margin": 0.0025,
+    "secondary_probability_review": {
+      "brier_alert_delta": 0.0025,
       "source": "existing F-ST prospective governance margin",
-      "role": "secondary safety guardrail, not primary optimization target"
+      "role": "diagnostic alert only under the accuracy-first policy; exceeding it does not automatically veto a clearly superior winner-pick engine",
+      "hard_sanity_checks": [
+        "probabilities are finite and strictly between zero and one",
+        "aggregate Brier remains better than the uninformative 0.25 binary-probability baseline",
+        "aggregate log loss remains better than the uninformative ln(2) binary-probability baseline",
+        "calibration direction is not pathological"
+      ],
+      "decoupling_policy": "If a candidate clearly improves winner accuracy but its probability calibration is materially worse, LevLine may promote the pick engine while keeping the confidence/probability layer under separate calibration research rather than sacrificing the more accurate pick."
     },
     "automatic_promotion": false,
     "explicit_authorization_required": true
