@@ -17,6 +17,14 @@
         "2023": "16b04e21da5aa3944cfa9c22cafcc84ed7e6d9866eaddf0344e9b8cbf2f63afe",
         "2024": "498bce8e13cb64b2ab9bb0ad6cb81d0a63c2ddb24016c9fc90c2de2126fae449"
       }
+    },
+    {
+      "stage": "before_first_strict_v2_execution",
+      "reason": "Raw NFL.com HTML can contain delivery-layer boilerplate unrelated to the injury-report state. Freeze the independent-source digest over the parsed semantic row contract instead, while retaining and content-addressing every raw HTML page separately. This makes the pin sensitive to player/team/week/practice/game-status evidence but not irrelevant dynamic page markup.",
+      "strict_v2_metrics_observed": false,
+      "model_metrics_observed": false,
+      "completed_2026_outcomes_consulted": false,
+      "threshold_relaxation": false
     }
   ],
   "scope_basis": {
@@ -25,7 +33,7 @@
     "weeks": [1, 18],
     "postseason_in_scope": false,
     "postseason_v4_terminal_failure_preserved": true,
-    "postseason_terminal_failure_record": "research/availability/2022_2025_harmonization_v4_failure_receipt.json",
+    "postseason_terminal_failure_record": "research/availability/postseason_harmonization_v4_terminal_record.json",
     "scope_change_is_post_hoc_rescue": false,
     "rationale": "This contract does not reclassify or repair the terminal all-22-week V4 source result. It separately qualifies only the pre-existing model evaluation universe; V09B cannot score postseason games because the model feature builder excludes them before evaluation."
   },
@@ -63,14 +71,16 @@
     "source_id": "nfl_com_official_historical_injury_pages",
     "url_template": "https://www.nfl.com/injuries/league/{season}/reg{week}",
     "pages_required_per_season": 18,
-    "expected_page_bundle_sha256": {
+    "semantic_hash_columns": ["season", "week", "team", "external_player", "external_position", "external_injury", "external_practice_status", "external_game_status", "external_source", "source_url"],
+    "expected_semantic_bundle_sha256": {
       "2022": null,
       "2023": null,
       "2024": null,
       "2025": null
     },
-    "bundle_hash_definition": "SHA-256 over the ordered sequence week=1..18 encoded as ASCII week number, 8-byte big-endian payload length, then exact response bytes.",
-    "hash_policy": "Qualification is audit-only until the exact regular-season official-page bundle SHA-256 is pinned for every season after a successful strict collection pass."
+    "semantic_hash_definition": "SHA-256 of UTF-8 CSV with LF line endings, no index, sorted by semantic_hash_columns, after complete semantic duplicate collapse and preregistered model-universe exception removal.",
+    "raw_page_policy": "Retain every week 1-18 HTML response and its individual SHA-256 in the audit artifact; raw page bytes are evidence but are not the frozen semantic state digest.",
+    "hash_policy": "Qualification is audit-only until the semantic regular-season official-source bundle SHA-256 is pinned for every season after a successful strict collection pass."
   },
   "schedule_source": {
     "source_id": "nflverse_schedule",
@@ -128,7 +138,7 @@
     "schedule_match_rate_required_among_model_eligible_rows": 1.0,
     "non_exception_schedule_unmatched_rows_allowed": 0,
     "duplicate_canonical_identity_rows_allowed": 0,
-    "official_page_bundle_hashes_must_be_pinned": true,
+    "official_semantic_bundle_hashes_must_be_pinned": true,
     "derived_schedule_subset_hash_must_be_pinned": true,
     "qualified_2025_receipt_required": true,
     "original_v09b_preregistration_unchanged_required": true
