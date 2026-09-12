@@ -1,0 +1,49 @@
+{
+  "record_version": 1,
+  "record_id": "V09B-GAME-DAY-ROSTER-UNIVERSE-PREFLIGHT-V1",
+  "purpose": "Evaluate whether historical weekly roster data can bound the positive-class denominator without becoming the active/inactive label authority.",
+  "candidate_source": {
+    "name": "NFL Data Exchange historical roster feed as exposed by nflverse weekly rosters",
+    "upstream_endpoint_family": "https://www.nfl.info/nfldataexchange/dataexchange.asmx/getRoster",
+    "upstream_builder": "nflverse/nflverse-rosters R/rosters_dataexchange.R",
+    "observed_fields": [
+      "season",
+      "game_type",
+      "week",
+      "current_club",
+      "gsis_id",
+      "status_description_abbr",
+      "status_short_description"
+    ],
+    "documented_exchange_schema": "NFL Data Exchange documentation defines StatusDescriptionAbbr as Player Status Abbreviation and StatusShortDescription as Short Description of Player Status.",
+    "availability": "nflverse exposes weekly rosters back to 2002"
+  },
+  "allowed_role_if_qualified": {
+    "game_week_roster_universe_boundary": true,
+    "identity_crosswalk": true,
+    "inactive_label_authority": false,
+    "weekly_roster_ina_as_negative_label": false,
+    "absence_from_weekly_roster_as_inactive_label": false
+  },
+  "remaining_qualification_requirements": [
+    "prove the historical feed is week-specific for every 2012-2021 regular-season club-week",
+    "freeze which status values constitute the eligible game-day roster universe before label fitting",
+    "prove promoted/elevated players and transaction-edge cases are represented consistently",
+    "crosscheck the roster universe against official Game Book roster/player sections on a preregistered multi-season sample",
+    "measure player-team-week identity resolution and duplicate rates",
+    "pin the exact historical source artifact hashes used for training-label construction"
+  ],
+  "current_disposition": {
+    "credible_roster_universe_candidate": true,
+    "game_day_roster_universe_qualified": false,
+    "inactive_label_semantics_qualified_from_this_source": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
