@@ -1,12 +1,18 @@
-name: LevLine availability harmonization v1
+name: LevLine availability harmonization
 
 on:
   pull_request:
     paths:
       - 'research/availability/harmonization_contract_v1.json'
+      - 'research/availability/harmonization_regular_season_contract_v2.json'
+      - 'research/availability/postseason_harmonization_v4_terminal_record.json'
       - 'research/availability_harmonization_v1.py'
+      - 'research/availability_harmonization_regular_v2.py'
+      - 'research/availability_identity_regular_v2.py'
       - 'research/run_availability_harmonization_v1.py'
+      - 'research/run_availability_harmonization_regular_v2.py'
       - 'research/test_availability_harmonization_v1.py'
+      - 'research/test_availability_harmonization_regular_v2.py'
       - '.github/workflows/research_availability_harmonization_v1.yml'
   workflow_dispatch:
 
@@ -14,13 +20,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: levline-availability-harmonization-v1-${{ github.event.pull_request.number || github.ref }}
+  group: levline-availability-harmonization-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   harmonization-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,8 +36,13 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - name: Test fail-closed harmonization contract
-        run: pytest -q research/test_availability_harmonization_v1.py
+
+      - name: Test fail-closed v1 and strict-v2 contracts
+        run: |
+          pytest -q \
+            research/test_availability_harmonization_v1.py \
+            research/test_availability_harmonization_regular_v2.py
+
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
@@ -40,31 +51,60 @@ jobs:
             nfl-availability-harmonization-${{ runner.os }}-
             nfl-availability-${{ runner.os }}-
             nflreadpy-${{ runner.os }}-
-      - name: Run 2022-2025 schema and chronology audit
+
+      - name: Preserve superseded v1 diagnostic as fail-closed evidence
         run: |
           rm -rf research_outputs/availability_harmonization_v1
           PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" python research/run_availability_harmonization_v1.py
           test -s research_outputs/availability_harmonization_v1/qualification.json
           test -s research_outputs/availability_harmonization_v1/source_manifest.json
-          test -s research_outputs/availability_harmonization_v1/season_audits.csv
-          test -s research_outputs/availability_harmonization_v1/harmonized_practice_state_2022_2025.csv
           python - <<'PY'
           import json
           from pathlib import Path
           report = json.loads(Path('research_outputs/availability_harmonization_v1/qualification.json').read_text())
-          assert report['technical_status'] == 'VERIFIED', report
-          assert report['research_classification'] in {
-              'AUDIT_ONLY_UNPINNED_SOURCE_HASHES',
-              'QUALIFIED_RESEARCH_2022_2025',
-          }, report
+          assert report['technical_status'] == 'BLOCKED', report
+          assert report['research_classification'] == 'BLOCKED', report
+          blockers = set(report['blockers'])
+          assert 'schedule join missingness failed: 2022' in blockers, report
+          assert 'T-120 chronology failed: 2022' in blockers, report
+          assert report['v09b_execution_authorized'] is False
           assert report['probability_model_built'] is False
           assert report['probability_feature_authorized'] is False
           assert report['production_dependency_authorized'] is False
           assert report['completed_2026_outcomes_used'] == 0
+          PY
+
+      - name: Run strict regular-season v2 source and chronology audit
+        run: |
+          rm -rf research_outputs/availability_harmonization_regular_v2
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/run_availability_harmonization_regular_v2.py
+          test -s research_outputs/availability_harmonization_regular_v2/qualification.json
+          test -s research_outputs/availability_harmonization_regular_v2/source_manifest.json
+          test -s research_outputs/availability_harmonization_regular_v2/season_summaries.csv
+          test -s research_outputs/availability_harmonization_regular_v2/availability_2022_2025_regular_strict.csv
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/availability_harmonization_regular_v2/qualification.json').read_text())
+          assert report['technical_status'] == 'VERIFIED', report
+          assert report['research_classification'] in {
+              'AUDIT_ONLY_UNPINNED_STRICT_SOURCE_HASHES',
+              'QUALIFIED_REGULAR_SEASON_SOURCE_2022_2025',
+          }, report
+          assert report['hard_blockers'] == [], report
+          assert report['probability_model_built'] is False
+          assert report['probability_feature_authorized'] is False
+          assert report['production_dependency_authorized'] is False
+          assert report['candidate_promotion_authorized'] is False
+          assert report['completed_2026_outcomes_used'] == 0
+          assert report['game_outcomes_used'] == 0
           assert report['historical_game_status_feature_authorized'] is False
           assert report['actual_snaps_used'] == 0
           assert report['postgame_participation_used'] == 0
+          assert report['postseason_v4_reopened'] is False
           PY
+
       - name: Prove branch remains research-only
         run: |
           git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
@@ -81,8 +121,11 @@ jobs:
           assert not bad, f'non-research paths changed: {bad}'
           PY
           git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
       - uses: actions/upload-artifact@v4
         with:
-          name: levline-availability-harmonization-v1-${{ github.run_id }}
-          path: research_outputs/availability_harmonization_v1/
+          name: levline-availability-harmonization-${{ github.run_id }}
+          path: |
+            research_outputs/availability_harmonization_v1/
+            research_outputs/availability_harmonization_regular_v2/
           retention-days: 30
