@@ -9,6 +9,7 @@ import re
 import pandas as pd
 
 from compose_copilot_media_reads import _domain_family, _extract_json
+from nfl_forecast.copilot_source_backfill import backfill_direct_sources
 from nfl_forecast.source_policy import is_direct_media_report_url
 from validate_copilot_media_reads import _mentions_any, _team_aliases, _unique_ngrams
 
@@ -58,6 +59,36 @@ def _valid_sources(sources: object) -> tuple[list[dict], set[str], list[str]]:
     return valid, families, failures
 
 
+def _valid_sources_with_backfill(row, sources: object) -> tuple[list[dict], set[str], list[str]]:
+    """Apply the same fail-closed provenance repair used by the final composer.
+
+    Groq must still execute live research, but its returned citations can include
+    navigation or matchup-shell URLs even when the researched prose is usable. The
+    publication contract is two independent *direct* approved reports, so establish
+    that contract deterministically before rejecting the prose. Invalid provider URLs
+    are never promoted; the backfill module discards them and searches approved
+    publishers for direct, current, matchup-relevant reports. If that repair cannot
+    establish two independent publisher families, validation still fails closed.
+    """
+    valid, families, failures = _valid_sources(sources)
+    if len(valid) >= 2 and len(families) >= 2:
+        return valid, families, []
+
+    existing = [dict(source) for source in sources[:8] if isinstance(source, dict)] if isinstance(sources, list) else []
+    repaired = backfill_direct_sources(row, existing)
+    repaired_valid, repaired_families, repaired_failures = _valid_sources(repaired)
+    if len(repaired_valid) >= 2 and len(repaired_families) >= 2:
+        return repaired_valid, repaired_families, []
+
+    # Keep useful provider diagnostics while making the decisive failure the same
+    # direct-source contract enforced after deterministic backfill.
+    provider_failures = [failure for failure in failures if "two independent" not in failure]
+    combined = provider_failures + repaired_failures
+    if not any("two independent" in failure for failure in combined):
+        combined.append("requires at least two independent direct approved-domain sources")
+    return repaired_valid, repaired_families, combined
+
+
 def _load_entry(path: Path, gid: str) -> dict:
     payload = _extract_json(path.read_text(encoding="utf-8", errors="replace"))
     games = payload.get("games") if isinstance(payload, dict) else None
@@ -99,7 +130,7 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
     if re.search(r"\d|%|\blevline\b|\bpure\b|\bmarket\b|\bspread\b|\bmodel line\b|\bmoneyline\b", rationale, flags=re.I):
         failures.append(f"{gid}: model_rationale contains a prohibited numerical/model term")
 
-    _, _, source_failures = _valid_sources(entry.get("sources"))
+    _, _, source_failures = _valid_sources_with_backfill(row, entry.get("sources"))
     failures.extend(f"{gid}: {failure}" for failure in source_failures)
 
     current_human = f"{headline} {paragraph1} {rationale}"

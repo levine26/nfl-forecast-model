@@ -40,6 +40,69 @@ def test_source_gate_requires_two_independent_direct_domains():
     assert not failures
 
 
+def test_focused_source_gate_uses_deterministic_backfill_before_rejecting(monkeypatch):
+    provider_sources = [
+        {
+            "name": "ESPN",
+            "title": "Bears at Panthers preview",
+            "url": "https://www.espn.com/nfl/preview/_/gameId/401872661",
+        }
+    ]
+    repaired = [
+        {
+            "name": "CBS Sports",
+            "title": "Bears Panthers matchup report",
+            "url": "https://www.cbssports.com/nfl/news/bears-panthers-matchup-report/",
+        },
+        {
+            "name": "Panthers",
+            "title": "Panthers prepare for Chicago",
+            "url": "https://www.panthers.com/news/panthers-prepare-for-chicago",
+        },
+    ]
+
+    def fake_backfill(row, existing_sources):
+        assert row["away_team"] == "CHI"
+        assert row["home_team"] == "CAR"
+        assert existing_sources == provider_sources
+        return repaired
+
+    monkeypatch.setattr(module, "backfill_direct_sources", fake_backfill)
+    valid, families, failures = module._valid_sources_with_backfill(
+        {"away_team": "CHI", "home_team": "CAR"}, provider_sources
+    )
+    assert len(valid) == 2
+    assert len(families) == 2
+    assert not failures
+
+
+def test_focused_source_backfill_still_fails_closed_without_two_families(monkeypatch):
+    provider_sources = [
+        {
+            "name": "ESPN",
+            "title": "Bears at Panthers preview",
+            "url": "https://www.espn.com/nfl/preview/_/gameId/401872661",
+        }
+    ]
+    monkeypatch.setattr(
+        module,
+        "backfill_direct_sources",
+        lambda row, sources: [
+            {
+                "name": "ESPN",
+                "title": "One direct report",
+                "url": "https://www.espn.com/nfl/story/_/id/123/one-direct-report",
+            }
+        ],
+    )
+    valid, families, failures = module._valid_sources_with_backfill(
+        {"away_team": "CHI", "home_team": "CAR"}, provider_sources
+    )
+    assert len(valid) == 1
+    assert families == {"espn.com"}
+    assert any("two independent" in failure for failure in failures)
+
+
 def test_source_gate_rejects_generic_team_schedule_game_and_stats_pages():
     generic = [
         {"name": "NFL", "title": "Chargers team", "url": "https://www.nfl.com/teams/los-angeles-chargers/"},
