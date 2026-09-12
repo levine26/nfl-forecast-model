@@ -43,16 +43,18 @@ This file is the authoritative high-level implementation ledger. Historical rese
 - Presentation tiers are derived UI shorthand only; they are not new model outputs.
 - Fail-closed Impact Monitor remains explainability-only unless a probability feature is separately authorized.
 - Responsive/browser QA covers 1440, 1180, 1024, 768, 430, 390, and 320 widths.
+- Week Board row typography is explicitly pinned to the normal-width UI stack, with browser regression coverage preventing reintroduction of condensed/compressed matchup text.
 
 ## Sunday Signal Check remediation status
 
 | Check finding | Current disposition |
 | --- | --- |
 | Locked forecast replaced by a newer live refresh | **Fixed and regression-tested.** Canonical public build selects the immutable lock row first. |
-| Current-week `#VALUE!` spreadsheet errors | **Currently clean.** Repository feed and connected dashboard tabs `THIS WEEK`, `GAME DETAIL`, `RAW FEED`, and `LAST GOOD` were re-audited with no `#VALUE!` matches. |
-| Ambiguous `BIGGEST EDGE` / `Model Line` semantics | **Retired.** Public presentation now distinguishes probability-implied line, market line, and LevLine-vs-market probability difference. |
+| Current-week `#VALUE!` spreadsheet errors | **Currently clean.** Repository feed and connected dashboard tabs `THIS WEEK`, `GAME DETAIL`, `RAW FEED`, and `LAST GOOD` were re-audited with no `#VALUE!` matches. Active browser QA also rejects `#VALUE!` on the Week Board. |
+| Ambiguous `BIGGEST EDGE` / `Model Line` semantics | **Retired and regression-tested.** Public presentation distinguishes probability-implied line, market line, and LevLine-vs-market probability difference; active browser QA rejects the stale labels. |
 | Standardized injury-report wording triggering uniqueness failures | **Fixed and regression-tested.** Recognized factual/status scaffolding is exempt; substantive prose is still checked. |
-| Stale implementation roadmap/docs | **Remediated in the current repository-hygiene pass.** README and this ledger now describe the active system rather than V0.1-era future work. |
+| Compressed/condensed Week Board typography | **Fixed and regression-tested.** Matchup-row text uses the normal UI font stack with normal stretch/variant/kerning. |
+| Stale implementation roadmap/docs | **Remediated.** README and this ledger describe the active system rather than V0.1-era future work. |
 
 ## Research-only / unresolved by design
 
@@ -65,16 +67,18 @@ The presentation/guardrails exist, but alternative numerical scenario probabilit
 ### F-ST legacy freeze provenance — issue #104
 The current guardrails/reconstruction evidence are implemented, but the missing original pre-fit candidate-freeze provenance cannot be recreated retroactively. Later evidence must remain labeled as reconstruction/shadow evidence; registered identity/tolerance cannot be rewritten to erase the exception.
 
-### Post-100 research program — draft PR #141
-Retained as a preregistration/research workspace only. Any actual challenger implementation should be split into a fresh, narrowly scoped research PR against current `main`, and completed 2026 outcomes remain prohibited for selection/tuning.
+### Post-100 research program — issue #178
+The surviving leakage-safe optimization/preregistration program from draft PR #141 now lives in issue #178 as research backlog. Any actual challenger implementation should be split into a fresh, narrowly scoped research PR against current `main`, and completed 2026 outcomes remain prohibited for selection/tuning.
 
 ## Repository hygiene disposition
 
 - PR #128: closed as superseded by the shipped Sunday Signal redesign/product layer.
 - PR #151: closed as superseded by the Groq production editorial pipeline already on `main`.
 - PR #163: closed as superseded by the broader underlength-rationale repair already on `main`.
-- PR #141: intentionally remains open **draft** as future research preregistration, not a production release candidate.
-- Issues #4 and #104: intentionally remain open because they record real unresolved research/governance constraints, not stale implementation tasks.
+- PR #141: closed after its surviving post-100 research scope was transferred to issue #178; its product-vision material was already superseded by shipped PRs #174/#175.
+- PR #176: merged after full responsive, dashboard, research-firewall, and F-ST validation; fixes Week Board typography and adds Sunday Signal Check browser guards.
+- PR #177: merged; repository status/docs were reconciled to the active production architecture.
+- Issues #4, #104, and #178: intentionally remain open because they are real research/governance backlog records, not stale production defects.
 
 ## Non-negotiable research firewall
 
