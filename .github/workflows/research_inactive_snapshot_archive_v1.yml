@@ -1,0 +1,140 @@
+name: LevLine research inactive snapshot archive v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/inactive_snapshot_contract_v1.json'
+      - 'research/inactive_snapshot_due_v1.py'
+      - 'research/inactive_snapshot_archive_v1.py'
+      - 'research/run_inactive_snapshot_archive_v1.py'
+      - 'research/test_inactive_snapshot_archive_v1.py'
+      - '.github/workflows/research_inactive_snapshot_archive_v1.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-research-inactive-snapshot-archive-v1
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate timing, raw preservation and research firewall
+        run: pytest -q research/test_inactive_snapshot_archive_v1.py
+      - name: Verify frozen research-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/inactive_snapshot_contract_v1.json').read_text())
+          assert contract['archive_id'] == 'NFL-INACTIVE-SNAPSHOT-2026-V1'
+          assert contract['season'] == 2026
+          assert contract['capture_policy']['eligible_window_minutes_to_kickoff'] == [20, 100]
+          assert contract['parser_policy']['player_level_parser_qualified'] is False
+          assert contract['parser_policy']['player_level_probability_feature_authorized'] is False
+          assert contract['research_firewall']['completed_2026_outcomes_used'] == 0
+          assert contract['research_firewall']['probability_feature_authorized'] is False
+          assert contract['research_firewall']['production_authorized'] is False
+          PY
+
+  capture:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cheap pregame gate
+        id: gate
+        run: |
+          RESULT=$(python -m research.inactive_snapshot_due_v1)
+          echo "$RESULT"
+          if echo "$RESULT" | grep -q '^due=true'; then
+            echo 'due=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'due=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore append-only inactive archive
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/inactive-snapshots-v1:refs/remotes/origin/research-data/inactive-snapshots-v1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
+            if git ls-tree -d --name-only origin/research-data/inactive-snapshots-v1 research_outputs/inactive_snapshot_archive_v1 | grep -q '^research_outputs/inactive_snapshot_archive_v1$'; then
+              git archive origin/research-data/inactive-snapshots-v1 research_outputs/inactive_snapshot_archive_v1 | tar -xf -
+            fi
+          fi
+
+      - uses: actions/setup-python@v5
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install collector dependencies
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: pip install 'requests>=2.32'
+
+      - name: Capture official inactive source bytes
+        id: capture
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        continue-on-error: true
+        run: PYTHONPATH="$PWD/src:$PWD" python -m research.run_inactive_snapshot_archive_v1 ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }}
+
+      - name: Persist archive away from main
+        if: always() && (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true')
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/inactive_snapshot_archive_v1
+          if [ ! -s "$DATA_DIR/observations.jsonl" ]; then
+            echo 'No inactive archive observations to persist.'
+            exit 0
+          fi
+          rm -rf /tmp/inactive_snapshot_archive_v1
+          cp -R "$DATA_DIR" /tmp/inactive_snapshot_archive_v1
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
+            git checkout -B inactive-snapshots-v1-data origin/research-data/inactive-snapshots-v1
+          else
+            git checkout -B inactive-snapshots-v1-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/inactive_snapshot_archive_v1
+          cp -R /tmp/inactive_snapshot_archive_v1 research_outputs/inactive_snapshot_archive_v1
+          git add research_outputs/inactive_snapshot_archive_v1/
+          if git diff --cached --quiet; then
+            echo 'Inactive archive unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture official NFL inactive source snapshot'
+          git push origin HEAD:research-data/inactive-snapshots-v1
+
+      - name: Surface capture failure after preserving evidence
+        if: always() && (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true')
+        run: |
+          if [ "${{ steps.capture.outcome }}" != 'success' ]; then
+            echo 'Official inactive snapshot capture failed; any evidence available was preserved.' >&2
+            exit 1
+          fi
