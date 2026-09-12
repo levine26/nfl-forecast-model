@@ -1,0 +1,38 @@
+/* Final presentation-only overrides after visual QA against the supplied mockup. */
+@media (max-width: 520px) {
+  .ss-board-hero {
+    min-height: 286px;
+  }
+
+  .ss-hero-copy h1 {
+    max-width: 330px;
+    font-size: 34px;
+    line-height: .88;
+    margin-bottom: 10px;
+  }
+
+  .ss-hero-copy p {
+    max-width: 310px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 390px) {
+  .ss-board-hero {
+    min-height: 282px;
+  }
+
+  .ss-hero-copy h1 {
+    font-size: 33px;
+  }
+}
+
+@media (max-width: 320px) {
+  .ss-board-hero {
+    min-height: 274px;
+  }
+
+  .ss-hero-copy h1 {
+    font-size: 30px;
+  }
+}
