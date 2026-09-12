@@ -12,9 +12,10 @@ HORIZONS = {
     "T-6h": 6 * 60,
     "T-120m": 120,
     "T-60m": 60,
+    "T-45m": 45,
     "T-30m": 30,
 }
-RESEARCH_ONLY_HORIZONS = {"T-60m", "T-30m"}
+RESEARCH_ONLY_HORIZONS = {"T-60m", "T-45m", "T-30m"}
 CAPTURE_TOLERANCE_MINUTES = 7.5
 WIND_NUMBER = re.compile(r"-?\d+(?:\.\d+)?")
 
