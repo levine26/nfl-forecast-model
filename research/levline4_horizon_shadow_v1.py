@@ -6,7 +6,8 @@ This module does not fit a model and does not touch production. It converts the 
 qualified point-in-time sportsbook consensus captured at each preregistered horizon into
 frozen research forecasts. The market candidate uses the consensus directly; the F-ST
 candidate applies the already-frozen F-ST coefficients to that same market probability
-and the nested PURE probability preserved in the official immutable T-120 lock.
+and the nested PURE probability preserved in the official immutable lock, but only when
+that lock existed no later than the horizon being evaluated.
 
 Missing or late inputs fail closed. Forecast identities already present in the ledger are
 never rewritten.
@@ -33,7 +34,6 @@ LEDGER_VERSION = "LEVLINE4-HORIZON-SHADOW-V1"
 MARKET_CANDIDATE_ID = "L4-MKT-H-V1"
 FST_HORIZON_CANDIDATE_ID = "L4-FST-H-V1"
 IDENTITY_COLUMNS = ("game_id", "horizon", "candidate_id")
-EPS = 1e-9
 
 
 def _as_utc(value: Any) -> pd.Timestamp:
@@ -70,10 +70,6 @@ def _int_or_none(value: Any) -> int | None:
         return None
 
 
-def _iso(value: Any) -> str:
-    return _as_utc(value).isoformat()
-
-
 def _input_digest(payload: dict[str, Any]) -> str:
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -86,16 +82,30 @@ def _validate_existing(existing: pd.DataFrame) -> pd.DataFrame:
     if missing:
         raise ValueError(f"existing LevLine 4 shadow ledger missing identity fields: {sorted(missing)}")
     if existing.duplicated(list(IDENTITY_COLUMNS)).any():
-        dupes = existing.loc[existing.duplicated(list(IDENTITY_COLUMNS), keep=False), list(IDENTITY_COLUMNS)]
-        raise ValueError(f"existing LevLine 4 shadow ledger contains duplicate identities: {dupes.to_dict('records')[:5]}")
+        dupes = existing.loc[
+            existing.duplicated(list(IDENTITY_COLUMNS), keep=False),
+            list(IDENTITY_COLUMNS),
+        ]
+        raise ValueError(
+            "existing LevLine 4 shadow ledger contains duplicate identities: "
+            f"{dupes.to_dict('records')[:5]}"
+        )
     return existing.copy()
 
 
 def _qualified_consensus_rows(market: pd.DataFrame) -> pd.DataFrame:
     required = {
-        "row_type", "game_id", "home_team", "away_team", "kickoff_timestamp_utc",
-        "horizon", "target_timestamp_utc", "request_timestamp_utc", "timing_error_minutes",
-        "h2h_home_no_vig", "source_count",
+        "row_type",
+        "game_id",
+        "home_team",
+        "away_team",
+        "kickoff_timestamp_utc",
+        "horizon",
+        "target_timestamp_utc",
+        "request_timestamp_utc",
+        "timing_error_minutes",
+        "h2h_home_no_vig",
+        "source_count",
     }
     if market.empty or not required.issubset(market.columns):
         return pd.DataFrame()
@@ -115,12 +125,15 @@ def _qualified_consensus_rows(market: pd.DataFrame) -> pd.DataFrame:
     valid_time = work[["request_dt", "target_dt", "kickoff_dt"]].notna().all(axis=1)
     pregame = work["request_dt"].lt(work["kickoff_dt"])
     enough_books = work["source_count_num"].ge(int(MIN_CONSENSUS_BOOKS))
-    work = work[valid_horizon & valid_prob & valid_timing & valid_time & pregame & enough_books].copy()
+    work = work[
+        valid_horizon & valid_prob & valid_timing & valid_time & pregame & enough_books
+    ].copy()
     if work.empty:
         return work
 
     expected_targets = work.apply(
-        lambda row: row["kickoff_dt"] - pd.Timedelta(minutes=HORIZONS[str(row["horizon"])]),
+        lambda row: row["kickoff_dt"]
+        - pd.Timedelta(minutes=HORIZONS[str(row["horizon"])]),
         axis=1,
     )
     target_error_seconds = (work["target_dt"] - expected_targets).abs().dt.total_seconds()
@@ -144,8 +157,12 @@ def _locked_rows(prediction_history: pd.DataFrame) -> dict[str, dict[str, Any]]:
     if work.empty:
         return {}
     if work["game_id"].astype(str).duplicated().any():
-        dupes = work.loc[work["game_id"].astype(str).duplicated(keep=False), "game_id"].astype(str).tolist()
-        raise ValueError(f"official prediction history has duplicate LOCKED game ids: {dupes[:5]}")
+        dupes = work.loc[
+            work["game_id"].astype(str).duplicated(keep=False), "game_id"
+        ].astype(str).tolist()
+        raise ValueError(
+            f"official prediction history has duplicate LOCKED game ids: {dupes[:5]}"
+        )
     return {str(row["game_id"]): row.to_dict() for _, row in work.iterrows()}
 
 
@@ -157,7 +174,6 @@ def _base_row(consensus: pd.Series, generated_at: pd.Timestamp) -> dict[str, Any
     kickoff = consensus["kickoff_dt"]
     target = consensus["target_dt"]
     request = consensus["request_dt"]
-
     return {
         "ledger_version": LEDGER_VERSION,
         "game_id": str(consensus["game_id"]),
@@ -175,7 +191,9 @@ def _base_row(consensus: pd.Series, generated_at: pd.Timestamp) -> dict[str, Any
         "market_source_count": int(consensus["source_count_num"]),
         "market_source_names": str(consensus.get("source_names") or ""),
         "market_probability_range": _finite_or_none(consensus.get("probability_range")),
-        "market_max_freshness_minutes": _finite_or_none(consensus.get("max_freshness_minutes")),
+        "market_max_freshness_minutes": _finite_or_none(
+            consensus.get("max_freshness_minutes")
+        ),
         "market_event_id": consensus.get("event_id"),
         "generated_at_utc": generated_at.isoformat(),
         "generation_mode": "prospective_exact_replay",
@@ -207,7 +225,9 @@ def _market_candidate(consensus: pd.Series, generated_at: pd.Timestamp) -> dict[
             "candidate_id": row["candidate_id"],
             "game_id": row["game_id"],
             "horizon": row["horizon"],
-            "market_snapshot_request_timestamp_utc": row["market_snapshot_request_timestamp_utc"],
+            "market_snapshot_request_timestamp_utc": row[
+                "market_snapshot_request_timestamp_utc"
+            ],
             "market_home_prob": row["market_home_prob"],
             "market_source_names": row["market_source_names"],
         }
@@ -229,8 +249,16 @@ def _fst_candidate(
         lock_timestamp = _as_utc(official_lock.get("lock_timestamp_utc"))
     except ValueError:
         return None
+
+    target = consensus["target_dt"]
     kickoff = consensus["kickoff_dt"]
-    if not lock_timestamp < kickoff:
+    # The PURE state is usable only if it was already frozen by the candidate horizon.
+    # This prevents a T-96 official lock, for example, from being replayed as a T-120
+    # research forecast. It remains valid evidence for T-60/T-45/T-30 because those
+    # targets occur later in time.
+    if not (lock_timestamp <= target < kickoff):
+        return None
+    if lock_timestamp > generated_at:
         return None
 
     artifact = load_fst_artifact()
@@ -262,7 +290,9 @@ def _fst_candidate(
             "candidate_id": row["candidate_id"],
             "game_id": row["game_id"],
             "horizon": row["horizon"],
-            "market_snapshot_request_timestamp_utc": row["market_snapshot_request_timestamp_utc"],
+            "market_snapshot_request_timestamp_utc": row[
+                "market_snapshot_request_timestamp_utc"
+            ],
             "market_home_prob": row["market_home_prob"],
             "pure_home_prob": row["pure_home_prob"],
             "pure_source_lock_timestamp_utc": row["pure_source_lock_timestamp_utc"],
@@ -282,13 +312,14 @@ def build_shadow_ledger(
     generated_at_utc: datetime | pd.Timestamp | str | None = None,
 ) -> pd.DataFrame:
     """Return existing immutable rows plus any newly eligible pregame forecasts."""
-
     if generated_at_utc is None:
         generated_at = pd.Timestamp(datetime.now(timezone.utc))
     else:
         generated_at = _as_utc(generated_at_utc)
 
-    existing = _validate_existing(existing_ledger if existing_ledger is not None else pd.DataFrame())
+    existing = _validate_existing(
+        existing_ledger if existing_ledger is not None else pd.DataFrame()
+    )
     existing_keys = {
         tuple(str(row[column]) for column in IDENTITY_COLUMNS)
         for _, row in existing.iterrows()
@@ -326,7 +357,15 @@ def build_shadow_ledger(
         return existing.reset_index(drop=True)
     combined = pd.concat([existing, pd.DataFrame(additions)], ignore_index=True, sort=False)
     combined = _validate_existing(combined)
-    order = [column for column in ("game_id", "horizon_minutes", "candidate_id") if column in combined.columns]
+    order = [
+        column
+        for column in ("game_id", "horizon_minutes", "candidate_id")
+        if column in combined.columns
+    ]
     if order:
-        combined = combined.sort_values(order, ascending=[True, False, True][: len(order)], kind="mergesort")
+        combined = combined.sort_values(
+            order,
+            ascending=[True, False, True][: len(order)],
+            kind="mergesort",
+        )
     return combined.reset_index(drop=True)
