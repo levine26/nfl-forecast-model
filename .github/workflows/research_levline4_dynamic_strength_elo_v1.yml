@@ -1,0 +1,58 @@
+name: LevLine 4 dynamic strength Elo
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/levline4_dynamic_strength_elo_v1.py'
+      - '.github/workflows/research_levline4_dynamic_strength_elo_v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project
+        run: pip install '.[dev]'
+      - name: Run fixed dynamic-strength residual audit
+        run: |
+          rm -rf research_outputs/levline4_dynamic_strength_elo_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/levline4_dynamic_strength_elo_v1.py
+          test -s research_outputs/levline4_dynamic_strength_elo_v1/audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/levline4_dynamic_strength_elo_v1/audit.json').read_text())
+          assert report['sample']['games'] == 1087
+          assert report['results']['market_correct'] == 735
+          assert report['results']['fst_correct'] == 741
+          assert report['governance']['completed_2026_outcomes_used'] == 0
+          assert report['promotion_authorized'] is False
+          PY
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/main...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [p for p in changed if not (p.startswith('research/') or p.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/main...HEAD -- outputs/ site/ src/ scripts/ config/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: levline4-dynamic-strength-elo-${{ github.run_id }}
+          path: research_outputs/levline4_dynamic_strength_elo_v1/
+          if-no-files-found: warn
+          retention-days: 30
