@@ -1,0 +1,41 @@
+{
+  "receipt_id": "LEVLINE4-DYNAMIC-STRENGTH-ELO-V1-FIRST-RUN",
+  "workflow_run_id": 34721531890,
+  "artifact_id": 10306406994,
+  "artifact_sha256": "6d909fe88f381c4653215d21c589b90e3f3f20ca478298a82e96619969a670db",
+  "validated_head_sha": "ecff27430ff3f78c96b654e918bb4f52e3622611",
+  "scientific_disposition": "REJECT_GENERIC_DYNAMIC_STRENGTH_ELO_RESIDUAL",
+  "sample": {"seasons": [2022, 2023, 2024, 2025], "games": 1087},
+  "results": {
+    "market_correct": 735,
+    "fst_correct": 741,
+    "standalone_elo_correct": 664,
+    "standalone_elo_accuracy": 0.6108555657773689,
+    "fst_plus_elo_correct": 739,
+    "fst_plus_elo_accuracy": 0.6798528058877645,
+    "fst_plus_elo_delta_correct": -2,
+    "fst_plus_elo_delta_accuracy_pp": -0.18399264029438367,
+    "switches_vs_fst": 12,
+    "fst_plus_elo_switch_correct": 5,
+    "fst_switch_correct": 7
+  },
+  "by_season_fst_plus_elo_delta_correct": {
+    "2022": 0,
+    "2023": 0,
+    "2024": -3,
+    "2025": 1
+  },
+  "algorithm_frozen_before_result": {
+    "elo_k": 20.0,
+    "home_advantage_elo_points": 55.0,
+    "offseason_regression_fraction_to_mean": 0.3333333333333333,
+    "same_week_outcomes_allowed_to_update_other_pregame_ratings": false
+  },
+  "interpretation": "A generic sequential team-strength rating does not add winner-accuracy signal to F-ST in this fixed formulation. No post-result K, home-advantage, or offseason-regression rescue search is authorized. Dynamic strength remains eligible only as a small context interaction if an independently justified orthogonal information state requires it.",
+  "governance": {
+    "completed_2026_outcomes_used": 0,
+    "production_changed": false,
+    "post_result_parameter_search_authorized": false,
+    "promotion_authorized": false
+  }
+}
