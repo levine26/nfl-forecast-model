@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Run one Sunday Signal editorial research prompt through Groq Compound.
+"""Run one Sunday Signal editorial research prompt through Groq.
 
 This module is intentionally provider-only. It does not alter LevLine predictions,
 locks, grading, or publication semantics. The existing deterministic validators
@@ -11,6 +11,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import time
 from urllib.error import HTTPError, URLError
@@ -19,8 +20,11 @@ from urllib.request import Request, urlopen
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
-DEFAULT_MODEL = "groq/compound"
-_WEB_TOOL_TYPES = {"search", "visit", "web_search", "visit_website"}
+# Compound Mini is deliberate for the current Free-tier production key: it uses at
+# most one tool call, avoiding the hidden underlying-model TPM amplification that
+# full Compound can incur during a multi-search agentic loop.
+DEFAULT_MODEL = "groq/compound-mini"
+_WEB_TOOL_TYPES = {"search", "web_search"}
 _RATE_LIMIT_HEADER_NAMES = (
     "retry-after",
     "x-ratelimit-limit-requests",
@@ -57,21 +61,44 @@ def _safe_rate_limit_headers(exc: HTTPError) -> dict[str, str]:
     return safe
 
 
-def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
-    """Return a bounded retry delay, or None when the provider says to wait too long.
+def _safe_rate_limit_reason(exc: HTTPError) -> str:
+    """Classify a Groq 429 without logging the raw provider response body."""
+    try:
+        raw = exc.read().decode("utf-8", errors="replace")
+        payload = json.loads(raw)
+        message = str((payload.get("error") or {}).get("message") or "")
+    except Exception:
+        return "unclassified"
 
-    Groq documents `retry-after` as seconds for 429 responses. A very long retry
-    window usually indicates an account/day quota rather than a transient burst;
-    the workflow should fail closed and allow a later scheduled run instead of
-    occupying a runner for an extended period.
-    """
+    lowered = message.lower()
+    kinds: list[str] = []
+    for token, label in (
+        ("input tokens per minute", "itpm"),
+        ("output tokens per minute", "otpm"),
+        ("tokens per minute", "tpm"),
+        ("requests per minute", "rpm"),
+        ("requests per day", "rpd"),
+        ("tokens per day", "tpd"),
+        ("project", "project_limit"),
+        ("capacity", "capacity"),
+    ):
+        if token in lowered and label not in kinds:
+            kinds.append(label)
+    model_match = re.search(r"\bmodel\s+[`'\"]?([a-z0-9_.\-/]+)", lowered)
+    model = model_match.group(1) if model_match else ""
+    parts = kinds or ["rate_limit"]
+    if model and len(model) <= 80:
+        parts.append(f"model={model}")
+    return ",".join(parts)
+
+
+def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
     retry_after = _parse_retry_after(_safe_rate_limit_headers(exc).get("retry-after"))
     if retry_after is not None:
         if retry_after > MAX_RATE_LIMIT_WAIT_SECONDS:
             return None
         return max(1.0, retry_after + 1.0)
-    # Conservative fallback when a 429 omits Retry-After.
-    return min(15.0 * (2 ** max(0, attempt - 1)), 60.0)
+    return min(20.0 * (2 ** max(0, attempt - 1)), 75.0)
 
 
 def _request(prompt: str, *, model: str, timeout: int) -> str:
@@ -81,18 +108,21 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
 
     payload = {
         "model": model,
+        "service_tier": "auto",
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.35,
+        "temperature": 0.3,
+        "max_completion_tokens": 1200,
         "response_format": {"type": "json_object"},
-        # We require explicit source URLs in the JSON payload and validate them ourselves;
-        # disabling automatic citation markers keeps user-facing prose clean.
         "citation_options": "disabled",
         "search_settings": {
             "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
         },
         "compound_custom": {
             "tools": {
-                "enabled_tools": ["web_search", "visit_website"],
+                # One broad search can return multiple publisher results. Restricting
+                # Mini to web_search guarantees its single tool call is spent on fresh
+                # reporting rather than an unnecessary secondary tool.
+                "enabled_tools": ["web_search"],
             }
         },
     }
@@ -126,7 +156,7 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
         if isinstance(tool, dict)
     }
     if not (tool_types & _WEB_TOOL_TYPES):
-        raise RuntimeError("Groq response used no web-search or website-visit tool")
+        raise RuntimeError("Groq response used no web-search tool")
 
     print("Groq research tools used:", ", ".join(sorted(tool_types & _WEB_TOOL_TYPES)))
     return content
@@ -138,14 +168,14 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
         try:
             return _request(prompt, model=model, timeout=timeout)
         except HTTPError as exc:
-            # Never print response bodies: provider errors may echo request metadata.
-            retryable = exc.code in {408, 409, 429, 500, 502, 503, 504}
+            retryable = exc.code in {408, 409, 429, 498, 500, 502, 503, 504}
             if exc.code == 429:
                 safe_headers = _safe_rate_limit_headers(exc)
+                reason = _safe_rate_limit_reason(exc)
                 detail = ", ".join(f"{key}={value}" for key, value in safe_headers.items()) or "no rate-limit headers"
-                print(f"Groq HTTP 429 rate limit ({detail})", file=sys.stderr)
+                print(f"Groq HTTP 429 rate limit class={reason} ({detail})", file=sys.stderr)
                 delay = _rate_limit_delay(exc, attempt)
-                last_error = RuntimeError(f"Groq HTTP 429 ({detail})")
+                last_error = RuntimeError(f"Groq HTTP 429 class={reason} ({detail})")
                 if attempt == attempts or delay is None:
                     break
                 print(f"Groq rate-limited; waiting {delay:.1f}s before provider retry {attempt + 1}/{attempts}.", file=sys.stderr)
@@ -170,7 +200,7 @@ def main() -> None:
     parser.add_argument("--output-file", required=True)
     parser.add_argument("--model", default=os.environ.get("GROQ_MEDIA_MODEL", DEFAULT_MODEL))
     parser.add_argument("--timeout", type=int, default=120)
-    parser.add_argument("--attempts", type=int, default=4)
+    parser.add_argument("--attempts", type=int, default=3)
     args = parser.parse_args()
 
     prompt = Path(args.prompt_file).read_text(encoding="utf-8")
