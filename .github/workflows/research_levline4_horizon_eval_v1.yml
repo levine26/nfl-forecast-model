@@ -8,6 +8,7 @@ on:
       - 'research/run_levline4_horizon_eval_v1.py'
       - 'research/test_levline4_horizon_eval_v1.py'
       - 'research/test_levline4_horizon_eligibility_v1.py'
+      - 'research/levline4_horizon_inference_contract_v1.json'
       - 'research/LEVLINE_4_EVALUATION_GOVERNANCE_V2.md'
       - '.github/workflows/research_levline4_horizon_eval_v1.yml'
   workflow_dispatch:
