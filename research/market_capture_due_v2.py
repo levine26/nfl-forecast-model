@@ -17,6 +17,13 @@ def kickoff_utc(gameday: str, gametime: str) -> datetime:
 
 
 def due_rows(feed: Path, now: datetime) -> list[tuple[str, str, float]]:
+    """Return only capture opportunities at or before a nominal T-minus cutoff.
+
+    The workflow runs every five minutes. A request observed after the target time is
+    later information and therefore cannot be used to claim a T-120/T-60/T-45/T-30
+    forecast. Missing the pre-cutoff window is treated as missing research data rather
+    than repaired with a later observation.
+    """
     result = []
     if not feed.exists():
         return result
@@ -29,7 +36,7 @@ def due_rows(feed: Path, now: datetime) -> list[tuple[str, str, float]]:
             for label, minutes in HORIZONS.items():
                 target = kickoff - timedelta(minutes=minutes)
                 timing_error = (now - target).total_seconds() / 60.0
-                if abs(timing_error) <= TOLERANCE_MINUTES:
+                if -TOLERANCE_MINUTES <= timing_error <= 0.0:
                     result.append((row.get("game_id", "unknown"), label, timing_error))
     return result
 
