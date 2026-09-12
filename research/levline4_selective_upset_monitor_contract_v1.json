@@ -52,6 +52,7 @@
   "evidence_status": {
     "component_resolved_boundary_signal": "strengthened_historically_but_not_statistically_proven",
     "generic_clear_favorite_football_override": "rejected_historically",
+    "large_margin_disagreement": "rejected_as_standalone_corroboration; at >=6 point model-vs-market gap the football margin model was about 2.03 MAE points worse and closer only about 35.6% of the time",
     "generic_reputation_fade": "rejected_historically",
     "generic_modern_rest_advantage": "demoted_to_modifier; NFL-specific 2024 evidence finds no significant current bye or mini-bye edge",
     "circadian_travel": "plausible_modifier_only; NFL evidence heterogeneous",
@@ -63,11 +64,13 @@
     "generic_pure_override_authorized": false,
     "generic_super_team_fade_authorized": false,
     "football_unanimity_alone_authorized": false,
+    "large_margin_disagreement_alone_authorized": false,
+    "large_margin_disagreement_counts_as_independent_channel": false,
     "reputation_alone_authorized": false,
     "rest_alone_authorized": false,
     "circadian_alone_authorized": false,
     "market_movement_direction_alone_authorized": false,
-    "principle": "A clear-favorite switch should require evidence from more than one information channel. Historical football disagreement is retained as one channel; contemporaneous market/news/context evidence supplies orthogonal corroboration. The evidence burden must increase with favorite strength rather than being mined from arbitrary probability bins."
+    "principle": "A clear-favorite switch should require evidence from more than one genuinely independent information channel. Historical football disagreement is retained as one channel; contemporaneous market/news/context evidence supplies orthogonal corroboration. Multiple transforms of the same football signal, including large projected-margin disagreement, do not create additional channels. The evidence burden must increase with favorite strength rather than being mined from arbitrary probability bins."
   },
   "prospective_diagnostics": [
     "incumbent winner accuracy",
