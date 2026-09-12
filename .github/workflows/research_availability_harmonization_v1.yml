@@ -6,15 +6,20 @@ on:
       - 'research/availability/harmonization_contract_v1.json'
       - 'research/availability/harmonization_regular_season_contract_v2.json'
       - 'research/availability/harmonization_regular_season_v2_failure_receipt.json'
+      - 'research/availability/harmonization_regular_v2_first_strict_failure_receipt.json'
+      - 'research/availability/harmonization_regular_v2_diagnostic_receipt.json'
       - 'research/availability/postseason_harmonization_v4_terminal_record.json'
+      - 'research/availability/v09b_execution_governance_v1.json'
       - 'research/availability_harmonization_v1.py'
       - 'research/availability_harmonization_regular_v2.py'
       - 'research/availability_identity_regular_v2.py'
       - 'research/diagnose_availability_harmonization_regular_v2.py'
+      - 'research/v09b_execution_gate_v1.py'
       - 'research/run_availability_harmonization_v1.py'
       - 'research/run_availability_harmonization_regular_v2.py'
       - 'research/test_availability_harmonization_v1.py'
       - 'research/test_availability_harmonization_regular_v2.py'
+      - 'research/test_v09b_execution_gate_v1.py'
       - '.github/workflows/research_availability_harmonization_v1.yml'
   workflow_dispatch:
 
@@ -39,11 +44,12 @@ jobs:
           cache: pip
       - run: pip install '.[dev]'
 
-      - name: Test fail-closed v1 and strict-v2 contracts
+      - name: Test fail-closed source and execution-governance contracts
         run: |
           pytest -q \
             research/test_availability_harmonization_v1.py \
-            research/test_availability_harmonization_regular_v2.py
+            research/test_availability_harmonization_regular_v2.py \
+            research/test_v09b_execution_gate_v1.py
 
       - uses: actions/cache@v4
         with:
@@ -76,7 +82,7 @@ jobs:
           assert report['completed_2026_outcomes_used'] == 0
           PY
 
-      - name: Run strict regular-season v2 source and chronology audit
+      - name: Reproduce strict v2 failed-closed source result
         run: |
           rm -rf research_outputs/availability_harmonization_regular_v2
           PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
@@ -91,13 +97,29 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+
           report = json.loads(Path('research_outputs/availability_harmonization_regular_v2/qualification.json').read_text())
-          assert report['technical_status'] == 'VERIFIED', report
-          assert report['research_classification'] in {
-              'AUDIT_ONLY_UNPINNED_STRICT_SOURCE_HASHES',
-              'QUALIFIED_REGULAR_SEASON_SOURCE_2022_2025',
-          }, report
-          assert report['hard_blockers'] == [], report
+          diagnostics = json.loads(Path('research_outputs/availability_harmonization_regular_v2/diagnostics/diagnostic_summary.json').read_text())
+          governance = json.loads(Path('research/availability/v09b_execution_governance_v1.json').read_text())
+
+          expected_hard = {
+              'diagnostic game-status agreement gate failed: 2023',
+              'official-to-canonical identity gate failed: 2024',
+              'diagnostic game-status agreement gate failed: 2024',
+          }
+          expected_pins = {
+              'official semantic source hash not pinned: 2022',
+              'official semantic source hash not pinned: 2023',
+              'official semantic source hash not pinned: 2024',
+              'official semantic source hash not pinned: 2025',
+              'derived schedule subset hash not pinned',
+          }
+
+          assert report['technical_status'] == 'BLOCKED', report
+          assert report['research_classification'] == 'BLOCKED', report
+          assert set(report['hard_blockers']) == expected_hard, report
+          assert set(report['pin_blockers']) == expected_pins, report
+          assert report['v09b_execution_authorized'] is False
           assert report['probability_model_built'] is False
           assert report['probability_feature_authorized'] is False
           assert report['production_dependency_authorized'] is False
@@ -108,6 +130,18 @@ jobs:
           assert report['actual_snaps_used'] == 0
           assert report['postgame_participation_used'] == 0
           assert report['postseason_v4_reopened'] is False
+
+          assert diagnostics['v2_disposition_preserved'] is True, diagnostics
+          assert diagnostics['thresholds_changed'] is False, diagnostics
+          assert diagnostics['source_state_semantics_changed'] is False, diagnostics
+          assert diagnostics['by_season']['2024']['official_unresolved_rows'] == 640, diagnostics
+          assert diagnostics['by_season']['2024']['unresolved_practice_blank_rows'] == 640, diagnostics
+          assert diagnostics['by_season']['2024']['game_status_mismatch_rows'] == 181, diagnostics
+          assert diagnostics['by_season']['2023']['game_status_mismatch_rows'] == 148, diagnostics
+
+          assert governance['current_evidence']['v09b_execution_authorized'] is False, governance
+          assert governance['current_evidence']['training_source_chronology_qualified'] is False, governance
+          assert governance['current_evidence']['training_label_semantics_qualified'] is False, governance
           PY
 
       - name: Prove branch remains research-only
