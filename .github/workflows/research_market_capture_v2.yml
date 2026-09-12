@@ -9,6 +9,9 @@ on:
       - 'research/test_market_capture_t45.py'
       - 'research/run_market_capture_v2.py'
       - 'research/market_capture_due_v2.py'
+      - 'research/levline4_horizon_shadow_v1.py'
+      - 'research/run_levline4_horizon_shadow_v1.py'
+      - 'research/test_levline4_horizon_shadow_v1.py'
       - '.github/workflows/research_market_capture_v2.yml'
   workflow_dispatch:
   schedule:
@@ -26,9 +29,13 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install lightweight test dependencies
-        run: python -m pip install pytest 'pandas==3.0.5' 'requests>=2.32'
-      - name: Validate market normalization and horizon semantics
-        run: python -m pytest -q research/test_market_capture_v2.py research/test_market_capture_t45.py
+        run: python -m pip install pytest 'pandas==3.0.5' 'numpy==2.4.6' 'requests>=2.32'
+      - name: Validate market normalization, horizon semantics and immutable shadows
+        run: >-
+          python -m pytest -q
+          research/test_market_capture_v2.py
+          research/test_market_capture_t45.py
+          research/test_levline4_horizon_shadow_v1.py
 
   capture:
     if: github.event_name != 'pull_request'
@@ -55,17 +62,21 @@ jobs:
             echo 'due=false' >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Restore append-only research market ledger
+      - name: Restore append-only research market and shadow ledgers
         if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
           set -euo pipefail
           git fetch origin research-data/market-capture-v2:refs/remotes/origin/research-data/market-capture-v2 || true
           mkdir -p research_outputs/market_capture_v2
           if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
-            git show origin/research-data/market-capture-v2:research_outputs/market_capture_v2/market_snapshots.csv \
-              > research_outputs/market_capture_v2/market_snapshots.csv 2>/dev/null || true
-            git show origin/research-data/market-capture-v2:research_outputs/market_capture_v2/status.json \
-              > research_outputs/market_capture_v2/status.json 2>/dev/null || true
+            for file in \
+              market_snapshots.csv \
+              status.json \
+              levline4_horizon_shadow.csv \
+              levline4_horizon_shadow_status.json; do
+              git show "origin/research-data/market-capture-v2:research_outputs/market_capture_v2/$file" \
+                > "research_outputs/market_capture_v2/$file" 2>/dev/null || true
+            done
           fi
 
       - uses: actions/setup-python@v5
@@ -76,7 +87,9 @@ jobs:
 
       - name: Install zero-cost collector dependencies
         if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
-        run: python -m pip install 'pandas==3.0.5' 'requests>=2.32'
+        run: |
+          python -m pip install 'pandas==3.0.5' 'numpy==2.4.6' 'requests>=2.32'
+          python -m pip install -e . --no-deps
 
       - name: Capture h2h, spread and total at preregistered horizons
         if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
@@ -86,13 +99,17 @@ jobs:
           python -m research.run_market_capture_v2
           --quota-reserve 50
 
-      - name: Persist ledger away from main
+      - name: Freeze eligible LevLine 4 horizon forecasts
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: python -m research.run_levline4_horizon_shadow_v1
+
+      - name: Persist research ledger away from main
         if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/market_capture_v2
-          if [ ! -s "$DATA_DIR/market_snapshots.csv" ] && [ ! -s "$DATA_DIR/status.json" ]; then
-            echo 'No market research data to persist.'
+          if [ ! -s "$DATA_DIR/market_snapshots.csv" ] && [ ! -s "$DATA_DIR/status.json" ] && [ ! -s "$DATA_DIR/levline4_horizon_shadow.csv" ]; then
+            echo 'No market or LevLine 4 shadow research data to persist.'
             exit 0
           fi
           rm -rf /tmp/market_capture_v2
@@ -110,8 +127,8 @@ jobs:
           cp -R /tmp/market_capture_v2 research_outputs/market_capture_v2
           git add research_outputs/market_capture_v2/
           if git diff --cached --quiet; then
-            echo 'Research market ledger unchanged.'
+            echo 'Research market/shadow ledger unchanged.'
             exit 0
           fi
-          git commit -m 'Capture preregistered LevLine market horizon'
+          git commit -m 'Capture preregistered LevLine market horizon and shadows'
           git push origin HEAD:research-data/market-capture-v2
