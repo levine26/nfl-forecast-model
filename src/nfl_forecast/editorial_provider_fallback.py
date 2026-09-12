@@ -12,6 +12,7 @@ This module is editorial-only. It never reads or writes model coefficients, prob
 inputs, locks, grading state, or market data.
 """
 
+from copy import deepcopy
 from datetime import datetime, timezone
 import json
 import os
@@ -24,6 +25,10 @@ CHATGPT_MAX_AGE_HOURS = 4.0
 CHATGPT_PRODUCER = "chatgpt-consumer-session"
 CHATGPT_RESEARCH_MODE = "live-web-search"
 CHATGPT_FORECAST_PATH = "F-ST-01-FROZEN-2026"
+PROVIDER_STATUS_POLICY = (
+    "Groq failures are game-specific; successful Groq games remain authoritative and "
+    "failed games use validated ChatGPT/last-good editorial fallback."
+)
 
 
 def _utc(value: Any) -> datetime | None:
@@ -155,6 +160,143 @@ def _last_validated_payload(provider_artifact: Path, game_id: str) -> dict[str, 
     }
 
 
+def _run_id() -> str:
+    return str(os.environ.get("GITHUB_RUN_ID") or "local").strip() or "local"
+
+
+def _ephemeral_status_enabled() -> bool:
+    """Use runner-local status only for real non-PR Groq production jobs.
+
+    PR validation uses the same `write-media` job name but must not leak test state
+    between cases. Other workflows can call the finalizer without being part of a Groq
+    provider run, so they should also ignore this ephemeral ledger.
+    """
+    return (
+        bool(os.environ.get("GITHUB_RUN_ID"))
+        and os.environ.get("GITHUB_JOB") == "write-media"
+        and os.environ.get("GITHUB_EVENT_NAME") != "pull_request"
+    )
+
+
+def _ephemeral_status_path(run_id: str | None = None) -> Path:
+    rid = re.sub(r"[^A-Za-z0-9_.-]+", "_", str(run_id or _run_id()))
+    return Path("/tmp") / f"sunday-signal-groq-provider-status-{rid}.json"
+
+
+def _new_provider_section(run_id: str, now: datetime) -> dict[str, Any]:
+    return {
+        "run_id": run_id,
+        "status": "healthy",
+        "games": {},
+        "failed_games": [],
+        "started_at_utc": now.astimezone(timezone.utc).isoformat(),
+        "policy": PROVIDER_STATUS_POLICY,
+    }
+
+
+def _recompute_provider_section(section: dict[str, Any]) -> dict[str, Any]:
+    games = section.get("games")
+    if not isinstance(games, dict):
+        games = {}
+        section["games"] = games
+    section["failed_games"] = sorted(
+        gid
+        for gid, item in games.items()
+        if isinstance(item, dict) and item.get("provider_result") == "failed"
+    )
+    section["status"] = (
+        "degraded"
+        if any(
+            bool(item.get("requires_chatgpt_refresh"))
+            for item in games.values()
+            if isinstance(item, dict)
+        )
+        else "healthy"
+    )
+    section["policy"] = PROVIDER_STATUS_POLICY
+    return section
+
+
+def _load_ephemeral_provider_section(now: datetime) -> tuple[Path, dict[str, Any]]:
+    run_id = _run_id()
+    path = _ephemeral_status_path(run_id)
+    section: dict[str, Any] | None = None
+    if path.is_file():
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict) and str(loaded.get("run_id")) == run_id:
+                section = loaded
+        except Exception:
+            section = None
+    if section is None:
+        section = _new_provider_section(run_id, now)
+    return path, section
+
+
+def _write_ephemeral_provider_section(section: dict[str, Any], path: Path) -> None:
+    path.write_text(json.dumps(_recompute_provider_section(section), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def record_provider_success(game_id: str, *, now: datetime | None = None) -> None:
+    """Record a successful current-run Groq game in runner-local state.
+
+    The first game of a new run creates a fresh ledger, which also prevents a prior
+    run's `requires_chatgpt_refresh` flags from leaking into a later all-success run.
+    """
+    if not _ephemeral_status_enabled():
+        return
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    path, section = _load_ephemeral_provider_section(current)
+    games = section.setdefault("games", {})
+    games[str(game_id)] = {
+        "provider": "groq",
+        "provider_result": "success",
+        "fallback_source": None,
+        "requires_chatgpt_refresh": False,
+        "completed_at_utc": current.isoformat(),
+    }
+    _write_ephemeral_provider_section(section, path)
+
+
+def _record_ephemeral_fallback(*, game_id: str, reason: str, source: str, now: datetime) -> None:
+    if not _ephemeral_status_enabled():
+        return
+    path, section = _load_ephemeral_provider_section(now)
+    games = section.setdefault("games", {})
+    games[str(game_id)] = {
+        "provider": "groq",
+        "provider_result": "failed",
+        "fallback_source": source,
+        "reason": _safe_reason(reason),
+        "recovered_at_utc": now.isoformat(),
+        "requires_chatgpt_refresh": source != "chatgpt",
+    }
+    _write_ephemeral_provider_section(section, path)
+
+
+def merge_current_run_provider_status(status: dict[str, Any]) -> dict[str, Any]:
+    """Restore runner-local provider status after any hard reset to latest main.
+
+    `/tmp` survives the workflow's `git reset --hard origin/main`. The finalizer calls
+    this function only in the Groq production job, replacing any stale previous-run
+    fallback section with the current run's authoritative per-game ledger.
+    """
+    if not _ephemeral_status_enabled():
+        return status
+    path = _ephemeral_status_path()
+    if not path.is_file():
+        return status
+    try:
+        section = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return status
+    if not isinstance(section, dict) or str(section.get("run_id")) != _run_id():
+        return status
+    merged = deepcopy(status)
+    merged["groq_provider_fallback"] = _recompute_provider_section(section)
+    return merged
+
+
 def _record_fallback(
     *,
     game_id: str,
@@ -172,15 +314,10 @@ def _record_fallback(
         except Exception:
             status = {}
 
-    run_id = str(os.environ.get("GITHUB_RUN_ID") or "local")
+    run_id = _run_id()
     section = status.get("groq_provider_fallback")
     if not isinstance(section, dict) or str(section.get("run_id")) != run_id:
-        section = {
-            "run_id": run_id,
-            "status": "healthy" if source == "chatgpt" else "degraded",
-            "games": {},
-            "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-        }
+        section = _new_provider_section(run_id, now)
     games = section.setdefault("games", {})
     games[game_id] = {
         "provider": "groq",
@@ -190,14 +327,10 @@ def _record_fallback(
         "recovered_at_utc": now.isoformat(),
         "requires_chatgpt_refresh": source != "chatgpt",
     }
-    if any(bool(item.get("requires_chatgpt_refresh")) for item in games.values() if isinstance(item, dict)):
-        section["status"] = "degraded"
-    else:
-        section["status"] = "healthy"
-    section["failed_games"] = sorted(games)
-    status["groq_provider_fallback"] = section
+    status["groq_provider_fallback"] = _recompute_provider_section(section)
     status_path.parent.mkdir(parents=True, exist_ok=True)
     status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _record_ephemeral_fallback(game_id=game_id, reason=reason, source=source, now=now)
 
 
 def recover_focused_payload(
