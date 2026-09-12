@@ -11,6 +11,7 @@ import pandas as pd
 from nfl_forecast.copilot_media import apply_copilot_reads
 from nfl_forecast.editorial_finalize import finalize_previews
 from nfl_forecast.editorial_model_read import render_model_paragraph
+from nfl_forecast.editorial_text_safety import sanitize_public_evidence, sanitize_preview_text
 from nfl_forecast.media_context import fetch_media_context
 from nfl_forecast.media_editorial import rewrite_reads_with_media
 
@@ -131,6 +132,11 @@ def main() -> None:
     evidence = json.loads(evidence_path.read_text())
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
 
+    # Repair only mechanical punctuation artifacts at the public boundary. Facts,
+    # standardized injury/status language, and all model values remain unchanged.
+    evidence, evidence_repairs = sanitize_public_evidence(evidence)
+    previews, preview_repairs_before = sanitize_preview_text(previews)
+
     media, media_status = fetch_media_context(predictions, timeout=8)
     display_media, display_status = _display_media(media)
     media_status.update(display_status)
@@ -148,8 +154,20 @@ def main() -> None:
         )
     status["copilot_media"] = copilot_status
 
+    # Provider prose and deterministic rewrites pass through the same punctuation-only
+    # boundary before uniqueness/editorial QA, so malformed source fragments cannot leak
+    # into either the Read or Key Developments.
+    previews, preview_repairs_after = sanitize_preview_text(previews)
+    status["editorial_text_safety"] = {
+        "status": "healthy",
+        "evidence_repairs": int(evidence_repairs),
+        "preview_repairs": int(preview_repairs_before + preview_repairs_after),
+        "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
+    }
+
     status["editorial_finalizer"] = finalize_previews(predictions, previews, evidence)
 
+    evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
     status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + "\n")
 

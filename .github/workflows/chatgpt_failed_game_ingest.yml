@@ -1,0 +1,141 @@
+name: Sunday Signal ChatGPT failed-game fallback
+
+on:
+  pull_request:
+    paths:
+      - "scripts/ingest_chatgpt_failed_games.py"
+      - "scripts/finalize_editorial.py"
+      - "tests/test_chatgpt_failed_game_ingest.py"
+      - "tests/test_editorial_provider_fallback.py"
+      - "tests/test_editorial_text_safety.py"
+      - "src/nfl_forecast/editorial_provider_fallback.py"
+      - "src/nfl_forecast/editorial_text_safety.py"
+      - ".github/workflows/chatgpt_failed_game_ingest.yml"
+  push:
+    branches: [main]
+    paths:
+      - "inputs/chatgpt_media/fallback/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: sunday-signal-chatgpt-failed-game-fallback
+  cancel-in-progress: true
+
+jobs:
+  validate-or-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install editorial environment
+        run: pip install ".[dev]"
+
+      - name: Test game-scoped fallback boundary
+        run: |
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          python -m py_compile scripts/ingest_chatgpt_failed_games.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
+
+      - name: Enforce editorial-only fallback wiring
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          ingest = Path('scripts/ingest_chatgpt_failed_games.py').read_text(encoding='utf-8')
+          fallback = Path('src/nfl_forecast/editorial_provider_fallback.py').read_text(encoding='utf-8')
+          required = (
+              'scripts/validate_single_copilot_game.py',
+              'scripts/compose_copilot_media_reads.py',
+              'scripts/render_levline_paragraphs.py',
+              'scripts/validate_copilot_media_reads.py',
+              'requires_chatgpt_refresh',
+              'CHATGPT_FORECAST_PATH',
+          )
+          for marker in required:
+              assert marker in ingest, marker
+          assert 'CHATGPT_FORECAST_PATH = "F-ST-01-FROZEN-2026"' in fallback
+          forbidden = ('train_model', 'run_model.py', 'grading.py', 'fst_production.py')
+          for marker in forbidden:
+              assert marker not in ingest, marker
+          print('Failed-game ChatGPT fallback is constrained to editorial artifacts and the governed frozen forecast identity.')
+          PY
+
+      - name: Stop after validation on pull request
+        if: github.event_name == 'pull_request'
+        run: echo "Fallback code and tests validated; no publication on PR."
+
+      - name: Require failed-game bundle
+        if: github.event_name != 'pull_request'
+        run: test -f inputs/chatgpt_media/fallback/manifest.json
+
+      - name: Canonicalize current editorial forecast source
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
+          cp /tmp/editorial_predictions.csv outputs/this_week.csv
+
+      - name: Refresh deterministic current reporting without erasing provider artifact
+        if: github.event_name != 'pull_request'
+        run: python scripts/finalize_editorial.py --skip-copilot
+
+      - name: Overlay ChatGPT only onto Groq-failed games and full-slate validate
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/ingest_chatgpt_failed_games.py \
+            --input-dir inputs/chatgpt_media/fallback \
+            --output outputs/copilot_media_reads.json
+
+      - name: Finalize and enforce publication gate
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/finalize_editorial.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
+          media = status.get('media_reporting', {})
+          provider = status.get('copilot_media', {})
+          finalizer = status.get('editorial_finalizer', {})
+          fallback = status.get('groq_provider_fallback', {})
+          games = int(finalizer.get('games', 0))
+          if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
+              raise SystemExit(f'media reporting not launch-grade: {media}')
+          if provider.get('status') != 'healthy' or int(provider.get('games_applied', 0)) != games:
+              raise SystemExit(f'merged editorial slate did not cover full slate: {provider}')
+          if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
+              raise SystemExit(f'final editorial gate failed: {finalizer}')
+          unresolved = [gid for gid, item in (fallback.get('games') or {}).items() if item.get('requires_chatgpt_refresh')]
+          if unresolved:
+              raise SystemExit(f'ChatGPT fallback still unresolved for: {unresolved}')
+          print('Failed-game ChatGPT fallback launch gate passed:', games, 'games')
+          PY
+
+      - name: Publish editorial-only recovery
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git config user.name "sunday-signal-media-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
+          if git diff --cached --quiet; then
+            echo "No failed-game editorial changes to publish."
+            exit 0
+          fi
+          git commit -m "Refresh ChatGPT fallback for Groq-failed Sunday Signal games"
+          git fetch origin main
+          validated_base=$(git rev-parse HEAD^)
+          if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then
+            echo "Main advanced after validation; refusing to publish an unvalidated rebase."
+            exit 1
+          fi
+          git push origin HEAD:main
