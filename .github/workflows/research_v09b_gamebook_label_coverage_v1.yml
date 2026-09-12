@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'research/availability/v09b_gamebook_label_coverage_contract_v1.json'
+      - 'research/availability/v09b_roster_universe_source_preflight_v1.json'
       - 'research/v09b_gamebook_label_coverage_gate_v1.py'
       - 'research/test_v09b_gamebook_label_coverage_gate_v1.py'
       - '.github/workflows/research_v09b_gamebook_label_coverage_v1.yml'
@@ -32,6 +33,7 @@ jobs:
           import json
           from pathlib import Path
           contract = json.loads(Path('research/availability/v09b_gamebook_label_coverage_contract_v1.json').read_text())
+          roster = json.loads(Path('research/availability/v09b_roster_universe_source_preflight_v1.json').read_text())
           assert contract['training_universe']['expected_games_total'] == 2576
           assert contract['training_universe']['silent_game_drops_allowed'] == 0
           assert contract['label_semantics']['not_active_is_negative'] is True
@@ -48,6 +50,13 @@ jobs:
           assert contract['current_authorization']['v09b_model_fit_authorized'] is False
           assert contract['governance']['model_fit_performed'] is False
           assert contract['governance']['completed_2026_outcomes_used'] == 0
+          assert roster['allowed_role_if_qualified']['game_week_roster_universe_boundary'] is True
+          assert roster['allowed_role_if_qualified']['inactive_label_authority'] is False
+          assert roster['allowed_role_if_qualified']['weekly_roster_ina_as_negative_label'] is False
+          assert roster['current_disposition']['credible_roster_universe_candidate'] is True
+          assert roster['current_disposition']['game_day_roster_universe_qualified'] is False
+          assert roster['current_disposition']['v09b_model_fit_authorized'] is False
+          assert roster['governance']['completed_2026_outcomes_used'] == 0
           PY
       - name: Prove branch remains research-only
         run: |
