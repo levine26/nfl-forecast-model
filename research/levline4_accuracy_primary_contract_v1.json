@@ -2,6 +2,8 @@
   "contract_id": "LEVLINE4-ACCURACY-PRIMARY-V1",
   "status": "prospective_research_governance",
   "effective_date": "2026-09-12",
+  "prospective_primary_sample_start": "first eligible NFL game whose strict-PIT T-120 research lock occurs after this contract is merged to main",
+  "pre_contract_2026_games": "excluded from the primary prospective accuracy gate even if research forecasts exist; they may be retained as audit evidence only",
   "production_changed": false,
   "production_model_preserved": "F-ST-01-FROZEN-2026",
   "completed_2026_outcomes_used_to_define_rule": 0,
@@ -18,18 +20,20 @@
   },
   "historical_context": {
     "paired_games_2022_2025": 1087,
-    "frozen_fst_winner_accuracy": 0.680773,
-    "market_winner_accuracy": 0.676173,
-    "approx_fst_correct": 740,
-    "approx_market_correct": 735,
-    "accuracy_difference_percentage_points": 0.46,
-    "interpretation": "F-ST was descriptively five wins better on this historical sample, but the difference is too small to treat as statistically resolved without paired disagreement data."
+    "chronology_clean_fst_architecture_winner_accuracy": 0.6816927322907084,
+    "chronology_clean_fst_correct": 741,
+    "frozen_final_coefficient_reconstruction_winner_accuracy": 0.6807727690892365,
+    "frozen_final_coefficient_reconstruction_correct": 740,
+    "market_winner_accuracy": 0.6761729530818767,
+    "market_correct": 735,
+    "interpretation": "The season-forward architecture estimate is the cleaner historical generalization estimate. Both F-ST views are descriptively ahead of market, but paired uncertainty does not establish statistical superiority."
   },
   "paired_accuracy_estimand": {
     "primary_comparison": "candidate correctness minus incumbent correctness on the same games",
     "disagreement_set": "games where candidate and incumbent select different winners",
     "switch_win_rate": "candidate-correct-and-incumbent-wrong divided by all disagreement games",
     "key_identity": "overall accuracy can change only on disagreement games",
+    "accuracy_delta_identity": "disagreement_rate * (2 * switch_win_rate - 1)",
     "inferential_methods": [
       "week-block bootstrap of paired zero-one-loss difference",
       "cluster-aware matched-pair testing",
@@ -39,7 +43,7 @@
   "horizon_family": {
     "members": ["T-120m", "T-60m", "T-45m", "T-30m"],
     "point_in_time_contract": "strict no-later-than cutoff; valid timing error [-7.5, 0] minutes",
-    "primary_sample": "same games with valid strict-PIT forecasts at all four horizons",
+    "primary_sample": "same post-contract games with valid strict-PIT forecasts at all four horizons",
     "primary_horizon_metric": "winner_accuracy",
     "secondary_horizon_metrics": ["brier", "log_loss", "calibration"],
     "family_inference": "family-level comparison on zero-one loss with week clustering and multiplicity control",
@@ -71,6 +75,7 @@
     "new_model_family_requires_new_candidate_id": true,
     "no_post_result_threshold_tuning": true,
     "no_2026_outcome_rescue_search": true,
+    "no_pre_contract_2026_outcomes_in_primary_accuracy_sample": true,
     "no_post_kickoff_information": true
   }
 }
