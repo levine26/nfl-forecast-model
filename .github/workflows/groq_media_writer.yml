@@ -77,7 +77,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: sunday-signal-media-writer
+  group: sunday-signal-media-writer-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -278,7 +278,8 @@ jobs:
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
           assert 'audit_groq_main_advance.py' in text
-          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, race reconciliation, and publication wiring validated without consuming repository secrets on PR.')
+          assert 'group: sunday-signal-media-writer-${{ github.ref }}' in text
+          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, race reconciliation, isolated concurrency, and publication wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
