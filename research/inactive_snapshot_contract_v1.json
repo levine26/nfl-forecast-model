@@ -1,0 +1,44 @@
+{
+  "archive_id": "NFL-INACTIVE-SNAPSHOT-2026-V1",
+  "status": "PROSPECTIVE_RAW_CAPTURE_ONLY",
+  "season": 2026,
+  "source": "NFL.com official inactives page",
+  "source_url": "https://www.nfl.com/inactives/",
+  "purpose": [
+    "preserve official game-day inactive source bytes around the T-90 release window",
+    "determine whether NFL.com exposes stable machine-parseable inactive state prospectively",
+    "support future leakage-safe LevLine 4 player-state research"
+  ],
+  "capture_policy": {
+    "workflow_cadence": "every_5_minutes",
+    "eligible_window_minutes_to_kickoff": [20, 100],
+    "reason": "cover the official approximately T-90 inactive release plus propagation delay and late corrections while remaining pre-kickoff",
+    "game_clock_source": "outputs/this_week.csv",
+    "observation_log": "append_only_jsonl",
+    "raw_source_storage": "content_addressed_original_http_body_gzip",
+    "unchanged_poll_behavior": "append observation referencing existing raw object",
+    "failed_poll_behavior": "append failed observation and preserve raw source bytes whenever an HTTP body was received"
+  },
+  "parser_policy": {
+    "player_level_parser_qualified": false,
+    "player_level_probability_feature_authorized": false,
+    "raw_capture_may_be_reparsed_later": true,
+    "qualification_required_before_player_state_use": true,
+    "note": "The first objective is immutable point-in-time preservation. No inactive player identity may enter a probability model until a separately tested parser/source contract proves that the archived source contains stable, correctly mapped inactive reports."
+  },
+  "integrity": {
+    "raw_http_body_sha256": true,
+    "raw_http_body_preserved": true,
+    "deterministic_gzip_mtime": 0,
+    "duplicate_observation_identity": "fail_closed",
+    "captured_due_games_recorded": true
+  },
+  "research_firewall": {
+    "completed_2026_outcomes_used": 0,
+    "probability_feature_authorized": false,
+    "production_authorized": false,
+    "production_model_import": false,
+    "production_forecast_dependency": false,
+    "retrospective_backfill_claimed": false
+  }
+}
