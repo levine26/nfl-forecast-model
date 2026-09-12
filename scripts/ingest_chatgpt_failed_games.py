@@ -22,7 +22,6 @@ from typing import Any
 
 import pandas as pd
 
-from compose_copilot_media_reads import _extract_json
 from nfl_forecast.editorial_provider_fallback import (
     CHATGPT_FORECAST_PATH,
     CHATGPT_MAX_AGE_HOURS,
@@ -214,7 +213,10 @@ def ingest(
                 "--predictions", str(prediction_path),
                 "--accepted-dir", str(accepted),
             ])
-            payload = _extract_json(staged.read_text(encoding="utf-8"))
+            # Focused validation normalizes accepted payloads to strict JSON, so no
+            # permissive provider parser is needed here. This also keeps the module
+            # import-safe when tests load it outside the scripts directory.
+            payload = json.loads(staged.read_text(encoding="utf-8"))
             chatgpt_entries[gid] = payload["games"][gid]
 
         raw = work / "mixed-raw.json"
