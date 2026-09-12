@@ -23,6 +23,9 @@ for (const [name, width, height] of viewports) {
     if (width > 1024) await expect(page.locator('.ss-board-labels:visible').getByText('LEVLINE PICK', { exact: true })).toBeVisible()
     else await expect(page.locator('.ss-mobile-card:visible').first().getByText('LEVLINE FORECAST')).toBeVisible()
     await expect(page.getByText('Fair line', { exact: true })).toHaveCount(0)
+    await expect(page.getByText('Model Line', { exact: true })).toHaveCount(0)
+    await expect(page.getByText(/BIGGEST EDGE/i)).toHaveCount(0)
+    await expect(page.getByText('#VALUE!', { exact: true })).toHaveCount(0)
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBeLessThanOrEqual(1)
@@ -47,6 +50,20 @@ for (const [name, width, height] of viewports) {
     await expect(page.getByText('WHY LEVLINE?', { exact: true })).toBeVisible()
   })
 }
+
+test('desktop slate values use readable non-condensed UI typography', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.goto('./')
+  const team = page.locator('.ss-game-row:visible .ss-row-matchup > span > b').first()
+  await expect(team).toBeVisible()
+  const typography = await team.evaluate(element => {
+    const style = getComputedStyle(element)
+    return { fontFamily: style.fontFamily, fontStretch: style.fontStretch, letterSpacing: style.letterSpacing }
+  })
+  expect(typography.fontFamily).not.toMatch(/Arial Narrow|Roboto Condensed/i)
+  expect(['normal', '100%']).toContain(typography.fontStretch)
+  expect(['normal', '0px']).toContain(typography.letterSpacing)
+})
 
 test('governance-approved Impact Monitor renders as explainability-only context', async ({ page }) => {
   await page.goto('./')
