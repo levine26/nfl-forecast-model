@@ -19,7 +19,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
-from typing import Any
+from typing import Any, Iterable
 
 CHATGPT_MAX_AGE_HOURS = 4.0
 CHATGPT_PRODUCER = "chatgpt-consumer-session"
@@ -237,27 +237,6 @@ def _write_ephemeral_provider_section(section: dict[str, Any], path: Path) -> No
     path.write_text(json.dumps(_recompute_provider_section(section), indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def record_provider_success(game_id: str, *, now: datetime | None = None) -> None:
-    """Record a successful current-run Groq game in runner-local state.
-
-    The first game of a new run creates a fresh ledger, which also prevents a prior
-    run's `requires_chatgpt_refresh` flags from leaking into a later all-success run.
-    """
-    if not _ephemeral_status_enabled():
-        return
-    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    path, section = _load_ephemeral_provider_section(current)
-    games = section.setdefault("games", {})
-    games[str(game_id)] = {
-        "provider": "groq",
-        "provider_result": "success",
-        "fallback_source": None,
-        "requires_chatgpt_refresh": False,
-        "completed_at_utc": current.isoformat(),
-    }
-    _write_ephemeral_provider_section(section, path)
-
-
 def _record_ephemeral_fallback(*, game_id: str, reason: str, source: str, now: datetime) -> None:
     if not _ephemeral_status_enabled():
         return
@@ -274,24 +253,38 @@ def _record_ephemeral_fallback(*, game_id: str, reason: str, source: str, now: d
     _write_ephemeral_provider_section(section, path)
 
 
-def merge_current_run_provider_status(status: dict[str, Any]) -> dict[str, Any]:
-    """Restore runner-local provider status after any hard reset to latest main.
+def merge_current_run_provider_status(
+    status: dict[str, Any],
+    expected_game_ids: Iterable[str] = (),
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Materialize the authoritative current-run provider ledger at finalization.
 
-    `/tmp` survives the workflow's `git reset --hard origin/main`. The finalizer calls
-    this function only in the Groq production job, replacing any stale previous-run
-    fallback section with the current run's authoritative per-game ledger.
+    `/tmp` survives the workflow's `git reset --hard origin/main`. Failures recorded
+    during research are restored from that runner-local file. Every canonical game with
+    no failure entry is recorded as a current-run Groq success. Therefore an all-success
+    run also replaces stale `requires_chatgpt_refresh` flags from an older run.
     """
     if not _ephemeral_status_enabled():
         return status
-    path = _ephemeral_status_path()
-    if not path.is_file():
-        return status
-    try:
-        section = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        return status
-    if not isinstance(section, dict) or str(section.get("run_id")) != _run_id():
-        return status
+
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    path, section = _load_ephemeral_provider_section(current)
+    games = section.setdefault("games", {})
+    for game_id in expected_game_ids:
+        gid = str(game_id).strip()
+        if not gid or gid in games:
+            continue
+        games[gid] = {
+            "provider": "groq",
+            "provider_result": "success",
+            "fallback_source": None,
+            "requires_chatgpt_refresh": False,
+            "completed_at_utc": current.isoformat(),
+        }
+
+    _write_ephemeral_provider_section(section, path)
     merged = deepcopy(status)
     merged["groq_provider_fallback"] = _recompute_provider_section(section)
     return merged
