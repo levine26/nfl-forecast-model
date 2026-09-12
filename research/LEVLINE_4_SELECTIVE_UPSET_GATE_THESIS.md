@@ -27,6 +27,19 @@ The component-resolved stack beat aggregate F-ST only 10–7 on 17 disagreement 
 
 Like F-ST, this component-resolved stack did not learn to fade strong favorites. Its market disagreements remained concentrated near 50/50; the strongest market favorite it overturned was only about 55.1%.
 
+## New historical finding: large score/margin disagreement is not independent upset evidence
+
+The isolated margin-model forensics reject another tempting shortcut. Across all 1,087 historical games, the football score/margin model had roughly 9.96 points of absolute margin error versus roughly 9.49 for the market spread, a deficit of about 0.47 points.
+
+The failure becomes more pronounced exactly where a naive upset gate might be tempted to trust the football model most. On the 73 games where the model margin and market spread differed by at least six points:
+
+- the model's mean absolute margin error was about **2.03 points worse** than the market's;
+- the week-block 95% interval for model-minus-market MAE was approximately **+0.13 to +3.68 points**, entirely on the wrong side of zero;
+- the model was closer to the realized margin only about **35.6%** of the time;
+- larger disagreement buckets generally produced larger model-minus-market error.
+
+Therefore a large football-vs-market projected-margin gap is **diagnostic context only**. It cannot count as an independent corroborating channel for a clear-favorite override, and it cannot rescue football unanimity. Any future value from score structure must be demonstrated through a separately frozen hypothesis on prior data rather than inferred from raw disagreement magnitude.
+
 ## Super-team / reputation hypothesis
 
 Peer-reviewed NFL evidence supports testing reputation anchoring. Fodor, Patterson & Shank (Economics Letters, 2025; DOI 10.1016/j.econlet.2025.112288) report that preseason Super Bowl expectations influence both betting behavior and sportsbook closing lines through the season.
@@ -53,6 +66,8 @@ The evidence points toward **orthogonal contemporaneous corroboration**. Candida
 - cross-model dispersion;
 - whether disagreement is broad or driven by one model.
 
+A large score/margin disagreement is not a separate channel. Historical margin forensics show that treating it as one would double-count a weaker football view rather than add orthogonal evidence.
+
 ### 2. Market path and microstructure
 
 - T-120 → T-60 → T-45 → T-30 consensus movement;
@@ -60,19 +75,19 @@ The evidence points toward **orthogonal contemporaneous corroboration**. Candida
 - cross-book dispersion and its contraction/expansion;
 - quote freshness and source count.
 
-A football underdog thesis is more credible when independent books are also moving toward that side while the consensus has not yet crossed 50%.
+A football underdog thesis is more credible when independent books are also moving toward that side while the consensus has not yet crossed 50%. This remains a hypothesis to test prospectively, not an authorized follow-the-move rule.
 
 ### 3. Authoritative player-state change
 
 After source qualification, use only point-in-time information actually published before the horizon:
 
 - QB availability;
-- role-weighted inactive shock;
-- replacement burden;
+- role-weighted inactive shock only after a separate player-value model is authorized;
+- replacement burden only after a separate player-value model is authorized;
 - expected-role uncertainty;
 - time since official announcement.
 
-The gate should ask whether the market has fully digested the news, not simply add an injury penalty twice.
+The gate should ask whether the market has fully digested the news, not simply add an injury penalty twice. Until numeric player impacts are separately authorized, player state remains timestamped descriptive evidence only.
 
 ### 4. Travel/rest/circadian context
 
@@ -87,6 +102,8 @@ Prospective context can include:
 - international venue;
 - verified arrival/acclimation information when timestamped and reproducibly sourced.
 
+Generic rest differential is a descriptive control/modifier rather than a standalone edge: modern NFL-specific evidence does not establish a meaningful current bye or mini-bye advantage. Circadian/travel context likewise remains an interaction hypothesis, not a switch trigger.
+
 No rule is authorized from the 2026 Rams–49ers result itself. That game may motivate source capture, but completed 2026 outcomes cannot define the thresholds.
 
 ### 5. Reputation / anchoring
@@ -97,11 +114,21 @@ No rule is authorized from the 2026 Rams–49ers result itself. That game may mo
 
 This is an interaction feature only. Historical evidence does not support using it alone.
 
+## Prospective evidence architecture
+
+The upset-gate monitor should preserve, rather than prematurely combine, the three strongest currently instrumented channels:
+
+1. component-resolved football probabilities and disagreement structure;
+2. strict-PIT market state and same-sportsbook movement microstructure at T-120/T-60/T-45/T-30;
+3. timestamped qualified player-state observations and changes.
+
+Those records must be composed with no completed 2026 outcome, no post-cutoff backfill, no switch threshold, no cross-channel evidence score, and no fitted conjunction. A future candidate may be specified only after prior evidence exists, with a new frozen candidate ID and a fresh evaluation period or genuinely prior training sample.
+
 ## Training and selection philosophy
 
 The final winner objective is zero-one accuracy, but the gate should not be fitted by brute-force accuracy threshold search. Earlier LevLine work already showed that direct empirical hit-rate weight searches were unstable and underperformed.
 
-Use regularized, classification-calibrated surrogate training, then select prospectively by:
+Use regularized, classification-calibrated surrogate training only after a legally available prior sample exists, then select prospectively by:
 
 - overall winner-accuracy delta versus frozen F-ST;
 - challenger-only-correct vs incumbent-only-correct;
