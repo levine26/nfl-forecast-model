@@ -88,6 +88,13 @@ def run(
             season=season,
             source_sha256=digest,
         )
+        unmatched = (
+            canonical.loc[canonical["game_id"].isna(), ["week", "team"]]
+            .drop_duplicates()
+            .sort_values(["week", "team"], kind="stable")
+            .to_dict("records")
+        )
+        unmatched_rows = int(canonical["game_id"].isna().sum())
         canonical_parts.append(canonical)
         audits.append(audit)
         source_manifest.append(
@@ -98,6 +105,8 @@ def run(
                 "full_asset_rows": len(frame),
                 "regular_rows": len(canonical),
                 "hash_pinned_in_contract": expected_hashes.get(key) is not None,
+                "schedule_unmatched_rows": unmatched_rows,
+                "schedule_unmatched_team_weeks": unmatched,
             }
         )
 
