@@ -21,6 +21,7 @@ on:
       - "scripts/render_levline_paragraphs.py"
       - "scripts/validate_single_copilot_game.py"
       - "scripts/validate_copilot_media_reads.py"
+      - "scripts/audit_groq_main_advance.py"
       - "tests/test_canonical_editorial_predictions.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
@@ -32,6 +33,7 @@ on:
       - "tests/test_read_contract.py"
       - "tests/test_editorial_finalize.py"
       - "tests/test_source_policy_direct_reports.py"
+      - "tests/test_groq_main_advance_audit.py"
       - "pyproject.toml"
       - ".github/workflows/groq_media_writer.yml"
   pull_request:
@@ -52,6 +54,7 @@ on:
       - "scripts/render_levline_paragraphs.py"
       - "scripts/validate_single_copilot_game.py"
       - "scripts/validate_copilot_media_reads.py"
+      - "scripts/audit_groq_main_advance.py"
       - "tests/test_canonical_editorial_predictions.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
@@ -63,6 +66,7 @@ on:
       - "tests/test_read_contract.py"
       - "tests/test_editorial_finalize.py"
       - "tests/test_source_policy_direct_reports.py"
+      - "tests/test_groq_main_advance_audit.py"
       - "pyproject.toml"
       - ".github/workflows/groq_media_writer.yml"
   schedule:
@@ -169,7 +173,7 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py
+        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_groq_main_advance_audit.py
 
       - name: Canonicalize editorial forecast source
         run: |
@@ -246,7 +250,7 @@ jobs:
       - name: PR provider migration gate
         if: github.event_name == 'pull_request'
         run: |
-          python -m py_compile scripts/run_groq_media_prompt.py scripts/build_single_game_copilot_prompt.py
+          python -m py_compile scripts/run_groq_media_prompt.py scripts/build_single_game_copilot_prompt.py scripts/audit_groq_main_advance.py
           python - <<'PY'
           from pathlib import Path
           import re
@@ -273,8 +277,8 @@ jobs:
           assert 'inherits latest successful contextual intelligence' in text
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
-          assert 'unexpected_main_changes' in text
-          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, and publication wiring validated without consuming repository secrets on PR.')
+          assert 'audit_groq_main_advance.py' in text
+          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, race reconciliation, and publication wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
@@ -283,16 +287,13 @@ jobs:
           set -euo pipefail
           git fetch origin main
           if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
-            echo "Main advanced during Groq research; auditing whether only market-owned outputs changed."
+            echo "Main advanced during Groq research; auditing whether deterministic outputs are safely reconcilable."
             changed_main_files=$(git diff --name-only HEAD..origin/main)
             printf '%s\n' "$changed_main_files"
-            unexpected_main_changes=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(outputs/this_week\.csv|outputs/run_history\.csv|outputs/status\.json|outputs/market_t120_research\.csv)$' || true)
-            if [ -n "$unexpected_main_changes" ]; then
-              echo "Main advanced in non-market files; refusing to reuse stale Groq research:"
-              printf '%s\n' "$unexpected_main_changes"
+            if ! printf '%s\n' "$changed_main_files" | python scripts/audit_groq_main_advance.py; then
               exit 1
             fi
-            echo "Only market-owned outputs advanced; rebuilding deterministic editorial facts on latest main."
+            echo "Only reconcilable deterministic outputs advanced; rebuilding deterministic editorial facts on latest main."
             git reset --hard origin/main
             python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
             cp /tmp/editorial_predictions.csv outputs/this_week.csv
