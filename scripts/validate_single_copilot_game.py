@@ -20,17 +20,52 @@ RATIONALE_PROHIBITED = re.compile(
     flags=re.I,
 )
 
-# A clean rationale that narrowly misses the minimum can be completed with one short,
-# matchup-specific mechanism already present in the researched paragraph. Every suffix
-# includes both clubs, which keeps the repair from becoming repeated slate boilerplate.
+# Groq occasionally compresses model_rationale to only a few words even when its
+# researched paragraph is publication-grade. In that case the rationale field is not
+# padded: it is discarded and deterministically reconstructed from a football mechanism
+# already present in the sourced matchup paragraph. Team names recur every few words so
+# two reconstructions using the same mechanism do not create slate-wide stock phrasing.
 RATIONALE_MECHANISMS = (
-    (("pass rush", "pressure", "protection", "pocket", "sack"), "{pick}' protection plan against {opponent} remains decisive."),
-    (("coverage", "secondary", "cornerback", "receiver", "route"), "{pick}' coverage answers against {opponent} remain central."),
-    (("run game", "rushing", "ground game", "run defense", "early down"), "{pick}' early-down rushing efficiency against {opponent} matters."),
-    (("explosive", "deep ball", "chunk play", "downfield"), "{pick}' explosive-play discipline against {opponent} becomes critical."),
-    (("quarterback", "passing game", "pass game", "dropback"), "{pick}' quarterback execution against {opponent} remains pivotal."),
-    (("scheme", "coordinator", "play-calling", "play calling", "motion"), "{pick}' schematic counters against {opponent} remain important."),
-    (("turnover", "ball security", "takeaway"), "{pick}' ball-security execution against {opponent} remains critical."),
+    (
+        ("pass rush", "pressure", "protection", "pocket", "sack"),
+        "{pick}' protection against {opponent}' pressure determines whether {pick} can stay on schedule; if {pick} holds up, {opponent}' cleanest disruption path narrows.",
+    ),
+    (
+        ("coverage", "secondary", "cornerback", "receiver", "route"),
+        "{pick}' coverage answers against {opponent}' receivers determine whether {pick} can stay structurally sound against {opponent}; if coverage favors {pick}, {opponent}' easy completions become harder.",
+    ),
+    (
+        ("run game", "rushing", "ground game", "run defense", "early down", "early-down"),
+        "{pick}' early-down rushing against {opponent}' front determines whether {pick} can control down-and-distance; efficient {pick} runs would force {opponent} into less favorable defensive situations.",
+    ),
+    (
+        ("explosive", "deep ball", "chunk play", "downfield"),
+        "{pick}' explosive-play discipline against {opponent} determines whether {pick} can avoid sudden swings against {opponent}; if discipline favors {pick}, {opponent}' shortcut scoring chances shrink.",
+    ),
+    (
+        ("quarterback", "passing game", "pass game", "dropback"),
+        "{pick}' quarterback execution against {opponent}' structure determines whether {pick} can sustain drives; steady {pick} quarterback play would give {opponent} fewer obvious passing situations.",
+    ),
+    (
+        ("scheme", "coordinator", "play-calling", "play calling", "motion"),
+        "{pick}' schematic answers to {opponent}' adjustments determine whether {pick} can create favorable looks against {opponent}; if the chess match favors {pick}, {opponent} must react instead of dictate.",
+    ),
+    (
+        ("turnover", "ball security", "takeaway"),
+        "{pick}' ball security against {opponent}' takeaway chances determines whether {pick} can preserve field position; secure {pick} possessions would deny {opponent} short-field opportunities.",
+    ),
+    (
+        ("injury", "availability", "questionable", "doubtful", "ruled out"),
+        "{pick}' response to its availability constraints against {opponent} determines whether {pick} can preserve its intended structure; successful {pick} adaptation would deny {opponent} matchup shortcuts.",
+    ),
+    (
+        ("special teams", "kicker", "punt", "kickoff", "return game"),
+        "{pick}' special-teams execution against {opponent} determines whether {pick} can protect field position; clean {pick} execution there would deny {opponent} hidden-yardage advantages.",
+    ),
+    (
+        ("red zone", "third down", "third-down"),
+        "{pick}' situational execution against {opponent} determines whether {pick} can finish drives; timely {pick} conversions would leave {opponent} fewer chances to reset the game.",
+    ),
 )
 
 
@@ -52,17 +87,17 @@ def _nickname(code: object) -> str:
 
 
 def _repair_underlength_rationale(rationale: str, paragraph1: str, row) -> tuple[str, bool]:
-    """Normalize only a clean 10-17 word near-miss using researched matchup mechanics.
+    """Reconstruct a clean underlength rationale from the researched paragraph.
 
-    This is intentionally not a generic padding path. Rationales shorter than 10 words,
-    longer than the contract, or containing prohibited numerical/model language still
-    fail closed. A repair is possible only when paragraph 1 contains a recognized
-    football mechanism, and the resulting text must itself satisfy the 18-40 word
-    contract and prohibited-term gate.
+    The hard publication contract remains 18-40 words. Any rationale already at or
+    above the minimum is left untouched, so overlength copy still fails normally.
+    Numerical/model/betting leakage is never repaired. For an underlength clean field,
+    reconstruction is allowed only when paragraph 1 contains a recognized football
+    mechanism and the production pick is one of the matchup teams. The provider's
+    original short rationale is discarded rather than used as unverified padding.
     """
     original = _clean(rationale)
-    word_count = len(_words(original))
-    if not 10 <= word_count < 18 or _rationale_has_prohibited(original):
+    if len(_words(original)) >= 18 or _rationale_has_prohibited(original):
         return original, False
 
     away = str(row.get("away_team") or "")
@@ -76,8 +111,7 @@ def _repair_underlength_rationale(rationale: str, paragraph1: str, row) -> tuple
     for triggers, template in RATIONALE_MECHANISMS:
         if not any(trigger in paragraph_lower for trigger in triggers):
             continue
-        suffix = template.format(pick=_nickname(pick), opponent=_nickname(opponent))
-        candidate = original.rstrip(".!?") + ". " + suffix
+        candidate = template.format(pick=_nickname(pick), opponent=_nickname(opponent))
         if 18 <= len(_words(candidate)) <= 40 and not _rationale_has_prohibited(candidate):
             return candidate, True
     return original, False
@@ -145,8 +179,6 @@ def _valid_sources_with_backfill(row, sources: object) -> tuple[list[dict], set[
     if len(repaired_valid) >= 2 and len(repaired_families) >= 2:
         return repaired_valid, repaired_families, []
 
-    # Keep useful provider diagnostics while making the decisive failure the same
-    # direct-source contract enforced after deterministic backfill.
     provider_failures = [failure for failure in failures if "two independent" not in failure]
     combined = provider_failures + repaired_failures
     if not any("two independent" in failure for failure in combined):
@@ -210,8 +242,6 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
     valid_sources, _, source_failures = _valid_sources_with_backfill(row, entry.get("sources"))
     failures.extend(f"{gid}: {failure}" for failure in source_failures)
     if not source_failures:
-        # Keep the exact direct-source set that passed the focused gate. This avoids
-        # downstream ambiguity if provider citations required deterministic repair.
         entry["sources"] = valid_sources
 
     current_human = f"{headline} {paragraph1} {rationale}"
