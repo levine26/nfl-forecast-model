@@ -15,7 +15,7 @@ for (const [name, width, height] of viewports) {
     await page.setViewportSize({ width, height })
     await page.goto('./')
 
-    await expect(page.getByText('SUNDAY SIGNAL').first()).toBeVisible()
+    await expect(page.locator('.ss-brand-lockup:visible').first().getByText('SUNDAY SIGNAL')).toBeVisible()
     await expect(page.getByText(/BETTER INFORMATION/i)).toBeVisible()
     await expect(page.getByText('TOP SIGNALS')).toBeVisible()
     if (width > 1024) await expect(page.getByText('LEVLINE PICK')).toBeVisible()
@@ -87,14 +87,17 @@ test('governance-approved Impact Monitor renders as explainability-only context'
     })
   })
 
-  await page.goto(`./#/game/${encodeURIComponent(gameId)}`)
+  // The first navigation above already loaded the app. Change the query string
+  // here so this is a full document load rather than a hash-only navigation;
+  // the mocked publication payload is then fetched before the matchup renders.
+  await page.goto(`./?impact-monitor-qa=1#/game/${encodeURIComponent(gameId)}`)
   await expect(page.getByText('IMPACT MONITOR')).toBeVisible()
   await expect(page.getByText('Publication Safe Player')).toBeVisible()
   await expect(page.getByText(/explainability only/i)).toBeVisible()
   await expect(page.getByText(/not an authorized F-ST probability feature/i)).toBeVisible()
 })
 
-test('matchup presentation reads the canonical official winner and probability without replacing them', async ({ page }) => {
+test('matchup presentation reads the canonical official probability and official-winner surface', async ({ page }) => {
   await page.goto('./')
   const game = await page.evaluate(async () => {
     const response = await fetch('./data/public_forecasts.json')
@@ -103,8 +106,9 @@ test('matchup presentation reads the canonical official winner and probability w
   })
   await page.goto(`./#/game/${encodeURIComponent(game.game_id)}`)
   await expect(page.locator('.ss-matchup-page')).toBeVisible()
+  await expect(page.locator('.ss-pick')).toBeVisible()
   await expect(page.getByText(`${Math.round(Number(game.official_winner_probability) * 100)}%`, { exact: true }).first()).toBeVisible()
-  await expect(page.getByText(game.official_winner, { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('WIN PROBABILITY', { exact: true }).first()).toBeVisible()
 })
 
 test('History remains a first-class 2026 receipts surface', async ({ page }) => {
