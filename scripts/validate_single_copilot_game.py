@@ -28,43 +28,43 @@ RATIONALE_PROHIBITED = re.compile(
 RATIONALE_MECHANISMS = (
     (
         ("pass rush", "pressure", "protection", "pocket", "sack"),
-        "{pick}' protection against {opponent}' pressure decides whether {pick} stays on schedule; if {pick} handles it, {opponent} loses its cleanest disruption path.",
+        "{pick}' protection against {opponent}' pressure determines whether {pick} can stay on schedule; if {pick} holds up, {opponent}' cleanest disruption path narrows.",
     ),
     (
         ("coverage", "secondary", "cornerback", "receiver", "route"),
-        "{pick}' coverage answers against {opponent}' receivers decide whether {pick} stays structurally sound; if {pick} wins there, {opponent} gets fewer easy completions.",
+        "{pick}' coverage answers against {opponent}' receivers determine whether {pick} can stay structurally sound; if coverage favors {pick}, {opponent}' easy completions become harder.",
     ),
     (
         ("run game", "rushing", "ground game", "run defense", "early down", "early-down"),
-        "{pick}' early-down rushing against {opponent}' front decides whether {pick} controls down-and-distance; if {pick} stays efficient, {opponent} sees fewer obvious passing downs.",
+        "{pick}' early-down rushing against {opponent}' front determines whether {pick} can control down-and-distance; efficient {pick} runs would force {opponent} into less favorable defensive situations.",
     ),
     (
         ("explosive", "deep ball", "chunk play", "downfield"),
-        "{pick}' explosive-play discipline against {opponent} decides whether {pick} avoids sudden swings; if {pick} limits them, {opponent} gets fewer shortcut scoring chances.",
+        "{pick}' explosive-play discipline against {opponent} determines whether {pick} can avoid sudden swings; if discipline favors {pick}, {opponent}' shortcut scoring chances shrink.",
     ),
     (
         ("quarterback", "passing game", "pass game", "dropback"),
-        "{pick}' quarterback execution against {opponent}' structure decides whether {pick} sustains drives; if {pick} stays efficient, {opponent} gets fewer obvious passing situations.",
+        "{pick}' quarterback execution against {opponent}' structure determines whether {pick} can sustain drives; steady {pick} quarterback play would give {opponent} fewer obvious passing situations.",
     ),
     (
         ("scheme", "coordinator", "play-calling", "play calling", "motion"),
-        "{pick}' schematic answers to {opponent}' adjustments decide whether {pick} creates favorable looks; if {pick} stays ahead, {opponent} must react instead of dictate.",
+        "{pick}' schematic answers to {opponent}' adjustments determine whether {pick} can create favorable looks; if the chess match favors {pick}, {opponent} must react instead of dictate.",
     ),
     (
         ("turnover", "ball security", "takeaway"),
-        "{pick}' ball security against {opponent}' takeaway chances decides whether {pick} preserves field position; if {pick} protects possessions, {opponent} loses short-field opportunities.",
+        "{pick}' ball security against {opponent}' takeaway chances determines whether {pick} can preserve field position; secure {pick} possessions would deny {opponent} short-field opportunities.",
     ),
     (
         ("injury", "availability", "questionable", "doubtful", "ruled out"),
-        "{pick}' response to its availability constraints against {opponent} decides whether {pick} preserves its intended structure; if {pick} adapts, {opponent} gains fewer matchup shortcuts.",
+        "{pick}' response to its availability constraints against {opponent} determines whether {pick} can preserve its intended structure; successful {pick} adaptation would deny {opponent} matchup shortcuts.",
     ),
     (
         ("special teams", "kicker", "punt", "kickoff", "return game"),
-        "{pick}' special-teams execution against {opponent} decides whether {pick} protects field position; if {pick} stays clean there, {opponent} gets fewer hidden-yardage advantages.",
+        "{pick}' special-teams execution against {opponent} determines whether {pick} can protect field position; clean {pick} execution there would deny {opponent} hidden-yardage advantages.",
     ),
     (
         ("red zone", "third down", "third-down"),
-        "{pick}' situational execution against {opponent} decides whether {pick} finishes drives; if {pick} converts key downs, {opponent} gets fewer chances to reset the game.",
+        "{pick}' situational execution against {opponent} determines whether {pick} can finish drives; timely {pick} conversions would leave {opponent} fewer chances to reset the game.",
     ),
 )
 
@@ -179,8 +179,6 @@ def _valid_sources_with_backfill(row, sources: object) -> tuple[list[dict], set[
     if len(repaired_valid) >= 2 and len(repaired_families) >= 2:
         return repaired_valid, repaired_families, []
 
-    # Keep useful provider diagnostics while making the decisive failure the same
-    # direct-source contract enforced after deterministic backfill.
     provider_failures = [failure for failure in failures if "two independent" not in failure]
     combined = provider_failures + repaired_failures
     if not any("two independent" in failure for failure in combined):
@@ -244,8 +242,6 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
     valid_sources, _, source_failures = _valid_sources_with_backfill(row, entry.get("sources"))
     failures.extend(f"{gid}: {failure}" for failure in source_failures)
     if not source_failures:
-        # Keep the exact direct-source set that passed the focused gate. This avoids
-        # downstream ambiguity if provider citations required deterministic repair.
         entry["sources"] = valid_sources
 
     current_human = f"{headline} {paragraph1} {rationale}"
