@@ -1,0 +1,45 @@
+{
+  "contract_id": "LEVLINE4-MARKET-DEVIG-V1",
+  "status": "research_only_preregistered_transform",
+  "candidate_created_at_utc": "2026-09-12T15:50:00Z",
+  "completed_2026_outcomes_used": 0,
+  "production_authorized": false,
+  "input_contract": "immutable book-level home/away moneyline prices from the same point-in-time market-capture-v2 batch",
+  "consensus_contract": "median probability in logit space across at least two uniquely identified sportsbooks from one game/horizon/request timestamp",
+  "candidates": [
+    {
+      "candidate_id": "L4-MKT-DEVIG-PROP-V1",
+      "method": "proportional",
+      "definition": "normalize the two raw implied probabilities by their booksum"
+    },
+    {
+      "candidate_id": "L4-MKT-DEVIG-SHIN2-V1",
+      "method": "shin_two_outcome_equivalent",
+      "definition": "for exactly two outcomes, use the algebraically equivalent additive solution q_i - (booksum - 1)/2",
+      "interpretation_guard": "do not treat the implied Shin parameter or transform as a direct measure of insiders, player news, or smart money"
+    },
+    {
+      "candidate_id": "L4-MKT-DEVIG-POWER-V1",
+      "method": "power",
+      "definition": "solve alpha such that q_home^alpha + q_away^alpha = 1 and use q_i^alpha"
+    }
+  ],
+  "evaluation": {
+    "same_game_same_horizon_pairing_required": true,
+    "primary_metric": "brier",
+    "secondary_metrics": ["log_loss", "calibration"],
+    "candidate_family_multiplicity_applies": true,
+    "no_method_selected_from_2026_results_until_family_gate": true
+  },
+  "point_in_time_rules": {
+    "later_book_prices_may_fill_earlier_horizon": false,
+    "closing_prices_may_reconstruct_missing_horizon": false,
+    "post_kickoff_information_allowed": false,
+    "raw_archived_prices_may_be_deterministically_recomputed": true
+  },
+  "scientific_notes": [
+    "Strumbelj (2014), International Journal of Forecasting, DOI 10.1016/j.ijforecast.2014.02.008: margin-removal method and bookmaker identity can affect probability accuracy.",
+    "Whelan (2025), Scottish Journal of Political Economy, DOI 10.1111/sjpe.70017: caution against interpreting Shin-style distortion as a monotone measure of inside information.",
+    "For a two-outcome market, Shin and additive margin removal are algebraically equivalent; this is why the candidate is labeled SHIN2 rather than treated as a distinct insider-information estimator."
+  ]
+}
