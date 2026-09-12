@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import './experience-dom-fixes.css'
 
 /**
  * Small DOM-compatibility bridge for presentation-only layers that coexist
