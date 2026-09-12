@@ -1,0 +1,66 @@
+{
+  "contract_version": 3,
+  "contract_id": "V09B-AVAILABILITY-PRACTICE-STATE-CROSSCHECK-V3",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "status": "post_v2_diagnostic_preregistered_before_v09b_model_fit",
+  "purpose": "Test whether the 2022-2025 validation source is qualified for the specific historical practice-participation state that V09B is allowed to use, while permanently preserving strict v2 as failed closed.",
+  "predecessor_failure_receipt": "research/availability/harmonization_regular_v2_diagnostic_receipt.json",
+  "target_seasons": [2022, 2023, 2024, 2025],
+  "source_semantics_revision": {
+    "reason": "Strict v2 proved that every unresolved 2024 official row lacked practice participation state. V3 therefore defines reverse identity only over official rows whose normalized practice state is one of full/limited/dnp. Rows without recognized practice participation remain diagnostic and may never be inferred healthy, active, or matched.",
+    "v2_reclassified_as_pass": false,
+    "v2_thresholds_relaxed": false,
+    "v2_failure_preserved": true,
+    "game_status_is_qualifying_gate": false,
+    "game_status_is_authorized_feature": false,
+    "blank_practice_rows_excluded_from_reverse_identity_denominator": true,
+    "blank_practice_rows_retained_as_diagnostics": true
+  },
+  "recognized_official_practice_states": ["full", "limited", "dnp"],
+  "frozen_qualification_gates": {
+    "required_seasons_exact": [2022, 2023, 2024, 2025],
+    "canonical_to_official_unique_identity_match_rate_min": 0.995,
+    "official_practice_state_to_canonical_identity_resolution_rate_min": 0.995,
+    "practice_status_agreement_rate_min": 0.985,
+    "known_by_t120_rate_required_among_identity_matched_rows": 1.0,
+    "fully_qualified_practice_state_rate_min": 0.99,
+    "legacy_date_modified_parse_rate_min": 0.995,
+    "schedule_match_rate_required_among_model_eligible_rows": 1.0,
+    "non_exception_schedule_unmatched_rows_allowed": 0,
+    "duplicate_canonical_identity_rows_allowed": 0,
+    "official_nfl_pages_required_per_season": 18
+  },
+  "pinned_source_evidence": {
+    "official_semantic_bundle_sha256": {
+      "2022": "693dbcb48ef270c2d73847763b5fa05cdf6fcd91cf7e0ffc6f3a1eda44429bbf",
+      "2023": "d11651213aa3131f5aab659bb541a6487f90268a60ab9b84e1d8fcc32829912c",
+      "2024": "70c9e3546aa790051597cca914f3be8ef242c0e7b0de978034998f42ba936036",
+      "2025": "4882755db9994b5a0c92c2d3c7a71101efd67010eba4cc85cd9e338c0e15cbbc"
+    },
+    "derived_schedule_subset_sha256": "4d03d8ec93e795d3f24ce43b5c1febacc8f2962470ceb881f6d9a6a687f978ff",
+    "pin_origin": "Successful strict-v2 source reproduction artifact; pins are source/provenance evidence only and were fixed before any V09B probability model fit or completed-2026 outcome use."
+  },
+  "feature_authorization": {
+    "practice_state_validation_source": "eligible_only_if_v3_gates_pass",
+    "v09b_model_fit": false,
+    "final_game_status": false,
+    "actual_snaps": false,
+    "postgame_participation": false,
+    "retrospective_inactive_status": false,
+    "later_injury_designation": false,
+    "completed_2026_outcomes": false
+  },
+  "separate_execution_dependencies": {
+    "training_source_chronology_2012_2021_must_be_qualified": true,
+    "training_target_label_semantics_2012_2021_must_be_qualified": true,
+    "validation_source_qualification_alone_authorizes_v09b_fit": false
+  },
+  "governance": {
+    "research_only": true,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "probability_model_built_by_this_contract": false,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
