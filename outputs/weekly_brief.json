@@ -1,25 +1,25 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_01_ATL_PIT",
+      "largest_driver": "Market movement",
+      "pick": "PIT",
+      "pick_delta_pp": -0.5254879212665209
+    },
+    {
+      "game_id": "2026_01_ARI_LAC",
+      "largest_driver": "Market movement",
+      "pick": "LAC",
+      "pick_delta_pp": 0.48763408682581666
+    },
+    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material input move",
       "pick": "SEA",
       "pick_delta_pp": -1.260265225511148e-08
-    },
-    {
-      "game_id": "2026_01_ARI_LAC",
-      "largest_driver": "No material input move",
-      "pick": "LAC",
-      "pick_delta_pp": 0.0
-    },
-    {
-      "game_id": "2026_01_BAL_IND",
-      "largest_driver": "No material input move",
-      "pick": "BAL",
-      "pick_delta_pp": -0.0
     }
   ],
-  "generated_utc": "2026-09-12T17:01:13.161114+00:00",
+  "generated_utc": "2026-09-12T20:36:03.759664+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
@@ -28,7 +28,7 @@
       "pick": "LV",
       "pick_prob": 0.6338599528153582,
       "projected_score": "LV 20.0 \u2013 MIA 23.5",
-      "pure_market_gap_pp": 23.725225461159766
+      "pure_market_gap_pp": 23.72522546115976
     },
     {
       "confidence": "Coin Flip",
@@ -37,7 +37,7 @@
       "pick": "KC",
       "pick_prob": 0.5949579556015904,
       "projected_score": "KC 19.7 \u2013 DEN 25.3",
-      "pure_market_gap_pp": 23.66661299145835
+      "pure_market_gap_pp": 23.666612991458358
     },
     {
       "confidence": "Solid",
@@ -46,7 +46,7 @@
       "pick": "DET",
       "pick_prob": 0.7525022608076984,
       "projected_score": "DET 24.7 \u2013 NO 21.1",
-      "pure_market_gap_pp": 17.454524928133164
+      "pure_market_gap_pp": 17.454524928133186
     }
   ],
   "most_uncertain": [
@@ -81,7 +81,7 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.8122064136854329,
+      "pick_prob": 0.8170827545536911,
       "projected_score": "LAC 25.4 \u2013 ARI 19.0"
     },
     {
