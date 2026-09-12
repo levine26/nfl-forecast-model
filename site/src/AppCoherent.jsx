@@ -1,4 +1,5 @@
 import AppSignal from './AppSignal.jsx'
+import './signal-polish.css'
 
 /**
  * Canonical consumer-surface compatibility contract.
