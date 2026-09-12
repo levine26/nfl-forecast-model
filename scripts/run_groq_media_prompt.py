@@ -20,9 +20,6 @@ from urllib.request import Request, urlopen
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
-# Compound Mini is deliberate for the current Free-tier production key: it uses at
-# most one tool call, avoiding the hidden underlying-model TPM amplification that
-# full Compound can incur during a multi-search agentic loop.
 DEFAULT_MODEL = "groq/compound-mini"
 _WEB_TOOL_TYPES = {"search", "web_search"}
 _RATE_LIMIT_HEADER_NAMES = (
@@ -33,6 +30,17 @@ _RATE_LIMIT_HEADER_NAMES = (
     "x-ratelimit-remaining-tokens",
     "x-ratelimit-reset-requests",
     "x-ratelimit-reset-tokens",
+)
+_REQUEST_FIELDS = (
+    "response_format",
+    "service_tier",
+    "max_completion_tokens",
+    "citation_options",
+    "search_settings",
+    "include_domains",
+    "compound_custom",
+    "enabled_tools",
+    "web_search",
 )
 MAX_RATE_LIMIT_WAIT_SECONDS = 180.0
 
@@ -61,16 +69,44 @@ def _safe_rate_limit_headers(exc: HTTPError) -> dict[str, str]:
     return safe
 
 
-def _safe_rate_limit_reason(exc: HTTPError) -> str:
-    """Classify a Groq 429 without logging the raw provider response body."""
+def _read_error_object(exc: HTTPError) -> dict:
+    """Read Groq's structured error once; never expose its raw body."""
     try:
         raw = exc.read().decode("utf-8", errors="replace")
         payload = json.loads(raw)
-        message = str((payload.get("error") or {}).get("message") or "")
+        error = payload.get("error") if isinstance(payload, dict) else None
+        return error if isinstance(error, dict) else {}
     except Exception:
-        return "unclassified"
+        return {}
 
-    lowered = message.lower()
+
+def _safe_request_error_reason(error: dict) -> str:
+    """Return only non-sensitive structured/classified request-error metadata."""
+    message = str(error.get("message") or "").lower()
+    code = str(error.get("code") or "").strip()
+    error_type = str(error.get("type") or "").strip()
+    param = str(error.get("param") or "").strip()
+    parts: list[str] = []
+    if code and len(code) <= 80:
+        parts.append(f"code={code}")
+    if error_type and len(error_type) <= 80:
+        parts.append(f"type={error_type}")
+    if param and len(param) <= 100:
+        parts.append(f"param={param}")
+    fields = [field for field in _REQUEST_FIELDS if field in message]
+    if fields:
+        parts.append("fields=" + ",".join(fields))
+    if "not supported" in message or "unsupported" in message:
+        parts.append("unsupported_parameter")
+    if "invalid" in message:
+        parts.append("invalid_request")
+    if "blocked" in message or "access" in message and "denied" in message:
+        parts.append("access_blocked")
+    return ",".join(parts) or "unclassified_request_error"
+
+
+def _safe_rate_limit_reason(error: dict) -> str:
+    message = str(error.get("message") or "").lower()
     kinds: list[str] = []
     for token, label in (
         ("input tokens per minute", "itpm"),
@@ -82,9 +118,9 @@ def _safe_rate_limit_reason(exc: HTTPError) -> str:
         ("project", "project_limit"),
         ("capacity", "capacity"),
     ):
-        if token in lowered and label not in kinds:
+        if token in message and label not in kinds:
             kinds.append(label)
-    model_match = re.search(r"\bmodel\s+[`'\"]?([a-z0-9_.\-/]+)", lowered)
+    model_match = re.search(r"\bmodel\s+[`'\"]?([a-z0-9_.\-/]+)", message)
     model = model_match.group(1) if model_match else ""
     parts = kinds or ["rate_limit"]
     if model and len(model) <= 80:
@@ -106,22 +142,17 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
     if not api_key:
         raise RuntimeError("GROQ_API_KEY is not configured")
 
+    # Keep the request deliberately close to Groq's documented Compound Mini web-
+    # search examples. JSON syntax/schema enforcement remains local in our repair +
+    # deterministic validators rather than depending on optional provider fields.
     payload = {
         "model": model,
-        "service_tier": "auto",
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.3,
-        "max_completion_tokens": 1200,
-        "response_format": {"type": "json_object"},
-        "citation_options": "disabled",
         "search_settings": {
             "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
         },
         "compound_custom": {
             "tools": {
-                # One broad search can return multiple publisher results. Restricting
-                # Mini to web_search guarantees its single tool call is spent on fresh
-                # reporting rather than an unnecessary secondary tool.
                 "enabled_tools": ["web_search"],
             }
         },
@@ -169,9 +200,10 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
             return _request(prompt, model=model, timeout=timeout)
         except HTTPError as exc:
             retryable = exc.code in {408, 409, 429, 498, 500, 502, 503, 504}
+            error = _read_error_object(exc)
             if exc.code == 429:
                 safe_headers = _safe_rate_limit_headers(exc)
-                reason = _safe_rate_limit_reason(exc)
+                reason = _safe_rate_limit_reason(error)
                 detail = ", ".join(f"{key}={value}" for key, value in safe_headers.items()) or "no rate-limit headers"
                 print(f"Groq HTTP 429 rate limit class={reason} ({detail})", file=sys.stderr)
                 delay = _rate_limit_delay(exc, attempt)
@@ -181,6 +213,11 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
                 print(f"Groq rate-limited; waiting {delay:.1f}s before provider retry {attempt + 1}/{attempts}.", file=sys.stderr)
                 time.sleep(delay)
                 continue
+            if 400 <= exc.code < 500:
+                reason = _safe_request_error_reason(error)
+                print(f"Groq HTTP {exc.code} request rejected: {reason}", file=sys.stderr)
+                last_error = RuntimeError(f"Groq HTTP {exc.code} class={reason}")
+                break
 
             last_error = RuntimeError(f"Groq HTTP {exc.code}")
             if not retryable or attempt == attempts:
