@@ -17,6 +17,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 from typing import Any
 
 CHATGPT_MAX_AGE_HOURS = 4.0
@@ -97,11 +98,40 @@ def _qualitative_rationale(entry: dict[str, Any]) -> str:
     return ""
 
 
-def _last_validated_payload(provider_artifact: Path, game_id: str) -> dict[str, Any] | None:
-    if not provider_artifact.is_file():
+def _provider_artifact_text(provider_artifact: Path) -> str | None:
+    """Read last-good editorial even if the workflow cleared the working file.
+
+    The Groq workflow intentionally removes outputs/copilot_media_reads.json before it
+    builds a new slate. The previously committed file is still available in Git HEAD,
+    so an isolated provider failure can recover that validated game without weakening
+    the workflow's clean-slate semantics.
+    """
+    if provider_artifact.is_file():
+        try:
+            return provider_artifact.read_text(encoding="utf-8")
+        except Exception:
+            return None
+    if provider_artifact.is_absolute():
         return None
     try:
-        payload = json.loads(provider_artifact.read_text(encoding="utf-8"))
+        result = subprocess.run(
+            ["git", "show", f"HEAD:{provider_artifact.as_posix()}"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except Exception:
+        return None
+    return result.stdout if result.returncode == 0 and result.stdout.strip() else None
+
+
+def _last_validated_payload(provider_artifact: Path, game_id: str) -> dict[str, Any] | None:
+    raw = _provider_artifact_text(provider_artifact)
+    if raw is None:
+        return None
+    try:
+        payload = json.loads(raw)
     except Exception:
         return None
     games = payload.get("games") if isinstance(payload, dict) else None
