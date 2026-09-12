@@ -46,11 +46,11 @@ def _consensus(
     }
 
 
-def _lock(*, pure: float = 0.57) -> dict:
+def _lock(*, pure: float = 0.57, timestamp: str = "2026-09-13T15:01:00Z") -> dict:
     return {
         "game_id": "2026_01_A_B",
         "lock_status": "LOCKED",
-        "lock_timestamp_utc": "2026-09-13T15:01:00Z",
+        "lock_timestamp_utc": timestamp,
         "fst_pure_home_prob": pure,
         "fst_artifact_id": "F-ST-01-FROZEN-2026",
         "model_version": "0.9.0-fst",
@@ -65,7 +65,10 @@ def test_builds_market_and_fst_candidates_from_same_horizon() -> None:
         history,
         generated_at_utc="2026-09-13T16:16:00Z",
     )
-    assert set(ledger["candidate_id"]) == {MARKET_CANDIDATE_ID, FST_HORIZON_CANDIDATE_ID}
+    assert set(ledger["candidate_id"]) == {
+        MARKET_CANDIDATE_ID,
+        FST_HORIZON_CANDIDATE_ID,
+    }
     market_row = ledger.loc[ledger["candidate_id"].eq(MARKET_CANDIDATE_ID)].iloc[0]
     fst_row = ledger.loc[ledger["candidate_id"].eq(FST_HORIZON_CANDIDATE_ID)].iloc[0]
     assert market_row["final_home_prob"] == pytest.approx(0.62)
@@ -82,8 +85,16 @@ def test_builds_market_and_fst_candidates_from_same_horizon() -> None:
 def test_first_qualified_consensus_is_immutable_source() -> None:
     market = pd.DataFrame(
         [
-            _consensus(request="2026-09-13T16:14:00Z", probability=0.61, timing_error=-1.0),
-            _consensus(request="2026-09-13T16:16:00Z", probability=0.67, timing_error=1.0),
+            _consensus(
+                request="2026-09-13T16:14:00Z",
+                probability=0.61,
+                timing_error=-1.0,
+            ),
+            _consensus(
+                request="2026-09-13T16:16:00Z",
+                probability=0.67,
+                timing_error=1.0,
+            ),
         ]
     )
     ledger = build_shadow_ledger(
@@ -112,7 +123,50 @@ def test_fst_candidate_waits_for_official_locked_pure() -> None:
         existing_ledger=without_lock,
         generated_at_utc="2026-09-13T16:20:00Z",
     )
-    assert set(with_lock["candidate_id"]) == {MARKET_CANDIDATE_ID, FST_HORIZON_CANDIDATE_ID}
+    assert set(with_lock["candidate_id"]) == {
+        MARKET_CANDIDATE_ID,
+        FST_HORIZON_CANDIDATE_ID,
+    }
+
+
+def test_fst_never_replays_a_later_lock_into_an_earlier_horizon() -> None:
+    # The production lock is the first valid refresh *inside* T-120. A lock at T-119
+    # cannot be used as if its PURE state had existed at the exact T-120 research target.
+    t120_market = pd.DataFrame(
+        [
+            _consensus(
+                horizon="T-120m",
+                request="2026-09-13T15:00:00Z",
+                target="2026-09-13T15:00:00Z",
+            )
+        ]
+    )
+    t120 = build_shadow_ledger(
+        t120_market,
+        pd.DataFrame([_lock(timestamp="2026-09-13T15:01:00Z")]),
+        generated_at_utc="2026-09-13T16:00:00Z",
+    )
+    assert list(t120["candidate_id"]) == [MARKET_CANDIDATE_ID]
+
+    # The same already-frozen lock is valid evidence for a later T-60 horizon.
+    t60_market = pd.DataFrame(
+        [
+            _consensus(
+                horizon="T-60m",
+                request="2026-09-13T16:00:00Z",
+                target="2026-09-13T16:00:00Z",
+            )
+        ]
+    )
+    t60 = build_shadow_ledger(
+        t60_market,
+        pd.DataFrame([_lock(timestamp="2026-09-13T15:01:00Z")]),
+        generated_at_utc="2026-09-13T16:01:00Z",
+    )
+    assert set(t60["candidate_id"]) == {
+        MARKET_CANDIDATE_ID,
+        FST_HORIZON_CANDIDATE_ID,
+    }
 
 
 def test_never_backfills_missing_forecast_after_kickoff() -> None:
@@ -145,7 +199,9 @@ def test_existing_identity_is_never_rewritten() -> None:
         existing_ledger=original,
         generated_at_utc="2026-09-13T16:25:00Z",
     )
-    pd.testing.assert_frame_equal(replay.reset_index(drop=True), original.reset_index(drop=True))
+    pd.testing.assert_frame_equal(
+        replay.reset_index(drop=True), original.reset_index(drop=True)
+    )
 
 
 def test_unqualified_market_rows_fail_closed() -> None:
