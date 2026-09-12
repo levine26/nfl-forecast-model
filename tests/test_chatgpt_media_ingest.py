@@ -137,3 +137,20 @@ def test_ingest_routes_every_game_through_existing_focused_and_full_slate_gates(
     focused_ids = [calls[0][calls[0].index("--game-id") + 1], calls[1][calls[1].index("--game-id") + 1]]
     assert focused_ids == game_ids
     assert str(output) in calls[-1]
+
+
+def test_publish_cleans_scratch_and_refuses_post_validation_main_race():
+    workflow = (ROOT / ".github" / "workflows" / "chatgpt_media_ingest.yml").read_text(encoding="utf-8")
+    publish = workflow.split("- name: Publish editorial-only outputs", 1)[1]
+    intended_add = "git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/context_source_status.json"
+    commit = 'git commit -m "Refresh ChatGPT-ingested Sunday Signal Reads"'
+    clean = "git reset --hard HEAD"
+    fetch = "git fetch origin main"
+    base = "validated_base=$(git rev-parse HEAD^)"
+    guard = 'if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then'
+    push = "git push origin HEAD:main"
+
+    assert intended_add in publish
+    assert "git pull --rebase origin main" not in publish
+    assert publish.index(intended_add) < publish.index(commit) < publish.index(clean) < publish.index(fetch)
+    assert publish.index(fetch) < publish.index(base) < publish.index(guard) < publish.index(push)

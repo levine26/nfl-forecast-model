@@ -12,6 +12,7 @@ on:
     branches: [main]
     paths:
       - "inputs/chatgpt_media/current/**"
+      - ".github/workflows/chatgpt_media_ingest.yml"
 
 permissions:
   contents: write
@@ -173,5 +174,11 @@ jobs:
           git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/context_source_status.json
           if git diff --cached --quiet; then echo "No media editorial changes to publish."; exit 0; fi
           git commit -m "Refresh ChatGPT-ingested Sunday Signal Reads"
-          git pull --rebase origin main
+          git reset --hard HEAD
+          git fetch origin main
+          validated_base=$(git rev-parse HEAD^)
+          if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then
+            echo "Main advanced after the final launch gate; refusing to publish an unvalidated rebase."
+            exit 1
+          fi
           git push origin HEAD:main
