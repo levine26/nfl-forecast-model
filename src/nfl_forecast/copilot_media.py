@@ -22,16 +22,23 @@ MAX_COPILOT_AGE_HOURS = 6.0
 NEW_REPORT_GRACE_MINUTES = 5.0
 
 
-def load_copilot_reads(path: str | Path) -> dict[str, dict[str, Any]]:
+def load_copilot_reads(path: str | Path) -> dict[str, dict[str, Any]] | None:
+    """Load a provider artifact while distinguishing unavailable from empty.
+
+    ``None`` means the artifact itself is unavailable, unreadable, or malformed.
+    An empty dict means a valid artifact exists but contains no game entries; callers
+    must then diagnose each expected game as ``missing_entry`` instead of losing the
+    game-scoped failure information in a blanket unavailable result.
+    """
     source = Path(path)
     if not source.exists():
-        return {}
+        return None
     try:
         payload = json.loads(source.read_text(encoding="utf-8"))
     except Exception:
-        return {}
+        return None
     games = payload.get("games") if isinstance(payload, dict) else None
-    return games if isinstance(games, dict) else {}
+    return games if isinstance(games, dict) else None
 
 
 def _utc(value: Any) -> pd.Timestamp | None:
@@ -125,7 +132,7 @@ def apply_copilot_reads(
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Overlay validated human prose per game; regenerate current LevLine facts."""
     generated = load_copilot_reads(path)
-    if not generated:
+    if generated is None:
         return previews, {"status": "unavailable", "games_applied": 0, "skipped": {}, "advisories": {}}
 
     expected = set(predictions.get("game_id", pd.Series(dtype=str)).astype(str))
