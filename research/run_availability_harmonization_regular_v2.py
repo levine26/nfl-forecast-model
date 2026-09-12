@@ -126,6 +126,65 @@ def _collect_official_regular_season(
     return official, 18
 
 
+def _write_mismatch_diagnostics(out: Path, canonical: pd.DataFrame, *, season: int) -> dict:
+    """Persist row-level discrepancies without changing any qualification denominator."""
+    matched = canonical[canonical["identity_matched"]].copy()
+
+    game_mismatch = matched.loc[~matched["game_status_agrees"]].copy()
+    game_columns = [
+        column
+        for column in [
+            "season", "week", "team", "gsis_id", "full_name", "external_player",
+            "report_status", "external_game_status", "nflverse_game_normalized",
+            "external_game_normalized", "practice_status", "external_practice_status",
+            "source_url", "identity_match_method",
+        ]
+        if column in game_mismatch.columns
+    ]
+    game_mismatch[game_columns].to_csv(
+        out / f"game_status_mismatches_{season}.csv", index=False
+    )
+    if len(game_mismatch):
+        (
+            game_mismatch.groupby(
+                ["nflverse_game_normalized", "external_game_normalized"],
+                dropna=False,
+            )
+            .size()
+            .reset_index(name="rows")
+            .sort_values("rows", ascending=False)
+            .to_csv(out / f"game_status_mismatch_pairs_{season}.csv", index=False)
+        )
+    else:
+        pd.DataFrame(
+            columns=["nflverse_game_normalized", "external_game_normalized", "rows"]
+        ).to_csv(out / f"game_status_mismatch_pairs_{season}.csv", index=False)
+
+    practice_mismatch = matched.loc[~matched["practice_status_agrees"]].copy()
+    practice_columns = [
+        column
+        for column in [
+            "season", "week", "team", "gsis_id", "full_name", "external_player",
+            "practice_status", "external_practice_status", "nflverse_practice_normalized",
+            "external_practice_normalized", "report_status", "external_game_status",
+            "source_url", "identity_match_method",
+        ]
+        if column in practice_mismatch.columns
+    ]
+    practice_mismatch[practice_columns].to_csv(
+        out / f"practice_status_mismatches_{season}.csv", index=False
+    )
+
+    return {
+        "season": int(season),
+        "identity_matched_rows": int(len(matched)),
+        "game_status_mismatch_rows": int(len(game_mismatch)),
+        "practice_status_mismatch_rows": int(len(practice_mismatch)),
+        "diagnostic_only": True,
+        "qualification_logic_changed": False,
+    }
+
+
 def run(
     *,
     output_dir: str = "research_outputs/availability_harmonization_regular_v2",
@@ -203,6 +262,7 @@ def run(
     audits = []
     unresolved_parts: list[pd.DataFrame] = []
     exception_parts: list[pd.DataFrame] = []
+    mismatch_diagnostics: list[dict] = []
 
     injury_source = contract["primary_state_source"]
     official_source = contract["independent_crosscheck"]
@@ -247,6 +307,7 @@ def run(
         )
         canonical.to_csv(out / f"availability_regular_{season}_canonical.csv", index=False)
         unresolved.to_csv(out / f"official_identity_unresolved_{season}.csv", index=False)
+        mismatch_diagnostics.append(_write_mismatch_diagnostics(out, canonical, season=season))
         canonical_parts.append(canonical)
         audits.append(audit)
         if not unresolved.empty:
@@ -266,6 +327,7 @@ def run(
     pd.DataFrame([audit.as_dict() for audit in audits]).to_csv(
         out / "season_summaries.csv", index=False
     )
+    _write_json(out / "mismatch_diagnostics.json", mismatch_diagnostics)
     if unresolved_parts:
         pd.concat(unresolved_parts, ignore_index=True, sort=False).to_csv(
             out / "official_identity_unresolved_all.csv", index=False
@@ -295,6 +357,12 @@ def run(
             "generated_at_utc": datetime.now(timezone.utc).isoformat(),
             "git_sha": _git_sha(),
             "preregistration_drift_reasons": prereg_reasons,
+            "diagnostic_expansion": {
+                "row_level_game_status_mismatches_persisted": True,
+                "row_level_practice_status_mismatches_persisted": True,
+                "qualification_logic_changed": False,
+                "thresholds_changed": False,
+            },
             "environment": {
                 "python": platform.python_version(),
                 "pandas": pd.__version__,
