@@ -1,0 +1,22 @@
+{
+  "contract_id": "LEVLINE4-STRICT-HORIZON-CUTOFF-V1",
+  "status": "research_only_preregistered_data_integrity_rule",
+  "completed_2026_outcomes_used": 0,
+  "production_authorized": false,
+  "nominal_horizons": ["T-120m", "T-60m", "T-45m", "T-30m"],
+  "capture_tolerance_minutes": 7.5,
+  "valid_timing_error_minutes": {
+    "minimum": -7.5,
+    "maximum": 0.0,
+    "interpretation": "A nominal T-X forecast may use a qualified observation captured at or before its cutoff, never after it. Negative values are minutes early."
+  },
+  "strict_rules": [
+    "Positive timing error is later information and is invalid for the nominal T-minus forecast.",
+    "If no qualified snapshot exists by the cutoff, that game-horizon is missing for the canonical timing experiment.",
+    "A later horizon, closing price, corrected source, or postgame reconstruction may not backfill a missed cutoff.",
+    "Actual request timestamp and timing error remain part of forecast provenance.",
+    "Legacy or audit rows captured after a cutoff may remain preserved as raw evidence but are ineligible for canonical LevLine 4 horizon grading."
+  ],
+  "rationale": "A forecast horizon is an information-set boundary. Symmetric timing tolerance would permit T-44 information to be labeled T-45, which violates strict point-in-time comparison even when the difference is operationally small.",
+  "production_behavior_changed": false
+}
