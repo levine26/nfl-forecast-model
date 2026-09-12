@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-HORIZONS = {"T-120m": 120, "T-60m": 60, "T-30m": 30}
+HORIZONS = {"T-120m": 120, "T-60m": 60, "T-45m": 45, "T-30m": 30}
 TOLERANCE_MINUTES = 7.5
 
 
