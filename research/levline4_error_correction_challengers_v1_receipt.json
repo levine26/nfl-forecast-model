@@ -1,0 +1,61 @@
+{
+  "receipt_id": "LEVLINE4-ERROR-CORRECTION-CHALLENGERS-V1-FIRST-RUN",
+  "workflow_run_id": 34721145106,
+  "workflow_artifact_id": 10306386575,
+  "workflow_artifact_sha256": "a9136f5f93e6891de388257dbaf4331ccc7ae954a7853e079b16e51b3c8bd851",
+  "validated_head_sha": "318bfac375d52ec4835f26a9f457967bd5b31fa7",
+  "scientific_disposition": "PROMISING_BOUNDARY_SIGNAL_NOT_SEASON_STABLE_NOT_PROMOTABLE",
+  "reproduction": {
+    "games": 1087,
+    "market_correct": 735,
+    "fst_correct": 741,
+    "component_correct": 744,
+    "component_fst_disagreements": 17,
+    "component_only_correct": 10,
+    "fst_only_correct": 7
+  },
+  "season_stability_of_all_component_fst_switches": [
+    {"season": 2022, "switches": 4, "component_correct": 4, "fst_correct": 0, "net_correct_vs_fst": 4},
+    {"season": 2023, "switches": 6, "component_correct": 3, "fst_correct": 3, "net_correct_vs_fst": 0},
+    {"season": 2024, "switches": 3, "component_correct": 1, "fst_correct": 2, "net_correct_vs_fst": -1},
+    {"season": 2025, "switches": 4, "component_correct": 2, "fst_correct": 2, "net_correct_vs_fst": 0}
+  ],
+  "post_2022_component_fst_switches": {
+    "seasons": [2023, 2024, 2025],
+    "switches": 13,
+    "component_correct": 6,
+    "fst_correct": 7,
+    "net_correct_vs_fst": -1,
+    "interpretation": "The full-sample +3 net edge is driven by 2022 and does not replicate as a positive net edge over 2023-2025."
+  },
+  "training_defined_low_novelty_gate": {
+    "switches": 16,
+    "component_correct": 10,
+    "fst_correct": 6,
+    "net_correct_vs_fst": 4,
+    "by_season": [
+      {"season": 2022, "switches": 4, "component_correct": 4, "fst_correct": 0, "net_correct_vs_fst": 4},
+      {"season": 2023, "switches": 5, "component_correct": 3, "fst_correct": 2, "net_correct_vs_fst": 1},
+      {"season": 2024, "switches": 3, "component_correct": 1, "fst_correct": 2, "net_correct_vs_fst": -1},
+      {"season": 2025, "switches": 4, "component_correct": 2, "fst_correct": 2, "net_correct_vs_fst": 0}
+    ],
+    "interpretation": "Novelty filtering removes one losing switch and is directionally sensible, but its apparent edge remains small-n and materially dependent on 2022."
+  },
+  "component_vote_topology": {
+    "exactly_3_of_4_on_challenger_side": {"switches": 3, "component_correct": 3, "fst_correct": 0},
+    "4_of_4_on_challenger_side": {"switches": 4, "component_correct": 1, "fst_correct": 3},
+    "interpretation": "Unanimity is not stronger evidence here; the attractive 3-of-4 cell has only three observations and is not a promotable rule."
+  },
+  "chronological_conformal_gate_alpha_0_10": {
+    "singleton_games": 443,
+    "switches_vs_fst": 0,
+    "interpretation": "At 90% nominal coverage, the predeclared conformal rule never supplies enough certainty to reverse F-ST. It is useful as an abstention diagnostic, not as a historical switch generator in this form."
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used": 0,
+    "thresholds_retuned_after_results": false,
+    "production_changed": false,
+    "promotion_authorized": false
+  }
+}
