@@ -1,0 +1,46 @@
+{
+  "audit_id": "LEVLINE4-CONDITIONAL-MARKET-RELIANCE-AUDIT-V1",
+  "status": "historical_exploratory_not_prospective_proof",
+  "sample": {
+    "seasons": [2022, 2023, 2024, 2025],
+    "games": 1087,
+    "source": "immutable F-ST provenance training_frame_keyed.csv"
+  },
+  "fixed_blend_accuracy": {
+    "market_only": {"correct": 735, "accuracy": 0.6761729530818767},
+    "pure_only": {"correct": 701, "accuracy": 0.6448942042318307},
+    "production_like_75_percent_pure_25_percent_market": {"correct": 716, "accuracy": 0.6586936522539099},
+    "exploratory_25_percent_pure_75_percent_market": {"correct": 734, "accuracy": 0.6752529898804048}
+  },
+  "production_like_75_25_switch_forensics": {
+    "definition": "0.75 * PURE probability + 0.25 * market probability",
+    "games_where_blend_pick_differs_from_market": 131,
+    "blend_only_correct": 56,
+    "market_only_correct": 75,
+    "blend_switch_win_rate": 0.42748091603053434,
+    "net_winners_vs_market_on_switches": -19,
+    "interpretation": "The fixed 75% PURE / 25% market rule changed too many market winner decisions and lost those switches 56-75. It is not supported as a globally optimal winner-selection weight."
+  },
+  "pure_vs_market_disagreement_forensics": {
+    "all_disagreements": {"games": 178, "pure_correct": 72, "market_correct": 106, "pure_switch_win_rate": 0.4044943820224719},
+    "market_favorite_at_least_60_percent": {"games": 35, "pure_upset_correct": 14, "market_favorite_correct": 21, "pure_switch_win_rate": 0.4},
+    "market_favorite_at_least_65_percent": {"games": 14, "pure_upset_correct": 5, "market_favorite_correct": 9, "pure_switch_win_rate": 0.35714285714285715},
+    "market_favorite_at_least_70_percent": {"games": 6, "pure_upset_correct": 1, "market_favorite_correct": 5, "pure_switch_win_rate": 0.16666666666666666},
+    "interpretation": "Historical PURE disagreement alone is not a viable underdog-override signal. The stronger the market favorite in this sample, the worse an unconditional PURE upset switch generally performed."
+  },
+  "chronology_clean_fst_context": {
+    "fst_correct": 741,
+    "fst_accuracy": 0.6816927322907084,
+    "market_correct": 735,
+    "market_accuracy": 0.6761729530818767,
+    "fst_market_disagreements": 34,
+    "fst_only_correct": 20,
+    "market_only_correct": 14,
+    "fst_switch_win_rate": 0.5882352941176471,
+    "maximum_market_favorite_probability_on_any_fst_market_pick_disagreement": 0.5399277029247453,
+    "interpretation": "The season-forward F-ST edge came from selective decision-boundary corrections. It did not historically earn its edge by routinely fading clear market favorites."
+  },
+  "research_conclusion": "Do not replace fixed 75/25 with another fixed global weight and do not authorize a generic super-team fade. The rational next challenger is a prospectively frozen selective switch/gating model that starts from the incumbent pick and asks whether specific pregame evidence makes the market favorite more likely to be mispriced.",
+  "production_changed": false,
+  "promotion_authorized": false
+}
