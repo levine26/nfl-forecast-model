@@ -5,6 +5,8 @@ from __future__ import annotations
 The derivative is descriptive research/UX state only. It never changes the frozen
 production forecast. Missing horizons remain missing; retries are resolved only by the
 closest qualifying consensus request at or before the preregistered target timestamp.
+Book-level movement features are paired only across the exact sportsbook snapshots that
+belong to those selected consensus requests, so retry mixing cannot manufacture breadth.
 """
 
 import argparse
@@ -13,6 +15,7 @@ import json
 import math
 from datetime import datetime, timezone
 from pathlib import Path
+from statistics import median
 from typing import Any, Iterable
 
 from research.market_capture_v2 import CAPTURE_TOLERANCE_MINUTES, HORIZONS, logit
@@ -67,13 +70,8 @@ def _parse_utc(value: Any) -> datetime | None:
     return parsed.astimezone(timezone.utc)
 
 
-def _qualifying_consensus(row: dict[str, Any]) -> bool:
-    if str(row.get("row_type")) != "consensus":
-        return False
+def _strict_pit_row(row: dict[str, Any]) -> bool:
     if str(row.get("horizon")) not in HORIZONS:
-        return False
-    source_count = _int(row.get("source_count"))
-    if source_count is None or source_count < MIN_CONSENSUS_BOOKS:
         return False
     probability = _float(row.get("h2h_home_no_vig"))
     if probability is None or not 0.0 < probability < 1.0:
@@ -91,6 +89,19 @@ def _qualifying_consensus(row: dict[str, Any]) -> bool:
     if request > target or request >= kickoff:
         return False
     return True
+
+
+def _qualifying_consensus(row: dict[str, Any]) -> bool:
+    if str(row.get("row_type")) != "consensus" or not _strict_pit_row(row):
+        return False
+    source_count = _int(row.get("source_count"))
+    return source_count is not None and source_count >= MIN_CONSENSUS_BOOKS
+
+
+def _qualifying_book(row: dict[str, Any]) -> bool:
+    if str(row.get("row_type")) != "book" or not _strict_pit_row(row):
+        return False
+    return bool(str(row.get("sportsbook_key") or "").strip())
 
 
 def _choose_horizon(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -128,6 +139,38 @@ def select_consensus_horizons(rows: Iterable[dict[str, Any]]) -> dict[str, dict[
     return selected
 
 
+def select_book_horizons(
+    rows: Iterable[dict[str, Any]],
+    selected_consensus: dict[str, dict[str, dict[str, Any]]],
+) -> dict[str, dict[str, dict[str, dict[str, Any]]]]:
+    """Select books from the exact requests chosen for each qualifying consensus horizon."""
+    selected: dict[str, dict[str, dict[str, dict[str, Any]]]] = {}
+    for original in rows:
+        row = dict(original)
+        if not _qualifying_book(row):
+            continue
+        game_id = str(row.get("game_id") or "").strip()
+        horizon = str(row.get("horizon") or "")
+        consensus = selected_consensus.get(game_id, {}).get(horizon)
+        if consensus is None:
+            continue
+        if _parse_utc(row.get("request_timestamp_utc")) != _parse_utc(consensus.get("request_timestamp_utc")):
+            continue
+        if any(str(row.get(field) or "") != str(consensus.get(field) or "") for field in IDENTITY_FIELDS):
+            raise ValueError(f"book/consensus identity mismatch for {game_id} {horizon}")
+        book_key = str(row.get("sportsbook_key") or "").strip()
+        horizon_books = selected.setdefault(game_id, {}).setdefault(horizon, {})
+        prior = horizon_books.get(book_key)
+        if prior is not None:
+            prior_prob = _float(prior.get("h2h_home_no_vig"))
+            current_prob = _float(row.get("h2h_home_no_vig"))
+            if prior_prob != current_prob:
+                raise ValueError(f"duplicate sportsbook conflict for {game_id} {horizon} {book_key}")
+            continue
+        horizon_books[book_key] = row
+    return selected
+
+
 def _difference(
     rows: dict[str, dict[str, Any]],
     newer: str,
@@ -157,6 +200,71 @@ def _logit_difference(
     return logit(left) - logit(right)
 
 
+def _book_pair_features(
+    books: dict[str, dict[str, dict[str, Any]]],
+    newer: str,
+    older: str,
+) -> dict[str, float | int | None]:
+    newer_books = books.get(newer, {})
+    older_books = books.get(older, {})
+    common = sorted(set(newer_books) & set(older_books))
+    union = set(newer_books) | set(older_books)
+    if not common:
+        return {
+            "common_count": 0,
+            "overlap_fraction": 0.0 if union else None,
+            "home_move_share": None,
+            "away_move_share": None,
+            "unchanged_share": None,
+            "movement_breadth": None,
+            "median_probability_change_pp": None,
+            "median_logit_change": None,
+        }
+
+    probability_changes: list[float] = []
+    logit_changes: list[float] = []
+    home_moves = 0
+    away_moves = 0
+    unchanged = 0
+    for book in common:
+        newer_prob = _float(newer_books[book].get("h2h_home_no_vig"))
+        older_prob = _float(older_books[book].get("h2h_home_no_vig"))
+        if newer_prob is None or older_prob is None:
+            continue
+        change = newer_prob - older_prob
+        probability_changes.append(change)
+        logit_changes.append(logit(newer_prob) - logit(older_prob))
+        if change > 0:
+            home_moves += 1
+        elif change < 0:
+            away_moves += 1
+        else:
+            unchanged += 1
+
+    paired = len(probability_changes)
+    if paired == 0:
+        return {
+            "common_count": 0,
+            "overlap_fraction": 0.0 if union else None,
+            "home_move_share": None,
+            "away_move_share": None,
+            "unchanged_share": None,
+            "movement_breadth": None,
+            "median_probability_change_pp": None,
+            "median_logit_change": None,
+        }
+    return {
+        "common_count": paired,
+        "overlap_fraction": paired / len(union) if union else None,
+        "home_move_share": home_moves / paired,
+        "away_move_share": away_moves / paired,
+        "unchanged_share": unchanged / paired,
+        "movement_breadth": (home_moves - away_moves) / paired,
+        "median_probability_change_pp": median(probability_changes) * 100.0,
+        "median_logit_change": median(logit_changes),
+    }
+
+
 def _assert_cross_horizon_identity(game_id: str, rows: dict[str, dict[str, Any]]) -> None:
     identities = {
         tuple(str(row.get(field) or "") for field in IDENTITY_FIELDS)
@@ -167,11 +275,14 @@ def _assert_cross_horizon_identity(game_id: str, rows: dict[str, dict[str, Any]]
 
 
 def build_market_state(rows: Iterable[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    selected = select_consensus_horizons(rows)
+    materialized = [dict(row) for row in rows]
+    selected = select_consensus_horizons(materialized)
+    selected_books = select_book_horizons(materialized, selected)
     output: list[dict[str, Any]] = []
     complete_games = 0
     for game_id in sorted(selected):
         horizons = selected[game_id]
+        books = selected_books.get(game_id, {})
         _assert_cross_horizon_identity(game_id, horizons)
         available = [horizon for horizon in HORIZON_ORDER if horizon in horizons]
         missing = [horizon for horizon in HORIZON_ORDER if horizon not in horizons]
@@ -213,6 +324,9 @@ def build_market_state(rows: Iterable[dict[str, Any]]) -> tuple[list[dict[str, A
             record[f"home_spread_{label}"] = _difference(horizons, newer, older, "home_spread")
             record[f"total_points_{label}"] = _difference(horizons, newer, older, "total_points")
             record[f"probability_range_{label}"] = _difference(horizons, newer, older, "probability_range")
+            micro = _book_pair_features(books, newer, older)
+            for key, value in micro.items():
+                record[f"book_{key}_{label}"] = value
         output.append(record)
 
     audit = {
@@ -225,6 +339,8 @@ def build_market_state(rows: Iterable[dict[str, Any]]) -> tuple[list[dict[str, A
         "valid_timing_error_minutes": [-CAPTURE_TOLERANCE_MINUTES, 0.0],
         "strict_no_later_than_cutoff": True,
         "horizons": list(HORIZON_ORDER),
+        "book_microstructure_features": True,
+        "book_pairing_policy": "same_sportsbook_exact_selected_consensus_request_only",
         "missingness_policy": "preserve_missing_no_imputation",
         "research_only": True,
         "production_authorized": False,
