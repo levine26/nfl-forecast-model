@@ -1,0 +1,85 @@
+{
+  "record_version": 1,
+  "contract_id": "V09B-AVAILABILITY-REGULAR-SEASON-HARMONIZATION-V2",
+  "disposition": "FAIL_CLOSED",
+  "workflow_run_id": 34716779566,
+  "workflow_job_id": 103615487257,
+  "validated_branch_head_sha": "bc2c1650d838c52c725bea548c22c2d2442fcd4f",
+  "pull_request_merge_test_sha": "ec38f40b88180744ada6e005b32e664f7c4dca4c",
+  "observed_at_utc": "2026-09-12T20:27:30Z",
+  "hard_blockers": [
+    "diagnostic game-status agreement gate failed: 2023",
+    "official-to-canonical identity gate failed: 2024",
+    "diagnostic game-status agreement gate failed: 2024"
+  ],
+  "pin_blockers": [
+    "official semantic source hash not pinned: 2022",
+    "official semantic source hash not pinned: 2023",
+    "official semantic source hash not pinned: 2024",
+    "official semantic source hash not pinned: 2025",
+    "derived schedule subset hash not pinned"
+  ],
+  "observed_unpinned_hashes": {
+    "schedule_subset_sha256": "4d03d8ec93e795d3f24ce43b5c1febacc8f2962470ceb881f6d9a6a687f978ff",
+    "official_semantic_sha256": {
+      "2022": "693dbcb48ef270c2d73847763b5fa05cdf6fcd91cf7e0ffc6f3a1eda44429bbf",
+      "2023": "d11651213aa3131f5aab659bb541a6487f90268a60ab9b84e1d8fcc32829912c",
+      "2024": "70c9e3546aa790051597cca914f3be8ef242c0e7b0de978034998f42ba936036",
+      "2025": "4882755db9994b5a0c92c2d3c7a71101efd67010eba4cc85cd9e338c0e15cbbc"
+    }
+  },
+  "season_metrics": {
+    "2022": {
+      "canonical_to_official_identity_rate": 0.999815939628198,
+      "official_to_canonical_identity_rate": 0.9996319470003681,
+      "practice_status_agreement_rate": 0.9950294550810015,
+      "diagnostic_game_status_agreement_rate": 0.9882179675994109,
+      "fully_qualified_practice_state_rate": 0.9948463095895453,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "schedule_match_rate": 1.0,
+      "exception_rows_removed": 17
+    },
+    "2023": {
+      "canonical_to_official_identity_rate": 0.997431663914878,
+      "official_to_canonical_identity_rate": 0.9996322853465711,
+      "practice_status_agreement_rate": 0.9939304763656428,
+      "diagnostic_game_status_agreement_rate": 0.9727791061247011,
+      "fully_qualified_practice_state_rate": 0.9913777288570904,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "schedule_match_rate": 1.0
+    },
+    "2024": {
+      "canonical_to_official_identity_rate": 1.0,
+      "official_to_canonical_identity_rate": 0.9029126213592233,
+      "practice_status_agreement_rate": 0.994119623655914,
+      "diagnostic_game_status_agreement_rate": 0.9695900537634409,
+      "fully_qualified_practice_state_rate": 0.994119623655914,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "schedule_match_rate": 1.0,
+      "official_rows": 6592,
+      "model_eligible_rows": 5952
+    },
+    "2025": {
+      "canonical_to_official_identity_rate": 1.0,
+      "official_to_canonical_identity_rate": 1.0,
+      "practice_status_agreement_rate": 0.9925644129344631,
+      "diagnostic_game_status_agreement_rate": 1.0,
+      "fully_qualified_practice_state_rate": 0.9925644129344631,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "schedule_match_rate": 1.0
+    }
+  },
+  "interpretation": {
+    "v2_qualified": false,
+    "v09b_execution_authorized": false,
+    "thresholds_relaxed": false,
+    "source_state_definition_changed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "probability_model_built": false,
+    "probability_feature_authorized": false,
+    "production_dependency_authorized": false,
+    "postseason_v4_reopened": false,
+    "next_permitted_action": "Diagnostics-only inspection of unresolved official rows and diagnostic game-status disagreement. Any materially different source/state contract must be preregistered as a new version before live qualification metrics are rerun."
+  }
+}

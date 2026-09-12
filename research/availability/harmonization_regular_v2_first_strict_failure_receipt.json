@@ -1,0 +1,111 @@
+{
+  "record_version": 1,
+  "contract_id": "V09B-AVAILABILITY-REGULAR-SEASON-HARMONIZATION-V2",
+  "source_head_sha": "bc2c1650d838c52c725bea548c22c2d2442fcd4f",
+  "workflow_run_id": 34716779566,
+  "workflow_job_id": 103615487257,
+  "status": "BLOCKED_FIRST_STRICT_EXECUTION",
+  "preservation_policy": "This receipt is terminal evidence for the first strict-v2 execution. Later source-contract versions or diagnostic repairs may not rewrite this result.",
+  "hard_blockers": [
+    "diagnostic game-status agreement gate failed: 2023",
+    "official-to-canonical identity gate failed: 2024",
+    "diagnostic game-status agreement gate failed: 2024"
+  ],
+  "pin_blockers": [
+    "official semantic source hash not pinned: 2022",
+    "official semantic source hash not pinned: 2023",
+    "official semantic source hash not pinned: 2024",
+    "official semantic source hash not pinned: 2025",
+    "derived schedule subset hash not pinned"
+  ],
+  "schedule_subset_sha256": "4d03d8ec93e795d3f24ce43b5c1febacc8f2962470ceb881f6d9a6a687f978ff",
+  "season_audits": {
+    "2022": {
+      "canonical_to_official_identity_rate": 0.999815939628198,
+      "official_to_canonical_identity_rate": 0.9996319470003681,
+      "practice_status_agreement_rate": 0.9950294550810015,
+      "diagnostic_game_status_agreement_rate": 0.9882179675994109,
+      "fully_qualified_practice_state_rate": 0.9948463095895453,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "date_modified_parse_rate": 1.0,
+      "schedule_match_rate": 1.0,
+      "stable_gsis_missing_rate": 0.0,
+      "exception_rows_removed": 17,
+      "model_eligible_rows": 5433,
+      "official_rows": 5434,
+      "official_pages_collected": 18,
+      "official_semantic_sha256": "693dbcb48ef270c2d73847763b5fa05cdf6fcd91cf7e0ffc6f3a1eda44429bbf",
+      "frozen_gate_result": "PASS"
+    },
+    "2023": {
+      "canonical_to_official_identity_rate": 0.997431663914878,
+      "official_to_canonical_identity_rate": 0.9996322853465711,
+      "practice_status_agreement_rate": 0.9939304763656428,
+      "diagnostic_game_status_agreement_rate": 0.9727791061247011,
+      "fully_qualified_practice_state_rate": 0.9913777288570904,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "date_modified_parse_rate": 1.0,
+      "schedule_match_rate": 1.0,
+      "stable_gsis_missing_rate": 0.0,
+      "model_eligible_rows": 5451,
+      "official_rows": 5439,
+      "official_pages_collected": 18,
+      "official_semantic_sha256": "d11651213aa3131f5aab659bb541a6487f90268a60ab9b84e1d8fcc32829912c",
+      "frozen_gate_result": "FAIL_DIAGNOSTIC_GAME_STATUS"
+    },
+    "2024": {
+      "canonical_to_official_identity_rate": 1.0,
+      "official_to_canonical_identity_rate": 0.9029126213592233,
+      "practice_status_agreement_rate": 0.994119623655914,
+      "diagnostic_game_status_agreement_rate": 0.9695900537634409,
+      "fully_qualified_practice_state_rate": 0.994119623655914,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "date_modified_parse_rate": 1.0,
+      "schedule_match_rate": 1.0,
+      "stable_gsis_missing_rate": 0.0,
+      "model_eligible_rows": 5952,
+      "official_rows": 6592,
+      "official_pages_collected": 18,
+      "identical_duplicate_rows_collapsed": 2,
+      "official_semantic_sha256": "70c9e3546aa790051597cca914f3be8ef242c0e7b0de978034998f42ba936036",
+      "frozen_gate_result": "FAIL_REVERSE_IDENTITY_AND_DIAGNOSTIC_GAME_STATUS"
+    },
+    "2025": {
+      "canonical_to_official_identity_rate": 1.0,
+      "official_to_canonical_identity_rate": 1.0,
+      "practice_status_agreement_rate": 0.9925644129344631,
+      "diagnostic_game_status_agreement_rate": 1.0,
+      "fully_qualified_practice_state_rate": 0.9925644129344631,
+      "known_by_t120_rate_among_identity_matched_rows": 1.0,
+      "schedule_match_rate": 1.0,
+      "stable_gsis_missing_rate": 0.0,
+      "model_eligible_rows": 5783,
+      "official_rows": 5783,
+      "official_pages_collected": 18,
+      "official_semantic_sha256": "4882755db9994b5a0c92c2d3c7a71101efd67010eba4cc85cd9e338c0e15cbbc",
+      "frozen_gate_result": "PASS"
+    }
+  },
+  "feature_state_observation": {
+    "practice_status_agreement_gate_passed_all_seasons": true,
+    "fully_qualified_practice_state_gate_passed_all_seasons": true,
+    "t120_gate_passed_all_seasons": true,
+    "schedule_gate_passed_all_seasons_after_preregistered_cancelled_game_exception": true,
+    "this_observation_does_not_override_v2_failure": true
+  },
+  "governance": {
+    "v09b_execution_authorized": false,
+    "probability_model_built": false,
+    "probability_feature_authorized": false,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false,
+    "completed_2026_outcomes_used": 0,
+    "game_outcomes_used_in_source_qualification": 0,
+    "actual_snaps_used": 0,
+    "postgame_participation_used": 0,
+    "historical_game_status_feature_authorized": false,
+    "thresholds_changed_after_observing_result": false,
+    "postseason_v4_reopened": false
+  },
+  "next_allowed_step": "diagnose row-level source discrepancies without changing v2 gates; any materially different practice-only source contract must be a new preregistered version that preserves this failure receipt"
+}

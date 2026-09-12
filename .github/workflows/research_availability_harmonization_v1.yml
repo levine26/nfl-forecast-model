@@ -1,0 +1,173 @@
+name: LevLine availability harmonization
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/harmonization_contract_v1.json'
+      - 'research/availability/harmonization_regular_season_contract_v2.json'
+      - 'research/availability/harmonization_regular_season_v2_failure_receipt.json'
+      - 'research/availability/harmonization_regular_v2_first_strict_failure_receipt.json'
+      - 'research/availability/harmonization_regular_v2_diagnostic_receipt.json'
+      - 'research/availability/postseason_harmonization_v4_terminal_record.json'
+      - 'research/availability/v09b_execution_governance_v1.json'
+      - 'research/availability_harmonization_v1.py'
+      - 'research/availability_harmonization_regular_v2.py'
+      - 'research/availability_identity_regular_v2.py'
+      - 'research/diagnose_availability_harmonization_regular_v2.py'
+      - 'research/v09b_execution_gate_v1.py'
+      - 'research/run_availability_harmonization_v1.py'
+      - 'research/run_availability_harmonization_regular_v2.py'
+      - 'research/test_availability_harmonization_v1.py'
+      - 'research/test_availability_harmonization_regular_v2.py'
+      - 'research/test_v09b_execution_gate_v1.py'
+      - '.github/workflows/research_availability_harmonization_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-availability-harmonization-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  harmonization-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+
+      - name: Test fail-closed source and execution-governance contracts
+        run: |
+          pytest -q \
+            research/test_availability_harmonization_v1.py \
+            research/test_availability_harmonization_regular_v2.py \
+            research/test_v09b_execution_gate_v1.py
+
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-availability-harmonization-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-availability-harmonization-${{ runner.os }}-
+            nfl-availability-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+
+      - name: Preserve superseded v1 diagnostic as fail-closed evidence
+        run: |
+          rm -rf research_outputs/availability_harmonization_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" python research/run_availability_harmonization_v1.py
+          test -s research_outputs/availability_harmonization_v1/qualification.json
+          test -s research_outputs/availability_harmonization_v1/source_manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/availability_harmonization_v1/qualification.json').read_text())
+          assert report['technical_status'] == 'BLOCKED', report
+          assert report['research_classification'] == 'BLOCKED', report
+          blockers = set(report['blockers'])
+          assert 'schedule join missingness failed: 2022' in blockers, report
+          assert 'T-120 chronology failed: 2022' in blockers, report
+          assert report['v09b_execution_authorized'] is False
+          assert report['probability_model_built'] is False
+          assert report['probability_feature_authorized'] is False
+          assert report['production_dependency_authorized'] is False
+          assert report['completed_2026_outcomes_used'] == 0
+          PY
+
+      - name: Reproduce strict v2 failed-closed source result
+        run: |
+          rm -rf research_outputs/availability_harmonization_regular_v2
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/run_availability_harmonization_regular_v2.py
+          test -s research_outputs/availability_harmonization_regular_v2/qualification.json
+          test -s research_outputs/availability_harmonization_regular_v2/source_manifest.json
+          test -s research_outputs/availability_harmonization_regular_v2/season_summaries.csv
+          test -s research_outputs/availability_harmonization_regular_v2/availability_2022_2025_regular_strict.csv
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/diagnose_availability_harmonization_regular_v2.py
+          test -s research_outputs/availability_harmonization_regular_v2/diagnostics/diagnostic_summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path('research_outputs/availability_harmonization_regular_v2/qualification.json').read_text())
+          diagnostics = json.loads(Path('research_outputs/availability_harmonization_regular_v2/diagnostics/diagnostic_summary.json').read_text())
+          governance = json.loads(Path('research/availability/v09b_execution_governance_v1.json').read_text())
+
+          expected_hard = {
+              'diagnostic game-status agreement gate failed: 2023',
+              'official-to-canonical identity gate failed: 2024',
+              'diagnostic game-status agreement gate failed: 2024',
+          }
+          expected_pins = {
+              'official semantic source hash not pinned: 2022',
+              'official semantic source hash not pinned: 2023',
+              'official semantic source hash not pinned: 2024',
+              'official semantic source hash not pinned: 2025',
+              'derived schedule subset hash not pinned',
+          }
+
+          assert report['technical_status'] == 'BLOCKED', report
+          assert report['research_classification'] == 'BLOCKED', report
+          assert set(report['hard_blockers']) == expected_hard, report
+          assert set(report['pin_blockers']) == expected_pins, report
+          assert report['v09b_execution_authorized'] is False
+          assert report['probability_model_built'] is False
+          assert report['probability_feature_authorized'] is False
+          assert report['production_dependency_authorized'] is False
+          assert report['candidate_promotion_authorized'] is False
+          assert report['completed_2026_outcomes_used'] == 0
+          assert report['game_outcomes_used'] == 0
+          assert report['historical_game_status_feature_authorized'] is False
+          assert report['actual_snaps_used'] == 0
+          assert report['postgame_participation_used'] == 0
+          assert report['postseason_v4_reopened'] is False
+
+          assert diagnostics['v2_disposition_preserved'] is True, diagnostics
+          assert diagnostics['thresholds_changed'] is False, diagnostics
+          assert diagnostics['source_state_semantics_changed'] is False, diagnostics
+          assert diagnostics['by_season']['2024']['official_unresolved_rows'] == 640, diagnostics
+          assert diagnostics['by_season']['2024']['unresolved_practice_blank_rows'] == 640, diagnostics
+          assert diagnostics['by_season']['2024']['game_status_mismatch_rows'] == 181, diagnostics
+          assert diagnostics['by_season']['2023']['game_status_mismatch_rows'] == 148, diagnostics
+
+          assert governance['current_evidence']['v09b_execution_authorized'] is False, governance
+          assert governance['current_evidence']['training_source_chronology_qualified'] is False, governance
+          assert governance['current_evidence']['training_label_semantics_qualified'] is False, governance
+          PY
+
+      - name: Prove branch remains research-only
+        if: always()
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [line.strip() for line in Path('/tmp/changed.txt').read_text().splitlines() if line.strip()]
+          bad = [
+              path for path in changed
+              if not (
+                  path.startswith('research/')
+                  or path.startswith('.github/workflows/research_')
+              )
+          ]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: levline-availability-harmonization-${{ github.run_id }}
+          path: |
+            research_outputs/availability_harmonization_v1/
+            research_outputs/availability_harmonization_regular_v2/
+          retention-days: 30
+          if-no-files-found: warn

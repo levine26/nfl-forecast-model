@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "experiment": "2022-2025 availability harmonization V4 official-club postseason source audit",
+  "disposition": "FAIL_CLOSED_COMPLETE",
+  "qualification_executed": false,
+  "production_authorized": false,
+  "historical_source_branch": "research/availability-postseason-fallback-v3",
+  "historical_record_path": "research/availability/2022_2025_harmonization_v4_failure_receipt.json",
+  "historical_record_sha": "e62a963dde77423dc69092cffc940c169f5df1f3",
+  "closeout_reason": "The identity source covered the preregistered postseason team-weeks, but a deterministic complete official-club final injury-report row source could not be established for every affected matchup. The contract forbade inferring healthy status from absence, mixing incomplete narrative pages into row-level state, or relaxing the 1.0 fallback qualification requirement. V4 therefore terminated before model fitting or availability qualification.",
+  "blocking_matchups": [
+    {
+      "season": 2023,
+      "week": 20,
+      "matchup": "HOU-BAL",
+      "reason": "No deterministic complete final row table for both clubs was established under the official-club source audit."
+    },
+    {
+      "season": 2024,
+      "week": 20,
+      "matchup": "WAS-DET",
+      "reason": "The audited Lions final page was Detroit-only and no deterministically captured complete complementary Washington row table was established."
+    },
+    {
+      "season": 2024,
+      "week": 20,
+      "matchup": "BAL-BUF",
+      "reason": "The audited Bills material was narrative/embedded-report oriented rather than a complete machine-readable row table, with no complementary complete official-club row source established."
+    }
+  ],
+  "terminal_policy": "Do not create another postseason rescue version solely to force qualification. Reopen only if a new, independently verifiable, complete official historical source is identified for every blocking matchup before downstream qualification metrics are inspected.",
+  "relationship_to_regular_season_v2": "Preserved unchanged. The regular-season v2 contract is a separate audit of the pre-existing LevLine model universe, which filters postseason games before matchup-feature evaluation.",
+  "safety_assertions": {
+    "no_2026_outcomes_used": true,
+    "no_realized_snap_or_postgame_participation_used": true,
+    "no_threshold_relaxed": true,
+    "no_production_model_change": true,
+    "no_healthy_from_absence_inference": true
+  }
+}

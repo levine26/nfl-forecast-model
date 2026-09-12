@@ -1,0 +1,65 @@
+{
+  "record_version": 1,
+  "source_contract": "V09B-AVAILABILITY-REGULAR-SEASON-HARMONIZATION-V2",
+  "disposition": "FAILED_CLOSED_WITH_DIAGNOSTIC_EXPLANATION",
+  "validated_head_sha": "f11385c6ab383d7a2960b77c8af496fb7d55013d",
+  "workflow_run_id": 34717356041,
+  "artifact_id": 10304894747,
+  "artifact_sha256": "40d67ba24fd1a9ef2faa63b6cddf2a455ee4629a81aaed76d946e1c60f4b3c01",
+  "reproduction_evidence": {
+    "head_sha": "c9f60e025defa0e13957703fc77bd811383e45c3",
+    "workflow_run_id": 34717885845,
+    "successful_attempt": 2,
+    "artifact_id": 10306561228,
+    "artifact_sha256": "a8c2101980a5b1aaabb43479c7b3444f396627e3f466f7fa53b900370f6c773c",
+    "attempt_1_transport_semantic_failure": "NFL.com 2023/reg4 returned a page that parsed zero injury rows; this was a transient live-source serving failure and did not alter the frozen scientific disposition.",
+    "attempt_2_result": "SUCCESSFUL_REPRODUCTION_OF_EXPECTED_FAILED_CLOSED_V2_RESULT",
+    "thresholds_changed_between_attempts": false,
+    "source_denominators_changed_between_attempts": false
+  },
+  "hard_blockers_preserved": [
+    "diagnostic game-status agreement gate failed: 2023",
+    "official-to-canonical identity gate failed: 2024",
+    "diagnostic game-status agreement gate failed: 2024"
+  ],
+  "diagnostic_findings": {
+    "2024_official_unresolved_rows": 640,
+    "2024_unresolved_rows_with_blank_practice_status": 640,
+    "2024_unresolved_status_breakdown": {
+      "blank_practice__questionable_game_status": 296,
+      "blank_practice__out_game_status": 284,
+      "blank_practice__doubtful_game_status": 22,
+      "blank_practice__blank_game_status": 38
+    },
+    "2024_identity_conclusion": "The reverse-identity failure is a source-universe mismatch: every unresolved 2024 official row lacks practice participation state. These are not 640 unidentified canonical practice-state rows.",
+    "game_status_mismatch_rows": {
+      "2022": 64,
+      "2023": 148,
+      "2024": 181,
+      "2025": 0
+    },
+    "dominant_game_status_mismatch_semantics": "The dominant 2023-2024 mismatch is blank nflverse game status versus an official Questionable/Out/Doubtful designation. Final game status is diagnostic only and is not an authorized historical feature.",
+    "practice_status_mismatch_rows": {
+      "2022": 27,
+      "2023": 33,
+      "2024": 35,
+      "2025": 43
+    },
+    "practice_state_gate_result": "The preregistered practice-state agreement and fully-qualified-practice-state gates passed in every target season despite the v2 contract failing overall."
+  },
+  "scientific_interpretation": {
+    "v2_reclassified_as_pass": false,
+    "thresholds_relaxed": false,
+    "source_denominators_changed": false,
+    "v09b_execution_authorized": false,
+    "completed_2026_outcomes_used": 0,
+    "game_outcomes_used": 0,
+    "allowed_next_step": "A new versioned source contract may preregister practice-state cross-check semantics that exclude official rows lacking practice participation from the reverse-identity denominator and may make game-status comparison descriptive rather than qualifying. That redesign must preserve this v2 failure receipt and rerun without changing practice-state thresholds after seeing model outcomes."
+  },
+  "training_window_governance": {
+    "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+    "training_source_chronology_qualified": false,
+    "training_label_semantics_qualified": false,
+    "conclusion": "Even a future 2022-2025 validation-source qualification cannot by itself authorize V09B fitting. The frozen 2012-2021 training source and label chronology require a separate fail-closed qualification."
+  }
+}
