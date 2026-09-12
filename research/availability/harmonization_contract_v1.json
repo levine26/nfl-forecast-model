@@ -70,7 +70,7 @@
   "identity": {
     "stable_id": "gsis_id",
     "missing_id_rate_required": 0.0,
-    "duplicate_player_team_week_rows_allowed": false
+    "duplicate_policy": "Repeated season/week/team/gsis_id rows may be collapsed only when position, normalized full name, practice injuries, and normalized practice status are equivalent. Differences confined to final report/game-status fields do not block because those fields are not authorized features. Any identity or practice-state disagreement is an unresolved source-revision ambiguity and fails closed."
   },
   "missingness_semantics": {
     "row_present": "player_was_listed_on_the_weekly_injury_report",
@@ -94,7 +94,7 @@
     "all_expected_full_asset_row_counts_match": true,
     "required_schema_present_all_seasons": true,
     "stable_identity_missing_rate": 0.0,
-    "duplicate_player_team_week_rows": 0,
+    "conflicting_duplicate_groups": 0,
     "schedule_join_missing_rate": 0.0,
     "known_by_t120_rate": 1.0,
     "practice_status_normalization_unknown_rate_max": 0.01,
