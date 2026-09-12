@@ -23,8 +23,8 @@ from nfl_forecast.availability_2025_reconstruction import (
 
 
 PLAYER_MASTER_URL = "https://github.com/nflverse/nflverse-data/releases/download/players/players.csv"
-PLAYER_MASTER_ASSET_ID = 557226328
-PLAYER_MASTER_EXPECTED_SHA256 = "6f896e1134757efe09761ae81280f89d9604d8ce611a888a56d9e7d49e80eeb9"
+PLAYER_MASTER_ASSET_ID = 559182453
+PLAYER_MASTER_EXPECTED_SHA256 = "b2fd8b7a384d6fc521c1832dba93878435554f1a4c4800d571edaa4ddd309134"
 PLAYER_MASTER_REQUIRED = {
     "gsis_id",
     "display_name",
