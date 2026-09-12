@@ -1,0 +1,32 @@
+{
+  "audit_id": "LEVLINE3-FST-BOUNDARY-ACCURACY-V1",
+  "status": "historical_descriptive_audit_not_prospective_rule",
+  "sample": "2022-2025 frozen final-coefficient reconstruction, 1087 games",
+  "boundary_definition": "absolute F-ST home-win probability distance from 0.5 below 0.05",
+  "boundary_games": {
+    "games": 141,
+    "fst_correct": 81,
+    "fst_accuracy": 0.574468085106383,
+    "market_correct": 76,
+    "market_accuracy": 0.5390070921985816,
+    "net_fst_correct_gain": 5,
+    "fst_market_pick_disagreements": 25
+  },
+  "outside_boundary": {
+    "games": 946,
+    "fst_market_pick_disagreements": 0,
+    "net_fst_correct_gain": 0
+  },
+  "narrower_boundary": {
+    "within_2_probability_points_of_0_5": {
+      "games": 50,
+      "fst_accuracy": 0.52,
+      "market_accuracy": 0.5,
+      "net_accuracy_gain_percentage_points": 2.0
+    }
+  },
+  "interpretation": "Every frozen-FST winner-pick disagreement with market occurred inside the approximately 45%-55% F-ST decision zone. All five of F-ST's net additional correct winners came from this boundary region. Away from the decision boundary, F-ST and market selected the same winner and therefore had identical straight-up accuracy.",
+  "research_implication": "Under an accuracy-first objective, late-horizon/player/news research has highest potential value when it changes the winner decision near the incumbent boundary or creates a genuinely large new information shock. Probability refinements that do not change the pick cannot improve straight-up hit rate.",
+  "production_changed": false,
+  "promotion_authorized": false
+}
