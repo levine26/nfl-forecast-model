@@ -84,7 +84,7 @@ def _safe_rate_limit_reason(exc: HTTPError) -> str:
     ):
         if token in lowered and label not in kinds:
             kinds.append(label)
-    model_match = re.search(r"(?:model|for)\s+[`'\"]?([a-z0-9_.\-/]+)", lowered)
+    model_match = re.search(r"\bmodel\s+[`'\"]?([a-z0-9_.\-/]+)", lowered)
     model = model_match.group(1) if model_match else ""
     parts = kinds or ["rate_limit"]
     if model and len(model) <= 80:
