@@ -23,10 +23,11 @@
     "current_feature_note": "Prior-game 2026 information may enter already-defined live feature values when available before the forecast timestamp; it may not refit models, create features, or tune thresholds."
   },
   "capture_policy": {
-    "cadence": "twice_daily_plus_manual",
+    "cadence": "daily_Tuesday_through_Saturday_plus_push_and_manual",
     "canonical_selection_for_game": "latest qualifying capture at or before the comparison horizon",
     "later_capture_backfill_allowed": false,
-    "post_kickoff_capture_for_same_game_allowed": false,
+    "post_horizon_capture_can_qualify_for_earlier_horizon": false,
+    "post_kickoff_capture_can_qualify_for_same_game": false,
     "append_only_data_branch": "research-data/levline4-components-v1",
     "immutable_fields": [
       "game_id",
