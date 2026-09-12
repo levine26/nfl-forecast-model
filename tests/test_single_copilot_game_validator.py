@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import re
 import sys
 from pathlib import Path
+
+import pandas as pd
 
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
@@ -101,6 +105,81 @@ def test_focused_source_backfill_still_fails_closed_without_two_families(monkeyp
     assert len(valid) == 1
     assert families == {"espn.com"}
     assert any("two independent" in failure for failure in failures)
+
+
+def test_underlength_rationale_repair_is_narrow_matchup_specific_and_contract_safe():
+    row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
+    rationale = "Cincinnati can control the game if its offense stays ahead of pressure."
+    paragraph1 = (
+        "Tampa Bay must manage Cincinnati pressure with a disciplined protection plan, "
+        "while the Bengals need their front to keep the Buccaneers behind schedule."
+    )
+    repaired, changed = module._repair_underlength_rationale(rationale, paragraph1, row)
+    assert changed
+    assert 18 <= len(module._words(repaired)) <= 40
+    assert "Bengals" in repaired
+    assert "Buccaneers" in repaired
+    assert not module._rationale_has_prohibited(repaired)
+
+
+def test_rationale_repair_refuses_too_short_or_prohibited_copy():
+    row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
+    paragraph1 = "The Bengals pressure Tampa Bay while the Buccaneers adjust their protection."
+
+    too_short = "Cincinnati needs pressure to win."
+    repaired, changed = module._repair_underlength_rationale(too_short, paragraph1, row)
+    assert not changed
+    assert repaired == too_short
+
+    prohibited = "Cincinnati has a market edge if its pressure plan works against Tampa Bay."
+    repaired, changed = module._repair_underlength_rationale(prohibited, paragraph1, row)
+    assert not changed
+    assert repaired == prohibited
+
+
+def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path):
+    gid = "2026_01_TB_CIN"
+    paragraph1 = (
+        "Buccaneers protection has to handle Cincinnati pressure without forcing rushed throws, while Tampa Bay can help with motion and quick-game answers. "
+        "The Bengals need their front to win enough early downs to avoid obvious passing situations, and Cincinnati's secondary must tackle cleanly after the catch. "
+        "That protection-versus-pressure exchange should shape both teams' third-down options and determine which offense can stay on schedule."
+    )
+    payload = {
+        "games": {
+            gid: {
+                "headline": "Bengals pressure tests Buccaneers protection plan",
+                "paragraph1": paragraph1,
+                "model_rationale": "Cincinnati can control the game if its offense stays ahead of pressure.",
+                "sources": [
+                    {
+                        "name": "ESPN",
+                        "title": "Buccaneers Bengals matchup report",
+                        "url": "https://www.espn.com/nfl/story/_/id/123/buccaneers-bengals-matchup-report",
+                    },
+                    {
+                        "name": "NFL.com",
+                        "title": "Bengals prepare for Tampa Bay",
+                        "url": "https://www.nfl.com/news/bengals-prepare-for-tampa-bay",
+                    },
+                ],
+            }
+        }
+    }
+    path = tmp_path / f"{gid}.txt"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    predictions = pd.DataFrame([
+        {"game_id": gid, "away_team": "TB", "home_team": "CIN", "pick": "CIN"}
+    ])
+
+    failures = module.validate(path, gid, predictions)
+    assert not failures
+
+    saved = json.loads(path.read_text(encoding="utf-8"))["games"][gid]
+    repaired = saved["model_rationale"]
+    assert 18 <= len(re.findall(r"\b[\w'-]+\b", repaired)) <= 40
+    assert "Bengals" in repaired and "Buccaneers" in repaired
+    assert not module._rationale_has_prohibited(repaired)
+    assert [source["name"] for source in saved["sources"]] == ["ESPN", "NFL.com"]
 
 
 def test_source_gate_rejects_generic_team_schedule_game_and_stats_pages():
