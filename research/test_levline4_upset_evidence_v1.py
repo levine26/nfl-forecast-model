@@ -76,6 +76,7 @@ def _personnel_payload(source_time: str = "2026-09-13T14:30:00Z") -> dict[str, o
         "generated_utc": "2026-09-13T14:31:00Z",
         "mode": "research_explainability_only",
         "source_scope": "verified_2026_sleeper_archive_all_positions",
+        "probability_feature_authorized": False,
         "live_site_consumes_this_file": False,
         "capture_audit": {
             "source_commit_timestamp_utc": source_time,
