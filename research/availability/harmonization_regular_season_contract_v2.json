@@ -1,0 +1,132 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-AVAILABILITY-REGULAR-SEASON-HARMONIZATION-V2",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "purpose": "Prove a leakage-safe 2022-2025 availability-state contract for the exact regular-season game universe consumed by LevLine before V09B may execute.",
+  "scope_basis": {
+    "preexisting_model_invariant": "src/nfl_forecast/features.py filters both PBP and schedule scaffolds to regular season before matchup features and home_win are built.",
+    "game_type": "REG",
+    "weeks": [1, 18],
+    "postseason_in_scope": false,
+    "postseason_v4_terminal_failure_preserved": true,
+    "postseason_terminal_failure_record": "research/availability/2022_2025_harmonization_v4_failure_receipt.json",
+    "scope_change_is_post_hoc_rescue": false,
+    "rationale": "This contract does not reclassify or repair the terminal all-22-week V4 source result. It separately qualifies only the pre-existing model evaluation universe; V09B cannot score postseason games because the model feature builder excludes them before evaluation."
+  },
+  "target_seasons": [2022, 2023, 2024, 2025],
+  "primary_state_source": {
+    "source_id": "nflverse_injuries",
+    "url_template": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv",
+    "expected_full_asset_rows": {
+      "2022": 5682,
+      "2023": 5599,
+      "2024": 6215,
+      "2025": 6068
+    },
+    "expected_sha256": {
+      "2022": "2acf24185367a11efc15cd509d6d3e0c641907cafbb05ba852e1eba95b16e213",
+      "2023": "5a24568570fd889b822a94f3a7b3bf5265d025a34ddd28deb512cb91cd19a80c",
+      "2024": "76ae5f49da249d6fde3fb85573f3a887517941b309609f8756374f3de6f67f30",
+      "2025": "873ca1606dd575bd01152508a243ef6b3a0f8f97b90b707217e62ee8c7ceb735"
+    }
+  },
+  "identity_source": {
+    "source_id": "nflverse_players",
+    "url": "https://github.com/nflverse/nflverse-data/releases/download/players/players.csv",
+    "release_asset_id": 557226328,
+    "expected_sha256": "6f896e1134757efe09761ae81280f89d9604d8ce611a888a56d9e7d49e80eeb9",
+    "policy": "Exact normalized aliases only; candidate GSIS must already exist in the same season/week/team injury rows. No fuzzy matching, status, injury, position, current team, snaps, participation, game outcome, or 2026 information may choose identity."
+  },
+  "independent_crosscheck": {
+    "source_id": "nfl_com_official_historical_injury_pages",
+    "url_template": "https://www.nfl.com/injuries/league/{season}/reg{week}",
+    "pages_required_per_season": 18,
+    "expected_page_bundle_sha256": {
+      "2022": null,
+      "2023": null,
+      "2024": null,
+      "2025": null
+    },
+    "hash_policy": "Qualification is audit-only until the exact concatenated regular-season official-page bundle SHA-256 is pinned for every season after a successful strict collection pass."
+  },
+  "schedule_source": {
+    "source_id": "nflverse_schedule",
+    "url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+    "filter": "season in 2022-2025 and game_type == REG",
+    "expected_derived_subset_sha256": null,
+    "hash_policy": "Hash a deterministic CSV serialization of the 2022-2025 REG schedule subset used by this audit. Qualification is audit-only until that derived subset hash is pinned."
+  },
+  "chronology": {
+    "authority": "NFL Personnel (Injury) Report Policy filing day",
+    "policy": "official_game_status_report_day_eod_eastern_before_t120",
+    "t120_definition": "kickoff_utc_minus_120_minutes",
+    "weekday_report_days_before_game": {
+      "Monday": 2,
+      "Wednesday": 1,
+      "Thursday": 1,
+      "Friday": 1,
+      "Saturday": 2,
+      "Sunday": 2
+    },
+    "date_modified_policy": "For 2022-2024, nflverse date_modified is a source-integrity diagnostic only and never replaces official filing-day chronology."
+  },
+  "model_universe_exceptions": [
+    {
+      "season": 2022,
+      "week": 17,
+      "teams": ["BUF", "CIN"],
+      "reason": "NFL-cancelled Bills at Bengals game; no completed game enters the LevLine REG outcome/evaluation frame.",
+      "source": "NFL official 2022 Week 17 schedule/game center",
+      "outcome_information_used": false
+    }
+  ],
+  "missingness_semantics": {
+    "injury_row_present": "player listed on weekly injury report",
+    "injury_row_absent": "not injury-listed in this source; never impute active or healthy from absence alone",
+    "identity_unresolved": "canonical practice state unknown",
+    "practice_state_unrecognized": "canonical practice state unknown",
+    "practice_crosscheck_mismatch": "canonical practice state unknown",
+    "schedule_unmatched": "blocked unless the exact season/week/team is a preregistered model-universe exception",
+    "cross_season_imputation": false
+  },
+  "canonical_practice_states": ["full", "limited", "dnp", "unknown"],
+  "frozen_qualification_gates": {
+    "required_seasons_exact": [2022, 2023, 2024, 2025],
+    "official_nfl_pages_required_per_season": 18,
+    "stable_gsis_missing_rate_max": 0.0,
+    "canonical_to_official_unique_identity_match_rate_min": 0.995,
+    "official_to_canonical_identity_resolution_rate_min": 0.995,
+    "practice_status_agreement_rate_min": 0.985,
+    "diagnostic_game_status_agreement_rate_min": 0.985,
+    "known_by_t120_rate_required_among_identity_matched_rows": 1.0,
+    "fully_qualified_practice_state_rate_min": 0.99,
+    "legacy_date_modified_parse_rate_min": 0.995,
+    "schedule_match_rate_required_among_model_eligible_rows": 1.0,
+    "non_exception_schedule_unmatched_rows_allowed": 0,
+    "duplicate_canonical_identity_rows_allowed": 0,
+    "official_page_bundle_hashes_must_be_pinned": true,
+    "derived_schedule_subset_hash_must_be_pinned": true,
+    "qualified_2025_receipt_required": true,
+    "original_v09b_preregistration_unchanged_required": true
+  },
+  "feature_authorization": {
+    "practice_state": "eligible_for_V09B_research_execution_only_after_all_frozen_gates_pass",
+    "final_game_status": false,
+    "actual_snaps": false,
+    "postgame_participation": false,
+    "retrospective_inactive_status": false,
+    "later_injury_designation": false,
+    "completed_2026_outcomes": false
+  },
+  "governance": {
+    "research_only": true,
+    "game_outcomes_allowed_in_source_qualification": false,
+    "completed_2026_outcomes_allowed": false,
+    "probability_model_built_by_this_contract": false,
+    "probability_feature_authorized_by_this_contract": false,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false,
+    "threshold_relaxation_after_observing_results": false,
+    "postseason_V4_reopened": false
+  }
+}
