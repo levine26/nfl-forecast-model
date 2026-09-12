@@ -72,11 +72,12 @@ def test_horizon_comparison_pairs_by_game_not_horizon_label() -> None:
     assert result["benchmark_only_correct"] == 1
 
 
-def test_brier_is_secondary_guardrail_not_primary_selection() -> None:
+def test_brier_is_secondary_alert_not_primary_selection_veto() -> None:
     candidate = _frame([1, 1, 1, 1], brier=[0.21, 0.21, 0.21, 0.21])
     benchmark = _frame([1, 0, 1, 1], brier=[0.20, 0.20, 0.20, 0.20])
     result = paired_accuracy_comparison(candidate, benchmark, label="incumbent")
     assert result["accuracy_delta"] == 0.25
     assert result["brier_delta"] > 0
-    assert "brier_secondary_guardrail_pass" in result
+    assert "brier_secondary_alert_triggered" in result
+    assert result["brier_secondary_alert_is_automatic_accuracy_veto"] is False
     assert result["promotion_authorized"] is False
