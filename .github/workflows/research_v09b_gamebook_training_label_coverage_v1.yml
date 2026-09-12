@@ -1,0 +1,115 @@
+name: LevLine V09B Game Book coverage audit
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_gamebook_training_label_coverage_contract_v1.json'
+      - 'research/v09b_gamebook_training_label_coverage_v1.py'
+      - 'research/test_v09b_gamebook_training_label_coverage_v1.py'
+      - '.github/workflows/research_v09b_gamebook_training_label_coverage_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-gamebook-coverage-v1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-coverage-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install research dependencies
+        run: pip install '.[dev]' 'pypdf>=5,<7'
+
+      - name: Test frozen coverage contract and source resolver
+        run: pytest -q research/test_v09b_gamebook_training_label_coverage_v1.py
+
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: v09b-gamebook-coverage-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            v09b-gamebook-coverage-${{ runner.os }}-
+            nfl-availability-${{ runner.os }}-
+
+      - name: Execute 2012-2021 Game Book archive coverage audit
+        run: |
+          rm -rf research_outputs/v09b_gamebook_training_label_coverage_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_gamebook_training_label_coverage_v1.py \
+              --output-dir research_outputs/v09b_gamebook_training_label_coverage_v1
+          test -s research_outputs/v09b_gamebook_training_label_coverage_v1/qualification.json
+          test -s research_outputs/v09b_gamebook_training_label_coverage_v1/game_source_map.csv
+          test -s research_outputs/v09b_gamebook_training_label_coverage_v1/sample_semantics.json
+
+      - name: Validate fail-closed scientific disposition
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(
+              Path('research_outputs/v09b_gamebook_training_label_coverage_v1/qualification.json').read_text()
+          )
+          assert report['technical_status'] in {'QUALIFIED', 'BLOCKED'}, report
+          assert report['training_label_semantics_qualified'] is False, report
+          assert report['training_source_chronology_qualified'] is False, report
+          assert report['v09b_model_fit_authorized'] is False, report
+          assert report['governance']['source_only_audit'] is True, report
+          assert report['governance']['model_fit_performed'] is False, report
+          assert report['governance']['labels_constructed'] is False, report
+          assert report['governance']['game_outcomes_used'] == 0, report
+          assert report['governance']['completed_2026_outcomes_used'] == 0, report
+          assert report['governance']['production_dependency_authorized'] is False, report
+          if report['historical_gamebook_coverage_qualified']:
+              assert report['technical_status'] == 'QUALIFIED', report
+              assert report['hard_blockers'] == [], report
+              assert report['metrics']['expected_games_contract'] == 2576, report
+              assert report['metrics']['schedule_games'] == 2576, report
+              assert report['metrics']['archive_games_found'] == 2576, report
+              assert report['metrics']['archive_games_missing'] == 0, report
+              assert report['metrics']['archive_coverage_rate'] == 1.0, report
+              assert report['metrics']['ambiguous_game_source_mappings'] == 0, report
+              assert report['metrics']['sample_games'] == 30, report
+              assert report['metrics']['sample_pdf_downloads_ok'] == 30, report
+              assert report['metrics']['sample_not_active_structure_ok'] == 30, report
+              assert report['metrics']['sample_did_not_play_structure_ok'] == 30, report
+          else:
+              assert report['technical_status'] == 'BLOCKED', report
+              assert report['hard_blockers'], report
+          PY
+
+      - name: Prove branch remains research-only
+        if: always()
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [line.strip() for line in Path('/tmp/changed.txt').read_text().splitlines() if line.strip()]
+          bad = [
+              path for path in changed
+              if not (path.startswith('research/') or path.startswith('.github/workflows/research_'))
+          ]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: levline-v09b-gamebook-coverage-v1-${{ github.run_id }}
+          path: research_outputs/v09b_gamebook_training_label_coverage_v1/
+          retention-days: 30
+          if-no-files-found: warn
