@@ -1,0 +1,65 @@
+{
+  "contract_id": "LEVLINE4-HORIZON-INFERENCE-V1",
+  "status": "prospective_research_governance",
+  "completed_2026_outcomes_used_to_define_rule": 0,
+  "production_authorized": false,
+  "candidate_family": "L4-MKT-H-V1 raw same-construction market consensus",
+  "horizons": ["T-120m", "T-60m", "T-45m", "T-30m"],
+  "primary_sample": {
+    "rule": "same games with strict point-in-time eligible raw market forecasts at all four horizons",
+    "post_cutoff_observation_allowed": false,
+    "later_horizon_backfill_allowed": false,
+    "closing_line_reconstruction_allowed": false,
+    "imputation_allowed": false
+  },
+  "minimum_formal_inference_gate": {
+    "eligible_games": 200,
+    "distinct_nfl_weeks": 14,
+    "interpretation": "eligibility to run formal family inference; not automatic authority to select or promote a horizon"
+  },
+  "loss": {
+    "primary": "brier",
+    "secondary": ["log_loss", "calibration_intercept", "calibration_slope"],
+    "winner_accuracy": "descriptive_only"
+  },
+  "family_inference": {
+    "primary_method": "95_percent_model_confidence_set",
+    "reference": "Hansen_Lunde_Nason_2011_Econometrica_10.3982_ECTA5771",
+    "candidate_set_initial": ["T-120m", "T-60m", "T-45m", "T-30m"],
+    "bootstrap_unit": "NFL_week",
+    "bootstrap_draws": 10000,
+    "bootstrap_seed": 20260912,
+    "preserve_within_week_structure": true,
+    "statistic_family": "MCS_range_statistic_on_pairwise_mean_Brier_loss_differences",
+    "confidence_level": 0.95,
+    "corroborating_method": "joint_multi_horizon_forecast_comparison_respecting_cross_horizon_covariance",
+    "corroborating_reference": "Grant_Mrazik_Satchell_2026_Journal_of_Forecasting_10.1002_for.70150",
+    "few_cluster_caution_reference": "MacKinnon_Webb_2018_Econometrics_Journal_10.1111_ectj.12107"
+  },
+  "horizon_selection_rule": {
+    "raw_numeric_minimum_brier_is_sufficient": false,
+    "later_horizon_can_replace_T120_only_if": [
+      "T-120m is excluded from the 95% model confidence set under the primary Brier analysis",
+      "at least one of T-60m, T-45m or T-30m remains in the model confidence set",
+      "paired candidate-minus-T120 Brier improvement has a week-block 95% upper confidence bound below zero",
+      "log loss and calibration do not materially contradict the Brier result",
+      "the result is coherent under leave-one-week-out and capture-completeness diagnostics",
+      "source and point-in-time integrity gates pass",
+      "explicit human promotion authorization is granted"
+    ],
+    "if_multiple_later_horizons_survive": "choose the earliest surviving later horizon that satisfies all integrity and product requirements; do not claim superiority among statistically unresolved survivors",
+    "if_T120_survives": "do not claim prospective evidence has established that waiting improves probability quality"
+  },
+  "same_horizon_adjustment_rule": {
+    "benchmark": "raw market consensus at the identical horizon",
+    "applies_to": ["F-ST transform", "player-state residual", "dynamic-strength residual", "score-derived probability", "calibration", "ensemble"],
+    "incremental_claim_requires": "paired proper-score improvement over the same-horizon raw market, not merely improvement over the earlier T-120 incumbent"
+  },
+  "multiplicity_firewall": {
+    "horizon_family_separate_from_market_construction_family": true,
+    "market_construction_family_separate_from_player_family": true,
+    "player_family_separate_from_calibration_and_ensemble_families": true,
+    "reusing_completed_2026_outcomes_to_invent_or_rescue_candidates": false,
+    "material_specification_change_requires_new_candidate_id_and_prospective_start": true
+  }
+}
