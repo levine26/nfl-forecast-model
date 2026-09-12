@@ -37,7 +37,7 @@
   "source_eras": {
     "legacy_2012_2016": {
       "status": "LOCATOR_PATTERN_AND_DISCOVERY_CROSSWALK_IDENTIFIED_NOT_YET_COVERAGE_QUALIFIED",
-      "official_source_pattern": "https://www.nflgsis.com/{season}/REG/{week}/{gamekey}/Gamebook.xml",
+      "official_source_pattern": "https://www.nflgsis.com/{season}/Reg/{week_zero_padded}/{gamekey}/Gamebook.pdf",
       "discovery_crosswalk": "archived BurntSushi/nflgame schedule.json containing event id plus legacy gamekey",
       "crosswalk_role": "locator discovery only; label authority remains official NFL Gamebook bytes",
       "known_coverage_boundary": "archived schedule contains the 2016 regular season through Week 17; no 2017-season records have been established from that source",
