@@ -103,27 +103,12 @@
   },
   "copilot_media": {
     "file": "outputs/copilot_media_reads.json",
-    "games_applied": 0,
+    "games_applied": 14,
     "games_expected": 14,
     "max_age_hours": 6.0,
     "new_report_grace_minutes": 5.0,
-    "skipped": {
-      "2026_01_ARI_LAC": "copilot_artifact_stale",
-      "2026_01_ATL_PIT": "copilot_artifact_stale",
-      "2026_01_BAL_IND": "copilot_artifact_stale",
-      "2026_01_BUF_HOU": "copilot_artifact_stale",
-      "2026_01_CHI_CAR": "copilot_artifact_stale",
-      "2026_01_CLE_JAX": "copilot_artifact_stale",
-      "2026_01_DAL_NYG": "copilot_artifact_stale",
-      "2026_01_DEN_KC": "copilot_artifact_stale",
-      "2026_01_GB_MIN": "copilot_artifact_stale",
-      "2026_01_MIA_LV": "copilot_artifact_stale",
-      "2026_01_NO_DET": "copilot_artifact_stale",
-      "2026_01_NYJ_TEN": "copilot_artifact_stale",
-      "2026_01_TB_CIN": "copilot_artifact_stale",
-      "2026_01_WAS_PHI": "copilot_artifact_stale"
-    },
-    "status": "unavailable"
+    "skipped": {},
+    "status": "healthy"
   },
   "depth_charts": {
     "season": 2026,
@@ -183,12 +168,12 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-12T03:28:41.567410+00:00",
+    "as_of": "2026-09-12T04:21:40.245763+00:00",
     "cross_game_titles_rejected": 0,
     "games": 14,
     "games_with_display_reporting": 14,
     "games_with_reporting": 14,
-    "games_with_substantive_reporting": 11,
+    "games_with_substantive_reporting": 10,
     "games_with_trusted_reporting": 14,
     "generic_titles_rejected": 17,
     "providers": {
