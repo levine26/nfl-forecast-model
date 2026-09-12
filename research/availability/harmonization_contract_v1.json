@@ -1,0 +1,111 @@
+{
+  "contract_version": 1,
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "purpose": "Prove one leakage-safe 2022-2025 injury/practice-state contract before any V09B probability fitting.",
+  "target_seasons": [2022, 2023, 2024, 2025],
+  "season_scope": "regular_season_weeks_1_18",
+  "source": {
+    "source_id": "nflverse_injuries_release_assets",
+    "url_template": "https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_{season}.csv",
+    "expected_full_asset_rows": {
+      "2022": 5682,
+      "2023": 5599,
+      "2024": 6215,
+      "2025": 6068
+    },
+    "expected_sha256": {
+      "2022": null,
+      "2023": null,
+      "2024": null,
+      "2025": "873ca1606dd575bd01152508a243ef6b3a0f8f97b90b707217e62ee8c7ceb735"
+    },
+    "hash_policy": "A season is not research-qualified until its exact release asset SHA-256 is pinned in this contract. First-pass discovery may verify schema/chronology but cannot authorize V09B execution.",
+    "qualified_2025_receipt": "research/availability/2025_reconstruction_qualification_v1.json"
+  },
+  "required_source_columns": [
+    "season",
+    "week",
+    "team",
+    "gsis_id",
+    "position",
+    "full_name",
+    "practice_primary_injury",
+    "practice_secondary_injury",
+    "practice_status",
+    "report_primary_injury",
+    "report_secondary_injury",
+    "report_status"
+  ],
+  "canonical_feature_columns": [
+    "season",
+    "week",
+    "game_id",
+    "team",
+    "gsis_id",
+    "position",
+    "full_name",
+    "practice_primary_injury",
+    "practice_secondary_injury",
+    "practice_status_normalized",
+    "listed_on_injury_report",
+    "report_deadline_eod_utc",
+    "kickoff_utc",
+    "t120_utc",
+    "known_by_t120",
+    "source_sha256"
+  ],
+  "chronology": {
+    "policy": "official_game_status_report_day_eod_eastern_before_t120",
+    "t120_definition": "kickoff_utc_minus_120_minutes",
+    "weekday_report_days_before_game": {
+      "Monday": 2,
+      "Wednesday": 1,
+      "Thursday": 1,
+      "Friday": 1,
+      "Saturday": 2,
+      "Sunday": 2
+    },
+    "required_known_by_t120_rate": 1.0
+  },
+  "identity": {
+    "stable_id": "gsis_id",
+    "missing_id_rate_required": 0.0,
+    "duplicate_player_team_week_rows_allowed": false
+  },
+  "missingness_semantics": {
+    "row_present": "player_was_listed_on_the_weekly_injury_report",
+    "row_absent": "not_injury_listed_in_this_source; do_not_impute_active_or_healthy_from_absence_alone",
+    "missing_practice_status": "unknown; fail_closed_for_status_dependent_feature_construction",
+    "unmatched_schedule": "unknown; fail_closed",
+    "cross_season_imputation": false
+  },
+  "practice_status_vocabulary": ["full", "limited", "dnp", "unknown"],
+  "feature_authorization": {
+    "practice_state": "eligible_only_after_full_contract_qualification",
+    "game_status": false,
+    "actual_snaps": false,
+    "postgame_participation": false,
+    "retrospective_inactive_status": false,
+    "later_injury_designation": false,
+    "completed_2026_outcomes": false
+  },
+  "qualification_gates": {
+    "all_season_assets_hash_pinned": true,
+    "all_expected_full_asset_row_counts_match": true,
+    "required_schema_present_all_seasons": true,
+    "stable_identity_missing_rate": 0.0,
+    "duplicate_player_team_week_rows": 0,
+    "schedule_join_missing_rate": 0.0,
+    "known_by_t120_rate": 1.0,
+    "practice_status_normalization_unknown_rate_max": 0.01,
+    "qualified_2025_receipt_required": true,
+    "original_v09b_preregistration_unchanged_required": true
+  },
+  "governance": {
+    "research_only": true,
+    "probability_model_built_by_this_lane": false,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false,
+    "completed_2026_outcome_selection_allowed": false
+  }
+}
