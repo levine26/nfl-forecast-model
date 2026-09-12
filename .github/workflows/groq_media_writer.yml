@@ -90,6 +90,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          git fetch origin main
+
+          changed_files=$(git diff --name-only "${GITHUB_SHA}^1" "$GITHUB_SHA")
+          printf 'push changed files:\n%s\n' "$changed_files"
+          context_affecting=$(printf '%s\n' "$changed_files" | grep -E '^(src/nfl_forecast/(media_context|media_editorial|source_policy)\.py|scripts/finalize_editorial\.py|tests/(test_media_context|test_read_contract|test_editorial_finalize|test_source_policy_direct_reports)\.py|pyproject\.toml)$' || true)
+
           context_seen=0
           for discovery in $(seq 1 12); do
             state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
@@ -107,6 +113,10 @@ jobs:
               if [ "$attempt" -eq 40 ]; then echo "Timed out waiting for matching context refresh."; exit 1; fi
               sleep 15
             done
+          elif [ -n "$context_affecting" ]; then
+            echo "Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered; failing closed."
+            printf '%s\n' "$context_affecting"
+            exit 1
           else
             echo "No matching context run was triggered; validating inherited context for this provider-only push."
             latest_context_sha=$(gh run list --workflow "Sunday Signal contextual intelligence" --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // ""' 2>/dev/null || true)
@@ -119,7 +129,6 @@ jobs:
             echo "Provider-only push inherits latest successful contextual intelligence from $latest_context_sha."
           fi
 
-          git fetch origin main
           git reset --hard origin/main
 
       - name: Refresh latest main for scheduled/manual run
@@ -243,9 +252,10 @@ jobs:
           assert 'retry-after' in runner and 'x-ratelimit-remaining-tokens' in runner
           assert 'transport/rate-limit retries exhausted' in text
           assert 'inherits latest successful contextual intelligence' in text
+          assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
           assert 'unexpected_main_changes' in text
-          print('Groq provider migration, rate-limit handling, context freshness, and web-research wiring validated without consuming repository secrets on PR.')
+          print('Groq provider migration, rate-limit handling, exact-or-fresh context sync, and web-research wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
