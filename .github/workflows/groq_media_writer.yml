@@ -214,7 +214,7 @@ jobs:
               prompt="$prompts/$gid.txt"
               python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
               if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 3; then
-                echo "$gid: Groq provider transport/rate-limit retries exhausted; failing closed without multiplying provider calls across editorial retries."
+                echo "$gid: Groq provider request failed; failing closed without multiplying provider calls across editorial retries."
                 exit 1
               fi
               if python scripts/validate_single_copilot_game.py --input "$parts/$gid.txt" --game-id "$gid" --predictions outputs/this_week.csv --accepted-dir "$parts" 2> "$feedback"; then
@@ -259,20 +259,22 @@ jobs:
           assert 'secrets.GROQ_API_KEY' in text
           assert 'GROQ_MEDIA_MODEL: groq/compound-mini' in text
           assert 'DEFAULT_MODEL = "groq/compound-mini"' in runner
-          assert '"enabled_tools": ["web_search"]' in runner
-          assert '"service_tier": "auto"' in runner
-          assert 'max_completion_tokens' in runner
+          assert 'def _build_payload' in runner and '"search_settings"' in runner
+          assert 'def _safe_bad_request_reason' in runner
+          assert '"response_format":' not in runner
+          assert '"compound_custom":' not in runner
+          assert '"service_tier": "auto"' not in runner
           assert 'sleep 65' in text
           assert '_compact_packet' in prompt and 'len(reporting) >= 4' in prompt and 'len(football) >= 4' in prompt
           assert 'src/nfl_forecast/editorial_model_read.py' in text
           assert 'executed_tools' in runner and 'web_search' in runner
           assert 'retry-after' in runner and 'x-ratelimit-remaining-tokens' in runner
-          assert 'transport/rate-limit retries exhausted' in text
+          assert 'Groq provider request failed; failing closed' in text
           assert 'inherits latest successful contextual intelligence' in text
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
           assert 'unexpected_main_changes' in text
-          print('Groq Compound Mini free-tier research, pacing, context freshness, and publication wiring validated without consuming repository secrets on PR.')
+          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, and publication wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot

@@ -34,6 +34,19 @@ _RATE_LIMIT_HEADER_NAMES = (
     "x-ratelimit-reset-requests",
     "x-ratelimit-reset-tokens",
 )
+_SAFE_ERROR_PARAMS = {
+    "citation_options",
+    "compound_custom",
+    "max_completion_tokens",
+    "messages",
+    "model",
+    "reasoning_format",
+    "response_format",
+    "search_settings",
+    "service_tier",
+    "temperature",
+    "tools",
+}
 MAX_RATE_LIMIT_WAIT_SECONDS = 180.0
 
 
@@ -61,15 +74,21 @@ def _safe_rate_limit_headers(exc: HTTPError) -> dict[str, str]:
     return safe
 
 
-def _safe_rate_limit_reason(exc: HTTPError) -> str:
-    """Classify a Groq 429 without logging the raw provider response body."""
+def _error_payload(exc: HTTPError) -> dict:
+    """Read a provider error body for classification only; callers never log it."""
     try:
         raw = exc.read().decode("utf-8", errors="replace")
         payload = json.loads(raw)
-        message = str((payload.get("error") or {}).get("message") or "")
     except Exception:
-        return "unclassified"
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
+
+def _safe_rate_limit_reason(exc: HTTPError) -> str:
+    """Classify a Groq 429 without logging the raw provider response body."""
+    payload = _error_payload(exc)
+    error = payload.get("error") if isinstance(payload.get("error"), dict) else {}
+    message = str(error.get("message") or "")
     lowered = message.lower()
     kinds: list[str] = []
     for token, label in (
@@ -92,6 +111,42 @@ def _safe_rate_limit_reason(exc: HTTPError) -> str:
     return ",".join(parts)
 
 
+def _safe_bad_request_reason(exc: HTTPError) -> str:
+    """Classify a 400 without echoing arbitrary provider text or request content."""
+    payload = _error_payload(exc)
+    error = payload.get("error") if isinstance(payload.get("error"), dict) else {}
+    message = str(error.get("message") or "").lower()
+    parts: list[str] = []
+
+    for field in ("param", "type", "code"):
+        value = str(error.get(field) or "").strip().lower()
+        if not value:
+            continue
+        if field == "param":
+            root = value.split(".", 1)[0].split("[", 1)[0]
+            if root in _SAFE_ERROR_PARAMS:
+                parts.append(f"param={root}")
+        elif re.fullmatch(r"[a-z0-9_.-]{1,80}", value):
+            parts.append(f"{field}={value}")
+
+    for token, label in (
+        ("response_format", "response_format"),
+        ("reasoning_format", "reasoning_format"),
+        ("compound_custom", "compound_custom"),
+        ("search_settings", "search_settings"),
+        ("citation_options", "citation_options"),
+        ("service_tier", "service_tier"),
+        ("max_completion_tokens", "max_completion_tokens"),
+        ("temperature", "temperature"),
+        ("invalid", "invalid_request"),
+        ("unsupported", "unsupported_parameter"),
+    ):
+        if token in message and label not in parts:
+            parts.append(label)
+
+    return ",".join(parts) if parts else "bad_request"
+
+
 def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
     retry_after = _parse_retry_after(_safe_rate_limit_headers(exc).get("retry-after"))
     if retry_after is not None:
@@ -101,34 +156,31 @@ def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
     return min(20.0 * (2 ** max(0, attempt - 1)), 75.0)
 
 
+def _build_payload(prompt: str, *, model: str) -> dict:
+    """Use the documented Compound Mini request surface and validate downstream.
+
+    Groq's canonical Compound Mini examples require only model/messages; web-search
+    search_settings are explicitly supported. Optional generation/reasoning/JSON
+    controls are intentionally omitted here because the deterministic Sunday Signal
+    validators already enforce JSON shape, sources, prose, and numerical contracts.
+    """
+    return {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "search_settings": {
+            "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
+        },
+    }
+
+
 def _request(prompt: str, *, model: str, timeout: int) -> str:
     api_key = os.environ.get("GROQ_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("GROQ_API_KEY is not configured")
 
-    payload = {
-        "model": model,
-        "service_tier": "auto",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.3,
-        "max_completion_tokens": 1200,
-        "response_format": {"type": "json_object"},
-        "citation_options": "disabled",
-        "search_settings": {
-            "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
-        },
-        "compound_custom": {
-            "tools": {
-                # One broad search can return multiple publisher results. Restricting
-                # Mini to web_search guarantees its single tool call is spent on fresh
-                # reporting rather than an unnecessary secondary tool.
-                "enabled_tools": ["web_search"],
-            }
-        },
-    }
     request = Request(
         API_URL,
-        data=json.dumps(payload).encode("utf-8"),
+        data=json.dumps(_build_payload(prompt, model=model)).encode("utf-8"),
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -181,6 +233,12 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
                 print(f"Groq rate-limited; waiting {delay:.1f}s before provider retry {attempt + 1}/{attempts}.", file=sys.stderr)
                 time.sleep(delay)
                 continue
+
+            if exc.code == 400:
+                reason = _safe_bad_request_reason(exc)
+                print(f"Groq HTTP 400 bad request class={reason}", file=sys.stderr)
+                last_error = RuntimeError(f"Groq HTTP 400 class={reason}")
+                break
 
             last_error = RuntimeError(f"Groq HTTP {exc.code}")
             if not retryable or attempt == attempts:
