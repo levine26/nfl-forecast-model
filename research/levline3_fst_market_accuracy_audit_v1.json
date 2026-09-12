@@ -1,0 +1,137 @@
+{
+  "audit_id": "LEVLINE3-FST-MARKET-ACCURACY-AUDIT-V1",
+  "status": "historical_descriptive_audit_not_prospective_proof",
+  "generated_from": {
+    "training_frame": "challenger_outputs/fst/provenance/training_frame_keyed.csv",
+    "candidate": "F-ST-01-FROZEN-2026",
+    "seasons": [2022, 2023, 2024, 2025],
+    "games": 1087,
+    "frozen_intercept": -0.06954359363166639,
+    "frozen_market_logit_coefficient": 1.1939087340527093,
+    "frozen_pure_logit_coefficient": -0.19342747983803402
+  },
+  "overall": {
+    "fst_correct": 740,
+    "fst_accuracy": 0.6807727690892365,
+    "market_correct": 735,
+    "market_accuracy": 0.6761729530818767,
+    "fst_minus_market_correct_games": 5,
+    "fst_minus_market_accuracy": 0.0045998160073598,
+    "accuracy_gain_percentage_points": 0.45998160073598
+  },
+  "paired_disagreement": {
+    "disagreement_games": 25,
+    "disagreement_rate": 0.02299908003679853,
+    "fst_only_correct": 15,
+    "market_only_correct": 10,
+    "fst_switch_win_rate": 0.6,
+    "exact_mcnemar_two_sided_p_diagnostic": 0.42435622215270996,
+    "switch_win_rate_wilson_95_ci": [0.40739457358966996, 0.7659669762225203],
+    "week_block_accuracy_delta_95_ci": [-0.004595588235294118, 0.0136986301369863],
+    "week_block_accuracy_delta_95_ci_percentage_points": [-0.4595588235294118, 1.36986301369863],
+    "interpretation": "F-ST won the historical switches 15-10, but conventional uncertainty does not establish a genuine winner-accuracy advantage. The result is promising descriptive evidence, not proof."
+  },
+  "by_season": [
+    {
+      "season": 2022,
+      "games": 271,
+      "fst_correct": 181,
+      "market_correct": 178,
+      "fst_accuracy": 0.6678966789667896,
+      "market_accuracy": 0.6568265682656826,
+      "disagreements": 5,
+      "fst_only_correct": 4,
+      "market_only_correct": 1,
+      "switch_win_rate": 0.8
+    },
+    {
+      "season": 2023,
+      "games": 272,
+      "fst_correct": 185,
+      "market_correct": 184,
+      "fst_accuracy": 0.6801470588235294,
+      "market_accuracy": 0.6764705882352942,
+      "disagreements": 7,
+      "fst_only_correct": 4,
+      "market_only_correct": 3,
+      "switch_win_rate": 0.5714285714285714
+    },
+    {
+      "season": 2024,
+      "games": 272,
+      "fst_correct": 195,
+      "market_correct": 195,
+      "fst_accuracy": 0.7169117647058824,
+      "market_accuracy": 0.7169117647058824,
+      "disagreements": 4,
+      "fst_only_correct": 2,
+      "market_only_correct": 2,
+      "switch_win_rate": 0.5
+    },
+    {
+      "season": 2025,
+      "games": 272,
+      "fst_correct": 179,
+      "market_correct": 178,
+      "fst_accuracy": 0.6580882352941176,
+      "market_accuracy": 0.6544117647058824,
+      "disagreements": 9,
+      "fst_only_correct": 5,
+      "market_only_correct": 4,
+      "switch_win_rate": 0.5555555555555556
+    }
+  ],
+  "stability": {
+    "season_level_net_correct_advantage": {
+      "2022": 3,
+      "2023": 1,
+      "2024": 0,
+      "2025": 1
+    },
+    "leave_one_season_out_net_correct_advantage": {
+      "omit_2022": 2,
+      "omit_2023": 4,
+      "omit_2024": 5,
+      "omit_2025": 4
+    },
+    "leave_one_season_week_out_checks": 72,
+    "leave_one_season_week_out_positive_accuracy_delta_checks": 72,
+    "interpretation": "The small point-estimate edge is directionally stable under leave-one-week and leave-one-season deletion even though statistical uncertainty still includes no advantage."
+  },
+  "decision_boundary_forensics": {
+    "market_home_to_fst_away_flips": 22,
+    "fst_correct_on_market_home_to_away_flips": 14,
+    "market_away_to_fst_home_flips": 3,
+    "fst_correct_on_market_away_to_home_flips": 1,
+    "market_probability_absolute_distance_from_0_5": {
+      "median_percentage_points": 0.4329754069968883,
+      "max_percentage_points": 5.1441114716549,
+      "within_1_percentage_point": 14,
+      "within_2_percentage_points": 21,
+      "within_3_percentage_points": 22,
+      "within_5_percentage_points": 24
+    },
+    "pure_signal_relationship": {
+      "pure_and_market_same_pick_among_fst_market_disagreements": 19,
+      "fst_correct_when_opposing_both_market_and_pure": 12,
+      "pure_and_market_opposite_pick_among_fst_market_disagreements": 6,
+      "fst_correct_when_agreeing_with_pure_against_market": 3
+    },
+    "interpretation": "F-ST's five-game net edge came almost entirely from altering the decision boundary in near-coinflip games. It usually flipped marginal market home picks to away and often opposed, rather than followed, the PURE pick. The negative partial PURE coefficient is functioning as a conditional correction after market information, not as a simple second vote."
+  },
+  "exploratory_simple_market_threshold_check": {
+    "status": "post_hoc_hypothesis_probe_not_candidate_evidence",
+    "method": "For each validation season, choose the market home-win threshold from 0.450 through 0.550 in 0.001 increments using only earlier seasons; break training ties toward 0.500; then score the held-out season.",
+    "results": [
+      {"season": 2022, "chosen_threshold": 0.464, "heldout_correct": 178, "market_0_5_correct": 178},
+      {"season": 2023, "chosen_threshold": 0.521, "heldout_correct": 184, "market_0_5_correct": 184},
+      {"season": 2024, "chosen_threshold": 0.505, "heldout_correct": 193, "market_0_5_correct": 195},
+      {"season": 2025, "chosen_threshold": 0.521, "heldout_correct": 179, "market_0_5_correct": 178}
+    ],
+    "heldout_correct_total": 734,
+    "market_0_5_correct_total": 735,
+    "conclusion": "A simple historically tuned home-win threshold did not reproduce the F-ST edge and finished one game worse than the standard 0.5 market decision. The F-ST effect is not well explained by a fixed home-bias threshold alone."
+  },
+  "production_changed": false,
+  "promotion_authorized": false
+}
