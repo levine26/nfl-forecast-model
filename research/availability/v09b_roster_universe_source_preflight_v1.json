@@ -1,0 +1,64 @@
+{
+  "record_version": 2,
+  "record_id": "V09B-GAME-DAY-ROSTER-UNIVERSE-PREFLIGHT-V1",
+  "purpose": "Evaluate whether historical weekly roster data can bound the positive-class denominator without becoming the active/inactive label authority.",
+  "candidate_source": {
+    "name": "nflverse weekly rosters with source-era-specific upstream lineage",
+    "availability": "nflverse exposes weekly rosters back to 2002",
+    "source_eras": {
+      "2012_2015": {
+        "upstream": "NFL Data Exchange getRoster",
+        "builder": "nflverse/nflverse-rosters R/rosters_dataexchange.R via build_rosters_weekly_dataexchange",
+        "week_specific": true,
+        "source_fields_of_interest": ["season", "game_type", "week", "team", "gsis_id", "status_description_abbr", "status_short_description"],
+        "important_builder_behavior": "Before release, the generic status column is removed from the weekly Data Exchange frame and rejoined from Shield season-roster metadata. Therefore generic status is not accepted as the week-specific roster-state field for V09B; source-native week fields must be audited separately."
+      },
+      "2016_2021": {
+        "upstream": "NFL NGS weekly roster API",
+        "builder": "nflverse/nflverse-rosters R/rosters_ngs.R via build_rosters_weekly_ngsapi",
+        "week_specific": true,
+        "source_fields_of_interest": ["season", "game_type", "week", "team", "gsis_id", "status_description_abbr"],
+        "important_builder_behavior": "The builder enumerates season schedule weeks and team-week pairs, scrapes each roster from NGS, then normalizes week numbering. NGS source semantics and status-value coverage must be qualified independently from the 2012-2015 Data Exchange era."
+      }
+    },
+    "lineage_conclusion": "The 2012-2021 release is not a single-source historical roster corpus. Qualification must be source-era-specific and may not transfer status semantics from Data Exchange to NGS or vice versa."
+  },
+  "field_authority": {
+    "generic_status": "NOT_AUTHORIZED_AS_WEEK_SPECIFIC_ROSTER_UNIVERSE_FIELD_WITHOUT_SEPARATE_SOURCE-ERA_PROOF",
+    "status_description_abbr": "CANDIDATE_SOURCE-NATIVE_WEEK_FIELD_REQUIRING_SOURCE-ERA_CROSSCHECK",
+    "status_short_description": "CANDIDATE_WHERE_PRESENT_REQUIRING_SOURCE-ERA_CROSSCHECK",
+    "week": "CANDIDATE_WEEK_KEY_REQUIRING_SCHEDULE_ALIGNMENT_AUDIT",
+    "gsis_id": "CANDIDATE_IDENTITY_KEY_REQUIRING_MISSINGNESS_AND_DUPLICATE_AUDIT"
+  },
+  "allowed_role_if_qualified": {
+    "game_week_roster_universe_boundary": true,
+    "identity_crosswalk": true,
+    "inactive_label_authority": false,
+    "weekly_roster_ina_as_negative_label": false,
+    "absence_from_weekly_roster_as_inactive_label": false
+  },
+  "remaining_qualification_requirements": [
+    "prove exact regular-season team-week coverage for each source era across 2012-2021",
+    "freeze source-era-specific status values that constitute the eligible game-day roster universe before label fitting",
+    "prove promoted/elevated players and transaction-edge cases are represented consistently",
+    "crosscheck the roster universe against official Game Book roster/player sections on a preregistered multi-season sample",
+    "measure player-team-week identity resolution, missing GSIS IDs, and duplicate rates separately by source era",
+    "pin SHA-256 for every historical weekly-roster artifact used in label construction",
+    "prove no generic Shield season-status field is inadvertently substituted for source-native week state"
+  ],
+  "current_disposition": {
+    "credible_roster_universe_candidate": true,
+    "game_day_roster_universe_qualified": false,
+    "inactive_label_semantics_qualified_from_this_source": false,
+    "source_era_semantics_transfer_authorized": false,
+    "generic_status_authorized_as_week_state": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}

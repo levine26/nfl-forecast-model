@@ -1,0 +1,76 @@
+{
+  "record_version": 1,
+  "record_id": "V09B-MODERN-GAMEBOOK-LOCATOR-PREFLIGHT-V1",
+  "purpose": "Preserve evidence that 2017-2021 historical NFL Game Center pages expose a first-party Game Book document link, without claiming full-era coverage.",
+  "locator_strategy": {
+    "game_center_pattern": "https://www.nfl.com/games/{away-slug}-at-{home-slug}-{season}-reg-{week}",
+    "document_discovery": "parse the NFL Game Center HTML for the Download Game Book (PDF) anchor and archive the resolved first-party static.www.nfl.com document bytes",
+    "document_host_observed": "static.www.nfl.com",
+    "third_party_search_results_required_for_production_collector": false,
+    "guessed_document_url_allowed": false
+  },
+  "boundary_samples": [
+    {
+      "season": 2017,
+      "week": 13,
+      "game": "KC at NYJ",
+      "game_center": "https://www.nfl.com/games/chiefs-at-jets-2017-reg-13",
+      "download_game_book_surface_observed": true
+    },
+    {
+      "season": 2018,
+      "week": 3,
+      "game": "CHI at ARI",
+      "game_center": "https://www.nfl.com/games/bears-at-cardinals-2018-reg-3",
+      "download_game_book_surface_observed": true
+    },
+    {
+      "season": 2019,
+      "week": 12,
+      "game": "NYG at CHI",
+      "game_center": "https://www.nfl.com/games/giants-at-bears-2019-reg-12",
+      "download_game_book_surface_observed": true,
+      "resolved_first_party_pdf": "https://static.www.nfl.com/image/upload/v1677629225/gamecenter/10012019-1124-02f4-23e2-b8a35402ab27.pdf",
+      "pdf_pages_observed": 18,
+      "not_active_section_observed": true,
+      "did_not_play_section_observed": true
+    },
+    {
+      "season": 2020,
+      "week": 11,
+      "game": "NE at HOU",
+      "game_center": "https://www.nfl.com/games/patriots-at-texans-2020-reg-11",
+      "download_game_book_surface_observed": true
+    },
+    {
+      "season": 2021,
+      "week": 18,
+      "game": "CIN at CLE",
+      "game_center": "https://www.nfl.com/games/bengals-at-browns-2021-reg-18",
+      "download_game_book_surface_observed": true
+    }
+  ],
+  "interpretation": {
+    "first_party_locator_method_supported_across_boundary_samples": true,
+    "all_2017_2021_games_resolved": false,
+    "all_source_bytes_archived": false,
+    "full_modern_era_coverage_qualified": false,
+    "training_label_source_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "remaining_requirements": [
+    "enumerate every canonical 2017-2021 regular-season game from the frozen schedule universe",
+    "resolve every canonical game to exactly one NFL Game Center page",
+    "extract exactly one first-party Game Book document link per game",
+    "archive content-addressed source bytes and pin SHA-256",
+    "verify PDF/content type and parse Not Active versus Did Not Play for every game",
+    "fail closed on any missing, duplicate, redirected-to-non-first-party, or unparsable source"
+  ],
+  "governance": {
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}

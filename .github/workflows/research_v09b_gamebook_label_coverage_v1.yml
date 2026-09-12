@@ -1,0 +1,81 @@
+name: LevLine V09B gamebook label coverage
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_gamebook_label_coverage_contract_v1.json'
+      - 'research/availability/v09b_roster_universe_source_preflight_v1.json'
+      - 'research/availability/v09b_modern_gamebook_locator_preflight_v1.json'
+      - 'research/v09b_gamebook_label_coverage_gate_v1.py'
+      - 'research/test_v09b_gamebook_label_coverage_gate_v1.py'
+      - '.github/workflows/research_v09b_gamebook_label_coverage_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  historical-label-governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen historical-label coverage gate
+        run: pytest -q research/test_v09b_gamebook_label_coverage_gate_v1.py
+      - name: Validate source-era and authorization contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/availability/v09b_gamebook_label_coverage_contract_v1.json').read_text())
+          roster = json.loads(Path('research/availability/v09b_roster_universe_source_preflight_v1.json').read_text())
+          modern = json.loads(Path('research/availability/v09b_modern_gamebook_locator_preflight_v1.json').read_text())
+          assert contract['training_universe']['expected_games_total'] == 2576
+          assert contract['training_universe']['silent_game_drops_allowed'] == 0
+          assert contract['label_semantics']['not_active_is_negative'] is True
+          assert contract['label_semantics']['did_not_play_is_negative'] is False
+          assert contract['label_semantics']['absence_from_inactive_list_alone_is_positive'] is False
+          assert contract['label_semantics']['positive_class_requires_game_day_roster_universe'] is True
+          assert contract['source_eras']['legacy_2012_2016']['seasons'] == [2012, 2013, 2014, 2015, 2016]
+          assert contract['source_eras']['modern_2017_2021']['seasons'] == [2017, 2018, 2019, 2020, 2021]
+          assert contract['raw_source_requirements']['third_party_discovery_index_may_be_label_authority'] is False
+          assert contract['frozen_qualification_gates']['canonical_game_coverage_rate_required'] == 1.0
+          assert contract['frozen_qualification_gates']['game_day_roster_universe_coverage_rate_required'] == 1.0
+          assert contract['current_authorization']['historical_inactive_source_qualified'] is False
+          assert contract['current_authorization']['historical_game_day_roster_universe_qualified'] is False
+          assert contract['current_authorization']['v09b_model_fit_authorized'] is False
+          assert contract['governance']['model_fit_performed'] is False
+          assert contract['governance']['completed_2026_outcomes_used'] == 0
+          assert roster['candidate_source']['source_eras']['2012_2015']['upstream'] == 'NFL Data Exchange getRoster'
+          assert roster['candidate_source']['source_eras']['2016_2021']['upstream'] == 'NFL NGS weekly roster API'
+          assert roster['field_authority']['generic_status'].startswith('NOT_AUTHORIZED')
+          assert roster['allowed_role_if_qualified']['game_week_roster_universe_boundary'] is True
+          assert roster['allowed_role_if_qualified']['inactive_label_authority'] is False
+          assert roster['current_disposition']['source_era_semantics_transfer_authorized'] is False
+          assert roster['current_disposition']['game_day_roster_universe_qualified'] is False
+          assert modern['locator_strategy']['third_party_search_results_required_for_production_collector'] is False
+          assert modern['locator_strategy']['guessed_document_url_allowed'] is False
+          assert len(modern['boundary_samples']) == 5
+          assert {row['season'] for row in modern['boundary_samples']} == {2017, 2018, 2019, 2020, 2021}
+          assert all(row['download_game_book_surface_observed'] for row in modern['boundary_samples'])
+          assert modern['interpretation']['first_party_locator_method_supported_across_boundary_samples'] is True
+          assert modern['interpretation']['full_modern_era_coverage_qualified'] is False
+          assert modern['interpretation']['v09b_model_fit_authorized'] is False
+          assert modern['governance']['completed_2026_outcomes_used'] == 0
+          PY
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
