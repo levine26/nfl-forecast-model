@@ -60,7 +60,7 @@ def _contract(*, pinned: bool) -> dict:
         },
         "qualification_gates": {
             "stable_identity_missing_rate": 0.0,
-            "duplicate_player_team_week_rows": 0,
+            "conflicting_duplicate_groups": 0,
             "schedule_join_missing_rate": 0.0,
             "known_by_t120_rate": 1.0,
             "practice_status_normalization_unknown_rate_max": 0.01,
@@ -83,7 +83,9 @@ def _audit(source_sha256: str = "abc") -> SeasonAudit:
         full_asset_rows=1,
         regular_rows=1,
         missing_id_rate=0.0,
-        duplicate_player_team_week_rows=0,
+        raw_duplicate_excess_rows=0,
+        identical_duplicate_rows_collapsed=0,
+        conflicting_duplicate_groups=0,
         schedule_join_missing_rate=0.0,
         known_by_t120_rate=1.0,
         unknown_practice_status_rate=0.0,
@@ -114,14 +116,33 @@ def test_harmonizer_excludes_game_status_and_proves_t120_chronology():
     assert audit.known_by_t120_rate == 1.0
 
 
-def test_duplicate_player_team_week_rows_fail_closed():
-    injuries = pd.concat([_injury_frame(), _injury_frame()], ignore_index=True)
+def test_feature_equivalent_duplicate_rows_collapse_deterministically():
+    duplicate = _injury_frame().copy()
+    duplicate.loc[0, "report_status"] = "Out"
+    injuries = pd.concat([_injury_frame(), duplicate], ignore_index=True)
+    canonical, audit = harmonize_season(
+        injuries,
+        _schedule(),
+        season=2022,
+        source_sha256="abc",
+    )
+    assert len(canonical) == 1
+    assert audit.raw_duplicate_excess_rows == 1
+    assert audit.identical_duplicate_rows_collapsed == 1
+    assert audit.conflicting_duplicate_groups == 0
+    assert "report_status" not in canonical.columns
+
+
+def test_conflicting_duplicate_practice_state_fails_closed():
+    conflicting = _injury_frame().copy()
+    conflicting.loc[0, "practice_status"] = "Did Not Participate In Practice"
+    injuries = pd.concat([_injury_frame(), conflicting], ignore_index=True)
     try:
         harmonize_season(injuries, _schedule(), season=2022, source_sha256="abc")
     except ValueError as exc:
-        assert "duplicate player-team-week" in str(exc)
+        assert "conflicting duplicate player-team-week groups" in str(exc)
     else:
-        raise AssertionError("duplicate stable player-week rows must fail closed")
+        raise AssertionError("conflicting practice-state revisions must fail closed")
 
 
 def test_unpinned_hashes_cannot_authorize_v09b():
