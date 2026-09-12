@@ -52,7 +52,7 @@ export default function AppCoherent() {
     <AppSignal/>
     <SignalEnhancements/>
     <ForecastClarity/>
-    <ExperienceLayer/>
     <ExperienceDomFixes/>
+    <ExperienceLayer/>
   </>
 }
