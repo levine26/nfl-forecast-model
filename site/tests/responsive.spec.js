@@ -20,7 +20,7 @@ for (const [name, width, height] of viewports) {
     await expect(page.getByText('FIND YOUR GAME')).toBeVisible()
     await expect(page.locator('.ss-plus-top-signals').getByText('TOP SIGNALS')).toBeVisible()
     await expect(page.getByText('MODEL VS MARKET').first()).toBeVisible()
-    if (width > 1024) await expect(page.getByText('LEVLINE PICK')).toBeVisible()
+    if (width > 1024) await expect(page.locator('.ss-board-labels:visible').getByText('LEVLINE PICK', { exact: true })).toBeVisible()
     else await expect(page.locator('.ss-mobile-card:visible').first().getByText('LEVLINE FORECAST')).toBeVisible()
     await expect(page.getByText('Fair line', { exact: true })).toHaveCount(0)
 
