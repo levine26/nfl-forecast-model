@@ -1,0 +1,49 @@
+{
+  "record_version": 1,
+  "record_id": "V09B-GAMEBOOK-ACTIVE-LABEL-PREFLIGHT-V1",
+  "purpose": "Record a source-semantic preflight for official NFL Game Book 'Not Active' rows without authorizing historical V09B fitting.",
+  "sample": {
+    "season": 2012,
+    "week": 10,
+    "away_team": "DAL",
+    "home_team": "PHI",
+    "game_date": "2012-11-11",
+    "gamebook_not_active": {
+      "DAL": ["Mike Jenkins", "DeMarco Murray", "Matt Johnson", "Dan Connor", "David Arkin", "Phil Costa", "Sean Lissemore"],
+      "PHI": ["Trent Edwards", "Mardy Gilyard", "Chris Polk", "Danny Watkins", "Nate Menkin", "Vinny Curry", "Phillip Hunt"]
+    },
+    "contemporaneous_inactive_report": {
+      "DAL": ["David Arkin", "Dan Connor", "Phil Costa", "Mike Jenkins", "Matt Johnson", "Sean Lissemore", "DeMarco Murray"],
+      "PHI": ["Vinny Curry", "Trent Edwards", "Mardy Gilyard", "Phillip Hunt", "Nate Menkin", "Chris Polk", "Danny Watkins"]
+    },
+    "exact_name_set_matches": {"DAL": true, "PHI": true},
+    "matched_players": 14,
+    "reported_players": 14,
+    "sample_name_set_agreement_rate": 1.0,
+    "gamebook_distinguishes_did_not_play_from_not_active": true
+  },
+  "source_references": {
+    "official_game_center": "https://www.nfl.com/games/cowboys-at-eagles-2012-reg-10",
+    "gamebook_mirror_used_for_text_preflight": "https://www.yumpu.com/en/document/view/26227991/gamebook-pdf-nflcom",
+    "contemporaneous_inactive_report": "https://areyouwatchingthis.com/nfl/news/270465-NFL-Inactives-Sunday-November-11-2012",
+    "nfl_gamebook_support": "https://support.nfl.com/hc/en-us/articles/35869678028180-Game-Books",
+    "nfl_90_minute_inactive_semantics": "https://operations.nfl.com/game-operations-logistics/preparation-safety/game-and-stadium-prep"
+  },
+  "interpretation": {
+    "semantic_plausibility_supported": true,
+    "full_training_archive_qualified": false,
+    "2012_2021_coverage_proven": false,
+    "stable_identity_mapping_proven": false,
+    "source_provenance_reproducible_at_scale": false,
+    "training_label_semantics_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "reason": "One exact 14-of-14 crosscheck supports the hypothesis that Game Book 'Not Active' is an archival transcription of the game-day inactive declaration, but a single sample cannot establish decade-wide coverage, immutable provenance, or identity quality."
+  },
+  "governance": {
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
