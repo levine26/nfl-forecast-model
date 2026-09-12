@@ -15,7 +15,7 @@ import pandas as pd
 
 BOOTSTRAP_DRAWS = 10_000
 BOOTSTRAP_SEED = 20260912
-BRIER_GUARDRAIL_MARGIN = 0.0025
+BRIER_ALERT_DELTA = 0.0025
 PRIMARY_HORIZONS = ("T-120m", "T-60m", "T-45m", "T-30m")
 
 
@@ -152,7 +152,6 @@ def paired_accuracy_comparison(
     discordant = candidate_only + benchmark_only
     switch_rate = (candidate_only / discordant) if discordant else None
 
-    # Prefer candidate metadata for cluster identity; if absent, fall back to benchmark.
     for name in ("season", "week"):
         c_name = f"{name}_candidate"
         b_name = f"{name}_benchmark"
@@ -190,10 +189,11 @@ def paired_accuracy_comparison(
         result["brier_week_block_bootstrap"] = _block_bootstrap_mean(paired, "brier_delta")
         brier_ci = result["brier_week_block_bootstrap"]
         high = brier_ci.get("ci95_high")
-        result["brier_secondary_guardrail_margin"] = BRIER_GUARDRAIL_MARGIN
-        result["brier_secondary_guardrail_pass"] = (
-            bool(high <= BRIER_GUARDRAIL_MARGIN) if high is not None else None
+        result["brier_secondary_alert_delta"] = BRIER_ALERT_DELTA
+        result["brier_secondary_alert_triggered"] = (
+            bool(high > BRIER_ALERT_DELTA) if high is not None else None
         )
+        result["brier_secondary_alert_is_automatic_accuracy_veto"] = False
 
     if {"log_loss_candidate", "log_loss_benchmark"}.issubset(paired.columns):
         paired["log_loss_delta"] = (
