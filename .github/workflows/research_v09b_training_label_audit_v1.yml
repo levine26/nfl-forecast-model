@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'research/availability/v09b_training_label_source_contract_v1.json'
+      - 'research/availability/v09b_gamebook_label_preflight_v1.json'
       - 'research/v09b_training_label_gate_v1.py'
       - 'research/test_v09b_training_label_gate_v1.py'
       - '.github/workflows/research_v09b_training_label_audit_v1.yml'
@@ -32,6 +33,7 @@ jobs:
           import json
           from pathlib import Path
           contract = json.loads(Path('research/availability/v09b_training_label_source_contract_v1.json').read_text())
+          preflight = json.loads(Path('research/availability/v09b_gamebook_label_preflight_v1.json').read_text())
           assert contract['authorization']['training_label_semantics_qualified'] is False
           assert contract['authorization']['training_source_chronology_qualified'] is False
           assert contract['authorization']['v09b_model_fit_authorized'] is False
@@ -40,6 +42,15 @@ jobs:
           assert contract['candidate_sources']['official_game_day_administration_inactive_list']['status'] == 'SEMANTICALLY_CORRECT_SOURCE_CLASS_COVERAGE_NOT_YET_QUALIFIED'
           assert contract['governance']['model_fit_performed'] is False
           assert contract['governance']['completed_2026_outcomes_used'] == 0
+          assert preflight['sample']['matched_players'] == 14
+          assert preflight['sample']['reported_players'] == 14
+          assert preflight['sample']['sample_name_set_agreement_rate'] == 1.0
+          assert preflight['sample']['gamebook_distinguishes_did_not_play_from_not_active'] is True
+          assert preflight['interpretation']['semantic_plausibility_supported'] is True
+          assert preflight['interpretation']['full_training_archive_qualified'] is False
+          assert preflight['interpretation']['training_label_semantics_qualified'] is False
+          assert preflight['interpretation']['v09b_model_fit_authorized'] is False
+          assert preflight['governance']['completed_2026_outcomes_used'] == 0
           PY
       - name: Prove branch remains research-only
         run: |
