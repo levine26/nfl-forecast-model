@@ -1,0 +1,92 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-TRAINING-ACTIVE-LABEL-SOURCE-V1",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+  "purpose": "Qualify the supervised target semantics for P(active) before any V09B model fitting. This contract evaluates source meaning and chronology, not model performance.",
+  "target_definition": {
+    "positive_class": "player was eligible/active for the specific game after the official game-day inactive declaration",
+    "negative_class": "player appeared on the club's official game-day inactive list for the specific game",
+    "target_observation_time": "official game-day inactive declaration, approximately 90 minutes before scheduled kickoff",
+    "feature_cutoff": "T-120",
+    "target_may_occur_after_feature_cutoff": true,
+    "rationale": "The target is a later pregame state being forecast from T-120 information; it is not an input feature."
+  },
+  "required_source_properties": {
+    "game_specific_active_inactive_semantics": true,
+    "semantic_link_to_official_game_day_inactive_declaration": true,
+    "player_team_game_identity_reconstructable": true,
+    "all_training_seasons_covered": true,
+    "regular_season_coverage_measurable": true,
+    "stable_identity_mapping_auditable": true,
+    "target_does_not_depend_on_postgame_participation_or_snaps": true,
+    "source_provenance_reproducible": true
+  },
+  "prohibited_target_proxies": [
+    "current-game snap counts",
+    "appeared in play-by-play",
+    "postgame participation tables used as active inference",
+    "final starter identity",
+    "injury game-status designation treated as active/inactive truth",
+    "weekly roster eligibility status treated as game-day inactive truth without an independent semantic crosswalk",
+    "completed 2026 outcomes"
+  ],
+  "candidate_sources": {
+    "nflverse_weekly_roster_status": {
+      "status": "REJECTED_AS_STANDALONE_TARGET",
+      "source": "nflverse weekly rosters / NFL Shield v2 API",
+      "documented_status_semantics": "Roster-status dictionary defines INA as 'Under contract but not on the active roster, inactive'; the upstream builder selects player_status from the Shield roster API.",
+      "failure_reason": "This is roster eligibility/status semantics, not proven to be the per-game 90-minute inactive declaration. Current weekly assets are retrospective builds and provide no source-level guarantee that INA is identical to the official game-day inactive list for each game.",
+      "allowed_use": "May be used only as an independent roster-state diagnostic/crosscheck after another game-specific label source is qualified; it cannot create P(active) labels by itself.",
+      "references": [
+        "https://nflreadr.nflverse.com/articles/dictionary_roster_status.html",
+        "https://github.com/nflverse/nflverse-rosters/blob/main/R/rosters_shield.R",
+        "https://github.com/nflverse/nflverse-data/releases/tag/weekly_rosters"
+      ]
+    },
+    "official_game_day_administration_inactive_list": {
+      "status": "SEMANTICALLY_CORRECT_SOURCE_CLASS_COVERAGE_NOT_YET_QUALIFIED",
+      "source": "NFL Game Day Administration Report / official inactive list",
+      "semantic_basis": "NFL Football Operations states that club PR representatives deliver Game Day Administration Reports containing each club's inactive list at the 90-minute officiating meeting.",
+      "remaining_requirements": [
+        "identify a reproducible historical archive for 2012-2021",
+        "prove regular-season game coverage",
+        "prove player/team/game identity mapping",
+        "pin source hashes or equivalent immutable provenance",
+        "measure unresolved identity and duplicate rates"
+      ],
+      "references": [
+        "https://operations.nfl.com/game-operations-logistics/preparation-safety/game-and-stadium-prep"
+      ]
+    },
+    "official_nfl_gamebook_not_active_section": {
+      "status": "CANDIDATE_SEMANTIC_CROSSCHECK_NOT_YET_QUALIFIED",
+      "source": "Official NFL Game Book 'Not Active' section",
+      "semantic_basis": "NFL game books distinguish Did Not Play from Not Active. This is potentially the archived representation of the game-day inactive declaration rather than realized participation.",
+      "remaining_requirements": [
+        "prove the Not Active section is a faithful transcription of the official inactive list rather than a postgame reclassification",
+        "locate reproducible 2012-2021 gamebook archive/URL mapping",
+        "measure complete regular-season coverage before authorization"
+      ],
+      "references": [
+        "https://support.nfl.com/hc/en-us/articles/35869678028180-Game-Books"
+      ]
+    }
+  },
+  "authorization": {
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "weekly_roster_ina_authorized_as_target": false,
+    "gamebook_not_active_authorized_as_target": false,
+    "official_inactive_archive_authorized_as_target": false
+  },
+  "governance": {
+    "source_only_audit": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
