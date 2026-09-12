@@ -28,18 +28,20 @@ def _http_429(*, body: str = "", **headers: str) -> HTTPError:
 
 def test_compound_mini_is_default_provider():
     assert module.DEFAULT_MODEL == "groq/compound-mini"
+    assert module.DEFAULT_COMPOUND_VERSION == "2025-07-23"
+    assert module.MAX_COMPLETION_TOKENS == 600
 
 
-def test_compound_mini_payload_uses_documented_minimal_surface():
+def test_compound_mini_payload_bounds_reserved_output_budget():
     payload = module._build_payload("research this game", model=module.DEFAULT_MODEL)
     assert payload["model"] == "groq/compound-mini"
     assert payload["messages"] == [{"role": "user", "content": "research this game"}]
+    assert payload["max_completion_tokens"] == 600
     assert payload["search_settings"]["include_domains"]
-    assert set(payload) == {"model", "messages", "search_settings"}
+    assert set(payload) == {"model", "messages", "max_completion_tokens", "search_settings"}
     for optional in (
         "citation_options",
         "compound_custom",
-        "max_completion_tokens",
         "reasoning_format",
         "response_format",
         "service_tier",
@@ -110,3 +112,18 @@ def test_safe_bad_request_reason_does_not_echo_unknown_param_or_message():
     assert reason == "bad_request"
     assert "private_prompt" not in reason
     assert "secret-token-123" not in reason
+
+
+def test_safe_413_reason_exposes_only_budget_metadata():
+    exc = _http_error(
+        413,
+        body='{"error":{"message":"Request too large for model `openai/gpt-oss-120b` in organization org_secret '
+        'on tokens per minute (TPM): Limit 8000, Requested 9174; prompt secret-do-not-log"}}',
+    )
+    reason = module._safe_request_too_large_reason(exc)
+    assert "tpm" in reason
+    assert "model=openai/gpt-oss-120b" in reason
+    assert "limit=8000" in reason
+    assert "requested=9174" in reason
+    assert "org_secret" not in reason
+    assert "secret-do-not-log" not in reason

@@ -24,6 +24,13 @@ API_URL = "https://api.groq.com/openai/v1/chat/completions"
 # most one tool call, avoiding the hidden underlying-model TPM amplification that
 # full Compound can incur during a multi-search agentic loop.
 DEFAULT_MODEL = "groq/compound-mini"
+# Groq documents 2025-07-23 as the basic-search Compound version. Advanced search
+# retrieves more context; basic search is intentionally used here to stay inside the
+# tighter Free-tier limits inherited from Compound Mini's underlying models.
+DEFAULT_COMPOUND_VERSION = "2025-07-23"
+# Keep the reserved generation budget far below the 8K TPM ceiling of the routed
+# GPT-OSS model on Groq Free tier. The focused JSON contract is comfortably smaller.
+MAX_COMPLETION_TOKENS = 600
 _WEB_TOOL_TYPES = {"search", "web_search"}
 _RATE_LIMIT_HEADER_NAMES = (
     "retry-after",
@@ -84,12 +91,15 @@ def _error_payload(exc: HTTPError) -> dict:
     return payload if isinstance(payload, dict) else {}
 
 
+def _error_message(payload: dict) -> str:
+    error = payload.get("error") if isinstance(payload.get("error"), dict) else {}
+    return str(error.get("message") or "")
+
+
 def _safe_rate_limit_reason(exc: HTTPError) -> str:
     """Classify a Groq 429 without logging the raw provider response body."""
     payload = _error_payload(exc)
-    error = payload.get("error") if isinstance(payload.get("error"), dict) else {}
-    message = str(error.get("message") or "")
-    lowered = message.lower()
+    lowered = _error_message(payload).lower()
     kinds: list[str] = []
     for token, label in (
         ("input tokens per minute", "itpm"),
@@ -147,6 +157,34 @@ def _safe_bad_request_reason(exc: HTTPError) -> str:
     return ",".join(parts) if parts else "bad_request"
 
 
+def _safe_request_too_large_reason(exc: HTTPError) -> str:
+    """Classify a 413 using only model/limit/requested token-budget metadata."""
+    payload = _error_payload(exc)
+    message = _error_message(payload).lower()
+    parts: list[str] = []
+    if "tokens per minute" in message or "tpm" in message:
+        parts.append("tpm")
+    elif "token" in message:
+        parts.append("token_budget")
+    else:
+        parts.append("request_too_large")
+
+    model_match = re.search(r"\bmodel\s+[`'\"]?([a-z0-9_.\-/]+)", message)
+    if model_match:
+        model = model_match.group(1)
+        if len(model) <= 80:
+            parts.append(f"model={model}")
+
+    for label, pattern in (
+        ("limit", r"\blimit\s*[:=]?\s*([0-9][0-9,]*)"),
+        ("requested", r"\brequested\s*[:=]?\s*([0-9][0-9,]*)"),
+    ):
+        match = re.search(pattern, message)
+        if match:
+            parts.append(f"{label}={match.group(1).replace(',', '')}")
+    return ",".join(parts)
+
+
 def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
     retry_after = _parse_retry_after(_safe_rate_limit_headers(exc).get("retry-after"))
     if retry_after is not None:
@@ -157,16 +195,11 @@ def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
 
 
 def _build_payload(prompt: str, *, model: str) -> dict:
-    """Use the documented Compound Mini request surface and validate downstream.
-
-    Groq's canonical Compound Mini examples require only model/messages; web-search
-    search_settings are explicitly supported. Optional generation/reasoning/JSON
-    controls are intentionally omitted here because the deterministic Sunday Signal
-    validators already enforce JSON shape, sources, prose, and numerical contracts.
-    """
+    """Keep the Mini request simple while explicitly bounding reserved output tokens."""
     return {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
+        "max_completion_tokens": MAX_COMPLETION_TOKENS,
         "search_settings": {
             "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
         },
@@ -178,13 +211,14 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
     if not api_key:
         raise RuntimeError("GROQ_API_KEY is not configured")
 
+    compound_version = os.environ.get("GROQ_COMPOUND_VERSION", DEFAULT_COMPOUND_VERSION).strip() or DEFAULT_COMPOUND_VERSION
     request = Request(
         API_URL,
         data=json.dumps(_build_payload(prompt, model=model)).encode("utf-8"),
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "Groq-Model-Version": "latest",
+            "Groq-Model-Version": compound_version,
             "User-Agent": "Sunday-Signal-LevLine/3.0",
         },
         method="POST",
@@ -238,6 +272,12 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
                 reason = _safe_bad_request_reason(exc)
                 print(f"Groq HTTP 400 bad request class={reason}", file=sys.stderr)
                 last_error = RuntimeError(f"Groq HTTP 400 class={reason}")
+                break
+
+            if exc.code == 413:
+                reason = _safe_request_too_large_reason(exc)
+                print(f"Groq HTTP 413 request too large class={reason}", file=sys.stderr)
+                last_error = RuntimeError(f"Groq HTTP 413 class={reason}")
                 break
 
             last_error = RuntimeError(f"Groq HTTP {exc.code}")
