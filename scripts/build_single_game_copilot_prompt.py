@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-"""Build a focused Copilot editorial prompt for exactly one NFL matchup."""
+"""Build a focused Groq editorial-research prompt for exactly one NFL matchup.
+
+The legacy filename is retained as an internal compatibility contract.
+"""
 
 import argparse
 import json
@@ -53,7 +56,7 @@ PARAGRAPH 1 — THE MATCHUP
 Write 55-100 words explaining how the game is likely to be decided. Discuss BOTH teams and what each side needs to do. Use current reporting to inform the football analysis, but synthesize it instead of writing outlet-led notes. Focus on concrete factors such as quarterback situation, protection/pass rush, coverage, explosive plays, early-down efficiency, run-game leverage, injuries, coaching changes, travel or weather.
 
 MODEL_RATIONALE — CONTEXT ONLY
-Write 18-40 words tying one or two verified football factors to the LevLine side. Do NOT include any number, percentage, spread, projected score, PURE value, MARKET value, model line, the word moneyline, or a final pick sentence.
+Write 18-40 words tying one or two verified football factors to the selected side. Do NOT use the word LevLine in this field. Do NOT include any number, percentage, spread, projected score, PURE value, MARKET value, F-ST value, model line, blend/weight formula, the word moneyline, or a final pick sentence. The packet intentionally contains no LevLine numerical internals.
 
 VOICE
 - Human NFL analyst: clear, confident, conversational, specific.
@@ -61,6 +64,7 @@ VOICE
 - Do not invent injuries, roster facts, statistics, model inputs, source URLs, or causal claims.
 - Paraphrase reporting and avoid unnecessary quotations.
 - Use matchup-specific wording rather than stock phrases.
+- Standardized official injury/status language may repeat when factually necessary; substantive analysis may not.
 
 RESEARCH PRIORITY
 1. ESPN / ESPN NFL Nation
@@ -68,7 +72,7 @@ RESEARCH PRIORITY
 3. NFL.com and either club's official team website
 4. AP, CBS Sports, Yahoo Sports, NBC Sports, FOX Sports, Sports Illustrated
 5. Credible attributable public X/Twitter reporting when accessible
-Prefer the last 7 days, and the last 48 hours for injuries/starters/availability.
+Prefer the last 7 days, and the last 48 hours for injuries/starters/availability. If newer reporting supersedes a packet lead, use the newest verified state. If a quarterback or other key starter has been ruled out, identify the verified replacement starter when available.
 
 SOURCE RULES — STRICT
 - Return at least TWO independent sources from the approved publishers above.
@@ -79,14 +83,14 @@ SOURCE RULES — STRICT
 
 OUTPUT
 Return ONLY one syntactically valid JSON object, with exactly this schema and exactly this game id:
-{{"games":{{"{args.game_id}":{{"headline":"matchup-oriented headline","paragraph1":"55-100 word matchup preview","model_rationale":"18-40 words, context only, no numbers","sources":[{{"name":"publisher","title":"article/report title","url":"https://direct.publisher/article"}},{{"name":"second publisher","title":"article/report title","url":"https://direct.second/article"}}]}}}}}}
+{{"games":{{"{args.game_id}":{{"headline":"matchup-oriented headline","paragraph1":"55-100 word matchup preview","model_rationale":"18-40 words, context only, no numbers or model terms","sources":[{{"name":"publisher","title":"article/report title","url":"https://direct.publisher/article"}},{{"name":"second publisher","title":"article/report title","url":"https://direct.second/article"}}]}}}}}}
 No Markdown, comments, trailing commas, extra game ids, or commentary.
 {feedback}
 GAME PACKET
 {json.dumps(packet, indent=2)}
 """
     Path(args.prompt_file).write_text(prompt, encoding="utf-8")
-    print(f"wrote focused Copilot prompt for {args.game_id} -> {args.prompt_file}")
+    print(f"wrote focused Groq prompt for {args.game_id} -> {args.prompt_file}")
 
 
 if __name__ == "__main__":

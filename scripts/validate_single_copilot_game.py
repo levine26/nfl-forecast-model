@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Fail closed on one focused Copilot response before accepting it into the slate."""
+"""Fail closed on one focused editorial response before accepting it into the slate."""
 
 import argparse
 from pathlib import Path
@@ -10,16 +10,11 @@ import pandas as pd
 
 from compose_copilot_media_reads import _domain_family, _extract_json
 from nfl_forecast.source_policy import is_direct_media_report_url
-from validate_copilot_media_reads import _mentions_any, _team_aliases
+from validate_copilot_media_reads import _mentions_any, _team_aliases, _unique_ngrams
 
 
 def _clean(value: object) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
-
-
-def _ngrams(text: str, n: int = 7) -> set[str]:
-    words = re.findall(r"[a-z0-9]+(?:'[a-z]+)?", _clean(text).lower())
-    return {" ".join(words[i:i + n]) for i in range(max(0, len(words) - n + 1))}
 
 
 def _headline_template(headline: str, away: str, home: str) -> str:
@@ -108,7 +103,7 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
     failures.extend(f"{gid}: {failure}" for failure in source_failures)
 
     current_human = f"{headline} {paragraph1} {rationale}"
-    current_grams = _ngrams(current_human)
+    current_grams = _unique_ngrams(current_human)
     current_template = _headline_template(headline, away, home)
     if accepted_dir and accepted_dir.exists():
         rows_by_gid = {str(r.get("game_id")): r for _, r in predictions.iterrows()}
@@ -124,9 +119,9 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
             except Exception:
                 continue
             other_human = f"{_clean(other.get('headline'))} {_clean(other.get('paragraph1'))} {_clean(other.get('model_rationale'))}"
-            repeated = sorted(current_grams & _ngrams(other_human))
+            repeated = sorted(current_grams & _unique_ngrams(other_human))
             if repeated:
-                failures.append(f"{gid}: repeats seven-word phrase with {other_gid}: '{repeated[0]}'")
+                failures.append(f"{gid}: repeats substantive seven-word phrase with {other_gid}: '{repeated[0]}'")
             other_template = _headline_template(
                 _clean(other.get("headline")), str(other_row.get("away_team")), str(other_row.get("home_team"))
             )
@@ -150,8 +145,8 @@ def main() -> None:
         Path(args.accepted_dir) if args.accepted_dir else None,
     )
     if failures:
-        raise SystemExit("Focused Copilot game validation failed: " + "; ".join(failures))
-    print(f"validated focused Copilot response for {args.game_id}")
+        raise SystemExit("Focused editorial game validation failed: " + "; ".join(failures))
+    print(f"validated focused editorial response for {args.game_id}")
 
 
 if __name__ == "__main__":

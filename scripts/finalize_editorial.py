@@ -10,6 +10,7 @@ import pandas as pd
 
 from nfl_forecast.copilot_media import apply_copilot_reads
 from nfl_forecast.editorial_finalize import finalize_previews
+from nfl_forecast.editorial_model_read import render_model_paragraph
 from nfl_forecast.media_context import fetch_media_context
 from nfl_forecast.media_editorial import rewrite_reads_with_media
 
@@ -86,13 +87,39 @@ def _display_media(media: dict[str, list[dict]]) -> tuple[dict[str, list[dict]],
     }
 
 
+def _fallback_context(preview: dict, pick: str, opponent: str) -> str:
+    for factor in preview.get("key_factors") or []:
+        if isinstance(factor, dict):
+            title = re.sub(r"\s+", " ", str(factor.get("title") or "")).strip()
+            if title:
+                return f"Football context: {title}"
+    case = re.sub(r"\s+", " ", str(preview.get("case_for_pick") or "")).strip()
+    return f"Football context: {case or f'{pick} execution against {opponent}'}"
+
+
+def _canonicalize_fallback_model_paragraphs(previews: dict, predictions: pd.DataFrame) -> dict:
+    """Make deterministic fallback Reads obey the same LevLine 3.0 public semantics."""
+    rows = {str(row.get("game_id")): row for _, row in predictions.iterrows()}
+    for game_id, preview in previews.items():
+        row = rows.get(str(game_id))
+        if row is None or not isinstance(preview, dict):
+            continue
+        paragraphs = [str(value) for value in (preview.get("paragraphs") or [])]
+        paragraph1 = paragraphs[0] if paragraphs else ""
+        pick = str(row.get("pick"))
+        opponent = str(row.get("away_team")) if pick == str(row.get("home_team")) else str(row.get("home_team"))
+        paragraph2 = render_model_paragraph(row, _fallback_context(preview, pick, opponent))
+        preview["paragraphs"] = [paragraph1, paragraph2]
+    return previews
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default="outputs")
     parser.add_argument(
         "--skip-copilot",
         action="store_true",
-        help="Refresh deterministic current reporting without applying an older Copilot artifact.",
+        help="Refresh deterministic current reporting without applying an older provider artifact.",
     )
     args = parser.parse_args()
     out = Path(args.output_dir)
@@ -108,6 +135,7 @@ def main() -> None:
     display_media, display_status = _display_media(media)
     media_status.update(display_status)
     previews = rewrite_reads_with_media(previews, predictions, evidence, display_media)
+    previews = _canonicalize_fallback_model_paragraphs(previews, predictions)
     status["media_reporting"] = media_status
 
     if args.skip_copilot:
@@ -136,7 +164,7 @@ def main() -> None:
         voice = preview.get("editorial_voice") or {}
         print(
             f"FINAL READ {game_id} | media={bool(voice.get('media_led'))} "
-            f"| copilot={bool(voice.get('copilot_researched'))} | sources={sources} "
+            f"| provider_researched={bool(voice.get('copilot_researched'))} | sources={sources} "
             f"| P1={paragraph1} | P2={paragraph2}"
         )
 

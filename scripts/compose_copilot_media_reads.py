@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-"""Compose Copilot-written matchup prose with deterministic LevLine facts.
+"""Compose provider-researched matchup prose with deterministic LevLine 3.0 facts.
 
-Copilot owns the human headline/matchup analysis and a short football rationale.
-This script owns every numerical LevLine statement and normalizes source provenance
-before the existing publication validator runs. It is editorial-only and cannot
-change model inputs, probabilities, weights, locks, or grading.
+The external provider owns the human headline/matchup analysis and a short football
+rationale. This script owns every numerical LevLine statement and source normalization.
+It is editorial-only and cannot change model inputs, probabilities, locks, or grading.
 """
 
 import argparse
@@ -19,6 +18,7 @@ import pandas as pd
 
 from nfl_forecast.context import TEAM_META
 from nfl_forecast.copilot_source_backfill import backfill_direct_sources
+from nfl_forecast.editorial_model_read import render_model_paragraph
 from nfl_forecast.source_policy import (
     is_direct_media_report_url,
     media_domain_allowed,
@@ -43,10 +43,10 @@ def _extract_json(text: str) -> dict:
         if isinstance(value, dict):
             return value
     if start < 0 or end <= start:
-        raise ValueError("Copilot output does not contain a JSON object")
+        raise ValueError("editorial output does not contain a JSON object")
     repaired = json_repair.loads(raw[start:end + 1], skip_json_loads=True)
     if not isinstance(repaired, dict):
-        raise ValueError("Repaired Copilot output JSON root is not an object")
+        raise ValueError("repaired editorial output JSON root is not an object")
     return repaired
 
 
@@ -59,12 +59,7 @@ def _domain_family(url: str) -> str:
 
 
 def _canonical_url(url: str, name: str = "", publisher_url: str = "") -> str:
-    """Return only a direct approved report URL or a resolvable Bing target.
-
-    Publisher homepages, team/schedule/matchup shells, stats dashboards and search
-    pages are never substituted for direct attributable reporting. If provenance
-    cannot be tied to a direct approved report, downstream publication fails closed.
-    """
+    """Return only a direct approved report URL or a resolvable Bing target."""
     del name, publisher_url
     raw = str(url or "").strip()
     if is_direct_media_report_url(raw):
@@ -89,35 +84,6 @@ def _nick(code: str) -> str:
     return _team_name(code).split()[-1]
 
 
-def _possessive(name: str) -> str:
-    return f"{name}'" if str(name).lower().endswith("s") else f"{name}'s"
-
-
-def _number(value) -> float | None:
-    try:
-        number = float(value)
-    except Exception:
-        return None
-    return None if pd.isna(number) else number
-
-
-def _pick_probability(row: pd.Series, field: str) -> float | None:
-    value = _number(row.get(field))
-    if value is None:
-        return None
-    return value if str(row.get("pick")) == str(row.get("home_team")) else 1.0 - value
-
-
-def _line_text(value, home: str, away: str) -> str:
-    margin = _number(value)
-    if margin is None:
-        return ""
-    if abs(margin) < 0.05:
-        return "pick'em"
-    favored = home if margin > 0 else away
-    return f"{_team_name(favored)} -{abs(margin):.1f}"
-
-
 def _clean_text(value: object) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
 
@@ -126,13 +92,11 @@ def _safe_rationale(entry: dict, preview: dict, pick: str, opponent: str) -> str
     rationale = _clean_text(entry.get("model_rationale") or "")
     words = re.findall(r"\b[\w'-]+\b", rationale)
     banned_fact_tokens = re.compile(
-        r"\d|%|\blevline\b|\bpure\b|\bmarket\b|\bspread\b|\bmodel line\b|\bmoneyline\b",
+        r"\d|%|\blevline\b|\bf-st\b|\bpure\b|\bmarket\b|\bspread\b|\bmodel line\b|\bmoneyline\b",
         flags=re.I,
     )
     if 16 <= len(words) <= 48 and not banned_fact_tokens.search(rationale):
-        if rationale[-1:] not in ".!?":
-            rationale += "."
-        return rationale
+        return rationale if rationale[-1:] in ".!?" else rationale + "."
 
     factor = ""
     for item in preview.get("key_factors") or []:
@@ -144,54 +108,12 @@ def _safe_rationale(entry: dict, preview: dict, pick: str, opponent: str) -> str
             break
     if not factor:
         factor = _clean_text(preview.get("case_for_pick")) or f"{_nick(pick)} execution against {_nick(opponent)}"
-    pick_nick = _nick(pick)
-    opponent_nick = _nick(opponent)
-    return (
-        f"{pick_nick} context: {factor}. For {pick_nick}, this evidence supports {pick_nick} against {opponent_nick}; "
-        f"{pick_nick} evidence stays editorial, not a {pick_nick} numerical input."
-    )
+    return f"Football context: {factor}."
 
 
 def _model_paragraph(row: pd.Series, rationale: str) -> str:
-    away = str(row.get("away_team"))
-    home = str(row.get("home_team"))
-    pick = str(row.get("pick"))
-    opponent = away if pick == home else home
-    pick_name = _team_name(pick)
-    pick_nick = _nick(pick)
-    opponent_nick = _nick(opponent)
-    matchup = f"{_nick(away)}-{_nick(home)}"
-
-    final_prob = _pick_probability(row, "final_home_prob")
-    pure_prob = _pick_probability(row, "pure_home_prob")
-    market_prob = _pick_probability(row, "market_home_prob")
-    model_line = _line_text(row.get("expected_margin"), home, away)
-    market_line = _line_text(row.get("spread_line"), home, away)
-    projected = _clean_text(row.get("projected_score"))
-
-    sentences: list[str] = []
-    if final_prob is not None:
-        sentences.append(
-            f"For {matchup}, LevLine's {pick_nick} win probability is {final_prob * 100:.1f}% against {opponent_nick}."
-        )
-    if pure_prob is not None and market_prob is not None:
-        sentences.append(
-            f"For {matchup}, football-only PURE rates the {pick_nick} at {pure_prob * 100:.1f}%; "
-            f"versus {opponent_nick}, MARKET rates the {pick_nick} at {market_prob * 100:.1f}%."
-        )
-        sentences.append(
-            f"{matchup} weighting is 75% PURE for {pick_nick} and 25% MARKET versus {opponent_nick}."
-        )
-    if model_line:
-        sentences.append(f"For {matchup}, the {pick_nick} LevLine model line is {model_line}.")
-    if market_line:
-        sentences.append(f"Against {opponent_nick} in {matchup}, the market spread is {market_line}.")
-    if projected:
-        sentences.append(f"{matchup} projected score for {pick_nick} versus {opponent_nick}: {projected}.")
-
-    sentences.append(rationale)
-    sentences.append(f"The pick: {pick_name} moneyline.")
-    return " ".join(sentences)
+    """Compatibility wrapper around the canonical 3.0 model-read serializer."""
+    return render_model_paragraph(row, rationale)
 
 
 def _source_candidates(entry: dict, preview: dict, evidence_items: list[dict]) -> list[dict]:
@@ -247,12 +169,12 @@ def _canonical_sources(entry: dict, preview: dict, evidence_items: list[dict]) -
 def compose(payload: dict, predictions: pd.DataFrame, previews: dict, evidence: dict) -> dict:
     games = payload.get("games") if isinstance(payload, dict) else None
     if not isinstance(games, dict):
-        raise ValueError("Copilot media output missing games object")
+        raise ValueError("editorial media output missing games object")
 
     expected = set(predictions["game_id"].astype(str))
     actual = set(str(key) for key in games)
     if actual != expected:
-        raise ValueError(f"Copilot media game coverage mismatch: missing={sorted(expected-actual)}, extra={sorted(actual-expected)}")
+        raise ValueError(f"editorial media game coverage mismatch: missing={sorted(expected-actual)}, extra={sorted(actual-expected)}")
 
     rows = {str(row.get("game_id")): row for _, row in predictions.iterrows()}
     out: dict[str, dict] = {}
@@ -275,6 +197,7 @@ def compose(payload: dict, predictions: pd.DataFrame, previews: dict, evidence: 
         out[gid] = {
             "headline": headline,
             "paragraph1": paragraph1,
+            "model_rationale": rationale,
             "paragraph2": paragraph2,
             "sources": sources,
         }
@@ -296,7 +219,7 @@ def main() -> None:
     evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8"))
     composed = compose(payload, predictions, previews, evidence)
     Path(args.output).write_text(json.dumps(composed, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"composed deterministic LevLine facts for {len(composed['games'])} Copilot Reads -> {args.output}")
+    print(f"composed deterministic LevLine 3.0 facts for {len(composed['games'])} researched Reads -> {args.output}")
 
 
 if __name__ == "__main__":

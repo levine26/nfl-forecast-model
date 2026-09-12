@@ -79,3 +79,38 @@ def test_finalizer_exempts_standardized_facts_without_weakening_substantive_uniq
     previews["g2"]["case_for_pick"] = repeated_editorial
     with pytest.raises(ValueError, match="publication repeats game-file prose across matchups"):
         finalize_previews(predictions, previews, {"g1": [], "g2": []})
+
+
+def test_finalizer_exempts_repeated_machine_metric_scaffold_but_not_analysis():
+    predictions = pd.DataFrame([
+        {"game_id":"g1","away_team":"ARI","home_team":"LAC","pick":"LAC"},
+        {"game_id":"g2","away_team":"NO","home_team":"DET","pick":"DET"},
+    ])
+    metric = "The opponent-side profile was 0.04 EPA/play last season."
+    previews = {
+        "g1": {
+            "headline":"Chargers protection test",
+            "paragraphs":[metric + " Arizona must keep obvious passing downs off the menu."],
+            "case_for_pick":"Los Angeles can create pressure without giving away coverage intent.",
+            "case_for_opponent":"Arizona can counter with early-down efficiency.",
+            "what_could_make_us_wrong":"Explosive plays can overturn the pressure advantage.",
+            "editorial_voice":{"game_specific":True}, "key_factors":[], "matchup_meter":[], "notebook":[],
+        },
+        "g2": {
+            "headline":"Lions explosive-play test",
+            "paragraphs":[metric + " New Orleans must prevent Detroit from owning first down."],
+            "case_for_pick":"Detroit can stretch the field and keep the Saints from compressing space.",
+            "case_for_opponent":"New Orleans can slow the game with sustained possessions.",
+            "what_could_make_us_wrong":"Turnovers can erase the field-position advantage.",
+            "editorial_voice":{"game_specific":True}, "key_factors":[], "matchup_meter":[], "notebook":[],
+        },
+    }
+
+    status = finalize_previews(predictions, previews, {"g1": [], "g2": []})
+    assert status["status"] == "healthy"
+
+    repeated_analysis = "This football interpretation is copied across two games and must still fail."
+    previews["g1"]["case_for_pick"] = repeated_analysis
+    previews["g2"]["case_for_pick"] = repeated_analysis
+    with pytest.raises(ValueError, match="publication repeats game-file prose across matchups"):
+        finalize_previews(predictions, previews, {"g1": [], "g2": []})
