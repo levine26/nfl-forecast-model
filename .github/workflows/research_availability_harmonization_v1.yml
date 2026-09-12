@@ -5,10 +5,12 @@ on:
     paths:
       - 'research/availability/harmonization_contract_v1.json'
       - 'research/availability/harmonization_regular_season_contract_v2.json'
+      - 'research/availability/harmonization_regular_season_v2_failure_receipt.json'
       - 'research/availability/postseason_harmonization_v4_terminal_record.json'
       - 'research/availability_harmonization_v1.py'
       - 'research/availability_harmonization_regular_v2.py'
       - 'research/availability_identity_regular_v2.py'
+      - 'research/diagnose_availability_harmonization_regular_v2.py'
       - 'research/run_availability_harmonization_v1.py'
       - 'research/run_availability_harmonization_regular_v2.py'
       - 'research/test_availability_harmonization_v1.py'
@@ -83,6 +85,9 @@ jobs:
           test -s research_outputs/availability_harmonization_regular_v2/source_manifest.json
           test -s research_outputs/availability_harmonization_regular_v2/season_summaries.csv
           test -s research_outputs/availability_harmonization_regular_v2/availability_2022_2025_regular_strict.csv
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/diagnose_availability_harmonization_regular_v2.py
+          test -s research_outputs/availability_harmonization_regular_v2/diagnostics/diagnostic_summary.json
           python - <<'PY'
           import json
           from pathlib import Path
