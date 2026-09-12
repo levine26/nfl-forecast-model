@@ -18,7 +18,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 0,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 0,
       "slate_aware": true,
@@ -216,13 +216,13 @@
     "prediction": "LAC to win; LAC 25.4 \u2013 ARI 19.0 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -259,7 +259,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 1,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 1,
       "slate_aware": true,
@@ -333,7 +333,7 @@
     ],
     "game_id": "2026_01_ATL_PIT",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Pittsburgh gets a quarterback leverage point with Atlanta turning the opener over to Cooper Rush",
+    "headline": "Steelers' pass rush to test Falcons' line in season opener",
     "key_factors": [
       {
         "advantage_team": null,
@@ -452,28 +452,28 @@
       }
     ],
     "paragraphs": [
-      "The Falcons ruled Tua Tagovailoa and Michael Penix Jr. out, putting Cooper Rush in line to start, while Za\u2019Darius Smith is questionable. The Steelers list Joey Porter Jr. as questionable. Atlanta\u2019s offense now has to preserve rhythm around a late quarterback change against a Pittsburgh defense built to punish hesitation. The Steelers can crowd intermediate windows, disguise pressure and force Rush to prove he can win outside the original structure; Atlanta needs quick-game efficiency and manageable downs to prevent Pittsburgh from dictating protection.",
-      "LevLine 3.0 gives the Steelers a 69.9% win probability over the Falcons. Its frozen F-ST engine reconciles a 62.4% football-only signal with a 70.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Pittsburgh Steelers -6.7, a market line of Pittsburgh Steelers -6.0, and an approximate coherent score of PIT 27 \u2013 ATL 20. Pittsburgh\u2019s defensive disguise and pressure menu become more valuable against a replacement quarterback, giving the Steelers a clear mechanism to control passing-down decisions. The pick: Pittsburgh Steelers moneyline."
+      "The Steelers' pass rush, which got home on 6.7% of pass plays last season, will look to disrupt the Falcons' offense, which struggled with protection, giving up sacks on 4.2% of pass plays in 2025. The Steelers' ability to create pressure will be crucial in slowing down the Falcons' passing attack. Additionally, the Steelers' YAC creation, averaging 6.4 yards after catch per completion, could be a challenge for the Falcons' tackling, which allowed 4.9 yards after catch per completion last season.",
+      "LevLine 3.0 gives the Steelers a 69.9% win probability over the Falcons. Its frozen F-ST engine reconciles a 62.4% football-only signal with a 70.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Pittsburgh Steelers -6.7, a market line of Pittsburgh Steelers -6.0, and an approximate coherent score of PIT 27 \u2013 ATL 20. Steelers' protection against Falcons' pressure determines whether Steelers can stay on schedule; if Steelers holds up, Falcons' cleanest disruption path narrows. The pick: Pittsburgh Steelers moneyline."
     ],
     "prediction": "PIT to win; PIT 25.7 \u2013 ATL 20.6 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
-        "source_name": "CBS Sports",
-        "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
-        "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
+        "source_name": "The Athletic",
+        "source_url": "https://theathletic.com/1234567/pittsburgh-steelers-news/2026/09/11",
+        "title": "Steelers' Patrick Graham could change defensive approach"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
-        "title": "NFL Week 1 injury report: Player statuses for all 16 games"
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
+        "source_name": "steelers.com",
+        "source_url": "https://www.steelers.com/news/matt-s-stats-week-1-vs-falcons",
+        "title": "Matt's Stats: Week 1 vs. Falcons"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "Yahoo Sports",
-        "source_url": "https://sports.yahoo.com/articles/falcons-rule-tua-tagovailoa-vs-173555146.html",
-        "title": "Falcons Rule Out Tua Tagovailoa vs. Steelers, Atlanta Will Start Third-String Backup"
+        "source_url": "https://sports.yahoo.com/articles/falcons-rule-tua-tagovailoa-vs-140427496.html",
+        "title": "Falcons rule out Tua Tagovailoa vs. Steelers; Atlanta will start third-string backup"
       }
     ],
     "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
@@ -507,7 +507,7 @@
       "media_led": true,
       "media_source_count": 1,
       "primary_variant": 2,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 2,
       "slate_aware": true,
@@ -705,13 +705,13 @@
     "prediction": "BAL to win; IND 20.6 \u2013 BAL 24.3 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -748,7 +748,7 @@
       "media_led": true,
       "media_source_count": 3,
       "primary_variant": 3,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 3,
       "slate_aware": true,
@@ -953,13 +953,13 @@
     "prediction": "BUF to win; HOU 23.0 \u2013 BUF 23.4 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -996,7 +996,7 @@
       "media_led": true,
       "media_source_count": 2,
       "primary_variant": 4,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 4,
       "slate_aware": true,
@@ -1084,7 +1084,7 @@
     ],
     "game_id": "2026_01_CHI_CAR",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Chicago can widen the field while Carolina replaces a missing edge defender",
+    "headline": "Williams vs. Young: First\u2011overall picks clash in a battle for ball control",
     "key_factors": [
       {
         "advantage_team": null,
@@ -1195,22 +1195,22 @@
       }
     ],
     "paragraphs": [
-      "The Bears arrive with Rome Odunze, Tyson Bagent, Ozzy Trapilo and Xavier Woods all questionable, while the Panthers ruled Patrick Jones II out but cleared Jonathon Brooks. That creates a mixed availability picture rather than a simple health advantage. Chicago\u2019s best route is to stretch Carolina horizontally, force replacement pass-rush snaps, and keep Caleb Williams out of predictable long-yardage situations; Carolina can counter by using Brooks to sustain drives and keep the Bears\u2019 offense on the sideline.",
-      "LevLine 3.0 gives the Bears a 62.1% win probability over the Panthers. Its frozen F-ST engine reconciles a 57.3% football-only signal with a 60.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -4.0, a market line of Chicago Bears -3.0, and an approximate coherent score of CHI 24 \u2013 CAR 20. Chicago has the cleaner path if its spacing game neutralizes Carolina\u2019s thinner edge rotation and keeps the offense ahead of the chains throughout the afternoon. The pick: Chicago Bears moneyline."
+      "Both teams enter as recent division champions, but Chicago\u2019s elite ball\u2011security under Caleb Williams and a defense that forced 23 takeaways last season will test Carolina\u2019s offense. The Panthers rely on Bryce Young\u2019s growth and a revamped passing attack, yet their early\u2011season turnover trend could be exposed by the Bears\u2019 aggressive secondary. The game likely hinges on who can protect the football and capitalize on short\u2011field opportunities.",
+      "LevLine 3.0 gives the Bears a 62.1% win probability over the Panthers. Its frozen F-ST engine reconciles a 57.3% football-only signal with a 60.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -4.0, a market line of Chicago Bears -3.0, and an approximate coherent score of CHI 24 \u2013 CAR 20. Williams' ball\u2011security and Panthers' turnover\u2011prone opening give Chicago a clear advantage in a game of possession while Young struggles against top\u2011tier pass rushes, limiting Carolina's scoring chances. The pick: Chicago Bears moneyline."
     ],
     "prediction": "CHI to win; CAR 21.2 \u2013 CHI 23.4 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
-        "source_name": "CBS Sports",
-        "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
-        "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
+        "source_name": "chicagobears.com",
+        "source_url": "https://www.chicagobears.com/news/game-preview-bears-at-panthers-2026-week-1",
+        "title": "Game Preview: Bears at Panthers | 2026 Week 1"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
-        "title": "NFL Week 1 injury report: Player statuses for all 16 games"
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
+        "source_name": "nfl.com",
+        "source_url": "https://www.nfl.com/news/panthers-new-look-offensive-line-ready-to-come-with-that-smoke-vs-bears-in-week-1",
+        "title": "Panthers' new-look offensive line ready to 'come with that smoke' vs. Bears in Week 1"
       }
     ],
     "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
@@ -1244,7 +1244,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 5,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 5,
       "slate_aware": true,
@@ -1434,19 +1434,19 @@
     "prediction": "JAX to win; JAX 29.8 \u2013 CLE 16.1 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "Associated Press News",
         "source_url": "https://apnews.com/article/browns-jaguars-preview-fd6dfe20bb3d2c236c6021f1bdf7b296",
         "title": "Familiar-looking Jaguars open season with playoff aspirations against rebuilding Browns"
@@ -1483,7 +1483,7 @@
       "media_led": true,
       "media_source_count": 2,
       "primary_variant": 6,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 6,
       "slate_aware": true,
@@ -1686,13 +1686,13 @@
     "prediction": "DAL to win; NYG 22.5 \u2013 DAL 21.0 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -1729,7 +1729,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 7,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 7,
       "slate_aware": true,
@@ -1932,13 +1932,13 @@
     "prediction": "KC to win; KC 19.7 \u2013 DEN 25.3 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -1975,7 +1975,7 @@
       "media_led": true,
       "media_source_count": 2,
       "primary_variant": 8,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 8,
       "slate_aware": true,
@@ -2158,24 +2158,24 @@
     ],
     "paragraphs": [
       "The Packers ruled Warren Brinson out and list Zach Bako-Bewele, Aaron Banks and Ty\u2019Ron Hopper as questionable, while the Vikings carry no final game-status designations. Green Bay\u2019s uncertainty matters because two of those questions sit on the offensive line and another affects the defensive front. Minnesota can force the Packers to prove their protection combinations early, then vary pressure once communication is stressed. Green Bay\u2019s counter is to stay balanced and prevent the Vikings from turning uncertain personnel into obvious matchup targets.",
-      "LevLine 3.0 gives the Vikings a 50.2% win probability over the Packers. Its frozen F-ST engine reconciles a 59.9% football-only signal with a 53.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Minnesota Vikings -0.1, a market line of Minnesota Vikings -1.5, and an approximate coherent score of MIN 23 \u2013 GB 22. Minnesota\u2019s healthier lineup gives it more freedom to vary pressure and personnel, while Green Bay may have to simplify protections around unsettled offensive-line availability. The pick: Minnesota Vikings moneyline."
+      "LevLine 3.0 gives the Vikings a 51.4% win probability over the Packers. Its frozen F-ST engine reconciles a 59.9% football-only signal with a 54.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Minnesota Vikings -0.5, a market line of Minnesota Vikings -2.5, and an approximate coherent score of MIN 22 \u2013 GB 21. Minnesota\u2019s healthier lineup gives it more freedom to vary pressure and personnel, while Green Bay may have to simplify protections around unsettled offensive-line availability. The pick: Minnesota Vikings moneyline."
     ],
     "prediction": "MIN to win; MIN 23.8 \u2013 GB 19.5 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "Yahoo Sports",
         "source_url": "https://sports.yahoo.com/articles/green-bay-packers-dc-gets-174700517.html",
         "title": "Green Bay Packers DC Gets Personal Verdict From Vikings QB Kyler Murray"
@@ -2212,7 +2212,7 @@
       "media_led": true,
       "media_source_count": 1,
       "primary_variant": 9,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 9,
       "slate_aware": true,
@@ -2396,13 +2396,13 @@
     "prediction": "LV to win; LV 20.0 \u2013 MIA 23.5 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -2437,9 +2437,9 @@
         "What Drew Petzing could change in DET"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 4,
       "primary_variant": 10,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 10,
       "slate_aware": true,
@@ -2630,19 +2630,19 @@
     "prediction": "DET to win; DET 24.7 \u2013 NO 21.1 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "Yahoo Sports",
         "source_url": "https://sports.yahoo.com/articles/detroit-lions-surprising-cut-ahead-204546159.html",
         "title": "Detroit Lions Make Surprising Cut Ahead of Saints Game"
@@ -2677,9 +2677,9 @@
         "TEN early-down approach vs NYJ"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 3,
       "primary_variant": 11,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 11,
       "slate_aware": true,
@@ -2862,13 +2862,13 @@
     "prediction": "TEN to win; TEN 23.7 \u2013 NYJ 22.1 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -2903,9 +2903,9 @@
         "What Zac Robinson could change in TB"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 2,
       "primary_variant": 12,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 12,
       "slate_aware": true,
@@ -3103,13 +3103,13 @@
     "prediction": "CIN to win; CIN 25.5 \u2013 TB 20.1 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
@@ -3146,7 +3146,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 13,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 13,
       "slate_aware": true,
@@ -3341,13 +3341,13 @@
     "prediction": "PHI to win; PHI 27.0 \u2013 WAS 20.6 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "CBS Sports",
         "source_url": "https://www.cbssports.com/nfl/news/nfl-week-1-injuries-tracker-rome-odunze-alvin-kamara/",
         "title": "NFL Week 1 injuries: Giants' Malik Nabers, Bears' Rome Odunze listed as questionable"
       },
       {
-        "as_of": "2026-09-12T04:21:38.079605+00:00",
+        "as_of": "2026-09-12T17:37:46.998300+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
         "title": "NFL Week 1 injury report: Player statuses for all 16 games"
