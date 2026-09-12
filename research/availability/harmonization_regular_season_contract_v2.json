@@ -2,7 +2,7 @@
   "contract_version": 2,
   "contract_id": "V09B-AVAILABILITY-REGULAR-SEASON-HARMONIZATION-V2",
   "experiment_dependency": "V09B-AVAILABILITY-001",
-  "status": "preregistered_before_first_strict_v2_execution",
+  "status": "preregistered_before_first_strict_v2_season_metrics",
   "purpose": "Prove a leakage-safe 2022-2025 availability-state contract for the exact regular-season game universe consumed by LevLine before V09B may execute.",
   "amendment_record": [
     {
@@ -25,6 +25,19 @@
       "model_metrics_observed": false,
       "completed_2026_outcomes_consulted": false,
       "threshold_relaxation": false
+    },
+    {
+      "stage": "before_first_strict_v2_season_metrics",
+      "reason": "The first strict-v2 live attempt halted while validating the nflverse players identity asset, before any season official-page, identity, practice-agreement, chronology, or qualification metrics ran. The nflverse players release had been republished on 2026-09-12. Pin the exact current release asset and digest reported by the GitHub release API; identity remains alias-only and a candidate GSIS must still exist in the same historical season/week/team injury rows.",
+      "observed_failure_stage": "identity_asset_digest_validation",
+      "strict_v2_season_metrics_observed": false,
+      "model_metrics_observed": false,
+      "completed_2026_outcomes_consulted": false,
+      "threshold_relaxation": false,
+      "old_release_asset_id": 557226328,
+      "new_release_asset_id": 559182453,
+      "old_sha256": "6f896e1134757efe09761ae81280f89d9604d8ce611a888a56d9e7d49e80eeb9",
+      "new_sha256": "b2fd8b7a384d6fc521c1832dba93878435554f1a4c4800d571edaa4ddd309134"
     }
   ],
   "scope_basis": {
@@ -63,8 +76,9 @@
   "identity_source": {
     "source_id": "nflverse_players",
     "url": "https://github.com/nflverse/nflverse-data/releases/download/players/players.csv",
-    "release_asset_id": 557226328,
-    "expected_sha256": "6f896e1134757efe09761ae81280f89d9604d8ce611a888a56d9e7d49e80eeb9",
+    "release_asset_id": 559182453,
+    "release_updated_at_utc": "2026-09-12T11:52:49Z",
+    "expected_sha256": "b2fd8b7a384d6fc521c1832dba93878435554f1a4c4800d571edaa4ddd309134",
     "policy": "Exact normalized aliases only; candidate GSIS must already exist in the same season/week/team injury rows. No fuzzy matching, status, injury, position, current team, snaps, participation, game outcome, or 2026 information may choose identity."
   },
   "independent_crosscheck": {
@@ -88,7 +102,8 @@
     "filter": "season in 2022-2025 and game_type == REG, with preregistered model-universe exceptions excluded from the model-eligible linkage subset",
     "hash_columns": ["season", "week", "game_id", "gameday", "gametime", "home_team", "away_team", "game_type"],
     "expected_derived_subset_sha256": null,
-    "hash_policy": "Hash UTF-8 CSV with LF line endings, no index, sorted by season/week/game_id, over exactly hash_columns after the model-eligible filter. Qualification is audit-only until that derived subset hash is pinned."
+    "hash_policy": "Hash UTF-8 CSV with LF line endings, no index, sorted by season/week/game_id, over exactly hash_columns after the model-eligible filter.",
+    "pin_policy": "Qualification is audit-only until the observed derived subset hash from a successful strict collection pass is pinned."
   },
   "chronology": {
     "authority": "NFL Personnel (Injury) Report Policy filing day",
