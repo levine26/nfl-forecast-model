@@ -1,0 +1,177 @@
+name: Sunday Signal ChatGPT free ingestion
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/ingest_chatgpt_media_payloads.py"
+      - "tests/test_chatgpt_media_ingest.py"
+      - "inputs/chatgpt_media/**"
+      - ".github/workflows/chatgpt_media_ingest.yml"
+  push:
+    branches: [main]
+    paths:
+      - "inputs/chatgpt_media/current/**"
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: sunday-signal-chatgpt-ingestion
+  cancel-in-progress: true
+
+jobs:
+  validate-or-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install editorial environment
+        run: pip install ".[dev]"
+
+      - name: Test free-ingestion boundary
+        run: |
+          pytest -q tests/test_chatgpt_media_ingest.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          python -m py_compile scripts/ingest_chatgpt_media_payloads.py
+
+      - name: Enforce editorial-only ingestion wiring
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('scripts/ingest_chatgpt_media_payloads.py').read_text(encoding='utf-8')
+          required = (
+              'scripts/validate_single_copilot_game.py',
+              'scripts/merge_copilot_game_payloads.py',
+              'scripts/compose_copilot_media_reads.py',
+              'scripts/render_levline_paragraphs.py',
+              'scripts/validate_copilot_media_reads.py',
+              'F-ST-01-FROZEN-2026',
+              'live-web-search',
+          )
+          for marker in required:
+              assert marker in text, marker
+          forbidden = (
+              'run_model.py',
+              'train_model',
+              'market_probability',
+              'final_probability',
+              'grading.py',
+          )
+          for marker in forbidden:
+              assert marker not in text, marker
+          print('ChatGPT ingestion is constrained to the existing editorial validation boundary.')
+          PY
+
+      - name: Require a complete bundle for production ingestion
+        if: github.event_name != 'pull_request'
+        run: test -f inputs/chatgpt_media/current/manifest.json
+
+      - name: Validate contextual packet freshness
+        if: github.event_name != 'pull_request'
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          stamp = str(status.get('generated_utc') or '')
+          if not stamp:
+              raise SystemExit('context packet missing generated_utc')
+          generated = datetime.fromisoformat(stamp.replace('Z', '+00:00'))
+          age_hours = (datetime.now(timezone.utc) - generated.astimezone(timezone.utc)).total_seconds() / 3600.0
+          if age_hours < -0.1 or age_hours > 4.0:
+              raise SystemExit(f'context packet stale: age_hours={age_hours:.2f}')
+          required = ('evidence', 'injuries', 'media_reporting', 'editorial_intelligence', 'coaching', 'career_qb_verification')
+          unhealthy = {key: (status.get(key) or {}).get('status') for key in required if (status.get(key) or {}).get('status') != 'healthy'}
+          if unhealthy:
+              raise SystemExit(f'context packet not publication-grade: {unhealthy}')
+          print(f'context packet is fresh and healthy: age_hours={age_hours:.2f}')
+          PY
+
+      - name: Canonicalize editorial forecast source
+        if: github.event_name != 'pull_request' || hashFiles('inputs/chatgpt_media/current/manifest.json') != ''
+        run: |
+          python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
+          cp /tmp/editorial_predictions.csv outputs/this_week.csv
+
+      - name: Refresh deterministic reporting packet
+        if: github.event_name != 'pull_request' || hashFiles('inputs/chatgpt_media/current/manifest.json') != ''
+        run: python scripts/finalize_editorial.py --skip-copilot
+
+      - name: Validate complete ChatGPT bundle on pull request
+        if: github.event_name == 'pull_request' && hashFiles('inputs/chatgpt_media/current/manifest.json') != ''
+        run: |
+          python scripts/ingest_chatgpt_media_payloads.py --input-dir inputs/chatgpt_media/current --output /tmp/chatgpt-media-pr.json
+          echo "Complete ChatGPT bundle passed focused, merge, composition, rationale, source, uniqueness, and full-slate gates."
+
+      - name: Ingest complete ChatGPT bundle
+        if: github.event_name != 'pull_request'
+        run: |
+          rm -f outputs/copilot_media_reads.json
+          python scripts/ingest_chatgpt_media_payloads.py --input-dir inputs/chatgpt_media/current --output outputs/copilot_media_reads.json
+          echo "All ChatGPT-ingested responses passed the LevLine 3.0 full-slate publication validator."
+
+      - name: Reconcile candidate with latest main snapshot
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "Main advanced during ChatGPT ingestion; auditing whether only market-owned outputs changed."
+            changed_main_files=$(git diff --name-only HEAD..origin/main)
+            printf '%s\n' "$changed_main_files"
+            unexpected_main_changes=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(outputs/this_week\.csv|outputs/run_history\.csv|outputs/status\.json|outputs/market_t120_research\.csv)$' || true)
+            if [ -n "$unexpected_main_changes" ]; then
+              echo "Main advanced in non-market files; refusing stale ingested research:"
+              printf '%s\n' "$unexpected_main_changes"
+              exit 1
+            fi
+            echo "Only market-owned outputs advanced; rebuilding and revalidating on latest main."
+            git reset --hard origin/main
+            python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
+            cp /tmp/editorial_predictions.csv outputs/this_week.csv
+            python scripts/finalize_editorial.py --skip-copilot
+            python scripts/ingest_chatgpt_media_payloads.py --input-dir inputs/chatgpt_media/current --output outputs/copilot_media_reads.json
+          fi
+
+      - name: Finalize and enforce full-slate launch gate
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/finalize_editorial.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
+          media = status.get('media_reporting', {})
+          provider = status.get('copilot_media', {})
+          finalizer = status.get('editorial_finalizer', {})
+          games = int(finalizer.get('games', 0))
+          if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
+              raise SystemExit(f'media reporting not launch-grade: {media}')
+          if provider.get('status') != 'healthy' or int(provider.get('games_applied', 0)) != games:
+              raise SystemExit(f'ingested editorial payload did not cover full slate: {provider}')
+          if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
+              raise SystemExit(f'final editorial gate failed: {finalizer}')
+          print('ChatGPT ingestion matchup/model/pick launch gate passed:', games, 'games')
+          PY
+
+      - name: Publish editorial-only outputs
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git config user.name "sunday-signal-media-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/context_source_status.json
+          if git diff --cached --quiet; then echo "No media editorial changes to publish."; exit 0; fi
+          git commit -m "Refresh ChatGPT-ingested Sunday Signal Reads"
+          git pull --rebase origin main
+          git push origin HEAD:main
