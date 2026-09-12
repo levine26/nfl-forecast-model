@@ -1,0 +1,123 @@
+{
+  "program_id": "LEVLINE-4-RESEARCH-V1",
+  "status": "preregistered_research_only",
+  "target_season": 2026,
+  "production_authorized": false,
+  "production_behavior_must_remain_unchanged": true,
+  "objective": "Maximize honest pregame win-probability quality using point-in-time information while preserving calibration, auditability, efficiency, and rollback safety.",
+  "incumbent": {
+    "candidate_id": "F-ST-01-FROZEN-2026",
+    "official_lock_horizon_minutes": 120,
+    "role": "immutable production and accountability benchmark",
+    "mutation_allowed": false
+  },
+  "research_clocks": {
+    "accountability_lock": "T-120m",
+    "official_inactive_information_event": "approximately T-90m",
+    "final_candidate_horizons": ["T-60m", "T-45m", "T-30m"],
+    "horizon_selection_rule": "No horizon is preferred based on 2026 outcomes until the preregistered prospective evidence gate is satisfied. Compare candidates only on genuinely captured point-in-time snapshots from the same games."
+  },
+  "primary_hypothesis": "A late multi-book market prior captured after official inactive information, optionally corrected by strictly point-in-time player/lineup information, can improve final pregame probability quality relative to the frozen T-120 incumbent without materially degrading same-horizon market calibration.",
+  "design_principles": [
+    "Treat the betting market as the primary prior and strongest public benchmark.",
+    "A proprietary correction receives weight only if it adds prospective information beyond the same-horizon market.",
+    "If raw late multi-book market consensus remains best on proper scoring, it is an acceptable LevLine 4 probability backbone.",
+    "Never manufacture historical T-minus snapshots from closing odds, retrospective inactive status, or post-kickoff data.",
+    "Use proper scoring rules and calibration as the primary evaluation framework; winner accuracy is secondary.",
+    "Keep every research candidate independently removable and fail closed on source, identity, or timestamp uncertainty."
+  ],
+  "candidate_families": [
+    {
+      "id": "L4-MKT-H",
+      "name": "same-horizon multi-book market consensus",
+      "inputs": ["book-level h2h odds", "book timestamps/freshness", "source count", "cross-book probability dispersion"],
+      "probability_construction": "de-vig each eligible book, then form a robust consensus such as median logit probability",
+      "required_ablations": ["basic proportional de-vig", "Shin de-vig where numerically valid", "power de-vig where numerically valid", "single-source versus multi-book consensus"],
+      "notes": "No de-vig method is promoted solely from non-NFL literature; same-horizon NFL evidence controls."
+    },
+    {
+      "id": "L4-FST-H",
+      "name": "frozen F-ST structural transform with same-horizon market",
+      "inputs": ["same-horizon market consensus", "unchanged frozen nested PURE signal"],
+      "coefficient_policy": "Use registered F-ST coefficient literals unchanged for shadow scoring only. Do not refit from 2026 outcomes.",
+      "notes": "This tests the value of the frozen transformation at later information horizons; historical closing-market evidence is not treated as a matched-horizon backtest."
+    },
+    {
+      "id": "L4-PLAYER-OFFSET",
+      "name": "market-offset player and expected-lineup correction",
+      "form": "logit(p_final) = logit(p_same_horizon_market) + delta_player",
+      "units": ["QB", "skill", "OL", "pass_rush", "run_defense", "secondary"],
+      "inputs": ["official inactive state available by forecast time", "expected role share", "modeled player value", "replacement value", "lineup value lost/gained", "replacement burden", "unit uncertainty", "identity and source receipts"],
+      "restrictions": ["no same-game actual snaps", "no post-kickoff participation", "no retrospective inactive status learned after the forecast horizon", "no postgame player value", "no manually tuned player point adjustments from 2026 outcomes"],
+      "notes": "After T-90, availability should use contemporaneous official inactive information where available; uncertainty remains primarily in role/performance rather than binary active status."
+    },
+    {
+      "id": "L4-CAL",
+      "name": "calibration candidates",
+      "methods": ["identity", "beta_calibration", "isotonic_only_when_sample_gate_is_met"],
+      "fit_policy": "Calibration maps must be fit on chronologically prior out-of-sample predictions only. No candidate may be fit and evaluated on the same 2026 outcomes.",
+      "notes": "Identity is always retained because calibration can worsen an already well-calibrated market."
+    },
+    {
+      "id": "L4-WEATHER",
+      "name": "late weather/venue ablation",
+      "role": "secondary research lane",
+      "inputs": ["point-in-time forecast weather", "venue coordinates", "roof/wall status if contemporaneously known"],
+      "notes": "Promote into winner probability only if it adds same-horizon Brier information beyond the market; otherwise retain for margin/total/explanation."
+    }
+  ],
+  "explicit_noncore_lanes": [
+    {
+      "name": "dynamic latent team strength",
+      "reason": "existing LevLine candidate did not improve the registered OOS gate; no presumption of core inclusion"
+    },
+    {
+      "name": "joint score distribution",
+      "reason": "existing coherent score-distribution candidate improved winner accuracy but worsened Brier and margin MAE; retain only as independent research"
+    },
+    {
+      "name": "large deep neural network",
+      "reason": "not justified by current game-level sample size or tabular evidence; reconsider only with materially richer tracking-scale data"
+    }
+  ],
+  "evaluation": {
+    "primary_metric": "brier",
+    "secondary_metrics": ["log_loss", "winner_accuracy", "calibration_intercept", "calibration_slope", "reliability_table", "sharpness", "same_horizon_market_delta"],
+    "uncertainty": ["paired week-block bootstrap", "leave-one-week-out recomputation", "paired same-game horizon comparison"],
+    "diagnostic_slices": ["QB status change", "major lineup value loss", "pre-to-post-inactive market move", "cross-book dispersion", "large model-market disagreement", "weather extremes", "favorite_probability_bucket"],
+    "slice_policy": "Diagnostic slices may explain performance but cannot rescue a failed aggregate primary-metric gate."
+  },
+  "prospective_evidence_gate": {
+    "minimum_eligible_graded_games": 200,
+    "minimum_distinct_nfl_weeks": 14,
+    "horizon_comparison": "Candidate horizons must be compared on the intersection of games with valid snapshots at all horizons being compared.",
+    "promotion_vs_incumbent": "Candidate minus frozen T-120 F-ST Brier must be negative and the 95% paired week-block bootstrap upper bound must be below 0.",
+    "same_horizon_market_gate": "For a model-adjusted candidate to claim incremental model value, candidate minus same-horizon raw market-consensus Brier must be negative with corroborating calibration/log-loss evidence. If no adjustment clears this gate, raw same-horizon market consensus may remain the probability backbone.",
+    "stability_gate": "Aggregate advantage must not reverse materially under leave-one-week-out evaluation, and no isolated week may account for the claimed advantage.",
+    "automatic_promotion": false,
+    "explicit_authorization_required": true
+  },
+  "data_integrity": {
+    "point_in_time_required": true,
+    "timestamp_receipts_required": true,
+    "source_identity_receipts_required": true,
+    "missing_or_ambiguous_player_identity_policy": "fail_closed",
+    "post_kickoff_information_allowed": false,
+    "retrospective_horizon_reconstruction_allowed": false,
+    "2026_outcome_use": "evaluation_only_for_frozen_preregistered_candidates; never use completed 2026 outcomes to rescue, retune, select thresholds, add interactions, or redefine a candidate during its active evaluation"
+  },
+  "publication_contract_if_promoted": {
+    "preserve_t120_accountability_history": true,
+    "late_final_probability_must_have_distinct_timestamp_and_horizon": true,
+    "do_not_rewrite_prior_official_locks": true,
+    "display_market_and_model_provenance": true,
+    "keep_editorial_generation_separate_from_probability_selection": true
+  },
+  "scientific_basis": [
+    "Song, Boulier & Stekler (2007), International Journal of Forecasting: NFL betting line outperformed statistical systems and experts in their sample.",
+    "Strumbelj (2014), International Journal of Forecasting: de-vig method and bookmaker identity can materially affect odds-derived probability forecasts.",
+    "Glickman & Stern (1998), JASA: dynamic state-space modeling of NFL team strength is statistically coherent, but LevLine requires its own OOS evidence before reuse.",
+    "Kull, Silva Filho & Flach (2017), AISTATS: beta calibration can avoid pathologies of logistic calibration and is appropriate as an explicit candidate rather than an assumption.",
+    "Timmermann (2006) and subsequent forecast-combination literature: estimation error can make flexible optimal weights inferior to simple or shrunken combinations."
+  ]
+}
