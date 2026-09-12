@@ -119,22 +119,45 @@ def test_underlength_rationale_repair_is_narrow_matchup_specific_and_contract_sa
     assert 18 <= len(module._words(repaired)) <= 40
     assert "Bengals" in repaired
     assert "Buccaneers" in repaired
+    assert rationale.rstrip(".") in repaired
     assert not module._rationale_has_prohibited(repaired)
 
 
-def test_rationale_repair_refuses_too_short_or_prohibited_copy():
+def test_too_short_clean_fragment_is_rebuilt_from_researched_mechanism():
+    row = pd.Series({"away_team": "CHI", "home_team": "CAR", "pick": "CHI"})
+    rationale = "Chicago must protect its quarterback."
+    paragraph1 = (
+        "The Bears protection plan has to withstand Panthers pressure, especially when "
+        "Carolina can force longer downs and let its pass rush attack the pocket."
+    )
+    repaired, changed = module._repair_underlength_rationale(rationale, paragraph1, row)
+    assert changed
+    assert 18 <= len(module._words(repaired)) <= 40
+    assert "Bears" in repaired
+    assert "Panthers" in repaired
+    assert repaired != rationale
+    assert not module._rationale_has_prohibited(repaired)
+
+
+def test_rationale_repair_refuses_one_to_three_words_prohibited_or_unrecognized_copy():
     row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
-    paragraph1 = "The Bengals pressure Tampa Bay while the Buccaneers adjust their protection."
+    pressure_paragraph = "The Bengals pressure Tampa Bay while the Buccaneers adjust their protection."
 
-    too_short = "Cincinnati needs pressure to win."
-    repaired, changed = module._repair_underlength_rationale(too_short, paragraph1, row)
+    too_small = "Pressure matters."
+    repaired, changed = module._repair_underlength_rationale(too_small, pressure_paragraph, row)
     assert not changed
-    assert repaired == too_short
+    assert repaired == too_small
 
-    prohibited = "Cincinnati has a market edge if its pressure plan works against Tampa Bay."
-    repaired, changed = module._repair_underlength_rationale(prohibited, paragraph1, row)
+    prohibited = "Cincinnati has a market edge if pressure works."
+    repaired, changed = module._repair_underlength_rationale(prohibited, pressure_paragraph, row)
     assert not changed
     assert repaired == prohibited
+
+    no_mechanism = "Cincinnati needs a sharper start."
+    neutral_paragraph = "The Bengals and Buccaneers each need cleaner execution for four quarters."
+    repaired, changed = module._repair_underlength_rationale(no_mechanism, neutral_paragraph, row)
+    assert not changed
+    assert repaired == no_mechanism
 
 
 def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path):
@@ -180,6 +203,50 @@ def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path
     assert "Bengals" in repaired and "Buccaneers" in repaired
     assert not module._rationale_has_prohibited(repaired)
     assert [source["name"] for source in saved["sources"]] == ["ESPN", "NFL.com"]
+
+
+def test_validate_persists_rebuilt_too_short_rationale(tmp_path):
+    gid = "2026_01_CHI_CAR"
+    paragraph1 = (
+        "Chicago needs its protection to handle Carolina pressure without letting obvious passing downs dictate the game. "
+        "The Bears can help with quick throws and movement, while the Panthers need their front to collapse the pocket before routes develop. "
+        "If Carolina cannot create that pressure, Chicago can stay balanced and make the Panthers defend the entire field instead of attacking predictable dropbacks."
+    )
+    payload = {
+        "games": {
+            gid: {
+                "headline": "Bears protection faces Panthers pressure test",
+                "paragraph1": paragraph1,
+                "model_rationale": "Chicago must protect its quarterback.",
+                "sources": [
+                    {
+                        "name": "CBS Sports",
+                        "title": "Bears Panthers matchup report",
+                        "url": "https://www.cbssports.com/nfl/news/bears-panthers-matchup-report/",
+                    },
+                    {
+                        "name": "Panthers",
+                        "title": "Panthers prepare for Chicago",
+                        "url": "https://www.panthers.com/news/panthers-prepare-for-chicago",
+                    },
+                ],
+            }
+        }
+    }
+    path = tmp_path / f"{gid}.txt"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    predictions = pd.DataFrame([
+        {"game_id": gid, "away_team": "CHI", "home_team": "CAR", "pick": "CHI"}
+    ])
+
+    failures = module.validate(path, gid, predictions)
+    assert not failures
+    saved = json.loads(path.read_text(encoding="utf-8"))["games"][gid]
+    repaired = saved["model_rationale"]
+    assert 18 <= len(module._words(repaired)) <= 40
+    assert "Bears" in repaired and "Panthers" in repaired
+    assert repaired != "Chicago must protect its quarterback."
+    assert not module._rationale_has_prohibited(repaired)
 
 
 def test_source_gate_rejects_generic_team_schedule_game_and_stats_pages():
