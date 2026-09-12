@@ -97,18 +97,28 @@ jobs:
             if [ "$state" != "missing" ]; then context_seen=1; break; fi
             sleep 5
           done
-          if [ "$context_seen" -ne 1 ]; then
-            echo "Matching contextual-intelligence run was not discovered; refusing to research against stale context."
-            exit 1
+
+          if [ "$context_seen" -eq 1 ]; then
+            for attempt in $(seq 1 40); do
+              state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
+              echo "context run: $state"
+              if [ "$state" = "completed:success" ]; then break; fi
+              if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then echo "Context refresh failed; refusing stale media research."; exit 1; fi
+              if [ "$attempt" -eq 40 ]; then echo "Timed out waiting for matching context refresh."; exit 1; fi
+              sleep 15
+            done
+          else
+            echo "No matching context run was triggered; validating inherited context for this provider-only push."
+            latest_context_sha=$(gh run list --workflow "Sunday Signal contextual intelligence" --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // ""' 2>/dev/null || true)
+            test -n "$latest_context_sha" || { echo "No successful contextual-intelligence run is available; failing closed."; exit 1; }
+            git fetch --deepen=100 origin main
+            if ! git merge-base --is-ancestor "$latest_context_sha" "$GITHUB_SHA"; then
+              echo "Latest successful contextual-intelligence run is not an ancestor of this push; failing closed."
+              exit 1
+            fi
+            echo "Provider-only push inherits latest successful contextual intelligence from $latest_context_sha."
           fi
-          for attempt in $(seq 1 40); do
-            state=$(gh run list --workflow "Sunday Signal contextual intelligence" --commit "$GITHUB_SHA" --limit 1 --json status,conclusion --jq 'if length == 0 then "missing" else .[0].status + ":" + (.[0].conclusion // "") end' 2>/dev/null || echo missing)
-            echo "context run: $state"
-            if [ "$state" = "completed:success" ]; then break; fi
-            if [[ "$state" == completed:* ]] && [ "$state" != "completed:success" ]; then echo "Context refresh failed; refusing stale media research."; exit 1; fi
-            if [ "$attempt" -eq 40 ]; then echo "Timed out waiting for matching context refresh."; exit 1; fi
-            sleep 15
-          done
+
           git fetch origin main
           git reset --hard origin/main
 
@@ -117,6 +127,29 @@ jobs:
         run: |
           git fetch origin main
           git reset --hard origin/main
+
+      - name: Validate contextual packet freshness
+        if: github.event_name != 'pull_request'
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          stamp = str(status.get('generated_utc') or '')
+          if not stamp:
+              raise SystemExit('context packet missing generated_utc')
+          generated = datetime.fromisoformat(stamp.replace('Z', '+00:00'))
+          age_hours = (datetime.now(timezone.utc) - generated.astimezone(timezone.utc)).total_seconds() / 3600.0
+          if age_hours < -0.1 or age_hours > 4.0:
+              raise SystemExit(f'context packet stale: age_hours={age_hours:.2f}')
+          required = ('evidence', 'injuries', 'media_reporting', 'editorial_intelligence', 'coaching', 'career_qb_verification')
+          unhealthy = {key: (status.get(key) or {}).get('status') for key in required if (status.get(key) or {}).get('status') != 'healthy'}
+          if unhealthy:
+              raise SystemExit(f'context packet not publication-grade: {unhealthy}')
+          print(f'context packet is fresh and healthy: age_hours={age_hours:.2f}')
+          PY
 
       - uses: actions/setup-python@v5
         with:
@@ -209,9 +242,10 @@ jobs:
           assert 'executed_tools' in runner and 'web_search' in runner and 'visit_website' in runner
           assert 'retry-after' in runner and 'x-ratelimit-remaining-tokens' in runner
           assert 'transport/rate-limit retries exhausted' in text
-          assert 'refusing to research against stale context' in text
+          assert 'inherits latest successful contextual intelligence' in text
+          assert 'context packet stale' in text
           assert 'unexpected_main_changes' in text
-          print('Groq provider migration, rate-limit handling, freshness, and web-research wiring validated without consuming repository secrets on PR.')
+          print('Groq provider migration, rate-limit handling, context freshness, and web-research wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
