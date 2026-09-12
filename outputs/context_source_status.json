@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-11T18:33:01.591523+00:00",
+    "as_of": "2026-09-12T00:07:35.218255+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-11T18:33:07.064681+00:00",
+    "as_of": "2026-09-12T00:07:38.534005+00:00",
     "conflicts": 0,
     "evidence_items_added": 24,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 24
   },
   "coaching": {
-    "as_of": "2026-09-11T18:31:04.595423+00:00",
+    "as_of": "2026-09-12T00:06:42.391173+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 28,
     "negative_cache_ttl_minutes": 60,
@@ -137,7 +137,7 @@
     "unique_headlines": 14
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-11T18:32:52.525620+00:00",
+    "as_of": "2026-09-12T00:07:26.377688+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -158,9 +158,9 @@
   },
   "evidence": {
     "games": 14,
-    "generated_utc": "2026-09-11T18:31:03.976612+00:00",
+    "generated_utc": "2026-09-12T00:06:42.120036+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 183,
+    "signals": 188,
     "status": "healthy"
   },
   "ftn": {
@@ -173,22 +173,22 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-11T18:31:03.976612+00:00",
+  "generated_utc": "2026-09-12T00:06:42.120036+00:00",
   "injuries": {
-    "as_of": "2026-09-11T18:31:04.296525+00:00",
-    "players": 169,
+    "as_of": "2026-09-12T00:06:42.244394+00:00",
+    "players": 182,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
     "status": "healthy",
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-11T18:33:15.920403+00:00",
+    "as_of": "2026-09-12T00:07:43.658704+00:00",
     "cross_game_titles_rejected": 0,
     "games": 14,
-    "games_with_display_reporting": 14,
+    "games_with_display_reporting": 13,
     "games_with_reporting": 14,
-    "games_with_substantive_reporting": 13,
+    "games_with_substantive_reporting": 12,
     "games_with_trusted_reporting": 14,
     "generic_titles_rejected": 15,
     "providers": {
@@ -207,7 +207,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-11T18:33:05.999698+00:00",
+    "as_of": "2026-09-12T00:07:37.725933+00:00",
     "evidence_items_added": 23,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 23,
@@ -229,10 +229,10 @@
   },
   "personnel_usage": {
     "ambiguous_player_keys_discarded": 2,
-    "eligible_skill_injuries": 44,
-    "evidence_items_enriched": 4,
+    "eligible_skill_injuries": 46,
+    "evidence_items_enriched": 9,
     "guardrail": "Prior usage clarifies role importance but is not converted into an unvalidated point-value injury adjustment; ambiguous abbreviated-name matches are discarded.",
-    "matched_injured_players": 22,
+    "matched_injured_players": 23,
     "season": 2025,
     "source": "NFL.com official injury report + nflverse PBP usage",
     "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
@@ -280,7 +280,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-11T18:31:07.628056+00:00",
+    "as_of": "2026-09-12T00:06:45.069516+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -313,7 +313,7 @@
     "story_items_added": 14
   },
   "weather": {
-    "as_of": "2026-09-11T18:32:38.976823+00:00",
+    "as_of": "2026-09-12T00:07:12.821616+00:00",
     "games_checked": 10,
     "status": "degraded"
   }
