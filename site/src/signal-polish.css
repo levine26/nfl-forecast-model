@@ -57,6 +57,26 @@
   letter-spacing: .02em;
 }
 
+/* Enhanced The Signal is a full-width editorial card. It intentionally keeps the
+   legacy .ss-the-signal class for ordering/semantics, but must not inherit that
+   component's 46px + 1fr two-column grid. Without this override, each direct child
+   auto-places into alternating columns, compressing entire paragraphs into a 46px rail. */
+.ss-plus-signal.ss-the-signal {
+  display: block;
+  grid-template-columns: none;
+  gap: 0;
+}
+
+.ss-plus-signal > .ss-plus-signal-head,
+.ss-plus-signal > h2,
+.ss-plus-signal > p,
+.ss-plus-signal > .ss-plus-what-matters,
+.ss-plus-signal > .ss-plus-sources,
+.ss-plus-signal > .ss-plus-guardrail {
+  width: 100%;
+  min-width: 0;
+}
+
 @media (max-width: 768px) {
   /* Keep the swipeable Top Signals rail self-contained instead of widening the document. */
   .ss-plus-top-signals {
