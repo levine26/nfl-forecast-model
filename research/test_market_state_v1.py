@@ -52,6 +52,30 @@ def _row(
     }
 
 
+def _book(
+    horizon: str,
+    book: str,
+    probability: float,
+    *,
+    request: str | None = None,
+    timing_error: float = 0.0,
+) -> dict:
+    row = _row(
+        horizon,
+        probability,
+        request=request,
+        timing_error=timing_error,
+        row_type="book",
+    )
+    row["sportsbook_key"] = book
+    row["sportsbook_title"] = book.upper()
+    row.pop("source_count", None)
+    row.pop("source_names", None)
+    row.pop("max_freshness_minutes", None)
+    row.pop("probability_range", None)
+    return row
+
+
 def test_market_state_derives_four_horizon_movement_without_outcomes() -> None:
     rows = [
         _row("T-120m", 0.55, spread=-2.5, total=45.5, probability_range=0.06),
@@ -80,6 +104,7 @@ def test_market_state_derives_four_horizon_movement_without_outcomes() -> None:
     assert state["production_authorized"] is False
     assert audit["games_with_all_four_horizons"] == 1
     assert audit["strict_no_later_than_cutoff"] is True
+    assert audit["book_microstructure_features"] is True
     assert audit["completed_2026_outcomes_used"] == 0
 
 
@@ -107,6 +132,46 @@ def test_request_timestamp_after_target_fails_closed_even_if_timing_field_claims
         _row("T-45m", 0.62, timing_error=-1.0, request="2026-09-13T19:41:00+00:00"),
     ]
     assert select_consensus_horizons(rows) == {}
+
+
+def test_book_breadth_pairs_same_books_from_selected_requests_only() -> None:
+    rows = [
+        _row("T-120m", 0.50),
+        _row("T-45m", 0.54),
+        _book("T-120m", "a", 0.49),
+        _book("T-120m", "b", 0.50),
+        _book("T-120m", "c", 0.51),
+        _book("T-45m", "a", 0.52),
+        _book("T-45m", "b", 0.51),
+        _book("T-45m", "c", 0.50),
+        _book("T-45m", "d", 0.60),
+        # This retry is not the selected T-45 consensus request and must not affect breadth.
+        _book("T-45m", "a", 0.90, request="2026-09-13T19:39:00+00:00", timing_error=-1.0),
+    ]
+    states, audit = build_market_state(rows)
+    state = states[0]
+    assert state["book_common_count_t45_minus_t120"] == 3
+    assert state["book_overlap_fraction_t45_minus_t120"] == pytest.approx(0.75)
+    assert state["book_home_move_share_t45_minus_t120"] == pytest.approx(2 / 3)
+    assert state["book_away_move_share_t45_minus_t120"] == pytest.approx(1 / 3)
+    assert state["book_unchanged_share_t45_minus_t120"] == 0.0
+    assert state["book_movement_breadth_t45_minus_t120"] == pytest.approx(1 / 3)
+    assert state["book_median_probability_change_pp_t45_minus_t120"] == pytest.approx(1.0)
+    assert state["book_median_logit_change_t45_minus_t120"] > 0
+    assert audit["book_pairing_policy"] == "same_sportsbook_exact_selected_consensus_request_only"
+
+
+def test_post_cutoff_book_cannot_enter_microstructure() -> None:
+    rows = [
+        _row("T-120m", 0.50),
+        _row("T-45m", 0.54),
+        _book("T-120m", "a", 0.49),
+        _book("T-45m", "a", 0.60, request="2026-09-13T19:41:00+00:00", timing_error=1.0),
+    ]
+    states, _ = build_market_state(rows)
+    state = states[0]
+    assert state["book_common_count_t45_minus_t120"] == 0
+    assert state["book_movement_breadth_t45_minus_t120"] is None
 
 
 def test_nonqualifying_rows_cannot_close_or_influence_state() -> None:
