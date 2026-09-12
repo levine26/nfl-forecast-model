@@ -10,7 +10,7 @@ on:
       - '.github/workflows/research_venue_resolution_v1.yml'
   workflow_dispatch:
   schedule:
-    - cron: '17 12 * * 1'
+    - cron: '17 12 * * *'
 
 jobs:
   test:
