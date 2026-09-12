@@ -1,0 +1,80 @@
+{
+  "contract_id": "LEVLINE4-SELECTIVE-UPSET-MONITOR-V1",
+  "status": "prospective_research_monitor_not_model_candidate",
+  "effective_date": "2026-09-12",
+  "production_model_preserved": "F-ST-01-FROZEN-2026",
+  "production_changed": false,
+  "primary_objective": "straight_up_winner_accuracy",
+  "incumbent_pick": "frozen T-120 F-ST winner",
+  "prospective_sample_start": "first eligible game whose T-120 research lock occurs after this contract is merged to main",
+  "pre_contract_2026_games": "audit-only; excluded from candidate fitting and promotion evidence",
+  "core_estimand": "On games where a later challenger would switch the frozen F-ST winner, does the challenger win more switches than it loses?",
+  "required_capture": {
+    "football_components": [
+      "logistic probability",
+      "extra_trees probability",
+      "xgboost probability",
+      "catboost probability",
+      "component vote count",
+      "component dispersion",
+      "component-vs-market residual"
+    ],
+    "market_path": [
+      "strict-PIT T-120 consensus",
+      "strict-PIT T-60 consensus",
+      "strict-PIT T-45 consensus",
+      "strict-PIT T-30 consensus",
+      "book-level movement direction",
+      "book-level movement breadth",
+      "cross-book dispersion",
+      "quote age/source count"
+    ],
+    "reputation": [
+      "preseason Super Bowl odds/rank",
+      "preseason win total when sourced"
+    ],
+    "player_state": [
+      "official timestamped status only after source qualification",
+      "role-weighted shock only after model authorization",
+      "time since official observation"
+    ],
+    "schedule_context": [
+      "rest differential",
+      "short-week flag",
+      "international venue",
+      "time zones crossed",
+      "travel direction",
+      "local kickoff/body-clock offset where reproducibly derivable"
+    ]
+  },
+  "interpretation_rules": {
+    "fixed_75_25_weight_authorized": false,
+    "generic_pure_override_authorized": false,
+    "generic_super_team_fade_authorized": false,
+    "football_unanimity_alone_authorized": false,
+    "reputation_alone_authorized": false,
+    "principle": "A switch should require evidence from more than one information channel. Historical football disagreement is retained as one channel; contemporaneous market/news/context evidence supplies orthogonal corroboration."
+  },
+  "prospective_diagnostics": [
+    "incumbent winner accuracy",
+    "raw later-market winner accuracy at each horizon",
+    "component-resolved challenger accuracy",
+    "disagreement count/rate",
+    "challenger-only-correct count",
+    "incumbent-only-correct count",
+    "switch win rate",
+    "week-block paired accuracy uncertainty",
+    "Brier/log-loss secondary diagnostics",
+    "results stratified descriptively by reputation, player-news, market-move, and travel/rest flags without post-hoc promotion"
+  ],
+  "candidate_creation_rule": "This monitor may reveal a candidate hypothesis, but no subgroup or threshold becomes a model from this same evaluation sample. A future switch rule requires a new candidate ID, frozen coefficients/logic, and fresh prospective evaluation start or genuinely prior training data.",
+  "research_firewall": {
+    "completed_2026_outcomes_used_to_define_current_rule": 0,
+    "no_post_result_threshold_search": true,
+    "no_team_identity_superteam_list": true,
+    "no_post_kickoff_information": true,
+    "strict_horizon_cutoff_required": true,
+    "automatic_promotion": false,
+    "explicit_authorization_required": true
+  }
+}
