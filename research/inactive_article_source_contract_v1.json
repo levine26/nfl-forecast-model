@@ -1,0 +1,44 @@
+{
+  "archive_id": "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
+  "status": "PROSPECTIVE_RAW_SOURCE_CAPTURE_ONLY",
+  "season": 2026,
+  "purpose": [
+    "preserve point-in-time NFL News discovery evidence around the official game-day inactive release",
+    "preserve raw official NFL inactives article bytes before kickoff when such articles are discoverable",
+    "support later source and parser qualification without retrospective web reconstruction"
+  ],
+  "source_policy": {
+    "news_index": "https://www.nfl.com/news/",
+    "article_origin": "https://www.nfl.com/news/",
+    "article_discovery_signal": "anchor text or NFL news URL contains inactive",
+    "maximum_article_urls_per_capture": 20,
+    "generic_inactives_landing_page_is_authoritative_player_feed": false
+  },
+  "capture_policy": {
+    "eligible_window_minutes_to_kickoff": [20, 100],
+    "cadence": "every_5_minutes_when_any_game_is_in_window",
+    "raw_source_storage": "content_addressed_original_http_body_gzip",
+    "observation_log": "append_only_jsonl",
+    "capture_news_index_even_when_no_article_is_discovered": true,
+    "preserve_http_error_bodies_when_available": true
+  },
+  "parser_policy": {
+    "player_level_parser_qualified": false,
+    "player_level_probability_feature_authorized": false,
+    "qualification_required_before_player_parsing": true,
+    "qualification_must_verify": [
+      "correct matchup identity",
+      "publication timestamp chronology",
+      "stable team and player extraction",
+      "emergency-third-QB semantics",
+      "no post-kickoff or retrospective source substitution"
+    ]
+  },
+  "research_firewall": {
+    "completed_2026_outcomes_used": 0,
+    "probability_feature_authorized": false,
+    "production_authorized": false,
+    "production_forecast_dependency": false,
+    "sunday_signal_dependency": false
+  }
+}
