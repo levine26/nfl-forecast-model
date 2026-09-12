@@ -1,5 +1,8 @@
 # Market blend research — Sunday Signal / LevLine
 
+> **Archived historical research record — not current production policy.**  
+> This document predates the LevLine 3.0 F-ST release and preserves the original market-blend research rationale. Current production is `F-ST-01-FROZEN-2026`; it is **not** a fixed 75% PURE / 25% MARKET arithmetic blend. The current production contract is `docs/LEVLINE_3_RELEASE.md`, and the active forward research program is `research/LEVLINE_4_RESEARCH_SPEC.md` plus `research/levline4_prereg_v1.json`. Fixed-blend language below is retained only to document the historical baseline that later research replaced.
+
 ## Purpose
 
 LevLine should use the betting market as an external information source without becoming a market clone. The market is unusually strong in the NFL because it aggregates injuries, quarterback news, weather, matchup opinions and professional trading. The right question is therefore not whether to use the market, but how to measure whether PURE adds information that survives after the market is known, and how aggressively to regress toward the market without erasing real independent signal.
