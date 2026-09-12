@@ -1,4 +1,17 @@
 /* Final presentation-only overrides after visual QA against the supplied mockup. */
+@media (max-width: 768px) {
+  /* Keep the swipeable Top Signals rail self-contained instead of widening the document. */
+  .ss-plus-top-signals {
+    overflow: hidden;
+  }
+
+  .ss-plus-top-grid {
+    max-width: 100%;
+    margin-right: 0;
+    padding-right: 0;
+  }
+}
+
 @media (max-width: 520px) {
   .ss-board-hero {
     min-height: 286px;
