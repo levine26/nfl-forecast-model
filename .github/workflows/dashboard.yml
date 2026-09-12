@@ -10,6 +10,8 @@ on:
       - 'src/nfl_forecast/player_impact_monitor.py'
       - 'scripts/build_public_forecasts.py'
       - 'scripts/build_public_impact_monitor.py'
+      - 'scripts/build_site_history_compat.py'
+      - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
   pull_request:
     paths:
@@ -18,6 +20,8 @@ on:
       - 'src/nfl_forecast/player_impact_monitor.py'
       - 'scripts/build_public_forecasts.py'
       - 'scripts/build_public_impact_monitor.py'
+      - 'scripts/build_site_history_compat.py'
+      - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
   workflow_run:
     workflows:
@@ -60,7 +64,7 @@ jobs:
       - name: Install Python package
         run: pip install '.[dev]'
       - name: Validate public Impact Monitor contract
-        run: python -m pytest -q tests/test_public_impact_monitor.py tests/test_player_impact_monitor.py
+        run: python -m pytest -q tests/test_public_impact_monitor.py tests/test_player_impact_monitor.py tests/test_site_history_compat.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -76,6 +80,8 @@ jobs:
             power_editorial.json history_scoreboard.json; do
             if [ -f "outputs/$f" ]; then cp "outputs/$f" "site/public/data/$f"; fi
           done
+      - name: Normalize immutable history for Sunday Signal
+        run: python scripts/build_site_history_compat.py site/public/data/prediction_history.csv
       - name: Build and validate canonical public forecasts
         run: python scripts/build_public_forecasts.py --output site/public/data/public_forecasts.json
       - name: Build fail-closed public Impact Monitor
