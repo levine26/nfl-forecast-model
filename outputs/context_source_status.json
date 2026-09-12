@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-12T15:26:40.161622+00:00",
+    "as_of": "2026-09-12T16:25:13.433940+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-12T15:26:44.949745+00:00",
+    "as_of": "2026-09-12T16:25:17.056443+00:00",
     "conflicts": 0,
     "evidence_items_added": 24,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 24
   },
   "coaching": {
-    "as_of": "2026-09-12T15:25:46.976830+00:00",
+    "as_of": "2026-09-12T16:23:38.499229+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 28,
     "negative_cache_ttl_minutes": 60,
@@ -102,28 +102,30 @@
     "status": "healthy"
   },
   "copilot_media": {
+    "advisories": {
+      "2026_01_ARI_LAC": "provider_artifact_older_than_refresh_window",
+      "2026_01_ATL_PIT": "provider_artifact_older_than_refresh_window",
+      "2026_01_BAL_IND": "provider_artifact_older_than_refresh_window",
+      "2026_01_BUF_HOU": "provider_artifact_older_than_refresh_window",
+      "2026_01_CHI_CAR": "provider_artifact_older_than_refresh_window",
+      "2026_01_CLE_JAX": "provider_artifact_older_than_refresh_window",
+      "2026_01_DAL_NYG": "provider_artifact_older_than_refresh_window",
+      "2026_01_DEN_KC": "provider_artifact_older_than_refresh_window",
+      "2026_01_GB_MIN": "provider_artifact_older_than_refresh_window",
+      "2026_01_MIA_LV": "provider_artifact_older_than_refresh_window",
+      "2026_01_NO_DET": "provider_artifact_older_than_refresh_window",
+      "2026_01_NYJ_TEN": "provider_artifact_older_than_refresh_window",
+      "2026_01_TB_CIN": "provider_artifact_older_than_refresh_window",
+      "2026_01_WAS_PHI": "provider_artifact_older_than_refresh_window"
+    },
+    "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
-    "games_applied": 0,
+    "games_applied": 14,
     "games_expected": 14,
     "max_age_hours": 6.0,
     "new_report_grace_minutes": 5.0,
-    "skipped": {
-      "2026_01_ARI_LAC": "copilot_artifact_stale",
-      "2026_01_ATL_PIT": "copilot_artifact_stale",
-      "2026_01_BAL_IND": "copilot_artifact_stale",
-      "2026_01_BUF_HOU": "copilot_artifact_stale",
-      "2026_01_CHI_CAR": "copilot_artifact_stale",
-      "2026_01_CLE_JAX": "copilot_artifact_stale",
-      "2026_01_DAL_NYG": "copilot_artifact_stale",
-      "2026_01_DEN_KC": "copilot_artifact_stale",
-      "2026_01_GB_MIN": "copilot_artifact_stale",
-      "2026_01_MIA_LV": "copilot_artifact_stale",
-      "2026_01_NO_DET": "copilot_artifact_stale",
-      "2026_01_NYJ_TEN": "copilot_artifact_stale",
-      "2026_01_TB_CIN": "copilot_artifact_stale",
-      "2026_01_WAS_PHI": "copilot_artifact_stale"
-    },
-    "status": "unavailable"
+    "skipped": {},
+    "status": "healthy"
   },
   "depth_charts": {
     "season": 2026,
@@ -137,7 +139,7 @@
     "unique_headlines": 14
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-12T15:26:32.988688+00:00",
+    "as_of": "2026-09-12T16:25:04.521825+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -156,9 +158,15 @@
     "signals_added_before_diversity_filter": 99,
     "status": "healthy"
   },
+  "editorial_text_safety": {
+    "evidence_repairs": 44,
+    "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
+    "preview_repairs": 0,
+    "status": "healthy"
+  },
   "evidence": {
     "games": 14,
-    "generated_utc": "2026-09-12T15:25:46.482627+00:00",
+    "generated_utc": "2026-09-12T16:23:38.243762+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
     "signals": 187,
     "status": "healthy"
@@ -173,9 +181,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-12T15:25:46.482627+00:00",
+  "generated_utc": "2026-09-12T16:23:38.243762+00:00",
   "injuries": {
-    "as_of": "2026-09-12T15:25:46.661347+00:00",
+    "as_of": "2026-09-12T16:23:38.357153+00:00",
     "players": 182,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -183,14 +191,14 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-12T15:26:51.540989+00:00",
+    "as_of": "2026-09-12T16:25:22.250406+00:00",
     "cross_game_titles_rejected": 0,
     "games": 14,
     "games_with_display_reporting": 14,
     "games_with_reporting": 14,
-    "games_with_substantive_reporting": 10,
+    "games_with_substantive_reporting": 11,
     "games_with_trusted_reporting": 14,
-    "generic_titles_rejected": 17,
+    "generic_titles_rejected": 14,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -207,7 +215,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-12T15:26:43.955825+00:00",
+    "as_of": "2026-09-12T16:25:16.192705+00:00",
     "evidence_items_added": 23,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 23,
@@ -280,7 +288,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-12T15:25:50.531026+00:00",
+    "as_of": "2026-09-12T16:23:40.597621+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -313,7 +321,7 @@
     "story_items_added": 14
   },
   "weather": {
-    "as_of": "2026-09-12T15:26:21.943723+00:00",
+    "as_of": "2026-09-12T16:24:50.885594+00:00",
     "games_checked": 10,
     "status": "degraded"
   }
