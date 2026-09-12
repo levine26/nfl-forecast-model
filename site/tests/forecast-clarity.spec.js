@@ -4,7 +4,8 @@ for (const [name,width,height] of [['desktop',1440,1000],['mobile',390,844]]) {
   test(`${name}: game forecast explains probabilities, market edge, and model roles`, async ({ page }) => {
     await page.setViewportSize({width,height})
     await page.goto('./')
-    await page.locator('[data-game-open]:visible').first().click()
+    const openRows=width<=768?page.locator('.ss-exp-mobile-board:visible button'):page.locator('.ss-exp-board-rows:visible button')
+    await openRows.first().click()
 
     const clarity=page.locator('.ss-clarity-shell:visible').first()
     await expect(clarity).toBeVisible()
