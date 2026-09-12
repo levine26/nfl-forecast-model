@@ -1,5 +1,8 @@
 # LevLine Phase 2 — market reliance, source breadth, and lock horizon
 
+> **Historical research plan — superseded by the active LevLine 4 preregistration.**  
+> This document records the earlier Phase 2 market/horizon design and is preserved for auditability. It does **not** define the current production lock or active LevLine 4 horizon set. Current production remains the immutable T−120 `F-ST-01-FROZEN-2026` accountability forecast. The active research program is `research/LEVLINE_4_RESEARCH_SPEC.md` plus `research/levline4_prereg_v1.json`, with prospectively captured T−120/T−60/T−45/T−30 horizons. T−25/T−15 language below is historical hypothesis material, not current preregistered policy.
+
 Status: **research only**. This document does not authorize any production probability,
 market-source, refresh-cadence, or lock-window change.
 
