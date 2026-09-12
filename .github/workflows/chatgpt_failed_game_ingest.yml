@@ -51,21 +51,23 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          text = Path('scripts/ingest_chatgpt_failed_games.py').read_text(encoding='utf-8')
+          ingest = Path('scripts/ingest_chatgpt_failed_games.py').read_text(encoding='utf-8')
+          fallback = Path('src/nfl_forecast/editorial_provider_fallback.py').read_text(encoding='utf-8')
           required = (
               'scripts/validate_single_copilot_game.py',
               'scripts/compose_copilot_media_reads.py',
               'scripts/render_levline_paragraphs.py',
               'scripts/validate_copilot_media_reads.py',
               'requires_chatgpt_refresh',
-              'F-ST-01-FROZEN-2026',
+              'CHATGPT_FORECAST_PATH',
           )
           for marker in required:
-              assert marker in text, marker
+              assert marker in ingest, marker
+          assert 'CHATGPT_FORECAST_PATH = "F-ST-01-FROZEN-2026"' in fallback
           forbidden = ('train_model', 'run_model.py', 'grading.py', 'fst_production.py')
           for marker in forbidden:
-              assert marker not in text, marker
-          print('Failed-game ChatGPT fallback is constrained to editorial artifacts only.')
+              assert marker not in ingest, marker
+          print('Failed-game ChatGPT fallback is constrained to editorial artifacts and the governed frozen forecast identity.')
           PY
 
       - name: Stop after validation on pull request
