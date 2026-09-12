@@ -1,0 +1,66 @@
+{
+  "audit_id": "LEVLINE4-COMPONENT-RESOLVED-UPSET-AUDIT-V1",
+  "status": "historical_exploratory_not_prospective_proof",
+  "generated_date": "2026-09-12",
+  "sample": {
+    "seasons": [2022, 2023, 2024, 2025],
+    "games": 1087,
+    "training_frame_sha256": "174be982d5ac7f3e9f93bda824641eae95c612ec0c1e9546472479a5f6cb55d5",
+    "base_oof_keyed_sha256": "5563b2c9eeb193891ad0ae3809f3fcc9fac04b6451376fc28fa5888c070a78fa",
+    "base_components": ["logistic", "extra_trees", "xgboost", "catboost"],
+    "evaluation_policy": "season-forward: each target season uses only earlier-season rows"
+  },
+  "component_resolved_stack": {
+    "architecture": "L2 logistic stack of market logit plus each of four base-model logits; C=1.0; lbfgs; no 2026 outcomes",
+    "winner_accuracy": 0.6844526218951242,
+    "correct": 744,
+    "brier": 0.21042501027044097,
+    "market": {
+      "winner_accuracy": 0.6761729530818767,
+      "correct": 735
+    },
+    "aggregate_pure_fst_season_forward": {
+      "winner_accuracy": 0.6816927322907084,
+      "correct": 741,
+      "brier": 0.21065334840485694
+    },
+    "vs_market": {
+      "accuracy_delta_percentage_points": 0.827966881324747,
+      "disagreements": 31,
+      "component_stack_only_correct": 20,
+      "market_only_correct": 11,
+      "switch_win_rate": 0.6451612903225806,
+      "week_block_accuracy_delta_95_ci": [-0.00273973, 0.01933702]
+    },
+    "vs_aggregate_fst": {
+      "accuracy_delta_percentage_points": 0.27598896044158236,
+      "disagreements": 17,
+      "component_stack_only_correct": 10,
+      "aggregate_fst_only_correct": 7,
+      "switch_win_rate": 0.5882352941176471,
+      "exact_mcnemar_two_sided_p_diagnostic": 0.629058837890625,
+      "week_block_accuracy_delta_95_ci": [-0.00461255, 0.01102967],
+      "interpretation": "Promising point estimate, but no established superiority and the gain is not season-stable enough for promotion."
+    },
+    "by_season": [
+      {"season": 2022, "component_correct": 186, "component_accuracy": 0.6863468634686347, "fst_correct": 182, "fst_accuracy": 0.6715867158671587},
+      {"season": 2023, "component_correct": 185, "component_accuracy": 0.6801470588235294, "fst_correct": 185, "fst_accuracy": 0.6801470588235294},
+      {"season": 2024, "component_correct": 194, "component_accuracy": 0.7132352941176471, "fst_correct": 195, "fst_accuracy": 0.7169117647058824},
+      {"season": 2025, "component_correct": 179, "component_accuracy": 0.6580882352941176, "fst_correct": 179, "fst_accuracy": 0.6580882352941176}
+    ],
+    "decision_boundary": {
+      "maximum_market_favorite_probability_on_component_stack_market_disagreement": 0.551441,
+      "interpretation": "Like F-ST, the component-resolved stack earned its point-estimate edge by correcting near-coinflip decisions, not by routinely fading clear favorites."
+    }
+  },
+  "unanimous_football_vs_market": {
+    "definition": "all four base football models choose the opposite side from the market",
+    "all_games": {"disagreements": 96, "football_upset_correct": 38, "market_correct": 58, "switch_win_rate": 0.3958333333333333},
+    "preseason_reputation_aligned_favorite": {"disagreements": 50, "football_upset_correct": 21, "market_correct": 29, "switch_win_rate": 0.42, "wilson_95_ci": [0.2937479723, 0.5576680331]},
+    "preseason_top8_favorite": {"disagreements": 22, "football_upset_correct": 7, "market_correct": 15, "switch_win_rate": 0.3181818182, "wilson_95_ci": [0.1636038735, 0.5268177722]},
+    "interpretation": "Unanimity among football components does not itself authorize an upset override. A simple reputation/super-team flag does not rescue the rule."
+  },
+  "research_conclusion": "Preserve individual football-component outputs for future gating because a component-resolved stack modestly exceeded aggregate F-ST historically, but do not authorize a generic PURE-consensus or super-team fade. The next prospective upset gate should require an orthogonal contemporaneous corroborator such as market movement breadth, official player-state change, or quantified travel/rest/circadian context.",
+  "production_changed": false,
+  "promotion_authorized": false
+}
