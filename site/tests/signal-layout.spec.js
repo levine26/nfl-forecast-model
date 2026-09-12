@@ -6,19 +6,23 @@ const viewports = [
 ]
 
 for (const [name, width, height] of viewports) {
-  test(`${name}: enhanced The Signal stays in normal document flow`, async ({ page }) => {
+  test(`${name}: The Signal stays in normal document flow`, async ({ page }) => {
     await page.setViewportSize({ width, height })
     await page.goto('./')
-    await page.locator('[data-game-open]:visible').first().click()
+    const openRows = width <= 768
+      ? page.locator('.ss-exp-mobile-board:visible > button')
+      : page.locator('.ss-exp-board-rows:visible > button')
+    await expect(openRows.first()).toBeVisible()
+    await openRows.first().click()
 
-    const signal = page.locator('.ss-plus-signal:visible').first()
+    const signal = page.locator('.ss-exp-signal:visible').first()
     await expect(signal).toBeVisible()
 
     const layout = await signal.evaluate(element => {
       const card = element.getBoundingClientRect()
-      const head = element.querySelector('.ss-plus-signal-head')?.getBoundingClientRect() || null
-      const headline = element.querySelector('h2')?.getBoundingClientRect() || null
-      const paragraphs = [...element.querySelectorAll(':scope > p')].map(node => node.getBoundingClientRect())
+      const head = element.querySelector(':scope > header')?.getBoundingClientRect() || null
+      const headline = element.querySelector(':scope > h2')?.getBoundingClientRect() || null
+      const paragraphs = [...element.querySelectorAll(':scope > .ss-exp-bottom-line')].map(node => node.getBoundingClientRect())
       const style = getComputedStyle(element)
       return {
         display: style.display,
