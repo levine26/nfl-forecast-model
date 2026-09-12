@@ -96,8 +96,6 @@ jobs:
             exit 0
           fi
           rm -rf /tmp/market_capture_v2
-          cp -R "$DATA_DIR" /tmp/phase2_market_reliance 2>/dev/null || true
-          rm -rf /tmp/phase2_market_reliance
           cp -R "$DATA_DIR" /tmp/market_capture_v2
           rm -rf "$DATA_DIR"
           git config user.name 'levline-research-bot'
