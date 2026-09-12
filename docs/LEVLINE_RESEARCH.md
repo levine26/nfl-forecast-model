@@ -1,5 +1,8 @@
 # LevLine Research Architecture
 
+> **Archived historical research record — superseded for current-state guidance.**  
+> This document preserves the wording and evidence from an earlier research phase. It is **not** the current production architecture or active LevLine 4 roadmap. Current production uses `F-ST-01-FROZEN-2026`; it is **not** a fixed 75% PURE / 25% MARKET arithmetic blend. Current production/release status is governed by `docs/LEVLINE_3_RELEASE.md` and `IMPLEMENTATION_STATUS.md`. The active research program is `research/LEVLINE_4_RESEARCH_SPEC.md` plus `research/levline4_prereg_v1.json`. Statements below about former production-like blends, F-ST being research-only, or old availability status are retained solely as historical evidence.
+
 ## Production firewall
 
 Production LevLine remains the official engine. Research code may not modify production `final_home_prob`, the 75% PURE / 25% MARKET production blend, T-120 locking, official prediction history or grading, `outputs/`, `site/`, or Sunday Signal publication. Research modules are not imported by the production prediction path. Research workflows are separate from normal forecast workflows and write only to `challenger_outputs/` or `research_outputs/`.
