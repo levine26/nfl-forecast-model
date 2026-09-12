@@ -24,9 +24,10 @@
       "strict-PIT T-60 consensus",
       "strict-PIT T-45 consensus",
       "strict-PIT T-30 consensus",
-      "book-level movement direction",
-      "book-level movement breadth",
-      "cross-book dispersion",
+      "same-sportsbook movement direction paired only across exact selected consensus requests",
+      "same-sportsbook movement breadth",
+      "sportsbook overlap fraction",
+      "cross-book dispersion and its change",
       "quote age/source count"
     ],
     "reputation": [
@@ -36,16 +37,26 @@
     "player_state": [
       "official timestamped status only after source qualification",
       "role-weighted shock only after model authorization",
-      "time since official observation"
+      "time since official observation",
+      "market response since authoritative observation"
     ],
     "schedule_context": [
-      "rest differential",
-      "short-week flag",
+      "rest differential retained for descriptive control/modifier research only",
+      "short-week flag retained for descriptive control/modifier research only",
       "international venue",
       "time zones crossed",
       "travel direction",
       "local kickoff/body-clock offset where reproducibly derivable"
     ]
+  },
+  "evidence_status": {
+    "component_resolved_boundary_signal": "strengthened_historically_but_not_statistically_proven",
+    "generic_clear_favorite_football_override": "rejected_historically",
+    "generic_reputation_fade": "rejected_historically",
+    "generic_modern_rest_advantage": "demoted_to_modifier; NFL-specific 2024 evidence finds no significant current bye or mini-bye edge",
+    "circadian_travel": "plausible_modifier_only; NFL evidence heterogeneous",
+    "market_movement_direction": "unresolved; 2025 NFL-inclusive evidence of negative price-change autocorrelation forbids assuming follow-the-move is optimal",
+    "player_market_digestion": "high_priority_unresolved_prospective_interaction"
   },
   "interpretation_rules": {
     "fixed_75_25_weight_authorized": false,
@@ -53,7 +64,10 @@
     "generic_super_team_fade_authorized": false,
     "football_unanimity_alone_authorized": false,
     "reputation_alone_authorized": false,
-    "principle": "A switch should require evidence from more than one information channel. Historical football disagreement is retained as one channel; contemporaneous market/news/context evidence supplies orthogonal corroboration."
+    "rest_alone_authorized": false,
+    "circadian_alone_authorized": false,
+    "market_movement_direction_alone_authorized": false,
+    "principle": "A clear-favorite switch should require evidence from more than one information channel. Historical football disagreement is retained as one channel; contemporaneous market/news/context evidence supplies orthogonal corroboration. The evidence burden must increase with favorite strength rather than being mined from arbitrary probability bins."
   },
   "prospective_diagnostics": [
     "incumbent winner accuracy",
@@ -74,6 +88,8 @@
     "no_team_identity_superteam_list": true,
     "no_post_kickoff_information": true,
     "strict_horizon_cutoff_required": true,
+    "positive_timing_error_allowed": false,
+    "later_horizon_backfill_allowed": false,
     "automatic_promotion": false,
     "explicit_authorization_required": true
   }
