@@ -1,0 +1,85 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-GAMEBOOK-TRAINING-LABEL-COVERAGE-V1",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "training_label_governance_dependency": "V09B-TRAINING-ACTIVE-LABEL-SOURCE-V1",
+  "status": "PREREGISTERED_SOURCE_ONLY_COVERAGE_AUDIT",
+  "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+  "game_type": "REG",
+  "purpose": "Determine whether the historical NFL Game Book source class can be addressed reproducibly for the complete 2012-2021 regular-season training universe before any P(active) label construction or model fitting.",
+  "source_universe": {
+    "schedule_source": "nflreadpy.load_schedules",
+    "required_schedule_fields": ["season", "week", "game_type", "game_id", "gsis", "home_team", "away_team"],
+    "expected_regular_season_games_by_season": {
+      "2012": 256,
+      "2013": 256,
+      "2014": 256,
+      "2015": 256,
+      "2016": 256,
+      "2017": 256,
+      "2018": 256,
+      "2019": 256,
+      "2020": 256,
+      "2021": 272
+    },
+    "expected_regular_season_games_total": 2576
+  },
+  "historical_locator": {
+    "canonical_original_pattern": "http://www.nfl.com/liveupdate/gamecenter/{gsis}/{home_code}_Gamebook.pdf",
+    "archive_index": "Internet Archive Wayback CDX",
+    "archive_query_scope": "www.nfl.com/liveupdate/gamecenter/ prefix, statuscode=200, original matching *_Gamebook.pdf, collapsed by urlkey",
+    "archive_fields_required": ["timestamp", "original", "statuscode", "digest", "mimetype", "length"],
+    "reason": "Historical NFL Game Book references use the numeric GSIS game identifier in the directory and the home club abbreviation in the filename. The CDX record supplies a reproducible archive identifier and content digest without inferring labels from outcomes or participation."
+  },
+  "legacy_home_code_aliases": {
+    "JAX": ["JAX", "JAC"],
+    "JAC": ["JAC", "JAX"],
+    "LAR": ["LAR", "LA", "STL"],
+    "LA": ["LA", "LAR", "STL"],
+    "STL": ["STL", "LA", "LAR"],
+    "LAC": ["LAC", "SD"],
+    "SD": ["SD", "LAC"],
+    "LV": ["LV", "OAK"],
+    "OAK": ["OAK", "LV"],
+    "WAS": ["WAS", "WSH"],
+    "WSH": ["WSH", "WAS"]
+  },
+  "frozen_qualification_gates": {
+    "required_seasons_exact": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+    "schedule_expected_game_count_match_required": true,
+    "schedule_gsis_present_rate_required": 1.0,
+    "archive_game_coverage_rate_required": 1.0,
+    "season_archive_game_coverage_rate_required": 1.0,
+    "matched_archive_rows_must_have_timestamp": true,
+    "matched_archive_rows_must_have_digest": true,
+    "ambiguous_game_source_mappings_allowed": 0,
+    "sample_games_per_season": 3,
+    "sample_pdf_download_rate_required": 1.0,
+    "sample_not_active_structure_rate_required": 1.0,
+    "sample_did_not_play_structure_rate_required": 1.0
+  },
+  "sample_policy": {
+    "selection": "deterministic earliest, middle, and latest regular-season game by season/week/game_id among archive-resolved games",
+    "purpose": "Crosscheck source identity and structural separation of Not Active from Did Not Play across the training era. This is not a substitute for independent contemporaneous inactive-report crosschecks.",
+    "pdf_text_parser": "pypdf in research CI only",
+    "archive_replay_pattern": "https://web.archive.org/web/{timestamp}id_/{original}"
+  },
+  "non_authorizations": {
+    "training_label_semantics_qualified_by_coverage_alone": false,
+    "v09b_model_fit_authorized_by_coverage_alone": false,
+    "weekly_roster_ina_authorized_as_target": false,
+    "postgame_participation_authorized_as_target_proxy": false,
+    "current_game_snaps_authorized_as_target_proxy": false,
+    "completed_2026_outcomes_authorized": false,
+    "production_changes_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "thresholds_frozen_before_coverage_execution": true,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
