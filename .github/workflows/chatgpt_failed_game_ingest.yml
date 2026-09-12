@@ -4,9 +4,12 @@ on:
   pull_request:
     paths:
       - "scripts/ingest_chatgpt_failed_games.py"
+      - "scripts/finalize_editorial.py"
       - "tests/test_chatgpt_failed_game_ingest.py"
       - "tests/test_editorial_provider_fallback.py"
+      - "tests/test_editorial_text_safety.py"
       - "src/nfl_forecast/editorial_provider_fallback.py"
+      - "src/nfl_forecast/editorial_text_safety.py"
       - ".github/workflows/chatgpt_failed_game_ingest.yml"
   push:
     branches: [main]
@@ -41,8 +44,8 @@ jobs:
 
       - name: Test game-scoped fallback boundary
         run: |
-          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
-          python -m py_compile scripts/ingest_chatgpt_failed_games.py src/nfl_forecast/editorial_provider_fallback.py
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          python -m py_compile scripts/ingest_chatgpt_failed_games.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
 
       - name: Enforce editorial-only fallback wiring
         run: |
@@ -121,7 +124,7 @@ jobs:
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/context_source_status.json
+          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
           if git diff --cached --quiet; then
             echo "No failed-game editorial changes to publish."
             exit 0
