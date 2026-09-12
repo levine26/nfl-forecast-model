@@ -1,0 +1,76 @@
+{
+  "contract_id": "LEVLINE4-ACCURACY-PRIMARY-V1",
+  "status": "prospective_research_governance",
+  "effective_date": "2026-09-12",
+  "production_changed": false,
+  "production_model_preserved": "F-ST-01-FROZEN-2026",
+  "completed_2026_outcomes_used_to_define_rule": 0,
+  "objective_hierarchy": {
+    "primary": "straight_up_winner_accuracy",
+    "primary_loss": "zero_one_loss_at_probability_threshold_0_5",
+    "secondary": [
+      "brier",
+      "log_loss",
+      "calibration_intercept",
+      "calibration_slope"
+    ],
+    "principle": "Prefer the model that picks more NFL winners. Use probability-quality metrics as tie-breakers and safety diagnostics, not as a reason to reject a genuinely more accurate winner classifier unless probability quality becomes materially pathological."
+  },
+  "historical_context": {
+    "paired_games_2022_2025": 1087,
+    "frozen_fst_winner_accuracy": 0.680773,
+    "market_winner_accuracy": 0.676173,
+    "approx_fst_correct": 740,
+    "approx_market_correct": 735,
+    "accuracy_difference_percentage_points": 0.46,
+    "interpretation": "F-ST was descriptively five wins better on this historical sample, but the difference is too small to treat as statistically resolved without paired disagreement data."
+  },
+  "paired_accuracy_estimand": {
+    "primary_comparison": "candidate correctness minus incumbent correctness on the same games",
+    "disagreement_set": "games where candidate and incumbent select different winners",
+    "switch_win_rate": "candidate-correct-and-incumbent-wrong divided by all disagreement games",
+    "key_identity": "overall accuracy can change only on disagreement games",
+    "inferential_methods": [
+      "week-block bootstrap of paired zero-one-loss difference",
+      "cluster-aware matched-pair testing",
+      "McNemar-style discordant-pair accounting as a non-clustered diagnostic"
+    ]
+  },
+  "horizon_family": {
+    "members": ["T-120m", "T-60m", "T-45m", "T-30m"],
+    "point_in_time_contract": "strict no-later-than cutoff; valid timing error [-7.5, 0] minutes",
+    "primary_sample": "same games with valid strict-PIT forecasts at all four horizons",
+    "primary_horizon_metric": "winner_accuracy",
+    "secondary_horizon_metrics": ["brier", "log_loss", "calibration"],
+    "family_inference": "family-level comparison on zero-one loss with week clustering and multiplicity control",
+    "if_accuracy_unresolved": "retain the incumbent or earliest statistically indistinguishable operationally adequate horizon; do not promote solely for better Brier"
+  },
+  "promotion_logic": {
+    "earliest_formal_checkpoint_games": 200,
+    "earliest_formal_checkpoint_weeks": 14,
+    "checkpoint_is_not_automatic_promotion": true,
+    "accuracy_superiority_required": "candidate paired winner-accuracy advantage must be positive and supported by week-aware uncertainty before claiming superior accuracy",
+    "if_accuracy_is_statistically_unresolved": "do not replace a higher-accuracy incumbent merely because Brier is better",
+    "secondary_probability_guardrail": {
+      "brier_noninferiority_margin": 0.0025,
+      "source": "existing F-ST prospective governance margin",
+      "role": "secondary safety guardrail, not primary optimization target"
+    },
+    "automatic_promotion": false,
+    "explicit_authorization_required": true
+  },
+  "training_policy": {
+    "direct_empirical_accuracy_grid_search_is_not_preferred": true,
+    "reason": "historical LevLine adaptive accuracy-weight searches were unstable across seasons and underperformed both the market and the frozen F-ST winner rate",
+    "preferred_training": "classification-calibrated regularized surrogate objectives trained chronologically, then evaluated primarily on out-of-sample zero-one loss",
+    "probability_calibration": "secondary and preferably pick-preserving; calibration must not silently change winner labels unless entered as a separate accuracy candidate"
+  },
+  "research_firewall": {
+    "existing_brier_primary_contract_rewritten": false,
+    "this_is_a_new_parallel_decision_policy": true,
+    "new_model_family_requires_new_candidate_id": true,
+    "no_post_result_threshold_tuning": true,
+    "no_2026_outcome_rescue_search": true,
+    "no_post_kickoff_information": true
+  }
+}
