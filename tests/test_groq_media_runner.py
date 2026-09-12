@@ -30,7 +30,9 @@ def test_compound_mini_is_default_provider_with_gpt_oss_long_window_fallback():
     assert module.DEFAULT_MODEL == "groq/compound-mini"
     assert module.FALLBACK_MODEL == "openai/gpt-oss-120b"
     assert module.DEFAULT_COMPOUND_VERSION == "2025-07-23"
-    assert module.MAX_COMPLETION_TOKENS == 600
+    assert module.PRIMARY_MAX_COMPLETION_TOKENS == 600
+    assert module.FALLBACK_MAX_COMPLETION_TOKENS == 2048
+    assert module.MAX_COMPLETION_TOKENS == module.PRIMARY_MAX_COMPLETION_TOKENS
 
 
 def test_compound_mini_payload_bounds_reserved_output_budget():
@@ -54,17 +56,23 @@ def test_compound_mini_payload_bounds_reserved_output_budget():
         assert optional not in payload
 
 
-def test_gpt_oss_fallback_requires_browser_search_and_low_reasoning():
+def test_gpt_oss_fallback_uses_documented_browser_search_headroom():
     payload = module._build_payload("research this game", model=module.FALLBACK_MODEL)
     assert payload == {
         "model": "openai/gpt-oss-120b",
         "messages": [{"role": "user", "content": "research this game"}],
-        "max_completion_tokens": 600,
-        "reasoning_effort": "low",
+        "max_completion_tokens": 2048,
+        "reasoning_effort": "medium",
         "tool_choice": "required",
         "tools": [{"type": "browser_search"}],
     }
     assert "search_settings" not in payload
+    assert payload["max_completion_tokens"] < 8000
+
+
+def test_completion_budget_is_provider_specific():
+    assert module._completion_budget(module.DEFAULT_MODEL) == 600
+    assert module._completion_budget(module.FALLBACK_MODEL) == 2048
 
 
 def test_browser_search_is_recognized_as_web_research():
