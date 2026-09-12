@@ -6,6 +6,17 @@
   "workflow_run_id": 34717356041,
   "artifact_id": 10304894747,
   "artifact_sha256": "40d67ba24fd1a9ef2faa63b6cddf2a455ee4629a81aaed76d946e1c60f4b3c01",
+  "reproduction_evidence": {
+    "head_sha": "c9f60e025defa0e13957703fc77bd811383e45c3",
+    "workflow_run_id": 34717885845,
+    "successful_attempt": 2,
+    "artifact_id": 10306561228,
+    "artifact_sha256": "a8c2101980a5b1aaabb43479c7b3444f396627e3f466f7fa53b900370f6c773c",
+    "attempt_1_transport_semantic_failure": "NFL.com 2023/reg4 returned a page that parsed zero injury rows; this was a transient live-source serving failure and did not alter the frozen scientific disposition.",
+    "attempt_2_result": "SUCCESSFUL_REPRODUCTION_OF_EXPECTED_FAILED_CLOSED_V2_RESULT",
+    "thresholds_changed_between_attempts": false,
+    "source_denominators_changed_between_attempts": false
+  },
   "hard_blockers_preserved": [
     "diagnostic game-status agreement gate failed: 2023",
     "official-to-canonical identity gate failed: 2024",
