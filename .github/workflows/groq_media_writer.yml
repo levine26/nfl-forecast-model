@@ -279,7 +279,7 @@ jobs:
           assert 'group: sunday-signal-media-writer-' in concurrency_block
           assert 'github.ref' in concurrency_block
           assert 'cancel-in-progress: true' in concurrency_block
-          publish_block = text.split('- name: Publish editorial-only outputs', 1)[1]
+          publish_block = text.rsplit('\n      - name: Publish editorial-only outputs', 1)[1]
           assert 'outputs/contextual_evidence.json' in publish_block
           assert 'validated_base=$(git rev-parse HEAD^)' in publish_block
           assert 'git pull --rebase origin main' not in publish_block
