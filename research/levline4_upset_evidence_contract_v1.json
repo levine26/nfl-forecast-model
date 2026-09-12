@@ -1,0 +1,57 @@
+{
+  "contract_id": "LEVLINE4-UPSET-EVIDENCE-V1",
+  "status": "prospective_research_evidence_not_picker",
+  "effective_date": "2026-09-12",
+  "production_model_preserved": "F-ST-01-FROZEN-2026",
+  "production_changed": false,
+  "primary_objective": "straight_up_winner_accuracy",
+  "purpose": "Preserve strictly point-in-time component, market-path, and player-state evidence so a future switch candidate can be specified on prior evidence and graded on a fresh prospective sample.",
+  "horizons": ["T-120m", "T-60m", "T-45m", "T-30m"],
+  "required_channels": {
+    "components": {
+      "source": "levline4-component-snapshot-v1",
+      "selection": "latest capture generated at or before each horizon cutoff",
+      "fields": ["logistic", "extra_trees", "xgboost", "catboost", "home vote count", "mean", "dispersion", "range", "component-minus-market residual"]
+    },
+    "market": {
+      "source": "levline-market-state-v1",
+      "selection": "exact strict consensus request at or before the nominal cutoff",
+      "fields": ["no-vig home probability", "spread", "total", "cross-book range", "source count", "freshness", "T-120 movement", "same-book overlap", "same-book movement breadth"]
+    },
+    "player_state": {
+      "source": "verified Sleeper archive impact monitor",
+      "selection": "latest qualified source commit available at or before each horizon cutoff",
+      "fields": ["attention counts", "qualified statuses", "state-change counts", "source timestamp"],
+      "numeric_player_value_authorized": false
+    }
+  },
+  "missingness_policy": "preserve_missing_no_imputation",
+  "timing_policy": {
+    "strict_no_later_than_cutoff": true,
+    "positive_market_timing_error_allowed": false,
+    "post_cutoff_component_capture_allowed": false,
+    "post_cutoff_player_state_allowed": false,
+    "later_horizon_backfill_allowed": false
+  },
+  "forbidden_inputs": [
+    "completed 2026 game outcomes",
+    "home/away score",
+    "winner/result fields",
+    "post-kickoff information"
+  ],
+  "forbidden_actions": {
+    "winner_switch_rule_defined": false,
+    "threshold_defined": false,
+    "learned_cross_channel_weight_defined": false,
+    "automatic_promotion": false,
+    "production_authorized": false
+  },
+  "interpretation": "This ledger describes what evidence existed. It does not decide whether the evidence is sufficient to switch the frozen incumbent. No threshold, conjunction rule, favorite-strength bin, or evidence score may be inferred from the same prospective sample it records.",
+  "research_firewall": {
+    "completed_2026_outcomes_used": 0,
+    "research_only": true,
+    "production_authorized": false,
+    "live_site_consumes_output": false,
+    "explicit_authorization_required_for_any_model_candidate": true
+  }
+}
