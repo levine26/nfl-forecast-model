@@ -14,16 +14,38 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
-def _http_429(*, body: str = "", **headers: str) -> HTTPError:
+def _http_error(code: int, *, body: str = "", **headers: str) -> HTTPError:
     message = Message()
     for key, value in headers.items():
         message[key.replace("_", "-")] = value
     fp = io.BytesIO(body.encode("utf-8")) if body else None
-    return HTTPError("https://api.groq.com", 429, "Too Many Requests", message, fp)
+    return HTTPError("https://api.groq.com", code, "Provider Error", message, fp)
+
+
+def _http_429(*, body: str = "", **headers: str) -> HTTPError:
+    return _http_error(429, body=body, **headers)
 
 
 def test_compound_mini_is_default_provider():
     assert module.DEFAULT_MODEL == "groq/compound-mini"
+
+
+def test_compound_mini_payload_uses_documented_minimal_surface():
+    payload = module._build_payload("research this game", model=module.DEFAULT_MODEL)
+    assert payload["model"] == "groq/compound-mini"
+    assert payload["messages"] == [{"role": "user", "content": "research this game"}]
+    assert payload["search_settings"]["include_domains"]
+    assert set(payload) == {"model", "messages", "search_settings"}
+    for optional in (
+        "citation_options",
+        "compound_custom",
+        "max_completion_tokens",
+        "reasoning_format",
+        "response_format",
+        "service_tier",
+        "temperature",
+    ):
+        assert optional not in payload
 
 
 def test_rate_limit_delay_honors_retry_after_seconds():
@@ -63,3 +85,28 @@ def test_safe_rate_limit_reason_classifies_without_echoing_body():
     assert "tpm" in reason
     assert "model=openai/gpt-oss-120b" in reason
     assert "secret-do-not-log" not in reason
+
+
+def test_safe_bad_request_reason_exposes_only_allowlisted_diagnostics():
+    exc = _http_error(
+        400,
+        body='{"error":{"message":"Unsupported parameter response_format; prompt secret-do-not-log",'
+        '"type":"invalid_request_error","code":"unsupported_parameter","param":"response_format.type"}}',
+    )
+    reason = module._safe_bad_request_reason(exc)
+    assert "param=response_format" in reason
+    assert "type=invalid_request_error" in reason
+    assert "code=unsupported_parameter" in reason
+    assert "response_format" in reason
+    assert "secret-do-not-log" not in reason
+
+
+def test_safe_bad_request_reason_does_not_echo_unknown_param_or_message():
+    exc = _http_error(
+        400,
+        body='{"error":{"message":"bad secret-token-123", "param":"private_prompt", "type":"weird type"}}',
+    )
+    reason = module._safe_bad_request_reason(exc)
+    assert reason == "bad_request"
+    assert "private_prompt" not in reason
+    assert "secret-token-123" not in reason
