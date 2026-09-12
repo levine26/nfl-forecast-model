@@ -1,0 +1,83 @@
+{
+  "receipt_version": 1,
+  "contract_id": "V09B-GAMEBOOK-TRAINING-LABEL-COVERAGE-V1",
+  "execution_head_sha": "8ed97e087f27edf01841c61b412036ddd43e2aba",
+  "workflow_run_id": 34724378565,
+  "workflow_artifact_id": 10307446366,
+  "workflow_artifact_sha256": "5dc8710232f49add19795ce383063f9094f883c84865efbb0a909c19cd7ae283",
+  "technical_status": "BLOCKED",
+  "historical_gamebook_coverage_qualified": false,
+  "schedule": {
+    "games": 2576,
+    "expected_games": 2576,
+    "missing_gsis": 0,
+    "schedule_subset_sha256": "43b7c5f839ba0e51789ef6a928acb1ac9ca029e609912556c262261033eca438"
+  },
+  "archive_index": {
+    "source_family": "www.nfl.com/liveupdate/gamecenter/",
+    "http_status": 200,
+    "parsed_gamebook_urls": 4672,
+    "response_bytes": 719852,
+    "response_sha256": "e3551750e1494ea756cf8308812660e68a4f3d863a1566077b7afd98f2a97ed0"
+  },
+  "coverage": {
+    "games_found": 1599,
+    "games_missing": 977,
+    "coverage_rate": 0.6207298136645962,
+    "ambiguous_game_source_mappings": 1,
+    "by_season": {
+      "2012": {"found": 256, "expected": 256, "rate": 1.0},
+      "2013": {"found": 256, "expected": 256, "rate": 1.0},
+      "2014": {"found": 256, "expected": 256, "rate": 1.0},
+      "2015": {"found": 252, "expected": 256, "rate": 0.984375},
+      "2016": {"found": 204, "expected": 256, "rate": 0.796875},
+      "2017": {"found": 256, "expected": 256, "rate": 1.0},
+      "2018": {"found": 119, "expected": 256, "rate": 0.46484375},
+      "2019": {"found": 0, "expected": 256, "rate": 0.0},
+      "2020": {"found": 0, "expected": 256, "rate": 0.0},
+      "2021": {"found": 0, "expected": 272, "rate": 0.0}
+    }
+  },
+  "sample_structure": {
+    "required_games": 30,
+    "selected_games": 21,
+    "pdf_downloads_ok": 19,
+    "not_active_structure_ok": 19,
+    "did_not_play_structure_ok": 19,
+    "note": "Two selected 2018 archive replays encountered connection-refused errors; these are retained as V1 failures and are not reclassified as passes."
+  },
+  "hard_blockers": [
+    "archive coverage gate failed: 2015 252/256 = 0.984375",
+    "archive mapping ambiguity gate failed: 2015 1",
+    "archive coverage gate failed: 2016 204/256 = 0.796875",
+    "archive coverage gate failed: 2018 119/256 = 0.464844",
+    "archive coverage gate failed: 2019 0/256 = 0.000000",
+    "archive coverage gate failed: 2020 0/256 = 0.000000",
+    "archive coverage gate failed: 2021 0/272 = 0.000000",
+    "sample cardinality gate failed: required 30 got 21",
+    "sample PDF download gate failed: 19/21",
+    "sample Not Active structure gate failed: 19/21",
+    "sample Did Not Play structure gate failed: 19/21",
+    "total archive coverage gate failed: 1599/2576 = 0.620730"
+  ],
+  "post_result_diagnostic": {
+    "v1_failure_preserved": true,
+    "thresholds_relaxed": false,
+    "reason_for_followup": "Independent historical references show official NFL Game Book URLs using the same GSIS/team path on nflcdns.nfl.com in the years where the frozen www.nfl.com-only archive family loses coverage. A separately preregistered source-family audit is therefore justified; V1 itself remains failed closed.",
+    "followup_may_add_official_nfl_cdn_source_family": true,
+    "followup_may_relax_coverage_requirement": false
+  },
+  "authorization": {
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "source_only_audit": true,
+    "labels_constructed": false,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0
+  }
+}
