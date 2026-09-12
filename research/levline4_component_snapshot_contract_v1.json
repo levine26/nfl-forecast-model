@@ -1,0 +1,63 @@
+{
+  "contract_id": "LEVLINE4-COMPONENT-SNAPSHOT-V1",
+  "status": "prospective_research_capture_only",
+  "effective_date": "2026-09-12",
+  "objective": "preserve component-resolved live state for accuracy-primary Boundary Gate research",
+  "production_model_preserved": "F-ST-01-FROZEN-2026",
+  "production_changed": false,
+  "component_models": [
+    "logistic",
+    "extra_trees",
+    "xgboost",
+    "catboost"
+  ],
+  "model_training_policy": {
+    "target": "home_win",
+    "training_outcomes": "completed seasons strictly before 2026 only",
+    "maximum_training_season": 2025,
+    "feature_set": "production_compatible",
+    "model_family_source": "nfl_forecast.models._win_models",
+    "component_logic_frozen_by_existing_model_family": true,
+    "completed_2026_outcomes_used_in_model_fitting": 0,
+    "current_2026_point_in_time_features_allowed": true,
+    "current_feature_note": "Prior-game 2026 information may enter already-defined live feature values when available before the forecast timestamp; it may not refit models, create features, or tune thresholds."
+  },
+  "capture_policy": {
+    "cadence": "twice_daily_plus_manual",
+    "canonical_selection_for_game": "latest qualifying capture at or before the comparison horizon",
+    "later_capture_backfill_allowed": false,
+    "post_kickoff_capture_for_same_game_allowed": false,
+    "append_only_data_branch": "research-data/levline4-components-v1",
+    "immutable_fields": [
+      "game_id",
+      "generated_utc",
+      "source_sha",
+      "logistic_home_prob",
+      "extra_trees_home_prob",
+      "xgboost_home_prob",
+      "catboost_home_prob"
+    ]
+  },
+  "derived_descriptive_state": [
+    "component_home_votes",
+    "component_mean_home_prob",
+    "component_std_home_prob",
+    "component_min_home_prob",
+    "component_max_home_prob",
+    "component_range_home_prob"
+  ],
+  "authorization": {
+    "winner_switch_rule_defined": false,
+    "threshold_defined": false,
+    "production_promotion_authorized": false,
+    "automatic_gate_action_authorized": false
+  },
+  "research_firewall": {
+    "completed_2026_outcomes_used_to_define_capture": 0,
+    "completed_2026_outcomes_used_in_model_fitting": 0,
+    "post_result_threshold_search": false,
+    "production_outputs_writable": false,
+    "production_workflows_modified": false,
+    "future_candidate_requires_new_id_and_frozen_logic": true
+  }
+}
