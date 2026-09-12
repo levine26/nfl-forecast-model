@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-"""Derive point-in-time market-state features from the v2 research capture ledger.
+"""Derive strict point-in-time market-state features from the v2 research capture ledger.
 
 The derivative is descriptive research/UX state only. It never changes the frozen
 production forecast. Missing horizons remain missing; retries are resolved only by the
-closest qualifying consensus request to the preregistered target timestamp.
+closest qualifying consensus request at or before the preregistered target timestamp.
 """
 
 import argparse
@@ -18,11 +18,14 @@ from typing import Any, Iterable
 from research.market_capture_v2 import CAPTURE_TOLERANCE_MINUTES, HORIZONS, logit
 from research.market_capture_contract_v2 import MIN_CONSENSUS_BOOKS
 
-HORIZON_ORDER = ("T-120m", "T-60m", "T-30m")
+HORIZON_ORDER = ("T-120m", "T-60m", "T-45m", "T-30m")
 PAIR_DEFINITIONS = (
     ("t60_minus_t120", "T-60m", "T-120m"),
+    ("t45_minus_t120", "T-45m", "T-120m"),
     ("t30_minus_t120", "T-30m", "T-120m"),
+    ("t45_minus_t60", "T-45m", "T-60m"),
     ("t30_minus_t60", "T-30m", "T-60m"),
+    ("t30_minus_t45", "T-30m", "T-45m"),
 )
 IDENTITY_FIELDS = (
     "event_id",
@@ -76,14 +79,16 @@ def _qualifying_consensus(row: dict[str, Any]) -> bool:
     if probability is None or not 0.0 < probability < 1.0:
         return False
     timing_error = _float(row.get("timing_error_minutes"))
-    if timing_error is None or abs(timing_error) > CAPTURE_TOLERANCE_MINUTES:
+    if timing_error is None or timing_error < -CAPTURE_TOLERANCE_MINUTES or timing_error > 0.0:
         return False
     if not _truthy(row.get("research_only")) or _truthy(row.get("production_authorized")):
         return False
     target = _parse_utc(row.get("target_timestamp_utc"))
     request = _parse_utc(row.get("request_timestamp_utc"))
     kickoff = _parse_utc(row.get("kickoff_timestamp_utc"))
-    if target is None or request is None or kickoff is None or request >= kickoff:
+    if target is None or request is None or kickoff is None:
+        return False
+    if request > target or request >= kickoff:
         return False
     return True
 
@@ -183,6 +188,7 @@ def build_market_state(rows: Iterable[dict[str, Any]]) -> tuple[list[dict[str, A
             "available_horizons": available,
             "missing_horizons": missing,
             "complete_horizons": not missing,
+            "strict_no_later_than_cutoff": True,
             "research_only": True,
             "production_authorized": False,
             "completed_2026_outcomes_used": 0,
@@ -212,10 +218,12 @@ def build_market_state(rows: Iterable[dict[str, Any]]) -> tuple[list[dict[str, A
     audit = {
         "schema_version": "levline-market-state-v1",
         "games_with_any_qualifying_horizon": len(output),
-        "games_with_all_three_horizons": complete_games,
+        "games_with_all_four_horizons": complete_games,
         "games_with_missing_horizons": len(output) - complete_games,
         "minimum_consensus_books": MIN_CONSENSUS_BOOKS,
         "capture_tolerance_minutes": CAPTURE_TOLERANCE_MINUTES,
+        "valid_timing_error_minutes": [-CAPTURE_TOLERANCE_MINUTES, 0.0],
+        "strict_no_later_than_cutoff": True,
         "horizons": list(HORIZON_ORDER),
         "missingness_policy": "preserve_missing_no_imputation",
         "research_only": True,
