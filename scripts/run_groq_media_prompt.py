@@ -20,18 +20,21 @@ from urllib.request import Request, urlopen
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
-# Compound Mini is deliberate for the current Free-tier production key: it uses at
-# most one tool call, avoiding the hidden underlying-model TPM amplification that
-# full Compound can incur during a multi-search agentic loop.
+# Compound Mini remains the primary provider because it gives Sunday Signal one
+# bounded web-search tool call per matchup. If Compound's hidden underlying model
+# exhausts a long-window quota, the runner can fail over to Groq's directly hosted
+# GPT-OSS model with its required browser-search tool without changing any LevLine
+# model or publication semantics.
 DEFAULT_MODEL = "groq/compound-mini"
+FALLBACK_MODEL = "openai/gpt-oss-120b"
 # Groq documents 2025-07-23 as the basic-search Compound version. Advanced search
 # retrieves more context; basic search is intentionally used here to stay inside the
 # tighter Free-tier limits inherited from Compound Mini's underlying models.
 DEFAULT_COMPOUND_VERSION = "2025-07-23"
 # Keep the reserved generation budget far below the 8K TPM ceiling of the routed
-# GPT-OSS model on Groq Free tier. The focused JSON contract is comfortably smaller.
+# Free-tier research models. The focused JSON contract is comfortably smaller.
 MAX_COMPLETION_TOKENS = 600
-_WEB_TOOL_TYPES = {"search", "web_search"}
+_WEB_TOOL_TYPES = {"search", "web_search", "browser_search"}
 _RATE_LIMIT_HEADER_NAMES = (
     "retry-after",
     "x-ratelimit-limit-requests",
@@ -47,14 +50,17 @@ _SAFE_ERROR_PARAMS = {
     "max_completion_tokens",
     "messages",
     "model",
+    "reasoning_effort",
     "reasoning_format",
     "response_format",
     "search_settings",
     "service_tier",
     "temperature",
+    "tool_choice",
     "tools",
 }
 MAX_RATE_LIMIT_WAIT_SECONDS = 180.0
+_LONG_WINDOW_QUOTA_CLASSES = {"tpd", "rpd"}
 
 
 def _parse_retry_after(value: str | None) -> float | None:
@@ -142,12 +148,15 @@ def _safe_bad_request_reason(exc: HTTPError) -> str:
     for token, label in (
         ("response_format", "response_format"),
         ("reasoning_format", "reasoning_format"),
+        ("reasoning_effort", "reasoning_effort"),
         ("compound_custom", "compound_custom"),
         ("search_settings", "search_settings"),
         ("citation_options", "citation_options"),
         ("service_tier", "service_tier"),
         ("max_completion_tokens", "max_completion_tokens"),
         ("temperature", "temperature"),
+        ("tool_choice", "tool_choice"),
+        ("tools", "tools"),
         ("invalid", "invalid_request"),
         ("unsupported", "unsupported_parameter"),
     ):
@@ -185,7 +194,15 @@ def _safe_request_too_large_reason(exc: HTTPError) -> str:
     return ",".join(parts)
 
 
-def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
+def _rate_limit_classes(reason: str) -> set[str]:
+    return {part for part in str(reason).split(",") if part and not part.startswith("model=")}
+
+
+def _rate_limit_delay(exc: HTTPError, attempt: int, *, reason: str | None = None) -> float | None:
+    quota_classes = _rate_limit_classes(reason if reason is not None else _safe_rate_limit_reason(exc))
+    if quota_classes & (_LONG_WINDOW_QUOTA_CLASSES | {"project_limit"}):
+        return None
+
     retry_after = _parse_retry_after(_safe_rate_limit_headers(exc).get("retry-after"))
     if retry_after is not None:
         if retry_after > MAX_RATE_LIMIT_WAIT_SECONDS:
@@ -194,16 +211,50 @@ def _rate_limit_delay(exc: HTTPError, attempt: int) -> float | None:
     return min(20.0 * (2 ** max(0, attempt - 1)), 75.0)
 
 
+def _is_compound_model(model: str) -> bool:
+    return model.startswith("groq/compound")
+
+
+def _is_gpt_oss_model(model: str) -> bool:
+    return model.startswith("openai/gpt-oss")
+
+
 def _build_payload(prompt: str, *, model: str) -> dict:
-    """Keep the Mini request simple while explicitly bounding reserved output tokens."""
-    return {
+    """Build one bounded research request for the configured Groq provider."""
+    base = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "max_completion_tokens": MAX_COMPLETION_TOKENS,
+    }
+    if _is_gpt_oss_model(model):
+        return {
+            **base,
+            "reasoning_effort": "low",
+            "tool_choice": "required",
+            "tools": [{"type": "browser_search"}],
+        }
+    return {
+        **base,
         "search_settings": {
             "include_domains": sorted(APPROVED_MEDIA_DOMAINS),
         },
     }
+
+
+def _used_web_research(message: dict) -> tuple[bool, set[str]]:
+    executed_tools = message.get("executed_tools") or []
+    markers: set[str] = set()
+    for tool in executed_tools:
+        if not isinstance(tool, dict):
+            continue
+        for key in ("type", "name"):
+            value = str(tool.get(key) or "").strip().lower()
+            if value:
+                markers.add(value)
+        if tool.get("search_results"):
+            markers.add("browser_search")
+    used = any(marker in _WEB_TOOL_TYPES or "search" in marker for marker in markers)
+    return used, markers
 
 
 def _request(prompt: str, *, model: str, timeout: int) -> str:
@@ -211,16 +262,19 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
     if not api_key:
         raise RuntimeError("GROQ_API_KEY is not configured")
 
-    compound_version = os.environ.get("GROQ_COMPOUND_VERSION", DEFAULT_COMPOUND_VERSION).strip() or DEFAULT_COMPOUND_VERSION
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "User-Agent": "Sunday-Signal-LevLine/3.0",
+    }
+    if _is_compound_model(model):
+        compound_version = os.environ.get("GROQ_COMPOUND_VERSION", DEFAULT_COMPOUND_VERSION).strip() or DEFAULT_COMPOUND_VERSION
+        headers["Groq-Model-Version"] = compound_version
+
     request = Request(
         API_URL,
         data=json.dumps(_build_payload(prompt, model=model)).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "Groq-Model-Version": compound_version,
-            "User-Agent": "Sunday-Signal-LevLine/3.0",
-        },
+        headers=headers,
         method="POST",
     )
     with urlopen(request, timeout=timeout) as response:
@@ -235,24 +289,21 @@ def _request(prompt: str, *, model: str, timeout: int) -> str:
     if not content:
         raise RuntimeError("Groq response contained no message content")
 
-    executed_tools = message.get("executed_tools") or []
-    tool_types = {
-        str(tool.get("type") or "").strip().lower()
-        for tool in executed_tools
-        if isinstance(tool, dict)
-    }
-    if not (tool_types & _WEB_TOOL_TYPES):
+    used_web, tool_markers = _used_web_research(message)
+    if not used_web:
         raise RuntimeError("Groq response used no web-search tool")
 
-    print("Groq research tools used:", ", ".join(sorted(tool_types & _WEB_TOOL_TYPES)))
+    visible_tools = sorted(marker for marker in tool_markers if marker in _WEB_TOOL_TYPES or "search" in marker)
+    print("Groq research tools used:", ", ".join(visible_tools) or "search")
     return content
 
 
 def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
     last_error: Exception | None = None
+    active_model = model
     for attempt in range(1, attempts + 1):
         try:
-            return _request(prompt, model=model, timeout=timeout)
+            return _request(prompt, model=active_model, timeout=timeout)
         except HTTPError as exc:
             retryable = exc.code in {408, 409, 429, 498, 500, 502, 503, 504}
             if exc.code == 429:
@@ -260,8 +311,20 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
                 reason = _safe_rate_limit_reason(exc)
                 detail = ", ".join(f"{key}={value}" for key, value in safe_headers.items()) or "no rate-limit headers"
                 print(f"Groq HTTP 429 rate limit class={reason} ({detail})", file=sys.stderr)
-                delay = _rate_limit_delay(exc, attempt)
                 last_error = RuntimeError(f"Groq HTTP 429 class={reason} ({detail})")
+
+                quota_classes = _rate_limit_classes(reason)
+                if quota_classes & _LONG_WINDOW_QUOTA_CLASSES and active_model != FALLBACK_MODEL:
+                    active_model = os.environ.get("GROQ_MEDIA_FALLBACK_MODEL", FALLBACK_MODEL).strip() or FALLBACK_MODEL
+                    print(
+                        f"Groq long-window quota reached; switching provider retry to {active_model} with required browser search.",
+                        file=sys.stderr,
+                    )
+                    if attempt == attempts:
+                        break
+                    continue
+
+                delay = _rate_limit_delay(exc, attempt, reason=reason)
                 if attempt == attempts or delay is None:
                     break
                 print(f"Groq rate-limited; waiting {delay:.1f}s before provider retry {attempt + 1}/{attempts}.", file=sys.stderr)
@@ -304,7 +367,7 @@ def main() -> None:
     prompt = Path(args.prompt_file).read_text(encoding="utf-8")
     content = run(prompt, model=args.model, timeout=args.timeout, attempts=args.attempts)
     Path(args.output_file).write_text(content + "\n", encoding="utf-8")
-    print(f"Groq editorial response written with {args.model}")
+    print(f"Groq editorial response written with primary model {args.model}")
 
 
 if __name__ == "__main__":

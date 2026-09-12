@@ -26,8 +26,9 @@ def _http_429(*, body: str = "", **headers: str) -> HTTPError:
     return _http_error(429, body=body, **headers)
 
 
-def test_compound_mini_is_default_provider():
+def test_compound_mini_is_default_provider_with_gpt_oss_long_window_fallback():
     assert module.DEFAULT_MODEL == "groq/compound-mini"
+    assert module.FALLBACK_MODEL == "openai/gpt-oss-120b"
     assert module.DEFAULT_COMPOUND_VERSION == "2025-07-23"
     assert module.MAX_COMPLETION_TOKENS == 600
 
@@ -42,12 +43,36 @@ def test_compound_mini_payload_bounds_reserved_output_budget():
     for optional in (
         "citation_options",
         "compound_custom",
+        "reasoning_effort",
         "reasoning_format",
         "response_format",
         "service_tier",
         "temperature",
+        "tool_choice",
+        "tools",
     ):
         assert optional not in payload
+
+
+def test_gpt_oss_fallback_requires_browser_search_and_low_reasoning():
+    payload = module._build_payload("research this game", model=module.FALLBACK_MODEL)
+    assert payload == {
+        "model": "openai/gpt-oss-120b",
+        "messages": [{"role": "user", "content": "research this game"}],
+        "max_completion_tokens": 600,
+        "reasoning_effort": "low",
+        "tool_choice": "required",
+        "tools": [{"type": "browser_search"}],
+    }
+    assert "search_settings" not in payload
+
+
+def test_browser_search_is_recognized_as_web_research():
+    used, markers = module._used_web_research(
+        {"executed_tools": [{"type": "function", "name": "browser_search"}]}
+    )
+    assert used is True
+    assert "browser_search" in markers
 
 
 def test_rate_limit_delay_honors_retry_after_seconds():
@@ -57,6 +82,13 @@ def test_rate_limit_delay_honors_retry_after_seconds():
 
 def test_rate_limit_delay_fails_closed_on_long_quota_window():
     exc = _http_429(retry_after="600", x_ratelimit_remaining_requests="0")
+    assert module._rate_limit_delay(exc, 1) is None
+
+
+def test_rate_limit_delay_fails_closed_on_tpd_without_retry_after():
+    exc = _http_429(
+        body='{"error":{"message":"Rate limit reached for model meta-llama/llama-4-scout-17b-16e-instruct: tokens per day exceeded"}}'
+    )
     assert module._rate_limit_delay(exc, 1) is None
 
 
@@ -87,6 +119,46 @@ def test_safe_rate_limit_reason_classifies_without_echoing_body():
     assert "tpm" in reason
     assert "model=openai/gpt-oss-120b" in reason
     assert "secret-do-not-log" not in reason
+
+
+def test_run_switches_compound_tpd_to_gpt_oss_browser_fallback(monkeypatch):
+    calls: list[str] = []
+
+    def fake_request(prompt: str, *, model: str, timeout: int) -> str:
+        calls.append(model)
+        if len(calls) == 1:
+            raise _http_429(
+                body='{"error":{"message":"Rate limit reached for model meta-llama/llama-4-scout-17b-16e-instruct: tokens per day exceeded"}}'
+            )
+        return "accepted researched payload"
+
+    monkeypatch.setattr(module, "_request", fake_request)
+    result = module.run("prompt", model=module.DEFAULT_MODEL, timeout=10, attempts=3)
+    assert result == "accepted researched payload"
+    assert calls == [module.DEFAULT_MODEL, module.FALLBACK_MODEL]
+
+
+def test_run_does_not_loop_when_fallback_hits_long_window_quota(monkeypatch):
+    calls: list[str] = []
+
+    def fake_request(prompt: str, *, model: str, timeout: int) -> str:
+        calls.append(model)
+        if model == module.DEFAULT_MODEL:
+            raise _http_429(
+                body='{"error":{"message":"Rate limit reached for model meta-llama/llama-4-scout-17b-16e-instruct: tokens per day exceeded"}}'
+            )
+        raise _http_429(
+            body='{"error":{"message":"Rate limit reached for model openai/gpt-oss-120b: tokens per day exceeded"}}'
+        )
+
+    monkeypatch.setattr(module, "_request", fake_request)
+    try:
+        module.run("prompt", model=module.DEFAULT_MODEL, timeout=10, attempts=3)
+    except RuntimeError as exc:
+        assert "tpd" in str(exc)
+    else:
+        raise AssertionError("expected long-window quota failure")
+    assert calls == [module.DEFAULT_MODEL, module.FALLBACK_MODEL]
 
 
 def test_safe_bad_request_reason_exposes_only_allowlisted_diagnostics():
