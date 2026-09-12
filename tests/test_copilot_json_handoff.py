@@ -11,6 +11,8 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 _extract_json = module._extract_json
 _contains_labeled_line = module._contains_labeled_line
+_ngrams = module._ngrams
+_unique_ngrams = module._unique_ngrams
 
 
 def test_extract_json_preserves_valid_payload():
@@ -47,3 +49,26 @@ def test_market_line_validation_rejects_wrong_number():
     labels = ("market", "spread", "consensus")
     assert _contains_labeled_line("The market spread is Kansas City Chiefs -3.5.", 3.5, "KC", "DEN", labels)
     assert not _contains_labeled_line("The market spread is Kansas City Chiefs -4.5.", 3.5, "KC", "DEN", labels)
+
+
+def test_official_status_boilerplate_is_not_a_uniqueness_failure():
+    text = (
+        "The Falcons listed as questionable after Friday practice while the defense "
+        "disguises pressure by rotating safeties late."
+    )
+    raw = _ngrams(text)
+    filtered = _unique_ngrams(text)
+    standardized = {gram for gram in raw if "listed as questionable" in gram}
+
+    assert standardized
+    assert standardized.isdisjoint(filtered)
+
+
+def test_substantive_editorial_prose_near_status_language_remains_unique_checked():
+    text = (
+        "The Falcons ruled out a reserve corner, but the defense disguises pressure "
+        "by rotating safeties after the snap."
+    )
+    filtered = _unique_ngrams(text)
+
+    assert "the defense disguises pressure by rotating safeties" in filtered
