@@ -1,0 +1,211 @@
+name: LevLine 4 upset evidence v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_upset_evidence_contract_v1.json'
+      - 'research/levline4_upset_evidence_v1.py'
+      - 'research/test_levline4_upset_evidence_v1.py'
+      - '.github/workflows/research_levline4_upset_evidence_v1.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['LevLine research market state v1']
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline4-upset-evidence-v1
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate strict-PIT evidence composition and outcome firewall
+        run: pytest -q research/test_levline4_upset_evidence_v1.py
+      - name: Verify evidence contract cannot authorize a pick
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/levline4_upset_evidence_contract_v1.json').read_text())
+          assert contract['contract_id'] == 'LEVLINE4-UPSET-EVIDENCE-V1'
+          assert contract['timing_policy']['strict_no_later_than_cutoff'] is True
+          assert contract['timing_policy']['positive_market_timing_error_allowed'] is False
+          assert contract['forbidden_actions']['winner_switch_rule_defined'] is False
+          assert contract['forbidden_actions']['threshold_defined'] is False
+          assert contract['forbidden_actions']['learned_cross_channel_weight_defined'] is False
+          assert contract['forbidden_actions']['automatic_promotion'] is False
+          assert contract['forbidden_actions']['production_authorized'] is False
+          assert contract['research_firewall']['completed_2026_outcomes_used'] == 0
+          PY
+      - name: Prove this workflow is research-only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('.github/workflows/research_levline4_upset_evidence_v1.yml').read_text()
+          forbidden = ['outputs/this_week.csv', 'site/data', 'src/nfl_forecast/config.py']
+          for token in forbidden:
+              assert token not in text, token
+          PY
+
+  capture:
+    if: >-
+      github.event_name != 'pull_request' &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore research source ledgers and prior evidence history
+        run: |
+          set -euo pipefail
+          for branch in \
+            research-data/levline4-components-v1 \
+            research-data/market-capture-v2 \
+            research-data/sleeper-player-state \
+            research-data/levline4-upset-evidence-v1
+          do
+            git fetch origin "$branch:refs/remotes/origin/$branch" || true
+          done
+
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/levline4-components-v1; then
+            git archive origin/research-data/levline4-components-v1 research_outputs/levline4_component_snapshot_v1 | tar -xf - || true
+          fi
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
+            git archive origin/research-data/market-capture-v2 research_outputs/market_state_v1 | tar -xf - || true
+          fi
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/sleeper-player-state; then
+            git archive origin/research-data/sleeper-player-state research_outputs/sleeper_player_state/impact_monitor | tar -xf - || true
+          fi
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/levline4-upset-evidence-v1; then
+            git archive origin/research-data/levline4-upset-evidence-v1 research_outputs/levline4_upset_evidence_v1 | tar -xf - || true
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Compose latest strictly point-in-time evidence bundle
+        id: compose
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/src
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          MARKET=research_outputs/market_state_v1/market_state.csv
+          COMPONENT_DIR=research_outputs/levline4_component_snapshot_v1/captures
+          PERSONNEL=research_outputs/sleeper_player_state/impact_monitor/current.json
+          OUT_DIR=research_outputs/levline4_upset_evidence_v1
+          mkdir -p "$OUT_DIR/captures"
+
+          if [[ ! -s "$MARKET" ]]; then
+            echo 'No derived strict-PIT market state exists yet; skipping evidence capture.'
+            echo 'captured=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          mapfile -t COMPONENT_FILES < <(find "$COMPONENT_DIR" -type f -name '*.csv' 2>/dev/null | sort || true)
+          if [[ ${#COMPONENT_FILES[@]} -eq 0 ]]; then
+            echo 'No prospective component captures exist yet; skipping evidence capture.'
+            echo 'captured=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CAPTURE="$OUT_DIR/captures/evidence_${RUN_ID}.json"
+          AUDIT="$OUT_DIR/captures/audit_${RUN_ID}.json"
+          ARGS=(--market-state "$MARKET" --output "$CAPTURE" --audit "$AUDIT")
+          for file in "${COMPONENT_FILES[@]}"; do
+            ARGS+=(--components "$file")
+          done
+          if [[ -s "$PERSONNEL" ]]; then
+            ARGS+=(--personnel "$PERSONNEL")
+          fi
+          python -m research.levline4_upset_evidence_v1 "${ARGS[@]}"
+
+          python - <<'PY'
+          import hashlib, json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          run_id = os.environ['RUN_ID']
+          out = Path('research_outputs/levline4_upset_evidence_v1')
+          capture = out / 'captures' / f'evidence_{run_id}.json'
+          audit = out / 'captures' / f'audit_{run_id}.json'
+          payload = json.loads(capture.read_text())
+          audit_payload = json.loads(audit.read_text())
+          assert payload['winner_switch_rule_defined'] is False
+          assert payload['threshold_defined'] is False
+          assert payload['learned_cross_channel_weight_defined'] is False
+          assert payload['production_authorized'] is False
+          assert payload['completed_2026_outcomes_used'] == 0
+          digest = hashlib.sha256(capture.read_bytes()).hexdigest()
+          manifest = out / 'manifest.jsonl'
+          entry = {
+              'run_id': int(run_id),
+              'captured_utc': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+              'capture_path': str(capture),
+              'audit_path': str(audit),
+              'capture_sha256': digest,
+              'records': audit_payload['records'],
+              'strict_pit_complete_records': audit_payload['strict_pit_complete_records'],
+              'winner_switch_rule_defined': False,
+              'threshold_defined': False,
+              'research_only': True,
+              'production_authorized': False,
+              'completed_2026_outcomes_used': 0,
+          }
+          with manifest.open('a', encoding='utf-8') as handle:
+              handle.write(json.dumps(entry, sort_keys=True) + '\n')
+          status = dict(entry)
+          status['schema_version'] = 'levline4-upset-evidence-v1'
+          (out / 'status.json').write_text(json.dumps(status, indent=2, sort_keys=True), encoding='utf-8')
+          PY
+          echo 'captured=true' >> "$GITHUB_OUTPUT"
+      - name: Prove production paths are untouched
+        if: steps.compose.outputs.captured == 'true'
+        run: git diff --exit-code -- outputs/ site/ src/ scripts/ config/
+      - uses: actions/upload-artifact@v4
+        if: steps.compose.outputs.captured == 'true'
+        with:
+          name: levline4-upset-evidence-${{ github.run_id }}
+          path: research_outputs/levline4_upset_evidence_v1/
+          retention-days: 90
+      - name: Persist append-only evidence away from main
+        if: steps.compose.outputs.captured == 'true'
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/levline4_upset_evidence_v1
+          test -s "$DATA_DIR/status.json"
+          test -s "$DATA_DIR/manifest.jsonl"
+          rm -rf /tmp/levline4_upset_evidence_v1
+          cp -R "$DATA_DIR" /tmp/levline4_upset_evidence_v1
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/levline4-upset-evidence-v1; then
+            git checkout -B levline4-upset-evidence-v1-data origin/research-data/levline4-upset-evidence-v1
+          else
+            git checkout -B levline4-upset-evidence-v1-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/levline4_upset_evidence_v1
+          cp -R /tmp/levline4_upset_evidence_v1 research_outputs/levline4_upset_evidence_v1
+          git add research_outputs/levline4_upset_evidence_v1/
+          if git diff --cached --quiet; then
+            echo 'Evidence ledger unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture LevLine 4 prospective evidence bundle'
+          git push origin HEAD:research-data/levline4-upset-evidence-v1
