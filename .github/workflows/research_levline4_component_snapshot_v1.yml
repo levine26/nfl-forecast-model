@@ -1,0 +1,131 @@
+name: LevLine 4 component snapshot v1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_component_snapshot_contract_v1.json'
+      - 'research/levline4_component_snapshot_v1.py'
+      - 'research/test_levline4_component_snapshot_v1.py'
+      - '.github/workflows/research_levline4_component_snapshot_v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/levline4_component_snapshot_contract_v1.json'
+      - 'research/levline4_component_snapshot_v1.py'
+      - 'research/test_levline4_component_snapshot_v1.py'
+      - '.github/workflows/research_levline4_component_snapshot_v1.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '11 12 * * 2-6'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline4-component-snapshot-v1
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate component identity, pre-2026 fit firewall, and append-only semantics
+        run: pytest -q research/test_levline4_component_snapshot_v1.py
+      - name: Verify research-only capture contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/levline4_component_snapshot_contract_v1.json').read_text())
+          assert contract['contract_id'] == 'LEVLINE4-COMPONENT-SNAPSHOT-V1'
+          assert contract['component_models'] == ['logistic', 'extra_trees', 'xgboost', 'catboost']
+          assert contract['model_training_policy']['maximum_training_season'] == 2025
+          assert contract['model_training_policy']['completed_2026_outcomes_used_in_model_fitting'] == 0
+          assert contract['authorization']['winner_switch_rule_defined'] is False
+          assert contract['authorization']['production_promotion_authorized'] is False
+          assert contract['research_firewall']['production_outputs_writable'] is False
+          assert contract['research_firewall']['production_workflows_modified'] is False
+          PY
+
+  capture:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore append-only component ledger from research data branch
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/levline4-components-v1:refs/remotes/origin/research-data/levline4-components-v1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/levline4-components-v1; then
+            if git ls-tree -d --name-only origin/research-data/levline4-components-v1 research_outputs/levline4_component_snapshot_v1 | grep -q '^research_outputs/levline4_component_snapshot_v1$'; then
+              git archive origin/research-data/levline4-components-v1 research_outputs/levline4_component_snapshot_v1 | tar -xf -
+            fi
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: levline4-components-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            levline4-components-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Capture four component probabilities for unresolved 2026 slate
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/src
+          OPENBLAS_NUM_THREADS: '4'
+          OMP_NUM_THREADS: '4'
+          MKL_NUM_THREADS: '4'
+          NUMEXPR_NUM_THREADS: '4'
+        run: |
+          set -euo pipefail
+          python -m research.levline4_component_snapshot_v1 --source-sha "${{ github.sha }}"
+          test -s research_outputs/levline4_component_snapshot_v1/status.json
+          test -s research_outputs/levline4_component_snapshot_v1/manifest.jsonl
+      - name: Prove production paths are untouched
+        run: git diff --exit-code -- outputs/ site/ src/ scripts/ config/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline4-component-snapshot-${{ github.run_id }}
+          path: research_outputs/levline4_component_snapshot_v1/
+          retention-days: 90
+      - name: Persist append-only ledger away from main
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/levline4_component_snapshot_v1
+          test -s "$DATA_DIR/status.json"
+          rm -rf /tmp/levline4_component_snapshot_v1
+          cp -R "$DATA_DIR" /tmp/levline4_component_snapshot_v1
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/levline4-components-v1; then
+            git checkout -B levline4-components-v1-data origin/research-data/levline4-components-v1
+          else
+            git checkout -B levline4-components-v1-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/levline4_component_snapshot_v1
+          cp -R /tmp/levline4_component_snapshot_v1 research_outputs/levline4_component_snapshot_v1
+          git add research_outputs/levline4_component_snapshot_v1/
+          if git diff --cached --quiet; then
+            echo 'Component ledger unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture LevLine 4 component probabilities'
+          git push origin HEAD:research-data/levline4-components-v1
