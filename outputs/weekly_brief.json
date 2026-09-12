@@ -1,12 +1,6 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_GB_MIN",
-      "largest_driver": "Market movement",
-      "pick": "MIN",
-      "pick_delta_pp": 1.233495860437006
-    },
-    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material input move",
       "pick": "SEA",
@@ -17,9 +11,15 @@
       "largest_driver": "No material input move",
       "pick": "LAC",
       "pick_delta_pp": 0.0
+    },
+    {
+      "game_id": "2026_01_BAL_IND",
+      "largest_driver": "No material input move",
+      "pick": "BAL",
+      "pick_delta_pp": -0.0
     }
   ],
-  "generated_utc": "2026-09-12T16:38:01.891246+00:00",
+  "generated_utc": "2026-09-12T17:01:13.161114+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
@@ -28,7 +28,7 @@
       "pick": "LV",
       "pick_prob": 0.6338599528153582,
       "projected_score": "LV 20.0 \u2013 MIA 23.5",
-      "pure_market_gap_pp": 23.72522546115977
+      "pure_market_gap_pp": 23.725225461159766
     },
     {
       "confidence": "Coin Flip",
@@ -37,7 +37,7 @@
       "pick": "KC",
       "pick_prob": 0.5949579556015904,
       "projected_score": "KC 19.7 \u2013 DEN 25.3",
-      "pure_market_gap_pp": 23.666612991458358
+      "pure_market_gap_pp": 23.66661299145835
     },
     {
       "confidence": "Solid",
@@ -46,7 +46,7 @@
       "pick": "DET",
       "pick_prob": 0.7525022608076984,
       "projected_score": "DET 24.7 \u2013 NO 21.1",
-      "pure_market_gap_pp": 17.454524928133186
+      "pure_market_gap_pp": 17.454524928133164
     }
   ],
   "most_uncertain": [
