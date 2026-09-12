@@ -1,0 +1,53 @@
+name: LevLine V09B training label audit
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_training_label_source_contract_v1.json'
+      - 'research/v09b_training_label_gate_v1.py'
+      - 'research/test_v09b_training_label_gate_v1.py'
+      - '.github/workflows/research_v09b_training_label_audit_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test fail-closed training-label source gate
+        run: pytest -q research/test_v09b_training_label_gate_v1.py
+      - name: Validate frozen source-audit disposition
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/availability/v09b_training_label_source_contract_v1.json').read_text())
+          assert contract['authorization']['training_label_semantics_qualified'] is False
+          assert contract['authorization']['training_source_chronology_qualified'] is False
+          assert contract['authorization']['v09b_model_fit_authorized'] is False
+          assert contract['authorization']['weekly_roster_ina_authorized_as_target'] is False
+          assert contract['candidate_sources']['nflverse_weekly_roster_status']['status'] == 'REJECTED_AS_STANDALONE_TARGET'
+          assert contract['candidate_sources']['official_game_day_administration_inactive_list']['status'] == 'SEMANTICALLY_CORRECT_SOURCE_CLASS_COVERAGE_NOT_YET_QUALIFIED'
+          assert contract['governance']['model_fit_performed'] is False
+          assert contract['governance']['completed_2026_outcomes_used'] == 0
+          PY
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
