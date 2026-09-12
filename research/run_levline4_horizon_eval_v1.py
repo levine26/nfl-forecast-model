@@ -7,6 +7,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from research.levline4_horizon_eligibility_v1 import (
+    enforce_strict_cutoffs,
+    horizon_completeness_audit,
+)
 from research.levline4_horizon_eval_v1 import evaluate
 
 
@@ -28,12 +32,19 @@ def run(
     report_file = Path(report_path)
     status_file = Path(status_path)
 
-    shadows = _read_csv(shadow_file)
+    raw_shadows = _read_csv(shadow_file)
     history = _read_csv(history_file)
+    eligibility = enforce_strict_cutoffs(raw_shadows)
+    shadows = eligibility.frame
     report = evaluate(shadows, history)
     generated = datetime.now(timezone.utc).isoformat()
     report["generated_at_utc"] = generated
+    report["raw_shadow_rows_available"] = int(len(raw_shadows))
+    report["strict_pit_shadow_rows_available"] = int(len(shadows))
+    # Retain the legacy key as the exact rows actually supplied to the scorer.
     report["shadow_rows_available"] = int(len(shadows))
+    report["strict_horizon_eligibility_audit"] = eligibility.audit
+    report["horizon_completeness_audit"] = horizon_completeness_audit(shadows)
     report["official_history_rows_available"] = int(len(history))
     report["research_only"] = True
     report["production_authorized"] = False
@@ -46,7 +57,11 @@ def run(
         "generated_at_utc": generated,
         "gate_status": report.get("gate_status"),
         "graded_shadow_rows": int(report.get("graded_shadow_rows", 0)),
-        "shadow_rows_available": int(len(shadows)),
+        "raw_shadow_rows_available": int(len(raw_shadows)),
+        "strict_pit_shadow_rows_available": int(len(shadows)),
+        "excluded_post_cutoff_rows": int(
+            eligibility.audit.get("excluded_post_cutoff_rows", 0)
+        ),
         "primary_timing_sample_ready": bool(report.get("primary_timing_sample_ready", False)),
         "horizon_selection_authorized": False,
         "promotion_authorized": False,
