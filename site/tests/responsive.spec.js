@@ -18,7 +18,7 @@ for (const [name, width, height] of viewports) {
     await expect(page.getByText('SUNDAY SIGNAL').first()).toBeVisible()
     await expect(page.getByText(/BETTER INFORMATION/i)).toBeVisible()
     await expect(page.getByText('TOP SIGNALS')).toBeVisible()
-    await expect(page.getByText('Probability-Implied Line').first()).toBeVisible()
+    await expect(page.getByText('LEVLINE PICK')).toBeVisible()
     await expect(page.getByText('Fair line', { exact: true })).toHaveCount(0)
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
@@ -27,6 +27,7 @@ for (const [name, width, height] of viewports) {
     await page.locator('[data-game-open]:visible').first().click()
     await expect(page.locator('.ss-matchup-page')).toBeVisible()
     await expect(page.getByText('LEVLINE FORECAST').first()).toBeVisible()
+    await expect(page.getByText('Probability-Implied Line').first()).toBeVisible()
     await expect(page.getByText('Football Signal').first()).toBeVisible()
     await expect(page.getByText('Market Signal').first()).toBeVisible()
     await expect(page.getByText('THE SIGNAL').first()).toBeVisible()
@@ -85,12 +86,24 @@ test('governance-approved Impact Monitor renders as explainability-only context'
     })
   })
 
-  await page.reload()
-  await page.locator('[data-game-open]:visible').first().click()
+  await page.goto(`./#/game/${encodeURIComponent(gameId)}`)
   await expect(page.getByText('IMPACT MONITOR')).toBeVisible()
   await expect(page.getByText('Publication Safe Player')).toBeVisible()
   await expect(page.getByText(/explainability only/i)).toBeVisible()
   await expect(page.getByText(/not an authorized F-ST probability feature/i)).toBeVisible()
+})
+
+test('matchup presentation reads the canonical official winner and probability without replacing them', async ({ page }) => {
+  await page.goto('./')
+  const game = await page.evaluate(async () => {
+    const response = await fetch('./data/public_forecasts.json')
+    const payload = await response.json()
+    return payload.games[0]
+  })
+  await page.goto(`./#/game/${encodeURIComponent(game.game_id)}`)
+  await expect(page.locator('.ss-matchup-page')).toBeVisible()
+  await expect(page.getByText(`${Math.round(Number(game.official_winner_probability) * 100)}%`, { exact: true }).first()).toBeVisible()
+  await expect(page.getByText(game.official_winner, { exact: true }).first()).toBeVisible()
 })
 
 test('History remains a first-class 2026 receipts surface', async ({ page }) => {
