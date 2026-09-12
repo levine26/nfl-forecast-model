@@ -1,0 +1,119 @@
+name: LevLine availability practice V3
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/harmonization_practice_state_crosscheck_v3.json'
+      - 'research/evaluate_availability_practice_state_crosscheck_v3.py'
+      - 'research/test_availability_practice_state_crosscheck_v3.py'
+      - '.github/workflows/research_availability_practice_v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-availability-practice-v3-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  practice-v3-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+
+      - name: Test V3 denominator semantics
+        run: pytest -q research/test_availability_practice_state_crosscheck_v3.py
+
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-availability-practice-v3-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-availability-practice-v3-${{ runner.os }}-
+            nfl-availability-harmonization-${{ runner.os }}-
+            nfl-availability-${{ runner.os }}-
+
+      - name: Reproduce preserved strict V2 source artifact
+        run: |
+          rm -rf research_outputs/availability_harmonization_regular_v2
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/run_availability_harmonization_regular_v2.py
+          test -s research_outputs/availability_harmonization_regular_v2/qualification.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/availability_harmonization_regular_v2/qualification.json').read_text())
+          assert report['technical_status'] == 'BLOCKED', report
+          assert set(report['hard_blockers']) == {
+              'diagnostic game-status agreement gate failed: 2023',
+              'official-to-canonical identity gate failed: 2024',
+              'diagnostic game-status agreement gate failed: 2024',
+          }, report
+          assert report['completed_2026_outcomes_used'] == 0
+          PY
+
+      - name: Evaluate frozen V3 practice-state source semantics
+        run: |
+          rm -rf research_outputs/availability_practice_v3
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/evaluate_availability_practice_state_crosscheck_v3.py
+          test -s research_outputs/availability_practice_v3/qualification.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('research_outputs/availability_practice_v3/qualification.json').read_text())
+          assert report['technical_status'] == 'QUALIFIED', report
+          assert report['validation_source_qualified'] is True, report
+          assert report['hard_blockers'] == [], report
+          assert report['v2_failure_preserved'] is True, report
+          assert report['game_status_qualifying_gate'] is False, report
+          assert report['final_game_status_feature_authorized'] is False, report
+          assert report['probability_model_built'] is False, report
+          assert report['completed_2026_outcomes_used'] == 0, report
+          assert report['game_outcomes_used'] == 0, report
+          assert report['training_source_chronology_qualified'] is False, report
+          assert report['training_label_semantics_qualified'] is False, report
+          assert report['v09b_execution_authorized'] is False, report
+          expected = {
+              '2022': (5424, 2),
+              '2023': (5406, 2),
+              '2024': (5917, 0),
+              '2025': (5740, 0),
+          }
+          for season, (recognized, unresolved) in expected.items():
+              metrics = report['metrics_by_season'][season]
+              assert metrics['official_recognized_practice_rows'] == recognized, metrics
+              assert metrics['unresolved_recognized_practice_rows'] == unresolved, metrics
+              assert metrics['official_practice_state_to_canonical_identity_resolution_rate'] >= 0.995, metrics
+          PY
+
+      - name: Prove branch remains research-only
+        if: always()
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [line.strip() for line in Path('/tmp/changed.txt').read_text().splitlines() if line.strip()]
+          bad = [path for path in changed if not (path.startswith('research/') or path.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: levline-availability-practice-v3-${{ github.run_id }}
+          path: |
+            research_outputs/availability_harmonization_regular_v2/
+            research_outputs/availability_practice_v3/
+          retention-days: 30
+          if-no-files-found: warn
