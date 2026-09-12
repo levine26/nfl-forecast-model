@@ -23,7 +23,17 @@
     ],
     "secondary": ["brier", "log_loss", "calibration"],
     "same_pick_games": "cannot affect relative winner accuracy; may still inform confidence-layer evaluation",
-    "disagreement_games": "decisive sample for whether later information should change the published winner pick"
+    "disagreement_games": "decisive sample for whether later information should change the published winner pick",
+    "preregistered_diagnostic_slices": [
+      "T-120 F-ST absolute probability distance from 0.5: 0-2 percentage points",
+      "T-120 F-ST absolute probability distance from 0.5: >2-5 percentage points",
+      "T-120 F-ST absolute probability distance from 0.5: >5-10 percentage points",
+      "T-120 F-ST absolute probability distance from 0.5: >10 percentage points",
+      "later market crosses the 0.5 winner boundary",
+      "large absolute market movement between T-120 and tested horizon",
+      "official point-in-time QB/inactive information shock when source qualification exists"
+    ],
+    "slice_role": "diagnostic only in V1; slices may explain where switch value comes from but cannot rescue a failed aggregate accuracy comparison or create an unregistered conditional switch rule"
   },
   "decision_policy": {
     "default": "retain the T-120 F-ST winner pick",
@@ -39,9 +49,10 @@
       "fst_only_correct": 15,
       "market_only_correct": 10,
       "switch_win_rate": 0.6,
-      "overall_accuracy_gain_percentage_points": 0.45998160073598
+      "overall_accuracy_gain_percentage_points": 0.45998160073598,
+      "all_fst_market_pick_disagreements_within_about_five_fst_probability_points_of_0_5": true
     },
-    "interpretation": "The entire observed 3.0 winner-accuracy advantage over market came from a very small disagreement set, demonstrating why switch quality rather than global probability movement is the key accuracy-first object."
+    "interpretation": "The entire observed 3.0 winner-accuracy advantage over market came from a very small decision-boundary disagreement set, demonstrating why switch quality rather than global probability movement is the key accuracy-first object."
   },
   "research_firewall": {
     "completed_2026_outcomes_used_to_define_rule": 0,
