@@ -17,6 +17,7 @@ import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from nfl_forecast.editorial_provider_fallback import recover_focused_payload
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
@@ -399,8 +400,26 @@ def main() -> None:
     args = parser.parse_args()
 
     prompt = Path(args.prompt_file).read_text(encoding="utf-8")
-    content = run(prompt, model=args.model, timeout=args.timeout, attempts=args.attempts)
-    Path(args.output_file).write_text(content + "\n", encoding="utf-8")
+    output_path = Path(args.output_file)
+    try:
+        content = run(prompt, model=args.model, timeout=args.timeout, attempts=args.attempts)
+    except RuntimeError as exc:
+        game_id = output_path.stem
+        recovered, source = recover_focused_payload(
+            game_id=game_id,
+            output_path=output_path,
+            reason=str(exc),
+        )
+        if recovered:
+            print(
+                f"{game_id}: Groq request failed; recovered only this game through {source}. "
+                "The focused and full-slate validators remain authoritative.",
+                file=sys.stderr,
+            )
+            return
+        raise
+
+    output_path.write_text(content + "\n", encoding="utf-8")
     print(f"Groq editorial response written with primary model {args.model}")
 
 
