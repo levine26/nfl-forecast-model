@@ -5,6 +5,10 @@ on:
     paths:
       - 'research/LEVLINE_4_ACCURACY_FIRST_THESIS.md'
       - 'research/levline4_accuracy_primary_contract_v1.json'
+      - 'research/levline4_accuracy_switch_contract_v1.json'
+      - 'research/levline3_fst_market_accuracy_audit_v1.json'
+      - 'research/levline3_chronological_accuracy_audit_v1.py'
+      - 'research/test_levline3_chronological_accuracy_audit_v1.py'
       - 'research/levline4_accuracy_primary_v1.py'
       - 'research/test_levline4_accuracy_primary_v1.py'
       - '.github/workflows/research_levline4_accuracy_primary_v1.yml'
@@ -20,10 +24,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install lightweight research dependencies
-        run: python -m pip install pytest 'pandas==3.0.5' 'numpy==2.4.6'
-      - name: Validate accuracy-first paired evaluation
-        run: python -m pytest -q research/test_levline4_accuracy_primary_v1.py
+      - name: Install frozen research dependencies
+        run: python -m pip install pytest 'pandas==3.0.5' 'numpy==2.4.6' 'scikit-learn==1.9.0'
+      - name: Install LevLine package without dependency drift
+        run: python -m pip install -e . --no-deps
+      - name: Validate accuracy-first paired evaluation and chronological audit
+        run: >-
+          python -m pytest -q
+          research/test_levline4_accuracy_primary_v1.py
+          research/test_levline3_chronological_accuracy_audit_v1.py
       - name: Prove production surfaces remain untouched
         run: |
           git diff --exit-code -- src/nfl_forecast .github/workflows/pregame.yml .github/workflows/weekly.yml
