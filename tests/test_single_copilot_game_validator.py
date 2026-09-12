@@ -107,37 +107,72 @@ def test_focused_source_backfill_still_fails_closed_without_two_families(monkeyp
     assert any("two independent" in failure for failure in failures)
 
 
-def test_underlength_rationale_repair_is_narrow_matchup_specific_and_contract_safe():
-    row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
-    rationale = "Cincinnati can control the game if its offense stays ahead of pressure."
+def test_underlength_rationale_is_derived_from_researched_matchup_mechanism():
+    row = pd.Series({"away_team": "CHI", "home_team": "CAR", "pick": "CHI"})
+    rationale = "Bears pressure can decide it."
     paragraph1 = (
-        "Tampa Bay must manage Cincinnati pressure with a disciplined protection plan, "
-        "while the Bengals need their front to keep the Buccaneers behind schedule."
+        "Chicago can create the cleaner passing environment if its protection handles Carolina's pressure, while the Panthers need their front to force longer downs. "
+        "The Bears can answer with quick-game concepts and movement throws, but Carolina has to keep Chicago from settling into rhythm. "
+        "If the Panthers cannot disrupt the pocket, the Bears should have more chances to sustain drives and control the matchup."
     )
     repaired, changed = module._repair_underlength_rationale(rationale, paragraph1, row)
     assert changed
     assert 18 <= len(module._words(repaired)) <= 40
-    assert "Bengals" in repaired
-    assert "Buccaneers" in repaired
+    assert "Bears" in repaired
+    assert "Panthers" in repaired
     assert not module._rationale_has_prohibited(repaired)
 
 
-def test_rationale_repair_refuses_too_short_or_prohibited_copy():
+def test_rationale_repair_refuses_missing_garbage_prohibited_or_unverified_copy():
     row = pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "CIN"})
-    paragraph1 = "The Bengals pressure Tampa Bay while the Buccaneers adjust their protection."
+    paragraph1 = (
+        "Tampa Bay must manage Cincinnati pressure with a disciplined protection plan, while the Bengals need their front to keep the Buccaneers behind schedule. "
+        "The Buccaneers can counter with quick throws and motion, but Cincinnati wants to create obvious passing downs and let its rush dictate the pocket. "
+        "That protection battle should determine whether either offense can stay on schedule late in drives."
+    )
 
-    too_short = "Cincinnati needs pressure to win."
-    repaired, changed = module._repair_underlength_rationale(too_short, paragraph1, row)
-    assert not changed
-    assert repaired == too_short
+    for too_short in ("", "Edge.", "Bengals edge."):
+        repaired, changed = module._repair_underlength_rationale(too_short, paragraph1, row)
+        assert not changed
+        assert repaired == too_short
 
-    prohibited = "Cincinnati has a market edge if its pressure plan works against Tampa Bay."
+    prohibited = "Cincinnati has a market edge if its pressure plan works."
     repaired, changed = module._repair_underlength_rationale(prohibited, paragraph1, row)
     assert not changed
     assert repaired == prohibited
 
+    unverified_paragraph = (
+        "The Bengals can create separation with tempo and spacing, but the Buccaneers need to tackle cleanly and avoid giving Cincinnati easy yards after the catch."
+    )
+    repaired, changed = module._repair_underlength_rationale(
+        "Bengals pressure can decide it.", unverified_paragraph, row
+    )
+    assert not changed
+    assert repaired == "Bengals pressure can decide it."
 
-def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path):
+
+def test_same_mechanism_repairs_do_not_repeat_substantive_seven_word_phrase():
+    paragraph_a = (
+        "Chicago can create the cleaner passing environment if its protection handles Carolina pressure, while the Panthers need their rush to force longer downs."
+    )
+    paragraph_b = (
+        "Tampa Bay can create the cleaner passing environment if its protection handles Cincinnati pressure, while the Bengals need their rush to force longer downs."
+    )
+    repaired_a, changed_a = module._repair_underlength_rationale(
+        "Bears pressure can decide it.",
+        paragraph_a,
+        pd.Series({"away_team": "CHI", "home_team": "CAR", "pick": "CHI"}),
+    )
+    repaired_b, changed_b = module._repair_underlength_rationale(
+        "Buccaneers pressure can decide it.",
+        paragraph_b,
+        pd.Series({"away_team": "TB", "home_team": "CIN", "pick": "TB"}),
+    )
+    assert changed_a and changed_b
+    assert not (module._unique_ngrams(repaired_a) & module._unique_ngrams(repaired_b))
+
+
+def test_validate_persists_derived_rationale_and_exact_passing_sources(tmp_path):
     gid = "2026_01_TB_CIN"
     paragraph1 = (
         "Buccaneers protection has to handle Cincinnati pressure without forcing rushed throws, while Tampa Bay can help with motion and quick-game answers. "
@@ -149,7 +184,7 @@ def test_validate_persists_repaired_rationale_and_exact_passing_sources(tmp_path
             gid: {
                 "headline": "Bengals pressure tests Buccaneers protection plan",
                 "paragraph1": paragraph1,
-                "model_rationale": "Cincinnati can control the game if its offense stays ahead of pressure.",
+                "model_rationale": "Bengals pressure can decide it.",
                 "sources": [
                     {
                         "name": "ESPN",
