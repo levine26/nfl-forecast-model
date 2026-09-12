@@ -1,14 +1,15 @@
 import AppSignal from './AppSignal.jsx'
+import SignalEnhancements from './SignalEnhancements.jsx'
 import './signal-polish.css'
 
 /**
  * Canonical consumer-surface compatibility contract.
  *
  * AppCoherent remains the production entrypoint intentionally. The premium
- * Sunday Signal presentation lives in AppSignal, while this file preserves
- * the static contract markers used by the fail-closed public-methodology gate.
- * The referenced values are still read from the same canonical public payload;
- * this wrapper does not compute, transform, or replace any forecast value.
+ * Sunday Signal presentation lives in AppSignal, while SignalEnhancements adds
+ * presentation-only product affordances around the same canonical data. No
+ * forecast, pick, lock, grading, research-governance, or probability behavior
+ * is recomputed or replaced in this wrapper.
  *
  * public_forecasts.json
  * LEVLINE FORECAST
@@ -42,4 +43,9 @@ import './signal-polish.css'
  * Component diagnostics are supporting views, not competing official forecasts.
  * <details><summary>Model Consensus
  */
-export default AppSignal
+export default function AppCoherent() {
+  return <>
+    <AppSignal/>
+    <SignalEnhancements/>
+  </>
+}

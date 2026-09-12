@@ -17,8 +17,10 @@ for (const [name, width, height] of viewports) {
 
     await expect(page.locator('.ss-brand-lockup:visible').first().getByText('SUNDAY SIGNAL')).toBeVisible()
     await expect(page.getByText(/BETTER INFORMATION/i)).toBeVisible()
-    await expect(page.getByText('TOP SIGNALS')).toBeVisible()
-    if (width > 1024) await expect(page.getByText('LEVLINE PICK')).toBeVisible()
+    await expect(page.getByText('FIND YOUR GAME')).toBeVisible()
+    await expect(page.locator('.ss-plus-top-signals').getByText('TOP SIGNALS')).toBeVisible()
+    await expect(page.getByText('MODEL VS MARKET').first()).toBeVisible()
+    if (width > 1024) await expect(page.locator('.ss-board-labels:visible').getByText('LEVLINE PICK', { exact: true })).toBeVisible()
     else await expect(page.locator('.ss-mobile-card:visible').first().getByText('LEVLINE FORECAST')).toBeVisible()
     await expect(page.getByText('Fair line', { exact: true })).toHaveCount(0)
 
@@ -31,7 +33,10 @@ for (const [name, width, height] of viewports) {
     await expect(page.getByText('Probability-Implied Line').first()).toBeVisible()
     await expect(page.locator('.ss-flow:visible').getByText('Football Signal')).toBeVisible()
     await expect(page.locator('.ss-flow:visible').getByText('Market Signal')).toBeVisible()
-    await expect(page.locator('.ss-the-signal:visible').getByText('THE SIGNAL', { exact: true })).toBeVisible()
+    await expect(page.locator('.ss-plus-signal:visible').getByText('THE SIGNAL', { exact: true })).toBeVisible()
+    await expect(page.getByText('SIGNAL STRENGTH', { exact: true })).toBeVisible()
+    await expect(page.getByText('WHAT CHANGED', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Share this Sunday Signal matchup/i })).toBeVisible()
     await expect(page.getByText('WHY LEVLINE?', { exact: true })).toHaveCount(0)
     await expect(page).toHaveURL(/#\/game\//)
 
@@ -87,9 +92,6 @@ test('governance-approved Impact Monitor renders as explainability-only context'
     })
   })
 
-  // The first navigation above already loaded the app. Change the query string
-  // here so this is a full document load rather than a hash-only navigation;
-  // the mocked publication payload is then fetched before the matchup renders.
   await page.goto(`./?impact-monitor-qa=1#/game/${encodeURIComponent(gameId)}`)
   await expect(page.getByText('IMPACT MONITOR')).toBeVisible()
   await expect(page.getByText('Publication Safe Player')).toBeVisible()
@@ -109,12 +111,24 @@ test('matchup presentation reads the canonical official probability and official
   await expect(page.locator('.ss-pick')).toBeVisible()
   await expect(page.getByText(`${Math.round(Number(game.official_winner_probability) * 100)}%`, { exact: true }).first()).toBeVisible()
   await expect(page.getByText('WIN PROBABILITY', { exact: true }).first()).toBeVisible()
+  await expect(page.locator('.ss-plus-game-command')).toContainText(game.official_winner)
 })
 
-test('History remains a first-class 2026 receipts surface', async ({ page }) => {
+test('History remains a first-class 2026 receipts surface with signal-tier accountability', async ({ page }) => {
   await page.goto('./#/history')
   await expect(page.getByText(/2026 PICKS OF RECORD/i)).toBeVisible()
   await expect(page.getByText(/Immutable pregame receipts/i)).toBeVisible()
+  await expect(page.getByText('PERFORMANCE BY SIGNAL TIER')).toBeVisible()
+  await expect(page.getByText('THE SUNDAY SIGNAL STANDARD')).toBeVisible()
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+  expect(overflow).toBeLessThanOrEqual(1)
+})
+
+test('Power Ratings exposes the richer published team profile without changing ranking authority', async ({ page }) => {
+  await page.goto('./#/power')
+  await expect(page.getByText('LEAGUE LENS')).toBeVisible()
+  await expect(page.getByText('OFF EPA')).toBeVisible()
+  await expect(page.getByText('DEF EPA ALLOWED')).toBeVisible()
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBeLessThanOrEqual(1)
 })
