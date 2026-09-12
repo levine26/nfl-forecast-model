@@ -1,4 +1,62 @@
 /* Final presentation-only overrides after visual QA against the supplied mockup. */
+
+/* Slate readability fix: keep row copy on the normal UI face and prevent any
+   condensed/display treatment from making matchup text look horizontally squeezed. */
+.ss-board-table,
+.ss-game-row,
+.ss-row-matchup,
+.ss-row-matchup > span,
+.ss-row-matchup > span > b,
+.ss-row-pick,
+.ss-row-pick b,
+.ss-row-pick span,
+.ss-game-row > span,
+.ss-game-row .ss-life,
+.ss-row-edge {
+  font-family: var(--ss-ui);
+  font-stretch: normal;
+  font-kerning: normal;
+  font-variant: normal;
+}
+
+.ss-row-matchup > span > b {
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.ss-row-pick b {
+  font-family: var(--ss-ui);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.ss-row-pick span,
+.ss-game-row > span,
+.ss-row-edge {
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.ss-row-prob {
+  font-family: var(--ss-ui);
+  font-size: 19px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -.01em;
+  font-stretch: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.ss-game-row .ss-life {
+  letter-spacing: .02em;
+}
+
 @media (max-width: 768px) {
   /* Keep the swipeable Top Signals rail self-contained instead of widening the document. */
   .ss-plus-top-signals {
