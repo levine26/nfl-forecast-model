@@ -1,0 +1,88 @@
+name: LevLine V09B roster duplicate provenance v3
+
+on:
+  pull_request:
+    paths:
+      - 'research/v09b_roster_universe_duplicate_provenance_v3.py'
+      - 'research/test_v09b_roster_universe_duplicate_provenance_v3.py'
+      - '.github/workflows/research_v09b_roster_duplicate_provenance_v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - run: pytest -q research/test_v09b_roster_universe_duplicate_provenance_v3.py
+
+  provenance-diagnostic:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Fingerprint all source columns for duplicate identities
+        run: |
+          mkdir -p research_outputs/v09b_roster_duplicate_provenance_v3
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_roster_universe_duplicate_provenance_v3.py \
+              --season ${{ matrix.season }} \
+              --output research_outputs/v09b_roster_duplicate_provenance_v3/${{ matrix.season }}.json
+      - name: Assert diagnostic-only boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          season='${{ matrix.season }}'
+          result=json.loads(Path(f'research_outputs/v09b_roster_duplicate_provenance_v3/{season}.json').read_text())
+          diag=result['full_row_duplicate_diagnostics']
+          assert result['qualification_authority'] is False
+          assert result['deduplication_performed'] is False
+          assert diag['qualification_authority'] is False
+          assert diag['deduplication_performed'] is False
+          assert diag['status_semantics_interpreted'] is False
+          assert diag['game_day_roster_universe_qualified'] is False
+          assert diag['training_label_semantics_qualified'] is False
+          assert diag['v09b_model_fit_authorized'] is False
+          assert diag['game_outcomes_used'] == 0
+          assert diag['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-roster-duplicate-provenance-v3-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_roster_duplicate_provenance_v3/${{ matrix.season }}.json
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove v3 remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
