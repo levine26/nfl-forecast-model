@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import subprocess
 
 from nfl_forecast.editorial_provider_fallback import recover_focused_payload
 
@@ -39,6 +40,19 @@ def _write_manifest(root: Path, generated_utc: str) -> None:
     (root / f"{GAME_ID}.json").write_text(json.dumps(_chatgpt_entry()))
 
 
+def _provider_payload(headline: str = "Validated prior headline") -> dict:
+    return {
+        "games": {
+            GAME_ID: {
+                "headline": headline,
+                "paragraph1": _chatgpt_entry()["games"][GAME_ID]["paragraph1"],
+                "paragraph2": "Football context: Arizona protection against Los Angeles pressure remains the central matchup mechanism. The pick: Los Angeles Chargers moneyline.",
+                "sources": _chatgpt_entry()["games"][GAME_ID]["sources"],
+            }
+        }
+    }
+
+
 def test_fresh_chatgpt_is_preferred_for_failed_groq_game(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_RUN_ID", "123")
     now = datetime(2026, 9, 12, 16, 0, tzinfo=timezone.utc)
@@ -71,16 +85,7 @@ def test_stale_chatgpt_uses_last_validated_game_and_flags_refresh(tmp_path: Path
     chatgpt = tmp_path / "chatgpt"
     _write_manifest(chatgpt, "2026-09-12T04:00:00Z")
     provider = tmp_path / "provider.json"
-    provider.write_text(json.dumps({
-        "games": {
-            GAME_ID: {
-                "headline": "Validated prior headline",
-                "paragraph1": _chatgpt_entry()["games"][GAME_ID]["paragraph1"],
-                "paragraph2": "Football context: Arizona protection against Los Angeles pressure remains the central matchup mechanism. The pick: Los Angeles Chargers moneyline.",
-                "sources": _chatgpt_entry()["games"][GAME_ID]["sources"],
-            }
-        }
-    }))
+    provider.write_text(json.dumps(_provider_payload()))
     output = tmp_path / "focused.txt"
     status = tmp_path / "status.json"
 
@@ -102,6 +107,38 @@ def test_stale_chatgpt_uses_last_validated_game_and_flags_refresh(tmp_path: Path
     assert recorded["status"] == "degraded"
     assert recorded["games"][GAME_ID]["requires_chatgpt_refresh"] is True
     assert recorded["failed_games"] == [GAME_ID]
+
+
+def test_deleted_worktree_artifact_can_recover_committed_last_good(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("GITHUB_RUN_ID", "git-head")
+    repo = tmp_path / "repo"
+    (repo / "outputs").mkdir(parents=True)
+    provider = repo / "outputs" / "copilot_media_reads.json"
+    provider.write_text(json.dumps(_provider_payload("Committed last-good headline")))
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=repo, check=True)
+    subprocess.run(["git", "add", "outputs/copilot_media_reads.json"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "last good"], cwd=repo, check=True)
+    provider.unlink()
+    monkeypatch.chdir(repo)
+
+    output = repo / "focused.txt"
+    status = repo / "status.json"
+    recovered, source = recover_focused_payload(
+        game_id=GAME_ID,
+        output_path=output,
+        reason="provider_down",
+        chatgpt_dir=repo / "no-chatgpt",
+        provider_artifact=Path("outputs/copilot_media_reads.json"),
+        status_path=status,
+        now=datetime(2026, 9, 12, 16, 0, tzinfo=timezone.utc),
+    )
+
+    assert recovered is True
+    assert source == "last_validated_editorial"
+    assert json.loads(output.read_text())["games"][GAME_ID]["headline"] == "Committed last-good headline"
+    assert json.loads(status.read_text())["groq_provider_fallback"]["games"][GAME_ID]["requires_chatgpt_refresh"] is True
 
 
 def test_missing_game_fallback_stays_fail_closed(tmp_path: Path, monkeypatch) -> None:
