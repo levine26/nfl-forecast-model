@@ -1,0 +1,100 @@
+name: LevLine V09B NFL transaction browser pagination diagnostic V3
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_nfl_transaction_browser_pagination_v3_contract.json'
+      - 'research/v09b_nfl_transaction_browser_pagination_v3.py'
+      - 'research/test_v09b_nfl_transaction_browser_pagination_v3.py'
+      - '.github/workflows/research_v09b_nfl_transaction_browser_pagination_v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - run: pytest -q research/test_v09b_nfl_transaction_browser_pagination_v3.py
+      - name: Validate diagnostic-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/availability/v09b_nfl_transaction_browser_pagination_v3_contract.json').read_text())
+          assert c['status']=='STAGED_BROWSER_CLIENT_DIAGNOSTIC_ONLY_NO_SOURCE_OR_CHRONOLOGY_AUTHORITY'
+          assert len(c['fixed_endpoints'])==2
+          assert c['explicit_non_gates']['novel_row_advancement_required_for_diagnostic_completion'] is False
+          assert c['authority']['diagnostic_has_source_qualification_authority'] is False
+          assert c['authority']['diagnostic_has_chronology_authority'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          PY
+
+  browser-diagnostic:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Prove browser client exists
+        run: google-chrome --version || google-chrome-stable --version || chromium --version
+      - name: Render frozen initial and cursor pages in fresh browser processes
+        run: |
+          OUT=research_outputs/v09b_nfl_transaction_browser_pagination_v3/result.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_nfl_transaction_browser_pagination_v3.py \
+              --contract research/availability/v09b_nfl_transaction_browser_pagination_v3_contract.json \
+              --output "$OUT" --timeout-seconds 45
+      - name: Assert accounting and authority only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research_outputs/v09b_nfl_transaction_browser_pagination_v3/result.json').read_text())
+          assert r['endpoints_reported']==2
+          assert r['render_attempts_reported']==4
+          assert r['accounting_integrity_pass'] is True
+          assert r['diagnostic_has_source_qualification_authority'] is False
+          assert r['diagnostic_has_chronology_authority'] is False
+          assert r['full_paginated_source_class_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['completed_2026_outcomes_used']==0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-nfl-transaction-browser-pagination-v3-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_browser_pagination_v3/result.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
