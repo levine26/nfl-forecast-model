@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'research/availability/v09b_modern_dnp_weekly_roster_diagnostic_contract_v1.json'
+      - 'research/availability/v09b_modern_dnp_weekly_roster_diagnostic_v1_receipt.json'
       - 'research/v09b_modern_dnp_weekly_roster_diagnostic_v1.py'
       - 'research/run_v09b_modern_dnp_weekly_roster_diagnostic_v1.py'
       - 'research/test_v09b_modern_dnp_weekly_roster_diagnostic_v1.py'
@@ -58,6 +59,30 @@ jobs:
           assert g['v09b_execution_authorized'] is False
           assert g['same_version_hash_pinning_after_results_allowed'] is False
           assert g['completed_2026_outcomes_used'] == 0
+          PY
+
+      - name: Validate preserved first-run receipt remains zero-authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path(
+              'research/availability/v09b_modern_dnp_weekly_roster_diagnostic_v1_receipt.json'
+          ).read_text())
+          assert r['status'] == 'DIAGNOSTIC_COMPLETE_ZERO_QUALIFICATION_AUTHORITY'
+          assert r['workflow_evidence']['run_id'] == 34737071414
+          assert r['workflow_evidence']['validated_head_sha'] == 'f5e72e198209aa4d6d14c0a71103cac9759381df'
+          assert r['empirical_result']['canonical_gamebooks_expected'] == 1296
+          assert r['empirical_result']['gamebook_parse_error_rows'] == 0
+          assert r['empirical_result']['dnp_tokens_parsed'] == 3582
+          assert r['empirical_result']['identity_state_counts'] == {'unique': 1900, 'unresolved': 1682}
+          assert r['scientific_disposition']['weekly_status_ACT_equals_game_day_active_qualified'] is False
+          assert r['scientific_disposition']['status_description_A01_equals_game_day_active_qualified'] is False
+          assert r['scientific_disposition']['training_label_semantics_qualified'] is False
+          assert r['scientific_disposition']['training_source_chronology_qualified'] is False
+          assert r['scientific_disposition']['v09b_execution_authorized'] is False
+          assert r['governance']['qualification_authority'] is False
+          assert r['governance']['completed_2026_outcomes_used'] == 0
           PY
 
       - name: Test diagnostic parser and identity rules
