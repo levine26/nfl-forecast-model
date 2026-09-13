@@ -1,0 +1,301 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-MODERN-DNP-CONTRADICTION-KICKOFF-CHRONOLOGY-DIAGNOSTIC-V2",
+  "status": "PREREGISTERED_SUCCESSOR_DIAGNOSTIC_ONLY_ZERO_MEMBERSHIP_OR_MODEL_AUTHORITY",
+  "purpose": "Retest the seven frozen DNP contradiction partitions with a stricter first-party pre-kickoff chronology interpreter after V1 was scientifically rejected. V2 fixes only preregistered interpretation defects and cannot qualify the league-wide roster universe, training labels, training chronology, or V09B fitting.",
+  "predecessor_failure": {
+    "contract_id": "V09B-MODERN-DNP-CONTRADICTION-KICKOFF-CHRONOLOGY-DIAGNOSTIC-V1",
+    "receipt_id": "V09B-MODERN-DNP-CONTRADICTION-KICKOFF-CHRONOLOGY-V1-FAILED",
+    "receipt_path": "research/availability/v09b_modern_dnp_contradiction_kickoff_chronology_v1_failure_receipt.json",
+    "required_status": "EMPIRICAL_RUN_COMPLETE_SCIENTIFIC_INTERPRETATION_FAILED_ZERO_AUTHORITY",
+    "v1_classifier_output_may_not_be_used_as_truth": true,
+    "v1_failure_modes_required_as_regressions": [
+      "PUBLICATION_TIMESTAMP_EXTRACTION_INCOMPLETE",
+      "TERMINAL_STATE_REDUCER_CARRIES_STALE_DESIGNATION",
+      "TEMPORARY_STANDARD_ELEVATION_SCOPE_NOT_MODELED",
+      "TRANSACTION_STATE_PERSISTENCE_USES_UNQUALIFIED_ABSENCE_OF_CHANGE",
+      "PLAYER_LOCAL_CONTEXT_NOT_STRICT_FOR_NON_TRANSACTION_ARTICLES",
+      "RESERVE_ACTIVATION_GRAMMAR_INCOMPLETE"
+    ]
+  },
+  "dependencies": {
+    "identity": {
+      "contract_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3",
+      "modern_player_team_game_identity_qualified": true,
+      "identity_only": true
+    },
+    "dnp_semantics": {
+      "contract_id": "V09B-MODERN-GAMEBOOK-DNP-SEMANTIC-DIAGNOSTIC-V2",
+      "uniform_did_not_play_as_active_membership_is_contradicted": true,
+      "qualification_authority": false
+    },
+    "weekly_status": {
+      "membership_authority": false
+    },
+    "club_transaction_archive_coverage": {
+      "coverage_receipt_path": "research/availability/v09b_modern_club_transaction_archive_coverage_v1_receipt.json",
+      "coverage_is_source_discovery_only": true,
+      "chronology_or_membership_authority": false
+    }
+  },
+  "adaptive_design_disclosure": {
+    "observed_before_v2_preregistration": [
+      "V1 raw artifact included 22 first-party source fetches across all seven partitions and 17 rows.",
+      "V1 missed JSON-LD datePublished timestamps on Chiefs, Buccaneers, and Steelers target-game inactive pages.",
+      "V1 carried stale waiver/practice-squad/reserve states to later target games from absence of a later parsed event.",
+      "V1 conflated temporary standard elevations with persistent active-roster state.",
+      "V1 could attribute neighboring-player reserve language to the target player.",
+      "V1 failed to clear older non-eligibility after explicit later activation from reserve."
+    ],
+    "same_version_rule_change_after_results_authorized": false,
+    "post_hoc_threshold_relaxation_authorized": false,
+    "manual_player_exception_authorized": false
+  },
+  "frozen_scope": {
+    "seasons": [2018, 2020, 2021],
+    "partition_count": 7,
+    "dnp_only_row_count": 17,
+    "partitions": [
+      {
+        "partition_key": "2018_16_DEN_OAK|OAK",
+        "game_id": "2018_16_DEN_OAK",
+        "team": "OAK",
+        "kickoff_utc": "2018-12-25T01:15:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 2,
+        "total_roster_max_contradiction": true,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "A.McCarron", "gsis_id": "00-0031288"},
+          {"jersey_number": "20", "display_name": "D.Worley", "gsis_id": "00-0032891"},
+          {"jersey_number": "56", "display_name": "D.Moore", "gsis_id": "00-0030069"},
+          {"jersey_number": "63", "display_name": "C.Hunt", "gsis_id": "00-0033667"}
+        ],
+        "source_seeds": [
+          "https://www.raiders.com/team/transactions/2018",
+          "https://www.raiders.com/news/raiders-announce-transactions-12-24-18",
+          "https://www.raiders.com/news/oakland-raiders-injury-report-week-16-hurst-and-worley-miss-thursday-practice"
+        ],
+        "source_local_timezone": "America/Los_Angeles"
+      },
+      {
+        "partition_key": "2020_11_PIT_JAX|JAX",
+        "game_id": "2020_11_PIT_JAX",
+        "team": "JAX",
+        "kickoff_utc": "2020-11-22T18:00:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": true,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "M.Glennon", "gsis_id": "00-0030520"},
+          {"jersey_number": "39", "display_name": "D.Middleton", "gsis_id": "00-0032697"}
+        ],
+        "source_seeds": [
+          "https://www.jaguars.com/team/transactions/2020",
+          "https://www.jaguars.com/news/jaguars-make-roster-moves-x3605",
+          "https://www.jaguars.com/news/jaguars-make-roster-moves-and-announce-updates-for-tomorrow-s-game",
+          "https://www.jaguars.com/news/in-and-out-jones-ruled-out"
+        ],
+        "source_local_timezone": "America/New_York"
+      },
+      {
+        "partition_key": "2020_13_NO_ATL|NO",
+        "game_id": "2020_13_NO_ATL",
+        "team": "NO",
+        "kickoff_utc": "2020-12-06T18:00:00Z",
+        "active_max_contradiction": false,
+        "minimum_dnp_non_active_required_by_active_max": 0,
+        "total_roster_max_contradiction": true,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "J.Winston", "gsis_id": "00-0031503"}
+        ],
+        "source_seeds": [
+          "https://www.neworleanssaints.com/sitemap/html/articles/2020/12",
+          "https://www.neworleanssaints.com/news/saints-at-falcons-2020-week-13-preview"
+        ],
+        "source_local_timezone": "America/Chicago"
+      },
+      {
+        "partition_key": "2020_15_JAX_BAL|JAX",
+        "game_id": "2020_15_JAX_BAL",
+        "team": "JAX",
+        "kickoff_utc": "2020-12-20T18:00:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "M.Glennon", "gsis_id": "00-0030520"},
+          {"jersey_number": "24", "display_name": "J.Scott", "gsis_id": "00-0036303"},
+          {"jersey_number": "9", "display_name": "L.Cooke", "gsis_id": "00-0034437"}
+        ],
+        "source_seeds": [
+          "https://www.jaguars.com/team/transactions/2020",
+          "https://www.jaguars.com/news/friday-update-jones-out-corner-issues-continue"
+        ],
+        "source_local_timezone": "America/New_York"
+      },
+      {
+        "partition_key": "2021_10_KC_LV|KC",
+        "game_id": "2021_10_KC_LV",
+        "team": "KC",
+        "kickoff_utc": "2021-11-15T01:20:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "99", "display_name": "K.Saunders", "gsis_id": "00-0035656"}
+        ],
+        "source_seeds": [
+          "https://www.chiefs.com/news/week-10-inactives-chiefs-vs-raiders",
+          "https://www.chiefs.com/team/transactions/2021"
+        ],
+        "source_local_timezone": "America/Chicago"
+      },
+      {
+        "partition_key": "2021_10_TB_WAS|TB",
+        "game_id": "2021_10_TB_WAS",
+        "team": "TB",
+        "kickoff_utc": "2021-11-14T18:00:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "11", "display_name": "B.Gabbert", "gsis_id": "00-0027948"},
+          {"jersey_number": "5", "display_name": "R.Sherman", "gsis_id": "00-0028092"},
+          {"jersey_number": "64", "display_name": "A.Stinnie", "gsis_id": "00-0034668"},
+          {"jersey_number": "70", "display_name": "R.Hainsey", "gsis_id": "00-0036985"},
+          {"jersey_number": "81", "display_name": "A.Brown", "gsis_id": "00-0027793"}
+        ],
+        "source_seeds": [
+          "https://www.buccaneers.com/news/will-wont-play-week-ten-washington-football-bucs-inactives-gronkowski-brown",
+          "https://www.buccaneers.com/team/transactions/2021",
+          "https://www.buccaneers.com/news/bucs-bye-week-injury-list-update-week-10-washington"
+        ],
+        "source_local_timezone": "America/New_York"
+      },
+      {
+        "partition_key": "2021_16_PIT_KC|PIT",
+        "game_id": "2021_16_PIT_KC",
+        "team": "PIT",
+        "kickoff_utc": "2021-12-26T21:25:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "95", "display_name": "C.Wormley", "gsis_id": "00-0033913"}
+        ],
+        "source_seeds": [
+          "https://www.steelers.com/news/steelers-inactives-for-week-16-vs-chiefs",
+          "https://www.steelers.com/team/transactions/2021"
+        ],
+        "source_local_timezone": "America/New_York"
+      }
+    ]
+  },
+  "source_policy": {
+    "first_party_required_for_classification": true,
+    "allowed_authority_hosts": [
+      "www.raiders.com", "raiders.com", "www.jaguars.com", "jaguars.com",
+      "www.neworleanssaints.com", "neworleanssaints.com", "www.chiefs.com", "chiefs.com",
+      "www.buccaneers.com", "buccaneers.com", "www.steelers.com", "steelers.com", "static.clubs.nfl.com"
+    ],
+    "seed_urls_are_discovery_inputs_not_preaccepted_truth": true,
+    "same_first_party_domain_one_hop_discovery_allowed": true,
+    "source_bytes_or_html_sha256_required": true,
+    "http_final_url_and_retrieval_timestamp_required": true,
+    "postgame_source_may_be_preserved_only_as_rejected_evidence": true,
+    "source_absence_is_non_evidence": true
+  },
+  "publication_timestamp_policy": {
+    "precedence": [
+      "json_ld_datePublished",
+      "meta_article_published_time",
+      "meta_og_published_time",
+      "time_datetime",
+      "visible_date_or_time"
+    ],
+    "json_ld_recursive_dict_list_search_required": true,
+    "timezone_aware_timestamp_normalized_to_utc": true,
+    "same_day_date_only_never_orders_against_kickoff": true,
+    "same_day_article_requires_explicit_timestamp_strictly_before_kickoff": true
+  },
+  "player_local_evidence_policy": {
+    "transaction_evidence_unit": "the smallest ledger row/list item/sentence or semicolon-delimited clause containing the target player's alias and the event verb",
+    "article_evidence_unit": "the smallest list item, table row, heading-associated roster line, or sentence containing the target player's alias and the designation/event language",
+    "target_alias_must_appear_inside_evidence_unit": true,
+    "neighbor_player_language_may_not_classify_target": true,
+    "broad_radius_context_as_authority_forbidden": true
+  },
+  "event_taxonomy": {
+    "types": [
+      "WAIVED_RELEASED", "PLACED_RESERVE", "SIGNED_PRACTICE_SQUAD", "SIGNED_ACTIVE_ROSTER",
+      "ACTIVATED_FROM_RESERVE", "PROMOTED_TO_ACTIVE_ROSTER", "STANDARD_ELEVATION",
+      "EXPLICIT_INACTIVE_TARGET_GAME", "EXPLICIT_ACTIVE_TARGET_GAME", "EXPLICIT_OUT_TARGET_GAME"
+    ],
+    "temporary_event_types": ["STANDARD_ELEVATION"],
+    "eligibility_restoring_types": ["SIGNED_ACTIVE_ROSTER", "ACTIVATED_FROM_RESERVE", "PROMOTED_TO_ACTIVE_ROSTER"],
+    "non_eligibility_types": ["WAIVED_RELEASED", "PLACED_RESERVE", "SIGNED_PRACTICE_SQUAD"],
+    "target_game_designation_types": ["EXPLICIT_INACTIVE_TARGET_GAME", "EXPLICIT_ACTIVE_TARGET_GAME", "EXPLICIT_OUT_TARGET_GAME"]
+  },
+  "chronology_and_reduction_policy": {
+    "classification_cutoff": "kickoff_utc",
+    "post_kickoff_event_forbidden": true,
+    "later_explicit_event_supersedes_incompatible_earlier_state": true,
+    "eligibility_restoring_event_clears_older_non_eligibility": true,
+    "temporary_standard_elevation_requires_explicit_target_game_or_target_date_applicability": true,
+    "temporary_standard_elevation_never_persists_to_another_game_by_silence": true,
+    "historical_transaction_state_may_not_be_projected_to_target_kickoff_from_absence_of_later_event": true,
+    "target_game_inactive_article_with_valid_pre_kickoff_timestamp_may_establish_explicit_inactive_and_roster_eligible_for_that_game": true,
+    "transaction_event_may_be_preserved_without_becoming_terminal_kickoff_state": true,
+    "contradictory_or_incomplete_event_sequence_forces_unresolved": true,
+    "date_only_event_ordering_timezone": "source_local_timezone frozen per partition; never compare date-only source events to raw UTC calendar date"
+  },
+  "row_outputs": {
+    "each_of_17_rows_exactly_once": true,
+    "required_fields": [
+      "partition_key", "gsis_id", "display_name", "accepted_events", "rejected_events",
+      "roster_eligibility_state", "game_day_designation_state", "supporting_source_ids", "unresolved_reasons"
+    ],
+    "unresolved_states": ["UNRESOLVED_CHRONOLOGY", "UNRESOLVED_DESIGNATION"],
+    "unresolved_rows_preserved_not_forced": true
+  },
+  "regression_requirements": {
+    "json_ld_timestamp_examples": [
+      {"source": "Chiefs Week 10 inactives", "expected_datePublished": "2021-11-15T00:01:57.189Z", "kickoff": "2021-11-15T01:20:00Z", "must_classify_publication_pre_kickoff": true},
+      {"source": "Buccaneers Week 10 inactives", "expected_datePublished": "2021-11-14T16:30:00Z", "kickoff": "2021-11-14T18:00:00Z", "must_classify_publication_pre_kickoff": true},
+      {"source": "Steelers Week 16 inactives", "expected_datePublished": "2021-12-26T19:55:00Z", "kickoff": "2021-12-26T21:25:00Z", "must_classify_publication_pre_kickoff": true}
+    ],
+    "antonio_brown_activation_clears_older_reserve": true,
+    "antonio_brown_montez_sweat_neighbor_context_must_not_create_reserve_event": true,
+    "mike_glennon_september_ps_state_may_not_persist_to_november_or_december_without_target_specific_evidence": true,
+    "josiah_scott_july_reserve_state_may_not_persist_to_december_without_target_specific_evidence": true,
+    "doug_middleton_earlier_standard_elevation_may_not_persist_to_week11_without_explicit_target_game_applicability": true,
+    "doug_middleton_later_eligibility_restoration_must_clear_older_not_applicable_designation": true
+  },
+  "diagnostic_interpretation": {
+    "success_means_complete_accounting_and_interpreter_regressions_pass": true,
+    "all_seven_partitions_explained_required": false,
+    "membership_qualification_threshold": null,
+    "broader_calibration_required_before_any_league_wide_qualification": true
+  },
+  "forbidden_inferences": [
+    "DNP equals active", "weekly roster ACT equals active", "weekly roster INA equals inactive", "A01 is an active code",
+    "absence from Not Active means active", "absence of later transaction proves persistence",
+    "postgame participation is training authority", "manual player-specific exceptions", "completed 2026 outcomes", "model fitting"
+  ],
+  "authority": {
+    "modern_player_team_game_identity_qualified": true,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "production_dependency_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "threshold_relaxation": false,
+    "production_dependency_authorized": false
+  }
+}
