@@ -1,0 +1,86 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-NFL-TRANSACTION-LEDGER-SOURCE-PROBE-V1-COMPLETE",
+  "contract_id": "V09B-NFL-TRANSACTION-LEDGER-SOURCE-PROBE-V1",
+  "status": "INITIAL_PAGE_SEMANTICS_PASS_PAGINATION_CONTENT_ADVANCEMENT_UNQUALIFIED",
+  "workflow_evidence": {
+    "run_id": 34734759103,
+    "validated_head_sha": "9404751513182519aa4184b0cdab105b241c2652",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "workflow_frozen_gate_passed": true,
+    "artifact_id": 10311190268,
+    "artifact_digest": "sha256:c1e302d348e033789485a5b88324ecedfafeb13552a5f8fe59608c386755c290",
+    "result_json_sha256": "8e92362a111b2f0155b2bc05678e5a52d44a77a5fffc5a95fdfa4724f7c162d6"
+  },
+  "empirical_result": {
+    "initial_endpoints_expected": 30,
+    "initial_endpoints_completed": 30,
+    "source_errors": 0,
+    "page_urls_fetched": 53,
+    "unique_page_urls": 53,
+    "unique_page_byte_sha256_values": 30,
+    "page_bytes_total": 12224280,
+    "unique_transaction_rows_after_exact_dedup": 663,
+    "duplicate_transaction_rows_across_cursor_pages": 575,
+    "season_row_totals": {
+      "2017": 147,
+      "2018": 137,
+      "2019": 140,
+      "2020": 120,
+      "2021": 119
+    },
+    "category_row_totals": {
+      "trades": 60,
+      "signings": 125,
+      "reserve-list": 125,
+      "waivers": 125,
+      "terminations": 125,
+      "other": 103
+    },
+    "all_seven_frozen_semantic_evidence_rows_found": true,
+    "all_initial_page_source_semantics_supported": true
+  },
+  "pagination_diagnostic": {
+    "endpoints_reporting_two_pages": 23,
+    "endpoints_reporting_one_page": 7,
+    "two_page_endpoints_with_second_page_exact_row_duplication": 23,
+    "observed_second_page_content_advancement": false,
+    "example": {
+      "endpoint": "https://www.nfl.com/transactions/league/signings/2017/9",
+      "cursor_url": "https://www.nfl.com/transactions/league/signings/2017/9?after=AAAH4QAAAAkAAAAbAAAAAAAKuXA=",
+      "initial_and_cursor_raw_sha256": "de638ecf08a0...",
+      "initial_rows": 25,
+      "cursor_rows": 25,
+      "cursor_rows_are_exact_duplicates_of_initial_rows": true
+    },
+    "interpretation": "The preregistered V1 gate proved that discovered cursor URLs stayed inside the frozen endpoint and that the crawl converged, but it did not preregister byte or row advancement as a pagination gate. Empirically, all 23 cursor fetches returned content identical to their initial page. Therefore full historical ledger pagination is not qualified by V1 despite the workflow gate passing.",
+    "pagination_qualified": false
+  },
+  "scientific_disposition": {
+    "initial_page_source_class_semantically_viable": true,
+    "full_paginated_source_class_qualified": false,
+    "workflow_pass_overridden_by_post_run_empirical_diagnostic": true,
+    "full_2017_2021_all_month_ledger_capture_authorized": false,
+    "next_authorized_research_step": "Separately preregister a pagination/content-advancement diagnostic or alternative official endpoint discovery before any full-ledger capture. The new gate must require cursor responses to advance bytes and/or transaction-row identity rather than merely converge by URL.",
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "probe_has_chronology_authority": false,
+    "probe_has_membership_authority": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

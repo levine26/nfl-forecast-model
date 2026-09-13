@@ -1,0 +1,82 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-NFL-TRANSACTION-LEDGER-SOURCE-PROBE-V1",
+  "status": "SOURCE_CLASS_SEMANTIC_VIABILITY_PROBE_ONLY_NO_CHRONOLOGY_OR_MEMBERSHIP_AUTHORITY",
+  "purpose": "Test whether the official NFL.com historical transaction ledger is a stable, first-party, paginated source class suitable for a later separately preregistered roster-chronology reconstruction. This probe does not apply transactions to any roster state and has no membership or label authority.",
+  "hypothesis": "NFL.com monthly transaction pages preserve roster-affecting transaction semantics across 2017-2021, including practice-squad signings, active-roster/free-agent signings, reserve-list moves, waivers, terminations, trades, and other eligibility changes. If the source class and pagination are stable across eras, a later immutable full-ledger capture may be used to reconcile separately qualified roster snapshots to game day.",
+  "fixed_cross_era_probe": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "month": 9,
+    "categories": ["trades", "signings", "reserve-list", "waivers", "terminations", "other"],
+    "initial_endpoint_count": 30,
+    "url_template": "https://www.nfl.com/transactions/league/{category}/{season}/{month}"
+  },
+  "source_requirements": {
+    "allowed_hosts": ["www.nfl.com"],
+    "https_required": true,
+    "same_host_redirect_required": true,
+    "content_sha256_required_for_every_fetched_page": true,
+    "network_fetch_allowed_for_probe": true,
+    "pagination_parameter": "after",
+    "pagination_must_remain_same_year_month_category": true,
+    "maximum_pages_per_endpoint": 100,
+    "duplicate_page_url_allowed": false,
+    "third_party_authority_allowed": false
+  },
+  "parser_contract": {
+    "required_columns": ["From", "To", "Date", "Name", "Position", "Transaction"],
+    "date_format": "MM/DD",
+    "zero_row_endpoint_is_not_by_itself_a_source_failure": true,
+    "all_rows_preserved_before_any_future_state-machine_classification": true,
+    "transaction_text_normalization_or_semantic_rewrite_performed": false
+  },
+  "known_semantic_evidence": [
+    {"season": 2017, "month": 9, "category": "signings", "name": "Vinston Painter", "transaction_contains": "Free Agent Signing"},
+    {"season": 2017, "month": 9, "category": "other", "name": "Willie Snead", "transaction_contains": "Suspension Lifted"},
+    {"season": 2020, "month": 9, "category": "reserve-list", "name": "Jalen Reagor", "transaction_contains": "Reserve/Injured"},
+    {"season": 2021, "month": 9, "category": "trades", "name": "Bradley Roby", "transaction_contains": "Traded"},
+    {"season": 2021, "month": 9, "category": "signings", "name": "Phillip Dorsett", "transaction_contains": "Practice Squad Veteran"},
+    {"season": 2021, "month": 9, "category": "waivers", "name": "Luq Barcoo", "transaction_contains": "Waived, No Recall"},
+    {"season": 2021, "month": 9, "category": "terminations", "name": "Jamie Collins", "transaction_contains": "Terminated, Vested Veteran"}
+  ],
+  "probe_gates": {
+    "all_30_initial_endpoints_first_party_http_success": true,
+    "all_30_initial_endpoints_identify_expected_year_month_category": true,
+    "pagination_converges_without_cross_endpoint_escape": true,
+    "all_fetched_pages_have_sha256": true,
+    "all_five_seasons_have_parsed_rows": true,
+    "all_six_categories_have_parsed_rows_across_probe": true,
+    "all_known_semantic_evidence_rows_found": true,
+    "source_errors_zero": true
+  },
+  "explicit_non_gates": {
+    "full_2017_2021_all_month_ledger_captured": false,
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "week_specific_roster_snapshot_coverage_proven": false,
+    "game_day_roster_membership_constructed": false,
+    "inactive_lists_reconciled": false,
+    "player_identity_resolution_performed": false
+  },
+  "next_step_if_probe_passes": "Preregister an immutable full 2017-2021 NFL transaction-ledger capture covering all months and all six categories, preserving raw first-party bytes/page hashes and every parsed row. Separately qualify the roster-state transition taxonomy and same-day chronology before applying any ledger row to a roster snapshot.",
+  "authority": {
+    "probe_has_chronology_authority": false,
+    "probe_has_membership_authority": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
