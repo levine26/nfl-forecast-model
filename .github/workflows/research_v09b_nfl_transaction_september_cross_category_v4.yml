@@ -1,0 +1,188 @@
+name: LevLine V09B NFL transaction September cross-category V4
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_nfl_transaction_september_cross_category_v4_contract.json'
+      - 'research/v09b_nfl_transaction_september_cross_category_v4.py'
+      - 'research/test_v09b_nfl_transaction_september_cross_category_v4.py'
+      - '.github/workflows/research_v09b_nfl_transaction_september_cross_category_v4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-nfl-transaction-september-v4-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen V4 crawl rules
+        run: pytest -q research/test_v09b_nfl_transaction_september_cross_category_v4.py
+      - name: Validate frozen V4 contract and V3 receipt
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_nfl_transaction_september_cross_category_v4_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-NFL-TRANSACTION-SEPTEMBER-CROSS-CATEGORY-V4'
+          assert c['status'] == 'PREREGISTERED_FIVE_SEASON_SIX_CATEGORY_AMP_PAGINATION_GATE_NO_CHRONOLOGY_AUTHORITY'
+          assert c['scope']['seasons'] == [2017,2018,2019,2020,2021]
+          assert c['scope']['month'] == 9
+          assert c['scope']['categories'] == ['trades','signings','reserve-list','waivers','terminations','other']
+          assert c['scope']['expected_initial_endpoints'] == 30
+          assert c['scope']['maximum_pages_per_endpoint'] == 100
+          g = c['frozen_gate']
+          assert g['all_30_endpoints_complete'] is True
+          assert g['source_errors_allowed'] == 0
+          assert g['every_cursor_transition_raw_sha_must_advance'] is True
+          assert g['every_cursor_transition_novel_rows_vs_prior_union_min'] == 1
+          assert g['duplicate_page_sha_within_endpoint_allowed'] == 0
+          assert g['duplicate_page_url_within_endpoint_allowed'] == 0
+          assert g['all_five_seasons_have_parsed_rows'] is True
+          assert g['all_six_categories_have_parsed_rows'] is True
+          assert g['all_known_semantic_evidence_rows_found'] is True
+          dep = c['dependency']
+          assert subprocess.check_output(['git','hash-object',dep['receipt_path']], text=True).strip() == dep['receipt_git_blob_sha1']
+          r = json.loads(Path(dep['receipt_path']).read_text())
+          assert r['receipt_id'] == dep['receipt_id']
+          assert r['status'] == dep['required_status']
+          assert r['empirical_result']['frozen_advancement_gate_pass'] is True
+          a = c['explicit_non_authority']
+          assert a['all_month_full_ledger_qualified'] is False
+          assert a['transaction_state_machine_defined'] is False
+          assert a['modern_game_day_roster_universe_qualified'] is False
+          assert a['training_label_semantics_qualified'] is False
+          assert a['training_source_chronology_qualified'] is False
+          assert a['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Crawl six September transaction categories over AMP
+        run: |
+          mkdir -p research_outputs/v09b_nfl_transaction_september_cross_category_v4
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_nfl_transaction_september_cross_category_v4.py \
+              --contract research/availability/v09b_nfl_transaction_september_cross_category_v4_contract.json \
+              --season ${{ matrix.season }} \
+              --output research_outputs/v09b_nfl_transaction_september_cross_category_v4/${{ matrix.season }}.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-nfl-transaction-september-v4-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_september_cross_category_v4/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate:
+    needs: season
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-nfl-transaction-september-v4-*-${{ github.run_id }}
+          path: /tmp/v09b-trans-v4
+          merge-multiple: true
+      - name: Apply frozen cross-category aggregate gate
+        run: |
+          mkdir -p research_outputs/v09b_nfl_transaction_september_cross_category_v4
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          files = sorted(Path('/tmp/v09b-trans-v4').glob('*.json'))
+          assert len(files) == 5, files
+          rows = [json.loads(p.read_text()) for p in files]
+          assert {r['season'] for r in rows} == {2017,2018,2019,2020,2021}
+          assert all(r['season_gate_pass'] for r in rows)
+          categories = ['trades','signings','reserve-list','waivers','terminations','other']
+          endpoints = [ep for r in rows for ep in r['endpoints']]
+          assert len(endpoints) == 30
+          assert sum(r['source_errors'] for r in rows) == 0
+          category_rows = {c: sum(ep['unique_transaction_rows'] for ep in endpoints if ep['category']==c) for c in categories}
+          assert all(category_rows[c] > 0 for c in categories), category_rows
+          evidence = [e for r in rows for e in r['known_semantic_evidence']]
+          assert len(evidence) == 7
+          assert all(e['found'] for e in evidence), evidence
+          transitions = sum(r['cursor_transitions_total'] for r in rows)
+          assert all(ep['converged'] for ep in endpoints)
+          assert all(ep['unique_page_urls'] == ep['pages_fetched'] for ep in endpoints)
+          assert all(ep['unique_page_shas'] == ep['pages_fetched'] for ep in endpoints)
+          result = {
+            'contract_id':'V09B-NFL-TRANSACTION-SEPTEMBER-CROSS-CATEGORY-V4',
+            'seasons':[2017,2018,2019,2020,2021],
+            'month':9,
+            'endpoints_completed':30,
+            'source_errors':0,
+            'pages_fetched_total':sum(r['pages_fetched_total'] for r in rows),
+            'cursor_transitions_total':transitions,
+            'category_unique_row_sums':category_rows,
+            'season_unique_row_sums':{str(r['season']):r['unique_transaction_rows_across_categories_sum'] for r in rows},
+            'known_semantic_evidence_found':7,
+            'frozen_cross_category_gate_pass':True,
+            'september_cross_category_amp_pagination_qualified':True,
+            'all_month_full_ledger_qualified':False,
+            'transaction_state_machine_defined':False,
+            'modern_game_day_roster_universe_qualified':False,
+            'training_label_semantics_qualified':False,
+            'training_source_chronology_qualified':False,
+            'v09b_model_fit_authorized':False,
+            'completed_2026_outcomes_used':0,
+            'model_fit_performed':False,
+            'production_dependency_authorized':False,
+          }
+          out=Path('research_outputs/v09b_nfl_transaction_september_cross_category_v4/aggregate.json')
+          out.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          print(out.read_text())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-nfl-transaction-september-v4-aggregate-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_september_cross_category_v4/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
