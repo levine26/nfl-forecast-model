@@ -1,0 +1,96 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-LEGACY-GAMEBOOK-RAW-ARCHIVE-V2",
+  "supersedes_parser_only": "V09B-LEGACY-GAMEBOOK-RAW-ARCHIVE-V1",
+  "status": "PREREGISTERED_SOURCE_ONLY_FAIL_CLOSED",
+  "purpose": "Re-run the unchanged 2012-2016 first-party raw Game Book qualification gates with a source-structure recognizer corrected for the official heading layout observed during the failed V1 parser audit.",
+  "v1_failure_preserved": {
+    "v1_parser_version": "V09B-GAMEBOOK-TEXT-STRUCTURE-V1",
+    "v1_rule": "Not Active and Did Not Play required trailing colons",
+    "empirical_trigger": "Official pdftotext -layout output includes Not Active and Did Not Play as standalone/column heading text without required colons. For 2013, V1 verified and extracted all 256 PDFs but rejected all 256 structure rows solely because the colon-anchored recognizers returned zero headings.",
+    "interpretation": "parser-specification failure, not evidence of missing first-party bytes",
+    "v1_result_may_be_rewritten": false
+  },
+  "seasons": [2012, 2013, 2014, 2015, 2016],
+  "expected_games_by_season": {"2012": 256, "2013": 256, "2014": 256, "2015": 256, "2016": 256},
+  "expected_games_total": 1280,
+  "source": {
+    "authority": "official NFLGSIS Gamebook.pdf bytes",
+    "url_pattern": "https://www.nflgsis.com/{season}/Reg/{week_zero_padded}/{gamekey}/Gamebook.pdf",
+    "discovery_crosswalk_is_label_authority": false,
+    "required_http_status": 200,
+    "required_content_type": "application/pdf",
+    "required_pdf_magic": "%PDF"
+  },
+  "archive": {
+    "archive_id": "V09B-LEGACY-GAMEBOOK-BYTES-2012-2016-V2",
+    "persistent_branch": "research-data/v09b-gamebooks-legacy-v2",
+    "root": "research_outputs/v09b_legacy_gamebook_raw_archive_v2",
+    "content_addressed_raw_path": "raw/{sha256}.pdf.gz",
+    "manifest_path": "manifests/{season}.jsonl",
+    "sha256_required": true,
+    "append_only_manifest_required": true
+  },
+  "parser": {
+    "implementation": "pdftotext -layout",
+    "parser_version": "V09B-GAMEBOOK-TEXT-STRUCTURE-V2",
+    "not_active_heading_regex": "(?im)^[ \\t]*Not[ \\t]+Active\\b",
+    "did_not_play_heading_regex": "(?im)^[ \\t]*Did[ \\t]+Not[ \\t]+Play\\b",
+    "recognition_scope": "line start after layout whitespace; a colon is optional rather than required",
+    "not_active_heading_occurrences_minimum": 1,
+    "did_not_play_heading_occurrences_minimum": 1,
+    "heading_occurrence_maximum": null,
+    "headings_must_be_distinct": true,
+    "not_active_is_negative_class_source": true,
+    "did_not_play_is_negative_class_source": false,
+    "player_identity_resolution_performed_in_this_gate": false
+  },
+  "frozen_qualification_gates": {
+    "canonical_game_coverage_rate_required": 1.0,
+    "source_bytes_verified_rate_required": 1.0,
+    "pdf_text_extraction_rate_required": 1.0,
+    "not_active_structure_rate_required": 1.0,
+    "did_not_play_structure_rate_required": 1.0,
+    "distinct_semantic_structure_rate_required": 1.0,
+    "duplicate_canonical_game_rows_allowed": 0,
+    "duplicate_source_sha_across_distinct_games_allowed": 0,
+    "source_row_errors_allowed": 0,
+    "season_game_counts_must_match_frozen_universe": true
+  },
+  "unchanged_from_v1": [
+    "canonical game universe",
+    "first-party source authority",
+    "content-addressed raw-byte requirements",
+    "100% byte/text/structure coverage thresholds",
+    "zero duplicate/error thresholds",
+    "Not Active versus Did Not Play semantics",
+    "completed-2026 prohibition",
+    "no label construction or model fitting"
+  ],
+  "prohibited_shortcuts": [
+    "drop any canonical game",
+    "relax a coverage or error threshold after observing V2",
+    "treat Did Not Play as inactive",
+    "infer active from snaps, play-by-play, starters, or postgame participation",
+    "use weekly roster INA as inactive truth",
+    "use completed 2026 outcomes"
+  ],
+  "authorization": {
+    "legacy_raw_source_bytes_qualified": false,
+    "legacy_not_active_structure_qualified": false,
+    "legacy_did_not_play_distinction_qualified": false,
+    "player_team_game_identity_qualified": false,
+    "game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
