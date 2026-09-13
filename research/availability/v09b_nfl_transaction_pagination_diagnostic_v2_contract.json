@@ -1,0 +1,48 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V2",
+  "status": "POST_V1_PAGINATION_DIAGNOSTIC_ONLY_NO_SOURCE_OR_CHRONOLOGY_AUTHORITY",
+  "dependency": "V09B-NFL-TRANSACTION-LEDGER-SOURCE-PROBE-V1-COMPLETE",
+  "purpose": "Diagnose why official NFL.com transaction `after` cursor URLs discovered in V1 returned byte-identical first-page content. Test only transport/session/cache behavior and bounded embedded-page evidence. No transaction state is constructed.",
+  "fixed_endpoints": [
+    {"season": 2017, "month": 9, "category": "signings", "url": "https://www.nfl.com/transactions/league/signings/2017/9"},
+    {"season": 2021, "month": 9, "category": "signings", "url": "https://www.nfl.com/transactions/league/signings/2021/9"}
+  ],
+  "transport_variants": [
+    "fresh_default",
+    "same_session_default",
+    "same_session_browser_referer",
+    "same_session_browser_referer_no_cache"
+  ],
+  "diagnostic_requirements": {
+    "first_party_https_only": true,
+    "exactly_one_after_cursor_discovered_per_endpoint": true,
+    "initial_page_rows_min": 25,
+    "attempt_all_four_variants_per_endpoint": true,
+    "record_initial_and_cursor_sha256": true,
+    "record_novel_row_count_vs_initial": true,
+    "record_response_cache_headers": ["cache-control", "age", "vary", "etag", "x-cache"],
+    "record_bounded_inline_script_snippets_matching": ["after", "transaction", "next page"],
+    "record_bounded_script_src_urls": true,
+    "content_advancement_is_observation_not_gate": true
+  },
+  "authority": {
+    "diagnostic_has_source_qualification_authority": false,
+    "diagnostic_has_chronology_authority": false,
+    "full_paginated_source_class_qualified": false,
+    "transaction_state_machine_defined": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
