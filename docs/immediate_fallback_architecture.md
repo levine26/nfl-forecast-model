@@ -1,0 +1,1 @@
+Groq remains primary. Failed game IDs immediately fall back through fresh ChatGPT bundles when available, while successful Groq games remain authoritative. All mixed slates still pass the standard full-slate validators before publication.
