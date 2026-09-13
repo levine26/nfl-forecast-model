@@ -1,0 +1,118 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-GAMEBOOK-ROSTER-UNIVERSE-V1",
+  "dependencies": [
+    "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION"
+  ],
+  "status": "PREREGISTERED_EXECUTABLE_AFTER_RAW_V2_QUALIFICATION",
+  "purpose": "Qualify the 2017-2021 official Game Book as the direct game-day eligible roster universe using only the exact already-qualified immutable V2 Game Book archive and era-appropriate roster-size sanity bounds. No player identity mapping or label construction is performed here.",
+  "upstream_raw_archive": {
+    "qualification_id": "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION",
+    "research_data_branch": "research-data/v09b-gamebooks-modern-v2",
+    "research_data_commit_sha": "aab55bf97aa62cae446b358b9739f4c62604cc8e",
+    "archive_root": "research_outputs/v09b_modern_gamebook_raw_archive_v2",
+    "aggregate_qualification_path": "research_outputs/v09b_modern_gamebook_raw_archive_v2/aggregate_qualification.json",
+    "expected_canonical_games": 1296,
+    "modern_raw_source_bytes_qualified_required": true,
+    "modern_gamebook_structure_qualified_required": true,
+    "network_redownload_allowed": false
+  },
+  "canonical_universe": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "expected_games_by_season": {"2017": 256, "2018": 256, "2019": 256, "2020": 256, "2021": 272},
+    "expected_games_total": 1296,
+    "expected_team_game_partitions_total": 2592,
+    "silent_game_or_partition_drops_allowed": false
+  },
+  "membership_semantics": {
+    "authority": "official first-party NFL Game Book roster sections from the qualified immutable modern V2 archive",
+    "active_candidate_sections": ["Lineups", "Substitutions", "Did Not Play"],
+    "inactive_negative_section": "Not Active",
+    "did_not_play_is_active_candidate": true,
+    "did_not_play_is_negative": false,
+    "absence_from_not_active_alone_is_positive": false,
+    "active_membership_is_set_union_of_active_candidate_sections": true,
+    "same_section_repeat_occurrences_are_set_deduplicated_but_reported": true,
+    "cross_active_semantic_section_membership_allowed": false,
+    "active_inactive_overlap_allowed": false,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used": false
+  },
+  "layout": {
+    "required_order": ["Lineups", "Substitutions", "Did Not Play", "Not Active", "Field Goals"],
+    "required_marker_count_per_game": {"Lineups": 1, "Substitutions": 1, "Did Not Play": 1, "Not Active": 1},
+    "paired_team_columns": true,
+    "column_split_character": 80,
+    "five_season_probe_is_not_qualification_authority": true
+  },
+  "era_roster_sanity": {
+    "2017_2019": {
+      "active_candidate_min": 43,
+      "active_candidate_max": 46,
+      "active_inactive_list_max": 53,
+      "official_rule_basis": "2017 NFL Record & Fact Book states clubs may dress minimum 43 and maximum 46 and Active/Inactive List maximum 53; 46-player game-day rule remained in force through 2019."
+    },
+    "2020_2021": {
+      "active_candidate_min": 44,
+      "active_candidate_max": 48,
+      "active_inactive_list_max": 55,
+      "official_rule_basis": "2020 NFL-NFLPA CBA Article 25 permits 48 active with at least eight offensive linemen, otherwise limit 47; individual clubs may carry no fewer than 44 active; Active/Inactive List may reach 54 or 55 only through standard practice-squad elevations."
+    },
+    "roster_candidate_min_is_active_candidate_min": true,
+    "count_bounds_are_sanity_checks_not_membership_authority": true,
+    "exact_maximum_roster_size_is_not_required": true
+  },
+  "official_rule_sources": [
+    "https://operations.nfl.com/media/2696/2017-record-and-fact-book.pdf",
+    "https://nflpaweb.blob.core.windows.net/website/PDFs/CBA/March-15-2020-NFL-NFLPA-Collective-Bargaining-Agreement-Final-Executed-Copy.pdf"
+  ],
+  "qualification_authority": {
+    "season_jobs_may_qualify_layer": false,
+    "aggregate_five_season_job_required": true
+  },
+  "frozen_qualification_gates": {
+    "upstream_raw_archive_qualified_required": true,
+    "canonical_game_coverage_rate_required": 1.0,
+    "team_partition_parse_coverage_rate_required": 1.0,
+    "marker_exact_game_rate_required": 1.0,
+    "expected_canonical_games_total": 1296,
+    "expected_team_partitions_total": 2592,
+    "cross_active_semantic_section_conflicts_allowed": 0,
+    "active_inactive_overlaps_allowed": 0,
+    "active_count_sanity_failures_allowed": 0,
+    "roster_count_sanity_failures_allowed": 0,
+    "source_errors_allowed": 0
+  },
+  "required_diagnostics": [
+    "active_candidate_count_distribution_by_season",
+    "not_active_count_distribution_by_season",
+    "roster_candidate_count_distribution_by_season",
+    "same_section_repeat_occurrences",
+    "same_section_repeat_identities",
+    "cross_active_semantic_section_conflicts",
+    "active_inactive_overlaps"
+  ],
+  "not_yet_qualified": {
+    "modern_player_team_game_identity": true,
+    "training_label_semantics": true,
+    "training_source_chronology": true,
+    "v09b_model_fit": true
+  },
+  "authorization": {
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "membership_semantics_and_era_bounds_were_staged_before_execution": true,
+    "only_upstream_archive_binding_updated_after_raw_v2_qualification": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
