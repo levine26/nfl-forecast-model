@@ -1,0 +1,120 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-CLUB-ARCHIVE-SURFACE-DISCOVERY-V1-COMPLETE",
+  "contract_id": "V09B-MODERN-CLUB-ARCHIVE-SURFACE-DISCOVERY-V1",
+  "status": "DISCOVERY_COMPLETE_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34734518085,
+    "validated_head_sha": "74a1f7aecdfbdb1f23b651bfc50a7efe808d7ee6",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "discovery_accounting_passed": true,
+    "artifact_id": 10310279893,
+    "artifact_digest": "sha256:cf14d773746072a05a613c6baf3a8934c536c182d8ff63334abb2314b215994b"
+  },
+  "aggregate_result": {
+    "team_season_pairs_expected": 160,
+    "team_season_pairs_reported": 160,
+    "candidate_attempts_expected": 1020,
+    "candidate_attempts_reported": 1020,
+    "archive_surface_team_season_hits": 7,
+    "archive_surface_team_season_missing": 153,
+    "archive_surface_discovery_fraction_diagnostic_only": 0.04375,
+    "http_status_distribution": {
+      "200": 7,
+      "404": 1013
+    },
+    "http_or_network_error_attempts": 1013,
+    "redirect_escape_attempts": 0,
+    "successful_http_nonhit_attempts": 0,
+    "discovery_accounting_integrity_pass": true
+  },
+  "discovered_team_season_pairs": [
+    {
+      "team": "NE",
+      "season": 2017,
+      "best_archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2017",
+      "roster_depth_anchor_count": 25,
+      "standardized_path": "/press-room/mediasite/game-packages-{season}"
+    },
+    {
+      "team": "NE",
+      "season": 2018,
+      "best_archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2018",
+      "roster_depth_anchor_count": 25,
+      "standardized_path": "/press-room/mediasite/game-packages-{season}"
+    },
+    {
+      "team": "NE",
+      "season": 2019,
+      "best_archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2019",
+      "roster_depth_anchor_count": 22,
+      "standardized_path": "/press-room/mediasite/game-packages-{season}"
+    },
+    {
+      "team": "NE",
+      "season": 2020,
+      "best_archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2020",
+      "roster_depth_anchor_count": 18,
+      "standardized_path": "/press-room/mediasite/game-packages-{season}"
+    },
+    {
+      "team": "NE",
+      "season": 2021,
+      "best_archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2021",
+      "roster_depth_anchor_count": 22,
+      "standardized_path": "/press-room/mediasite/game-packages-{season}"
+    },
+    {
+      "team": "TB",
+      "season": 2020,
+      "best_archive_url": "https://www.buccaneers.com/media/weekly-information-2020",
+      "roster_depth_anchor_count": 19,
+      "standardized_path": "/media/weekly-information-{season}"
+    },
+    {
+      "team": "TB",
+      "season": 2021,
+      "best_archive_url": "https://www.buccaneers.com/media/weekly-information-2021",
+      "roster_depth_anchor_count": 22,
+      "standardized_path": "/media/weekly-information-{season}"
+    }
+  ],
+  "standardized_path_hit_counts": {
+    "/press-room/mediasite/game-packages-{season}": 5,
+    "/media/weekly-information-{season}": 2,
+    "/press-room/game-packages-{season}": 0,
+    "/media/game-packages-{season}": 0,
+    "/team/press-room/weekly-information-{season}": 0,
+    "/press-room/weekly-information-{season}": 0
+  },
+  "scientific_interpretation": {
+    "shared_standardized_path_taxonomy_is_sufficient_for_league_wide_locator": false,
+    "observed_standardized_surface_hits_are_concentrated_in_two_clubs": true,
+    "club_specific_historical_archive_discovery_required": true,
+    "observed_hit_rate_used_as_qualification_gate": false,
+    "missing_team_season_pairs_silently_dropped": 0,
+    "next_authorized_research_step": "Separately preregister club-specific first-party archive-surface discovery for the 153 missing team-season pairs before attempting the full 2,592 team-game locator/chronology audit."
+  },
+  "authority": {
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "all_2592_team_game_partitions_tested": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
