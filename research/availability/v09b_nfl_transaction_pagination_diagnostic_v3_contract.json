@@ -1,0 +1,69 @@
+{
+  "contract_version": 3,
+  "contract_id": "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V3",
+  "status": "PREREGISTERED_AMP_TRANSPORT_ADVANCEMENT_DIAGNOSTIC_NO_SOURCE_AUTHORITY",
+  "dependency": "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V2-COMPLETE",
+  "purpose": "Test a previously untested first-party NFL AMP transport for the exact historical `after` cursors whose www.nfl.com responses were byte/row-identical to page one in V2. No transaction state is constructed and no chronology or membership authority is granted.",
+  "fixed_endpoints": [
+    {
+      "season": 2017,
+      "month": 9,
+      "category": "signings",
+      "www_initial_url": "https://www.nfl.com/transactions/league/signings/2017/9",
+      "frozen_after_cursor": "AAAH4QAAAAkAAAAbAAAAAAAKuXA="
+    },
+    {
+      "season": 2021,
+      "month": 9,
+      "category": "signings",
+      "www_initial_url": "https://www.nfl.com/transactions/league/signings/2021/9",
+      "frozen_after_cursor": "AAAH5QAAAAkAAAAdAAAAAAAMi0M="
+    }
+  ],
+  "transport": {
+    "amp_host": "amp.nfl.com",
+    "amp_path_must_equal_www_path": true,
+    "frozen_after_cursor_must_be_used_verbatim": true,
+    "https_required": true,
+    "allowed_final_hosts": ["amp.nfl.com", "www.nfl.com"],
+    "redirect_path_must_preserve_transaction_endpoint": true
+  },
+  "frozen_advancement_gate": {
+    "both_endpoints_must_complete": true,
+    "initial_rows_min": 25,
+    "amp_initial_required_header": true,
+    "amp_cursor_required_header": true,
+    "amp_cursor_raw_sha_must_differ_from_amp_initial": true,
+    "amp_cursor_novel_rows_vs_amp_initial_min": 1,
+    "both_endpoints_must_pass": true
+  },
+  "required_evidence": [
+    "www initial response SHA and parsed row identities",
+    "AMP initial response SHA and parsed row identities",
+    "AMP cursor response SHA and parsed row identities",
+    "novel row count versus AMP initial",
+    "overlap row count versus AMP initial",
+    "status/final URL/host for every request"
+  ],
+  "explicit_non_authority": {
+    "diagnostic_has_source_qualification_authority": false,
+    "diagnostic_has_chronology_authority": false,
+    "full_paginated_source_class_qualified": false,
+    "transaction_state_machine_defined": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
