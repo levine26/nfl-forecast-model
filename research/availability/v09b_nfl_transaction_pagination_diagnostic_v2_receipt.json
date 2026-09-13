@@ -1,0 +1,86 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V2-COMPLETE",
+  "contract_id": "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V2",
+  "status": "DIAGNOSTIC_COMPLETE_NO_TRANSPORT_VARIANT_ADVANCEMENT_NO_SOURCE_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34735031870,
+    "validated_head_sha": "ad6f7dfe19ba5e1d22412f374607741f9587c093",
+    "artifact_id": 10310761797,
+    "artifact_digest": "sha256:a2b10e511b8187f4350e6d94fce72984bbe3e9ec83ac2904e491f4639951f0e3",
+    "result_json_sha256": "716aa40c9eef6f5062950f82bb89659e978e9c3806f4f2b5f3f7e1ebab01ef5f",
+    "research_firewall_passed": true,
+    "diagnostic_complete": true
+  },
+  "aggregate_result": {
+    "endpoints_expected": 2,
+    "endpoints_completed": 2,
+    "transport_attempts_total": 8,
+    "errors": 0,
+    "transport_attempts_with_byte_advancement": 0,
+    "transport_attempts_with_novel_row_advancement": 0,
+    "any_endpoint_transport_advanced_bytes": false,
+    "any_endpoint_transport_advanced_rows": false
+  },
+  "endpoint_results": {
+    "2017_09_signings": {
+      "initial_rows": 25,
+      "initial_raw_bytes": 224494,
+      "initial_raw_sha256": "de638ecf08a0b95e27c97c6f1ea9c2d1500da63f6f2114db9df2a52786c1d789",
+      "cursor": "AAAH4QAAAAkAAAAbAAAAAAAKuXA=",
+      "cursor_variants": 4,
+      "all_cursor_variants_same_sha_as_initial": true,
+      "all_cursor_variants_novel_rows": 0,
+      "initial_cache_control": "public, max-age=5",
+      "initial_vary": "Accept-Encoding,X-NFL-Geo,Origin",
+      "cursor_x_cache": "MISS, HIT, HIT"
+    },
+    "2021_09_signings": {
+      "initial_rows": 25,
+      "initial_raw_bytes": 224639,
+      "initial_raw_sha256": "3d3b4fbec1a5da5f3f296ec97ac7b7e66e92f48f4f700525be5829017f17dee3",
+      "cursor": "AAAH5QAAAAkAAAAdAAAAAAAMi0M=",
+      "cursor_variants": 4,
+      "all_cursor_variants_same_sha_as_initial": true,
+      "all_cursor_variants_novel_rows": 0,
+      "initial_cache_control": "public, max-age=5",
+      "initial_vary": "Accept-Encoding,X-NFL-Geo,Origin",
+      "cursor_x_cache": "MISS, HIT, HIT"
+    }
+  },
+  "transport_variants_tested": [
+    "fresh_default",
+    "same_session_default",
+    "same_session_browser_referer",
+    "same_session_browser_referer_no_cache"
+  ],
+  "embedded_page_evidence": {
+    "bounded_inline_snippets_exposed_transaction_page_tracking_metadata": true,
+    "bounded_inline_snippets_exposed_a_transaction_cursor_api": false,
+    "bounded_script_sources_were_generic_site_scripts": true,
+    "diagnostic_did_not_execute_browser_javascript": true
+  },
+  "scientific_disposition": {
+    "simple_session_cookie_fix_supported": false,
+    "referer_fix_supported": false,
+    "cache_control_bypass_fix_supported": false,
+    "plain_http_cursor_pagination_qualified": false,
+    "full_paginated_source_class_qualified": false,
+    "next_authorized_research_step": "Use a separately preregistered exact-URL/browser-or-client-implementation diagnostic or identify an alternative first-party historical transaction export. Any new path must demonstrate novel rows under frozen advancement gates before full-ledger capture.",
+    "diagnostic_has_source_qualification_authority": false,
+    "diagnostic_has_chronology_authority": false,
+    "transaction_state_machine_defined": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
