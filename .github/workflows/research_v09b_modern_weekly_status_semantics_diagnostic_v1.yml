@@ -43,6 +43,8 @@ jobs:
           assert c['identity_resolution_rule']['status_value_may_break_identity_tie'] is False
           assert c['identity_resolution_rule']['candidate_uniqueness_alone_is_evidence'] is False
           assert c['identity_resolution_rule']['ambiguous_or_unresolved_identity_is_retained'] is True
+          assert c['diagnostic_outputs']['section_by_generic_status_cross_tab'] is True
+          assert c['diagnostic_outputs']['section_by_status_description_abbr_cross_tab'] is True
           assert c['explicit_non_gates']['identity_resolution_rate_threshold'] is None
           assert c['explicit_non_gates']['section_status_agreement_threshold'] is None
           assert c['explicit_non_gates']['status_value_semantics_qualified'] is False
@@ -112,6 +114,8 @@ jobs:
           assert r['marker_exact_games'] == r['expected_games']
           assert r['parsed_team_partitions'] == r['expected_team_partitions']
           assert r['source_error_count'] == 0
+          assert set(r['section_by_generic_status']) == {'lineup', 'substitutions', 'did_not_play', 'not_active'}
+          assert set(r['section_by_status_description_abbr']) == {'lineup', 'substitutions', 'did_not_play', 'not_active'}
           assert r['observed_status_pattern_has_qualification_authority'] is False
           assert r['status_value_semantics_qualified'] is False
           assert r['weekly_roster_game_day_membership_qualified'] is False
@@ -157,14 +161,18 @@ jobs:
           assert sum(r['parsed_team_partitions'] for r in receipts) == 2592
           assert sum(r['source_error_count'] for r in receipts) == 0
 
+          sections = ['lineup', 'substitutions', 'did_not_play', 'not_active']
           section_totals = Counter()
           resolution_totals = Counter()
-          cross = {section: Counter() for section in ['lineup', 'substitutions', 'did_not_play', 'not_active']}
+          generic_status_cross = {section: Counter() for section in sections}
+          status_abbr_cross = {section: Counter() for section in sections}
           for r in receipts:
               section_totals.update(r['section_unique_identity_counts'])
               resolution_totals.update(r['identity_resolution_counts'])
+              for section, values in r['section_by_generic_status'].items():
+                  generic_status_cross[section].update(values)
               for section, values in r['section_by_status_description_abbr'].items():
-                  cross[section].update(values)
+                  status_abbr_cross[section].update(values)
           total = sum(section_totals.values())
           resolved = resolution_totals['resolved']
           out = {
@@ -178,8 +186,11 @@ jobs:
               'total_section_unique_identities': total,
               'identity_resolution_counts': dict(sorted(resolution_totals.items())),
               'unique_identity_resolution_rate': resolved / total if total else 0.0,
+              'section_by_generic_status': {
+                  section: dict(sorted(values.items())) for section, values in generic_status_cross.items()
+              },
               'section_by_status_description_abbr': {
-                  section: dict(sorted(values.items())) for section, values in cross.items()
+                  section: dict(sorted(values.items())) for section, values in status_abbr_cross.items()
               },
               'integrity_gate_pass': True,
               'status_used_during_identity_resolution': False,
