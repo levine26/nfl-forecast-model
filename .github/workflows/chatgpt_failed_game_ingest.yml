@@ -15,6 +15,7 @@ on:
     branches: [main]
     paths:
       - "inputs/chatgpt_media/fallback/**"
+      - ".github/workflows/chatgpt_failed_game_ingest.yml"
   workflow_dispatch:
 
 permissions:
@@ -53,6 +54,7 @@ jobs:
           from pathlib import Path
           ingest = Path('scripts/ingest_chatgpt_failed_games.py').read_text(encoding='utf-8')
           fallback = Path('src/nfl_forecast/editorial_provider_fallback.py').read_text(encoding='utf-8')
+          workflow = Path('.github/workflows/chatgpt_failed_game_ingest.yml').read_text(encoding='utf-8')
           required = (
               'scripts/validate_single_copilot_game.py',
               'scripts/compose_copilot_media_reads.py',
@@ -67,7 +69,10 @@ jobs:
           forbidden = ('train_model', 'run_model.py', 'grading.py', 'fst_production.py')
           for marker in forbidden:
               assert marker not in ingest, marker
-          print('Failed-game ChatGPT fallback is constrained to editorial artifacts and the governed frozen forecast identity.')
+          assert '/tmp/chatgpt-preserved-media-reporting.json' in workflow
+          assert 'fallback_snapshot_reused' in workflow
+          assert 'games_with_trusted_reporting' in workflow
+          print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves the last launch-grade reporting snapshot, and retains the governed frozen forecast identity.')
           PY
 
       - name: Stop after validation on pull request
@@ -84,9 +89,29 @@ jobs:
           python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
-      - name: Refresh deterministic current reporting without erasing provider artifact
+      - name: Preserve validated media reporting snapshot
         if: github.event_name != 'pull_request'
-        run: python scripts/finalize_editorial.py --skip-copilot
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
+          media = dict(status.get('media_reporting') or {})
+          finalizer = status.get('editorial_finalizer') or {}
+          games = int(finalizer.get('games', 0))
+          trusted = int(media.get('games_with_trusted_reporting', 0))
+          if games <= 0:
+              raise SystemExit(f'cannot preserve reporting without a validated slate size: {finalizer}')
+          if media.get('status') != 'healthy' or trusted != games:
+              raise SystemExit(f'pre-fallback media reporting is not launch-grade: {media}')
+          snapshot = {'games': games, 'media_reporting': media}
+          Path('/tmp/chatgpt-preserved-media-reporting.json').write_text(
+              json.dumps(snapshot, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          print('preserved launch-grade media reporting snapshot:', games, 'games')
+          PY
 
       - name: Overlay ChatGPT only onto Groq-failed games and full-slate validate
         if: github.event_name != 'pull_request'
@@ -102,8 +127,19 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          status = json.loads(Path('outputs/context_source_status.json').read_text())
-          media = status.get('media_reporting', {})
+
+          status_path = Path('outputs/context_source_status.json')
+          status = json.loads(status_path.read_text())
+          snapshot = json.loads(Path('/tmp/chatgpt-preserved-media-reporting.json').read_text())
+          media = dict(snapshot.get('media_reporting') or {})
+          media['fallback_snapshot_reused'] = True
+          media['fallback_snapshot_guardrail'] = (
+              'Failed-game recovery preserves the previously launch-grade media packet; '
+              'a transient fallback-run media rediscovery cannot erase validated reporting authority.'
+          )
+          status['media_reporting'] = media
+          status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n')
+
           provider = status.get('copilot_media', {})
           finalizer = status.get('editorial_finalizer', {})
           fallback = status.get('groq_provider_fallback', {})
