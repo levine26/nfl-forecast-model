@@ -1,0 +1,81 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-INACTIVE-ARTICLE-SITEMAP-DISCOVERY-V1-COMPLETE",
+  "contract_id": "V09B-MODERN-INACTIVE-ARTICLE-SITEMAP-DISCOVERY-V1",
+  "status": "DIAGNOSTIC_COMPLETE_PARTIAL_COVERAGE_ZERO_LABEL_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34743586413,
+    "validated_head_sha": "a982eb4d132fa568eb77f90cea7ca7301d8ef871",
+    "aggregate_artifact": {"id": 10313048808, "digest": "sha256:2a852d420ae611540a2995baceb8807604d2a16f9eb9320316f4a2c6b1163cc7"},
+    "season_artifacts": {
+      "2017": {"id": 10312829036, "digest": "sha256:9593467b00b7a8abc1deaddbd88a8202a9af6afb13b63e81d91e1ac4786870d9"},
+      "2018": {"id": 10312732781, "digest": "sha256:1faccfe43160e3e8d68c1f97ed40c0b9619c85a497d8a412f797326aa3b62a78"},
+      "2019": {"id": 10312722781, "digest": "sha256:b702c59a041baa108ee6e3f932d4ef4fcafc355cd6269d5b02aef87aca5f37f6"},
+      "2020": {"id": 10313368392, "digest": "sha256:5493706607030875be6713e45b866f9674d7b83356d955f6c85eea42106dd870"},
+      "2021": {"id": 10313532880, "digest": "sha256:19e9840e7483eff06b68b1752fd642b936ef509b5a43a7e9a09693abc3e9c48b"}
+    }
+  },
+  "aggregate_result": {
+    "canonical_games": 1296,
+    "team_partitions_reported": 2592,
+    "sitemap_attempts_total": 748,
+    "sitemap_attempts_with_error": 0,
+    "unique": 1471,
+    "missing": 1074,
+    "ambiguous": 47,
+    "unique_fraction_diagnostic_only": 0.5675154320987654,
+    "all_season_accounting_integrity_pass": true
+  },
+  "season_results": {
+    "2017": {"team_partitions": 512, "unique": 277, "missing": 233, "ambiguous": 2, "sitemap_attempts": 136, "sitemap_errors": 0},
+    "2018": {"team_partitions": 512, "unique": 277, "missing": 223, "ambiguous": 12, "sitemap_attempts": 136, "sitemap_errors": 0},
+    "2019": {"team_partitions": 512, "unique": 263, "missing": 235, "ambiguous": 14, "sitemap_attempts": 136, "sitemap_errors": 0},
+    "2020": {"team_partitions": 512, "unique": 302, "missing": 198, "ambiguous": 12, "sitemap_attempts": 170, "sitemap_errors": 0},
+    "2021": {"team_partitions": 544, "unique": 352, "missing": 185, "ambiguous": 7, "sitemap_attempts": 170, "sitemap_errors": 0}
+  },
+  "known_dnp_contradiction_partition_replay": {
+    "partitions": 7,
+    "unique_article_recovered": 5,
+    "missing": 2,
+    "rows": [
+      {"partition": "2018_16_DEN_OAK|OAK", "state": "unique", "title": "Oakland Raiders Inactives Week 16 vs. Denver Broncos"},
+      {"partition": "2020_11_PIT_JAX|JAX", "state": "missing", "diagnostic_note": "Same-date official sitemap contains 'In and out: Jones ruled out'; frozen V1 title taxonomy did not include this phrase, so V1 correctly retains the partition as missing."},
+      {"partition": "2020_13_NO_ATL|NO", "state": "unique", "title": "New Orleans Saints inactives vs. the Atlanta Falcons"},
+      {"partition": "2020_15_JAX_BAL|JAX", "state": "unique", "title": "In and out: Jones, Luton inactive"},
+      {"partition": "2021_10_KC_LV|KC", "state": "missing", "diagnostic_note": "The exact-date Chiefs sitemap exposed only a How to Watch article under the V1 surface; no inactive-title candidate was present."},
+      {"partition": "2021_10_TB_WAS|TB", "state": "unique", "title": "Bucs-Football Team Inactives | Chris Godwin Set to Play"},
+      {"partition": "2021_16_PIT_KC|PIT", "state": "unique", "title": "Steelers inactives for Week 16 vs. Chiefs"}
+    ]
+  },
+  "scientific_interpretation": {
+    "standardized_sitemap_transport_worked_without_errors": true,
+    "inactive_article_surface_is_materially_useful": true,
+    "inactive_article_locator_coverage_complete": false,
+    "v1_title_taxonomy_has_observed_false_negative": true,
+    "v1_taxonomy_relaxed_post_hoc": false,
+    "missing_article_used_as_no_inactive_evidence": false,
+    "absence_from_article_used_as_positive": false,
+    "reason": "The first preregistered run fully accounted for all 2,592 partitions with zero sitemap transport errors, but only 1,471 had exactly one qualifying official inactive article. 1,074 were missing and 47 ambiguous. Therefore the standardized source surface is useful but cannot qualify league-wide inactive coverage. The observed Jaguars 'In and out: Jones ruled out' miss is retained as a V1 miss rather than retrofitting the frozen taxonomy."
+  },
+  "authority": {
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "player_inactive_labels_parsed": false,
+    "historical_inactive_source_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": true,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

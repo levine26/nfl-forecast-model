@@ -1,0 +1,202 @@
+name: LevLine V09B modern inactive article sitemap diagnostic V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_inactive_article_sitemap_v1_contract.json'
+      - 'research/v09b_modern_inactive_article_sitemap_v1.py'
+      - 'research/test_v09b_modern_inactive_article_sitemap_v1.py'
+      - '.github/workflows/research_v09b_modern_inactive_article_sitemap_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-inactive-sitemap-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test preregistered parser rules
+        run: pytest -q research/test_v09b_modern_inactive_article_sitemap_v1.py
+      - name: Validate frozen contract and upstream mapping
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_inactive_article_sitemap_v1_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-MODERN-INACTIVE-ARTICLE-SITEMAP-DISCOVERY-V1'
+          assert c['status'] == 'PREREGISTERED_FULL_2592_PARTITION_DISCOVERY_DIAGNOSTIC_ZERO_LABEL_AUTHORITY'
+          assert c['scope']['expected_games_total'] == 1296
+          assert c['scope']['expected_team_partitions_total'] == 2592
+          assert c['scope']['silent_partition_drops_allowed'] == 0
+          s = c['sitemap_discovery']
+          assert s['game_date_match_required'] is True
+          assert s['article_href_must_remain_on_partition_team_domain'] is True
+          assert s['multiple_qualifying_candidates_are_ambiguous'] is True
+          assert s['candidate_tie_break_authorized'] is False
+          assert c['explicit_non_gates']['inactive_article_locator_coverage_threshold'] is None
+          assert c['explicit_non_gates']['modern_game_day_roster_universe_qualified'] is False
+          assert c['explicit_non_gates']['training_label_semantics_qualified'] is False
+          assert c['explicit_non_gates']['training_source_chronology_qualified'] is False
+          assert c['explicit_non_gates']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          dep = c['dependencies']['team_domain_and_visible_signal_contract']
+          actual = subprocess.check_output(['git','hash-object',dep['path']], text=True).strip()
+          assert actual == dep['git_blob_sha1']
+          PY
+
+  diagnostic-season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Materialize exact canonical locator snapshot
+        run: |
+          set -euo pipefail
+          SNAPSHOT_COMMIT=a3f5c5a791f878b12cb92658df37b8a7d093cd0b
+          git fetch origin research-data/v09b-modern-locator-snapshot-v1
+          git cat-file -e "$SNAPSHOT_COMMIT^{commit}"
+          git worktree add --detach /tmp/v09b-locator-snapshot "$SNAPSHOT_COMMIT"
+          test "$(sha256sum /tmp/v09b-locator-snapshot/research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv | awk '{print $1}')" = "d26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351"
+      - name: Run full-season first-party inactive article discovery
+        run: |
+          mkdir -p research_outputs/v09b_modern_inactive_article_sitemap_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_inactive_article_sitemap_v1.py \
+              --contract research/availability/v09b_modern_inactive_article_sitemap_v1_contract.json \
+              --snapshot /tmp/v09b-locator-snapshot/research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv \
+              --prior-contract research/availability/v09b_modern_constructed_game_day_url_v2_contract.json \
+              --season ${{ matrix.season }} \
+              --output research_outputs/v09b_modern_inactive_article_sitemap_v1/${{ matrix.season }}.json
+      - name: Assert season accounting remains zero-authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          season = int('${{ matrix.season }}')
+          p = Path(f'research_outputs/v09b_modern_inactive_article_sitemap_v1/{season}.json')
+          r = json.loads(p.read_text())
+          expected = {2017:256, 2018:256, 2019:256, 2020:256, 2021:272}[season]
+          assert r['canonical_games'] == expected
+          assert r['team_partitions_reported'] == expected * 2
+          assert sum(r['partition_locator_states'].values()) == expected * 2
+          assert r['accounting_integrity_pass'] is True
+          assert r['diagnostic_has_locator_qualification_authority'] is False
+          assert r['diagnostic_has_membership_authority'] is False
+          assert r['player_inactive_labels_parsed'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['weekly_roster_status_used'] is False
+          assert r['postgame_participation_used_as_training_authority'] is False
+          assert r['absence_from_inactive_used_as_positive'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-inactive-sitemap-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_modern_inactive_article_sitemap_v1/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate:
+    needs: diagnostic-season
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-inactive-sitemap-v1-*-${{ github.run_id }}
+          path: /tmp/v09b-inactive-sitemap
+          merge-multiple: true
+      - name: Aggregate full-universe accounting without a coverage threshold
+        run: |
+          mkdir -p research_outputs/v09b_modern_inactive_article_sitemap_v1
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          files = sorted(Path('/tmp/v09b-inactive-sitemap').glob('*.json'))
+          assert len(files) == 5, files
+          rows = [json.loads(p.read_text()) for p in files]
+          assert {r['season'] for r in rows} == {2017,2018,2019,2020,2021}
+          total_games = sum(r['canonical_games'] for r in rows)
+          total_parts = sum(r['team_partitions_reported'] for r in rows)
+          states = {k: sum(r['partition_locator_states'][k] for r in rows) for k in ('unique','missing','ambiguous')}
+          result = {
+            'contract_id': 'V09B-MODERN-INACTIVE-ARTICLE-SITEMAP-DISCOVERY-V1',
+            'canonical_games': total_games,
+            'team_partitions_reported': total_parts,
+            'partition_locator_states': states,
+            'unique_inactive_article_fraction_diagnostic_only': states['unique'] / total_parts,
+            'sitemap_attempts_total': sum(r['unique_team_month_domain_sitemap_attempts'] for r in rows),
+            'sitemap_attempts_with_error': sum(r['sitemap_attempts_with_error'] for r in rows),
+            'all_season_accounting_integrity_pass': all(r['accounting_integrity_pass'] for r in rows),
+            'diagnostic_has_locator_qualification_authority': False,
+            'diagnostic_has_membership_authority': False,
+            'player_inactive_labels_parsed': False,
+            'modern_game_day_roster_universe_qualified': False,
+            'training_label_semantics_qualified': False,
+            'training_source_chronology_qualified': False,
+            'v09b_model_fit_authorized': False,
+            'completed_2026_outcomes_used': 0,
+            'model_fit_performed': False,
+            'production_dependency_authorized': False,
+          }
+          assert total_games == 1296
+          assert total_parts == 2592
+          assert sum(states.values()) == 2592
+          assert result['all_season_accounting_integrity_pass'] is True
+          out = Path('research_outputs/v09b_modern_inactive_article_sitemap_v1/aggregate.json')
+          out.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          print(out.read_text())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-inactive-sitemap-v1-aggregate-${{ github.run_id }}
+          path: research_outputs/v09b_modern_inactive_article_sitemap_v1/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
