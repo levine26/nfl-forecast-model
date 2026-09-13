@@ -1,0 +1,131 @@
+name: LevLine V09B DNP contradiction kickoff chronology V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_dnp_contradiction_kickoff_chronology_v1_contract.json'
+      - 'research/v09b_modern_dnp_contradiction_kickoff_chronology_v1.py'
+      - 'research/test_v09b_modern_dnp_contradiction_kickoff_chronology_v1.py'
+      - '.github/workflows/research_v09b_modern_dnp_contradiction_kickoff_chronology_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-dnp-kickoff-chronology-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Prove preregistration commit remains frozen
+        run: |
+          set -euo pipefail
+          CONTRACT=research/availability/v09b_modern_dnp_contradiction_kickoff_chronology_v1_contract.json
+          LAST_TOUCH=$(git log -1 --format=%H -- "$CONTRACT")
+          test "$LAST_TOUCH" = "bba1e9ba97e6b2da1abeab3c06cadffa5596448b"
+      - name: Test chronology and fail-closed semantics
+        run: pytest -q research/test_v09b_modern_dnp_contradiction_kickoff_chronology_v1.py
+      - name: Validate frozen authority state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_dnp_contradiction_kickoff_chronology_v1_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-MODERN-DNP-CONTRADICTION-KICKOFF-CHRONOLOGY-DIAGNOSTIC-V1'
+          assert c['status'] == 'PREREGISTERED_DIAGNOSTIC_ONLY_NO_MEMBERSHIP_OR_MODEL_AUTHORITY'
+          ps = c['frozen_scope']['partitions']
+          assert len(ps) == 7
+          assert sum(len(p['dnp_rows']) for p in ps) == 17
+          assert sum(bool(p['active_max_contradiction']) for p in ps) == 6
+          assert sum(bool(p['total_roster_max_contradiction']) for p in ps) == 3
+          assert sum(int(p['minimum_dnp_non_active_required_by_active_max']) for p in ps) == 7
+          assert c['identity_policy']['status_fields_may_not_be_used_for_identity_matching_or_tie_breaking'] is True
+          assert c['source_policy']['source_absence_is_non_evidence'] is True
+          assert c['taxonomy']['absence_from_official_inactive_list_may_not_create_EXPLICIT_ACTIVE'] is True
+          assert c['authority']['modern_player_team_game_identity_qualified'] is True
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authority']['training_label_semantics_qualified'] is False
+          assert c['authority']['training_source_chronology_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  empirical-diagnostic:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Run seven-partition pre-kickoff chronology diagnostic
+        run: |
+          set -euo pipefail
+          OUT=research_outputs/v09b_modern_dnp_contradiction_kickoff_chronology_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_dnp_contradiction_kickoff_chronology_v1.py \
+              --contract research/availability/v09b_modern_dnp_contradiction_kickoff_chronology_v1_contract.json \
+              --output-dir "$OUT" \
+              --timeout 60
+      - name: Assert empirical accounting and research firewall
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('research_outputs/v09b_modern_dnp_contradiction_kickoff_chronology_v1/diagnostic_report.json')
+          r = json.loads(p.read_text())
+          assert r['status'] == 'DIAGNOSTIC_COMPLETE_ZERO_QUALIFICATION_AUTHORITY'
+          assert r['accounting_integrity_pass'] is True
+          assert len(r['chronology_rows']) == 17
+          assert len(r['partition_diagnostics']) == 7
+          assert r['aggregate']['active_max_partitions_total'] == 6
+          assert r['authority']['diagnostic_has_membership_qualification_authority'] is False
+          assert r['authority']['modern_player_team_game_identity_qualified'] is True
+          assert r['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert r['authority']['training_label_semantics_qualified'] is False
+          assert r['authority']['training_source_chronology_qualified'] is False
+          assert r['authority']['v09b_model_fit_authorized'] is False
+          assert r['governance']['weekly_roster_status_used_as_authority'] is False
+          assert r['governance']['absence_from_inactive_used_as_positive'] is False
+          assert r['governance']['postgame_participation_used_as_training_authority'] is False
+          assert r['governance']['completed_2026_outcomes_used'] == 0
+          assert r['governance']['model_fit_performed'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-dnp-kickoff-chronology-v1-${{ github.run_id }}
+          path: research_outputs/v09b_modern_dnp_contradiction_kickoff_chronology_v1
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
