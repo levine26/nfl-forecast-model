@@ -67,6 +67,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - run: pip install '.[dev]'
       - name: Probe five frozen first-party weekly releases
+        id: probe
+        continue-on-error: true
         run: |
           OUT=research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json
           mkdir -p "$(dirname "$OUT")"
@@ -75,19 +77,19 @@ jobs:
               --contract research/availability/v09b_modern_game_release_roster_source_probe_v1_contract.json \
               --output "$OUT"
       - name: Assert no authority escapes the probe
+        if: always()
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          r = json.loads(Path('research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json').read_text())
+          p = Path('research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json')
+          assert p.exists(), 'probe did not persist diagnostic result'
+          r = json.loads(p.read_text())
           assert r['sample_count_expected'] == 5
           assert r['sample_count_completed'] == 5
           assert r['source_errors'] == []
-          assert r['source_class_semantic_viability_probe_pass'] is True
-          assert all(x['semantic_viability_gate_pass'] is True for x in r['samples'])
           assert all(x['pdf_magic_valid'] is True for x in r['samples'])
           assert all(x['source_host'] == 'static.clubs.nfl.com' for x in r['samples'])
-          assert all(x['chosen_pregame_roster_snapshot'] is not None for x in r['samples'])
           assert r['all_team_game_locator_coverage_tested'] is False
           assert r['game_day_membership_constructed'] is False
           assert r['same_day_transactions_reconciled'] is False
@@ -107,11 +109,23 @@ jobs:
           assert r['model_fit_performed'] is False
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: v09b-modern-game-release-roster-source-probe-v1-${{ github.run_id }}
           path: research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json
           if-no-files-found: error
           retention-days: 30
+      - name: Enforce frozen semantic viability gate
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json').read_text())
+          assert r['source_class_semantic_viability_probe_pass'] is True
+          assert all(x['semantic_viability_gate_pass'] is True for x in r['samples'])
+          assert all(x['chosen_pregame_roster_snapshot'] is not None for x in r['samples'])
+          PY
 
   research-firewall:
     runs-on: ubuntu-latest
