@@ -1,0 +1,98 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-INACTIVE-ARTICLE-SITEMAP-DISCOVERY-V1",
+  "status": "PREREGISTERED_FULL_2592_PARTITION_DISCOVERY_DIAGNOSTIC_ZERO_LABEL_AUTHORITY",
+  "purpose": "Measure whether standardized first-party NFL club article sitemaps can recover official game-day inactive announcement articles for the full 2017-2021 regular-season team-game universe. This is a locator/source-surface diagnostic only; it cannot create active labels, infer positives from absence, or qualify the game-day roster universe.",
+  "dependencies": {
+    "canonical_locator_snapshot": {
+      "research_data_branch": "research-data/v09b-modern-locator-snapshot-v1",
+      "research_data_commit_sha": "a3f5c5a791f878b12cb92658df37b8a7d093cd0b",
+      "path": "research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv",
+      "sha256": "d26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351",
+      "rows": 1296
+    },
+    "team_domain_and_visible_signal_contract": {
+      "path": "research/availability/v09b_modern_constructed_game_day_url_v2_contract.json",
+      "git_blob_sha1": "7915a6ff131f38c330e2f4fa78af9d30ca129042",
+      "contract_id": "V09B-MODERN-CONSTRUCTED-GAME-DAY-URL-DIAGNOSTIC-V2"
+    },
+    "canonical_schedule_function": "research.v09b_modern_gamebook_locator_audit_v1._canonical_games",
+    "schedule_role": "locator metadata only: game_id/team/week/gameday; never label authority"
+  },
+  "scope": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "game_type": "REG",
+    "expected_games_by_season": {"2017": 256, "2018": 256, "2019": 256, "2020": 256, "2021": 272},
+    "expected_games_total": 1296,
+    "expected_team_partitions_total": 2592,
+    "silent_partition_drops_allowed": 0
+  },
+  "sitemap_discovery": {
+    "url_template": "https://www.{domain}/sitemap/html/articles/{year}/{month_zero_padded}",
+    "game_date_match_required": true,
+    "article_href_must_remain_on_partition_team_domain": true,
+    "http_status_below_400_required": true,
+    "redirect_escape_allowed": false,
+    "candidate_titles_must_match_frozen_taxonomy": true,
+    "title_taxonomy_case_insensitive_substrings": [
+      "inactive",
+      "inactives",
+      "will/won't play",
+      "will-wont-play",
+      "will wont play",
+      "who will play",
+      "who won't play",
+      "who wont play"
+    ],
+    "candidate_article_body_requires_inactive_signal": true,
+    "candidate_article_body_requires_opponent_signal": true,
+    "candidate_article_body_requires_week_signal": false,
+    "multiple_qualifying_candidates_are_ambiguous": true,
+    "candidate_tie_break_authorized": false
+  },
+  "required_accounting": {
+    "every_1296_canonical_game_reported": true,
+    "every_2592_team_partition_reported": true,
+    "every_unique_team_month_sitemap_attempt_reported": true,
+    "missing_sitemap_retained_explicitly": true,
+    "zero_candidate_partition_retained_explicitly": true,
+    "multiple_candidate_partition_retained_explicitly": true,
+    "source_errors_retained_explicitly": true
+  },
+  "known_preexecution_evidence_used_only_to_define_taxonomy": [
+    "Raiders Week 16 2018 official inactives article",
+    "Chiefs Week 10 2021 official inactives article",
+    "Buccaneers Week 10 2021 Will/Won't Play inactives article",
+    "Steelers Week 16 2021 official inactives article",
+    "Saints Week 13 2020 official inactives article"
+  ],
+  "explicit_non_gates": {
+    "inactive_article_locator_coverage_threshold": null,
+    "player_name_parse_threshold": null,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "prohibited_inferences": [
+    "absence of an inactive article means the player was active",
+    "absence of a player from a recovered inactive article means the player was active",
+    "weekly roster status supplies inactive truth",
+    "postgame participation, snaps, or play-by-play supplies active truth",
+    "generic current roster pages are historical roster snapshots",
+    "search-engine results are source authority",
+    "completed 2026 outcomes are used"
+  ],
+  "governance": {
+    "research_only": true,
+    "third_party_authority_used": false,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
