@@ -1,0 +1,134 @@
+name: LevLine V09B DNP weekly-roster diagnostic V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_dnp_weekly_roster_diagnostic_contract_v1.json'
+      - 'research/v09b_modern_dnp_weekly_roster_diagnostic_v1.py'
+      - 'research/run_v09b_modern_dnp_weekly_roster_diagnostic_v1.py'
+      - 'research/test_v09b_modern_dnp_weekly_roster_diagnostic_v1.py'
+      - '.github/workflows/research_v09b_modern_dnp_weekly_roster_diagnostic_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v09b-modern-dnp-weekly-roster-diagnostic-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install '.[dev]'
+
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Validate preregistered zero-authority contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path(
+              'research/availability/v09b_modern_dnp_weekly_roster_diagnostic_contract_v1.json'
+          ).read_text())
+          assert c['status'] == 'PREREGISTERED_DIAGNOSTIC_NO_QUALIFICATION_AUTHORITY'
+          assert c['target_seasons'] == [2017, 2018, 2019, 2020, 2021]
+          assert c['gamebook_dependency']['commit_sha'] == 'aab55bf97aa62cae446b358b9739f4c62604cc8e'
+          assert c['gamebook_dependency']['canonical_games'] == 1296
+          assert c['gamebook_semantics']['did_not_play'].startswith('ambiguous')
+          assert c['gamebook_semantics']['dnp_must_not_be_imputed_active'] is True
+          assert all(v is None for v in c['weekly_roster_source']['expected_sha256'].values())
+          g = c['governance']
+          assert g['diagnostic_only'] is True
+          assert g['qualification_authority'] is False
+          assert g['training_label_authority'] is False
+          assert g['v09b_execution_authorized'] is False
+          assert g['same_version_hash_pinning_after_results_allowed'] is False
+          assert g['completed_2026_outcomes_used'] == 0
+          PY
+
+      - name: Test diagnostic parser and identity rules
+        run: pytest -q research/test_v09b_modern_dnp_weekly_roster_diagnostic_v1.py
+
+      - name: Materialize exact qualified 2017-2021 Game Book archive
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-gamebooks-modern-v2
+          DATA_COMMIT=aab55bf97aa62cae446b358b9739f4c62604cc8e
+          git fetch origin "$DATA_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$DATA_COMMIT"
+          mkdir -p /tmp/v09b-gamebooks
+          git archive "$DATA_COMMIT" research_outputs/v09b_modern_gamebook_raw_archive_v2 \
+            | tar -x -C /tmp/v09b-gamebooks
+          test -s /tmp/v09b-gamebooks/research_outputs/v09b_modern_gamebook_raw_archive_v2/aggregate_qualification.json
+
+      - name: Run first-pass DNP weekly-roster diagnostic
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/src
+        run: |
+          rm -rf research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1
+          python research/run_v09b_modern_dnp_weekly_roster_diagnostic_v1.py \
+            --archive-root /tmp/v09b-gamebooks/research_outputs/v09b_modern_gamebook_raw_archive_v2
+          test -s research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1/diagnostic_report.json
+          test -s research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1/dnp_weekly_roster_resolution.csv
+          test -s research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1/weekly_roster_source_manifest.json
+
+      - name: Enforce zero qualification authority after live diagnostic
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1')
+          r = json.loads((p / 'diagnostic_report.json').read_text())
+          assert r['governance']['diagnostic_only'] is True
+          assert r['governance']['qualification_authority'] is False
+          assert r['governance']['probability_model_built'] is False
+          assert r['governance']['production_dependency_authorized'] is False
+          assert r['governance']['game_outcomes_used'] == 0
+          assert r['governance']['completed_2026_outcomes_used'] == 0
+          assert r['interpretation']['weekly_roster_source_qualified'] is False
+          assert r['interpretation']['game_day_membership_qualified'] is False
+          assert r['interpretation']['dnp_active_semantics_qualified'] is False
+          assert r['interpretation']['training_label_semantics_qualified'] is False
+          assert r['interpretation']['v09b_execution_authorized'] is False
+          assert r['interpretation']['same_version_hash_pinning_authorized'] is False
+          assert len(r['source_manifest']) == 5
+          assert all(item['hash_pinned_before_run'] is False for item in r['source_manifest'])
+          assert all(item['source_qualification_authority'] is False for item in r['source_manifest'])
+          PY
+
+      - name: Prove branch remains research-only
+        if: always()
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [
+              p for p in changed
+              if not (p.startswith('research/') or p.startswith('.github/workflows/research_'))
+          ]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-modern-dnp-weekly-roster-diagnostic-v1-${{ github.run_id }}
+          path: research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1/
+          if-no-files-found: warn
+          retention-days: 30
