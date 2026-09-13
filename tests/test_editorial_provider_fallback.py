@@ -79,6 +79,42 @@ def test_fresh_chatgpt_is_preferred_for_failed_groq_game(tmp_path: Path, monkeyp
     assert recorded["games"][GAME_ID]["requires_chatgpt_refresh"] is False
 
 
+def test_default_recovery_uses_freshest_chatgpt_cache(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("GITHUB_RUN_ID", "freshest")
+    monkeypatch.chdir(tmp_path)
+    now = datetime(2026, 9, 12, 16, 0, tzinfo=timezone.utc)
+
+    current = tmp_path / "inputs" / "chatgpt_media" / "current"
+    fallback = tmp_path / "inputs" / "chatgpt_media" / "fallback"
+    _write_manifest(current, "2026-09-12T13:30:00Z")
+    _write_manifest(fallback, "2026-09-12T15:45:00Z")
+
+    current_payload = _chatgpt_entry()
+    current_payload["games"][GAME_ID]["headline"] = "Older current cache headline"
+    (current / f"{GAME_ID}.json").write_text(json.dumps(current_payload))
+    fallback_payload = _chatgpt_entry()
+    fallback_payload["games"][GAME_ID]["headline"] = "Fresh failed-game cache headline"
+    (fallback / f"{GAME_ID}.json").write_text(json.dumps(fallback_payload))
+
+    output = tmp_path / "focused.txt"
+    status = tmp_path / "status.json"
+    recovered, source = recover_focused_payload(
+        game_id=GAME_ID,
+        output_path=output,
+        reason="groq_http_429",
+        provider_artifact=tmp_path / "missing.json",
+        status_path=status,
+        now=now,
+    )
+
+    assert recovered is True
+    assert source == "chatgpt"
+    assert json.loads(output.read_text())["games"][GAME_ID]["headline"] == "Fresh failed-game cache headline"
+    recorded = json.loads(status.read_text())["groq_provider_fallback"]
+    assert recorded["status"] == "healthy"
+    assert recorded["games"][GAME_ID]["requires_chatgpt_refresh"] is False
+
+
 def test_stale_chatgpt_uses_last_validated_game_and_flags_refresh(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_RUN_ID", "456")
     now = datetime(2026, 9, 12, 16, 0, tzinfo=timezone.utc)
