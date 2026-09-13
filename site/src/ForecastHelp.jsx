@@ -46,7 +46,11 @@ export default function ForecastHelp() {
     const bind = () => {
       for (const button of document.querySelectorAll('.ss-clarity-info')) {
         if (listeners.has(button)) continue
-        const handler = () => setOpen(true)
+        const handler = event => {
+          event.preventDefault()
+          event.stopPropagation()
+          setOpen(true)
+        }
         button.addEventListener('click', handler)
         button.setAttribute('aria-haspopup', 'dialog')
         button.setAttribute('aria-controls', 'ss-forecast-help-dialog')
