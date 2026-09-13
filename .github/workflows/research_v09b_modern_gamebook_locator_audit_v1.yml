@@ -1,0 +1,94 @@
+name: LevLine V09B modern gamebook locator audit
+
+on:
+  pull_request:
+    paths:
+      - 'research/v09b_modern_gamebook_locator_audit_v1.py'
+      - 'research/v09b_modern_gamebook_locator_audit_v2.py'
+      - 'research/test_v09b_modern_gamebook_locator_audit_v1.py'
+      - 'research/test_v09b_modern_gamebook_locator_audit_v2.py'
+      - '.github/workflows/research_v09b_modern_gamebook_locator_audit_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - run: >-
+          pytest -q
+          research/test_v09b_modern_gamebook_locator_audit_v1.py
+          research/test_v09b_modern_gamebook_locator_audit_v2.py
+
+  locator-audit:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Resolve every canonical Game Book locator
+        run: |
+          mkdir -p research_outputs/v09b_modern_gamebook_locator
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_gamebook_locator_audit_v2.py \
+              --season ${{ matrix.season }} \
+              --output research_outputs/v09b_modern_gamebook_locator/${{ matrix.season }}.json
+      - name: Assert no model or outcome dependency
+        if: always()
+        run: |
+          if test -s research_outputs/v09b_modern_gamebook_locator/${{ matrix.season }}.json; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          result = json.loads(Path(f'research_outputs/v09b_modern_gamebook_locator/{season}.json').read_text())
+          assert result['model_fit_performed'] is False
+          assert result['game_outcomes_used'] == 0
+          assert result['completed_2026_outcomes_used'] == 0
+          assert result['week_schedule_is_label_authority'] is False
+          assert result['game_center_is_label_authority'] is False
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-modern-gamebook-locator-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_modern_gamebook_locator/${{ matrix.season }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

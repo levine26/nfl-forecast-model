@@ -1,0 +1,102 @@
+{
+  "record_version": 1,
+  "record_id": "V09B-MODERN-GAMEBOOK-LOCATOR-V1-DIAGNOSTIC-RECEIPT",
+  "experiment_dependency": "V09B-GAMEBOOK-LABEL-COVERAGE-V1",
+  "purpose": "Permanently preserve the first full 2017-2021 modern Game Book locator execution before hardening the locator implementation. This is a source-discovery diagnostic, not model performance evidence.",
+  "execution": {
+    "head_sha": "84f3d5a23cdd9d6afca1c38fa328244bc1c118b0",
+    "workflow_run_id": 34723966017,
+    "completed_2026_outcomes_used": 0,
+    "game_outcomes_used": 0,
+    "model_fit_performed": false
+  },
+  "observed_by_season": {
+    "2017": {
+      "canonical_games": 256,
+      "qualified_gamebook_locators": 256,
+      "locator_coverage_rate": 1.0,
+      "failed_games": []
+    },
+    "2018": {
+      "canonical_games": 256,
+      "qualified_gamebook_locators": 255,
+      "locator_coverage_rate": 0.99609375,
+      "failed_games": [
+        {
+          "game_id": "2018_03_LAC_LA",
+          "old_game_id": "2018092310",
+          "game_center_url": "https://www.nfl.com/games/chargers-at-rams-2018-reg-3",
+          "diagnostic": "HTTP 200; anchor-text extractor found zero Download Game Book links"
+        }
+      ]
+    },
+    "2019": {
+      "canonical_games": 256,
+      "qualified_gamebook_locators": 256,
+      "locator_coverage_rate": 1.0,
+      "failed_games": []
+    },
+    "2020": {
+      "canonical_games": 256,
+      "qualified_gamebook_locators": 254,
+      "locator_coverage_rate": 0.9921875,
+      "failed_games": [
+        {
+          "game_id": "2020_04_IND_CHI",
+          "old_game_id": "2020100401",
+          "game_center_url": "https://www.nfl.com/games/colts-at-bears-2020-reg-4",
+          "diagnostic": "deterministically constructed Game Center URL returned HTTP 404"
+        },
+        {
+          "game_id": "2020_15_SEA_WAS",
+          "old_game_id": "2020122010",
+          "game_center_url": "https://www.nfl.com/games/seahawks-at-football-team-2020-reg-15",
+          "diagnostic": "HTTP 200; anchor-text extractor found zero Download Game Book links"
+        }
+      ]
+    },
+    "2021": {
+      "canonical_games": 272,
+      "qualified_gamebook_locators": 271,
+      "locator_coverage_rate": 0.9963235294117647,
+      "failed_games": [
+        {
+          "game_id": "2021_17_DET_SEA",
+          "old_game_id": "2022010213",
+          "game_center_url": "https://www.nfl.com/games/lions-at-seahawks-2021-reg-17",
+          "diagnostic": "HTTP 200; anchor-text extractor found zero Download Game Book links"
+        }
+      ]
+    }
+  },
+  "post_execution_source_diagnostics": {
+    "2018_03_LAC_LA": {
+      "first_party_game_center_currently_exposes_download_game_book": true,
+      "resolved_first_party_pdf": "https://static.www.nfl.com/image/upload/v1677629115/gamecenter/10012018-0923-105f-06e7-3af474ef0c42.pdf",
+      "interpretation": "The V1 zero-link row is an extraction-surface failure, not evidence that the official Game Book is absent."
+    },
+    "2020_15_SEA_WAS": {
+      "first_party_game_center_currently_exposes_download_game_book": true,
+      "resolved_first_party_pdf": "https://static.www.nfl.com/image/upload/v1677629298/gamecenter/10012020-1220-1042-1bc4-10ba01628156.pdf",
+      "interpretation": "The V1 zero-link row is an extraction-surface failure, not evidence that the official Game Book is absent."
+    },
+    "2020_04_IND_CHI": {
+      "first_party_week_schedule_resolves_exact_game_center": "https://www.nfl.com/games/colts-at-bears-2020-reg-4-x4464",
+      "interpretation": "The V1 HTTP 404 row is a deterministic-slug locator defect because the canonical NFL Game Center carries an opaque suffix. Game Book document qualification remains to be rerun."
+    },
+    "2021_17_DET_SEA": {
+      "first_party_game_center_resolved": true,
+      "download_game_book_current_surface_observed": false,
+      "interpretation": "This row remains a genuine unresolved source-locator case after the V1 follow-up and may not be waived."
+    }
+  },
+  "scientific_disposition": {
+    "v1_locator_implementation_qualified": false,
+    "full_modern_era_source_coverage_qualified": false,
+    "thresholds_changed_after_results": false,
+    "silent_game_drops_allowed": false,
+    "hardened_rerun_required": true,
+    "v09b_model_fit_authorized": false,
+    "reason": "The first full audit missed four rows. Three have independent first-party evidence showing locator/extraction brittleness rather than source absence; the 2021 DET-SEA row remains unresolved. The frozen 100% coverage requirement is unchanged."
+  }
+}

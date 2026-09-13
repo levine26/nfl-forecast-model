@@ -1,0 +1,53 @@
+{
+  "qualification_version": 1,
+  "qualification_id": "V09B-MODERN-GAMEBOOK-LOCATOR-V2-QUALIFICATION",
+  "scope": "2017-2021 regular-season official first-party NFL Game Book locator coverage only",
+  "workflow_evidence": {
+    "run_id": 34725715104,
+    "workflow_head_sha": "2c18ecb722c9a3696482285a3e2b82c55031bfa2",
+    "workflow_name": "LevLine V09B modern gamebook locator audit",
+    "unit_passed": true,
+    "research_firewall_passed": true,
+    "season_jobs": {
+      "2017": {"job_id": 103642074422, "passed": true, "artifact_id": 10307759606, "artifact_digest": "sha256:8e5b0cfc1ae61e7b70a4f59d8d0dad54eeafb7d5165962756da4d3781043e14b", "canonical_games": 256},
+      "2018": {"job_id": 103642074442, "passed": true, "artifact_id": 10308151131, "artifact_digest": "sha256:c3968e3689c602a625f566a88a6ffeb491cc99a89e158eeafa7c8ecad3f1af9d", "canonical_games": 256},
+      "2019": {"job_id": 103642074431, "passed": true, "artifact_id": 10308575420, "artifact_digest": "sha256:708b6e8a1cb3a7e2ef45e804b19781858cc3abe1230c2e6ad9b8a907a9324224", "canonical_games": 256},
+      "2020": {"job_id": 103642074414, "passed": true, "artifact_id": 10308360495, "artifact_digest": "sha256:9d666194b1f40c3c0a79e4eb8e827397a3c1a9905a29abed6144f9e5f3cf23d9", "canonical_games": 256},
+      "2021": {"job_id": 103642074439, "passed": true, "artifact_id": 10308800231, "artifact_digest": "sha256:f3ae00be7dfd41ed1e48d7aafe739d7d888bcd1da17f40d3371af79f56b15fde", "canonical_games": 272}
+    }
+  },
+  "frozen_gate_result": {
+    "seasons_required": [2017, 2018, 2019, 2020, 2021],
+    "seasons_passed": [2017, 2018, 2019, 2020, 2021],
+    "canonical_games_required": 1296,
+    "qualified_gamebook_locators": 1296,
+    "locator_coverage_rate": 1.0,
+    "first_party_final_host_required": true,
+    "redirected_to_non_first_party_allowed": false,
+    "silent_game_drops_allowed": false,
+    "coverage_threshold_relaxed_from_v1": false,
+    "all_frozen_v2_locator_gates_pass": true
+  },
+  "v1_failure_preservation": {
+    "diagnostic_receipt": "research/availability/v09b_modern_gamebook_locator_v1_diagnostic_receipt.json",
+    "v1_failure_preserved": true,
+    "v1_missed_rows": 4,
+    "v2_interpretation": "The hardened rerun resolves all canonical rows under the unchanged 100% requirement and first-party final-host provenance gate."
+  },
+  "scientific_disposition": {
+    "modern_gamebook_locator_layer_qualified": true,
+    "modern_raw_source_bytes_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
