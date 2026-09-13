@@ -1,0 +1,109 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAME-RELEASE-ROSTER-SOURCE-PROBE-V1-FAILURE",
+  "contract_id": "V09B-MODERN-GAME-RELEASE-ROSTER-SOURCE-PROBE-V1",
+  "status": "FAILED_SOURCE_CLASS_SEMANTIC_VIABILITY_PROBE_NO_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34733978657,
+    "validated_head_sha": "879ba35eba8541dce8cd9f167a048b19db8194a9",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "semantic_gate_conclusion": "failure",
+    "artifact_id": 10309908083,
+    "artifact_digest": "sha256:02ed1fb7a54d9569a25be5b0fc94733c2ecfbb415eecc97227e54885a8167a46"
+  },
+  "aggregate_result": {
+    "sample_count_expected": 5,
+    "sample_count_completed": 5,
+    "source_errors": 0,
+    "first_party_pdf_samples": 5,
+    "source_class_semantic_viability_probe_pass": false,
+    "samples_passing_frozen_v1_semantic_gate": 1,
+    "samples_failing_frozen_v1_semantic_gate": 4
+  },
+  "samples": {
+    "2017_DEN": {
+      "game_id": "2017_10_NE_DEN",
+      "raw_sha256": "2768ee575a8df531c94881a025251f072da9dfceeade58dc75093df377df18c8",
+      "release_marker_count": 18,
+      "current_roster_marker_count": 2,
+      "excluded_population_marker_count": 196,
+      "chosen_pregame_roster_snapshot": null,
+      "semantic_viability_gate_pass": false,
+      "observed_failure_shape": "Roster and excluded-population structure is present, but the frozen V1 date parser did not recognize the official abbreviated-month As of format; V1 remains failed rather than being retrofitted."
+    },
+    "2018_NE": {
+      "game_id": "2018_12_NE_NYJ",
+      "raw_sha256": "638aa5189684da73b473f1cca676a88987eb076cea5cff3f207e154e4f843cd1",
+      "release_marker_count": 0,
+      "current_roster_marker_count": 2,
+      "excluded_population_marker_count": 59,
+      "chosen_pregame_roster_snapshot": {
+        "date": "2018-11-20",
+        "snapshot_age_days": 5
+      },
+      "semantic_viability_gate_pass": false,
+      "observed_failure_shape": "Current roster, excluded populations, and a five-day pregame snapshot are present; the frozen V1 release-marker taxonomy was not observed."
+    },
+    "2019_NE": {
+      "game_id": "2019_13_NE_HOU",
+      "raw_sha256": "3d5828b54e8b51038b3bd830cf09d2464453f4db644eab9511f483a7c99200cb",
+      "release_marker_count": 0,
+      "current_roster_marker_count": 2,
+      "excluded_population_marker_count": 60,
+      "chosen_pregame_roster_snapshot": {
+        "date": "2019-11-26",
+        "snapshot_age_days": 5
+      },
+      "semantic_viability_gate_pass": false,
+      "observed_failure_shape": "Current roster, excluded populations, and a five-day pregame snapshot are present; the frozen V1 release-marker taxonomy was not observed."
+    },
+    "2020_NE": {
+      "game_id": "2020_11_NE_HOU",
+      "raw_sha256": "363e9feeaa3fa9dd0932908e2cfd5647bc6cfc536d111233a9d06d11faeffda4",
+      "release_marker_count": 1,
+      "current_roster_marker_count": 2,
+      "excluded_population_marker_count": 110,
+      "chosen_pregame_roster_snapshot": {
+        "date": "2020-11-17",
+        "snapshot_age_days": 5
+      },
+      "semantic_viability_gate_pass": true,
+      "observed_failure_shape": null
+    },
+    "2021_PIT": {
+      "game_id": "2021_16_PIT_KC",
+      "raw_sha256": "277ba42b83712fca11c443ccaed16ccb4b6077b1f1da44b47946c03639a896ba",
+      "release_marker_count": 3,
+      "current_roster_marker_count": 0,
+      "excluded_population_marker_count": 213,
+      "chosen_pregame_roster_snapshot": null,
+      "semantic_viability_gate_pass": false,
+      "observed_failure_shape": "The official packet contains extensive practice-squad/reserve structure, but the frozen V1 current-roster heading taxonomy did not match the Steelers packet; V1 remains failed rather than being retrofitted."
+    }
+  },
+  "scientific_disposition": {
+    "v1_source_class_semantic_viability_qualified": false,
+    "v1_gate_relaxed_post_hoc": false,
+    "v1_parser_or_marker_taxonomy_retrofitted": false,
+    "source_class_rejected_as_unusable_in_principle": false,
+    "separate_replacement_source_probe_required": true,
+    "recommended_replacement_source_class": "direct week-specific first-party Roster and Depth Chart PDFs exposed by official club archive pages",
+    "all_team_game_locator_coverage_tested": false,
+    "game_day_membership_constructed": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
