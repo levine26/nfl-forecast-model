@@ -1,0 +1,75 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-DNP-WEEKLY-ROSTER-DIAGNOSTIC-V1",
+  "status": "PREREGISTERED_DIAGNOSTIC_NO_QUALIFICATION_AUTHORITY",
+  "purpose": "Test whether nflverse NFL-Shield weekly-roster rows can independently resolve the ambiguous Did Not Play bucket in qualified 2017-2021 NFL Game Books without treating DNP as active by default.",
+  "target_seasons": [2017, 2018, 2019, 2020, 2021],
+  "gamebook_dependency": {
+    "data_branch": "research-data/v09b-gamebooks-modern-v2",
+    "commit_sha": "aab55bf97aa62cae446b358b9739f4c62604cc8e",
+    "archive_root": "research_outputs/v09b_modern_gamebook_raw_archive_v2",
+    "canonical_games": 1296,
+    "team_games": 2592,
+    "raw_source_qualified": true,
+    "game_day_membership_qualified": false
+  },
+  "weekly_roster_source": {
+    "source_id": "nflverse_weekly_rosters_nfl_shield_v2",
+    "url_template": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_{season}.csv",
+    "expected_sha256": {
+      "2017": null,
+      "2018": null,
+      "2019": null,
+      "2020": null,
+      "2021": null
+    },
+    "first_run_policy": "Fetch and archive exact bytes and report observed hashes. Null preregistered hashes mean this V1 run can never qualify the source or labels. Any later qualification requires a new version with hashes pinned before qualification execution."
+  },
+  "gamebook_semantics": {
+    "lineups": "positive_active_evidence_not_retested_by_this_diagnostic",
+    "substitutions": "positive_active_evidence_not_retested_by_this_diagnostic",
+    "not_active": "negative_inactive_evidence_not_retested_by_this_diagnostic",
+    "did_not_play": "ambiguous_membership_bucket_requiring_independent_resolution",
+    "dnp_must_not_be_imputed_active": true
+  },
+  "identity_policy": {
+    "scope": "same season, week, team, and jersey number",
+    "name_rule": "exact normalized surname plus exact first-name prefix compatible with the Game Book abbreviation; no fuzzy, edit-distance, phonetic, cross-team, or cross-week matching",
+    "unique_candidate_required": true,
+    "source_absence_semantics": "unresolved; never infer active, inactive, healthy, waived, or reserve from absence alone"
+  },
+  "diagnostic_outputs": [
+    "weekly-roster source hashes and schemas",
+    "all parsed DNP tokens",
+    "stable identity resolution state",
+    "weekly roster status and status-description distribution",
+    "per-team-game DNP status composition",
+    "predeclared anomaly sentinel observations"
+  ],
+  "predeclared_sentinels": [
+    {"season": 2018, "week": 16, "team": "OAK", "game_id": "2018_16_DEN_OAK", "gamebook_name": "D.Worley", "independent_evidence": "placed on Reserve/Injured before game", "expected_not_simple_active": true},
+    {"season": 2018, "week": 16, "team": "OAK", "game_id": "2018_16_DEN_OAK", "gamebook_name": "D.Moore", "independent_evidence": "waived before game", "expected_not_simple_active": true},
+    {"season": 2020, "week": 15, "team": "JAX", "game_id": "2020_15_JAX_BAL", "gamebook_name": "L.Cooke", "independent_evidence": "missed game with illness and later activated from Reserve/COVID-19", "expected_not_simple_active": true},
+    {"season": 2021, "week": 10, "team": "KC", "game_id": "2021_10_KC_LV", "gamebook_name": "K.Saunders", "independent_evidence": "listed inactive by contemporaneous official Chiefs/NFL report", "expected_not_simple_active": true},
+    {"season": 2021, "week": 10, "team": "TB", "game_id": "2021_10_TB_WAS", "gamebook_name": "A.Brown", "independent_evidence": "listed inactive by contemporaneous official Buccaneers/NFL report", "expected_not_simple_active": true},
+    {"season": 2021, "week": 16, "team": "PIT", "game_id": "2021_16_PIT_KC", "gamebook_name": "C.Wormley", "independent_evidence": "listed inactive by contemporaneous official Steelers report", "expected_not_simple_active": true}
+  ],
+  "governance": {
+    "research_only": true,
+    "diagnostic_only": true,
+    "qualification_authority": false,
+    "training_label_authority": false,
+    "training_source_chronology_authority": false,
+    "v09b_execution_authorized": false,
+    "probability_model_built": false,
+    "probability_feature_authorized": false,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false,
+    "threshold_relaxation_after_results_allowed": false,
+    "same_version_hash_pinning_after_results_allowed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "actual_current_game_snaps_used": 0,
+    "postgame_participation_used": 0
+  }
+}
