@@ -1,7 +1,18 @@
+import importlib.util
+import json
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
 from nfl_forecast.editorial_finalize import finalize_previews
+
+
+FINALIZE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "finalize_editorial.py"
+_spec = importlib.util.spec_from_file_location("finalize_editorial_script", FINALIZE_SCRIPT)
+assert _spec and _spec.loader
+finalize_script = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(finalize_script)
 
 
 def test_finalizer_replaces_generic_factor_copy_and_builds_notebook():
@@ -114,3 +125,35 @@ def test_finalizer_exempts_repeated_machine_metric_scaffold_but_not_analysis():
     previews["g2"]["case_for_pick"] = repeated_analysis
     with pytest.raises(ValueError, match="publication repeats game-file prose across matchups"):
         finalize_previews(predictions, previews, {"g1": [], "g2": []})
+
+
+def test_script_finalizer_restores_only_current_run_groq_fallback(tmp_path: Path):
+    sidecar = tmp_path / "fallback.json"
+    sidecar.write_text(json.dumps({
+        "run_id": "101",
+        "status": "degraded",
+        "games": {
+            "2026_01_CLE_JAX": {
+                "provider_result": "failed",
+                "fallback_source": "last_validated_editorial",
+                "requires_chatgpt_refresh": True,
+            }
+        },
+    }))
+    latest_main_status = {"generated_utc": "2026-09-13T01:00:00Z", "media_reporting": {"status": "healthy"}}
+
+    restored = finalize_script._restore_current_run_fallback_status(
+        latest_main_status,
+        sidecar_path=sidecar,
+        run_id="101",
+    )
+    assert restored["generated_utc"] == latest_main_status["generated_utc"]
+    assert restored["groq_provider_fallback"]["run_id"] == "101"
+    assert restored["groq_provider_fallback"]["games"]["2026_01_CLE_JAX"]["requires_chatgpt_refresh"] is True
+
+    ignored = finalize_script._restore_current_run_fallback_status(
+        latest_main_status,
+        sidecar_path=sidecar,
+        run_id="102",
+    )
+    assert "groq_provider_fallback" not in ignored

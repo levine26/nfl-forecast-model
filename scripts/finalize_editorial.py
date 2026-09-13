@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 import json
+import os
 from pathlib import Path
 import re
 
@@ -29,6 +30,8 @@ _GENERIC_VISIBLE_TITLE_SIGNALS = (
     "week one matchup",
     "starting lineup",
 )
+
+_GROQ_FALLBACK_STATUS_SIDECAR = Path("/tmp/sunday-signal-groq-provider-fallback.json")
 
 
 def _title_key(item: dict) -> str:
@@ -114,6 +117,30 @@ def _canonicalize_fallback_model_paragraphs(previews: dict, predictions: pd.Data
     return previews
 
 
+def _restore_current_run_fallback_status(
+    status: dict,
+    *,
+    sidecar_path: Path = _GROQ_FALLBACK_STATUS_SIDECAR,
+    run_id: str | None = None,
+) -> dict:
+    """Restore only this Actions run's Groq-failure metadata after a safe git reset."""
+    expected_run = str(run_id or os.environ.get("GITHUB_RUN_ID") or "").strip()
+    if not expected_run or not sidecar_path.is_file():
+        return status
+    try:
+        section = json.loads(sidecar_path.read_text(encoding="utf-8"))
+    except Exception:
+        return status
+    if not isinstance(section, dict) or str(section.get("run_id") or "") != expected_run:
+        return status
+    games = section.get("games")
+    if not isinstance(games, dict) or not games:
+        return status
+    restored = dict(status)
+    restored["groq_provider_fallback"] = section
+    return restored
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default="outputs")
@@ -131,6 +158,7 @@ def main() -> None:
     previews = json.loads(previews_path.read_text())
     evidence = json.loads(evidence_path.read_text())
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
+    status = _restore_current_run_fallback_status(status)
 
     # Repair only mechanical punctuation artifacts at the public boundary. Facts,
     # standardized injury/status language, and all model values remain unchanged.
