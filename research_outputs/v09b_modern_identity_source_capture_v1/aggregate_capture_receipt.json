@@ -1,0 +1,67 @@
+{
+  "all_five_seasons_captured": true,
+  "capture_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1-COMPLETE",
+  "capture_version": 1,
+  "completed_2026_outcomes_used": 0,
+  "game_outcomes_used": 0,
+  "identity_resolution_performed": false,
+  "missing_gsis_rows_by_season": {
+    "2017": 0,
+    "2018": 35,
+    "2019": 2,
+    "2020": 5,
+    "2021": 23
+  },
+  "model_fit_performed": false,
+  "modern_game_day_roster_universe_qualified_by_this_capture": false,
+  "modern_player_team_game_identity_qualified": false,
+  "production_dependency_authorized": false,
+  "projection_sha256_by_season": {
+    "2017": "1ade2f94b602f52f53046f9efb868c441edf4f5f64ef1e205fa716327b9d4db0",
+    "2018": "237a75521207ea59be030fdf1d469ce04440e35cf8302fa8edbfabab506e45d2",
+    "2019": "ebc3e761749b956e809dfbb3e8d3556d65df22f3dcd8d7e103c70807077df7b7",
+    "2020": "49f770d6293cfab446165e5571274e44c2be61c3dfc4ee7321139006ce50ce1a",
+    "2021": "29860c837236401e1750f4902eda15ae809a62c62236ff17f16b75ca58b33fac"
+  },
+  "raw_source_sha256_by_season": {
+    "2017": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
+    "2018": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
+    "2019": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+    "2020": "8d601bf5c5d669465481421ad5cd1a1470d51792054e84bdc04f3620785f7530",
+    "2021": "3e9f67569e940b54b3778ef2c9150850920b5bf93143bad3bd158e649825cf6b"
+  },
+  "seasons": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021
+  ],
+  "source_identity_conflicts_by_season": {
+    "2017": 0,
+    "2018": 0,
+    "2019": 0,
+    "2020": 0,
+    "2021": 0
+  },
+  "source_rows_selected_by_season": {
+    "2017": 49210,
+    "2018": 50113,
+    "2019": 49561,
+    "2020": 41972,
+    "2021": 44539
+  },
+  "status_fields_read_for_resolution": false,
+  "status_fields_selected": false,
+  "training_label_semantics_qualified": false,
+  "training_source_chronology_qualified": false,
+  "usable_non_null_gsis_rows_by_season": {
+    "2017": 49210,
+    "2018": 50078,
+    "2019": 49559,
+    "2020": 41967,
+    "2021": 44516
+  },
+  "v09b_model_fit_authorized": false,
+  "weekly_roster_defines_game_day_membership": false
+}
