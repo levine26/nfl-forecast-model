@@ -17,15 +17,18 @@
     "completed_2026_outcomes_used": 0
   },
   "current_evidence": {
-    "validation_source_state_qualified": false,
-    "validation_source_basis": "V09B-AVAILABILITY-REGULAR-SEASON-HARMONIZATION-V2 failed closed on its first strict execution; the failure is preserved and may not be reclassified.",
+    "validation_source_state_qualified": true,
+    "validation_source_contract_id": "V09B-AVAILABILITY-PRACTICE-STATE-CROSSCHECK-V3",
+    "validation_source_basis": "Merged PR #211 qualified the 2022-2025 validation source for the specific recognized practice-participation states Full, Limited, and DNP under the frozen V3 thresholds. Strict V2 remains preserved as FAILED CLOSED; blank/unrecognized practice rows remain diagnostic and are never inferred active/healthy, and final game status remains unauthorized as a feature.",
     "training_source_chronology_qualified": false,
-    "training_source_chronology_basis": "The legacy injury feed has 2012-2021 coverage, but no per-season T-120-safe chronology contract has been qualified for the training window.",
+    "training_source_chronology_basis": "2012-2021 source work has advanced beyond the original legacy-feed statement, but the complete kickoff-safe training chronology required for the frozen P(active) target is not yet qualified across the full training window.",
     "training_label_semantics_qualified": false,
-    "training_label_semantics_basis": "No frozen source contract has yet proven that the labels used to fit P(active) for 2012-2021 are available under the same pregame information discipline.",
+    "training_label_semantics_basis": "The 2012-2021 kickoff active/inactive target denominator remains fail-closed until the modern 2017-2021 game-day membership reconstruction and its chronology/identity gates are qualified; postgame participation and retrospective inactive repair remain prohibited.",
+    "original_preregistration_unchanged": true,
+    "completed_2026_outcomes_used": 0,
     "v09b_execution_authorized": false
   },
-  "decision_rule": "V09B execution is authorized only when every authorization requirement is satisfied simultaneously. A 2022-2025 validation-source qualification can never, by itself, authorize fitting on 2012-2021.",
+  "decision_rule": "V09B execution is authorized only when every authorization requirement is satisfied simultaneously. The qualified 2022-2025 validation practice-state source can never, by itself, authorize fitting on 2012-2021.",
   "prohibited_rescues": [
     "do not infer active/healthy from source absence",
     "do not use realized current-game snaps as a pregame feature",
