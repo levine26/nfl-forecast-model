@@ -1,0 +1,71 @@
+name: LevLine V09B legacy Game Book roster duplicate probe
+
+on:
+  pull_request:
+    paths:
+      - 'research/v09b_legacy_gamebook_roster_duplicate_probe_v1.py'
+      - '.github/workflows/research_v09b_legacy_gamebook_roster_duplicate_probe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  duplicate-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Identify exact 2012 duplicated active-section membership
+        run: |
+          ROOT=research_outputs/v09b_legacy_gamebook_roster_duplicate_probe_v1/2012
+          mkdir -p "$ROOT"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_roster_duplicate_probe_v1.py \
+              --season 2012 \
+              --archive-root "$ROOT/archive" \
+              --output "$ROOT/receipt.json"
+      - name: Assert diagnostic-only boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research_outputs/v09b_legacy_gamebook_roster_duplicate_probe_v1/2012/receipt.json').read_text())
+          assert r['membership_modified'] is False
+          assert r['deduplication_performed'] is False
+          assert r['qualification_authority'] is False
+          assert r['player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['model_fit_performed'] is False
+          assert r['game_outcomes_used'] == 0
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-legacy-gamebook-roster-duplicate-probe-2012-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_roster_duplicate_probe_v1/2012/receipt.json
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove probe remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY

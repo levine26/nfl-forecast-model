@@ -1,0 +1,76 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-LEGACY-GAMEBOOK-ROSTER-UNIVERSE-V1",
+  "dependency": "V09B-LEGACY-GAMEBOOK-RAW-ARCHIVE-V2",
+  "status": "POST_SOURCE_INSPECTION_DETERMINISTIC_PARSER_AUDIT",
+  "purpose": "Test whether official 2012-2016 NFL Game Books can directly bound the game-day P(active) denominator, avoiding inference from ambiguous weekly-roster status codes.",
+  "scientific_disclosure": {
+    "parser_design_informed_by_raw_source_inspection": true,
+    "game_outcomes_used_to_design_parser": false,
+    "completed_2026_outcomes_used": 0,
+    "exploratory_replay_before_contract": "All 1,280 V1-captured PDFs were inspected structurally. Every game exposed one Lineups, Substitutions, Did Not Play and Not Active block; all 2,560 team partitions had disjoint active/inactive player keys and no duplicate player keys across active sections.",
+    "promotion_claim_allowed_from_this_audit": false
+  },
+  "source_semantics": {
+    "authority": "official NFLGSIS Gamebook.pdf Game Summary first-page roster structures",
+    "visitor_partition": "left layout column",
+    "home_partition": "right layout column",
+    "column_split": 80,
+    "active_candidate_sections": ["Lineups", "Substitutions", "Did Not Play"],
+    "inactive_negative_section": "Not Active",
+    "positive_candidate_definition": "union of player entries listed in Lineups, Substitutions and Did Not Play for that team",
+    "negative_definition": "player entry listed in Not Active for that team",
+    "did_not_play_is_negative": false,
+    "weekly_roster_status_used_to_define_membership": false,
+    "postgame_participation_used_to_define_membership": false
+  },
+  "canonical_universe": {
+    "seasons": [2012, 2013, 2014, 2015, 2016],
+    "games_per_season": 256,
+    "games_total": 1280,
+    "team_game_partitions_total": 2560
+  },
+  "parser": {
+    "implementation": "pdftotext -layout followed by deterministic first-page two-column extraction",
+    "required_game_markers_exactly_once": ["Lineups", "Substitutions", "Did Not Play", "Not Active"],
+    "player_entry_identity_for_parser_checks": ["jersey_number", "display_name"],
+    "position_is_diagnostic_not_identity": true,
+    "active_section_duplicate_membership_allowed": 0,
+    "active_inactive_overlap_allowed": 0,
+    "accepted_active_candidate_count_per_team": [45, 46],
+    "accepted_total_candidate_roster_count_range_per_team": [45, 53],
+    "reason_for_count_sanity_gate": "The full exploratory raw-source replay produced only 45- or 46-player active candidate sets and 50-53 total parsed roster entries. The gate is a parser-completeness sanity check, not an NFL outcome or betting assumption."
+  },
+  "frozen_audit_gates": {
+    "upstream_v2_source_gate_required": true,
+    "canonical_game_parse_coverage_rate_required": 1.0,
+    "team_partition_parse_coverage_rate_required": 1.0,
+    "required_marker_exact_count_rate_required": 1.0,
+    "active_section_duplicate_memberships_allowed": 0,
+    "active_inactive_overlaps_allowed": 0,
+    "team_partitions_outside_active_count_sanity_allowed": 0,
+    "team_partitions_outside_total_roster_count_sanity_allowed": 0,
+    "source_row_errors_allowed": 0
+  },
+  "not_yet_qualified": {
+    "player_team_game_identity_resolution": true,
+    "gsis_id_assignment": true,
+    "cross_era_2017_2021_roster_parser": true,
+    "training_label_source_chronology": true,
+    "v09b_model_fit": true
+  },
+  "authorization": {
+    "legacy_gamebook_roster_partition_qualified": false,
+    "legacy_game_day_roster_universe_qualified": false,
+    "player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
