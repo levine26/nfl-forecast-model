@@ -1,0 +1,39 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-LEGACY-GAMEBOOK-RAW-ARCHIVE-V1-FAILURE",
+  "workflow_evidence": {
+    "run_id": 34724990513,
+    "unit_job_id": 103637459723,
+    "research_firewall_job_id": 103637459831,
+    "season_jobs": {
+      "2012": {"job_id": 103637586912, "conclusion": "failure"},
+      "2013": {"job_id": 103637586846, "conclusion": "failure"},
+      "2014": {"job_id": 103637586906, "conclusion": "failure"},
+      "2015": {"job_id": 103637586916, "conclusion": "failure"},
+      "2016": {"job_id": 103637586885, "conclusion": "failure"}
+    }
+  },
+  "observed_result": {
+    "canonical_games": 1280,
+    "source_bytes_verified": 1280,
+    "pdf_text_extractions": 1280,
+    "qualified_source_rows": 0,
+    "source_row_errors": 1280,
+    "archive_integrity_ok_all_seasons": true,
+    "failure_class": "parser_specification_failure",
+    "failure_reason": "V1 required colon-terminated Not Active: and Did Not Play: headings, while official pdftotext -layout output renders the headings without a required colon."
+  },
+  "scientific_disposition": {
+    "v1_failure_preserved": true,
+    "source_transport_failure": false,
+    "source_absence_inferred": false,
+    "qualification_claimed": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

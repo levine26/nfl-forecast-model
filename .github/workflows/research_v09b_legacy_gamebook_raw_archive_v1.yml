@@ -1,0 +1,223 @@
+name: LevLine V09B legacy Game Book raw archive
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_legacy_gamebook_raw_archive_contract_v1.json'
+      - 'research/availability/v09b_legacy_gamebook_locator_v1_receipt.json'
+      - 'research/v09b_legacy_gamebook_locator_audit_v1.py'
+      - 'research/v09b_legacy_gamebook_raw_archive_v1.py'
+      - 'research/test_v09b_legacy_gamebook_raw_archive_v1.py'
+      - '.github/workflows/research_v09b_legacy_gamebook_raw_archive_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-legacy-gamebook-raw-archive-v1-${{ github.event_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Test content addressing, immutable manifests and semantic structure gate
+        run: pytest -q research/test_v09b_legacy_gamebook_raw_archive_v1.py
+      - name: Validate preregistered source-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract = json.loads(Path('research/availability/v09b_legacy_gamebook_raw_archive_contract_v1.json').read_text())
+          locator = json.loads(Path('research/availability/v09b_legacy_gamebook_locator_v1_receipt.json').read_text())
+          assert contract['status'] == 'PREREGISTERED_SOURCE_ONLY_FAIL_CLOSED'
+          assert contract['expected_games_total'] == 1280
+          assert contract['source']['discovery_crosswalk_is_label_authority'] is False
+          assert contract['archive']['sha256_required'] is True
+          assert 'immutable' in contract['archive']['append_only_manifest_semantics']
+          assert contract['parser']['not_active_heading_occurrences_minimum'] == 1
+          assert contract['parser']['did_not_play_heading_occurrences_minimum'] == 1
+          assert contract['parser']['heading_occurrence_maximum'] is None
+          assert contract['parser']['not_active_is_negative_class_source'] is True
+          assert contract['parser']['did_not_play_is_negative_class_source'] is False
+          gates = contract['frozen_qualification_gates']
+          assert gates['canonical_game_coverage_rate_required'] == 1.0
+          assert gates['source_bytes_verified_rate_required'] == 1.0
+          assert gates['pdf_text_extraction_rate_required'] == 1.0
+          assert gates['not_active_structure_rate_required'] == 1.0
+          assert gates['did_not_play_structure_rate_required'] == 1.0
+          assert gates['distinct_semantic_structure_rate_required'] == 1.0
+          assert contract['authorization']['v09b_model_fit_authorized'] is False
+          assert contract['governance']['completed_2026_outcomes_used'] == 0
+          assert locator['aggregate']['qualified_gamebook_locators'] == 1280
+          assert locator['aggregate']['locator_coverage_rate'] == 1.0
+          assert locator['scientific_disposition']['v09b_model_fit_authorized'] is False
+          PY
+
+  source-audit:
+    if: github.event_name == 'pull_request'
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015, 2016]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Archive bytes and audit frozen source structure
+        run: |
+          mkdir -p research_outputs/v09b_legacy_gamebook_raw_archive_v1/receipts
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_raw_archive_v1.py \
+              --season ${{ matrix.season }} \
+              --archive-root research_outputs/v09b_legacy_gamebook_raw_archive_v1 \
+              --receipt research_outputs/v09b_legacy_gamebook_raw_archive_v1/receipts/${{ matrix.season }}.json
+      - name: Assert no downstream label or outcome dependency
+        if: always()
+        run: |
+          if test -s research_outputs/v09b_legacy_gamebook_raw_archive_v1/receipts/${{ matrix.season }}.json; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          receipt = json.loads(Path(f'research_outputs/v09b_legacy_gamebook_raw_archive_v1/receipts/{season}.json').read_text())
+          assert receipt['player_identity_resolution_performed'] is False
+          assert receipt['game_day_roster_universe_constructed'] is False
+          assert receipt['training_label_semantics_qualified'] is False
+          assert receipt['training_source_chronology_qualified'] is False
+          assert receipt['v09b_model_fit_authorized'] is False
+          assert receipt['model_fit_performed'] is False
+          assert receipt['game_outcomes_used'] == 0
+          assert receipt['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-legacy-gamebook-raw-audit-${{ matrix.season }}-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_legacy_gamebook_raw_archive_v1/manifests/${{ matrix.season }}.jsonl
+            research_outputs/v09b_legacy_gamebook_raw_archive_v1/receipts/${{ matrix.season }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  research-firewall:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
+  persist-qualified-archive:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore immutable historical archive if it already exists
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-gamebooks-legacy-v1
+          ROOT=research_outputs/v09b_legacy_gamebook_raw_archive_v1
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            if git ls-tree -d --name-only "origin/$DATA_BRANCH" "$ROOT" | grep -q "^$ROOT$"; then
+              git archive "origin/$DATA_BRANCH" "$ROOT" | tar -xf -
+            fi
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install source-audit dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y poppler-utils
+          pip install '.[dev]'
+      - name: Capture and verify all 1,280 official Game Books
+        run: |
+          set -euo pipefail
+          ROOT=research_outputs/v09b_legacy_gamebook_raw_archive_v1
+          mkdir -p "$ROOT/receipts"
+          for season in 2012 2013 2014 2015 2016; do
+            PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+              python research/v09b_legacy_gamebook_raw_archive_v1.py \
+                --season "$season" \
+                --archive-root "$ROOT" \
+                --receipt "$ROOT/receipts/$season.json"
+          done
+      - name: Prove every season passed while authorization remains closed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('research_outputs/v09b_legacy_gamebook_raw_archive_v1/receipts')
+          seasons = [2012, 2013, 2014, 2015, 2016]
+          receipts = [json.loads((root / f'{season}.json').read_text()) for season in seasons]
+          assert all(row['all_frozen_gates_pass'] is True for row in receipts)
+          assert sum(row['canonical_games'] for row in receipts) == 1280
+          assert sum(row['source_bytes_verified'] for row in receipts) == 1280
+          assert sum(row['qualified_source_rows'] for row in receipts) == 1280
+          assert all(row['v09b_model_fit_authorized'] is False for row in receipts)
+          assert all(row['completed_2026_outcomes_used'] == 0 for row in receipts)
+          PY
+      - name: Persist content-addressed archive away from main
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-gamebooks-legacy-v1
+          ROOT=research_outputs/v09b_legacy_gamebook_raw_archive_v1
+          rm -rf /tmp/v09b_legacy_gamebook_raw_archive_v1
+          cp -R "$ROOT" /tmp/v09b_legacy_gamebook_raw_archive_v1
+          rm -rf "$ROOT"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B v09b-gamebooks-legacy-v1-data "origin/$DATA_BRANCH"
+          else
+            git checkout -B v09b-gamebooks-legacy-v1-data
+          fi
+          mkdir -p research_outputs
+          rm -rf "$ROOT"
+          cp -R /tmp/v09b_legacy_gamebook_raw_archive_v1 "$ROOT"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'Historical Game Book archive unchanged; immutable revalidation succeeded.'
+            exit 0
+          fi
+          git commit -m 'Archive verified 2012-2016 NFL Game Books for V09B research'
+          git push origin HEAD:"$DATA_BRANCH"
