@@ -1,0 +1,111 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V1",
+  "status": "PREREGISTERED_IDENTITY_ONLY_AGGREGATE_QUALIFICATION_GATE",
+  "purpose": "Resolve every distinct 2017-2021 official Game Book roster-section identity to GSIS using only immutable status-free weekly-roster identity fields. This audit is independent of whether Did Not Play represents game-day active membership and grants no membership, label, chronology, or model-fit authority.",
+  "seasons": [2017, 2018, 2019, 2020, 2021],
+  "upstream_gamebook_archive": {
+    "qualification_id": "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION",
+    "research_data_branch": "research-data/v09b-gamebooks-modern-v2",
+    "commit_sha": "aab55bf97aa62cae446b358b9739f4c62604cc8e",
+    "expected_games_by_season": {"2017": 256, "2018": 256, "2019": 256, "2020": 256, "2021": 272},
+    "expected_games_total": 1296,
+    "expected_team_partitions_total": 2592,
+    "network_redownload_allowed": false
+  },
+  "upstream_identity_source": {
+    "contract_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1",
+    "research_data_branch": "research-data/v09b-modern-identity-source-v1",
+    "commit_sha": "1c6f388c06f7473eb7483d6b4b91685ecb3d019c",
+    "projection_fields": ["season", "game_type", "week", "team", "gsis_id", "jersey_number", "first_name", "football_name", "last_name"],
+    "forbidden_fields": ["status", "status_description_abbr", "status_short_description"],
+    "raw_source_sha256_by_season": {
+      "2017": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
+      "2018": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
+      "2019": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+      "2020": "8d601bf5c5d669465481421ad5cd1a1470d51792054e84bdc04f3620785f7530",
+      "2021": "3e9f67569e940b54b3778ef2c9150850920b5bf93143bad3bd158e649825cf6b"
+    },
+    "projection_sha256_by_season": {
+      "2017": "1ade2f94b602f52f53046f9efb868c441edf4f5f64ef1e205fa716327b9d4db0",
+      "2018": "237a75521207ea59be030fdf1d469ce04440e35cf8302fa8edbfabab506e45d2",
+      "2019": "ebc3e761749b956e809dfbb3e8d3556d65df22f3dcd8d7e103c70807077df7b7",
+      "2020": "49f770d6293cfab446165e5571274e44c2be61c3dfc4ee7321139006ce50ce1a",
+      "2021": "29860c837236401e1750f4902eda15ae809a62c62236ff17f16b75ca58b33fac"
+    },
+    "source_rows_selected_by_season": {"2017": 49210, "2018": 50113, "2019": 49561, "2020": 41972, "2021": 44539},
+    "missing_gsis_rows_by_season": {"2017": 0, "2018": 35, "2019": 2, "2020": 5, "2021": 23},
+    "source_identity_conflicts_by_season": {"2017": 0, "2018": 0, "2019": 0, "2020": 0, "2021": 0}
+  },
+  "gamebook_identity_universe": {
+    "definition": "set union of distinct parser identities appearing in Lineups, Substitutions, Did Not Play, or Not Active for each team-game partition",
+    "all_four_sections_included": true,
+    "section_membership_not_interpreted": true,
+    "did_not_play_not_assumed_active": true,
+    "same_identity_repeated_within_section_counts_once": true,
+    "every_canonical_game_required": true,
+    "every_team_partition_required": true
+  },
+  "resolution_rule": {
+    "stage_1_exact": "same season, REG week, normalized team, normalized jersey, and exact compact Game Book first-initial-plus-surname key against first_name/football_name plus last_name",
+    "stage_2_scope": "only stage-1 zero-candidate identities; same season/week/team/jersey candidate set only",
+    "stage_2_authorized_methods_inherited_from_qualified_legacy_v4": [
+      "given_full_prefix+surname_exact",
+      "given_full_prefix+compound_component_prefix",
+      "given_initial_only+compound_component_prefix",
+      "given_initial_only+gamebook_surname_is_source_leading_components",
+      "given_initial_only+source_surname_is_gamebook_leading_components"
+    ],
+    "candidate_uniqueness_alone_is_evidence": false,
+    "initial_plus_exact_surname_as_stage_2_only_rule_authorized": false,
+    "surname_only_matching_authorized": false,
+    "fuzzy_or_phonetic_matching_authorized": false,
+    "adjacent_week_fallback_authorized": false,
+    "season_wide_fallback_authorized": false,
+    "manual_overrides_authorized": false,
+    "roster_status_tie_break_authorized": false,
+    "ambiguous_and_unresolved_rows_retained": true
+  },
+  "frozen_integrity_gates": {
+    "exact_upstream_commits_required": true,
+    "projection_sha256_must_match": true,
+    "projection_allowlist_only_required": true,
+    "status_fields_present_allowed": false,
+    "source_rows_selected_must_match_frozen_capture": true,
+    "missing_gsis_rows_must_match_frozen_capture": true,
+    "source_identity_conflicts_allowed": 0,
+    "canonical_games_must_equal": 1296,
+    "team_partitions_must_equal": 2592,
+    "gamebook_parse_source_errors_allowed": 0,
+    "silent_gamebook_identity_drops_allowed": 0
+  },
+  "aggregate_identity_qualification_gate": {
+    "minimum_final_resolution_rate": 0.995,
+    "final_ambiguities_allowed": 0,
+    "source_identity_conflicts_allowed": 0,
+    "all_five_seasons_required": true,
+    "qualification_authority_belongs_only_to_aggregate_gate": true
+  },
+  "explicit_non_authority": {
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "production_dependency_authorized": false
+  },
+  "prohibited_shortcuts": [
+    "do not use weekly-roster status fields for identity resolution or tie-breaking",
+    "do not use postgame participation, snaps, play-by-play, starters, or game outcomes",
+    "do not infer membership from Game Book section identity resolution",
+    "do not drop unresolved or ambiguous identities",
+    "do not relax the 0.995 aggregate gate after observing results",
+    "do not use completed 2026 outcomes"
+  ],
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}

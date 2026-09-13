@@ -1,0 +1,82 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V1-FAILED",
+  "contract_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V1",
+  "status": "EMPIRICAL_AUDIT_COMPLETE_QUALIFICATION_GATE_FAILED",
+  "workflow_evidence": {
+    "run_id": 34738604141,
+    "validated_head_sha": "b4877bae995897952358713e8677e95d69ed9710",
+    "aggregate_job_id": 103674628830,
+    "aggregate_artifact": {
+      "id": 10311397906,
+      "digest": "sha256:146e44f2e9845db85c445cca8230fd59f18b77127baea3c6a519cc1cc959b602"
+    },
+    "season_artifacts": {
+      "2017": {"id": 10312420517, "digest": "sha256:6378043f5c1ad437251a2ac4f7dbb2b8191dabaa7e631d37d1a5a57b224fe5af"},
+      "2018": {"id": 10312096512, "digest": "sha256:287227e62aa5bae1fcbe8f604c83ac5e46b151f362aecc1ba06be72a5847c946"},
+      "2019": {"id": 10312281186, "digest": "sha256:98c4bd6dcf00d81346ee7d996de6831118467f888146a6a397c4b2cecd2546b7"},
+      "2020": {"id": 10311986793, "digest": "sha256:d7f9d1d8c03923a8ec84ccb117e7affc77450330b77a9864d94aae38f074103a"},
+      "2021": {"id": 10311283226, "digest": "sha256:c6803524984680ffae0ba4c39a24d00396ad524b27c4be7002cbcdeef1d2243d"}
+    }
+  },
+  "frozen_qualification_gate": {
+    "minimum_final_identity_resolution_rate": 0.995,
+    "required_final_ambiguity_count": 0,
+    "required_source_identity_conflicts": 0,
+    "all_five_seasons_integrity_required": true
+  },
+  "aggregate_result": {
+    "canonical_games": 1296,
+    "team_partitions": 2592,
+    "gamebook_identities_total": 138205,
+    "exact_resolved": 136155,
+    "structural_resolved": 1635,
+    "final_resolved": 137790,
+    "final_unresolved": 405,
+    "final_ambiguous": 10,
+    "final_identity_resolution_rate": 0.9969972142831302,
+    "source_identity_conflicts": 0,
+    "all_five_seasons_integrity_pass": true,
+    "resolution_rate_gate_pass": true,
+    "source_conflict_gate_pass": true,
+    "ambiguity_gate_pass": false,
+    "aggregate_qualification_gate_pass": false
+  },
+  "per_season_result": {
+    "2017": {"gamebook_identities_total": 27110, "final_resolved": 26952, "final_unresolved": 158, "final_ambiguous": 0, "final_identity_resolution_rate": 0.9941718922906676, "source_identity_conflicts": 0},
+    "2018": {"gamebook_identities_total": 27115, "final_resolved": 27022, "final_unresolved": 93, "final_ambiguous": 0, "final_identity_resolution_rate": 0.996570164115803, "source_identity_conflicts": 0},
+    "2019": {"gamebook_identities_total": 27110, "final_resolved": 27029, "final_unresolved": 71, "final_ambiguous": 10, "final_identity_resolution_rate": 0.9970121726300258, "source_identity_conflicts": 0},
+    "2020": {"gamebook_identities_total": 27637, "final_resolved": 27572, "final_unresolved": 65, "final_ambiguous": 0, "final_identity_resolution_rate": 0.9976480804718313, "source_identity_conflicts": 0},
+    "2021": {"gamebook_identities_total": 29233, "final_resolved": 29215, "final_unresolved": 18, "final_ambiguous": 0, "final_identity_resolution_rate": 0.9993842575171895, "source_identity_conflicts": 0}
+  },
+  "ambiguity_examples": [
+    {"season": 2019, "week": 1, "game_id": "2019_01_BUF_NYJ", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 2, "game_id": "2019_02_CLE_NYJ", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 3, "game_id": "2019_03_NYJ_NE", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 5, "game_id": "2019_05_NYJ_PHI", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 6, "game_id": "2019_06_DAL_NYJ", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 7, "game_id": "2019_07_NE_NYJ", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 8, "game_id": "2019_08_NYJ_JAX", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 9, "game_id": "2019_09_NYJ_MIA", "team": "NYJ", "jersey_number": "33", "display_name": "J.Adams", "stage": "exact", "candidate_gsis_ids": ["00-0033872", "00-0034457"]},
+    {"season": 2019, "week": 16, "game_id": "2019_16_NYG_WAS", "team": "WAS", "jersey_number": "46", "display_name": "M.Smith", "stage": "exact", "candidate_gsis_ids": ["00-0031371", "00-0033415"]},
+    {"season": 2019, "week": 17, "game_id": "2019_17_WAS_DAL", "team": "WAS", "jersey_number": "46", "display_name": "M.Smith", "stage": "exact", "candidate_gsis_ids": ["00-0031371", "00-0033415"]}
+  ],
+  "scientific_disposition": {
+    "modern_player_team_game_identity_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "threshold_relaxation_authorized": false,
+    "same_version_rule_change_authorized": false,
+    "follow_up_requires_separately_preregistered_experiment": true
+  },
+  "governance": {
+    "identity_resolution_status_blind": true,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": 0,
+    "production_dependency_authorized": false,
+    "model_fit_performed": false
+  }
+}
