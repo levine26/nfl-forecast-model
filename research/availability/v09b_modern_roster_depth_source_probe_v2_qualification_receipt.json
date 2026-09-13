@@ -1,0 +1,114 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-ROSTER-DEPTH-SOURCE-PROBE-V2-QUALIFICATION",
+  "contract_id": "V09B-MODERN-ROSTER-DEPTH-SOURCE-PROBE-V2",
+  "status": "SOURCE_CLASS_SEMANTIC_VIABILITY_QUALIFIED_NO_COVERAGE_OR_MEMBERSHIP_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34734281343,
+    "validated_head_sha": "065899c0a976f8e6563b80b8eed96921af35578e",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "semantic_viability_probe_passed": true,
+    "artifact_id": 10310685902,
+    "artifact_digest": "sha256:4b57df73c1d2734f50630ed754c869174c40fb5a45ecc6ebbdc621e4738a281e"
+  },
+  "aggregate_result": {
+    "sample_count_expected": 5,
+    "sample_count_completed": 5,
+    "source_errors": 0,
+    "samples_passing_frozen_v2_semantic_gate": 5,
+    "source_class_semantic_viability_probe_pass": true,
+    "all_archive_pages_linked_exact_frozen_source": true,
+    "all_sources_first_party_pdf": true,
+    "all_sources_current_roster_marker_present": true,
+    "all_sources_practice_squad_marker_present": true,
+    "all_sources_reserve_marker_present": true,
+    "all_sources_pregame_snapshot_within_7_days": true
+  },
+  "samples": {
+    "2017_NE": {
+      "game_id": "2017_10_NE_DEN",
+      "raw_sha256": "1a8dcdbbf851a5d3bafb578c1001431489ab7d1b72f8dfd1af0f57f70a7dfc5c",
+      "roster_snapshot_date": "2017-11-09",
+      "snapshot_age_days": 3,
+      "current_roster_marker_count": 1,
+      "practice_squad_marker_count": 44,
+      "reserve_marker_count": 22,
+      "archive_exact_source_link_present": true,
+      "semantic_viability_gate_pass": true
+    },
+    "2018_NE": {
+      "game_id": "2018_12_NE_NYJ",
+      "raw_sha256": "25ccd89a1131f07cc7bd44718a432283ddf4f2b6824549583d752b65e11912d5",
+      "roster_snapshot_date": "2018-11-20",
+      "snapshot_age_days": 5,
+      "current_roster_marker_count": 1,
+      "practice_squad_marker_count": 40,
+      "reserve_marker_count": 21,
+      "archive_exact_source_link_present": true,
+      "semantic_viability_gate_pass": true
+    },
+    "2019_NE": {
+      "game_id": "2019_13_NE_HOU",
+      "raw_sha256": "ecd51c03ff48421a6743a932e5b391dc3c390e736937c633e72c45d2beadeb3a",
+      "roster_snapshot_date": "2019-11-26",
+      "snapshot_age_days": 5,
+      "current_roster_marker_count": 1,
+      "practice_squad_marker_count": 36,
+      "reserve_marker_count": 26,
+      "archive_exact_source_link_present": true,
+      "semantic_viability_gate_pass": true
+    },
+    "2020_NE": {
+      "game_id": "2020_11_NE_HOU",
+      "raw_sha256": "50898c9a499f9cdfde975f0a56e42218bacf0629ad3443aeedf480f0c3484594",
+      "roster_snapshot_date": "2020-11-17",
+      "snapshot_age_days": 5,
+      "current_roster_marker_count": 1,
+      "practice_squad_marker_count": 82,
+      "reserve_marker_count": 27,
+      "archive_exact_source_link_present": true,
+      "semantic_viability_gate_pass": true
+    },
+    "2021_TB": {
+      "game_id": "2021_01_DAL_TB",
+      "raw_sha256": "844b741a0c979891b6074706b77256d52878b59bba4073581a733ced2ddd091d",
+      "roster_snapshot_date": "2021-09-03",
+      "snapshot_age_days": 6,
+      "current_roster_marker_count": 3,
+      "practice_squad_marker_count": 2,
+      "reserve_marker_count": 6,
+      "archive_exact_source_link_present": true,
+      "semantic_viability_gate_pass": true
+    }
+  },
+  "scientific_disposition": {
+    "direct_week_specific_roster_depth_source_class_semantically_viable": true,
+    "all_team_game_locator_coverage_tested": false,
+    "all_team_game_locator_coverage_qualified": false,
+    "roster_snapshot_exactly_equals_kickoff_eligible_population": false,
+    "same_day_transactions_reconciled": false,
+    "standard_elevations_reconciled": false,
+    "inactive_lists_reconciled": false,
+    "game_day_membership_constructed": false,
+    "probe_has_coverage_authority": false,
+    "probe_has_membership_authority": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "next_authorized_research_step": "Separately preregister a 2017-2021 first-party club-archive locator/chronology audit for the full modern team-game universe."
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "identity_resolution_performed": false,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
