@@ -1,0 +1,80 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAME-DAY-MEDIA-SURFACE-DISCOVERY-V1-COMPLETE",
+  "contract_id": "V09B-MODERN-GAME-DAY-MEDIA-SURFACE-DISCOVERY-V1",
+  "status": "DISCOVERY_COMPLETE_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34734833095,
+    "validated_head_sha": "91dea6a43369e166647a27eedfee502dab9a513c",
+    "unit_and_contract": {"job_id": 103664261959, "conclusion": "success"},
+    "research_firewall": {"job_id": 103664262108, "conclusion": "success"},
+    "season_jobs": {
+      "2017": {"job_id": 103664287116, "conclusion": "success", "artifact_id": 10310438331, "artifact_digest": "sha256:3be1b51f2971ea39799f882ebebde612d203aef017ac1c2eb25ef482a9e8d1ff"},
+      "2018": {"job_id": 103664287100, "conclusion": "success", "artifact_id": 10310891006, "artifact_digest": "sha256:3d9bddd29d092f87602ec6e0eca3a171bfff92ff112bb70a65c5f8cfab4449a8"},
+      "2019": {"job_id": 103664287108, "conclusion": "success", "artifact_id": 10310328594, "artifact_digest": "sha256:6502e7ba329d329f3b4b51ad3ebcc722483aa53a39809baa0b73c82650f03b24"},
+      "2020": {"job_id": 103664287101, "conclusion": "success", "artifact_id": 10310566971, "artifact_digest": "sha256:6aeae1adeaa322cfba7d15857f20001e3fa6a39ed2b049cdc1d98360d55b08a7"},
+      "2021": {"job_id": 103664287109, "conclusion": "success", "artifact_id": 10310721448, "artifact_digest": "sha256:06802cdcb087534316284ec8fcfc9e53b6d1d5cfe6f7275769d8670046751bc3"}
+    },
+    "aggregate": {"job_id": 103664327547, "conclusion": "success", "artifact_id": 10310970942, "artifact_digest": "sha256:cc18c1607eabb526d4de81d534aaae70d5045d7c9f5c3b05f1da19164301a63c"}
+  },
+  "aggregate_result": {
+    "expected_regular_season_team_games": 2592,
+    "team_seasons_reported": 160,
+    "schedule_surfaces_available": 155,
+    "discovered_regular_season_team_game_pages": 13,
+    "missing_expected_regular_season_team_games_diagnostic": 2579,
+    "game_day_pages_fetch_success": 13,
+    "game_day_pages_fetch_failure": 0,
+    "media_class_page_counts": {
+      "game_release": 0,
+      "roster": 0,
+      "depth_chart": 0,
+      "flip_card": 0,
+      "game_notes": 0
+    },
+    "all_13_discovered_game_pages_belong_to_team": "MIA",
+    "all_13_discovered_game_pages_season": 2021
+  },
+  "season_result": {
+    "2017": {"schedule_surfaces_available": 31, "discovered_game_pages": 0},
+    "2018": {"schedule_surfaces_available": 31, "discovered_game_pages": 0},
+    "2019": {"schedule_surfaces_available": 31, "discovered_game_pages": 0},
+    "2020": {"schedule_surfaces_available": 31, "discovered_game_pages": 0},
+    "2021": {"schedule_surfaces_available": 31, "discovered_game_pages": 13}
+  },
+  "scientific_interpretation": {
+    "official_historical_schedule_pages_are_broadly_reachable": true,
+    "server_rendered_anchor_links_are_sufficient_to_recover_historical_game_day_urls": false,
+    "server_rendered_anchor_discovery_assumption_rejected": true,
+    "observed_schedule_page_coverage_used_as_locator_qualification": false,
+    "observed_game_page_count_used_as_locator_qualification": false,
+    "media_anchor_absence_used_as_source_absence_proof": false,
+    "reason_media_anchor_absence_is_not_source_absence_proof": "Known official historical game-day pages found independently can expose GAME RELEASE or other media even when the club's historical schedule page does not server-render links to those game pages; the next diagnostic must construct game-day URL candidates from the frozen canonical game universe rather than infer them from schedule anchors.",
+    "next_authorized_research_step": "Separately preregister a deterministic constructed historical game-day URL diagnostic for all 2,592 canonical modern team-game partitions using only the qualified canonical manifest and frozen NFL CMS URL grammar."
+  },
+  "authority": {
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "source_bytes_qualified_by_this_diagnostic": false,
+    "source_chronology_qualified": false,
+    "transaction_reconciliation_performed": false,
+    "game_day_membership_constructed": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "third_party_authority_used": false,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
