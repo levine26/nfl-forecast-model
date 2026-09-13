@@ -12,6 +12,7 @@ This module is editorial-only. It never reads or writes model coefficients, prob
 inputs, locks, grading state, or market data.
 """
 
+from collections.abc import Iterable
 from datetime import datetime, timezone
 import json
 import os
@@ -24,6 +25,10 @@ CHATGPT_MAX_AGE_HOURS = 4.0
 CHATGPT_PRODUCER = "chatgpt-consumer-session"
 CHATGPT_RESEARCH_MODE = "live-web-search"
 CHATGPT_FORECAST_PATH = "F-ST-01-FROZEN-2026"
+DEFAULT_CHATGPT_DIRS = (
+    "inputs/chatgpt_media/fallback",
+    "inputs/chatgpt_media/current",
+)
 
 
 def _utc(value: Any) -> datetime | None:
@@ -46,7 +51,7 @@ def _safe_reason(value: Any) -> str:
     return text[:240] or "provider_failure"
 
 
-def _fresh_chatgpt_payload(chatgpt_dir: Path, game_id: str, now: datetime) -> Path | None:
+def _fresh_chatgpt_candidate(chatgpt_dir: Path, game_id: str, now: datetime) -> tuple[datetime, Path] | None:
     manifest_path = chatgpt_dir / "manifest.json"
     payload_path = chatgpt_dir / f"{game_id}.json"
     if not manifest_path.is_file() or not payload_path.is_file():
@@ -72,7 +77,35 @@ def _fresh_chatgpt_payload(chatgpt_dir: Path, game_id: str, now: datetime) -> Pa
     age_hours = (now - generated).total_seconds() / 3600.0
     if age_hours < -0.1 or age_hours > CHATGPT_MAX_AGE_HOURS:
         return None
-    return payload_path
+    return generated, payload_path
+
+
+def _fresh_chatgpt_payload(chatgpt_dir: Path, game_id: str, now: datetime) -> Path | None:
+    candidate = _fresh_chatgpt_candidate(chatgpt_dir, game_id, now)
+    return candidate[1] if candidate is not None else None
+
+
+def _chatgpt_search_dirs(chatgpt_dir: str | Path | Iterable[str | Path] | None) -> list[Path]:
+    if chatgpt_dir is None:
+        return [Path(value) for value in DEFAULT_CHATGPT_DIRS]
+    if isinstance(chatgpt_dir, (str, Path)):
+        return [Path(chatgpt_dir)]
+    return [Path(value) for value in chatgpt_dir]
+
+
+def _freshest_chatgpt_payload(
+    chatgpt_dir: str | Path | Iterable[str | Path] | None,
+    game_id: str,
+    now: datetime,
+) -> Path | None:
+    candidates: list[tuple[datetime, Path]] = []
+    for root in _chatgpt_search_dirs(chatgpt_dir):
+        candidate = _fresh_chatgpt_candidate(root, game_id, now)
+        if candidate is not None:
+            candidates.append(candidate)
+    if not candidates:
+        return None
+    return max(candidates, key=lambda item: item[0])[1]
 
 
 def _qualitative_rationale(entry: dict[str, Any]) -> str:
@@ -205,24 +238,26 @@ def recover_focused_payload(
     game_id: str,
     output_path: str | Path,
     reason: str,
-    chatgpt_dir: str | Path = "inputs/chatgpt_media/current",
+    chatgpt_dir: str | Path | Iterable[str | Path] | None = None,
     provider_artifact: str | Path = "outputs/copilot_media_reads.json",
     status_path: str | Path = "outputs/context_source_status.json",
     now: datetime | None = None,
 ) -> tuple[bool, str]:
     """Recover one focused payload and record why Groq failed for this game.
 
-    Fresh ChatGPT research is preferred. If it is unavailable, the last full-slate
-    artifact that already passed the publication validator is used only as an emergency
-    continuity bridge; the status explicitly asks Sunday Signal Check for a fresh
-    ChatGPT replacement.
+    Fresh ChatGPT research is preferred. By default, the recovery path selects the
+    newest valid game payload across the failed-game cache and the full-slate ChatGPT
+    cache so a Groq transport or focused-validation failure can hand off immediately.
+    If no fresh ChatGPT payload exists, the last full-slate artifact that already passed
+    the publication validator is used only as an emergency continuity bridge; the status
+    explicitly asks Sunday Signal Check for a fresh ChatGPT replacement.
     """
     gid = str(game_id)
     current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
 
-    chatgpt_path = _fresh_chatgpt_payload(Path(chatgpt_dir), gid, current)
+    chatgpt_path = _freshest_chatgpt_payload(chatgpt_dir, gid, current)
     if chatgpt_path is not None:
         output.write_text(chatgpt_path.read_text(encoding="utf-8"), encoding="utf-8")
         _record_fallback(
