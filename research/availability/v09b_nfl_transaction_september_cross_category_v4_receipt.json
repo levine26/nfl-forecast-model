@@ -1,0 +1,82 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-NFL-TRANSACTION-SEPTEMBER-CROSS-CATEGORY-V4-QUALIFIED",
+  "contract_id": "V09B-NFL-TRANSACTION-SEPTEMBER-CROSS-CATEGORY-V4",
+  "status": "SEPTEMBER_CROSS_CATEGORY_AMP_PAGINATION_QUALIFIED_NO_CHRONOLOGY_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34743941120,
+    "validated_head_sha": "5fb6a18377266662794c4fffbfc07409b67efc51",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "aggregate_artifact": {
+      "id": 10312714729,
+      "digest": "sha256:c7f2675c62ced21c866bdbc25e78690604b62937d8bd9bbfc83225ed5da6e95e"
+    },
+    "season_artifacts": {
+      "2017": {"id": 10312903055, "digest": "sha256:a67cf36c42ce4b050713458128d26589689b0788a80b6d57a58f9097a7045298"},
+      "2018": {"id": 10313557202, "digest": "sha256:b2bec53556eaebc58de663293d9698f6dabdc40962801e82da0e409b9a2f570b"},
+      "2019": {"id": 10312668353, "digest": "sha256:0364870d02b2f44c162eada54acad1494e78cd5253282216488a21b00d688bd4"},
+      "2020": {"id": 10313338967, "digest": "sha256:79a6417b1e141eaa5d44a84a955f7a96be05217cb678edb15f6d2306cf99b339"},
+      "2021": {"id": 10313613099, "digest": "sha256:2f1fb9e5caf06ee2fa3ae1431d690c223ba5c31547ed33ebeb8207cb05dbd697"}
+    }
+  },
+  "aggregate_result": {
+    "endpoints_completed": 30,
+    "source_errors": 0,
+    "pages_fetched_total": 505,
+    "cursor_transitions_total": 475,
+    "known_semantic_evidence_found": 7,
+    "frozen_cross_category_gate_pass": true,
+    "category_unique_row_sums": {
+      "trades": 60,
+      "signings": 3137,
+      "reserve-list": 982,
+      "waivers": 7446,
+      "terminations": 486,
+      "other": 121
+    },
+    "season_unique_row_sums": {
+      "2017": 2979,
+      "2018": 2963,
+      "2019": 1930,
+      "2020": 2570,
+      "2021": 1790
+    },
+    "category_summed_unique_rows": 12232
+  },
+  "scientific_interpretation": {
+    "september_cross_category_amp_pagination_qualified": true,
+    "qualification_scope": "September only; six official NFL transaction categories; 2017-2021",
+    "all_30_endpoints_completed": true,
+    "all_observed_cursor_transitions_advanced_under_frozen_gate": true,
+    "all_observed_endpoints_converged_before_page_cap": true,
+    "all_six_categories_represented": true,
+    "all_five_seasons_represented": true,
+    "all_seven_frozen_semantic_evidence_rows_found": true,
+    "all_month_full_ledger_qualified": false,
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "next_authorized_research_step": "Separately preregister an immutable full 2017-2021 all-month, six-category AMP ledger capture covering 360 year-month-category endpoints. Preserve page bytes/hashes and every parsed row, require cursor advancement/convergence under the V4 rules, and grant no roster-state or chronology authority from capture alone."
+  },
+  "authority": {
+    "september_cross_category_amp_pagination_qualified": true,
+    "all_month_full_ledger_qualified": false,
+    "transaction_state_machine_defined": false,
+    "diagnostic_has_chronology_authority": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": true,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
