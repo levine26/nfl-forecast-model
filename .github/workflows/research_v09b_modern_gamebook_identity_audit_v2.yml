@@ -1,0 +1,225 @@
+name: LevLine V09B modern Game Book identity audit V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_gamebook_identity_audit_v2_contract.json'
+      - 'research/v09b_modern_position_identity_source_capture_v1.py'
+      - 'research/v09b_modern_gamebook_identity_audit_v2.py'
+      - 'research/test_v09b_modern_gamebook_identity_audit_v2.py'
+      - '.github/workflows/research_v09b_modern_gamebook_identity_audit_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-gamebook-identity-audit-v2-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test blinded V2 identity rules
+        run: pytest -q research/test_v09b_modern_gamebook_identity_audit_v2.py
+      - name: Validate preregistered V2 contract and immutable V1 predecessor
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          c = json.loads(Path('research/availability/v09b_modern_gamebook_identity_audit_v2_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V2'
+          assert c['status'] == 'PREREGISTERED_BLINDED_POSITION_SIDE_TIEBREAK_GATE'
+          p = c['predecessor_v1']
+          assert p['receipt_git_blob_sha1'] == 'a1ba27c9d386eb5c4607767dca4448a7eef55826'
+          assert p['final_ambiguous'] == 10
+          assert p['final_unresolved'] == 405
+          assert p['ambiguity_rows_reopened'] == 10
+          assert p['unresolved_rows_reopened'] == 0
+          actual_blob = subprocess.check_output(
+              ['git', 'hash-object', p['receipt_path']], text=True
+          ).strip()
+          assert actual_blob == p['receipt_git_blob_sha1']
+
+          s = c['position_source_projection']
+          assert s['source_commit_sha'] == '1c6f388c06f7473eb7483d6b4b91685ecb3d019c'
+          assert s['raw_source_sha256'] == '08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4'
+          assert s['projection_fields'] == [
+              'season', 'game_type', 'week', 'team', 'gsis_id', 'jersey_number', 'position'
+          ]
+          assert s['status_fields_selected'] is False
+          assert s['status_fields_read'] is False
+          assert s['projection_must_be_persisted_before_identity_resolver_consumes_it'] is True
+
+          r = c['tie_break_rule']
+          assert r['roster_status_tie_break_authorized'] is False
+          assert r['section_membership_interpretation_authorized'] is False
+          assert r['postgame_participation_authorized'] is False
+          g = c['aggregate_identity_qualification_gate']
+          assert g['minimum_final_resolution_rate'] == 0.995
+          assert g['final_ambiguities_allowed'] == 0
+          assert g['source_identity_conflicts_allowed'] == 0
+          assert g['all_10_v1_ambiguity_rows_must_replay'] is True
+          assert c['explicit_non_authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['explicit_non_authority']['training_label_semantics_qualified'] is False
+          assert c['explicit_non_authority']['training_source_chronology_qualified'] is False
+          assert c['explicit_non_authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  capture-position-source:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Materialize exact frozen weekly-roster raw source
+        run: |
+          set -euo pipefail
+          SOURCE_COMMIT=1c6f388c06f7473eb7483d6b4b91685ecb3d019c
+          git fetch origin research-data/v09b-modern-identity-source-v1
+          git cat-file -e "$SOURCE_COMMIT^{commit}"
+          git worktree add --detach /tmp/v09b-modern-identity-source "$SOURCE_COMMIT"
+      - name: Persist status-free 2019 position projection
+        run: |
+          RAW_SHA=08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4
+          OUT=research_outputs/v09b_modern_position_identity_source_capture_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_position_identity_source_capture_v1.py \
+              --raw-path "/tmp/v09b-modern-identity-source/research_outputs/v09b_modern_identity_source_capture_v1/raw/${RAW_SHA}.parquet" \
+              --output-root "$OUT"
+      - name: Validate capture gate and status firewall
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('research_outputs/v09b_modern_position_identity_source_capture_v1/receipts/2019.json')
+          r = json.loads(p.read_text())
+          assert r['capture_contract_id'] == 'V09B-MODERN-POSITION-IDENTITY-SOURCE-CAPTURE-V1'
+          assert r['capture_gate_pass'] is True
+          assert r['source_rows_selected'] == 49561
+          assert r['missing_gsis_rows'] == 2
+          assert r['projection_fields'] == [
+              'season', 'game_type', 'week', 'team', 'gsis_id', 'jersey_number', 'position'
+          ]
+          assert r['projection_contains_status_fields'] is False
+          assert r['status_fields_selected'] is False
+          assert r['status_fields_read'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-position-source-v1-${{ github.run_id }}
+          path: research_outputs/v09b_modern_position_identity_source_capture_v1
+          if-no-files-found: error
+          retention-days: 30
+
+  identity-v2-gate:
+    needs: capture-position-source
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Materialize exact qualified modern Game Book archive
+        run: |
+          set -euo pipefail
+          GAMEBOOK_COMMIT=aab55bf97aa62cae446b358b9739f4c62604cc8e
+          git fetch origin research-data/v09b-gamebooks-modern-v2
+          git cat-file -e "$GAMEBOOK_COMMIT^{commit}"
+          git worktree add --detach /tmp/v09b-modern-gamebooks "$GAMEBOOK_COMMIT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: v09b-modern-position-source-v1-${{ github.run_id }}
+          path: /tmp/v09b-position-source
+      - name: Run blinded V2 ambiguity replay
+        run: |
+          OUT=research_outputs/v09b_modern_gamebook_identity_audit_v2/aggregate.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_gamebook_identity_audit_v2.py \
+              --archive-root /tmp/v09b-modern-gamebooks/research_outputs/v09b_modern_gamebook_raw_archive_v2 \
+              --position-root /tmp/v09b-position-source \
+              --predecessor-receipt research/availability/v09b_modern_gamebook_identity_audit_v1_receipt.json \
+              --output "$OUT"
+      - name: Apply frozen V2 aggregate identity gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(
+              Path('research_outputs/v09b_modern_gamebook_identity_audit_v2/aggregate.json').read_text()
+          )
+          assert r['contract_id'] == 'V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V2'
+          assert r['predecessor_v1_unresolved_rows_reopened'] == 0
+          assert r['weekly_roster_status_used'] is False
+          assert r['raw_weekly_roster_consumed_by_identity_resolver'] is False
+          assert r['position_source_capture_gate_pass'] is True
+          assert r['gamebook_archive_qualified'] is True
+          assert r['all_10_v1_ambiguity_rows_replayed'] is True
+          assert r['candidate_projection_lookup_misses'] == 0
+          assert r['candidate_position_side_conflicts'] == 0
+          assert r['candidate_unknown_position_evidence'] == 0
+          assert r['gamebook_position_evidence_failures'] == 0
+          assert r['source_error_count'] == 0
+          assert r['source_identity_conflicts'] == 0
+          assert r['final_identity_resolution_rate'] >= 0.995
+          assert r['final_ambiguous'] == 0
+          assert r['aggregate_qualification_gate_pass'] is True
+          assert r['modern_player_team_game_identity_qualified'] is True
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-modern-gamebook-identity-v2-${{ github.run_id }}
+          path: research_outputs/v09b_modern_gamebook_identity_audit_v2/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
