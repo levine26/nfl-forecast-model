@@ -1,0 +1,89 @@
+{
+  "record_version": 1,
+  "receipt_id": "V09B-MODERN-DNP-WEEKLY-ROSTER-BBOX-V2-RECEIPT",
+  "contract_id": "V09B-MODERN-DNP-WEEKLY-ROSTER-DIAGNOSTIC-V1",
+  "status": "DIAGNOSTIC_COMPLETE_ZERO_QUALIFICATION_AUTHORITY_POST_FIRST_RUN_PARSER_CORRECTION",
+  "scope": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "game_type": "REG",
+    "canonical_gamebooks_expected": 1296
+  },
+  "provenance": {
+    "branch": "research/v09b-dnp-weekly-roster-diagnostic-v1",
+    "head_sha": "a64aeb63d7886c2b2c4c21055d7feabf811661d3",
+    "workflow_run_id": 34737627937,
+    "workflow_artifact_id": 10311970816,
+    "workflow_artifact_name": "v09b-modern-dnp-weekly-roster-diagnostic-v1-34737627937",
+    "workflow_artifact_digest": "sha256:224d036eebdc1df9ec0738fd3df752d11b8d058f9e77c19a2518ecf47b04e97e",
+    "dnp_parser_version": "BBOX_HALF_COLUMN_V2",
+    "parser_correction_post_first_run": true
+  },
+  "canonical_completeness": {
+    "gamebook_parse_error_rows": 0,
+    "dnp_tokens_parsed": 3610,
+    "expected_dnp_tokens_by_season": {
+      "2017": 675,
+      "2018": 656,
+      "2019": 672,
+      "2020": 776,
+      "2021": 831
+    },
+    "observed_dnp_tokens_by_season": {
+      "2017": 675,
+      "2018": 656,
+      "2019": 672,
+      "2020": 776,
+      "2021": 831
+    },
+    "exact_canonical_count_match": true
+  },
+  "identity_diagnostic": {
+    "unique": 3589,
+    "unresolved": 21,
+    "by_season": {
+      "2017": {"unique": 668, "unresolved": 7},
+      "2018": {"unique": 653, "unresolved": 3},
+      "2019": {"unique": 671, "unresolved": 1},
+      "2020": {"unique": 769, "unresolved": 7},
+      "2021": {"unique": 828, "unresolved": 3}
+    }
+  },
+  "status_cross_tab": [
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "A01", "rows": 3537},
+    {"identity_state": "unresolved", "weekly_statuses": null, "weekly_status_description_abbrs": null, "rows": 21},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "P01", "rows": 13},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "P07", "rows": 10},
+    {"identity_state": "unique", "weekly_statuses": "INA", "weekly_status_description_abbrs": "A01", "rows": 7},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "P10", "rows": 6},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "P12", "rows": 4},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "P06", "rows": 3},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": null, "rows": 3},
+    {"identity_state": "unique", "weekly_statuses": "DEV", "weekly_status_description_abbrs": null, "rows": 2},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "E02", "rows": 1},
+    {"identity_state": "unique", "weekly_statuses": "ACT", "weekly_status_description_abbrs": "R48", "rows": 1},
+    {"identity_state": "unique", "weekly_statuses": "DEV", "weekly_status_description_abbrs": "W03", "rows": 1},
+    {"identity_state": "unique", "weekly_statuses": "TRC", "weekly_status_description_abbrs": "A01", "rows": 1}
+  ],
+  "sentinel_recovery": [
+    {"gamebook_name": "D.Worley", "season": 2018, "week": 16, "team": "OAK", "identity_state": "unique", "weekly_status": "ACT", "weekly_status_description_abbr": "A01", "independent_evidence": "placed on Reserve/Injured before game"},
+    {"gamebook_name": "D.Moore", "season": 2018, "week": 16, "team": "OAK", "identity_state": "unique", "weekly_status": "ACT", "weekly_status_description_abbr": "A01", "independent_evidence": "waived before game"},
+    {"gamebook_name": "L.Cooke", "season": 2020, "week": 15, "team": "JAX", "identity_state": "unique", "weekly_status": "INA", "weekly_status_description_abbr": "A01", "independent_evidence": "missed game with illness and later activated from Reserve/COVID-19"},
+    {"gamebook_name": "K.Saunders", "season": 2021, "week": 10, "team": "KC", "identity_state": "unique", "weekly_status": "INA", "weekly_status_description_abbr": "A01", "independent_evidence": "listed inactive by contemporaneous official Chiefs/NFL report"},
+    {"gamebook_name": "A.Brown", "season": 2021, "week": 10, "team": "TB", "identity_state": "unique", "weekly_status": "INA", "weekly_status_description_abbr": "A01", "independent_evidence": "listed inactive by contemporaneous official Buccaneers/NFL report"},
+    {"gamebook_name": "C.Wormley", "season": 2021, "week": 16, "team": "PIT", "identity_state": "unique", "weekly_status": "INA", "weekly_status_description_abbr": "A01", "independent_evidence": "listed inactive by contemporaneous official Steelers report"}
+  ],
+  "scientific_interpretation": {
+    "parser_completeness_repaired": true,
+    "act_a01_is_game_day_active_semantics": false,
+    "a01_is_unique_active_code": false,
+    "dnp_active_semantics_qualified": false,
+    "weekly_roster_source_qualified": false,
+    "game_day_membership_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_execution_authorized": false,
+    "qualification_authority": false,
+    "reason": "This receipt preserves a post-first-run parser-completeness correction only. The corrected diagnostic exactly reproduces the canonical DNP counts and recovers omitted sentinels, but weekly-roster status still contradicts independently known game-day participation semantics and the CSV release bytes were not hash-pinned before this diagnostic run."
+  },
+  "immutability_note": "The original first-run receipt remains unchanged. This separate receipt records only the coordinate-corrected post-first-run empirical result and grants no qualification authority."
+}
