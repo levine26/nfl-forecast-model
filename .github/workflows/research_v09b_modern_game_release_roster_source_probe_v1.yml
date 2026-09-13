@@ -1,0 +1,131 @@
+name: LevLine V09B modern game-release roster source probe V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_game_release_roster_source_probe_v1_contract.json'
+      - 'research/v09b_modern_game_release_roster_source_probe_v1.py'
+      - 'research/test_v09b_modern_game_release_roster_source_probe_v1.py'
+      - '.github/workflows/research_v09b_modern_game_release_roster_source_probe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-game-release-roster-source-probe-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen source-probe semantics
+        run: pytest -q research/test_v09b_modern_game_release_roster_source_probe_v1.py
+      - name: Validate diagnostic-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_game_release_roster_source_probe_v1_contract.json').read_text())
+          assert c['status'] == 'SOURCE_CLASS_SEMANTIC_VIABILITY_PROBE_ONLY_NO_COVERAGE_OR_QUALIFICATION_AUTHORITY'
+          assert len(c['fixed_cross_era_samples']) == 5
+          assert [x['season'] for x in c['fixed_cross_era_samples']] == [2017, 2018, 2019, 2020, 2021]
+          assert c['source_requirements']['allowed_hosts'] == ['static.clubs.nfl.com']
+          assert c['source_requirements']['third_party_authority_allowed'] is False
+          assert c['semantic_markers']['dated_snapshot_required'] is True
+          assert c['semantic_markers']['pregame_snapshot_required'] is True
+          assert c['semantic_markers']['maximum_snapshot_age_days_for_viability'] == 7
+          assert c['explicit_non_gates']['all_team_game_locator_coverage_tested'] is False
+          assert c['explicit_non_gates']['current_roster_population_exactly_equals_game_day_eligible_population'] is False
+          assert c['explicit_non_gates']['same_day_transactions_reconciled'] is False
+          assert c['authority']['probe_has_coverage_authority'] is False
+          assert c['authority']['probe_has_membership_authority'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  semantic-viability-probe:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Probe five frozen first-party weekly releases
+        run: |
+          OUT=research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_game_release_roster_source_probe_v1.py \
+              --contract research/availability/v09b_modern_game_release_roster_source_probe_v1_contract.json \
+              --output "$OUT"
+      - name: Assert no authority escapes the probe
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json').read_text())
+          assert r['sample_count_expected'] == 5
+          assert r['sample_count_completed'] == 5
+          assert r['source_errors'] == []
+          assert r['source_class_semantic_viability_probe_pass'] is True
+          assert all(x['semantic_viability_gate_pass'] is True for x in r['samples'])
+          assert all(x['pdf_magic_valid'] is True for x in r['samples'])
+          assert all(x['source_host'] == 'static.clubs.nfl.com' for x in r['samples'])
+          assert all(x['chosen_pregame_roster_snapshot'] is not None for x in r['samples'])
+          assert r['all_team_game_locator_coverage_tested'] is False
+          assert r['game_day_membership_constructed'] is False
+          assert r['same_day_transactions_reconciled'] is False
+          assert r['standard_elevations_reconciled'] is False
+          assert r['inactive_lists_reconciled'] is False
+          assert r['probe_has_coverage_authority'] is False
+          assert r['probe_has_membership_authority'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['weekly_roster_membership_used'] is False
+          assert r['weekly_roster_status_used'] is False
+          assert r['postgame_participation_used_as_training_authority'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          assert r['model_fit_performed'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-game-release-roster-source-probe-v1-${{ github.run_id }}
+          path: research_outputs/v09b_modern_game_release_roster_source_probe_v1/result.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
