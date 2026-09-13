@@ -1,0 +1,65 @@
+{
+  "qualification_version": 1,
+  "qualification_id": "V09B-LEGACY-GAMEBOOK-ROSTER-UNIVERSE-V2-QUALIFICATION",
+  "scope": "2012-2016 regular-season official Game Book name/jersey game-day roster partition",
+  "workflow_evidence": {
+    "run_id": 34726904576,
+    "workflow_head_sha": "6f2090f9f1de68be9e9acdf25d2ba1ec0c91b7da",
+    "workflow_name": "LevLine V09B legacy Game Book roster universe V2",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "season_jobs": {
+      "2012": {"job_id": 103643161898, "passed": true, "artifact_id": 10308320863, "artifact_digest": "sha256:d6e2962534c00c71c53bcc125d90cc51b4690107ec89021ffd65993ed9b08385"},
+      "2013": {"job_id": 103643161878, "passed": true, "artifact_id": 10307759783, "artifact_digest": "sha256:d52dae5fbfc6b6155386a5f0c23604d9272b92096335ed24cc7c24696e23627e"},
+      "2014": {"job_id": 103643161872, "passed": true, "artifact_id": 10308265780, "artifact_digest": "sha256:9976b7e2ec00d7b9bf6d21211f2f04437a5ede6c8e78ffd89b920ed4dbdc1de7"},
+      "2015": {"job_id": 103643161885, "passed": true, "artifact_id": 10307944627, "artifact_digest": "sha256:240f22142016ce9ef558d52f1e9481bf86e7663a801edcb773525dc088df385a"},
+      "2016": {"job_id": 103643161915, "passed": true, "artifact_id": 10307874819, "artifact_digest": "sha256:ad304353ad59d4053191a3d26af0974e6e226f5da9e763cb878d3344c8cff97d"}
+    }
+  },
+  "frozen_gate_result": {
+    "seasons_required": [2012, 2013, 2014, 2015, 2016],
+    "seasons_passed": [2012, 2013, 2014, 2015, 2016],
+    "canonical_games_required": 1280,
+    "canonical_games_qualified": 1280,
+    "team_partitions_required": 2560,
+    "team_partitions_qualified": 2560,
+    "canonical_game_parse_coverage_rate": 1.0,
+    "team_partition_parse_coverage_rate": 1.0,
+    "required_marker_exact_count_rate": 1.0,
+    "cross_semantic_active_section_conflicts": 0,
+    "active_inactive_overlaps": 0,
+    "source_row_errors": 0,
+    "coverage_thresholds_relaxed_from_v1": false,
+    "label_semantics_changed_from_v1": false,
+    "all_frozen_v2_roster_partition_gates_pass": true
+  },
+  "source_semantics": {
+    "active_candidate_sections": ["Lineups", "Substitutions", "Did Not Play"],
+    "inactive_negative_section": "Not Active",
+    "did_not_play_is_negative": false,
+    "repeated_identity_within_same_semantic_section": "diagnostic only",
+    "membership_in_multiple_distinct_active_sections": "hard failure",
+    "weekly_roster_status_used_to_define_membership": false,
+    "postgame_participation_used_to_define_membership": false
+  },
+  "v1_failure_preservation": {
+    "v1_result_preserved": true,
+    "observed_v1_blocker": "2012 Week 14 NYJ at JAX, NYJ #31 A.Cromartie repeated twice inside Lineups only",
+    "v2_correction_changed_active_player_set": false
+  },
+  "scientific_disposition": {
+    "legacy_gamebook_roster_partition_qualified": true,
+    "legacy_game_day_roster_universe_qualified_at_name_jersey_level": true,
+    "player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
