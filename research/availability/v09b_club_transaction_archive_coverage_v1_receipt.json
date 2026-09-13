@@ -1,0 +1,85 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-CLUB-TRANSACTION-ARCHIVE-COVERAGE-V1-COMPLETE",
+  "contract_id": "V09B-CLUB-TRANSACTION-ARCHIVE-COVERAGE-V1",
+  "status": "DIAGNOSTIC_COMPLETE_154_OF_160_SOURCE_SURFACES_NO_CHRONOLOGY_OR_MEMBERSHIP_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34743278342,
+    "validated_head_sha": "9d69a796dcefb0e8755a52399e1e85b51fe1b79e",
+    "season_artifacts": {
+      "2017": {"id": 10312732451, "digest": "sha256:b44475529da254859cc4e8229e22774b0d7fc3e5c723cc9fe1f125ee7f470ed3"},
+      "2018": {"id": 10312527788, "digest": "sha256:403bc4a5cf955f3fb165973ef94127ba5de3125a68179cc18f9b7899d28343b0"},
+      "2019": {"id": 10313632020, "digest": "sha256:54dc2c181d20340880d4c65cbf4ec8561e550787118d7860d884bb61f3a779a2"},
+      "2020": {"id": 10313442717, "digest": "sha256:8c1d45356018a3ed794fa7366cd022b46943436c4e96be3a8bb61ef1ba9bf1aa"},
+      "2021": {"id": 10313007251, "digest": "sha256:4321251fd66abc4af0ee96f4b5e1d6e0f170c9669f251fc030377552f9ec4142"}
+    },
+    "aggregate_artifact": {
+      "id": 10312518047,
+      "digest": "sha256:360fa74019ea4b552f53e8918a92ac3e246b106d3733787e4eabfd8132b4c1b2"
+    },
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "all_five_season_jobs_passed": true,
+    "aggregate_accounting_gate_passed": true
+  },
+  "aggregate_result": {
+    "team_season_pairs_expected": 160,
+    "team_season_pairs_reported": 160,
+    "team_season_pairs_with_qualifying_archive": 154,
+    "team_season_pairs_missing": 6,
+    "coverage_fraction": 0.9625,
+    "candidate_attempt_count": 160,
+    "network_or_transport_errors": 0,
+    "accounting_integrity_pass": true,
+    "per_season": {
+      "2017": {"reported": 32, "found": 30, "missing": 2, "coverage_fraction": 0.9375},
+      "2018": {"reported": 32, "found": 31, "missing": 1, "coverage_fraction": 0.96875},
+      "2019": {"reported": 32, "found": 31, "missing": 1, "coverage_fraction": 0.96875},
+      "2020": {"reported": 32, "found": 31, "missing": 1, "coverage_fraction": 0.96875},
+      "2021": {"reported": 32, "found": 31, "missing": 1, "coverage_fraction": 0.96875}
+    },
+    "franchises_with_full_five_season_coverage": 30,
+    "dallas_coverage": {"reported": 5, "found": 0, "coverage_fraction": 0.0},
+    "miami_coverage": {"reported": 5, "found": 4, "coverage_fraction": 0.8}
+  },
+  "frozen_misses": [
+    {"team": "DAL", "season": 2017, "requested_url": "https://www.dallascowboys.com/team/transactions/2017", "http_status": 404, "raw_sha256": "6b4eea547717697ccd893bbd115c752689c18d011c51cf5fa8c33c49e0449c75", "failure_shape": "hard_404_no_transactions_or_month_semantics"},
+    {"team": "DAL", "season": 2018, "requested_url": "https://www.dallascowboys.com/team/transactions/2018", "http_status": 404, "raw_sha256": "5ae4d232b281d880b3621af917e1bec915818ee6f4f0ce6597360f2cefcc26b0", "failure_shape": "hard_404_no_transactions_or_month_semantics"},
+    {"team": "DAL", "season": 2019, "requested_url": "https://www.dallascowboys.com/team/transactions/2019", "http_status": 404, "raw_sha256": "15d3dea355a717d7e61d2326e1408c4b15a532219fa99d761f3c6c5934b7ee09", "failure_shape": "hard_404_no_transactions_or_month_semantics"},
+    {"team": "DAL", "season": 2020, "requested_url": "https://www.dallascowboys.com/team/transactions/2020", "http_status": 404, "raw_sha256": "aa556b17693adcc1181b65ddc8da64c2bed972711681eafff17f3f0698097021", "failure_shape": "hard_404_no_transactions_or_month_semantics"},
+    {"team": "DAL", "season": 2021, "requested_url": "https://www.dallascowboys.com/team/transactions/2021", "http_status": 404, "raw_sha256": "26da7ccd65892580a4e99dd9b24fb61f4d9f4bbd503970ca3fe42cf213c4504a", "failure_shape": "hard_404_no_transactions_or_month_semantics"},
+    {"team": "MIA", "season": 2017, "requested_url": "https://www.miamidolphins.com/team/transactions/2017", "http_status": 200, "raw_sha256": "05cb555824cc50c3eabaf30595479a7c44d2f6676435d29ffce39cada12e3a14", "failure_shape": "year_scoped_transactions_shell_but_no_month_headings_or_transaction_dates"}
+  ],
+  "scientific_interpretation": {
+    "shared_club_cms_year_scoped_transaction_surface_is_broadly_available": true,
+    "shared_surface_is_complete_across_frozen_universe": false,
+    "coverage_result_is_descriptive_not_a_qualification_gate": true,
+    "v1_url_grammar_retrofitted_after_results": false,
+    "missing_pairs_silently_dropped": 0,
+    "next_authorized_research_step": "Separately preregister a first-party alternate-locator diagnostic restricted to the six frozen misses (Dallas 2017-2021 and Miami 2017). Do not modify V1 grammar or infer roster state from transaction-source absence."
+  },
+  "authority": {
+    "diagnostic_has_source_coverage_qualification_authority": false,
+    "diagnostic_has_chronology_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "kickoff_relative_chronology_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "modern_player_team_game_identity_qualified_elsewhere": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_of_transaction_used_as_active_evidence": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
