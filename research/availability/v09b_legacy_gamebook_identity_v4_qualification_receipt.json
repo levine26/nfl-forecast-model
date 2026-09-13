@@ -1,0 +1,60 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-V4-QUALIFICATION",
+  "purpose": "Preserve the successful five-season and aggregate execution of the preregistered narrow structural 2012-2016 Game Book-to-GSIS identity resolver.",
+  "workflow_evidence": {
+    "run_id": 34729846127,
+    "workflow_head_sha": "1f6f07441dc984c553e60fdb976846829ada4330",
+    "unit_and_contract": {"job_id": 103650490247, "conclusion": "success"},
+    "research_firewall": {"job_id": 103650490390, "conclusion": "success"},
+    "season_jobs": {
+      "2012": {"job_id": 103650597609, "conclusion": "success", "artifact_id": 10308644310, "artifact_digest": "sha256:a2f75c694e5d02c7f0fecec8f6d763ca480582b234f1e4b13be4da2a902eba6f", "total": 27108, "exact_resolved": 26795, "structural_resolved": 275, "final_resolved": 27070, "final_unresolved": 38, "final_ambiguous": 0, "resolution_rate": 0.9985989302065811},
+      "2013": {"job_id": 103650597613, "conclusion": "success", "artifact_id": 10309252766, "artifact_digest": "sha256:6fd02474610d72fe1708d591d3074d36c39697cdc578f025a6b0cedc72dbc9ea", "total": 27122, "exact_resolved": 26824, "structural_resolved": 272, "final_resolved": 27096, "final_unresolved": 26, "final_ambiguous": 0, "resolution_rate": 0.999041368630632},
+      "2014": {"job_id": 103650597621, "conclusion": "success", "artifact_id": 10308754095, "artifact_digest": "sha256:2c38b2555b0adeada0daef6345fd832351f80745a3dc476c6447ab6ea92a8608", "total": 27119, "exact_resolved": 26855, "structural_resolved": 198, "final_resolved": 27053, "final_unresolved": 66, "final_ambiguous": 0, "resolution_rate": 0.9975662820162986},
+      "2015": {"job_id": 103650597636, "conclusion": "success", "artifact_id": 10308318493, "artifact_digest": "sha256:065470b48403f4f3a97ba773acaa767dab8006251f78dec1e2e452cf961bd8a2", "total": 27112, "exact_resolved": 26860, "structural_resolved": 245, "final_resolved": 27105, "final_unresolved": 7, "final_ambiguous": 0, "resolution_rate": 0.9997418117438772},
+      "2016": {"job_id": 103650597672, "conclusion": "success", "artifact_id": 10308512962, "artifact_digest": "sha256:58da468837e95086ee82cd455f13bd0a211e2be6c90979c300200f1abc396f7d", "total": 27111, "exact_resolved": 26406, "structural_resolved": 215, "final_resolved": 26621, "final_unresolved": 490, "final_ambiguous": 0, "resolution_rate": 0.9819261554343256}
+    },
+    "aggregate_job": {
+      "job_id": 103651100219,
+      "conclusion": "success",
+      "artifact_id": 10308833815,
+      "artifact_digest": "sha256:3d9f5df13b2d459f3e0999196c4398af88418987022e89fc87773d621ce2f3ee"
+    }
+  },
+  "aggregate_result": {
+    "gamebook_identities_total": 135572,
+    "v1_exact_resolved": 133740,
+    "v1_exact_misses": 1832,
+    "structural_fallback_resolved": 1205,
+    "final_resolved": 134945,
+    "final_unresolved": 627,
+    "final_ambiguous": 0,
+    "final_identity_resolution_rate": 0.9953751512111646,
+    "frozen_resolution_rate_min": 0.995,
+    "aggregate_frozen_identity_gate_pass": true,
+    "source_identity_conflicts": 0,
+    "missing_gsis_rows": 0,
+    "authorized_structural_method_counts": {
+      "given_full_prefix+surname_exact": 919,
+      "given_initial_only+compound_component_prefix": 17,
+      "given_initial_only+gamebook_surname_is_source_leading_components": 258,
+      "given_initial_only+source_surname_is_gamebook_leading_components": 11
+    }
+  },
+  "scientific_disposition": {
+    "legacy_player_team_game_identity_qualified": true,
+    "unresolved_identities_retained_explicitly": 627,
+    "unresolved_identities_silently_dropped": 0,
+    "modern_2017_2021_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_status_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
