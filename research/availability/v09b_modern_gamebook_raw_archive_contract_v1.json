@@ -1,0 +1,93 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V1",
+  "dependencies": [
+    "V09B-MODERN-GAMEBOOK-LOCATOR-V2-QUALIFICATION",
+    "V09B-MODERN-GAMEBOOK-STRUCTURE-PROBE-V1-RESULT"
+  ],
+  "status": "PREREGISTERED_FULL_SOURCE_QUALIFICATION",
+  "purpose": "Qualify first-party 2017-2021 NFL Game Book bytes and the minimum text structure required for game-specific inactive-label authority across every canonical regular-season game, without constructing roster membership, player identities, labels, or fitting V09B.",
+  "canonical_universe": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "expected_games_by_season": {"2017": 256, "2018": 256, "2019": 256, "2020": 256, "2021": 272},
+    "expected_games_total": 1296,
+    "game_type": "REG",
+    "silent_game_drops_allowed": false
+  },
+  "locator_dependency": {
+    "qualified_locator_required_for_every_game": true,
+    "game_center_discovery_is_label_authority": false,
+    "week_schedule_fallback_is_label_authority": false,
+    "required_game_center_final_hosts": ["nfl.com", "www.nfl.com"],
+    "required_document_final_host": "static.www.nfl.com",
+    "required_scheme": "https"
+  },
+  "raw_source_requirements": {
+    "content_addressed_bytes_required": true,
+    "gzip_object_name": "sha256.pdf.gz",
+    "sha256_required": true,
+    "source_url_required": true,
+    "final_url_required": true,
+    "retrieval_timestamp_required": true,
+    "content_length_required": true,
+    "required_content_type": "application/pdf",
+    "required_pdf_magic": "%PDF",
+    "append_only_manifest_required": true,
+    "durable_research_data_branch_required": true,
+    "research_data_branch": "research-data/v09b-gamebooks-modern-v1"
+  },
+  "parser": {
+    "parser_version": "V09B-MODERN-GAMEBOOK-TEXT-STRUCTURE-V1",
+    "extraction": "pdftotext -layout",
+    "not_active_heading_regex": "(?im)^[ \\t]*Not[ \\t]+Active\\b",
+    "did_not_play_heading_regex": "(?im)^[ \\t]*Did[ \\t]+Not[ \\t]+Play\\b",
+    "lineups_heading_measured_not_qualified_here": true,
+    "substitutions_heading_measured_not_qualified_here": true,
+    "not_active_is_negative_class_source": true,
+    "did_not_play_is_negative_class_source": false,
+    "absence_from_inactive_list_is_positive": false,
+    "game_day_roster_universe_constructed": false
+  },
+  "probe_evidence_boundary": {
+    "five_season_samples_all_showed_expected_roster_section_order": true,
+    "sample_result_is_full_coverage_evidence": false,
+    "full_audit_may_fail_if_any_game_differs": true,
+    "thresholds_may_not_be_relaxed_after_execution": true
+  },
+  "frozen_qualification_gates": {
+    "canonical_game_coverage_rate_required": 1.0,
+    "qualified_locator_rate_required": 1.0,
+    "source_bytes_verified_rate_required": 1.0,
+    "pdf_text_extraction_rate_required": 1.0,
+    "not_active_structure_rate_required": 1.0,
+    "did_not_play_structure_rate_required": 1.0,
+    "distinct_semantic_structure_rate_required": 1.0,
+    "duplicate_canonical_game_rows_allowed": 0,
+    "duplicate_source_sha_across_distinct_games_allowed": 0,
+    "source_row_errors_allowed": 0,
+    "archive_integrity_failures_allowed": 0
+  },
+  "not_yet_qualified": {
+    "modern_game_day_roster_universe": true,
+    "modern_player_team_game_identity": true,
+    "training_label_semantics": true,
+    "training_source_chronology": true,
+    "v09b_model_fit": true
+  },
+  "authorization": {
+    "modern_raw_source_bytes_qualified": false,
+    "modern_gamebook_structure_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}

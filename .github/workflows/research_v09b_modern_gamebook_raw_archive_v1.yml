@@ -1,0 +1,239 @@
+name: LevLine V09B modern Game Book raw archive V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_gamebook_raw_archive_contract_v1.json'
+      - 'research/v09b_modern_gamebook_raw_archive_v1.py'
+      - 'research/test_v09b_modern_gamebook_raw_archive_v1.py'
+      - '.github/workflows/research_v09b_modern_gamebook_raw_archive_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-gamebook-raw-archive-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test modern source structure and immutable-manifest semantics
+        run: pytest -q research/test_v09b_modern_gamebook_raw_archive_v1.py
+      - name: Validate frozen modern source contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_gamebook_raw_archive_contract_v1.json').read_text())
+          assert c['status'] == 'PREREGISTERED_FULL_SOURCE_QUALIFICATION'
+          assert c['canonical_universe']['expected_games_total'] == 1296
+          assert c['canonical_universe']['silent_game_drops_allowed'] is False
+          assert c['locator_dependency']['qualified_locator_required_for_every_game'] is True
+          assert c['locator_dependency']['required_document_final_host'] == 'static.www.nfl.com'
+          assert c['raw_source_requirements']['content_addressed_bytes_required'] is True
+          assert c['parser']['not_active_is_negative_class_source'] is True
+          assert c['parser']['did_not_play_is_negative_class_source'] is False
+          assert c['parser']['absence_from_inactive_list_is_positive'] is False
+          assert c['parser']['game_day_roster_universe_constructed'] is False
+          assert c['probe_evidence_boundary']['sample_result_is_full_coverage_evidence'] is False
+          assert c['probe_evidence_boundary']['full_audit_may_fail_if_any_game_differs'] is True
+          assert all(value == 1.0 for key, value in c['frozen_qualification_gates'].items() if key.endswith('_required'))
+          assert c['frozen_qualification_gates']['duplicate_canonical_game_rows_allowed'] == 0
+          assert c['frozen_qualification_gates']['duplicate_source_sha_across_distinct_games_allowed'] == 0
+          assert c['frozen_qualification_gates']['source_row_errors_allowed'] == 0
+          assert c['authorization']['modern_raw_source_bytes_qualified'] is False
+          assert c['authorization']['modern_gamebook_structure_qualified'] is False
+          assert c['authorization']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authorization']['modern_player_team_game_identity_qualified'] is False
+          assert c['authorization']['training_label_semantics_qualified'] is False
+          assert c['authorization']['training_source_chronology_qualified'] is False
+          assert c['authorization']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  source-audit:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Resolve, archive and audit every modern Game Book
+        run: |
+          ROOT=research_outputs/v09b_modern_gamebook_raw_archive_v1
+          mkdir -p "$ROOT/receipts"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_gamebook_raw_archive_v1.py \
+              --season ${{ matrix.season }} \
+              --archive-root "$ROOT" \
+              --receipt "$ROOT/receipts/${{ matrix.season }}.json"
+      - name: Assert source-only authority and frozen gates
+        if: always()
+        run: |
+          receipt=research_outputs/v09b_modern_gamebook_raw_archive_v1/receipts/${{ matrix.season }}.json
+          if test -s "$receipt"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_modern_gamebook_raw_archive_v1/receipts/{season}.json').read_text())
+          assert r['contract_id'] == 'V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V1'
+          assert r['parser_version'] == 'V09B-MODERN-GAMEBOOK-TEXT-STRUCTURE-V1'
+          assert r['qualified_locator_rate'] == 1.0
+          assert r['source_bytes_verified_rate'] == 1.0
+          assert r['pdf_text_extraction_rate'] == 1.0
+          assert r['not_active_structure_rate'] == 1.0
+          assert r['did_not_play_structure_rate'] == 1.0
+          assert r['distinct_semantic_structure_rate'] == 1.0
+          assert r['canonical_game_coverage_rate'] == 1.0
+          assert r['all_frozen_gates_pass'] is True
+          assert r['modern_raw_source_bytes_qualified'] is True
+          assert r['modern_gamebook_structure_qualified'] is True
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['player_identity_resolution_performed'] is False
+          assert r['game_day_roster_universe_constructed'] is False
+          assert r['model_fit_performed'] is False
+          assert r['game_outcomes_used'] == 0
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-modern-gamebook-raw-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_modern_gamebook_raw_archive_v1/manifests/${{ matrix.season }}.jsonl
+            research_outputs/v09b_modern_gamebook_raw_archive_v1/receipts/${{ matrix.season }}.json
+            research_outputs/v09b_modern_gamebook_raw_archive_v1/raw/*.pdf.gz
+          if-no-files-found: error
+          retention-days: 30
+
+  persist-qualified-archive:
+    needs: source-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-gamebook-raw-v1-*-${{ github.run_id }}
+          path: /tmp/v09b_modern_gamebook_raw_archive_v1
+          merge-multiple: true
+      - name: Verify aggregate immutable modern archive before persistence
+        run: |
+          python - <<'PY'
+          import gzip
+          import hashlib
+          import json
+          from pathlib import Path
+          root = Path('/tmp/v09b_modern_gamebook_raw_archive_v1')
+          seasons = [2017, 2018, 2019, 2020, 2021]
+          receipts = [json.loads((root / 'receipts' / f'{season}.json').read_text()) for season in seasons]
+          assert all(r['all_frozen_gates_pass'] is True for r in receipts)
+          assert sum(r['canonical_games'] for r in receipts) == 1296
+          assert sum(r['qualified_locator_games'] for r in receipts) == 1296
+          assert sum(r['source_bytes_verified'] for r in receipts) == 1296
+          assert sum(r['pdf_text_extractions'] for r in receipts) == 1296
+          assert sum(r['not_active_structure_valid_games'] for r in receipts) == 1296
+          assert sum(r['did_not_play_structure_valid_games'] for r in receipts) == 1296
+          assert sum(r['distinct_semantic_structure_games'] for r in receipts) == 1296
+          assert sum(r['qualified_source_rows'] for r in receipts) == 1296
+          assert sum(r['source_row_errors'] for r in receipts) == 0
+          assert sum(r['duplicate_canonical_game_rows'] for r in receipts) == 0
+          assert sum(r['duplicate_source_sha_across_distinct_games'] for r in receipts) == 0
+          assert all(r['archive_integrity_ok'] is True for r in receipts)
+          assert all(r['modern_raw_source_bytes_qualified'] is True for r in receipts)
+          assert all(r['modern_gamebook_structure_qualified'] is True for r in receipts)
+          assert all(r['modern_game_day_roster_universe_qualified'] is False for r in receipts)
+          assert all(r['modern_player_team_game_identity_qualified'] is False for r in receipts)
+          assert all(r['training_label_semantics_qualified'] is False for r in receipts)
+          assert all(r['training_source_chronology_qualified'] is False for r in receipts)
+          assert all(r['v09b_model_fit_authorized'] is False for r in receipts)
+          assert all(r['completed_2026_outcomes_used'] == 0 for r in receipts)
+          manifest_rows = []
+          for season in seasons:
+              manifest_rows.extend(
+                  json.loads(line)
+                  for line in (root / 'manifests' / f'{season}.jsonl').read_text().splitlines()
+                  if line.strip()
+              )
+          assert len(manifest_rows) == 1296
+          assert len({row['game_id'] for row in manifest_rows}) == 1296
+          raw_files = list((root / 'raw').glob('*.pdf.gz'))
+          assert len(raw_files) == 1296
+          for path in raw_files:
+              raw = gzip.decompress(path.read_bytes())
+              assert raw.startswith(b'%PDF')
+              assert hashlib.sha256(raw).hexdigest() == path.name.removesuffix('.pdf.gz')
+          PY
+      - name: Persist content-addressed archive on isolated research-data branch
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-gamebooks-modern-v1
+          ROOT=research_outputs/v09b_modern_gamebook_raw_archive_v1
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B v09b-gamebooks-modern-v1-data "origin/$DATA_BRANCH"
+          else
+            git checkout --orphan v09b-gamebooks-modern-v1-data
+            git rm -rf . || true
+          fi
+          rm -rf "$ROOT"
+          mkdir -p "$(dirname "$ROOT")"
+          cp -R /tmp/v09b_modern_gamebook_raw_archive_v1 "$ROOT"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'Modern historical Game Book archive already matches immutable source bytes.'
+            exit 0
+          fi
+          git commit -m 'Archive qualified 2017-2021 NFL Game Books for V09B research'
+          git push origin HEAD:"$DATA_BRANCH"
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

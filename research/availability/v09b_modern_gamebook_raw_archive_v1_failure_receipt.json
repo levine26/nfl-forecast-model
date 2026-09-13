@@ -1,0 +1,82 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V1-FAILURE",
+  "purpose": "Preserve the failed full 2017-2021 modern Game Book raw-source experiment in which live Game Center rediscovery became ambiguous for three games after the already-qualified locator audit had been completed.",
+  "workflow_evidence": {
+    "run_id": 34729701985,
+    "workflow_head_sha": "af77ca9a3664b251d66e21d27e2b4773e4307660",
+    "unit_and_contract": {"job_id": 103650102111, "conclusion": "success"},
+    "research_firewall": {"job_id": 103650102211, "conclusion": "success"},
+    "season_jobs": {
+      "2017": {"job_id": 103650221839, "conclusion": "failure", "artifact_id": 10308574336, "artifact_digest": "sha256:520aace94cb0221d88beb21053eeac04bb362fb554aba44b7c9755fa79776865", "canonical_games": 256, "qualified_source_rows": 255, "source_row_errors": 1},
+      "2018": {"job_id": 103650221849, "conclusion": "success", "artifact_id": 10309058367, "artifact_digest": "sha256:c053a1419b81b450b58c4ce61ac97c15837c50964d5d6a76f99fb16f3e5a2b68", "canonical_games": 256, "qualified_source_rows": 256, "source_row_errors": 0},
+      "2019": {"job_id": 103650221871, "conclusion": "failure", "artifact_id": 10309252756, "artifact_digest": "sha256:e2caed2c224d3c01fc855eaa6dc0fe14ba9cd817a6284507a25744a207ddd574", "canonical_games": 256, "qualified_source_rows": 255, "source_row_errors": 1},
+      "2020": {"job_id": 103650221913, "conclusion": "success", "artifact_id": 10308808894, "artifact_digest": "sha256:8a74ad151aafffd3f2b792d0c7b0d472e87b23097c11c4ec1847a2723d47d971", "canonical_games": 256, "qualified_source_rows": 256, "source_row_errors": 0},
+      "2021": {"job_id": 103650221870, "conclusion": "failure", "artifact_id": 10308788970, "artifact_digest": "sha256:eee1be26747f31c891200d0acfaac1059d92b9e7a709b20c3feaf14ca6ef5307", "canonical_games": 272, "qualified_source_rows": 271, "source_row_errors": 1}
+    },
+    "persist_qualified_archive_job_id": 103651089964,
+    "persist_qualified_archive_conclusion": "skipped"
+  },
+  "aggregate_result": {
+    "canonical_games": 1296,
+    "qualified_source_rows": 1293,
+    "source_row_errors": 3,
+    "qualified_source_rate": 0.9976851851851852,
+    "successfully_downloaded_pdfs": 1293,
+    "successful_pdf_text_extractions": 1293,
+    "downloaded_pdfs_with_not_active_heading": 1293,
+    "downloaded_pdfs_with_did_not_play_heading": 1293,
+    "downloaded_pdfs_with_distinct_not_active_and_did_not_play_headings": 1293,
+    "downloaded_pdfs_with_lineups_heading": 1293,
+    "downloaded_pdfs_with_substitutions_heading": 1293,
+    "structure_failures_after_successful_download": 0
+  },
+  "failed_rows": [
+    {
+      "game_id": "2017_01_ARI_DET",
+      "game_center_url": "https://www.nfl.com/games/cardinals-at-lions-2017-reg-1",
+      "observed_extraction_method": "embedded_first_party_pdf",
+      "error": "locator not qualified: expected exactly one Game Book link, found 2",
+      "previously_qualified_locator_url": "https://static.www.nfl.com/image/upload/v1677629455/gamecenter/10012017-0910-04e6-82e0-b5888d13894c.pdf"
+    },
+    {
+      "game_id": "2019_15_BUF_PIT",
+      "game_center_url": "https://www.nfl.com/games/bills-at-steelers-2019-reg-15",
+      "observed_extraction_method": "embedded_first_party_pdf",
+      "error": "locator not qualified: expected exactly one Game Book link, found 2",
+      "previously_qualified_locator_url": "https://static.www.nfl.com/image/upload/v1677629243/gamecenter/10012019-1215-06a6-8b69-31443afc6dd3.pdf"
+    },
+    {
+      "game_id": "2021_13_BAL_PIT",
+      "game_center_url": "https://www.nfl.com/games/ravens-at-steelers-2021-reg-13",
+      "observed_extraction_method": "embedded_first_party_pdf",
+      "error": "locator not qualified: expected exactly one Game Book link, found 2",
+      "previously_qualified_locator_url": "https://static.www.nfl.com/image/upload/v1677629376/gamecenter/c5987bd5-b37c-11eb-96b9-62a07f8b20c1.pdf"
+    }
+  ],
+  "scientific_interpretation": {
+    "v1_failed_frozen_100_percent_gate": true,
+    "failure_type": "mutable_live_locator_rediscovery_ambiguity",
+    "successful_pdf_structure_supported_legacy_heading_hypothesis": true,
+    "parser_or_heading_failure_observed": false,
+    "threshold_relaxation_authorized": false,
+    "live_page_order_may_break_ties": false,
+    "corrective_design": "Use an immutable snapshot of the already-qualified 1296-row locator audit as discovery authority, then independently revalidate first-party HTTPS download provenance and PDF/text structure."
+  },
+  "scientific_disposition": {
+    "modern_raw_source_bytes_qualified": false,
+    "modern_gamebook_structure_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
