@@ -46,7 +46,7 @@ def test_completed_2026_outcomes_fail_closed():
         )
 
 
-def test_effective_governance_recognizes_v3_validation_but_stays_closed():
+def test_effective_governance_recognizes_v3_validation_and_modern_identity_but_stays_closed():
     governance = json.loads(
         Path("research/availability/v09b_execution_governance_v1.json").read_text(
             encoding="utf-8"
@@ -55,6 +55,10 @@ def test_effective_governance_recognizes_v3_validation_but_stays_closed():
     current = governance["current_evidence"]
     assert current["validation_source_state_qualified"] is True
     assert current["validation_source_contract_id"] == "V09B-AVAILABILITY-PRACTICE-STATE-CROSSCHECK-V3"
+    assert current["modern_player_team_game_identity_qualified"] is True
+    assert current["modern_player_team_game_identity_contract_id"] == "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3"
+    assert current["modern_player_team_game_identity_receipt_id"] == "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3-QUALIFIED"
+    assert current["modern_game_day_roster_universe_qualified"] is False
     assert current["training_source_chronology_qualified"] is False
     assert current["training_label_semantics_qualified"] is False
     assert current["original_preregistration_unchanged"] is True
