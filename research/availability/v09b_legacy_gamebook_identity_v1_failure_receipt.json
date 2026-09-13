@@ -1,0 +1,47 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-V1-FAILURE",
+  "purpose": "Preserve the first full exact-match Game Book-to-GSIS identity execution before any fallback rule is designed.",
+  "workflow_evidence": {
+    "run_id": 34727119819,
+    "workflow_head_sha": "1a6bd3d1dc189efbfefe0edeec300fbef3cd6c8d",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "season_jobs": {
+      "2012": {"job_id": 103643400077, "conclusion": "failure", "artifact_id": 10308730535, "artifact_digest": "sha256:8783cea86fd29541e6686e7c9c61e66f950ed137b392ca2d458cf0c035336be7", "total": 27108, "resolved": 26795, "unresolved": 313, "ambiguous": 0, "resolution_rate": 0.9884535930352664},
+      "2013": {"job_id": 103643400079, "conclusion": "failure", "artifact_id": 10308261068, "artifact_digest": "sha256:1bc957fb1c51cb7a39e3653389938f4707f00b45a4d365298b1867a30868e9bb", "total": 27122, "resolved": 26824, "unresolved": 298, "ambiguous": 0, "resolution_rate": 0.989012609689551},
+      "2014": {"job_id": 103643400059, "conclusion": "failure", "artifact_id": 10308905177, "artifact_digest": "sha256:fad46211990ce29bc7c879965d1b418d3ed6ed78abec057a755aae9f8e4280ab", "total": 27119, "resolved": 26855, "unresolved": 264, "ambiguous": 0, "resolution_rate": 0.990265127770198},
+      "2015": {"job_id": 103643400035, "conclusion": "failure", "artifact_id": 10308235980, "artifact_digest": "sha256:fe27dc3599c5e07f7bf1422557f48e08c4d9442d17bd21262ef244b8dbc6f75f", "total": 27112, "resolved": 26860, "unresolved": 252, "ambiguous": 0, "resolution_rate": 0.990705222779581},
+      "2016": {"job_id": 103643400066, "conclusion": "failure", "artifact_id": 10308960114, "artifact_digest": "sha256:ee4683c229de18305fd4c30d106b753921d035d4136d0ae2b0389dae81a409c3", "total": 27111, "resolved": 26406, "unresolved": 705, "ambiguous": 0, "resolution_rate": 0.9739957950647339}
+    }
+  },
+  "aggregate": {
+    "gamebook_identities_total": 135572,
+    "exact_unique_gsis_resolutions": 133740,
+    "unresolved_gamebook_identities": 1832,
+    "ambiguous_gamebook_identities": 0,
+    "source_identity_conflicts": 0,
+    "missing_gsis_rows": 0,
+    "exact_identity_resolution_rate": 0.9864869684747219
+  },
+  "observed_failure_shape": {
+    "repeated_player_misses_across_weeks": true,
+    "examples": ["DJ.Davis", "St.Johnson", "Ald.Smith", "D.R-Cromartie", "JM.Webb", "Br.McCain", "Jo.Brown", "N.Robey-Coleman"],
+    "interpretation": "The exact first-initial-plus-last-name key is too strict for historical Game Book display-name abbreviations. This receipt does not authorize a replacement rule."
+  },
+  "scientific_disposition": {
+    "v1_failure_preserved": true,
+    "legacy_player_team_game_identity_qualified": false,
+    "fallback_rule_authorized": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_status_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
