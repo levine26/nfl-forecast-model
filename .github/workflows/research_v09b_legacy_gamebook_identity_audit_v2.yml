@@ -1,0 +1,181 @@
+name: LevLine V09B legacy Game Book identity audit V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_legacy_gamebook_identity_contract_v2.json'
+      - 'research/v09b_legacy_gamebook_identity_audit_v2.py'
+      - 'research/test_v09b_legacy_gamebook_identity_audit_v2.py'
+      - '.github/workflows/research_v09b_legacy_gamebook_identity_audit_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test exact-then-unique-jersey V2 semantics
+        run: pytest -q research/test_v09b_legacy_gamebook_identity_audit_v2.py
+      - name: Validate preregistered aggregate identity contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_legacy_gamebook_identity_contract_v2.json').read_text())
+          assert c['status'] == 'PREREGISTERED_EXACT_THEN_UNIQUE_JERSEY_AUDIT'
+          assert c['scientific_disclosure']['v1_failure_preserved'] is True
+          assert c['scientific_disclosure']['diagnostic_preserved'] is True
+          assert c['membership_authority']['weekly_roster_defines_membership'] is False
+          assert c['membership_authority']['weekly_roster_status_used'] is False
+          assert c['identity_source']['forbidden_for_resolution'] == [
+              'status', 'status_description_abbr', 'status_short_description'
+          ]
+          assert c['resolution_rule']['weekly_roster_status_may_break_ties'] is False
+          assert c['resolution_rule']['manual_player_overrides_allowed'] is False
+          assert c['resolution_rule']['adjacent_week_fallback_allowed'] is False
+          assert c['resolution_rule']['season_wide_fallback_allowed'] is False
+          gates = c['frozen_qualification_gates']
+          assert gates['qualification_scope'] == 'aggregate 2012-2016 player-team-game identity population'
+          assert gates['legacy_identity_population_must_equal'] == 135572
+          assert gates['player_team_game_identity_resolution_rate_min'] == 0.995
+          assert gates['season_level_resolution_rate_min'] is None
+          assert gates['arbitrary_resolution_of_multiple_candidates_allowed'] == 0
+          assert gates['silent_drop_of_unresolved_or_ambiguous_identities_allowed'] == 0
+          assert c['authorization']['legacy_player_team_game_identity_qualified'] is False
+          assert c['authorization']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  identity-audit-v2:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015, 2016]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Audit frozen V2 identity rule for one season
+        run: |
+          ROOT=research_outputs/v09b_legacy_gamebook_identity_v2/${{ matrix.season }}
+          mkdir -p "$ROOT"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_identity_audit_v2.py season \
+              --season ${{ matrix.season }} \
+              --archive-root "$ROOT/archive" \
+              --output "$ROOT/receipt.json"
+      - name: Assert season receipt is source-integrity only and cannot self-qualify
+        if: always()
+        run: |
+          p=research_outputs/v09b_legacy_gamebook_identity_v2/${{ matrix.season }}/receipt.json
+          if test -s "$p"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_legacy_gamebook_identity_v2/{season}/receipt.json').read_text())
+          assert r['season_has_qualification_authority'] is False
+          assert r['source_integrity_gates_pass'] is True
+          assert r['weekly_roster_status_used'] is False
+          assert 'status' not in r['weekly_identity_source_allowed_fields_only']
+          assert 'status_description_abbr' not in r['weekly_identity_source_allowed_fields_only']
+          assert 'status_short_description' not in r['weekly_identity_source_allowed_fields_only']
+          assert r['unresolved_identities_silently_dropped'] is False
+          assert r['legacy_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['model_fit_performed'] is False
+          assert r['game_outcomes_used'] == 0
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-legacy-gamebook-identity-v2-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_identity_v2/${{ matrix.season }}/receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-qualification:
+    needs: identity-audit-v2
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-legacy-gamebook-identity-v2-*-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_identity_v2/aggregate_input
+      - name: Apply frozen aggregate >=99.5% identity gate
+        run: |
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_identity_audit_v2.py aggregate \
+              --input-root research_outputs/v09b_legacy_gamebook_identity_v2/aggregate_input \
+              --output research_outputs/v09b_legacy_gamebook_identity_v2/aggregate_receipt.json
+      - name: Assert qualification stops at legacy identity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research_outputs/v09b_legacy_gamebook_identity_v2/aggregate_receipt.json').read_text())
+          assert r['legacy_identity_population'] == 135572
+          assert r['aggregate_identity_resolution_rate'] >= 0.995
+          assert r['aggregate_identity_resolution_gate_pass'] is True
+          assert r['source_integrity_all_seasons_pass'] is True
+          assert r['legacy_player_team_game_identity_qualified'] is True
+          assert r['unresolved_identities_silently_dropped'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['game_outcomes_used'] == 0
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-legacy-gamebook-identity-v2-aggregate-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_identity_v2/aggregate_receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove V2 identity audit remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
