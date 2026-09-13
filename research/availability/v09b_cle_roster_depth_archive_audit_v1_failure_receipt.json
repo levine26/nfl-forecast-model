@@ -1,0 +1,128 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-CLE-ROSTER-DEPTH-ARCHIVE-AUDIT-V1-FAILURE",
+  "contract_id": "V09B-CLE-ROSTER-DEPTH-ARCHIVE-AUDIT-V1",
+  "status": "FAILED_COMPLETE_CLUB_WEEKLY_SNAPSHOT_SOURCE_COVERAGE_NO_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34735554833,
+    "validated_head_sha": "e5a2098be7e75ed6139201adcff52db7116058a0",
+    "aggregate_artifact_id": 10309894931,
+    "aggregate_artifact_digest": "sha256:0549dc30c8e98302bad895b156cf95bf7ae11befdbf6ef09a0348e2b6099085b",
+    "season_artifacts": {
+      "2017": {
+        "artifact_id": 10311176493,
+        "digest": "sha256:850c157fb8fb8cd28e2a80cada4db72b34352c3158b95c45e5000fab6aea37ad"
+      },
+      "2018": {
+        "artifact_id": 10310677844,
+        "digest": "sha256:18fc73f336e6325055dd7fdc948f14a8f35fc29cc657977eb859416dd9d57c32"
+      },
+      "2019": {
+        "artifact_id": 10310907365,
+        "digest": "sha256:b6d801d628cc5cea77b4323f714e7b89ada15ffaf18cc41a5b94c2ea7d082d80"
+      },
+      "2020": {
+        "artifact_id": 10310319316,
+        "digest": "sha256:6bd5426db520d35e9920770c15ee75edd4434eeceae986d6901d1bb719792396"
+      },
+      "2021": {
+        "artifact_id": 10310533392,
+        "digest": "sha256:9e9bef5b5a124e204b4959d58c118631b28e67c3cac89f5292a87ecbfb146e05"
+      }
+    }
+  },
+  "aggregate_result": {
+    "expected_team_game_partitions": 81,
+    "all_five_seasons_accounted": true,
+    "viewer_links_discovered": 65,
+    "week_rows_completed": 64,
+    "semantic_pass_weeks": 29,
+    "fresh_snapshot_pass_weeks": 15,
+    "weekly_snapshot_source_pass_weeks": 15,
+    "source_errors": 1,
+    "duplicate_week_links": 0,
+    "document_sha_collisions": 0,
+    "cle_weekly_snapshot_source_coverage_qualified": false
+  },
+  "season_results": {
+    "2017": {
+      "expected_team_game_partitions": 16,
+      "viewer_links_discovered": 0,
+      "week_rows_completed": 0,
+      "semantic_pass_weeks": 0,
+      "fresh_snapshot_pass_weeks": 0,
+      "weekly_snapshot_source_pass_weeks": 0,
+      "source_errors": 0,
+      "season_gate_pass": false,
+      "observed_failure_shape": "The provenance-qualified Cleveland 2017 season archive was reachable, but it exposed zero frozen regular-season Rosters & Depth week viewers under the V1 discovery contract."
+    },
+    "2018": {
+      "expected_team_game_partitions": 16,
+      "viewer_links_discovered": 16,
+      "week_rows_completed": 16,
+      "semantic_pass_weeks": 0,
+      "fresh_snapshot_pass_weeks": 0,
+      "weekly_snapshot_source_pass_weeks": 0,
+      "source_errors": 0,
+      "season_gate_pass": false,
+      "observed_failure_shape": "All 16 regular-season week viewers and exactly linked first-party PDFs were recovered, but the PDFs were depth-chart documents rather than the frozen current-roster plus practice-squad plus reserve-population snapshot structure; zero weeks passed semantic viability."
+    },
+    "2019": {
+      "expected_team_game_partitions": 16,
+      "viewer_links_discovered": 16,
+      "week_rows_completed": 15,
+      "semantic_pass_weeks": 15,
+      "fresh_snapshot_pass_weeks": 15,
+      "weekly_snapshot_source_pass_weeks": 15,
+      "source_errors": 1,
+      "season_gate_pass": false,
+      "observed_failure_shape": "Fifteen of sixteen weeks supplied fresh semantically valid pregame roster snapshots. Week 11 failed closed because the week viewer exposed zero direct Full Document links where the frozen contract required exactly one."
+    },
+    "2020": {
+      "expected_team_game_partitions": 16,
+      "viewer_links_discovered": 16,
+      "week_rows_completed": 16,
+      "semantic_pass_weeks": 0,
+      "fresh_snapshot_pass_weeks": 0,
+      "weekly_snapshot_source_pass_weeks": 0,
+      "source_errors": 0,
+      "season_gate_pass": false,
+      "observed_failure_shape": "All 16 week viewers and linked PDFs were recovered, but no week simultaneously satisfied the frozen current-roster, practice-squad, reserve-population, and fresh as-of snapshot requirements."
+    },
+    "2021": {
+      "expected_team_game_partitions": 17,
+      "viewer_links_discovered": 17,
+      "week_rows_completed": 17,
+      "semantic_pass_weeks": 14,
+      "fresh_snapshot_pass_weeks": 0,
+      "weekly_snapshot_source_pass_weeks": 0,
+      "source_errors": 0,
+      "season_gate_pass": false,
+      "observed_failure_shape": "Fourteen of seventeen linked PDFs satisfied the frozen roster/practice-squad/reserve structural semantics, but none yielded a parseable pregame roster snapshot dated no more than seven days before the target game."
+    }
+  },
+  "scientific_disposition": {
+    "v1_complete_cleveland_weekly_snapshot_source_coverage_qualified": false,
+    "v1_gate_relaxed_post_hoc": false,
+    "v1_parser_or_semantic_contract_retrofitted": false,
+    "direct_weekly_roster_depth_source_class_rejected_as_unusable_in_principle": false,
+    "cumulative_result": "The exact Cleveland archive chain is useful for selected seasons and weeks but is not a complete 2017-2021 source of frozen pregame roster snapshots.",
+    "snapshot_exactly_equals_kickoff_eligible_population": false,
+    "transactions_between_snapshot_and_kickoff_reconciled": false,
+    "standard_elevations_reconciled": false,
+    "inactive_lists_reconciled": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_status_used_as_membership_authority": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

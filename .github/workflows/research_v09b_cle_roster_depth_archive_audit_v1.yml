@@ -1,0 +1,315 @@
+name: LevLine V09B CLE roster-depth archive audit V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_cle_roster_depth_archive_audit_v1_contract.json'
+      - 'research/availability/v09b_cle_roster_depth_archive_audit_v1_failure_receipt.json'
+      - 'research/v09b_cle_roster_depth_archive_audit_v1.py'
+      - 'research/test_v09b_cle_roster_depth_archive_audit_v1.py'
+      - '.github/workflows/research_v09b_cle_roster_depth_archive_audit_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-cle-roster-depth-archive-audit-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen Cleveland archive semantics and preserved failure receipt
+        run: pytest -q research/test_v09b_cle_roster_depth_archive_audit_v1.py
+      - name: Validate preregistered club-complete contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_cle_roster_depth_archive_audit_v1_contract.json').read_text())
+          assert c['status'] == 'CLUB_COMPLETE_WEEKLY_SNAPSHOT_SOURCE_COVERAGE_AUDIT_ONLY_NO_GAME_DAY_MEMBERSHIP_AUTHORITY'
+          assert c['club'] == 'CLE'
+          assert c['seasons'] == [2017, 2018, 2019, 2020, 2021]
+          assert c['expected_regular_season_games_by_season'] == {'2017': 16, '2018': 16, '2019': 16, '2020': 16, '2021': 17}
+          assert c['expected_regular_season_team_game_partitions_total'] == 81
+          assert c['source_chain']['season_archive_host'] == 'browns.1rmg.com'
+          assert c['source_chain']['viewer_host'] == 'browns.1rmg.com'
+          assert c['source_chain']['full_document_host'] == 'media.browns.1rmg.com'
+          assert c['source_chain']['provider_wide_host_authority'] is False
+          assert c['semantic_requirements']['maximum_snapshot_age_days'] == 7
+          assert all(v == 1.0 for k, v in c['frozen_qualification_gates'].items() if k.endswith('_rate'))
+          assert c['explicit_non_gates']['game_day_roster_membership_constructed'] is False
+          assert c['authority']['other_clubs_snapshot_source_coverage_qualified'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authority']['training_source_chronology_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+      - name: Validate immutable failed empirical disposition
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research/availability/v09b_cle_roster_depth_archive_audit_v1_failure_receipt.json').read_text())
+          assert r['status'] == 'FAILED_COMPLETE_CLUB_WEEKLY_SNAPSHOT_SOURCE_COVERAGE_NO_AUTHORITY'
+          assert r['workflow_evidence']['run_id'] == 34735554833
+          assert r['workflow_evidence']['validated_head_sha'] == 'e5a2098be7e75ed6139201adcff52db7116058a0'
+          assert r['aggregate_result']['expected_team_game_partitions'] == 81
+          assert r['aggregate_result']['weekly_snapshot_source_pass_weeks'] == 15
+          assert r['aggregate_result']['cle_weekly_snapshot_source_coverage_qualified'] is False
+          assert r['scientific_disposition']['v1_gate_relaxed_post_hoc'] is False
+          assert r['scientific_disposition']['v1_parser_or_semantic_contract_retrofitted'] is False
+          assert r['scientific_disposition']['modern_game_day_roster_universe_qualified'] is False
+          assert r['scientific_disposition']['training_source_chronology_qualified'] is False
+          assert r['scientific_disposition']['v09b_model_fit_authorized'] is False
+          PY
+
+  audit-season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Re-run exact season archive and preserve result before interpreting failure
+        run: |
+          ROOT=research_outputs/v09b_cle_roster_depth_archive_audit_v1
+          OUT=$ROOT/${{ matrix.season }}.json
+          STATUS=$ROOT/${{ matrix.season }}.exit_status.txt
+          mkdir -p "$ROOT"
+          set +e
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_cle_roster_depth_archive_audit_v1.py \
+              --contract research/availability/v09b_cle_roster_depth_archive_audit_v1_contract.json \
+              --season ${{ matrix.season }} \
+              --output "$OUT"
+          rc=$?
+          set -e
+          echo "$rc" > "$STATUS"
+          test -f "$OUT"
+      - name: Assert authority firewall from preserved season result
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('research_outputs/v09b_cle_roster_depth_archive_audit_v1/${{ matrix.season }}.json')
+          assert p.exists(), 'season result missing'
+          r = json.loads(p.read_text())
+          assert r['club'] == 'CLE'
+          assert r['season'] == ${{ matrix.season }}
+          assert r['cle_weekly_snapshot_source_coverage_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['game_outcomes_used'] == 0
+          assert r['completed_2026_outcomes_used'] == 0
+          assert r['model_fit_performed'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-cle-roster-depth-archive-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_cle_roster_depth_archive_audit_v1/${{ matrix.season }}.json
+            research_outputs/v09b_cle_roster_depth_archive_audit_v1/${{ matrix.season }}.exit_status.txt
+          if-no-files-found: error
+          retention-days: 30
+      - name: Reproduce frozen failed season disposition after preserving evidence
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('research_outputs/v09b_cle_roster_depth_archive_audit_v1')
+          r = json.loads((root / '${{ matrix.season }}.json').read_text())
+          rc = int((root / '${{ matrix.season }}.exit_status.txt').read_text().strip())
+          season = ${{ matrix.season }}
+          expected = {
+              2017: {'games': 16, 'viewers': 0, 'unique_weeks': 0, 'rows': 0, 'errors': 0, 'semantic': 0, 'fresh': 0, 'passed': 0},
+              2018: {'games': 16, 'viewers': 16, 'unique_weeks': 16, 'rows': 16, 'errors': 0, 'semantic': 0, 'fresh': 0, 'passed': 0},
+              2019: {'games': 16, 'viewers': 16, 'unique_weeks': 16, 'rows': 15, 'errors': 1, 'semantic': 15, 'fresh': 15, 'passed': 15},
+              2020: {'games': 16, 'viewers': 16, 'unique_weeks': 16, 'rows': 16, 'errors': 0, 'semantic': 0, 'fresh': 0, 'passed': 0},
+              2021: {'games': 17, 'viewers': 17, 'unique_weeks': 17, 'rows': 17, 'errors': 0, 'semantic': 14, 'fresh': 0, 'passed': 0},
+          }[season]
+          assert rc != 0, 'V1 unexpectedly qualified on rerun; do not silently rewrite the preserved failure'
+          assert r['expected_regular_season_games'] == expected['games']
+          assert r['viewer_links_discovered'] == expected['viewers']
+          assert r['unique_week_numbers_discovered'] == expected['unique_weeks']
+          assert r['duplicate_week_links'] == 0
+          assert r['week_rows_completed'] == expected['rows']
+          assert len(r['source_errors']) == expected['errors']
+          assert r['semantic_pass_weeks'] == expected['semantic']
+          assert r['fresh_snapshot_pass_weeks'] == expected['fresh']
+          assert r['weekly_snapshot_source_pass_weeks'] == expected['passed']
+          assert r['document_sha_collisions'] == 0
+          assert r['season_snapshot_source_coverage_gate_pass'] is False
+          if season == 2019:
+              assert r['source_errors'][0]['week'] == '11'
+              assert 'expected exactly one direct Full Document link, found 0' in r['source_errors'][0]['error']
+          PY
+
+  aggregate:
+    if: always()
+    needs: audit-season
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-cle-roster-depth-archive-v1-*-${{ github.run_id }}
+          path: /tmp/v09b_cle_roster_depth_archive_v1
+          merge-multiple: true
+      - name: Build aggregate result from every preserved season
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('/tmp/v09b_cle_roster_depth_archive_v1')
+          seasons = [2017, 2018, 2019, 2020, 2021]
+          expected = {2017: 16, 2018: 16, 2019: 16, 2020: 16, 2021: 17}
+          season_results = {}
+          missing = []
+          for season in seasons:
+              p = root / f'{season}.json'
+              s = root / f'{season}.exit_status.txt'
+              if not p.exists() or not s.exists():
+                  missing.append(str(season))
+                  continue
+              r = json.loads(p.read_text())
+              season_results[str(season)] = {
+                  'expected': expected[season],
+                  'exit_status': int(s.read_text().strip()),
+                  'viewer_links_discovered': r['viewer_links_discovered'],
+                  'unique_week_numbers_discovered': r['unique_week_numbers_discovered'],
+                  'duplicate_week_links': r['duplicate_week_links'],
+                  'week_rows_completed': r['week_rows_completed'],
+                  'source_error_count': len(r['source_errors']),
+                  'semantic_pass_weeks': r['semantic_pass_weeks'],
+                  'fresh_snapshot_pass_weeks': r['fresh_snapshot_pass_weeks'],
+                  'weekly_snapshot_source_pass_weeks': r['weekly_snapshot_source_pass_weeks'],
+                  'document_sha_collisions': r['document_sha_collisions'],
+                  'season_gate_pass': r['season_snapshot_source_coverage_gate_pass'],
+              }
+          accounted = len(season_results) == 5 and not missing
+          totals = {
+              'expected_team_game_partitions': 81,
+              'viewer_links_discovered': sum(x['viewer_links_discovered'] for x in season_results.values()),
+              'week_rows_completed': sum(x['week_rows_completed'] for x in season_results.values()),
+              'source_errors': sum(x['source_error_count'] for x in season_results.values()),
+              'semantic_pass_weeks': sum(x['semantic_pass_weeks'] for x in season_results.values()),
+              'fresh_snapshot_pass_weeks': sum(x['fresh_snapshot_pass_weeks'] for x in season_results.values()),
+              'weekly_snapshot_source_pass_weeks': sum(x['weekly_snapshot_source_pass_weeks'] for x in season_results.values()),
+              'duplicate_week_links': sum(x['duplicate_week_links'] for x in season_results.values()),
+              'document_sha_collisions': sum(x['document_sha_collisions'] for x in season_results.values()),
+          }
+          qualified = bool(
+              accounted
+              and all(x['exit_status'] == 0 for x in season_results.values())
+              and all(x['season_gate_pass'] is True for x in season_results.values())
+              and all(x['viewer_links_discovered'] == x['expected'] for x in season_results.values())
+              and all(x['unique_week_numbers_discovered'] == x['expected'] for x in season_results.values())
+              and totals['viewer_links_discovered'] == 81
+              and totals['week_rows_completed'] == 81
+              and totals['source_errors'] == 0
+              and totals['semantic_pass_weeks'] == 81
+              and totals['fresh_snapshot_pass_weeks'] == 81
+              and totals['weekly_snapshot_source_pass_weeks'] == 81
+              and totals['duplicate_week_links'] == 0
+          )
+          result = {
+              'qualification_version': 1,
+              'qualification_id': 'V09B-CLE-ROSTER-DEPTH-ARCHIVE-AUDIT-V1-AGGREGATE',
+              'club': 'CLE',
+              'season_results': season_results,
+              'missing_season_results': missing,
+              'all_five_seasons_accounted': accounted,
+              **totals,
+              'cle_weekly_snapshot_source_coverage_qualified': qualified,
+              'snapshot_exactly_equals_kickoff_eligible_population': False,
+              'transactions_between_snapshot_and_kickoff_reconciled': False,
+              'standard_elevations_reconciled': False,
+              'inactive_lists_reconciled': False,
+              'modern_game_day_roster_universe_qualified': False,
+              'modern_player_team_game_identity_qualified': False,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+              'model_fit_performed': False,
+              'production_dependency_authorized': False,
+          }
+          out = root / 'aggregate.json'
+          out.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(result, indent=2, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-cle-roster-depth-archive-v1-aggregate-${{ github.run_id }}
+          path: /tmp/v09b_cle_roster_depth_archive_v1/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Reproduce frozen aggregate failure and authority firewall
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('/tmp/v09b_cle_roster_depth_archive_v1/aggregate.json').read_text())
+          receipt = json.loads(Path('research/availability/v09b_cle_roster_depth_archive_audit_v1_failure_receipt.json').read_text())
+          assert r['all_five_seasons_accounted'] is True
+          assert r['expected_team_game_partitions'] == receipt['aggregate_result']['expected_team_game_partitions'] == 81
+          assert r['viewer_links_discovered'] == receipt['aggregate_result']['viewer_links_discovered'] == 65
+          assert r['week_rows_completed'] == receipt['aggregate_result']['week_rows_completed'] == 64
+          assert r['source_errors'] == receipt['aggregate_result']['source_errors'] == 1
+          assert r['semantic_pass_weeks'] == receipt['aggregate_result']['semantic_pass_weeks'] == 29
+          assert r['fresh_snapshot_pass_weeks'] == receipt['aggregate_result']['fresh_snapshot_pass_weeks'] == 15
+          assert r['weekly_snapshot_source_pass_weeks'] == receipt['aggregate_result']['weekly_snapshot_source_pass_weeks'] == 15
+          assert r['duplicate_week_links'] == receipt['aggregate_result']['duplicate_week_links'] == 0
+          assert r['document_sha_collisions'] == receipt['aggregate_result']['document_sha_collisions'] == 0
+          assert r['cle_weekly_snapshot_source_coverage_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert receipt['scientific_disposition']['v1_gate_relaxed_post_hoc'] is False
+          assert receipt['scientific_disposition']['v1_parser_or_semantic_contract_retrofitted'] is False
+          PY
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

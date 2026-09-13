@@ -1,0 +1,97 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-CLE-ROSTER-DEPTH-ARCHIVE-AUDIT-V1",
+  "status": "CLUB_COMPLETE_WEEKLY_SNAPSHOT_SOURCE_COVERAGE_AUDIT_ONLY_NO_GAME_DAY_MEMBERSHIP_AUTHORITY",
+  "dependencies": [
+    "V09B-MODERN-ROSTER-DEPTH-SOURCE-PROBE-V2-COMPLETE",
+    "V09B-DELEGATED-MEDIA-PROVENANCE-V1-COMPLETE"
+  ],
+  "purpose": "Test whether the provenance-qualified Cleveland Browns delegated media archive provides a semantically valid, fresh week-specific Roster & Depth snapshot for every Cleveland regular-season game from 2017 through 2021. Passing qualifies only Cleveland weekly snapshot source coverage; kickoff eligibility still requires a separately qualified chronology reconciliation.",
+  "club": "CLE",
+  "seasons": [2017, 2018, 2019, 2020, 2021],
+  "expected_regular_season_games_by_season": {
+    "2017": 16,
+    "2018": 16,
+    "2019": 16,
+    "2020": 16,
+    "2021": 17
+  },
+  "expected_regular_season_team_game_partitions_total": 81,
+  "source_chain": {
+    "season_archive_url_template": "https://browns.1rmg.com/season/{season}/",
+    "season_archive_host": "browns.1rmg.com",
+    "required_archive_link_text": "Rosters & Depth",
+    "viewer_url_regex": "^https://browns\\.1rmg\\.com/season/{season}/regular-season/week-[0-9]+/rosters-depth/?$",
+    "viewer_host": "browns.1rmg.com",
+    "required_viewer_link_text": "Full Document",
+    "full_document_host": "media.browns.1rmg.com",
+    "full_document_must_be_directly_linked_from_exact_week_viewer": true,
+    "provider_wide_host_authority": false
+  },
+  "source_requirements": {
+    "https_required": true,
+    "season_archive_http_success_required": true,
+    "viewer_http_success_required": true,
+    "full_document_http_success_required": true,
+    "pdf_magic_required": true,
+    "content_sha256_required": true,
+    "pdftotext_nonempty_required": true,
+    "duplicate_week_links_allowed": false,
+    "silent_game_or_week_drops_allowed": false,
+    "network_fetch_allowed": true
+  },
+  "semantic_requirements": {
+    "current_roster_marker_any": ["NUMERICAL ROSTER", "ALPHABETICAL ROSTER", "ROSTER BY POSITION"],
+    "practice_squad_marker_required": "PRACTICE SQUAD",
+    "reserve_marker_any": [
+      "RESERVE/INJURED",
+      "INJURED RESERVE",
+      "RESERVE/PUP",
+      "RESERVE/COVID-19",
+      "RESERVE/NFI",
+      "RESERVE/NON-FOOTBALL INJURY",
+      "RESERVE/NON-FOOTBALL ILLNESS"
+    ],
+    "pregame_roster_as_of_date_required": true,
+    "maximum_snapshot_age_days": 7,
+    "roster_date_search_window_lines": 180
+  },
+  "frozen_qualification_gates": {
+    "season_archive_coverage_rate": 1.0,
+    "week_viewer_coverage_rate": 1.0,
+    "full_document_pdf_coverage_rate": 1.0,
+    "semantic_structure_rate": 1.0,
+    "fresh_snapshot_rate": 1.0,
+    "exact_expected_season_counts_required": true,
+    "source_errors": 0,
+    "duplicate_week_links": 0
+  },
+  "explicit_non_gates": {
+    "snapshot_exactly_equals_kickoff_eligible_population": false,
+    "transactions_between_snapshot_and_kickoff_reconciled": false,
+    "standard_elevations_reconciled": false,
+    "inactive_lists_reconciled": false,
+    "game_day_roster_membership_constructed": false,
+    "player_identity_resolution_performed": false
+  },
+  "authority": {
+    "cle_weekly_snapshot_source_coverage_may_qualify": true,
+    "other_clubs_snapshot_source_coverage_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
