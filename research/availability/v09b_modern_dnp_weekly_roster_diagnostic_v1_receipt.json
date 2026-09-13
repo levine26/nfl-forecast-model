@@ -1,0 +1,171 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-DNP-WEEKLY-ROSTER-DIAGNOSTIC-V1-COMPLETE",
+  "contract_id": "V09B-MODERN-DNP-WEEKLY-ROSTER-DIAGNOSTIC-V1",
+  "status": "DIAGNOSTIC_COMPLETE_ZERO_QUALIFICATION_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34737071414,
+    "validated_head_sha": "f5e72e198209aa4d6d14c0a71103cac9759381df",
+    "artifact_id": 10310749787,
+    "artifact_digest": "sha256:2ddbde3e03b4e08b40aefafad84e8f145ef0d68c22fa44d52cbfad02cbd3c127"
+  },
+  "live_csv_source_manifest": {
+    "2017": {"sha256": "fd3fe005b676fe0ad8d88c50701d71adef4287501397c33f479c9765cd8c45d4", "regular_season_rows": 49996},
+    "2018": {"sha256": "c3bca1ee53e63e21b964f1bb42c251e25b7b4b8c55210730dd4ded2f9d4a709a", "regular_season_rows": 50873},
+    "2019": {"sha256": "af6aa7b8aa7850c47fe307d548d66fa7c1cac88fe11e5951c781974cb6909e03", "regular_season_rows": 50306},
+    "2020": {"sha256": "0b948cca8735a2417cbda14464f4532aeee58d871e2fcd8464a23e969e45789e", "regular_season_rows": 42964},
+    "2021": {"sha256": "88adfe0fba5cbedd260d7928ad373476d4fb168d0213cb52ef1163ed5d3056b7", "regular_season_rows": 44539}
+  },
+  "comparison_to_prior_frozen_parquet_capture": {
+    "prior_contract_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1",
+    "prior_research_data_commit_sha": "1c6f388c06f7473eb7483d6b4b91685ecb3d019c",
+    "same_artifact_representation": false,
+    "hashes_directly_comparable": false,
+    "frozen_parquet_raw_sha256_by_season": {
+      "2017": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
+      "2018": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
+      "2019": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+      "2020": "8d601bf5c5d669465481421ad5cd1a1470d51792054e84bdc04f3620785f7530",
+      "2021": "3e9f67569e940b54b3778ef2c9150850920b5bf93143bad3bd158e649825cf6b"
+    },
+    "frozen_parquet_selected_reg_rows_by_season": {
+      "2017": 49210,
+      "2018": 50113,
+      "2019": 49561,
+      "2020": 41972,
+      "2021": 44539
+    },
+    "live_csv_minus_frozen_parquet_selected_rows_by_season": {
+      "2017": 786,
+      "2018": 760,
+      "2019": 745,
+      "2020": 992,
+      "2021": 0
+    },
+    "all_season_row_counts_equal": false,
+    "disposition": "The V1 live CSV diagnostic must not be described as replaying the already-frozen Parquet source capture. Its evidence remains useful diagnostically, but the pinned-source follow-up must consume the exact frozen Parquet bytes and status-free projection rather than infer source equivalence."
+  },
+  "empirical_result": {
+    "canonical_gamebooks_expected": 1296,
+    "gamebook_parse_error_rows": 0,
+    "dnp_tokens_parsed": 3582,
+    "identity_state_counts": {
+      "unique": 1900,
+      "unresolved": 1682
+    },
+    "unique_identity_rate": 0.5304299274148521,
+    "resolved_status_distribution": [
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": "A01", "rows": 1870},
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": "P01", "rows": 8},
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": "P07", "rows": 5},
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": "P10", "rows": 3},
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": null, "rows": 3},
+      {"identity_state": "unique", "weekly_status": "INA", "status_description_abbr": "A01", "rows": 3},
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": "P06", "rows": 2},
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": "P12", "rows": 2},
+      {"identity_state": "unique", "weekly_status": "DEV", "status_description_abbr": null, "rows": 2},
+      {"identity_state": "unique", "weekly_status": "ACT", "status_description_abbr": "E02", "rows": 1},
+      {"identity_state": "unique", "weekly_status": "TRC", "status_description_abbr": "A01", "rows": 1}
+    ]
+  },
+  "predeclared_sentinel_observations": [
+    {
+      "season": 2018,
+      "week": 16,
+      "team": "OAK",
+      "game_id": "2018_16_DEN_OAK",
+      "gamebook_name": "D.Worley",
+      "independent_evidence": "placed on Reserve/Injured before game",
+      "matching_dnp_rows": 0,
+      "identity_states": [],
+      "weekly_statuses": [],
+      "weekly_status_description_abbrs": []
+    },
+    {
+      "season": 2018,
+      "week": 16,
+      "team": "OAK",
+      "game_id": "2018_16_DEN_OAK",
+      "gamebook_name": "D.Moore",
+      "independent_evidence": "waived before game",
+      "matching_dnp_rows": 1,
+      "identity_states": ["unique"],
+      "gsis_ids": ["00-0030069"],
+      "weekly_statuses": ["ACT"],
+      "weekly_status_description_abbrs": ["A01"]
+    },
+    {
+      "season": 2020,
+      "week": 15,
+      "team": "JAX",
+      "game_id": "2020_15_JAX_BAL",
+      "gamebook_name": "L.Cooke",
+      "independent_evidence": "missed game with illness and later activated from Reserve/COVID-19",
+      "matching_dnp_rows": 1,
+      "identity_states": ["unique"],
+      "gsis_ids": ["00-0034437"],
+      "weekly_statuses": ["INA"],
+      "weekly_status_description_abbrs": ["A01"]
+    },
+    {
+      "season": 2021,
+      "week": 10,
+      "team": "KC",
+      "game_id": "2021_10_KC_LV",
+      "gamebook_name": "K.Saunders",
+      "independent_evidence": "listed inactive by contemporaneous official Chiefs/NFL report",
+      "matching_dnp_rows": 1,
+      "identity_states": ["unique"],
+      "gsis_ids": ["00-0035656"],
+      "weekly_statuses": ["INA"],
+      "weekly_status_description_abbrs": ["A01"]
+    },
+    {
+      "season": 2021,
+      "week": 10,
+      "team": "TB",
+      "game_id": "2021_10_TB_WAS",
+      "gamebook_name": "A.Brown",
+      "independent_evidence": "listed inactive by contemporaneous official Buccaneers/NFL report",
+      "matching_dnp_rows": 0,
+      "identity_states": [],
+      "weekly_statuses": [],
+      "weekly_status_description_abbrs": []
+    },
+    {
+      "season": 2021,
+      "week": 16,
+      "team": "PIT",
+      "game_id": "2021_16_PIT_KC",
+      "gamebook_name": "C.Wormley",
+      "independent_evidence": "listed inactive by contemporaneous official Steelers report",
+      "matching_dnp_rows": 1,
+      "identity_states": ["unique"],
+      "gsis_ids": ["00-0033913"],
+      "weekly_statuses": ["INA"],
+      "weekly_status_description_abbrs": ["A01"]
+    }
+  ],
+  "scientific_disposition": {
+    "uniform_did_not_play_equals_active_rejected": true,
+    "weekly_status_ACT_equals_game_day_active_qualified": false,
+    "status_description_A01_equals_game_day_active_qualified": false,
+    "weekly_roster_source_qualified_by_v1": false,
+    "game_day_membership_qualified_by_v1": false,
+    "dnp_active_semantics_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "same_version_hash_pinning_authorized": false,
+    "v09b_execution_authorized": false
+  },
+  "governance": {
+    "diagnostic_only": true,
+    "qualification_authority": false,
+    "training_label_authority": false,
+    "probability_model_built": false,
+    "production_dependency_authorized": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": 0
+  }
+}
