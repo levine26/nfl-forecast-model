@@ -61,24 +61,29 @@ def test_multiple_matching_gsis_ids_remain_ambiguous() -> None:
 
 
 def test_status_fields_are_rejected_from_identity_resolver() -> None:
-    candidate = _identity_row()
-    candidate["status_description_abbr"] = "ACT"
-    with pytest.raises(ValueError, match="status field leaked"):
-        resolve_identity(display_name="D.Hopkins", candidates=[candidate])
+    for field in ("status", "status_description_abbr", "status_short_description"):
+        candidate = _identity_row()
+        candidate[field] = "ACT"
+        with pytest.raises(ValueError, match="status field leaked"):
+            resolve_identity(display_name="D.Hopkins", candidates=[candidate])
 
 
 def test_projection_index_requires_exact_status_free_allowlist() -> None:
     frame = pl.DataFrame([_identity_row()]).select(list(identity_capture.ALLOWED_FIELDS))
     index = _projection_index(frame, season=2021)
     assert list(index) == [(1, "ARI", "10")]
-    assert "status_description_abbr" not in index[(1, "ARI", "10")][0]
+    assert not {
+        "status",
+        "status_description_abbr",
+        "status_short_description",
+    } & set(index[(1, "ARI", "10")][0])
 
     contaminated = frame.with_columns(pl.lit("ACT").alias("status_description_abbr"))
     with pytest.raises(RuntimeError, match="allowlist"):
         _projection_index(contaminated, season=2021)
 
 
-def test_status_lookup_is_post_resolution_keyed_by_gsis() -> None:
+def test_status_lookup_is_post_resolution_keyed_by_gsis_and_preserves_both_status_layers() -> None:
     frame = pl.DataFrame(
         [
             {
@@ -87,7 +92,8 @@ def test_status_lookup_is_post_resolution_keyed_by_gsis() -> None:
                 "week": 1,
                 "team": "ARI",
                 "gsis_id": "00-0000001",
-                "status_description_abbr": "ACT",
+                "status": "ACT",
+                "status_description_abbr": "A01",
                 "status_short_description": "Active",
             },
             {
@@ -96,10 +102,43 @@ def test_status_lookup_is_post_resolution_keyed_by_gsis() -> None:
                 "week": 1,
                 "team": "ARI",
                 "gsis_id": "00-0000001",
-                "status_description_abbr": "ACT",
+                "status": "ACT",
+                "status_description_abbr": "A01",
                 "status_short_description": "Active",
             },
         ]
     )
     lookup = _status_lookup(frame, season=2021)
-    assert lookup[(1, "ARI", "00-0000001")][("ACT", "Active")] == 2
+    assert lookup[(1, "ARI", "00-0000001")][("ACT", "A01", "Active")] == 2
+
+
+def test_status_lookup_retains_generic_status_contradictions_separately() -> None:
+    frame = pl.DataFrame(
+        [
+            {
+                "season": 2021,
+                "game_type": "REG",
+                "week": 1,
+                "team": "ARI",
+                "gsis_id": "00-0000001",
+                "status": "ACT",
+                "status_description_abbr": "A01",
+                "status_short_description": "Active",
+            },
+            {
+                "season": 2021,
+                "game_type": "REG",
+                "week": 1,
+                "team": "ARI",
+                "gsis_id": "00-0000001",
+                "status": "INA",
+                "status_description_abbr": "A01",
+                "status_short_description": "Active",
+            },
+        ]
+    )
+    lookup = _status_lookup(frame, season=2021)
+    variants = lookup[(1, "ARI", "00-0000001")]
+    assert variants[("ACT", "A01", "Active")] == 1
+    assert variants[("INA", "A01", "Active")] == 1
+    assert len(variants) == 2
