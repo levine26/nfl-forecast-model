@@ -1,0 +1,231 @@
+name: LevLine V09B legacy Game Book identity audit V4
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_legacy_gamebook_identity_contract_v4.json'
+      - 'research/v09b_legacy_gamebook_identity_audit_v4.py'
+      - 'research/test_v09b_legacy_gamebook_identity_audit_v4.py'
+      - '.github/workflows/research_v09b_legacy_gamebook_identity_audit_v4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test narrow structural fallback boundary
+        run: pytest -q research/test_v09b_legacy_gamebook_identity_audit_v4.py
+      - name: Validate frozen V4 aggregate contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_legacy_gamebook_identity_contract_v4.json').read_text())
+          assert c['status'] == 'PREREGISTERED_NARROW_STRUCTURAL_IDENTITY_AUDIT'
+          assert c['canonical_identity_population']['gamebook_identities_total'] == 135572
+          assert c['canonical_identity_population']['v1_exact_resolved_total'] == 133740
+          assert c['canonical_identity_population']['v1_exact_misses_total'] == 1832
+          assert c['canonical_identity_population']['silent_identity_drops_allowed'] is False
+          assert c['membership_authority']['weekly_roster_defines_membership'] is False
+          assert c['membership_authority']['weekly_roster_status_used'] is False
+          assert c['identity_source']['forbidden_for_resolution'] == [
+              'status', 'status_description_abbr', 'status_short_description'
+          ]
+          r = c['resolution_rule']
+          assert r['step_2_exactly_one_authorized_candidate_required'] is True
+          assert r['step_2_zero_authorized_candidates_remain_unresolved'] is True
+          assert r['step_2_multiple_authorized_candidates_are_ambiguous_and_fail'] is True
+          assert r['candidate_uniqueness_without_authorized_name_evidence'] is False
+          assert r['given_initial_only_plus_exact_surname_authorized'] is False
+          assert r['given_absent_plus_exact_surname_authorized'] is False
+          assert r['fuzzy_distance_allowed'] is False
+          assert r['phonetic_matching_allowed'] is False
+          assert r['adjacent_week_fallback_allowed'] is False
+          assert r['season_wide_fallback_allowed'] is False
+          assert r['manual_player_overrides_allowed'] is False
+          assert r['weekly_roster_status_may_break_ties'] is False
+          g = c['frozen_aggregate_qualification_gates']
+          assert g['player_team_game_identity_resolution_rate_min'] == 0.995
+          assert g['exact_ambiguities_allowed'] == 0
+          assert g['structural_fallback_ambiguities_allowed'] == 0
+          assert g['source_identity_conflicts_allowed'] == 0
+          assert g['missing_gsis_rows_allowed'] == 0
+          assert c['diagnostic_projection_not_a_gate']['projection_may_not_substitute_for_v4_execution'] is True
+          assert c['authorization']['legacy_player_team_game_identity_qualified'] is False
+          assert c['authorization']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  identity-audit-v4:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015, 2016]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Execute preregistered V4 resolver audit
+        run: |
+          ROOT=research_outputs/v09b_legacy_gamebook_identity_v4/${{ matrix.season }}
+          mkdir -p "$ROOT"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_identity_audit_v4.py \
+              --season ${{ matrix.season }} \
+              --archive-root "$ROOT/archive" \
+              --output "$ROOT/receipt.json"
+      - name: Assert season has no qualification authority and no leakage
+        if: always()
+        run: |
+          p=research_outputs/v09b_legacy_gamebook_identity_v4/${{ matrix.season }}/receipt.json
+          if test -s "$p"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_legacy_gamebook_identity_v4/{season}/receipt.json').read_text())
+          assert r['source_and_rule_replay_pass'] is True
+          assert r['weekly_roster_status_used'] is False
+          assert 'status' not in r['weekly_identity_source_allowed_fields_only']
+          assert 'status_description_abbr' not in r['weekly_identity_source_allowed_fields_only']
+          assert 'status_short_description' not in r['weekly_identity_source_allowed_fields_only']
+          assert r['v1_exact_ambiguous'] == 0
+          assert r['structural_fallback_ambiguous'] == 0
+          assert r['source_identity_conflicts'] == 0
+          assert r['missing_gsis_rows'] == 0
+          assert r['season_has_identity_qualification_authority'] is False
+          assert r['legacy_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['model_fit_performed'] is False
+          assert r['game_outcomes_used'] == 0
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-legacy-gamebook-identity-v4-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_identity_v4/${{ matrix.season }}/receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-qualification:
+    needs: identity-audit-v4
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-legacy-gamebook-identity-v4-*-${{ github.run_id }}
+          path: /tmp/v09b_legacy_gamebook_identity_v4
+          merge-multiple: false
+      - name: Apply frozen aggregate identity gate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          root = Path('/tmp/v09b_legacy_gamebook_identity_v4')
+          paths = sorted(root.rglob('receipt.json'))
+          receipts = [json.loads(path.read_text()) for path in paths]
+          assert len(receipts) == 5, [str(path) for path in paths]
+          assert {r['season'] for r in receipts} == {2012, 2013, 2014, 2015, 2016}
+          assert all(r['source_and_rule_replay_pass'] is True for r in receipts)
+          total = sum(r['gamebook_identities_total'] for r in receipts)
+          exact = sum(r['v1_exact_resolved'] for r in receipts)
+          misses = sum(r['v1_exact_unresolved'] for r in receipts)
+          exact_ambiguous = sum(r['v1_exact_ambiguous'] for r in receipts)
+          structural = sum(r['structural_fallback_resolved'] for r in receipts)
+          structural_ambiguous = sum(r['structural_fallback_ambiguous'] for r in receipts)
+          unresolved = sum(r['final_unresolved'] for r in receipts)
+          resolved = sum(r['final_resolved'] for r in receipts)
+          final_ambiguous = sum(r['final_ambiguous'] for r in receipts)
+          source_conflicts = sum(r['source_identity_conflicts'] for r in receipts)
+          missing_gsis = sum(r['missing_gsis_rows'] for r in receipts)
+          assert total == 135572
+          assert exact == 133740
+          assert misses == 1832
+          assert exact_ambiguous == 0
+          assert structural_ambiguous == 0
+          assert final_ambiguous == 0
+          assert source_conflicts == 0
+          assert missing_gsis == 0
+          assert resolved + unresolved + final_ambiguous == total
+          rate = resolved / total
+          assert rate >= 0.995, rate
+          methods = Counter()
+          for r in receipts:
+              methods.update(r['authorized_structural_method_counts'])
+          out = {
+              'receipt_version': 1,
+              'contract_id': 'V09B-LEGACY-GAMEBOOK-IDENTITY-V4',
+              'seasons': [2012, 2013, 2014, 2015, 2016],
+              'gamebook_identities_total': total,
+              'v1_exact_resolved': exact,
+              'v1_exact_misses': misses,
+              'structural_fallback_resolved': structural,
+              'final_resolved': resolved,
+              'final_unresolved': unresolved,
+              'final_ambiguous': final_ambiguous,
+              'final_identity_resolution_rate': rate,
+              'authorized_structural_method_counts': dict(sorted(methods.items())),
+              'frozen_resolution_rate_min': 0.995,
+              'aggregate_frozen_identity_gate_pass': True,
+              'legacy_player_team_game_identity_qualified': True,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'model_fit_performed': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+          }
+          target = Path('research_outputs/v09b_legacy_gamebook_identity_v4_aggregate_receipt.json')
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(json.dumps(out, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(out, indent=2, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-legacy-gamebook-identity-v4-aggregate-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_identity_v4_aggregate_receipt.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove V4 remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

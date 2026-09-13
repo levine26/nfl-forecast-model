@@ -1,0 +1,105 @@
+{
+  "contract_version": 4,
+  "contract_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-V4",
+  "dependencies": [
+    "V09B-LEGACY-GAMEBOOK-ROSTER-UNIVERSE-V2",
+    "V09B-LEGACY-GAMEBOOK-IDENTITY-V1-FAILURE",
+    "V09B-LEGACY-GAMEBOOK-IDENTITY-DIAGNOSTIC-V2-RESULT",
+    "V09B-LEGACY-GAMEBOOK-IDENTITY-NAME-COMPAT-V3-RESULT"
+  ],
+  "status": "PREREGISTERED_NARROW_STRUCTURAL_IDENTITY_AUDIT",
+  "purpose": "Empirically audit a bounded 2012-2016 Game Book-to-GSIS resolver that preserves strict V1 exact matching and permits only preselected deterministic structural-name fallbacks supported by the preserved V3 diagnostic.",
+  "canonical_identity_population": {
+    "seasons": [2012, 2013, 2014, 2015, 2016],
+    "gamebook_identities_total": 135572,
+    "expected_by_season": {"2012": 27108, "2013": 27122, "2014": 27119, "2015": 27112, "2016": 27111},
+    "v1_exact_resolved_total": 133740,
+    "v1_exact_resolved_by_season": {"2012": 26795, "2013": 26824, "2014": 26855, "2015": 26860, "2016": 26406},
+    "v1_exact_misses_total": 1832,
+    "v1_exact_misses_by_season": {"2012": 313, "2013": 298, "2014": 264, "2015": 252, "2016": 705},
+    "silent_identity_drops_allowed": false
+  },
+  "membership_authority": {
+    "source": "qualified official NFLGSIS Game Book roster partition",
+    "weekly_roster_defines_membership": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used": false
+  },
+  "identity_source": {
+    "source": "nflverse weekly_rosters parquet",
+    "allowed_fields": ["season", "game_type", "week", "team", "gsis_id", "jersey_number", "first_name", "football_name", "last_name"],
+    "forbidden_for_resolution": ["status", "status_description_abbr", "status_short_description"],
+    "expected_source_sha256_by_season": {
+      "2012": "32a218e187e553abdeacd107ae9c76c321e258809d18578f1b1267882f1c0b29",
+      "2013": "bb68c0e5dba854c4d0b7dda4331456df701c06a66160b96decdfdc1b71147663",
+      "2014": "51ae5047bb95297e039ba3d6560cee1ed16407f2e91897f6c9c79aafecdef397",
+      "2015": "61a57f4484a556d4cad1cf50030a8a8822a345eace783e013f8ba8ae2f721243",
+      "2016": "70d0ceab697860e946a2acdafcae48809015dcdaf06bd21d26777473cff7db8f"
+    },
+    "expected_selected_reg_rows_by_season": {"2012": 30005, "2013": 30437, "2014": 30492, "2015": 30636, "2016": 32944},
+    "source_identity_conflicts_allowed": 0,
+    "missing_gsis_rows_allowed": 0
+  },
+  "resolution_rule": {
+    "step_1": "Apply frozen V1 exact same-season/REG-week/normalized-team/jersey/name key. Exactly one GSIS ID resolves; exact ambiguity hard-fails and may not fall back.",
+    "step_2_population": "Only V1 exact zero-candidate identities.",
+    "step_2_candidate_scope": ["same season", "same REG week", "same normalized team", "same jersey number"],
+    "step_2_authorized_compatibility_methods": [
+      "given_full_prefix+surname_exact",
+      "given_full_prefix+compound_component_prefix",
+      "given_initial_only+compound_component_prefix",
+      "given_initial_only+gamebook_surname_is_source_leading_components",
+      "given_initial_only+source_surname_is_gamebook_leading_components"
+    ],
+    "step_2_exactly_one_authorized_candidate_required": true,
+    "step_2_zero_authorized_candidates_remain_unresolved": true,
+    "step_2_multiple_authorized_candidates_are_ambiguous_and_fail": true,
+    "candidate_uniqueness_without_authorized_name_evidence": false,
+    "given_initial_only_plus_exact_surname_authorized": false,
+    "given_absent_plus_exact_surname_authorized": false,
+    "fuzzy_distance_allowed": false,
+    "phonetic_matching_allowed": false,
+    "adjacent_week_fallback_allowed": false,
+    "season_wide_fallback_allowed": false,
+    "manual_player_overrides_allowed": false,
+    "weekly_roster_status_may_break_ties": false
+  },
+  "frozen_aggregate_qualification_gates": {
+    "identity_population_must_equal": 135572,
+    "v1_exact_resolved_must_equal": 133740,
+    "v1_exact_misses_must_equal": 1832,
+    "player_team_game_identity_resolution_rate_min": 0.995,
+    "exact_ambiguities_allowed": 0,
+    "structural_fallback_ambiguities_allowed": 0,
+    "source_identity_conflicts_allowed": 0,
+    "missing_gsis_rows_allowed": 0,
+    "silent_identity_drops_allowed": 0
+  },
+  "diagnostic_projection_not_a_gate": {
+    "v3_narrow_structural_additional_resolutions": 1205,
+    "projected_total_resolutions": 134945,
+    "projected_resolution_rate": 0.9953751512111646,
+    "projected_unresolved": 627,
+    "projection_may_not_substitute_for_v4_execution": true
+  },
+  "not_yet_qualified": {
+    "modern_2017_2021_identity": true,
+    "training_label_semantics": true,
+    "training_source_chronology": true,
+    "v09b_model_fit": true
+  },
+  "authorization": {
+    "legacy_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "rule_frozen_after_v3_evidence_before_v4_execution": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
