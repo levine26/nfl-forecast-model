@@ -1,0 +1,118 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-NFL-TRANSACTION-FULL-LEDGER-CAPTURE-V5-FAILED",
+  "contract_id": "V09B-NFL-TRANSACTION-FULL-LEDGER-CAPTURE-V5",
+  "status": "FAILED_FROZEN_ALL_MONTH_CAPTURE_GATE_ZERO_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34744289991,
+    "validated_head_sha": "00d8d73c113f19e8aedb1c18ce1184f855bbcd9f",
+    "research_firewall_passed": true,
+    "unit_and_contract_passed": true,
+    "aggregate_job_ran": false,
+    "aggregate_job_disposition": "skipped because every year capture job failed the unchanged frozen gate"
+  },
+  "artifact_evidence": {
+    "2017": {
+      "manifest_artifact_id": 10313483022,
+      "manifest_artifact_digest": "sha256:a3a21940f1f92116ecc1ad62d36369d07b2f9d20daaaf124ecacf8de9a852db4",
+      "raw_artifact_id": 10313123491,
+      "raw_artifact_digest": "sha256:6dea5d8fd1f0804b75a2e709d575e3463e78940e39929e756644cd035766adf3"
+    },
+    "2018": {
+      "manifest_artifact_id": 10313324813,
+      "manifest_artifact_digest": "sha256:32ff06bfb88c174bccbcf971929ccdf448eb8cf36faa5e35b9a043141534489f",
+      "raw_artifact_id": 10313750706,
+      "raw_artifact_digest": "sha256:41179ebe2a691dc39fa3bee8d7499582ee7644b8055b1ceed98a8b9733571edb"
+    },
+    "2019": {
+      "manifest_artifact_id": 10313164956,
+      "manifest_artifact_digest": "sha256:0f8ff5283915eb1b37444b602ef4ffacff6751775bd09dec777eb869a431cd6e",
+      "raw_artifact_id": 10313885343,
+      "raw_artifact_digest": "sha256:53100c6d8c83d7cc7b95f06a2d8859f9208007a02b5a68269359b356bd66e995"
+    },
+    "2020": {
+      "manifest_artifact_id": 10313840336,
+      "manifest_artifact_digest": "sha256:5a9b20bd0fab5b57e6b0b15df5dc653ed21d65b4157ec11aab6a282ce8029da9",
+      "raw_artifact_id": 10313825374,
+      "raw_artifact_digest": "sha256:89528ad4eb9753cc3829fa6617a8890057c38f19965df4af2b08cbb3b7188e1e"
+    },
+    "2021": {
+      "manifest_artifact_id": 10313394532,
+      "manifest_artifact_digest": "sha256:548fe3caaf882e42cc473cd00949282f5e1435e292dedcfa3f692bb819c86a35",
+      "raw_artifact_id": 10313544214,
+      "raw_artifact_digest": "sha256:a96997684d2593b93fcef953bee39ed51a9658c5fe5fcde774833a08b789d967"
+    }
+  },
+  "empirical_result": {
+    "years_expected": 5,
+    "years_completed": 5,
+    "endpoints_expected": 360,
+    "endpoints_accounted_for": 360,
+    "source_errors": 72,
+    "pages_preserved_before_failure": 1610,
+    "cursor_transitions_preserved_before_failure": 1320,
+    "raw_source_bytes_preserved_before_failure": 368711094,
+    "gzip_bytes_preserved_before_failure": 81986662,
+    "unique_transaction_rows_across_endpoint_sums": 36322,
+    "year_results": {
+      "2017": {"source_errors": 16, "pages_fetched": 327, "cursor_transitions": 270, "unique_transaction_rows": 7446},
+      "2018": {"source_errors": 15, "pages_fetched": 331, "cursor_transitions": 274, "unique_transaction_rows": 7454},
+      "2019": {"source_errors": 14, "pages_fetched": 334, "cursor_transitions": 276, "unique_transaction_rows": 7585},
+      "2020": {"source_errors": 16, "pages_fetched": 294, "cursor_transitions": 237, "unique_transaction_rows": 6525},
+      "2021": {"source_errors": 11, "pages_fetched": 324, "cursor_transitions": 263, "unique_transaction_rows": 7312}
+    },
+    "failure_error_text": "RuntimeError: required transaction table header missing",
+    "failure_shape": {
+      "no_header_on_initial_fetch": 70,
+      "no_header_after_one_or_more_accepted_pages": 2,
+      "post_pagination_cases": [
+        {"year": 2017, "month": 5, "category": "waivers", "accepted_pages_before_failure": 12},
+        {"year": 2020, "month": 10, "category": "waivers", "accepted_pages_before_failure": 4}
+      ],
+      "failure_counts_by_category": {
+        "trades": 23,
+        "signings": 0,
+        "reserve-list": 3,
+        "waivers": 2,
+        "terminations": 14,
+        "other": 30
+      },
+      "failure_counts_by_month": {
+        "1": 11,
+        "2": 8,
+        "3": 4,
+        "4": 6,
+        "5": 8,
+        "6": 8,
+        "7": 7,
+        "8": 3,
+        "9": 0,
+        "10": 1,
+        "11": 6,
+        "12": 10
+      }
+    },
+    "frozen_capture_gate_pass": false,
+    "all_month_capture_complete": false
+  },
+  "scientific_disposition": {
+    "v5_is_failed_and_immutable": true,
+    "missing_required_header_is_not_reinterpreted_post_hoc_as_valid_empty": true,
+    "september_cross_category_amp_pagination_qualification_from_v4_remains_valid": true,
+    "all_month_full_ledger_qualified": false,
+    "durable_full_ledger_source_archive_qualified": false,
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "next_authorized_research_step": "Separately preregister a source-shape diagnostic restricted to the 72 V5 no-header failure cases. Preserve the exact response bytes and classify only whether a deterministic first-party empty-result or end-of-pagination representation can be distinguished from malformed/transport failure. Do not grant full-ledger, roster-state, membership, label, chronology, or model-fit authority from V5."
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
