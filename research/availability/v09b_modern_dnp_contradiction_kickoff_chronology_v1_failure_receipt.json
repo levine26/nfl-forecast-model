@@ -1,0 +1,121 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-DNP-CONTRADICTION-KICKOFF-CHRONOLOGY-V1-FAILED",
+  "contract_id": "V09B-MODERN-DNP-CONTRADICTION-KICKOFF-CHRONOLOGY-DIAGNOSTIC-V1",
+  "status": "EMPIRICAL_RUN_COMPLETE_SCIENTIFIC_INTERPRETATION_FAILED_ZERO_AUTHORITY",
+  "provenance": {
+    "branch": "research/v09b-contradiction-kickoff-chronology-v1",
+    "pr_number": 277,
+    "preregistered_design_commit_sha": "bba1e9ba97e6b2da1abeab3c06cadffa5596448b",
+    "empirical_head_sha": "b3b022e8cd2ff1e23b7573c1cc8f0a02d331aaf7",
+    "workflow_run_id": 34744527243,
+    "workflow_conclusion": "success",
+    "artifact_id": 10313464510,
+    "artifact_name": "v09b-modern-dnp-kickoff-chronology-v1-34744527243",
+    "artifact_digest": "sha256:c486d42ec4f65d4ea9ac672e55af5e01fd54b848e119ec37cba588c5a40eb6b8"
+  },
+  "frozen_scope_replayed": {
+    "partitions": 7,
+    "dnp_rows": 17,
+    "active_max_contradiction_partitions": 6,
+    "total_roster_max_contradiction_partitions": 3,
+    "minimum_dnp_non_active_required_total": 7,
+    "accounting_integrity_pass": true
+  },
+  "raw_empirical_output_as_emitted_before_review": {
+    "sources_attempted": 22,
+    "rows_with_any_emitted_authoritative_event": 8,
+    "rows_unresolved_without_emitted_authoritative_event": 9,
+    "active_max_partitions_descriptively_explained_by_emitted_classifier": 4,
+    "active_max_partitions_total": 6,
+    "note": "These emitted classification counts are preserved as failed V1 output only. They are not scientifically accepted because artifact inspection identified implementation/source-semantics defects that invalidate the classifications."
+  },
+  "artifact_review_failures": [
+    {
+      "failure_id": "PUBLICATION_TIMESTAMP_EXTRACTION_INCOMPLETE",
+      "severity": "FATAL_TO_SAME_DAY_CHRONOLOGY",
+      "finding": "The raw first-party inactive pages contain machine-readable JSON-LD datePublished timestamps with UTC offsets, but V1 did not parse them and instead reduced visible same-day publication strings to date-only chronology.",
+      "concrete_examples": [
+        "Chiefs Week 10 inactive raw source S016 contains datePublished=2021-11-15T00:01:57.189Z, before the frozen 2021-11-15T01:20:00Z kickoff, but V1 rejected Khalen Saunders as same_day_date_without_ordering.",
+        "Buccaneers Week 10 inactive raw source S018 contains datePublished=2021-11-14T16:30:00Z, before the frozen 2021-11-14T18:00:00Z kickoff, but V1 rejected the explicit Antonio Brown inactive designation as same_day_date_without_ordering.",
+        "Steelers Week 16 inactive raw source S021 contains datePublished=2021-12-26T19:55:00Z, before the frozen 2021-12-26T21:25:00Z kickoff, but V1 rejected the explicit Chris Wormley inactive designation as same_day_date_without_ordering."
+      ],
+      "disposition": "V1 same-day chronology classifications are not reliable."
+    },
+    {
+      "failure_id": "TERMINAL_STATE_REDUCER_CARRIES_STALE_DESIGNATION",
+      "severity": "FATAL_TO_ROW_STATE",
+      "finding": "V1 could preserve NOT_APPLICABLE_NOT_ROSTER_ELIGIBLE from an older waived/practice-squad event after a later explicit activation/elevation changed roster eligibility.",
+      "concrete_example": "Doug Middleton was emitted as PROVABLY_ROSTER_ELIGIBLE_BEFORE_KICKOFF while simultaneously retaining NOT_APPLICABLE_NOT_ROSTER_ELIGIBLE after later activation/elevation events. This state pair is internally inconsistent and violates the intended ordered-event taxonomy.",
+      "disposition": "Any V1 row depending on multi-event state reduction is scientifically invalid."
+    },
+    {
+      "failure_id": "TEMPORARY_STANDARD_ELEVATION_SCOPE_NOT_MODELED",
+      "severity": "FATAL_TO_CROSS_GAME_PERSISTENCE",
+      "finding": "The source corpus contains standard-elevation events that are explicitly temporary/game-scoped. V1 treated ELEVATED_ACTIVATED as a general terminal roster state without proving that an elevation applied to the target game or persisted through the target kickoff.",
+      "concrete_example": "Doug Middleton has explicit Jacksonville standard-elevation/activation chronology before Week 11, including events tied to earlier games. V1 lacked a frozen target-game applicability rule, so those events cannot safely establish Week 11 kickoff eligibility.",
+      "disposition": "A successor must distinguish permanent active-roster transactions from temporary standard elevations and require target-game applicability for the latter."
+    },
+    {
+      "failure_id": "TRANSACTION_STATE_PERSISTENCE_USES_UNQUALIFIED_ABSENCE_OF_CHANGE",
+      "severity": "FATAL_TO_STALE_ROSTER_STATE",
+      "finding": "V1 could carry an old roster state forward to the target kickoff merely because no later qualifying transaction was parsed. That requires a separately qualified completeness/persistence premise and conflicts with the frozen rule that source absence is non-evidence.",
+      "concrete_examples": [
+        "Mike Glennon was emitted as PRACTICE_SQUAD for November and December targets from September 4-5 waiver/practice-squad events without a target-game-specific source proving that state at those kickoffs.",
+        "Antonio Brown was emitted as a reserve/non-eligible state from a September reserve/COVID transaction even though the same transaction ledger contains a September 29 activation and the target-game inactive page explicitly designates him inactive in November."
+      ],
+      "disposition": "A successor may not project stale roster states through target kickoff unless source completeness and state persistence are explicitly frozen and justified."
+    },
+    {
+      "failure_id": "PLAYER_LOCAL_CONTEXT_NOT_STRICT_FOR_NON_TRANSACTION_ARTICLES",
+      "severity": "FATAL_TO_CONTEXTUAL_CLASSIFICATION",
+      "finding": "Generic reserve/injury language in a broad article context could be attributed to the target player even when it described a different player.",
+      "concrete_example": "The Buccaneers inactive article contains Antonio Brown in the inactive list and separately discusses Montez Sweat on injured reserve; V1 produced a reserve-style event for Brown from broad context. Player-local clause/list parsing must be stricter in any successor.",
+      "disposition": "V1 article-context roster classifications are not accepted."
+    },
+    {
+      "failure_id": "RESERVE_ACTIVATION_GRAMMAR_INCOMPLETE",
+      "severity": "FATAL_TO_EVENT_ORDERING",
+      "finding": "V1 recognized placement on reserve/COVID but did not symmetrically recognize activation from reserve/COVID as an eligibility-restoring event.",
+      "concrete_example": "The Buccaneers transaction ledger includes Antonio Brown activated from the reserve/COVID-19 list on 2021-09-29 after placement on 2021-09-21; V1 retained the older reserve state.",
+      "disposition": "V1 terminal roster state for affected reserve/activation sequences is invalid."
+    }
+  ],
+  "scientific_interpretation": {
+    "v1_workflow_green_means_scientifically_qualified": false,
+    "v1_classifier_output_accepted_as_membership_evidence": false,
+    "v1_partition_explanation_counts_accepted": false,
+    "common_chronology_taxonomy_qualified": false,
+    "game_day_membership_qualified": false,
+    "training_source_chronology_qualified": false,
+    "training_label_semantics_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "reason": "The raw artifact is valuable preserved evidence, but post-run inspection falsified the V1 implementation as a defensible interpreter of that evidence. Under the frozen fail-closed rules, the experiment is archived as failed rather than patched or reinterpreted in-place."
+  },
+  "authority": {
+    "modern_player_team_game_identity_qualified": true,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "production_dependency_authorized": false
+  },
+  "successor_constraints": [
+    "Start a separately preregistered V2; do not mutate the V1 frozen contract or reinterpret V1 output as qualified.",
+    "Parse machine-readable source publication timestamps, including JSON-LD datePublished, before falling back to visible date text.",
+    "Use a player-local evidence grammar for every source class; neighboring-player reserve/injury language cannot classify the target.",
+    "Use ordered-event reduction that clears stale non-eligibility designations when an explicit later eligibility-restoring event occurs.",
+    "Distinguish permanent active-roster transactions from standard elevations and require explicit target-game applicability for temporary elevations.",
+    "Do not project stale transaction states to kickoff from absence of later changes unless a separately preregistered completeness/persistence premise is qualified.",
+    "Continue to leave unresolved chronology unresolved; do not use weekly status, source absence, postgame participation, or manual exceptions as rescue evidence."
+  ],
+  "governance": {
+    "research_only": true,
+    "thresholds_relaxed": false,
+    "v1_source_rule_retrofitted_after_results": false,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}

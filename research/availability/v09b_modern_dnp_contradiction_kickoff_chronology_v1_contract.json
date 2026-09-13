@@ -1,0 +1,288 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-DNP-CONTRADICTION-KICKOFF-CHRONOLOGY-DIAGNOSTIC-V1",
+  "status": "PREREGISTERED_DIAGNOSTIC_ONLY_NO_MEMBERSHIP_OR_MODEL_AUTHORITY",
+  "purpose": "Diagnose the seven frozen 2017-2021 Game Book roster-universe contradiction partitions using explicit first-party pre-kickoff roster-state chronology. The experiment asks whether the observed DNP contamination can be explained by a consistent taxonomy of roster eligibility and game-day designation without treating DNP, weekly status, source absence, or postgame participation as authority. This diagnostic cannot qualify the league-wide game-day roster universe or authorize V09B fitting.",
+  "dependencies": {
+    "identity": {
+      "contract_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3",
+      "receipt_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3-QUALIFIED",
+      "modern_player_team_game_identity_qualified": true,
+      "identity_only": true
+    },
+    "dnp_semantic_predecessor": {
+      "contract_id": "V09B-MODERN-GAMEBOOK-DNP-SEMANTIC-DIAGNOSTIC-V2",
+      "receipt_id": "V09B-MODERN-GAMEBOOK-DNP-SEMANTIC-DIAGNOSTIC-V2-COMPLETE",
+      "uniform_did_not_play_as_active_membership_is_contradicted": true,
+      "diagnostic_has_qualification_authority": false
+    },
+    "corrected_dnp_parser": {
+      "receipt_id": "V09B-MODERN-DNP-WEEKLY-ROSTER-BBOX-V2-RECEIPT",
+      "dnp_tokens_total": 3610,
+      "gamebook_parse_errors": 0,
+      "weekly_status_has_membership_authority": false
+    },
+    "constructed_game_day_locator": {
+      "contract_id": "V09B-MODERN-CONSTRUCTED-GAME-DAY-URL-DIAGNOSTIC-V2",
+      "receipt_path": "research/availability/v09b_modern_constructed_game_day_url_v2_receipt.json",
+      "locator_or_membership_authority": false,
+      "historical_roster_or_depth_anchor_presence_is_chronology_authority": false
+    }
+  },
+  "adaptive_design_disclosure": {
+    "observed_before_preregistration": [
+      "The predecessor diagnostic identified exactly seven failed team-game partitions and seventeen DNP-only rows across those partitions.",
+      "Independent first-party examples already showed Daryl Worley placed on Reserve/Injured and Damontre Moore waived before OAK's 2018 Week 16 game, Khalen Saunders officially inactive in KC 2021 Week 10, Antonio Brown officially inactive in TB 2021 Week 10, and Chris Wormley officially inactive in PIT 2021 Week 16.",
+      "The corrected weekly-roster diagnostic showed generic ACT/INA/A01 values cannot be used as game-day membership authority.",
+      "Constructed CMS game-day pages exist for five of the seven frozen contradiction partitions, but their roster/depth anchors are generally current/generic endpoints and therefore do not prove historical pregame chronology.",
+      "For JAX 2020 Week 11, the public first-party transaction chronology around Doug Middleton is nontrivial and must be adjudicated from explicit dated events rather than assumed from a weekly status row.",
+      "The NO 2020 Week 13 partition has a total-roster-max contradiction but no active-max contradiction, so this DNP-focused experiment is not required to explain that partition solely through its one DNP row."
+    ],
+    "manual_player_specific_production_exception_authorized": false,
+    "same_version_rule_change_after_results_authorized": false,
+    "post_hoc_threshold_relaxation_authorized": false
+  },
+  "frozen_scope": {
+    "seasons": [2018, 2020, 2021],
+    "partition_count": 7,
+    "dnp_only_row_count": 17,
+    "partitions": [
+      {
+        "partition_key": "2018_16_DEN_OAK|OAK",
+        "game_id": "2018_16_DEN_OAK",
+        "team": "OAK",
+        "kickoff_utc": "2018-12-25T01:15:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 2,
+        "total_roster_max_contradiction": true,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "A.McCarron", "gsis_id": "00-0031288"},
+          {"jersey_number": "20", "display_name": "D.Worley", "gsis_id": "00-0032891"},
+          {"jersey_number": "56", "display_name": "D.Moore", "gsis_id": "00-0030069"},
+          {"jersey_number": "63", "display_name": "C.Hunt", "gsis_id": "00-0033667"}
+        ],
+        "source_seeds": [
+          "https://www.raiders.com/team/transactions/2018",
+          "https://www.raiders.com/news/raiders-announce-transactions-12-24-18",
+          "https://www.raiders.com/news/oakland-raiders-injury-report-week-16-hurst-and-worley-miss-thursday-practice"
+        ]
+      },
+      {
+        "partition_key": "2020_11_PIT_JAX|JAX",
+        "game_id": "2020_11_PIT_JAX",
+        "team": "JAX",
+        "kickoff_utc": "2020-11-22T18:00:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": true,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "M.Glennon", "gsis_id": "00-0030520"},
+          {"jersey_number": "39", "display_name": "D.Middleton", "gsis_id": "00-0032697"}
+        ],
+        "source_seeds": [
+          "https://www.jaguars.com/team/transactions/2020",
+          "https://www.jaguars.com/news/jaguars-make-roster-moves-x3605",
+          "https://www.jaguars.com/news/jaguars-make-roster-moves-and-announce-updates-for-tomorrow-s-game",
+          "https://www.jaguars.com/news/in-and-out-jones-ruled-out"
+        ]
+      },
+      {
+        "partition_key": "2020_13_NO_ATL|NO",
+        "game_id": "2020_13_NO_ATL",
+        "team": "NO",
+        "kickoff_utc": "2020-12-06T18:00:00Z",
+        "active_max_contradiction": false,
+        "minimum_dnp_non_active_required_by_active_max": 0,
+        "total_roster_max_contradiction": true,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "J.Winston", "gsis_id": "00-0031503"}
+        ],
+        "source_seeds": [
+          "https://www.neworleanssaints.com/sitemap/html/articles/2020/12",
+          "https://www.neworleanssaints.com/news/saints-at-falcons-2020-week-13-preview"
+        ]
+      },
+      {
+        "partition_key": "2020_15_JAX_BAL|JAX",
+        "game_id": "2020_15_JAX_BAL",
+        "team": "JAX",
+        "kickoff_utc": "2020-12-20T18:00:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "2", "display_name": "M.Glennon", "gsis_id": "00-0030520"},
+          {"jersey_number": "24", "display_name": "J.Scott", "gsis_id": "00-0036303"},
+          {"jersey_number": "9", "display_name": "L.Cooke", "gsis_id": "00-0034437"}
+        ],
+        "source_seeds": [
+          "https://www.jaguars.com/team/transactions/2020",
+          "https://www.jaguars.com/news/friday-update-jones-out-corner-issues-continue"
+        ]
+      },
+      {
+        "partition_key": "2021_10_KC_LV|KC",
+        "game_id": "2021_10_KC_LV",
+        "team": "KC",
+        "kickoff_utc": "2021-11-15T01:20:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "99", "display_name": "K.Saunders", "gsis_id": "00-0035656"}
+        ],
+        "source_seeds": [
+          "https://www.chiefs.com/news/week-10-inactives-chiefs-vs-raiders",
+          "https://www.chiefs.com/team/transactions/2021"
+        ]
+      },
+      {
+        "partition_key": "2021_10_TB_WAS|TB",
+        "game_id": "2021_10_TB_WAS",
+        "team": "TB",
+        "kickoff_utc": "2021-11-14T18:00:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "11", "display_name": "B.Gabbert", "gsis_id": "00-0027948"},
+          {"jersey_number": "5", "display_name": "R.Sherman", "gsis_id": "00-0028092"},
+          {"jersey_number": "64", "display_name": "A.Stinnie", "gsis_id": "00-0034668"},
+          {"jersey_number": "70", "display_name": "R.Hainsey", "gsis_id": "00-0036985"},
+          {"jersey_number": "81", "display_name": "A.Brown", "gsis_id": "00-0027793"}
+        ],
+        "source_seeds": [
+          "https://www.buccaneers.com/news/will-wont-play-week-ten-washington-football-bucs-inactives-gronkowski-brown",
+          "https://www.buccaneers.com/team/transactions/2021",
+          "https://www.buccaneers.com/news/bucs-bye-week-injury-list-update-week-10-washington"
+        ]
+      },
+      {
+        "partition_key": "2021_16_PIT_KC|PIT",
+        "game_id": "2021_16_PIT_KC",
+        "team": "PIT",
+        "kickoff_utc": "2021-12-26T21:25:00Z",
+        "active_max_contradiction": true,
+        "minimum_dnp_non_active_required_by_active_max": 1,
+        "total_roster_max_contradiction": false,
+        "dnp_rows": [
+          {"jersey_number": "95", "display_name": "C.Wormley", "gsis_id": "00-0033913"}
+        ],
+        "source_seeds": [
+          "https://www.steelers.com/news/steelers-inactives-for-week-16-vs-chiefs",
+          "https://www.steelers.com/team/transactions/2021"
+        ]
+      }
+    ]
+  },
+  "identity_policy": {
+    "qualified_identity_layer_required": true,
+    "status_fields_may_not_be_used_for_identity_matching_or_tie_breaking": true,
+    "manual_name_exception_authorized": false,
+    "fuzzy_identity_matching_authorized": false,
+    "the_frozen_gsis_ids_above_are_identity_references_only_and_confer_zero_membership_authority": true
+  },
+  "source_policy": {
+    "first_party_required_for_classification": true,
+    "allowed_authority_hosts": [
+      "www.raiders.com", "raiders.com",
+      "www.jaguars.com", "jaguars.com",
+      "www.neworleanssaints.com", "neworleanssaints.com",
+      "www.chiefs.com", "chiefs.com",
+      "www.buccaneers.com", "buccaneers.com",
+      "www.steelers.com", "steelers.com",
+      "static.clubs.nfl.com"
+    ],
+    "seed_urls_are_discovery_inputs_not_preaccepted_truth": true,
+    "same_first_party_domain_link_following_allowed": true,
+    "cross_domain_delegation_requires_separate_explicit_provenance": true,
+    "source_bytes_or_html_must_be_sha256_preserved": true,
+    "http_final_url_and_retrieval_timestamp_must_be_recorded": true,
+    "source_publication_date_or_timestamp_must_be_recorded_when available": true,
+    "postgame_source_may_be_preserved_as_rejected_evidence_but_may_not_classify_a_row": true,
+    "source_absence_is_non_evidence": true
+  },
+  "chronology_policy": {
+    "classification_cutoff": "kickoff_utc for the frozen partition",
+    "event_strictly_after_kickoff_is_forbidden_authority": true,
+    "date_only_event_before_game_date_may_establish_prior-day chronology": true,
+    "date_only_event_on_game_date_is_insufficient_for_same-day ordering and must remain unresolved unless a time or stronger ordering fact is explicit": true,
+    "publication_timestamp_after kickoff cannot be used to prove a pre-kickoff state even if describing an earlier event unless the earlier event time/order is independently explicit": true,
+    "later retrospective summaries cannot repair an unresolved pre-kickoff row": true
+  },
+  "taxonomy": {
+    "roster_eligibility_states": [
+      "PROVABLY_ROSTER_ELIGIBLE_BEFORE_KICKOFF",
+      "PROVABLY_NOT_ROSTER_ELIGIBLE_BEFORE_KICKOFF",
+      "RESERVE_IR",
+      "PRACTICE_SQUAD",
+      "WAIVED_RELEASED",
+      "ELEVATED_ACTIVATED",
+      "UNRESOLVED_CHRONOLOGY"
+    ],
+    "game_day_designation_states": [
+      "EXPLICIT_ACTIVE",
+      "EXPLICIT_INACTIVE",
+      "ACTIVE_BUT_UNABLE_AFTER_DESIGNATION",
+      "NOT_APPLICABLE_NOT_ROSTER_ELIGIBLE",
+      "UNRESOLVED_DESIGNATION"
+    ],
+    "multi_event_timeline_required": true,
+    "terminal_state_is_latest_explicit_event_provably_before_kickoff": true,
+    "absence_from_official_inactive_list_may_not_create_EXPLICIT_ACTIVE": true,
+    "DNP_section_presence_may_not_create_EXPLICIT_ACTIVE_or_roster_eligibility": true
+  },
+  "row_classification_requirements": {
+    "each_of_17_rows_must_be_emitted_exactly_once": true,
+    "each_classified_row_must_include_supporting_source_ids": true,
+    "each_supporting_source_must_include_exact_quote_or_bounded_evidence_excerpt": true,
+    "contradictory_first_party_sources_force_UNRESOLVED_CHRONOLOGY_or_UNRESOLVED_DESIGNATION": true,
+    "unresolved_rows_are_preserved_not_forced": true
+  },
+  "partition_diagnostics": {
+    "active_max_explanation_metric": "For each of the six active-max contradiction partitions, count DNP rows with explicit pre-kickoff evidence proving either EXPLICIT_INACTIVE, NOT_APPLICABLE_NOT_ROSTER_ELIGIBLE, or another frozen non-active designation. Compare descriptively with the predecessor minimum_dnp_non_active_required_by_active_max. No threshold grants authority.",
+    "total_roster_max_explanation_metric": "Record whether DNP-row chronology alone can explain a total-roster-max contradiction. The experiment must not force an explanation when contamination may reside in Not Active or another section.",
+    "all_seven_partitions_must_be_reported_even_if_unresolved": true,
+    "diagnostic_success_means_complete_accounting_not_semantic_qualification": true
+  },
+  "forbidden_inferences": [
+    "DNP equals active",
+    "weekly roster ACT equals game-day active",
+    "weekly roster INA equals game-day inactive",
+    "A01 is a unique active code",
+    "absence from Not Active equals active",
+    "absence from an official inactive list equals active",
+    "source absence equals active or healthy",
+    "postgame snaps, participation, play-by-play, lineup, or substitution evidence as training authority",
+    "status fields for identity matching or tie-breaking",
+    "manual player exceptions promoted into a production rule",
+    "completed 2026 outcomes",
+    "2022-2025 validation data for training-rule design",
+    "model fitting"
+  ],
+  "required_outputs": [
+    "source manifest with URL, final URL, HTTP status, retrieval UTC, publication timestamp/date if available, SHA256, first-party verdict, pre-kickoff verdict, and rejection reason if non-authoritative",
+    "17-row chronology table with identity, ordered explicit events, roster-eligibility state, game-day-designation state, supporting source ids, and unresolved reason where applicable",
+    "seven-partition accounting table comparing explicit non-active DNP evidence with predecessor contradiction lower bounds",
+    "bounded rejected-evidence table for postgame, generic-current, or chronology-insufficient sources",
+    "aggregate diagnostic receipt explicitly preserving zero qualification authority"
+  ],
+  "authority": {
+    "diagnostic_has_membership_qualification_authority": false,
+    "modern_player_team_game_identity_qualified": true,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "production_dependency_authorized": false
+  },
+  "next_step_rule": "If a common chronology taxonomy appears empirically coherent, preregister a separate broader calibration and coverage audit before any league-wide membership or chronology qualification. This seven-partition diagnostic can never itself grant those authorities.",
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "sunday_signal_or_production_model_files_may_not_be_modified": true
+  }
+}
