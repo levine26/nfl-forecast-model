@@ -1,0 +1,122 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3",
+  "status": "PREREGISTERED_INDEPENDENT_POSITION_FAMILY_CALIBRATION_GATE",
+  "purpose": "Follow up only the two ambiguity rows retained by failed V2. V3 may use a secondary-vs-linebacker position-family tie-break only if that family mapping first passes an independent calibration on 2017-2021 V1 exact-unique identities with every V1 ambiguity row excluded. The experiment may qualify player-team-game identity only; it grants no game-day membership, training-label, chronology, production, or model-fit authority.",
+  "adaptive_design_disclosure": {
+    "observed_before_v3_preregistration": "V2 retained two 2019 WAS M.Smith #46 rows because Game Book DB and both candidate source positions LB/DB were all defensive under the coarse side-of-ball rule.",
+    "target_identity_values_may_not_be_used_in_calibration": true,
+    "all_10_v1_ambiguity_rows_excluded_from_calibration": true,
+    "manual_target_specific_exception_authorized": false,
+    "same_version_rule_change_authorized": false
+  },
+  "predecessor_v2": {
+    "receipt_path": "research/availability/v09b_modern_gamebook_identity_audit_v2_receipt.json",
+    "receipt_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V2-FAILED",
+    "receipt_git_blob_sha1": "0d79d904798db2e8d3aa5e40efb3550fe9220a19",
+    "required_status": "EMPIRICAL_AUDIT_COMPLETE_QUALIFICATION_GATE_FAILED",
+    "gamebook_identities_total": 138205,
+    "final_resolved": 137798,
+    "final_unresolved": 405,
+    "final_ambiguous": 2,
+    "final_identity_resolution_rate": 0.9970550993089975,
+    "source_identity_conflicts": 0,
+    "ambiguity_rows_reopened": 2,
+    "unresolved_rows_reopened": 0
+  },
+  "upstream_sources": {
+    "gamebook_archive_commit_sha": "aab55bf97aa62cae446b358b9739f4c62604cc8e",
+    "identity_source_commit_sha": "1c6f388c06f7473eb7483d6b4b91685ecb3d019c",
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "network_redownload_allowed": false,
+    "raw_weekly_roster_sha256": {
+      "2017": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
+      "2018": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
+      "2019": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+      "2020": "8d601bf5c5d669465481421ad5cd1a1470d51792054e84bdc04f3620785f7530",
+      "2021": "3e9f67569e940b54b3778ef2c9150850920b5bf93143bad3bd158e649825cf6b"
+    },
+    "expected_reg_rows": {"2017": 49210, "2018": 50113, "2019": 49561, "2020": 41972, "2021": 44539},
+    "expected_missing_gsis_rows": {"2017": 0, "2018": 35, "2019": 2, "2020": 5, "2021": 23}
+  },
+  "position_source_projection": {
+    "capture_contract_id": "V09B-MODERN-POSITION-IDENTITY-SOURCE-CAPTURE-V2",
+    "projection_fields": ["season", "game_type", "week", "team", "gsis_id", "jersey_number", "position"],
+    "forbidden_status_fields": ["status", "status_description_abbr", "status_short_description"],
+    "status_fields_selected": false,
+    "status_fields_read": false,
+    "projection_must_be_persisted_before_calibration_or_target_resolution": true
+  },
+  "position_family_taxonomy": {
+    "secondary": ["CB", "DB", "FS", "LCB", "NB", "RCB", "S", "SAF", "SFTY", "SS"],
+    "linebacker": ["ILB", "LB", "LILB", "LLB", "LOLB", "MLB", "OLB", "RILB", "RLB", "ROLB", "SLB", "WLB"],
+    "normalization": "uppercase; strip periods/whitespace; split slash or hyphen components; all nonblank components must map to exactly one frozen family",
+    "unknown_token_authorized": false,
+    "mixed_family_token_authorized": false,
+    "defensive_line_or_other_position_family_authorized_for_target_tiebreak": false
+  },
+  "independent_calibration": {
+    "truth_source": "V1 exact resolver only: same REG week, normalized team, jersey, and compact display-name key with exactly one GSIS candidate in the frozen status-free identity projection",
+    "structural_v1_resolutions_included": false,
+    "all_v1_ambiguity_rows_excluded": true,
+    "calibration_seasons": [2017, 2018, 2019, 2020, 2021],
+    "eligible_rows": "exact-unique Game Book identities whose Game Book and source positions both classify as secondary or linebacker",
+    "minimum_total_comparable_rows": 5000,
+    "minimum_secondary_gamebook_rows": 1000,
+    "minimum_linebacker_gamebook_rows": 1000,
+    "minimum_overall_family_agreement": 0.95,
+    "minimum_secondary_family_agreement": 0.95,
+    "minimum_linebacker_family_agreement": 0.95,
+    "minimum_wilson95_lower_bound_each_family": 0.94,
+    "source_identity_conflicts_allowed": 0,
+    "gamebook_parse_errors_allowed": 0,
+    "target_rows_allowed_in_calibration": 0,
+    "calibration_gate_must_pass_before_target_resolution": true
+  },
+  "target_follow_up_scope": {
+    "only_v2_remaining_ambiguity_rows": true,
+    "expected_rows": 2,
+    "expected_identity": {"season": 2019, "team": "WAS", "jersey_number": "46", "display_name": "M.Smith", "weeks": [16, 17]},
+    "candidate_gsis_sets_must_match_v2_receipt": true,
+    "resolution_rule": "after calibration passes, resolve only if Game Book evidence maps to exactly one frozen family and exactly one V2 candidate maps to that same family; otherwise remain ambiguous",
+    "manual_override_authorized": false
+  },
+  "aggregate_identity_qualification_gate": {
+    "minimum_final_resolution_rate": 0.995,
+    "final_ambiguities_allowed": 0,
+    "source_identity_conflicts_allowed": 0,
+    "v2_predecessor_integrity_required": true,
+    "five_season_position_projection_capture_gate_required": true,
+    "independent_calibration_gate_required": true,
+    "both_v2_remaining_rows_must_replay": true,
+    "candidate_projection_lookup_misses_allowed": 0,
+    "qualification_authority_belongs_only_to_v3_aggregate_gate": true
+  },
+  "explicit_non_authority": {
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "production_dependency_authorized": false
+  },
+  "prohibited_shortcuts": [
+    "do not include any of the 10 V1 ambiguity rows in calibration",
+    "do not use V1 structural resolutions as calibration truth",
+    "do not use weekly-roster status fields",
+    "do not consume raw weekly-roster rows in the calibration or target resolver",
+    "do not use detailed position equality without the independent family calibration gate",
+    "do not use candidate uniqueness alone",
+    "do not use manual player-specific overrides",
+    "do not use postgame participation, snaps, play-by-play, final game status, or game outcomes",
+    "do not reopen the 405 V1/V2 unresolved identities",
+    "do not relax calibration or aggregate thresholds after observing results",
+    "do not use completed 2026 outcomes"
+  ],
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}

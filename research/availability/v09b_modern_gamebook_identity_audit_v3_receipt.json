@@ -1,0 +1,173 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3-QUALIFIED",
+  "contract_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V3",
+  "status": "EMPIRICAL_AUDIT_COMPLETE_IDENTITY_QUALIFIED",
+  "workflow_evidence": {
+    "run_id": 34742136290,
+    "validated_head_sha": "e760942ae5f18eb64688ab1f630d2874edada8f0",
+    "identity_gate_job_id": 103683713509,
+    "aggregate_artifact": {
+      "id": 10312706309,
+      "digest": "sha256:d69050b2bbba8f11f26a6b7d1793f96f0e024e52d44f02798cc27c509a1301d7"
+    },
+    "position_source_artifact": {
+      "id": 10312751997,
+      "digest": "sha256:2c0ccc268f74ec8775f81f8766ebda8cbd7fd88d81cb968bb559bbda510ac0bc"
+    }
+  },
+  "predecessor_v2": {
+    "receipt_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V2-FAILED",
+    "receipt_git_blob_sha1": "0d79d904798db2e8d3aa5e40efb3550fe9220a19",
+    "final_resolved": 137798,
+    "final_unresolved": 405,
+    "final_ambiguous": 2,
+    "final_identity_resolution_rate": 0.9970550993089975
+  },
+  "position_source_capture": {
+    "capture_contract_id": "V09B-MODERN-POSITION-IDENTITY-SOURCE-CAPTURE-V2",
+    "projection_fields": [
+      "season",
+      "game_type",
+      "week",
+      "team",
+      "gsis_id",
+      "jersey_number",
+      "position"
+    ],
+    "projection_contains_status_fields": false,
+    "status_fields_selected": false,
+    "status_fields_read": false,
+    "all_five_seasons_capture_gate_pass": true,
+    "per_season": {
+      "2017": {
+        "raw_source_sha256": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
+        "source_rows_selected": 49210,
+        "missing_gsis_rows": 0,
+        "blank_position_rows": 3,
+        "projection_sha256": "e3cecaae67ec0de72995da64e0d25860a70fdd18f9d3341febcd836dd501c04c"
+      },
+      "2018": {
+        "raw_source_sha256": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
+        "source_rows_selected": 50113,
+        "missing_gsis_rows": 35,
+        "blank_position_rows": 0,
+        "projection_sha256": "d31f69db8ebab9d2a63de92524c4206014f38ffad1ab5fb8224104690c0d464c"
+      },
+      "2019": {
+        "raw_source_sha256": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+        "source_rows_selected": 49561,
+        "missing_gsis_rows": 2,
+        "blank_position_rows": 0,
+        "projection_sha256": "c10b7f38bf58ab891c5c4b8bd95216b2e29a7c42006b30d343ac965cdf38c695"
+      },
+      "2020": {
+        "raw_source_sha256": "8d601bf5c5d669465481421ad5cd1a1470d51792054e84bdc04f3620785f7530",
+        "source_rows_selected": 41972,
+        "missing_gsis_rows": 5,
+        "blank_position_rows": 0,
+        "projection_sha256": "120e2bd7164790827609cb0ef0789fdddca38721f74f5d2c947d9ca8a4f32b76"
+      },
+      "2021": {
+        "raw_source_sha256": "3e9f67569e940b54b3778ef2c9150850920b5bf93143bad3bd158e649825cf6b",
+        "source_rows_selected": 44539,
+        "missing_gsis_rows": 23,
+        "blank_position_rows": 0,
+        "projection_sha256": "cb06c9c1ddde08088f8455a9be70a3c67abe5f918a13ef7aabd3eac75ac51602"
+      }
+    }
+  },
+  "independent_calibration": {
+    "truth_source": "V1 exact-unique identities only",
+    "structural_v1_resolutions_included": false,
+    "all_v1_ambiguity_rows_excluded": true,
+    "v1_ambiguity_rows_excluded": 10,
+    "total_comparable_rows": 42461,
+    "total_agreement_rows": 42339,
+    "overall_agreement_rate": 0.9971267751583807,
+    "by_gamebook_family": {
+      "secondary": {
+        "rows": 25596,
+        "agreement": 25548,
+        "agreement_rate": 0.9981247069854665,
+        "wilson95_lower_bound": 0.9975147379406402
+      },
+      "linebacker": {
+        "rows": 16865,
+        "agreement": 16791,
+        "agreement_rate": 0.995612214645716,
+        "wilson95_lower_bound": 0.9944955770533768
+      }
+    },
+    "source_identity_conflicts": 0,
+    "source_error_count": 0,
+    "calibration_gate_pass": true
+  },
+  "target_follow_up": {
+    "rows_replayed": 2,
+    "resolved_rows": 2,
+    "candidate_projection_lookup_misses": 0,
+    "source_error_count": 0,
+    "rows": [
+      {
+        "season": 2019,
+        "week": 16,
+        "game_id": "2019_16_NYG_WAS",
+        "team": "WAS",
+        "jersey_number": "46",
+        "display_name": "M.Smith",
+        "gamebook_position": "DB",
+        "gamebook_family": "secondary",
+        "candidate_families": {
+          "00-0031371": "linebacker",
+          "00-0033415": "secondary"
+        },
+        "resolved_gsis_id": "00-0033415",
+        "resolution_basis": "unique_calibrated_family_candidate"
+      },
+      {
+        "season": 2019,
+        "week": 17,
+        "game_id": "2019_17_WAS_DAL",
+        "team": "WAS",
+        "jersey_number": "46",
+        "display_name": "M.Smith",
+        "gamebook_position": "DB",
+        "gamebook_family": "secondary",
+        "candidate_families": {
+          "00-0031371": "linebacker",
+          "00-0033415": "secondary"
+        },
+        "resolved_gsis_id": "00-0033415",
+        "resolution_basis": "unique_calibrated_family_candidate"
+      }
+    ]
+  },
+  "aggregate_result": {
+    "gamebook_identities_total": 138205,
+    "final_resolved": 137800,
+    "final_unresolved": 405,
+    "final_ambiguous": 0,
+    "final_identity_resolution_rate": 0.9970695705654643,
+    "source_identity_conflicts": 0,
+    "aggregate_qualification_gate_pass": true
+  },
+  "scientific_disposition": {
+    "modern_player_team_game_identity_qualified": true,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "threshold_relaxation_authorized": false,
+    "same_version_rule_change_authorized": false
+  },
+  "governance": {
+    "identity_resolution_status_blind": true,
+    "raw_weekly_roster_consumed_by_calibration_or_target_resolver": false,
+    "postgame_participation_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "model_fit_performed": false
+  }
+}
