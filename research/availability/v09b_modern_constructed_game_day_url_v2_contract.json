@@ -1,0 +1,134 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-MODERN-CONSTRUCTED-GAME-DAY-URL-DIAGNOSTIC-V2",
+  "status": "PREREGISTERED_FULL_2592_PARTITION_DISCOVERY_DIAGNOSTIC_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY",
+  "purpose": "Test the frozen NFL club CMS game-day URL grammar directly for every 2017-2021 regular-season team-game partition, rather than relying on server-rendered historical schedule anchors. The canonical universe comes only from the already-qualified immutable 1,296-game locator snapshot. Constructed URLs are discovery candidates; observed page/media coverage is descriptive and cannot qualify roster locator coverage or membership.",
+  "dependencies": [
+    "V09B-MODERN-GAMEBOOK-LOCATOR-SNAPSHOT-V1-QUALIFICATION",
+    "V09B-MODERN-GAME-DAY-MEDIA-SURFACE-DISCOVERY-V1-COMPLETE"
+  ],
+  "canonical_snapshot": {
+    "research_data_branch": "research-data/v09b-modern-locator-snapshot-v1",
+    "research_data_commit_sha": "a3f5c5a791f878b12cb92658df37b8a7d093cd0b",
+    "path": "research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv",
+    "sha256": "d26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351",
+    "rows": 1296
+  },
+  "expected_games_by_season": {
+    "2017": 256,
+    "2018": 256,
+    "2019": 256,
+    "2020": 256,
+    "2021": 272
+  },
+  "expected_team_partitions_by_season": {
+    "2017": 512,
+    "2018": 512,
+    "2019": 512,
+    "2020": 512,
+    "2021": 544
+  },
+  "expected_games_total": 1296,
+  "expected_team_partitions_total": 2592,
+  "cms_grammar": {
+    "url_template": "https://www.{domain}/game-day/{season}/{stage}/{away_slug}-at-{home_slug}/",
+    "stage_variants_in_frozen_order": ["reg-week{week}", "week{week}"],
+    "https_required": true,
+    "final_redirect_must_remain_within_partition_team_domain_allowlist": true,
+    "candidate_attempts_stop_after_first_qualifying_page": true,
+    "qualifying_page_requires_http_below_400": true,
+    "qualifying_page_requires_week_signal": true,
+    "qualifying_page_requires_both_matchup_team_signals": true
+  },
+  "team_domains": {
+    "ARI": ["azcardinals.com"], "ATL": ["atlantafalcons.com"], "BAL": ["baltimoreravens.com"],
+    "BUF": ["buffalobills.com"], "CAR": ["panthers.com"], "CHI": ["chicagobears.com"],
+    "CIN": ["bengals.com"], "CLE": ["clevelandbrowns.com"], "DAL": ["dallascowboys.com"],
+    "DEN": ["denverbroncos.com"], "DET": ["detroitlions.com"], "GB": ["packers.com"],
+    "HOU": ["houstontexans.com"], "IND": ["colts.com"], "JAX": ["jaguars.com"],
+    "KC": ["chiefs.com"], "OAK": ["raiders.com"], "LV": ["raiders.com"],
+    "LAC": ["chargers.com"], "LA": ["therams.com"], "MIA": ["miamidolphins.com"],
+    "MIN": ["vikings.com"], "NE": ["patriots.com"], "NO": ["neworleanssaints.com"],
+    "NYG": ["giants.com"], "NYJ": ["newyorkjets.com"], "PHI": ["philadelphiaeagles.com"],
+    "PIT": ["steelers.com"], "SEA": ["seahawks.com"], "SF": ["49ers.com"],
+    "TB": ["buccaneers.com"], "TEN": ["tennesseetitans.com"],
+    "WAS": ["commanders.com", "washingtonfootball.com", "redskins.com"]
+  },
+  "team_slug_variants": {
+    "ARI": ["cardinals"], "ATL": ["falcons"], "BAL": ["ravens"], "BUF": ["bills"],
+    "CAR": ["panthers"], "CHI": ["bears"], "CIN": ["bengals"], "CLE": ["browns"],
+    "DAL": ["cowboys"], "DEN": ["broncos"], "DET": ["lions"], "GB": ["packers"],
+    "HOU": ["texans"], "IND": ["colts"], "JAX": ["jaguars"], "KC": ["chiefs"],
+    "OAK": ["raiders"], "LV": ["raiders"], "LAC": ["chargers"], "LA": ["rams"],
+    "MIA": ["dolphins"], "MIN": ["vikings"], "NE": ["patriots"], "NO": ["saints"],
+    "NYG": ["giants"], "NYJ": ["jets"], "PHI": ["eagles"], "PIT": ["steelers"],
+    "SEA": ["seahawks"], "SF": ["49ers"], "TB": ["buccaneers"], "TEN": ["titans"],
+    "WAS": ["redskins", "washington", "washington-football-team", "football-team"]
+  },
+  "team_visible_signals": {
+    "ARI": ["ARIZONA CARDINALS", "CARDINALS"], "ATL": ["ATLANTA FALCONS", "FALCONS"],
+    "BAL": ["BALTIMORE RAVENS", "RAVENS"], "BUF": ["BUFFALO BILLS", "BILLS"],
+    "CAR": ["CAROLINA PANTHERS", "PANTHERS"], "CHI": ["CHICAGO BEARS", "BEARS"],
+    "CIN": ["CINCINNATI BENGALS", "BENGALS"], "CLE": ["CLEVELAND BROWNS", "BROWNS"],
+    "DAL": ["DALLAS COWBOYS", "COWBOYS"], "DEN": ["DENVER BRONCOS", "BRONCOS"],
+    "DET": ["DETROIT LIONS", "LIONS"], "GB": ["GREEN BAY PACKERS", "PACKERS"],
+    "HOU": ["HOUSTON TEXANS", "TEXANS"], "IND": ["INDIANAPOLIS COLTS", "COLTS"],
+    "JAX": ["JACKSONVILLE JAGUARS", "JAGUARS"], "KC": ["KANSAS CITY CHIEFS", "CHIEFS"],
+    "OAK": ["OAKLAND RAIDERS", "RAIDERS"], "LV": ["LAS VEGAS RAIDERS", "RAIDERS"],
+    "LAC": ["LOS ANGELES CHARGERS", "CHARGERS"], "LA": ["LOS ANGELES RAMS", "RAMS"],
+    "MIA": ["MIAMI DOLPHINS", "DOLPHINS"], "MIN": ["MINNESOTA VIKINGS", "VIKINGS"],
+    "NE": ["NEW ENGLAND PATRIOTS", "PATRIOTS"], "NO": ["NEW ORLEANS SAINTS", "SAINTS"],
+    "NYG": ["NEW YORK GIANTS", "GIANTS"], "NYJ": ["NEW YORK JETS", "JETS"],
+    "PHI": ["PHILADELPHIA EAGLES", "EAGLES"], "PIT": ["PITTSBURGH STEELERS", "STEELERS"],
+    "SEA": ["SEATTLE SEAHAWKS", "SEAHAWKS"], "SF": ["SAN FRANCISCO 49ERS", "49ERS"],
+    "TB": ["TAMPA BAY BUCCANEERS", "BUCCANEERS"], "TEN": ["TENNESSEE TITANS", "TITANS"],
+    "WAS": ["WASHINGTON REDSKINS", "WASHINGTON FOOTBALL TEAM", "WASHINGTON COMMANDERS", "WASHINGTON"]
+  },
+  "media_classes": {
+    "game_release": ["GAME RELEASE"],
+    "roster": ["ROSTER", "ROSTERS"],
+    "depth_chart": ["DEPTH CHART", "DEPTH"],
+    "flip_card": ["FLIP CARD"],
+    "game_notes": ["GAME NOTES"]
+  },
+  "first_party_document_hosts": ["static.clubs.nfl.com"],
+  "same_partition_team_domain_documents_allowed": true,
+  "required_accounting": {
+    "every_1296_canonical_game_reported": true,
+    "every_2592_team_partition_reported": true,
+    "every_constructed_candidate_attempt_reported_until_success_or_exhaustion": true,
+    "missing_pages_retained_explicitly": true,
+    "media_links_bounded_per_class_per_page": 20
+  },
+  "explicit_non_gates": {
+    "constructed_page_coverage_threshold": null,
+    "media_class_coverage_threshold": null,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "source_bytes_qualified": false,
+    "source_chronology_qualified": false,
+    "transaction_reconciliation_performed": false,
+    "game_day_membership_constructed": false,
+    "identity_resolution_performed": false
+  },
+  "authority": {
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "third_party_authority_used": false,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
