@@ -1,0 +1,156 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAMEBOOK-ROSTER-UNIVERSE-V1-FAILURE",
+  "contract_id": "V09B-MODERN-GAMEBOOK-ROSTER-UNIVERSE-V1",
+  "status": "FAILED_EXPERIMENT_PRESERVED_NO_QUALIFICATION",
+  "workflow_run_id": 34732284738,
+  "validated_head_sha": "48544d8c35371d60c3848ddeca1d6bbd280cf93e",
+  "upstream_modern_raw_archive_v2_commit": "aab55bf97aa62cae446b358b9739f4c62604cc8e",
+  "upstream_modern_raw_archive_v2_qualified": true,
+  "season_results": {
+    "2017": {
+      "season_gate_pass": true,
+      "artifact_id": 10309882047,
+      "artifact_sha256": "5541548cb0844f4ddcf626924138ec3c3ff90ae6e68936009c0898fd190466a2"
+    },
+    "2018": {
+      "season_gate_pass": false,
+      "artifact_id": 10309437799,
+      "artifact_sha256": "dcb398724e6fc3058034df427a06a6fa3c84ac25011adce40c9356b36f50933d"
+    },
+    "2019": {
+      "season_gate_pass": true,
+      "artifact_id": 10309676381,
+      "artifact_sha256": "0c130c619ed303200404d44077db2fa66665d89f4857124d239ebe59091f6865"
+    },
+    "2020": {
+      "season_gate_pass": false,
+      "artifact_id": 10309822179,
+      "artifact_sha256": "5ee1311e52bbac07b1eadbc495eb884c0b8cbb14faad850965f84aa5edb8d329"
+    },
+    "2021": {
+      "season_gate_pass": false,
+      "artifact_id": 10309442764,
+      "artifact_sha256": "fc9d3d2b3686fad8e23c5fd6c14318a0301515ef6ba5f6066f940fa4ffac5843"
+    }
+  },
+  "failed_team_partitions": [
+    {
+      "game_id": "2018_16_DEN_OAK",
+      "team": "OAK",
+      "active_candidate_count": 48,
+      "not_active_count": 7,
+      "roster_candidate_count": 55,
+      "lineup_count": 22,
+      "substitutions_count": 22,
+      "did_not_play_count": 4,
+      "active_count_sanity_pass": false,
+      "roster_count_sanity_pass": false
+    },
+    {
+      "game_id": "2020_11_PIT_JAX",
+      "team": "JAX",
+      "active_candidate_count": 49,
+      "not_active_count": 7,
+      "roster_candidate_count": 56,
+      "lineup_count": 22,
+      "substitutions_count": 25,
+      "did_not_play_count": 2,
+      "active_count_sanity_pass": false,
+      "roster_count_sanity_pass": false
+    },
+    {
+      "game_id": "2020_13_NO_ATL",
+      "team": "NO",
+      "active_candidate_count": 48,
+      "not_active_count": 8,
+      "roster_candidate_count": 56,
+      "lineup_count": 22,
+      "substitutions_count": 25,
+      "did_not_play_count": 1,
+      "active_count_sanity_pass": true,
+      "roster_count_sanity_pass": false
+    },
+    {
+      "game_id": "2020_15_JAX_BAL",
+      "team": "JAX",
+      "active_candidate_count": 49,
+      "not_active_count": 5,
+      "roster_candidate_count": 54,
+      "lineup_count": 22,
+      "substitutions_count": 24,
+      "did_not_play_count": 3,
+      "active_count_sanity_pass": false,
+      "roster_count_sanity_pass": true
+    },
+    {
+      "game_id": "2021_10_KC_LV",
+      "team": "KC",
+      "active_candidate_count": 49,
+      "not_active_count": 3,
+      "roster_candidate_count": 52,
+      "lineup_count": 22,
+      "substitutions_count": 26,
+      "did_not_play_count": 1,
+      "active_count_sanity_pass": false,
+      "roster_count_sanity_pass": true
+    },
+    {
+      "game_id": "2021_10_TB_WAS",
+      "team": "TB",
+      "active_candidate_count": 49,
+      "not_active_count": 5,
+      "roster_candidate_count": 54,
+      "lineup_count": 22,
+      "substitutions_count": 22,
+      "did_not_play_count": 5,
+      "active_count_sanity_pass": false,
+      "roster_count_sanity_pass": true
+    },
+    {
+      "game_id": "2021_16_PIT_KC",
+      "team": "PIT",
+      "active_candidate_count": 49,
+      "not_active_count": 5,
+      "roster_candidate_count": 54,
+      "lineup_count": 22,
+      "substitutions_count": 26,
+      "did_not_play_count": 1,
+      "active_count_sanity_pass": false,
+      "roster_count_sanity_pass": true
+    }
+  ],
+  "clean_controls": {
+    "exact_section_marker_games": 1296,
+    "team_partitions_parsed": 2592,
+    "source_errors": 0,
+    "cross_active_semantic_section_conflicts": 0,
+    "active_inactive_overlaps": 0,
+    "same_section_repeat_identities": 0,
+    "same_section_repeat_occurrences": 0
+  },
+  "interpretation": {
+    "count_thresholds_relaxed_post_hoc": false,
+    "membership_semantics_changed_post_hoc": false,
+    "v1_active_union_rule_qualified": false,
+    "did_not_play_as_uniform_active_membership_authority_qualified": false,
+    "failure_requires_separate_preregistered_diagnostic": true
+  },
+  "authority": {
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

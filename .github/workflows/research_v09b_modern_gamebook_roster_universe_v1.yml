@@ -1,0 +1,283 @@
+name: LevLine V09B modern Game Book roster universe V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_gamebook_roster_universe_contract_v1.json'
+      - 'research/v09b_modern_gamebook_roster_universe_v1.py'
+      - 'research/test_v09b_modern_gamebook_roster_universe_v1.py'
+      - '.github/workflows/research_v09b_modern_gamebook_roster_universe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-gamebook-roster-universe-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen modern roster semantics and upstream guard
+        run: pytest -q research/test_v09b_modern_gamebook_roster_universe_v1.py
+      - name: Validate frozen roster contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_gamebook_roster_universe_contract_v1.json').read_text())
+          assert c['status'] == 'PREREGISTERED_EXECUTABLE_AFTER_RAW_V2_QUALIFICATION'
+          assert c['upstream_raw_archive']['qualification_id'] == 'V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION'
+          assert c['upstream_raw_archive']['research_data_commit_sha'] == 'aab55bf97aa62cae446b358b9739f4c62604cc8e'
+          assert c['upstream_raw_archive']['network_redownload_allowed'] is False
+          assert c['canonical_universe']['expected_games_total'] == 1296
+          assert c['canonical_universe']['expected_team_game_partitions_total'] == 2592
+          assert c['membership_semantics']['active_candidate_sections'] == ['Lineups', 'Substitutions', 'Did Not Play']
+          assert c['membership_semantics']['inactive_negative_section'] == 'Not Active'
+          assert c['membership_semantics']['did_not_play_is_active_candidate'] is True
+          assert c['membership_semantics']['did_not_play_is_negative'] is False
+          assert c['membership_semantics']['absence_from_not_active_alone_is_positive'] is False
+          assert c['membership_semantics']['weekly_roster_status_used'] is False
+          assert c['membership_semantics']['postgame_participation_used'] is False
+          assert c['era_roster_sanity']['2017_2019']['active_candidate_min'] == 43
+          assert c['era_roster_sanity']['2017_2019']['active_candidate_max'] == 46
+          assert c['era_roster_sanity']['2017_2019']['active_inactive_list_max'] == 53
+          assert c['era_roster_sanity']['2020_2021']['active_candidate_min'] == 44
+          assert c['era_roster_sanity']['2020_2021']['active_candidate_max'] == 48
+          assert c['era_roster_sanity']['2020_2021']['active_inactive_list_max'] == 55
+          assert c['qualification_authority']['season_jobs_may_qualify_layer'] is False
+          assert c['qualification_authority']['aggregate_five_season_job_required'] is True
+          assert c['authorization']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authorization']['modern_player_team_game_identity_qualified'] is False
+          assert c['authorization']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  roster-audit:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Materialize exact qualified modern V2 archive
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-gamebooks-modern-v2
+          EXPECTED_COMMIT=aab55bf97aa62cae446b358b9739f4c62604cc8e
+          git fetch origin "$DATA_BRANCH"
+          git cat-file -e "$EXPECTED_COMMIT^{commit}"
+          git worktree add --detach /tmp/v09b-modern-v2-data "$EXPECTED_COMMIT"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('/tmp/v09b-modern-v2-data/research_outputs/v09b_modern_gamebook_raw_archive_v2/aggregate_qualification.json')
+          r = json.loads(p.read_text())
+          assert r['qualification_id'] == 'V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION'
+          assert r['canonical_games'] == 1296
+          assert r['qualified_source_rows'] == 1296
+          assert r['modern_raw_source_bytes_qualified'] is True
+          assert r['modern_gamebook_structure_qualified'] is True
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - name: Parse official game-day roster universe from immutable archive
+        run: |
+          ROOT=/tmp/v09b-modern-v2-data/research_outputs/v09b_modern_gamebook_raw_archive_v2
+          OUT=research_outputs/v09b_modern_gamebook_roster_universe_v1/receipts/${{ matrix.season }}.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_gamebook_roster_universe_v1.py \
+              --season ${{ matrix.season }} \
+              --archive-root "$ROOT" \
+              --output "$OUT"
+      - name: Assert season roster gate without global qualification authority
+        if: always()
+        run: |
+          receipt=research_outputs/v09b_modern_gamebook_roster_universe_v1/receipts/${{ matrix.season }}.json
+          if test -s "$receipt"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_modern_gamebook_roster_universe_v1/receipts/{season}.json').read_text())
+          assert r['contract_id'] == 'V09B-MODERN-GAMEBOOK-ROSTER-UNIVERSE-V1'
+          assert r['upstream_raw_archive_qualified'] is True
+          assert r['canonical_game_coverage_rate'] == 1.0
+          assert r['team_partition_parse_coverage_rate'] == 1.0
+          assert r['marker_exact_game_rate'] == 1.0
+          assert r['cross_active_semantic_section_conflicts'] == 0
+          assert r['active_inactive_overlaps'] == 0
+          assert r['active_count_sanity_failures'] == 0
+          assert r['roster_count_sanity_failures'] == 0
+          assert r['source_errors'] == 0
+          assert r['season_roster_universe_gate_pass'] is True
+          assert r['season_has_global_qualification_authority'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['weekly_roster_membership_used'] is False
+          assert r['weekly_roster_status_used'] is False
+          assert r['postgame_participation_used'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-modern-roster-universe-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_modern_gamebook_roster_universe_v1/receipts/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-qualification:
+    needs: roster-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-roster-universe-v1-*-${{ github.run_id }}
+          path: /tmp/v09b_modern_roster_universe_v1
+          merge-multiple: true
+      - name: Apply frozen five-season aggregate roster gate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          root = Path('/tmp/v09b_modern_roster_universe_v1')
+          seasons = [2017, 2018, 2019, 2020, 2021]
+          receipts = [json.loads((root / f'{season}.json').read_text()) for season in seasons]
+          assert all(r['season_roster_universe_gate_pass'] is True for r in receipts)
+          assert all(r['season_has_global_qualification_authority'] is False for r in receipts)
+          assert all(r['upstream_raw_archive_qualified'] is True for r in receipts)
+          assert sum(r['canonical_games'] for r in receipts) == 1296
+          assert sum(r['qualified_games'] for r in receipts) == 1296
+          assert sum(r['team_partitions_parsed'] for r in receipts) == 2592
+          assert sum(r['marker_exact_games'] for r in receipts) == 1296
+          assert sum(r['cross_active_semantic_section_conflicts'] for r in receipts) == 0
+          assert sum(r['active_inactive_overlaps'] for r in receipts) == 0
+          assert sum(r['active_count_sanity_failures'] for r in receipts) == 0
+          assert sum(r['roster_count_sanity_failures'] for r in receipts) == 0
+          assert sum(r['source_errors'] for r in receipts) == 0
+          assert all(r['weekly_roster_status_used'] is False for r in receipts)
+          assert all(r['postgame_participation_used'] is False for r in receipts)
+          assert all(r['completed_2026_outcomes_used'] == 0 for r in receipts)
+
+          def aggregate_distribution(key):
+              out = Counter()
+              for receipt in receipts:
+                  out.update({int(k): int(v) for k, v in receipt[key].items()})
+              return {str(k): out[k] for k in sorted(out)}
+
+          result = {
+              'qualification_version': 1,
+              'qualification_id': 'V09B-MODERN-GAMEBOOK-ROSTER-UNIVERSE-V1-QUALIFICATION',
+              'canonical_games': 1296,
+              'qualified_games': 1296,
+              'team_partitions_parsed': 2592,
+              'marker_exact_games': 1296,
+              'cross_active_semantic_section_conflicts': 0,
+              'active_inactive_overlaps': 0,
+              'active_count_sanity_failures': 0,
+              'roster_count_sanity_failures': 0,
+              'source_errors': 0,
+              'same_section_repeat_occurrences': sum(r['same_section_repeat_occurrences'] for r in receipts),
+              'same_section_repeat_identities': sum(r['same_section_repeat_identities'] for r in receipts),
+              'active_candidate_count_distribution': aggregate_distribution('active_candidate_count_distribution'),
+              'not_active_count_distribution': aggregate_distribution('not_active_count_distribution'),
+              'roster_candidate_count_distribution': aggregate_distribution('roster_candidate_count_distribution'),
+              'modern_game_day_roster_universe_qualified': True,
+              'modern_player_team_game_identity_qualified': False,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'weekly_roster_membership_used': False,
+              'weekly_roster_status_used': False,
+              'postgame_participation_used': False,
+              'model_fit_performed': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+          }
+          (root / 'aggregate_qualification.json').write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-roster-universe-v1-aggregate-${{ github.run_id }}
+          path: /tmp/v09b_modern_roster_universe_v1/aggregate_qualification.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist qualified roster audit on isolated research-data branch
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-modern-roster-universe-v1
+          ROOT=research_outputs/v09b_modern_gamebook_roster_universe_v1
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B v09b-modern-roster-v1-data "origin/$DATA_BRANCH"
+          else
+            git checkout --orphan v09b-modern-roster-v1-data
+            git rm -rf . || true
+          fi
+          rm -rf "$ROOT"
+          mkdir -p "$ROOT/receipts"
+          for season in 2017 2018 2019 2020 2021; do
+            cp "/tmp/v09b_modern_roster_universe_v1/$season.json" "$ROOT/receipts/$season.json"
+          done
+          cp /tmp/v09b_modern_roster_universe_v1/aggregate_qualification.json "$ROOT/aggregate_qualification.json"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'Modern roster-universe audit already matches qualified outputs.'
+            exit 0
+          fi
+          git commit -m 'Persist qualified 2017-2021 Game Book roster universe audit'
+          git push origin HEAD:"$DATA_BRANCH"
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
