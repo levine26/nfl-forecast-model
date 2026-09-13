@@ -1,0 +1,54 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-DIAGNOSTIC-V2-RESULT",
+  "purpose": "Preserve the post-V1 diagnostic result before any same-week/team/jersey fallback rule is preregistered.",
+  "workflow_evidence": {
+    "run_id": 34727862728,
+    "workflow_head_sha": "1bedb2ab559497d989c909840f05ed09594ae526",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "season_jobs": {
+      "2012": {"job_id": 103645773366, "conclusion": "success", "artifact_id": 10308261983, "artifact_digest": "sha256:d58530b751561ef5fe4f546d7a221be25d23df760f92929f1b1f3395a4eea001", "v1_misses": 313, "unique_same_week_team_jersey": 313, "multiple_same_week_team_jersey": 0, "zero_same_week_team_jersey": 0},
+      "2013": {"job_id": 103645773280, "conclusion": "success", "artifact_id": 10308117322, "artifact_digest": "sha256:00e5746d4a34abf98d184cf7efea5faaf1783466bc1b7af8fa3c96273583cb89", "v1_misses": 298, "unique_same_week_team_jersey": 298, "multiple_same_week_team_jersey": 0, "zero_same_week_team_jersey": 0},
+      "2014": {"job_id": 103645773259, "conclusion": "success", "artifact_id": 10308381455, "artifact_digest": "sha256:bea5f684b84c7385bf2adbbf6870e00c784869498bd869cc9f243f9cd4351bbe", "v1_misses": 264, "unique_same_week_team_jersey": 264, "multiple_same_week_team_jersey": 0, "zero_same_week_team_jersey": 0},
+      "2015": {"job_id": 103645773270, "conclusion": "success", "artifact_id": 10308711678, "artifact_digest": "sha256:03d3970bc809d391c6ddf3cce17c7c0beb5197ced46f5d76151119ad6bf1ec76", "v1_misses": 252, "unique_same_week_team_jersey": 252, "multiple_same_week_team_jersey": 0, "zero_same_week_team_jersey": 0},
+      "2016": {"job_id": 103645773289, "conclusion": "success", "artifact_id": 10308162087, "artifact_digest": "sha256:08867d8cc11d2438aafbad30774257fdf1ba85289c87e0b8f31765e3b26ee036", "v1_misses": 705, "unique_same_week_team_jersey": 321, "multiple_same_week_team_jersey": 7, "zero_same_week_team_jersey": 377}
+    }
+  },
+  "aggregate": {
+    "v1_unresolved_identities": 1832,
+    "unique_same_week_team_jersey_candidates": 1448,
+    "multiple_same_week_team_jersey_candidates": 7,
+    "zero_same_week_team_jersey_candidates": 377,
+    "unique_candidate_share_of_v1_misses": 0.7903930131004366,
+    "candidate_rule_if_later_authorized_exact_plus_unique_resolved": 135188,
+    "legacy_identity_population": 135572,
+    "candidate_rule_if_later_authorized_resolution_rate": 0.9971675567226271,
+    "still_unresolved_or_ambiguous_if_later_authorized": 384
+  },
+  "era_shape": {
+    "2012_2015_all_v1_misses_have_unique_same_week_team_jersey_candidate": true,
+    "2012_2015_unique_candidates": 1127,
+    "2012_2015_multiple_candidates": 0,
+    "2012_2015_zero_candidates": 0,
+    "2016_unique_candidate_share": 0.4553191489361702,
+    "2016_exception_requires_fail_closed_handling": true
+  },
+  "scientific_disposition": {
+    "diagnostic_has_qualification_authority": false,
+    "legacy_player_team_game_identity_qualified": false,
+    "same_week_team_jersey_fallback_authorized": false,
+    "v2_audit_may_be_preregistered_from_this_evidence": true,
+    "v2_audit_must_leave_multiple_or_zero_candidate_cases_unresolved": true,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_status_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
