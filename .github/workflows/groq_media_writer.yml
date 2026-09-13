@@ -133,7 +133,12 @@ jobs:
             echo "Provider-only push inherits latest successful contextual intelligence from $latest_context_sha."
           fi
 
+          # The exact-SHA context workflow can push its refreshed packet after this job's
+          # initial fetch. Refetch now so research always starts from the context commit
+          # we just waited for, rather than a stale origin/main ref.
+          git fetch origin main
           git reset --hard origin/main
+          echo "Synchronized editorial research base: $(git rev-parse HEAD)"
 
       - name: Refresh latest main for scheduled/manual run
         if: github.event_name != 'push' && github.event_name != 'pull_request'
@@ -275,6 +280,8 @@ jobs:
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
           assert 'audit_groq_main_advance.py' in text
+          sync_block = text.split('- name: Synchronize with contextual intelligence', 1)[1].split('- name: Refresh latest main for scheduled/manual run', 1)[0]
+          assert 'git fetch origin main\n          git reset --hard origin/main\n          echo "Synchronized editorial research base:' in sync_block
           concurrency_block = text.split('concurrency:', 1)[1].split('jobs:', 1)[0]
           assert 'group: sunday-signal-media-writer-' in concurrency_block
           assert 'github.ref' in concurrency_block
@@ -283,7 +290,7 @@ jobs:
           assert 'outputs/contextual_evidence.json' in publish_block
           assert 'validated_base=$(git rev-parse HEAD^)' in publish_block
           assert 'git pull --rebase origin main' not in publish_block
-          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, race reconciliation, isolated concurrency, and validated-snapshot publication wiring validated without consuming repository secrets on PR.')
+          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness, post-context refetch, race reconciliation, isolated concurrency, and validated-snapshot publication wiring validated without consuming repository secrets on PR.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
