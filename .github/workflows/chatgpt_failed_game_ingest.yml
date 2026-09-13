@@ -72,7 +72,10 @@ jobs:
           assert '/tmp/chatgpt-preserved-media-reporting.json' in workflow
           assert 'fallback_snapshot_reused' in workflow
           assert 'games_with_trusted_reporting' in workflow
-          print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves the last launch-grade reporting snapshot, and retains the governed frozen forecast identity.')
+          assert "git merge-base --is-ancestor \"$validated_base\" origin/main" in workflow
+          assert "grep -Ev '^(research/|research_outputs/|\\.github/workflows/research_[^/]+\\.ya?ml$)'" in workflow
+          assert 'Only research-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
+          print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves launch-grade reporting, and reconciles only research-isolated main advances.')
           PY
 
       - name: Stop after validation on pull request
@@ -171,7 +174,20 @@ jobs:
           git fetch origin main
           validated_base=$(git rev-parse HEAD^)
           if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then
-            echo "Main advanced after validation; refusing to publish an unvalidated rebase."
-            exit 1
+            echo "Main advanced after validation; auditing the intervening files before publication."
+            if ! git merge-base --is-ancestor "$validated_base" origin/main; then
+              echo "Latest main is not a descendant of the validated fallback base; refusing publication."
+              exit 1
+            fi
+            changed_main_files=$(git diff --name-only "$validated_base"..origin/main)
+            printf 'main advance files:\n%s\n' "$changed_main_files"
+            unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
+            if [ -n "$unsafe_main_files" ]; then
+              echo "Main changed outside the research-isolated namespace; refusing an unvalidated rebase."
+              printf '%s\n' "$unsafe_main_files"
+              exit 1
+            fi
+            echo "Only research-isolated files advanced; rebasing the already validated editorial output commit."
+            git rebase origin/main
           fi
           git push origin HEAD:main
