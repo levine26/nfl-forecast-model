@@ -1,0 +1,65 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-DIAGNOSTIC-V2",
+  "dependency": "V09B-LEGACY-GAMEBOOK-IDENTITY-V1-FAILURE",
+  "status": "POST_V1_FAILURE_DIAGNOSTIC_ONLY",
+  "purpose": "Measure whether Game Book identities unresolved by the exact V1 name key are uniquely identifiable from the same-week normalized-team jersey key, without authorizing that key as a fallback.",
+  "v1_failure_preservation": {
+    "failure_receipt": "research/availability/v09b_legacy_gamebook_identity_v1_failure_receipt.json",
+    "v1_failure_preserved": true,
+    "v1_unresolved_identities": 1832,
+    "v1_ambiguous_identities": 0
+  },
+  "membership_authority": {
+    "source": "official NFLGSIS Game Book roster partition",
+    "weekly_roster_defines_membership": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used": false
+  },
+  "identity_source": {
+    "source": "nflverse weekly_rosters parquet",
+    "allowed_fields": ["season", "game_type", "week", "team", "gsis_id", "jersey_number", "first_name", "football_name", "last_name"],
+    "forbidden_for_diagnostic": ["status", "status_description_abbr", "status_short_description"],
+    "same_identity_consistency_required": true
+  },
+  "diagnostic_rule": {
+    "population": "only Game Book identities for which V1 exact same-week/team/jersey/name resolution returned zero candidates",
+    "candidate_key": ["season", "week", "normalized_team", "jersey_number"],
+    "unique_candidate_definition": "exactly one distinct non-null gsis_id after identity-signature consistency checks",
+    "zero_candidate_definition": "no eligible gsis_id on the same week/team/jersey key",
+    "multiple_candidate_definition": "more than one distinct eligible gsis_id on the same week/team/jersey key",
+    "candidate_name_compatibility_is_qualification_authority": false,
+    "fallback_rule_authorized": false,
+    "manual_overrides_allowed": false
+  },
+  "required_outputs": [
+    "v1_exact_resolved",
+    "v1_exact_unresolved",
+    "v1_exact_ambiguous",
+    "v1_miss_unique_same_week_team_jersey_candidate",
+    "v1_miss_zero_same_week_team_jersey_candidates",
+    "v1_miss_multiple_same_week_team_jersey_candidates",
+    "candidate_identity_examples"
+  ],
+  "scientific_disclosure": {
+    "rule_designed_after_v1_failure": true,
+    "diagnostic_has_qualification_authority": false,
+    "game_outcomes_used_to_design_diagnostic": false,
+    "completed_2026_outcomes_used": 0,
+    "promotion_claim_allowed": false
+  },
+  "authorization": {
+    "legacy_player_team_game_identity_qualified": false,
+    "same_week_team_jersey_fallback_authorized": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
