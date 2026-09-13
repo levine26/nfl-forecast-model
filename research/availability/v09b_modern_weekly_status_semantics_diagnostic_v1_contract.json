@@ -45,7 +45,8 @@
   },
   "gamebook_semantic_sections": ["lineup", "substitutions", "did_not_play", "not_active"],
   "diagnostic_outputs": {
-    "section_by_status_cross_tab": true,
+    "section_by_generic_status_cross_tab": true,
+    "section_by_status_description_abbr_cross_tab": true,
     "unique_identity_resolution_counts": true,
     "ambiguous_identity_counts": true,
     "unresolved_identity_counts": true,
