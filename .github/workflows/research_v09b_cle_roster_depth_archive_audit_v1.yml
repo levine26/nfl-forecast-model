@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'research/availability/v09b_cle_roster_depth_archive_audit_v1_contract.json'
+      - 'research/availability/v09b_cle_roster_depth_archive_audit_v1_failure_receipt.json'
       - 'research/v09b_cle_roster_depth_archive_audit_v1.py'
       - 'research/test_v09b_cle_roster_depth_archive_audit_v1.py'
       - '.github/workflows/research_v09b_cle_roster_depth_archive_audit_v1.yml'
@@ -27,7 +28,7 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - name: Test frozen Cleveland archive semantics
+      - name: Test frozen Cleveland archive semantics and preserved failure receipt
         run: pytest -q research/test_v09b_cle_roster_depth_archive_audit_v1.py
       - name: Validate preregistered club-complete contract
         run: |
@@ -53,6 +54,24 @@ jobs:
           assert c['authority']['v09b_model_fit_authorized'] is False
           assert c['governance']['completed_2026_outcomes_used'] == 0
           PY
+      - name: Validate immutable failed empirical disposition
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research/availability/v09b_cle_roster_depth_archive_audit_v1_failure_receipt.json').read_text())
+          assert r['status'] == 'FAILED_COMPLETE_CLUB_WEEKLY_SNAPSHOT_SOURCE_COVERAGE_NO_AUTHORITY'
+          assert r['workflow_evidence']['run_id'] == 34735554833
+          assert r['workflow_evidence']['validated_head_sha'] == 'e5a2098be7e75ed6139201adcff52db7116058a0'
+          assert r['aggregate_result']['expected_team_game_partitions'] == 81
+          assert r['aggregate_result']['weekly_snapshot_source_pass_weeks'] == 15
+          assert r['aggregate_result']['cle_weekly_snapshot_source_coverage_qualified'] is False
+          assert r['scientific_disposition']['v1_gate_relaxed_post_hoc'] is False
+          assert r['scientific_disposition']['v1_parser_or_semantic_contract_retrofitted'] is False
+          assert r['scientific_disposition']['modern_game_day_roster_universe_qualified'] is False
+          assert r['scientific_disposition']['training_source_chronology_qualified'] is False
+          assert r['scientific_disposition']['v09b_model_fit_authorized'] is False
+          PY
 
   audit-season:
     needs: unit-and-contract
@@ -71,7 +90,7 @@ jobs:
       - name: Install PDF text extractor
         run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - run: pip install '.[dev]'
-      - name: Audit exact season archive and preserve result before gate
+      - name: Re-run exact season archive and preserve result before interpreting failure
         run: |
           ROOT=research_outputs/v09b_cle_roster_depth_archive_audit_v1
           OUT=$ROOT/${{ matrix.season }}.json
@@ -115,7 +134,7 @@ jobs:
             research_outputs/v09b_cle_roster_depth_archive_audit_v1/${{ matrix.season }}.exit_status.txt
           if-no-files-found: error
           retention-days: 30
-      - name: Enforce frozen season gate after preserving evidence
+      - name: Reproduce frozen failed season disposition after preserving evidence
         if: always()
         run: |
           python - <<'PY'
@@ -124,18 +143,29 @@ jobs:
           root = Path('research_outputs/v09b_cle_roster_depth_archive_audit_v1')
           r = json.loads((root / '${{ matrix.season }}.json').read_text())
           rc = int((root / '${{ matrix.season }}.exit_status.txt').read_text().strip())
-          expected = {2017: 16, 2018: 16, 2019: 16, 2020: 16, 2021: 17}[${{ matrix.season }}]
-          assert rc == 0
-          assert r['expected_regular_season_games'] == expected
-          assert r['viewer_links_discovered'] == expected
-          assert r['unique_week_numbers_discovered'] == expected
+          season = ${{ matrix.season }}
+          expected = {
+              2017: {'games': 16, 'viewers': 0, 'unique_weeks': 0, 'rows': 0, 'errors': 0, 'semantic': 0, 'fresh': 0, 'passed': 0},
+              2018: {'games': 16, 'viewers': 16, 'unique_weeks': 16, 'rows': 16, 'errors': 0, 'semantic': 0, 'fresh': 0, 'passed': 0},
+              2019: {'games': 16, 'viewers': 16, 'unique_weeks': 16, 'rows': 15, 'errors': 1, 'semantic': 15, 'fresh': 15, 'passed': 15},
+              2020: {'games': 16, 'viewers': 16, 'unique_weeks': 16, 'rows': 16, 'errors': 0, 'semantic': 0, 'fresh': 0, 'passed': 0},
+              2021: {'games': 17, 'viewers': 17, 'unique_weeks': 17, 'rows': 17, 'errors': 0, 'semantic': 14, 'fresh': 0, 'passed': 0},
+          }[season]
+          assert rc != 0, 'V1 unexpectedly qualified on rerun; do not silently rewrite the preserved failure'
+          assert r['expected_regular_season_games'] == expected['games']
+          assert r['viewer_links_discovered'] == expected['viewers']
+          assert r['unique_week_numbers_discovered'] == expected['unique_weeks']
           assert r['duplicate_week_links'] == 0
-          assert r['week_rows_completed'] == expected
-          assert r['source_errors'] == []
-          assert r['semantic_pass_weeks'] == expected
-          assert r['fresh_snapshot_pass_weeks'] == expected
-          assert r['weekly_snapshot_source_pass_weeks'] == expected
-          assert r['season_snapshot_source_coverage_gate_pass'] is True
+          assert r['week_rows_completed'] == expected['rows']
+          assert len(r['source_errors']) == expected['errors']
+          assert r['semantic_pass_weeks'] == expected['semantic']
+          assert r['fresh_snapshot_pass_weeks'] == expected['fresh']
+          assert r['weekly_snapshot_source_pass_weeks'] == expected['passed']
+          assert r['document_sha_collisions'] == 0
+          assert r['season_snapshot_source_coverage_gate_pass'] is False
+          if season == 2019:
+              assert r['source_errors'][0]['week'] == '11'
+              assert 'expected exactly one direct Full Document link, found 0' in r['source_errors'][0]['error']
           PY
 
   aggregate:
@@ -241,26 +271,30 @@ jobs:
           path: /tmp/v09b_cle_roster_depth_archive_v1/aggregate.json
           if-no-files-found: error
           retention-days: 30
-      - name: Enforce frozen aggregate qualification gate
+      - name: Reproduce frozen aggregate failure and authority firewall
         if: always()
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           r = json.loads(Path('/tmp/v09b_cle_roster_depth_archive_v1/aggregate.json').read_text())
+          receipt = json.loads(Path('research/availability/v09b_cle_roster_depth_archive_audit_v1_failure_receipt.json').read_text())
           assert r['all_five_seasons_accounted'] is True
-          assert r['expected_team_game_partitions'] == 81
-          assert r['viewer_links_discovered'] == 81
-          assert r['week_rows_completed'] == 81
-          assert r['source_errors'] == 0
-          assert r['semantic_pass_weeks'] == 81
-          assert r['fresh_snapshot_pass_weeks'] == 81
-          assert r['weekly_snapshot_source_pass_weeks'] == 81
-          assert r['duplicate_week_links'] == 0
-          assert r['cle_weekly_snapshot_source_coverage_qualified'] is True
+          assert r['expected_team_game_partitions'] == receipt['aggregate_result']['expected_team_game_partitions'] == 81
+          assert r['viewer_links_discovered'] == receipt['aggregate_result']['viewer_links_discovered'] == 65
+          assert r['week_rows_completed'] == receipt['aggregate_result']['week_rows_completed'] == 64
+          assert r['source_errors'] == receipt['aggregate_result']['source_errors'] == 1
+          assert r['semantic_pass_weeks'] == receipt['aggregate_result']['semantic_pass_weeks'] == 29
+          assert r['fresh_snapshot_pass_weeks'] == receipt['aggregate_result']['fresh_snapshot_pass_weeks'] == 15
+          assert r['weekly_snapshot_source_pass_weeks'] == receipt['aggregate_result']['weekly_snapshot_source_pass_weeks'] == 15
+          assert r['duplicate_week_links'] == receipt['aggregate_result']['duplicate_week_links'] == 0
+          assert r['document_sha_collisions'] == receipt['aggregate_result']['document_sha_collisions'] == 0
+          assert r['cle_weekly_snapshot_source_coverage_qualified'] is False
           assert r['modern_game_day_roster_universe_qualified'] is False
           assert r['training_source_chronology_qualified'] is False
           assert r['v09b_model_fit_authorized'] is False
+          assert receipt['scientific_disposition']['v1_gate_relaxed_post_hoc'] is False
+          assert receipt['scientific_disposition']['v1_parser_or_semantic_contract_retrofitted'] is False
           PY
 
   research-firewall:
