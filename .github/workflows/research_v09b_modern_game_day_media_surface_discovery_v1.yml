@@ -1,0 +1,210 @@
+name: LevLine V09B modern game-day media surface discovery V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_game_day_media_surface_discovery_v1_contract.json'
+      - 'research/v09b_modern_game_day_media_surface_discovery_v1.py'
+      - 'research/test_v09b_modern_game_day_media_surface_discovery_v1.py'
+      - '.github/workflows/research_v09b_modern_game_day_media_surface_discovery_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-game-day-media-surface-discovery-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4 pytest
+      - name: Test frozen game-day discovery mechanics
+        run: pytest -q research/test_v09b_modern_game_day_media_surface_discovery_v1.py
+      - name: Validate full-matrix discovery-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_game_day_media_surface_discovery_v1_contract.json').read_text())
+          assert c['status'] == 'PREREGISTERED_FULL_TEAM_GAME_DISCOVERY_ONLY_NO_LOCATOR_OR_MEMBERSHIP_QUALIFICATION_AUTHORITY'
+          assert c['seasons'] == [2017, 2018, 2019, 2020, 2021]
+          assert c['expected_regular_season_team_games_total'] == 2592
+          assert c['expected_regular_season_team_games_by_season'] == {
+              '2017': 512, '2018': 512, '2019': 512, '2020': 512, '2021': 544
+          }
+          assert len(c['teams']) == 32
+          assert c['schedule_surface']['url_template'] == 'https://www.{domain}/schedule/{season}/'
+          assert c['schedule_surface']['missing_expected_team_games_are_retained_explicitly'] is True
+          assert set(c['game_day_surface']['media_classes']) == {'game_release', 'roster', 'depth_chart', 'flip_card', 'game_notes'}
+          assert c['game_day_surface']['media_target_is_not_fetched_or_semantically_qualified_by_this_diagnostic'] is True
+          assert c['explicit_non_gates']['schedule_page_coverage_threshold'] is None
+          assert c['explicit_non_gates']['game_day_page_coverage_threshold'] is None
+          assert c['explicit_non_gates']['media_class_coverage_threshold'] is None
+          assert c['authority']['diagnostic_has_locator_qualification_authority'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['third_party_authority_used'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  discover-season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests beautifulsoup4
+      - name: Inventory official historical schedule and game-day media surfaces
+        run: |
+          OUT=research_outputs/v09b_modern_game_day_media_surface_discovery_v1/${{ matrix.season }}.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_game_day_media_surface_discovery_v1.py \
+              --contract research/availability/v09b_modern_game_day_media_surface_discovery_v1_contract.json \
+              --season ${{ matrix.season }} \
+              --output "$OUT" \
+              --timeout 12 \
+              --workers 32
+      - name: Assert complete diagnostic accounting and authority firewall
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_modern_game_day_media_surface_discovery_v1/{season}.json').read_text())
+          expected = {'2017':512,'2018':512,'2019':512,'2020':512,'2021':544}[season]
+          assert r['season'] == int(season)
+          assert r['expected_regular_season_team_games'] == expected
+          assert r['team_seasons_reported'] == 32
+          assert r['discovery_accounting_integrity_pass'] is True
+          assert len(r['team_schedule_results']) == 32
+          assert len(r['game_day_results']) == r['discovered_regular_season_team_game_pages']
+          assert r['diagnostic_has_locator_qualification_authority'] is False
+          assert r['diagnostic_has_membership_authority'] is False
+          assert r['modern_roster_depth_locator_coverage_qualified'] is False
+          assert r['source_bytes_qualified_by_this_diagnostic'] is False
+          assert r['source_chronology_qualified'] is False
+          assert r['transaction_reconciliation_performed'] is False
+          assert r['game_day_membership_constructed'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['third_party_authority_used'] is False
+          assert r['weekly_roster_membership_used'] is False
+          assert r['weekly_roster_status_used'] is False
+          assert r['postgame_participation_used_as_training_authority'] is False
+          assert r['absence_from_inactive_used_as_positive'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          assert r['model_fit_performed'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-game-day-media-surface-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_modern_game_day_media_surface_discovery_v1/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-diagnostic:
+    needs: discover-season
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-game-day-media-surface-v1-*-${{ github.run_id }}
+          path: /tmp/v09b_game_day_media_surface_v1
+          merge-multiple: true
+      - name: Aggregate the complete five-season descriptive matrix
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('/tmp/v09b_game_day_media_surface_v1')
+          seasons = [2017, 2018, 2019, 2020, 2021]
+          receipts = [json.loads((root / f'{season}.json').read_text()) for season in seasons]
+          assert all(r['discovery_accounting_integrity_pass'] is True for r in receipts)
+          assert sum(r['expected_regular_season_team_games'] for r in receipts) == 2592
+          assert sum(r['team_seasons_reported'] for r in receipts) == 160
+          classes = ['game_release','roster','depth_chart','flip_card','game_notes']
+          discovered = sum(r['discovered_regular_season_team_game_pages'] for r in receipts)
+          fetched = sum(r['game_day_pages_fetch_success'] for r in receipts)
+          counts = {c: sum(r['media_class_page_counts'][c] for r in receipts) for c in classes}
+          result = {
+              'discovery_version': 1,
+              'diagnostic_id': 'V09B-MODERN-GAME-DAY-MEDIA-SURFACE-DISCOVERY-V1-COMPLETE',
+              'seasons': seasons,
+              'expected_regular_season_team_games': 2592,
+              'team_seasons_reported': 160,
+              'schedule_surfaces_available': sum(r['schedule_surfaces_available'] for r in receipts),
+              'discovered_regular_season_team_game_pages': discovered,
+              'missing_expected_regular_season_team_games_diagnostic': max(0, 2592-discovered),
+              'game_day_pages_fetch_success': fetched,
+              'game_day_pages_fetch_failure': sum(r['game_day_pages_fetch_failure'] for r in receipts),
+              'media_class_page_counts': counts,
+              'media_class_coverage_fraction_of_fetched_pages': {c: (counts[c]/fetched if fetched else 0.0) for c in classes},
+              'season_summaries': {
+                  str(r['season']): {
+                      'schedule_surfaces_available': r['schedule_surfaces_available'],
+                      'discovered_regular_season_team_game_pages': r['discovered_regular_season_team_game_pages'],
+                      'game_day_pages_fetch_success': r['game_day_pages_fetch_success'],
+                      'media_class_page_counts': r['media_class_page_counts'],
+                  } for r in receipts
+              },
+              'observed_coverage_is_diagnostic_only': True,
+              'diagnostic_has_locator_qualification_authority': False,
+              'diagnostic_has_membership_authority': False,
+              'modern_roster_depth_locator_coverage_qualified': False,
+              'source_chronology_qualified': False,
+              'game_day_membership_constructed': False,
+              'modern_game_day_roster_universe_qualified': False,
+              'modern_player_team_game_identity_qualified': False,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'third_party_authority_used': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+              'model_fit_performed': False,
+              'production_dependency_authorized': False,
+          }
+          (root / 'aggregate.json').write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-game-day-media-surface-v1-aggregate-${{ github.run_id }}
+          path: /tmp/v09b_game_day_media_surface_v1/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
