@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -118,3 +119,49 @@ def test_duplicate_and_blank_paths_are_normalized() -> None:
     audit = module.audit_main_advance(["", "outputs/status.json", " outputs/status.json "])
     assert audit.changed == ("outputs/status.json",)
     assert audit.safe_to_reconcile
+
+
+def test_current_run_fallback_status_is_saved_outside_worktree(tmp_path: Path) -> None:
+    status_path = tmp_path / "status.json"
+    sidecar = tmp_path / "fallback-sidecar.json"
+    status_path.write_text(json.dumps({
+        "generated_utc": "2026-09-13T00:30:00Z",
+        "groq_provider_fallback": {
+            "run_id": "101",
+            "status": "degraded",
+            "games": {
+                "2026_01_CLE_JAX": {
+                    "provider_result": "failed",
+                    "fallback_source": "last_validated_editorial",
+                    "requires_chatgpt_refresh": True,
+                }
+            },
+        },
+    }))
+
+    assert module.persist_current_run_fallback_status(
+        status_path=status_path,
+        sidecar_path=sidecar,
+        run_id="101",
+    )
+    preserved = json.loads(sidecar.read_text())
+    assert preserved["run_id"] == "101"
+    assert preserved["games"]["2026_01_CLE_JAX"]["requires_chatgpt_refresh"] is True
+
+
+def test_fallback_status_from_another_run_is_not_preserved(tmp_path: Path) -> None:
+    status_path = tmp_path / "status.json"
+    sidecar = tmp_path / "fallback-sidecar.json"
+    status_path.write_text(json.dumps({
+        "groq_provider_fallback": {
+            "run_id": "old-run",
+            "games": {"g": {"requires_chatgpt_refresh": True}},
+        }
+    }))
+
+    assert not module.persist_current_run_fallback_status(
+        status_path=status_path,
+        sidecar_path=sidecar,
+        run_id="new-run",
+    )
+    assert not sidecar.exists()
