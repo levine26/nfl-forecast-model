@@ -1,0 +1,162 @@
+name: LevLine V09B club transaction archive coverage V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_club_transaction_archive_coverage_v1_contract.json'
+      - 'research/v09b_club_transaction_archive_coverage_v1.py'
+      - 'research/test_v09b_club_transaction_archive_coverage_v1.py'
+      - '.github/workflows/research_v09b_club_transaction_archive_coverage_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-club-transaction-archive-coverage-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen diagnostic rules
+        run: pytest -q research/test_v09b_club_transaction_archive_coverage_v1.py
+      - name: Validate fail-closed contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_club_transaction_archive_coverage_v1_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-CLUB-TRANSACTION-ARCHIVE-COVERAGE-V1'
+          assert c['frozen_universe']['team_season_pairs_expected'] == 160
+          assert c['url_grammar']['successful_final_path_must_retain_requested_season'] is True
+          assert c['url_grammar']['redirect_to_bare_current_transactions_page_is_failure'] is True
+          assert c['explicit_non_gates']['coverage_threshold_for_source_qualification'] is None
+          assert c['explicit_non_gates']['transaction_state_machine_defined'] is False
+          assert c['explicit_non_gates']['same_day_transaction_order_resolved'] is False
+          assert c['explicit_non_gates']['absence_of_transaction_used_as_active_evidence'] is False
+          assert c['authority']['diagnostic_has_source_coverage_qualification_authority'] is False
+          assert c['authority']['diagnostic_has_membership_authority'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Audit official club transaction archive coverage
+        run: |
+          mkdir -p out
+          python -m research.v09b_club_transaction_archive_coverage_v1 \
+            --season ${{ matrix.season }} \
+            --timeout 20 \
+            --output out/${{ matrix.season }}.json
+      - name: Require exact season accounting only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          season = int('${{ matrix.season }}')
+          r = json.loads(Path(f'out/{season}.json').read_text())
+          assert r['contract_id'] == 'V09B-CLUB-TRANSACTION-ARCHIVE-COVERAGE-V1'
+          assert r['team_season_pairs_expected'] == 32
+          assert r['team_season_pairs_reported'] == 32
+          assert r['team_season_pairs_with_qualifying_archive'] + r['team_season_pairs_missing'] == 32
+          assert r['accounting_integrity_pass'] is True
+          assert r['diagnostic_has_source_coverage_qualification_authority'] is False
+          assert r['diagnostic_has_membership_authority'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-club-transaction-archive-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: out/${{ matrix.season }}.json
+          if-no-files-found: error
+
+  aggregate:
+    needs: season
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-club-transaction-archive-v1-*-${{ github.run_id }}
+          path: season-results
+          merge-multiple: true
+      - name: Aggregate all 160 team-season pairs
+        run: |
+          mkdir -p out
+          python -m research.v09b_club_transaction_archive_coverage_v1 \
+            --aggregate \
+            --inputs season-results/2017.json season-results/2018.json season-results/2019.json season-results/2020.json season-results/2021.json \
+            --output out/aggregate.json
+      - name: Require exact full-universe accounting with zero authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('out/aggregate.json').read_text())
+          assert r['team_season_pairs_expected'] == 160
+          assert r['team_season_pairs_reported'] == 160
+          assert r['team_season_pairs_with_qualifying_archive'] + r['team_season_pairs_missing'] == 160
+          assert r['accounting_integrity_pass'] is True
+          assert r['coverage_is_descriptive_not_qualification_gate'] is True
+          assert r['transaction_state_machine_defined'] is False
+          assert r['kickoff_relative_chronology_qualified'] is False
+          assert r['absence_of_transaction_used_as_active_evidence'] is False
+          assert r['diagnostic_has_source_coverage_qualification_authority'] is False
+          assert r['diagnostic_has_membership_authority'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-club-transaction-archive-v1-aggregate-${{ github.run_id }}
+          path: out/aggregate.json
+          if-no-files-found: error
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          bad="$(git diff --name-only origin/main...HEAD | grep -Ev '^(research/|\.github/workflows/)' || true)"
+          if [[ -n "$bad" ]]; then
+            echo "Non-research paths changed:"
+            echo "$bad"
+            exit 1
+          fi
