@@ -1,0 +1,64 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1",
+  "status": "PREREGISTERED_SOURCE_PROVENANCE_CAPTURE_ONLY",
+  "purpose": "Freeze the exact 2017-2021 nflverse weekly-roster release bytes and a status-free identity-only projection before any modern Game Book-to-GSIS identity resolution is executed.",
+  "seasons": [2017, 2018, 2019, 2020, 2021],
+  "source": {
+    "provider": "nflverse",
+    "release_url_template": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_{season}.parquet",
+    "raw_parquet_magic_required": true,
+    "raw_sha256_required": true,
+    "raw_bytes_persisted": true
+  },
+  "identity_projection": {
+    "game_type": "REG",
+    "allowed_fields": ["season", "game_type", "week", "team", "gsis_id", "jersey_number", "first_name", "football_name", "last_name"],
+    "forbidden_fields": ["status", "status_description_abbr", "status_short_description"],
+    "status_fields_selected": false,
+    "status_fields_read_for_resolution": false,
+    "projection_bytes_persisted": true,
+    "projection_sha256_required": true,
+    "downstream_identity_audit_must_use_projection_not_raw_source": true
+  },
+  "diagnostics_only": {
+    "source_rows_selected": true,
+    "usable_non_null_gsis_rows": true,
+    "missing_gsis_rows": true,
+    "collapsed_player_team_week_gsis_keys": true,
+    "source_identity_conflicts": true,
+    "source_identity_conflict_examples": true,
+    "diagnostic_values_do_not_authorize_identity_resolution": true
+  },
+  "durability": {
+    "research_data_branch": "research-data/v09b-modern-identity-source-v1",
+    "research_data_root": "research_outputs/v09b_modern_identity_source_capture_v1",
+    "source_receipts_persisted": true,
+    "raw_source_bytes_persisted": true,
+    "identity_projection_bytes_persisted": true
+  },
+  "capture_gates": {
+    "all_five_seasons_required": true,
+    "valid_raw_parquet_required": true,
+    "nonempty_reg_projection_required": true,
+    "projection_contains_only_allowlisted_fields": true,
+    "projection_contains_status_fields_allowed": false,
+    "silent_season_drops_allowed": false
+  },
+  "authority": {
+    "weekly_roster_defines_game_day_membership": false,
+    "modern_player_team_game_identity_qualified": false,
+    "modern_game_day_roster_universe_qualified_by_this_capture": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "identity_resolution_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

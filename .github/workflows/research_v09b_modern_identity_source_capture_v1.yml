@@ -1,0 +1,236 @@
+name: LevLine V09B modern identity-source capture V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_identity_source_capture_contract_v1.json'
+      - 'research/v09b_modern_identity_source_capture_v1.py'
+      - 'research/test_v09b_modern_identity_source_capture_v1.py'
+      - '.github/workflows/research_v09b_modern_identity_source_capture_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-identity-source-capture-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test status-free identity-source projection
+        run: pytest -q research/test_v09b_modern_identity_source_capture_v1.py
+      - name: Validate frozen source-capture contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_identity_source_capture_contract_v1.json').read_text())
+          assert c['status'] == 'PREREGISTERED_SOURCE_PROVENANCE_CAPTURE_ONLY'
+          assert c['seasons'] == [2017, 2018, 2019, 2020, 2021]
+          assert c['identity_projection']['allowed_fields'] == [
+              'season', 'game_type', 'week', 'team', 'gsis_id', 'jersey_number',
+              'first_name', 'football_name', 'last_name'
+          ]
+          assert c['identity_projection']['forbidden_fields'] == [
+              'status', 'status_description_abbr', 'status_short_description'
+          ]
+          assert c['identity_projection']['status_fields_selected'] is False
+          assert c['identity_projection']['status_fields_read_for_resolution'] is False
+          assert c['identity_projection']['downstream_identity_audit_must_use_projection_not_raw_source'] is True
+          assert c['authority']['weekly_roster_defines_game_day_membership'] is False
+          assert c['authority']['modern_player_team_game_identity_qualified'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified_by_this_capture'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['identity_resolution_performed'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  capture-season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Capture exact weekly-roster source and status-free projection
+        run: |
+          ROOT=research_outputs/v09b_modern_identity_source_capture_v1
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_identity_source_capture_v1.py \
+              --season ${{ matrix.season }} \
+              --output-root "$ROOT"
+      - name: Assert capture-only authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          p = Path(f'research_outputs/v09b_modern_identity_source_capture_v1/receipts/{season}.json')
+          r = json.loads(p.read_text())
+          assert r['contract_id'] == 'V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1'
+          assert r['season'] == int(season)
+          assert r['raw_parquet_magic_valid'] is True
+          assert r['projection_parquet_magic_valid'] is True
+          assert r['projection_contains_only_allowlisted_fields'] is True
+          assert r['projection_contains_status_fields'] is False
+          assert r['status_fields_selected'] is False
+          assert r['status_fields_read_for_resolution'] is False
+          assert r['capture_gate_pass'] is True
+          assert r['diagnostic_values_authorize_identity_resolution'] is False
+          assert r['weekly_roster_defines_game_day_membership'] is False
+          assert r['modern_game_day_roster_universe_qualified_by_this_capture'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['identity_resolution_performed'] is False
+          assert r['model_fit_performed'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-identity-source-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_modern_identity_source_capture_v1/raw/
+            research_outputs/v09b_modern_identity_source_capture_v1/projections/
+            research_outputs/v09b_modern_identity_source_capture_v1/receipts/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-capture:
+    needs: capture-season
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-identity-source-v1-*-${{ github.run_id }}
+          path: /tmp/v09b_modern_identity_source_capture_v1
+          merge-multiple: true
+      - name: Apply five-season source-capture gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('/tmp/v09b_modern_identity_source_capture_v1')
+          receipts = []
+          for season in [2017, 2018, 2019, 2020, 2021]:
+              p = root / 'receipts' / f'{season}.json'
+              assert p.exists(), f'missing receipt {season}'
+              r = json.loads(p.read_text())
+              assert r['season'] == season
+              assert r['capture_gate_pass'] is True
+              assert r['projection_contains_only_allowlisted_fields'] is True
+              assert r['projection_contains_status_fields'] is False
+              assert r['status_fields_selected'] is False
+              assert r['status_fields_read_for_resolution'] is False
+              assert r['weekly_roster_defines_game_day_membership'] is False
+              assert r['modern_player_team_game_identity_qualified'] is False
+              assert r['v09b_model_fit_authorized'] is False
+              assert r['completed_2026_outcomes_used'] == 0
+              raw_path = root / r['raw_source_relpath']
+              projection_path = root / r['projection_relpath']
+              assert raw_path.exists()
+              assert projection_path.exists()
+              receipts.append(r)
+
+          aggregate = {
+              'capture_version': 1,
+              'capture_id': 'V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1-COMPLETE',
+              'seasons': [2017, 2018, 2019, 2020, 2021],
+              'all_five_seasons_captured': True,
+              'raw_source_sha256_by_season': {str(r['season']): r['raw_source_sha256'] for r in receipts},
+              'projection_sha256_by_season': {str(r['season']): r['projection_sha256'] for r in receipts},
+              'source_rows_selected_by_season': {str(r['season']): r['source_rows_selected'] for r in receipts},
+              'usable_non_null_gsis_rows_by_season': {str(r['season']): r['usable_non_null_gsis_rows'] for r in receipts},
+              'missing_gsis_rows_by_season': {str(r['season']): r['missing_gsis_rows'] for r in receipts},
+              'source_identity_conflicts_by_season': {str(r['season']): r['source_identity_conflicts'] for r in receipts},
+              'status_fields_selected': False,
+              'status_fields_read_for_resolution': False,
+              'weekly_roster_defines_game_day_membership': False,
+              'modern_game_day_roster_universe_qualified_by_this_capture': False,
+              'modern_player_team_game_identity_qualified': False,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'identity_resolution_performed': False,
+              'model_fit_performed': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+              'production_dependency_authorized': False,
+          }
+          (root / 'aggregate_capture_receipt.json').write_text(json.dumps(aggregate, indent=2, sort_keys=True) + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-identity-source-v1-aggregate-${{ github.run_id }}
+          path: /tmp/v09b_modern_identity_source_capture_v1/aggregate_capture_receipt.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist immutable identity-source capture on isolated research-data branch
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-modern-identity-source-v1
+          ROOT=research_outputs/v09b_modern_identity_source_capture_v1
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B v09b-modern-identity-source-v1-data "origin/$DATA_BRANCH"
+          else
+            git checkout --orphan v09b-modern-identity-source-v1-data
+            git rm -rf . || true
+          fi
+          rm -rf "$ROOT"
+          mkdir -p "$ROOT"
+          cp -R /tmp/v09b_modern_identity_source_capture_v1/raw "$ROOT/raw"
+          cp -R /tmp/v09b_modern_identity_source_capture_v1/projections "$ROOT/projections"
+          cp -R /tmp/v09b_modern_identity_source_capture_v1/receipts "$ROOT/receipts"
+          cp /tmp/v09b_modern_identity_source_capture_v1/aggregate_capture_receipt.json "$ROOT/aggregate_capture_receipt.json"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'Identity-source capture already matches persisted outputs.'
+            exit 0
+          fi
+          git commit -m 'Persist 2017-2021 status-free identity-source capture'
+          git push origin HEAD:"$DATA_BRANCH"
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
