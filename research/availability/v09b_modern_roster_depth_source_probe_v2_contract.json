@@ -1,0 +1,116 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-MODERN-ROSTER-DEPTH-SOURCE-PROBE-V2",
+  "status": "PREREGISTERED_DIRECT_ROSTER_DEPTH_SOURCE_CLASS_PROBE_ONLY_NO_COVERAGE_OR_MEMBERSHIP_AUTHORITY",
+  "purpose": "Test a narrower first-party source class after Game Release probe V1 failed: direct week-specific Roster and Depth Chart PDFs linked from official club season archive pages. The probe tests archive provenance, current-roster enumeration, explicit practice-squad/reserve separation, and pregame snapshot dating only. It does not construct game-day eligibility or prove all-team-game coverage.",
+  "dependencies": [
+    "V09B-MODERN-GAME-RELEASE-ROSTER-SOURCE-PROBE-V1-FAILURE"
+  ],
+  "fixed_cross_era_samples": [
+    {
+      "season": 2017,
+      "club": "NE",
+      "game_id": "2017_10_NE_DEN",
+      "game_date": "2017-11-12",
+      "archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2017",
+      "archive_link_text": "Rosters & Depth",
+      "source_url": "https://static.clubs.nfl.com/image/upload/v1576186145/patriots/ydxjckfdn72arnrsbet9.pdf"
+    },
+    {
+      "season": 2018,
+      "club": "NE",
+      "game_id": "2018_12_NE_NYJ",
+      "game_date": "2018-11-25",
+      "archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2018",
+      "archive_link_text": "Rosters & Depth",
+      "source_url": "https://static.clubs.nfl.com/image/upload/v1576079694/patriots/lzkht9akdoysytelcgn1.pdf"
+    },
+    {
+      "season": 2019,
+      "club": "NE",
+      "game_id": "2019_13_NE_HOU",
+      "game_date": "2019-12-01",
+      "archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2019",
+      "archive_link_text": "Rosters & Depth",
+      "source_url": "https://static.clubs.nfl.com/image/upload/v1575920135/patriots/esjsnepadcohliyjb8ls.pdf"
+    },
+    {
+      "season": 2020,
+      "club": "NE",
+      "game_id": "2020_11_NE_HOU",
+      "game_date": "2020-11-22",
+      "archive_url": "https://www.patriots.com/press-room/mediasite/game-packages-2020",
+      "archive_link_text": "Rosters & Depth",
+      "source_url": "https://static.clubs.nfl.com/image/upload/patriots/huzpvlsn3aoqpf8xbiex.pdf"
+    },
+    {
+      "season": 2021,
+      "club": "TB",
+      "game_id": "2021_01_DAL_TB",
+      "game_date": "2021-09-09",
+      "archive_url": "https://www.buccaneers.com/media/weekly-information-2021",
+      "archive_link_text": "ROSTER AND DEPTH CHART",
+      "source_url": "https://static.clubs.nfl.com/image/upload/buccaneers/zjvs4jwdwo13wkofjewv"
+    }
+  ],
+  "source_requirements": {
+    "archive_hosts_allowed": ["www.patriots.com", "patriots.com", "www.buccaneers.com", "buccaneers.com"],
+    "pdf_hosts_allowed": ["static.clubs.nfl.com"],
+    "https_required": true,
+    "archive_page_must_link_exact_source_url": true,
+    "archive_link_text_must_match_frozen_sample_label": true,
+    "pdf_magic_required": true,
+    "content_sha256_required": true,
+    "network_fetch_allowed_for_probe": true,
+    "third_party_authority_allowed": false
+  },
+  "semantic_markers": {
+    "current_roster_marker_any": ["NUMERICAL ROSTER", "ALPHABETICAL ROSTER", "ROSTER BY POSITION"],
+    "practice_squad_marker_required": "PRACTICE SQUAD",
+    "reserve_marker_any": ["RESERVE/INJURED", "INJURED RESERVE", "RESERVE/PUP", "RESERVE/COVID-19", "RESERVE/NFI", "RESERVE/NON-FOOTBALL INJURY", "RESERVE/NON-FOOTBALL ILLNESS"],
+    "dated_snapshot_required": true,
+    "pregame_snapshot_required": true,
+    "maximum_snapshot_age_days_for_viability": 7,
+    "roster_date_search_window_lines_around_current_roster_marker": 60,
+    "accepted_date_forms": ["AS OF <FULL_MONTH_NAME> D, YYYY", "AS OF M/D/YY", "AS OF M/D/YYYY"]
+  },
+  "probe_gates": {
+    "all_five_archive_pages_first_party": true,
+    "all_five_archive_pages_link_exact_pdf": true,
+    "all_five_pdf_sources_first_party_pdf": true,
+    "all_five_current_roster_marker_present": true,
+    "all_five_practice_squad_marker_present": true,
+    "all_five_reserve_marker_present": true,
+    "all_five_parseable_pregame_roster_as_of_date_within_7_days": true
+  },
+  "explicit_non_gates": {
+    "all_team_game_locator_coverage_tested": false,
+    "roster_snapshot_exactly_equals_kickoff_eligible_population": false,
+    "same_day_transactions_reconciled": false,
+    "standard_elevations_reconciled": false,
+    "inactive_lists_reconciled": false,
+    "game_day_membership_labels_constructed": false,
+    "player_identity_resolution_performed": false
+  },
+  "next_step_if_probe_passes": "Preregister a separate 2017-2021 club-archive locator and chronology audit. It must prove a qualifying first-party roster snapshot for every required team-game partition or fail closed. Any transaction, reserve activation, standard elevation, or other roster change between snapshot time and kickoff must be handled by a separately frozen chronology/reconciliation layer before membership qualification.",
+  "authority": {
+    "probe_has_coverage_authority": false,
+    "probe_has_membership_authority": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
