@@ -9,6 +9,42 @@
     "artifact_id": 10310749787,
     "artifact_digest": "sha256:2ddbde3e03b4e08b40aefafad84e8f145ef0d68c22fa44d52cbfad02cbd3c127"
   },
+  "live_csv_source_manifest": {
+    "2017": {"sha256": "fd3fe005b676fe0ad8d88c50701d71adef4287501397c33f479c9765cd8c45d4", "regular_season_rows": 49996},
+    "2018": {"sha256": "c3bca1ee53e63e21b964f1bb42c251e25b7b4b8c55210730dd4ded2f9d4a709a", "regular_season_rows": 50873},
+    "2019": {"sha256": "af6aa7b8aa7850c47fe307d548d66fa7c1cac88fe11e5951c781974cb6909e03", "regular_season_rows": 50306},
+    "2020": {"sha256": "0b948cca8735a2417cbda14464f4532aeee58d871e2fcd8464a23e969e45789e", "regular_season_rows": 42964},
+    "2021": {"sha256": "88adfe0fba5cbedd260d7928ad373476d4fb168d0213cb52ef1163ed5d3056b7", "regular_season_rows": 44539}
+  },
+  "comparison_to_prior_frozen_parquet_capture": {
+    "prior_contract_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1",
+    "prior_research_data_commit_sha": "1c6f388c06f7473eb7483d6b4b91685ecb3d019c",
+    "same_artifact_representation": false,
+    "hashes_directly_comparable": false,
+    "frozen_parquet_raw_sha256_by_season": {
+      "2017": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
+      "2018": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
+      "2019": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+      "2020": "8d601bf5c5d669465481421ad5cd1a1470d51792054e84bdc04f3620785f7530",
+      "2021": "3e9f67569e940b54b3778ef2c9150850920b5bf93143bad3bd158e649825cf6b"
+    },
+    "frozen_parquet_selected_reg_rows_by_season": {
+      "2017": 49210,
+      "2018": 50113,
+      "2019": 49561,
+      "2020": 41972,
+      "2021": 44539
+    },
+    "live_csv_minus_frozen_parquet_selected_rows_by_season": {
+      "2017": 786,
+      "2018": 760,
+      "2019": 745,
+      "2020": 992,
+      "2021": 0
+    },
+    "all_season_row_counts_equal": false,
+    "disposition": "The V1 live CSV diagnostic must not be described as replaying the already-frozen Parquet source capture. Its evidence remains useful diagnostically, but the pinned-source follow-up must consume the exact frozen Parquet bytes and status-free projection rather than infer source equivalence."
+  },
   "empirical_result": {
     "canonical_gamebooks_expected": 1296,
     "gamebook_parse_error_rows": 0,
