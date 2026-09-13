@@ -1,0 +1,63 @@
+{
+  "qualification_version": 1,
+  "qualification_id": "V09B-MODERN-GAMEBOOK-LOCATOR-SNAPSHOT-V1-QUALIFICATION",
+  "scope": "Durable 2017-2021 regular-season first-party Game Book locator snapshot only",
+  "workflow_evidence": {
+    "run_id": 34731289224,
+    "workflow_head_sha": "5b049a1b699a5e68d05309e27ba788766e3d8abd",
+    "unit_and_contract": {"job_id": 103654436641, "conclusion": "success"},
+    "research_firewall": {"job_id": 103654436702, "conclusion": "success"},
+    "snapshot_build": {"job_id": 103654456762, "conclusion": "success"},
+    "artifact": {
+      "artifact_id": 10310095265,
+      "artifact_digest": "sha256:2f30cbfbce93e653f5e96f7582a65c9125e93e77a0f28aafec50cc7537b5fc0b"
+    }
+  },
+  "source_locator_evidence": {
+    "qualified_locator_run_id": 34725715104,
+    "qualified_locator_head_sha": "2c18ecb722c9a3696482285a3e2b82c55031bfa2",
+    "canonical_games": 1296,
+    "qualified_locators": 1296,
+    "locator_coverage_rate": 1.0
+  },
+  "durable_snapshot": {
+    "research_data_branch": "research-data/v09b-modern-locator-snapshot-v1",
+    "research_data_commit_sha": "a3f5c5a791f878b12cb92658df37b8a7d093cd0b",
+    "path": "research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv",
+    "receipt_path": "research_outputs/v09b_modern_locator_snapshot_v1/receipt.json",
+    "snapshot_rows": 1296,
+    "unique_game_ids": 1296,
+    "unique_gamebook_urls": 1296,
+    "snapshot_bytes": 154920,
+    "snapshot_sha256": "d26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351",
+    "gamebook_extraction_method_counts": {"download_anchor": 1296},
+    "game_center_resolution_method_counts": {
+      "deterministic_slug": 1295,
+      "first_party_week_schedule_fallback": 1
+    },
+    "v1_failed_live_rediscovery_games_present": [
+      "2017_01_ARI_DET",
+      "2019_15_BUF_PIT",
+      "2021_13_BAL_PIT"
+    ]
+  },
+  "scientific_disposition": {
+    "modern_locator_snapshot_frozen": true,
+    "snapshot_is_downstream_discovery_authority": true,
+    "snapshot_is_label_authority": false,
+    "modern_raw_source_bytes_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "live_page_order_tie_break_used": false,
+    "threshold_relaxation_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
