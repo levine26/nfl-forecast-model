@@ -1,0 +1,57 @@
+{
+  "qualification_version": 1,
+  "qualification_id": "V09B-LEGACY-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION",
+  "scope": "2012-2016 regular-season official NFLGSIS Game Book raw-byte and source-structure layer only",
+  "workflow_evidence": {
+    "run_id": 34725850027,
+    "workflow_head_sha": "4f262c8a41fbd2f27e47b2b1f865217613d00b5f",
+    "workflow_name": "LevLine V09B legacy Game Book raw archive V2",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "season_jobs": {
+      "2012": {"job_id": 103640025996, "passed": true, "artifact_id": 10307813028, "artifact_digest": "sha256:7a82d2c1ba1e7757f1781466d0a1cbf1767ae7a23b528f34a9275f3c4c788584"},
+      "2013": {"job_id": 103640025994, "passed": true, "artifact_id": 10308037711, "artifact_digest": "sha256:50872988b765329bbd09b72ba990e7ac733737e17608b06a2a7ca2eaf76bbb17"},
+      "2014": {"job_id": 103640026008, "passed": true, "artifact_id": 10307638585, "artifact_digest": "sha256:b055748ceaa2fbf9f3c64ce532a3c137cae56d727fcc76833b0e291bb1ec27e4"},
+      "2015": {"job_id": 103640026000, "passed": true, "artifact_id": 10308170168, "artifact_digest": "sha256:d0a8393550e43f9e4c66f7450b26ad00138f4393186565f7be3967c0e9693242"},
+      "2016": {"job_id": 103640025989, "passed": true, "artifact_id": 10307728283, "artifact_digest": "sha256:6fd48bab733133f8e220240d6609d2fec8fb05642ee2704f0b8aef2617bca858"}
+    },
+    "persist_qualified_archive_job_id": 103641343445,
+    "persist_qualified_archive_passed": true
+  },
+  "durable_archive": {
+    "branch": "research-data/v09b-gamebooks-legacy-v2",
+    "commit_sha": "de5377baac60c61d6649438d028f1a2f1b395579",
+    "content_addressed": true,
+    "isolated_research_data_branch": true
+  },
+  "frozen_gate_result": {
+    "seasons_passed": [2012, 2013, 2014, 2015, 2016],
+    "seasons_required": [2012, 2013, 2014, 2015, 2016],
+    "canonical_games_required": 1280,
+    "canonical_games_qualified": 1280,
+    "raw_byte_coverage_rate": 1.0,
+    "pdf_text_extraction_rate": 1.0,
+    "not_active_structure_rate": 1.0,
+    "did_not_play_structure_rate": 1.0,
+    "coverage_thresholds_relaxed_from_v1": false,
+    "label_semantics_changed_from_v1": false,
+    "v1_failure_preserved": true,
+    "all_frozen_v2_source_gates_pass": true
+  },
+  "scientific_disposition": {
+    "legacy_raw_source_layer_qualified": true,
+    "legacy_raw_byte_archive_qualified": true,
+    "legacy_source_structure_qualified": true,
+    "player_team_game_identity_qualified": false,
+    "game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

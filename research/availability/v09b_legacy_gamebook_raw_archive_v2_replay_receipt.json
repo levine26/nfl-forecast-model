@@ -1,0 +1,64 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-LEGACY-GAMEBOOK-RAW-ARCHIVE-V2-REPLAY",
+  "purpose": "Preserve an independent parser-only replay of the preregistered V2 heading recognizer against all raw PDFs captured by the failed V1 GitHub Actions source audit, without rewriting V1 or claiming final source qualification.",
+  "input_provenance": {
+    "workflow_run_id": 34724990513,
+    "workflow_head_sha": "4fd4c9eae91fd6aed261b7612b6169a9520c9c53",
+    "artifacts": {
+      "2012": {"artifact_id": 10307621934, "artifact_sha256": "e96e7cea1204c403cc0902bf0d73876459a5fe46ce35993ae2b5daaca570da35"},
+      "2013": {"artifact_id": 10307671817, "artifact_sha256": "a82c09a39057261e578c50f8c59d6aefcf0ca8ed4f958e03cee3754d5734201b"},
+      "2014": {"artifact_id": 10307861516, "artifact_sha256": "e1e8794a3372deb327d87c5df1735d0942d45285cb9e9c118fab98287a7856bf"},
+      "2015": {"artifact_id": 10307043448, "artifact_sha256": "550b3382c26fd272f630d169b1661c80ffd83194203d4bd411eb804626c216af"},
+      "2016": {"artifact_id": 10307651972, "artifact_sha256": "ae2dca5871e42b2550692905360c2272ffbaa7f584e1e70e92f1bc86cdaba8b7"}
+    },
+    "v1_receipt_facts": {
+      "canonical_games": 1280,
+      "source_bytes_verified": 1280,
+      "pdf_text_extractions": 1280,
+      "archive_integrity_ok_all_seasons": true,
+      "v1_qualified_source_rows": 0,
+      "v1_source_row_errors": 1280,
+      "v1_failure_reason": "colon-required heading recognizers rejected the official layout headings"
+    }
+  },
+  "replay_method": {
+    "pdf_text_extractor": "pdftotext -layout",
+    "not_active_heading_regex": "(?im)^[ \\t]*Not[ \\t]+Active\\b",
+    "did_not_play_heading_regex": "(?im)^[ \\t]*Did[ \\t]+Not[ \\t]+Play\\b",
+    "semantic_requirement": "both independently present",
+    "raw_pdf_bytes_modified": false,
+    "coverage_thresholds_relaxed": false,
+    "label_semantics_changed": false
+  },
+  "results_by_season": {
+    "2012": {"pdfs": 256, "text_extraction_success": 256, "not_active_present": 256, "did_not_play_present": 256, "both_distinct_present": 256, "heading_count_distribution": {"not_active_1__did_not_play_1": 256}},
+    "2013": {"pdfs": 256, "text_extraction_success": 256, "not_active_present": 256, "did_not_play_present": 256, "both_distinct_present": 256, "heading_count_distribution": {"not_active_1__did_not_play_1": 256}},
+    "2014": {"pdfs": 256, "text_extraction_success": 256, "not_active_present": 256, "did_not_play_present": 256, "both_distinct_present": 256, "heading_count_distribution": {"not_active_1__did_not_play_1": 256}},
+    "2015": {"pdfs": 256, "text_extraction_success": 256, "not_active_present": 256, "did_not_play_present": 256, "both_distinct_present": 256, "heading_count_distribution": {"not_active_1__did_not_play_1": 256}},
+    "2016": {"pdfs": 256, "text_extraction_success": 256, "not_active_present": 256, "did_not_play_present": 256, "both_distinct_present": 256, "heading_count_distribution": {"not_active_1__did_not_play_1": 256}}
+  },
+  "aggregate": {
+    "pdfs": 1280,
+    "text_extraction_success": 1280,
+    "not_active_present": 1280,
+    "did_not_play_present": 1280,
+    "both_distinct_present": 1280,
+    "parser_replay_rate": 1.0
+  },
+  "scientific_disposition": {
+    "v1_failure_preserved": true,
+    "v2_parser_correction_supported_across_all_v1_raw_bytes": true,
+    "legacy_raw_source_final_qualification_claimed": false,
+    "reason_final_qualification_remains_closed": "The dedicated V2 CI source-audit must independently emit passing season receipts and durable content-addressed archive persistence must be completed.",
+    "player_team_game_identity_qualified": false,
+    "game_day_roster_universe_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}

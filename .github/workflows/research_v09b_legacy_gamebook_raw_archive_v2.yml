@@ -1,0 +1,211 @@
+name: LevLine V09B legacy Game Book raw archive V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_legacy_gamebook_raw_archive_contract_v2.json'
+      - 'research/availability/v09b_legacy_gamebook_raw_archive_v2_replay_receipt.json'
+      - 'research/v09b_legacy_gamebook_raw_archive_v2.py'
+      - 'research/test_v09b_legacy_gamebook_raw_archive_v2.py'
+      - '.github/workflows/research_v09b_legacy_gamebook_raw_archive_v2.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-legacy-gamebook-raw-archive-v2-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test V1 preservation and V2 heading semantics
+        run: >-
+          pytest -q
+          research/test_v09b_legacy_gamebook_raw_archive_v1.py
+          research/test_v09b_legacy_gamebook_raw_archive_v2.py
+      - name: Prove V2 changes parser only, not frozen qualification gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          v1 = json.loads(Path('research/availability/v09b_legacy_gamebook_raw_archive_contract_v1.json').read_text())
+          v2 = json.loads(Path('research/availability/v09b_legacy_gamebook_raw_archive_contract_v2.json').read_text())
+          replay = json.loads(Path('research/availability/v09b_legacy_gamebook_raw_archive_v2_replay_receipt.json').read_text())
+          assert v1['parser']['parser_version'] == 'V09B-GAMEBOOK-TEXT-STRUCTURE-V1'
+          assert v1['parser']['not_active_heading_regex'].endswith('\\s*:')
+          assert v1['parser']['did_not_play_heading_regex'].endswith('\\s*:')
+          assert v2['v1_failure_preserved']['v1_result_may_be_rewritten'] is False
+          assert v2['parser']['parser_version'] == 'V09B-GAMEBOOK-TEXT-STRUCTURE-V2'
+          assert v2['frozen_qualification_gates'] == v1['frozen_qualification_gates']
+          assert v2['expected_games_total'] == v1['expected_games_total'] == 1280
+          assert v2['parser']['not_active_is_negative_class_source'] is True
+          assert v2['parser']['did_not_play_is_negative_class_source'] is False
+          assert v2['authorization']['v09b_model_fit_authorized'] is False
+          assert v2['governance']['completed_2026_outcomes_used'] == 0
+          assert replay['aggregate']['pdfs'] == 1280
+          assert replay['aggregate']['both_distinct_present'] == 1280
+          assert replay['scientific_disposition']['v1_failure_preserved'] is True
+          assert replay['scientific_disposition']['legacy_raw_source_final_qualification_claimed'] is False
+          PY
+
+  source-audit:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015, 2016]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Archive bytes and audit frozen V2 source structure
+        run: |
+          ROOT=research_outputs/v09b_legacy_gamebook_raw_archive_v2
+          mkdir -p "$ROOT/receipts"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_raw_archive_v2.py \
+              --season ${{ matrix.season }} \
+              --archive-root "$ROOT" \
+              --receipt "$ROOT/receipts/${{ matrix.season }}.json"
+      - name: Assert source-only governance and unchanged thresholds
+        if: always()
+        run: |
+          receipt=research_outputs/v09b_legacy_gamebook_raw_archive_v2/receipts/${{ matrix.season }}.json
+          if test -s "$receipt"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          result = json.loads(Path(f'research_outputs/v09b_legacy_gamebook_raw_archive_v2/receipts/{season}.json').read_text())
+          assert result['contract_id'] == 'V09B-LEGACY-GAMEBOOK-RAW-ARCHIVE-V2'
+          assert result['parser_version'] == 'V09B-GAMEBOOK-TEXT-STRUCTURE-V2'
+          assert result['v1_failure_preserved'] is True
+          assert result['coverage_thresholds_relaxed_from_v1'] is False
+          assert result['label_semantics_changed_from_v1'] is False
+          assert result['player_identity_resolution_performed'] is False
+          assert result['game_day_roster_universe_constructed'] is False
+          assert result['training_label_semantics_qualified'] is False
+          assert result['training_source_chronology_qualified'] is False
+          assert result['v09b_model_fit_authorized'] is False
+          assert result['model_fit_performed'] is False
+          assert result['game_outcomes_used'] == 0
+          assert result['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-legacy-gamebook-raw-v2-${{ matrix.season }}-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_legacy_gamebook_raw_archive_v2/manifests/${{ matrix.season }}.jsonl
+            research_outputs/v09b_legacy_gamebook_raw_archive_v2/receipts/${{ matrix.season }}.json
+            research_outputs/v09b_legacy_gamebook_raw_archive_v2/raw/*.pdf.gz
+          if-no-files-found: error
+          retention-days: 30
+
+  persist-qualified-archive:
+    needs: source-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-legacy-gamebook-raw-v2-*-${{ github.run_id }}
+          path: /tmp/v09b_legacy_gamebook_raw_archive_v2
+          merge-multiple: true
+      - name: Verify aggregate immutable archive before persistence
+        run: |
+          python - <<'PY'
+          import gzip
+          import hashlib
+          import json
+          from pathlib import Path
+          root = Path('/tmp/v09b_legacy_gamebook_raw_archive_v2')
+          seasons = [2012, 2013, 2014, 2015, 2016]
+          receipts = [json.loads((root / 'receipts' / f'{season}.json').read_text()) for season in seasons]
+          assert all(row['all_frozen_gates_pass'] is True for row in receipts)
+          assert sum(row['canonical_games'] for row in receipts) == 1280
+          assert sum(row['source_bytes_verified'] for row in receipts) == 1280
+          assert sum(row['pdf_text_extractions'] for row in receipts) == 1280
+          assert sum(row['qualified_source_rows'] for row in receipts) == 1280
+          assert sum(row['not_active_structure_valid_games'] for row in receipts) == 1280
+          assert sum(row['did_not_play_structure_valid_games'] for row in receipts) == 1280
+          assert sum(row['source_row_errors'] for row in receipts) == 0
+          assert all(row['player_identity_resolution_performed'] is False for row in receipts)
+          assert all(row['v09b_model_fit_authorized'] is False for row in receipts)
+          assert all(row['completed_2026_outcomes_used'] == 0 for row in receipts)
+          manifest_rows = []
+          for season in seasons:
+              manifest_rows.extend(json.loads(line) for line in (root / 'manifests' / f'{season}.jsonl').read_text().splitlines() if line.strip())
+          assert len(manifest_rows) == 1280
+          raw_files = list((root / 'raw').glob('*.pdf.gz'))
+          assert len(raw_files) == 1280
+          for path in raw_files:
+              raw = gzip.decompress(path.read_bytes())
+              assert raw.startswith(b'%PDF')
+              assert hashlib.sha256(raw).hexdigest() == path.name.removesuffix('.pdf.gz')
+          PY
+      - name: Persist content-addressed archive on isolated research-data branch
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-gamebooks-legacy-v2
+          ROOT=research_outputs/v09b_legacy_gamebook_raw_archive_v2
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B v09b-gamebooks-legacy-v2-data "origin/$DATA_BRANCH"
+          else
+            git checkout --orphan v09b-gamebooks-legacy-v2-data
+            git rm -rf . || true
+          fi
+          rm -rf "$ROOT"
+          mkdir -p "$(dirname "$ROOT")"
+          cp -R /tmp/v09b_legacy_gamebook_raw_archive_v2 "$ROOT"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'V2 historical Game Book archive already matches immutable source bytes.'
+            exit 0
+          fi
+          git commit -m 'Archive qualified 2012-2016 NFL Game Books for V09B V2 research'
+          git push origin HEAD:"$DATA_BRANCH"
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
