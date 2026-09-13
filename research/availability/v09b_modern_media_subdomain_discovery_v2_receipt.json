@@ -1,0 +1,94 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-MEDIA-SUBDOMAIN-DISCOVERY-V2-COMPLETE",
+  "contract_id": "V09B-MODERN-MEDIA-SUBDOMAIN-DISCOVERY-V2",
+  "status": "DIAGNOSTIC_COMPLETE_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34734856197,
+    "validated_head_sha": "4ddd35da7bc58424374cfb8b7a0427c475670e43",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "discovery_job_passed": true,
+    "artifact_id": 10310308597,
+    "artifact_digest": "sha256:ed45250b98158b3567e37de8d10fec5aae5bcf7b218256aed133f373744bc5e6"
+  },
+  "aggregate_result": {
+    "expected_unresolved_team_season_pairs": 153,
+    "unresolved_team_season_pairs_reported": 153,
+    "derived_subdomain_probes_expected": 99,
+    "derived_subdomain_probes_reported": 99,
+    "reachable_first_party_media_subdomains": 2,
+    "reachable_first_party_media_hosts": [
+      "media.miamidolphins.com",
+      "media.philadelphiaeagles.com"
+    ],
+    "team_season_pairs_with_candidate_urls": 4,
+    "team_season_pairs_without_candidate_urls": 149,
+    "candidate_discovery_fraction_diagnostic_only": 0.026143790849673203,
+    "candidate_pair_keys": [
+      "MIA|2017",
+      "MIA|2018",
+      "MIA|2019",
+      "MIA|2020"
+    ],
+    "discovery_accounting_integrity_pass": true
+  },
+  "interpretation": {
+    "media_press_pr_child_subdomain_family_is_league_wide_solution": false,
+    "candidate_url_hits_are_validated_roster_documents": false,
+    "miami_wordpress_candidates_are_search_seeds_only": true,
+    "miami_candidate_examples_include_non_roster_material": true,
+    "candidate_counts_must_not_be_interpreted_as_locator_coverage": true,
+    "remaining_unresolved_team_season_pairs_after_this_diagnostic": 149
+  },
+  "delegated_host_observations": [
+    {
+      "team": "CLE",
+      "official_probe_host": "media.clevelandbrowns.com",
+      "observed_successful_redirect_target": "https://browns.1rmg.com/",
+      "accepted_by_v2_source_firewall": false,
+      "reason": "target is outside the frozen Cleveland Browns domain family"
+    },
+    {
+      "team": "DEN",
+      "official_probe_host": "media.denverbroncos.com",
+      "observed_successful_redirect_target": "https://nfl.omgsports.com/",
+      "accepted_by_v2_source_firewall": false,
+      "reason": "target is outside the frozen Denver Broncos domain family"
+    },
+    {
+      "team": "PHI",
+      "official_probe_host": "media.philadelphiaeagles.com",
+      "observed_sitemap_redirect_target": "https://eagles.1rmg.com/wp-sitemap.xml",
+      "accepted_by_v2_source_firewall": false,
+      "reason": "target is outside the frozen Philadelphia Eagles domain family"
+    }
+  ],
+  "next_research_implication": {
+    "delegated_media_host_source_family_requires_separate_preregistration": true,
+    "delegated_hosts_may_not_be_silently_allowlisted_post_hoc": true,
+    "delegated_host_provenance_must_be_directly_established_from_official_club_surface": true,
+    "delegated_host_discovery_has_no_membership_authority": true
+  },
+  "authority": {
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "all_2592_team_game_partitions_tested": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
