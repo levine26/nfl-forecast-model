@@ -1,0 +1,78 @@
+{
+  "contract_version": 3,
+  "contract_id": "V09B-NFL-TRANSACTION-BROWSER-PAGINATION-DIAGNOSTIC-V3",
+  "status": "STAGED_BROWSER_CLIENT_DIAGNOSTIC_ONLY_NO_SOURCE_OR_CHRONOLOGY_AUTHORITY",
+  "dependencies": [
+    "V09B-NFL-TRANSACTION-LEDGER-SOURCE-PROBE-V1-COMPLETE",
+    "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V2-COMPLETE"
+  ],
+  "purpose": "Test whether the two frozen NFL.com historical transaction cursor URLs that failed to advance under every V2 HTTP/session/cache transport render novel transaction rows only when executed in a real headless browser client. Browser advancement is an observation, not a qualification gate.",
+  "fixed_endpoints": [
+    {
+      "id": "2017_09_signings",
+      "season": 2017,
+      "month": 9,
+      "category": "signings",
+      "initial_url": "https://www.nfl.com/transactions/league/signings/2017/9",
+      "cursor": "AAAH4QAAAAkAAAAbAAAAAAAKuXA="
+    },
+    {
+      "id": "2021_09_signings",
+      "season": 2021,
+      "month": 9,
+      "category": "signings",
+      "initial_url": "https://www.nfl.com/transactions/league/signings/2021/9",
+      "cursor": "AAAH5QAAAAkAAAAdAAAAAAAMi0M="
+    }
+  ],
+  "browser_requirements": {
+    "client": "google-chrome-headless",
+    "javascript_enabled": true,
+    "virtual_time_budget_ms": 10000,
+    "initial_and_cursor_urls_each_rendered_in_fresh_browser_process": true,
+    "dump_final_dom": true,
+    "parse_transaction_rows_with_v1_semantic_parser": true,
+    "page_identity_markers_required_for_interpretation": true,
+    "record_dom_sha256": true,
+    "record_exact_row_keys": true,
+    "record_novel_cursor_rows_vs_initial": true,
+    "record_missing_initial_rows_from_cursor": true
+  },
+  "advancement_observations": {
+    "dom_sha_differs": "diagnostic only",
+    "novel_cursor_rows_gt_zero": "diagnostic only",
+    "cursor_row_set_differs": "diagnostic only",
+    "no_advancement": "preserve as negative evidence"
+  },
+  "required_accounting": {
+    "endpoints_expected": 2,
+    "initial_render_attempts_expected": 2,
+    "cursor_render_attempts_expected": 2,
+    "all_render_attempts_reported_even_if_browser_fails": true
+  },
+  "explicit_non_gates": {
+    "novel_row_advancement_required_for_diagnostic_completion": false,
+    "full_paginated_source_class_qualified": false,
+    "transaction_state_machine_defined": false,
+    "training_source_chronology_qualified": false,
+    "game_day_membership_constructed": false
+  },
+  "authority": {
+    "diagnostic_has_source_qualification_authority": false,
+    "diagnostic_has_chronology_authority": false,
+    "full_paginated_source_class_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "first_party_nfl_com_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
