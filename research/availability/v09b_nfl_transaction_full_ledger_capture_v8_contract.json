@@ -1,0 +1,130 @@
+{
+  "contract_version": 8,
+  "contract_id": "V09B-NFL-TRANSACTION-FULL-LEDGER-CAPTURE-V8",
+  "status": "PREREGISTERED_ALL_MONTH_CAPTURE_WITH_V7_QUALIFIED_EMPTY_SEMANTICS_NO_STATE_AUTHORITY",
+  "purpose": "Recapture the complete official NFL AMP transaction ledger for 2017-2021 across all 12 months and six frozen categories after V7 qualified one exact explicit-empty/terminal representation. Preserve every response before parsing, accept only ordinary advancing transaction pages or the V7-qualified explicit-empty rule, and require exact reproduction of the hash-locked 72-request V6 empty universe. Capture completeness grants no roster-state, chronology, game-day membership, label, production, or model-fit authority.",
+  "dependencies": {
+    "v7_semantics_receipt": {
+      "path": "research/availability/v09b_nfl_transaction_empty_semantics_v7_receipt.json",
+      "git_blob_sha1": "bb14c94cbc2b9f8a39e3907ff5bf943896ec5e32",
+      "receipt_id": "V09B-NFL-TRANSACTION-EMPTY-SEMANTICS-V7-QUALIFIED",
+      "required_status": "EXPLICIT_NO_TRANSACTIONS_EMPTY_AND_TERMINAL_SEMANTICS_QUALIFIED_NO_LEDGER_AUTHORITY"
+    },
+    "v7_contract": {
+      "path": "research/availability/v09b_nfl_transaction_empty_semantics_v7_contract.json",
+      "git_blob_sha1": "d13644b8d0712ef98fb04532cbd7e76742745973"
+    },
+    "v6_empty_universe": {
+      "path": "research/availability/v09b_nfl_transaction_no_header_source_shape_v6_contract.json",
+      "git_blob_sha1": "2b2a28f25125652ddc6b9f11263ddced9c36d90a",
+      "expected_requests": 72
+    },
+    "v4_september_receipt": {
+      "path": "research/availability/v09b_nfl_transaction_september_cross_category_v4_receipt.json",
+      "git_blob_sha1": "f4cfde897d4b83e00e8bd24f6c5b881eaa75155e",
+      "receipt_id": "V09B-NFL-TRANSACTION-SEPTEMBER-CROSS-CATEGORY-V4-QUALIFIED"
+    }
+  },
+  "scope": {
+    "years": [2017, 2018, 2019, 2020, 2021],
+    "months": [1,2,3,4,5,6,7,8,9,10,11,12],
+    "categories": ["trades", "signings", "reserve-list", "waivers", "terminations", "other"],
+    "expected_endpoints": 360,
+    "expected_endpoints_per_year": 72,
+    "url_template": "https://amp.nfl.com/transactions/league/{category}/{year}/{month}",
+    "maximum_pages_per_endpoint": 100
+  },
+  "source_preservation": {
+    "preserve_every_response_before_parse": true,
+    "raw_body_storage": "gzip with mtime=0; decompressed bytes must exactly equal fetched response content",
+    "raw_sha256_over_decompressed_source_bytes": true,
+    "record_requested_url": true,
+    "record_final_url": true,
+    "record_http_status": true,
+    "record_page_index": true,
+    "record_page_classification": true,
+    "record_every_parsed_row_before_any_dedup": true,
+    "artifact_retention_days": 30,
+    "artifact_capture_is_not_permanent_archive_qualification": true
+  },
+  "transport_and_pagination": {
+    "https_required": true,
+    "allowed_final_hosts": ["amp.nfl.com", "www.nfl.com"],
+    "final_path_must_equal_endpoint_path": true,
+    "http_status_required": 200,
+    "pagination_parameter": "after",
+    "at_most_one_distinct_forward_cursor_per_transaction_page": true,
+    "cursor_cycle_allowed": false,
+    "transaction_cursor_page_raw_sha_must_advance": true,
+    "transaction_cursor_page_novel_rows_vs_prior_union_min": 1
+  },
+  "qualified_explicit_empty_rule": {
+    "source": "V7 qualified semantics receipt",
+    "exact_heading": "No Transactions Available",
+    "standard_transaction_header_seen": false,
+    "standard_transaction_row_count": 0,
+    "html_table_count": 0,
+    "distinct_forward_after_cursor_count": 0,
+    "allowed_as_initial_empty_endpoint": true,
+    "allowed_as_post_pagination_terminal_page": true,
+    "expected_request_identity_set_source": "the exact 72 fixed requests in the hash-locked V6 empty-universe contract",
+    "new_explicit_empty_request_identities_allowed": 0,
+    "missing_expected_explicit_empty_request_identities_allowed": 0
+  },
+  "ordinary_transaction_page_rule": {
+    "standard_transaction_header_required": true,
+    "standard_transaction_rows_min": 1,
+    "qualified_explicit_empty_heading_forbidden": true,
+    "on_page_index_gt_zero_raw_sha_must_be_novel_within_endpoint": true,
+    "on_page_index_gt_zero_novel_transaction_rows_min": 1
+  },
+  "known_semantic_evidence": [
+    {"year":2017,"month":9,"category":"signings","name":"Vinston Painter","transaction_contains":"Free Agent Signing"},
+    {"year":2017,"month":9,"category":"other","name":"Willie Snead","transaction_contains":"Suspension Lifted"},
+    {"year":2020,"month":9,"category":"reserve-list","name":"Jalen Reagor","transaction_contains":"Reserve/Injured"},
+    {"year":2021,"month":9,"category":"trades","name":"Bradley Roby","transaction_contains":"Traded"},
+    {"year":2021,"month":9,"category":"signings","name":"Phillip Dorsett","transaction_contains":"Practice Squad Veteran"},
+    {"year":2021,"month":9,"category":"waivers","name":"Luq Barcoo","transaction_contains":"Waived, No Recall"},
+    {"year":2021,"month":9,"category":"terminations","name":"Jamie Collins","transaction_contains":"Terminated, Vested Veteran"}
+  ],
+  "frozen_capture_gate": {
+    "all_360_endpoints_accounted_for": true,
+    "all_endpoints_converge_before_page_cap": true,
+    "source_errors_allowed": 0,
+    "unclassified_pages_allowed": 0,
+    "raw_preservation_failures_allowed": 0,
+    "duplicate_page_url_within_endpoint_allowed": 0,
+    "transaction_cursor_page_duplicate_raw_sha_allowed": 0,
+    "transaction_cursor_page_zero_novel_rows_allowed": 0,
+    "observed_explicit_empty_request_set_must_exactly_equal_frozen_72_request_set": true,
+    "all_seven_frozen_semantic_evidence_rows_found": true,
+    "all_five_years_have_transaction_rows": true,
+    "all_twelve_months_have_transaction_rows_across_capture": true,
+    "all_six_categories_have_transaction_rows_across_capture": true,
+    "silent_endpoint_or_page_drops_allowed": 0
+  },
+  "authority_if_gate_passes": {
+    "all_month_full_ledger_capture_qualified": true,
+    "full_ledger_source_capture_complete": true,
+    "durable_full_ledger_source_archive_qualified": false,
+    "transaction_state_machine_defined": false,
+    "transaction_semantic_taxonomy_qualified": false,
+    "same_day_transaction_order_resolved": false,
+    "game_day_roster_membership_constructed": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
