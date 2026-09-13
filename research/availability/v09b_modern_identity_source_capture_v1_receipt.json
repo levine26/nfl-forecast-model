@@ -1,0 +1,86 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1-COMPLETE",
+  "contract_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1",
+  "status": "SOURCE_CAPTURE_COMPLETE_NO_IDENTITY_AUTHORITY",
+  "workflow_run_id": 34733099323,
+  "validated_head_sha": "f93b47533308ef877c17cfe7cf021dddfd763ba7",
+  "research_data_branch": "research-data/v09b-modern-identity-source-v1",
+  "research_data_commit_sha": "1c6f388c06f7473eb7483d6b4b91685ecb3d019c",
+  "aggregate_artifact": {
+    "artifact_id": 10309753765,
+    "artifact_sha256": "829aabfea40604e52d59d2250c759cdcaad086fbd61206484d7b61b937de462d"
+  },
+  "season_artifacts": {
+    "2017": {"artifact_id": 10309848325, "artifact_sha256": "1a763fa253512b5c897ed748498f6d322ad3d4b1157e0680f100641dc7133d61"},
+    "2018": {"artifact_id": 10309733499, "artifact_sha256": "bfa8f1b4b5492c6aa817336d412263664a60d546eee57babbdc4b50bd4e4336c"},
+    "2019": {"artifact_id": 10310477002, "artifact_sha256": "25a3e55d73eef6fb253e0dc694b90c7dacf84c09d3c38fed38a877b6c9e86f1e"},
+    "2020": {"artifact_id": 10310505911, "artifact_sha256": "eb16870c71bf64e9a2d15a366229b4e46af28232aed79461e7163850db43e15f"},
+    "2021": {"artifact_id": 10309364295, "artifact_sha256": "508441ece202bbd390cda215e3b0019ba5e3ca0322feaf04cb77bcb90119d22c"}
+  },
+  "raw_source_sha256_by_season": {
+    "2017": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
+    "2018": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
+    "2019": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+    "2020": "8d601bf5c5d669465481421ad5cd1a1470d51792054e84bdc04f3620785f7530",
+    "2021": "3e9f67569e940b54b3778ef2c9150850920b5bf93143bad3bd158e649825cf6b"
+  },
+  "projection_sha256_by_season": {
+    "2017": "1ade2f94b602f52f53046f9efb868c441edf4f5f64ef1e205fa716327b9d4db0",
+    "2018": "237a75521207ea59be030fdf1d469ce04440e35cf8302fa8edbfabab506e45d2",
+    "2019": "ebc3e761749b956e809dfbb3e8d3556d65df22f3dcd8d7e103c70807077df7b7",
+    "2020": "49f770d6293cfab446165e5571274e44c2be61c3dfc4ee7321139006ce50ce1a",
+    "2021": "29860c837236401e1750f4902eda15ae809a62c62236ff17f16b75ca58b33fac"
+  },
+  "source_rows_selected_by_season": {
+    "2017": 49210,
+    "2018": 50113,
+    "2019": 49561,
+    "2020": 41972,
+    "2021": 44539
+  },
+  "usable_non_null_gsis_rows_by_season": {
+    "2017": 49210,
+    "2018": 50078,
+    "2019": 49559,
+    "2020": 41967,
+    "2021": 44516
+  },
+  "missing_gsis_rows_by_season": {
+    "2017": 0,
+    "2018": 35,
+    "2019": 2,
+    "2020": 5,
+    "2021": 23
+  },
+  "source_identity_conflicts_by_season": {
+    "2017": 0,
+    "2018": 0,
+    "2019": 0,
+    "2020": 0,
+    "2021": 0
+  },
+  "capture_gates": {
+    "all_five_seasons_captured": true,
+    "valid_raw_parquet_all_seasons": true,
+    "nonempty_reg_projection_all_seasons": true,
+    "projection_allowlist_only_all_seasons": true,
+    "status_fields_selected": false,
+    "status_fields_read_for_resolution": false
+  },
+  "authority": {
+    "weekly_roster_defines_game_day_membership": false,
+    "modern_game_day_roster_universe_qualified_by_this_capture": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "identity_resolution_performed": false,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
