@@ -1,0 +1,67 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V3-COMPLETE",
+  "contract_id": "V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V3",
+  "status": "AMP_TRANSPORT_ADVANCEMENT_GATE_PASSED_ZERO_SOURCE_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34743740511,
+    "validated_head_sha": "b95e18b79b4fb63f41e2560be2efe6e4fe0a6592",
+    "artifact_id": 10313138903,
+    "artifact_digest": "sha256:143977dd6316bc6c38f63c4e385abbba3b95613ab06479337f76808777e41b78",
+    "research_firewall_passed": true,
+    "unit_and_contract_passed": true,
+    "exit_code": 0
+  },
+  "empirical_result": {
+    "endpoints_expected": 2,
+    "endpoints_completed": 2,
+    "errors": 0,
+    "frozen_advancement_gate_pass": true,
+    "2017_09_signings": {
+      "amp_initial_rows": 25,
+      "amp_initial_sha256": "de638ecf08a0b95e27c97c6f1ea9c2d1500da63f6f2114db9df2a52786c1d789",
+      "amp_cursor_rows": 25,
+      "amp_cursor_sha256": "5a0799428708144f67b42a52e960398deefb9ac3f1229a14badfc25d0c9b43cf",
+      "novel_rows_vs_initial": 25,
+      "overlap_rows_vs_initial": 0,
+      "endpoint_gate_pass": true
+    },
+    "2021_09_signings": {
+      "amp_initial_rows": 25,
+      "amp_initial_sha256": "3d3b4fbec1a5da5f3f296ec97ac7b7e66e92f48f4f700525be5829017f17dee3",
+      "amp_cursor_rows": 25,
+      "amp_cursor_sha256": "d68a2713015b589c430bf29951816753ed21794cf8b1e704d8b29e955e44f762",
+      "novel_rows_vs_initial": 25,
+      "overlap_rows_vs_initial": 0,
+      "endpoint_gate_pass": true
+    }
+  },
+  "scientific_interpretation": {
+    "v1_v2_duplicate_cursor_failure_was_transport_specific": true,
+    "amp_transport_is_supported_for_the_two_frozen_historical_signings_cursors": true,
+    "cross_category_amp_pagination_qualified": false,
+    "all_month_full_ledger_qualified": false,
+    "transaction_state_machine_defined": false,
+    "next_authorized_research_step": "Separately preregister a five-season September cross-category AMP pagination capture over all six transaction categories. Require every observed cursor page to advance row identity and converge without endpoint escape before any all-month ledger capture."
+  },
+  "authority": {
+    "diagnostic_has_source_qualification_authority": false,
+    "diagnostic_has_chronology_authority": false,
+    "full_paginated_source_class_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": true,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
