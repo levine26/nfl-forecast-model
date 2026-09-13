@@ -1,0 +1,103 @@
+name: LevLine V09B delegated media provenance V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_delegated_media_provenance_v1_contract.json'
+      - 'research/v09b_delegated_media_provenance_v1.py'
+      - 'research/test_v09b_delegated_media_provenance_v1.py'
+      - '.github/workflows/research_v09b_delegated_media_provenance_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - run: pytest -q research/test_v09b_delegated_media_provenance_v1.py
+      - name: Validate club-specific authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_delegated_media_provenance_v1_contract.json').read_text())
+          assert c['status'] == 'CLUB_SPECIFIC_DELEGATION_PROVENANCE_AUDIT_ONLY_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY'
+          assert [x['team'] for x in c['qualification_candidates']] == ['CLE', 'PHI']
+          assert [x['team'] for x in c['observation_only']] == ['DEN']
+          assert c['qualification_rule']['provider_wide_allowlisting_forbidden'] is True
+          assert c['authority']['delegated_provider_globally_qualified'] is False
+          assert c['authority']['historical_document_locator_coverage_qualified'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          PY
+
+  audit-delegation:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Audit frozen club-owned delegation relations
+        run: |
+          OUT=research_outputs/v09b_delegated_media_provenance_v1/result.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_delegated_media_provenance_v1.py \
+              --contract research/availability/v09b_delegated_media_provenance_v1_contract.json \
+              --output "$OUT"
+      - name: Assert no locator or membership authority escapes
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research_outputs/v09b_delegated_media_provenance_v1/result.json').read_text())
+          assert r['candidate_count_expected'] == 2
+          assert r['candidate_count_completed'] == 2
+          assert r['candidate_errors'] == []
+          assert r['qualified_clubs'] == ['CLE', 'PHI']
+          assert r['club_specific_delegation_provenance_gate_pass'] is True
+          assert r['delegated_provider_globally_qualified'] is False
+          assert r['historical_document_locator_coverage_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-delegated-media-provenance-v1-${{ github.run_id }}
+          path: research_outputs/v09b_delegated_media_provenance_v1/result.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

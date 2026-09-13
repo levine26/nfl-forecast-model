@@ -1,0 +1,66 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-DELEGATED-MEDIA-PROVENANCE-V1",
+  "status": "CLUB_SPECIFIC_DELEGATION_PROVENANCE_AUDIT_ONLY_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY",
+  "purpose": "Determine whether specific non-club media hosts can be treated as club-delegated source origins when and only when the delegation is directly established from a club-owned media origin. This audit never grants provider-wide trust.",
+  "qualification_candidates": [
+    {
+      "team": "CLE",
+      "official_origin": "https://media.clevelandbrowns.com/",
+      "expected_delegated_host": "browns.1rmg.com",
+      "relation": "redirect",
+      "required_markers": ["Browns Media Center", "Rosters", "Depth Chart", "Season Archive"]
+    },
+    {
+      "team": "PHI",
+      "official_origin": "https://media.philadelphiaeagles.com/",
+      "expected_delegated_host": "eagles.1rmg.com",
+      "relation": "linked",
+      "minimum_delegated_links": 10,
+      "required_markers": ["Eagles Media Center", "Rosters", "Depth Chart", "Season Archives"]
+    }
+  ],
+  "observation_only": [
+    {
+      "team": "DEN",
+      "official_origin": "https://media.denverbroncos.com/",
+      "observed_prior_target": "nfl.omgsports.com",
+      "reason_no_qualification_gate": "The observed target is a generic provider host. Club-specific delegation semantics must be observed before Denver can qualify."
+    }
+  ],
+  "source_requirements": {
+    "official_origin_must_be_https": true,
+    "official_origin_must_be_club_domain_family": true,
+    "redirect_or_link_must_originate_from_official_origin_response": true,
+    "delegated_host_must_exactly_match_frozen_candidate": true,
+    "raw_official_origin_sha256_required": true,
+    "raw_final_response_sha256_required_when_redirected": true,
+    "third_party_search_result_alone_is_not_provenance": true
+  },
+  "qualification_rule": {
+    "per_club_only": true,
+    "CLE": "official club origin resolves by HTTP redirect to browns.1rmg.com and final page contains every required Browns media marker",
+    "PHI": "official club origin contains at least the frozen minimum number of direct links to eagles.1rmg.com and official-origin page contains every required Eagles media marker",
+    "provider_wide_allowlisting_forbidden": true,
+    "DEN_has_qualification_gate": false
+  },
+  "authority": {
+    "delegation_provenance_may_qualify_per_club": true,
+    "delegated_provider_globally_qualified": false,
+    "historical_document_locator_coverage_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
