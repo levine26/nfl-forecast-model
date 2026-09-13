@@ -1,0 +1,134 @@
+name: LevLine V09B legacy Game Book identity name compatibility V3
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_legacy_gamebook_identity_name_compat_v3_contract.json'
+      - 'research/v09b_legacy_gamebook_identity_name_compat_v3.py'
+      - 'research/test_v09b_legacy_gamebook_identity_name_compat_v3.py'
+      - '.github/workflows/research_v09b_legacy_gamebook_identity_name_compat_v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test name-compatibility taxonomy and rejected false-positive cases
+        run: pytest -q research/test_v09b_legacy_gamebook_identity_name_compat_v3.py
+      - name: Validate diagnostic-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_legacy_gamebook_identity_name_compat_v3_contract.json').read_text())
+          assert c['status'] == 'POST_FAILURE_NAME_COMPATIBILITY_DIAGNOSTIC_ONLY'
+          assert c['rejected_design_preservation']['unique_same_week_team_jersey_alone_authorized'] is False
+          assert c['population']['v1_exact_misses_total'] == 1832
+          assert c['population']['silent_miss_drop_allowed'] is False
+          assert c['identity_source']['forbidden_for_diagnostic'] == [
+              'status', 'status_description_abbr', 'status_short_description'
+          ]
+          assert c['candidate_scope']['all_candidates_must_be_evaluated'] is True
+          assert c['candidate_scope']['candidate_uniqueness_is_name_compatibility'] is False
+          assert c['candidate_scope']['manual_overrides_allowed'] is False
+          assert c['compatibility_taxonomy']['no_fuzzy_distance'] is True
+          assert c['compatibility_taxonomy']['no_phonetic_matching'] is True
+          assert c['compatibility_taxonomy']['no_adjacent_week_matching'] is True
+          assert c['compatibility_taxonomy']['no_season_wide_matching'] is True
+          assert c['scientific_disclosure']['diagnostic_has_qualification_authority'] is False
+          assert c['scientific_disclosure']['compatibility_tier_is_resolution_rule'] is False
+          assert c['scientific_disclosure']['future_rule_must_be_separately_preregistered'] is True
+          assert c['authorization']['legacy_player_team_game_identity_qualified'] is False
+          assert c['authorization']['name_compatibility_resolution_authorized'] is False
+          assert c['authorization']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  name-compat-diagnostic:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2012, 2013, 2014, 2015, 2016]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Diagnose name compatibility for every strict-V1 identity miss
+        run: |
+          ROOT=research_outputs/v09b_legacy_gamebook_identity_name_compat_v3/${{ matrix.season }}
+          mkdir -p "$ROOT"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_legacy_gamebook_identity_name_compat_v3.py \
+              --season ${{ matrix.season }} \
+              --archive-root "$ROOT/archive" \
+              --output "$ROOT/receipt.json"
+      - name: Assert diagnostic authority remains closed
+        if: always()
+        run: |
+          p=research_outputs/v09b_legacy_gamebook_identity_name_compat_v3/${{ matrix.season }}/receipt.json
+          if test -s "$p"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_legacy_gamebook_identity_name_compat_v3/{season}/receipt.json').read_text())
+          assert r['weekly_roster_status_used'] is False
+          assert 'status' not in r['weekly_identity_source_allowed_fields_only']
+          assert 'status_description_abbr' not in r['weekly_identity_source_allowed_fields_only']
+          assert 'status_short_description' not in r['weekly_identity_source_allowed_fields_only']
+          assert r['source_integrity_and_population_replay_pass'] is True
+          assert r['diagnostic_has_qualification_authority'] is False
+          assert r['name_compatibility_resolution_authorized'] is False
+          assert r['legacy_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['model_fit_performed'] is False
+          assert r['game_outcomes_used'] == 0
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-legacy-gamebook-identity-name-compat-v3-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_legacy_gamebook_identity_name_compat_v3/${{ matrix.season }}/receipt.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove diagnostic remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

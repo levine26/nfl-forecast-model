@@ -1,0 +1,97 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-NAME-COMPAT-V3-RESULT",
+  "purpose": "Preserve the complete five-season deterministic name-compatibility diagnostic before any replacement legacy identity resolver is preregistered.",
+  "workflow_evidence": {
+    "run_id": 34729208868,
+    "workflow_head_sha": "b55e36b6f319d88d7ce46646fb78e1f29c38dc37",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "season_jobs": {
+      "2012": {"job_id": 103648866563, "conclusion": "success", "artifact_id": 10308163103, "artifact_digest": "sha256:a88cdeca00c61ed7e7b313ea760ada3aae568bd1b95d293bfd2eb86aebd9d57e", "v1_misses": 313, "strong_zero": 111, "strong_one": 202, "extended_zero": 23, "extended_one": 290},
+      "2013": {"job_id": 103648866661, "conclusion": "success", "artifact_id": 10308467356, "artifact_digest": "sha256:9b2bcb4ddae43ad7e9d1547f97ae23b937502b9aa22e00a33c2071acd3c1de4e", "v1_misses": 298, "strong_zero": 67, "strong_one": 231, "extended_zero": 26, "extended_one": 272},
+      "2014": {"job_id": 103648866557, "conclusion": "success", "artifact_id": 10308683284, "artifact_digest": "sha256:202cb2d0a0a5794aa525d6a10a66a0c02d5027d2672de06426bb2d4df0ee6cad", "v1_misses": 264, "strong_zero": 110, "strong_one": 154, "extended_zero": 59, "extended_one": 205},
+      "2015": {"job_id": 103648866569, "conclusion": "success", "artifact_id": 10308658303, "artifact_digest": "sha256:e7a2149b42b1d2c777bd988676840872b9a0caa080fa0ce9347e6d68354866a9", "v1_misses": 252, "strong_zero": 61, "strong_one": 191, "extended_zero": 3, "extended_one": 249},
+      "2016": {"job_id": 103648866576, "conclusion": "success", "artifact_id": 10308603408, "artifact_digest": "sha256:44bfa52f083f0a3156524734f323d203aa7a1152c4ee63681b755898855cdda6", "v1_misses": 705, "strong_zero": 547, "strong_one": 158, "extended_zero": 489, "extended_one": 216}
+    }
+  },
+  "aggregate": {
+    "v1_exact_misses": 1832,
+    "same_week_team_jersey_zero_candidate_misses": 377,
+    "same_week_team_jersey_one_candidate_misses": 1448,
+    "same_week_team_jersey_multiple_candidate_misses": 7,
+    "strong_compatible_candidate_count_distribution": {"0": 896, "1": 936},
+    "extended_compatible_candidate_count_distribution": {"0": 600, "1": 1232},
+    "misses_with_more_than_one_strong_compatible_candidate": 0,
+    "misses_with_more_than_one_extended_compatible_candidate": 0,
+    "compatibility_method_counts": {
+      "given_full_prefix+surname_exact": 919,
+      "given_initial_only+compound_component_prefix": 17,
+      "given_initial_only+gamebook_surname_is_source_leading_components": 258,
+      "given_initial_only+source_surname_is_gamebook_leading_components": 11,
+      "given_initial_only+surname_exact": 22,
+      "given_absent+surname_exact": 5,
+      "given_initial_only+surname_absent": 39,
+      "given_full_prefix+surname_absent": 52,
+      "given_initial_only+surname_incompatible": 24,
+      "given_absent+surname_incompatible": 5,
+      "given_incompatible+surname_exact": 22,
+      "given_incompatible+surname_incompatible": 88
+    }
+  },
+  "candidate_rule_diagnostics_only": {
+    "strict_strong_additional_resolutions": 936,
+    "strict_strong_projected_total_resolutions": 134676,
+    "strict_strong_projected_resolution_rate": 0.9933909656861298,
+    "strict_strong_meets_frozen_0_995_minimum": false,
+    "all_extended_additional_resolutions": 1232,
+    "all_extended_projected_total_resolutions": 134972,
+    "all_extended_projected_resolution_rate": 0.9955743073791048,
+    "all_extended_meets_frozen_0_995_minimum": true,
+    "narrow_structural_candidate_methods": [
+      "given_full_prefix+surname_exact",
+      "given_initial_only+compound_component_prefix",
+      "given_initial_only+gamebook_surname_is_source_leading_components",
+      "given_initial_only+source_surname_is_gamebook_leading_components"
+    ],
+    "narrow_structural_additional_resolutions": 1205,
+    "narrow_structural_projected_total_resolutions": 134945,
+    "narrow_structural_projected_resolution_rate": 0.9953751512111646,
+    "narrow_structural_projected_unresolved": 627,
+    "narrow_structural_meets_frozen_0_995_minimum": true,
+    "excluded_weaker_extended_methods": [
+      "given_initial_only+surname_exact",
+      "given_absent+surname_exact"
+    ]
+  },
+  "observed_semantic_shape": {
+    "rejected_unique_jersey_false_candidates_remain_incompatible": true,
+    "leading_component_examples_are_compound_or_truncated_surnames": [
+      "D.Van -> DeMarcus Van Dyke",
+      "R.Jean -> Ricky Jean Francois",
+      "B.De -> Brian De La Puente",
+      "K.Grugier- -> Kamu Grugier-Hill",
+      "D.Rodgers- -> Dominique Rodgers-Cromartie",
+      "N.Robey-Coleman -> Nickell Robey"
+    ],
+    "interpretation": "The diagnostic supports preregistering a narrower structural-name resolver for empirical audit. It does not itself authorize or qualify any identity mapping."
+  },
+  "scientific_disposition": {
+    "diagnostic_has_qualification_authority": false,
+    "legacy_player_team_game_identity_qualified": false,
+    "name_compatibility_resolution_authorized": false,
+    "future_narrow_structural_resolver_may_be_preregistered": true,
+    "future_rule_must_replay_exact_legacy_denominator": true,
+    "future_rule_must_leave_nonmatching_or_multiple_candidates_unresolved": true,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_status_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
