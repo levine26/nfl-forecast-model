@@ -8,6 +8,7 @@ on:
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/editorial_model_read.py"
+      - "src/nfl_forecast/editorial_provider_fallback.py"
       - "src/nfl_forecast/copilot_media.py"
       - "src/nfl_forecast/copilot_source_backfill.py"
       - "src/nfl_forecast/source_policy.py"
@@ -16,6 +17,7 @@ on:
       - "scripts/build_copilot_media_prompt.py"
       - "scripts/build_single_game_copilot_prompt.py"
       - "scripts/run_groq_media_prompt.py"
+      - "scripts/recover_groq_focused_game.py"
       - "scripts/merge_copilot_game_payloads.py"
       - "scripts/compose_copilot_media_reads.py"
       - "scripts/render_levline_paragraphs.py"
@@ -28,6 +30,8 @@ on:
       - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
       - "tests/test_groq_media_runner.py"
+      - "tests/test_editorial_provider_fallback.py"
+      - "tests/test_recover_groq_focused_game.py"
       - "tests/test_levline_paragraph_renderer.py"
       - "tests/test_single_copilot_game_validator.py"
       - "tests/test_read_contract.py"
@@ -41,6 +45,7 @@ on:
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/editorial_model_read.py"
+      - "src/nfl_forecast/editorial_provider_fallback.py"
       - "src/nfl_forecast/copilot_media.py"
       - "src/nfl_forecast/copilot_source_backfill.py"
       - "src/nfl_forecast/source_policy.py"
@@ -49,6 +54,7 @@ on:
       - "scripts/build_copilot_media_prompt.py"
       - "scripts/build_single_game_copilot_prompt.py"
       - "scripts/run_groq_media_prompt.py"
+      - "scripts/recover_groq_focused_game.py"
       - "scripts/merge_copilot_game_payloads.py"
       - "scripts/compose_copilot_media_reads.py"
       - "scripts/render_levline_paragraphs.py"
@@ -61,6 +67,8 @@ on:
       - "tests/test_copilot_composition.py"
       - "tests/test_copilot_json_handoff.py"
       - "tests/test_groq_media_runner.py"
+      - "tests/test_editorial_provider_fallback.py"
+      - "tests/test_recover_groq_focused_game.py"
       - "tests/test_levline_paragraph_renderer.py"
       - "tests/test_single_copilot_game_validator.py"
       - "tests/test_read_contract.py"
@@ -177,7 +185,9 @@ jobs:
         run: pip install ".[dev]"
 
       - name: Test media editorial guardrails
-        run: pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_groq_main_advance_audit.py
+        run: |
+          pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_editorial_provider_fallback.py tests/test_recover_groq_focused_game.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_groq_main_advance_audit.py
+          python -m py_compile scripts/recover_groq_focused_game.py src/nfl_forecast/editorial_provider_fallback.py
 
       - name: Canonicalize editorial forecast source
         run: |
@@ -188,7 +198,29 @@ jobs:
       - name: Refresh deterministic reporting packet
         run: python scripts/finalize_editorial.py --skip-copilot
 
-      - name: Research, compose and validate human game Reads with Groq
+      - name: Preserve last launch-grade media reporting snapshot
+        if: github.event_name != 'pull_request'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          media = dict(status.get('media_reporting') or {})
+          finalizer = status.get('editorial_finalizer') or {}
+          games = int(finalizer.get('games', 0))
+          trusted = int(media.get('games_with_trusted_reporting', 0))
+          if games > 0 and media.get('status') == 'healthy' and trusted == games:
+              Path('/tmp/groq-preserved-media-reporting.json').write_text(
+                  json.dumps({'games': games, 'media_reporting': media}, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8',
+              )
+              print('Preserved launch-grade media reporting snapshot for', games, 'games')
+          else:
+              print('No launch-grade media reporting snapshot available to preserve:', media)
+          PY
+
+      - name: Research, compose and validate human game Reads with Groq and immediate ChatGPT fallback
         if: github.event_name != 'pull_request'
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -210,6 +242,22 @@ jobs:
           rm -f /tmp/groq-media-raw.json /tmp/groq-media-composed.json /tmp/groq-media-rendered.json outputs/copilot_media_reads.json
           echo "Groq focused matchups: ${#game_ids[@]}"
 
+          recover_game() {
+            local gid="$1"
+            local reason="$2"
+            local feedback="$3"
+            echo "$gid: Groq failed ($reason); invoking immediate game-scoped ChatGPT recovery."
+            if ! python scripts/recover_groq_focused_game.py --game-id "$gid" --output "$parts/$gid.txt" --reason "$reason"; then
+              return 1
+            fi
+            if ! python scripts/validate_single_copilot_game.py --input "$parts/$gid.txt" --game-id "$gid" --predictions outputs/this_week.csv --accepted-dir "$parts" 2> "$feedback"; then
+              cat "$feedback"
+              return 1
+            fi
+            echo "$gid: immediate ChatGPT/last-good recovery passed focused validation."
+            return 0
+          }
+
           total_games=${#game_ids[@]}
           game_index=0
           for gid in "${game_ids[@]}"; do
@@ -217,13 +265,17 @@ jobs:
             feedback="/tmp/groq-${gid}-feedback.txt"
             : > "$feedback"
             accepted=0
+            provider_failed=0
             for attempt in 1 2 3; do
               echo "$gid focused Groq editorial attempt $attempt/3"
               prompt="$prompts/$gid.txt"
               python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
               if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 3; then
-                echo "$gid: Groq provider request failed; failing closed without multiplying provider calls across editorial retries."
-                exit 1
+                provider_failed=1
+                if recover_game "$gid" "groq_provider_request_failed" "$feedback"; then
+                  accepted=1
+                fi
+                break
               fi
               if python scripts/validate_single_copilot_game.py --input "$parts/$gid.txt" --game-id "$gid" --predictions outputs/this_week.csv --accepted-dir "$parts" 2> "$feedback"; then
                 accepted=1
@@ -236,7 +288,16 @@ jobs:
                 sleep 65
               fi
             done
-            if [ "$accepted" -ne 1 ]; then echo "$gid failed all three focused editorial validation attempts."; exit 1; fi
+
+            if [ "$accepted" -ne 1 ] && [ "$provider_failed" -eq 0 ]; then
+              if recover_game "$gid" "focused_validation_failed" "$feedback"; then
+                accepted=1
+              fi
+            fi
+            if [ "$accepted" -ne 1 ]; then
+              echo "$gid could not be recovered safely after Groq failure."
+              exit 1
+            fi
             if [ "$game_index" -lt "$total_games" ]; then
               sleep 65
             fi
@@ -245,13 +306,32 @@ jobs:
           python scripts/merge_copilot_game_payloads.py --input-dir "$parts" --predictions outputs/this_week.csv --output /tmp/groq-media-raw.json
           python scripts/compose_copilot_media_reads.py --input /tmp/groq-media-raw.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --evidence outputs/contextual_evidence.json --output /tmp/groq-media-composed.json
           python scripts/render_levline_paragraphs.py --input /tmp/groq-media-composed.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --output /tmp/groq-media-rendered.json
-          python scripts/validate_copilot_media_reads.py --input /tmp/groq-media-rendered.json --predictions outputs/this_week.csv --output outputs/copilot_media_reads.json
-          echo "All Groq responses passed the LevLine 3.0 full-slate publication validator."
+
+          validation_log=/tmp/groq-full-slate-validation.txt
+          if ! python scripts/validate_copilot_media_reads.py --input /tmp/groq-media-rendered.json --predictions outputs/this_week.csv --output outputs/copilot_media_reads.json 2> "$validation_log"; then
+            cat "$validation_log"
+            mapfile -t repair_ids < <(grep -oE '2026_[0-9]{2}_[A-Z]{2,3}_[A-Z]{2,3}' "$validation_log" | sort -u || true)
+            if [ "${#repair_ids[@]}" -eq 0 ]; then
+              echo "Full-slate validation failed without a game-scoped target; refusing broad replacement of successful Groq games."
+              exit 1
+            fi
+            echo "Full-slate validator implicated ${#repair_ids[@]} game(s); replacing only those games through ChatGPT fallback."
+            for gid in "${repair_ids[@]}"; do
+              feedback="/tmp/groq-${gid}-full-slate-feedback.txt"
+              : > "$feedback"
+              recover_game "$gid" "full_slate_validation_failed" "$feedback" || exit 1
+            done
+            python scripts/merge_copilot_game_payloads.py --input-dir "$parts" --predictions outputs/this_week.csv --output /tmp/groq-media-raw.json
+            python scripts/compose_copilot_media_reads.py --input /tmp/groq-media-raw.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --evidence outputs/contextual_evidence.json --output /tmp/groq-media-composed.json
+            python scripts/render_levline_paragraphs.py --input /tmp/groq-media-composed.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --output /tmp/groq-media-rendered.json
+            python scripts/validate_copilot_media_reads.py --input /tmp/groq-media-rendered.json --predictions outputs/this_week.csv --output outputs/copilot_media_reads.json
+          fi
+          echo "Groq/ChatGPT hybrid responses passed the LevLine 3.0 full-slate publication validator."
 
       - name: PR provider migration gate
         if: github.event_name == 'pull_request'
         run: |
-          python -m py_compile scripts/run_groq_media_prompt.py scripts/build_single_game_copilot_prompt.py scripts/audit_groq_main_advance.py
+          python -m py_compile scripts/run_groq_media_prompt.py scripts/build_single_game_copilot_prompt.py scripts/recover_groq_focused_game.py scripts/audit_groq_main_advance.py
           python - <<'PY'
           from pathlib import Path
           import re
@@ -259,6 +339,7 @@ jobs:
           text = Path('.github/workflows/groq_media_writer.yml').read_text(encoding='utf-8')
           runner = Path('scripts/run_groq_media_prompt.py').read_text(encoding='utf-8')
           prompt = Path('scripts/build_single_game_copilot_prompt.py').read_text(encoding='utf-8')
+          recovery = Path('scripts/recover_groq_focused_game.py').read_text(encoding='utf-8')
           assert not re.search(r'^\s*copilot-requests\s*:', text, flags=re.M)
           assert not re.search(r'^\s*run:\s*npm\s+install\s+-g\s+@github/copilot\s*$', text, flags=re.M)
           assert 'secrets.GROQ_API_KEY' in text
@@ -274,7 +355,12 @@ jobs:
           assert 'src/nfl_forecast/editorial_model_read.py' in text
           assert 'executed_tools' in runner and 'web_search' in runner
           assert 'retry-after' in runner and 'x-ratelimit-remaining-tokens' in runner
-          assert 'Groq provider request failed; failing closed' in text
+          assert 'recover_groq_focused_game.py' in text
+          assert 'groq_provider_request_failed' in text
+          assert 'focused_validation_failed' in text
+          assert 'full_slate_validation_failed' in text
+          assert 'inputs/chatgpt_media/fallback' in recovery
+          assert 'inputs/chatgpt_media/current' in recovery
           assert 'inherits latest successful contextual intelligence' in text
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
@@ -291,7 +377,7 @@ jobs:
           assert 'outputs/contextual_evidence.json' in publish_block
           assert 'validated_base=$(git rev-parse HEAD^)' in publish_block
           assert 'git pull --rebase origin main' not in publish_block
-          print('Groq Compound Mini minimal-request, safe diagnostics, pacing, context freshness/refetch, race reconciliation, isolated concurrency, and validated-snapshot publication wiring validated without consuming repository secrets on PR.')
+          print('Groq remains primary, but provider/focused/full-slate game failures now fail soft into immediate game-scoped ChatGPT recovery while preserving successful Groq games.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
@@ -322,18 +408,39 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          status = json.loads(Path('outputs/context_source_status.json').read_text())
-          media = status.get('media_reporting', {})
+
+          status_path = Path('outputs/context_source_status.json')
+          status = json.loads(status_path.read_text())
+          media = dict(status.get('media_reporting') or {})
           provider = status.get('copilot_media', {})
           finalizer = status.get('editorial_finalizer', {})
           games = int(finalizer.get('games', 0))
+
+          snapshot_path = Path('/tmp/groq-preserved-media-reporting.json')
+          trusted = int(media.get('games_with_trusted_reporting', 0))
+          if (media.get('status') != 'healthy' or trusted != games) and snapshot_path.is_file():
+              snapshot = json.loads(snapshot_path.read_text())
+              prior_media = dict(snapshot.get('media_reporting') or {})
+              prior_games = int(snapshot.get('games', 0))
+              prior_trusted = int(prior_media.get('games_with_trusted_reporting', 0))
+              if prior_games == games and prior_media.get('status') == 'healthy' and prior_trusted == games:
+                  prior_media['groq_refresh_snapshot_reused'] = True
+                  prior_media['groq_refresh_snapshot_guardrail'] = (
+                      'A transient deterministic reporting rediscovery dip cannot discard already validated provider human Reads; '
+                      'fresh reporting remains visible through contextual evidence and provider advisories.'
+                  )
+                  status['media_reporting'] = prior_media
+                  status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n')
+                  media = prior_media
+                  print('Reused prior launch-grade media reporting snapshot after transient refresh degradation.')
+
           if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
               raise SystemExit(f'media reporting not launch-grade: {media}')
           if provider.get('status') != 'healthy' or int(provider.get('games_applied', 0)) != games:
-              raise SystemExit(f'Groq editorial provider did not cover full slate: {provider}')
+              raise SystemExit(f'Editorial provider did not cover full slate: {provider}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
               raise SystemExit(f'final editorial gate failed: {finalizer}')
-          print('Groq matchup/model/pick launch gate passed:', games, 'games')
+          print('Groq/ChatGPT matchup/model/pick launch gate passed:', games, 'games')
           PY
 
       - name: Publish editorial-only outputs
@@ -344,7 +451,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
           if git diff --cached --quiet; then echo "No media editorial changes to publish."; exit 0; fi
-          git commit -m "Refresh Groq-powered Sunday Signal Reads"
+          git commit -m "Refresh Groq/ChatGPT Sunday Signal Reads"
           git fetch origin main
           validated_base=$(git rev-parse HEAD^)
           if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then
