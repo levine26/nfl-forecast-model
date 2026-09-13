@@ -1,0 +1,92 @@
+{
+  "authority": {
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "modern_raw_source_bytes_qualified": false,
+    "snapshot_is_downstream_discovery_authority": true,
+    "snapshot_is_label_authority": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "canonical_universe": {
+    "expected_games_by_season": {
+      "2017": 256,
+      "2018": 256,
+      "2019": 256,
+      "2020": 256,
+      "2021": 272
+    },
+    "expected_games_total": 1296,
+    "seasons": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021
+    ],
+    "silent_game_drops_allowed": false
+  },
+  "contract_id": "V09B-MODERN-GAMEBOOK-LOCATOR-SNAPSHOT-V1",
+  "contract_version": 1,
+  "dependencies": [
+    "V09B-MODERN-GAMEBOOK-LOCATOR-V2-QUALIFICATION",
+    "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V1-FAILURE"
+  ],
+  "governance": {
+    "completed_2026_outcomes_used": 0,
+    "game_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false,
+    "research_only": true
+  },
+  "purpose": "Generate and persist an immutable 1,296-row game_id->official first-party Game Book URL snapshot from the already-qualified locator workflow artifacts so downstream raw-byte qualification never re-discovers historical URLs from mutable live Game Center markup.",
+  "snapshot": {
+    "combined_sha256": "d26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351",
+    "expected_bytes": 154920,
+    "format": "UTF-8 TSV, one row per game: game_id<TAB>gamebook_url<LF>",
+    "required_document_host": "static.www.nfl.com",
+    "required_document_scheme": "https",
+    "required_gamebook_extraction_method_in_source_artifacts": "download_anchor",
+    "required_unique_game_ids": 1296,
+    "required_unique_gamebook_urls": 1296,
+    "research_data_branch": "research-data/v09b-modern-locator-snapshot-v1",
+    "research_data_path": "research_outputs/v09b_modern_locator_snapshot_v1"
+  },
+  "source_workflow": {
+    "artifact_digests_by_season": {
+      "2017": "sha256:8e5b0cfc1ae61e7b70a4f59d8d0dad54eeafb7d5165962756da4d3781043e14b",
+      "2018": "sha256:c3968e3689c602a625f566a88a6ffeb491cc99a89e158eeafa7c8ecad3f1af9d",
+      "2019": "sha256:708b6e8a1cb3a7e2ef45e804b19781858cc3abe1230c2e6ad9b8a907a9324224",
+      "2020": "sha256:9d666194b1f40c3c0a79e4eb8e827397a3c1a9905a29abed6144f9e5f3cf23d9",
+      "2021": "sha256:f3ae00be7dfd41ed1e48d7aafe739d7d888bcd1da17f40d3371af79f56b15fde"
+    },
+    "artifact_ids_by_season": {
+      "2017": 10307759606,
+      "2018": 10308151131,
+      "2019": 10308575420,
+      "2020": 10308360495,
+      "2021": 10308800231
+    },
+    "artifact_names_by_season": {
+      "2017": "v09b-modern-gamebook-locator-2017-34725715104",
+      "2018": "v09b-modern-gamebook-locator-2018-34725715104",
+      "2019": "v09b-modern-gamebook-locator-2019-34725715104",
+      "2020": "v09b-modern-gamebook-locator-2020-34725715104",
+      "2021": "v09b-modern-gamebook-locator-2021-34725715104"
+    },
+    "head_sha": "2c18ecb722c9a3696482285a3e2b82c55031bfa2",
+    "run_id": 34725715104
+  },
+  "status": "PREREGISTERED_DURABLE_QUALIFIED_LOCATOR_SNAPSHOT",
+  "v1_failure_boundary": {
+    "failed_live_rediscovery_games": [
+      "2017_01_ARI_DET",
+      "2019_15_BUF_PIT",
+      "2021_13_BAL_PIT"
+    ],
+    "live_page_order_tie_break_allowed": false,
+    "snapshot_must_contain_qualified_url_for_each": true,
+    "threshold_relaxation_allowed": false
+  }
+}

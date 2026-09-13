@@ -1,0 +1,109 @@
+name: LevLine V09B modern locator snapshot V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_gamebook_locator_snapshot_contract_v1.json'
+      - 'research/v09b_modern_gamebook_locator_snapshot_v1.py'
+      - 'research/test_v09b_modern_gamebook_locator_snapshot_v1.py'
+      - '.github/workflows/research_v09b_modern_gamebook_locator_snapshot_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest
+      - run: pytest -q research/test_v09b_modern_gamebook_locator_snapshot_v1.py
+      - name: Validate frozen artifact provenance contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_gamebook_locator_snapshot_contract_v1.json').read_text())
+          assert c['status'] == 'PREREGISTERED_DURABLE_QUALIFIED_LOCATOR_SNAPSHOT'
+          assert c['source_workflow']['run_id'] == 34725715104
+          assert c['source_workflow']['head_sha'] == '2c18ecb722c9a3696482285a3e2b82c55031bfa2'
+          assert c['canonical_universe']['expected_games_total'] == 1296
+          assert c['snapshot']['combined_sha256'] == 'd26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351'
+          assert c['authority']['modern_raw_source_bytes_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          PY
+
+  snapshot-build:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 34725715104
+          pattern: v09b-modern-gamebook-locator-*-34725715104
+          path: /tmp/v09b_locator_qualified
+          merge-multiple: true
+      - name: Generate immutable locator snapshot from qualified artifacts
+        run: |
+          python research/v09b_modern_gamebook_locator_snapshot_v1.py \
+            --artifact-dir /tmp/v09b_locator_qualified \
+            --output-dir /tmp/v09b_modern_locator_snapshot_v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-locator-snapshot-v1-${{ github.run_id }}
+          path: /tmp/v09b_modern_locator_snapshot_v1
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist snapshot on isolated research-data branch
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-modern-locator-snapshot-v1
+          ROOT=research_outputs/v09b_modern_locator_snapshot_v1
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B v09b-modern-locator-snapshot-data "origin/$DATA_BRANCH"
+          else
+            git checkout --orphan v09b-modern-locator-snapshot-data
+            git rm -rf . || true
+          fi
+          rm -rf "$ROOT"
+          mkdir -p "$ROOT"
+          cp /tmp/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv "$ROOT/locator_snapshot.tsv"
+          cp /tmp/v09b_modern_locator_snapshot_v1/receipt.json "$ROOT/receipt.json"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'Locator snapshot already matches frozen qualified artifacts.'
+            exit 0
+          fi
+          git commit -m 'Freeze qualified 2017-2021 Game Book locator snapshot'
+          git push origin HEAD:"$DATA_BRANCH"
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove snapshot generator remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
