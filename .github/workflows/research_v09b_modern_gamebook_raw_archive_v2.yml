@@ -1,0 +1,288 @@
+name: LevLine V09B modern Game Book raw archive V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_gamebook_raw_archive_contract_v2.json'
+      - 'research/v09b_modern_gamebook_raw_archive_v2.py'
+      - 'research/test_v09b_modern_gamebook_raw_archive_v2.py'
+      - '.github/workflows/research_v09b_modern_gamebook_raw_archive_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-gamebook-raw-archive-v2-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test snapshot-backed source semantics
+        run: pytest -q research/test_v09b_modern_gamebook_raw_archive_v2.py
+      - name: Validate frozen V2 contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_gamebook_raw_archive_contract_v2.json').read_text())
+          assert c['status'] == 'PREREGISTERED_SNAPSHOT_BACKED_FULL_SOURCE_QUALIFICATION'
+          assert c['canonical_universe']['expected_games_total'] == 1296
+          assert c['locator_snapshot_dependency']['sha256'] == 'd26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351'
+          assert c['locator_snapshot_dependency']['commit_sha'] == 'a3f5c5a791f878b12cb92658df37b8a7d093cd0b'
+          assert c['locator_snapshot_dependency']['live_game_center_rediscovery_allowed'] is False
+          assert c['locator_snapshot_dependency']['page_order_tie_break_allowed'] is False
+          assert c['qualification_authority']['season_jobs_may_qualify_layer'] is False
+          assert c['qualification_authority']['aggregate_five_season_job_required'] is True
+          assert c['governance']['thresholds_unchanged_from_v1'] is True
+          assert c['governance']['label_semantics_unchanged_from_v1'] is True
+          assert all(value == 1.0 for key, value in c['frozen_qualification_gates'].items() if key.endswith('_required'))
+          assert c['frozen_qualification_gates']['source_row_errors_allowed'] == 0
+          assert c['not_yet_qualified']['modern_game_day_roster_universe'] is True
+          assert c['not_yet_qualified']['modern_player_team_game_identity'] is True
+          assert c['not_yet_qualified']['training_source_chronology'] is True
+          assert c['not_yet_qualified']['v09b_model_fit'] is True
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  source-audit:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Materialize exact frozen locator snapshot
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-modern-locator-snapshot-v1
+          EXPECTED_COMMIT=a3f5c5a791f878b12cb92658df37b8a7d093cd0b
+          git fetch origin "$DATA_BRANCH"
+          test "$(git rev-parse FETCH_HEAD)" = "$EXPECTED_COMMIT"
+          mkdir -p /tmp/v09b_modern_locator_snapshot_v1
+          git show "$EXPECTED_COMMIT:research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv" \
+            > /tmp/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p = Path('/tmp/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv')
+          raw = p.read_bytes()
+          assert len(raw) == 154920
+          assert hashlib.sha256(raw).hexdigest() == 'd26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351'
+          PY
+      - name: Archive and audit every season Game Book from frozen snapshot
+        run: |
+          ROOT=research_outputs/v09b_modern_gamebook_raw_archive_v2
+          mkdir -p "$ROOT/receipts"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_gamebook_raw_archive_v2.py \
+              --season ${{ matrix.season }} \
+              --snapshot /tmp/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv \
+              --archive-root "$ROOT" \
+              --receipt "$ROOT/receipts/${{ matrix.season }}.json"
+      - name: Assert season gates without layer qualification authority
+        if: always()
+        run: |
+          receipt=research_outputs/v09b_modern_gamebook_raw_archive_v2/receipts/${{ matrix.season }}.json
+          if test -s "$receipt"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_modern_gamebook_raw_archive_v2/receipts/{season}.json').read_text())
+          assert r['contract_id'] == 'V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2'
+          assert r['parser_version'] == 'V09B-MODERN-GAMEBOOK-TEXT-STRUCTURE-V2'
+          assert r['snapshot_coverage_rate'] == 1.0
+          assert r['source_bytes_verified_rate'] == 1.0
+          assert r['pdf_text_extraction_rate'] == 1.0
+          assert r['not_active_structure_rate'] == 1.0
+          assert r['did_not_play_structure_rate'] == 1.0
+          assert r['distinct_semantic_structure_rate'] == 1.0
+          assert r['canonical_game_coverage_rate'] == 1.0
+          assert r['season_frozen_source_gates_pass'] is True
+          assert r['season_has_layer_qualification_authority'] is False
+          assert r['modern_raw_source_bytes_qualified'] is False
+          assert r['modern_gamebook_structure_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['live_game_center_rediscovery_used'] is False
+          assert r['page_order_tie_break_used'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-modern-gamebook-raw-v2-${{ matrix.season }}-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_modern_gamebook_raw_archive_v2/manifests/${{ matrix.season }}.jsonl
+            research_outputs/v09b_modern_gamebook_raw_archive_v2/receipts/${{ matrix.season }}.json
+            research_outputs/v09b_modern_gamebook_raw_archive_v2/raw/*.pdf.gz
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-qualification:
+    needs: source-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-gamebook-raw-v2-*-${{ github.run_id }}
+          path: /tmp/v09b_modern_gamebook_raw_archive_v2
+          merge-multiple: true
+      - name: Apply frozen five-season aggregate source gate
+        run: |
+          python - <<'PY'
+          import gzip
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path('/tmp/v09b_modern_gamebook_raw_archive_v2')
+          seasons = [2017, 2018, 2019, 2020, 2021]
+          receipts = [json.loads((root / 'receipts' / f'{season}.json').read_text()) for season in seasons]
+          assert all(r['season_frozen_source_gates_pass'] is True for r in receipts)
+          assert all(r['season_has_layer_qualification_authority'] is False for r in receipts)
+          assert sum(r['canonical_games'] for r in receipts) == 1296
+          assert sum(r['snapshot_covered_games'] for r in receipts) == 1296
+          assert sum(r['source_bytes_verified'] for r in receipts) == 1296
+          assert sum(r['pdf_text_extractions'] for r in receipts) == 1296
+          assert sum(r['not_active_structure_valid_games'] for r in receipts) == 1296
+          assert sum(r['did_not_play_structure_valid_games'] for r in receipts) == 1296
+          assert sum(r['distinct_semantic_structure_games'] for r in receipts) == 1296
+          assert sum(r['qualified_source_rows'] for r in receipts) == 1296
+          assert sum(r['source_row_errors'] for r in receipts) == 0
+          assert sum(r['duplicate_canonical_game_rows'] for r in receipts) == 0
+          assert sum(r['duplicate_source_sha_across_distinct_games'] for r in receipts) == 0
+          assert all(r['archive_integrity_ok'] is True for r in receipts)
+          assert all(r['live_game_center_rediscovery_used'] is False for r in receipts)
+          assert all(r['page_order_tie_break_used'] is False for r in receipts)
+          assert all(r['completed_2026_outcomes_used'] == 0 for r in receipts)
+
+          manifest_rows = []
+          for season in seasons:
+              manifest_rows.extend(
+                  json.loads(line)
+                  for line in (root / 'manifests' / f'{season}.jsonl').read_text().splitlines()
+                  if line.strip()
+              )
+          assert len(manifest_rows) == 1296
+          assert len({row['game_id'] for row in manifest_rows}) == 1296
+          assert all(row['source_row_qualified'] is True for row in manifest_rows)
+          assert all(row['locator_snapshot_sha256'] == 'd26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351' for row in manifest_rows)
+          assert all(row['live_game_center_rediscovery_used'] is False for row in manifest_rows)
+
+          raw_files = list((root / 'raw').glob('*.pdf.gz'))
+          assert len(raw_files) == 1296
+          for path in raw_files:
+              raw = gzip.decompress(path.read_bytes())
+              assert raw.startswith(b'%PDF')
+              assert hashlib.sha256(raw).hexdigest() == path.name.removesuffix('.pdf.gz')
+
+          result = {
+              'qualification_version': 1,
+              'qualification_id': 'V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION',
+              'canonical_games': 1296,
+              'snapshot_covered_games': 1296,
+              'source_bytes_verified': 1296,
+              'pdf_text_extractions': 1296,
+              'not_active_structure_valid_games': 1296,
+              'did_not_play_structure_valid_games': 1296,
+              'distinct_semantic_structure_games': 1296,
+              'qualified_source_rows': 1296,
+              'source_row_errors': 0,
+              'duplicate_canonical_game_rows': 0,
+              'duplicate_source_sha_across_distinct_games': 0,
+              'locator_snapshot_sha256': 'd26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351',
+              'live_game_center_rediscovery_used': False,
+              'page_order_tie_break_used': False,
+              'modern_raw_source_bytes_qualified': True,
+              'modern_gamebook_structure_qualified': True,
+              'modern_game_day_roster_universe_qualified': False,
+              'modern_player_team_game_identity_qualified': False,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'model_fit_performed': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+          }
+          (root / 'aggregate_qualification.json').write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-gamebook-raw-v2-aggregate-${{ github.run_id }}
+          path: /tmp/v09b_modern_gamebook_raw_archive_v2/aggregate_qualification.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist qualified V2 archive on isolated research-data branch
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-gamebooks-modern-v2
+          ROOT=research_outputs/v09b_modern_gamebook_raw_archive_v2
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B v09b-gamebooks-modern-v2-data "origin/$DATA_BRANCH"
+          else
+            git checkout --orphan v09b-gamebooks-modern-v2-data
+            git rm -rf . || true
+          fi
+          rm -rf "$ROOT"
+          mkdir -p "$(dirname "$ROOT")"
+          cp -R /tmp/v09b_modern_gamebook_raw_archive_v2 "$ROOT"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'Modern V2 Game Book archive already matches qualified immutable bytes.'
+            exit 0
+          fi
+          git commit -m 'Archive qualified 2017-2021 NFL Game Books for V09B V2 research'
+          git push origin HEAD:"$DATA_BRANCH"
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

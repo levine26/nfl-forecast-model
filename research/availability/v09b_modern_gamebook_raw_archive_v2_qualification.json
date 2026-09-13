@@ -1,0 +1,61 @@
+{
+  "qualification_version": 1,
+  "qualification_id": "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION",
+  "scope": "2017-2021 regular-season official first-party NFL Game Book bytes and minimum inactive-source text structure",
+  "workflow_evidence": {
+    "run_id": 34731654680,
+    "workflow_head_sha": "1766cc54e3eaefad3cd32384b9c05d55b8eac184",
+    "unit_and_contract": {"job_id": 103655423490, "conclusion": "success"},
+    "research_firewall": {"job_id": 103655423536, "conclusion": "success"},
+    "season_jobs": {
+      "2017": {"job_id": 103655521664, "conclusion": "success", "artifact_id": 10310145912, "artifact_digest": "sha256:706052ff8b1358533cb510092f5a892b36e69b4c9088380f6c559917d41aee52", "canonical_games": 256},
+      "2018": {"job_id": 103655521663, "conclusion": "success", "artifact_id": 10310280128, "artifact_digest": "sha256:f7422b9bc644637d50a65ebfc2bade9df5cee4ba1a4961e3e135b2ebd80c6d53", "canonical_games": 256},
+      "2019": {"job_id": 103655521670, "conclusion": "success", "artifact_id": 10309841190, "artifact_digest": "sha256:a3839b8a94e6c5e30495ebdd4e6b778d7cbd1c148b2129de71462d5ddb41b70c", "canonical_games": 256},
+      "2020": {"job_id": 103655521699, "conclusion": "success", "artifact_id": 10310080842, "artifact_digest": "sha256:b50903959b18dc8812cda482bbd0644f888d8a5706c8b3b0fa9110719450bbba", "canonical_games": 256},
+      "2021": {"job_id": 103655521752, "conclusion": "success", "artifact_id": 10310100815, "artifact_digest": "sha256:3f28f329a9d6118d909dfdac5deab306d3a836c9d6c9b07aec387d998c311f79", "canonical_games": 272}
+    },
+    "aggregate_job": {"job_id": 103655807216, "conclusion": "success", "artifact_id": 10309870629, "artifact_digest": "sha256:2ed68471c1effd9628d369a177fdb0e821b420ae95851d41042d7c86a12a860e"}
+  },
+  "locator_snapshot_dependency": {
+    "snapshot_sha256": "d26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351",
+    "snapshot_rows": 1296,
+    "snapshot_data_commit": "a3f5c5a791f878b12cb92658df37b8a7d093cd0b",
+    "live_game_center_rediscovery_used": false,
+    "page_order_tie_break_used": false
+  },
+  "aggregate_result": {
+    "canonical_games": 1296,
+    "snapshot_covered_games": 1296,
+    "source_bytes_verified": 1296,
+    "pdf_text_extractions": 1296,
+    "not_active_structure_valid_games": 1296,
+    "did_not_play_structure_valid_games": 1296,
+    "distinct_semantic_structure_games": 1296,
+    "qualified_source_rows": 1296,
+    "source_row_errors": 0,
+    "duplicate_canonical_game_rows": 0,
+    "duplicate_source_sha_across_distinct_games": 0
+  },
+  "durable_archive": {
+    "research_data_branch": "research-data/v09b-gamebooks-modern-v2",
+    "research_data_commit_sha": "aab55bf97aa62cae446b358b9739f4c62604cc8e",
+    "aggregate_qualification_path": "research_outputs/v09b_modern_gamebook_raw_archive_v2/aggregate_qualification.json"
+  },
+  "scientific_disposition": {
+    "modern_raw_source_bytes_qualified": true,
+    "modern_gamebook_structure_qualified": true,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "threshold_relaxation_used": false,
+    "label_semantics_changed_from_v1": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
