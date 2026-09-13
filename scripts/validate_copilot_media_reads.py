@@ -17,6 +17,7 @@ from nfl_forecast.editorial_model_read import (
     coherent_score_text,
     football_pick_probability,
     pick_side_probability,
+    render_model_paragraph,
 )
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
@@ -218,6 +219,19 @@ def _contains_labeled_line(
     return False
 
 
+def _canonical_deterministic_prefix(row, expected_final: str) -> str:
+    """Return the exact canonical deterministic sentences that must lead paragraph 2.
+
+    The renderer accepts qualitative matchup context between the deterministic model
+    sentences and the final pick sentence. Rendering with blank context gives us the
+    canonical deterministic envelope without constraining that human/context sentence.
+    """
+    canonical = render_model_paragraph(row, "")
+    if not canonical.endswith(expected_final):
+        raise ValueError("canonical model renderer produced an unexpected pick sentence")
+    return canonical[:-len(expected_final)].strip()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -319,6 +333,15 @@ def main() -> None:
             failures.append(f"{gid}: paragraph2 missing coherent public projected score")
 
         expected_final = f"The pick: {_team_name(pick)} moneyline."
+        try:
+            canonical_prefix = _canonical_deterministic_prefix(row, expected_final)
+        except ValueError as exc:
+            failures.append(f"{gid}: {exc}")
+            canonical_prefix = ""
+        if canonical_prefix and not paragraph2.startswith(canonical_prefix):
+            failures.append(
+                f"{gid}: paragraph2 deterministic prefix does not exactly match the latest canonical forecast row"
+            )
         if not paragraph2.endswith(expected_final):
             failures.append(f"{gid}: paragraph2 must end exactly with '{expected_final}'")
 
