@@ -1,0 +1,235 @@
+name: LevLine V09B modern Game Book identity audit V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_gamebook_identity_audit_v1_contract.json'
+      - 'research/v09b_modern_gamebook_identity_audit_v1.py'
+      - 'research/test_v09b_modern_gamebook_identity_audit_v1.py'
+      - '.github/workflows/research_v09b_modern_gamebook_identity_audit_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-gamebook-identity-audit-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen modern identity rules
+        run: pytest -q research/test_v09b_modern_gamebook_identity_audit_v1.py
+      - name: Validate preregistered identity-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_gamebook_identity_audit_v1_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V1'
+          assert c['status'] == 'PREREGISTERED_IDENTITY_ONLY_AGGREGATE_QUALIFICATION_GATE'
+          assert c['seasons'] == [2017, 2018, 2019, 2020, 2021]
+          assert c['upstream_gamebook_archive']['commit_sha'] == 'aab55bf97aa62cae446b358b9739f4c62604cc8e'
+          assert c['upstream_identity_source']['commit_sha'] == '1c6f388c06f7473eb7483d6b4b91685ecb3d019c'
+          assert c['gamebook_identity_universe']['all_four_sections_included'] is True
+          assert c['gamebook_identity_universe']['section_membership_not_interpreted'] is True
+          assert c['gamebook_identity_universe']['did_not_play_not_assumed_active'] is True
+          r = c['resolution_rule']
+          assert r['candidate_uniqueness_alone_is_evidence'] is False
+          assert r['initial_plus_exact_surname_as_stage_2_only_rule_authorized'] is False
+          assert r['roster_status_tie_break_authorized'] is False
+          assert r['fuzzy_or_phonetic_matching_authorized'] is False
+          assert r['manual_overrides_authorized'] is False
+          g = c['aggregate_identity_qualification_gate']
+          assert g['minimum_final_resolution_rate'] == 0.995
+          assert g['final_ambiguities_allowed'] == 0
+          assert g['source_identity_conflicts_allowed'] == 0
+          assert c['explicit_non_authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['explicit_non_authority']['training_label_semantics_qualified'] is False
+          assert c['explicit_non_authority']['training_source_chronology_qualified'] is False
+          assert c['explicit_non_authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  audit-season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Materialize exact immutable Game Book and status-free identity commits
+        run: |
+          set -euo pipefail
+          GAMEBOOK_COMMIT=aab55bf97aa62cae446b358b9739f4c62604cc8e
+          IDENTITY_COMMIT=1c6f388c06f7473eb7483d6b4b91685ecb3d019c
+          git fetch origin research-data/v09b-gamebooks-modern-v2
+          git fetch origin research-data/v09b-modern-identity-source-v1
+          git cat-file -e "$GAMEBOOK_COMMIT^{commit}"
+          git cat-file -e "$IDENTITY_COMMIT^{commit}"
+          git worktree add --detach /tmp/v09b-modern-gamebooks "$GAMEBOOK_COMMIT"
+          git worktree add --detach /tmp/v09b-modern-identity "$IDENTITY_COMMIT"
+      - name: Audit status-free Game Book identity
+        run: |
+          OUT=research_outputs/v09b_modern_gamebook_identity_audit_v1/${{ matrix.season }}.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_gamebook_identity_audit_v1.py \
+              --season ${{ matrix.season }} \
+              --archive-root /tmp/v09b-modern-gamebooks/research_outputs/v09b_modern_gamebook_raw_archive_v2 \
+              --identity-root /tmp/v09b-modern-identity/research_outputs/v09b_modern_identity_source_capture_v1 \
+              --output "$OUT"
+      - name: Assert source integrity and no per-season qualification authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          season = int('${{ matrix.season }}')
+          r = json.loads(Path(f'research_outputs/v09b_modern_gamebook_identity_audit_v1/{season}.json').read_text())
+          expected_games = {2017:256, 2018:256, 2019:256, 2020:256, 2021:272}[season]
+          assert r['contract_id'] == 'V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V1'
+          assert r['season_source_and_rule_integrity_pass'] is True
+          assert r['upstream_gamebook_archive_qualified'] is True
+          assert r['identity_source_capture_gate_pass'] is True
+          assert r['canonical_games'] == r['parsed_games'] == r['marker_exact_games'] == expected_games
+          assert r['parsed_team_partitions'] == r['expected_team_partitions'] == expected_games * 2
+          assert r['source_error_count'] == 0
+          assert r['source_identity_conflicts'] == 0
+          assert r['source_accounting_consistent'] is True
+          assert r['weekly_roster_status_used'] is False
+          assert r['gamebook_identities_total'] == r['exact_resolved'] + r['exact_zero_candidate'] + r['exact_ambiguous']
+          assert r['exact_zero_candidate'] == r['structural_resolved'] + r['structural_ambiguous'] + r['final_unresolved']
+          assert r['final_resolved'] == r['exact_resolved'] + r['structural_resolved']
+          assert r['final_ambiguous'] == r['exact_ambiguous'] + r['structural_ambiguous']
+          assert r['season_has_identity_qualification_authority'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['postgame_participation_used'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-gamebook-identity-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_modern_gamebook_identity_audit_v1/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-identity-gate:
+    needs: audit-season
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-gamebook-identity-v1-*-${{ github.run_id }}
+          path: /tmp/v09b-modern-gamebook-identity-v1
+          merge-multiple: true
+      - name: Apply frozen five-season aggregate identity gate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          root = Path('/tmp/v09b-modern-gamebook-identity-v1')
+          seasons = [2017, 2018, 2019, 2020, 2021]
+          rows = [json.loads((root / f'{season}.json').read_text()) for season in seasons]
+          assert all(r['season_source_and_rule_integrity_pass'] is True for r in rows)
+          assert sum(r['canonical_games'] for r in rows) == 1296
+          assert sum(r['parsed_team_partitions'] for r in rows) == 2592
+          assert sum(r['source_error_count'] for r in rows) == 0
+          assert sum(r['source_identity_conflicts'] for r in rows) == 0
+          total = sum(r['gamebook_identities_total'] for r in rows)
+          resolved = sum(r['final_resolved'] for r in rows)
+          unresolved = sum(r['final_unresolved'] for r in rows)
+          ambiguous = sum(r['final_ambiguous'] for r in rows)
+          exact_resolved = sum(r['exact_resolved'] for r in rows)
+          structural_resolved = sum(r['structural_resolved'] for r in rows)
+          methods = Counter()
+          for r in rows:
+              methods.update(r['authorized_structural_method_counts'])
+          assert resolved + unresolved + ambiguous == total
+          rate = resolved / total if total else 0.0
+          qualified = bool(rate >= 0.995 and ambiguous == 0)
+          out = {
+              'qualification_version': 1,
+              'qualification_id': 'V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V1-AGGREGATE',
+              'contract_id': 'V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V1',
+              'seasons': seasons,
+              'canonical_games': 1296,
+              'team_partitions': 2592,
+              'gamebook_identities_total': total,
+              'exact_resolved': exact_resolved,
+              'structural_resolved': structural_resolved,
+              'final_resolved': resolved,
+              'final_unresolved': unresolved,
+              'final_ambiguous': ambiguous,
+              'final_identity_resolution_rate': rate,
+              'minimum_required_resolution_rate': 0.995,
+              'authorized_structural_method_counts': dict(sorted(methods.items())),
+              'all_five_seasons_integrity_pass': True,
+              'source_identity_conflicts': 0,
+              'modern_player_team_game_identity_qualified': qualified,
+              'modern_game_day_roster_universe_qualified': False,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'postgame_participation_used': False,
+              'model_fit_performed': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+              'production_dependency_authorized': False,
+          }
+          (root / 'aggregate.json').write_text(json.dumps(out, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(out, indent=2, sort_keys=True))
+          if not qualified:
+              raise SystemExit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-modern-gamebook-identity-v1-aggregate-${{ github.run_id }}
+          path: /tmp/v09b-modern-gamebook-identity-v1/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
