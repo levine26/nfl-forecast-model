@@ -17,6 +17,7 @@ from nfl_forecast.editorial_model_read import (
     coherent_score_text,
     football_pick_probability,
     pick_side_probability,
+    render_model_paragraph,
 )
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
@@ -253,6 +254,7 @@ def main() -> None:
         headline = re.sub(r"\s+", " ", str(entry.get("headline") or "")).strip()
         paragraph1 = re.sub(r"\s+", " ", str(entry.get("paragraph1") or "")).strip()
         paragraph2 = re.sub(r"\s+", " ", str(entry.get("paragraph2") or "")).strip()
+        model_rationale = re.sub(r"\s+", " ", str(entry.get("model_rationale") or "")).strip()
         sources = entry.get("sources") or []
 
         p1_words = re.findall(r"\b[\w'-]+\b", paragraph1)
@@ -271,6 +273,17 @@ def main() -> None:
                 failures.append(f"{gid}: banned/stale phrase '{phrase}'")
 
         row = rows[gid]
+        if not model_rationale:
+            failures.append(f"{gid}: model_rationale missing; cannot verify canonical paragraph2 parity")
+        else:
+            canonical_paragraph2 = re.sub(
+                r"\s+", " ", render_model_paragraph(row, model_rationale)
+            ).strip()
+            if paragraph2 != canonical_paragraph2:
+                failures.append(
+                    f"{gid}: paragraph2 does not exactly match canonical LevLine renderer for current predictions"
+                )
+
         away = str(row.get("away_team"))
         home = str(row.get("home_team"))
         pick = str(row.get("pick"))
