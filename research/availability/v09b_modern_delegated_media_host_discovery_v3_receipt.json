@@ -1,0 +1,72 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-DELEGATED-MEDIA-HOST-DISCOVERY-V3-COMPLETE",
+  "contract_id": "V09B-MODERN-DELEGATED-MEDIA-HOST-DISCOVERY-V3",
+  "status": "DIAGNOSTIC_COMPLETE_NO_SOURCE_LOCATOR_OR_MEMBERSHIP_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34735121970,
+    "validated_head_sha": "f94b22cf42f45494564825dc7cdcb8e08ff02012",
+    "artifact_id": 10311265059,
+    "artifact_digest": "sha256:9913f22312ed80eac4e07f03f320a888d869252df2d5a419a954e428bd1d0a47",
+    "accounting_integrity_pass": true
+  },
+  "aggregate_result": {
+    "delegations_expected": 3,
+    "delegations_reported": 3,
+    "delegations_with_exact_terminal_host": 3,
+    "team_season_pairs_expected": 15,
+    "team_season_pairs_reported": 15,
+    "team_season_pairs_with_candidate_urls": 2
+  },
+  "delegation_results": {
+    "CLE": {
+      "official_origin": "https://media.clevelandbrowns.com/",
+      "terminal_host": "browns.1rmg.com",
+      "exact_terminal_host_pass": true,
+      "club_attribution_signals": ["CLEVELAND BROWNS", "BROWNS"],
+      "historical_candidate_urls_found": 3,
+      "candidate_summary": "2020 and 2021 initial 53-man roster / roster-move press releases only; not week-specific roster-depth documents",
+      "wp_search_rate_limiting_observed": true
+    },
+    "DEN": {
+      "official_origin": "https://media.denverbroncos.com/",
+      "terminal_host": "nfl.omgsports.com",
+      "exact_terminal_host_pass": true,
+      "club_attribution_signals": [],
+      "historical_candidate_urls_found": 0,
+      "generic_provider_root_only": true
+    },
+    "PHI": {
+      "official_origin_relation": "official media sitemap redirect",
+      "terminal_host": "eagles.1rmg.com",
+      "exact_terminal_host_pass": true,
+      "club_attribution_signals": ["EAGLES"],
+      "historical_candidate_urls_found": 0,
+      "wordpress_sitemap_available": true
+    }
+  },
+  "scientific_disposition": {
+    "exact_delegation_relations_empirically_observed": true,
+    "delegated_host_is_first_party_authority": false,
+    "candidate_urls_are_validated_roster_sources": false,
+    "delegated_provider_globally_qualified": false,
+    "historical_document_locator_coverage_qualified": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "all_2592_team_game_partitions_tested": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

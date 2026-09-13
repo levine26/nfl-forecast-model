@@ -1,0 +1,120 @@
+{
+  "contract_version": 3,
+  "contract_id": "V09B-MODERN-DELEGATED-MEDIA-HOST-DISCOVERY-V3",
+  "status": "PREREGISTERED_DELEGATION_PROVENANCE_DIAGNOSTIC_ONLY_NO_SOURCE_OR_LOCATOR_AUTHORITY",
+  "purpose": "Test only the three delegated media-host relationships empirically exposed by the completed first-party media-subdomain V2 diagnostic. A delegated vendor host is not treated as first-party source authority merely because a club URL redirects to it. This audit verifies the exact official-origin delegation path, inventories bounded historical release/roster/depth candidate surfaces on the exact delegated host, and records club-attribution evidence for future source-design decisions.",
+  "dependencies": [
+    "V09B-MODERN-MEDIA-SUBDOMAIN-DISCOVERY-V2-COMPLETE"
+  ],
+  "fixed_delegations": [
+    {
+      "team": "CLE",
+      "team_name": "Cleveland Browns",
+      "seasons": [2017, 2018, 2019, 2020, 2021],
+      "official_origin_url": "https://media.clevelandbrowns.com/",
+      "expected_delegated_host": "browns.1rmg.com",
+      "delegation_kind": "root_redirect"
+    },
+    {
+      "team": "DEN",
+      "team_name": "Denver Broncos",
+      "seasons": [2017, 2018, 2019, 2020, 2021],
+      "official_origin_url": "https://media.denverbroncos.com/",
+      "expected_delegated_host": "nfl.omgsports.com",
+      "delegation_kind": "root_redirect"
+    },
+    {
+      "team": "PHI",
+      "team_name": "Philadelphia Eagles",
+      "seasons": [2017, 2018, 2019, 2020, 2021],
+      "official_origin_url": "https://media.philadelphiaeagles.com/wp-sitemap.xml",
+      "expected_delegated_host": "eagles.1rmg.com",
+      "delegation_kind": "sitemap_redirect"
+    }
+  ],
+  "delegation_requirements": {
+    "https_only": true,
+    "official_origin_must_be_exact_frozen_url": true,
+    "redirect_chain_must_terminate_on_exact_expected_delegated_host": true,
+    "intermediate_redirects_reported": true,
+    "unobserved_vendor_hosts_forbidden": true,
+    "delegation_does_not_create_source_authority": true
+  },
+  "delegated_host_probe_endpoints": [
+    "/",
+    "/wp-json/",
+    "/wp-sitemap.xml",
+    "/sitemap_index.xml",
+    "/sitemap.xml"
+  ],
+  "wordpress_search_queries": [
+    "weekly release",
+    "game release",
+    "roster",
+    "depth chart"
+  ],
+  "candidate_signal_terms": [
+    "WEEKLY RELEASE",
+    "GAME RELEASE",
+    "ROSTER",
+    "DEPTH CHART",
+    "ROSTERS & DEPTH"
+  ],
+  "attribution_signals": {
+    "CLE": ["CLEVELAND BROWNS", "BROWNS"],
+    "DEN": ["DENVER BRONCOS", "BRONCOS"],
+    "PHI": ["PHILADELPHIA EAGLES", "EAGLES"]
+  },
+  "discovery_logic": {
+    "exact_three_delegations_only": true,
+    "delegated_host_root_and_bounded_indexes_only": true,
+    "bounded_child_sitemaps_max": 50,
+    "wordpress_search_only_when_wp_json_reachable": true,
+    "candidate_requires_season_and_document_signal": true,
+    "candidate_is_seed_only": true,
+    "candidate_document_not_downloaded_or_semantically_qualified_here": true
+  },
+  "required_accounting": {
+    "delegations_expected": 3,
+    "delegations_reported": 3,
+    "all_delegation_checks_reported_even_if_failed": true,
+    "every_team_season_pair_reported": true,
+    "team_season_pairs_expected": 15,
+    "bounded_candidate_examples_per_pair": 30
+  },
+  "explicit_non_gates": {
+    "delegation_success_rate_threshold": null,
+    "candidate_discovery_rate_threshold": null,
+    "delegated_host_is_first_party_authority": false,
+    "delegated_documents_are_official_source_bytes": false,
+    "all_2592_team_game_partitions_tested": false,
+    "game_level_locator_coverage_qualified": false,
+    "roster_snapshot_bytes_qualified": false,
+    "source_chronology_qualified": false,
+    "transaction_reconciliation_performed": false,
+    "game_day_membership_constructed": false,
+    "identity_resolution_performed": false
+  },
+  "authority": {
+    "diagnostic_has_source_qualification_authority": false,
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
