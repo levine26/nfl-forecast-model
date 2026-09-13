@@ -1,0 +1,210 @@
+name: LevLine V09B NFL transaction full ledger capture V5
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_nfl_transaction_full_ledger_capture_v5_contract.json'
+      - 'research/v09b_nfl_transaction_full_ledger_capture_v5.py'
+      - 'research/test_v09b_nfl_transaction_full_ledger_capture_v5.py'
+      - '.github/workflows/research_v09b_nfl_transaction_full_ledger_capture_v5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-nfl-transaction-full-ledger-v5-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen V5 capture rules
+        run: pytest -q research/test_v09b_nfl_transaction_full_ledger_capture_v5.py
+      - name: Validate V5 contract and V4 qualification dependency
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          c=json.loads(Path('research/availability/v09b_nfl_transaction_full_ledger_capture_v5_contract.json').read_text())
+          assert c['contract_id']=='V09B-NFL-TRANSACTION-FULL-LEDGER-CAPTURE-V5'
+          assert c['status']=='PREREGISTERED_ALL_MONTH_SIX_CATEGORY_CAPTURE_NO_STATE_AUTHORITY'
+          assert c['scope']['years']==[2017,2018,2019,2020,2021]
+          assert c['scope']['months']==list(range(1,13))
+          assert c['scope']['categories']==['trades','signings','reserve-list','waivers','terminations','other']
+          assert c['scope']['expected_endpoints']==360
+          assert c['source_preservation']['preserve_every_response_body'] is True
+          assert c['source_preservation']['raw_sha256_over_decompressed_source_bytes'] is True
+          assert c['source_preservation']['durable_research_data_archive_required_after_success'] is True
+          g=c['frozen_capture_gate']
+          assert g['all_360_endpoints_complete'] is True
+          assert g['source_errors_allowed']==0
+          assert g['every_fetched_page_raw_gzip_roundtrip_matches_sha256'] is True
+          assert g['every_cursor_transition_raw_sha_must_advance'] is True
+          assert g['every_cursor_transition_novel_rows_vs_prior_union_min']==1
+          assert g['all_endpoints_converge_before_max_pages'] is True
+          dep=c['dependency']
+          actual=subprocess.check_output(['git','hash-object',dep['receipt_path']], text=True).strip()
+          assert actual==dep['receipt_git_blob_sha1']
+          r=json.loads(Path(dep['receipt_path']).read_text())
+          assert r['receipt_id']==dep['receipt_id']
+          assert r['status']==dep['required_status']
+          assert r['authority']['september_cross_category_amp_pagination_qualified'] is True
+          a=c['explicit_non_authority']
+          assert a['durable_full_ledger_source_archive_qualified'] is False
+          assert a['transaction_state_machine_defined'] is False
+          assert a['modern_game_day_roster_universe_qualified'] is False
+          assert a['training_label_semantics_qualified'] is False
+          assert a['training_source_chronology_qualified'] is False
+          assert a['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used']==0
+          PY
+
+  capture-year:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        year: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Capture all 72 year-month-category endpoints
+        run: |
+          mkdir -p research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/${{ matrix.year }}
+          set +e
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_nfl_transaction_full_ledger_capture_v5.py \
+              --contract research/availability/v09b_nfl_transaction_full_ledger_capture_v5_contract.json \
+              --year ${{ matrix.year }} \
+              --output-root research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/${{ matrix.year }}
+          code=$?
+          echo "$code" > research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/${{ matrix.year }}/exit_code.txt
+          exit "$code"
+      - name: Upload compact year manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v09b-full-ledger-v5-manifest-${{ matrix.year }}-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/${{ matrix.year }}/capture.json
+            research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/${{ matrix.year }}/exit_code.txt
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload exact raw source pages
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v09b-full-ledger-v5-raw-${{ matrix.year }}-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/${{ matrix.year }}/raw
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+
+  aggregate:
+    needs: capture-year
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-full-ledger-v5-manifest-*-${{ github.run_id }}
+          path: /tmp/v09b-full-ledger-v5
+      - name: Apply frozen full-capture aggregate gate
+        run: |
+          mkdir -p research_outputs/v09b_nfl_transaction_full_ledger_capture_v5
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifests=sorted(Path('/tmp/v09b-full-ledger-v5').glob('**/capture.json'))
+          assert len(manifests)==5, manifests
+          rows=[json.loads(p.read_text()) for p in manifests]
+          assert {r['year'] for r in rows}=={2017,2018,2019,2020,2021}
+          assert all(r['year_capture_gate_pass'] for r in rows)
+          endpoints=[ep for r in rows for ep in r['endpoints']]
+          assert len(endpoints)==360
+          assert sum(r['source_errors'] for r in rows)==0
+          assert all(ep['converged'] for ep in endpoints)
+          assert all(ep['unique_page_urls']==ep['pages_fetched'] for ep in endpoints)
+          assert all(ep['unique_page_shas']==ep['pages_fetched'] for ep in endpoints)
+          months=range(1,13)
+          categories=['trades','signings','reserve-list','waivers','terminations','other']
+          month_rows={str(m):sum(ep['unique_transaction_rows'] for ep in endpoints if ep['month']==m) for m in months}
+          category_rows={c:sum(ep['unique_transaction_rows'] for ep in endpoints if ep['category']==c) for c in categories}
+          assert all(month_rows[str(m)]>0 for m in months), month_rows
+          assert all(category_rows[c]>0 for c in categories), category_rows
+          evidence=[e for r in rows for e in r['known_semantic_evidence']]
+          assert len(evidence)==7
+          assert all(e['found'] for e in evidence), evidence
+          result={
+            'contract_id':'V09B-NFL-TRANSACTION-FULL-LEDGER-CAPTURE-V5',
+            'years':[2017,2018,2019,2020,2021],
+            'months':list(months),
+            'categories':categories,
+            'endpoints_completed':360,
+            'source_errors':0,
+            'pages_fetched_total':sum(r['pages_fetched_total'] for r in rows),
+            'cursor_transitions_total':sum(r['cursor_transitions_total'] for r in rows),
+            'raw_source_bytes_total':sum(r['raw_source_bytes_total'] for r in rows),
+            'gzip_bytes_total':sum(r['gzip_bytes_total'] for r in rows),
+            'year_unique_row_sums':{str(r['year']):r['unique_transaction_rows_across_endpoint_sums'] for r in rows},
+            'month_unique_row_sums':month_rows,
+            'category_unique_row_sums':category_rows,
+            'known_semantic_evidence_found':7,
+            'frozen_full_capture_gate_pass':True,
+            'all_month_capture_complete':True,
+            'durable_full_ledger_source_archive_qualified':False,
+            'transaction_state_machine_defined':False,
+            'same_day_transaction_order_resolved':False,
+            'modern_game_day_roster_universe_qualified':False,
+            'training_label_semantics_qualified':False,
+            'training_source_chronology_qualified':False,
+            'v09b_model_fit_authorized':False,
+            'completed_2026_outcomes_used':0,
+            'model_fit_performed':False,
+            'production_dependency_authorized':False,
+          }
+          out=Path('research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/aggregate.json')
+          out.write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          print(out.read_text())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-full-ledger-v5-aggregate-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_full_ledger_capture_v5/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
