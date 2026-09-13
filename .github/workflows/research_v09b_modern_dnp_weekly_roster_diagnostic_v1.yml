@@ -66,9 +66,8 @@ jobs:
       - name: Materialize exact qualified 2017-2021 Game Book archive
         run: |
           set -euo pipefail
-          DATA_BRANCH=research-data/v09b-gamebooks-modern-v2
           DATA_COMMIT=aab55bf97aa62cae446b358b9739f4c62604cc8e
-          git fetch origin "$DATA_BRANCH"
+          git fetch origin "$DATA_COMMIT"
           test "$(git rev-parse FETCH_HEAD)" = "$DATA_COMMIT"
           mkdir -p /tmp/v09b-gamebooks
           git archive "$DATA_COMMIT" research_outputs/v09b_modern_gamebook_raw_archive_v2 \
