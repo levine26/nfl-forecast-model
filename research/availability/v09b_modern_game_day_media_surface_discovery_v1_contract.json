@@ -1,0 +1,133 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-GAME-DAY-MEDIA-SURFACE-DISCOVERY-V1",
+  "status": "PREREGISTERED_FULL_TEAM_GAME_DISCOVERY_ONLY_NO_LOCATOR_OR_MEMBERSHIP_QUALIFICATION_AUTHORITY",
+  "purpose": "Use only official club historical season schedule pages to derive regular-season game-day pages for every 2017-2021 team-season, then inventory first-party GAME RELEASE, ROSTER, DEPTH CHART, FLIP CARD, and GAME NOTES links on each discovered game-day page. This diagnostic observes the full team-game media-surface matrix before any source hierarchy or locator rule is preregistered.",
+  "dependencies": [
+    "V09B-MODERN-ROSTER-DEPTH-SOURCE-PROBE-V2-QUALIFICATION",
+    "V09B-MODERN-CLUB-ARCHIVE-SURFACE-DISCOVERY-V1-COMPLETE"
+  ],
+  "seasons": [2017, 2018, 2019, 2020, 2021],
+  "expected_regular_season_team_games_by_season": {
+    "2017": 512,
+    "2018": 512,
+    "2019": 512,
+    "2020": 512,
+    "2021": 544
+  },
+  "expected_regular_season_team_games_total": 2592,
+  "teams": {
+    "ARI": ["azcardinals.com"],
+    "ATL": ["atlantafalcons.com"],
+    "BAL": ["baltimoreravens.com"],
+    "BUF": ["buffalobills.com"],
+    "CAR": ["panthers.com"],
+    "CHI": ["chicagobears.com"],
+    "CIN": ["bengals.com"],
+    "CLE": ["clevelandbrowns.com"],
+    "DAL": ["dallascowboys.com"],
+    "DEN": ["denverbroncos.com"],
+    "DET": ["detroitlions.com"],
+    "GB": ["packers.com"],
+    "HOU": ["houstontexans.com"],
+    "IND": ["colts.com"],
+    "JAX": ["jaguars.com"],
+    "KC": ["chiefs.com"],
+    "LV": ["raiders.com"],
+    "LAC": ["chargers.com"],
+    "LA": ["therams.com"],
+    "MIA": ["miamidolphins.com"],
+    "MIN": ["vikings.com"],
+    "NE": ["patriots.com"],
+    "NO": ["neworleanssaints.com"],
+    "NYG": ["giants.com"],
+    "NYJ": ["newyorkjets.com"],
+    "PHI": ["philadelphiaeagles.com"],
+    "PIT": ["steelers.com"],
+    "SEA": ["seahawks.com"],
+    "SF": ["49ers.com"],
+    "TB": ["buccaneers.com"],
+    "TEN": ["tennesseetitans.com"],
+    "WAS": ["commanders.com", "washingtonfootball.com", "redskins.com"]
+  },
+  "schedule_surface": {
+    "url_template": "https://www.{domain}/schedule/{season}/",
+    "https_required": true,
+    "final_redirect_must_remain_within_team_allowlisted_domains": true,
+    "game_day_href_prefix_template": "/game-day/{season}/",
+    "regular_season_stage_regex": "^(?:reg-)?week(?:[1-9]|1[0-8])$",
+    "game_day_base_shape": "/game-day/{season}/{stage}/{slug}/",
+    "schedule_page_game_link_count_is_diagnostic_only": true,
+    "missing_expected_team_games_are_retained_explicitly": true
+  },
+  "game_day_surface": {
+    "page_must_remain_within_team_allowlisted_domains": true,
+    "first_party_document_target_hosts": ["static.clubs.nfl.com"],
+    "same_team_https_document_targets_allowed": true,
+    "media_classes": {
+      "game_release": ["GAME RELEASE"],
+      "roster": ["ROSTER", "ROSTERS"],
+      "depth_chart": ["DEPTH CHART", "DEPTH"],
+      "flip_card": ["FLIP CARD"],
+      "game_notes": ["GAME NOTES"]
+    },
+    "visible_anchor_text_is_primary_classification_evidence": true,
+    "media_target_is_not_fetched_or_semantically_qualified_by_this_diagnostic": true
+  },
+  "required_accounting": {
+    "all_160_team_season_schedule_surfaces_reported": true,
+    "all_schedule_domain_attempts_reported": true,
+    "all_discovered_regular_season_game_day_pages_reported": true,
+    "schedule_failures_retained_explicitly": true,
+    "game_page_failures_retained_explicitly": true,
+    "media_link_examples_bounded_per_page": true,
+    "duplicate_game_day_bases_deduplicated_within_team_season": true
+  },
+  "diagnostic_outputs": [
+    "schedule-page success/failure matrix",
+    "discovered regular-season team-game count by team and season",
+    "missing expected team-game count by team and season",
+    "game-day page fetch success/failure counts",
+    "first-party GAME RELEASE coverage count",
+    "first-party ROSTER coverage count",
+    "first-party DEPTH CHART coverage count",
+    "first-party FLIP CARD coverage count",
+    "first-party GAME NOTES coverage count",
+    "per-team-season media-class coverage fractions",
+    "bounded first-party media-link examples"
+  ],
+  "explicit_non_gates": {
+    "schedule_page_coverage_threshold": null,
+    "game_day_page_coverage_threshold": null,
+    "media_class_coverage_threshold": null,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "source_bytes_qualified": false,
+    "source_semantics_qualified_beyond_existing_v2_roster_depth_class": false,
+    "source_chronology_qualified": false,
+    "transaction_reconciliation_performed": false,
+    "game_day_membership_constructed": false,
+    "identity_resolution_performed": false
+  },
+  "authority": {
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "third_party_authority_used": false,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
