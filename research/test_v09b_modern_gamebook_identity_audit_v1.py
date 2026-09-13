@@ -61,20 +61,21 @@ def test_structural_fallback_requires_authorized_name_evidence() -> None:
 
 
 def test_structural_fallback_accepts_prequalified_compound_rule() -> None:
+    # This exact structural pattern is already covered by the qualified legacy V4 rule tests.
     frame = _projection([
         {
             "gsis_id": "00-0000002",
             "jersey_number": "17",
-            "first_name": "Amon-Ra",
-            "football_name": "Amon-Ra",
-            "last_name": "St. Brown",
+            "first_name": "Dominique",
+            "football_name": "Dominique",
+            "last_name": "Rodgers-Cromartie",
         }
     ])
     source = jersey_diag.build_same_week_team_jersey_index(season=2021, frame=frame)
     jersey_index = source.pop("index")
     signatures = source.pop("signatures_by_gsis")
     authorized = _authorized_structural_candidates(
-        display_name="A.St.Brown",
+        display_name="D.R-Cromartie",
         week=1,
         team="ARI",
         jersey="17",
@@ -83,26 +84,30 @@ def test_structural_fallback_accepts_prequalified_compound_rule() -> None:
     )
     assert len(authorized) == 1
     assert authorized[0]["gsis_id"] == "00-0000002"
-    assert authorized[0]["method"] in {
-        "given_initial_only+compound_component_prefix",
-        "given_initial_only+gamebook_surname_is_source_leading_components",
-        "given_initial_only+source_surname_is_gamebook_leading_components",
-    }
+    assert authorized[0]["method"] == "given_initial_only+compound_component_prefix"
+
+
+def _two_col(left: str, right: str) -> str:
+    return f"{left:<80}{right}"
 
 
 def test_gamebook_identity_universe_is_all_four_sections_without_membership_interpretation() -> None:
-    text = """
-Lineups                                      Lineups
-Offense                 Defense              Offense                 Defense
- 10 D.Hopkins            3 B.Baker             1 K.Murray             7 I.Simmons
-Substitutions                                Substitutions
- 13 C.Kirk                                    18 A.Green
-Did Not Play                                 Did Not Play
- 44 M.Vallejo                                 82 M.Williams
-Not Active                                   Not Active
- 99 J.Watt                                     2 C.Jones
-Field Goals                                  Field Goals
-"""
+    # Match the frozen Game Book parser's actual marker and entry grammar. The test is only
+    # about set-union identity scope; it intentionally makes no membership-semantic claim.
+    text = "\n".join(
+        [
+            "Lineups",
+            "Offense Defense",
+            _two_col("WR 10 D.Hopkins", "QB 1 K.Murray"),
+            _two_col("Substitutions", "Substitutions"),
+            _two_col("WR 13 C.Kirk", "WR 18 A.Green"),
+            _two_col("Did Not Play", "Did Not Play"),
+            _two_col("LB 44 M.Vallejo", "WR 82 M.Williams"),
+            _two_col("Not Active", "Not Active"),
+            _two_col("DE 99 J.Watt", "DT 2 C.Jones"),
+            _two_col("Field Goals", "Field Goals"),
+        ]
+    )
     left, left_markers = _all_section_identities(text, side=0)
     right, right_markers = _all_section_identities(text, side=1)
     assert left_markers is True
