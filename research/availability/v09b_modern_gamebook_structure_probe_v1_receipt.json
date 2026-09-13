@@ -1,0 +1,55 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAMEBOOK-STRUCTURE-PROBE-V1-RESULT",
+  "purpose": "Preserve the five-season diagnostic sample result before any full 2017-2021 modern Game Book parser or roster-partition contract is preregistered.",
+  "workflow_evidence": {
+    "run_id": 34728763151,
+    "workflow_head_sha": "dbd6c8e61b6266c3318dda62d837b0cc3d6d8b9f",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "season_jobs": {
+      "2017": {"job_id": 103647842006, "conclusion": "success", "artifact_id": 10308727494, "artifact_digest": "sha256:29bc665e0b45a5b902621746970a6082ad904e33b6c1a1eb238a744cec8e3360", "game_id": "2017_01_ARI_DET", "source_sha256": "c0009ceeafddfa947e69fd5b3a6697a54ac69252057e63505b56a827bcfdc604", "text_sha256": "67b3a5b2d63de5d82f846734570f4030f1a77906884f6e3572df7ce35a1355f9"},
+      "2018": {"job_id": 103647841908, "conclusion": "success", "artifact_id": 10308456958, "artifact_digest": "sha256:59c00d5a1ff9199e3d6d075af81e8858c2dcfba40aee30f57c2eba3be29eed0e", "game_id": "2018_01_ATL_PHI", "source_sha256": "4bba04cb7de1dc9d287916b72cba05ec81e65f60a9264ee7c21f12c332116e38", "text_sha256": "a17c112fc156e66f23967b38bf09a543d2226a112d203d9c32cac3b44b3dff29"},
+      "2019": {"job_id": 103647841921, "conclusion": "success", "artifact_id": 10308058994, "artifact_digest": "sha256:b02a8afe7614b987530549b21b03aa9206a9427caecde1066b1b51f57a9dcbdb", "game_id": "2019_01_ATL_MIN", "source_sha256": "ddd35ddbd39dab7ff7f60f9ac77dc12e132edc29a497bef3d17d41b0c9536502", "text_sha256": "72fced7911b96820d0798c91ef42ee7f3af81ada70dc865683266387bfc397d2"},
+      "2020": {"job_id": 103647841936, "conclusion": "success", "artifact_id": 10309256060, "artifact_digest": "sha256:2b746a03189e29444b360770c2d86fa2a1f463b0466b6eb1cd840a8c0b23d8bf", "game_id": "2020_01_ARI_SF", "source_sha256": "baa0ae69a70e6fe8c96a678d848c71e3f9b18befabf4d5d1675ebe1f22803d20", "text_sha256": "9711cb9d13c5b76a3aba0f1df71a5acb373ceb5ddbcae3e57761807450c744cf"},
+      "2021": {"job_id": 103647842007, "conclusion": "success", "artifact_id": 10308177532, "artifact_digest": "sha256:0434529ac169f0d3b2533d3daa897ce7900ead36d6186bb3173a9350c3af5887", "game_id": "2021_01_ARI_TEN", "source_sha256": "7472cad0b155102d51639db0e66eac9e91c0b73343d34df53f4dcf9de8e85975", "text_sha256": "a547014e2f1c720d7c4f01ea3b33cf08962a57a3da1209768780c5ec7379d4f8"}
+    }
+  },
+  "observed_layout": {
+    "all_five_samples_first_party_pdf": true,
+    "all_five_samples_download_anchor_resolution": true,
+    "all_five_samples_keyword_lines": [
+      "Lineups",
+      "Substitutions Substitutions",
+      "Did Not Play Did Not Play",
+      "Not Active Not Active"
+    ],
+    "all_five_samples_literal_phrase_occurrence_counts": {
+      "lineup": 1,
+      "substitutions": 2,
+      "did_not_play": 2,
+      "not_active": 2
+    },
+    "interpretation": "The sampled 2017-2021 Game Books exhibit the same visible roster-section ordering and paired-team headings seen in the qualified legacy era. This is evidence for preregistering a full modern parser audit, not evidence that all 1,296 modern games share the layout."
+  },
+  "scientific_disposition": {
+    "diagnostic_has_qualification_authority": false,
+    "legacy_parser_reuse_authorized": false,
+    "modern_raw_source_bytes_qualified": false,
+    "modern_gamebook_structure_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "full_modern_archive_and_parser_audit_may_be_preregistered": true,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "semantic_parser_applied": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

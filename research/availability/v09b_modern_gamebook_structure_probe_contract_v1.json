@@ -1,0 +1,60 @@
+{
+  "contract_version": 1,
+  "contract_id": "V09B-MODERN-GAMEBOOK-STRUCTURE-PROBE-V1",
+  "dependency": "V09B-MODERN-GAMEBOOK-LOCATOR-V2-QUALIFICATION",
+  "status": "DIAGNOSTIC_ONLY_NO_QUALIFICATION_AUTHORITY",
+  "purpose": "Inspect one already-locator-qualified first-party NFL Game Book per season for 2017-2021 before defining any modern raw-parser or roster-partition semantics.",
+  "sample_design": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "sample_per_season": 1,
+    "selection_rule": "first canonical regular-season game after canonical schedule sort",
+    "selection_rule_frozen_before_execution": true,
+    "sample_is_coverage_qualification": false
+  },
+  "source": {
+    "locator": "qualified modern Game Book locator V2",
+    "required_game_center_final_host": ["nfl.com", "www.nfl.com"],
+    "required_document_final_host": ["static.www.nfl.com"],
+    "required_document_content_type": "application/pdf",
+    "required_pdf_magic": "%PDF",
+    "third_party_document_allowed": false
+  },
+  "text_extraction": {
+    "implementation": "pdftotext -layout through existing raw-source extraction helper",
+    "semantic_parser_applied": false,
+    "legacy_heading_regex_assumed_valid": false,
+    "legacy_roster_partition_assumed_valid": false,
+    "outputs": [
+      "keyword_candidate_lines",
+      "heading_like_lines",
+      "first_nonempty_lines",
+      "last_nonempty_lines",
+      "literal_phrase_occurrence_counts"
+    ]
+  },
+  "prohibited_inferences": [
+    "qualify modern raw-source coverage from five samples",
+    "assume legacy 2012-2016 layout carries into 2017-2021",
+    "construct active/inactive labels",
+    "treat Did Not Play as inactive",
+    "use participation or outcomes to repair structure",
+    "fit V09B",
+    "use completed 2026 outcomes"
+  ],
+  "authorization": {
+    "modern_raw_source_bytes_qualified": false,
+    "modern_gamebook_structure_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
