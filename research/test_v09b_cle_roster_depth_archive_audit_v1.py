@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
 from research.v09b_cle_roster_depth_archive_audit_v1 import discover_week_viewers, full_document_link
@@ -56,3 +59,23 @@ def test_duplicate_week_links_are_diagnostic_failure_input() -> None:
     rows, duplicates = discover_week_viewers(html, archive_url="https://browns.1rmg.com/season/2019/", season=2019)
     assert len(rows) == 2
     assert duplicates == 1
+
+
+def test_preserved_failure_receipt_is_fail_closed() -> None:
+    receipt = json.loads(
+        Path(
+            "research/availability/v09b_cle_roster_depth_archive_audit_v1_failure_receipt.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert receipt["contract_id"] == "V09B-CLE-ROSTER-DEPTH-ARCHIVE-AUDIT-V1"
+    assert receipt["status"] == "FAILED_COMPLETE_CLUB_WEEKLY_SNAPSHOT_SOURCE_COVERAGE_NO_AUTHORITY"
+    assert receipt["workflow_evidence"]["validated_head_sha"] == "e5a2098be7e75ed6139201adcff52db7116058a0"
+    assert receipt["aggregate_result"]["expected_team_game_partitions"] == 81
+    assert receipt["aggregate_result"]["weekly_snapshot_source_pass_weeks"] == 15
+    assert receipt["aggregate_result"]["cle_weekly_snapshot_source_coverage_qualified"] is False
+    disposition = receipt["scientific_disposition"]
+    assert disposition["v1_gate_relaxed_post_hoc"] is False
+    assert disposition["v1_parser_or_semantic_contract_retrofitted"] is False
+    assert disposition["modern_game_day_roster_universe_qualified"] is False
+    assert disposition["training_source_chronology_qualified"] is False
+    assert disposition["v09b_model_fit_authorized"] is False
