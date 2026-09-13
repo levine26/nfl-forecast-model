@@ -115,13 +115,23 @@ jobs:
           test -s research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1/dnp_weekly_roster_resolution.csv
           test -s research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1/weekly_roster_source_manifest.json
 
-      - name: Enforce parser correction and zero qualification authority
+      - name: Enforce coordinate parser completeness and zero qualification authority
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
+          import pandas as pd
           p = Path('research_outputs/v09b_modern_dnp_weekly_roster_diagnostic_v1')
           r = json.loads((p / 'diagnostic_report.json').read_text())
+          rows = pd.read_csv(p / 'dnp_weekly_roster_resolution.csv')
+          expected_by_season = {2017: 675, 2018: 656, 2019: 672, 2020: 776, 2021: 831}
+          observed_by_season = {
+              int(season): int(count)
+              for season, count in rows.groupby('season').size().to_dict().items()
+          }
+          assert observed_by_season == expected_by_season
+          assert len(rows) == 3610
+          assert r['dnp_tokens_parsed'] == 3610
           assert r['dnp_parser_version'] == 'BBOX_HALF_COLUMN_V2'
           assert r['parser_correction_post_first_run'] is True
           assert r['gamebook_parse_error_rows'] == 0
