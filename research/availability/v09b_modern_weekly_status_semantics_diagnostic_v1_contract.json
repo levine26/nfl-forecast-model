@@ -3,6 +3,14 @@
   "contract_id": "V09B-MODERN-WEEKLY-STATUS-SEMANTICS-DIAGNOSTIC-V1",
   "status": "PREREGISTERED_DIAGNOSTIC_ONLY_NO_MEMBERSHIP_OR_LABEL_AUTHORITY",
   "purpose": "Measure how immutable 2017-2021 nflverse weekly-roster source-native status values align with independently parsed official Game Book semantic sections, without using roster status to resolve player identity or assigning any status value game-day membership authority.",
+  "pre_execution_amendment": {
+    "made_before_first_v1_empirical_season_run": true,
+    "reason": "A separately preregistered zero-authority DNP diagnostic (#258) completed before this V1 empirical execution and showed that generic weekly status (for example ACT/INA) and status_description_abbr (for example A01) carry distinct observed information. This V1 therefore freezes both section-by-generic-status and section-by-status-description cross-tabs before execution rather than inspecting only one field.",
+    "qualification_threshold_changed": false,
+    "identity_rule_changed": false,
+    "source_bytes_changed": false,
+    "authority_changed": false
+  },
   "seasons": [2017, 2018, 2019, 2020, 2021],
   "upstream_gamebook_archive": {
     "qualification_id": "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION",
@@ -17,6 +25,7 @@
     "contract_id": "V09B-MODERN-IDENTITY-SOURCE-CAPTURE-V1",
     "research_data_branch": "research-data/v09b-modern-identity-source-v1",
     "research_data_commit_sha": "1c6f388c06f7473eb7483d6b4b91685ecb3d019c",
+    "raw_required_status_fields": ["status", "status_description_abbr"],
     "raw_source_sha256_by_season": {
       "2017": "2f633cf331f561ea5346238a1808e8a68811eb280084e75f0dd09880535c5012",
       "2018": "0fcd3c3f098dbb5350be2095959acf38202602c6b3c71475e883fabda23077a8",
@@ -60,6 +69,7 @@
     "raw_weekly_roster_sha_must_match": true,
     "status_free_projection_sha_must_match": true,
     "projection_must_contain_only_identity_allowlist": true,
+    "raw_required_status_fields_must_exist": true,
     "all_canonical_games_must_parse": true,
     "all_team_partitions_must_parse": true,
     "all_four_gamebook_sections_must_be_present": true,
