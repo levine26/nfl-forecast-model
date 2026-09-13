@@ -1,0 +1,225 @@
+name: LevLine V09B modern weekly status semantics diagnostic V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_weekly_status_semantics_diagnostic_v1_contract.json'
+      - 'research/v09b_modern_weekly_status_semantics_diagnostic_v1.py'
+      - 'research/test_v09b_modern_weekly_status_semantics_diagnostic_v1.py'
+      - '.github/workflows/research_v09b_modern_weekly_status_semantics_diagnostic_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-weekly-status-semantics-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test status-free identity firewall
+        run: pytest -q research/test_v09b_modern_weekly_status_semantics_diagnostic_v1.py
+      - name: Validate frozen diagnostic contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_weekly_status_semantics_diagnostic_v1_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-MODERN-WEEKLY-STATUS-SEMANTICS-DIAGNOSTIC-V1'
+          assert c['status'] == 'PREREGISTERED_DIAGNOSTIC_ONLY_NO_MEMBERSHIP_OR_LABEL_AUTHORITY'
+          assert c['seasons'] == [2017, 2018, 2019, 2020, 2021]
+          assert c['upstream_gamebook_archive']['research_data_commit_sha'] == 'aab55bf97aa62cae446b358b9739f4c62604cc8e'
+          assert c['upstream_weekly_roster_capture']['research_data_commit_sha'] == '1c6f388c06f7473eb7483d6b4b91685ecb3d019c'
+          assert c['identity_resolution_rule']['status_value_may_break_identity_tie'] is False
+          assert c['identity_resolution_rule']['candidate_uniqueness_alone_is_evidence'] is False
+          assert c['identity_resolution_rule']['ambiguous_or_unresolved_identity_is_retained'] is True
+          assert c['explicit_non_gates']['identity_resolution_rate_threshold'] is None
+          assert c['explicit_non_gates']['section_status_agreement_threshold'] is None
+          assert c['explicit_non_gates']['status_value_semantics_qualified'] is False
+          assert c['explicit_non_gates']['training_label_semantics_qualified'] is False
+          assert c['explicit_non_gates']['training_source_chronology_qualified'] is False
+          assert c['explicit_non_gates']['v09b_model_fit_authorized'] is False
+          assert c['governance']['diagnostic_has_membership_authority'] is False
+          assert c['governance']['diagnostic_has_label_authority'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  diagnostic-season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install PDF text extractor
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install '.[dev]'
+      - name: Materialize exact immutable upstream data commits
+        run: |
+          set -euo pipefail
+          GAMEBOOK_COMMIT=aab55bf97aa62cae446b358b9739f4c62604cc8e
+          IDENTITY_COMMIT=1c6f388c06f7473eb7483d6b4b91685ecb3d019c
+          git fetch origin research-data/v09b-gamebooks-modern-v2
+          git fetch origin research-data/v09b-modern-identity-source-v1
+          git cat-file -e "$GAMEBOOK_COMMIT^{commit}"
+          git cat-file -e "$IDENTITY_COMMIT^{commit}"
+          git worktree add --detach /tmp/v09b-modern-gamebooks "$GAMEBOOK_COMMIT"
+          git worktree add --detach /tmp/v09b-modern-identity "$IDENTITY_COMMIT"
+      - name: Run status semantics diagnostic without semantic qualification authority
+        run: |
+          OUT=research_outputs/v09b_modern_weekly_status_semantics_diagnostic_v1/${{ matrix.season }}.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_weekly_status_semantics_diagnostic_v1.py \
+              --season ${{ matrix.season }} \
+              --archive-root /tmp/v09b-modern-gamebooks/research_outputs/v09b_modern_gamebook_raw_archive_v2 \
+              --identity-root /tmp/v09b-modern-identity/research_outputs/v09b_modern_identity_source_capture_v1 \
+              --output "$OUT"
+      - name: Assert integrity only; prohibit semantic promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          season = '${{ matrix.season }}'
+          r = json.loads(Path(f'research_outputs/v09b_modern_weekly_status_semantics_diagnostic_v1/{season}.json').read_text())
+          assert r['contract_id'] == 'V09B-MODERN-WEEKLY-STATUS-SEMANTICS-DIAGNOSTIC-V1'
+          assert r['season'] == int(season)
+          assert r['integrity_gate_pass'] is True
+          assert r['upstream_gamebook_archive_qualified'] is True
+          assert r['identity_source_capture_gate_pass'] is True
+          assert r['status_fields_present_in_identity_projection'] is False
+          assert r['status_used_during_identity_resolution'] is False
+          assert r['parsed_games'] == r['expected_games']
+          assert r['marker_exact_games'] == r['expected_games']
+          assert r['parsed_team_partitions'] == r['expected_team_partitions']
+          assert r['source_error_count'] == 0
+          assert r['observed_status_pattern_has_qualification_authority'] is False
+          assert r['status_value_semantics_qualified'] is False
+          assert r['weekly_roster_game_day_membership_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['postgame_participation_used'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-weekly-status-semantics-v1-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_modern_weekly_status_semantics_diagnostic_v1/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-diagnostic:
+    needs: diagnostic-season
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-weekly-status-semantics-v1-*-${{ github.run_id }}
+          path: /tmp/v09b-modern-weekly-status-semantics-v1
+          merge-multiple: true
+      - name: Aggregate descriptive evidence without creating a semantic gate
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          root = Path('/tmp/v09b-modern-weekly-status-semantics-v1')
+          seasons = [2017, 2018, 2019, 2020, 2021]
+          receipts = [json.loads((root / f'{season}.json').read_text()) for season in seasons]
+          assert all(r['integrity_gate_pass'] is True for r in receipts)
+          assert all(r['status_used_during_identity_resolution'] is False for r in receipts)
+          assert all(r['observed_status_pattern_has_qualification_authority'] is False for r in receipts)
+          assert sum(r['canonical_games'] for r in receipts) == 1296
+          assert sum(r['parsed_team_partitions'] for r in receipts) == 2592
+          assert sum(r['source_error_count'] for r in receipts) == 0
+
+          section_totals = Counter()
+          resolution_totals = Counter()
+          cross = {section: Counter() for section in ['lineup', 'substitutions', 'did_not_play', 'not_active']}
+          for r in receipts:
+              section_totals.update(r['section_unique_identity_counts'])
+              resolution_totals.update(r['identity_resolution_counts'])
+              for section, values in r['section_by_status_description_abbr'].items():
+                  cross[section].update(values)
+          total = sum(section_totals.values())
+          resolved = resolution_totals['resolved']
+          out = {
+              'diagnostic_version': 1,
+              'contract_id': 'V09B-MODERN-WEEKLY-STATUS-SEMANTICS-DIAGNOSTIC-V1',
+              'seasons': seasons,
+              'canonical_games': 1296,
+              'parsed_team_partitions': 2592,
+              'source_errors': 0,
+              'section_unique_identity_counts': dict(sorted(section_totals.items())),
+              'total_section_unique_identities': total,
+              'identity_resolution_counts': dict(sorted(resolution_totals.items())),
+              'unique_identity_resolution_rate': resolved / total if total else 0.0,
+              'section_by_status_description_abbr': {
+                  section: dict(sorted(values.items())) for section, values in cross.items()
+              },
+              'integrity_gate_pass': True,
+              'status_used_during_identity_resolution': False,
+              'observed_status_pattern_has_qualification_authority': False,
+              'status_value_semantics_qualified': False,
+              'weekly_roster_game_day_membership_qualified': False,
+              'modern_game_day_roster_universe_qualified': False,
+              'modern_player_team_game_identity_qualified': False,
+              'training_label_semantics_qualified': False,
+              'training_source_chronology_qualified': False,
+              'v09b_model_fit_authorized': False,
+              'postgame_participation_used': False,
+              'model_fit_performed': False,
+              'game_outcomes_used': 0,
+              'completed_2026_outcomes_used': 0,
+              'production_dependency_authorized': False,
+          }
+          (root / 'aggregate.json').write_text(json.dumps(out, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(out, indent=2, sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-weekly-status-semantics-v1-aggregate-${{ github.run_id }}
+          path: /tmp/v09b-modern-weekly-status-semantics-v1/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
