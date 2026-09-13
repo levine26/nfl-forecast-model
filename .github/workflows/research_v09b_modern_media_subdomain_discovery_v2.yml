@@ -1,0 +1,123 @@
+name: LevLine V09B modern media-subdomain discovery V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_media_subdomain_discovery_v2_contract.json'
+      - 'research/v09b_modern_media_subdomain_discovery_v2.py'
+      - 'research/test_v09b_modern_media_subdomain_discovery_v2.py'
+      - '.github/workflows/research_v09b_modern_media_subdomain_discovery_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-modern-media-subdomain-discovery-v2-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen media-subdomain discovery mechanics
+        run: pytest -q research/test_v09b_modern_media_subdomain_discovery_v2.py
+      - name: Validate discovery-only contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_modern_media_subdomain_discovery_v2_contract.json').read_text())
+          assert c['status'] == 'PREREGISTERED_DISCOVERY_ONLY_NO_LOCATOR_COVERAGE_OR_MEMBERSHIP_AUTHORITY'
+          assert c['expected_unresolved_team_season_pairs'] == 153
+          assert c['candidate_subdomain_prefixes'] == ['media', 'press', 'pr']
+          assert c['source_rules']['derived_subdomain_must_be_child_of_that_teams_allowlisted_domain'] is True
+          assert c['source_rules']['third_party_search_results_may_not_be_source_authority'] is True
+          assert c['explicit_non_gates']['discovery_rate_threshold'] is None
+          assert c['explicit_non_gates']['all_2592_team_game_partitions_tested'] is False
+          assert c['authority']['diagnostic_has_locator_qualification_authority'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  discover-media-subdomains:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Probe deterministic first-party media/press subdomains
+        run: |
+          OUT=research_outputs/v09b_modern_media_subdomain_discovery_v2/result.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_media_subdomain_discovery_v2.py \
+              --contract research/availability/v09b_modern_media_subdomain_discovery_v2_contract.json \
+              --output "$OUT" \
+              --timeout 8 \
+              --workers 24
+      - name: Assert complete accounting and authority firewall only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research_outputs/v09b_modern_media_subdomain_discovery_v2/result.json').read_text())
+          assert r['expected_unresolved_team_season_pairs'] == 153
+          assert r['unresolved_team_season_pairs_reported'] == 153
+          assert r['discovery_accounting_integrity_pass'] is True
+          assert r['derived_subdomain_probes_expected'] == r['derived_subdomain_probes_reported']
+          assert r['team_season_pairs_with_candidate_urls'] + r['team_season_pairs_without_candidate_urls'] == 153
+          assert len(r['team_season_results']) == 153
+          assert len({(x['team'], x['season']) for x in r['team_season_results']}) == 153
+          assert r['diagnostic_has_locator_qualification_authority'] is False
+          assert r['diagnostic_has_membership_authority'] is False
+          assert r['modern_roster_depth_locator_coverage_qualified'] is False
+          assert r['all_2592_team_game_partitions_tested'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['training_label_semantics_qualified'] is False
+          assert r['training_source_chronology_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['weekly_roster_membership_used'] is False
+          assert r['weekly_roster_status_used'] is False
+          assert r['postgame_participation_used_as_training_authority'] is False
+          assert r['absence_from_inactive_used_as_positive'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          assert r['model_fit_performed'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-media-subdomain-discovery-v2-${{ github.run_id }}
+          path: research_outputs/v09b_modern_media_subdomain_discovery_v2/result.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
