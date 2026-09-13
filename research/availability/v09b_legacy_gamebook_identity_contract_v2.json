@@ -1,0 +1,109 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-V2",
+  "dependencies": [
+    "V09B-LEGACY-GAMEBOOK-ROSTER-UNIVERSE-V2",
+    "V09B-LEGACY-GAMEBOOK-IDENTITY-V1-FAILURE",
+    "V09B-LEGACY-GAMEBOOK-IDENTITY-DIAGNOSTIC-V2-RESULT"
+  ],
+  "status": "PREREGISTERED_EXACT_THEN_UNIQUE_JERSEY_AUDIT",
+  "purpose": "Audit a bounded Game Book-to-GSIS identity rule for 2012-2016 while preserving V1 exact matching as the primary rule and failing closed on non-unique fallback candidates.",
+  "scientific_disclosure": {
+    "rule_designed_after_v1_failure_and_diagnostic": true,
+    "game_outcomes_used_to_design_rule": false,
+    "completed_2026_outcomes_used": 0,
+    "model_performance_used_to_design_rule": false,
+    "v1_failure_preserved": true,
+    "diagnostic_preserved": true
+  },
+  "membership_authority": {
+    "source": "official NFLGSIS Game Book roster partition",
+    "weekly_roster_defines_membership": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used": false
+  },
+  "identity_source": {
+    "source": "nflverse weekly_rosters parquet",
+    "allowed_fields": ["season", "game_type", "week", "team", "gsis_id", "jersey_number", "first_name", "football_name", "last_name"],
+    "forbidden_for_resolution": ["status", "status_description_abbr", "status_short_description"],
+    "team_aliases_are_identifier_normalization_only": true,
+    "same_gsis_identity_signature_consistency_required": true,
+    "expected_source_sha256_by_season": {
+      "2012": "32a218e187e553abdeacd107ae9c76c321e258809d18578f1b1267882f1c0b29",
+      "2013": "bb68c0e5dba854c4d0b7dda4331456df701c06a66160b96decdfdc1b71147663",
+      "2014": "51ae5047bb95297e039ba3d6560cee1ed16407f2e91897f6c9c79aafecdef397",
+      "2015": "61a57f4484a556d4cad1cf50030a8a8822a345eace783e013f8ba8ae2f721243",
+      "2016": "70d0ceab697860e946a2acdafcae48809015dcdaf06bd21d26777473cff7db8f"
+    },
+    "expected_selected_reg_rows_by_season": {
+      "2012": 30005,
+      "2013": 30437,
+      "2014": 30492,
+      "2015": 30636,
+      "2016": 32944
+    }
+  },
+  "resolution_rule": {
+    "step_1": "Apply the frozen V1 exact key: same season, REG week, normalized team, jersey number, and compact Game Book display-name key. Exactly one distinct GSIS ID resolves the identity.",
+    "step_2_eligibility": "Only a Step-1 exact key with zero candidates may proceed to fallback. Exact keys with multiple candidates remain ambiguous and may not fall back.",
+    "step_2": "On an eligible exact miss, inspect same season, REG week, normalized team and jersey number. Exactly one distinct non-null GSIS ID resolves the identity.",
+    "step_2_zero_candidates": "remain unresolved",
+    "step_2_multiple_candidates": "remain ambiguous; no candidate is selected",
+    "nickname_or_fuzzy_matching_allowed": false,
+    "adjacent_week_fallback_allowed": false,
+    "season_wide_fallback_allowed": false,
+    "manual_player_overrides_allowed": false,
+    "weekly_roster_status_may_break_ties": false
+  },
+  "frozen_legacy_population": {
+    "seasons": [2012, 2013, 2014, 2015, 2016],
+    "gamebook_identities_total": 135572,
+    "expected_by_season": {
+      "2012": 27108,
+      "2013": 27122,
+      "2014": 27119,
+      "2015": 27112,
+      "2016": 27111
+    },
+    "v1_exact_resolved_expected_by_season": {
+      "2012": 26795,
+      "2013": 26824,
+      "2014": 26855,
+      "2015": 26860,
+      "2016": 26406
+    }
+  },
+  "frozen_qualification_gates": {
+    "qualification_scope": "aggregate 2012-2016 player-team-game identity population",
+    "upstream_roster_universe_v2_required_all_seasons": true,
+    "identity_source_sha256_must_match_preregistered_value": true,
+    "identity_source_selected_reg_rows_must_match_preregistered_value": true,
+    "legacy_identity_population_must_equal": 135572,
+    "player_team_game_identity_resolution_rate_min": 0.995,
+    "source_identity_conflicts_allowed": 0,
+    "missing_gsis_source_rows_allowed": 0,
+    "arbitrary_resolution_of_multiple_candidates_allowed": 0,
+    "silent_drop_of_unresolved_or_ambiguous_identities_allowed": 0,
+    "season_level_resolution_rate_min": null
+  },
+  "expected_from_prior_diagnostic_not_a_qualification_override": {
+    "exact_plus_unique_jersey_resolved": 135188,
+    "resolution_rate": 0.9971675567226271,
+    "remaining_zero_candidate": 377,
+    "remaining_multiple_candidate": 7,
+    "purpose": "replay-consistency reference only; final qualification is determined by the frozen aggregate gates on an independent V2 execution"
+  },
+  "authorization": {
+    "legacy_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
