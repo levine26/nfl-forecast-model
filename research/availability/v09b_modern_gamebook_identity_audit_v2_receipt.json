@@ -1,0 +1,135 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V2-FAILED",
+  "contract_id": "V09B-MODERN-GAMEBOOK-IDENTITY-AUDIT-V2",
+  "status": "EMPIRICAL_AUDIT_COMPLETE_QUALIFICATION_GATE_FAILED",
+  "workflow_evidence": {
+    "run_id": 34740338220,
+    "validated_head_sha": "1e7ba226ce05ea6896211981d47cd4a724ca5a6f",
+    "identity_artifact": {
+      "id": 10312452572,
+      "digest": "sha256:61cb5a39730169b5029c436ac83d596cf8fa1895bce2dd92e3e9055138f4adf1"
+    },
+    "position_source_artifact": {
+      "id": 10312408009,
+      "digest": "sha256:dfd897c4b6656aa6e6537c6d4b3726791f25f8e666eb21f4fc31a9341edfd293"
+    }
+  },
+  "position_source_capture": {
+    "capture_contract_id": "V09B-MODERN-POSITION-IDENTITY-SOURCE-CAPTURE-V1",
+    "raw_source_sha256": "08ef64996cecdff2f4631ca26b21ed9a39bf5fba0b3379d902e531facf81e5c4",
+    "source_rows_selected": 49561,
+    "missing_gsis_rows": 2,
+    "blank_position_rows": 0,
+    "projection_sha256": "c10b7f38bf58ab891c5c4b8bd95216b2e29a7c42006b30d343ac965cdf38c695",
+    "projection_bytes": 66655,
+    "projection_fields": [
+      "season",
+      "game_type",
+      "week",
+      "team",
+      "gsis_id",
+      "jersey_number",
+      "position"
+    ],
+    "status_fields_selected": false,
+    "status_fields_read": false,
+    "capture_gate_pass": true
+  },
+  "frozen_qualification_gate": {
+    "minimum_final_identity_resolution_rate": 0.995,
+    "required_final_ambiguity_count": 0,
+    "required_source_identity_conflicts": 0,
+    "all_10_v1_ambiguity_rows_must_replay": true,
+    "candidate_projection_lookup_misses_allowed": 0,
+    "candidate_position_side_conflicts_allowed": 0
+  },
+  "aggregate_result": {
+    "v1_gamebook_identities_total": 138205,
+    "v1_final_resolved": 137790,
+    "v1_final_unresolved": 405,
+    "v1_final_ambiguous": 10,
+    "position_tiebreak_resolved": 8,
+    "final_resolved": 137798,
+    "final_unresolved": 405,
+    "final_ambiguous": 2,
+    "final_identity_resolution_rate": 0.9970550993089975,
+    "source_identity_conflicts": 0,
+    "all_10_v1_ambiguity_rows_replayed": true,
+    "candidate_projection_lookup_misses": 0,
+    "candidate_position_side_conflicts": 0,
+    "candidate_unknown_position_evidence": 0,
+    "gamebook_position_evidence_failures": 0,
+    "source_error_count": 0,
+    "resolution_rate_gate_pass": true,
+    "source_conflict_gate_pass": true,
+    "ambiguity_gate_pass": false,
+    "aggregate_qualification_gate_pass": false
+  },
+  "resolved_collision_family": {
+    "season": 2019,
+    "team": "NYJ",
+    "jersey_number": "33",
+    "display_name": "J.Adams",
+    "rows_resolved": 8,
+    "resolved_gsis_id": "00-0033872",
+    "resolved_candidate_position": "DB",
+    "resolved_candidate_side": "defense",
+    "alternate_gsis_id": "00-0034457",
+    "alternate_candidate_position": "RB",
+    "alternate_candidate_side": "offense",
+    "gamebook_positions_observed": ["S", "SS"],
+    "gamebook_side": "defense",
+    "resolution_reason": "unique_same_side_candidate"
+  },
+  "remaining_ambiguities": [
+    {
+      "season": 2019,
+      "week": 16,
+      "game_id": "2019_16_NYG_WAS",
+      "team": "WAS",
+      "jersey_number": "46",
+      "display_name": "M.Smith",
+      "gamebook_position": "DB",
+      "gamebook_side": "defense",
+      "candidate_gsis_ids": ["00-0031371", "00-0033415"],
+      "candidate_positions": {"00-0031371": "LB", "00-0033415": "DB"},
+      "candidate_sides": {"00-0031371": "defense", "00-0033415": "defense"},
+      "reason": "multiple_same_side_candidates"
+    },
+    {
+      "season": 2019,
+      "week": 17,
+      "game_id": "2019_17_WAS_DAL",
+      "team": "WAS",
+      "jersey_number": "46",
+      "display_name": "M.Smith",
+      "gamebook_position": "DB",
+      "gamebook_side": "defense",
+      "candidate_gsis_ids": ["00-0031371", "00-0033415"],
+      "candidate_positions": {"00-0031371": "LB", "00-0033415": "DB"},
+      "candidate_sides": {"00-0031371": "defense", "00-0033415": "defense"},
+      "reason": "multiple_same_side_candidates"
+    }
+  ],
+  "scientific_disposition": {
+    "modern_player_team_game_identity_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "threshold_relaxation_authorized": false,
+    "same_version_rule_change_authorized": false,
+    "detailed_position_rescue_authorized_in_v2": false,
+    "follow_up_requires_separately_preregistered_experiment": true
+  },
+  "governance": {
+    "weekly_roster_status_used": false,
+    "raw_weekly_roster_consumed_by_identity_resolver": false,
+    "postgame_participation_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false,
+    "model_fit_performed": false
+  }
+}
