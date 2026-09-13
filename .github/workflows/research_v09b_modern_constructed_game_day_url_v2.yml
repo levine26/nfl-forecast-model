@@ -1,0 +1,182 @@
+name: LevLine V09B modern constructed game-day URL diagnostic V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_modern_constructed_game_day_url_v2_contract.json'
+      - 'research/v09b_modern_constructed_game_day_url_v2.py'
+      - 'research/test_v09b_modern_constructed_game_day_url_v2.py'
+      - '.github/workflows/research_v09b_modern_constructed_game_day_url_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-constructed-gameday-v2-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - run: pytest -q research/test_v09b_modern_constructed_game_day_url_v2.py
+      - name: Validate frozen diagnostic contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/availability/v09b_modern_constructed_game_day_url_v2_contract.json').read_text())
+          assert c['status']=='PREREGISTERED_FULL_2592_PARTITION_DISCOVERY_DIAGNOSTIC_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY'
+          assert c['expected_games_total']==1296
+          assert c['expected_team_partitions_total']==2592
+          assert c['canonical_snapshot']['research_data_commit_sha']=='a3f5c5a791f878b12cb92658df37b8a7d093cd0b'
+          assert c['canonical_snapshot']['sha256']=='d26b2cab8bdd05c223de0239cfaf70b09b75b6487c8ba2c353bd7749d1730351'
+          assert c['cms_grammar']['stage_variants_in_frozen_order']==['reg-week{week}','week{week}']
+          assert c['explicit_non_gates']['constructed_page_coverage_threshold'] is None
+          assert c['authority']['diagnostic_has_locator_qualification_authority'] is False
+          assert c['authority']['modern_game_day_roster_universe_qualified'] is False
+          assert c['authority']['v09b_model_fit_authorized'] is False
+          PY
+
+  diagnose-season:
+    needs: unit-and-contract
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2017, 2018, 2019, 2020, 2021]
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Materialize exact immutable canonical locator snapshot
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/v09b-modern-locator-snapshot-v1
+          EXPECTED_COMMIT=a3f5c5a791f878b12cb92658df37b8a7d093cd0b
+          git fetch origin "$DATA_BRANCH"
+          git cat-file -e "$EXPECTED_COMMIT^{commit}"
+          git worktree add --detach /tmp/v09b-locator-snapshot "$EXPECTED_COMMIT"
+          sha256sum /tmp/v09b-locator-snapshot/research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv
+      - name: Probe constructed historical game-day URLs
+        run: |
+          OUT=research_outputs/v09b_modern_constructed_game_day_url_v2/${{ matrix.season }}.json
+          mkdir -p "$(dirname "$OUT")"
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_modern_constructed_game_day_url_v2.py \
+              --contract research/availability/v09b_modern_constructed_game_day_url_v2_contract.json \
+              --snapshot /tmp/v09b-locator-snapshot/research_outputs/v09b_modern_locator_snapshot_v1/locator_snapshot.tsv \
+              --season ${{ matrix.season }} \
+              --output "$OUT" --timeout 10 --workers 32
+      - name: Assert season accounting and authority firewall
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s='${{ matrix.season }}'
+          r=json.loads(Path(f'research_outputs/v09b_modern_constructed_game_day_url_v2/{s}.json').read_text())
+          expected={'2017':512,'2018':512,'2019':512,'2020':512,'2021':544}[s]
+          games={'2017':256,'2018':256,'2019':256,'2020':256,'2021':272}[s]
+          assert r['canonical_games']==games
+          assert r['team_partitions_expected']==expected
+          assert r['team_partitions_reported']==expected
+          assert r['constructed_pages_discovered']+r['constructed_pages_missing']==expected
+          assert r['accounting_integrity_pass'] is True
+          assert r['diagnostic_has_locator_qualification_authority'] is False
+          assert r['diagnostic_has_membership_authority'] is False
+          assert r['modern_roster_depth_locator_coverage_qualified'] is False
+          assert r['source_chronology_qualified'] is False
+          assert r['modern_game_day_roster_universe_qualified'] is False
+          assert r['modern_player_team_game_identity_qualified'] is False
+          assert r['v09b_model_fit_authorized'] is False
+          assert r['completed_2026_outcomes_used']==0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-constructed-gameday-v2-${{ matrix.season }}-${{ github.run_id }}
+          path: research_outputs/v09b_modern_constructed_game_day_url_v2/${{ matrix.season }}.json
+          if-no-files-found: error
+          retention-days: 30
+
+  aggregate-diagnostic:
+    needs: diagnose-season
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v09b-modern-constructed-gameday-v2-*-${{ github.run_id }}
+          path: /tmp/v09b_constructed_gameday_v2
+          merge-multiple: true
+      - name: Aggregate full 2592-partition diagnostic
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/v09b_constructed_gameday_v2')
+          rows=[json.loads((root/f'{s}.json').read_text()) for s in [2017,2018,2019,2020,2021]]
+          assert sum(x['canonical_games'] for x in rows)==1296
+          assert sum(x['team_partitions_reported'] for x in rows)==2592
+          assert all(x['accounting_integrity_pass'] is True for x in rows)
+          media={k:sum(x['media_class_partition_counts'][k] for x in rows) for k in rows[0]['media_class_partition_counts']}
+          result={
+            'diagnostic_version':2,
+            'contract_id':'V09B-MODERN-CONSTRUCTED-GAME-DAY-URL-DIAGNOSTIC-V2',
+            'canonical_games':1296,
+            'team_partitions_reported':2592,
+            'constructed_pages_discovered':sum(x['constructed_pages_discovered'] for x in rows),
+            'constructed_pages_missing':sum(x['constructed_pages_missing'] for x in rows),
+            'candidate_attempts_total':sum(x['candidate_attempts_total'] for x in rows),
+            'media_class_partition_counts':media,
+            'accounting_integrity_pass':True,
+            'diagnostic_has_locator_qualification_authority':False,
+            'modern_roster_depth_locator_coverage_qualified':False,
+            'modern_game_day_roster_universe_qualified':False,
+            'modern_player_team_game_identity_qualified':False,
+            'training_source_chronology_qualified':False,
+            'v09b_model_fit_authorized':False,
+            'model_fit_performed':False,
+            'game_outcomes_used':0,
+            'completed_2026_outcomes_used':0,
+          }
+          (root/'aggregate.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+          print(json.dumps(result,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v09b-modern-constructed-gameday-v2-aggregate-${{ github.run_id }}
+          path: /tmp/v09b_constructed_gameday_v2/aggregate.json
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
