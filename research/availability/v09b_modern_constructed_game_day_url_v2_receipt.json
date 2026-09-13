@@ -1,0 +1,76 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-CONSTRUCTED-GAME-DAY-URL-DIAGNOSTIC-V2-COMPLETE",
+  "contract_id": "V09B-MODERN-CONSTRUCTED-GAME-DAY-URL-DIAGNOSTIC-V2",
+  "status": "DIAGNOSTIC_COMPLETE_NO_LOCATOR_OR_MEMBERSHIP_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34735299033,
+    "validated_head_sha": "c31f88723cdd8531f01f7273e871576d45dc734e",
+    "aggregate_artifact": {
+      "id": 10310403890,
+      "digest": "sha256:ed4c859ed22d8a45362f8afc0119894329691df431004a0677b85db778b70304"
+    },
+    "season_artifacts": {
+      "2017": {"id": 10310528192, "digest": "sha256:89d335fefb793f0645bb8b49f18a3d57967a0bc72956178a946abccd993d74ff"},
+      "2018": {"id": 10310448917, "digest": "sha256:2f478acb87ed104b13c754a4583bf773cc2aebce96fd0fd5257dc8d877fcdc5c"},
+      "2019": {"id": 10310662433, "digest": "sha256:f5520d3038919b851d17432def6bfb8346c36a99b797e8341394d9e3fb8a5160"},
+      "2020": {"id": 10309994585, "digest": "sha256:c5b557314bcf297f806888508bf639b8415b0d85f5ed568cb3e73342647a2699"},
+      "2021": {"id": 10310637651, "digest": "sha256:3db1d13d6ee1656659d8eec1eead5aca41191fd34102260666cd42dec5027811"}
+    }
+  },
+  "aggregate_result": {
+    "canonical_games": 1296,
+    "team_partitions_reported": 2592,
+    "candidate_attempts_total": 5895,
+    "constructed_pages_discovered": 1453,
+    "constructed_pages_missing": 1139,
+    "accounting_integrity_pass": true,
+    "media_class_partition_counts": {
+      "roster": 1379,
+      "depth_chart": 1036,
+      "game_notes": 138,
+      "game_release": 51,
+      "flip_card": 23
+    }
+  },
+  "per_season_result": {
+    "2017": {"team_partitions": 512, "candidate_attempts": 1472, "pages_discovered": 0, "pages_missing": 512, "media": {"roster": 0, "depth_chart": 0, "game_notes": 0, "game_release": 0, "flip_card": 0}},
+    "2018": {"team_partitions": 512, "candidate_attempts": 1053, "pages_discovered": 365, "pages_missing": 147, "media": {"roster": 340, "depth_chart": 260, "game_notes": 42, "game_release": 16, "flip_card": 2}},
+    "2019": {"team_partitions": 512, "candidate_attempts": 1088, "pages_discovered": 346, "pages_missing": 166, "media": {"roster": 330, "depth_chart": 248, "game_notes": 26, "game_release": 16, "flip_card": 0}},
+    "2020": {"team_partitions": 512, "candidate_attempts": 1080, "pages_discovered": 371, "pages_missing": 141, "media": {"roster": 355, "depth_chart": 259, "game_notes": 33, "game_release": 18, "flip_card": 18}},
+    "2021": {"team_partitions": 544, "candidate_attempts": 1202, "pages_discovered": 371, "pages_missing": 173, "media": {"roster": 354, "depth_chart": 269, "game_notes": 37, "game_release": 1, "flip_card": 3}}
+  },
+  "scientific_interpretation": {
+    "deterministic_cms_construction_materially_improved_historical_game_page_discovery": true,
+    "constructed_page_coverage_complete": false,
+    "constructed_page_coverage_fraction": 0.560570987654321,
+    "2017_constructed_page_coverage": 0.0,
+    "generic_roster_or_depth_link_presence_is_historical_snapshot_authority": false,
+    "missing_constructed_page_is_source_absence_proof": false,
+    "reason": "The frozen CMS grammar recovered 1,453 of 2,592 canonical team-game pages and exposed many roster/depth anchors, but 1,139 partitions remained undiscovered, all 2017 partitions were missing, and observed roster/depth anchors can point to generic current-team endpoints rather than immutable pregame snapshots. The diagnostic therefore improves locator knowledge but cannot qualify historical roster coverage or game-day membership."
+  },
+  "authority_from_this_diagnostic": {
+    "diagnostic_has_locator_qualification_authority": false,
+    "diagnostic_has_membership_authority": false,
+    "modern_roster_depth_locator_coverage_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "current_repository_state_note": {
+    "modern_player_team_game_identity_qualified_elsewhere_by_v3": true,
+    "identity_qualification_is_not_derived_from_this_diagnostic": true
+  },
+  "governance": {
+    "third_party_authority_used": false,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
