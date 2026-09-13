@@ -1,16 +1,16 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_ARI_LAC",
-      "largest_driver": "Market movement",
-      "pick": "LAC",
-      "pick_delta_pp": -0.9869481790234391
-    },
-    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material input move",
       "pick": "SEA",
       "pick_delta_pp": -1.260265225511148e-08
+    },
+    {
+      "game_id": "2026_01_ARI_LAC",
+      "largest_driver": "No material input move",
+      "pick": "LAC",
+      "pick_delta_pp": 0.0
     },
     {
       "game_id": "2026_01_BAL_IND",
@@ -19,7 +19,7 @@
       "pick_delta_pp": -0.0
     }
   ],
-  "generated_utc": "2026-09-13T19:39:42.624779+00:00",
+  "generated_utc": "2026-09-13T22:40:33.504318+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
@@ -27,8 +27,8 @@
       "matchup": "MIA @ LV",
       "pick": "LV",
       "pick_prob": 0.6338599528153582,
-      "projected_score": "LV 20.0 \u2013 MIA 23.5",
-      "pure_market_gap_pp": 23.725225461159766
+      "projected_score": "LV 20.1 \u2013 MIA 23.9",
+      "pure_market_gap_pp": 23.74129668887547
     },
     {
       "confidence": "Coin Flip",
@@ -36,43 +36,43 @@
       "matchup": "DEN @ KC",
       "pick": "KC",
       "pick_prob": 0.5808285308101886,
-      "projected_score": "KC 19.7 \u2013 DEN 25.3",
-      "pure_market_gap_pp": 22.46151811390691
+      "projected_score": "KC 19.8 \u2013 DEN 25.5",
+      "pure_market_gap_pp": 22.29172962655331
     },
     {
-      "confidence": "Solid",
-      "game_id": "2026_01_NO_DET",
-      "matchup": "NO @ DET",
-      "pick": "DET",
-      "pick_prob": 0.7439940570102664,
-      "projected_score": "DET 24.7 \u2013 NO 21.1",
-      "pure_market_gap_pp": 16.721595536741518
+      "confidence": "High",
+      "game_id": "2026_01_ARI_LAC",
+      "matchup": "ARI @ LAC",
+      "pick": "LAC",
+      "pick_prob": 0.7970307247917651,
+      "projected_score": "LAC 25.3 \u2013 ARI 19.0",
+      "pure_market_gap_pp": 12.876305799904786
     }
   ],
   "most_uncertain": [
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_01_NYJ_TEN",
-      "matchup": "NYJ @ TEN",
-      "pick": "NYJ",
-      "pick_prob": 0.5093660606517145,
-      "projected_score": "TEN 23.7 \u2013 NYJ 22.1"
-    },
-    {
-      "confidence": "Coin Flip",
       "game_id": "2026_01_GB_MIN",
       "matchup": "GB @ MIN",
       "pick": "MIN",
-      "pick_prob": 0.5143072225475234,
+      "pick_prob": 0.5019722639431533,
       "projected_score": "MIN 23.8 \u2013 GB 19.5"
     },
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_01_BUF_HOU",
-      "matchup": "BUF @ HOU",
-      "pick": "BUF",
-      "pick_prob": 0.5261720214841437,
-      "projected_score": "HOU 23.0 \u2013 BUF 23.4"
+      "game_id": "2026_01_DEN_KC",
+      "matchup": "DEN @ KC",
+      "pick": "KC",
+      "pick_prob": 0.5808285308101886,
+      "projected_score": "KC 19.8 \u2013 DEN 25.5"
+    },
+    {
+      "confidence": "Lean",
+      "game_id": "2026_01_DAL_NYG",
+      "matchup": "DAL @ NYG",
+      "pick": "DAL",
+      "pick_prob": 0.6302054300816646,
+      "projected_score": "NYG 22.3 \u2013 DAL 21.0"
     }
   ],
   "strongest": [
@@ -81,24 +81,24 @@
       "game_id": "2026_01_ARI_LAC",
       "matchup": "ARI @ LAC",
       "pick": "LAC",
-      "pick_prob": 0.8023369318951985,
-      "projected_score": "LAC 25.4 \u2013 ARI 19.0"
-    },
-    {
-      "confidence": "High",
-      "game_id": "2026_01_CLE_JAX",
-      "matchup": "CLE @ JAX",
-      "pick": "JAX",
-      "pick_prob": 0.7814204979585643,
-      "projected_score": "JAX 29.8 \u2013 CLE 16.1"
+      "pick_prob": 0.7970307247917651,
+      "projected_score": "LAC 25.3 \u2013 ARI 19.0"
     },
     {
       "confidence": "Solid",
-      "game_id": "2026_01_NO_DET",
-      "matchup": "NO @ DET",
-      "pick": "DET",
-      "pick_prob": 0.7439940570102664,
-      "projected_score": "DET 24.7 \u2013 NO 21.1"
+      "game_id": "2026_01_WAS_PHI",
+      "matchup": "WAS @ PHI",
+      "pick": "PHI",
+      "pick_prob": 0.6678465462875075,
+      "projected_score": "PHI 26.6 \u2013 WAS 21.1"
+    },
+    {
+      "confidence": "Lean",
+      "game_id": "2026_01_MIA_LV",
+      "matchup": "MIA @ LV",
+      "pick": "LV",
+      "pick_prob": 0.6338599528153582,
+      "projected_score": "LV 20.1 \u2013 MIA 23.9"
     }
   ],
   "week": 1
