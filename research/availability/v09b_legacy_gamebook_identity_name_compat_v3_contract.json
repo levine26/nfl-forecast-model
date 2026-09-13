@@ -1,0 +1,110 @@
+{
+  "contract_version": 3,
+  "contract_id": "V09B-LEGACY-GAMEBOOK-IDENTITY-NAME-COMPAT-V3",
+  "dependencies": [
+    "V09B-LEGACY-GAMEBOOK-IDENTITY-V1-FAILURE",
+    "V09B-LEGACY-GAMEBOOK-IDENTITY-DIAGNOSTIC-V2-RESULT"
+  ],
+  "status": "POST_FAILURE_NAME_COMPATIBILITY_DIAGNOSTIC_ONLY",
+  "purpose": "Measure deterministic Game Book/source-name compatibility inside same-season/week/team/jersey candidate sets for every V1 exact-name miss, after rejecting candidate uniqueness alone as unsafe.",
+  "rejected_design_preservation": {
+    "unique_same_week_team_jersey_alone_authorized": false,
+    "reason": "Diagnostic examples exposed semantically false unique candidates caused by jersey reuse and weekly roster snapshot mismatch.",
+    "examples": [
+      "BAL R.Mallett #15 -> Michael Campanaro",
+      "BAL M.Wallace #17 -> Devin Hester",
+      "PHI K.Grugier-Hill #54 -> Stephen Tulloch / Deontae Skinner candidate set"
+    ]
+  },
+  "population": {
+    "seasons": [2012, 2013, 2014, 2015, 2016],
+    "population_rule": "all and only V1 exact zero-candidate Game Book identities",
+    "v1_exact_misses_total": 1832,
+    "expected_misses_by_season": {"2012": 313, "2013": 298, "2014": 264, "2015": 252, "2016": 705},
+    "silent_miss_drop_allowed": false
+  },
+  "identity_source": {
+    "source": "nflverse weekly_rosters parquet",
+    "allowed_fields": ["season", "game_type", "week", "team", "gsis_id", "jersey_number", "first_name", "football_name", "last_name"],
+    "forbidden_for_diagnostic": ["status", "status_description_abbr", "status_short_description"],
+    "expected_source_sha256_by_season": {
+      "2012": "32a218e187e553abdeacd107ae9c76c321e258809d18578f1b1267882f1c0b29",
+      "2013": "bb68c0e5dba854c4d0b7dda4331456df701c06a66160b96decdfdc1b71147663",
+      "2014": "51ae5047bb95297e039ba3d6560cee1ed16407f2e91897f6c9c79aafecdef397",
+      "2015": "61a57f4484a556d4cad1cf50030a8a8822a345eace783e013f8ba8ae2f721243",
+      "2016": "70d0ceab697860e946a2acdafcae48809015dcdaf06bd21d26777473cff7db8f"
+    },
+    "expected_selected_reg_rows_by_season": {"2012": 30005, "2013": 30437, "2014": 30492, "2015": 30636, "2016": 32944}
+  },
+  "candidate_scope": {
+    "key": ["season", "REG week", "normalized team", "jersey number"],
+    "zero_candidate_cases_remain_zero": true,
+    "all_candidates_must_be_evaluated": true,
+    "candidate_uniqueness_is_name_compatibility": false,
+    "manual_overrides_allowed": false
+  },
+  "compatibility_taxonomy": {
+    "normalization": "Unicode NFKD; uppercase alphanumeric compact forms; surname components preserve hyphen/space/apostrophe boundaries for component comparisons.",
+    "given_evidence": {
+      "given_full_prefix": "Game Book given fragment contains at least two alphanumeric characters and prefixes source first_name or football_name.",
+      "given_initial_only": "Game Book given fragment contributes only a first-initial match; reported separately as weaker evidence.",
+      "given_absent": "No usable given fragment; never counted as strong evidence."
+    },
+    "surname_evidence": {
+      "surname_exact": "compact Game Book surname equals compact source last_name",
+      "compound_component_prefix": "Game Book and source surname component sequences have equal length and every Game Book component prefixes the corresponding source component",
+      "source_surname_is_gamebook_leading_components": "source surname component sequence equals a leading sequence of the Game Book surname components",
+      "gamebook_surname_is_source_leading_components": "Game Book surname component sequence equals a leading sequence of the source surname components",
+      "surname_absent": "no usable Game Book surname fragment"
+    },
+    "strong_tier": [
+      "given_full_prefix + surname_exact",
+      "given_full_prefix + compound_component_prefix",
+      "given_initial_only + compound_component_prefix when a nontrivial surname component supplies distinguishing evidence"
+    ],
+    "extended_tier_report_only": [
+      "strong_tier",
+      "given_full_prefix + leading-component surname evidence",
+      "given_initial_only + surname_exact",
+      "given_initial_only + leading-component surname evidence",
+      "given_absent + surname_exact"
+    ],
+    "no_fuzzy_distance": true,
+    "no_phonetic_matching": true,
+    "no_adjacent_week_matching": true,
+    "no_season_wide_matching": true
+  },
+  "required_outputs": [
+    "v1_exact_misses",
+    "same_week_team_jersey_zero_candidate_misses",
+    "same_week_team_jersey_one_candidate_misses",
+    "same_week_team_jersey_multiple_candidate_misses",
+    "strong_compatible_candidate_count_distribution",
+    "extended_compatible_candidate_count_distribution",
+    "compatibility_method_counts",
+    "candidate_level_examples",
+    "malformed_or_insufficient_gamebook_name_examples"
+  ],
+  "scientific_disclosure": {
+    "designed_after_v1_and_same_jersey_diagnostic": true,
+    "diagnostic_has_qualification_authority": false,
+    "compatibility_tier_is_resolution_rule": false,
+    "future_rule_must_be_separately_preregistered": true,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0
+  },
+  "authorization": {
+    "legacy_player_team_game_identity_qualified": false,
+    "name_compatibility_resolution_authorized": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}
