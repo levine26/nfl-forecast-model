@@ -1,0 +1,67 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-DELEGATED-MEDIA-PROVENANCE-V1-COMPLETE",
+  "contract_id": "V09B-DELEGATED-MEDIA-PROVENANCE-V1",
+  "status": "CLUB_SPECIFIC_DELEGATION_PROVENANCE_QUALIFIED_CLE_PHI_ONLY",
+  "workflow_evidence": {
+    "run_id": 34735255781,
+    "validated_head_sha": "9c9ea39d3f147d3482631afa5822fd32e603b757",
+    "artifact_id": 10310846914,
+    "artifact_digest": "sha256:2b6a53495f99823d369f541cfa6b1593cc6b739787973bc0c6ffa44c8f4bcb5a",
+    "result_json_sha256": "f876afbc5f58fa5bbd5bccb4a67dc8f92dade116d4a19932730da01865336a6e"
+  },
+  "qualified_relations": {
+    "CLE": {
+      "official_origin": "https://media.clevelandbrowns.com/",
+      "relation": "redirect",
+      "delegated_host": "browns.1rmg.com",
+      "redirect_status": 301,
+      "final_status": 200,
+      "required_markers_all_present": true,
+      "delegated_link_count_on_final_page": 86,
+      "raw_sha256": "477e8be08ecebddf58b14b59dd9aa863da1f4dcd76f5d2448d66d93a5ff84fd7"
+    },
+    "PHI": {
+      "official_origin": "https://media.philadelphiaeagles.com/",
+      "relation": "linked",
+      "delegated_host": "eagles.1rmg.com",
+      "official_origin_status": 200,
+      "required_markers_all_present": true,
+      "delegated_link_count": 60,
+      "frozen_minimum_delegated_links": 10,
+      "raw_sha256": "6ea9babb22537a8e24d7726ad3c9b030ab87bfbfcd747e08406077c8ebe55afa"
+    }
+  },
+  "observation_only": {
+    "DEN": {
+      "official_origin": "https://media.denverbroncos.com/",
+      "observed_redirect_target": "nfl.omgsports.com",
+      "redirect_status": 301,
+      "final_status": 200,
+      "final_raw_sha256": "4a9f1e82b3af62b375a0b4cbc129998bfc804a6c9a870ab8176d9b79d9af1062",
+      "bounded_final_page_semantics": "generic NFLOMG login requiring JavaScript/cookies",
+      "club_specific_attribution_qualified": false,
+      "qualification_evaluated": false
+    }
+  },
+  "scientific_disposition": {
+    "qualified_clubs": ["CLE", "PHI"],
+    "delegation_provenance_may_be_used_for_future_candidate_discovery_for_qualified_clubs_only": true,
+    "delegated_provider_globally_qualified": false,
+    "denver_delegated_host_qualified": false,
+    "historical_document_locator_coverage_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
