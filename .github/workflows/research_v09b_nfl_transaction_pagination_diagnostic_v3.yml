@@ -1,0 +1,98 @@
+name: LevLine V09B NFL transaction pagination diagnostic V3
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_nfl_transaction_pagination_diagnostic_v3_contract.json'
+      - 'research/v09b_nfl_transaction_pagination_diagnostic_v3.py'
+      - 'research/test_v09b_nfl_transaction_pagination_diagnostic_v3.py'
+      - '.github/workflows/research_v09b_nfl_transaction_pagination_diagnostic_v3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-nfl-transaction-pagination-v3-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test preregistered V3 transport rules
+        run: pytest -q research/test_v09b_nfl_transaction_pagination_diagnostic_v3.py
+      - name: Validate frozen V3 contract and failed V2 dependency
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/availability/v09b_nfl_transaction_pagination_diagnostic_v3_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V3'
+          assert c['status'] == 'PREREGISTERED_AMP_TRANSPORT_ADVANCEMENT_DIAGNOSTIC_NO_SOURCE_AUTHORITY'
+          assert len(c['fixed_endpoints']) == 2
+          assert {x['season'] for x in c['fixed_endpoints']} == {2017, 2021}
+          assert c['transport']['amp_host'] == 'amp.nfl.com'
+          g = c['frozen_advancement_gate']
+          assert g['both_endpoints_must_complete'] is True
+          assert g['initial_rows_min'] == 25
+          assert g['amp_cursor_raw_sha_must_differ_from_amp_initial'] is True
+          assert g['amp_cursor_novel_rows_vs_amp_initial_min'] == 1
+          assert g['both_endpoints_must_pass'] is True
+          a = c['explicit_non_authority']
+          assert a['diagnostic_has_source_qualification_authority'] is False
+          assert a['diagnostic_has_chronology_authority'] is False
+          assert a['full_paginated_source_class_qualified'] is False
+          assert a['modern_game_day_roster_universe_qualified'] is False
+          assert a['training_label_semantics_qualified'] is False
+          assert a['training_source_chronology_qualified'] is False
+          assert a['v09b_model_fit_authorized'] is False
+          v2 = json.loads(Path('research/availability/v09b_nfl_transaction_pagination_diagnostic_v2_receipt.json').read_text())
+          assert v2['receipt_id'] == 'V09B-NFL-TRANSACTION-PAGINATION-DIAGNOSTIC-V2-COMPLETE'
+          assert v2['aggregate_result']['transport_attempts_with_novel_row_advancement'] == 0
+          assert v2['scientific_disposition']['full_paginated_source_class_qualified'] is False
+          PY
+      - name: Run exact historical AMP advancement diagnostic
+        run: |
+          mkdir -p research_outputs/v09b_nfl_transaction_pagination_diagnostic_v3
+          set +e
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_nfl_transaction_pagination_diagnostic_v3.py \
+              --contract research/availability/v09b_nfl_transaction_pagination_diagnostic_v3_contract.json \
+              --output research_outputs/v09b_nfl_transaction_pagination_diagnostic_v3/result.json
+          code=$?
+          echo "$code" > research_outputs/v09b_nfl_transaction_pagination_diagnostic_v3/exit_code.txt
+          exit "$code"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v09b-nfl-transaction-pagination-v3-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_pagination_diagnostic_v3
+          if-no-files-found: error
+          retention-days: 30
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
