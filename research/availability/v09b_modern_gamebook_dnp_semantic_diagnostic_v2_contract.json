@@ -1,0 +1,90 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-MODERN-GAMEBOOK-DNP-SEMANTIC-DIAGNOSTIC-V2",
+  "status": "POST_FAILURE_DIAGNOSTIC_ONLY_NO_QUALIFICATION_AUTHORITY",
+  "dependencies": [
+    "V09B-MODERN-GAMEBOOK-RAW-ARCHIVE-V2-QUALIFICATION",
+    "V09B-MODERN-GAMEBOOK-ROSTER-UNIVERSE-V1-FAILURE"
+  ],
+  "purpose": "Characterize why the preregistered modern roster-universe V1 rule failed without relaxing any count threshold or assigning any replacement game-day membership labels. The diagnostic quantifies whether adding Did Not Play identities to Lineups plus Substitutions creates direct contradictions with frozen official era active-roster maxima and records the exact DNP-only identities requiring independent eligibility evidence.",
+  "canonical_universe": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "expected_games_by_season": {"2017": 256, "2018": 256, "2019": 256, "2020": 256, "2021": 272},
+    "expected_games_total": 1296,
+    "expected_team_partitions_total": 2592,
+    "silent_drops_allowed": false
+  },
+  "upstream_archive": {
+    "research_data_branch": "research-data/v09b-gamebooks-modern-v2",
+    "research_data_commit_sha": "aab55bf97aa62cae446b358b9739f4c62604cc8e",
+    "archive_root": "research_outputs/v09b_modern_gamebook_raw_archive_v2",
+    "network_redownload_allowed": false
+  },
+  "frozen_v1_failure_replay": {
+    "expected_failed_game_team_partitions": [
+      "2018_16_DEN_OAK|OAK",
+      "2020_11_PIT_JAX|JAX",
+      "2020_13_NO_ATL|NO",
+      "2020_15_JAX_BAL|JAX",
+      "2021_10_KC_LV|KC",
+      "2021_10_TB_WAS|TB",
+      "2021_16_PIT_KC|PIT"
+    ],
+    "expected_active_count_contradiction_partitions": 6,
+    "expected_total_roster_count_contradiction_partitions": 3,
+    "v1_thresholds_relaxed": false,
+    "v1_membership_semantics_changed": false
+  },
+  "diagnostic_sets": {
+    "lineups_plus_substitutions_union": "set union of exact Game Book parser identities printed in Lineups and Substitutions; diagnostic only and not authorized as a positive-label universe",
+    "did_not_play_only": "Did Not Play parser identities not already present in Lineups plus Substitutions",
+    "v1_active_candidate_union": "Lineups plus Substitutions plus Did Not Play exact parser-identity set union",
+    "not_active": "Game Book Not Active exact parser-identity set",
+    "v1_roster_candidate_union": "v1 active candidate union plus Not Active"
+  },
+  "contradiction_logic": {
+    "active_max_contradiction": "Lineups plus Substitutions union is at or below the frozen era active maximum while adding DNP-only identities makes the V1 active candidate union exceed that maximum.",
+    "minimum_dnp_non_active_required_by_active_max": "max(0, v1_active_candidate_count - era_active_max) when lineups_plus_substitutions_count <= era_active_max; diagnostic lower bound only.",
+    "total_roster_max_contradiction": "V1 roster candidate union exceeds the frozen era active/inactive list maximum.",
+    "postgame_participation_used_for_training_authority": false,
+    "diagnostic_contradictions_authorize_replacement_membership": false
+  },
+  "era_bounds_replayed_unchanged": {
+    "2017_2019": {"active_max": 46, "active_inactive_list_max": 53},
+    "2020_2021": {"active_max": 48, "active_inactive_list_max": 55}
+  },
+  "required_outputs": [
+    "all 2592 team partitions",
+    "DNP-only identity counts by season",
+    "active-max contradiction partitions and exact DNP-only identities",
+    "minimum DNP non-active lower bound for each active-max contradiction",
+    "total-roster-max contradiction partitions",
+    "exact replay of all seven V1 failed team partitions",
+    "bounded examples for non-contradictory DNP-only partitions"
+  ],
+  "forbidden_inferences": {
+    "did_not_play_identity_classified_active": false,
+    "did_not_play_identity_classified_inactive": false,
+    "lineups_or_substitutions_used_as_training_positive_labels": false,
+    "absence_from_not_active_used_as_positive_label": false,
+    "weekly_roster_status_used": false,
+    "weekly_roster_membership_used": false,
+    "player_identity_crosswalk_used": false,
+    "fuzzy_identity_matching_used": false
+  },
+  "authority": {
+    "diagnostic_has_qualification_authority": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "production_dependency_authorized": false
+  }
+}

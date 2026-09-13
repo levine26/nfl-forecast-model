@@ -1,0 +1,72 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-MODERN-GAMEBOOK-DNP-SEMANTIC-DIAGNOSTIC-V2-COMPLETE",
+  "contract_id": "V09B-MODERN-GAMEBOOK-DNP-SEMANTIC-DIAGNOSTIC-V2",
+  "status": "DIAGNOSTIC_COMPLETE_NO_QUALIFICATION_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34733314819,
+    "validated_head_sha": "5823e2d132c53f0ec8af94fb8e4a459934b7b014",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "season_artifacts": {
+      "2017": {"artifact_id": 10310477464, "artifact_digest": "sha256:95bd0187861151569ab209b36de47f9f7ca65bea170c71d9790458eae16ddafe"},
+      "2018": {"artifact_id": 10309953616, "artifact_digest": "sha256:c53afe03b15bddfa2a53bfef9cf3abc67c46e366a921ce6f98a563cc691be4f3"},
+      "2019": {"artifact_id": 10309883720, "artifact_digest": "sha256:22c7d1bd52c9e574ac8155f4650ca32aab3fe33141514afde092076c6a0bbc98"},
+      "2020": {"artifact_id": 10310247035, "artifact_digest": "sha256:93951009f1c4c38114f7fdfa8a4e1c981a5d0d77fee3aa66fc6fcabb9da24115"},
+      "2021": {"artifact_id": 10309449519, "artifact_digest": "sha256:f129a82cbc03dd98a815e1d0232fce8a500a46f93b209087344c2b1b4dcd80c1"}
+    },
+    "aggregate_artifact": {"artifact_id": 10310348133, "artifact_digest": "sha256:e68835409068a9660f9f3408ccb09a988579aceff8f8c011843a69a431c3bd2a"}
+  },
+  "aggregate_result": {
+    "canonical_games": 1296,
+    "team_partitions_diagnosed": 2592,
+    "exact_marker_games": 1296,
+    "source_errors": 0,
+    "partitions_with_dnp_only_identities": 2254,
+    "dnp_only_identity_count_total": 3610,
+    "active_max_contradiction_partitions": 6,
+    "minimum_dnp_non_active_required_total": 7,
+    "total_roster_max_contradiction_partitions": 3,
+    "uniform_did_not_play_as_active_membership_is_contradicted": true,
+    "v1_failed_partition_keys": [
+      "2018_16_DEN_OAK|OAK",
+      "2020_11_PIT_JAX|JAX",
+      "2020_13_NO_ATL|NO",
+      "2020_15_JAX_BAL|JAX",
+      "2021_10_KC_LV|KC",
+      "2021_10_TB_WAS|TB",
+      "2021_16_PIT_KC|PIT"
+    ]
+  },
+  "season_results": {
+    "2017": {"games": 256, "team_partitions": 512, "partitions_with_dnp_only": 449, "dnp_only_identities": 675, "active_max_contradictions": 0, "minimum_dnp_non_active_required": 0, "total_roster_max_contradictions": 0},
+    "2018": {"games": 256, "team_partitions": 512, "partitions_with_dnp_only": 443, "dnp_only_identities": 656, "active_max_contradictions": 1, "minimum_dnp_non_active_required": 2, "total_roster_max_contradictions": 1},
+    "2019": {"games": 256, "team_partitions": 512, "partitions_with_dnp_only": 451, "dnp_only_identities": 672, "active_max_contradictions": 0, "minimum_dnp_non_active_required": 0, "total_roster_max_contradictions": 0},
+    "2020": {"games": 256, "team_partitions": 512, "partitions_with_dnp_only": 441, "dnp_only_identities": 776, "active_max_contradictions": 2, "minimum_dnp_non_active_required": 2, "total_roster_max_contradictions": 2},
+    "2021": {"games": 272, "team_partitions": 544, "partitions_with_dnp_only": 470, "dnp_only_identities": 831, "active_max_contradictions": 3, "minimum_dnp_non_active_required": 3, "total_roster_max_contradictions": 0}
+  },
+  "scientific_disposition": {
+    "v1_uniform_did_not_play_as_active_rule_rejected": true,
+    "count_thresholds_relaxed": false,
+    "did_not_play_individual_membership_classification_performed": false,
+    "lineups_or_substitutions_promoted_to_training_positive_universe": false,
+    "replacement_membership_rule_authorized": false,
+    "independent_game_day_eligibility_evidence_required": true,
+    "diagnostic_has_qualification_authority": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "weekly_roster_status_used": false,
+    "weekly_roster_membership_used": false,
+    "player_identity_crosswalk_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
