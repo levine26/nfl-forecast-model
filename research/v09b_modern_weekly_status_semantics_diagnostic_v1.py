@@ -163,12 +163,24 @@ def _projection_index(frame: pl.DataFrame, *, season: int) -> dict[tuple[int, st
     return index
 
 
-def _status_lookup(frame: pl.DataFrame, *, season: int) -> dict[tuple[int, str, str], Counter[tuple[str, str]]]:
-    required = {"season", "game_type", "week", "team", "gsis_id", "status_description_abbr"}
+def _status_lookup(
+    frame: pl.DataFrame,
+    *,
+    season: int,
+) -> dict[tuple[int, str, str], Counter[tuple[str, str, str]]]:
+    required = {
+        "season",
+        "game_type",
+        "week",
+        "team",
+        "gsis_id",
+        "status",
+        "status_description_abbr",
+    }
     missing = sorted(required - set(frame.columns))
     if missing:
         raise RuntimeError(f"raw weekly roster missing required status fields: {missing}")
-    lookup: dict[tuple[int, str, str], Counter[tuple[str, str]]] = defaultdict(Counter)
+    lookup: dict[tuple[int, str, str], Counter[tuple[str, str, str]]] = defaultdict(Counter)
     for row in frame.to_dicts():
         if int(row.get("season") or -1) != season or str(row.get("game_type") or "") != "REG":
             continue
@@ -180,9 +192,10 @@ def _status_lookup(frame: pl.DataFrame, *, season: int) -> dict[tuple[int, str, 
         gsis = str(row.get("gsis_id") or "").strip()
         if not team or not gsis:
             continue
+        status = "<NULL>" if row.get("status") is None else str(row.get("status")).strip() or "<BLANK>"
         abbr = "<NULL>" if row.get("status_description_abbr") is None else str(row.get("status_description_abbr")).strip() or "<BLANK>"
         short = "<NULL>" if "status_short_description" not in frame.columns or row.get("status_short_description") is None else str(row.get("status_short_description")).strip() or "<BLANK>"
-        lookup[(week, team, gsis)][(abbr, short)] += 1
+        lookup[(week, team, gsis)][(status, abbr, short)] += 1
     return lookup
 
 
@@ -232,7 +245,8 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
     section_totals = Counter()
     resolution_counts = Counter()
     section_resolution_counts: dict[str, Counter[str]] = {section: Counter() for section in SECTIONS}
-    cross_tab: dict[str, Counter[str]] = {section: Counter() for section in SECTIONS}
+    generic_status_cross_tab: dict[str, Counter[str]] = {section: Counter() for section in SECTIONS}
+    status_abbr_cross_tab: dict[str, Counter[str]] = {section: Counter() for section in SECTIONS}
     source_errors: list[dict[str, object]] = []
     unresolved_examples: list[dict[str, object]] = []
     ambiguous_examples: list[dict[str, object]] = []
@@ -250,23 +264,36 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
                 text = raw_helpers._extract_pdf_text(handle.read())
             marker_left, sections_left = gamebook_parser._section_entries(text, side=0)
             marker_right, sections_right = gamebook_parser._section_entries(text, side=1)
-            if marker_left != marker_right or not all(marker_left.get(name) == 1 for name in ("lineups", "substitutions", "did_not_play", "not_active")):
+            if marker_left != marker_right or not all(
+                marker_left.get(name) == 1
+                for name in ("lineups", "substitutions", "did_not_play", "not_active")
+            ):
                 raise ValueError("Game Book semantic marker counts are not exact")
             marker_exact_games += 1
             parsed_games += 1
 
-            for team, sections in ((str(source_row["away_team"]), sections_left), (str(source_row["home_team"]), sections_right)):
+            for team, sections in (
+                (str(source_row["away_team"]), sections_left),
+                (str(source_row["home_team"]), sections_right),
+            ):
                 parsed_partitions += 1
                 week = int(source_row["week"])
                 team_norm = normalize_team(team)
                 for section in SECTIONS:
                     entries = sections[section]
                     counts = Counter(entry.parser_identity for entry in entries)
-                    repeated_within_section_occurrences += sum(max(0, count - 1) for count in counts.values())
+                    repeated_within_section_occurrences += sum(
+                        max(0, count - 1) for count in counts.values()
+                    )
                     for jersey, display_name in sorted(counts):
                         section_totals[section] += 1
-                        candidates = projection_index.get((week, team_norm, normalize_jersey(jersey)), [])
-                        resolved = resolve_identity(display_name=display_name, candidates=candidates)
+                        candidates = projection_index.get(
+                            (week, team_norm, normalize_jersey(jersey)), []
+                        )
+                        resolved = resolve_identity(
+                            display_name=display_name,
+                            candidates=candidates,
+                        )
                         resolution = str(resolved["resolution"])
                         resolution_counts[resolution] += 1
                         section_resolution_counts[section][resolution] += 1
@@ -280,10 +307,19 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
                             "display_name": display_name,
                         }
                         if resolution == "unresolved":
-                            _bounded_append(unresolved_examples, {**base_example, "candidate_count": len(candidates)})
+                            _bounded_append(
+                                unresolved_examples,
+                                {**base_example, "candidate_count": len(candidates)},
+                            )
                             continue
                         if resolution == "ambiguous":
-                            _bounded_append(ambiguous_examples, {**base_example, "matching_gsis_ids": resolved["matching_gsis_ids"]})
+                            _bounded_append(
+                                ambiguous_examples,
+                                {
+                                    **base_example,
+                                    "matching_gsis_ids": resolved["matching_gsis_ids"],
+                                },
+                            )
                             continue
 
                         gsis = str(resolved["gsis_id"])
@@ -291,7 +327,10 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
                         if not variants:
                             resolution_counts["resolved_missing_status"] += 1
                             section_resolution_counts[section]["resolved_missing_status"] += 1
-                            _bounded_append(missing_status_examples, {**base_example, "gsis_id": gsis})
+                            _bounded_append(
+                                missing_status_examples,
+                                {**base_example, "gsis_id": gsis},
+                            )
                             continue
                         if len(variants) != 1:
                             resolution_counts["resolved_multi_status_variant"] += 1
@@ -302,21 +341,29 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
                                     **base_example,
                                     "gsis_id": gsis,
                                     "status_variants": [
-                                        {"status_description_abbr": abbr, "status_short_description": short, "rows": count}
-                                        for (abbr, short), count in sorted(variants.items())
+                                        {
+                                            "status": status,
+                                            "status_description_abbr": abbr,
+                                            "status_short_description": short,
+                                            "rows": count,
+                                        }
+                                        for (status, abbr, short), count in sorted(variants.items())
                                     ],
                                 },
                             )
                             continue
-                        (abbr, _short), _count = next(iter(variants.items()))
-                        cross_tab[section][abbr] += 1
+                        (status, abbr, _short), _count = next(iter(variants.items()))
+                        generic_status_cross_tab[section][status] += 1
+                        status_abbr_cross_tab[section][abbr] += 1
                         resolution_counts["resolved_single_status"] += 1
                         section_resolution_counts[section]["resolved_single_status"] += 1
         except Exception as exc:
-            source_errors.append({
-                "game_id": str(source_row.get("game_id")),
-                "error": f"{type(exc).__name__}: {exc}",
-            })
+            source_errors.append(
+                {
+                    "game_id": str(source_row.get("game_id")),
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
 
     expected_games = EXPECTED_GAMES[season]
     expected_partitions = EXPECTED_TEAM_PARTITIONS[season]
@@ -335,7 +382,7 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
 
     total_section_identities = sum(section_totals.values())
     resolved_identity = int(resolution_counts["resolved"])
-    result = {
+    return {
         "diagnostic_version": 1,
         "contract_id": CONTRACT_ID,
         "season": season,
@@ -344,7 +391,9 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
         "raw_weekly_roster_sha256": RAW_SHA256[season],
         "status_free_projection_sha256": PROJECTION_SHA256[season],
         "projection_fields": list(projection.columns),
-        "status_fields_present_in_identity_projection": any(field in projection.columns for field in STATUS_FIELDS),
+        "status_fields_present_in_identity_projection": any(
+            field in projection.columns for field in STATUS_FIELDS
+        ),
         "status_used_during_identity_resolution": False,
         "canonical_games": len(manifest),
         "expected_games": expected_games,
@@ -354,15 +403,25 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
         "expected_team_partitions": expected_partitions,
         "source_error_count": len(source_errors),
         "source_errors": source_errors[:100],
-        "section_unique_identity_counts": {section: section_totals[section] for section in SECTIONS},
+        "section_unique_identity_counts": {
+            section: section_totals[section] for section in SECTIONS
+        },
         "total_section_unique_identities": total_section_identities,
         "identity_resolution_counts": dict(sorted(resolution_counts.items())),
-        "unique_identity_resolution_rate": resolved_identity / total_section_identities if total_section_identities else 0.0,
+        "unique_identity_resolution_rate": (
+            resolved_identity / total_section_identities if total_section_identities else 0.0
+        ),
         "section_resolution_counts": {
-            section: dict(sorted(section_resolution_counts[section].items())) for section in SECTIONS
+            section: dict(sorted(section_resolution_counts[section].items()))
+            for section in SECTIONS
+        },
+        "section_by_generic_status": {
+            section: dict(sorted(generic_status_cross_tab[section].items()))
+            for section in SECTIONS
         },
         "section_by_status_description_abbr": {
-            section: dict(sorted(cross_tab[section].items())) for section in SECTIONS
+            section: dict(sorted(status_abbr_cross_tab[section].items()))
+            for section in SECTIONS
         },
         "repeated_within_section_occurrences": repeated_within_section_occurrences,
         "unresolved_examples": unresolved_examples,
@@ -384,7 +443,6 @@ def audit_season(season: int, *, archive_root: Path, identity_root: Path) -> dic
         "completed_2026_outcomes_used": 0,
         "production_dependency_authorized": False,
     }
-    return result
 
 
 def main(argv: Iterable[str] | None = None) -> None:
@@ -394,10 +452,27 @@ def main(argv: Iterable[str] | None = None) -> None:
     parser.add_argument("--identity-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(list(argv) if argv is not None else None)
-    result = audit_season(args.season, archive_root=args.archive_root, identity_root=args.identity_root)
+    result = audit_season(
+        args.season,
+        archive_root=args.archive_root,
+        identity_root=args.identity_root,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({k: v for k, v in result.items() if not k.endswith("_examples") and k != "source_errors"}, indent=2, sort_keys=True))
+    args.output.write_text(
+        json.dumps(result, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print(
+        json.dumps(
+            {
+                key: value
+                for key, value in result.items()
+                if not key.endswith("_examples") and key != "source_errors"
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     if result["integrity_gate_pass"] is not True:
         raise SystemExit(1)
 
