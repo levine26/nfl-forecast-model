@@ -1,0 +1,75 @@
+{
+  "record_version": 1,
+  "receipt_id": "V09B-MODERN-WEEKLY-STATUS-SEMANTICS-DIAGNOSTIC-V1-RECEIPT",
+  "contract_id": "V09B-MODERN-WEEKLY-STATUS-SEMANTICS-DIAGNOSTIC-V1",
+  "status": "DIAGNOSTIC_COMPLETE_ZERO_QUALIFICATION_AUTHORITY",
+  "scope": {
+    "seasons": [2017, 2018, 2019, 2020, 2021],
+    "game_type": "REG",
+    "canonical_games": 1296,
+    "parsed_team_partitions": 2592
+  },
+  "provenance": {
+    "branch": "research/levline4-v09b-modern-weekly-status-semantics-v1",
+    "head_sha": "dea144eaa48230eb98fa8ebaa2731b821a535120",
+    "workflow_run_id": 34737433052,
+    "aggregate_artifact_id": 10312295105,
+    "aggregate_artifact_name": "v09b-modern-weekly-status-semantics-v1-aggregate-34737433052",
+    "aggregate_artifact_digest": "sha256:99f93a7a0ce3e0d0e1d464fcf53328b2879eeb4276b43b0759a36d02e3d457b0",
+    "season_artifacts": {
+      "2017": {"artifact_id": 10311746000, "digest": "sha256:75255db64b90daab8ac687bf40c0babae0422e85ac7201cc2f3c845832c6a07e"},
+      "2018": {"artifact_id": 10312080548, "digest": "sha256:03c3ca47128dfe44fe10adf5b5868950f2c25a865bed8863e7410959e692a44a"},
+      "2019": {"artifact_id": 10311536838, "digest": "sha256:c43c7f6f691237ffe90159d3fffe4eaf0c78831912fb85cbf50f63d747a3eacb"},
+      "2020": {"artifact_id": 10311960912, "digest": "sha256:28315ddd8b8ce168c7ce9ba470b9af79c54ff0018b6a14495cf7d56b3c6ac412"},
+      "2021": {"artifact_id": 10312260069, "digest": "sha256:e140fd36fb48b39683fece9652abd13508f709c00842d3e16ab5d4f32666a5ee"}
+    }
+  },
+  "integrity": {
+    "integrity_gate_pass": true,
+    "source_errors": 0,
+    "status_used_during_identity_resolution": false,
+    "completed_2026_outcomes_used": 0,
+    "game_outcomes_used": 0,
+    "postgame_participation_used": false,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  },
+  "identity_diagnostic": {
+    "total_section_unique_identities": 138205,
+    "resolved": 137381,
+    "resolved_single_status": 137381,
+    "ambiguous": 10,
+    "unresolved": 814,
+    "unique_identity_resolution_rate": 0.9940378423356608,
+    "modern_player_team_game_identity_qualified": false
+  },
+  "section_unique_identity_counts": {
+    "lineup": 56985,
+    "substitutions": 60689,
+    "did_not_play": 3610,
+    "not_active": 16921
+  },
+  "section_by_generic_status": {
+    "lineup": {"ACT": 56709, "RES": 1},
+    "substitutions": {"ACT": 60296, "DEV": 5, "RES": 1, "RSN": 1, "TRC": 2, "TRD": 1},
+    "did_not_play": {"ACT": 3578, "DEV": 3, "INA": 7, "TRC": 1},
+    "not_active": {"ACT": 7868, "DEV": 3, "INA": 8904, "RES": 1}
+  },
+  "section_by_status_description_abbr": {
+    "lineup": {"<NULL>": 8, "A01": 56680, "I01": 3, "P01": 4, "P07": 1, "P10": 1, "P12": 1, "R48": 7, "R59": 5},
+    "substitutions": {"<NULL>": 91, "A01": 60043, "E18": 1, "I01": 5, "P01": 62, "P06": 13, "P07": 20, "P10": 24, "P11": 4, "P12": 26, "R36": 1, "R48": 13, "R59": 3},
+    "did_not_play": {"<NULL>": 5, "A01": 3545, "E02": 1, "P01": 13, "P06": 3, "P07": 10, "P10": 6, "P12": 4, "R48": 1, "W03": 1},
+    "not_active": {"<NULL>": 12, "A01": 16602, "E18": 1, "I01": 153, "P01": 3, "P10": 2, "R48": 1, "R59": 2}
+  },
+  "scientific_interpretation": {
+    "observed_status_pattern_has_qualification_authority": false,
+    "status_value_semantics_qualified": false,
+    "weekly_roster_game_day_membership_qualified": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "modern_player_team_game_identity_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "reason": "The same generic weekly-roster values occur across mutually different Game Book sections. In particular, Not Active contains both ACT and INA rows, and Did Not Play also contains ACT and INA rows. The frozen diagnostic was descriptive only and preregistered no semantic qualification threshold, so no status value or section/status combination is promoted to game-day membership authority."
+  }
+}
