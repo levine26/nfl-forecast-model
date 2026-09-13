@@ -72,10 +72,13 @@ jobs:
           assert '/tmp/chatgpt-preserved-media-reporting.json' in workflow
           assert 'fallback_snapshot_reused' in workflow
           assert 'games_with_trusted_reporting' in workflow
-          assert "git merge-base --is-ancestor \"$validated_base\" origin/main" in workflow
+          assert "git merge-base --is-ancestor \"$current_base\" origin/main" in workflow
           assert "grep -Ev '^(research/|research_outputs/|\\.github/workflows/research_[^/]+\\.ya?ml$)'" in workflow
           assert 'Only research-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
-          print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves launch-grade reporting, and reconciles only research-isolated main advances.')
+          assert 'git restore --worktree -- .' in workflow
+          assert 'for publish_attempt in 1 2 3; do' in workflow
+          assert 'if git push origin HEAD:main; then' in workflow
+          print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves launch-grade reporting, and safely retries research-only publication races.')
           PY
 
       - name: Stop after validation on pull request
@@ -171,23 +174,38 @@ jobs:
             exit 0
           fi
           git commit -m "Refresh ChatGPT fallback for Groq-failed Sunday Signal games"
-          git fetch origin main
-          validated_base=$(git rev-parse HEAD^)
-          if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then
-            echo "Main advanced after validation; auditing the intervening files before publication."
-            if ! git merge-base --is-ancestor "$validated_base" origin/main; then
-              echo "Latest main is not a descendant of the validated fallback base; refusing publication."
+
+          for publish_attempt in 1 2 3; do
+            echo "editorial publication attempt $publish_attempt/3"
+            git fetch origin main
+            current_base=$(git rev-parse HEAD^)
+            if [ "$(git rev-parse origin/main)" != "$current_base" ]; then
+              echo "Main advanced after validation; auditing the intervening files before publication."
+              if ! git merge-base --is-ancestor "$current_base" origin/main; then
+                echo "Latest main is not a descendant of the current validated fallback base; refusing publication."
+                exit 1
+              fi
+              changed_main_files=$(git diff --name-only "$current_base"..origin/main)
+              printf 'main advance files:\n%s\n' "$changed_main_files"
+              unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
+              if [ -n "$unsafe_main_files" ]; then
+                echo "Main changed outside the research-isolated namespace; refusing an unvalidated rebase."
+                printf '%s\n' "$unsafe_main_files"
+                exit 1
+              fi
+              echo "Only research-isolated files advanced; rebasing the already validated editorial output commit."
+              git restore --worktree -- .
+              git rebase origin/main
+            fi
+
+            if git push origin HEAD:main; then
+              echo "Published validated ChatGPT failed-game recovery."
+              exit 0
+            fi
+            if [ "$publish_attempt" -eq 3 ]; then
+              echo "Publication raced main three times; failing closed."
               exit 1
             fi
-            changed_main_files=$(git diff --name-only "$validated_base"..origin/main)
-            printf 'main advance files:\n%s\n' "$changed_main_files"
-            unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
-            if [ -n "$unsafe_main_files" ]; then
-              echo "Main changed outside the research-isolated namespace; refusing an unvalidated rebase."
-              printf '%s\n' "$unsafe_main_files"
-              exit 1
-            fi
-            echo "Only research-isolated files advanced; rebasing the already validated editorial output commit."
-            git rebase origin/main
-          fi
-          git push origin HEAD:main
+            echo "Push raced another main update; retrying after a fresh research-only audit."
+            sleep 2
+          done
