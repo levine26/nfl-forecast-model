@@ -10,17 +10,15 @@ import pandas as pd
 
 NFLVERSE_GAMES_URL = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
 PROBABILITY_TOLERANCE = 1e-10
-NUMERIC_PRICE_COLUMNS = (
+LEDGER_COLUMNS = (
+    "game_id",
+    "season",
+    "lock_timestamp_utc",
     "locked_home_moneyline",
     "locked_away_moneyline",
-    "locked_home_spread_price",
-    "locked_away_spread_price",
-)
-TEXT_PRICE_COLUMNS = (
     "bet_price_source",
     "bet_price_verified_utc",
 )
-PRICE_COLUMNS = NUMERIC_PRICE_COLUMNS + TEXT_PRICE_COLUMNS
 
 
 def american_implied(odds: float) -> float:
@@ -71,71 +69,77 @@ def _market_index(frame: pd.DataFrame, season: int) -> pd.DataFrame:
     return current.drop_duplicates("game_id", keep="last").set_index("game_id")
 
 
-def enrich_locked_bet_prices(
+def _empty_ledger() -> pd.DataFrame:
+    return pd.DataFrame(columns=list(LEDGER_COLUMNS))
+
+
+def enrich_price_ledger(
     history: pd.DataFrame,
     market: pd.DataFrame,
+    existing: pd.DataFrame | None = None,
     *,
     season: int = 2026,
     verified_utc: datetime | None = None,
 ) -> tuple[pd.DataFrame, int]:
-    """Backfill only raw moneyline prices that are provably the lock-time pair.
+    """Append only moneyline pairs that are provably the immutable lock-time pair.
 
-    Older receipts retained the vig-free market probability but not the raw American
-    moneyline pair. A candidate pair is accepted only when converting it back to a
-    vig-free home probability exactly reproduces the immutable lock receipt within a
-    tight floating-point tolerance. A later or otherwise different pair fails closed.
+    Older forecast receipts retained the vig-free market home probability but not the
+    raw American moneyline pair. A candidate pair is accepted only when converting it
+    back to a vig-free home probability reproduces the immutable receipt within a
+    tight floating-point tolerance. Later/different prices fail closed.
 
-    Spread-side juice is never inferred from a later market row. The tracker uses a
-    documented -110 fallback unless an explicit lock-time spread price is already
-    present on the receipt from a future capture source.
+    Betting prices are kept in a separate append-only ledger so model publishing can
+    never rewrite or strip them. Spread juice is not inferred; the site applies its
+    documented -110 fallback until a genuine lock-time spread-price source exists.
     """
-    out = history.copy()
-    for column in NUMERIC_PRICE_COLUMNS:
-        if column not in out.columns:
-            out[column] = np.nan
-    for column in TEXT_PRICE_COLUMNS:
-        if column not in out.columns:
-            out[column] = pd.Series("", index=out.index, dtype="object")
-        else:
-            out[column] = out[column].astype("object")
+    ledger = (existing.copy() if existing is not None else _empty_ledger())
+    for column in LEDGER_COLUMNS:
+        if column not in ledger.columns:
+            ledger[column] = ""
+    ledger = ledger[list(LEDGER_COLUMNS)]
 
     market_by_game = _market_index(market, season)
     if market_by_game.empty:
-        return out, 0
+        return ledger, 0
 
+    existing_ids = set(ledger["game_id"].astype(str)) if not ledger.empty else set()
     verified_at = (verified_utc or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
-    changed_rows = 0
+    additions: list[dict[str, object]] = []
 
-    for index, receipt in out.iterrows():
+    for _, receipt in history.iterrows():
         if str(receipt.get("lock_status", "")).strip().upper() != "LOCKED":
             continue
         receipt_season = _number(receipt.get("season"))
         if receipt_season is not None and int(receipt_season) != int(season):
             continue
         game_id = str(receipt.get("game_id", "")).strip()
-        if not game_id or game_id not in market_by_game.index:
-            continue
-
-        home_existing = _number(receipt.get("locked_home_moneyline"))
-        away_existing = _number(receipt.get("locked_away_moneyline"))
-        if home_existing is not None and away_existing is not None:
+        if not game_id or game_id in existing_ids or game_id not in market_by_game.index:
             continue
 
         pair = _verified_moneyline_pair(receipt, market_by_game.loc[game_id])
         if pair is None:
             continue
 
-        out.at[index, "locked_home_moneyline"] = pair[0]
-        out.at[index, "locked_away_moneyline"] = pair[1]
-        out.at[index, "bet_price_source"] = "nflverse_moneyline_verified_against_locked_market_probability"
-        out.at[index, "bet_price_verified_utc"] = verified_at
-        changed_rows += 1
+        additions.append({
+            "game_id": game_id,
+            "season": int(receipt_season) if receipt_season is not None else int(season),
+            "lock_timestamp_utc": str(receipt.get("lock_timestamp_utc", "")),
+            "locked_home_moneyline": pair[0],
+            "locked_away_moneyline": pair[1],
+            "bet_price_source": "nflverse_moneyline_verified_against_locked_market_probability",
+            "bet_price_verified_utc": verified_at,
+        })
+        existing_ids.add(game_id)
 
-    return out, changed_rows
+    if additions:
+        ledger = pd.concat([ledger, pd.DataFrame(additions)], ignore_index=True)
+    ledger = ledger.drop_duplicates("game_id", keep="first").sort_values(["season", "game_id"], kind="stable")
+    return ledger, len(additions)
 
 
 def capture(
     history_path: Path,
+    ledger_path: Path,
     *,
     season: int = 2026,
     market_source: str = NFLVERSE_GAMES_URL,
@@ -144,21 +148,29 @@ def capture(
         raise FileNotFoundError(f"Prediction history not found: {history_path}")
     history = pd.read_csv(history_path)
     market = pd.read_csv(market_source, low_memory=False)
-    enriched, changed = enrich_locked_bet_prices(history, market, season=season)
-    schema_changed = any(column not in history.columns for column in PRICE_COLUMNS)
-    if schema_changed or changed:
-        enriched.to_csv(history_path, index=False)
+    if ledger_path.exists():
+        try:
+            existing = pd.read_csv(ledger_path)
+        except Exception:
+            existing = _empty_ledger()
+    else:
+        existing = _empty_ledger()
+    ledger, changed = enrich_price_ledger(history, market, existing, season=season)
+    if changed or not ledger_path.exists():
+        ledger_path.parent.mkdir(parents=True, exist_ok=True)
+        ledger.to_csv(ledger_path, index=False)
     return changed
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Persist verified moneyline prices on immutable LevLine receipts.")
+    parser = argparse.ArgumentParser(description="Persist verified lock-time moneyline prices for Sunday Signal.")
     parser.add_argument("--history", type=Path, default=Path("outputs/prediction_history.csv"))
+    parser.add_argument("--ledger", type=Path, default=Path("outputs/bet_price_history.csv"))
     parser.add_argument("--season", type=int, default=2026)
     parser.add_argument("--market-source", default=NFLVERSE_GAMES_URL)
     args = parser.parse_args()
-    changed = capture(args.history, season=args.season, market_source=args.market_source)
-    print(f"Verified moneyline prices added to {changed} locked receipt(s).")
+    changed = capture(args.history, args.ledger, season=args.season, market_source=args.market_source)
+    print(f"Verified moneyline prices added to {changed} betting-price receipt(s).")
 
 
 if __name__ == "__main__":
