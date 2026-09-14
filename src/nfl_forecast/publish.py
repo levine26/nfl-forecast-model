@@ -17,16 +17,13 @@ CURRENT_COLUMNS = [
     "spread_line","total_line","model_edge","cover_home_prob","over_prob","confidence",
     "model_disagreement","consistency_flag","market_available","data_state","snapshot_type",
     "model_version","prediction_timestamp_utc",
-    # Append-only legacy diagnostics retained for backward-compatible consumers.
     "logistic_home_prob","extra_trees_home_prob","xgboost_home_prob","catboost_home_prob",
     "elo_home_prob","home_elo","away_elo",
-    # Append-only F-ST accountability fields. Old locked rows remain null here.
     "legacy_pure_home_prob","legacy_final_home_prob","fst_pure_home_prob",
     "final_probability_strategy","fst_artifact_id","fst_artifact_training_data_sha256",
     "fst_artifact_freeze_implementation_sha","fst_fallback","fst_fallback_reason",
     "fst_vs_market_delta","fst_vs_legacy_delta","legacy_confidence",
     "legacy_consistency_flag","confidence_diagnostic_scope",
-    # Source freshness is recorded when the upstream snapshot time is observable.
     "market_snapshot_timestamp_utc","market_snapshot_source","market_freshness_status",
 ]
 
@@ -40,7 +37,6 @@ BOOLEAN_GRADE_COLUMNS = ["winner_correct", "actual_home_cover", "actual_over"]
 
 
 def kickoff_utc(gameday, gametime) -> datetime:
-    """nflverse gametime is Eastern time; convert the scheduled kickoff to UTC."""
     text = f"{str(gameday)[:10]} {str(gametime)[:5]}"
     dt = datetime.strptime(text, "%Y-%m-%d %H:%M")
     return dt.replace(tzinfo=ZoneInfo("America/New_York")).astimezone(timezone.utc)
@@ -83,6 +79,42 @@ def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
             old[c] = pd.NA if c in BOOLEAN_GRADE_COLUMNS else np.nan
     old = old[columns + [c for c in LOCK_META_COLUMNS if c not in columns]]
     return _coerce_grade_dtypes(old)
+
+
+def _canonical_current_slate(p: pd.DataFrame, official: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+    """Publish the active week without mutating already-locked forecasts.
+
+    Full model runs naturally shrink to unresolved games as results arrive. The public
+    current-slate contract must not shrink with them: any immutable LOCKED rows for the
+    same season/week are retained, and locked rows win over a later mutable row for the
+    same game_id. This is publication selection only; it never recomputes a forecast.
+    """
+    if p.empty or not {"game_id", "season", "week"}.issubset(p.columns):
+        return p.copy()
+    season = pd.to_numeric(p["season"], errors="coerce").dropna().unique()
+    week = pd.to_numeric(p["week"], errors="coerce").dropna().unique()
+    if len(season) != 1 or len(week) != 1 or official.empty:
+        return p.copy()
+
+    locked = official[
+        pd.to_numeric(official.get("season"), errors="coerce").eq(float(season[0]))
+        & pd.to_numeric(official.get("week"), errors="coerce").eq(float(week[0]))
+        & official.get("lock_status", pd.Series("", index=official.index)).eq("LOCKED")
+    ].copy()
+    if locked.empty:
+        return p.copy()
+
+    locked = locked.drop_duplicates("game_id", keep="last")
+    locked_ids = set(locked["game_id"].astype(str))
+    live = p[~p["game_id"].astype(str).isin(locked_ids)].copy()
+    locked_current = locked.reindex(columns=columns)
+    live_current = live.reindex(columns=columns)
+    published = pd.concat([locked_current, live_current], ignore_index=True)
+    published = published.drop_duplicates("game_id", keep="first")
+    sort_cols = [c for c in ["gameday", "gametime", "game_id"] if c in published.columns]
+    if sort_cols:
+        published = published.sort_values(sort_cols, kind="stable").reset_index(drop=True)
+    return published
 
 
 def _append_run_history(p: pd.DataFrame, path: Path, columns: list[str]) -> None:
@@ -138,13 +170,7 @@ def _write_power_ratings(power: pd.DataFrame, path: Path) -> None:
     current[[c for c in order if c in current.columns]].to_csv(path, index=False)
 
 
-def _lock_new_games(
-    official: pd.DataFrame,
-    p: pd.DataFrame,
-    columns: list[str],
-    now_utc: datetime,
-    lock_window_minutes: float,
-) -> pd.DataFrame:
+def _lock_new_games(official, p, columns, now_utc, lock_window_minutes):
     already = set(official["game_id"].astype(str)) if len(official) else set()
     new_rows = []
     for _, row in p.iterrows():
@@ -160,19 +186,12 @@ def _lock_new_games(
             continue
         locked = {c: row.get(c, np.nan) for c in columns}
         locked.update({
-            "kickoff_utc": ko.isoformat(),
-            "lock_timestamp_utc": now_utc.isoformat(),
-            "minutes_to_kickoff_at_lock": float(minutes),
-            "lock_status": "LOCKED",
-            "actual_home_score": np.nan,
-            "actual_away_score": np.nan,
-            "actual_margin": np.nan,
-            "actual_total": np.nan,
-            "winner_correct": pd.NA,
-            "margin_abs_error": np.nan,
-            "total_abs_error": np.nan,
-            "actual_home_cover": pd.NA,
-            "actual_over": pd.NA,
+            "kickoff_utc": ko.isoformat(), "lock_timestamp_utc": now_utc.isoformat(),
+            "minutes_to_kickoff_at_lock": float(minutes), "lock_status": "LOCKED",
+            "actual_home_score": np.nan, "actual_away_score": np.nan,
+            "actual_margin": np.nan, "actual_total": np.nan, "winner_correct": pd.NA,
+            "margin_abs_error": np.nan, "total_abs_error": np.nan,
+            "actual_home_cover": pd.NA, "actual_over": pd.NA,
         })
         new_rows.append(locked)
         already.add(gid)
@@ -221,12 +240,7 @@ def _grade_locked_games(official: pd.DataFrame, games: pd.DataFrame) -> pd.DataF
     return official
 
 
-def write_outputs(
-    artifacts,
-    output_dir="outputs",
-    now_utc: datetime | None = None,
-    lock_window_minutes: float = LOCK_WINDOW_MINUTES,
-) -> None:
+def write_outputs(artifacts, output_dir="outputs", now_utc=None, lock_window_minutes=LOCK_WINDOW_MINUTES) -> None:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     now_utc = now_utc or datetime.now(timezone.utc)
@@ -237,8 +251,6 @@ def write_outputs(
 
     p = artifacts.predictions.copy()
     cols = _available_current_columns(p)
-    p[cols].to_csv(out / "this_week.csv", index=False)
-    _append_run_history(p, out / "run_history.csv", cols)
 
     if hasattr(artifacts, "power_ratings"):
         _write_power_ratings(artifacts.power_ratings, out / "power_ratings.csv")
@@ -251,6 +263,10 @@ def write_outputs(
     official = _grade_locked_games(official, artifacts.games)
     official.to_csv(official_path, index=False)
 
+    published = _canonical_current_slate(p, official, cols)
+    published[cols].to_csv(out / "this_week.csv", index=False)
+    _append_run_history(published, out / "run_history.csv", cols)
+
     next_kickoff = None
     if len(p):
         kos = []
@@ -262,26 +278,27 @@ def write_outputs(
         future = [x for x in kos if x > now_utc]
         if future:
             next_kickoff = min(future).isoformat()
-    market_available = p.get("market_available", pd.Series(False, index=p.index)).fillna(False).astype(bool)
-    fallback = p.get("fst_fallback", pd.Series(False, index=p.index)).fillna(False).astype(bool)
-    freshness = p.get("market_freshness_status", pd.Series("unknown", index=p.index)).fillna("unknown").astype(str)
+
+    market_available = published.get("market_available", pd.Series(False, index=published.index)).fillna(False).astype(bool)
+    fallback = published.get("fst_fallback", pd.Series(False, index=published.index)).fillna(False).astype(bool)
+    freshness = published.get("market_freshness_status", pd.Series("unknown", index=published.index)).fillna("unknown").astype(str)
     status = {
         "status": "healthy",
         "generated_utc": now_utc.isoformat(),
-        "games": int(len(p)),
+        "games": int(len(published)),
         "locked_official_predictions": int(len(official)),
         "power_rating_teams": int(len(getattr(artifacts, "power_ratings", []))),
         "next_kickoff_utc": next_kickoff,
-        "model_version": str(p["model_version"].iloc[0]) if len(p) and "model_version" in p else None,
-        "final_probability_strategy": str(p["final_probability_strategy"].iloc[0]) if len(p) and "final_probability_strategy" in p else None,
-        "fst_artifact_id": str(p["fst_artifact_id"].iloc[0]) if len(p) and "fst_artifact_id" in p else None,
-        "fst_artifact_training_data_sha256": str(p["fst_artifact_training_data_sha256"].iloc[0]) if len(p) and "fst_artifact_training_data_sha256" in p else None,
+        "model_version": str(published["model_version"].iloc[0]) if len(published) and "model_version" in published else None,
+        "final_probability_strategy": str(published["final_probability_strategy"].iloc[0]) if len(published) and "final_probability_strategy" in published else None,
+        "fst_artifact_id": str(published["fst_artifact_id"].iloc[0]) if len(published) and "fst_artifact_id" in published else None,
+        "fst_artifact_training_data_sha256": str(published["fst_artifact_training_data_sha256"].iloc[0]) if len(published) and "fst_artifact_training_data_sha256" in published else None,
         "market_available_games": int(market_available.sum()),
         "market_missing_or_invalid_games": int((~market_available).sum()),
         "fst_fallback_count": int(fallback.sum()),
-        "market_snapshot_timestamp_utc": str(p["market_snapshot_timestamp_utc"].iloc[0]) if len(p) and "market_snapshot_timestamp_utc" in p else None,
-        "market_snapshot_source": str(p["market_snapshot_source"].iloc[0]) if len(p) and "market_snapshot_source" in p else None,
+        "market_snapshot_timestamp_utc": str(published["market_snapshot_timestamp_utc"].iloc[0]) if len(published) and "market_snapshot_timestamp_utc" in published else None,
+        "market_snapshot_source": str(published["market_snapshot_source"].iloc[0]) if len(published) and "market_snapshot_source" in published else None,
         "market_freshness_status_counts": {str(k): int(v) for k, v in freshness.value_counts(dropna=False).items()},
-        "data_state": str(p["data_state"].iloc[0]) if len(p) and "data_state" in p else None,
+        "data_state": str(published["data_state"].iloc[0]) if len(published) and "data_state" in published else None,
     }
     (out / "status.json").write_text(json.dumps(status, indent=2), encoding="utf-8")
