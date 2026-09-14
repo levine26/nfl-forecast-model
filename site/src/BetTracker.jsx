@@ -29,9 +29,9 @@ function parseCSV(text) {
   return rows.filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(headers.map((key,i)=>[key,r[i]??''])))
 }
 
-async function fetchHistory() {
+async function fetchCSV(name) {
   try {
-    const response=await fetch(`${BASE}data/prediction_history.csv`,{cache:'no-store'})
+    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
     return response.ok ? parseCSV(await response.text()) : []
   } catch { return [] }
 }
@@ -179,6 +179,7 @@ function BetTrackerPanel({history}) {
 
 export default function BetTracker() {
   const [history,setHistory]=useState([])
+  const [prices,setPrices]=useState([])
   const [active,setActive]=useState(()=>onHistoryRoute())
   const [host,setHost]=useState(null)
 
@@ -188,7 +189,18 @@ export default function BetTracker() {
     return()=>window.removeEventListener('hashchange',onHash)
   },[])
 
-  useEffect(()=>{ fetchHistory().then(setHistory) },[])
+  useEffect(()=>{
+    Promise.all([fetchCSV('prediction_history.csv'),fetchCSV('bet_price_history.csv')]).then(([historyRows,priceRows])=>{
+      setHistory(historyRows)
+      setPrices(priceRows)
+    })
+  },[])
+
+  const enrichedHistory=useMemo(()=>{
+    if (!prices.length) return history
+    const byGame=Object.fromEntries(prices.map(row=>[row.game_id,row]))
+    return history.map(row=>({...row,...(byGame[row.game_id]||{})}))
+  },[history,prices])
 
   useEffect(()=>{
     if (!active) {
@@ -217,5 +229,5 @@ export default function BetTracker() {
     }
   },[active])
 
-  return active && host ? createPortal(<BetTrackerPanel history={history}/>,host) : null
+  return active && host ? createPortal(<BetTrackerPanel history={enrichedHistory}/>,host) : null
 }
