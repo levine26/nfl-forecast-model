@@ -86,3 +86,25 @@ def test_never_overwrites_an_existing_locked_moneyline_pair():
     assert changed == 0
     assert enriched.loc[0, "locked_home_moneyline"] == -165
     assert enriched.loc[0, "locked_away_moneyline"] == 140
+
+
+def test_does_not_import_later_spread_juice_without_lock_time_proof():
+    home_ml, away_ml = -170, 142
+    locked_probability = vig_free_home_probability(home_ml, away_ml)
+    history = pd.DataFrame([_receipt("2026_01_ARI_LAC", locked_probability)])
+    market = pd.DataFrame([
+        {
+            "game_id": "2026_01_ARI_LAC",
+            "season": 2026,
+            "home_moneyline": home_ml,
+            "away_moneyline": away_ml,
+            "home_spread_price": -118,
+            "away_spread_price": -102,
+        }
+    ])
+
+    enriched, changed = enrich_locked_bet_prices(history, market)
+
+    assert changed == 1
+    assert pd.isna(enriched.loc[0, "locked_home_spread_price"])
+    assert pd.isna(enriched.loc[0, "locked_away_spread_price"])
