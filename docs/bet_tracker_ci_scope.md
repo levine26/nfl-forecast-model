@@ -1,0 +1,1 @@
+Dashboard PR CI builds the React surface and runs Node settlement tests; weekly/model PR CI runs the Python price-capture tests. Production deployment remains gated on the existing dashboard workflow.
