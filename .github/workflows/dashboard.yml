@@ -27,6 +27,7 @@ on:
     workflows:
       - 'Daily NFL model refresh'
       - 'Hourly NFL market refresh'
+      - 'Sunday Signal bet price capture'
       - 'Sunday Signal contextual intelligence'
       - 'Sunday Signal Groq media writer'
       - 'Sunday Signal ChatGPT free ingestion'
