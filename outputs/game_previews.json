@@ -18,7 +18,7 @@
       "media_led": true,
       "media_source_count": 3,
       "primary_variant": 0,
-      "provider_freshness_advisory": null,
+      "provider_freshness_advisory": "newer_reporting_available",
       "reporting_first": true,
       "secondary_variant": 0,
       "slate_aware": true,
@@ -135,7 +135,7 @@
     "matchup": "DAL @ NYG",
     "matchup_meter": [
       {
-        "as_of": "2026-09-14T00:36:22.609837+00:00",
+        "as_of": "2026-09-14T03:29:49.512545+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -145,7 +145,7 @@
         "title": "Dak Prescott vs NYG: player history"
       },
       {
-        "as_of": "2026-09-14T00:36:19.314915+00:00",
+        "as_of": "2026-09-14T03:29:47.704106+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -155,7 +155,7 @@
         "title": "NYG explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-14T00:36:19.314425+00:00",
+        "as_of": "2026-09-14T03:29:47.703586+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -165,7 +165,7 @@
         "title": "NYG protection vs DAL pass rush"
       },
       {
-        "as_of": "2026-09-14T00:36:12.932375+00:00",
+        "as_of": "2026-09-14T03:29:42.891569+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -218,7 +218,7 @@
       "Dallas enters the NFC East opener with Dak Prescott throwing to CeeDee Lamb and George Pickens, but the Cowboys will be without starting left guard Tyler Smith. New York begins the John Harbaugh era with Jaxson Dart at quarterback and uncertainty around Malik Nabers as he returns from a torn ACL. The Giants\u2019 front must exploit Dallas\u2019 interior protection issue before Prescott can attack isolated coverage. New York, meanwhile, needs enough explosive offense to avoid asking its defense to survive long stretches against Dallas\u2019 receiver talent.",
       "LevLine 3.0 gives the Cowboys a 63.0% win probability over the Giants. Its frozen F-ST engine reconciles a 52.4% football-only signal with a 60.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Dallas Cowboys -4.3, a market line of Dallas Cowboys -3.0, and an approximate coherent score of DAL 24 \u2013 NYG 20. Dallas has the more established passing-game ceiling, but New York can tilt the matchup by disrupting interior protection and keeping its own offense out of obvious passing situations. The pick: Dallas Cowboys moneyline."
     ],
-    "prediction": "DAL to win; NYG 22.1 \u2013 DAL 21.7 is the central score projection.",
+    "prediction": "DAL to win; NYG 22.3 \u2013 DAL 21.0 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-13T22:04:21.868168+00:00",
@@ -247,7 +247,7 @@
   },
   "2026_01_DEN_KC": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "What Eric Bieniemy could change in KC: staff impact context.",
+    "case_for_opponent": "KC protection vs DEN pass rush: pass-rush leverage favors DEN.",
     "case_for_pick": "Patrick Mahomes vs DEN: player history: quarterback history context.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
@@ -259,10 +259,10 @@
       "game_specific": true,
       "lead_items": [
         "Patrick Mahomes vs DEN: player history",
-        "What Eric Bieniemy could change in KC"
+        "KC protection vs DEN pass rush"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 3,
       "primary_variant": 1,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -288,17 +288,17 @@
       },
       {
         "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Kansas_City_Chiefs_season",
-        "strength": "Strong",
-        "title": "What Eric Bieniemy could change in KC"
-      },
-      {
-        "category": "coaching",
         "source_name": "Wikipedia season staff records",
         "source_url": "https://en.wikipedia.org/wiki/2026_Denver_Broncos_season",
         "strength": "Strong",
         "title": "DEN offense changed its decision-makers"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Kansas_City_Chiefs_season",
+        "strength": "Strong",
+        "title": "KC offense changed its decision-makers"
       },
       {
         "category": "scheme",
@@ -366,16 +366,6 @@
       },
       {
         "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 2831,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Kansas_City_Chiefs_season",
-        "strength": "Strong",
-        "summary": "KC's new offensive coordinator, Eric Bieniemy, arrives with a verifiable prior-team tendency profile: less RPO usage (7% across KC 2022, WAS 2023 versus 11% for KC last season); more shotgun usage (69% across KC 2022, WAS 2023 versus 64% for KC last season). That changes the conflict rules for second-level defenders. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Eric Bieniemy could change in KC"
-      },
-      {
-        "advantage_team": null,
         "family": "availability",
         "sample_size": null,
         "source_name": "NFL.com official injury report",
@@ -383,12 +373,22 @@
         "strength": "Strong",
         "summary": "The official NFL injury report lists Chamarri Conner (S) as Out. Knee. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.09 EPA/play last season.",
         "title": "KC: Chamarri Conner \u2014 Out"
+      },
+      {
+        "advantage_team": "DEN",
+        "family": "pressure",
+        "sample_size": 734,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "KC gave up sacks on 6.4% of pass plays last season; DEN got home on 9.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "title": "KC protection vs DEN pass rush"
       }
     ],
     "matchup": "DEN @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-14T00:36:23.163508+00:00",
+        "as_of": "2026-09-14T03:29:50.096243+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "KC",
@@ -398,7 +398,7 @@
         "title": "Patrick Mahomes vs DEN: player history"
       },
       {
-        "as_of": "2026-09-14T00:36:19.914137+00:00",
+        "as_of": "2026-09-14T03:29:48.362657+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -408,7 +408,7 @@
         "title": "KC protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-14T00:36:19.914930+00:00",
+        "as_of": "2026-09-14T03:29:48.363466+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -418,14 +418,14 @@
         "title": "KC early-down approach vs DEN"
       },
       {
-        "as_of": "2026-09-14T00:36:12.932764+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
+        "as_of": "2026-09-14T03:29:41.003822+00:00",
+        "family": "availability",
+        "label": "Availability",
         "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_name": "NFL.com official injury report",
         "strength": "Strong",
-        "summary": "KC's new offensive coordinator, Eric Bieniemy, arrives with a verifiable prior-team tendency profile: less RPO usage (7% across KC 2022, WAS 2023 versus 11% for KC last season); more shotgun usage (69% across KC 2022, WAS 2023 versus 64% for KC last season). That changes the conflict rules for second-level defenders. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Eric Bieniemy could change in KC"
+        "summary": "The official NFL injury report lists Chamarri Conner (S) as Out. Knee. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.09 EPA/play last season.",
+        "title": "KC: Chamarri Conner \u2014 Out"
       }
     ],
     "notebook": [
@@ -463,7 +463,7 @@
         "provenance_grade": null,
         "source_name": "Staff records + FTN/nflverse historical tendencies",
         "source_url": "https://en.wikipedia.org/wiki/2026_Kansas_City_Chiefs_season",
-        "summary": "KC's new offensive coordinator, Eric Bieniemy, arrives with a verifiable prior-team tendency profile: less RPO usage (7% across KC 2022, WAS 2023 versus 11% for KC last season); more shotgun usage (69% across KC 2022, WAS 2023 versus 64% for KC last season). That changes the conflict rules for second-level defenders. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
+        "summary": "KC's new offensive coordinator, Eric Bieniemy, arrives with a verifiable prior-team tendency profile: more shotgun usage (71% across KC 2022 versus 64% for KC last season); more pre-snap motion (44% across KC 2022 versus 40% for KC last season). That changes the protection and play-action picture defenses see most often. That can force coverage declarations earlier and create leverage before the snap. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
         "title": "What Eric Bieniemy could change in KC"
       }
     ],
@@ -471,7 +471,7 @@
       "Kansas City expects Patrick Mahomes to return from last season\u2019s major knee injury, giving the Chiefs their offensive centerpiece back for a divisional opener against Denver. The Broncos counter with Bo Nix, a defense coming off a strong season and a receiving corps upgraded by Jaylen Waddle. Kansas City\u2019s rebuilt secondary will be tested vertically, while Denver must account for Mahomes\u2019 quick-game answers and Kenneth Walker III in the backfield. Protection, movement in the pocket and explosive passing efficiency are the matchup\u2019s defining variables.",
       "LevLine 3.0 gives the Chiefs a 58.1% win probability over the Broncos. Its frozen F-ST engine reconciles a 31.6% football-only signal with a 55.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -2.6, a market line of Kansas City Chiefs -2.5, and an approximate coherent score of KC 24 \u2013 DEN 21. Kansas City\u2019s offense regains its defining quarterback, while Denver can create leverage through pressure and a deeper receiving group if it forces the Chiefs into uncomfortable long-yardage situations. The pick: Kansas City Chiefs moneyline."
     ],
-    "prediction": "KC to win; KC 19.9 \u2013 DEN 25.4 is the central score projection.",
+    "prediction": "KC to win; KC 20.0 \u2013 DEN 25.2 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-13T22:04:21.868168+00:00",
@@ -496,700 +496,6 @@
       "secondary_family": "pressure",
       "secondary_title": "KC protection vs DEN pass rush"
     },
-    "what_could_make_us_wrong": "DEN-KC: no sourced DEN counter clears the publication threshold."
-  },
-  "2026_01_GB_MIN": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "Jordan Love vs MIN: player history: quarterback history context.",
-    "case_for_pick": "Jordan Love vs MIN: player history: quarterback history context.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "Jordan Love vs MIN: player history",
-        "GB: Warren Brinson \u2014 Out"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 2,
-      "provider_freshness_advisory": "newer_reporting_available",
-      "reporting_first": true,
-      "secondary_variant": 2,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "Jordan Love vs MIN: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse PBP + Wikipedia staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Minnesota_Vikings_season",
-        "strength": "Strong",
-        "title": "Jordan Love vs Brian Flores's MIN defense"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Green_Bay_Packers_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in GB"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "GB explosives vs MIN prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "MIN protection vs GB pass rush"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "GB early-down approach vs MIN"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "GB: Warren Brinson \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "GB: Aaron Banks \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "GB: Ty'Ron Hopper \u2014 Questionable"
-      }
-    ],
-    "game_id": "2026_01_GB_MIN",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Green Bay\u2019s depleted front meets Minnesota\u2019s rebuilt passing attack",
-    "key_factors": [
-      {
-        "advantage_team": "GB",
-        "family": "qb_opponent_history",
-        "sample_size": 202,
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "In the nflverse play-by-play sample since 2023, Jordan Love has 5 meaningful games against MIN; the most recent was last season, Week 12. Over 190 charted dropbacks in those games, he averaged +0.02 EPA/dropback with a 48% positive-EPA rate. A further 3 short cameos under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
-        "title": "Jordan Love vs MIN: player history"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Warren Brinson (DT) as Out. Calf. LevLine does not make up an injury point value for it.",
-        "title": "GB: Warren Brinson \u2014 Out"
-      },
-      {
-        "advantage_team": null,
-        "family": "history",
-        "sample_size": 190,
-        "source_name": "nflverse PBP + Wikipedia staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Minnesota_Vikings_season",
-        "strength": "Strong",
-        "summary": "Across 5 prior games in seasons when Brian Flores was the listed MIN defensive coordinator, Jordan Love averaged +0.02 EPA/dropback with a 48% positive-EPA rate over 190 charted dropbacks. A real sample, though not immune to coaching and personnel changes.",
-        "title": "Jordan Love vs Brian Flores's MIN defense"
-      }
-    ],
-    "matchup": "GB @ MIN",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-14T00:36:21.532244+00:00",
-        "family": "qb_opponent_history",
-        "label": "QB history",
-        "leader": "GB",
-        "source_name": "nflverse play-by-play",
-        "strength": "Strong",
-        "summary": "In the nflverse play-by-play sample since 2023, Jordan Love has 5 meaningful games against MIN; the most recent was last season, Week 12. Over 190 charted dropbacks in those games, he averaged +0.02 EPA/dropback with a 48% positive-EPA rate. A further 3 short cameos under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
-        "title": "Jordan Love vs MIN: player history"
-      },
-      {
-        "as_of": "2026-09-14T00:36:18.094720+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "GB",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "GB hit a 20+ yard pass on 10.6% of pass plays; MIN allowed one on 5.8%. The short version: GB wants chunks, and MIN would rather make it earn twelve-play drives.",
-        "title": "GB explosives vs MIN prevention"
-      },
-      {
-        "as_of": "2026-09-14T00:36:18.095574+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "MIN",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "MIN gave up sacks on 9.9% of pass plays last season; GB got home on 5.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "MIN protection vs GB pass rush"
-      },
-      {
-        "as_of": "2026-09-14T00:36:10.224670+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Warren Brinson (DT) as Out. Calf. LevLine does not make up an injury point value for it.",
-        "title": "GB: Warren Brinson \u2014 Out"
-      }
-    ],
-    "notebook": [
-      {
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, Packers and Vikings have played 11 completed games in the nflverse schedule sample: Packers is 4-7. The most recent finished Packers 22, Vikings 39.",
-        "title": "Packers-Vikings: division rivalry"
-      },
-      {
-        "family": "rivalry",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, GB and MIN have played 11 completed games in the nflverse schedule sample: GB is 4-7. The most recent finished GB 22, MIN 39.",
-        "title": "GB-MIN: division rivalry"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2023 through 2025 contains 5 meaningful passing games for Jordan Love against MIN (5 regular season, 0 postseason). Across those games: 179 attempts, 1,198 passing yards, 9 TD, 4 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Jordan Love vs MIN: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2021 through 2024 contains 2 meaningful passing games for Kyler Murray against GB (2 regular season, 0 postseason). Across those games: 65 attempts, 488 passing yards, 1 TD, 2 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Kyler Murray vs GB: career game ledger"
-      }
-    ],
-    "paragraphs": [
-      "Green Bay heads to Minnesota without Josh Jacobs and Micah Parsons, removing major pieces from both sides of the ball. The Packers still have Jordan Love, but an inexperienced backfield must produce enough efficiency to keep Minnesota\u2019s rush from controlling obvious passing downs. The Vikings are trying to restore their passing game and can lean on Justin Jefferson while stressing Green Bay\u2019s thinner defensive front. Inside a loud divisional road environment, protection communication, run-game efficiency and the ability to generate explosives without inviting negative plays should decide the matchup.",
-      "LevLine 3.0 gives the Vikings a 50.2% win probability over the Packers. Its frozen F-ST engine reconciles a 59.9% football-only signal with a 53.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Minnesota Vikings -0.1, a market line of Minnesota Vikings -1.5, and an approximate coherent score of MIN 23 \u2013 GB 22. Minnesota can attack Green Bay\u2019s missing star power and home-field environment, while the Packers need composed protection and efficient early downs to keep the game structurally balanced. The pick: Minnesota Vikings moneyline."
-    ],
-    "prediction": "MIN to win; MIN 23.7 \u2013 GB 20.0 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
-        "title": "NFL Week 1 injury report: Player statuses for all 16 games"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "packers.com",
-        "source_url": "https://www.packers.com/news/in-game-updates-week-1-vikings-2026",
-        "title": "Packers lead Vikings 9-3 after first quarter"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "Sports Illustrated",
-        "source_url": "https://www.si.com/betting/kyler-murray-injury-update-packers-jump-to-massive-favorites-with-vikings-qb-headed-to-locker-room",
-        "title": "Kyler Murray Injury Update: Packers Jump to Massive Favorites With Vikings QB Headed to Locker Room"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "MIN",
-      "primary_family": "pressure",
-      "primary_mode": "support",
-      "primary_title": "MIN protection vs GB pass rush",
-      "secondary_advantage_team": "GB",
-      "secondary_family": "qb_opponent_history",
-      "secondary_title": "Jordan Love vs MIN: player history"
-    },
-    "what_could_make_us_wrong": "GB's counter in GB-MIN: Jordan Love vs MIN: player history: quarterback history context."
-  },
-  "2026_01_MIA_LV": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "LV early-down approach vs MIA: early-down leverage favors MIA.",
-    "case_for_pick": "LV early-down approach vs MIA: early-down leverage favors MIA.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "LV early-down approach vs MIA",
-        "LV: Brock Bowers \u2014 Out"
-      ],
-      "media_led": true,
-      "media_source_count": 3,
-      "primary_variant": 3,
-      "provider_freshness_advisory": "newer_reporting_available",
-      "reporting_first": true,
-      "secondary_variant": 3,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Kirk Cousins vs MIA: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
-        "strength": "Strong",
-        "title": "MIA offense changed its decision-makers"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Las_Vegas_Raiders_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in LV"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "LV early-down approach vs MIA"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "MIA explosives vs LV prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "LV protection vs MIA pass rush"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "LV: Brock Bowers \u2014 Out"
-      },
-      {
-        "category": "travel",
-        "source_name": "nflverse schedule + venue geography",
-        "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
-        "strength": "Moderate",
-        "title": "Long travel spot for MIA"
-      }
-    ],
-    "game_id": "2026_01_MIA_LV",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Miami attacks a Las Vegas offense missing its toughest coverage problem",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Brock Bowers (TE) as Out. Knee. LevLine does not make up an injury point value for it. In 2025, he accounted for 18% of the team's recorded targets (87). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was +0.17 EPA/play last season.",
-        "title": "LV: Brock Bowers \u2014 Out"
-      },
-      {
-        "advantage_team": "MIA",
-        "family": "early_down",
-        "sample_size": 558,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "LV threw on 57% of first- and second-down plays and averaged -0.11 EPA per early-down pass. MIA allowed +0.19. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "LV early-down approach vs MIA"
-      },
-      {
-        "advantage_team": "MIA",
-        "family": "explosives",
-        "sample_size": 558,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "MIA hit a 20+ yard pass on 7.7% of pass plays; LV allowed one on 5.9%. The short version: MIA wants chunks, and LV would rather make it earn twelve-play drives.",
-        "title": "MIA explosives vs LV prevention"
-      }
-    ],
-    "matchup": "MIA @ LV",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-14T00:36:09.993530+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Brock Bowers (TE) as Out. Knee. LevLine does not make up an injury point value for it. In 2025, he accounted for 18% of the team's recorded targets (87). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was +0.17 EPA/play last season.",
-        "title": "LV: Brock Bowers \u2014 Out"
-      },
-      {
-        "as_of": "2026-09-14T00:36:17.474673+00:00",
-        "family": "early_down",
-        "label": "Early downs",
-        "leader": "MIA",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "LV threw on 57% of first- and second-down plays and averaged -0.11 EPA per early-down pass. MIA allowed +0.19. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "LV early-down approach vs MIA"
-      },
-      {
-        "as_of": "2026-09-14T00:36:17.473001+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "MIA",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "MIA hit a 20+ yard pass on 7.7% of pass plays; LV allowed one on 5.9%. The short version: MIA wants chunks, and LV would rather make it earn twelve-play drives.",
-        "title": "MIA explosives vs LV prevention"
-      },
-      {
-        "as_of": "2026-09-14T00:36:17.473883+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "LV",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "LV gave up sacks on 10.1% of pass plays last season; MIA got home on 6.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "LV protection vs MIA pass rush"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, MIA and LV have played 4 completed games in the nflverse schedule sample: MIA is 2-2. The most recent finished MIA 13, LV 27.",
-        "title": "MIA-LV: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2015 through 2025 contains 4 meaningful passing games for Kirk Cousins against MIA (4 regular season, 0 postseason). Across those games: 113 attempts, 759 passing yards, 5 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Kirk Cousins vs MIA: career game ledger"
-      },
-      {
-        "family": "ngs_qb_profile",
-        "provenance_grade": "B",
-        "source_name": "NFL Next Gen Stats via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
-        "summary": "NFL Next Gen Stats' 2025 regular-season profile for Kirk Cousins, over 269 attempts: 2.78s average time to throw; -1.7 completion percentage points over expectation; 6.9 average intended air yards; 17.5% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
-        "title": "Kirk Cousins: Next Gen passing profile"
-      }
-    ],
-    "paragraphs": [
-      "Las Vegas will play without Brock Bowers, removing the Raiders\u2019 most difficult matchup piece and placing more responsibility on Ashton Jeanty and the remaining receiving group. Miami enters without a game-status injury designation and can pressure the Raiders by winning early downs and forcing predictable passing situations. Jeanty\u2019s return gives Las Vegas a route to stay balanced, but the Raiders need sustained efficiency rather than isolated chunk plays. Miami\u2019s tackling and ability to prevent a slow, possession-heavy game will shape whether Bowers\u2019 absence becomes decisive.",
-      "LevLine 3.0 gives the Raiders a 63.4% win probability over the Dolphins. Its frozen F-ST engine reconciles a 35.5% football-only signal with a 60.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Las Vegas Raiders -4.4, a market line of Las Vegas Raiders -3.0, and an approximate coherent score of LV 24 \u2013 MIA 20. Miami has the cleaner availability picture, while Las Vegas needs Jeanty, efficient early downs and complementary targets to keep the Dolphins from dictating obvious passing situations. The pick: Las Vegas Raiders moneyline."
-    ],
-    "prediction": "LV to win; LV 20.6 \u2013 MIA 23.8 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
-        "title": "NFL Week 1 injury report: Player statuses for all 16 games"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "miamidolphins.com",
-        "source_url": "https://www.miamidolphins.com/news/game-preview-miami-dolphins-at-las-vegas-raiders",
-        "title": "Game Preview: Miami Dolphins at Las Vegas Raiders"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "LV",
-      "primary_family": "pressure",
-      "primary_mode": "support",
-      "primary_title": "LV protection vs MIA pass rush",
-      "secondary_advantage_team": "MIA",
-      "secondary_family": "early_down",
-      "secondary_title": "LV early-down approach vs MIA"
-    },
-    "what_could_make_us_wrong": "MIA's counter in MIA-LV: LV early-down approach vs MIA: early-down leverage favors MIA."
-  },
-  "2026_01_WAS_PHI": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "PHI YAC creation vs WAS tackling: yards after the catch evidence.",
-    "case_for_pick": "Jalen Hurts vs WAS: player history: quarterback history context.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "Jalen Hurts vs WAS: player history",
-        "PHI YAC creation vs WAS tackling"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 4,
-      "provider_freshness_advisory": "newer_reporting_available",
-      "reporting_first": true,
-      "secondary_variant": 4,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "Jalen Hurts vs WAS: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse PBP + Wikipedia staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Philadelphia_Eagles_season",
-        "strength": "Moderate",
-        "title": "Jayden Daniels vs Vic Fangio's PHI defense"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Washington_Commanders_season",
-        "strength": "Strong",
-        "title": "WAS offense changed its decision-makers"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Philadelphia_Eagles_season",
-        "strength": "Strong",
-        "title": "PHI offense changed its decision-makers"
-      },
-      {
-        "category": "matchup",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "PHI YAC creation vs WAS tackling"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "PHI explosives vs WAS prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "WAS early-down approach vs PHI"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "PHI: Eli Stowers \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "PHI: Jonathan Greenard \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Weak",
-        "title": "WAS: K'Lavon Chaisson \u2014 Limited Participation in Practice"
-      }
-    ],
-    "game_id": "2026_01_WAS_PHI",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Washington\u2019s rebound attempt runs directly into Philadelphia\u2019s physical core",
-    "key_factors": [
-      {
-        "advantage_team": "PHI",
-        "family": "qb_opponent_history",
-        "sample_size": 297,
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "In the nflverse play-by-play sample since 2021, Jalen Hurts has 9 meaningful games against WAS; the most recent was last season, Week 16. Over 293 charted dropbacks in those games, he averaged +0.26 EPA/dropback with a 50% positive-EPA rate. A further 1 short cameo under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
-        "title": "Jalen Hurts vs WAS: player history"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Eli Stowers (TE) as Out. Hamstring, Quadricep. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.24 EPA/play last season.",
-        "title": "PHI: Eli Stowers \u2014 Out"
-      },
-      {
-        "advantage_team": "WAS",
-        "family": "yac",
-        "sample_size": 617,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "PHI averaged 4.3 yards after catch per completion; WAS allowed 6.4. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
-        "title": "PHI YAC creation vs WAS tackling"
-      }
-    ],
-    "matchup": "WAS @ PHI",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-14T00:36:22.094698+00:00",
-        "family": "qb_opponent_history",
-        "label": "QB history",
-        "leader": "PHI",
-        "source_name": "nflverse play-by-play",
-        "strength": "Strong",
-        "summary": "In the nflverse play-by-play sample since 2021, Jalen Hurts has 9 meaningful games against WAS; the most recent was last season, Week 16. Over 293 charted dropbacks in those games, he averaged +0.26 EPA/dropback with a 50% positive-EPA rate. A further 1 short cameo under 10 dropbacks is excluded from that game count. This is a recent analytical sample, not a career meeting count.",
-        "title": "Jalen Hurts vs WAS: player history"
-      },
-      {
-        "as_of": "2026-09-14T00:36:18.697856+00:00",
-        "family": "yac",
-        "label": "YAC",
-        "leader": "WAS",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "PHI averaged 4.3 yards after catch per completion; WAS allowed 6.4. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
-        "title": "PHI YAC creation vs WAS tackling"
-      },
-      {
-        "as_of": "2026-09-14T00:36:18.697513+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "WAS",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "PHI hit a 20+ yard pass on 6.8% of pass plays; WAS allowed one on 8.3%. The short version: PHI wants chunks, and WAS would rather make it earn twelve-play drives.",
-        "title": "PHI explosives vs WAS prevention"
-      },
-      {
-        "as_of": "2026-09-14T00:36:10.706778+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Eli Stowers (TE) as Out. Hamstring, Quadricep. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.24 EPA/play last season.",
-        "title": "PHI: Eli Stowers \u2014 Out"
-      }
-    ],
-    "notebook": [
-      {
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, Commanders and Eagles have played 12 completed games in the nflverse schedule sample: Commanders is 3-9. The most recent finished Commanders 22, Eagles 24.",
-        "title": "Commanders-Eagles: division rivalry"
-      },
-      {
-        "family": "rivalry",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, WAS and PHI have played 12 completed games in the nflverse schedule sample: WAS is 3-9. The most recent finished WAS 22, PHI 24.",
-        "title": "WAS-PHI: division rivalry"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2020 through 2025 contains 10 meaningful passing games for Jalen Hurts against WAS (9 regular season, 1 postseason). Across those games: 294 attempts, 2,387 passing yards, 15 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Jalen Hurts vs WAS: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2024 through 2024 contains 3 meaningful passing games for Jayden Daniels against PHI (2 regular season, 1 postseason). Across those games: 119 attempts, 704 passing yards, 7 TD, 4 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Jayden Daniels vs PHI: career game ledger"
-      }
-    ],
-    "paragraphs": [
-      "Philadelphia opens its title defense with Jalen Hurts leading an offense that has changed coordinators again but retained its physical identity. Washington is trying to rebound after a five-win season and needs Jayden Daniels healthy enough to restore the creation ability that powered his rookie breakout. The Eagles will be without edge rusher Jonathan Greenard, giving Washington some relief in protection, but Philadelphia can still create pressure with its remaining rotation. Early-down rushing efficiency, protection around Daniels and Hurts\u2019 ability to punish broken contain should drive the divisional matchup.",
-      "LevLine 3.0 gives the Eagles a 66.8% win probability over the Commanders. Its frozen F-ST engine reconciles a 66.8% football-only signal with a 68.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Philadelphia Eagles -5.6, a market line of Philadelphia Eagles -6.0, and an approximate coherent score of PHI 26 \u2013 WAS 21. Philadelphia has the more stable offensive and defensive foundation, while Washington needs Daniels to create efficiently and its protection to prevent the Eagles from controlling obvious passing downs. The pick: Philadelphia Eagles moneyline."
-    ],
-    "prediction": "PHI to win; PHI 26.4 \u2013 WAS 20.8 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/eagles-edge-rusher-jonathan-greenard-ruled-out-vs-commanders",
-        "title": "Eagles edge rusher Jonathan Greenard ruled out vs. Commanders"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "commanders.com",
-        "source_url": "https://www.commanders.com/video/rasul-douglas-uses-a-hit-stick-tackle-to-generate-third-down-pbu-against-wicks",
-        "title": "Rasul Douglas uses a hit-stick tackle to generate third-down PBU against Wicks"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "PHI",
-      "primary_family": "qb_opponent_history",
-      "primary_mode": "support",
-      "primary_title": "Jalen Hurts vs WAS: player history",
-      "secondary_advantage_team": "WAS",
-      "secondary_family": "yac",
-      "secondary_title": "PHI YAC creation vs WAS tackling"
-    },
-    "what_could_make_us_wrong": "WAS's counter in WAS-PHI: PHI YAC creation vs WAS tackling: yards after the catch evidence."
+    "what_could_make_us_wrong": "DEN's counter in DEN-KC: KC protection vs DEN pass rush: pass-rush leverage favors DEN."
   }
 }
