@@ -5,6 +5,7 @@ import {
   BET_UNIT_DOLLARS,
   americanWinProfit,
   buildBetLedger,
+  roundSpreadToHalfPoint,
   settleBet,
   summarizeBets,
   summarizeCombined,
@@ -32,6 +33,25 @@ test('modeled spread is graded against the LevLine line, not market spread', () 
   assert.equal(ledger[0].spread.result,'win')
   assert.equal(ledger[0].spread.odds,-110)
   assert.equal(ledger[0].spread.usedFallbackPrice,true)
+})
+
+test('modeled spreads round to the nearest half point before grading', () => {
+  assert.equal(roundSpreadToHalfPoint(3.1),3)
+  assert.equal(roundSpreadToHalfPoint(3.3),3.5)
+  assert.equal(roundSpreadToHalfPoint(-3.8),-4)
+  assert.equal(roundSpreadToHalfPoint(3.25),3.5)
+
+  const ledger=buildBetLedger([{
+    game_id:'2026_01_A_B', season:'2026', week:'1', lock_status:'LOCKED',
+    away_team:'A', home_team:'B', pick:'B', final_home_prob:'0.60',
+    locked_model_spread:'3.1', actual_home_score:'24', actual_away_score:'21',
+    locked_home_moneyline:'-125',
+  }])
+  assert.equal(ledger.length,1)
+  assert.equal(ledger[0].spread.modelMargin,3.1)
+  assert.equal(ledger[0].spread.roundedModelMargin,3)
+  assert.equal(ledger[0].spread.line,3)
+  assert.equal(ledger[0].spread.result,'push')
 })
 
 test('spread push returns stake while remaining in ROI denominator', () => {

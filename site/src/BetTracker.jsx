@@ -171,7 +171,7 @@ function BetTrackerPanel({history}) {
         <div className="ss-bet-market-title"><div><span>LEVLINE SPREAD</span><h3>1 unit on every final modeled spread</h3></div><small>LevLine line, not the market spread</small></div>
         <WeekSummary summary={weeklySpread}/>
         <SpreadRows entries={selected}/>
-        <p className="ss-bet-disclosure">Spread wagers are graded against LevLine’s immutable modeled margin. Captured spread-side juice is used when stored; otherwise the approved -110 fallback is applied. Pushes return the stake and remain in the ROI denominator.</p>
+        <p className="ss-bet-disclosure">Spread wagers use LevLine’s immutable modeled margin rounded to the nearest 0.5 point, sportsbook-style, and are graded against that rounded line. Captured spread-side juice is used when stored; otherwise the approved -110 fallback is applied. Pushes return the stake and remain in the ROI denominator.</p>
       </section>
     </div>
   </section>

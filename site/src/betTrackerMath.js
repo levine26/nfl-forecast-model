@@ -16,6 +16,13 @@ function firstNumber(...values) {
   return null
 }
 
+export function roundSpreadToHalfPoint(value) {
+  const parsed = numberOrNull(value)
+  if (parsed == null) return null
+  const magnitude = Math.round((Math.abs(parsed) + EPS) * 2) / 2
+  return parsed < 0 ? -magnitude : magnitude
+}
+
 function resultFromEdge(edge) {
   if (Math.abs(edge) <= EPS) return 'push'
   return edge > 0 ? 'win' : 'loss'
@@ -81,15 +88,18 @@ export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
       const modelMargin = lockedModelMargin(row)
       let spread = null
       if (modelMargin != null) {
+        const roundedModelMargin = roundSpreadToHalfPoint(modelMargin)
         const side = modelMargin > EPS ? row.home_team : modelMargin < -EPS ? row.away_team : pick
         const sideMargin = side === row.home_team ? actualMargin : -actualMargin
-        const spreadEdge = sideMargin - Math.abs(modelMargin)
+        const line = Math.abs(roundedModelMargin)
+        const spreadEdge = sideMargin - line
         const spreadResult = resultFromEdge(spreadEdge)
         const price = spreadPrice(row, side)
         spread = {
           side,
           modelMargin,
-          line: Math.abs(modelMargin),
+          roundedModelMargin,
+          line,
           odds: price.odds,
           usedFallbackPrice: price.fallback,
           result: spreadResult,
