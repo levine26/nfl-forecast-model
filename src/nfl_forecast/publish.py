@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 LOCK_WINDOW_MINUTES = 120.0
+CURRENT_FORECAST_IDENTITY = "F-ST-01-FROZEN-2026"
 
 CURRENT_COLUMNS = [
     "game_id","season","week","gameday","gametime","away_team","home_team",
@@ -85,9 +86,11 @@ def _canonical_current_slate(p: pd.DataFrame, official: pd.DataFrame, columns: l
     """Publish the active week without mutating already-locked forecasts.
 
     Full model runs naturally shrink to unresolved games as results arrive. The public
-    current-slate contract must not shrink with them: any immutable LOCKED rows for the
-    same season/week are retained, and locked rows win over a later mutable row for the
-    same game_id. This is publication selection only; it never recomputes a forecast.
+    current-slate contract must not shrink with them: immutable LOCKED rows for the
+    same season/week and current frozen F-ST identity are retained, and locked rows win
+    over a later mutable row for the same game_id. Historical pre-F-ST locks remain in
+    prediction_history.csv but are never promoted back into the current public slate.
+    This is publication selection only; it never recomputes a forecast.
     """
     if p.empty or not {"game_id", "season", "week"}.issubset(p.columns):
         return p.copy()
@@ -96,10 +99,14 @@ def _canonical_current_slate(p: pd.DataFrame, official: pd.DataFrame, columns: l
     if len(season) != 1 or len(week) != 1 or official.empty:
         return p.copy()
 
+    artifact = official.get("fst_artifact_id", pd.Series("", index=official.index)).astype(str)
+    strategy = official.get("final_probability_strategy", pd.Series("", index=official.index)).astype(str)
+    current_identity = artifact.eq(CURRENT_FORECAST_IDENTITY) & strategy.eq(CURRENT_FORECAST_IDENTITY)
     locked = official[
         pd.to_numeric(official.get("season"), errors="coerce").eq(float(season[0]))
         & pd.to_numeric(official.get("week"), errors="coerce").eq(float(week[0]))
         & official.get("lock_status", pd.Series("", index=official.index)).eq("LOCKED")
+        & current_identity
     ].copy()
     if locked.empty:
         return p.copy()
