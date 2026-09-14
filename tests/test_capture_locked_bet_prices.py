@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
+import scripts.capture_locked_bet_prices as bet_prices
 from scripts.capture_locked_bet_prices import (
     enrich_price_ledger,
     vig_free_home_probability,
@@ -114,3 +115,53 @@ def test_does_not_import_later_spread_juice_without_lock_time_proof():
     assert changed == 1
     assert "locked_home_spread_price" not in ledger.columns
     assert "locked_away_spread_price" not in ledger.columns
+
+
+def test_historical_backfill_walks_backward_until_exact_snapshot_matches(monkeypatch):
+    locked_probability = vig_free_home_probability(142, -170)
+    history = pd.DataFrame([
+        {
+            **_receipt("2026_01_CHI_CAR", locked_probability),
+            "lock_timestamp_utc": "2026-09-13T15:37:41.752256+00:00",
+        }
+    ])
+    newer_market = pd.DataFrame([
+        {
+            "game_id": "2026_01_CHI_CAR",
+            "season": 2026,
+            "home_moneyline": 140,
+            "away_moneyline": -166,
+        }
+    ])
+    matching_market = pd.DataFrame([
+        {
+            "game_id": "2026_01_CHI_CAR",
+            "season": 2026,
+            "home_moneyline": 142,
+            "away_moneyline": -170,
+        }
+    ])
+
+    monkeypatch.setattr(
+        bet_prices,
+        "_nflverse_snapshot_shas_at_or_before",
+        lambda _lock_utc: ["newer-sha", "matching-sha"],
+    )
+    monkeypatch.setattr(
+        bet_prices,
+        "_historical_market_snapshot_by_sha",
+        lambda sha: newer_market if sha == "newer-sha" else matching_market,
+    )
+
+    ledger, changed = bet_prices._historical_backfill(
+        history,
+        bet_prices._empty_ledger(),
+        season=2026,
+    )
+
+    assert changed == 1
+    assert ledger.loc[0, "locked_home_moneyline"] == 142
+    assert ledger.loc[0, "locked_away_moneyline"] == -170
+    assert ledger.loc[0, "bet_price_source"] == (
+        "nflverse_git:matching-sha_verified_against_locked_market_probability"
+    )

@@ -15,6 +15,7 @@ NFLVERSE_GAMES_URL = "https://raw.githubusercontent.com/nflverse/nfldata/master/
 NFLVERSE_COMMITS_API = "https://api.github.com/repos/nflverse/nfldata/commits"
 NFLVERSE_RAW_TEMPLATE = "https://raw.githubusercontent.com/nflverse/nfldata/{sha}/data/games.csv"
 PROBABILITY_TOLERANCE = 1e-10
+HISTORICAL_COMMIT_LOOKBACK = 6
 LEDGER_COLUMNS = (
     "game_id",
     "season",
@@ -158,11 +159,24 @@ def _lock_timestamp(value: object) -> datetime | None:
     return parsed.astimezone(timezone.utc)
 
 
-def _nflverse_snapshot_sha_at_or_before(lock_utc: datetime, timeout: int = 20) -> str | None:
+def _nflverse_snapshot_shas_at_or_before(
+    lock_utc: datetime,
+    timeout: int = 20,
+    limit: int = HISTORICAL_COMMIT_LOOKBACK,
+) -> list[str]:
+    """Return recent games.csv commits at or before the receipt lock, newest first.
+
+    LevLine can consume an nflverse snapshot moments before nflverse publishes a newer
+    commit. Looking only at the single latest upstream commit can therefore miss the
+    exact pair that generated the immutable market probability. A bounded backward
+    walk lets us recover that immediately preceding snapshot while the probability
+    equality check remains the authority for accepting a price.
+    """
+    per_page = max(1, min(int(limit), 100))
     params = urlencode({
         "path": "data/games.csv",
         "until": lock_utc.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "per_page": 1,
+        "per_page": per_page,
     })
     request = Request(
         f"{NFLVERSE_COMMITS_API}?{params}",
@@ -172,20 +186,38 @@ def _nflverse_snapshot_sha_at_or_before(lock_utc: datetime, timeout: int = 20) -
         with urlopen(request, timeout=timeout) as response:
             payload = json.load(response)
     except Exception:
+        return []
+    if not isinstance(payload, list):
+        return []
+
+    shas: list[str] = []
+    for entry in payload:
+        if not isinstance(entry, dict):
+            continue
+        sha = str(entry.get("sha", "")).strip()
+        if sha and sha not in shas:
+            shas.append(sha)
+    return shas
+
+
+def _nflverse_snapshot_sha_at_or_before(lock_utc: datetime, timeout: int = 20) -> str | None:
+    shas = _nflverse_snapshot_shas_at_or_before(lock_utc, timeout=timeout, limit=1)
+    return shas[0] if shas else None
+
+
+def _historical_market_snapshot_by_sha(sha: str) -> pd.DataFrame | None:
+    try:
+        return pd.read_csv(NFLVERSE_RAW_TEMPLATE.format(sha=sha), low_memory=False)
+    except Exception:
         return None
-    if not isinstance(payload, list) or not payload:
-        return None
-    sha = str(payload[0].get("sha", "")).strip()
-    return sha or None
 
 
 def _historical_market_snapshot(lock_utc: datetime) -> tuple[pd.DataFrame, str] | None:
     sha = _nflverse_snapshot_sha_at_or_before(lock_utc)
     if not sha:
         return None
-    try:
-        frame = pd.read_csv(NFLVERSE_RAW_TEMPLATE.format(sha=sha), low_memory=False)
-    except Exception:
+    frame = _historical_market_snapshot_by_sha(sha)
+    if frame is None:
         return None
     return frame, sha
 
@@ -198,10 +230,11 @@ def _historical_backfill(
 ) -> tuple[pd.DataFrame, int]:
     """Try archived nflverse snapshots for receipts not verifiable from today's file.
 
-    Snapshot lookup is keyed to each immutable lock timestamp and cached for games
-    sharing that lock. The archived raw pair is still required to reproduce the
-    receipt's stored vig-free probability, so repository timing lag cannot silently
-    substitute a different market.
+    For each immutable lock timestamp, walk a small number of archived games.csv
+    commits backward from the lock. This handles upstream publication/consumption lag
+    such as a price changing a few minutes before LevLine's receipt was written. Every
+    candidate still must reproduce the receipt's exact vig-free probability, so the
+    wider search cannot silently substitute a merely nearby market price.
     """
     existing_ids = set(ledger["game_id"].astype(str)) if not ledger.empty else set()
     candidates = history[
@@ -213,28 +246,34 @@ def _historical_backfill(
     if candidates.empty:
         return ledger, 0
 
-    cache: dict[str, tuple[pd.DataFrame, str] | None] = {}
+    commit_cache: dict[str, list[str]] = {}
+    snapshot_cache: dict[str, pd.DataFrame | None] = {}
     added = 0
     for _, receipt in candidates.iterrows():
         lock_utc = _lock_timestamp(receipt.get("lock_timestamp_utc"))
         if lock_utc is None:
             continue
         cache_key = lock_utc.isoformat()
-        if cache_key not in cache:
-            cache[cache_key] = _historical_market_snapshot(lock_utc)
-        snapshot = cache[cache_key]
-        if snapshot is None:
-            continue
-        market, sha = snapshot
-        one = pd.DataFrame([receipt.to_dict()])
-        ledger, changed = enrich_price_ledger(
-            one,
-            market,
-            ledger,
-            season=season,
-            source_label=f"nflverse_git:{sha}_verified_against_locked_market_probability",
-        )
-        added += changed
+        if cache_key not in commit_cache:
+            commit_cache[cache_key] = _nflverse_snapshot_shas_at_or_before(lock_utc)
+
+        for sha in commit_cache[cache_key]:
+            if sha not in snapshot_cache:
+                snapshot_cache[sha] = _historical_market_snapshot_by_sha(sha)
+            market = snapshot_cache[sha]
+            if market is None:
+                continue
+            one = pd.DataFrame([receipt.to_dict()])
+            ledger, changed = enrich_price_ledger(
+                one,
+                market,
+                ledger,
+                season=season,
+                source_label=f"nflverse_git:{sha}_verified_against_locked_market_probability",
+            )
+            if changed:
+                added += changed
+                break
     return ledger, added
 
 
