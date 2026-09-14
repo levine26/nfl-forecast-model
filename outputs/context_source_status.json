@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-14T09:30:47.398470+00:00",
+    "as_of": "2026-09-14T12:35:21.635481+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-14T09:30:53.670465+00:00",
+    "as_of": "2026-09-14T12:35:27.493162+00:00",
     "conflicts": 0,
     "evidence_items_added": 4,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 4
   },
   "coaching": {
-    "as_of": "2026-09-14T09:30:30.997380+00:00",
+    "as_of": "2026-09-14T12:35:06.342701+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 4,
     "negative_cache_ttl_minutes": 60,
@@ -124,7 +124,7 @@
     "unique_headlines": 2
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-14T09:30:45.259855+00:00",
+    "as_of": "2026-09-14T12:35:19.560643+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -144,14 +144,14 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 0,
+    "evidence_repairs": 4,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
   },
   "evidence": {
     "games": 2,
-    "generated_utc": "2026-09-14T09:30:30.568100+00:00",
+    "generated_utc": "2026-09-14T12:35:05.953661+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
     "signals": 26,
     "status": "healthy"
@@ -166,9 +166,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-14T09:30:30.568100+00:00",
+  "generated_utc": "2026-09-14T12:35:05.953661+00:00",
   "injuries": {
-    "as_of": "2026-09-14T09:30:30.670134+00:00",
+    "as_of": "2026-09-14T12:35:06.122925+00:00",
     "players": 182,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -176,7 +176,7 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-14T09:51:27.773165+00:00",
+    "as_of": "2026-09-14T12:35:31.788987+00:00",
     "cross_game_titles_rejected": 0,
     "games": 2,
     "games_with_display_reporting": 2,
@@ -200,7 +200,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-14T09:30:52.793325+00:00",
+    "as_of": "2026-09-14T12:35:26.466643+00:00",
     "evidence_items_added": 4,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 4,
@@ -273,7 +273,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-14T09:30:35.478614+00:00",
+    "as_of": "2026-09-14T12:35:10.125646+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -306,7 +306,7 @@
     "story_items_added": 2
   },
   "weather": {
-    "as_of": "2026-09-14T09:30:38.629594+00:00",
+    "as_of": "2026-09-14T12:35:13.200202+00:00",
     "games_checked": 2,
     "status": "healthy"
   }
