@@ -26,8 +26,13 @@ def test_historical_backfill_uses_archived_snapshot_only_when_probability_matche
 
     monkeypatch.setattr(
         capture_mod,
-        "_historical_market_snapshot",
-        lambda lock_utc: (archived, "abc123"),
+        "_nflverse_snapshot_shas_at_or_before",
+        lambda lock_utc: ["abc123"],
+    )
+    monkeypatch.setattr(
+        capture_mod,
+        "_historical_market_snapshot_by_sha",
+        lambda sha: archived if sha == "abc123" else None,
     )
 
     ledger, changed = capture_mod._historical_backfill(
@@ -60,8 +65,13 @@ def test_historical_backfill_fails_closed_on_nonmatching_archived_snapshot(monke
 
     monkeypatch.setattr(
         capture_mod,
-        "_historical_market_snapshot",
-        lambda lock_utc: (different, "def456"),
+        "_nflverse_snapshot_shas_at_or_before",
+        lambda lock_utc: ["def456"],
+    )
+    monkeypatch.setattr(
+        capture_mod,
+        "_historical_market_snapshot_by_sha",
+        lambda sha: different if sha == "def456" else None,
     )
 
     ledger, changed = capture_mod._historical_backfill(
