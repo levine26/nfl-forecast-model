@@ -1,1 +1,0 @@
-Release checklist: PR CI green; dashboard build green; Python capture tests green; merge to main; run price capture; confirm bet_price_history.csv contains only verified rows; confirm Pages deployment; inspect History > Bet Tracker weekly and season summaries.

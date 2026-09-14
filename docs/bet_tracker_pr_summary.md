@@ -1,1 +1,0 @@
-Implements Sunday Signal Bet Tracker with $25 fixed-unit ML and LevLine modeled-spread ledgers, weekly and season ROI/P&L, verified lock-price persistence, historical backfill with fail-closed provenance checks, and dashboard settlement tests.
