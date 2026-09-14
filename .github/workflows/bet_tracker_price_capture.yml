@@ -29,7 +29,7 @@ jobs:
           python-version: "3.11.16"
           cache: pip
       - run: pip install "pandas==3.0.5" "numpy==2.4.6"
-      - name: Verify and persist sportsbook prices on locked receipts
+      - name: Verify and persist sportsbook prices in append-only ledger
         run: |
           set -euo pipefail
           git config user.name "nfl-bet-tracker-bot"
@@ -40,7 +40,7 @@ jobs:
             git reset --hard origin/main
 
             python scripts/capture_locked_bet_prices.py --season 2026
-            git add outputs/prediction_history.csv
+            git add outputs/bet_price_history.csv
 
             if git diff --cached --quiet; then
               echo "No newly verifiable lock prices."
@@ -61,5 +61,5 @@ jobs:
             echo "main advanced during price capture; retrying from current main (attempt $attempt/3)"
           done
 
-          echo "main changed during all three price-capture attempts; leaving existing receipts untouched."
+          echo "main changed during all three price-capture attempts; leaving existing betting-price ledger untouched."
           exit 1
