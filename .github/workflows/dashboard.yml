@@ -74,7 +74,7 @@ jobs:
         run: |
           mkdir -p site/public/data
           for f in \
-            this_week.csv run_history.csv prediction_history.csv power_ratings.csv model_leaderboard.csv \
+            this_week.csv run_history.csv prediction_history.csv bet_price_history.csv power_ratings.csv model_leaderboard.csv \
             calibration.csv confidence_diagnostics.csv movement_attribution.csv team_profiles.csv \
             status.json contextual_evidence.json game_previews.json context_source_status.json weekly_brief.json postgame_autopsies.json \
             power_editorial.json history_scoreboard.json; do
@@ -89,6 +89,9 @@ jobs:
       - name: Install dashboard dependencies
         working-directory: site
         run: npm install
+      - name: Validate Bet Tracker settlement math
+        working-directory: site
+        run: node --test tests/betTrackerMath.test.mjs
       - name: Build dashboard
         working-directory: site
         run: npm run build

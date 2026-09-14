@@ -1,0 +1,65 @@
+name: Sunday Signal bet price capture
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Hourly NFL market refresh"
+      - "Daily NFL model refresh"
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sunday-signal-bet-price-capture
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.16"
+          cache: pip
+      - run: pip install "pandas==3.0.5" "numpy==2.4.6"
+      - name: Verify and persist sportsbook prices in append-only ledger
+        run: |
+          set -euo pipefail
+          git config user.name "nfl-bet-tracker-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+
+            python scripts/capture_locked_bet_prices.py --season 2026
+            git add outputs/bet_price_history.csv
+
+            if git diff --cached --quiet; then
+              echo "No newly verifiable lock prices."
+              exit 0
+            fi
+
+            git commit -m "Capture Sunday Signal bet prices"
+            base_sha=$(git rev-parse HEAD^)
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+
+            git fetch origin main
+            if [ "$(git rev-parse origin/main)" = "$base_sha" ]; then
+              echo "Push failed even though main did not advance; refusing to mask a non-race publish error."
+              exit 1
+            fi
+            echo "main advanced during price capture; retrying from current main (attempt $attempt/3)"
+          done
+
+          echo "main changed during all three price-capture attempts; leaving existing betting-price ledger untouched."
+          exit 1
