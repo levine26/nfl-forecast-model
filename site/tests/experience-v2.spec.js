@@ -38,5 +38,11 @@ test('history adds calibration and immutable receipt navigation when receipts ex
     await expect(page.locator('.ss-exp-receipt-page:visible')).toBeVisible()
     await expect(page.getByText(/OFFICIAL PREGAME RECEIPT/)).toBeVisible()
     await expect(page.getByText('PICK OF RECORD',{exact:true})).toBeVisible()
+    await expect(page.locator('.ss-history-receipt-details:visible')).toBeVisible()
+    await expect(page.getByText('LEVLINE LOCKED SPREAD',{exact:true})).toBeVisible()
+    await expect(page.getByText('MARKET SPREAD AT LOCK',{exact:true})).toBeVisible()
+    await expect(page.getByText('EDGE AT LOCK',{exact:true})).toBeVisible()
+    await expect(page.getByText('CLOSING SPREAD',{exact:true})).toBeVisible()
+    await expect(page.getByText('FINAL SCORE',{exact:true})).toBeVisible()
   }
 })
