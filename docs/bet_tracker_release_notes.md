@@ -1,0 +1,1 @@
+Sunday Signal Bet Tracker adds hypothetical fixed-unit performance tracking in History without altering LevLine forecasting. Moneyline and modeled-spread returns are separated weekly and cumulatively, with combined season reporting for convenience.
