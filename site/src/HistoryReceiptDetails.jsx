@@ -119,14 +119,19 @@ export default function HistoryReceiptDetails() {
     if (!row) return
     const final=score(row)
     if (!final) return
+    let observer
     const replace=()=>{
       const resultCard=document.querySelector('.ss-exp-receipt-grid > article:nth-child(3) span')
-      if (resultCard) resultCard.textContent=final
+      if (!resultCard) return false
+      if (resultCard.textContent!==final) resultCard.textContent=final
+      observer?.disconnect()
+      return true
     }
-    replace()
-    const observer=new MutationObserver(replace)
-    observer.observe(document.getElementById('root')||document.body,{childList:true,subtree:true})
-    return()=>observer.disconnect()
+    if (!replace()) {
+      observer=new MutationObserver(()=>replace())
+      observer.observe(document.getElementById('root')||document.body,{childList:true,subtree:true})
+    }
+    return()=>observer?.disconnect()
   },[row])
 
   return host && row ? createPortal(<ReceiptDetails row={row}/>,host) : null
