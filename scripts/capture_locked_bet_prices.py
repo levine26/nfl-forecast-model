@@ -104,7 +104,7 @@ def enrich_locked_bet_prices(
         return out, 0
 
     verified_at = (verified_utc or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
-    verified_moneylines = 0
+    changed_rows = 0
 
     for index, receipt in out.iterrows():
         if str(receipt.get("lock_status", "")).strip().upper() != "LOCKED":
@@ -116,6 +116,7 @@ def enrich_locked_bet_prices(
         if not game_id or game_id not in market_by_game.index:
             continue
 
+        row_changed = False
         market_row = market_by_game.loc[game_id]
         home_existing = _number(receipt.get("locked_home_moneyline"))
         away_existing = _number(receipt.get("locked_away_moneyline"))
@@ -126,16 +127,21 @@ def enrich_locked_bet_prices(
                 out.at[index, "locked_away_moneyline"] = pair[1]
                 out.at[index, "bet_price_source"] = "nflverse_moneyline_verified_against_locked_market_probability"
                 out.at[index, "bet_price_verified_utc"] = verified_at
-                verified_moneylines += 1
+                row_changed = True
 
         home_spread_price = _number(market_row.get("home_spread_price"))
         away_spread_price = _number(market_row.get("away_spread_price"))
         if home_spread_price is not None and _number(out.at[index, "locked_home_spread_price"]) is None:
             out.at[index, "locked_home_spread_price"] = home_spread_price
+            row_changed = True
         if away_spread_price is not None and _number(out.at[index, "locked_away_spread_price"]) is None:
             out.at[index, "locked_away_spread_price"] = away_spread_price
+            row_changed = True
 
-    return out, verified_moneylines
+        if row_changed:
+            changed_rows += 1
+
+    return out, changed_rows
 
 
 def capture(
@@ -150,8 +156,7 @@ def capture(
     market = pd.read_csv(market_source, low_memory=False)
     enriched, changed = enrich_locked_bet_prices(history, market, season=season)
     schema_changed = any(column not in history.columns for column in PRICE_COLUMNS)
-    content_changed = not enriched.equals(history.reindex(columns=enriched.columns))
-    if schema_changed or content_changed:
+    if schema_changed or changed:
         enriched.to_csv(history_path, index=False)
     return changed
 
@@ -163,7 +168,7 @@ def main() -> None:
     parser.add_argument("--market-source", default=NFLVERSE_GAMES_URL)
     args = parser.parse_args()
     changed = capture(args.history, season=args.season, market_source=args.market_source)
-    print(f"Verified moneyline prices added to {changed} locked receipt(s).")
+    print(f"Verified sportsbook prices added to {changed} locked receipt(s).")
 
 
 if __name__ == "__main__":
