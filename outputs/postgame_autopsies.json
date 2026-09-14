@@ -134,6 +134,51 @@
     ],
     "winner_correct": true
   },
+  "2026_01_GB_MIN": {
+    "actual_score": "MIN 39 \u2013 GB 22",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "margin_miss",
+      "total_miss"
+    ],
+    "game_id": "2026_01_GB_MIN",
+    "margin_abs_error": 12.674853922850373,
+    "matchup": "GB @ MIN",
+    "official_home_prob": 0.5143072225475234,
+    "official_pick": "MIN",
+    "projected_score": "MIN 23.8 \u2013 GB 19.5",
+    "total_abs_error": 17.749877446556127,
+    "what_missed": [
+      "The predicted margin finished 12.7 points from the actual margin.",
+      "The predicted total finished 17.7 points from the actual total."
+    ],
+    "what_went_right": [
+      "The locked forecast got the winner direction right."
+    ],
+    "winner_correct": true
+  },
+  "2026_01_MIA_LV": {
+    "actual_score": "LV 27 \u2013 MIA 13",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "margin_miss"
+    ],
+    "game_id": "2026_01_MIA_LV",
+    "margin_abs_error": 17.51778690093981,
+    "matchup": "MIA @ LV",
+    "official_home_prob": 0.6338599528153582,
+    "official_pick": "LV",
+    "projected_score": "LV 20.0 \u2013 MIA 23.5",
+    "total_abs_error": 3.445240276068823,
+    "what_missed": [
+      "The predicted margin finished 17.5 points from the actual margin."
+    ],
+    "what_went_right": [
+      "The locked forecast got the winner direction right.",
+      "The predicted total finished 3.4 points from the actual total."
+    ],
+    "winner_correct": true
+  },
   "2026_01_NE_SEA": {
     "actual_score": "SEA 13 \u2013 NE 10",
     "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
@@ -243,6 +288,27 @@
     "what_went_right": [
       "The locked forecast got the winner direction right.",
       "The predicted margin finished 0.7 points from the actual margin."
+    ],
+    "winner_correct": true
+  },
+  "2026_01_WAS_PHI": {
+    "actual_score": "PHI 24 \u2013 WAS 22",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "no_major_error_flag"
+    ],
+    "game_id": "2026_01_WAS_PHI",
+    "margin_abs_error": 4.388275445655903,
+    "matchup": "WAS @ PHI",
+    "official_home_prob": 0.6863521643162133,
+    "official_pick": "PHI",
+    "projected_score": "PHI 27.0 \u2013 WAS 20.6",
+    "total_abs_error": 1.5485449396509878,
+    "what_missed": [],
+    "what_went_right": [
+      "The locked forecast got the winner direction right.",
+      "The predicted margin finished 4.4 points from the actual margin.",
+      "The predicted total finished 1.5 points from the actual total."
     ],
     "winner_correct": true
   }

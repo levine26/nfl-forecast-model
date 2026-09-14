@@ -19,44 +19,53 @@
       "pick_delta_pp": -0.0
     }
   ],
-  "generated_utc": "2026-09-13T23:41:20.157068+00:00",
+  "generated_utc": "2026-09-14T01:03:18.583181+00:00",
   "market_disagreements": [
-    {
-      "confidence": "Lean",
-      "game_id": "2026_01_MIA_LV",
-      "matchup": "MIA @ LV",
-      "pick": "LV",
-      "pick_prob": 0.6338599528153582,
-      "projected_score": "LV 20.6 \u2013 MIA 23.8",
-      "pure_market_gap_pp": 22.65345594623069
-    },
     {
       "confidence": "Coin Flip",
       "game_id": "2026_01_DEN_KC",
       "matchup": "DEN @ KC",
       "pick": "KC",
       "pick_prob": 0.5808285308101886,
-      "projected_score": "KC 19.9 \u2013 DEN 25.4",
-      "pure_market_gap_pp": 21.85651939894892
+      "projected_score": "KC 20.0 \u2013 DEN 25.2",
+      "pure_market_gap_pp": 21.55620636919473
     },
     {
-      "confidence": "Solid",
+      "confidence": "Lean",
       "game_id": "2026_01_DAL_NYG",
       "matchup": "DAL @ NYG",
       "pick": "DAL",
       "pick_prob": 0.6302054300816646,
-      "projected_score": "NYG 22.1 \u2013 DAL 21.7",
-      "pure_market_gap_pp": 9.005526751940824
+      "projected_score": "NYG 22.3 \u2013 DAL 21.0",
+      "pure_market_gap_pp": 9.160177419986088
     }
   ],
   "most_uncertain": [
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_01_GB_MIN",
-      "matchup": "GB @ MIN",
-      "pick": "MIN",
-      "pick_prob": 0.5019722639431533,
-      "projected_score": "MIN 23.7 \u2013 GB 20.0"
+      "game_id": "2026_01_DEN_KC",
+      "matchup": "DEN @ KC",
+      "pick": "KC",
+      "pick_prob": 0.5808285308101886,
+      "projected_score": "KC 20.0 \u2013 DEN 25.2"
+    },
+    {
+      "confidence": "Lean",
+      "game_id": "2026_01_DAL_NYG",
+      "matchup": "DAL @ NYG",
+      "pick": "DAL",
+      "pick_prob": 0.6302054300816646,
+      "projected_score": "NYG 22.3 \u2013 DAL 21.0"
+    }
+  ],
+  "strongest": [
+    {
+      "confidence": "Lean",
+      "game_id": "2026_01_DAL_NYG",
+      "matchup": "DAL @ NYG",
+      "pick": "DAL",
+      "pick_prob": 0.6302054300816646,
+      "projected_score": "NYG 22.3 \u2013 DAL 21.0"
     },
     {
       "confidence": "Coin Flip",
@@ -64,41 +73,7 @@
       "matchup": "DEN @ KC",
       "pick": "KC",
       "pick_prob": 0.5808285308101886,
-      "projected_score": "KC 19.9 \u2013 DEN 25.4"
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_01_DAL_NYG",
-      "matchup": "DAL @ NYG",
-      "pick": "DAL",
-      "pick_prob": 0.6302054300816646,
-      "projected_score": "NYG 22.1 \u2013 DAL 21.7"
-    }
-  ],
-  "strongest": [
-    {
-      "confidence": "Solid",
-      "game_id": "2026_01_WAS_PHI",
-      "matchup": "WAS @ PHI",
-      "pick": "PHI",
-      "pick_prob": 0.6678465462875075,
-      "projected_score": "PHI 26.4 \u2013 WAS 20.8"
-    },
-    {
-      "confidence": "Lean",
-      "game_id": "2026_01_MIA_LV",
-      "matchup": "MIA @ LV",
-      "pick": "LV",
-      "pick_prob": 0.6338599528153582,
-      "projected_score": "LV 20.6 \u2013 MIA 23.8"
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_01_DAL_NYG",
-      "matchup": "DAL @ NYG",
-      "pick": "DAL",
-      "pick_prob": 0.6302054300816646,
-      "projected_score": "NYG 22.1 \u2013 DAL 21.7"
+      "projected_score": "KC 20.0 \u2013 DEN 25.2"
     }
   ],
   "week": 1
