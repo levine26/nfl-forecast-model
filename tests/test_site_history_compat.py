@@ -29,11 +29,54 @@ def test_final_history_rows_become_locked_site_receipts(tmp_path: Path) -> None:
     assert rows[2]["lock_timestamp_utc"] == ""
 
 
+def test_locked_spread_and_edge_aliases_are_immutable_receipt_values(tmp_path: Path) -> None:
+    path = tmp_path / "prediction_history.csv"
+    path.write_text(
+        "game_id,snapshot_type,prediction_timestamp_utc,expected_margin,spread_line,model_edge\n"
+        "2026_01_NE_SEA,FINAL,lock-time,3.25,2.5,0.75\n"
+        "2026_01_SF_LA,LIVE,live-time,4.5,3.5,1.0\n",
+        encoding="utf-8",
+    )
+
+    normalize_history_for_site(path)
+
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+
+    assert rows[0]["locked_model_spread"] == "3.25"
+    assert rows[0]["locked_market_spread"] == "2.5"
+    assert rows[0]["locked_edge"] == "0.75"
+    assert rows[0]["closing_spread"] == ""
+    assert rows[1]["locked_model_spread"] == ""
+    assert rows[1]["locked_market_spread"] == ""
+    assert rows[1]["locked_edge"] == ""
+
+
+def test_closing_line_is_kept_distinct_from_lock_line(tmp_path: Path) -> None:
+    path = tmp_path / "prediction_history.csv"
+    path.write_text(
+        "game_id,snapshot_type,prediction_timestamp_utc,expected_margin,spread_line,model_edge,closing_spread_line\n"
+        "2026_01_NE_SEA,FINAL,lock-time,3.25,2.5,0.75,4.0\n",
+        encoding="utf-8",
+    )
+
+    normalize_history_for_site(path)
+
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["locked_market_spread"] == "2.5"
+    assert row["closing_spread"] == "4.0"
+    assert row["closing_spread"] != row["locked_market_spread"]
+
+
 def test_existing_lock_fields_are_preserved(tmp_path: Path) -> None:
     path = tmp_path / "prediction_history.csv"
     path.write_text(
-        "game_id,snapshot_type,prediction_timestamp_utc,lock_status,lock_timestamp_utc\n"
-        "2026_01_NE_SEA,FINAL,newer,LOCKED,original\n",
+        "game_id,snapshot_type,prediction_timestamp_utc,lock_status,lock_timestamp_utc,"
+        "locked_model_spread,locked_market_spread,locked_edge,closing_spread,"
+        "expected_margin,spread_line,model_edge\n"
+        "2026_01_NE_SEA,FINAL,newer,LOCKED,original,9.0,8.0,1.0,7.5,3.0,2.0,1.0\n",
         encoding="utf-8",
     )
 
@@ -44,3 +87,7 @@ def test_existing_lock_fields_are_preserved(tmp_path: Path) -> None:
 
     assert row["lock_status"] == "LOCKED"
     assert row["lock_timestamp_utc"] == "original"
+    assert row["locked_model_spread"] == "9.0"
+    assert row["locked_market_spread"] == "8.0"
+    assert row["locked_edge"] == "1.0"
+    assert row["closing_spread"] == "7.5"
