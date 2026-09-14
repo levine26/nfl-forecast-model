@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-13T21:26:58.579536+00:00",
+    "as_of": "2026-09-14T00:36:24.299493+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,38 +75,42 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-13T21:27:02.387795+00:00",
+    "as_of": "2026-09-14T00:36:27.680944+00:00",
     "conflicts": 0,
-    "evidence_items_added": 24,
+    "evidence_items_added": 9,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
     "seasons_loaded_end": 2025,
     "seasons_loaded_start": 2012,
     "source": "nflverse weekly player stats",
     "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
     "status": "healthy",
-    "targets": 24,
-    "verified": 24
+    "targets": 9,
+    "verified": 9
   },
   "coaching": {
-    "as_of": "2026-09-13T21:26:09.299552+00:00",
+    "as_of": "2026-09-14T00:36:06.298825+00:00",
     "current_retry_recoveries": 0,
-    "current_team_coverage": 28,
+    "current_team_coverage": 10,
     "negative_cache_ttl_minutes": 60,
     "negative_entries_retried": 0,
     "pages_missing": 0,
     "parser_version": 2,
     "parser_version_refreshes": 0,
     "refresh_attempts": 0,
-    "requested_teams": 28,
+    "requested_teams": 10,
     "source": "Wikipedia season-page rendered infoboxes + explicit staff tables",
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {},
+    "advisories": {
+      "2026_01_GB_MIN": "newer_reporting_available",
+      "2026_01_MIA_LV": "newer_reporting_available",
+      "2026_01_WAS_PHI": "newer_reporting_available"
+    },
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
-    "games_applied": 14,
-    "games_expected": 14,
+    "games_applied": 5,
+    "games_expected": 5,
     "max_age_hours": 6.0,
     "new_report_grace_minutes": 5.0,
     "skipped": {},
@@ -118,13 +122,13 @@
   },
   "editorial_finalizer": {
     "editorial_version": "story-desk-v3",
-    "games": 14,
+    "games": 5,
     "guardrail": "Final editorial pass changes only public explanation and story hierarchy, never LevLine probabilities.",
     "status": "healthy",
-    "unique_headlines": 14
+    "unique_headlines": 5
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-13T21:26:51.430842+00:00",
+    "as_of": "2026-09-14T00:36:20.519355+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -138,22 +142,22 @@
       "rpo",
       "screen"
     ],
-    "games": 14,
+    "games": 5,
     "guardrail": "Diversity ranking changes only explanatory evidence, never LevLine probabilities.",
-    "signals_added_before_diversity_filter": 99,
+    "signals_added_before_diversity_filter": 38,
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 0,
+    "evidence_repairs": 11,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
   },
   "evidence": {
-    "games": 14,
-    "generated_utc": "2026-09-13T21:26:09.000778+00:00",
+    "games": 5,
+    "generated_utc": "2026-09-14T00:36:06.037060+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 189,
+    "signals": 65,
     "status": "healthy"
   },
   "ftn": {
@@ -166,110 +170,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-13T21:26:09.000778+00:00",
-  "groq_provider_fallback": {
-    "failed_games": [
-      "2026_01_ARI_LAC",
-      "2026_01_ATL_PIT",
-      "2026_01_BAL_IND",
-      "2026_01_CHI_CAR",
-      "2026_01_CLE_JAX",
-      "2026_01_DAL_NYG",
-      "2026_01_DEN_KC",
-      "2026_01_GB_MIN",
-      "2026_01_MIA_LV",
-      "2026_01_WAS_PHI"
-    ],
-    "games": {
-      "2026_01_ARI_LAC": {
-        "chatgpt_refreshed_at_utc": "2026-09-13T22:04:22.021874+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=659, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=996, x-ratelimit-remaining-tokens=",
-        "recovered_at_utc": "2026-09-13T21:55:22.181944+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_ATL_PIT": {
-        "chatgpt_refreshed_at_utc": "2026-09-13T22:04:22.021874+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 400 class=type=invalid_request_error,code=output_parse_failed",
-        "recovered_at_utc": "2026-09-13T21:52:56.228412+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_BAL_IND": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_01_BAL_IND: paragraph1 length 116 outside 55-100",
-        "recovered_at_utc": "2026-09-13T21:50:20.361841+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_CHI_CAR": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_01_CHI_CAR: model_rationale contains a prohibited numerical/model term",
-        "recovered_at_utc": "2026-09-13T21:45:40.741780+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_CLE_JAX": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_01_CLE_JAX: paragraph1 length 46 outside 55-100",
-        "recovered_at_utc": "2026-09-13T21:51:34.552175+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_DAL_NYG": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=378, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
-        "recovered_at_utc": "2026-09-13T21:59:53.111218+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_DEN_KC": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=299, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
-        "recovered_at_utc": "2026-09-13T22:01:00.435403+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_GB_MIN": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=480, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=998, x-ratelimit-remaining-tokens=",
-        "recovered_at_utc": "2026-09-13T21:57:39.221978+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_MIA_LV": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=694, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=997, x-ratelimit-remaining-tokens=",
-        "recovered_at_utc": "2026-09-13T21:56:30.762199+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_01_WAS_PHI": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=550, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=999, x-ratelimit-remaining-tokens=",
-        "recovered_at_utc": "2026-09-13T21:58:46.182575+00:00",
-        "requires_chatgpt_refresh": false
-      }
-    },
-    "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "34784730483",
-    "status": "healthy"
-  },
+  "generated_utc": "2026-09-14T00:36:06.037060+00:00",
   "injuries": {
-    "as_of": "2026-09-13T21:26:09.156002+00:00",
+    "as_of": "2026-09-14T00:36:06.166700+00:00",
     "players": 182,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg1",
@@ -277,16 +180,14 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-13T22:01:07.875474+00:00",
+    "as_of": "2026-09-14T00:36:31.103810+00:00",
     "cross_game_titles_rejected": 0,
-    "fallback_snapshot_guardrail": "Failed-game recovery preserves the previously launch-grade media packet; a transient fallback-run media rediscovery cannot erase validated reporting authority.",
-    "fallback_snapshot_reused": true,
-    "games": 14,
-    "games_with_display_reporting": 14,
-    "games_with_reporting": 14,
-    "games_with_substantive_reporting": 11,
-    "games_with_trusted_reporting": 14,
-    "generic_titles_rejected": 6,
+    "games": 5,
+    "games_with_display_reporting": 5,
+    "games_with_reporting": 5,
+    "games_with_substantive_reporting": 4,
+    "games_with_trusted_reporting": 5,
+    "generic_titles_rejected": 2,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -298,15 +199,15 @@
         "status": "unavailable"
       }
     },
-    "signals": 56,
+    "signals": 20,
     "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-13T21:27:01.424223+00:00",
-    "evidence_items_added": 23,
+    "as_of": "2026-09-14T00:36:26.877122+00:00",
+    "evidence_items_added": 9,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
-    "qb_profiles_matched": 23,
+    "qb_profiles_matched": 9,
     "season": 2025,
     "source": "NFL Next Gen Stats via nflverse",
     "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
@@ -325,10 +226,10 @@
   },
   "personnel_usage": {
     "ambiguous_player_keys_discarded": 2,
-    "eligible_skill_injuries": 46,
-    "evidence_items_enriched": 9,
+    "eligible_skill_injuries": 16,
+    "evidence_items_enriched": 2,
     "guardrail": "Prior usage clarifies role importance but is not converted into an unvalidated point-value injury adjustment; ambiguous abbreviated-name matches are discarded.",
-    "matched_injured_players": 23,
+    "matched_injured_players": 10,
     "season": 2025,
     "source": "NFL.com official injury report + nflverse PBP usage",
     "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
@@ -337,28 +238,28 @@
   "previews": {
     "editorial_audit": {
       "counter_led_reads": [],
-      "headline_count": 14,
+      "headline_count": 5,
       "high_similarity_read_pair_count": 0,
       "high_similarity_read_pairs": [],
       "normalized_read_similarity_limit": 0.78,
-      "read_count": 14,
+      "read_count": 5,
       "read_evidence_overlap": [],
       "read_evidence_overlap_count": 0,
       "read_evidence_similarity_limit": 0.9,
       "repeated_read_sentence_count": 0,
       "repeated_read_sentences": {},
-      "unique_headlines": 14,
-      "unique_read_leads": 14
+      "unique_headlines": 5,
+      "unique_read_leads": 5
     },
     "engine": "LevLine",
-    "games": 14,
+    "games": 5,
     "generator": "Sunday Signal ranked story-spine + slate-aware voice composer",
     "guardrail": "The Read synthesizes verified context; detailed modules below retain the underlying facts and sources. Neither layer alters LevLine probabilities.",
     "status": "healthy"
   },
   "qb_history": {
     "game_level_meeting_metadata": true,
-    "games_with_player_opponent_history": 24,
+    "games_with_player_opponent_history": 9,
     "guardrail": "Historical quarterback evidence follows the player across team changes but remains explanatory and is discounted for system/personnel changes.",
     "status": "healthy",
     "team_change_safe": true
@@ -367,7 +268,7 @@
     "career_counts_published": false,
     "guardrail": "Displayed counts are explicitly recent nflverse PBP samples; short cameos do not count as meaningful games and no limited sample is presented as a career total.",
     "meaningful_game_threshold_dropbacks": 10,
-    "recent_samples_audited": 24,
+    "recent_samples_audited": 9,
     "status": "healthy"
   },
   "schedule": {
@@ -376,7 +277,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-13T21:26:12.014892+00:00",
+    "as_of": "2026-09-14T00:36:09.073382+00:00",
     "charted_plays": 47316,
     "season": 2025,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -384,8 +285,8 @@
   },
   "staff_impact": {
     "guardrail": "Coordinator impact is a historical tendency projection for explanation only; it does not alter LevLine unless separately validated out of sample.",
-    "impacts_added": 12,
-    "new_coordinator_roles": 32,
+    "impacts_added": 2,
+    "new_coordinator_roles": 13,
     "profile_status": {
       "seasons": [
         2022,
@@ -397,7 +298,7 @@
       "status": "healthy",
       "team_seasons": 128
     },
-    "roles_with_verified_prior_tendency_profile": 12,
+    "roles_with_verified_prior_tendency_profile": 2,
     "source": "Wikipedia rendered staff records + FTN charting + nflverse PBP",
     "status": "healthy"
   },
@@ -406,11 +307,11 @@
     "games_with_notebook": 4,
     "guardrail": "Rivalry, event, history and fun-fact context is explanatory only and never changes LevLine numerically.",
     "status": "healthy",
-    "story_items_added": 14
+    "story_items_added": 5
   },
   "weather": {
-    "as_of": "2026-09-13T21:26:40.376841+00:00",
-    "games_checked": 10,
-    "status": "degraded"
+    "as_of": "2026-09-14T00:36:12.284152+00:00",
+    "games_checked": 3,
+    "status": "healthy"
   }
 }

@@ -1,1469 +1,4 @@
 {
-  "2026_01_ARI_LAC": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "What Nathaniel Hackett could change in ARI: staff impact context.",
-    "case_for_pick": "LAC protection vs ARI pass rush: pass-rush leverage favors LAC.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "LAC protection vs ARI pass rush",
-        "What Nathaniel Hackett could change in ARI"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 0,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 0,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Justin Herbert vs ARI: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Jacoby Brissett vs LAC: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
-        "strength": "Strong",
-        "title": "What Nathaniel Hackett could change in ARI"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
-        "strength": "Strong",
-        "title": "ARI offense changed its decision-makers"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "LAC protection vs ARI pass rush"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "ARI explosives vs LAC prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "ARI early-down approach vs LAC"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "ARI: Garrett Williams \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "ARI: Isaiah Adams \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "ARI: Dadrion Taylor-Demerson \u2014 Out"
-      }
-    ],
-    "game_id": "2026_01_ARI_LAC",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Herbert\u2019s quick-game structure tests Arizona\u2019s pressure plan at SoFi",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 2703,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
-        "strength": "Strong",
-        "summary": "ARI's new offensive coordinator, Nathaniel Hackett, arrives with a verifiable prior-team tendency profile: less early-down pass rate (58% across NYJ 2023, NYJ 2024 versus 63% for ARI last season); less pre-snap motion (31% across NYJ 2023, NYJ 2024 versus 35% for ARI last season). That matters because first and second down dictate how often a defense gets obvious passing situations. That can force coverage declarations earlier and create leverage before the snap. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Nathaniel Hackett could change in ARI"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Garrett Williams (CB) as Out. Achilles. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.04 EPA/play last season.",
-        "title": "ARI: Garrett Williams \u2014 Out"
-      },
-      {
-        "advantage_team": "LAC",
-        "family": "pressure",
-        "sample_size": 758,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "LAC protection vs ARI pass rush"
-      }
-    ],
-    "matchup": "ARI @ LAC",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:40.813118+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
-        "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "strength": "Strong",
-        "summary": "ARI's new offensive coordinator, Nathaniel Hackett, arrives with a verifiable prior-team tendency profile: less early-down pass rate (58% across NYJ 2023, NYJ 2024 versus 63% for ARI last season); less pre-snap motion (31% across NYJ 2023, NYJ 2024 versus 35% for ARI last season). That matters because first and second down dictate how often a defense gets obvious passing situations. That can force coverage declarations earlier and create leverage before the snap. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Nathaniel Hackett could change in ARI"
-      },
-      {
-        "as_of": "2026-09-13T21:26:48.325733+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "LAC",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "LAC gave up sacks on 8.7% of pass plays last season; ARI got home on 4.5%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "LAC protection vs ARI pass rush"
-      },
-      {
-        "as_of": "2026-09-13T21:26:48.325044+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "ARI",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "ARI hit a 20+ yard pass on 6.4% of pass plays; LAC allowed one on 6.5%. The short version: ARI wants chunks, and LAC would rather make it earn twelve-play drives.",
-        "title": "ARI explosives vs LAC prevention"
-      },
-      {
-        "as_of": "2026-09-13T21:26:18.034990+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Garrett Williams (CB) as Out. Achilles. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.04 EPA/play last season.",
-        "title": "ARI: Garrett Williams \u2014 Out"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, ARI and LAC have played 2 completed games in the nflverse schedule sample: ARI is 1-1. The most recent finished LAC 15, ARI 17.",
-        "title": "ARI-LAC: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2019 through 2022 contains 2 meaningful passing games for Jacoby Brissett against LAC (2 regular season, 0 postseason). Across those games: 61 attempts, 420 passing yards, 3 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Jacoby Brissett vs LAC: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2022 through 2024 contains 2 meaningful passing games for Justin Herbert against ARI (2 regular season, 0 postseason). Across those games: 86 attempts, 623 passing yards, 3 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Justin Herbert vs ARI: career game ledger"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Arizona_Cardinals_season",
-        "summary": "ARI's new offensive coordinator, Nathaniel Hackett, arrives with a verifiable prior-team tendency profile: less early-down pass rate (58% across NYJ 2023, NYJ 2024 versus 63% for ARI last season); less pre-snap motion (31% across NYJ 2023, NYJ 2024 versus 35% for ARI last season). That matters because first and second down dictate how often a defense gets obvious passing situations. That can force coverage declarations earlier and create leverage before the snap. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Nathaniel Hackett could change in ARI"
-      }
-    ],
-    "paragraphs": [
-      "Arizona enters SoFi trying to keep Justin Herbert from settling into Mike McDaniel\u2019s quicker passing structure, while the Chargers have emphasized creating explosive gains without exposing their quarterback to the punishment he absorbed last season. The Cardinals also entered the opener managing Jeremiyah Love\u2019s ankle and Josh Sweat\u2019s knee. Arizona\u2019s path is efficient early-down offense and disruptive pressure; Los Angeles can take control if Herbert stays clean and repeatedly attacks favorable coverage leverage.",
-      "LevLine 3.0 gives the Chargers a 81.2% win probability over the Cardinals. Its frozen F-ST engine reconciles a 65.2% football-only signal with a 80.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Los Angeles Chargers -11.4, a market line of Los Angeles Chargers -9.5, and an approximate coherent score of LAC 28 \u2013 ARI 16. Los Angeles has the steadier path through quarterback efficiency and protection, while Arizona needs early-down success and consistent disruption to prevent the Chargers from controlling tempo. The pick: Los Angeles Chargers moneyline."
-    ],
-    "prediction": "LAC to win; LAC 25.4 \u2013 ARI 19.0 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NBC Sports",
-        "source_url": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/los-angeles-chargers",
-        "title": "Josh Sweat returns to practice, Jeremiyah Love remains limited"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "Los Angeles Chargers",
-        "source_url": "https://www.chargers.com/news/players-to-watch-cardinals-week-1-quentin-johnston",
-        "title": "3 Chargers Players to Watch Against Cardinals in Week 1"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "cbssports.com",
-        "source_url": "https://www.cbssports.com/nfl/news/chargers-set-to-unveil-mike-mcdaniels-offense-vs-cardinals/",
-        "title": "Chargers set to unveil Mike McDaniel's offense vs. Cardinals"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "LAC",
-      "primary_family": "pressure",
-      "primary_mode": "support",
-      "primary_title": "LAC protection vs ARI pass rush",
-      "secondary_advantage_team": "ARI",
-      "secondary_family": "explosives",
-      "secondary_title": "ARI explosives vs LAC prevention"
-    },
-    "what_could_make_us_wrong": "ARI-LAC: no sourced ARI counter clears the publication threshold."
-  },
-  "2026_01_ATL_PIT": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "What Patrick Graham could change in PIT: staff impact context.",
-    "case_for_pick": "ATL protection vs PIT pass rush: pass-rush leverage favors PIT.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "ATL protection vs PIT pass rush",
-        "What Patrick Graham could change in PIT"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 1,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 1,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Tua Tagovailoa vs PIT: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
-        "strength": "Strong",
-        "title": "What Patrick Graham could change in PIT"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Atlanta_Falcons_season",
-        "strength": "Strong",
-        "title": "ATL offense changed its decision-makers"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "ATL protection vs PIT pass rush"
-      },
-      {
-        "category": "matchup",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "PIT YAC creation vs ATL tackling"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "ATL early-down approach vs PIT"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "ATL: Tua Tagovailoa \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "ATL: Michael Penix Jr. \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "ATL: Billy Bowman Jr. \u2014 Out"
-      }
-    ],
-    "game_id": "2026_01_ATL_PIT",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Atlanta\u2019s emergency quarterback plan runs into Pittsburgh\u2019s veteran front",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 5367,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
-        "strength": "Strong",
-        "summary": "PIT's new defensive coordinator, Patrick Graham, arrives with a verifiable prior-team tendency profile: less blitz rate (12% across LV 2023, LV 2024, LV 2025 versus 19% for PIT last season). That changes the quarterback's protection calls and hot-read burden. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Patrick Graham could change in PIT"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Tua Tagovailoa (projected starting quarterback) as Out. Oblique. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.06 EPA/play last season.",
-        "title": "ATL: Tua Tagovailoa \u2014 Out"
-      },
-      {
-        "advantage_team": "PIT",
-        "family": "pressure",
-        "sample_size": 617,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "ATL gave up sacks on 4.2% of pass plays last season; PIT got home on 6.7%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "ATL protection vs PIT pass rush"
-      }
-    ],
-    "matchup": "ATL @ PIT",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:40.812150+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
-        "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "strength": "Strong",
-        "summary": "PIT's new defensive coordinator, Patrick Graham, arrives with a verifiable prior-team tendency profile: less blitz rate (12% across LV 2023, LV 2024, LV 2025 versus 19% for PIT last season). That changes the quarterback's protection calls and hot-read burden. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Patrick Graham could change in PIT"
-      },
-      {
-        "as_of": "2026-09-13T21:26:47.164569+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "PIT",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "ATL gave up sacks on 4.2% of pass plays last season; PIT got home on 6.7%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "ATL protection vs PIT pass rush"
-      },
-      {
-        "as_of": "2026-09-13T21:26:47.166142+00:00",
-        "family": "yac",
-        "label": "YAC",
-        "leader": "PIT",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "PIT averaged 6.4 yards after catch per completion; ATL allowed 4.9. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
-        "title": "PIT YAC creation vs ATL tackling"
-      },
-      {
-        "as_of": "2026-09-13T21:26:16.804030+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Tua Tagovailoa (projected starting quarterback) as Out. Oblique. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.06 EPA/play last season.",
-        "title": "ATL: Tua Tagovailoa \u2014 Out"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, ATL and PIT have played 3 completed games in the nflverse schedule sample: ATL is 0-3. The most recent finished ATL 13, PIT 20.",
-        "title": "ATL-PIT: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2022 through 2025 contains 2 meaningful passing games for Tua Tagovailoa against PIT (2 regular season, 0 postseason). Across those games: 63 attempts, 514 passing yards, 3 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Tua Tagovailoa vs PIT: career game ledger"
-      },
-      {
-        "family": "ngs_qb_profile",
-        "provenance_grade": "B",
-        "source_name": "NFL Next Gen Stats via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
-        "summary": "NFL Next Gen Stats' 2025 regular-season profile for Tua Tagovailoa, over 384 attempts: 2.65s average time to throw; -0.4 completion percentage points over expectation; 6.7 average intended air yards; 12.8% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
-        "title": "Tua Tagovailoa: Next Gen passing profile"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Pittsburgh_Steelers_season",
-        "summary": "PIT's new defensive coordinator, Patrick Graham, arrives with a verifiable prior-team tendency profile: less blitz rate (12% across LV 2023, LV 2024, LV 2025 versus 19% for PIT last season). That changes the quarterback's protection calls and hot-read burden. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Patrick Graham could change in PIT"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Atlanta_Falcons_season",
-        "summary": "ATL's new offensive coordinator, Tommy Rees, arrives with a verifiable prior-team tendency profile: less pre-snap motion (39% across CLE 2025 versus 53% for ATL last season); more shotgun usage (52% across CLE 2025 versus 38% for ATL last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Tommy Rees could change in ATL"
-      }
-    ],
-    "paragraphs": [
-      "Atlanta reached the opener with Cooper Rush starting after Tua Tagovailoa was ruled out with an oblique injury and Michael Penix Jr. remained inactive, increasing the burden on Bijan Robinson and the protection unit. Pittsburgh entered comparatively healthy, with Joey Porter Jr. its primary injury question and a defense built to create difficult passing downs. The Falcons need manageable down-and-distance and efficient touches for Robinson; the Steelers can dictate terms if their rush forces Rush into obvious dropback situations.",
-      "LevLine 3.0 gives the Steelers a 72.1% win probability over the Falcons. Its frozen F-ST engine reconciles a 62.4% football-only signal with a 71.8% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Pittsburgh Steelers -7.5, a market line of Pittsburgh Steelers -6.5, and an approximate coherent score of PIT 27 \u2013 ATL 19. Pittsburgh can pressure Atlanta\u2019s replacement-quarterback structure by winning passing downs, while the Falcons need Robinson and efficient early offense to avoid predictable situations. The pick: Pittsburgh Steelers moneyline."
-    ],
-    "prediction": "PIT to win; PIT 25.7 \u2013 ATL 20.6 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "Atlanta Falcons",
-        "source_url": "https://www.atlantafalcons.com/news/cooper-rush-takes-first-team-reps-in-wake-of-tua-tagovailoa-s-oblique-injury",
-        "title": "Cooper Rush takes first-team reps in wake of Tua Tagovailoa's oblique injury"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "Pittsburgh Steelers",
-        "source_url": "https://www.steelers.com/news/week-1-injury-report-falcons-x3059",
-        "title": "Week 1 Injury Report (Falcons)"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "PIT",
-      "primary_family": "pressure",
-      "primary_mode": "support",
-      "primary_title": "ATL protection vs PIT pass rush",
-      "secondary_advantage_team": "ATL",
-      "secondary_family": "early_down",
-      "secondary_title": "ATL early-down approach vs PIT"
-    },
-    "what_could_make_us_wrong": "ATL-PIT: no sourced ATL counter clears the publication threshold."
-  },
-  "2026_01_BAL_IND": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "BAL early-down approach vs IND: early-down leverage favors IND.",
-    "case_for_pick": "BAL protection vs IND pass rush: pass-rush leverage favors BAL.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "BAL protection vs IND pass rush",
-        "BAL early-down approach vs IND"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 2,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 2,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Lamar Jackson vs IND: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Daniel Jones vs BAL: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Baltimore_Ravens_season",
-        "strength": "Strong",
-        "title": "BAL offense changed its decision-makers"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Baltimore_Ravens_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in BAL"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "BAL protection vs IND pass rush"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "BAL early-down approach vs IND"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "IND explosives vs BAL prevention"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "BAL: Teddye Buchanan \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "BAL: Nnamdi Madubuike \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "IND: Austin Ajiake \u2014 Out"
-      }
-    ],
-    "game_id": "2026_01_BAL_IND",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Baltimore\u2019s quarterback edge meets an Indianapolis protection test",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Teddye Buchanan (LB) as Out. Knee. LevLine does not make up an injury point value for it.",
-        "title": "BAL: Teddye Buchanan \u2014 Out"
-      },
-      {
-        "advantage_team": "BAL",
-        "family": "pressure",
-        "sample_size": 533,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "BAL gave up sacks on 8.4% of pass plays last season; IND got home on 5.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "BAL protection vs IND pass rush"
-      },
-      {
-        "advantage_team": "IND",
-        "family": "early_down",
-        "sample_size": 533,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass. IND allowed +0.10. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "BAL early-down approach vs IND"
-      }
-    ],
-    "matchup": "BAL @ IND",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:15.422584+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Teddye Buchanan (LB) as Out. Knee. LevLine does not make up an injury point value for it.",
-        "title": "BAL: Teddye Buchanan \u2014 Out"
-      },
-      {
-        "as_of": "2026-09-13T21:26:46.280307+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "BAL",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "BAL gave up sacks on 8.4% of pass plays last season; IND got home on 5.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "BAL protection vs IND pass rush"
-      },
-      {
-        "as_of": "2026-09-13T21:26:46.280932+00:00",
-        "family": "early_down",
-        "label": "Early downs",
-        "leader": "IND",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass. IND allowed +0.10. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "BAL early-down approach vs IND"
-      },
-      {
-        "as_of": "2026-09-13T21:26:46.281666+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "BAL",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "IND hit a 20+ yard pass on 6.9% of pass plays; BAL allowed one on 9.3%. The short version: IND wants chunks, and BAL would rather make it earn twelve-play drives.",
-        "title": "IND explosives vs BAL prevention"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, BAL and IND have played 3 completed games in the nflverse schedule sample: BAL is 2-1. The most recent finished BAL 41, IND 23.",
-        "title": "BAL-IND: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2020 through 2023 contains 3 meaningful passing games for Lamar Jackson against IND (3 regular season, 0 postseason). Across those games: 97 attempts, 814 passing yards, 4 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Lamar Jackson vs IND: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2020 through 2022 contains 2 meaningful passing games for Daniel Jones against BAL (2 regular season, 0 postseason). Across those games: 68 attempts, 425 passing yards, 3 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Daniel Jones vs BAL: career game ledger"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Baltimore_Ravens_season",
-        "summary": "BAL's new offensive coordinator, Declan Doyle, arrives with a verifiable prior-team tendency profile: more early-down pass rate (51% across CHI 2025 versus 42% for BAL last season); more overall pass rate (55% across CHI 2025 versus 48% for BAL last season). That matters because first and second down dictate how often a defense gets obvious passing situations. That would change how aggressively defenses can play the run across the full game script. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Declan Doyle could change in BAL"
-      }
-    ],
-    "paragraphs": [
-      "Baltimore brings Lamar Jackson and Derrick Henry into Indianapolis, where the Colts are starting Daniel Jones after his Achilles recovery. The Ravens\u2019 rushing threat can punish light boxes and turn broken structure into explosive gains, while Indianapolis needs Jonathan Taylor and a controlled passing plan to keep the game out of Jackson\u2019s preferred tempo. With Baltimore missing interior disruptor Nnamdi Madubuike, the Colts have a better chance to stay balanced, but protection and third-down efficiency remain the central stress points.",
-      "LevLine 3.0 gives the Ravens a 63.0% win probability over the Colts. Its frozen F-ST engine reconciles a 58.7% football-only signal with a 60.9% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Baltimore Ravens -4.3, a market line of Baltimore Ravens -3.5, and an approximate coherent score of BAL 25 \u2013 IND 20. Baltimore has the stronger quarterback-driven ceiling, while Indianapolis needs efficient protection, a productive run game and disciplined third downs to keep the matchup compressed. The pick: Baltimore Ravens moneyline."
-    ],
-    "prediction": "BAL to win; IND 20.6 \u2013 BAL 24.3 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
-        "title": "NFL Week 1 injury report: Player statuses for all 16 games"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "baltimoreravens.com",
-        "source_url": "https://www.baltimoreravens.com/video/ravens-colts-week-1-game-highlights",
-        "title": "Full Highlights: Ravens vs. Colts"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "The New York Times",
-        "source_url": "https://www.nytimes.com/athletic/7590384/2026/09/13/ravens-colts-nfl-2026-score-result-takeaways/",
-        "title": "Ravens, Lamar Jackson overwhelm Colts, but how concerning are WR injuries?"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "BAL",
-      "primary_family": "pressure",
-      "primary_mode": "support",
-      "primary_title": "BAL protection vs IND pass rush",
-      "secondary_advantage_team": "IND",
-      "secondary_family": "early_down",
-      "secondary_title": "BAL early-down approach vs IND"
-    },
-    "what_could_make_us_wrong": "IND's counter in BAL-IND: BAL early-down approach vs IND: early-down leverage favors IND."
-  },
-  "2026_01_BUF_HOU": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "BUF protection vs HOU pass rush: pass-rush leverage favors HOU.",
-    "case_for_pick": "BUF early-down approach vs HOU: early-down leverage favors BUF.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "BUF early-down approach vs HOU",
-        "BUF protection vs HOU pass rush"
-      ],
-      "media_led": true,
-      "media_source_count": 3,
-      "primary_variant": 3,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 3,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Moderate",
-        "title": "Josh Allen vs HOU: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse PBP + Wikipedia staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Houston_Texans_season",
-        "strength": "Weak",
-        "title": "Josh Allen vs Matt Burke's HOU defense"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Buffalo_Bills_season",
-        "strength": "Strong",
-        "title": "BUF offense changed its decision-makers"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Buffalo_Bills_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in BUF"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "BUF early-down approach vs HOU"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "BUF protection vs HOU pass rush"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "HOU explosives vs BUF prevention"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "BUF: Jordan Hancock \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "BUF: T.J. Sanders \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "BUF: Ty Johnson \u2014 Questionable"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in HOU"
-      }
-    ],
-    "game_id": "2026_01_BUF_HOU",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Bills edge Texans with late surge in season opener",
-    "key_factors": [
-      {
-        "advantage_team": "BUF",
-        "family": "early_down",
-        "sample_size": 706,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "BUF threw on 50% of first- and second-down plays and averaged +0.20 EPA per early-down pass. HOU allowed -0.16. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "BUF early-down approach vs HOU"
-      },
-      {
-        "advantage_team": "HOU",
-        "family": "pressure",
-        "sample_size": 706,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "BUF gave up sacks on 6.2% of pass plays last season; HOU got home on 7.6%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "BUF protection vs HOU pass rush"
-      },
-      {
-        "advantage_team": "HOU",
-        "family": "explosives",
-        "sample_size": 706,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "HOU hit a 20+ yard pass on 6.9% of pass plays; BUF allowed one on 7.2%. The short version: HOU wants chunks, and BUF would rather make it earn twelve-play drives.",
-        "title": "HOU explosives vs BUF prevention"
-      }
-    ],
-    "matchup": "BUF @ HOU",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:14.805725+00:00",
-        "family": "coaching",
-        "label": "Staff",
-        "leader": "Watch",
-        "source_name": "Wikipedia season staff records",
-        "strength": "Strong",
-        "summary": "BUF enters 2026 with head coach Joe Brady and offensive coordinator Pete Carmichael. Older matchup history gets a haircut here: the people calling the offense are different.",
-        "title": "BUF offense changed its decision-makers"
-      },
-      {
-        "as_of": "2026-09-13T21:26:45.845825+00:00",
-        "family": "early_down",
-        "label": "Early downs",
-        "leader": "BUF",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "BUF threw on 50% of first- and second-down plays and averaged +0.20 EPA per early-down pass. HOU allowed -0.16. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "BUF early-down approach vs HOU"
-      },
-      {
-        "as_of": "2026-09-13T21:26:45.845160+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "HOU",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "BUF gave up sacks on 6.2% of pass plays last season; HOU got home on 7.6%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "BUF protection vs HOU pass rush"
-      },
-      {
-        "as_of": "2026-09-13T21:26:45.846643+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "HOU",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "HOU hit a 20+ yard pass on 6.9% of pass plays; BUF allowed one on 7.2%. The short version: HOU wants chunks, and BUF would rather make it earn twelve-play drives.",
-        "title": "HOU explosives vs BUF prevention"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, BUF and HOU have played 4 completed games in the nflverse schedule sample: BUF is 2-2. The most recent finished BUF 36, HOU 31.",
-        "title": "BUF-HOU: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2018 through 2025 contains 5 meaningful passing games for Josh Allen against HOU (4 regular season, 1 postseason). Across those games: 157 attempts, 980 passing yards, 3 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Josh Allen vs HOU: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2024 through 2024 contains 1 meaningful passing games for C.J. Stroud against BUF (1 regular season, 0 postseason). Across those games: 38 attempts, 331 passing yards, 1 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "C.J. Stroud vs BUF: career game ledger"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Buffalo_Bills_season",
-        "summary": "BUF's new offensive coordinator, Pete Carmichael, arrives with a verifiable prior-team tendency profile: less pre-snap motion (24% across NO 2023 versus 50% for BUF last season); more shotgun usage (50% across NO 2023 versus 41% for BUF last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Pete Carmichael could change in BUF"
-      }
-    ],
-    "paragraphs": [
-      "The Bills and Texans clashed in a thrilling Week 1 matchup, with Buffalo ultimately emerging victorious 36-31. The game was marked by a strong performance from Bills quarterback Josh Allen, who led his team on a crucial late drive. Houston's defense, known for its pass-rushing prowess, posed a significant challenge to Allen and the Buffalo offense. Conversely, the Texans' offense, led by C.J. Stroud, sought to exploit the Bills' defense.",
-      "LevLine 3.0 gives the Bills a 52.6% win probability over the Texans. Its frozen F-ST engine reconciles a 48.1% football-only signal with a 50.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Buffalo Bills -0.8, a market line of Buffalo Bills -1.5, and an approximate coherent score of BUF 24 \u2013 HOU 23. Bills' early-down rushing against Texans' front determines whether Bills can control down-and-distance; efficient Bills runs would force Texans into less favorable defensive situations. The pick: Buffalo Bills moneyline."
-    ],
-    "prediction": "BUF to win; HOU 23.0 \u2013 BUF 23.4 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NBC Sports",
-        "source_url": "https://www.nbcsports.com/nfl/news/bills-texans-week-1-game-recap",
-        "title": "Bills score late, then stop Texans to win 36-31 in classic"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "houstontexans.com",
-        "source_url": "https://www.houstontexans.com/video/c-j-stroud-35-yard-connection-to-jaylin-noel-gets-texans-deep-into-bills-territory",
-        "title": "C.J. Stroud 35-yard connection to Jaylin Noel gets Texans deep into Bills' territory"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "BUF",
-      "primary_family": "early_down",
-      "primary_mode": "support",
-      "primary_title": "BUF early-down approach vs HOU",
-      "secondary_advantage_team": "HOU",
-      "secondary_family": "pressure",
-      "secondary_title": "BUF protection vs HOU pass rush"
-    },
-    "what_could_make_us_wrong": "HOU's counter in BUF-HOU: BUF protection vs HOU pass rush: pass-rush leverage favors HOU."
-  },
-  "2026_01_CHI_CAR": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "What Press Taylor could change in CHI: staff impact context.",
-    "case_for_pick": "CAR explosives vs CHI prevention: explosive-pass leverage favors CHI.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "CAR explosives vs CHI prevention",
-        "What Press Taylor could change in CHI"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 4,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 4,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Bryce Young vs CHI: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse PBP + Wikipedia staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Carolina_Panthers_season",
-        "strength": "Weak",
-        "title": "Caleb Williams vs Ejiro Evero's CAR defense"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
-        "strength": "Strong",
-        "title": "What Press Taylor could change in CHI"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
-        "strength": "Strong",
-        "title": "CHI offense changed its decision-makers"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "CAR explosives vs CHI prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "CHI play action vs CAR"
-      },
-      {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Moderate",
-        "title": "CAR RPOs vs CHI"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "CAR: Patrick Jones II \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "CHI: Tyson Bagent \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "CHI: Rome Odunze \u2014 Questionable"
-      }
-    ],
-    "game_id": "2026_01_CHI_CAR",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Chicago\u2019s explosive offense tests Carolina\u2019s rebuilt pass rush",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 4088,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
-        "strength": "Strong",
-        "summary": "CHI's new offensive coordinator, Press Taylor, arrives with a verifiable prior-team tendency profile: more shotgun usage (62% across JAX 2022, JAX 2023, JAX 2024 versus 42% for CHI last season); less pre-snap motion (33% across JAX 2022, JAX 2023, JAX 2024 versus 47% for CHI last season). That changes the protection and play-action picture defenses see most often. That can force coverage declarations earlier and create leverage before the snap. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Press Taylor could change in CHI"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Patrick Jones II (LB) as Out. Back. LevLine does not make up an injury point value for it.",
-        "title": "CAR: Patrick Jones II \u2014 Out"
-      },
-      {
-        "advantage_team": "CHI",
-        "family": "explosives",
-        "sample_size": 668,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. The short version: CAR wants chunks, and CHI would rather make it earn twelve-play drives.",
-        "title": "CAR explosives vs CHI prevention"
-      }
-    ],
-    "matchup": "CHI @ CAR",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:40.809553+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
-        "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "strength": "Strong",
-        "summary": "CHI's new offensive coordinator, Press Taylor, arrives with a verifiable prior-team tendency profile: more shotgun usage (62% across JAX 2022, JAX 2023, JAX 2024 versus 42% for CHI last season); less pre-snap motion (33% across JAX 2022, JAX 2023, JAX 2024 versus 47% for CHI last season). That changes the protection and play-action picture defenses see most often. That can force coverage declarations earlier and create leverage before the snap. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Press Taylor could change in CHI"
-      },
-      {
-        "as_of": "2026-09-13T21:26:44.507060+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "CHI",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "CAR hit a 20+ yard pass on 7.2% of pass plays; CHI allowed one on 10.1%. The short version: CAR wants chunks, and CHI would rather make it earn twelve-play drives.",
-        "title": "CAR explosives vs CHI prevention"
-      },
-      {
-        "as_of": "2026-09-13T21:26:12.696654+00:00",
-        "family": "play_action",
-        "label": "Play action",
-        "leader": "Watch",
-        "source_name": "FTN Data via nflverse",
-        "strength": "Strong",
-        "summary": "CHI used play action on 15% of charted plays in 2025, versus a league median of 11%, and produced +0.16 EPA/play on those snaps. CAR allowed -0.03 EPA/play against the same concept. The offense and defense are good at the same thing. Something has to give; for now this stays in the scouting report, not the formula.",
-        "title": "CHI play action vs CAR"
-      },
-      {
-        "as_of": "2026-09-13T21:26:12.694161+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Patrick Jones II (LB) as Out. Back. LevLine does not make up an injury point value for it.",
-        "title": "CAR: Patrick Jones II \u2014 Out"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, CHI and CAR have played 3 completed games in the nflverse schedule sample: CHI is 3-0. The most recent finished CHI 59, CAR 37.",
-        "title": "CHI-CAR: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2024 through 2024 contains 1 meaningful passing games for Caleb Williams against CAR (1 regular season, 0 postseason). Across those games: 29 attempts, 304 passing yards, 2 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Caleb Williams vs CAR: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2023 through 2023 contains 1 meaningful passing games for Bryce Young against CHI (1 regular season, 0 postseason). Across those games: 38 attempts, 185 passing yards, 0 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Bryce Young vs CHI: career game ledger"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Chicago_Bears_season",
-        "summary": "CHI's new offensive coordinator, Press Taylor, arrives with a verifiable prior-team tendency profile: more shotgun usage (62% across JAX 2022, JAX 2023, JAX 2024 versus 42% for CHI last season); less pre-snap motion (33% across JAX 2022, JAX 2023, JAX 2024 versus 47% for CHI last season). That changes the protection and play-action picture defenses see most often. That can force coverage declarations earlier and create leverage before the snap. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Press Taylor could change in CHI"
-      }
-    ],
-    "paragraphs": [
-      "Chicago arrives with Caleb Williams directing Ben Johnson\u2019s offense after the Bears finished last season among the league leaders in explosive plays. Carolina added Jaelan Phillips to a pass rush that needed more disruption, but Patrick Jones II is unavailable and the Panthers must also account for Chicago\u2019s tight ends and play-action structure. Bryce Young\u2019s best counter is to keep Carolina ahead of the chains and avoid feeding a Bears defense that generated turnovers at a high rate last season.",
-      "LevLine 3.0 gives the Bears a 62.6% win probability over the Panthers. Its frozen F-ST engine reconciles a 57.3% football-only signal with a 60.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -4.1, a market line of Chicago Bears -3.0, and an approximate coherent score of CHI 24 \u2013 CAR 20. Chicago can create stress through explosive plays and formation versatility, while Carolina needs clean early downs, ball security and consistent pressure to prevent the Bears from controlling tempo. The pick: Chicago Bears moneyline."
-    ],
-    "prediction": "CHI to win; CAR 21.2 \u2013 CHI 23.4 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
-        "title": "NFL Week 1 injury report: Player statuses for all 16 games"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "chicagobears.com",
-        "source_url": "https://www.chicagobears.com/news/game-preview-bears-at-panthers-2026-week-1",
-        "title": "Game Preview: Bears at Panthers | 2026 Week 1"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "CHI",
-      "primary_family": "explosives",
-      "primary_mode": "support",
-      "primary_title": "CAR explosives vs CHI prevention",
-      "secondary_advantage_team": "CHI",
-      "secondary_family": "qb_opponent_history",
-      "secondary_title": "Bryce Young vs CHI: player history"
-    },
-    "what_could_make_us_wrong": "CHI-CAR: no sourced CAR counter clears the publication threshold."
-  },
-  "2026_01_CLE_JAX": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "CLE protection vs JAX pass rush: pass-rush leverage favors CLE.",
-    "case_for_pick": "CLE explosives vs JAX prevention: explosive-pass leverage favors JAX.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "CLE explosives vs JAX prevention",
-        "CLE protection vs JAX pass rush"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 5,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 5,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Trevor Lawrence vs CLE: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Deshaun Watson vs JAX: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Cleveland_Browns_season",
-        "strength": "Strong",
-        "title": "CLE offense changed its decision-makers"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Cleveland_Browns_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in CLE"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "CLE explosives vs JAX prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "CLE protection vs JAX pass rush"
-      },
-      {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "JAX pre-snap motion vs CLE"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "CLE: Teven Jenkins \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "CLE: Parker Brailsford \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "JAX: LeQuint Allen Jr. \u2014 Questionable"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=30.3239&longitude=-81.6373&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in JAX"
-      }
-    ],
-    "game_id": "2026_01_CLE_JAX",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Cleveland\u2019s rebuilt offense faces Jacksonville\u2019s continuity advantage",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Teven Jenkins (G) as Out. Back. LevLine does not make up an injury point value for it. That matters a little more against JAX, which generated sacks on 4.2% of opponent pass plays last season.",
-        "title": "CLE: Teven Jenkins \u2014 Out"
-      },
-      {
-        "advantage_team": "JAX",
-        "family": "explosives",
-        "sample_size": 681,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "CLE hit a 20+ yard pass on 5.1% of pass plays; JAX allowed one on 6.3%. The short version: CLE wants chunks, and JAX would rather make it earn twelve-play drives.",
-        "title": "CLE explosives vs JAX prevention"
-      },
-      {
-        "advantage_team": "CLE",
-        "family": "pressure",
-        "sample_size": 681,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "CLE protection vs JAX pass rush"
-      }
-    ],
-    "matchup": "CLE @ JAX",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:16.111865+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Teven Jenkins (G) as Out. Back. LevLine does not make up an injury point value for it. That matters a little more against JAX, which generated sacks on 4.2% of opponent pass plays last season.",
-        "title": "CLE: Teven Jenkins \u2014 Out"
-      },
-      {
-        "as_of": "2026-09-13T21:26:46.729743+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "JAX",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "CLE hit a 20+ yard pass on 5.1% of pass plays; JAX allowed one on 6.3%. The short version: CLE wants chunks, and JAX would rather make it earn twelve-play drives.",
-        "title": "CLE explosives vs JAX prevention"
-      },
-      {
-        "as_of": "2026-09-13T21:26:46.729321+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "CLE",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "CLE gave up sacks on 7.5% of pass plays last season; JAX got home on 4.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "CLE protection vs JAX pass rush"
-      },
-      {
-        "as_of": "2026-09-13T21:26:16.116312+00:00",
-        "family": "motion",
-        "label": "Motion",
-        "leader": "Watch",
-        "source_name": "FTN Data via nflverse",
-        "strength": "Strong",
-        "summary": "JAX used pre-snap motion on 47% of charted plays in 2025, versus a league median of 43%, and produced +0.07 EPA/play on those snaps. CLE allowed -0.16 EPA/play against the same concept. The offense and defense are good at the same thing. Something has to give; for now this stays in the scouting report, not the formula.",
-        "title": "JAX pre-snap motion vs CLE"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, CLE and JAX have played 3 completed games in the nflverse schedule sample: CLE is 2-1. The most recent finished CLE 10, JAX 34.",
-        "title": "CLE-JAX: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2017 through 2024 contains 8 meaningful passing games for Deshaun Watson against JAX (8 regular season, 0 postseason). Across those games: 240 attempts, 1,661 passing yards, 9 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Deshaun Watson vs JAX: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2023 through 2024 contains 2 meaningful passing games for Trevor Lawrence against CLE (2 regular season, 0 postseason). Across those games: 80 attempts, 477 passing yards, 3 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Trevor Lawrence vs CLE: career game ledger"
-      }
-    ],
-    "paragraphs": [
-      "Cleveland opens a new chapter under Todd Monken with Deshaun Watson returning from his Achilles injury, while Jacksonville brings back a largely intact staff and core after winning the AFC South. The Browns\u2019 offensive line has undergone changes, making protection against Josh Hines-Allen and Jacksonville\u2019s front an immediate concern. Trevor Lawrence has the benefit of system continuity, but Cleveland\u2019s defensive front can shorten the game if it creates pressure without sacrificing run fits. Sacks and early-down efficiency should determine which offense stays on schedule.",
-      "LevLine 3.0 gives the Jaguars a 78.1% win probability over the Browns. Its frozen F-ST engine reconciles a 78.3% football-only signal with a 79.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Jacksonville Jaguars -10.0, a market line of Jacksonville Jaguars -8.5, and an approximate coherent score of JAX 28 \u2013 CLE 18. Jacksonville owns the steadier offensive environment, while Cleveland\u2019s upset path depends on protecting Watson, avoiding negative plays and creating enough defensive pressure to disrupt Lawrence\u2019s rhythm. The pick: Jacksonville Jaguars moneyline."
-    ],
-    "prediction": "JAX to win; JAX 29.8 \u2013 CLE 16.1 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "NFL.com",
-        "source_url": "https://www.nfl.com/news/nfl-week-1-injury-report-2026-season",
-        "title": "NFL Week 1 injury report: Player statuses for all 16 games"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "jaguars.com",
-        "source_url": "https://www.jaguars.com/video/browns-vs-jaguars-week-1-highlights",
-        "title": "Browns vs. Jaguars: Week 1 Highlights"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "JAX",
-      "primary_family": "explosives",
-      "primary_mode": "support",
-      "primary_title": "CLE explosives vs JAX prevention",
-      "secondary_advantage_team": "CLE",
-      "secondary_family": "pressure",
-      "secondary_title": "CLE protection vs JAX pass rush"
-    },
-    "what_could_make_us_wrong": "CLE's counter in CLE-JAX: CLE protection vs JAX pass rush: pass-rush leverage favors CLE."
-  },
   "2026_01_DAL_NYG": {
     "brand": "Sunday Signal",
     "case_for_opponent": "What Matt Nagy could change in NYG: staff impact context.",
@@ -1482,10 +17,10 @@
       ],
       "media_led": true,
       "media_source_count": 3,
-      "primary_variant": 6,
+      "primary_variant": 0,
       "provider_freshness_advisory": null,
       "reporting_first": true,
-      "secondary_variant": 6,
+      "secondary_variant": 0,
       "slate_aware": true,
       "two_paragraph_contract": true
     },
@@ -1514,10 +49,10 @@
       },
       {
         "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_name": "Wikipedia season staff records",
         "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
         "strength": "Strong",
-        "title": "What Dennard Wilson could change in NYG"
+        "title": "New defensive coordinator in NYG"
       },
       {
         "category": "scheme",
@@ -1600,7 +135,7 @@
     "matchup": "DAL @ NYG",
     "matchup_meter": [
       {
-        "as_of": "2026-09-13T21:26:56.349950+00:00",
+        "as_of": "2026-09-14T00:36:22.609837+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -1610,7 +145,7 @@
         "title": "Dak Prescott vs NYG: player history"
       },
       {
-        "as_of": "2026-09-13T21:26:50.460480+00:00",
+        "as_of": "2026-09-14T00:36:19.314915+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -1620,7 +155,7 @@
         "title": "NYG explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-13T21:26:50.460052+00:00",
+        "as_of": "2026-09-14T00:36:19.314425+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -1630,7 +165,7 @@
         "title": "NYG protection vs DAL pass rush"
       },
       {
-        "as_of": "2026-09-13T21:26:40.815218+00:00",
+        "as_of": "2026-09-14T00:36:12.932375+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1683,7 +218,7 @@
       "Dallas enters the NFC East opener with Dak Prescott throwing to CeeDee Lamb and George Pickens, but the Cowboys will be without starting left guard Tyler Smith. New York begins the John Harbaugh era with Jaxson Dart at quarterback and uncertainty around Malik Nabers as he returns from a torn ACL. The Giants\u2019 front must exploit Dallas\u2019 interior protection issue before Prescott can attack isolated coverage. New York, meanwhile, needs enough explosive offense to avoid asking its defense to survive long stretches against Dallas\u2019 receiver talent.",
       "LevLine 3.0 gives the Cowboys a 63.0% win probability over the Giants. Its frozen F-ST engine reconciles a 52.4% football-only signal with a 60.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Dallas Cowboys -4.3, a market line of Dallas Cowboys -3.0, and an approximate coherent score of DAL 24 \u2013 NYG 20. Dallas has the more established passing-game ceiling, but New York can tilt the matchup by disrupting interior protection and keeping its own offense out of obvious passing situations. The pick: Dallas Cowboys moneyline."
     ],
-    "prediction": "DAL to win; NYG 22.5 \u2013 DAL 21.0 is the central score projection.",
+    "prediction": "DAL to win; NYG 22.1 \u2013 DAL 21.7 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-13T22:04:21.868168+00:00",
@@ -1728,10 +263,10 @@
       ],
       "media_led": true,
       "media_source_count": 4,
-      "primary_variant": 7,
+      "primary_variant": 1,
       "provider_freshness_advisory": null,
       "reporting_first": true,
-      "secondary_variant": 7,
+      "secondary_variant": 1,
       "slate_aware": true,
       "two_paragraph_contract": true
     },
@@ -1806,6 +341,13 @@
         "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
         "strength": "Moderate",
         "title": "KC: Chris Jones \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+        "strength": "Strong",
+        "title": "Kickoff weather in KC"
       }
     ],
     "game_id": "2026_01_DEN_KC",
@@ -1846,7 +388,7 @@
     "matchup": "DEN @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-13T21:26:56.737315+00:00",
+        "as_of": "2026-09-14T00:36:23.163508+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "KC",
@@ -1856,7 +398,7 @@
         "title": "Patrick Mahomes vs DEN: player history"
       },
       {
-        "as_of": "2026-09-13T21:26:50.948549+00:00",
+        "as_of": "2026-09-14T00:36:19.914137+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -1866,7 +408,7 @@
         "title": "KC protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-13T21:26:50.949129+00:00",
+        "as_of": "2026-09-14T00:36:19.914930+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -1876,7 +418,7 @@
         "title": "KC early-down approach vs DEN"
       },
       {
-        "as_of": "2026-09-13T21:26:40.815858+00:00",
+        "as_of": "2026-09-14T00:36:12.932764+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1929,7 +471,7 @@
       "Kansas City expects Patrick Mahomes to return from last season\u2019s major knee injury, giving the Chiefs their offensive centerpiece back for a divisional opener against Denver. The Broncos counter with Bo Nix, a defense coming off a strong season and a receiving corps upgraded by Jaylen Waddle. Kansas City\u2019s rebuilt secondary will be tested vertically, while Denver must account for Mahomes\u2019 quick-game answers and Kenneth Walker III in the backfield. Protection, movement in the pocket and explosive passing efficiency are the matchup\u2019s defining variables.",
       "LevLine 3.0 gives the Chiefs a 58.1% win probability over the Broncos. Its frozen F-ST engine reconciles a 31.6% football-only signal with a 55.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -2.6, a market line of Kansas City Chiefs -2.5, and an approximate coherent score of KC 24 \u2013 DEN 21. Kansas City\u2019s offense regains its defining quarterback, while Denver can create leverage through pressure and a deeper receiving group if it forces the Chiefs into uncomfortable long-yardage situations. The pick: Kansas City Chiefs moneyline."
     ],
-    "prediction": "KC to win; KC 19.7 \u2013 DEN 25.3 is the central score projection.",
+    "prediction": "KC to win; KC 19.9 \u2013 DEN 25.4 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-13T22:04:21.868168+00:00",
@@ -1973,11 +515,11 @@
         "GB: Warren Brinson \u2014 Out"
       ],
       "media_led": true,
-      "media_source_count": 3,
-      "primary_variant": 8,
-      "provider_freshness_advisory": null,
+      "media_source_count": 4,
+      "primary_variant": 2,
+      "provider_freshness_advisory": "newer_reporting_available",
       "reporting_first": true,
-      "secondary_variant": 8,
+      "secondary_variant": 2,
       "slate_aware": true,
       "two_paragraph_contract": true
     },
@@ -2085,7 +627,7 @@
     "matchup": "GB @ MIN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-13T21:26:55.605419+00:00",
+        "as_of": "2026-09-14T00:36:21.532244+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "GB",
@@ -2095,7 +637,7 @@
         "title": "Jordan Love vs MIN: player history"
       },
       {
-        "as_of": "2026-09-13T21:26:49.430386+00:00",
+        "as_of": "2026-09-14T00:36:18.094720+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "GB",
@@ -2105,7 +647,7 @@
         "title": "GB explosives vs MIN prevention"
       },
       {
-        "as_of": "2026-09-13T21:26:49.431038+00:00",
+        "as_of": "2026-09-14T00:36:18.095574+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
@@ -2115,7 +657,7 @@
         "title": "MIN protection vs GB pass rush"
       },
       {
-        "as_of": "2026-09-13T21:26:18.364989+00:00",
+        "as_of": "2026-09-14T00:36:10.224670+00:00",
         "family": "availability",
         "label": "Availability",
         "leader": "Watch",
@@ -2128,7 +670,7 @@
     "notebook": [
       {
         "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, Packers and Vikings have played 10 completed games in the nflverse schedule sample: Packers is 4-6. The most recent finished Packers 3, Vikings 16.",
+        "summary": "Since 2021, Packers and Vikings have played 11 completed games in the nflverse schedule sample: Packers is 4-7. The most recent finished Packers 22, Vikings 39.",
         "title": "Packers-Vikings: division rivalry"
       },
       {
@@ -2136,7 +678,7 @@
         "provenance_grade": null,
         "source_name": "nflverse schedule/results",
         "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, GB and MIN have played 10 completed games in the nflverse schedule sample: GB is 4-6. The most recent finished GB 3, MIN 16.",
+        "summary": "Since 2021, GB and MIN have played 11 completed games in the nflverse schedule sample: GB is 4-7. The most recent finished GB 22, MIN 39.",
         "title": "GB-MIN: division rivalry"
       },
       {
@@ -2158,9 +700,9 @@
     ],
     "paragraphs": [
       "Green Bay heads to Minnesota without Josh Jacobs and Micah Parsons, removing major pieces from both sides of the ball. The Packers still have Jordan Love, but an inexperienced backfield must produce enough efficiency to keep Minnesota\u2019s rush from controlling obvious passing downs. The Vikings are trying to restore their passing game and can lean on Justin Jefferson while stressing Green Bay\u2019s thinner defensive front. Inside a loud divisional road environment, protection communication, run-game efficiency and the ability to generate explosives without inviting negative plays should decide the matchup.",
-      "LevLine 3.0 gives the Vikings a 51.4% win probability over the Packers. Its frozen F-ST engine reconciles a 59.9% football-only signal with a 54.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Minnesota Vikings -0.5, a market line of Minnesota Vikings -1.5, and an approximate coherent score of MIN 22 \u2013 GB 21. Minnesota can attack Green Bay\u2019s missing star power and home-field environment, while the Packers need composed protection and efficient early downs to keep the game structurally balanced. The pick: Minnesota Vikings moneyline."
+      "LevLine 3.0 gives the Vikings a 50.2% win probability over the Packers. Its frozen F-ST engine reconciles a 59.9% football-only signal with a 53.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Minnesota Vikings -0.1, a market line of Minnesota Vikings -1.5, and an approximate coherent score of MIN 23 \u2013 GB 22. Minnesota can attack Green Bay\u2019s missing star power and home-field environment, while the Packers need composed protection and efficient early downs to keep the game structurally balanced. The pick: Minnesota Vikings moneyline."
     ],
-    "prediction": "MIN to win; MIN 23.8 \u2013 GB 19.5 is the central score projection.",
+    "prediction": "MIN to win; MIN 23.7 \u2013 GB 20.0 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-13T22:04:21.868168+00:00",
@@ -2207,14 +749,14 @@
       "game_specific": true,
       "lead_items": [
         "LV early-down approach vs MIA",
-        "What Bobby Slowik could change in MIA"
+        "LV: Brock Bowers \u2014 Out"
       ],
       "media_led": true,
       "media_source_count": 3,
-      "primary_variant": 9,
-      "provider_freshness_advisory": null,
+      "primary_variant": 3,
+      "provider_freshness_advisory": "newer_reporting_available",
       "reporting_first": true,
-      "secondary_variant": 9,
+      "secondary_variant": 3,
       "slate_aware": true,
       "two_paragraph_contract": true
     },
@@ -2229,17 +771,17 @@
       },
       {
         "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
-        "strength": "Strong",
-        "title": "What Bobby Slowik could change in MIA"
-      },
-      {
-        "category": "coaching",
         "source_name": "Wikipedia season staff records",
         "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
         "strength": "Strong",
         "title": "MIA offense changed its decision-makers"
+      },
+      {
+        "category": "coaching",
+        "source_name": "Wikipedia season staff records",
+        "source_url": "https://en.wikipedia.org/wiki/2026_Las_Vegas_Raiders_season",
+        "strength": "Strong",
+        "title": "New defensive coordinator in LV"
       },
       {
         "category": "scheme",
@@ -2283,16 +825,6 @@
     "key_factors": [
       {
         "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 3084,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
-        "strength": "Strong",
-        "summary": "MIA's new offensive coordinator, Bobby Slowik, arrives with a verifiable prior-team tendency profile: less pre-snap motion (42% across HOU 2023, HOU 2024 versus 56% for MIA last season); more shotgun usage (47% across HOU 2023, HOU 2024 versus 42% for MIA last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Bobby Slowik could change in MIA"
-      },
-      {
-        "advantage_team": null,
         "family": "availability",
         "sample_size": null,
         "source_name": "NFL.com official injury report + nflverse usage",
@@ -2310,22 +842,32 @@
         "strength": "Strong",
         "summary": "LV threw on 57% of first- and second-down plays and averaged -0.11 EPA per early-down pass. MIA allowed +0.19. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
         "title": "LV early-down approach vs MIA"
+      },
+      {
+        "advantage_team": "MIA",
+        "family": "explosives",
+        "sample_size": 558,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "MIA hit a 20+ yard pass on 7.7% of pass plays; LV allowed one on 5.9%. The short version: MIA wants chunks, and LV would rather make it earn twelve-play drives.",
+        "title": "MIA explosives vs LV prevention"
       }
     ],
     "matchup": "MIA @ LV",
     "matchup_meter": [
       {
-        "as_of": "2026-09-13T21:26:40.813722+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
+        "as_of": "2026-09-14T00:36:09.993530+00:00",
+        "family": "availability",
+        "label": "Availability",
         "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
+        "source_name": "NFL.com official injury report + nflverse usage",
         "strength": "Strong",
-        "summary": "MIA's new offensive coordinator, Bobby Slowik, arrives with a verifiable prior-team tendency profile: less pre-snap motion (42% across HOU 2023, HOU 2024 versus 56% for MIA last season); more shotgun usage (47% across HOU 2023, HOU 2024 versus 42% for MIA last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Bobby Slowik could change in MIA"
+        "summary": "The official NFL injury report lists Brock Bowers (TE) as Out. Knee. LevLine does not make up an injury point value for it. In 2025, he accounted for 18% of the team's recorded targets (87). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was +0.17 EPA/play last season.",
+        "title": "LV: Brock Bowers \u2014 Out"
       },
       {
-        "as_of": "2026-09-13T21:26:48.950839+00:00",
+        "as_of": "2026-09-14T00:36:17.474673+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "MIA",
@@ -2335,7 +877,7 @@
         "title": "LV early-down approach vs MIA"
       },
       {
-        "as_of": "2026-09-13T21:26:48.949468+00:00",
+        "as_of": "2026-09-14T00:36:17.473001+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "MIA",
@@ -2345,14 +887,14 @@
         "title": "MIA explosives vs LV prevention"
       },
       {
-        "as_of": "2026-09-13T21:26:18.304792+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report + nflverse usage",
+        "as_of": "2026-09-14T00:36:17.473883+00:00",
+        "family": "pressure",
+        "label": "Pressure",
+        "leader": "LV",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Brock Bowers (TE) as Out. Knee. LevLine does not make up an injury point value for it. In 2025, he accounted for 18% of the team's recorded targets (87). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was +0.17 EPA/play last season.",
-        "title": "LV: Brock Bowers \u2014 Out"
+        "summary": "LV gave up sacks on 10.1% of pass plays last season; MIA got home on 6.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "title": "LV protection vs MIA pass rush"
       }
     ],
     "notebook": [
@@ -2361,7 +903,7 @@
         "provenance_grade": null,
         "source_name": "nflverse schedule/results",
         "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, MIA and LV have played 3 completed games in the nflverse schedule sample: MIA is 2-1. The most recent finished LV 19, MIA 34.",
+        "summary": "Since 2021, MIA and LV have played 4 completed games in the nflverse schedule sample: MIA is 2-2. The most recent finished MIA 13, LV 27.",
         "title": "MIA-LV: recent series"
       },
       {
@@ -2379,21 +921,13 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
         "summary": "NFL Next Gen Stats' 2025 regular-season profile for Kirk Cousins, over 269 attempts: 2.78s average time to throw; -1.7 completion percentage points over expectation; 6.9 average intended air yards; 17.5% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
         "title": "Kirk Cousins: Next Gen passing profile"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Miami_Dolphins_season",
-        "summary": "MIA's new offensive coordinator, Bobby Slowik, arrives with a verifiable prior-team tendency profile: less pre-snap motion (42% across HOU 2023, HOU 2024 versus 56% for MIA last season); more shotgun usage (47% across HOU 2023, HOU 2024 versus 42% for MIA last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Bobby Slowik could change in MIA"
       }
     ],
     "paragraphs": [
       "Las Vegas will play without Brock Bowers, removing the Raiders\u2019 most difficult matchup piece and placing more responsibility on Ashton Jeanty and the remaining receiving group. Miami enters without a game-status injury designation and can pressure the Raiders by winning early downs and forcing predictable passing situations. Jeanty\u2019s return gives Las Vegas a route to stay balanced, but the Raiders need sustained efficiency rather than isolated chunk plays. Miami\u2019s tackling and ability to prevent a slow, possession-heavy game will shape whether Bowers\u2019 absence becomes decisive.",
       "LevLine 3.0 gives the Raiders a 63.4% win probability over the Dolphins. Its frozen F-ST engine reconciles a 35.5% football-only signal with a 60.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Las Vegas Raiders -4.4, a market line of Las Vegas Raiders -3.0, and an approximate coherent score of LV 24 \u2013 MIA 20. Miami has the cleaner availability picture, while Las Vegas needs Jeanty, efficient early downs and complementary targets to keep the Dolphins from dictating obvious passing situations. The pick: Las Vegas Raiders moneyline."
     ],
-    "prediction": "LV to win; LV 20.0 \u2013 MIA 23.5 is the central score projection.",
+    "prediction": "LV to win; LV 20.6 \u2013 MIA 23.8 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-13T22:04:21.868168+00:00",
@@ -2420,720 +954,6 @@
     },
     "what_could_make_us_wrong": "MIA's counter in MIA-LV: LV early-down approach vs MIA: early-down leverage favors MIA."
   },
-  "2026_01_NO_DET": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "What Drew Petzing could change in DET: staff impact context.",
-    "case_for_pick": "NO explosives vs DET prevention: explosive-pass leverage favors DET.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "NO explosives vs DET prevention",
-        "What Drew Petzing could change in DET"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 10,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 10,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Jared Goff vs NO: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Detroit_Lions_season",
-        "strength": "Strong",
-        "title": "What Drew Petzing could change in DET"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Detroit_Lions_season",
-        "strength": "Strong",
-        "title": "DET offense changed its decision-makers"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "NO explosives vs DET prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "NO protection vs DET pass rush"
-      },
-      {
-        "category": "matchup",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "DET YAC creation vs NO tackling"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "NO: Oscar Delp \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "NO: Cameron Jordan \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "NO: Audric Estim\u00e9 \u2014 Out"
-      }
-    ],
-    "game_id": "2026_01_NO_DET",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Lions' explosive plays spark overtime victory over Saints",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 4121,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Detroit_Lions_season",
-        "strength": "Strong",
-        "summary": "DET's new offensive coordinator, Drew Petzing, arrives with a verifiable prior-team tendency profile: less pre-snap motion (31% across ARI 2023, ARI 2024, ARI 2025 versus 47% for DET last season); more shotgun usage (54% across ARI 2023, ARI 2024, ARI 2025 versus 41% for DET last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Drew Petzing could change in DET"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Oscar Delp (TE) as Out. Hamstring. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.04 EPA/play last season.",
-        "title": "NO: Oscar Delp \u2014 Out"
-      },
-      {
-        "advantage_team": "DET",
-        "family": "explosives",
-        "sample_size": 650,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "NO hit a 20+ yard pass on 4.8% of pass plays; DET allowed one on 8.5%. The short version: NO wants chunks, and DET would rather make it earn twelve-play drives.",
-        "title": "NO explosives vs DET prevention"
-      }
-    ],
-    "matchup": "NO @ DET",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:40.810320+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
-        "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "strength": "Strong",
-        "summary": "DET's new offensive coordinator, Drew Petzing, arrives with a verifiable prior-team tendency profile: less pre-snap motion (31% across ARI 2023, ARI 2024, ARI 2025 versus 47% for DET last season); more shotgun usage (54% across ARI 2023, ARI 2024, ARI 2025 versus 41% for DET last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Drew Petzing could change in DET"
-      },
-      {
-        "as_of": "2026-09-13T21:26:45.389201+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "DET",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "NO hit a 20+ yard pass on 4.8% of pass plays; DET allowed one on 8.5%. The short version: NO wants chunks, and DET would rather make it earn twelve-play drives.",
-        "title": "NO explosives vs DET prevention"
-      },
-      {
-        "as_of": "2026-09-13T21:26:45.388755+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "DET",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "NO gave up sacks on 6.9% of pass plays last season; DET got home on 7.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "NO protection vs DET pass rush"
-      },
-      {
-        "as_of": "2026-09-13T21:26:14.269087+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Oscar Delp (TE) as Out. Hamstring. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.04 EPA/play last season.",
-        "title": "NO: Oscar Delp \u2014 Out"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, NO and DET have played 2 completed games in the nflverse schedule sample: NO is 0-2. The most recent finished NO 30, DET 31.",
-        "title": "NO-DET: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2016 through 2023 contains 6 meaningful passing games for Jared Goff against NO (5 regular season, 1 postseason). Across those games: 208 attempts, 1,752 passing yards, 12 TD, 4 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Jared Goff vs NO: career game ledger"
-      },
-      {
-        "family": "ngs_qb_profile",
-        "provenance_grade": "B",
-        "source_name": "NFL Next Gen Stats via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
-        "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jared Goff, over 578 attempts: 2.70s average time to throw; +1.7 completion percentage points over expectation; 6.8 average intended air yards; 12.5% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
-        "title": "Jared Goff: Next Gen passing profile"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Detroit_Lions_season",
-        "summary": "DET's new offensive coordinator, Drew Petzing, arrives with a verifiable prior-team tendency profile: less pre-snap motion (31% across ARI 2023, ARI 2024, ARI 2025 versus 47% for DET last season); more shotgun usage (54% across ARI 2023, ARI 2024, ARI 2025 versus 41% for DET last season). That can force coverage declarations earlier and create leverage before the snap. That changes the protection and play-action picture defenses see most often. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Drew Petzing could change in DET"
-      }
-    ],
-    "paragraphs": [
-      "The Detroit Lions' ability to create explosive plays and the New Orleans Saints' struggles to prevent them were crucial in the Lions' 31-30 overtime victory. The Saints' offense was efficient, but Tyler Shough's interceptions and fumble set up Lions' scores. Jared Goff's two touchdown passes to Amon-Ra St. Brown, including one in overtime, sealed the win. The Lions' running back Jahmyr Gibbs had 29 carries for 156 yards and two touchdowns.",
-      "LevLine 3.0 gives the Lions a 74.4% win probability over the Saints. Its frozen F-ST engine reconciles a 59.3% football-only signal with a 73.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Detroit Lions -8.5, a market line of Detroit Lions -7.0, and an approximate coherent score of DET 27 \u2013 NO 19. Lions' explosive-play discipline against Saints determines whether Lions can avoid sudden swings against Saints; if discipline favors Lions, Saints' shortcut scoring chances shrink. The pick: Detroit Lions moneyline."
-    ],
-    "prediction": "DET to win; DET 24.7 \u2013 NO 21.1 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "Associated Press News",
-        "source_url": "https://apnews.com/article/nfl-lions-saints-game-recap-20260913140000",
-        "title": "Lions escape with 31-30 win over Saints in OT"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "neworleanssaints.com",
-        "source_url": "https://www.neworleanssaints.com/video/tyler-shough-noah-fant-overtime-touchdown-saints-lions-highlights-2026-nfl-week-1",
-        "title": "Tyler Shough connects with Noah Fant on overtime touchdown | Saints-Lions Highlights | 2026 NFL Week 1"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "DET",
-      "primary_family": "explosives",
-      "primary_mode": "support",
-      "primary_title": "NO explosives vs DET prevention",
-      "secondary_advantage_team": "DET",
-      "secondary_family": "pressure",
-      "secondary_title": "NO protection vs DET pass rush"
-    },
-    "what_could_make_us_wrong": "NO-DET: no sourced NO counter clears the publication threshold."
-  },
-  "2026_01_NYJ_TEN": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "NYJ explosives vs TEN prevention: explosive-pass leverage favors TEN.",
-    "case_for_pick": "TEN early-down approach vs NYJ: early-down leverage favors NYJ.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "TEN early-down approach vs NYJ",
-        "NYJ explosives vs TEN prevention"
-      ],
-      "media_led": true,
-      "media_source_count": 3,
-      "primary_variant": 11,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 11,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Geno Smith vs TEN: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Jets_season",
-        "strength": "Strong",
-        "title": "NYJ offense changed its decision-makers"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Tennessee_Titans_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in TEN"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "NYJ explosives vs TEN prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "TEN early-down approach vs NYJ"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "TEN protection vs NYJ pass rush"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "NYJ: Tim Patrick \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "NYJ: Joseph Ossai \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "NYJ: D'Angelo Ponds \u2014 Doubtful"
-      }
-    ],
-    "game_id": "2026_01_NYJ_TEN",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Jets\u2019 explosive start forces Titans into a defensive scramble",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Tim Patrick (WR) as Out. Groin. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.20 EPA/play last season.",
-        "title": "NYJ: Tim Patrick \u2014 Out"
-      },
-      {
-        "advantage_team": "TEN",
-        "family": "explosives",
-        "sample_size": 636,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "NYJ hit a 20+ yard pass on 4.4% of pass plays; TEN allowed one on 9.5%. The short version: NYJ wants chunks, and TEN would rather make it earn twelve-play drives.",
-        "title": "NYJ explosives vs TEN prevention"
-      },
-      {
-        "advantage_team": "NYJ",
-        "family": "early_down",
-        "sample_size": 636,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "TEN threw on 58% of first- and second-down plays and averaged -0.10 EPA per early-down pass. NYJ allowed +0.33. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "TEN early-down approach vs NYJ"
-      }
-    ],
-    "matchup": "NYJ @ TEN",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:17.573209+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Tim Patrick (WR) as Out. Groin. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.20 EPA/play last season.",
-        "title": "NYJ: Tim Patrick \u2014 Out"
-      },
-      {
-        "as_of": "2026-09-13T21:26:47.605092+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "TEN",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "NYJ hit a 20+ yard pass on 4.4% of pass plays; TEN allowed one on 9.5%. The short version: NYJ wants chunks, and TEN would rather make it earn twelve-play drives.",
-        "title": "NYJ explosives vs TEN prevention"
-      },
-      {
-        "as_of": "2026-09-13T21:26:47.606395+00:00",
-        "family": "early_down",
-        "label": "Early downs",
-        "leader": "NYJ",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "TEN threw on 58% of first- and second-down plays and averaged -0.10 EPA per early-down pass. NYJ allowed +0.33. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "TEN early-down approach vs NYJ"
-      },
-      {
-        "as_of": "2026-09-13T21:26:47.605798+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "TEN",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "TEN gave up sacks on 8.2% of pass plays last season; NYJ got home on 4.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "TEN protection vs NYJ pass rush"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, NYJ and TEN have played 3 completed games in the nflverse schedule sample: NYJ is 3-0. The most recent finished NYJ 23, TEN 10.",
-        "title": "NYJ-TEN: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2013 through 2025 contains 4 meaningful passing games for Geno Smith against TEN (4 regular season, 0 postseason). Across those games: 121 attempts, 869 passing yards, 5 TD, 3 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Geno Smith vs TEN: career game ledger"
-      },
-      {
-        "family": "ngs_qb_profile",
-        "provenance_grade": "B",
-        "source_name": "NFL Next Gen Stats via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
-        "summary": "NFL Next Gen Stats' 2025 regular-season profile for Geno Smith, over 448 attempts: 2.80s average time to throw; +1.6 completion percentage points over expectation; 6.6 average intended air yards; 15.4% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
-        "title": "Geno Smith: Next Gen passing profile"
-      }
-    ],
-    "paragraphs": [
-      "The Jets entered with a revitalized offense under Frank Reich, leaning on Breece Hall\u2019s 102\u2011yard rushing performance and Geno Smith\u2019s efficient passing. Tennessee\u2019s early\u2011down struggles and inability to contain New York\u2019s balanced attack set the tone, allowing the Jets to dominate time of possession and keep the Titans off the field.",
-      "LevLine 3.0 gives the Jets a 50.9% win probability over the Titans. Its frozen F-ST engine reconciles a 43.5% football-only signal with a 48.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of New York Jets -0.3, a market line of Tennessee Titans -1.5, and an approximate coherent score of NYJ 24 \u2013 TEN 23. Jets' balanced attack and fresh offensive scheme clash with Titans' struggling early\u2011down efficiency, giving New York a clear path to control tempo through dominance. The pick: New York Jets moneyline."
-    ],
-    "prediction": "NYJ to win; TEN 23.7 \u2013 NYJ 22.1 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "newyorkjets.com",
-        "source_url": "https://www.newyorkjets.com/news/jets-vs-titans-week-1-2026-geno-smith-demario-davis-homecoming-09-13-2026",
-        "title": "Jets-Titans Game Preview | The Story Begins"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "espn.com",
-        "source_url": "https://www.espn.com/nfl/story/_/id/49930796/jets-wr-cooper-safety-fitzpatrick-hurt-titans",
-        "title": "Jets WR Cooper, safety Fitzpatrick both hurt against Titans"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "Associated Press News",
-        "source_url": "https://apnews.com/article/jets-titans-score-1262a31cfd0f44e0987f860c2f5bef89",
-        "title": "Breece Hall powers Jets past Titans 23-10 in a dominant season opener against their former coach"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "NYJ",
-      "primary_family": "early_down",
-      "primary_mode": "support",
-      "primary_title": "TEN early-down approach vs NYJ",
-      "secondary_advantage_team": "TEN",
-      "secondary_family": "explosives",
-      "secondary_title": "NYJ explosives vs TEN prevention"
-    },
-    "what_could_make_us_wrong": "TEN's counter in NYJ-TEN: NYJ explosives vs TEN prevention: explosive-pass leverage favors TEN."
-  },
-  "2026_01_TB_CIN": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "What Zac Robinson could change in TB: staff impact context.",
-    "case_for_pick": "TB explosives vs CIN prevention: explosive-pass leverage favors CIN.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "TB explosives vs CIN prevention",
-        "What Zac Robinson could change in TB"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 12,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 12,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Baker Mayfield vs CIN: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Joe Burrow vs TB: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Tampa_Bay_Buccaneers_season",
-        "strength": "Strong",
-        "title": "What Zac Robinson could change in TB"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Tampa_Bay_Buccaneers_season",
-        "strength": "Strong",
-        "title": "TB offense changed its decision-makers"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "TB explosives vs CIN prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "CIN early-down approach vs TB"
-      },
-      {
-        "category": "matchup",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "TB YAC creation vs CIN tackling"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "TB: Jalen McMillan \u2014 Doubtful"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "TB: Justin Skule \u2014 Doubtful"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "TB: Sean Tucker \u2014 Doubtful"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0955&longitude=-84.5161&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in CIN"
-      }
-    ],
-    "game_id": "2026_01_TB_CIN",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Bengals' rebuilt defense shines in win over fumbling Buccaneers",
-    "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 2759,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Tampa_Bay_Buccaneers_season",
-        "strength": "Strong",
-        "summary": "TB's new offensive coordinator, Zac Robinson, arrives with a verifiable prior-team tendency profile: less shotgun usage (37% across ATL 2024, ATL 2025 versus 50% for TB last season); less RPO usage (3% across ATL 2024, ATL 2025 versus 6% for TB last season). That changes the protection and play-action picture defenses see most often. That changes the conflict rules for second-level defenders. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Zac Robinson could change in TB"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Jalen McMillan (WR) as Doubtful. Knee. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.18 EPA/play last season.",
-        "title": "TB: Jalen McMillan \u2014 Doubtful"
-      },
-      {
-        "advantage_team": "CIN",
-        "family": "explosives",
-        "sample_size": 690,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "TB hit a 20+ yard pass on 8.7% of pass plays; CIN allowed one on 9.5%. The short version: TB wants chunks, and CIN would rather make it earn twelve-play drives.",
-        "title": "TB explosives vs CIN prevention"
-      }
-    ],
-    "matchup": "TB @ CIN",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-13T21:26:40.809960+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
-        "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "strength": "Strong",
-        "summary": "TB's new offensive coordinator, Zac Robinson, arrives with a verifiable prior-team tendency profile: less shotgun usage (37% across ATL 2024, ATL 2025 versus 50% for TB last season); less RPO usage (3% across ATL 2024, ATL 2025 versus 6% for TB last season). That changes the protection and play-action picture defenses see most often. That changes the conflict rules for second-level defenders. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Zac Robinson could change in TB"
-      },
-      {
-        "as_of": "2026-09-13T21:26:44.952277+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "CIN",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "TB hit a 20+ yard pass on 8.7% of pass plays; CIN allowed one on 9.5%. The short version: TB wants chunks, and CIN would rather make it earn twelve-play drives.",
-        "title": "TB explosives vs CIN prevention"
-      },
-      {
-        "as_of": "2026-09-13T21:26:44.953463+00:00",
-        "family": "early_down",
-        "label": "Early downs",
-        "leader": "TB",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "CIN threw on 60% of first- and second-down plays and averaged -0.05 EPA per early-down pass. TB allowed +0.14. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "CIN early-down approach vs TB"
-      },
-      {
-        "as_of": "2026-09-13T21:26:13.586149+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Jalen McMillan (WR) as Doubtful. Knee. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.18 EPA/play last season.",
-        "title": "TB: Jalen McMillan \u2014 Doubtful"
-      }
-    ],
-    "notebook": [
-      {
-        "family": "recent_series",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, TB and CIN have played 2 completed games in the nflverse schedule sample: TB is 0-2. The most recent finished TB 27, CIN 33.",
-        "title": "TB-CIN: recent series"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2018 through 2022 contains 8 meaningful passing games for Baker Mayfield against CIN (8 regular season, 0 postseason). Across those games: 206 attempts, 1,902 passing yards, 21 TD, 7 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Baker Mayfield vs CIN: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2022 through 2022 contains 1 meaningful passing games for Joe Burrow against TB (1 regular season, 0 postseason). Across those games: 39 attempts, 200 passing yards, 4 TD, 1 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Joe Burrow vs TB: career game ledger"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_Tampa_Bay_Buccaneers_season",
-        "summary": "TB's new offensive coordinator, Zac Robinson, arrives with a verifiable prior-team tendency profile: less shotgun usage (37% across ATL 2024, ATL 2025 versus 50% for TB last season); less RPO usage (3% across ATL 2024, ATL 2025 versus 6% for TB last season). That changes the protection and play-action picture defenses see most often. That changes the conflict rules for second-level defenders. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Zac Robinson could change in TB"
-      }
-    ],
-    "paragraphs": [
-      "The Cincinnati Bengals' rebuilt defense forced four turnovers and Joe Burrow threw for a touchdown in their 33-27 win over the Tampa Bay Buccaneers. The Bengals' defense, which has been revamped with new players, played a crucial role in the win. Joe Burrow completed 25-of-35 passes for 254 yards and a touchdown, while the Bengals' running back Chase Brown had 16 carries for 56 yards and a score. The Buccaneers' quarterback Baker Mayfield had a tough game, throwing three fumbles, two of which were recovered by the Bengals.",
-      "LevLine 3.0 gives the Bengals a 62.9% win probability over the Buccaneers. Its frozen F-ST engine reconciles a 64.3% football-only signal with a 64.5% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Cincinnati Bengals -4.2, a market line of Cincinnati Bengals -3.5, and an approximate coherent score of CIN 25 \u2013 TB 21. Bengals' quarterback execution against Buccaneers' structure determines whether Bengals can sustain drives; steady Bengals quarterback play would give Buccaneers fewer obvious passing situations. The pick: Cincinnati Bengals moneyline."
-    ],
-    "prediction": "CIN to win; CIN 25.5 \u2013 TB 20.1 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "nytimes.com",
-        "source_url": "https://www.nytimes.com/2026/09/13/sports/nfl/bengals-buccaneers.html",
-        "title": "Rebuilt Bengals defense shines in win over fumbling Buccaneers"
-      },
-      {
-        "as_of": "2026-09-13T22:04:21.868168+00:00",
-        "source_name": "apnews.com",
-        "source_url": "https://apnews.com/article/nfl/cincinnati-bengals-tampa-bay-buccaneers-game-analysis-20260913-44a944a944a944a944",
-        "title": "Bengals force 4 turnovers, Burrow throws for TD in 33-27 win over the Buccaneers"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "CIN",
-      "primary_family": "explosives",
-      "primary_mode": "support",
-      "primary_title": "TB explosives vs CIN prevention",
-      "secondary_advantage_team": "TB",
-      "secondary_family": "early_down",
-      "secondary_title": "CIN early-down approach vs TB"
-    },
-    "what_could_make_us_wrong": "TB-CIN: no sourced TB counter clears the publication threshold."
-  },
   "2026_01_WAS_PHI": {
     "brand": "Sunday Signal",
     "case_for_opponent": "PHI YAC creation vs WAS tackling: yards after the catch evidence.",
@@ -3151,11 +971,11 @@
         "PHI YAC creation vs WAS tackling"
       ],
       "media_led": true,
-      "media_source_count": 3,
-      "primary_variant": 13,
-      "provider_freshness_advisory": null,
+      "media_source_count": 4,
+      "primary_variant": 4,
+      "provider_freshness_advisory": "newer_reporting_available",
       "reporting_first": true,
-      "secondary_variant": 13,
+      "secondary_variant": 4,
       "slate_aware": true,
       "two_paragraph_contract": true
     },
@@ -3270,7 +1090,7 @@
     "matchup": "WAS @ PHI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-13T21:26:55.996522+00:00",
+        "as_of": "2026-09-14T00:36:22.094698+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "PHI",
@@ -3280,7 +1100,7 @@
         "title": "Jalen Hurts vs WAS: player history"
       },
       {
-        "as_of": "2026-09-13T21:26:49.919504+00:00",
+        "as_of": "2026-09-14T00:36:18.697856+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "WAS",
@@ -3290,7 +1110,7 @@
         "title": "PHI YAC creation vs WAS tackling"
       },
       {
-        "as_of": "2026-09-13T21:26:49.919224+00:00",
+        "as_of": "2026-09-14T00:36:18.697513+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "WAS",
@@ -3300,7 +1120,7 @@
         "title": "PHI explosives vs WAS prevention"
       },
       {
-        "as_of": "2026-09-13T21:26:18.632579+00:00",
+        "as_of": "2026-09-14T00:36:10.706778+00:00",
         "family": "availability",
         "label": "Availability",
         "leader": "Watch",
@@ -3313,7 +1133,7 @@
     "notebook": [
       {
         "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, Commanders and Eagles have played 11 completed games in the nflverse schedule sample: Commanders is 3-8. The most recent finished Commanders 24, Eagles 17.",
+        "summary": "Since 2021, Commanders and Eagles have played 12 completed games in the nflverse schedule sample: Commanders is 3-9. The most recent finished Commanders 22, Eagles 24.",
         "title": "Commanders-Eagles: division rivalry"
       },
       {
@@ -3321,7 +1141,7 @@
         "provenance_grade": null,
         "source_name": "nflverse schedule/results",
         "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, WAS and PHI have played 11 completed games in the nflverse schedule sample: WAS is 3-8. The most recent finished WAS 24, PHI 17.",
+        "summary": "Since 2021, WAS and PHI have played 12 completed games in the nflverse schedule sample: WAS is 3-9. The most recent finished WAS 22, PHI 24.",
         "title": "WAS-PHI: division rivalry"
       },
       {
@@ -3343,9 +1163,9 @@
     ],
     "paragraphs": [
       "Philadelphia opens its title defense with Jalen Hurts leading an offense that has changed coordinators again but retained its physical identity. Washington is trying to rebound after a five-win season and needs Jayden Daniels healthy enough to restore the creation ability that powered his rookie breakout. The Eagles will be without edge rusher Jonathan Greenard, giving Washington some relief in protection, but Philadelphia can still create pressure with its remaining rotation. Early-down rushing efficiency, protection around Daniels and Hurts\u2019 ability to punish broken contain should drive the divisional matchup.",
-      "LevLine 3.0 gives the Eagles a 68.6% win probability over the Commanders. Its frozen F-ST engine reconciles a 66.8% football-only signal with a 69.6% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Philadelphia Eagles -6.3, a market line of Philadelphia Eagles -6.0, and an approximate coherent score of PHI 27 \u2013 WAS 21. Philadelphia has the more stable offensive and defensive foundation, while Washington needs Daniels to create efficiently and its protection to prevent the Eagles from controlling obvious passing downs. The pick: Philadelphia Eagles moneyline."
+      "LevLine 3.0 gives the Eagles a 66.8% win probability over the Commanders. Its frozen F-ST engine reconciles a 66.8% football-only signal with a 68.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Philadelphia Eagles -5.6, a market line of Philadelphia Eagles -6.0, and an approximate coherent score of PHI 26 \u2013 WAS 21. Philadelphia has the more stable offensive and defensive foundation, while Washington needs Daniels to create efficiently and its protection to prevent the Eagles from controlling obvious passing downs. The pick: Philadelphia Eagles moneyline."
     ],
-    "prediction": "PHI to win; PHI 27.0 \u2013 WAS 20.6 is the central score projection.",
+    "prediction": "PHI to win; PHI 26.4 \u2013 WAS 20.8 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-13T22:04:21.868168+00:00",
