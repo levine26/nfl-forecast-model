@@ -18,8 +18,9 @@ for (const [name, width, height] of viewports) {
     await expect(page.locator('.ss-brand-lockup:visible').first().getByText('SUNDAY SIGNAL')).toBeVisible()
     await expect(page.getByText(/BETTER INFORMATION/i)).toBeVisible()
     await expect(page.getByText('FIND YOUR GAME')).toBeVisible()
-    await expect(page.locator('.ss-exp-top-signals:visible').getByText('TOP SIGNALS')).toBeVisible()
-    await expect(page.getByText('Largest Edge vs Market', { exact: true })).toBeVisible()
+    const topSignals = page.locator('.ss-exp-top-signals:visible')
+    await expect(topSignals.getByText('TOP SIGNALS')).toBeVisible()
+    await expect(topSignals.locator('button').first()).toBeVisible()
     await expect(page.getByRole('button', { name: 'Win Probability', exact: true })).toBeVisible()
     if (width > 768) {
       await expect(page.locator('.ss-exp-board-labels:visible').getByText('LEVLINE FAIR SPREAD', { exact: true })).toBeVisible()
@@ -149,7 +150,9 @@ test('matchup presentation reads the canonical official probability and official
 test('History remains a first-class 2026 receipts surface with calibration and signal-tier accountability', async ({ page }) => {
   await page.goto('./#/history')
   await expect(page.getByText(/2026 PICKS OF RECORD/i)).toBeVisible()
-  await expect(page.getByText(/Immutable pregame receipts/i)).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Immutable pregame receipts.' })).toBeVisible()
+  await expect(page.getByText('BET TRACKER', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /What 1 unit on every LevLine pick would have done/i })).toBeVisible()
   await expect(page.getByText('PERFORMANCE BY SIGNAL TIER')).toBeVisible()
   await expect(page.getByText('PROBABILITY CALIBRATION')).toBeVisible()
   await expect(page.getByText('THE SUNDAY SIGNAL STANDARD')).toBeVisible()
