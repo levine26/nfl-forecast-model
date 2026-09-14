@@ -1,256 +1,4 @@
 {
-  "2026_01_DAL_NYG": {
-    "brand": "Sunday Signal",
-    "case_for_opponent": "What Matt Nagy could change in NYG: staff impact context.",
-    "case_for_pick": "Dak Prescott vs NYG: player history: quarterback history context.",
-    "editorial_version": "story-desk-v3",
-    "editorial_voice": {
-      "copilot_researched": true,
-      "evidence_led": true,
-      "explicit_final_pick": true,
-      "explicit_model_explanation": true,
-      "fallback_templates_used": false,
-      "game_specific": true,
-      "lead_items": [
-        "Dak Prescott vs NYG: player history",
-        "What Matt Nagy could change in NYG"
-      ],
-      "media_led": true,
-      "media_source_count": 4,
-      "primary_variant": 0,
-      "provider_freshness_advisory": null,
-      "reporting_first": true,
-      "secondary_variant": 0,
-      "slate_aware": true,
-      "two_paragraph_contract": true
-    },
-    "engine": "LevLine",
-    "evidence_used": [
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "title": "Dak Prescott vs NYG: player history"
-      },
-      {
-        "category": "history",
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Weak",
-        "title": "Jaxson Dart vs DAL: player history"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-        "strength": "Strong",
-        "title": "What Matt Nagy could change in NYG"
-      },
-      {
-        "category": "coaching",
-        "source_name": "Wikipedia season staff records",
-        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-        "strength": "Strong",
-        "title": "New defensive coordinator in NYG"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "NYG explosives vs DAL prevention"
-      },
-      {
-        "category": "scheme",
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "title": "NYG protection vs DAL pass rush"
-      },
-      {
-        "category": "scheme",
-        "source_name": "FTN Data via nflverse",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Moderate",
-        "title": "DAL RPOs vs NYG"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "title": "DAL: Malik Davis \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "NYG: Malik Nabers \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Moderate",
-        "title": "DAL: Luke Schoonmaker \u2014 Did Not Participate In Practice"
-      }
-    ],
-    "game_id": "2026_01_DAL_NYG",
-    "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Giants' physicality, Jaxson Dart's poise under pressure prove too much for Cowboys",
-    "key_factors": [
-      {
-        "advantage_team": "DAL",
-        "family": "qb_opponent_history",
-        "sample_size": 257,
-        "source_name": "nflverse play-by-play",
-        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-        "strength": "Strong",
-        "summary": "In the nflverse play-by-play sample since 2021, Dak Prescott has 8 meaningful games against NYG; the most recent was last season, Week 18. Over 257 charted dropbacks in those games, he averaged +0.24 EPA/dropback with a 51% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
-        "title": "Dak Prescott vs NYG: player history"
-      },
-      {
-        "advantage_team": null,
-        "family": "staff_impact",
-        "sample_size": 4645,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-        "strength": "Strong",
-        "summary": "NYG's new offensive coordinator, Matt Nagy, arrives with a verifiable prior-team tendency profile: more pre-snap motion (46% across KC 2023, KC 2024, KC 2025 versus 31% for NYG last season); more early-down pass rate (56% across KC 2023, KC 2024, KC 2025 versus 47% for NYG last season). That can force coverage declarations earlier and create leverage before the snap. That matters because first and second down dictate how often a defense gets obvious passing situations. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Matt Nagy could change in NYG"
-      },
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Malik Davis (RB) as Out. Hip. LevLine does not make up an injury point value for it. In 2025, he represented 11% of team rushes (52). Usage is context for the role at risk, not an automatic forecast adjustment. The run-game backdrop is NYG at +0.15 rushing EPA allowed per play last season.",
-        "title": "DAL: Malik Davis \u2014 Out"
-      }
-    ],
-    "matchup": "DAL @ NYG",
-    "matchup_meter": [
-      {
-        "as_of": "2026-09-14T12:35:20.071230+00:00",
-        "family": "qb_opponent_history",
-        "label": "QB history",
-        "leader": "DAL",
-        "source_name": "nflverse play-by-play",
-        "strength": "Strong",
-        "summary": "In the nflverse play-by-play sample since 2021, Dak Prescott has 8 meaningful games against NYG; the most recent was last season, Week 18. Over 257 charted dropbacks in those games, he averaged +0.24 EPA/dropback with a 51% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
-        "title": "Dak Prescott vs NYG: player history"
-      },
-      {
-        "as_of": "2026-09-14T12:35:18.324012+00:00",
-        "family": "explosives",
-        "label": "Explosives",
-        "leader": "DAL",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. The short version: NYG wants chunks, and DAL would rather make it earn twelve-play drives.",
-        "title": "NYG explosives vs DAL prevention"
-      },
-      {
-        "as_of": "2026-09-14T12:35:18.323498+00:00",
-        "family": "pressure",
-        "label": "Pressure",
-        "leader": "NYG",
-        "source_name": "nflverse PBP + FTN charting",
-        "strength": "Strong",
-        "summary": "NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-        "title": "NYG protection vs DAL pass rush"
-      },
-      {
-        "as_of": "2026-09-14T12:35:13.841302+00:00",
-        "family": "staff_impact",
-        "label": "Staff Impact",
-        "leader": "Watch",
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "strength": "Strong",
-        "summary": "NYG's new offensive coordinator, Matt Nagy, arrives with a verifiable prior-team tendency profile: more pre-snap motion (46% across KC 2023, KC 2024, KC 2025 versus 31% for NYG last season); more early-down pass rate (56% across KC 2023, KC 2024, KC 2025 versus 47% for NYG last season). That can force coverage declarations earlier and create leverage before the snap. That matters because first and second down dictate how often a defense gets obvious passing situations. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Matt Nagy could change in NYG"
-      }
-    ],
-    "notebook": [
-      {
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, Cowboys and Giants have played 11 completed games in the nflverse schedule sample: Cowboys is 9-2. The most recent finished Cowboys 20, Giants 28.",
-        "title": "Cowboys-Giants: division rivalry"
-      },
-      {
-        "family": "rivalry",
-        "provenance_grade": null,
-        "source_name": "nflverse schedule/results",
-        "source_url": "https://github.com/nflverse/nfldata",
-        "summary": "Since 2021, DAL and NYG have played 11 completed games in the nflverse schedule sample: DAL is 9-2. The most recent finished DAL 20, NYG 28.",
-        "title": "DAL-NYG: division rivalry"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2016 through 2025 contains 17 meaningful passing games for Dak Prescott against NYG (17 regular season, 0 postseason). Across those games: 556 attempts, 4,346 passing yards, 31 TD, 9 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Dak Prescott vs NYG: career game ledger"
-      },
-      {
-        "family": "career_qb_opponent_ledger",
-        "provenance_grade": "B",
-        "source_name": "nflverse weekly player stats",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-        "summary": "The full nflverse weekly player-stat ledger from 2025 through 2025 contains 1 meaningful passing games for Jaxson Dart against DAL (1 regular season, 0 postseason). Across those games: 32 attempts, 230 passing yards, 2 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-        "title": "Jaxson Dart vs DAL: career game ledger"
-      },
-      {
-        "family": "staff_impact",
-        "provenance_grade": null,
-        "source_name": "Staff records + FTN/nflverse historical tendencies",
-        "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-        "summary": "NYG's new offensive coordinator, Matt Nagy, arrives with a verifiable prior-team tendency profile: more pre-snap motion (46% across KC 2023, KC 2024, KC 2025 versus 31% for NYG last season); more early-down pass rate (56% across KC 2023, KC 2024, KC 2025 versus 47% for NYG last season). That can force coverage declarations earlier and create leverage before the snap. That matters because first and second down dictate how often a defense gets obvious passing situations. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-        "title": "What Matt Nagy could change in NYG"
-      }
-    ],
-    "paragraphs": [
-      "The Giants' victory over the Cowboys was largely due to their ability to control the tempo of the game with their running game and Jaxson Dart's efficient passing. New York's physical front and Dart's poise under pressure allowed them to convert 9 of 10 third downs, while the Cowboys' defense struggled to get off the field. The Giants' running back Cam Skattebo and quarterback Jaxson Dart led the charge, with Skattebo rushing for 81 yards and a touchdown, and Dart completing 23 of 29 passes for 230 yards and three touchdowns.",
-      "LevLine 3.0 gives the Cowboys a 63.0% win probability over the Giants. Its frozen F-ST engine reconciles a 52.4% football-only signal with a 60.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Dallas Cowboys -4.3, a market line of Dallas Cowboys -3.0, and an approximate coherent score of DAL 24 \u2013 NYG 19. The Giants' running game and Jaxson Dart's ability to convert on third downs were key factors in their victory, as they controlled the tempo of the game and limited the Cowboys' possessions. The pick: Dallas Cowboys moneyline."
-    ],
-    "prediction": "DAL to win; NYG 22.3 \u2013 DAL 21.0 is the central score projection.",
-    "reported_sources": [
-      {
-        "as_of": "2026-09-14T12:55:26.721457+00:00",
-        "source_name": "ESPN",
-        "source_url": "https://www.espn.com/nfl/story/_/id/49937489/john-harbaugh-giants-win-cowboys-debut-really-special",
-        "title": "John Harbaugh: Giants' win over Cowboys in debut 'really special'"
-      },
-      {
-        "as_of": "2026-09-14T12:55:26.721457+00:00",
-        "source_name": "CBS Sports",
-        "source_url": "https://www.cbssports.com/nfl/news/giants-vs-cowboys-live-updates-score-highlights-snf/live/",
-        "title": "Giants vs. Cowboys final: Jaxson Dart tosses three TDs as New York upsets rival Dallas in John Harbaugh debut"
-      },
-      {
-        "as_of": "2026-09-14T12:55:26.721457+00:00",
-        "source_name": "The Athletic",
-        "source_url": "https://www.theathletic.com/nfl/news/giants-vs-cowboys-instant-analysis-dart-skattebo-likely-harbaugh",
-        "title": "Giants vs. Cowboys: Instant Analysis"
-      }
-    ],
-    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
-    "story_spine": {
-      "primary_advantage_team": "DAL",
-      "primary_family": "qb_opponent_history",
-      "primary_mode": "support",
-      "primary_title": "Dak Prescott vs NYG: player history",
-      "secondary_advantage_team": "NYG",
-      "secondary_family": "pressure",
-      "secondary_title": "NYG protection vs DAL pass rush"
-    },
-    "what_could_make_us_wrong": "DAL-NYG: no sourced NYG counter clears the publication threshold."
-  },
   "2026_01_DEN_KC": {
     "brand": "Sunday Signal",
     "case_for_opponent": "KC protection vs DEN pass rush: pass-rush leverage favors DEN.",
@@ -269,10 +17,10 @@
       ],
       "media_led": true,
       "media_source_count": 4,
-      "primary_variant": 1,
+      "primary_variant": 0,
       "provider_freshness_advisory": null,
       "reporting_first": true,
-      "secondary_variant": 1,
+      "secondary_variant": 0,
       "slate_aware": true,
       "two_paragraph_contract": true
     },
@@ -394,7 +142,7 @@
     "matchup": "DEN @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-14T12:35:20.626252+00:00",
+        "as_of": "2026-09-14T15:31:09.052917+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "KC",
@@ -404,7 +152,7 @@
         "title": "Patrick Mahomes vs DEN: player history"
       },
       {
-        "as_of": "2026-09-14T12:35:18.960050+00:00",
+        "as_of": "2026-09-14T15:31:08.358796+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -414,7 +162,7 @@
         "title": "KC protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-14T12:35:18.960832+00:00",
+        "as_of": "2026-09-14T15:31:08.359243+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -424,7 +172,7 @@
         "title": "KC early-down approach vs DEN"
       },
       {
-        "as_of": "2026-09-14T12:35:11.912603+00:00",
+        "as_of": "2026-09-14T15:31:04.896312+00:00",
         "family": "availability",
         "label": "Availability",
         "leader": "Watch",
@@ -475,9 +223,9 @@
     ],
     "paragraphs": [
       "The Denver Broncos will test the Kansas City Chiefs' rebuilt secondary with their revamped wide receiver corps, led by Jaylen Waddle. The Chiefs' pass protection, which struggled last season, must hold up against the Broncos' pass rush. Denver's early-down approach, which often featured a run-heavy approach, will be crucial in dictating the pace of the game. The Chiefs' ability to use play-action passing effectively could also be a key factor.",
-      "LevLine 3.0 gives the Chiefs a 57.1% win probability over the Broncos. Its frozen F-ST engine reconciles a 31.6% football-only signal with a 54.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -2.3, a market line of Kansas City Chiefs -2.5, and an approximate coherent score of KC 24 \u2013 DEN 21. Chiefs' protection against Broncos' pressure determines whether Chiefs can stay on schedule; if Chiefs holds up, Broncos' cleanest disruption path narrows. The pick: Kansas City Chiefs moneyline."
+      "LevLine 3.0 gives the Chiefs a 57.1% win probability over the Broncos. Its frozen F-ST engine reconciles a 31.6% football-only signal with a 54.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -2.3, a market line of Kansas City Chiefs -2.5, and an approximate coherent score of KC 24 \u2013 DEN 22. Chiefs' protection against Broncos' pressure determines whether Chiefs can stay on schedule; if Chiefs holds up, Broncos' cleanest disruption path narrows. The pick: Kansas City Chiefs moneyline."
     ],
-    "prediction": "KC to win; KC 20.0 \u2013 DEN 25.2 is the central score projection.",
+    "prediction": "KC to win; KC 20.4 \u2013 DEN 25.4 is the central score projection.",
     "reported_sources": [
       {
         "as_of": "2026-09-14T12:55:26.721457+00:00",

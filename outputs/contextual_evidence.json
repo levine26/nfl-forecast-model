@@ -1,600 +1,7 @@
 {
-  "2026_01_DAL_NYG": [
-    {
-      "as_of": "2026-09-14T12:35:18.324012+00:00",
-      "category": "scheme",
-      "metadata": {
-        "advantage_team": "DAL",
-        "editorial_score": 0.53125,
-        "family": "explosives"
-      },
-      "promoted_to_model": false,
-      "relevance": "Explosive pass generation paired with opponent prevention",
-      "sample_size": 676,
-      "side": "home",
-      "source_name": "nflverse PBP + FTN charting",
-      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-      "strength": "Strong",
-      "summary": "NYG hit a 20+ yard pass on 8.1% of pass plays; DAL allowed one on 8.8%. The short version: NYG wants chunks, and DAL would rather make it earn twelve-play drives.",
-      "title": "NYG explosives vs DAL prevention"
-    },
-    {
-      "as_of": "2026-09-14T12:35:18.323498+00:00",
-      "category": "scheme",
-      "metadata": {
-        "advantage_team": "NYG",
-        "editorial_score": 0.5,
-        "family": "pressure"
-      },
-      "promoted_to_model": false,
-      "relevance": "Pass protection paired directly with opponent sack creation",
-      "sample_size": 676,
-      "side": "home",
-      "source_name": "nflverse PBP + FTN charting",
-      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-      "strength": "Strong",
-      "summary": "NYG gave up sacks on 7.1% of pass plays last season; DAL got home on 5.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
-      "title": "NYG protection vs DAL pass rush"
-    },
-    {
-      "as_of": "2026-09-14T12:35:11.033442+00:00",
-      "category": "scheme",
-      "metadata": {
-        "concept": "rpo",
-        "defense_epa_allowed": 0.20909439702518284,
-        "family": "rpo",
-        "league_rate": 0.043930544351750686,
-        "offense_epa": -0.015212947377099073,
-        "offense_rate": 0.04120879120879121
-      },
-      "promoted_to_model": false,
-      "relevance": "Current offensive tendency matched to opponent results against the same charted concept",
-      "sample_size": 60,
-      "side": "away",
-      "source_name": "FTN Data via nflverse",
-      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-      "strength": "Moderate",
-      "summary": "DAL used RPOs on 4% of charted plays in 2025, versus a league median of 4%, and produced -0.02 EPA/play on those snaps. NYG allowed +0.21 EPA/play against the same concept. The offense and defense are good at the same thing. Something has to give; for now this stays in the scouting report, not the formula.",
-      "title": "DAL RPOs vs NYG"
-    },
-    {
-      "as_of": "2026-09-14T12:35:13.841302+00:00",
-      "category": "coaching",
-      "metadata": {
-        "coordinator": "Matt Nagy",
-        "family": "staff_impact",
-        "inference": "historical tendency projection",
-        "prior_profile": {
-          "early_down_pass_rate": 0.5573968386208045,
-          "epa_per_play": 0.033151466500752146,
-          "motion_rate": 0.4581270182992465,
-          "pass_rate": 0.5959525900421393,
-          "play_action_rate": 0.09192680301399354,
-          "rpo_rate": 0.06910656620021528,
-          "screen_rate": 0.061356297093649086,
-          "shotgun_rate": 0.62497308934338
-        },
-        "prior_stints": [
-          {
-            "season": 2023,
-            "source_url": "https://en.wikipedia.org/wiki/2023_Kansas_City_Chiefs_season",
-            "team": "KC"
-          },
-          {
-            "season": 2024,
-            "source_url": "https://en.wikipedia.org/wiki/2024_Kansas_City_Chiefs_season",
-            "team": "KC"
-          },
-          {
-            "season": 2025,
-            "source_url": "https://en.wikipedia.org/wiki/2025_Kansas_City_Chiefs_season",
-            "team": "KC"
-          }
-        ],
-        "role": "off_coach",
-        "supporting_sources": [
-          "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-          "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-          "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
-        ],
-        "team_baseline": {
-          "early_down_pass_rate": 0.4701583434835566,
-          "epa_per_play": 0.026658975738775084,
-          "motion_rate": 0.30807365439093487,
-          "pass_rate": 0.5298438934802571,
-          "play_action_rate": 0.10835694050991501,
-          "plays": 1412.0,
-          "rpo_rate": 0.09348441926345609,
-          "screen_rate": 0.031161473087818695,
-          "shotgun_rate": 0.5722379603399433
-        }
-      },
-      "promoted_to_model": false,
-      "relevance": "New coordinator's prior NFL tendency profile compared with the new team's most recent complete-season baseline",
-      "sample_size": 4645,
-      "side": "home",
-      "source_name": "Staff records + FTN/nflverse historical tendencies",
-      "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-      "strength": "Strong",
-      "summary": "NYG's new offensive coordinator, Matt Nagy, arrives with a verifiable prior-team tendency profile: more pre-snap motion (46% across KC 2023, KC 2024, KC 2025 versus 31% for NYG last season); more early-down pass rate (56% across KC 2023, KC 2024, KC 2025 versus 47% for NYG last season). That can force coverage declarations earlier and create leverage before the snap. That matters because first and second down dictate how often a defense gets obvious passing situations. This is a historical tendency projection, not a claim that the new playbook will copy the old rates or an unvalidated numerical adjustment to LevLine.",
-      "title": "What Matt Nagy could change in NYG"
-    },
-    {
-      "as_of": "2026-09-14T12:35:11.246426+00:00",
-      "category": "coaching",
-      "promoted_to_model": false,
-      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
-      "side": "away",
-      "source_name": "Wikipedia season staff records",
-      "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-      "strength": "Strong",
-      "summary": "NYG is coordinated by Dennard Wilson in 2026, replacing the prior defensive staff. Older DAL-vs-NYG tape came against a different defensive play-caller.",
-      "title": "New defensive coordinator in NYG"
-    },
-    {
-      "as_of": "2026-09-14T12:35:11.246476+00:00",
-      "category": "coaching",
-      "metadata": {
-        "previous_head_coach": "Brian Daboll (fired November 10, 2\u20138 record) Mike Kafka (interim, 2\u20135 record)",
-        "previous_off_coach": null
-      },
-      "promoted_to_model": false,
-      "relevance": "Offensive coaching continuity changes the applicability of older matchup history",
-      "side": "home",
-      "source_name": "Wikipedia season staff records",
-      "source_url": "https://en.wikipedia.org/wiki/2026_New_York_Giants_season",
-      "strength": "Strong",
-      "summary": "NYG enters 2026 with head coach John Harbaugh and offensive coordinator Matt Nagy. Older matchup history gets a haircut here: the people calling the offense are different.",
-      "title": "NYG offense changed its decision-makers"
-    },
-    {
-      "as_of": "2026-09-14T12:35:11.246488+00:00",
-      "category": "coaching",
-      "promoted_to_model": false,
-      "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
-      "side": "home",
-      "source_name": "Wikipedia season staff records",
-      "source_url": "https://en.wikipedia.org/wiki/2026_Dallas_Cowboys_season",
-      "strength": "Strong",
-      "summary": "DAL is coordinated by Christian Parker in 2026, replacing Matt Eberflus. Older NYG-vs-DAL tape came against a different defensive play-caller.",
-      "title": "New defensive coordinator in DAL"
-    },
-    {
-      "as_of": "2026-09-14T12:35:11.030627+00:00",
-      "category": "personnel",
-      "metadata": {
-        "family": "availability",
-        "opponent": "NYG",
-        "person_key": "mdavis",
-        "position": "RB",
-        "supporting_sources": [
-          "https://www.nfl.com/injuries/league/2026/reg1",
-          "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
-        ],
-        "team": "DAL",
-        "usage_as_of": "2026-09-14T12:35:14.565092+00:00",
-        "usage_context": {
-          "dropback_share": 0.0,
-          "dropbacks": 0,
-          "rush_share": 0.11182795698924732,
-          "rushes": 52,
-          "season": 2025,
-          "target_share": 0.00819672131147541,
-          "targets": 5
-        }
-      },
-      "promoted_to_model": false,
-      "relevance": "Official availability status plus position-specific matchup context; no automatic point penalty",
-      "side": "away",
-      "source_name": "NFL.com official injury report + nflverse usage",
-      "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-      "strength": "Strong",
-      "summary": "The official NFL injury report lists Malik Davis (RB) as Out. Hip. LevLine does not make up an injury point value for it. In 2025, he represented 11% of team rushes (52). Usage is context for the role at risk, not an automatic forecast adjustment. The run-game backdrop is NYG at +0.15 rushing EPA allowed per play last season.",
-      "title": "DAL: Malik Davis \u2014 Out"
-    },
-    {
-      "as_of": "2026-09-14T12:35:11.030674+00:00",
-      "category": "personnel",
-      "metadata": {
-        "family": "availability",
-        "opponent": "DAL",
-        "position": "WR",
-        "team": "NYG"
-      },
-      "promoted_to_model": false,
-      "relevance": "Official availability status plus position-specific matchup context; no automatic point penalty",
-      "side": "home",
-      "source_name": "NFL.com official injury report",
-      "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-      "strength": "Moderate",
-      "summary": "The official NFL injury report lists Malik Nabers (WR) as Questionable. Knee. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.24 EPA/play last season.",
-      "title": "NYG: Malik Nabers \u2014 Questionable"
-    },
-    {
-      "as_of": "2026-09-14T12:35:13.201316+00:00",
-      "category": "personnel",
-      "metadata": {
-        "family": "availability",
-        "game_status": "",
-        "opponent": "NYG",
-        "position": "TE",
-        "practice_status": "Did Not Participate In Practice",
-        "team": "DAL"
-      },
-      "promoted_to_model": false,
-      "relevance": "Official availability status plus position-specific matchup context; no automatic point penalty",
-      "side": "away",
-      "source_name": "NFL.com official injury report",
-      "source_url": "https://www.nfl.com/injuries/league/2026/reg1",
-      "strength": "Moderate",
-      "summary": "The official NFL injury report lists Luke Schoonmaker (TE) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. The passing-game backdrop: the relevant opponent-side profile was +0.09 EPA/play last season.",
-      "title": "DAL: Luke Schoonmaker \u2014 Did Not Participate In Practice"
-    },
-    {
-      "as_of": "2026-09-14T12:35:20.071230+00:00",
-      "category": "history",
-      "metadata": {
-        "advantage_team": "DAL",
-        "cameos": [],
-        "current_team": "DAL",
-        "epa_per_dropback": 0.2438315202671464,
-        "excluded_cameos": 0,
-        "family": "qb_opponent_history",
-        "games": 8,
-        "latest_meeting": {
-          "date": "2026-01-04",
-          "dropbacks": 11,
-          "epa_per_dropback": -0.09481086505577242,
-          "game_id": "2025_18_DAL_NYG",
-          "human_label": "last season, Week 18",
-          "label": "2025 Week 18",
-          "offense": "DAL",
-          "score": "DAL 10, NYG 9",
-          "season": 2025,
-          "stage": "Week 18",
-          "success_rate": 0.5454545454545454,
-          "week": 18
-        },
-        "meetings": [
-          {
-            "date": "2026-01-04",
-            "dropbacks": 11,
-            "epa_per_dropback": -0.09481086505577242,
-            "game_id": "2025_18_DAL_NYG",
-            "human_label": "last season, Week 18",
-            "label": "2025 Week 18",
-            "offense": "DAL",
-            "score": "DAL 10, NYG 9",
-            "season": 2025,
-            "stage": "Week 18",
-            "success_rate": 0.5454545454545454,
-            "week": 18
-          },
-          {
-            "date": "2025-09-14",
-            "dropbacks": 55,
-            "epa_per_dropback": 0.183608866592401,
-            "game_id": "2025_02_NYG_DAL",
-            "human_label": "last season, Week 2",
-            "label": "2025 Week 2",
-            "offense": "DAL",
-            "score": "NYG 37, DAL 37",
-            "season": 2025,
-            "stage": "Week 2",
-            "success_rate": 0.4909090909090909,
-            "week": 2
-          },
-          {
-            "date": "2024-09-26",
-            "dropbacks": 28,
-            "epa_per_dropback": 0.39115291026302146,
-            "game_id": "2024_04_DAL_NYG",
-            "human_label": "2024 Week 4",
-            "label": "2024 Week 4",
-            "offense": "DAL",
-            "score": "DAL 17, NYG 15",
-            "season": 2024,
-            "stage": "Week 4",
-            "success_rate": 0.6071428571428571,
-            "week": 4
-          },
-          {
-            "date": "2023-11-12",
-            "dropbacks": 35,
-            "epa_per_dropback": 0.4608093469037807,
-            "game_id": "2023_10_NYG_DAL",
-            "human_label": "2023 Week 10",
-            "label": "2023 Week 10",
-            "offense": "DAL",
-            "score": "NYG 7, DAL 41",
-            "season": 2023,
-            "stage": "Week 10",
-            "success_rate": 0.5714285714285714,
-            "week": 10
-          },
-          {
-            "date": "2023-09-10",
-            "dropbacks": 24,
-            "epa_per_dropback": 0.17410351413075376,
-            "game_id": "2023_01_DAL_NYG",
-            "human_label": "2023 Week 1",
-            "label": "2023 Week 1",
-            "offense": "DAL",
-            "score": "DAL 33, NYG 0",
-            "season": 2023,
-            "stage": "Week 1",
-            "success_rate": 0.375,
-            "week": 1
-          },
-          {
-            "date": "2022-11-24",
-            "dropbacks": 30,
-            "epa_per_dropback": 0.3883867823809851,
-            "game_id": "2022_12_NYG_DAL",
-            "human_label": "2022 Week 12",
-            "label": "2022 Week 12",
-            "offense": "DAL",
-            "score": "NYG 13, DAL 21",
-            "season": 2022,
-            "stage": "Week 12",
-            "success_rate": 0.5333333333333333,
-            "week": 12
-          },
-          {
-            "date": "2021-12-19",
-            "dropbacks": 40,
-            "epa_per_dropback": 0.008860218174136092,
-            "game_id": "2021_15_DAL_NYG",
-            "human_label": "2021 Week 15",
-            "label": "2021 Week 15",
-            "offense": "DAL",
-            "score": "DAL 21, NYG 6",
-            "season": 2021,
-            "stage": "Week 15",
-            "success_rate": 0.475,
-            "week": 15
-          },
-          {
-            "date": "2021-10-10",
-            "dropbacks": 34,
-            "epa_per_dropback": 0.3042360998575897,
-            "game_id": "2021_05_NYG_DAL",
-            "human_label": "2021 Week 5",
-            "label": "2021 Week 5",
-            "offense": "DAL",
-            "score": "NYG 20, DAL 34",
-            "season": 2021,
-            "stage": "Week 5",
-            "success_rate": 0.5294117647058824,
-            "week": 5
-          }
-        ],
-        "prior_offenses": [
-          "DAL"
-        ],
-        "recent_sample_games": 8,
-        "recent_sample_start_season": 2021,
-        "success_rate": 0.5136186770428015,
-        "team_changed": false,
-        "verification_scope": "recent_pbp_not_career"
-      },
-      "promoted_to_model": false,
-      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
-      "sample_size": 257,
-      "side": "away",
-      "source_name": "nflverse play-by-play",
-      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-      "strength": "Strong",
-      "summary": "In the nflverse play-by-play sample since 2021, Dak Prescott has 8 meaningful games against NYG; the most recent was last season, Week 18. Over 257 charted dropbacks in those games, he averaged +0.24 EPA/dropback with a 51% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
-      "title": "Dak Prescott vs NYG: player history"
-    },
-    {
-      "as_of": "2026-09-14T12:35:20.091580+00:00",
-      "category": "history",
-      "metadata": {
-        "advantage_team": "NYG",
-        "cameos": [],
-        "current_team": "NYG",
-        "epa_per_dropback": 0.22372055787708728,
-        "excluded_cameos": 0,
-        "family": "qb_opponent_history",
-        "games": 1,
-        "latest_meeting": {
-          "date": "2026-01-04",
-          "dropbacks": 36,
-          "epa_per_dropback": 0.22372055787708728,
-          "game_id": "2025_18_DAL_NYG",
-          "human_label": "last season, Week 18",
-          "label": "2025 Week 18",
-          "offense": "NYG",
-          "score": "DAL 17, NYG 34",
-          "season": 2025,
-          "stage": "Week 18",
-          "success_rate": 0.5277777777777778,
-          "week": 18
-        },
-        "meetings": [
-          {
-            "date": "2026-01-04",
-            "dropbacks": 36,
-            "epa_per_dropback": 0.22372055787708728,
-            "game_id": "2025_18_DAL_NYG",
-            "human_label": "last season, Week 18",
-            "label": "2025 Week 18",
-            "offense": "NYG",
-            "score": "DAL 17, NYG 34",
-            "season": 2025,
-            "stage": "Week 18",
-            "success_rate": 0.5277777777777778,
-            "week": 18
-          }
-        ],
-        "prior_offenses": [
-          "NYG"
-        ],
-        "recent_sample_games": 1,
-        "recent_sample_start_season": 2025,
-        "success_rate": 0.5277777777777778,
-        "team_changed": false,
-        "verification_scope": "recent_pbp_not_career"
-      },
-      "promoted_to_model": false,
-      "relevance": "Same quarterback versus the same opponent, independent of the quarterback's prior team",
-      "sample_size": 36,
-      "side": "home",
-      "source_name": "nflverse play-by-play",
-      "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
-      "strength": "Weak",
-      "summary": "In the nflverse play-by-play sample since 2025, Jaxson Dart has 1 meaningful game against DAL; the most recent was last season, Week 18. Over 36 charted dropbacks in those games, he averaged +0.22 EPA/dropback with a 53% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
-      "title": "Jaxson Dart vs DAL: player history"
-    },
-    {
-      "as_of": "2026-09-14T12:35:21.620392+00:00",
-      "category": "history",
-      "metadata": {
-        "family": "rivalry",
-        "sample_start_season": 2021
-      },
-      "relevance": "Recent team-vs-team history, explicitly limited to the stated sample window",
-      "sample_size": 11,
-      "side": "neutral",
-      "source_name": "nflverse schedule/results",
-      "source_url": "https://github.com/nflverse/nfldata",
-      "strength": "Strong",
-      "summary": "Since 2021, DAL and NYG have played 11 completed games in the nflverse schedule sample: DAL is 9-2. The most recent finished DAL 20, NYG 28.",
-      "title": "DAL-NYG: division rivalry"
-    },
-    {
-      "as_of": "2026-09-14T12:35:26.466643+00:00",
-      "category": "personnel",
-      "metadata": {
-        "aggressiveness": 20.333333333333332,
-        "attempts": 600,
-        "avg_intended_air_yards": 8.33302564102564,
-        "avg_time_to_throw": 2.819700167504188,
-        "cpoe": 4.600966666666665,
-        "family": "ngs_qb_profile",
-        "provenance_grade": "B",
-        "season": 2025
-      },
-      "promoted_to_model": false,
-      "relevance": "Prior-season tracking profile for the current starting quarterback",
-      "sample_size": 600,
-      "side": "away",
-      "source_name": "NFL Next Gen Stats via nflverse",
-      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
-      "strength": "Strong",
-      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Dak Prescott, over 600 attempts: 2.82s average time to throw; +4.6 completion percentage points over expectation; 8.3 average intended air yards; 20.3% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
-      "title": "Dak Prescott: Next Gen passing profile"
-    },
-    {
-      "as_of": "2026-09-14T12:35:26.466643+00:00",
-      "category": "personnel",
-      "metadata": {
-        "aggressiveness": 12.979351032448378,
-        "attempts": 339,
-        "avg_intended_air_yards": 8.29176291793313,
-        "avg_time_to_throw": 2.8210266272189353,
-        "cpoe": -1.9900884955752147,
-        "family": "ngs_qb_profile",
-        "provenance_grade": "B",
-        "season": 2025
-      },
-      "promoted_to_model": false,
-      "relevance": "Prior-season tracking profile for the current starting quarterback",
-      "sample_size": 339,
-      "side": "home",
-      "source_name": "NFL Next Gen Stats via nflverse",
-      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_nextgen_stats.html",
-      "strength": "Strong",
-      "summary": "NFL Next Gen Stats' 2025 regular-season profile for Jaxson Dart, over 339 attempts: 2.82s average time to throw; -2.0 completion percentage points over expectation; 8.3 average intended air yards; 13.0% of attempts into tight windows. These tracking metrics describe how he played, not a standalone prediction for this matchup.",
-      "title": "Jaxson Dart: Next Gen passing profile"
-    },
-    {
-      "as_of": "2026-09-14T12:35:27.493162+00:00",
-      "category": "history",
-      "metadata": {
-        "attempt_threshold": 10,
-        "career_game_ids": [
-          "2016_01_NYG_DAL",
-          "2016_14_DAL_NYG",
-          "2017_01_NYG_DAL",
-          "2017_14_DAL_NYG",
-          "2018_02_NYG_DAL",
-          "2018_17_DAL_NYG",
-          "2019_01_NYG_DAL",
-          "2019_09_DAL_NYG",
-          "2020_05_NYG_DAL",
-          "2021_05_NYG_DAL",
-          "2021_15_DAL_NYG",
-          "2022_12_NYG_DAL",
-          "2023_01_DAL_NYG",
-          "2023_10_NYG_DAL",
-          "2024_04_DAL_NYG",
-          "2025_02_NYG_DAL",
-          "2025_18_DAL_NYG"
-        ],
-        "family": "career_qb_opponent_ledger",
-        "meaningful_games": 17,
-        "postseason_games": 0,
-        "provenance_grade": "B",
-        "recent_overlap_verified": true,
-        "recent_pbp_game_ids": [
-          "2021_05_NYG_DAL",
-          "2021_15_DAL_NYG",
-          "2022_12_NYG_DAL",
-          "2023_01_DAL_NYG",
-          "2023_10_NYG_DAL",
-          "2024_04_DAL_NYG",
-          "2025_02_NYG_DAL",
-          "2025_18_DAL_NYG"
-        ],
-        "regular_season_games": 17,
-        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
-      },
-      "promoted_to_model": false,
-      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
-      "sample_size": 17,
-      "side": "away",
-      "source_name": "nflverse weekly player stats",
-      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-      "strength": "Strong",
-      "summary": "The full nflverse weekly player-stat ledger from 2016 through 2025 contains 17 meaningful passing games for Dak Prescott against NYG (17 regular season, 0 postseason). Across those games: 556 attempts, 4,346 passing yards, 31 TD, 9 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-      "title": "Dak Prescott vs NYG: career game ledger"
-    },
-    {
-      "as_of": "2026-09-14T12:35:27.493162+00:00",
-      "category": "history",
-      "metadata": {
-        "attempt_threshold": 10,
-        "career_game_ids": [
-          "2025_18_DAL_NYG"
-        ],
-        "family": "career_qb_opponent_ledger",
-        "meaningful_games": 1,
-        "postseason_games": 0,
-        "provenance_grade": "B",
-        "recent_overlap_verified": true,
-        "recent_pbp_game_ids": [
-          "2025_18_DAL_NYG"
-        ],
-        "regular_season_games": 1,
-        "scope": "career_weekly_stats_meaningful_passing_games_not_starts"
-      },
-      "promoted_to_model": false,
-      "relevance": "Full-career opponent ledger cross-check for the current starting quarterback",
-      "sample_size": 1,
-      "side": "home",
-      "source_name": "nflverse weekly player stats",
-      "source_url": "https://nflreadr.nflverse.com/articles/dictionary_player_stats.html",
-      "strength": "Weak",
-      "summary": "The full nflverse weekly player-stat ledger from 2025 through 2025 contains 1 meaningful passing games for Jaxson Dart against DAL (1 regular season, 0 postseason). Across those games: 32 attempts, 230 passing yards, 2 TD, 0 INT. A game must include at least 10 pass attempts to count here, so brief relief cameos are excluded. The recent play-by-play sample is cross-checked against this ledger.",
-      "title": "Jaxson Dart vs DAL: career game ledger"
-    }
-  ],
   "2026_01_DEN_KC": [
     {
-      "as_of": "2026-09-14T12:35:18.960050+00:00",
+      "as_of": "2026-09-14T15:31:08.358796+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DEN",
@@ -612,7 +19,7 @@
       "title": "KC protection vs DEN pass rush"
     },
     {
-      "as_of": "2026-09-14T12:35:18.960832+00:00",
+      "as_of": "2026-09-14T15:31:08.359243+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "KC",
@@ -630,7 +37,7 @@
       "title": "KC early-down approach vs DEN"
     },
     {
-      "as_of": "2026-09-14T12:35:11.915179+00:00",
+      "as_of": "2026-09-14T15:31:04.898245+00:00",
       "category": "scheme",
       "metadata": {
         "concept": "play_action",
@@ -651,7 +58,7 @@
       "title": "DEN play action vs KC"
     },
     {
-      "as_of": "2026-09-14T12:35:12.548170+00:00",
+      "as_of": "2026-09-14T15:31:05.281416+00:00",
       "category": "history",
       "metadata": {
         "dc": "Vance Joseph",
@@ -676,13 +83,13 @@
       "title": "Patrick Mahomes vs Vance Joseph's DEN defense"
     },
     {
-      "as_of": "2026-09-14T12:35:13.199065+00:00",
+      "as_of": "2026-09-14T15:31:05.418721+00:00",
       "category": "weather",
       "metadata": {
         "gust_mph": 32.4,
         "precip_pct": 0.0,
         "roof": "outdoor",
-        "temp_f": 90.0,
+        "temp_f": 90.5,
         "wind_mph": 15.0
       },
       "promoted_to_model": false,
@@ -695,7 +102,7 @@
       "title": "Kickoff weather in KC"
     },
     {
-      "as_of": "2026-09-14T12:35:12.126505+00:00",
+      "as_of": "2026-09-14T15:31:04.943052+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean Payton",
@@ -711,7 +118,7 @@
       "title": "DEN offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-14T12:35:12.338567+00:00",
+      "as_of": "2026-09-14T15:31:05.110935+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Andy Reid",
@@ -727,7 +134,7 @@
       "title": "KC offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-14T12:35:11.912603+00:00",
+      "as_of": "2026-09-14T15:31:04.896312+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -745,7 +152,7 @@
       "title": "KC: Chamarri Conner \u2014 Out"
     },
     {
-      "as_of": "2026-09-14T12:35:11.912616+00:00",
+      "as_of": "2026-09-14T15:31:04.896331+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -763,7 +170,7 @@
       "title": "KC: Josh Simmons \u2014 Out"
     },
     {
-      "as_of": "2026-09-14T12:35:13.841605+00:00",
+      "as_of": "2026-09-14T15:31:05.752851+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Eric Bieniemy",
@@ -815,7 +222,7 @@
       "title": "What Eric Bieniemy could change in KC"
     },
     {
-      "as_of": "2026-09-14T12:35:13.201403+00:00",
+      "as_of": "2026-09-14T15:31:05.420410+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -835,7 +242,7 @@
       "title": "KC: Chris Jones \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-14T12:35:13.201410+00:00",
+      "as_of": "2026-09-14T15:31:05.420417+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -855,7 +262,7 @@
       "title": "KC: L'Jarius Sneed \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-14T12:35:20.584538+00:00",
+      "as_of": "2026-09-14T15:31:09.026460+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DEN",
@@ -957,7 +364,7 @@
       "title": "Bo Nix vs KC: player history"
     },
     {
-      "as_of": "2026-09-14T12:35:20.626252+00:00",
+      "as_of": "2026-09-14T15:31:09.052917+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "KC",
@@ -1115,7 +522,7 @@
       "title": "Patrick Mahomes vs DEN: player history"
     },
     {
-      "as_of": "2026-09-14T12:35:21.633289+00:00",
+      "as_of": "2026-09-14T15:31:09.794069+00:00",
       "category": "history",
       "metadata": {
         "family": "rivalry",
@@ -1131,7 +538,7 @@
       "title": "DEN-KC: division rivalry"
     },
     {
-      "as_of": "2026-09-14T12:35:26.466643+00:00",
+      "as_of": "2026-09-14T15:31:11.943469+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 11.11111111111111,
@@ -1154,7 +561,7 @@
       "title": "Bo Nix: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-14T12:35:26.466643+00:00",
+      "as_of": "2026-09-14T15:31:11.943469+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 13.346613545816732,
@@ -1177,7 +584,7 @@
       "title": "Patrick Mahomes: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-14T12:35:27.493162+00:00",
+      "as_of": "2026-09-14T15:31:12.626890+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -1212,7 +619,7 @@
       "title": "Bo Nix vs KC: career game ledger"
     },
     {
-      "as_of": "2026-09-14T12:35:27.493162+00:00",
+      "as_of": "2026-09-14T15:31:12.626890+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
