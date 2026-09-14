@@ -22,6 +22,18 @@ RATIONALE_PROHIBITED = re.compile(
     flags=re.I,
 )
 
+_POSTGAME_HINTS = (
+    re.compile(r"\bproved too much\b", flags=re.I),
+    re.compile(r"\b(?:sealed|secured|clinched) (?:the )?(?:win|victory)\b", flags=re.I),
+    re.compile(r"\b(?:in|after) (?:the )?(?:win|loss|victory|defeat)\b", flags=re.I),
+    re.compile(r"\b(?:won|lost|defeated|beat|fell to)\b[^.]{0,80}\b\d{1,2}\s*[-–]\s*\d{1,2}\b", flags=re.I),
+    re.compile(r"\b(?:finished|ended) (?:the game|Sunday|Monday|Thursday) with\b", flags=re.I),
+)
+_HISTORICAL_CONTEXT = re.compile(
+    r"\b(?:last (?:season|year|week)|previous(?:ly)?|in 202[0-5]|week \d{1,2})\b",
+    flags=re.I,
+)
+
 # Groq occasionally compresses model_rationale to only a few words even when its
 # researched paragraph is publication-grade. In that case the rationale field is not
 # padded: it is discarded and deterministically reconstructed from a football mechanism
@@ -83,21 +95,22 @@ def _rationale_has_prohibited(value: object) -> bool:
     return RATIONALE_PROHIBITED.search(_clean(value)) is not None
 
 
+def _paragraph_has_postgame_hindsight(value: object) -> bool:
+    """Reject current-game result language while allowing clearly historical context."""
+    for sentence in re.split(r"(?<=[.!?])\s+", _clean(value)):
+        if not sentence or _HISTORICAL_CONTEXT.search(sentence):
+            continue
+        if any(pattern.search(sentence) for pattern in _POSTGAME_HINTS):
+            return True
+    return False
+
+
 def _nickname(code: object) -> str:
     name = _team_name(str(code or ""))
     return name.split()[-1] if name else str(code or "")
 
 
 def _repair_underlength_rationale(rationale: str, paragraph1: str, row) -> tuple[str, bool]:
-    """Reconstruct a clean underlength rationale from the researched paragraph.
-
-    The hard publication contract remains 18-40 words. Any rationale already at or
-    above the minimum is left untouched, so overlength copy still fails normally.
-    Numerical/model/betting leakage is never repaired. For an underlength clean field,
-    reconstruction is allowed only when paragraph 1 contains a recognized football
-    mechanism and the production pick is one of the matchup teams. The provider's
-    original short rationale is discarded rather than used as unverified padding.
-    """
     original = _clean(rationale)
     if len(_words(original)) >= 18 or _rationale_has_prohibited(original):
         return original, False
@@ -161,16 +174,6 @@ def _valid_sources(sources: object) -> tuple[list[dict], set[str], list[str]]:
 
 
 def _valid_sources_with_backfill(row, sources: object) -> tuple[list[dict], set[str], list[str]]:
-    """Apply the same fail-closed provenance repair used by the final composer.
-
-    Groq must still execute live research, but its returned citations can include
-    navigation or matchup-shell URLs even when the researched prose is usable. The
-    publication contract is two independent *direct* approved reports, so establish
-    that contract deterministically before rejecting the prose. Invalid provider URLs
-    are never promoted; the backfill module discards them and searches approved
-    publishers for direct, current, matchup-relevant reports. If that repair cannot
-    establish two independent publisher families, validation still fails closed.
-    """
     valid, families, failures = _valid_sources(sources)
     if len(valid) >= 2 and len(families) >= 2:
         return valid, families, []
@@ -200,7 +203,6 @@ def _load_entry(path: Path, gid: str) -> dict:
 
 
 def _write_accepted_entry(path: Path, gid: str, entry: dict) -> None:
-    """Persist exactly the normalized payload that downstream slate gates will read."""
     path.write_text(
         json.dumps({"games": {gid: entry}}, ensure_ascii=False, separators=(",", ":")) + "\n",
         encoding="utf-8",
@@ -236,6 +238,8 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
         failures.append(f"{gid}: paragraph1 length {len(p1_words)} outside 55-100")
     if not _mentions_any(paragraph1, _team_aliases(away)) or not _mentions_any(paragraph1, _team_aliases(home)):
         failures.append(f"{gid}: paragraph1 must discuss both teams")
+    if _paragraph_has_postgame_hindsight(paragraph1):
+        failures.append(f"{gid}: paragraph1 contains postgame hindsight; Sunday Signal Reads must remain pregame")
     if not 18 <= len(rationale_words) <= 40:
         failures.append(f"{gid}: model_rationale length {len(rationale_words)} outside 18-40")
     if _rationale_has_prohibited(rationale):
@@ -278,11 +282,6 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
 
 
 def _groq_step_active() -> bool:
-    """Only provider CI may auto-recover invalid Groq prose.
-
-    ChatGPT ingestion and ordinary tests must retain their normal fail-closed behavior.
-    The Groq workflow exports GROQ_API_KEY to the focused writer/validator step.
-    """
     return bool(os.environ.get("GROQ_API_KEY"))
 
 
