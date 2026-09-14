@@ -78,16 +78,16 @@ def enrich_locked_bet_prices(
     season: int = 2026,
     verified_utc: datetime | None = None,
 ) -> tuple[pd.DataFrame, int]:
-    """Add only sportsbook prices that can be verified against a locked market signal.
+    """Backfill only raw moneyline prices that are provably the lock-time pair.
 
-    Historical receipts store the vig-free market home probability but older rows did
-    not retain the raw American moneyline pair. A current nflverse pair is accepted
-    only when converting that exact pair back to vig-free probability reproduces the
-    immutable receipt within a tight floating-point tolerance. Mismatches fail closed.
+    Older receipts retained the vig-free market probability but not the raw American
+    moneyline pair. A candidate pair is accepted only when converting it back to a
+    vig-free home probability exactly reproduces the immutable lock receipt within a
+    tight floating-point tolerance. A later or otherwise different pair fails closed.
 
-    Spread-side juice is intentionally left blank unless an upstream source already
-    supplies explicit side prices. The Sunday Signal tracker applies its documented
-    -110 fallback when those fields are absent.
+    Spread-side juice is never inferred from a later market row. The tracker uses a
+    documented -110 fallback unless an explicit lock-time spread price is already
+    present on the receipt from a future capture source.
     """
     out = history.copy()
     for column in NUMERIC_PRICE_COLUMNS:
@@ -116,30 +116,20 @@ def enrich_locked_bet_prices(
         if not game_id or game_id not in market_by_game.index:
             continue
 
-        row_changed = False
-        market_row = market_by_game.loc[game_id]
         home_existing = _number(receipt.get("locked_home_moneyline"))
         away_existing = _number(receipt.get("locked_away_moneyline"))
-        if home_existing is None or away_existing is None:
-            pair = _verified_moneyline_pair(receipt, market_row)
-            if pair is not None:
-                out.at[index, "locked_home_moneyline"] = pair[0]
-                out.at[index, "locked_away_moneyline"] = pair[1]
-                out.at[index, "bet_price_source"] = "nflverse_moneyline_verified_against_locked_market_probability"
-                out.at[index, "bet_price_verified_utc"] = verified_at
-                row_changed = True
+        if home_existing is not None and away_existing is not None:
+            continue
 
-        home_spread_price = _number(market_row.get("home_spread_price"))
-        away_spread_price = _number(market_row.get("away_spread_price"))
-        if home_spread_price is not None and _number(out.at[index, "locked_home_spread_price"]) is None:
-            out.at[index, "locked_home_spread_price"] = home_spread_price
-            row_changed = True
-        if away_spread_price is not None and _number(out.at[index, "locked_away_spread_price"]) is None:
-            out.at[index, "locked_away_spread_price"] = away_spread_price
-            row_changed = True
+        pair = _verified_moneyline_pair(receipt, market_by_game.loc[game_id])
+        if pair is None:
+            continue
 
-        if row_changed:
-            changed_rows += 1
+        out.at[index, "locked_home_moneyline"] = pair[0]
+        out.at[index, "locked_away_moneyline"] = pair[1]
+        out.at[index, "bet_price_source"] = "nflverse_moneyline_verified_against_locked_market_probability"
+        out.at[index, "bet_price_verified_utc"] = verified_at
+        changed_rows += 1
 
     return out, changed_rows
 
@@ -162,13 +152,13 @@ def capture(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Persist verified sportsbook prices on immutable LevLine receipts.")
+    parser = argparse.ArgumentParser(description="Persist verified moneyline prices on immutable LevLine receipts.")
     parser.add_argument("--history", type=Path, default=Path("outputs/prediction_history.csv"))
     parser.add_argument("--season", type=int, default=2026)
     parser.add_argument("--market-source", default=NFLVERSE_GAMES_URL)
     args = parser.parse_args()
     changed = capture(args.history, season=args.season, market_source=args.market_source)
-    print(f"Verified sportsbook prices added to {changed} locked receipt(s).")
+    print(f"Verified moneyline prices added to {changed} locked receipt(s).")
 
 
 if __name__ == "__main__":
