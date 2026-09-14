@@ -89,6 +89,9 @@ jobs:
       - name: Install dashboard dependencies
         working-directory: site
         run: npm install
+      - name: Validate Bet Tracker settlement math
+        working-directory: site
+        run: node --test tests/betTrackerMath.test.mjs
       - name: Build dashboard
         working-directory: site
         run: npm run build
