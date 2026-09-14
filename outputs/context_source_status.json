@@ -102,9 +102,7 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {
-      "2026_01_DAL_NYG": "newer_reporting_available"
-    },
+    "advisories": {},
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 2,
@@ -146,7 +144,7 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 4,
+    "evidence_repairs": 0,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
@@ -178,14 +176,14 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-14T03:30:00.464543+00:00",
+    "as_of": "2026-09-14T03:50:40.947445+00:00",
     "cross_game_titles_rejected": 0,
     "games": 2,
     "games_with_display_reporting": 2,
     "games_with_reporting": 2,
     "games_with_substantive_reporting": 2,
     "games_with_trusted_reporting": 2,
-    "generic_titles_rejected": 2,
+    "generic_titles_rejected": 0,
     "providers": {
       "bing_news_rss": {
         "errors": 0
