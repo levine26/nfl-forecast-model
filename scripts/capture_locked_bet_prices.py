@@ -10,14 +10,17 @@ import pandas as pd
 
 NFLVERSE_GAMES_URL = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
 PROBABILITY_TOLERANCE = 1e-10
-PRICE_COLUMNS = (
+NUMERIC_PRICE_COLUMNS = (
     "locked_home_moneyline",
     "locked_away_moneyline",
     "locked_home_spread_price",
     "locked_away_spread_price",
+)
+TEXT_PRICE_COLUMNS = (
     "bet_price_source",
     "bet_price_verified_utc",
 )
+PRICE_COLUMNS = NUMERIC_PRICE_COLUMNS + TEXT_PRICE_COLUMNS
 
 
 def american_implied(odds: float) -> float:
@@ -87,16 +90,21 @@ def enrich_locked_bet_prices(
     -110 fallback when those fields are absent.
     """
     out = history.copy()
-    for column in PRICE_COLUMNS:
+    for column in NUMERIC_PRICE_COLUMNS:
         if column not in out.columns:
             out[column] = np.nan
+    for column in TEXT_PRICE_COLUMNS:
+        if column not in out.columns:
+            out[column] = pd.Series("", index=out.index, dtype="object")
+        else:
+            out[column] = out[column].astype("object")
 
     market_by_game = _market_index(market, season)
     if market_by_game.empty:
         return out, 0
 
     verified_at = (verified_utc or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
-    changed = 0
+    verified_moneylines = 0
 
     for index, receipt in out.iterrows():
         if str(receipt.get("lock_status", "")).strip().upper() != "LOCKED":
@@ -108,18 +116,18 @@ def enrich_locked_bet_prices(
         if not game_id or game_id not in market_by_game.index:
             continue
 
+        market_row = market_by_game.loc[game_id]
         home_existing = _number(receipt.get("locked_home_moneyline"))
         away_existing = _number(receipt.get("locked_away_moneyline"))
         if home_existing is None or away_existing is None:
-            pair = _verified_moneyline_pair(receipt, market_by_game.loc[game_id])
+            pair = _verified_moneyline_pair(receipt, market_row)
             if pair is not None:
                 out.at[index, "locked_home_moneyline"] = pair[0]
                 out.at[index, "locked_away_moneyline"] = pair[1]
                 out.at[index, "bet_price_source"] = "nflverse_moneyline_verified_against_locked_market_probability"
                 out.at[index, "bet_price_verified_utc"] = verified_at
-                changed += 1
+                verified_moneylines += 1
 
-        market_row = market_by_game.loc[game_id]
         home_spread_price = _number(market_row.get("home_spread_price"))
         away_spread_price = _number(market_row.get("away_spread_price"))
         if home_spread_price is not None and _number(out.at[index, "locked_home_spread_price"]) is None:
@@ -127,7 +135,7 @@ def enrich_locked_bet_prices(
         if away_spread_price is not None and _number(out.at[index, "locked_away_spread_price"]) is None:
             out.at[index, "locked_away_spread_price"] = away_spread_price
 
-    return out, changed
+    return out, verified_moneylines
 
 
 def capture(
@@ -141,7 +149,9 @@ def capture(
     history = pd.read_csv(history_path)
     market = pd.read_csv(market_source, low_memory=False)
     enriched, changed = enrich_locked_bet_prices(history, market, season=season)
-    if changed or any(column not in history.columns for column in PRICE_COLUMNS):
+    schema_changed = any(column not in history.columns for column in PRICE_COLUMNS)
+    content_changed = not enriched.equals(history.reindex(columns=enriched.columns))
+    if schema_changed or content_changed:
         enriched.to_csv(history_path, index=False)
     return changed
 
