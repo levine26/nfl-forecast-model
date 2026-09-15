@@ -1,0 +1,30 @@
+name: Dispatch Groq after contextual intelligence
+
+on:
+  workflow_run:
+    workflows: ["Sunday Signal contextual intelligence"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: sunday-signal-groq-dispatch-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  dispatch-groq:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Sunday Signal Groq media writer on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run groq_media_writer.yml --repo "$GITHUB_REPOSITORY" --ref main
