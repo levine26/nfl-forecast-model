@@ -102,9 +102,7 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {
-      "2026_01_DEN_KC": "newer_reporting_available"
-    },
+    "advisories": {},
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 1,
@@ -146,7 +144,7 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 2,
+    "evidence_repairs": 0,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
@@ -178,7 +176,7 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-15T00:36:42.535581+00:00",
+    "as_of": "2026-09-15T00:53:07.811108+00:00",
     "cross_game_titles_rejected": 0,
     "games": 1,
     "games_with_display_reporting": 1,
