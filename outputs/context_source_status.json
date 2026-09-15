@@ -173,17 +173,18 @@
     ],
     "games": {
       "2026_01_DEN_KC": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-15T07:08:41.261802+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "focused_validation_failed: 2026_01_DEN_KC: paragraph1 length 111 outside 55-100",
         "recovered_at_utc": "2026-09-15T06:53:37.269863+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       }
     },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
     "run_id": "34938937903",
-    "status": "degraded"
+    "status": "healthy"
   },
   "injuries": {
     "as_of": "2026-09-15T06:35:35.765598+00:00",
@@ -196,6 +197,8 @@
   "media_reporting": {
     "as_of": "2026-09-15T06:53:41.075506+00:00",
     "cross_game_titles_rejected": 0,
+    "fallback_snapshot_guardrail": "Failed-game recovery preserves the previously launch-grade media packet; a transient fallback-run media rediscovery cannot erase validated reporting authority.",
+    "fallback_snapshot_reused": true,
     "games": 1,
     "games_with_display_reporting": 1,
     "games_with_reporting": 1,
