@@ -1,0 +1,104 @@
+{
+  "receipt_version": 2,
+  "contract_id": "V09B-GAMEBOOK-TRAINING-LABEL-COVERAGE-V2",
+  "predecessor_receipt": "research/availability/v09b_gamebook_training_label_coverage_receipt_v1.json",
+  "execution_head_sha": "d40774f00850e0a3f8eb6ad5692c756cd4bbb49f",
+  "workflow_run_id": 34725033534,
+  "workflow_artifact_id": 10307063435,
+  "workflow_artifact_sha256": "9616e97a1c1a3944698b6f4e29a9f52d7996e308cb228aa60ebfe7d8518ad3ed",
+  "technical_status": "BLOCKED",
+  "historical_gamebook_coverage_qualified": false,
+  "v1_failure_preserved": true,
+  "schedule": {
+    "games": 2576,
+    "expected_games": 2576,
+    "missing_gsis": 0,
+    "schedule_subset_sha256": "43b7c5f839ba0e51789ef6a928acb1ac9ca029e609912556c262261033eca438"
+  },
+  "source_families": {
+    "legacy_www": {
+      "prefix": "www.nfl.com/liveupdate/gamecenter/",
+      "http_status": 200,
+      "parsed_gamebook_urls": 4672
+    },
+    "nfl_cdn": {
+      "prefix": "nflcdns.nfl.com/liveupdate/gamecenter/",
+      "http_status": 200,
+      "parsed_gamebook_urls": 2356
+    }
+  },
+  "coverage": {
+    "games_found": 2506,
+    "games_missing": 70,
+    "coverage_rate": 0.9728260869565217,
+    "alias_conflict_games": 1,
+    "chosen_host_counts": {
+      "nflcdns.nfl.com": 1247,
+      "www.nfl.com": 1107,
+      "www.nfl.com:80": 152
+    },
+    "by_season": {
+      "2012": {"found": 256, "expected": 256, "rate": 1.0},
+      "2013": {"found": 256, "expected": 256, "rate": 1.0},
+      "2014": {"found": 256, "expected": 256, "rate": 1.0},
+      "2015": {"found": 254, "expected": 256, "rate": 0.9921875, "alias_conflicts": 1},
+      "2016": {"found": 211, "expected": 256, "rate": 0.82421875},
+      "2017": {"found": 256, "expected": 256, "rate": 1.0},
+      "2018": {"found": 247, "expected": 256, "rate": 0.96484375},
+      "2019": {"found": 244, "expected": 256, "rate": 0.953125},
+      "2020": {"found": 254, "expected": 256, "rate": 0.9921875},
+      "2021": {"found": 272, "expected": 272, "rate": 1.0}
+    }
+  },
+  "sample_structure": {
+    "selected_games": 30,
+    "pdf_downloads_ok": 18,
+    "not_active_structure_ok": 18,
+    "did_not_play_structure_ok": 18,
+    "failed_replays": 12,
+    "failure_class": "Wayback HTTPS connection refused for every failed sample replay",
+    "interpretation": "The 12 replay failures are retained as V2 source-replay failures. They are not evidence that Not Active and Did Not Play collapsed semantically, because no PDF bytes were obtained for those samples."
+  },
+  "residual_missing_games": {
+    "2015": 2,
+    "2016": 45,
+    "2018": 9,
+    "2019": 12,
+    "2020": 2,
+    "total": 70
+  },
+  "hard_blockers": [
+    "combined archive coverage gate failed: 2015 254/256 = 0.992188",
+    "alias conflict gate failed: 2015 1",
+    "combined archive coverage gate failed: 2016 211/256 = 0.824219",
+    "combined archive coverage gate failed: 2018 247/256 = 0.964844",
+    "combined archive coverage gate failed: 2019 244/256 = 0.953125",
+    "combined archive coverage gate failed: 2020 254/256 = 0.992188",
+    "sample PDF download gate failed: 18/30",
+    "sample Not Active structure gate failed: 18/30",
+    "sample Did Not Play structure gate failed: 18/30",
+    "total combined archive coverage gate failed: 2506/2576 = 0.972826",
+    "total alias conflict gate failed: 1"
+  ],
+  "post_result_diagnostic": {
+    "v2_failure_preserved": true,
+    "thresholds_relaxed": false,
+    "source_family_addition_recovered_games_vs_v1": 907,
+    "next_question": "Do the 70 residual missing games resolve through another coherent official NFL Game Book URL/host convention, or are they true archive gaps?",
+    "per_game_search_or_outcome_based_label_invention_authorized": false,
+    "further_source_discovery_must_be_source_only_and_versioned": true
+  },
+  "authorization": {
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "source_only_audit": true,
+    "labels_constructed": false,
+    "model_fit_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0
+  }
+}

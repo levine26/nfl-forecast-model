@@ -1,0 +1,117 @@
+{
+  "contract_version": 2,
+  "contract_id": "V09B-GAMEBOOK-TRAINING-LABEL-COVERAGE-V2",
+  "experiment_dependency": "V09B-AVAILABILITY-001",
+  "predecessor_receipt": "research/availability/v09b_gamebook_training_label_coverage_receipt_v1.json",
+  "status": "POST_V1_DIAGNOSTIC_PREREGISTERED_SOURCE_FAMILY_AUDIT",
+  "training_seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+  "game_type": "REG",
+  "purpose": "Test whether the V1 coverage cliff reflects an official NFL source-host migration by adding the historically documented nflcdns.nfl.com Game Book family while preserving the V1 universe and 100% source-coverage threshold.",
+  "v1_result_preservation": {
+    "v1_status": "BLOCKED",
+    "v1_games_found": 1599,
+    "v1_games_expected": 2576,
+    "v1_coverage_rate": 0.6207298136645962,
+    "v1_failure_reclassified_as_pass": false,
+    "v1_thresholds_relaxed": false
+  },
+  "source_universe": {
+    "schedule_source": "nflreadpy.load_schedules",
+    "required_schedule_fields": ["season", "week", "game_type", "game_id", "gsis", "home_team", "away_team"],
+    "expected_regular_season_games_by_season": {
+      "2012": 256,
+      "2013": 256,
+      "2014": 256,
+      "2015": 256,
+      "2016": 256,
+      "2017": 256,
+      "2018": 256,
+      "2019": 256,
+      "2020": 256,
+      "2021": 272
+    },
+    "expected_regular_season_games_total": 2576
+  },
+  "official_source_families": [
+    {
+      "family": "legacy_www",
+      "host": "www.nfl.com",
+      "prefix": "www.nfl.com/liveupdate/gamecenter/",
+      "path_pattern": "http://www.nfl.com/liveupdate/gamecenter/{gsis}/{home_code}_Gamebook.pdf",
+      "status": "V1_FROZEN_SOURCE_FAMILY"
+    },
+    {
+      "family": "nfl_cdn",
+      "host": "nflcdns.nfl.com",
+      "prefix": "nflcdns.nfl.com/liveupdate/gamecenter/",
+      "path_pattern": "https://nflcdns.nfl.com/liveupdate/gamecenter/{gsis}/{home_code}_Gamebook.pdf",
+      "status": "POST_V1_DOCUMENTED_OFFICIAL_MIRROR_FAMILY"
+    }
+  ],
+  "mirror_policy": {
+    "same_gsis_and_filename_team_across_hosts_is_one_game_source_identity": true,
+    "multiple_hosts_for_same_gsis_and_filename_team_are_not_ambiguity": true,
+    "preferred_host_order": ["nflcdns.nfl.com", "www.nfl.com"],
+    "different_filename_team_codes_for_same_game_are_reported_as_alias_conflict": true,
+    "archive_record_must_preserve_original_host_timestamp_digest": true
+  },
+  "archive_index": {
+    "service": "Internet Archive Wayback CDX",
+    "query_each_official_source_family_separately": true,
+    "statuscode_filter": 200,
+    "original_filter": "*_Gamebook.pdf",
+    "collapse": "urlkey",
+    "required_fields": ["timestamp", "original", "statuscode", "digest", "mimetype", "length"]
+  },
+  "legacy_home_code_aliases": {
+    "JAX": ["JAX", "JAC"],
+    "JAC": ["JAC", "JAX"],
+    "LAR": ["LAR", "LA", "STL"],
+    "LA": ["LA", "LAR", "STL"],
+    "STL": ["STL", "LA", "LAR"],
+    "LAC": ["LAC", "SD"],
+    "SD": ["SD", "LAC"],
+    "LV": ["LV", "OAK"],
+    "OAK": ["OAK", "LV"],
+    "WAS": ["WAS", "WSH"],
+    "WSH": ["WSH", "WAS"]
+  },
+  "frozen_qualification_gates": {
+    "required_seasons_exact": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021],
+    "schedule_expected_game_count_match_required": true,
+    "schedule_gsis_present_rate_required": 1.0,
+    "combined_archive_game_coverage_rate_required": 1.0,
+    "season_combined_archive_game_coverage_rate_required": 1.0,
+    "matched_archive_rows_must_have_timestamp": true,
+    "matched_archive_rows_must_have_digest": true,
+    "alias_conflict_games_allowed": 0,
+    "sample_games_per_season": 3,
+    "sample_pdf_download_rate_required": 1.0,
+    "sample_not_active_structure_rate_required": 1.0,
+    "sample_did_not_play_structure_rate_required": 1.0
+  },
+  "sample_policy": {
+    "selection": "deterministic earliest, middle, and latest regular-season archive-resolved game per season",
+    "archive_replay": "selected canonical source record through Wayback timestamp replay",
+    "purpose": "Verify source replay and the structural distinction between Not Active and Did Not Play across the full training era; this does not independently prove inactive-list semantics."
+  },
+  "non_authorizations": {
+    "training_label_semantics_qualified_by_coverage_alone": false,
+    "v09b_model_fit_authorized_by_coverage_alone": false,
+    "weekly_roster_ina_authorized_as_target": false,
+    "postgame_participation_authorized_as_target_proxy": false,
+    "current_game_snaps_authorized_as_target_proxy": false,
+    "completed_2026_outcomes_authorized": false,
+    "production_changes_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "model_fit_performed": false,
+    "labels_constructed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "thresholds_frozen_before_v2_execution": true,
+    "production_dependency_authorized": false,
+    "candidate_promotion_authorized": false
+  }
+}
