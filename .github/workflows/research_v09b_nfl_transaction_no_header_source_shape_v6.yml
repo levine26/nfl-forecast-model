@@ -1,0 +1,131 @@
+name: LevLine V09B NFL transaction no-header source shape V6
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_nfl_transaction_no_header_source_shape_v6_contract.json'
+      - 'research/availability/v09b_nfl_transaction_full_ledger_capture_v5_failure_receipt.json'
+      - 'research/v09b_nfl_transaction_no_header_source_shape_v6.py'
+      - 'research/test_v09b_nfl_transaction_no_header_source_shape_v6.py'
+      - '.github/workflows/research_v09b_nfl_transaction_no_header_source_shape_v6.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-nfl-transaction-no-header-shape-v6-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen V6 source-shape rules
+        run: pytest -q research/test_v09b_nfl_transaction_no_header_source_shape_v6.py
+      - name: Validate preregistered contract and immutable failed V5 dependency
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from collections import Counter
+          from pathlib import Path
+
+          c = json.loads(Path('research/availability/v09b_nfl_transaction_no_header_source_shape_v6_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-NFL-TRANSACTION-NO-HEADER-SOURCE-SHAPE-V6'
+          assert c['status'] == 'PREREGISTERED_V5_FAILURE_SHAPE_CAPTURE_DIAGNOSTIC_NO_EMPTY_SEMANTICS_AUTHORITY'
+          scope = c['scope']
+          rows = scope['fixed_requests']
+          assert scope['fixed_request_count'] == len(rows) == 72
+          assert Counter(x['kind'] for x in rows) == {'initial':70,'post_pagination':2}
+          assert len({x['case_id'] for x in rows}) == 72
+          dep = c['dependency']
+          assert subprocess.check_output(['git','hash-object',dep['receipt_path']], text=True).strip() == dep['receipt_git_blob_sha1']
+          receipt = json.loads(Path(dep['receipt_path']).read_text())
+          assert receipt['receipt_id'] == dep['receipt_id']
+          assert receipt['status'] == dep['required_status']
+          assert receipt['empirical_result']['source_errors'] == 72
+          assert receipt['empirical_result']['failure_shape']['no_header_on_initial_fetch'] == 70
+          assert receipt['empirical_result']['failure_shape']['no_header_after_one_or_more_accepted_pages'] == 2
+          assert receipt['scientific_disposition']['v5_is_failed_and_immutable'] is True
+          assert receipt['scientific_disposition']['missing_required_header_is_not_reinterpreted_post_hoc_as_valid_empty'] is True
+          assert c['capture']['preserve_response_body_before_parse'] is True
+          assert c['capture']['no_response_is_classified_as_empty_or_terminal_by_v6'] is True
+          assert c['frozen_diagnostic_gate']['no_empty_semantics_qualification'] is True
+          authority = c['explicit_non_authority']
+          assert authority['empty_result_semantics_qualified'] is False
+          assert authority['terminal_page_semantics_qualified'] is False
+          assert authority['all_month_full_ledger_qualified'] is False
+          assert authority['modern_game_day_roster_universe_qualified'] is False
+          assert authority['training_label_semantics_qualified'] is False
+          assert authority['training_source_chronology_qualified'] is False
+          assert authority['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  diagnostic:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Capture exact 72 V5 no-header response shapes
+        run: |
+          mkdir -p research_outputs/v09b_nfl_transaction_no_header_source_shape_v6
+          set +e
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_nfl_transaction_no_header_source_shape_v6.py \
+              --contract research/availability/v09b_nfl_transaction_no_header_source_shape_v6_contract.json \
+              --output-root research_outputs/v09b_nfl_transaction_no_header_source_shape_v6
+          code=$?
+          echo "$code" > research_outputs/v09b_nfl_transaction_no_header_source_shape_v6/exit_code.txt
+          exit "$code"
+      - name: Upload V6 diagnostic manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v09b-nfl-transaction-no-header-shape-v6-manifest-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_nfl_transaction_no_header_source_shape_v6/diagnostic.json
+            research_outputs/v09b_nfl_transaction_no_header_source_shape_v6/exit_code.txt
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload exact V6 source bytes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v09b-nfl-transaction-no-header-shape-v6-raw-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_no_header_source_shape_v6/raw
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
