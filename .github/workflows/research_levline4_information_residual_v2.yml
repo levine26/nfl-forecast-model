@@ -1,0 +1,48 @@
+name: LevLine 4 information residual V2
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/levline4_information_residual_prereg_v2.json'
+      - 'research/test_levline4_information_residual_prereg_v2.py'
+      - 'research/LEVLINE_4_CANONICAL_RESEARCH_LEDGER.md'
+      - 'research/LEVLINE_4_LITERATURE_REVIEW.md'
+      - 'research/inactive_information_event_v1.py'
+      - 'research/test_inactive_information_event_v1.py'
+      - '.github/workflows/research_levline4_information_residual_v2.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-information-residual-research:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project
+        run: pip install '.[dev]'
+      - name: Test preregistration and inactive-event ledger
+        run: |
+          pytest -q \
+            research/test_levline4_information_residual_prereg_v2.py \
+            research/test_inactive_information_event_v1.py
+      - name: Validate preregistration JSON
+        run: |
+          python -m json.tool research/levline4_information_residual_prereg_v2.json >/dev/null
+      - name: Prove research firewall
+        run: |
+          git diff --name-only origin/main...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [p for p in changed if not (p.startswith('research/') or p.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/main...HEAD -- outputs/ site/ src/ scripts/ config/
