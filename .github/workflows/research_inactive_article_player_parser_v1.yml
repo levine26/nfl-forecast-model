@@ -1,0 +1,85 @@
+name: LevLine inactive article player parser V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/inactive_article_player_parser_v1_contract.json'
+      - 'research/inactive_article_player_parser_v1_receipt.json'
+      - 'research/inactive_article_player_parser_v1.py'
+      - 'research/qualify_inactive_article_player_parser_v1.py'
+      - 'research/test_inactive_article_player_parser_v1.py'
+      - '.github/workflows/research_inactive_article_player_parser_v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  preserve-failed-v1-experiment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install parser dependencies
+        run: python -m pip install pytest 'beautifulsoup4>=4.12'
+      - name: Unit-test deterministic parser
+        run: pytest -q research/test_inactive_article_player_parser_v1.py
+      - name: Validate frozen contract and failed receipt JSON
+        run: |
+          python -m json.tool research/inactive_article_player_parser_v1_contract.json >/dev/null
+          python -m json.tool research/inactive_article_player_parser_v1_receipt.json >/dev/null
+      - name: Restore exact archived Week 1 source artifact
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/inactive-snapshots-v1:refs/remotes/origin/research-data/inactive-snapshots-v1
+          ARCHIVE='research_outputs/inactive_article_source_archive_v1/raw/b501eb89b4e43a4e5630eb9a3e356fb625df9b1f9b1da623b307d178a70f2cd9.html.gz'
+          git show "origin/research-data/inactive-snapshots-v1:${ARCHIVE}" > /tmp/week1-official-inactives.html.gz
+          test -s /tmp/week1-official-inactives.html.gz
+      - name: Reproduce frozen V1 failure without relaxing gates
+        run: |
+          set +e
+          python -m research.qualify_inactive_article_player_parser_v1 \
+            --contract research/inactive_article_player_parser_v1_contract.json \
+            --archive-gzip /tmp/week1-official-inactives.html.gz \
+            --receipt /tmp/inactive_article_player_parser_v1_receipt.json \
+            --rows /tmp/inactive_article_player_parser_v1_rows.jsonl
+          code=$?
+          set -e
+          test "$code" -eq 1
+      - name: Verify reproduced failure equals frozen receipt and grants no authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          frozen = json.loads(Path('research/inactive_article_player_parser_v1_receipt.json').read_text())
+          reproduced = json.loads(Path('/tmp/inactive_article_player_parser_v1_receipt.json').read_text())
+          assert reproduced == frozen, (reproduced, frozen)
+          assert reproduced['status'] == 'FAIL'
+          assert reproduced['qualification_passed'] is False
+          assert reproduced['observed']['team_sections'] == 16
+          assert reproduced['observed']['inactive_entries'] == 103
+          assert reproduced['observed']['emergency_third_qb_annotations'] == 5
+          assert reproduced['gates']['raw_sha256_exact'] is True
+          assert reproduced['gates']['team_section_count_exact'] is False
+          assert reproduced['authority']['player_level_parser_qualified'] is False
+          assert reproduced['authority']['player_identity_to_gsis_qualified'] is False
+          assert reproduced['authority']['availability_probability_feature_authorized'] is False
+          assert reproduced['authority']['player_value_join_authorized'] is False
+          assert reproduced['authority']['forecast_probability_effect_authorized'] is False
+          assert reproduced['authority']['production_authorized'] is False
+          assert reproduced['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inactive-article-player-parser-v1-failed-qualification
+          path: |
+            /tmp/inactive_article_player_parser_v1_receipt.json
+            /tmp/inactive_article_player_parser_v1_rows.jsonl
+          if-no-files-found: error
+          retention-days: 90

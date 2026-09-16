@@ -1,0 +1,51 @@
+{
+  "authority": {
+    "availability_probability_feature_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "player_identity_to_gsis_qualified": false,
+    "player_level_parser_qualified": false,
+    "player_value_join_authorized": false,
+    "production_authorized": false
+  },
+  "completed_2026_outcomes_used": 0,
+  "contract_id": "NFL-INACTIVE-ARTICLE-PLAYER-PARSER-2026-V1",
+  "gates": {
+    "all_sentinel_emergency_qbs_present": false,
+    "all_sentinel_player_team_pairs_present": false,
+    "all_team_entry_counts_exact": false,
+    "emergency_annotation_count_exact": false,
+    "inactive_entry_count_exact": false,
+    "raw_sha256_exact": true,
+    "team_section_count_exact": false,
+    "zero_duplicate_players_within_team": true,
+    "zero_duplicate_team_sections": true,
+    "zero_unparseable_entries": true
+  },
+  "observed": {
+    "emergency_third_qb_annotations": 5,
+    "inactive_entries": 103,
+    "raw_html_sha256": "b501eb89b4e43a4e5630eb9a3e356fb625df9b1f9b1da623b307d178a70f2cd9",
+    "team_entry_counts": {
+      "ATL": 6,
+      "BAL": 7,
+      "BUF": 7,
+      "CAR": 7,
+      "CHI": 7,
+      "CIN": 7,
+      "CLE": 7,
+      "DET": 5,
+      "HOU": 6,
+      "IND": 6,
+      "JAX": 6,
+      "NO": 7,
+      "NYJ": 5,
+      "PIT": 6,
+      "TB": 7,
+      "TEN": 7
+    },
+    "team_sections": 16
+  },
+  "qualification_passed": false,
+  "schema_version": "levline-inactive-article-player-parser-v1",
+  "status": "FAIL"
+}
