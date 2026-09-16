@@ -1,0 +1,209 @@
+name: LevLine 4 preserve NGS player ID surface V1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_surface_v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_surface_v1.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-ngs-player-id-surface-v1
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10470775804'
+  SOURCE_WORKFLOW_RUN_ID: '35154092751'
+  SOURCE_HEAD_SHA: 'e0dc6ffe4651d858612176914c1728d83a88dc98'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:0559c6977c66c4c1ca5200fa805288f27a31f545c957948693b5c1de5f3f2bf9'
+  EXPECTED_ARTIFACT_SIZE: '701152'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_surface_probe_v1_first_result_manifest.json'
+  DATA_BRANCH: 'research-data/levline4-ngs-player-id-surface-v1'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable canonical first artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v1.zip
+          rm -rf /tmp/ngs_v1
+          mkdir -p /tmp/ngs_v1
+          unzip -q /tmp/ngs_v1.zip -d /tmp/ngs_v1
+      - name: Verify canonical file set, hashes, result, and authority ceiling
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          root = Path('/tmp/ngs_v1')
+          manifest = json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          observed = {
+              p.relative_to(root).as_posix(): sha(p)
+              for p in sorted(root.rglob('*')) if p.is_file()
+          }
+          assert manifest['schema_version'] == 'levline4-2026-ngs-player-id-surface-probe-v1-first-result-manifest'
+          assert manifest['first_artifact_id'] == int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert manifest['first_workflow_run_id'] == int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert manifest['first_head_sha'] == os.environ['SOURCE_HEAD_SHA']
+          assert manifest['artifact_digest'] == os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert manifest['artifact_size_in_bytes'] == int(os.environ['EXPECTED_ARTIFACT_SIZE'])
+          assert observed == manifest['file_sha256']
+          assert manifest['first_result_is_canonical'] is True
+          assert manifest['later_same_version_execution_may_replace_first_result'] is False
+          assert manifest['same_version_rule_adaptation_after_first_result'] is False
+          assert manifest['first_result_status'] == 'PASS'
+          assert manifest['first_result_characterization']['ngs_surface_capture_qualified'] is True
+          assert manifest['first_result_characterization']['ambiguity_observed'] is True
+          assert manifest['first_result_characterization']['ambiguous_frozen_queries'] == ['Josh Allen', 'Justin Jefferson']
+          assert manifest['first_result_characterization']['discovered_player_search_endpoint_template'] == 'https://api.ngs.nfl.com/league/player/search?term={query}'
+          assert manifest['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert manifest['postgame_participation_used'] is False
+          assert manifest['week2_inactive_execution_evidence_used_for_design'] is False
+          assert manifest['f_st_01_frozen_2026_unchanged'] is True
+          for key, value in manifest['authority'].items():
+              assert value is False, key
+
+          receipt = json.loads((root / 'receipt.json').read_text())
+          assert receipt['status'] == 'PASS'
+          assert receipt['ngs_surface_capture_qualified'] is True
+          for key in (
+              'ngs_backend_endpoint_qualified',
+              'ngs_name_to_gsis_parser_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert receipt[key] is False, key
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download immutable canonical first artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v1.zip
+          rm -rf /tmp/ngs_v1
+          mkdir -p /tmp/ngs_v1
+          unzip -q /tmp/ngs_v1.zip -d /tmp/ngs_v1
+      - name: Reverify and add preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('/tmp/ngs_v1')
+          manifest = json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          observed = {
+              p.relative_to(root).as_posix(): sha(p)
+              for p in sorted(root.rglob('*')) if p.is_file()
+          }
+          assert observed == manifest['file_sha256']
+          assert manifest['first_result_status'] == 'PASS'
+          assert all(v is False for v in manifest['authority'].values())
+          receipt = json.loads((root / 'receipt.json').read_text())
+          assert receipt['ngs_surface_capture_qualified'] is True
+          assert receipt['production_authorized'] is False
+          preservation = {
+              'schema_version': 'levline4-ngs-player-id-surface-v1-preservation',
+              'source_actions_artifact_id': int(os.environ['SOURCE_ARTIFACT_ID']),
+              'source_workflow_run_id': int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'actions_artifact_digest': os.environ['EXPECTED_ARTIFACT_DIGEST'],
+              'actions_artifact_size_in_bytes': int(os.environ['EXPECTED_ARTIFACT_SIZE']),
+              'canonical_file_sha256': manifest['file_sha256'],
+              'preserved_at_utc': datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+              'preserving_workflow_run_id': os.environ['GITHUB_RUN_ID'],
+              'research_only': True,
+              'ngs_surface_capture_qualified': True,
+              'ngs_backend_endpoint_qualified': False,
+              'ngs_name_to_gsis_parser_qualified': False,
+              'player_identity_to_gsis_qualified': False,
+              'game_day_membership_qualified': False,
+              'availability_state_authorized': False,
+              'player_value_join_authorized': False,
+              'forecast_probability_effect_authorized': False,
+              'model_fit_authorized': False,
+              'production_authorized': False,
+              'completed_2026_outcomes_used': 0,
+              'postgame_participation_used': False,
+              'f_st_01_frozen_2026_unchanged': True,
+          }
+          (root / 'preservation.json').write_text(json.dumps(preservation, indent=2, sort_keys=True) + '\n')
+          PY
+      - name: Persist on dedicated research-data branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B ngs-player-id-v1-data "origin/${DATA_BRANCH}"
+          else
+            git checkout -B ngs-player-id-v1-data
+          fi
+          DEST='research_outputs/levline4_2026_ngs_player_id_surface_probe_v1/first_result_35154092751'
+          if [ -e "$DEST/preservation.json" ]; then
+            DEST="$DEST" python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['DEST'])
+          p = json.loads((root / 'preservation.json').read_text())
+          assert p['source_actions_artifact_id'] == int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert p['source_workflow_run_id'] == int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert p['source_head_sha'] == os.environ['SOURCE_HEAD_SHA']
+          assert p['actions_artifact_digest'] == os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert p['production_authorized'] is False
+          for rel, expected in p['canonical_file_sha256'].items():
+              actual = hashlib.sha256((root / rel).read_bytes()).hexdigest()
+              assert actual == expected, rel
+          PY
+            echo 'Canonical NGS player-ID surface V1 evidence already preserved exactly.'
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/ngs_v1 "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve canonical first NGS player ID surface V1 evidence'
+          git push origin HEAD:"${DATA_BRANCH}"
