@@ -5,7 +5,8 @@ from __future__ import annotations
 The extraction layer is deliberately separated from forecasting. An observation may state a
 point-in-time football fact or uncertainty state; it may not contain a pick, sentiment score,
 edge, probability delta, model probability, recommendation, or any other direct forecast
-adjustment.
+adjustment. The same firewall is enforced recursively inside ``value_json`` so an extractor
+cannot smuggle forecast judgment through a nested payload.
 """
 
 import argparse
@@ -34,14 +35,21 @@ ALLOWED_ENTITY_TYPES = {"player", "coach", "unit", "team"}
 ALLOWED_EXTRACTION_METHODS = {"deterministic", "manual_structured", "llm_fact_extraction"}
 PROHIBITED_FORECAST_FIELDS = {
     "pick",
+    "ml_pick",
+    "spread_pick",
     "sentiment",
     "sentiment_score",
     "edge",
     "win_probability_delta",
     "probability_delta",
+    "probability_adjustment",
     "forecast_adjustment",
+    "spread_adjustment",
     "model_probability",
     "win_probability",
+    "home_win_probability",
+    "away_win_probability",
+    "final_home_prob",
     "recommendation",
     "bet_recommendation",
 }
@@ -77,7 +85,28 @@ def _confidence(value: Any) -> float:
     return out
 
 
-def _value_json(value: Any) -> str:
+def _prohibited_payload_paths(value: Any, prefix: str = "value_json") -> list[str]:
+    """Return nested paths containing direct forecast-judgment keys.
+
+    Payload values themselves are not interpreted here. The guard is intentionally structural:
+    football-state facts may be captured, but fields that directly encode a game pick, edge,
+    recommendation, model probability, or probability adjustment are forbidden at any depth.
+    """
+    hits: list[str] = []
+    if isinstance(value, dict):
+        for raw_key, child in value.items():
+            key = str(raw_key).strip().lower()
+            path = f"{prefix}.{raw_key}"
+            if key in PROHIBITED_FORECAST_FIELDS:
+                hits.append(path)
+            hits.extend(_prohibited_payload_paths(child, path))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            hits.extend(_prohibited_payload_paths(child, f"{prefix}[{index}]"))
+    return hits
+
+
+def _value_json(value: Any) -> tuple[str, Any]:
     if isinstance(value, str):
         text = value.strip()
         if not text:
@@ -90,7 +119,11 @@ def _value_json(value: Any) -> str:
         parsed = value
     if parsed is None:
         raise ValueError("value_json cannot be null")
-    return json.dumps(parsed, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    forbidden = _prohibited_payload_paths(parsed)
+    if forbidden:
+        raise ValueError(f"forecast-effect fields are prohibited inside value_json: {sorted(forbidden)}")
+    normalized = json.dumps(parsed, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return normalized, parsed
 
 
 def validate_structured_observation(row: dict[str, Any]) -> dict[str, Any]:
@@ -141,7 +174,7 @@ def validate_structured_observation(row: dict[str, Any]) -> dict[str, Any]:
     if not extractor_id or not extractor_version:
         raise ValueError("extractor_id and extractor_version are required")
 
-    normalized_value_json = _value_json(row.get("value_json"))
+    normalized_value_json, _ = _value_json(row.get("value_json"))
     confidence = _confidence(row.get("confidence"))
     confidence_basis = str(row.get("confidence_basis") or "").strip()
     if not confidence_basis:
