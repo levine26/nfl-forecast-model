@@ -4,8 +4,10 @@ on:
   pull_request:
     paths:
       - ".github/workflows/week2_groq_recovery.yml"
-      - "inputs/chatgpt_media/current/**"
+      - "inputs/chatgpt_media/carryover/**"
       - "inputs/chatgpt_media/fallback/**"
+      - "scripts/recover_groq_focused_game.py"
+      - "tests/test_recover_groq_focused_game.py"
   push:
     branches: [main]
     paths:
@@ -49,12 +51,13 @@ jobs:
           for gid in expected:
               if not Path(f"inputs/chatgpt_media/fallback/{gid}.json").is_file():
                   raise SystemExit(f"missing failed-game payload: {gid}")
-          carry = json.loads(Path("inputs/chatgpt_media/current/manifest.json").read_text())
+
+          carry = json.loads(Path("inputs/chatgpt_media/carryover/manifest.json").read_text())
           approved = {"2026_02_DET_BUF", "2026_02_PIT_NE"}
           if {str(value) for value in carry.get("game_ids", [])} != approved:
-              raise SystemExit("current bundle may contain only the two already-approved prior Groq fallbacks")
+              raise SystemExit("carryover bundle must contain only the two already-approved prior Groq fallbacks")
           for gid in approved:
-              if not Path(f"inputs/chatgpt_media/current/{gid}.json").is_file():
+              if not Path(f"inputs/chatgpt_media/carryover/{gid}.json").is_file():
                   raise SystemExit(f"missing approved carryover payload: {gid}")
           for manifest in (fallback, carry):
               if manifest.get("forecast_path_identity") != "F-ST-01-FROZEN-2026":
