@@ -1,0 +1,171 @@
+{
+  "schema_version": "levline4-2026-ngs-player-id-heldout-v2-contract",
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-HELDOUT-V2",
+  "purpose": "Held-out validation of a fail-closed first-party NFL NGS exact-name-plus-team resolver from frozen official-club roster metadata to candidate GSIS identifiers. This experiment tests deterministic operational resolution only; it does not establish independent semantic ground truth, injury availability, player value, forecast effect, model fit, or production authority.",
+  "preregistration_state": {
+    "contract_must_precede_executable_v2_probe": true,
+    "no_v2_target_ngs_responses_observed_before_contract_freeze": true,
+    "same_version_rule_adaptation_after_first_result": false,
+    "first_result_is_canonical_whether_pass_or_fail": true,
+    "later_same_version_execution_may_replace_first_result": false
+  },
+  "frozen_upstream_evidence": {
+    "official_club_roster_v2": {
+      "workflow_run_id": 35130069924,
+      "artifact_id": 10461126275,
+      "head_sha": "1280e4a06eacf3e30700f75d4dab9ecff99944a4",
+      "artifact_digest": "sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e",
+      "roster_metadata_sha256": "90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f",
+      "row_count": 2463,
+      "team_count": 32,
+      "official_club_roster_metadata_parser_qualified": true,
+      "independent_gsis_ground_truth": false
+    },
+    "ngs_surface_v1": {
+      "workflow_run_id": 35154092751,
+      "artifact_id": 10470775804,
+      "head_sha": "e0dc6ffe4651d858612176914c1728d83a88dc98",
+      "artifact_digest": "sha256:0559c6977c66c4c1ca5200fa805288f27a31f545c957948693b5c1de5f3f2bf9",
+      "result": "PASS",
+      "surface_capture_qualified": true,
+      "name_only_ambiguity_observed": true,
+      "endpoint_template_observed": "https://api.ngs.nfl.com/league/player/search?term={query}",
+      "endpoint_production_dependency_qualified": false,
+      "name_to_gsis_parser_qualified": false
+    }
+  },
+  "target_selection": {
+    "source": "Only the pinned official_club_roster_v2 roster_metadata.jsonl above.",
+    "v1_sentinel_visible_name_exclusions": [
+      "Patrick Mahomes",
+      "Josh Allen",
+      "Justin Jefferson"
+    ],
+    "eligibility": {
+      "visible_name_nonempty": true,
+      "team_nonempty": true,
+      "position_nonempty": true,
+      "no_week2_inactive_or_availability_input_may_be_consulted": true
+    },
+    "name_normalization": "Unicode NFKD; encode ASCII with non-ASCII combining/content dropped; lowercase; replace each maximal run of non-[a-z0-9] with one space; trim; collapse whitespace. Token order is preserved and suffix tokens are not removed.",
+    "selection_key": {
+      "algorithm": "sha256",
+      "separator": "U+001F",
+      "ordered_fields": [
+        "team",
+        "visible_name",
+        "position",
+        "jersey_number_or_empty",
+        "profile_path_or_empty"
+      ]
+    },
+    "coverage_stratum": {
+      "rule": "For each of the 32 teams in lexicographic team order, sort eligible non-sentinel rows by selection_key SHA-256 ascending, then visible_name ascending, then profile_path ascending; take exactly the first 2 rows.",
+      "expected_team_count": 32,
+      "expected_target_count": 64
+    },
+    "source_name_ambiguity_stratum": {
+      "rule": "Among all eligible non-sentinel source rows, group by normalized visible_name. Include every row in every group represented on more than one distinct team. Do not select or rank ambiguity groups using NGS data.",
+      "expected_duplicate_name_group_count": 3,
+      "expected_target_count": 6
+    },
+    "union_rule": "Take the row-identity union of coverage_stratum and source_name_ambiguity_stratum keyed by team, visible_name, and profile_path.",
+    "expected_overlap_count": 0,
+    "expected_total_target_count": 70
+  },
+  "fixed_query_and_resolution_rule": {
+    "request": {
+      "method": "GET",
+      "url_template": "https://api.ngs.nfl.com/league/player/search?term={urlencoded_exact_visible_name}",
+      "query_string_source": "exact official-club visible_name from frozen target row",
+      "semantic_query_expansion_allowed": false,
+      "alternate_name_query_allowed": false,
+      "fuzzy_query_allowed": false,
+      "transport_retry_policy": "At most 2 additional attempts of the identical URL only for network timeout, HTTP 429, or HTTP 5xx. Zero-result, malformed semantic content, or ambiguity must not trigger alternate queries.",
+      "required_success_shape": "HTTP 200 JSON object containing a players array"
+    },
+    "candidate_name_match": "normalize(players[].displayName) must equal normalize(target.visible_name) exactly",
+    "candidate_team_match": "strip(players[].teamAbbr).upper() must equal strip(target.team).upper() exactly; no team alias substitution",
+    "selected_candidate_rule": "Exactly one response candidate must satisfy both candidate_name_match and candidate_team_match, and its gsisId must match ^00-[0-9]{7}$. Zero or multiple matching candidates are unresolved.",
+    "fields_forbidden_from_selection": [
+      "position",
+      "positionGroup",
+      "jerseyNumber",
+      "uniformNumber",
+      "status",
+      "statusShortDescription",
+      "nflId",
+      "esbId",
+      "smartId"
+    ],
+    "fallback_matching_allowed": false,
+    "manual_resolution_allowed": false,
+    "unresolved_rows_fail_closed": true
+  },
+  "corroboration_diagnostics": {
+    "jersey": {
+      "official_value": "integer-normalized target.jersey_number when nonempty and parseable",
+      "ngs_value": "integer-normalized selected candidate uniformNumber, else jerseyNumber, when nonempty and parseable",
+      "used_for_selection": false
+    },
+    "position": {
+      "record_official_position": true,
+      "record_ngs_position_and_position_group": true,
+      "used_for_selection": false,
+      "used_as_qualification_gate": false
+    },
+    "status": {
+      "may_be_recorded_as_raw_source_metadata": true,
+      "used_for_selection": false,
+      "used_for_availability": false,
+      "availability_semantics_authorized": false
+    }
+  },
+  "frozen_pass_gates": {
+    "all_70_targets_must_end_with_http_200_parseable_players_array": true,
+    "coverage_stratum_unique_resolution_minimum_count": 61,
+    "coverage_stratum_unique_resolution_minimum_fraction": 0.953125,
+    "source_name_ambiguity_stratum_unique_resolution_required_count": 6,
+    "source_name_ambiguity_stratum_unique_resolution_required_fraction": 1.0,
+    "invalid_selected_gsis_count_allowed": 0,
+    "duplicate_selected_gsis_across_distinct_target_rows_allowed": 0,
+    "same_target_multiple_name_plus_team_candidate_count_allowed": 0,
+    "resolved_coverage_jersey_comparable_minimum_fraction": 0.8,
+    "resolved_coverage_jersey_agreement_minimum_fraction": 0.95,
+    "threshold_relaxation_after_first_result_allowed": false,
+    "manual_unresolved_repair_before_gate_allowed": false
+  },
+  "authority_if_and_only_if_all_v2_gates_pass": {
+    "ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population": true,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": true,
+    "ngs_is_independent_player_identity_ground_truth": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "authority_if_any_v2_gate_fails": {
+    "ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population": false,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false,
+    "required_next_action": "Freeze the failed first result; any revised resolver, threshold, selection rule, source, or retry behavior must be a new version."
+  },
+  "governance": {
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "week2_inactive_execution_evidence_used_for_design": false,
+    "f_st_01_frozen_2026_unchanged": true,
+    "research_only": true,
+    "production_paths_may_change": false,
+    "next_phase_after_pass": "Separately preregister a held-out PIT inactive/availability identity application. V2 itself cannot authorize availability, player-value joins, forecast effects, model fitting, or production."
+  }
+}
