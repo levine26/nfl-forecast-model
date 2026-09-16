@@ -1,0 +1,82 @@
+{
+  "contract_id": "LEVLINE-2026-STATUS-FREE-IDENTITY-SOURCE-CAPTURE-V1",
+  "status": "PREREGISTERED_PROSPECTIVE_IDENTITY_SOURCE_CAPTURE_ONLY",
+  "scientific_purpose": "Freeze an exact 2026 nflverse weekly-roster byte object and derive a status-free identity projection for future prospective inactive/personnel identity research. This source may identify a player but may not establish game-day membership, health, availability, starter probability, role, or any forecast effect.",
+  "season": 2026,
+  "source": {
+    "provider": "nflverse",
+    "release_repository": "nflverse/nflverse-data",
+    "release_tag": "weekly_rosters",
+    "release_body_semantics": "Week-level rosters via NFL Shield v2 API, dating back to 2002.",
+    "asset_id": 567939096,
+    "asset_name": "roster_weekly_2026.parquet",
+    "browser_download_url": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2026.parquet",
+    "asset_created_at_utc": "2026-09-16T12:35:57Z",
+    "asset_updated_at_utc": "2026-09-16T12:35:57Z",
+    "expected_sha256": "71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e",
+    "expected_size_bytes": 619674
+  },
+  "prospective_time_firewall": {
+    "source_known_by_utc": "2026-09-16T12:35:57Z",
+    "may_support_observations_known_before_source_known_by": false,
+    "week_1_retroactive_identity_join_authorized": false,
+    "retroactive_team_membership_inference_authorized": false,
+    "future_roster_status_may_be_used_for_past_state": false,
+    "downstream_observation_must_have_asof_at_or_after_source_known_by": true,
+    "reason": "The 2026 release asset was refreshed after Week 1. Even status-free bytes may contain later corrections, so this capture is prospective only for downstream point-in-time joins."
+  },
+  "identity_projection": {
+    "allowed_fields": [
+      "season",
+      "game_type",
+      "week",
+      "team",
+      "gsis_id",
+      "jersey_number",
+      "first_name",
+      "football_name",
+      "last_name"
+    ],
+    "forbidden_fields": [
+      "status",
+      "status_description_abbr",
+      "status_short_description"
+    ],
+    "row_filter": "season == 2026 and game_type == REG",
+    "status_fields_selected": false,
+    "status_fields_read": false,
+    "status_fields_allowed_for_resolution": false,
+    "projection_must_be_content_addressed": true,
+    "downstream_identity_resolution_must_use_projection_not_raw_source": true
+  },
+  "source_capture_gates": {
+    "raw_sha256_exact": true,
+    "raw_size_exact": true,
+    "valid_parquet_magic": true,
+    "all_allowed_fields_present": true,
+    "projection_fields_exactly_allowlisted": true,
+    "projection_contains_zero_forbidden_status_fields": true,
+    "projection_nonempty": true,
+    "source_identity_conflicts_are_diagnostic_only": true
+  },
+  "authority_if_passed": {
+    "exact_2026_status_free_identity_source_captured": true,
+    "player_identity_resolution_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_qualified": false,
+    "starter_probability_qualified": false,
+    "role_share_qualified": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "next_authorized_action_if_passed": "Separately preregister a conservative prospective rendered-name/team to GSIS resolver. The resolver must be frozen before inspecting resolution outcomes and must preserve unresolved/ambiguous rows rather than use fuzzy or status-based rescue rules.",
+  "governance": {
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": false,
+    "postgame_snaps_used": false,
+    "identity_resolution_performed_by_this_candidate": false,
+    "production_forecast_mutation": false
+  }
+}

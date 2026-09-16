@@ -1,0 +1,154 @@
+name: LevLine 2026 status-free identity source V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_identity_source_v1_contract.json'
+      - 'research/levline4_2026_identity_source_v1.py'
+      - 'research/test_levline4_2026_identity_source_v1.py'
+      - '.github/workflows/research_levline4_2026_identity_source_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-2026-status-free-identity-source-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest 'polars>=1.0'
+      - name: Test prospective status-free source contract
+        run: pytest -q research/test_levline4_2026_identity_source_v1.py
+      - name: Validate frozen authority and time firewall
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/levline4_2026_identity_source_v1_contract.json').read_text())
+          assert c['contract_id'] == 'LEVLINE-2026-STATUS-FREE-IDENTITY-SOURCE-CAPTURE-V1'
+          assert c['status'] == 'PREREGISTERED_PROSPECTIVE_IDENTITY_SOURCE_CAPTURE_ONLY'
+          assert c['source']['asset_id'] == 567939096
+          assert c['source']['expected_sha256'] == '71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e'
+          assert c['source']['expected_size_bytes'] == 619674
+          assert c['prospective_time_firewall']['source_known_by_utc'] == '2026-09-16T12:35:57Z'
+          assert c['prospective_time_firewall']['week_1_retroactive_identity_join_authorized'] is False
+          assert c['prospective_time_firewall']['future_roster_status_may_be_used_for_past_state'] is False
+          assert c['identity_projection']['status_fields_selected'] is False
+          assert c['identity_projection']['status_fields_read'] is False
+          assert c['identity_projection']['status_fields_allowed_for_resolution'] is False
+          assert c['authority_if_passed']['player_identity_resolution_qualified'] is False
+          assert c['authority_if_passed']['game_day_membership_qualified'] is False
+          assert c['authority_if_passed']['availability_state_qualified'] is False
+          assert c['authority_if_passed']['forecast_probability_effect_authorized'] is False
+          assert c['authority_if_passed']['production_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  capture-frozen-source:
+    needs: unit-and-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'polars>=1.0'
+      - name: Download exact preregistered 2026 nflverse asset
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 \
+            'https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2026.parquet' \
+            -o /tmp/roster_weekly_2026.parquet
+          test "$(stat -c%s /tmp/roster_weekly_2026.parquet)" -eq 619674
+          echo '71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e  /tmp/roster_weekly_2026.parquet' | sha256sum -c -
+      - name: Derive status-free identity projection
+        run: |
+          PYTHONPATH="$PWD" python -m research.levline4_2026_identity_source_v1 \
+            --raw-source /tmp/roster_weekly_2026.parquet \
+            --contract research/levline4_2026_identity_source_v1_contract.json \
+            --output-root research_outputs/levline4_2026_identity_source_v1
+      - name: Assert source-only authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research_outputs/levline4_2026_identity_source_v1/capture_receipt.json').read_text())
+          assert r['status'] == 'PASS'
+          assert r['raw_source_sha256'] == '71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e'
+          assert r['raw_source_bytes'] == 619674
+          assert r['projection_contains_only_allowlisted_fields'] is True
+          assert r['projection_contains_status_fields'] is False
+          assert r['status_fields_selected'] is False
+          assert r['status_fields_read'] is False
+          assert r['week_1_retroactive_identity_join_authorized'] is False
+          assert r['player_identity_resolution_qualified'] is False
+          assert r['game_day_membership_qualified'] is False
+          assert r['availability_state_qualified'] is False
+          assert r['player_value_join_authorized'] is False
+          assert r['forecast_probability_effect_authorized'] is False
+          assert r['model_fit_authorized'] is False
+          assert r['production_authorized'] is False
+          assert r['completed_2026_outcomes_used'] == 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-2026-status-free-identity-source-v1-${{ github.run_id }}
+          path: research_outputs/levline4_2026_identity_source_v1/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist exact source and projection off main
+        run: |
+          set -euo pipefail
+          DATA_BRANCH=research-data/levline4-2026-identity-source-v1
+          ROOT=research_outputs/levline4_2026_identity_source_v1
+          cp -R "$ROOT" /tmp/levline4_2026_identity_source_v1
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git fetch origin "$DATA_BRANCH:refs/remotes/origin/$DATA_BRANCH" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/$DATA_BRANCH"; then
+            git checkout -B levline4-2026-identity-source-v1-data "origin/$DATA_BRANCH"
+          else
+            git checkout --orphan levline4-2026-identity-source-v1-data
+            git rm -rf . || true
+          fi
+          rm -rf "$ROOT"
+          mkdir -p research_outputs
+          cp -R /tmp/levline4_2026_identity_source_v1 "$ROOT"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo 'Exact 2026 identity-source capture already persisted.'
+            exit 0
+          fi
+          git commit -m 'Persist prospective 2026 status-free identity source V1'
+          git push origin HEAD:"$DATA_BRANCH"
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove source capture remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
