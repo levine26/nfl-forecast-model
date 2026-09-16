@@ -1,0 +1,90 @@
+{
+  "schema_version": "levline4-2026-official-club-player-profile-surface-probe-v1-first-result-manifest-v2",
+  "contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-PLAYER-PROFILE-SURFACE-PROBE-V1",
+  "first_result_is_canonical": true,
+  "later_same_version_execution_may_replace_first_result": false,
+  "first_workflow_run_id": 35136388628,
+  "first_artifact_id": 10463865079,
+  "first_head_sha": "db98ab7b37add137c536b21df78aa0e0bef6e407",
+  "artifact_digest": "sha256:4817196a26820c68c6d2054aaa02758779f5454314b4e033bba850f42c553ff3",
+  "canonical_artifact_file_hashes": {
+    "receipt.json": "85c399f11cce83d704ec192c9014380e8a0effbbed58a6a41b680750746b9c8e",
+    "team_diagnostics.json": "34b56daa43f4639281de03b3681a9dae2b6b48e0b9757c8bf705a2ca84889578",
+    "selected_profiles.json": "ee882e69d604f91eae198d880bb79a967984add67056fb5fb005b0634e2767be"
+  },
+  "raw_tree_sha256": "064dccd171e121ea03a67b5493aa50b7482466e4622811dc09879bbce78eb94f",
+  "raw_total_bytes": 11421601,
+  "artifact_uncompressed_total_bytes": 11509972,
+  "status": "PASS",
+  "selected_profile_count": 32,
+  "captured_team_count": 32,
+  "http_success_team_count": 32,
+  "raw_file_team_count": 32,
+  "source_error_count": 0,
+  "pages_with_gsis_like_values": 0,
+  "literal_token_page_counts": {
+    "athlete-id": 0,
+    "athlete_id": 0,
+    "athleteid": 0,
+    "espn": 4,
+    "gsis": 0,
+    "nfl-id": 0,
+    "nfl_id": 0,
+    "nflid": 0,
+    "person-id": 0,
+    "person_id": 0,
+    "personid": 0,
+    "player-id": 0,
+    "player_id": 0,
+    "playerid": 0,
+    "sportradar": 0
+  },
+  "observed_id_like_attribute_names": [
+    "data-id",
+    "data-notification-id",
+    "id"
+  ],
+  "structural_interpretation": {
+    "no_gsis_like_value_observed_in_canonical_sample": true,
+    "broad_espn_literal_observed_on_four_pages": true,
+    "literal_token_presence_is_identifier_qualification": false,
+    "generic_html_id_attributes_observed": true,
+    "generic_data_id_attributes_observed": true,
+    "official_stable_player_identifier_exposed_qualified": false,
+    "json_ld_stable_player_identifier_field_qualified": false,
+    "profile_slug_as_stable_identifier_qualified": false,
+    "generic_html_or_media_identifier_as_player_identifier_qualified": false,
+    "universal_absence_of_first_party_player_identifier_claimed": false
+  },
+  "noncanonical_later_live_capture_before_replay_hardening": {
+    "workflow_run_id": 35136870891,
+    "artifact_id": 10464126056,
+    "artifact_digest": "sha256:05ad49a8b844355019bb317c273cc8310d1d9966d749e9c12d8462aa671f6718",
+    "may_replace_first_result": false,
+    "used_for_scientific_conclusion": false,
+    "used_for_rule_or_threshold_changes": false
+  },
+  "authority": {
+    "official_club_player_profile_surface_capture_qualified": true,
+    "official_stable_player_identifier_exposed_qualified": false,
+    "official_identifier_parser_qualified": false,
+    "official_identifier_to_gsis_bridge_qualified": false,
+    "player_identity_to_gsis_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "target_inactive_rows_used_for_sample_selection_or_parser_design": false,
+    "same_version_parser_adaptation_after_first_result": false,
+    "manifest_reconciled_only_to_named_immutable_first_artifact": true,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
