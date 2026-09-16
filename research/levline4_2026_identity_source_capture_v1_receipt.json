@@ -1,0 +1,66 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "LEVLINE-4-2026-STATUS-FREE-IDENTITY-SOURCE-V1-QUALIFIED",
+  "contract_id": "LEVLINE-4-2026-STATUS-FREE-IDENTITY-SOURCE-V1",
+  "status": "EMPIRICAL_SOURCE_CAPTURE_COMPLETE_SOURCE_QUALIFIED",
+  "workflow_evidence": {
+    "first_frozen_run_id": 35113550399,
+    "capture_job_id": 104853240910,
+    "validated_head_sha": "46a6e968afee49c36531fcd5aa80c4e4fdc4f3a1",
+    "artifact_id": 10452584328,
+    "artifact_zip_sha256": "489e3f407b5704b142e9244234d0193848e87a7a4fa00d051906ba41a9923318"
+  },
+  "source_result": {
+    "provider": "nflverse",
+    "asset_id": 567939096,
+    "asset_created_at_utc": "2026-09-16T12:35:57Z",
+    "raw_source_bytes": 619674,
+    "raw_source_sha256": "71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e",
+    "raw_parquet_magic_valid": true,
+    "exact_preregistered_source_gate_pass": true
+  },
+  "projection_result": {
+    "projection_sha256": "fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f",
+    "projection_bytes": 68917,
+    "projection_fields": [
+      "season",
+      "game_type",
+      "week",
+      "team",
+      "gsis_id",
+      "jersey_number",
+      "first_name",
+      "football_name",
+      "last_name"
+    ],
+    "weeks_present": [1, 2],
+    "source_rows_selected": 5464,
+    "usable_non_null_gsis_rows": 5462,
+    "missing_gsis_rows": 2,
+    "source_identity_conflicts": 0,
+    "projection_contains_status_fields": false,
+    "status_fields_selected": false,
+    "status_fields_read_for_resolution": false
+  },
+  "scientific_disposition": {
+    "source_capture_qualified": true,
+    "status_free_identity_projection_qualified": true,
+    "player_identity_to_gsis_qualified": false,
+    "weekly_roster_defines_game_day_membership": false,
+    "week_1_membership_or_availability_reconstruction_authorized": false,
+    "availability_state_authorized": false,
+    "availability_probability_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "identity_resolution_performed": false,
+    "postgame_participation_used": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "threshold_relaxation_after_observation": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}

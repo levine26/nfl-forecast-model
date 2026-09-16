@@ -1,0 +1,67 @@
+{
+  "contract_version": 1,
+  "contract_id": "LEVLINE-4-2026-STATUS-FREE-IDENTITY-SOURCE-V1",
+  "status": "PREREGISTERED_SOURCE_PROVENANCE_CAPTURE_ONLY",
+  "purpose": "Freeze the exact first prospective 2026 nflverse weekly-roster source bytes and a status-free identity-only projection for future official-inactive name-to-GSIS research.",
+  "season": 2026,
+  "game_type": "REG",
+  "source": {
+    "provider": "nflverse",
+    "upstream_description": "Week-level rosters via NFL Shield v2 API",
+    "release_tag": "weekly_rosters",
+    "asset_id": 567939096,
+    "asset_name": "roster_weekly_2026.parquet",
+    "asset_created_at_utc": "2026-09-16T12:35:57Z",
+    "asset_size_bytes": 619674,
+    "download_url": "https://github.com/nflverse/nflverse-data/releases/download/weekly_rosters/roster_weekly_2026.parquet",
+    "expected_sha256": "71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e",
+    "parquet_magic_required": true,
+    "exact_initial_source_required": true
+  },
+  "identity_projection": {
+    "allowed_fields": [
+      "season",
+      "game_type",
+      "week",
+      "team",
+      "gsis_id",
+      "jersey_number",
+      "first_name",
+      "football_name",
+      "last_name"
+    ],
+    "forbidden_fields": [
+      "status",
+      "status_description_abbr",
+      "status_short_description"
+    ],
+    "select_allowlist_before_row_conversion": true,
+    "status_fields_selected": false,
+    "status_fields_read_for_resolution": false,
+    "downstream_identity_work_must_consume_projection_not_raw_source": true
+  },
+  "chronology": {
+    "initial_asset_is_prospective_for_future_week_2_and_later_games": true,
+    "initial_asset_may_not_be_used_to_assert_week_1_team_membership_or_availability": true,
+    "retrospective_roster_status_reconstruction_authorized": false,
+    "postgame_participation_authorized": false
+  },
+  "authority": {
+    "source_capture_qualified_by_this_contract": false,
+    "player_identity_to_gsis_qualified": false,
+    "weekly_roster_defines_game_day_membership": false,
+    "availability_state_authorized": false,
+    "availability_probability_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "identity_resolution_performed": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "production_forecast_mutation_authorized": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
