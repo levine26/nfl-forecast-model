@@ -1,0 +1,112 @@
+{
+  "contract_version": 1,
+  "contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-SURFACE-PROBE-V1",
+  "status": "PREREGISTERED_SOURCE_SURFACE_CAPTURE_AND_DIAGNOSTIC_ONLY",
+  "purpose": "Capture and characterize the 32 official NFL club roster web surfaces before the Week 2 Sunday inactive execution so a later version can preregister a first-party cross-provider identity validation without adapting parser rules to the target inactive rows.",
+  "source_discovery": {
+    "directory_url": "https://www.nfl.com/teams/",
+    "discovery_basis": "NFL official teams directory",
+    "roster_path": "/team/players-roster/",
+    "clubs": {
+      "ARI": "www.azcardinals.com",
+      "ATL": "www.atlantafalcons.com",
+      "BAL": "www.baltimoreravens.com",
+      "BUF": "www.buffalobills.com",
+      "CAR": "www.panthers.com",
+      "CHI": "www.chicagobears.com",
+      "CIN": "www.bengals.com",
+      "CLE": "www.clevelandbrowns.com",
+      "DAL": "www.dallascowboys.com",
+      "DEN": "www.denverbroncos.com",
+      "DET": "www.detroitlions.com",
+      "GB": "www.packers.com",
+      "HOU": "www.houstontexans.com",
+      "IND": "www.colts.com",
+      "JAX": "www.jaguars.com",
+      "KC": "www.chiefs.com",
+      "LV": "www.raiders.com",
+      "LAC": "www.chargers.com",
+      "LAR": "www.therams.com",
+      "MIA": "www.miamidolphins.com",
+      "MIN": "www.vikings.com",
+      "NE": "www.patriots.com",
+      "NO": "www.neworleanssaints.com",
+      "NYG": "www.giants.com",
+      "NYJ": "www.newyorkjets.com",
+      "PHI": "www.philadelphiaeagles.com",
+      "PIT": "www.steelers.com",
+      "SEA": "www.seahawks.com",
+      "SF": "www.49ers.com",
+      "TB": "www.buccaneers.com",
+      "TEN": "www.tennesseetitans.com",
+      "WAS": "www.commanders.com"
+    }
+  },
+  "capture": {
+    "https_required": true,
+    "raw_response_bytes_preserved": true,
+    "raw_sha256_required": true,
+    "captured_at_utc_required": true,
+    "final_url_required": true,
+    "content_type_recorded": true,
+    "network_redirects_allowed_only_within_frozen_club_host_www_variant": true,
+    "silent_team_drops_allowed": false,
+    "append_only_snapshot_storage_required": true
+  },
+  "frozen_diagnostics": {
+    "profile_href_pattern": "/team/players-roster/<nonempty-slug>",
+    "record_unique_profile_urls": true,
+    "record_profile_anchor_visible_text": true,
+    "record_html_table_header_vectors": true,
+    "record_tables_with_player_number_position_headers": true,
+    "record_next_data_script_presence": true,
+    "record_json_ld_script_count": true,
+    "record_profile_link_host_counts": true,
+    "at_least_one_profile_link_is_surface_presence_only": true,
+    "diagnostics_may_not_qualify_identity_truth": true
+  },
+  "projection_policy": {
+    "diagnostic_profile_link_fields": [
+      "team",
+      "profile_url",
+      "anchor_text",
+      "source_url",
+      "final_url",
+      "captured_at_utc",
+      "raw_html_sha256"
+    ],
+    "roster_section_or_status_selected": false,
+    "roster_section_or_status_interpreted": false,
+    "active_practice_squad_reserve_semantics_authorized": false,
+    "injury_status_selected": false,
+    "starter_or_depth_role_selected": false
+  },
+  "v1_disposition": {
+    "all_32_http_success_required_to_call_capture_complete": true,
+    "all_32_surface_presence_required_to_call_surface_probe_complete": true,
+    "minimum_player_rows_per_team_frozen": null,
+    "name_jersey_position_parser_qualified": false,
+    "player_identity_to_gsis_qualified": false,
+    "same_version_parser_rule_adaptation_after_live_probe": false,
+    "follow_up_requires_new_preregistered_version": true
+  },
+  "authority": {
+    "official_club_roster_surface_capture_may_qualify": true,
+    "official_club_roster_identity_parser_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "f_st_01_frozen_2026_unchanged": true,
+    "production_dependency_authorized": false
+  }
+}
