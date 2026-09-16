@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'research/levline4_2026_identity_source_capture_v1_contract.json'
+      - 'research/levline4_2026_identity_source_capture_v1_receipt.json'
       - 'research/levline4_2026_identity_source_capture_v1.py'
       - 'research/test_levline4_2026_identity_source_capture_v1.py'
       - '.github/workflows/research_levline4_2026_identity_source_capture_v1.yml'
@@ -29,12 +30,13 @@ jobs:
         run: python -m pip install pytest 'polars==1.44.2' 'requests>=2.32'
       - name: Test status-free projection
         run: pytest -q research/test_levline4_2026_identity_source_capture_v1.py
-      - name: Validate frozen contract
+      - name: Validate frozen contract and empirical receipt
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           c = json.loads(Path('research/levline4_2026_identity_source_capture_v1_contract.json').read_text())
+          r = json.loads(Path('research/levline4_2026_identity_source_capture_v1_receipt.json').read_text())
           assert c['contract_id'] == 'LEVLINE-4-2026-STATUS-FREE-IDENTITY-SOURCE-V1'
           assert c['status'] == 'PREREGISTERED_SOURCE_PROVENANCE_CAPTURE_ONLY'
           assert c['source']['asset_id'] == 567939096
@@ -48,7 +50,21 @@ jobs:
           assert c['authority']['weekly_roster_defines_game_day_membership'] is False
           assert c['authority']['production_authorized'] is False
           assert c['governance']['completed_2026_outcomes_used_for_design_or_selection'] == 0
-          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
+          assert r['contract_id'] == c['contract_id']
+          assert r['status'] == 'EMPIRICAL_SOURCE_CAPTURE_COMPLETE_SOURCE_QUALIFIED'
+          assert r['workflow_evidence']['first_frozen_run_id'] == 35113550399
+          assert r['source_result']['raw_source_sha256'] == c['source']['expected_sha256']
+          assert r['projection_result']['source_rows_selected'] == 5464
+          assert r['projection_result']['usable_non_null_gsis_rows'] == 5462
+          assert r['projection_result']['missing_gsis_rows'] == 2
+          assert r['projection_result']['source_identity_conflicts'] == 0
+          assert r['projection_result']['projection_contains_status_fields'] is False
+          assert r['scientific_disposition']['source_capture_qualified'] is True
+          assert r['scientific_disposition']['player_identity_to_gsis_qualified'] is False
+          assert r['scientific_disposition']['week_1_membership_or_availability_reconstruction_authorized'] is False
+          assert r['scientific_disposition']['production_authorized'] is False
+          assert r['governance']['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert r['governance']['f_st_01_frozen_2026_unchanged'] is True
           PY
 
   capture-exact-initial-source:
@@ -64,30 +80,45 @@ jobs:
         run: python -m pip install 'polars==1.44.2' 'requests>=2.32'
       - name: Capture exact preregistered source and identity-only projection
         run: python -m research.levline4_2026_identity_source_capture_v1
-      - name: Assert narrow source-capture authority
+      - name: Reproduce deterministic frozen empirical evidence
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          p = Path('research_outputs/levline4_2026_identity_source_v1/receipt.json')
-          r = json.loads(p.read_text())
-          assert r['status'] == 'PASS'
-          assert r['raw_source_sha256'] == '71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e'
-          assert r['raw_source_bytes'] == 619674
-          assert r['projection_contains_only_allowlisted_fields'] is True
-          assert r['projection_contains_status_fields'] is False
-          assert r['status_fields_selected'] is False
-          assert r['status_fields_read_for_resolution'] is False
-          assert r['source_capture_qualified_by_this_receipt'] is True
-          assert r['player_identity_to_gsis_qualified'] is False
-          assert r['weekly_roster_defines_game_day_membership'] is False
-          assert r['availability_state_authorized'] is False
-          assert r['player_value_join_authorized'] is False
-          assert r['forecast_probability_effect_authorized'] is False
-          assert r['production_authorized'] is False
-          assert r['completed_2026_outcomes_used_for_design_or_selection'] == 0
-          assert r['f_st_01_frozen_2026_unchanged'] is True
-          print(json.dumps(r, indent=2, sort_keys=True))
+          observed = json.loads(Path('research_outputs/levline4_2026_identity_source_v1/receipt.json').read_text())
+          frozen = json.loads(Path('research/levline4_2026_identity_source_capture_v1_receipt.json').read_text())
+          assert observed['status'] == 'PASS'
+          assert observed['raw_source_sha256'] == frozen['source_result']['raw_source_sha256']
+          assert observed['raw_source_bytes'] == frozen['source_result']['raw_source_bytes']
+          assert observed['projection_sha256'] == frozen['projection_result']['projection_sha256']
+          assert observed['projection_bytes'] == frozen['projection_result']['projection_bytes']
+          assert observed['projection_fields'] == frozen['projection_result']['projection_fields']
+          assert observed['weeks_present'] == frozen['projection_result']['weeks_present']
+          assert observed['source_rows_selected'] == frozen['projection_result']['source_rows_selected']
+          assert observed['usable_non_null_gsis_rows'] == frozen['projection_result']['usable_non_null_gsis_rows']
+          assert observed['missing_gsis_rows'] == frozen['projection_result']['missing_gsis_rows']
+          assert observed['source_identity_conflicts'] == frozen['projection_result']['source_identity_conflicts']
+          assert observed['projection_contains_status_fields'] is False
+          assert observed['status_fields_selected'] is False
+          assert observed['status_fields_read_for_resolution'] is False
+          assert observed['source_capture_qualified_by_this_receipt'] is True
+          assert observed['player_identity_to_gsis_qualified'] is False
+          assert observed['weekly_roster_defines_game_day_membership'] is False
+          assert observed['availability_state_authorized'] is False
+          assert observed['player_value_join_authorized'] is False
+          assert observed['forecast_probability_effect_authorized'] is False
+          assert observed['production_authorized'] is False
+          assert observed['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert observed['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'raw_source_sha256': observed['raw_source_sha256'],
+              'projection_sha256': observed['projection_sha256'],
+              'source_rows_selected': observed['source_rows_selected'],
+              'usable_non_null_gsis_rows': observed['usable_non_null_gsis_rows'],
+              'missing_gsis_rows': observed['missing_gsis_rows'],
+              'source_identity_conflicts': observed['source_identity_conflicts'],
+              'weeks_present': observed['weeks_present'],
+          }, indent=2, sort_keys=True))
           PY
       - uses: actions/upload-artifact@v4
         with:
