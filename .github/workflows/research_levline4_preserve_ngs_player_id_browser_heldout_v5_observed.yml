@@ -1,0 +1,211 @@
+name: LevLine 4 preserve observed NGS player ID browser held-out V5
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_browser_heldout_v5_observed.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_browser_heldout_v5_observed.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-ngs-player-id-browser-heldout-v5-observed
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10473671117'
+  SOURCE_WORKFLOW_RUN_ID: '35162079741'
+  SOURCE_HEAD_SHA: '2fbd9cbb76efc12448581eb1ed393a579cfd60b9'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:961994eb487c59103f5388708456659e40e11d13ee4462494f7d093876787c90'
+  EXPECTED_ARTIFACT_SIZE: '85599'
+  SOURCE_MANIFEST_COMMIT: '55cdbb3104827a4c35f1023e2bd742b8a203cf83'
+  SOURCE_MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v5_first_result_manifest.json'
+  DATA_BRANCH: 'research-data/levline4-ngs-player-id-browser-heldout-v5-observed'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recover pinned V5 first-result manifest
+        run: |
+          set -euo pipefail
+          git fetch origin research/levline4-ngs-player-id-browser-heldout-v5-prereg
+          test "$(git rev-parse ${SOURCE_MANIFEST_COMMIT})" = "$SOURCE_MANIFEST_COMMIT"
+          git show "${SOURCE_MANIFEST_COMMIT}:${SOURCE_MANIFEST_PATH}" > /tmp/v5_manifest.json
+      - name: Download immutable canonical V5 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v5.zip
+          rm -rf /tmp/ngs_v5
+          mkdir -p /tmp/ngs_v5
+          unzip -q /tmp/ngs_v5.zip -d /tmp/ngs_v5
+      - name: Verify bytes, observed PASS, and governance hold
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path('/tmp/ngs_v5')
+          manifest=json.loads(Path('/tmp/v5_manifest.json').read_text())
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert manifest['first_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert manifest['first_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert manifest['first_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert manifest['artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert manifest['artifact_size_in_bytes']==int(os.environ['EXPECTED_ARTIFACT_SIZE'])
+          assert manifest['artifact_uncompressed_file_count']==87
+          assert manifest['first_result_is_canonical'] is True
+          assert manifest['first_result_status']=='PASS'
+          assert observed==manifest['file_sha256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['status']=='PASS'
+          m=receipt['metrics']
+          assert m['target_count']==74
+          assert m['coverage_unique_resolution_count']==64
+          assert m['coverage_target_count']==64
+          assert m['team_alias_ari_unique_resolution_count']==4
+          assert m['team_alias_ari_selected_ngs_az_count']==4
+          assert m['source_name_variant_unique_resolution_count']==16
+          assert m['executed_query_attempt_count']==81
+          assert m['fallback_exercised_count']==7
+          assert m['fallback_success_count']==7
+          assert m['invalid_selected_gsis_count']==0
+          assert m['duplicate_selected_gsis_across_distinct_target_rows_count']==0
+          assert m['independent_resolved_coverage_jersey_agreement_count']==60
+          assert m['independent_resolved_coverage_jersey_comparable_count']==62
+          assert m['tiebreak_exercised_count']==0
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert receipt['research_only'] is True
+          assert receipt['production_paths_changed'] is False
+          # Preservation does not accept the source manifest's authority claims.
+          # PR #336 is on governance hold because its preregistration premise conflicts
+          # with the controlling V3 -> V4 -> successor chronology.
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recover pinned V5 first-result manifest
+        run: |
+          set -euo pipefail
+          git fetch origin research/levline4-ngs-player-id-browser-heldout-v5-prereg
+          git show "${SOURCE_MANIFEST_COMMIT}:${SOURCE_MANIFEST_PATH}" > /tmp/v5_manifest.json
+      - name: Download immutable canonical V5 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v5.zip
+          rm -rf /tmp/ngs_v5
+          mkdir -p /tmp/ngs_v5
+          unzip -q /tmp/ngs_v5.zip -d /tmp/ngs_v5
+      - name: Reverify and add governance-hold preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from datetime import datetime,timezone
+          from pathlib import Path
+          root=Path('/tmp/ngs_v5')
+          manifest=json.loads(Path('/tmp/v5_manifest.json').read_text())
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert observed==manifest['file_sha256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['status']=='PASS'
+          Path('/tmp/ngs_v5/source_first_result_manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+          preservation={
+            'schema_version':'levline4-ngs-player-id-browser-heldout-v5-observed-preservation-v1',
+            'source_actions_artifact_id':int(os.environ['SOURCE_ARTIFACT_ID']),
+            'source_workflow_run_id':int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+            'source_head_sha':os.environ['SOURCE_HEAD_SHA'],
+            'source_manifest_commit':os.environ['SOURCE_MANIFEST_COMMIT'],
+            'actions_artifact_digest':os.environ['EXPECTED_ARTIFACT_DIGEST'],
+            'actions_artifact_size_in_bytes':int(os.environ['EXPECTED_ARTIFACT_SIZE']),
+            'canonical_artifact_file_sha256':manifest['file_sha256'],
+            'preserved_at_utc':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+            'preserving_workflow_run_id':os.environ['GITHUB_RUN_ID'],
+            'observed_result':'PASS',
+            'scientific_authority_status':'SUSPENDED_GOVERNANCE_PROVENANCE_CONFLICT',
+            'governance_conflict':'V5 preregistration asserted V4 was withdrawn before empirical execution and reused the exact V4 population; controlling chronology required V4 canonical execution/freeze first.',
+            'v5_target_rows_must_be_excluded_from_fresh_successor_validation':True,
+            'research_only':True,
+            'general_2026_player_identity_to_gsis_qualified':False,
+            'game_day_membership_qualified':False,
+            'availability_state_authorized':False,
+            'player_value_join_authorized':False,
+            'forecast_probability_effect_authorized':False,
+            'model_fit_authorized':False,
+            'production_authorized':False,
+            'completed_2026_outcomes_used':0,
+            'postgame_participation_used':False,
+            'week2_inactive_execution_evidence_used_for_design':False,
+            'f_st_01_frozen_2026_unchanged':True,
+          }
+          (root/'preservation.json').write_text(json.dumps(preservation,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist on dedicated observed-evidence branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B ngs-v5-observed-data "origin/${DATA_BRANCH}"
+          else
+            git checkout -B ngs-v5-observed-data
+          fi
+          DEST='research_outputs/levline4_2026_ngs_player_id_browser_heldout_v5_observed/first_result_35162079741'
+          if [ -e "$DEST/preservation.json" ]; then
+            DEST="$DEST" python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['DEST']); p=json.loads((root/'preservation.json').read_text())
+          assert p['source_actions_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert p['source_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert p['source_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert p['actions_artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert p['observed_result']=='PASS'
+          assert p['scientific_authority_status']=='SUSPENDED_GOVERNANCE_PROVENANCE_CONFLICT'
+          assert p['production_authorized'] is False
+          for rel,expected in p['canonical_artifact_file_sha256'].items():
+              assert hashlib.sha256((root/rel).read_bytes()).hexdigest()==expected, rel
+          PY
+            echo 'Observed V5 evidence already preserved exactly under governance hold.'
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/ngs_v5 "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve observed V5 PASS under governance hold'
+          git push origin HEAD:"${DATA_BRANCH}"
