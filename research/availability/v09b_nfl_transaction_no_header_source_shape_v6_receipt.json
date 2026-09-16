@@ -1,0 +1,82 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-NFL-TRANSACTION-NO-HEADER-SOURCE-SHAPE-V6-COMPLETE",
+  "contract_id": "V09B-NFL-TRANSACTION-NO-HEADER-SOURCE-SHAPE-V6",
+  "status": "NO_HEADER_SOURCE_SHAPES_CAPTURED_EXPLICIT_NO_TRANSACTIONS_HEADING_ZERO_SEMANTIC_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34767820731,
+    "validated_head_sha": "b4bc9377523467fbf87701def4051db8611f7fa9",
+    "manifest_artifact_id": 10321320140,
+    "manifest_artifact_digest": "sha256:598d7d2f4c441f42f034393fc3a82428f316837854a10efab8d272e3ada95892",
+    "raw_artifact_id": 10320819083,
+    "raw_artifact_digest": "sha256:82a037fc49eb09728c61efb6b28ace6a9e52c36e0c88233885d16fd098fce154",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "source_governance_passed": true,
+    "exit_code": 0
+  },
+  "empirical_result": {
+    "fixed_requests_expected": 72,
+    "fixed_requests_accounted_for": 72,
+    "initial_requests": 70,
+    "post_pagination_requests": 2,
+    "transport_errors": 0,
+    "http_status_failures": 0,
+    "raw_preservation_failures": 0,
+    "gzip_roundtrip_failures": 0,
+    "http_200_responses": 72,
+    "allowed_first_party_final_host_path_passes": 72,
+    "standard_transaction_header_seen": 0,
+    "standard_transaction_rows_total": 0,
+    "html_table_count_total": 0,
+    "explicit_no_transactions_available_heading_count": 72,
+    "initial_cases_with_after_links": 0,
+    "post_pagination_cases_with_after_link_equal_to_requested_current_cursor": 2,
+    "unique_raw_response_shas": 72,
+    "unique_normalized_visible_text_shas": 72,
+    "frozen_diagnostic_gate_pass": true,
+    "no_header_shape_capture_complete": true
+  },
+  "observed_common_structure": {
+    "all_72_have_exact_heading": "No Transactions Available",
+    "all_72_have_zero_standard_transaction_rows": true,
+    "all_72_have_zero_html_tables": true,
+    "all_72_are_http_200": true,
+    "all_70_initial_cases_have_zero_after_links": true,
+    "post_pagination_notes": [
+      {
+        "case_id": "cursor-2017-05-waivers-terminal-shape",
+        "requested_url": "https://amp.nfl.com/transactions/league/waivers/2017/5?after=AAAH4QAAAAUAAAABAAAAAAAKlXA%3D",
+        "observed_after_value": "AAAH4QAAAAUAAAABAAAAAAAKlXA=",
+        "after_value_equals_requested_current_cursor": true
+      },
+      {
+        "case_id": "cursor-2020-10-waivers-terminal-shape",
+        "requested_url": "https://amp.nfl.com/transactions/league/waivers/2020/10?after=AAAH5AAAAAoAAAABAAAAAAAMEQ8%3D",
+        "observed_after_value": "AAAH5AAAAAoAAAABAAAAAAAMEQ8=",
+        "after_value_equals_requested_current_cursor": true
+      }
+    ]
+  },
+  "scientific_interpretation": {
+    "v6_qualifies_only_source_shape_capture": true,
+    "explicit_no_transactions_heading_is_observed_not_yet_semantically_qualified": true,
+    "empty_result_semantics_qualified": false,
+    "terminal_page_semantics_qualified": false,
+    "all_month_full_ledger_qualified": false,
+    "durable_full_ledger_source_archive_qualified": false,
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false,
+    "next_authorized_research_step": "Separately preregister a semantics-validation experiment using the exact V6-positive heading/zero-row structure as the candidate empty-result rule, with fixed non-empty first-party negative controls (including the 30 V4 September initial endpoints) and the two immediately preceding accepted V5 waiver cursor pages. Require zero false positives and reproducibility on all 72 V6 cases before any successor all-month capture may treat the explicit heading as an empty/terminal source representation."
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
