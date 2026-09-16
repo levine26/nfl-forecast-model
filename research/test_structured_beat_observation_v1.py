@@ -55,6 +55,27 @@ def test_forecast_effect_fields_are_rejected() -> None:
             validate_structured_observation(row)
 
 
+def test_nested_forecast_effect_fields_are_rejected() -> None:
+    payloads = [
+        '{"expected_to_start":true,"analysis":{"edge":0.03}}',
+        '{"expected_to_start":true,"notes":[{"win_probability_delta":0.02}]}',
+        '{"expected_to_start":true,"nested":{"recommendation":"bet home"}}',
+        '{"expected_to_start":true,"model_probability":0.61}',
+    ]
+    for payload in payloads:
+        row = _row()
+        row["value_json"] = payload
+        with pytest.raises(ValueError, match="forecast-effect fields are prohibited inside value_json"):
+            validate_structured_observation(row)
+
+
+def test_nonforecast_state_probability_name_is_not_blocked_by_generic_substring() -> None:
+    row = _row()
+    row["value_json"] = '{"expected_to_start":true,"source_reported_starter_probability":0.9}'
+    out = validate_structured_observation(row)
+    assert "source_reported_starter_probability" in out["value_json"]
+
+
 def test_observation_not_known_by_forecast_asof_fails_closed() -> None:
     row = _row()
     row["captured_at_utc"] = "2026-09-27T18:01:00Z"
