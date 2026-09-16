@@ -2,11 +2,15 @@ from __future__ import annotations
 
 """Immediately recover one Groq-failed Sunday Signal game.
 
-This is an editorial-only bridge. It prefers the freshest validated ChatGPT bundle that
-contains the failed game, first considering the game-scoped fallback bundle and then the
-full-slate current bundle. If no fresh ChatGPT payload exists, the existing provider
-fallback module may reuse the last already-validated human Read as a continuity bridge
-and explicitly leave requires_chatgpt_refresh=true.
+This is an editorial-only bridge. It selects the freshest validated payload that covers
+exactly the failed game from one of three isolated sources: the current failed-game
+fallback bundle, an approved Groq-recovery carryover bundle, or the complete ChatGPT
+current bundle. The carryover namespace exists so previously approved game-scoped
+recoveries do not masquerade as a complete full-slate ChatGPT ingestion bundle.
+
+If no fresh ChatGPT payload exists, the existing provider fallback module may reuse the
+last already-validated human Read as a continuity bridge and explicitly leave
+requires_chatgpt_refresh=true.
 
 The script never changes predictions, probabilities, locks, grading, model artifacts, or
 market inputs.
@@ -63,6 +67,7 @@ def choose_chatgpt_dir(game_id: str, now: datetime | None = None) -> Path:
     current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     candidates = [
         Path("inputs/chatgpt_media/fallback"),
+        Path("inputs/chatgpt_media/carryover"),
         Path("inputs/chatgpt_media/current"),
     ]
     fresh: list[tuple[datetime, Path]] = []
