@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""LevLine 4 held-out NGS player-ID resolver V2 (research only)."""
+"""LevLine 4 held-out NGS player-ID resolver V2 (research only).
+
+The frozen preregistration contract controls target selection, request semantics,
+resolution, pass gates, and authority. This executable fails closed and retains
+raw response bytes for every target.
+"""
 from __future__ import annotations
 
 import argparse
@@ -45,15 +50,12 @@ def clean(value: Any) -> str:
 
 
 def int_or_none(value: Any) -> int | None:
-    if value is None:
+    if value is None or isinstance(value, bool):
         return None
     text = str(value).strip()
-    if not text:
+    if not re.fullmatch(r"[0-9]+", text):
         return None
-    try:
-        return int(text)
-    except (TypeError, ValueError):
-        return None
+    return int(text)
 
 
 def selection_key(row: dict[str, Any]) -> str:
@@ -76,29 +78,29 @@ def row_identity(row: dict[str, Any]) -> tuple[str, str, str]:
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
-    out: list[dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         if not line.strip():
             continue
         value = json.loads(line)
         if not isinstance(value, dict):
             raise ValueError(f"{path}:{line_no}: row is not an object")
-        out.append(value)
-    return out
+        rows.append(value)
+    return rows
 
 
 def select_targets(
     rows: Iterable[dict[str, Any]], contract: dict[str, Any]
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     cfg = contract["target_selection"]
-    sentinels = set(cfg["v1_sentinel_visible_name_exclusions"])
+    sentinel_norms = {normalize_name(x) for x in cfg["v1_sentinel_visible_name_exclusions"]}
     eligible = [
-        dict(r)
-        for r in rows
-        if clean(r.get("visible_name"))
-        and clean(r.get("team"))
-        and clean(r.get("position"))
-        and clean(r.get("visible_name")) not in sentinels
+        dict(row)
+        for row in rows
+        if clean(row.get("visible_name"))
+        and clean(row.get("team"))
+        and clean(row.get("position"))
+        and normalize_name(row.get("visible_name")) not in sentinel_norms
     ]
 
     by_team: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -109,10 +111,10 @@ def select_targets(
     for team in sorted(by_team):
         ordered = sorted(
             by_team[team],
-            key=lambda r: (
-                selection_key(r),
-                clean(r.get("visible_name")),
-                clean(r.get("profile_path")),
+            key=lambda row: (
+                selection_key(row),
+                clean(row.get("visible_name")),
+                clean(row.get("profile_path")),
             ),
         )
         coverage.extend(ordered[:2])
@@ -123,23 +125,23 @@ def select_targets(
     ambiguity_groups = {
         name: group
         for name, group in by_name.items()
-        if len({clean(r.get("team")).upper() for r in group}) > 1
+        if len({clean(row.get("team")).upper() for row in group}) > 1
     }
     ambiguity = [
         row
         for name in sorted(ambiguity_groups)
         for row in sorted(
             ambiguity_groups[name],
-            key=lambda r: (
-                clean(r.get("team")),
-                clean(r.get("visible_name")),
-                clean(r.get("profile_path")),
+            key=lambda item: (
+                clean(item.get("team")),
+                clean(item.get("visible_name")),
+                clean(item.get("profile_path")),
             ),
         )
     ]
 
-    coverage_ids = {row_identity(r) for r in coverage}
-    ambiguity_ids = {row_identity(r) for r in ambiguity}
+    coverage_ids = {row_identity(row) for row in coverage}
+    ambiguity_ids = {row_identity(row) for row in ambiguity}
     overlap_ids = coverage_ids & ambiguity_ids
 
     target_map: dict[tuple[str, str, str], dict[str, Any]] = {}
@@ -172,18 +174,18 @@ def select_targets(
         "ambiguity_groups": {
             name: [
                 {
-                    "team": clean(r.get("team")),
-                    "visible_name": clean(r.get("visible_name")),
-                    "position": clean(r.get("position")),
-                    "jersey_number": clean(r.get("jersey_number")),
-                    "profile_path": clean(r.get("profile_path")),
+                    "team": clean(row.get("team")),
+                    "visible_name": clean(row.get("visible_name")),
+                    "position": clean(row.get("position")),
+                    "jersey_number": clean(row.get("jersey_number")),
+                    "profile_path": clean(row.get("profile_path")),
                 }
-                for r in sorted(
+                for row in sorted(
                     group,
-                    key=lambda r: (
-                        clean(r.get("team")),
-                        clean(r.get("visible_name")),
-                        clean(r.get("profile_path")),
+                    key=lambda item: (
+                        clean(item.get("team")),
+                        clean(item.get("visible_name")),
+                        clean(item.get("profile_path")),
                     ),
                 )
             ]
@@ -199,6 +201,28 @@ def select_targets(
     return targets, diagnostics
 
 
+def _transport_record(attempt: int, exc: BaseException) -> dict[str, Any]:
+    return {
+        "attempt": attempt,
+        "status": None,
+        "transport_error": f"{type(exc).__name__}: {exc}",
+        "body_bytes": 0,
+        "body_sha256": None,
+        "content_type": None,
+    }
+
+
+def _failure_result(attempts: list[dict[str, Any]], semantic_error: str) -> dict[str, Any]:
+    return {
+        "attempts": attempts,
+        "http_status": None,
+        "body": b"",
+        "json": None,
+        "parseable_players_array": False,
+        "semantic_error": semantic_error,
+    }
+
+
 def request_json(
     url: str,
     *,
@@ -207,6 +231,7 @@ def request_json(
     urlopen: Callable[..., Any] = urllib.request.urlopen,
     sleep: Callable[[float], None] = time.sleep,
 ) -> dict[str, Any]:
+    """GET one frozen URL; retry only timeout, 429, or 5xx as preregistered."""
     attempts: list[dict[str, Any]] = []
     last_body = b""
     for attempt in range(1, max_attempts + 1):
@@ -254,26 +279,23 @@ def request_json(
                 sleep(0.5 * attempt)
                 continue
             break
-        except (urllib.error.URLError, TimeoutError, socket.timeout) as exc:
-            attempts.append({
-                "attempt": attempt,
-                "status": None,
-                "transport_error": f"{type(exc).__name__}: {exc}",
-                "body_bytes": 0,
-                "body_sha256": None,
-                "content_type": None,
-            })
+        except (TimeoutError, socket.timeout) as exc:
+            attempts.append(_transport_record(attempt, exc))
             if attempt < max_attempts:
                 sleep(0.5 * attempt)
                 continue
-            return {
-                "attempts": attempts,
-                "http_status": None,
-                "body": b"",
-                "json": None,
-                "parseable_players_array": False,
-                "semantic_error": "transport_exhausted",
-            }
+            return _failure_result(attempts, "transport_timeout_exhausted")
+        except urllib.error.URLError as exc:
+            attempts.append(_transport_record(attempt, exc))
+            reason = getattr(exc, "reason", None)
+            is_timeout = isinstance(reason, (TimeoutError, socket.timeout))
+            if is_timeout and attempt < max_attempts:
+                sleep(0.5 * attempt)
+                continue
+            return _failure_result(
+                attempts,
+                "transport_timeout_exhausted" if is_timeout else "transport_nonretryable",
+            )
 
     status = attempts[-1]["status"] if attempts else None
     parsed = None
@@ -282,7 +304,9 @@ def request_json(
     if status == 200:
         try:
             parsed = json.loads(last_body.decode("utf-8"))
-            if isinstance(parsed, dict) and isinstance(parsed.get("players"), list):
+            if isinstance(parsed, dict) and isinstance(parsed.get("players"), list) and all(
+                isinstance(player, dict) for player in parsed["players"]
+            ):
                 parseable_players_array = True
             else:
                 semantic_error = "http_200_without_object_players_array"
@@ -323,16 +347,17 @@ def resolve_target(target: dict[str, Any], response_json: dict[str, Any] | None)
     target_name = normalize_name(target["visible_name"])
     target_team = clean(target["team"]).upper()
     matches = [
-        p for p in players
-        if isinstance(p, dict)
-        and normalize_name(p.get("displayName")) == target_name
-        and clean(p.get("teamAbbr")).upper() == target_team
+        player for player in players
+        if isinstance(player, dict)
+        and normalize_name(player.get("displayName")) == target_name
+        and clean(player.get("teamAbbr")).upper() == target_team
     ]
     unique_name_team_candidate = len(matches) == 1
     candidate = matches[0] if unique_name_team_candidate else None
     gsis = clean(candidate.get("gsisId")) if candidate else ""
     gsis_valid = bool(GSIS_RE.fullmatch(gsis)) if candidate else False
     resolved = bool(candidate and gsis_valid)
+
     ngs_jersey = None
     if candidate:
         ngs_jersey = int_or_none(candidate.get("uniformNumber"))
@@ -340,12 +365,13 @@ def resolve_target(target: dict[str, Any], response_json: dict[str, Any] | None)
             ngs_jersey = int_or_none(candidate.get("jerseyNumber"))
     official_jersey = int_or_none(target.get("jersey_number"))
     comparable = resolved and official_jersey is not None and ngs_jersey is not None
+
     return {
         "normalized_target_name": target_name,
         "target_team": target_team,
         "response_player_count": len(players),
         "name_plus_team_match_count": len(matches),
-        "matching_candidates": [candidate_projection(p) for p in matches],
+        "matching_candidates": [candidate_projection(player) for player in matches],
         "unique_name_plus_team_candidate": unique_name_team_candidate,
         "selected_gsis_id": gsis if resolved else None,
         "selected_candidate_gsis_raw": gsis if candidate else None,
@@ -365,36 +391,45 @@ def evaluate_gates(
     contract: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, bool], bool]:
     gates_cfg = contract["frozen_pass_gates"]
-    by_id = {tuple(r["target_row_identity"]): r for r in results}
-    coverage_ids = [row_identity(t) for t in targets if "coverage" in t["_strata"]]
-    ambiguity_ids = [row_identity(t) for t in targets if "source_name_ambiguity" in t["_strata"]]
+    by_id = {tuple(result["target_row_identity"]): result for result in results}
+    coverage_ids = [row_identity(target) for target in targets if "coverage" in target["_strata"]]
+    ambiguity_ids = [row_identity(target) for target in targets if "source_name_ambiguity" in target["_strata"]]
     coverage_results = [by_id[rid] for rid in coverage_ids]
     ambiguity_results = [by_id[rid] for rid in ambiguity_ids]
-    all_parseable = all(r["http_status"] == 200 and r["parseable_players_array"] for r in results)
-    coverage_resolved = [r for r in coverage_results if r["resolved"]]
-    ambiguity_resolved = [r for r in ambiguity_results if r["resolved"]]
-    invalid_selected = [r for r in results if r["unique_name_plus_team_candidate"] and not r["selected_candidate_gsis_valid"]]
-    multiple_matches = [r for r in results if r["name_plus_team_match_count"] > 1]
+
+    all_parseable = all(result["http_status"] == 200 and result["parseable_players_array"] for result in results)
+    coverage_resolved = [result for result in coverage_results if result["resolved"]]
+    ambiguity_resolved = [result for result in ambiguity_results if result["resolved"]]
+    invalid_selected = [
+        result for result in results
+        if result["unique_name_plus_team_candidate"] and not result["selected_candidate_gsis_valid"]
+    ]
+    multiple_matches = [result for result in results if result["name_plus_team_match_count"] > 1]
 
     gsis_to_rows: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
     for result in results:
         if result["resolved"]:
             gsis_to_rows[result["selected_gsis_id"]].append(tuple(result["target_row_identity"]))
-    duplicate_assignments = {gsis: ids for gsis, ids in gsis_to_rows.items() if len(set(ids)) > 1}
+    duplicate_assignments = {
+        gsis: ids for gsis, ids in gsis_to_rows.items() if len(set(ids)) > 1
+    }
 
-    comparable = [r for r in coverage_resolved if r["jersey_comparable"]]
-    agreements = [r for r in comparable if r["jersey_agrees"]]
+    comparable = [result for result in coverage_resolved if result["jersey_comparable"]]
+    agreements = [result for result in comparable if result["jersey_agrees"]]
+    coverage_resolution_fraction = len(coverage_resolved) / len(coverage_results) if coverage_results else 0.0
+    ambiguity_resolution_fraction = len(ambiguity_resolved) / len(ambiguity_results) if ambiguity_results else 0.0
     comparable_fraction = len(comparable) / len(coverage_resolved) if coverage_resolved else 0.0
     agreement_fraction = len(agreements) / len(comparable) if comparable else 0.0
+
     metrics = {
         "target_count": len(results),
         "all_http_200_parseable_players_array": all_parseable,
         "coverage_target_count": len(coverage_results),
         "coverage_unique_resolution_count": len(coverage_resolved),
-        "coverage_unique_resolution_fraction": len(coverage_resolved) / len(coverage_results) if coverage_results else 0.0,
+        "coverage_unique_resolution_fraction": coverage_resolution_fraction,
         "source_name_ambiguity_target_count": len(ambiguity_results),
         "source_name_ambiguity_unique_resolution_count": len(ambiguity_resolved),
-        "source_name_ambiguity_unique_resolution_fraction": len(ambiguity_resolved) / len(ambiguity_results) if ambiguity_results else 0.0,
+        "source_name_ambiguity_unique_resolution_fraction": ambiguity_resolution_fraction,
         "invalid_selected_gsis_count": len(invalid_selected),
         "duplicate_selected_gsis_across_distinct_target_rows_count": len(duplicate_assignments),
         "same_target_multiple_name_plus_team_candidate_count": len(multiple_matches),
@@ -403,13 +438,20 @@ def evaluate_gates(
         "resolved_coverage_jersey_agreement_count": len(agreements),
         "resolved_coverage_jersey_agreement_fraction": agreement_fraction,
         "duplicate_selected_gsis_assignments": {
-            gsis: [list(rid) for rid in ids] for gsis, ids in sorted(duplicate_assignments.items())
+            gsis: [list(rid) for rid in ids]
+            for gsis, ids in sorted(duplicate_assignments.items())
         },
     }
     gates = {
         "all_70_targets_http_200_parseable_players_array": all_parseable and len(results) == 70,
-        "coverage_unique_resolution_minimum": len(coverage_resolved) >= gates_cfg["coverage_stratum_unique_resolution_minimum_count"],
-        "source_name_ambiguity_unique_resolution_required": len(ambiguity_resolved) == gates_cfg["source_name_ambiguity_stratum_unique_resolution_required_count"],
+        "coverage_unique_resolution_minimum": (
+            len(coverage_resolved) >= gates_cfg["coverage_stratum_unique_resolution_minimum_count"]
+            and coverage_resolution_fraction >= gates_cfg["coverage_stratum_unique_resolution_minimum_fraction"]
+        ),
+        "source_name_ambiguity_unique_resolution_required": (
+            len(ambiguity_resolved) == gates_cfg["source_name_ambiguity_stratum_unique_resolution_required_count"]
+            and ambiguity_resolution_fraction == gates_cfg["source_name_ambiguity_stratum_unique_resolution_required_fraction"]
+        ),
         "invalid_selected_gsis_zero": len(invalid_selected) <= gates_cfg["invalid_selected_gsis_count_allowed"],
         "duplicate_selected_gsis_zero": len(duplicate_assignments) <= gates_cfg["duplicate_selected_gsis_across_distinct_target_rows_allowed"],
         "same_target_multiple_name_plus_team_candidate_zero": len(multiple_matches) <= gates_cfg["same_target_multiple_name_plus_team_candidate_count_allowed"],
@@ -421,17 +463,21 @@ def evaluate_gates(
 
 def run_probe(contract_path: Path, roster_path: Path, output_dir: Path) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    raw_dir = output_dir / "responses"
-    raw_dir.mkdir(parents=True, exist_ok=True)
+    response_dir = output_dir / "responses"
+    response_dir.mkdir(parents=True, exist_ok=True)
+
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    if contract["schema_version"] != "levline4-2026-ngs-player-id-heldout-v2-contract":
+        raise ValueError("unexpected contract schema")
+
     roster_sha = sha256_file(roster_path)
-    expected_roster_sha = contract["frozen_upstream_evidence"]["official_club_roster_v2"]["roster_metadata_sha256"]
+    roster_cfg = contract["frozen_upstream_evidence"]["official_club_roster_v2"]
+    expected_roster_sha = roster_cfg["roster_metadata_sha256"]
     if roster_sha != expected_roster_sha:
         raise ValueError(f"roster metadata hash mismatch: {roster_sha} != {expected_roster_sha}")
     rows = load_jsonl(roster_path)
-    expected_rows = contract["frozen_upstream_evidence"]["official_club_roster_v2"]["row_count"]
-    if len(rows) != expected_rows:
-        raise ValueError(f"roster row count mismatch: {len(rows)} != {expected_rows}")
+    if len(rows) != roster_cfg["row_count"]:
+        raise ValueError(f"roster row count mismatch: {len(rows)} != {roster_cfg['row_count']}")
 
     targets, selection_diag = select_targets(rows, contract)
     selection_payload = {
@@ -441,7 +487,14 @@ def run_probe(contract_path: Path, roster_path: Path, output_dir: Path) -> dict[
         "selection_diagnostics": selection_diag,
         "targets": targets,
     }
-    (output_dir / "target_selection.json").write_text(json.dumps(selection_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (output_dir / "target_selection.json").write_text(
+        json.dumps(selection_payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    (output_dir / "contract.json").write_text(
+        json.dumps(contract, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
     results: list[dict[str, Any]] = []
     for idx, target in enumerate(targets, 1):
@@ -475,16 +528,17 @@ def run_probe(contract_path: Path, roster_path: Path, output_dir: Path) -> dict[
             **resolution,
         }
         results.append(result)
-        time.sleep(0.05)
 
-    with (output_dir / "target_results.jsonl").open("w", encoding="utf-8") as fh:
+    with (output_dir / "target_results.jsonl").open("w", encoding="utf-8") as handle:
         for result in results:
-            fh.write(json.dumps(result, sort_keys=True) + "\n")
+            handle.write(json.dumps(result, sort_keys=True) + "\n")
 
     metrics, gates, passed = evaluate_gates(targets, results, contract)
-    scoped_authority = contract[
-        "authority_if_and_only_if_all_v2_gates_pass" if passed else "authority_if_any_v2_gate_fails"
-    ]
+    authority_key = (
+        "authority_if_and_only_if_all_v2_gates_pass"
+        if passed
+        else "authority_if_any_v2_gate_fails"
+    )
     receipt = {
         "schema_version": "levline4-2026-ngs-player-id-heldout-v2-receipt",
         "contract_id": contract["contract_id"],
@@ -494,7 +548,7 @@ def run_probe(contract_path: Path, roster_path: Path, output_dir: Path) -> dict[
         "target_selection": selection_diag,
         "metrics": metrics,
         "gates": gates,
-        "authority": scoped_authority,
+        "authority": contract[authority_key],
         "completed_2026_outcomes_used_for_design_or_selection": 0,
         "postgame_participation_used": False,
         "week2_inactive_execution_evidence_used_for_design": False,
@@ -502,7 +556,10 @@ def run_probe(contract_path: Path, roster_path: Path, output_dir: Path) -> dict[
         "research_only": True,
         "production_paths_changed": False,
     }
-    (output_dir / "receipt.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (output_dir / "receipt.json").write_text(
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     return receipt
 
 
