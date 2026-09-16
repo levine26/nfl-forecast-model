@@ -38,11 +38,22 @@ def test_prefers_newer_game_scoped_fallback_bundle(tmp_path: Path, monkeypatch) 
     assert choose_chatgpt_dir(GAME_ID, now) == Path("inputs/chatgpt_media/fallback")
 
 
-def test_uses_current_bundle_when_fallback_does_not_cover_game(tmp_path: Path, monkeypatch) -> None:
+def test_uses_recovery_carryover_without_polluting_current_bundle(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    now = datetime(2026, 9, 13, 4, 30, tzinfo=timezone.utc)
+    _bundle(Path("inputs/chatgpt_media/current"), "2026-09-13T04:20:00Z", ["2026_01_ARI_LAC"])
+    _bundle(Path("inputs/chatgpt_media/fallback"), "2026-09-13T04:15:00Z", ["2026_01_ARI_LAC"])
+    _bundle(Path("inputs/chatgpt_media/carryover"), "2026-09-13T04:00:00Z", [GAME_ID])
+
+    assert choose_chatgpt_dir(GAME_ID, now) == Path("inputs/chatgpt_media/carryover")
+
+
+def test_uses_current_bundle_when_fallback_and_carryover_do_not_cover_game(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     now = datetime(2026, 9, 13, 4, 30, tzinfo=timezone.utc)
     _bundle(Path("inputs/chatgpt_media/current"), "2026-09-13T04:00:00Z", [GAME_ID])
     _bundle(Path("inputs/chatgpt_media/fallback"), "2026-09-13T04:15:00Z", ["2026_01_ARI_LAC"])
+    _bundle(Path("inputs/chatgpt_media/carryover"), "2026-09-13T04:10:00Z", ["2026_01_NO_DET"])
 
     assert choose_chatgpt_dir(GAME_ID, now) == Path("inputs/chatgpt_media/current")
 
