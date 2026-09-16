@@ -220,6 +220,16 @@ jobs:
               print('No launch-grade media reporting snapshot available to preserve:', media)
           PY
 
+      - name: Restore validated Groq game checkpoints
+        if: github.event_name != 'pull_request'
+        id: groq-checkpoint-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/groq-validated-checkpoint
+          key: groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-${{ github.run_id }}
+          restore-keys: |
+            groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-
+
       - name: Research, compose and validate human game Reads with Groq and immediate ChatGPT fallback
         if: github.event_name != 'pull_request'
         env:
@@ -237,9 +247,27 @@ jobs:
 
           parts=/tmp/groq-game-parts
           prompts=/tmp/groq-game-prompts
+          checkpoint=/tmp/groq-validated-checkpoint
           rm -rf "$parts" "$prompts"
-          mkdir -p "$parts" "$prompts"
-          rm -f /tmp/groq-media-raw.json /tmp/groq-media-composed.json /tmp/groq-media-rendered.json outputs/copilot_media_reads.json
+          mkdir -p "$parts" "$prompts" "$checkpoint"
+          rm -f /tmp/groq-media-raw.json /tmp/groq-media-composed.json /tmp/groq-media-rendered.json /tmp/groq-unresolved-game-ids.txt outputs/copilot_media_reads.json
+
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          path = Path('outputs/context_source_status.json')
+          status = json.loads(path.read_text(encoding='utf-8'))
+          status['groq_provider_fallback'] = {
+              'run_id': str(os.environ.get('GITHUB_RUN_ID') or 'local'),
+              'status': 'healthy',
+              'games': {},
+              'failed_games': [],
+              'policy': 'Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.',
+          }
+          path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+          PY
+
           echo "Groq focused matchups: ${#game_ids[@]}"
 
           recover_game() {
@@ -258,6 +286,22 @@ jobs:
             return 0
           }
 
+          provider_recorded_failure() {
+            local gid="$1"
+            python - "$gid" <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+          gid = sys.argv[1]
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          section = status.get('groq_provider_fallback') or {}
+          item = (section.get('games') or {}).get(gid) or {}
+          current = str(section.get('run_id') or '') == str(os.environ.get('GITHUB_RUN_ID') or 'local')
+          print('1' if current and item.get('provider_result') == 'failed' else '0')
+          PY
+          }
+
           total_games=${#game_ids[@]}
           game_index=0
           for gid in "${game_ids[@]}"; do
@@ -266,42 +310,102 @@ jobs:
             : > "$feedback"
             accepted=0
             provider_failed=0
-            for attempt in 1 2 3; do
-              echo "$gid focused Groq editorial attempt $attempt/3"
-              prompt="$prompts/$gid.txt"
-              python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
-              if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 3; then
-                provider_failed=1
-                if recover_game "$gid" "groq_provider_request_failed" "$feedback"; then
-                  accepted=1
-                fi
-                break
-              fi
+            provider_attempted=0
+
+            if [ -s "$checkpoint/$gid.txt" ]; then
+              cp "$checkpoint/$gid.txt" "$parts/$gid.txt"
               if python scripts/validate_single_copilot_game.py --input "$parts/$gid.txt" --game-id "$gid" --predictions outputs/this_week.csv --accepted-dir "$parts" 2> "$feedback"; then
                 accepted=1
-                echo "$gid passed focused source/prose validation on editorial attempt $attempt."
-                break
+                echo "$gid restored from a previously validated Groq checkpoint and passed focused validation."
+              else
+                echo "$gid checkpoint no longer validates against the current canonical slate; discarding it."
+                cat "$feedback"
+                rm -f "$checkpoint/$gid.txt" "$parts/$gid.txt"
+                : > "$feedback"
               fi
-              cat "$feedback"
-              if [ "$attempt" -lt 3 ]; then
-                echo "$gid needs a prose/source retry; waiting for the underlying-model token window to reset."
-                sleep 65
-              fi
-            done
+            fi
 
-            if [ "$accepted" -ne 1 ] && [ "$provider_failed" -eq 0 ]; then
+            if [ "$accepted" -ne 1 ]; then
+              for attempt in 1 2 3; do
+                provider_attempted=1
+                echo "$gid focused Groq editorial attempt $attempt/3"
+                prompt="$prompts/$gid.txt"
+                python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
+                if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 3; then
+                  provider_failed=1
+                  if recover_game "$gid" "groq_provider_request_failed" "$feedback"; then
+                    accepted=1
+                  fi
+                  break
+                fi
+
+                if [ "$(provider_recorded_failure "$gid")" = "1" ]; then
+                  provider_failed=1
+                fi
+
+                if python scripts/validate_single_copilot_game.py --input "$parts/$gid.txt" --game-id "$gid" --predictions outputs/this_week.csv --accepted-dir "$parts" 2> "$feedback"; then
+                  accepted=1
+                  if [ "$provider_failed" -eq 0 ]; then
+                    cp "$parts/$gid.txt" "$checkpoint/$gid.txt"
+                    echo "$gid passed focused source/prose validation on editorial attempt $attempt and was checkpointed as Groq HUMAN prose."
+                  else
+                    echo "$gid passed focused validation through game-scoped fallback after a recorded Groq failure."
+                  fi
+                  break
+                fi
+                cat "$feedback"
+                if [ "$attempt" -lt 3 ]; then
+                  echo "$gid needs a prose/source retry; waiting for the underlying-model token window to reset."
+                  sleep 65
+                fi
+              done
+            fi
+
+            if [ "$accepted" -ne 1 ] && [ "$provider_failed" -eq 0 ] && [ "$provider_attempted" -eq 1 ]; then
               if recover_game "$gid" "focused_validation_failed" "$feedback"; then
                 accepted=1
+                provider_failed=1
               fi
             fi
             if [ "$accepted" -ne 1 ]; then
-              echo "$gid could not be recovered safely after Groq failure."
-              exit 1
+              echo "$gid could not be recovered safely after its Groq failure; recording it and continuing so every canonical game receives an independent provider attempt."
+              rm -f "$parts/$gid.txt"
             fi
-            if [ "$game_index" -lt "$total_games" ]; then
+            if [ "$game_index" -lt "$total_games" ] && [ "$provider_attempted" -eq 1 ]; then
               sleep 65
             fi
           done
+
+          mapfile -t unresolved_ids < <(python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          section = status.get('groq_provider_fallback') or {}
+          if str(section.get('run_id') or '') != str(os.environ.get('GITHUB_RUN_ID') or 'local'):
+              raise SystemExit('Groq fallback status does not belong to the current run')
+          for gid, item in sorted((section.get('games') or {}).items()):
+              if isinstance(item, dict) and item.get('provider_result') == 'failed' and bool(item.get('requires_chatgpt_refresh')):
+                  print(gid)
+          PY
+          )
+          if [ "${#unresolved_ids[@]}" -gt 0 ]; then
+            printf '%s\n' "${unresolved_ids[@]}" | tee /tmp/groq-unresolved-game-ids.txt
+            echo "Groq completed the full canonical attempt sweep, but ${#unresolved_ids[@]} game(s) still require exact game-scoped ChatGPT refresh; refusing partial publication."
+            exit 2
+          fi
+
+          missing_parts=0
+          for gid in "${game_ids[@]}"; do
+            if [ ! -s "$parts/$gid.txt" ]; then
+              echo "Missing validated HUMAN payload after full sweep: $gid"
+              missing_parts=1
+            fi
+          done
+          if [ "$missing_parts" -ne 0 ]; then
+            echo "Full sweep ended without a payload for at least one game; refusing partial publication."
+            exit 2
+          fi
 
           python scripts/merge_copilot_game_payloads.py --input-dir "$parts" --predictions outputs/this_week.csv --output /tmp/groq-media-raw.json
           python scripts/compose_copilot_media_reads.py --input /tmp/groq-media-raw.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --evidence outputs/contextual_evidence.json --output /tmp/groq-media-composed.json
@@ -327,6 +431,76 @@ jobs:
             python scripts/validate_copilot_media_reads.py --input /tmp/groq-media-rendered.json --predictions outputs/this_week.csv --output outputs/copilot_media_reads.json
           fi
           echo "Groq/ChatGPT hybrid responses passed the LevLine 3.0 full-slate publication validator."
+
+      - name: Save validated Groq game checkpoints
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/groq-validated-checkpoint
+          key: groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-${{ github.run_id }}
+
+      - name: Persist exact unresolved Groq failure state
+        if: failure() && github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          status_path = Path('outputs/context_source_status.json')
+          status = json.loads(status_path.read_text(encoding='utf-8'))
+          section = status.get('groq_provider_fallback') or {}
+          if str(section.get('run_id') or '') != str(os.environ.get('GITHUB_RUN_ID') or 'local'):
+              print('No current-run Groq failure section to persist.')
+              raise SystemExit(0)
+          unresolved = sorted(
+              gid for gid, item in (section.get('games') or {}).items()
+              if isinstance(item, dict) and item.get('provider_result') == 'failed' and bool(item.get('requires_chatgpt_refresh'))
+          )
+          if not unresolved:
+              print('Current run has no unresolved Groq games to persist.')
+              raise SystemExit(0)
+          Path('/tmp/groq-provider-fallback-section.json').write_text(
+              json.dumps(section, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+          )
+          Path('/tmp/groq-unresolved-game-ids.txt').write_text('\n'.join(unresolved) + '\n', encoding='utf-8')
+          print('Exact unresolved Groq games:', ', '.join(unresolved))
+          PY
+
+          if [ ! -s /tmp/groq-provider-fallback-section.json ]; then
+            exit 0
+          fi
+
+          git config user.name "sunday-signal-media-bot"
+          git config user.email "actions@users.noreply.github.com"
+          for publish_attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            python - <<'PY'
+            import json
+            from pathlib import Path
+            status_path = Path('outputs/context_source_status.json')
+            status = json.loads(status_path.read_text(encoding='utf-8'))
+            section = json.loads(Path('/tmp/groq-provider-fallback-section.json').read_text(encoding='utf-8'))
+            status['groq_provider_fallback'] = section
+            status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+            PY
+            git add outputs/context_source_status.json
+            if git diff --cached --quiet; then
+              echo "Latest main already contains this exact Groq failure state."
+              exit 0
+            fi
+            git commit -m "Record exact Groq failed-game recovery targets"
+            if git push origin HEAD:main; then
+              echo "Persisted exact unresolved Groq failure state without publishing partial HUMAN prose."
+              exit 0
+            fi
+            if [ "$publish_attempt" -eq 3 ]; then
+              echo "Could not persist Groq failure state after three publication races."
+              exit 1
+            fi
+            sleep 2
+          done
 
       - name: PR provider migration gate
         if: github.event_name == 'pull_request'
@@ -365,6 +539,11 @@ jobs:
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
           assert 'audit_groq_main_advance.py' in text
+          assert 'actions/cache/restore@v4' in text
+          assert 'actions/cache/save@v4' in text
+          assert 'recording it and continuing so every canonical game receives an independent provider attempt' in text
+          assert 'Persist exact unresolved Groq failure state' in text
+          assert 'refusing partial publication' in text
           sync_block = text.split('      - name: Synchronize with contextual intelligence', 1)[1].split('      - name: Refresh latest main for scheduled/manual run', 1)[0]
           assert sync_block.count('git fetch origin main') >= 2
           assert sync_block.rfind('git fetch origin main') < sync_block.rfind('git reset --hard origin/main')
@@ -377,7 +556,7 @@ jobs:
           assert 'outputs/contextual_evidence.json' in publish_block
           assert 'validated_base=$(git rev-parse HEAD^)' in publish_block
           assert 'git pull --rebase origin main' not in publish_block
-          print('Groq remains primary, but provider/focused/full-slate game failures now fail soft into immediate game-scoped ChatGPT recovery while preserving successful Groq games.')
+          print('Groq remains primary; validated Groq games checkpoint across retries, every unresolved game is isolated and recorded, and partial slates cannot publish.')
           PY
 
       - name: Reconcile candidate with latest main snapshot
@@ -414,6 +593,7 @@ jobs:
           media = dict(status.get('media_reporting') or {})
           provider = status.get('copilot_media', {})
           finalizer = status.get('editorial_finalizer', {})
+          fallback = status.get('groq_provider_fallback', {})
           games = int(finalizer.get('games', 0))
 
           snapshot_path = Path('/tmp/groq-preserved-media-reporting.json')
@@ -440,6 +620,9 @@ jobs:
               raise SystemExit(f'Editorial provider did not cover full slate: {provider}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
               raise SystemExit(f'final editorial gate failed: {finalizer}')
+          unresolved = [gid for gid, item in (fallback.get('games') or {}).items() if isinstance(item, dict) and item.get('requires_chatgpt_refresh')]
+          if unresolved:
+              raise SystemExit(f'Groq/ChatGPT fallback still unresolved for: {sorted(unresolved)}')
           print('Groq/ChatGPT matchup/model/pick launch gate passed:', games, 'games')
           PY
 
