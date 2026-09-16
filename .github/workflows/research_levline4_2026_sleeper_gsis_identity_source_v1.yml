@@ -1,0 +1,118 @@
+name: LevLine 4 Sleeper GSIS identity source V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_sleeper_gsis_identity_source_v1_contract.json'
+      - 'research/levline4_2026_sleeper_gsis_identity_source_v1.py'
+      - 'research/test_levline4_2026_sleeper_gsis_identity_source_v1.py'
+      - 'research/levline4_2026_sleeper_gsis_identity_source_v1_first_receipt.json'
+      - 'research/levline4_2026_sleeper_gsis_identity_source_v1_first_manifest.json'
+      - '.github/workflows/research_levline4_2026_sleeper_gsis_identity_source_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: levline4-sleeper-gsis-identity-source-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  FIRST_ARTIFACT_ID: '10461387509'
+  FIRST_ARTIFACT_DIGEST: 'sha256:bcee116b632247d0e0bfc8ea36dbc4fc2a0be4af6ef237ad0b0565a520b4fb4d'
+
+jobs:
+  reproduce-first-result:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight dependencies
+        run: python -m pip install pytest 'requests>=2.32'
+      - name: Re-run frozen synthetic tests
+        run: pytest -q research/test_levline4_2026_sleeper_gsis_identity_source_v1.py
+      - name: Verify preregistered V1 contract remains the execution contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/levline4_2026_sleeper_gsis_identity_source_v1_contract.json').read_text())
+          assert c['contract_id']=='LEVLINE-4-2026-SLEEPER-GSIS-IDENTITY-SOURCE-V1'
+          assert c['source_capture_gate']['minimum_total_player_objects']==5000
+          assert c['source_capture_gate']['minimum_canonical_gsis_rows']==1000
+          assert c['source_capture_gate']['duplicate_gsis_with_conflicting_normalized_names_allowed']==0
+          assert 'malformed_records_allowed' not in c['source_capture_gate']
+          assert c['projection']['source_team_or_status_used_for_identity'] is False
+          assert c['authority_if_capture_gate_passes']['player_identity_to_gsis_qualified'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection']==0
+          PY
+      - name: Download exact canonical first capture artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          observed=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${FIRST_ARTIFACT_ID}" --jq '.digest')
+          test "$observed" = "$FIRST_ARTIFACT_DIGEST"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${FIRST_ARTIFACT_ID}/zip" > /tmp/sleeper_v1.zip
+          rm -rf /tmp/sleeper_v1
+          mkdir -p /tmp/sleeper_v1
+          unzip -q /tmp/sleeper_v1.zip -d /tmp/sleeper_v1
+      - name: Reproduce frozen failed source qualification
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path('/tmp/sleeper_v1')
+          manifest=json.loads(Path('research/levline4_2026_sleeper_gsis_identity_source_v1_first_manifest.json').read_text())
+          frozen=json.loads(Path('research/levline4_2026_sleeper_gsis_identity_source_v1_first_receipt.json').read_text())
+          observed=json.loads((root/'receipt.json').read_text())
+          def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+          assert sha(root/'receipt.json')==manifest['receipt_sha256']
+          assert sha(root/'identity_projection.jsonl')==manifest['projection_sha256']
+          raw=root/f"raw-{manifest['raw_source_sha256']}.json"
+          assert sha(raw)==manifest['raw_source_sha256']
+          assert observed==frozen
+          assert observed['status']=='FAIL'
+          assert observed['capture_gate_pass'] is False
+          assert observed['total_player_objects']==12227
+          assert observed['projection_row_count']==3893
+          assert observed['missing_gsis_row_count']==8334
+          assert observed['duplicate_gsis_conflicting_name_count']==7
+          assert observed['projection_contains_forbidden_fields'] is False
+          assert observed['sleeper_external_identity_source_capture_qualified'] is False
+          assert observed['player_identity_to_gsis_qualified'] is False
+          assert observed['week2_sunday_due_inactive_player_identity_to_gsis_qualified'] is False
+          assert observed['availability_state_authorized'] is False
+          assert observed['forecast_probability_effect_authorized'] is False
+          assert observed['production_authorized'] is False
+          assert observed['completed_2026_outcomes_used_for_design_or_selection']==0
+          print(json.dumps({
+            'status': observed['status'],
+            'total_player_objects': observed['total_player_objects'],
+            'canonical_gsis_rows': observed['projection_row_count'],
+            'missing_gsis_rows': observed['missing_gsis_row_count'],
+            'conflicting_gsis_groups': observed['duplicate_gsis_conflicting_name_count'],
+          }, indent=2, sort_keys=True))
+          PY
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch is research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

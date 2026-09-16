@@ -1,0 +1,94 @@
+{
+  "contract_version": 1,
+  "contract_id": "LEVLINE-4-2026-SLEEPER-GSIS-IDENTITY-SOURCE-V1",
+  "status": "PREREGISTERED_EXTERNAL_IDENTITY_SOURCE_CAPTURE_ONLY",
+  "purpose": "Freeze a prospective external-provider player identity catalog that directly publishes GSIS IDs, so a later separately preregistered audit can test LevLine's inactive-name GSIS candidates without relying only on nflverse-derived identity artifacts.",
+  "source": {
+    "provider": "Sleeper",
+    "endpoint": "https://api.sleeper.app/v1/players/nfl",
+    "documentation": "https://docs.sleeper.com/",
+    "method": "GET",
+    "authentication_required": false,
+    "https_required": true,
+    "redirects_allowed": false,
+    "raw_response_bytes_preserved": true,
+    "raw_sha256_required": true,
+    "captured_at_utc_required": true,
+    "content_type_recorded": true,
+    "single_first_capture_is_canonical": true,
+    "later_same_version_capture_may_replace_first_capture": false
+  },
+  "projection": {
+    "top_level_object_key_is_sleeper_player_id": true,
+    "allowed_fields": [
+      "sleeper_player_id",
+      "gsis_id",
+      "full_name",
+      "first_name",
+      "last_name",
+      "position",
+      "number",
+      "birth_date",
+      "espn_id",
+      "sportradar_id"
+    ],
+    "forbidden_fields": [
+      "team",
+      "active",
+      "status",
+      "roster_status",
+      "injury_status",
+      "injury_body_part",
+      "injury_notes",
+      "injury_start_date",
+      "practice_participation",
+      "practice_description",
+      "depth_chart_position",
+      "depth_chart_order",
+      "news_updated"
+    ],
+    "forbidden_fields_may_exist_in_raw_source_but_may_not_be_persisted_or_used": true,
+    "downstream_identity_work_must_consume_projection_not_raw_source": true,
+    "canonical_gsis_regex": "^00-[0-9]{7}$",
+    "rows_without_canonical_gsis_retained_in_projection": false,
+    "source_team_or_status_used_for_identity": false
+  },
+  "source_capture_gate": {
+    "http_status_required": 200,
+    "top_level_json_object_required": true,
+    "minimum_total_player_objects": 5000,
+    "minimum_canonical_gsis_rows": 1000,
+    "minimum_thresholds_are_source_sanity_floors_not_identity_accuracy_thresholds": true,
+    "duplicate_sleeper_player_ids_allowed": 0,
+    "duplicate_gsis_with_conflicting_normalized_names_allowed": 0,
+    "projection_may_not_contain_forbidden_fields": true,
+    "post_result_threshold_relaxation_allowed": false
+  },
+  "chronology": {
+    "capture_must_precede_any_week2_sunday_cross_provider_identity_qualification_execution": true,
+    "capture_may_support_future_prospective_identity_audits_only": true,
+    "capture_may_not_reconstruct_week1_availability_or_membership": true,
+    "postgame_participation_authorized": false
+  },
+  "authority_if_capture_gate_passes": {
+    "sleeper_external_identity_source_capture_qualified": true,
+    "sleeper_is_treated_as_a_separate_publisher_from_nflverse": true,
+    "statistical_independence_of_underlying_provider_data_proven": false,
+    "player_identity_to_gsis_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "f_st_01_frozen_2026_unchanged": true,
+    "production_dependency_authorized": false
+  }
+}
