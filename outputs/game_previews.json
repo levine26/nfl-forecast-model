@@ -16,7 +16,7 @@
         "CAR protection vs ATL pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 0,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -74,34 +74,6 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "ATL third downs vs CAR"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "CAR: Patrick Jones II \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "ATL: Michael Penix Jr. \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "ATL: Tua Tagovailoa \u2014 Out"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=33.7554&longitude=-84.4008&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in ATL"
       }
     ],
     "game_id": "2026_02_CAR_ATL",
@@ -119,16 +91,6 @@
         "title": "Bryce Young vs ATL: player history"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Patrick Jones II (LB) as Out. Back. LevLine does not make up an injury point value for it.",
-        "title": "CAR: Patrick Jones II \u2014 Out"
-      },
-      {
         "advantage_team": "ATL",
         "family": "pressure",
         "sample_size": 617,
@@ -137,12 +99,22 @@
         "strength": "Strong",
         "summary": "CAR gave up sacks on 5.5% of pass plays last season; ATL got home on 8.6%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
         "title": "CAR protection vs ATL pass rush"
+      },
+      {
+        "advantage_team": "ATL",
+        "family": "early_down",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "ATL threw on 49% of first- and second-down plays and averaged +0.16 EPA per early-down pass. CAR allowed +0.08. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "ATL early-down approach vs CAR"
       }
     ],
     "matchup": "CAR @ ATL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:23.477964+00:00",
+        "as_of": "2026-09-16T06:37:01.747672+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "CAR",
@@ -152,7 +124,7 @@
         "title": "Bryce Young vs ATL: player history"
       },
       {
-        "as_of": "2026-09-16T03:31:13.899252+00:00",
+        "as_of": "2026-09-16T06:36:51.925911+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "ATL",
@@ -162,7 +134,7 @@
         "title": "CAR protection vs ATL pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:13.901215+00:00",
+        "as_of": "2026-09-16T06:36:51.927836+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ATL",
@@ -172,14 +144,14 @@
         "title": "ATL early-down approach vs CAR"
       },
       {
-        "as_of": "2026-09-16T03:28:56.644854+00:00",
-        "family": "availability",
-        "label": "Availability",
+        "as_of": "2026-09-16T06:34:53.904289+00:00",
+        "family": "coaching",
+        "label": "Staff",
         "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Patrick Jones II (LB) as Out. Back. LevLine does not make up an injury point value for it.",
-        "title": "CAR: Patrick Jones II \u2014 Out"
+        "summary": "ATL enters 2026 with head coach Kevin Stefanski and offensive coordinator Tommy Rees. Older matchup history gets a haircut here: the people calling the offense are different.",
+        "title": "ATL offense changed its decision-makers"
       }
     ],
     "notebook": [
@@ -315,27 +287,6 @@
         "title": "CIN early-down approach vs HOU"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "CIN: Shemar Stewart \u2014 Doubtful"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "CIN: Ja'Marr Chase \u2014 Did Not Participate In Practice"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "CIN: Dexter Lawrence \u2014 Did Not Participate In Practice"
-      },
-      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
@@ -347,16 +298,6 @@
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "Houston\u2019s improved run game challenges Cincinnati\u2019s road discipline",
     "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Shemar Stewart (DE) as Doubtful. Knee. LevLine does not make up an injury point value for it.",
-        "title": "CIN: Shemar Stewart \u2014 Doubtful"
-      },
       {
         "advantage_team": "CIN",
         "family": "yac",
@@ -376,22 +317,32 @@
         "strength": "Strong",
         "summary": "CIN gave up sacks on 5.0% of pass plays last season; HOU got home on 7.6%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
         "title": "CIN protection vs HOU pass rush"
+      },
+      {
+        "advantage_team": "CIN",
+        "family": "early_down",
+        "sample_size": 726,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "CIN threw on 60% of first- and second-down plays and averaged -0.05 EPA per early-down pass. HOU allowed -0.16. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "CIN early-down approach vs HOU"
       }
     ],
     "matchup": "CIN @ HOU",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:29:00.165859+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Shemar Stewart (DE) as Doubtful. Knee. LevLine does not make up an injury point value for it.",
-        "title": "CIN: Shemar Stewart \u2014 Doubtful"
+        "as_of": "2026-09-16T06:37:03.243411+00:00",
+        "family": "qb_opponent_history",
+        "label": "QB history",
+        "leader": "CIN",
+        "source_name": "nflverse play-by-play",
+        "strength": "Weak",
+        "summary": "In the nflverse play-by-play sample since 2023, Joe Burrow has 1 meaningful game against HOU; the most recent was 2023 Week 10. Over 44 charted dropbacks in those games, he averaged +0.07 EPA/dropback with a 36% positive-EPA rate. This is a recent analytical sample, not a career meeting count.",
+        "title": "Joe Burrow vs HOU: player history"
       },
       {
-        "as_of": "2026-09-16T03:31:15.631671+00:00",
+        "as_of": "2026-09-16T06:36:53.710061+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "CIN",
@@ -401,7 +352,7 @@
         "title": "HOU YAC creation vs CIN tackling"
       },
       {
-        "as_of": "2026-09-16T03:31:15.629605+00:00",
+        "as_of": "2026-09-16T06:36:53.707989+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "HOU",
@@ -411,7 +362,7 @@
         "title": "CIN protection vs HOU pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:15.630375+00:00",
+        "as_of": "2026-09-16T06:36:53.708743+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "CIN",
@@ -501,7 +452,7 @@
         "What Zac Robinson could change in TB"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 2,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -552,27 +503,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "TB protection vs CLE pass rush"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "CLE: Teven Jenkins \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "TB: Jalen McMillan \u2014 Doubtful"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "TB: Justin Skule \u2014 Doubtful"
       }
     ],
     "game_id": "2026_02_CLE_TB",
@@ -590,16 +520,6 @@
         "title": "What Zac Robinson could change in TB"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Teven Jenkins (G) as Out. Back. LevLine does not make up an injury point value for it. That matters a little more against TB, which generated sacks on 5.5% of opponent pass plays last season.",
-        "title": "CLE: Teven Jenkins \u2014 Out"
-      },
-      {
         "advantage_team": "TB",
         "family": "explosives",
         "sample_size": 681,
@@ -608,12 +528,22 @@
         "strength": "Strong",
         "summary": "CLE hit a 20+ yard pass on 5.1% of pass plays; TB allowed one on 8.3%. The short version: CLE wants chunks, and TB would rather make it earn twelve-play drives.",
         "title": "CLE explosives vs TB prevention"
+      },
+      {
+        "advantage_team": "TB",
+        "family": "early_down",
+        "sample_size": 681,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "CLE threw on 56% of first- and second-down plays and averaged -0.16 EPA per early-down pass. TB allowed +0.14. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "CLE early-down approach vs TB"
       }
     ],
     "matchup": "CLE @ TB",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.813793+00:00",
+        "as_of": "2026-09-16T06:36:46.795513+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -623,7 +553,7 @@
         "title": "What Zac Robinson could change in TB"
       },
       {
-        "as_of": "2026-09-16T03:31:17.354888+00:00",
+        "as_of": "2026-09-16T06:36:55.460333+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TB",
@@ -633,7 +563,7 @@
         "title": "CLE explosives vs TB prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:17.355219+00:00",
+        "as_of": "2026-09-16T06:36:55.460609+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "TB",
@@ -643,14 +573,14 @@
         "title": "CLE early-down approach vs TB"
       },
       {
-        "as_of": "2026-09-16T03:29:22.516312+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "as_of": "2026-09-16T06:36:55.461141+00:00",
+        "family": "pressure",
+        "label": "Pressure",
+        "leader": "CLE",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Teven Jenkins (G) as Out. Back. LevLine does not make up an injury point value for it. That matters a little more against TB, which generated sacks on 5.5% of opponent pass plays last season.",
-        "title": "CLE: Teven Jenkins \u2014 Out"
+        "summary": "TB gave up sacks on 5.5% of pass plays last season; CLE got home on 8.9%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "title": "TB protection vs CLE pass rush"
       }
     ],
     "notebook": [
@@ -799,21 +729,21 @@
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
-        "title": "DET: Christian Izien \u2014 Questionable"
+        "title": "DET: Blake Miller \u2014 Did Not Participate In Practice"
       },
       {
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
-        "title": "BUF: Jordan Hancock \u2014 Questionable"
+        "title": "DET: Christian Mahogany \u2014 Did Not Participate In Practice"
       },
       {
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
-        "title": "BUF: T.J. Sanders \u2014 Questionable"
+        "title": "BUF: T.J. Sanders \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_02_DET_BUF",
@@ -854,7 +784,7 @@
     "matchup": "DET @ BUF",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.809963+00:00",
+        "as_of": "2026-09-16T06:36:46.791842+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -864,7 +794,7 @@
         "title": "What Drew Petzing could change in DET"
       },
       {
-        "as_of": "2026-09-16T03:31:13.327651+00:00",
+        "as_of": "2026-09-16T06:36:51.335325+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BUF",
@@ -874,7 +804,7 @@
         "title": "BUF explosives vs DET prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:13.327940+00:00",
+        "as_of": "2026-09-16T06:36:51.335592+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BUF",
@@ -884,7 +814,7 @@
         "title": "BUF early-down approach vs DET"
       },
       {
-        "as_of": "2026-09-16T03:31:13.326621+00:00",
+        "as_of": "2026-09-16T06:36:51.334285+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DET",
@@ -981,10 +911,10 @@
       "game_specific": true,
       "lead_items": [
         "GB explosives vs NYJ prevention",
-        "GB: Warren Brinson \u2014 Out"
+        "NYJ protection vs GB pass rush"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 4,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -1035,43 +965,12 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "GB early-down approach vs NYJ"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "GB: Warren Brinson \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "NYJ: Tim Patrick \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "NYJ: Joseph Ossai \u2014 Out"
       }
     ],
     "game_id": "2026_02_GB_NYJ",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "Packers pressure package confronts the Jets\u2019 young line",
     "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Warren Brinson (DT) as Out. Calf. LevLine does not make up an injury point value for it.",
-        "title": "GB: Warren Brinson \u2014 Out"
-      },
       {
         "advantage_team": "NYJ",
         "family": "explosives",
@@ -1091,22 +990,32 @@
         "strength": "Strong",
         "summary": "NYJ gave up sacks on 9.4% of pass plays last season; GB got home on 5.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
         "title": "NYJ protection vs GB pass rush"
+      },
+      {
+        "advantage_team": "NYJ",
+        "family": "early_down",
+        "sample_size": 633,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "GB threw on 49% of first- and second-down plays and averaged +0.22 EPA per early-down pass. NYJ allowed +0.33. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "GB early-down approach vs NYJ"
       }
     ],
     "matchup": "GB @ NYJ",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:29:02.090690+00:00",
-        "family": "availability",
-        "label": "Availability",
+        "as_of": "2026-09-16T06:34:59.538866+00:00",
+        "family": "coaching",
+        "label": "Staff",
         "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Warren Brinson (DT) as Out. Calf. LevLine does not make up an injury point value for it.",
-        "title": "GB: Warren Brinson \u2014 Out"
+        "summary": "NYJ is coordinated by Brian Duker in 2026, replacing the prior defensive staff. Older GB-vs-NYJ tape came against a different defensive play-caller.",
+        "title": "New defensive coordinator in NYJ"
       },
       {
-        "as_of": "2026-09-16T03:31:16.767334+00:00",
+        "as_of": "2026-09-16T06:36:54.882912+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "NYJ",
@@ -1116,7 +1025,7 @@
         "title": "GB explosives vs NYJ prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:16.768319+00:00",
+        "as_of": "2026-09-16T06:36:54.883820+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYJ",
@@ -1126,7 +1035,7 @@
         "title": "NYJ protection vs GB pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:16.767621+00:00",
+        "as_of": "2026-09-16T06:36:54.883202+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYJ",
@@ -1195,7 +1104,7 @@
   },
   "2026_02_IND_KC": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "What Eric Bieniemy could change in KC: staff impact context.",
+    "case_for_opponent": "KC YAC creation vs IND tackling: yards after the catch evidence.",
     "case_for_pick": "KC early-down approach vs IND: early-down leverage favors KC.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
@@ -1207,7 +1116,7 @@
       "game_specific": true,
       "lead_items": [
         "KC early-down approach vs IND",
-        "What Eric Bieniemy could change in KC"
+        "KC YAC creation vs IND tackling"
       ],
       "media_led": true,
       "media_source_count": 2,
@@ -1263,27 +1172,6 @@
         "title": "KC YAC creation vs IND tackling"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "IND: Austin Ajiake \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "KC: Chamarri Conner \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "KC: Josh Simmons \u2014 Out"
-      },
-      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
@@ -1306,16 +1194,6 @@
         "title": "What Eric Bieniemy could change in KC"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Austin Ajiake (LB) as Out. Hamstring. LevLine does not make up an injury point value for it.",
-        "title": "IND: Austin Ajiake \u2014 Out"
-      },
-      {
         "advantage_team": "KC",
         "family": "early_down",
         "sample_size": 640,
@@ -1324,12 +1202,22 @@
         "strength": "Strong",
         "summary": "KC threw on 61% of first- and second-down plays and averaged +0.11 EPA per early-down pass. IND allowed +0.10. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
         "title": "KC early-down approach vs IND"
+      },
+      {
+        "advantage_team": "KC",
+        "family": "yac",
+        "sample_size": 640,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "KC averaged 5.8 yards after catch per completion; IND allowed 4.9. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "title": "KC YAC creation vs IND tackling"
       }
     ],
     "matchup": "IND @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.817490+00:00",
+        "as_of": "2026-09-16T06:36:46.799093+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1339,7 +1227,7 @@
         "title": "What Eric Bieniemy could change in KC"
       },
       {
-        "as_of": "2026-09-16T03:31:21.375558+00:00",
+        "as_of": "2026-09-16T06:36:59.594351+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -1349,7 +1237,7 @@
         "title": "KC early-down approach vs IND"
       },
       {
-        "as_of": "2026-09-16T03:31:21.375638+00:00",
+        "as_of": "2026-09-16T06:36:59.594428+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "KC",
@@ -1359,14 +1247,14 @@
         "title": "KC YAC creation vs IND tackling"
       },
       {
-        "as_of": "2026-09-16T03:31:06.574069+00:00",
-        "family": "availability",
-        "label": "Availability",
+        "as_of": "2026-09-16T06:36:44.872335+00:00",
+        "family": "coaching",
+        "label": "Staff",
         "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Austin Ajiake (LB) as Out. Hamstring. LevLine does not make up an injury point value for it.",
-        "title": "IND: Austin Ajiake \u2014 Out"
+        "summary": "KC enters 2026 with offensive coordinator Eric Bieniemy. Older matchup history gets a haircut here: the people calling the offense are different.",
+        "title": "KC offense changed its decision-makers"
       }
     ],
     "notebook": [
@@ -1502,27 +1390,6 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "DEN YAC creation vs JAX tackling"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "JAX: LeQuint Allen Jr. \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "JAX: Anton Harrison \u2014 Did Not Participate In Practice"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Weak",
-        "title": "JAX: Cole Van Lanen \u2014 Limited Participation in Practice"
       }
     ],
     "game_id": "2026_02_JAX_DEN",
@@ -1563,7 +1430,7 @@
     "matchup": "JAX @ DEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:30:03.953744+00:00",
+        "as_of": "2026-09-16T06:36:01.208720+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1573,7 +1440,7 @@
         "title": "DEN offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-16T03:31:18.495563+00:00",
+        "as_of": "2026-09-16T06:36:56.626194+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "JAX",
@@ -1583,7 +1450,7 @@
         "title": "JAX explosives vs DEN prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:18.495033+00:00",
+        "as_of": "2026-09-16T06:36:56.625644+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -1593,7 +1460,7 @@
         "title": "JAX protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:18.497188+00:00",
+        "as_of": "2026-09-16T06:36:56.627846+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DEN",
@@ -1741,27 +1608,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "LAC early-down approach vs LV"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "LV: Brock Bowers \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "LAC: Deane Leonard \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "LAC: Tuli Tuipulotu \u2014 Questionable"
       }
     ],
     "game_id": "2026_02_LV_LAC",
@@ -1779,16 +1625,6 @@
         "title": "Justin Herbert vs LV: player history"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Brock Bowers (TE) as Out. Knee. LevLine does not make up an injury point value for it. In 2025, he accounted for 18% of the team's recorded targets (87). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was -0.05 EPA/play last season.",
-        "title": "LV: Brock Bowers \u2014 Out"
-      },
-      {
         "advantage_team": "LV",
         "family": "pressure",
         "sample_size": 634,
@@ -1797,12 +1633,22 @@
         "strength": "Strong",
         "summary": "LV gave up sacks on 10.1% of pass plays last season; LAC got home on 7.5%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
         "title": "LV protection vs LAC pass rush"
+      },
+      {
+        "advantage_team": "LAC",
+        "family": "explosives",
+        "sample_size": 634,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "LV hit a 20+ yard pass on 6.0% of pass plays; LAC allowed one on 6.5%. The short version: LV wants chunks, and LAC would rather make it earn twelve-play drives.",
+        "title": "LV explosives vs LAC prevention"
       }
     ],
     "matchup": "LV @ LAC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:28.012262+00:00",
+        "as_of": "2026-09-16T06:37:06.299500+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "LAC",
@@ -1812,7 +1658,7 @@
         "title": "Justin Herbert vs LV: player history"
       },
       {
-        "as_of": "2026-09-16T03:31:19.072419+00:00",
+        "as_of": "2026-09-16T06:36:57.219688+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LV",
@@ -1822,7 +1668,7 @@
         "title": "LV protection vs LAC pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:19.072970+00:00",
+        "as_of": "2026-09-16T06:36:57.220236+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LAC",
@@ -1832,14 +1678,14 @@
         "title": "LV explosives vs LAC prevention"
       },
       {
-        "as_of": "2026-09-16T03:30:24.389416+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report + nflverse usage",
+        "as_of": "2026-09-16T06:36:57.221895+00:00",
+        "family": "early_down",
+        "label": "Early downs",
+        "leader": "LV",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Brock Bowers (TE) as Out. Knee. LevLine does not make up an injury point value for it. In 2025, he accounted for 18% of the team's recorded targets (87). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was -0.05 EPA/play last season.",
-        "title": "LV: Brock Bowers \u2014 Out"
+        "summary": "LAC threw on 57% of first- and second-down plays and averaged +0.03 EPA per early-down pass. LV allowed +0.07. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "LAC early-down approach vs LV"
       }
     ],
     "notebook": [
@@ -1907,7 +1753,7 @@
   "2026_02_MIA_SF": {
     "brand": "Sunday Signal",
     "case_for_opponent": "MIA protection vs SF pass rush: pass-rush leverage favors MIA.",
-    "case_for_pick": "MIA protection vs SF pass rush: pass-rush leverage favors MIA.",
+    "case_for_pick": "MIA early-down approach vs SF: early-down leverage favors SF.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
       "copilot_researched": true,
@@ -1917,8 +1763,8 @@
       "fallback_templates_used": false,
       "game_specific": true,
       "lead_items": [
-        "MIA protection vs SF pass rush",
-        "What Bobby Slowik could change in MIA"
+        "MIA early-down approach vs SF",
+        "MIA protection vs SF pass rush"
       ],
       "media_led": true,
       "media_source_count": 3,
@@ -1974,27 +1820,6 @@
         "title": "SF explosives vs MIA prevention"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "SF: Alfred Collins \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "SF: James Thompson Jr. \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Weak",
-        "title": "SF: Nick Bosa \u2014 Limited Participation in Practice"
-      },
-      {
         "category": "travel",
         "source_name": "nflverse schedule + venue geography",
         "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
@@ -2024,16 +1849,6 @@
         "title": "What Bobby Slowik could change in MIA"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Alfred Collins (DT) as Out. Knee. LevLine does not make up an injury point value for it.",
-        "title": "SF: Alfred Collins \u2014 Out"
-      },
-      {
         "advantage_team": "MIA",
         "family": "pressure",
         "sample_size": 558,
@@ -2042,12 +1857,22 @@
         "strength": "Strong",
         "summary": "MIA gave up sacks on 6.8% of pass plays last season; SF got home on 3.2%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
         "title": "MIA protection vs SF pass rush"
+      },
+      {
+        "advantage_team": "SF",
+        "family": "early_down",
+        "sample_size": 558,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "MIA threw on 49% of first- and second-down plays and averaged +0.04 EPA per early-down pass. SF allowed +0.17. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "MIA early-down approach vs SF"
       }
     ],
     "matchup": "MIA @ SF",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.816784+00:00",
+        "as_of": "2026-09-16T06:36:46.798384+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2057,7 +1882,7 @@
         "title": "What Bobby Slowik could change in MIA"
       },
       {
-        "as_of": "2026-09-16T03:31:20.783286+00:00",
+        "as_of": "2026-09-16T06:36:59.006088+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIA",
@@ -2067,7 +1892,7 @@
         "title": "MIA protection vs SF pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:20.784155+00:00",
+        "as_of": "2026-09-16T06:36:59.006912+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "SF",
@@ -2077,14 +1902,14 @@
         "title": "MIA early-down approach vs SF"
       },
       {
-        "as_of": "2026-09-16T03:31:05.764278+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "as_of": "2026-09-16T06:36:59.007974+00:00",
+        "family": "explosives",
+        "label": "Explosives",
+        "leader": "MIA",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Alfred Collins (DT) as Out. Knee. LevLine does not make up an injury point value for it.",
-        "title": "SF: Alfred Collins \u2014 Out"
+        "summary": "SF hit a 20+ yard pass on 7.7% of pass plays; MIA allowed one on 8.3%. The short version: SF wants chunks, and MIA would rather make it earn twelve-play drives.",
+        "title": "SF explosives vs MIA prevention"
       }
     ],
     "notebook": [
@@ -2235,27 +2060,6 @@
         "title": "MIN third downs vs CHI"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "CHI: Tyson Bagent \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "CHI: Rome Odunze \u2014 Questionable"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "CHI: Xavier Woods \u2014 Questionable"
-      },
-      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=41.8623&longitude=-87.6167&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
@@ -2301,7 +2105,7 @@
     "matchup": "MIN @ CHI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.811774+00:00",
+        "as_of": "2026-09-16T06:36:46.793567+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2311,7 +2115,7 @@
         "title": "What Press Taylor could change in CHI"
       },
       {
-        "as_of": "2026-09-16T03:31:15.054756+00:00",
+        "as_of": "2026-09-16T06:36:53.116281+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
@@ -2321,7 +2125,7 @@
         "title": "CHI protection vs MIN pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:15.055279+00:00",
+        "as_of": "2026-09-16T06:36:53.116795+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CHI",
@@ -2331,7 +2135,7 @@
         "title": "CHI explosives vs MIN prevention"
       },
       {
-        "as_of": "2026-09-16T03:28:59.401577+00:00",
+        "as_of": "2026-09-16T06:34:56.292715+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2428,7 +2232,7 @@
         "BAL protection vs NO pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 10,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -2481,27 +2285,6 @@
         "title": "BAL early-down approach vs NO"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "NO: Oscar Delp \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "NO: Cameron Jordan \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "NO: Audric Estim\u00e9 \u2014 Out"
-      },
-      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.278&longitude=-76.6227&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
@@ -2514,16 +2297,6 @@
     "headline": "Ravens Look to Keep Momentum Against Saints",
     "key_factors": [
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Oscar Delp (TE) as Out. Hamstring. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.10 EPA/play last season.",
-        "title": "NO: Oscar Delp \u2014 Out"
-      },
-      {
         "advantage_team": "BAL",
         "family": "explosives",
         "sample_size": 533,
@@ -2542,22 +2315,32 @@
         "strength": "Strong",
         "summary": "BAL gave up sacks on 8.4% of pass plays last season; NO got home on 7.6%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
         "title": "BAL protection vs NO pass rush"
+      },
+      {
+        "advantage_team": "BAL",
+        "family": "early_down",
+        "sample_size": 533,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "BAL threw on 45% of first- and second-down plays and averaged +0.08 EPA per early-down pass. NO allowed +0.02. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "BAL early-down approach vs NO"
       }
     ],
     "matchup": "NO @ BAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:28:57.982979+00:00",
-        "family": "availability",
-        "label": "Availability",
+        "as_of": "2026-09-16T06:34:55.023149+00:00",
+        "family": "coaching",
+        "label": "Staff",
         "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Oscar Delp (TE) as Out. Hamstring. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.10 EPA/play last season.",
-        "title": "NO: Oscar Delp \u2014 Out"
+        "summary": "BAL is coordinated by Anthony Weaver in 2026, replacing Zach Orr. Older NO-vs-BAL tape came against a different defensive play-caller.",
+        "title": "New defensive coordinator in BAL"
       },
       {
-        "as_of": "2026-09-16T03:31:14.482676+00:00",
+        "as_of": "2026-09-16T06:36:52.527359+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BAL",
@@ -2567,7 +2350,7 @@
         "title": "NO explosives vs BAL prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:14.483548+00:00",
+        "as_of": "2026-09-16T06:36:52.528196+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "BAL",
@@ -2577,7 +2360,7 @@
         "title": "BAL protection vs NO pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:14.484339+00:00",
+        "as_of": "2026-09-16T06:36:52.528987+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BAL",
@@ -2654,7 +2437,7 @@
   },
   "2026_02_NYG_LA": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "What Matt Nagy could change in NYG: staff impact context.",
+    "case_for_opponent": "NYG protection vs LA pass rush: pass-rush leverage favors NYG.",
     "case_for_pick": "LA explosives vs NYG prevention: explosive-pass leverage favors LA.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
@@ -2666,7 +2449,7 @@
       "game_specific": true,
       "lead_items": [
         "LA explosives vs NYG prevention",
-        "What Matt Nagy could change in NYG"
+        "NYG protection vs LA pass rush"
       ],
       "media_led": true,
       "media_source_count": 4,
@@ -2722,20 +2505,6 @@
         "title": "NYG early-down approach vs LA"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "LA: Aaron Donald \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "NYG: Malik Nabers \u2014 Questionable"
-      },
-      {
         "category": "travel",
         "source_name": "nflverse schedule + venue geography",
         "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
@@ -2765,16 +2534,6 @@
         "title": "What Matt Nagy could change in NYG"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Aaron Donald (DE) as Out. Not injury related - resting player. LevLine does not make up an injury point value for it.",
-        "title": "LA: Aaron Donald \u2014 Out"
-      },
-      {
         "advantage_team": "LA",
         "family": "explosives",
         "sample_size": 676,
@@ -2783,12 +2542,22 @@
         "strength": "Strong",
         "summary": "LA hit a 20+ yard pass on 10.9% of pass plays; NYG allowed one on 7.8%. The short version: LA wants chunks, and NYG would rather make it earn twelve-play drives.",
         "title": "LA explosives vs NYG prevention"
+      },
+      {
+        "advantage_team": "NYG",
+        "family": "pressure",
+        "sample_size": 676,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "NYG gave up sacks on 7.1% of pass plays last season; LA got home on 6.3%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "title": "NYG protection vs LA pass rush"
       }
     ],
     "matchup": "NYG @ LA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.817834+00:00",
+        "as_of": "2026-09-16T06:36:46.799440+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2798,7 +2567,7 @@
         "title": "What Matt Nagy could change in NYG"
       },
       {
-        "as_of": "2026-09-16T03:31:21.939104+00:00",
+        "as_of": "2026-09-16T06:37:00.176105+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LA",
@@ -2808,7 +2577,7 @@
         "title": "LA explosives vs NYG prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:21.937242+00:00",
+        "as_of": "2026-09-16T06:37:00.174264+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -2818,14 +2587,14 @@
         "title": "NYG protection vs LA pass rush"
       },
       {
-        "as_of": "2026-09-16T03:31:07.765649+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "as_of": "2026-09-16T06:37:00.175085+00:00",
+        "family": "early_down",
+        "label": "Early downs",
+        "leader": "NYG",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Aaron Donald (DE) as Out. Not injury related - resting player. LevLine does not make up an injury point value for it.",
-        "title": "LA: Aaron Donald \u2014 Out"
+        "summary": "NYG threw on 50% of first- and second-down plays and averaged +0.06 EPA per early-down pass. LA allowed +0.04. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "NYG early-down approach vs LA"
       }
     ],
     "notebook": [
@@ -2905,7 +2674,7 @@
       "secondary_family": "pressure",
       "secondary_title": "NYG protection vs LA pass rush"
     },
-    "what_could_make_us_wrong": "NYG-LA: no sourced NYG counter clears the publication threshold."
+    "what_could_make_us_wrong": "NYG's counter in NYG-LA: NYG protection vs LA pass rush: pass-rush leverage favors NYG."
   },
   "2026_02_PHI_TEN": {
     "brand": "Sunday Signal",
@@ -2975,43 +2744,12 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "PHI YAC creation vs TEN tackling"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "PHI: Eli Stowers \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "PHI: Jonathan Greenard \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "TEN: Cedric Gray \u2014 Out"
       }
     ],
     "game_id": "2026_02_PHI_TEN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
     "headline": "Eagles aim to stretch the field as Titans cling to early\u2011down efficiency",
     "key_factors": [
-      {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Eli Stowers (TE) as Out. Hamstring, Quadricep. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.20 EPA/play last season.",
-        "title": "PHI: Eli Stowers \u2014 Out"
-      },
       {
         "advantage_team": "TEN",
         "family": "explosives",
@@ -3031,22 +2769,32 @@
         "strength": "Strong",
         "summary": "TEN threw on 58% of first- and second-down plays and averaged -0.10 EPA per early-down pass. PHI allowed +0.05. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
         "title": "TEN early-down approach vs PHI"
+      },
+      {
+        "advantage_team": "TEN",
+        "family": "yac",
+        "sample_size": 644,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+        "strength": "Strong",
+        "summary": "PHI averaged 4.3 yards after catch per completion; TEN allowed 5.6. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "title": "PHI YAC creation vs TEN tackling"
       }
     ],
     "matchup": "PHI @ TEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:29:42.921537+00:00",
-        "family": "availability",
-        "label": "Availability",
+        "as_of": "2026-09-16T06:35:40.388718+00:00",
+        "family": "coaching",
+        "label": "Staff",
         "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Eli Stowers (TE) as Out. Hamstring, Quadricep. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.20 EPA/play last season.",
-        "title": "PHI: Eli Stowers \u2014 Out"
+        "summary": "PHI enters 2026 with offensive coordinator Sean Mannion. Older matchup history gets a haircut here: the people calling the offense are different.",
+        "title": "PHI offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-16T03:31:17.928703+00:00",
+        "as_of": "2026-09-16T06:36:56.046086+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TEN",
@@ -3056,7 +2804,7 @@
         "title": "PHI explosives vs TEN prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:17.930348+00:00",
+        "as_of": "2026-09-16T06:36:56.047715+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "PHI",
@@ -3066,7 +2814,7 @@
         "title": "TEN early-down approach vs PHI"
       },
       {
-        "as_of": "2026-09-16T03:31:17.929118+00:00",
+        "as_of": "2026-09-16T06:36:56.046437+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "TEN",
@@ -3136,7 +2884,7 @@
   "2026_02_PIT_NE": {
     "brand": "Sunday Signal",
     "case_for_opponent": "PIT explosives vs NE prevention: explosive-pass leverage favors PIT.",
-    "case_for_pick": "PIT explosives vs NE prevention: explosive-pass leverage favors PIT.",
+    "case_for_pick": "NE protection vs PIT pass rush: pass-rush leverage favors NE.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
       "copilot_researched": true,
@@ -3146,11 +2894,11 @@
       "fallback_templates_used": false,
       "game_specific": true,
       "lead_items": [
-        "PIT explosives vs NE prevention",
-        "What Patrick Graham could change in PIT"
+        "NE protection vs PIT pass rush",
+        "PIT explosives vs NE prevention"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 13,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -3210,27 +2958,6 @@
         "title": "PIT YAC creation vs NE tackling"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "NE: Ben Brown \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "NE: TreVeyon Henderson \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "PIT: Joey Porter Jr. \u2014 Questionable"
-      },
-      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=42.0909&longitude=-71.2643&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
@@ -3260,16 +2987,6 @@
         "title": "What Patrick Graham could change in PIT"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Ben Brown (C) as Out. Knee. LevLine does not make up an injury point value for it. That matters a little more against PIT, which generated sacks on 6.7% of opponent pass plays last season.",
-        "title": "NE: Ben Brown \u2014 Out"
-      },
-      {
         "advantage_team": "PIT",
         "family": "explosives",
         "sample_size": 667,
@@ -3278,12 +2995,22 @@
         "strength": "Strong",
         "summary": "PIT hit a 20+ yard pass on 6.6% of pass plays; NE allowed one on 6.0%. The short version: PIT wants chunks, and NE would rather make it earn twelve-play drives.",
         "title": "PIT explosives vs NE prevention"
+      },
+      {
+        "advantage_team": "NE",
+        "family": "pressure",
+        "sample_size": 667,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "NE gave up sacks on 8.5% of pass plays last season; PIT got home on 6.7%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "title": "NE protection vs PIT pass rush"
       }
     ],
     "matchup": "PIT @ NE",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.812375+00:00",
+        "as_of": "2026-09-16T06:36:46.794146+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3293,7 +3020,7 @@
         "title": "What Patrick Graham could change in PIT"
       },
       {
-        "as_of": "2026-09-16T03:31:16.192416+00:00",
+        "as_of": "2026-09-16T06:36:54.290372+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "PIT",
@@ -3303,7 +3030,7 @@
         "title": "PIT explosives vs NE prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:16.193252+00:00",
+        "as_of": "2026-09-16T06:36:54.291198+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NE",
@@ -3313,14 +3040,14 @@
         "title": "NE protection vs PIT pass rush"
       },
       {
-        "as_of": "2026-09-16T03:29:01.316518+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "as_of": "2026-09-16T06:36:54.290660+00:00",
+        "family": "yac",
+        "label": "YAC",
+        "leader": "PIT",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Ben Brown (C) as Out. Knee. LevLine does not make up an injury point value for it. That matters a little more against PIT, which generated sacks on 6.7% of opponent pass plays last season.",
-        "title": "NE: Ben Brown \u2014 Out"
+        "summary": "PIT averaged 6.4 yards after catch per completion; NE allowed 4.6. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "title": "PIT YAC creation vs NE tackling"
       }
     ],
     "notebook": [
@@ -3390,7 +3117,7 @@
   },
   "2026_02_SEA_ARI": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "What Nathaniel Hackett could change in ARI: staff impact context.",
+    "case_for_opponent": "ARI early-down approach vs SEA: early-down leverage favors ARI.",
     "case_for_pick": "ARI explosives vs SEA prevention: explosive-pass leverage favors SEA.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
@@ -3402,7 +3129,7 @@
       "game_specific": true,
       "lead_items": [
         "ARI explosives vs SEA prevention",
-        "What Nathaniel Hackett could change in ARI"
+        "ARI early-down approach vs SEA"
       ],
       "media_led": true,
       "media_source_count": 4,
@@ -3458,27 +3185,6 @@
         "title": "ARI early-down approach vs SEA"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "SEA: Ty Okada \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "ARI: Garrett Williams \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "ARI: Isaiah Adams \u2014 Out"
-      },
-      {
         "category": "travel",
         "source_name": "nflverse schedule",
         "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
@@ -3501,16 +3207,6 @@
         "title": "What Nathaniel Hackett could change in ARI"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Ty Okada (S) as Out. Hamstring. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.16 EPA/play last season.",
-        "title": "SEA: Ty Okada \u2014 Out"
-      },
-      {
         "advantage_team": "SEA",
         "family": "explosives",
         "sample_size": 652,
@@ -3519,12 +3215,22 @@
         "strength": "Strong",
         "summary": "ARI hit a 20+ yard pass on 6.4% of pass plays; SEA allowed one on 6.8%. The short version: ARI wants chunks, and SEA would rather make it earn twelve-play drives.",
         "title": "ARI explosives vs SEA prevention"
+      },
+      {
+        "advantage_team": "ARI",
+        "family": "early_down",
+        "sample_size": 652,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "ARI threw on 65% of first- and second-down plays and averaged +0.06 EPA per early-down pass. SEA allowed +0.00. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
+        "title": "ARI early-down approach vs SEA"
       }
     ],
     "matchup": "SEA @ ARI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:08.815873+00:00",
+        "as_of": "2026-09-16T06:36:46.797492+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3534,7 +3240,7 @@
         "title": "What Nathaniel Hackett could change in ARI"
       },
       {
-        "as_of": "2026-09-16T03:31:19.640189+00:00",
+        "as_of": "2026-09-16T06:36:57.812241+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "SEA",
@@ -3544,7 +3250,7 @@
         "title": "ARI explosives vs SEA prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:19.640457+00:00",
+        "as_of": "2026-09-16T06:36:57.812507+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ARI",
@@ -3554,14 +3260,14 @@
         "title": "ARI early-down approach vs SEA"
       },
       {
-        "as_of": "2026-09-16T03:30:24.601745+00:00",
-        "family": "availability",
-        "label": "Availability",
+        "as_of": "2026-09-16T06:36:22.072393+00:00",
+        "family": "coaching",
+        "label": "Staff",
         "leader": "Watch",
-        "source_name": "NFL.com official injury report",
+        "source_name": "Wikipedia season staff records",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Ty Okada (S) as Out. Hamstring. LevLine does not make up an injury point value for it. The passing-game backdrop: the relevant opponent-side profile was +0.16 EPA/play last season.",
-        "title": "SEA: Ty Okada \u2014 Out"
+        "summary": "SEA enters 2026 with offensive coordinator Brian Fleury. Older matchup history gets a haircut here: the people calling the offense are different.",
+        "title": "SEA offense changed its decision-makers"
       }
     ],
     "notebook": [
@@ -3632,11 +3338,11 @@
       "secondary_family": "early_down",
       "secondary_title": "ARI early-down approach vs SEA"
     },
-    "what_could_make_us_wrong": "SEA-ARI: no sourced ARI counter clears the publication threshold."
+    "what_could_make_us_wrong": "ARI's counter in SEA-ARI: ARI early-down approach vs SEA: early-down leverage favors ARI."
   },
   "2026_02_WAS_DAL": {
     "brand": "Sunday Signal",
-    "case_for_opponent": "DAL: Malik Davis \u2014 Out: availability evidence.",
+    "case_for_opponent": "DAL protection vs WAS pass rush: pass-rush leverage favors WAS.",
     "case_for_pick": "Dak Prescott vs WAS: player history: quarterback history context.",
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
@@ -3648,7 +3354,7 @@
       "game_specific": true,
       "lead_items": [
         "Dak Prescott vs WAS: player history",
-        "DAL: Malik Davis \u2014 Out"
+        "DAL protection vs WAS pass rush"
       ],
       "media_led": true,
       "media_source_count": 2,
@@ -3711,25 +3417,11 @@
         "title": "DAL YAC creation vs WAS tackling"
       },
       {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "title": "DAL: Malik Davis \u2014 Out"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "DAL: Luke Schoonmaker \u2014 Did Not Participate In Practice"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=32.7473&longitude=-97.0945&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
         "strength": "Weak",
-        "title": "WAS: K'Lavon Chaisson \u2014 Limited Participation in Practice"
+        "title": "Kickoff weather in DAL"
       }
     ],
     "game_id": "2026_02_WAS_DAL",
@@ -3747,16 +3439,6 @@
         "title": "Dak Prescott vs WAS: player history"
       },
       {
-        "advantage_team": null,
-        "family": "availability",
-        "sample_size": null,
-        "source_name": "NFL.com official injury report + nflverse usage",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Strong",
-        "summary": "The official NFL injury report lists Malik Davis (RB) as Out. Hip. LevLine does not make up an injury point value for it. In 2025, he represented 11% of team rushes (52). Usage is context for the role at risk, not an automatic forecast adjustment. The run-game backdrop is WAS at +0.07 rushing EPA allowed per play last season.",
-        "title": "DAL: Malik Davis \u2014 Out"
-      },
-      {
         "advantage_team": "DAL",
         "family": "explosives",
         "sample_size": 617,
@@ -3765,12 +3447,22 @@
         "strength": "Strong",
         "summary": "WAS hit a 20+ yard pass on 6.8% of pass plays; DAL allowed one on 8.8%. The short version: WAS wants chunks, and DAL would rather make it earn twelve-play drives.",
         "title": "WAS explosives vs DAL prevention"
+      },
+      {
+        "advantage_team": "WAS",
+        "family": "pressure",
+        "sample_size": 617,
+        "source_name": "nflverse PBP + FTN charting",
+        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
+        "strength": "Strong",
+        "summary": "DAL gave up sacks on 4.2% of pass plays last season; WAS got home on 6.4%. If this turns into an obvious-passing-down game, that matchup gets loud fast.",
+        "title": "DAL protection vs WAS pass rush"
       }
     ],
     "matchup": "WAS @ DAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T03:31:29.020424+00:00",
+        "as_of": "2026-09-16T06:37:07.331341+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -3780,7 +3472,7 @@
         "title": "Dak Prescott vs WAS: player history"
       },
       {
-        "as_of": "2026-09-16T03:31:20.215140+00:00",
+        "as_of": "2026-09-16T06:36:58.402899+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -3790,7 +3482,7 @@
         "title": "WAS explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-16T03:31:20.216046+00:00",
+        "as_of": "2026-09-16T06:36:58.403734+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "WAS",
@@ -3800,14 +3492,14 @@
         "title": "DAL protection vs WAS pass rush"
       },
       {
-        "as_of": "2026-09-16T03:30:45.372285+00:00",
-        "family": "availability",
-        "label": "Availability",
-        "leader": "Watch",
-        "source_name": "NFL.com official injury report + nflverse usage",
+        "as_of": "2026-09-16T06:36:58.404540+00:00",
+        "family": "yac",
+        "label": "YAC",
+        "leader": "WAS",
+        "source_name": "nflverse PBP + FTN charting",
         "strength": "Strong",
-        "summary": "The official NFL injury report lists Malik Davis (RB) as Out. Hip. LevLine does not make up an injury point value for it. In 2025, he represented 11% of team rushes (52). Usage is context for the role at risk, not an automatic forecast adjustment. The run-game backdrop is WAS at +0.07 rushing EPA allowed per play last season.",
-        "title": "DAL: Malik Davis \u2014 Out"
+        "summary": "DAL averaged 5.0 yards after catch per completion; WAS allowed 6.4. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
+        "title": "DAL YAC creation vs WAS tackling"
       }
     ],
     "notebook": [
@@ -3870,6 +3562,6 @@
       "secondary_family": "pressure",
       "secondary_title": "DAL protection vs WAS pass rush"
     },
-    "what_could_make_us_wrong": "WAS-DAL: no sourced WAS counter clears the publication threshold."
+    "what_could_make_us_wrong": "WAS's counter in WAS-DAL: DAL protection vs WAS pass rush: pass-rush leverage favors WAS."
   }
 }
