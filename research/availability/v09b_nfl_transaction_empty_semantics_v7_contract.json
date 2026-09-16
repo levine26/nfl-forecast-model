@@ -1,0 +1,118 @@
+{
+  "contract_version": 7,
+  "contract_id": "V09B-NFL-TRANSACTION-EMPTY-SEMANTICS-V7",
+  "status": "PREREGISTERED_EXPLICIT_EMPTY_SEMANTICS_VALIDATION_NO_LEDGER_AUTHORITY",
+  "purpose": "Validate whether the exact first-party heading `No Transactions Available`, combined with zero standard transaction rows, zero transaction table/header, and no distinct forward cursor, can be treated as an explicit empty-result representation on the NFL AMP transaction surface. Use all 72 V6 positive cases and 32 fixed non-empty controls. A pass may qualify only this source-semantic rule; it does not qualify the all-month ledger, transaction chronology, roster membership, labels, production dependencies, or V09B fitting.",
+  "dependencies": {
+    "v6_receipt": {
+      "path": "research/availability/v09b_nfl_transaction_no_header_source_shape_v6_receipt.json",
+      "git_blob_sha1": "7ab17e751b575b224f441891429517612683549d",
+      "receipt_id": "V09B-NFL-TRANSACTION-NO-HEADER-SOURCE-SHAPE-V6-COMPLETE",
+      "required_status": "NO_HEADER_SOURCE_SHAPES_CAPTURED_EXPLICIT_NO_TRANSACTIONS_HEADING_ZERO_SEMANTIC_AUTHORITY"
+    },
+    "v6_positive_universe_contract": {
+      "path": "research/availability/v09b_nfl_transaction_no_header_source_shape_v6_contract.json",
+      "git_blob_sha1": "2b2a28f25125652ddc6b9f11263ddced9c36d90a",
+      "expected_fixed_requests": 72
+    },
+    "v4_september_receipt": {
+      "path": "research/availability/v09b_nfl_transaction_september_cross_category_v4_receipt.json",
+      "git_blob_sha1": "f4cfde897d4b83e00e8bd24f6c5b881eaa75155e",
+      "receipt_id": "V09B-NFL-TRANSACTION-SEPTEMBER-CROSS-CATEGORY-V4-QUALIFIED",
+      "required_status": "SEPTEMBER_CROSS_CATEGORY_AMP_PAGINATION_QUALIFIED_NO_CHRONOLOGY_AUTHORITY"
+    }
+  },
+  "candidate_rule": {
+    "exact_heading_required": "No Transactions Available",
+    "standard_transaction_header_seen_must_equal": false,
+    "standard_transaction_row_count_must_equal": 0,
+    "html_table_count_must_equal": 0,
+    "distinct_forward_after_cursor_count_must_equal": 0,
+    "classification_name": "explicit_nfl_transaction_empty_result"
+  },
+  "positive_cases": {
+    "source": "the exact 72 fixed requests in the hash-locked V6 contract",
+    "expected_count": 72,
+    "expected_initial_count": 70,
+    "expected_post_pagination_count": 2,
+    "all_must_match_candidate_rule": true
+  },
+  "negative_controls": {
+    "september_grid": {
+      "years": [2017, 2018, 2019, 2020, 2021],
+      "month": 9,
+      "categories": ["trades", "signings", "reserve-list", "waivers", "terminations", "other"],
+      "url_template": "https://amp.nfl.com/transactions/league/{category}/{year}/9",
+      "expected_count": 30,
+      "dependency_evidence": "V4 completed all 30 September endpoints with parsed rows and zero source errors",
+      "candidate_rule_must_never_match": true,
+      "standard_transaction_header_required": true,
+      "standard_transaction_rows_min": 1
+    },
+    "pre_terminal_cursor_pages": [
+      {
+        "case_id": "negative-preterminal-2017-05-waivers",
+        "requested_url": "https://amp.nfl.com/transactions/league/waivers/2017/5?after=AAAH4QAAAAUAAAACAAAAAAAKle0%3D",
+        "v5_preserved_raw_sha256": "dbf216da2767ed7c34eb953590935b4dc5b5b3e8b95090e7d43e267d3b82d923",
+        "standard_transaction_rows_expected": 25,
+        "expected_distinct_forward_after_cursor": "AAAH4QAAAAUAAAABAAAAAAAKlXA="
+      },
+      {
+        "case_id": "negative-preterminal-2020-10-waivers",
+        "requested_url": "https://amp.nfl.com/transactions/league/waivers/2020/10?after=AAAH5AAAAAoAAAAHAAAAAAAME6c%3D",
+        "v5_preserved_raw_sha256": "05f48a5fa47d679def593146360239b480237edc7a61c38b9fc1f8cb6141cde8",
+        "standard_transaction_rows_expected": 25,
+        "expected_distinct_forward_after_cursor": "AAAH5AAAAAoAAAABAAAAAAAMEQ8="
+      }
+    ],
+    "expected_total_count": 32,
+    "all_must_reject_candidate_rule": true
+  },
+  "transport": {
+    "https_required": true,
+    "allowed_final_hosts": ["amp.nfl.com", "www.nfl.com"],
+    "final_path_must_equal_requested_path": true,
+    "http_status_required": 200,
+    "preserve_every_response_body_before_parse": true,
+    "raw_body_storage": "gzip with mtime=0 and exact decompression roundtrip",
+    "record_raw_sha256": true
+  },
+  "frozen_semantics_gate": {
+    "positive_cases_accounted_for": 72,
+    "positive_rule_matches_required": 72,
+    "negative_controls_accounted_for": 32,
+    "negative_rule_matches_allowed": 0,
+    "september_negative_controls_with_header_and_rows_required": 30,
+    "preterminal_controls_with_exact_25_rows_required": 2,
+    "preterminal_controls_must_point_to_frozen_positive_cursor": true,
+    "transport_errors_allowed": 0,
+    "http_status_failures_allowed": 0,
+    "raw_preservation_failures_allowed": 0,
+    "zero_false_negatives_required": true,
+    "zero_false_positives_required": true
+  },
+  "authority_if_gate_passes": {
+    "explicit_no_transactions_empty_result_semantics_qualified": true,
+    "post_pagination_explicit_empty_terminal_semantics_qualified": true,
+    "qualification_scope": "NFL AMP transaction pages for the frozen 2017-2021 six-category research surface only",
+    "all_month_full_ledger_qualified": false,
+    "durable_full_ledger_source_archive_qualified": false,
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "weekly_roster_membership_used": false,
+    "weekly_roster_status_used": false,
+    "postgame_participation_used_as_training_authority": false,
+    "absence_from_inactive_used_as_positive": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}

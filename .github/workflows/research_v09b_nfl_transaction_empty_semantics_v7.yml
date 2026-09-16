@@ -1,0 +1,136 @@
+name: LevLine V09B NFL transaction empty semantics V7
+
+on:
+  pull_request:
+    paths:
+      - 'research/availability/v09b_nfl_transaction_empty_semantics_v7_contract.json'
+      - 'research/availability/v09b_nfl_transaction_no_header_source_shape_v6_contract.json'
+      - 'research/availability/v09b_nfl_transaction_no_header_source_shape_v6_receipt.json'
+      - 'research/availability/v09b_nfl_transaction_september_cross_category_v4_receipt.json'
+      - 'research/v09b_nfl_transaction_empty_semantics_v7.py'
+      - 'research/test_v09b_nfl_transaction_empty_semantics_v7.py'
+      - '.github/workflows/research_v09b_nfl_transaction_empty_semantics_v7.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline-v09b-nfl-transaction-empty-semantics-v7-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Test frozen V7 semantics rules
+        run: pytest -q research/test_v09b_nfl_transaction_empty_semantics_v7.py
+      - name: Validate hash-locked dependencies and V7 authority bounds
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+
+          c = json.loads(Path('research/availability/v09b_nfl_transaction_empty_semantics_v7_contract.json').read_text())
+          assert c['contract_id'] == 'V09B-NFL-TRANSACTION-EMPTY-SEMANTICS-V7'
+          assert c['status'] == 'PREREGISTERED_EXPLICIT_EMPTY_SEMANTICS_VALIDATION_NO_LEDGER_AUTHORITY'
+          for dep_name in ('v6_receipt','v6_positive_universe_contract','v4_september_receipt'):
+              dep = c['dependencies'][dep_name]
+              actual = subprocess.check_output(['git','hash-object',dep['path']], text=True).strip()
+              assert actual == dep['git_blob_sha1'], (dep_name, actual, dep['git_blob_sha1'])
+          v6r = json.loads(Path(c['dependencies']['v6_receipt']['path']).read_text())
+          assert v6r['receipt_id'] == c['dependencies']['v6_receipt']['receipt_id']
+          assert v6r['status'] == c['dependencies']['v6_receipt']['required_status']
+          assert v6r['empirical_result']['fixed_requests_accounted_for'] == 72
+          assert v6r['empirical_result']['explicit_no_transactions_available_heading_count'] == 72
+          assert v6r['scientific_interpretation']['empty_result_semantics_qualified'] is False
+          v6c = json.loads(Path(c['dependencies']['v6_positive_universe_contract']['path']).read_text())
+          assert len(v6c['scope']['fixed_requests']) == 72
+          v4 = json.loads(Path(c['dependencies']['v4_september_receipt']['path']).read_text())
+          assert v4['receipt_id'] == c['dependencies']['v4_september_receipt']['receipt_id']
+          assert v4['status'] == c['dependencies']['v4_september_receipt']['required_status']
+          assert v4['aggregate_result']['endpoints_completed'] == 30
+          assert v4['aggregate_result']['source_errors'] == 0
+          gate = c['frozen_semantics_gate']
+          assert gate['positive_rule_matches_required'] == 72
+          assert gate['negative_controls_accounted_for'] == 32
+          assert gate['negative_rule_matches_allowed'] == 0
+          assert gate['zero_false_negatives_required'] is True
+          assert gate['zero_false_positives_required'] is True
+          a = c['authority_if_gate_passes']
+          assert a['all_month_full_ledger_qualified'] is False
+          assert a['modern_game_day_roster_universe_qualified'] is False
+          assert a['training_label_semantics_qualified'] is False
+          assert a['training_source_chronology_qualified'] is False
+          assert a['v09b_model_fit_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+
+  semantics-validation:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate candidate empty semantics against 72 positives and 32 fixed controls
+        run: |
+          mkdir -p research_outputs/v09b_nfl_transaction_empty_semantics_v7
+          set +e
+          PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/v09b_nfl_transaction_empty_semantics_v7.py \
+              --contract research/availability/v09b_nfl_transaction_empty_semantics_v7_contract.json \
+              --v6-contract research/availability/v09b_nfl_transaction_no_header_source_shape_v6_contract.json \
+              --output-root research_outputs/v09b_nfl_transaction_empty_semantics_v7
+          code=$?
+          echo "$code" > research_outputs/v09b_nfl_transaction_empty_semantics_v7/exit_code.txt
+          exit "$code"
+      - name: Upload V7 validation manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v09b-nfl-transaction-empty-semantics-v7-manifest-${{ github.run_id }}
+          path: |
+            research_outputs/v09b_nfl_transaction_empty_semantics_v7/validation.json
+            research_outputs/v09b_nfl_transaction_empty_semantics_v7/exit_code.txt
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload exact V7 response bytes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v09b-nfl-transaction-empty-semantics-v7-raw-${{ github.run_id }}
+          path: research_outputs/v09b_nfl_transaction_empty_semantics_v7/raw
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch remains research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
