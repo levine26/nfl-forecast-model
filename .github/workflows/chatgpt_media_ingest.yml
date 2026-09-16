@@ -6,13 +6,12 @@ on:
     paths:
       - "scripts/ingest_chatgpt_media_payloads.py"
       - "tests/test_chatgpt_media_ingest.py"
-      - "inputs/chatgpt_media/**"
+      - "inputs/chatgpt_media/current/**"
       - ".github/workflows/chatgpt_media_ingest.yml"
   push:
     branches: [main]
     paths:
       - "inputs/chatgpt_media/current/**"
-      - ".github/workflows/chatgpt_media_ingest.yml"
 
 permissions:
   contents: write
@@ -71,6 +70,20 @@ jobs:
           print('ChatGPT ingestion is constrained to the existing editorial validation boundary.')
           PY
 
+      - name: Detect complete ChatGPT bundle change
+        if: github.event_name == 'pull_request'
+        id: current-bundle
+        run: |
+          set -euo pipefail
+          git fetch origin "${{ github.base_ref }}" --depth=100
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -q '^inputs/chatgpt_media/current/'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Complete ChatGPT current bundle changed; full bundle validation is required."
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No complete ChatGPT current bundle change; code tests are sufficient for this PR."
+          fi
+
       - name: Require a complete bundle for production ingestion
         if: github.event_name != 'pull_request'
         run: test -f inputs/chatgpt_media/current/manifest.json
@@ -99,17 +112,17 @@ jobs:
           PY
 
       - name: Canonicalize editorial forecast source
-        if: github.event_name != 'pull_request' || hashFiles('inputs/chatgpt_media/current/manifest.json') != ''
+        if: github.event_name != 'pull_request' || steps.current-bundle.outputs.changed == 'true'
         run: |
           python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
       - name: Refresh deterministic reporting packet
-        if: github.event_name != 'pull_request' || hashFiles('inputs/chatgpt_media/current/manifest.json') != ''
+        if: github.event_name != 'pull_request' || steps.current-bundle.outputs.changed == 'true'
         run: python scripts/finalize_editorial.py --skip-copilot
 
       - name: Validate complete ChatGPT bundle on pull request
-        if: github.event_name == 'pull_request' && hashFiles('inputs/chatgpt_media/current/manifest.json') != ''
+        if: github.event_name == 'pull_request' && steps.current-bundle.outputs.changed == 'true'
         run: |
           python scripts/ingest_chatgpt_media_payloads.py --input-dir inputs/chatgpt_media/current --output /tmp/chatgpt-media-pr.json
           echo "Complete ChatGPT bundle passed focused, merge, composition, rationale, source, uniqueness, and full-slate gates."
