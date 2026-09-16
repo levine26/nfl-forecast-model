@@ -1,0 +1,258 @@
+name: LevLine 4 official club roster identity corroboration V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_official_club_roster_identity_corroboration_v2_contract.json'
+      - 'research/levline4_2026_official_club_roster_identity_corroboration_v2.py'
+      - 'research/test_levline4_2026_official_club_roster_identity_corroboration_v2.py'
+      - '.github/workflows/research_levline4_2026_official_club_roster_identity_corroboration_v2.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/levline4_2026_official_club_roster_identity_corroboration_v2_contract.json'
+      - 'research/levline4_2026_official_club_roster_identity_corroboration_v2.py'
+      - 'research/test_levline4_2026_official_club_roster_identity_corroboration_v2.py'
+      - '.github/workflows/research_levline4_2026_official_club_roster_identity_corroboration_v2.yml'
+
+concurrency:
+  group: levline4-official-club-roster-identity-v2
+  cancel-in-progress: false
+
+env:
+  FROZEN_IDENTITY_ARTIFACT_ID: '10452584328'
+  FROZEN_IDENTITY_PROJECTION_SHA256: 'fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f'
+  DATA_BRANCH: 'research-data/official-club-roster-identity-v2'
+  CANONICAL_DIR: 'research_outputs/levline4_2026_official_club_roster_identity_corroboration_v2/canonical'
+
+jobs:
+  deterministic-ci:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deterministic test dependencies
+        run: python -m pip install pytest 'polars==1.44.2' 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Compile V2 implementation
+        run: python -m py_compile research/levline4_2026_official_club_roster_identity_corroboration_v2.py
+      - name: Run deterministic V2 tests only
+        run: pytest -q research/test_levline4_2026_official_club_roster_identity_corroboration_v2.py
+      - name: Validate preregistered one-shot authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/levline4_2026_official_club_roster_identity_corroboration_v2_contract.json').read_text())
+          assert c['contract_id'] == 'LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-IDENTITY-CORROBORATION-V2'
+          assert c['status'] == 'PREREGISTERED_BEFORE_FIRST_V2_VALIDATION_EXECUTION'
+          assert c['validation_capture']['first_v2_validation_execution_is_canonical'] is True
+          assert c['validation_capture']['later_v2_rerun_may_not_replace_or_rescue_first_execution'] is True
+          assert c['parser_rule']['same_version_parser_rule_adaptation_after_first_v2_execution'] is False
+          assert c['frozen_week2_identity_projection']['projection_sha256'] == '${{ env.FROZEN_IDENTITY_PROJECTION_SHA256 }}'
+          assert c['frozen_week2_identity_projection']['status_fields_available_to_v2'] is False
+          assert c['fresh_validation_gates']['minimum_exact_unique_week2_name_candidates'] == 1900
+          assert c['fresh_validation_gates']['minimum_exact_unique_name_coverage_of_official_rows'] == 0.80
+          assert c['fresh_validation_gates']['minimum_jersey_auditable_rows'] == 1800
+          assert c['fresh_validation_gates']['minimum_jersey_agreement_rate'] == 0.995
+          assert c['fresh_validation_gates']['minimum_wilson_95_lower_bound_for_jersey_agreement'] == 0.99
+          assert c['fresh_validation_gates']['post_result_threshold_relaxation_allowed'] is False
+          assert c['authority_if_fresh_validation_passes']['week2_sunday_due_inactive_player_identity_to_gsis_qualified'] is False
+          assert c['authority_if_fresh_validation_passes']['production_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert c['governance']['postgame_participation_used'] is False
+          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  research-firewall:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove V2 branch is research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
+  first-main-validation:
+    if: github.event_name == 'push' && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Refuse to replace an already-preserved canonical V2 execution
+        id: canonical
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code origin "refs/heads/${DATA_BRANCH}" >/dev/null 2>&1; then
+            git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}"
+            if git cat-file -e "origin/${DATA_BRANCH}:${CANONICAL_DIR}/receipt.json" 2>/dev/null; then
+              echo 'skip=true' >> "$GITHUB_OUTPUT"
+              echo 'Canonical V2 execution is already preserved; refusing replacement.'
+              exit 0
+            fi
+          fi
+          echo 'skip=false' >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        if: steps.canonical.outputs.skip != 'true'
+        with:
+          python-version: '3.11'
+      - name: Install V2 validation dependencies
+        if: steps.canonical.outputs.skip != 'true'
+        run: python -m pip install 'polars==1.44.2' 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Download exact frozen Week 2 status-free identity projection
+        if: steps.canonical.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -L --fail-with-body \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${FROZEN_IDENTITY_ARTIFACT_ID}/zip" \
+            -o /tmp/frozen_identity.zip
+          rm -rf /tmp/frozen_identity
+          mkdir -p /tmp/frozen_identity
+          unzip -q /tmp/frozen_identity.zip -d /tmp/frozen_identity
+          projection="$(find /tmp/frozen_identity/projections -maxdepth 1 -type f -name '*.parquet' -print -quit)"
+          test -n "$projection"
+          echo "PROJECTION_PATH=$projection" >> "$GITHUB_ENV"
+      - name: Execute first and only canonical V2 validation
+        if: steps.canonical.outputs.skip != 'true'
+        id: validate
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m research.levline4_2026_official_club_roster_identity_corroboration_v2 \
+            --projection-path "$PROJECTION_PATH"
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Preserve a fail-closed receipt if execution crashed before writing one
+        if: always() && steps.canonical.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='research_outputs/levline4_2026_official_club_roster_identity_corroboration_v2'
+          mkdir -p "$OUT"
+          if test ! -f "$OUT/receipt.json"; then
+            python - <<'PY'
+          import json, os
+          from pathlib import Path
+          out = Path('research_outputs/levline4_2026_official_club_roster_identity_corroboration_v2')
+          receipt = {
+              'schema_version': 'levline4-2026-official-club-roster-identity-corroboration-v2',
+              'contract_id': 'LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-IDENTITY-CORROBORATION-V2',
+              'status': 'FAIL',
+              'failure_reason': 'execution_failed_before_receipt',
+              'github_run_id': os.environ.get('GITHUB_RUN_ID'),
+              'github_run_attempt': os.environ.get('GITHUB_RUN_ATTEMPT'),
+              'canonical_first_execution': True,
+              'official_club_roster_identity_metadata_parser_qualified': False,
+              'week2_exact_unique_name_plus_jersey_corroboration_rule_qualified': False,
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified': False,
+              'general_2026_player_identity_to_gsis_qualified': False,
+              'game_day_membership_qualified': False,
+              'availability_state_authorized': False,
+              'player_value_join_authorized': False,
+              'forecast_probability_effect_authorized': False,
+              'model_fit_authorized': False,
+              'production_authorized': False,
+              'completed_2026_outcomes_used_for_design_or_selection': 0,
+              'postgame_participation_used': False,
+              'f_st_01_frozen_2026_unchanged': True,
+          }
+          (out / 'receipt.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
+          PY
+          fi
+      - name: Verify V2 receipt authority boundary
+        if: always() && steps.canonical.outputs.skip != 'true'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('research_outputs/levline4_2026_official_club_roster_identity_corroboration_v2/receipt.json').read_text())
+          assert r['contract_id'] == 'LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-IDENTITY-CORROBORATION-V2'
+          assert r['canonical_first_execution'] is True
+          for key in (
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert r[key] is False, key
+          assert r['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert r['postgame_participation_used'] is False
+          assert r['f_st_01_frozen_2026_unchanged'] is True
+          if r['status'] == 'PASS':
+              assert r['official_club_roster_identity_metadata_parser_qualified'] is True
+              assert r['week2_exact_unique_name_plus_jersey_corroboration_rule_qualified'] is True
+          else:
+              assert r['official_club_roster_identity_metadata_parser_qualified'] is False
+              assert r['week2_exact_unique_name_plus_jersey_corroboration_rule_qualified'] is False
+          print(json.dumps(r, indent=2, sort_keys=True))
+          PY
+      - name: Upload canonical V2 evidence artifact
+        if: always() && steps.canonical.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-official-club-roster-identity-v2-canonical-${{ github.run_id }}
+          path: research_outputs/levline4_2026_official_club_roster_identity_corroboration_v2/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Persist canonical V2 evidence append-only off main
+        if: always() && steps.canonical.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC='research_outputs/levline4_2026_official_club_roster_identity_corroboration_v2'
+          test -f "$SRC/receipt.json"
+          rm -rf /tmp/v2-canonical-evidence
+          cp -R "$SRC" /tmp/v2-canonical-evidence
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B v2-identity-data "origin/${DATA_BRANCH}"
+          else
+            git checkout --orphan v2-identity-data
+            git rm -rf . || true
+          fi
+          test ! -e "$CANONICAL_DIR"
+          mkdir -p "$(dirname "$CANONICAL_DIR")"
+          cp -R /tmp/v2-canonical-evidence "$CANONICAL_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$CANONICAL_DIR"
+          git commit -m 'Preserve canonical official-club identity V2 validation'
+          git push origin HEAD:"${DATA_BRANCH}"
+      - name: Surface canonical V2 validation failure only after preservation
+        if: always() && steps.canonical.outputs.skip != 'true'
+        shell: bash
+        run: |
+          test "${{ steps.validate.outputs.exit_code }}" = "0"
