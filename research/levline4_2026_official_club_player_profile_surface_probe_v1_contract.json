@@ -1,0 +1,96 @@
+{
+  "contract_version": 1,
+  "contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-PLAYER-PROFILE-SURFACE-PROBE-V1",
+  "status": "PREREGISTERED_SOURCE_SURFACE_CAPTURE_AND_DIAGNOSTIC_ONLY",
+  "purpose": "Capture and structurally characterize one deterministic official first-party player-profile page per club to discover whether a stable player identifier candidate is exposed. This experiment does not qualify any identifier parser, identifier-to-GSIS bridge, player identity, roster membership, availability, player value, forecast effect, model fit, or production dependency.",
+  "frozen_dependency": {
+    "roster_parser_contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-PARSER-V2",
+    "canonical_workflow_run_id": 35130069924,
+    "canonical_artifact_id": 10461126275,
+    "canonical_artifact_digest": "sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e",
+    "roster_metadata_sha256": "90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f",
+    "official_club_roster_metadata_parser_qualified": true,
+    "player_identity_to_gsis_qualified": false
+  },
+  "sample_selection": {
+    "expected_team_count": 32,
+    "group_by": "team",
+    "selection_rule": "lexicographically smallest profile_path within each team from the frozen V2 roster_metadata.jsonl projection",
+    "target_inactive_rows_consulted": false,
+    "manual_player_selection_allowed": false,
+    "fuzzy_selection_allowed": false,
+    "same_version_sample_adaptation_after_live_capture": false
+  },
+  "capture": {
+    "https_only": true,
+    "redirects_allowed_only_within_selected_profile_host_www_variant": true,
+    "raw_response_bytes_preserved": true,
+    "raw_sha256_required": true,
+    "captured_at_utc_required": true,
+    "final_url_required": true,
+    "content_type_required": true,
+    "silent_team_drops_allowed": false
+  },
+  "diagnostics_only": {
+    "literal_token_patterns": [
+      "gsis",
+      "playerid",
+      "player_id",
+      "player-id",
+      "nflid",
+      "nfl_id",
+      "nfl-id",
+      "personid",
+      "person_id",
+      "person-id",
+      "athleteid",
+      "athlete_id",
+      "athlete-id",
+      "sportradar",
+      "espn"
+    ],
+    "gsis_like_value_regex": "00-[0-9]{7}",
+    "id_like_attribute_name_regex": "(^id$|(^|[-_:])(id|player|athlete|person|gsis|nfl)([-_:]|$))",
+    "record_script_ids_and_types": true,
+    "record_json_ld_count": true,
+    "record_next_data_presence": true,
+    "record_canonical_link": true,
+    "record_id_like_attribute_names_and_bounded_samples": true,
+    "maximum_attribute_samples_per_name": 10,
+    "candidate_presence_is_not_identifier_qualification": true
+  },
+  "surface_capture_gate": {
+    "all_32_selected_profiles_required": true,
+    "all_32_http_success_required": true,
+    "all_32_raw_files_required": true,
+    "source_errors_allowed": 0,
+    "post_result_threshold_relaxation_allowed": false,
+    "same_version_retry_may_replace_first_result": false
+  },
+  "authority_even_if_gate_passes": {
+    "official_club_player_profile_surface_capture_qualified": true,
+    "official_stable_player_identifier_exposed_qualified": false,
+    "official_identifier_parser_qualified": false,
+    "official_identifier_to_gsis_bridge_qualified": false,
+    "player_identity_to_gsis_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "follow_up_rule": {
+    "if_candidate_identifier_is_observed": "A separately preregistered successor must freeze the extraction grammar and independent GSIS bridge before any target inactive row is tested.",
+    "if_no_candidate_identifier_is_observed": "Record the negative structural result without claiming universal absence outside the sampled official profile surfaces."
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "f_st_01_frozen_2026_unchanged": true,
+    "production_dependency_authorized": false
+  }
+}
