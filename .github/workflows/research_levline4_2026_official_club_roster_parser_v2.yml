@@ -1,0 +1,160 @@
+name: LevLine 4 official club roster parser V2 held-out
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_official_club_roster_parser_v2_contract.json'
+      - 'research/levline4_2026_official_club_roster_parser_v2.py'
+      - 'research/test_levline4_2026_official_club_roster_parser_v2.py'
+      - '.github/workflows/research_levline4_2026_official_club_roster_parser_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline4-official-club-roster-parser-v2-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight parser dependencies
+        run: python -m pip install pytest 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Run frozen V2 parser tests
+        run: pytest -q research/test_levline4_2026_official_club_roster_parser_v2.py
+      - name: Assert preregistered authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/levline4_2026_official_club_roster_parser_v2_contract.json').read_text())
+          assert c['contract_id']=='LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-PARSER-V2'
+          assert c['status']=='PREREGISTERED_HELD_OUT_SOURCE_PARSER_QUALIFICATION'
+          assert c['discovery_evidence']['workflow_run_id']==35127480203
+          assert c['discovery_evidence']['artifact_id']==10459946019
+          assert c['discovery_evidence']['discovery_only_not_validation'] is True
+          assert c['frozen_parser']['minimum_parsed_rows_per_team']==70
+          assert c['frozen_parser']['jersey_may_be_empty'] is True
+          assert c['frozen_parser']['no_fuzzy_matching'] is True
+          assert c['qualification_gate']['post_result_threshold_relaxation_allowed'] is False
+          assert c['qualification_gate']['same_version_retry_may_replace_first_held_out_result'] is False
+          assert c['authority_if_gate_passes']['official_club_roster_metadata_parser_qualified'] is True
+          assert c['authority_if_gate_passes']['official_club_roster_source_is_independent_gsis_ground_truth'] is False
+          assert c['authority_if_gate_passes']['player_identity_to_gsis_qualified'] is False
+          assert c['authority_if_gate_passes']['availability_state_authorized'] is False
+          assert c['authority_if_gate_passes']['forecast_probability_effect_authorized'] is False
+          assert c['authority_if_gate_passes']['production_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert c['governance']['postgame_participation_used'] is False
+          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  first-held-out-capture:
+    needs: unit-and-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install held-out capture dependencies
+        run: python -m pip install 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Prove parser contract predates this execution head
+        run: |
+          set -euo pipefail
+          contract_commit=$(git log -1 --format=%H -- research/levline4_2026_official_club_roster_parser_v2_contract.json)
+          test -n "$contract_commit"
+          test "$contract_commit" != "$GITHUB_SHA"
+          echo "frozen_contract_commit=$contract_commit"
+      - name: Execute first held-out 32-club V2 capture
+        id: heldout
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m research.levline4_2026_official_club_roster_parser_v2
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Verify held-out receipt cannot broaden authority
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research_outputs/levline4_2026_official_club_roster_parser_v2/receipt.json')
+          assert p.is_file(), 'held-out V2 receipt missing'
+          r=json.loads(p.read_text())
+          assert r['contract_id']=='LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-PARSER-V2'
+          assert r['expected_team_count']==32
+          assert r['discovery_workflow_run_id']==35127480203
+          assert r['discovery_artifact_id']==10459946019
+          assert r['official_club_roster_source_is_independent_gsis_ground_truth'] is False
+          for key in (
+              'player_identity_to_gsis_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert r[key] is False, key
+          assert r['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert r['postgame_participation_used'] is False
+          assert r['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'status':r['status'],
+              'captured_team_count':r['captured_team_count'],
+              'parser_gate_pass_team_count':r['parser_gate_pass_team_count'],
+              'parsed_row_count':r['parsed_row_count'],
+              'minimum_parsed_rows_observed':r['minimum_parsed_rows_observed'],
+              'maximum_parsed_rows_observed':r['maximum_parsed_rows_observed'],
+              'empty_jersey_row_count':r['empty_jersey_row_count'],
+              'parse_error_count':r['parse_error_count'],
+              'duplicate_profile_path_count':r['duplicate_profile_path_count'],
+              'source_error_count':len(r['source_errors']),
+              'official_club_roster_metadata_parser_qualified':r['official_club_roster_metadata_parser_qualified'],
+          },indent=2,sort_keys=True))
+          PY
+      - name: Upload immutable first held-out V2 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-official-club-roster-parser-v2-first-held-out-${{ github.run_id }}
+          path: research_outputs/levline4_2026_official_club_roster_parser_v2/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface frozen held-out failure after evidence upload
+        if: always()
+        shell: bash
+        run: test "${{ steps.heldout.outputs.exit_code }}" = "0"
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch is research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
