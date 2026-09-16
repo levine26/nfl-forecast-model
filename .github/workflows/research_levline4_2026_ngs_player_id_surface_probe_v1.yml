@@ -1,0 +1,117 @@
+name: LevLine 4 NFL NGS player-ID surface probe V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_ngs_player_id_surface_probe_v1_contract.json'
+      - 'research/levline4_2026_ngs_player_id_surface_probe_v1.py'
+      - 'research/test_levline4_2026_ngs_player_id_surface_probe_v1.py'
+      - '.github/workflows/research_levline4_2026_ngs_player_id_surface_probe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline4-ngs-player-id-surface-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight test dependency
+        run: python -m pip install pytest
+      - name: Test deterministic discovery helpers and frozen contract
+        run: pytest -q research/test_levline4_2026_ngs_player_id_surface_probe_v1.py
+
+  live-discovery:
+    needs: unit-and-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install browser capture dependency
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Execute fixed-sentinel NGS discovery probe
+        id: probe
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m research.levline4_2026_ngs_player_id_surface_probe_v1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
+      - name: Verify discovery never expands authority
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('research_outputs/levline4_2026_ngs_player_id_surface_probe_v1')
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-SURFACE-PROBE-V1'
+          assert receipt['fixed_query_count']==3
+          assert receipt['ngs_backend_endpoint_qualified'] is False
+          assert receipt['ngs_name_to_gsis_parser_qualified'] is False
+          for key in (
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified','game_day_membership_qualified',
+              'availability_state_authorized','player_value_join_authorized','forecast_probability_effect_authorized',
+              'model_fit_authorized','production_authorized'):
+              assert receipt[key] is False, key
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert (root/'query_diagnostics.json').is_file()
+          assert (root/'network_responses.json').is_file()
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+      - name: Upload discovery evidence before surfacing failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-ngs-player-id-surface-probe-v1-${{ github.run_id }}
+          path: research_outputs/levline4_2026_ngs_player_id_surface_probe_v1/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface discovery failure after evidence upload
+        if: always()
+        env:
+          PROBE_OUTCOME: ${{ steps.probe.outcome }}
+          PROBE_EXIT_CODE: ${{ steps.probe.outputs.exit_code }}
+        run: |
+          set -euo pipefail
+          if [ "$PROBE_OUTCOME" != "success" ] || [ "${PROBE_EXIT_CODE:-1}" != "0" ]; then
+            echo 'NGS V1 discovery failed; preserve the evidence and use a new preregistered version for any rule change.'
+            exit 1
+          fi
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove research-only scope
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
