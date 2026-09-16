@@ -1,5 +1,5 @@
 {
-  "schema_version": "levline4-2026-official-club-player-profile-surface-probe-v1-first-result-manifest-v2",
+  "schema_version": "levline4-2026-official-club-player-profile-surface-probe-v1-first-result-manifest-v3",
   "contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-PLAYER-PROFILE-SURFACE-PROBE-V1",
   "first_result_is_canonical": true,
   "later_same_version_execution_may_replace_first_result": false,
@@ -12,7 +12,7 @@
     "team_diagnostics.json": "34b56daa43f4639281de03b3681a9dae2b6b48e0b9757c8bf705a2ca84889578",
     "selected_profiles.json": "ee882e69d604f91eae198d880bb79a967984add67056fb5fb005b0634e2767be"
   },
-  "raw_tree_sha256": "064dccd171e121ea03a67b5493aa50b7482466e4622811dc09879bbce78eb94f",
+  "raw_integrity_basis": "Each of the 32 raw HTML files must hash to raw_html_sha256 in canonical team_diagnostics.json; team_diagnostics.json itself is frozen by canonical_artifact_file_hashes.",
   "raw_total_bytes": 11421601,
   "artifact_uncompressed_total_bytes": 11509972,
   "status": "PASS",
