@@ -1,0 +1,114 @@
+name: Sunday Signal Week 2 Groq recovery bridge
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/week2_groq_recovery.yml"
+      - "inputs/chatgpt_media/current/**"
+      - "inputs/chatgpt_media/fallback/**"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/week2_groq_recovery.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: sunday-signal-week2-groq-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - name: Validate recovery boundary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          expected = {
+              "2026_02_CIN_HOU", "2026_02_CLE_TB", "2026_02_GB_NYJ",
+              "2026_02_IND_KC", "2026_02_JAX_DEN", "2026_02_LV_LAC",
+              "2026_02_MIA_SF", "2026_02_NO_BAL", "2026_02_NYG_LA",
+              "2026_02_PHI_TEN", "2026_02_SEA_ARI",
+          }
+          fallback = json.loads(Path("inputs/chatgpt_media/fallback/manifest.json").read_text())
+          actual = {str(value) for value in fallback.get("game_ids", [])}
+          if actual != expected:
+              raise SystemExit(f"fallback manifest must equal exact unresolved Groq set: {sorted(actual)}")
+          for gid in expected:
+              if not Path(f"inputs/chatgpt_media/fallback/{gid}.json").is_file():
+                  raise SystemExit(f"missing failed-game payload: {gid}")
+          carry = json.loads(Path("inputs/chatgpt_media/current/manifest.json").read_text())
+          approved = {"2026_02_DET_BUF", "2026_02_PIT_NE"}
+          if {str(value) for value in carry.get("game_ids", [])} != approved:
+              raise SystemExit("current bundle may contain only the two already-approved prior Groq fallbacks")
+          for gid in approved:
+              if not Path(f"inputs/chatgpt_media/current/{gid}.json").is_file():
+                  raise SystemExit(f"missing approved carryover payload: {gid}")
+          for manifest in (fallback, carry):
+              if manifest.get("forecast_path_identity") != "F-ST-01-FROZEN-2026":
+                  raise SystemExit("editorial recovery attempted to leave frozen forecast identity")
+          print("Week 2 recovery manifests are exactly scoped and editorial-only.")
+          PY
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            exit 0
+          fi
+          latest_context_sha=$(gh run list --workflow "Sunday Signal contextual intelligence" --branch main --status success --limit 1 --json headSha --jq '.[0].headSha // ""')
+          test -n "$latest_context_sha" || { echo "No successful contextual-intelligence run exists."; exit 1; }
+          git fetch origin main
+          if ! git merge-base --is-ancestor "$latest_context_sha" origin/main; then
+            echo "Latest successful contextual-intelligence run is not an ancestor of main; refusing recovery dispatch."
+            exit 1
+          fi
+          echo "Recovery inherits successful contextual intelligence from $latest_context_sha."
+
+      - name: Restore validated Groq HUMAN checkpoints across deterministic forecast refresh
+        if: github.event_name != 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/groq-validated-checkpoint
+          key: groq-week2-recovery-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-${{ github.run_id }}
+          restore-keys: |
+            groq-validated-${{ runner.os }}-
+
+      - name: Require prior validated Groq checkpoints
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          test -s /tmp/groq-validated-checkpoint/2026_02_CAR_ATL.txt
+          test -s /tmp/groq-validated-checkpoint/2026_02_MIN_CHI.txt
+          test -s /tmp/groq-validated-checkpoint/2026_02_WAS_DAL.txt
+          echo "Restored the three successful Groq HUMAN checkpoints from the failed full-slate attempt."
+
+      - name: Re-key checkpoints for current canonical slate
+        if: github.event_name != 'pull_request'
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/groq-validated-checkpoint
+          key: groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-week2-recovery-${{ github.run_id }}
+
+      - name: Dispatch canonical Groq writer once
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          active=$(gh run list --workflow "Sunday Signal Groq media writer" --branch main --limit 20 --json status --jq '[.[] | select(.status == "queued" or .status == "in_progress")] | length')
+          if [ "$active" -ne 0 ]; then
+            echo "A canonical Groq writer is already active; refusing duplicate dispatch."
+            exit 1
+          fi
+          gh workflow run groq_media_writer.yml --ref main
+          echo "Dispatched the canonical Sunday Signal Groq media writer."
