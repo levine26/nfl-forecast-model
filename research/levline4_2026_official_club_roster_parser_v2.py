@@ -192,6 +192,24 @@ def parse_team_html(
     return rows, diagnostics
 
 
+def _failed_http_diagnostics(team: str, raw_html: bytes, status_code: int) -> dict[str, Any]:
+    return {
+        "team": team,
+        "raw_html_sha256": v1.sha256_bytes(raw_html),
+        "raw_html_bytes": len(raw_html),
+        "exact_roster_table_count": 0,
+        "candidate_row_count": 0,
+        "parsed_row_count": 0,
+        "empty_jersey_row_count": 0,
+        "duplicate_profile_paths": [],
+        "duplicate_profile_path_count": 0,
+        "parse_errors": [{"error": "http_status_not_success", "http_status": int(status_code)}],
+        "parse_error_count": 1,
+        "minimum_rows_gate_pass": False,
+        "parser_team_gate_pass": False,
+    }
+
+
 def capture_and_parse_team(
     team: str,
     host: str,
@@ -204,15 +222,18 @@ def capture_and_parse_team(
     result = v1.request_with_frozen_redirects(source_url, host, get=get)
     if not v1.host_allowed(result.url, host):
         raise RuntimeError(f"final_url_left_frozen_host:{result.url}")
-    if not 200 <= result.status_code < 300:
-        raise RuntimeError(f"http_status_not_success:{result.status_code}")
-    rows, parser_diagnostics = parse_team_html(
-        team=team,
-        source_url=source_url,
-        final_url=result.url,
-        captured_at_utc=captured_at,
-        raw_html=result.content,
-    )
+    http_success = 200 <= result.status_code < 300
+    if http_success:
+        rows, parser_diagnostics = parse_team_html(
+            team=team,
+            source_url=source_url,
+            final_url=result.url,
+            captured_at_utc=captured_at,
+            raw_html=result.content,
+        )
+    else:
+        rows = []
+        parser_diagnostics = _failed_http_diagnostics(team, result.content, result.status_code)
     record = {
         "team": team,
         "host": host,
@@ -220,7 +241,7 @@ def capture_and_parse_team(
         "final_url": result.url,
         "captured_at_utc": captured_at,
         "http_status": result.status_code,
-        "http_success": True,
+        "http_success": http_success,
         "content_type": result.headers.get("Content-Type") or result.headers.get("content-type") or "",
         **parser_diagnostics,
     }
