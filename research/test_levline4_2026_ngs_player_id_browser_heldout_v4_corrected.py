@@ -10,6 +10,7 @@ from research.levline4_2026_ngs_player_id_browser_heldout_v4_corrected import (
 
 CONTRACT = Path("research/levline4_2026_ngs_player_id_browser_heldout_v4_contract.json")
 ADDENDUM = Path("research/levline4_2026_ngs_player_id_browser_heldout_v4_preexecution_addendum.json")
+SUPERSEDED_WORKFLOW = Path(".github/workflows/research_levline4_2026_ngs_player_id_browser_heldout_v4.yml")
 
 
 def _contract():
@@ -84,6 +85,10 @@ def test_addendum_is_preexecution_and_narrow():
     assert a["governance"]["completed_2026_outcomes_used_for_design_or_selection"] == 0
     assert a["governance"]["postgame_participation_used"] is False
     assert a["governance"]["f_st_01_frozen_2026_unchanged"] is True
+
+
+def test_superseded_uncorrected_workflow_is_absent():
+    assert not SUPERSEDED_WORKFLOW.exists()
 
 
 def test_alias_capability_stays_false_when_equivalence_is_not_exercised():
