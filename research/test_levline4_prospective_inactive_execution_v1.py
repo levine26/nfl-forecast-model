@@ -32,8 +32,9 @@ def _archive(tmp_path: Path, *, include_matching_article: bool = True, duplicate
     raw = _html()
     sha = hashlib.sha256(raw).hexdigest()
     relpath = f"raw/{sha}.html.gz"
-    with gzip.open(root / relpath, "wb", mtime=0) as handle:
-        handle.write(raw)
+    with (root / relpath).open("wb") as raw_handle:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw_handle, mtime=0) as zipped:
+            zipped.write(raw)
     sources = [
         {
             "source_kind": "nfl_news_index",
