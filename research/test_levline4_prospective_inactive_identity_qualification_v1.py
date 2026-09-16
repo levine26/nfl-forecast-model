@@ -34,7 +34,7 @@ def _add_execution(
         obs = f"obs-{execution_id}-{i:03d}"
         parsed.append({"team": team, "player_name_rendered": f"Player {i}"})
         inputs.append({"observation_id": obs, "team": team, "week": 2})
-        state = "UNRESOLVED_NO_EXACT_MATCH" if unresolved_index == i else "RESOLVED_EXACT_UNIQUE"
+        state = "UNRESOLVED" if unresolved_index == i else "RESOLVED_EXACT_UNIQUE"
         state_counts[state] = state_counts.get(state, 0) + 1
         resolved = None if unresolved_index == i else f"00-{i:04d}"
         resolver.append({
@@ -101,46 +101,50 @@ def _write_attempts(root: Path, receipts: list[dict]) -> None:
     _write_jsonl(root / "attempts.jsonl", receipts)
 
 
-def test_wilson_73_of_73_clears_frozen_point_95_gate() -> None:
+def test_wilson_73_of_73_clears_descriptive_point_95_consistency_gate() -> None:
     assert wilson_lower(73, 73) > 0.95
     assert wilson_lower(72, 72) < 0.95
 
 
-def test_passes_only_narrow_week2_identity_authority(tmp_path: Path) -> None:
+def test_passes_mechanics_but_never_grants_identity_truth_authority(tmp_path: Path) -> None:
     root = tmp_path / "out"
     first = _add_execution(root, execution_id="first", captured_at="2026-09-20T16:00:00Z")
     _write_attempts(root, [first])
     result = evaluate(execution_output_dir=root)
-    assert result["status"] == "PASS_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY"
+    assert result["status"] == "PASS_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
     assert result["metrics"]["total_resolver_rows"] == 73
     assert result["metrics"]["exact_unique_resolution_rate"] == 1.0
-    assert result["metrics"]["independent_audit_agreement"] == 1.0
-    assert result["gates"]["independent_agreement_wilson95_lower_gte_0_95"] is True
-    assert result["authority"]["week2_sunday_due_inactive_player_identity_to_gsis_qualified"] is True
+    assert result["metrics"]["cross_artifact_agreement"] == 1.0
+    assert result["gates"]["cross_artifact_agreement_wilson95_lower_gte_0_95"] is True
+    assert result["source_lineage"]["cross_artifact_audit_is_source_independent"] is False
+    assert result["authority"]["week2_sunday_due_inactive_identity_mechanics_validated"] is True
+    assert result["authority"]["week2_sunday_due_inactive_player_identity_to_gsis_qualified"] is False
+    assert result["authority"]["source_independent_identity_validation_still_required"] is True
     assert result["authority"]["general_2026_player_identity_to_gsis_qualified"] is False
     assert result["authority"]["availability_probability_feature_authorized"] is False
     assert result["authority"]["production_authorized"] is False
     assert result["completed_2026_outcomes_used"] == 0
 
 
-def test_72_of_72_fails_minimum_independent_evidence_gate(tmp_path: Path) -> None:
+def test_72_of_72_fails_minimum_cross_artifact_evidence_gate(tmp_path: Path) -> None:
     root = tmp_path / "out"
     first = _add_execution(root, execution_id="first", captured_at="2026-09-20T16:00:00Z", n=72)
     _write_attempts(root, [first])
     result = evaluate(execution_output_dir=root)
-    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY"
-    assert result["gates"]["independent_auditable_rows_gte_73"] is False
-    assert result["gates"]["independent_agreement_wilson95_lower_gte_0_95"] is False
+    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
+    assert result["gates"]["cross_artifact_auditable_rows_gte_73"] is False
+    assert result["gates"]["cross_artifact_agreement_wilson95_lower_gte_0_95"] is False
 
 
-def test_cross_source_contradiction_fails_closed(tmp_path: Path) -> None:
+def test_cross_artifact_contradiction_fails_closed(tmp_path: Path) -> None:
     root = tmp_path / "out"
     first = _add_execution(root, execution_id="first", captured_at="2026-09-20T16:00:00Z", contradiction_index=0)
     _write_attempts(root, [first])
     result = evaluate(execution_output_dir=root)
-    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY"
+    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
     assert result["gates"]["first_execution_status_pass"] is False
-    assert result["gates"]["cross_source_contradictions_zero"] is False
+    assert result["gates"]["cross_artifact_contradictions_zero"] is False
+    assert result["authority"]["week2_sunday_due_inactive_player_identity_to_gsis_qualified"] is False
 
 
 def test_one_unresolved_in_73_fails_0_995_resolution_gate(tmp_path: Path) -> None:
@@ -148,7 +152,7 @@ def test_one_unresolved_in_73_fails_0_995_resolution_gate(tmp_path: Path) -> Non
     first = _add_execution(root, execution_id="first", captured_at="2026-09-20T16:00:00Z", unresolved_index=0)
     _write_attempts(root, [first])
     result = evaluate(execution_output_dir=root)
-    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY"
+    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
     assert result["metrics"]["exact_unique_resolution_rate"] < 0.995
     assert result["gates"]["exact_unique_resolution_rate_gte_0_995"] is False
 
@@ -160,7 +164,7 @@ def test_later_execution_cannot_rescue_first_identity_execution(tmp_path: Path) 
     _write_attempts(root, [later, first])
     result = evaluate(execution_output_dir=root)
     assert result["evaluated_execution_id"] == "first"
-    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY"
+    assert result["status"] == "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
 
 
 def test_contract_identity_is_stable() -> None:
