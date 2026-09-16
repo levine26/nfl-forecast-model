@@ -1,0 +1,58 @@
+{
+  "authority": {
+    "absence_of_team_section_means_active_or_healthy": false,
+    "availability_probability_feature_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "full_day_article_completeness_assumed": false,
+    "player_identity_to_gsis_qualified": false,
+    "player_level_parser_qualified_for_due_cohort_filtering": true,
+    "player_value_join_authorized": false,
+    "production_authorized": false
+  },
+  "completed_2026_outcomes_used": 0,
+  "contract_id": "NFL-INACTIVE-ARTICLE-COHORT-PARSER-2026-V2",
+  "gates": {
+    "all_cohort_sentinel_emergency_qbs_present": true,
+    "all_cohort_sentinel_player_team_pairs_present": true,
+    "all_due_teams_present": true,
+    "cohort_emergency_annotation_count_exact": true,
+    "cohort_inactive_entry_count_exact": true,
+    "cohort_team_entry_counts_exact": true,
+    "cohort_team_section_count_exact": true,
+    "full_parser_zero_duplicate_players_within_team": true,
+    "full_parser_zero_duplicate_team_sections": true,
+    "full_parser_zero_unparseable_entries": true,
+    "raw_sha256_exact": true
+  },
+  "observed": {
+    "cohort_emergency_third_qb_annotations": 6,
+    "cohort_inactive_entries": 47,
+    "cohort_team_entry_counts": {
+      "ARI": 6,
+      "GB": 6,
+      "LAC": 5,
+      "LV": 7,
+      "MIA": 6,
+      "MIN": 7,
+      "PHI": 5,
+      "WAS": 5
+    },
+    "cohort_team_sections": 8,
+    "cohort_teams": [
+      "ARI",
+      "GB",
+      "LAC",
+      "LV",
+      "MIA",
+      "MIN",
+      "PHI",
+      "WAS"
+    ],
+    "full_article_inactive_entries": 150,
+    "full_article_team_sections": 24,
+    "raw_html_sha256": "8d5cd6531f0ecea74c2fe25c9bd38b0849129849adc3797e8cee118605b25605"
+  },
+  "qualification_passed": true,
+  "schema_version": "levline-inactive-article-cohort-parser-v2",
+  "status": "PASS"
+}
