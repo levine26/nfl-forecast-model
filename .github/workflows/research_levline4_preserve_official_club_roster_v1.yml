@@ -1,0 +1,156 @@
+name: LevLine 4 preserve official club roster probe V1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_official_club_roster_v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_official_club_roster_v1.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-official-club-roster-v1
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10459946019'
+  SOURCE_WORKFLOW_RUN_ID: '35127480203'
+  SOURCE_HEAD_SHA: '31698199e37b3570a82a5c55f879db65f2fdaa34'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:ab95f7812876df2c5c91e5d736020acddeb4705f5a55acfaa77140754fca397c'
+  EXPECTED_RECEIPT_SHA256: '123637280d83b59582324b3e905777dc8b251cdb83769be60a875a9871073841'
+  EXPECTED_DIAGNOSTICS_SHA256: 'dce2e6af2ee671f3eae9b742df1f59ff80978c70bfc7d65e476689580727d61e'
+  EXPECTED_PROFILE_LINKS_SHA256: '5044624c0dbf092d107feee9bdd146f8d05b63c3c1be4692a22441e6f2da6b2f'
+  DATA_BRANCH: 'research-data/levline4-official-club-roster-v1'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable first-run artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          digest=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}" --jq .digest)
+          test "$digest" = "$EXPECTED_ARTIFACT_DIGEST"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/probe.zip
+          mkdir -p /tmp/probe
+          unzip -q /tmp/probe.zip -d /tmp/probe
+      - name: Verify frozen evidence and research-only authority
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path('/tmp/probe')
+          sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          assert sha(root/'receipt.json') == os.environ['EXPECTED_RECEIPT_SHA256']
+          assert sha(root/'team_diagnostics.json') == os.environ['EXPECTED_DIAGNOSTICS_SHA256']
+          assert sha(root/'profile_links.jsonl') == os.environ['EXPECTED_PROFILE_LINKS_SHA256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          diagnostics=json.loads((root/'team_diagnostics.json').read_text())
+          assert receipt['status']=='PASS'
+          assert receipt['captured_team_count']==32
+          assert receipt['http_success_team_count']==32
+          assert receipt['surface_presence_team_count']==32
+          assert receipt['official_club_roster_surface_capture_qualified'] is True
+          assert len(diagnostics)==32
+          for row in diagnostics:
+              raw=root/'raw'/f"{row['team']}.html"
+              assert raw.is_file()
+              assert sha(raw)==row['raw_html_sha256']
+              assert row['http_success'] is True
+              assert row['surface_presence'] is True
+          assert len(list((root/'raw').glob('*.html')))==32
+          for key in ('name_jersey_position_parser_qualified','official_club_roster_identity_parser_qualified',
+                      'week2_sunday_due_inactive_player_identity_to_gsis_qualified','general_2026_player_identity_to_gsis_qualified',
+                      'game_day_membership_qualified','availability_state_authorized','player_value_join_authorized',
+                      'forecast_probability_effect_authorized','model_fit_authorized','production_authorized'):
+              assert receipt[key] is False, key
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download immutable first-run artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          digest=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}" --jq .digest)
+          test "$digest" = "$EXPECTED_ARTIFACT_DIGEST"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/probe.zip
+          mkdir -p /tmp/probe
+          unzip -q /tmp/probe.zip -d /tmp/probe
+      - name: Verify and add preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          root=Path('/tmp/probe')
+          sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          assert sha(root/'receipt.json')==os.environ['EXPECTED_RECEIPT_SHA256']
+          assert sha(root/'team_diagnostics.json')==os.environ['EXPECTED_DIAGNOSTICS_SHA256']
+          assert sha(root/'profile_links.jsonl')==os.environ['EXPECTED_PROFILE_LINKS_SHA256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          diagnostics=json.loads((root/'team_diagnostics.json').read_text())
+          assert receipt['status']=='PASS' and len(diagnostics)==32
+          for row in diagnostics:
+              assert sha(root/'raw'/f"{row['team']}.html")==row['raw_html_sha256']
+          preservation={
+              'schema_version':'levline4-official-club-roster-probe-v1-preservation',
+              'source_actions_artifact_id':int(os.environ['SOURCE_ARTIFACT_ID']),
+              'source_workflow_run_id':int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+              'source_head_sha':os.environ['SOURCE_HEAD_SHA'],
+              'actions_artifact_digest':os.environ['EXPECTED_ARTIFACT_DIGEST'],
+              'receipt_sha256':os.environ['EXPECTED_RECEIPT_SHA256'],
+              'team_diagnostics_sha256':os.environ['EXPECTED_DIAGNOSTICS_SHA256'],
+              'profile_links_sha256':os.environ['EXPECTED_PROFILE_LINKS_SHA256'],
+              'preserved_at_utc':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+              'preserving_workflow_run_id':os.environ['GITHUB_RUN_ID'],
+              'research_only':True,
+              'identity_parser_qualified':False,
+              'player_identity_to_gsis_qualified':False,
+              'availability_state_authorized':False,
+              'forecast_probability_effect_authorized':False,
+              'production_authorized':False,
+              'completed_2026_outcomes_used':0,
+          }
+          (root/'preservation.json').write_text(json.dumps(preservation,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist on dedicated research-data branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}"
+          git checkout -B probe-data "origin/${DATA_BRANCH}"
+          DEST='research_outputs/levline4_2026_official_club_roster_surface_probe_v1/first_run_35127480203'
+          if [ -e "$DEST" ]; then
+            diff -qr /tmp/probe "$DEST"
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/probe "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve first official club roster surface probe V1'
+          git push origin HEAD:"${DATA_BRANCH}"
