@@ -1,0 +1,120 @@
+{
+  "contract_id": "NFL-INACTIVE-ARTICLE-PLAYER-PARSER-2026-V1",
+  "status": "preregistered_source_parser_qualification",
+  "frozen_at_utc": "2026-09-16T14:36:00Z",
+  "purpose": "Qualify a deterministic player-level parser against exact official NFL inactive-article bytes that were archived before Week 1 kickoff. This qualifies extraction semantics only; it does not authorize probability effects or model fitting.",
+  "depends_on": [
+    "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
+    "LEVLINE-4-INFORMATION-RESIDUAL-V2",
+    "L4-H6-INACTIVE-INFORMATION-SURPRISE-V1"
+  ],
+  "calibration_artifact": {
+    "season": 2026,
+    "week": 1,
+    "article_url": "https://www.nfl.com/news/inactive-reports-sunday-week-1-2026-nfl-season",
+    "archive_branch": "research-data/inactive-snapshots-v1",
+    "archive_path": "research_outputs/inactive_article_source_archive_v1/raw/b501eb89b4e43a4e5630eb9a3e356fb625df9b1f9b1da623b307d178a70f2cd9.html.gz",
+    "raw_html_sha256": "b501eb89b4e43a4e5630eb9a3e356fb625df9b1f9b1da623b307d178a70f2cd9",
+    "first_capture_known_by_utc": "2026-09-13T15:49:38.220127Z",
+    "capture_minutes_to_1pm_et_kickoff": 70.36299788333334
+  },
+  "frozen_expected_source_shape": {
+    "game_sections": 13,
+    "team_sections": 26,
+    "inactive_entries": 162,
+    "emergency_third_qb_annotations": 12,
+    "team_entry_counts": {
+      "CAR": 7,
+      "CHI": 7,
+      "TB": 7,
+      "CIN": 7,
+      "NO": 7,
+      "DET": 5,
+      "BUF": 7,
+      "HOU": 6,
+      "BAL": 7,
+      "IND": 6,
+      "CLE": 7,
+      "JAX": 6,
+      "ATL": 6,
+      "PIT": 6,
+      "NYJ": 5,
+      "TEN": 7,
+      "ARI": 6,
+      "LAC": 5,
+      "MIA": 6,
+      "LV": 7,
+      "GB": 6,
+      "MIN": 7,
+      "WAS": 5,
+      "PHI": 5,
+      "DAL": 5,
+      "NYG": 7
+    },
+    "sentinel_player_team_pairs": [
+      ["CAR", "Ja'Tavion Sanders"],
+      ["CHI", "Tyson Bagent"],
+      ["NO", "Alvin Kamara"],
+      ["BUF", "T.J. Sanders"],
+      ["BAL", "Nnamdi Madubuike"],
+      ["CLE", "Teven Jenkins"],
+      ["ATL", "Tua Tagovailoa"],
+      ["TEN", "Nick Singleton"],
+      ["ARI", "Garrett Williams"],
+      ["LV", "Brock Bowers"],
+      ["MIN", "J.J. McCarthy"],
+      ["NYG", "Najee Harris"]
+    ],
+    "sentinel_emergency_third_qbs": [
+      ["CAR", "Haynes King"],
+      ["NO", "Zach Wilson"],
+      ["BAL", "Joe Fagnano"],
+      ["IND", "Riley Leonard"],
+      ["CLE", "Taylen Green"],
+      ["PIT", "Will Howard"],
+      ["ARI", "Carson Beck"],
+      ["MIA", "Brady Cook"],
+      ["LV", "Aidan O'Connell"],
+      ["MIN", "J.J. McCarthy"],
+      ["WAS", "Athan Kaliakmanis"],
+      ["PHI", "Tanner McKee"]
+    ]
+  },
+  "parser_semantics": {
+    "team_heading_rule": "Recognize canonical NFL team nickname headings only within article heading elements.",
+    "entry_rule": "Within each recognized team heading section, collect list-item text until the next article heading; parse leading position token and player name; preserve emergency-third-QB annotation separately.",
+    "duplicate_team_section_policy": "fail_closed",
+    "duplicate_player_within_team_policy": "fail_closed",
+    "unknown_or_unparseable_entry_policy": "fail_closed",
+    "identity_authority": "text_name_plus_team_only; GSIS resolution is a separate downstream qualification",
+    "chronology_basis": "conservative archive captured_at; parser does not infer publication time when absent from qualified source metadata"
+  },
+  "qualification_gates": {
+    "raw_sha256_exact": true,
+    "team_section_count_exact": 26,
+    "inactive_entry_count_exact": 162,
+    "emergency_annotation_count_exact": 12,
+    "all_team_entry_counts_exact": true,
+    "all_sentinel_player_team_pairs_present": true,
+    "all_sentinel_emergency_qbs_present": true,
+    "zero_unparseable_entries": true,
+    "zero_duplicate_team_sections": true,
+    "zero_duplicate_players_within_team": true
+  },
+  "failure_policy": "Any failed gate leaves player_level_parser_qualified=false. Parser implementation defects may be corrected only while preserving this frozen source artifact, expected truth set, gates, and authority boundaries; the qualification target may not be relaxed after observing execution.",
+  "authority_if_passed": {
+    "player_level_parser_qualified_for_matching_article_shape": true,
+    "player_level_identity_to_gsis_qualified": false,
+    "inactive_information_event_input_qualified": "team plus rendered player name and emergency-third-QB annotation, timestamped by archived capture",
+    "availability_probability_feature_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "production_authorized": false
+  },
+  "research_firewall": {
+    "completed_2026_game_outcomes_used": 0,
+    "postgame_participation_used": false,
+    "postgame_snaps_used": false,
+    "production_forecast_mutation": false
+  }
+}
