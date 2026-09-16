@@ -34,8 +34,11 @@
   "live_source_selection": {
     "source_archive_id": "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
     "eligible_window_minutes_to_kickoff": [20, 100],
+    "qualified_game_day_semantics": "Sunday in America/New_York only",
+    "non_sunday_due_cohort_behavior": "preserve raw source evidence and skip parser/resolver execution",
     "candidate_source_kind": "nfl_inactives_news_article",
-    "selection_rule": "parse every successfully captured candidate article; retain candidates with zero parser integrity failures and all currently due cohort teams present; require exactly one distinct raw-body SHA among matching candidates; otherwise fail closed",
+    "selection_rule": "parse every successfully captured candidate article; retain candidates with zero parser integrity failures and all currently due cohort teams present; require exactly one distinct raw-body SHA among matching candidates; otherwise do not execute authority-bearing downstream work",
+    "zero_matching_article_behavior": "preserve waiting attempt and retry on a later scheduled capture",
     "extra_non_due_team_sections_allowed": true,
     "missing_due_team_section_allowed": false,
     "absence_of_team_or_player_means_active_or_healthy": false
@@ -62,6 +65,7 @@
   },
   "durability": {
     "persist_raw_article_evidence": true,
+    "persist_waiting_and_skip_attempts": true,
     "persist_parsed_due_cohort_rows": true,
     "persist_resolver_rows": true,
     "persist_cross_source_audit_rows": true,
@@ -73,7 +77,7 @@
   },
   "failure_policy": {
     "raw_capture_must_be_preserved_before_execution_failure_is_surfaced": true,
-    "zero_matching_articles": "fail_closed",
+    "zero_matching_articles": "preserve_waiting_attempt_and_retry_later",
     "multiple_distinct_matching_article_bodies": "fail_closed",
     "projection_sha_mismatch": "fail_closed",
     "resolver_ambiguity": "preserve_as_ambiguous",
