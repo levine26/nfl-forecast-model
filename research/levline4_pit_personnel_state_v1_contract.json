@@ -1,0 +1,72 @@
+{
+  "contract_id": "LEVLINE-4-PIT-PERSONNEL-STATE-V1",
+  "status": "PREREGISTERED_RESEARCH_INFRASTRUCTURE_ONLY",
+  "purpose": "Reduce already-validated point-in-time structured football observations into immutable as-of personnel/QB state snapshots without converting football state into win-probability effects.",
+  "input_schema": "levline-structured-beat-observation-v1",
+  "state_key": [
+    "game_id",
+    "team",
+    "entity_type",
+    "entity_id",
+    "observation_type"
+  ],
+  "chronology": {
+    "inclusion_rule": "published_at_utc <= captured_at_utc <= forecast_asof_utc <= snapshot_asof_utc < kickoff_timestamp_utc",
+    "future_observations_excluded": true,
+    "later_observations_may_supersede_earlier_state_only_for_later_snapshots": true,
+    "back_propagation_to_earlier_snapshot": false,
+    "post_kickoff_observations_allowed": false
+  },
+  "revision_rule": {
+    "primary_order": [
+      "forecast_asof_utc",
+      "captured_at_utc",
+      "published_at_utc"
+    ],
+    "direction": "latest_known_state_at_or_before_snapshot",
+    "source_priority_used_for_adjudication": false,
+    "coequal_identical_values": "coalesce_with_all_supporting_observation_ids_preserved",
+    "coequal_conflicting_values": "fail_closed",
+    "reason_source_priority_not_used": "No outcome-independent source-priority ordering has yet been separately frozen and validated for adjudication."
+  },
+  "missingness": {
+    "absence_of_observation_means_healthy_or_active": false,
+    "absence_of_observation_means_starter": false,
+    "complete_lineup_claim_authorized": false,
+    "missing_state_imputation_allowed": false
+  },
+  "probability_firewall": {
+    "availability_probability_mapping_authorized": false,
+    "starter_probability_mapping_authorized": false,
+    "role_share_numeric_mapping_authorized": false,
+    "football_to_win_probability_mapping_authorized": false,
+    "probability_feature_authorized": false,
+    "production_authorized": false,
+    "official_forecast_mutation_authorized": false
+  },
+  "integrity": {
+    "verify_input_observation_sha256": true,
+    "hash_snapshot_rows": true,
+    "preserve_selected_and_supporting_observation_ids": true,
+    "preserve_source_and_raw_evidence_hash": true
+  },
+  "intended_research_use": [
+    "prospective H1 expected-lineup state collection",
+    "prospective H2 QB starter/replacement-state collection",
+    "H6 inactive-event before/after state alignment",
+    "H8 extraction quality and revision analysis"
+  ],
+  "not_authorized": [
+    "retrospective reconstruction of missing 2022-2025 states",
+    "conversion of categorical state to probability using completed 2026 outcomes",
+    "personnel-conditioned matchup model fitting",
+    "conditional win probability scenarios",
+    "production probability changes"
+  ],
+  "governance": {
+    "completed_2026_outcomes_used": 0,
+    "game_outcomes_used": 0,
+    "research_only": true,
+    "prospective_capture_capability": true
+  }
+}

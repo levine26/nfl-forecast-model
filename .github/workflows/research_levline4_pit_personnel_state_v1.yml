@@ -1,0 +1,58 @@
+name: LevLine 4 PIT personnel state V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/levline4_pit_personnel_state_v1_contract.json'
+      - 'research/pit_personnel_state_snapshot_v1.py'
+      - 'research/test_pit_personnel_state_snapshot_v1.py'
+      - '.github/workflows/research_levline4_pit_personnel_state_v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-pit-personnel-state:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project
+        run: pip install '.[dev]'
+      - name: Test PIT personnel-state chronology and firewalls
+        run: pytest -q research/test_pit_personnel_state_snapshot_v1.py
+      - name: Validate frozen contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/levline4_pit_personnel_state_v1_contract.json').read_text())
+          assert c['contract_id'] == 'LEVLINE-4-PIT-PERSONNEL-STATE-V1'
+          assert c['status'] == 'PREREGISTERED_RESEARCH_INFRASTRUCTURE_ONLY'
+          assert c['input_schema'] == 'levline-structured-beat-observation-v1'
+          assert c['chronology']['back_propagation_to_earlier_snapshot'] is False
+          assert c['revision_rule']['source_priority_used_for_adjudication'] is False
+          assert c['revision_rule']['coequal_conflicting_values'] == 'fail_closed'
+          assert c['missingness']['absence_of_observation_means_healthy_or_active'] is False
+          assert c['missingness']['complete_lineup_claim_authorized'] is False
+          for key, value in c['probability_firewall'].items():
+              assert value is False, (key, value)
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          assert c['governance']['game_outcomes_used'] == 0
+          PY
+      - name: Prove research-only diff
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [p for p in changed if not (p.startswith('research/') or p.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
