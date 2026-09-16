@@ -1,0 +1,260 @@
+name: LevLine 4 NFL NGS player-ID surface probe V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_ngs_player_id_surface_probe_v1_contract.json'
+      - 'research/levline4_2026_ngs_player_id_surface_probe_v1.py'
+      - 'research/test_levline4_2026_ngs_player_id_surface_probe_v1.py'
+      - 'research/levline4_2026_ngs_player_id_surface_probe_v1_first_result_manifest.json'
+      - '.github/workflows/research_levline4_2026_ngs_player_id_surface_probe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: levline4-ngs-player-id-surface-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  FROZEN_CONTRACT_COMMIT: '53534e82a0d7d44191fc3bd214ccb69f740abab6'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_surface_probe_v1_first_result_manifest.json'
+
+jobs:
+  mode:
+    runs-on: ubuntu-24.04
+    outputs:
+      frozen: ${{ steps.mode.outputs.frozen }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        shell: bash
+        run: |
+          if [ -f "$MANIFEST_PATH" ]; then
+            echo 'frozen=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'frozen=false' >> "$GITHUB_OUTPUT"
+          fi
+
+  unit-and-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove frozen preregistration predates executable probe
+        run: |
+          set -euo pipefail
+          contract_commit=$(git log -1 --format=%H -- research/levline4_2026_ngs_player_id_surface_probe_v1_contract.json)
+          test "$contract_commit" = "$FROZEN_CONTRACT_COMMIT"
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" HEAD
+          test "$FROZEN_CONTRACT_COMMIT" != "$(git log -1 --format=%H -- research/levline4_2026_ngs_player_id_surface_probe_v1.py)"
+          test "$FROZEN_CONTRACT_COMMIT" != "$(git log -1 --format=%H -- .github/workflows/research_levline4_2026_ngs_player_id_surface_probe_v1.yml)"
+      - name: Install lightweight test dependency
+        run: python -m pip install pytest
+      - name: Test deterministic discovery helpers and frozen contract
+        run: pytest -q research/test_levline4_2026_ngs_player_id_surface_probe_v1.py
+      - name: Assert frozen research authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/levline4_2026_ngs_player_id_surface_probe_v1_contract.json').read_text())
+          assert c['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-SURFACE-PROBE-V1'
+          assert c['status']=='PREREGISTERED_DISCOVERY_CAPTURE_ONLY'
+          assert c['frozen_discovery_queries']==['Patrick Mahomes','Josh Allen','Justin Jefferson']
+          assert c['browser_capture']['no_week2_inactive_names_may_be_added_to_v1'] is True
+          assert c['v1_disposition']['same_version_rule_adaptation_after_live_probe'] is False
+          assert c['v1_disposition']['follow_up_requires_new_preregistered_version'] is True
+          assert c['authority']['ngs_backend_endpoint_qualified'] is False
+          assert c['authority']['ngs_name_to_gsis_parser_qualified'] is False
+          assert c['authority']['week2_sunday_due_inactive_player_identity_to_gsis_qualified'] is False
+          assert c['authority']['general_2026_player_identity_to_gsis_qualified'] is False
+          assert c['authority']['availability_state_authorized'] is False
+          assert c['authority']['forecast_probability_effect_authorized'] is False
+          assert c['authority']['model_fit_authorized'] is False
+          assert c['authority']['production_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert c['governance']['postgame_participation_used'] is False
+          assert c['governance']['week2_inactive_execution_evidence_used_for_design'] is False
+          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  live-discovery:
+    if: needs.mode.outputs.frozen == 'false'
+    needs: [mode, unit-and-contract]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove this is the unfrozen first-result path
+        run: |
+          set -euo pipefail
+          test ! -f "$MANIFEST_PATH"
+          contract_commit=$(git log -1 --format=%H -- research/levline4_2026_ngs_player_id_surface_probe_v1_contract.json)
+          test "$contract_commit" = "$FROZEN_CONTRACT_COMMIT"
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" HEAD
+      - name: Install browser capture dependency
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Execute fixed-sentinel NGS discovery probe once
+        id: probe
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m research.levline4_2026_ngs_player_id_surface_probe_v1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
+      - name: Verify discovery never expands authority
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('research_outputs/levline4_2026_ngs_player_id_surface_probe_v1')
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-SURFACE-PROBE-V1'
+          assert receipt['fixed_query_count']==3
+          assert receipt['ngs_backend_endpoint_qualified'] is False
+          assert receipt['ngs_name_to_gsis_parser_qualified'] is False
+          for key in (
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified','availability_state_authorized',
+              'player_value_join_authorized','forecast_probability_effect_authorized',
+              'model_fit_authorized','production_authorized'):
+              assert receipt[key] is False, key
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert (root/'query_diagnostics.json').is_file()
+          assert (root/'network_responses.json').is_file()
+          print(json.dumps(receipt, indent=2, sort_keys=True))
+          PY
+      - name: Upload immutable first NGS discovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-ngs-player-id-surface-probe-v1-first-${{ github.run_id }}
+          path: research_outputs/levline4_2026_ngs_player_id_surface_probe_v1/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface first-result status after evidence upload
+        if: always()
+        env:
+          PROBE_OUTCOME: ${{ steps.probe.outcome }}
+          PROBE_EXIT_CODE: ${{ steps.probe.outputs.exit_code }}
+        run: |
+          set -euo pipefail
+          if [ "$PROBE_OUTCOME" != 'success' ] || [ "${PROBE_EXIT_CODE:-1}" != '0' ]; then
+            echo 'Canonical first NGS V1 discovery failed. Freeze this first artifact; do not adapt V1 rules or retry it as a replacement.' >&2
+            exit 1
+          fi
+
+  replay-canonical-first-result:
+    if: needs.mode.outputs.frozen == 'true'
+    needs: [mode, unit-and-contract]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read immutable first-result coordinates
+        id: manifest
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_surface_probe_v1_first_result_manifest.json').read_text())
+          assert m['schema_version']=='levline4-2026-ngs-player-id-surface-probe-v1-first-result-manifest'
+          assert m['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-SURFACE-PROBE-V1'
+          assert m['first_result_is_canonical'] is True
+          assert m['later_same_version_execution_may_replace_first_result'] is False
+          assert m['same_version_rule_adaptation_after_first_result'] is False
+          print(f"artifact_id={m['first_artifact_id']}")
+          print(f"artifact_digest={m['artifact_digest']}")
+          print(f"workflow_run_id={m['first_workflow_run_id']}")
+          print(f"head_sha={m['first_head_sha']}")
+          PY
+      - name: Download named canonical artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}")
+          test "$(echo "$meta" | jq -r .digest)" = "${{ steps.manifest.outputs.artifact_digest }}"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "${{ steps.manifest.outputs.workflow_run_id }}"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "${{ steps.manifest.outputs.head_sha }}"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}/zip" > /tmp/ngs_v1.zip
+          rm -rf /tmp/ngs_v1
+          mkdir -p /tmp/ngs_v1
+          unzip -q /tmp/ngs_v1.zip -d /tmp/ngs_v1
+      - name: Verify canonical artifact and zero expanded authority
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          manifest=json.loads(Path('research/levline4_2026_ngs_player_id_surface_probe_v1_first_result_manifest.json').read_text())
+          root=Path('/tmp/ngs_v1')
+          for rel,expected in manifest['file_sha256'].items():
+              p=root/rel
+              assert p.is_file(), p
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==expected, rel
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['contract_id']==manifest['contract_id']
+          assert receipt['status']==manifest['first_result_status']
+          for key in (
+              'ngs_backend_endpoint_qualified','ngs_name_to_gsis_parser_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified','game_day_membership_qualified',
+              'availability_state_authorized','player_value_join_authorized',
+              'forecast_probability_effect_authorized','model_fit_authorized','production_authorized'):
+              assert receipt[key] is False, key
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert manifest['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert manifest['postgame_participation_used'] is False
+          assert manifest['week2_inactive_execution_evidence_used_for_design'] is False
+          assert manifest['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'canonical_first_result_replayed':True,
+              'status':receipt['status'],
+              'page_loaded':receipt['page_loaded'],
+              'queries_action_completed':receipt['queries_action_completed'],
+              'queries_with_visible_gsis_pattern':receipt['queries_with_visible_gsis_pattern'],
+              'json_response_count':receipt['json_response_count'],
+          },indent=2,sort_keys=True))
+          PY
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove research-only scope
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
