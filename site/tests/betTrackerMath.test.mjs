@@ -10,6 +10,7 @@ import {
   summarizeBets,
   summarizeCombined,
 } from '../src/betTrackerMath.js'
+import { canUseCurrentPreviewForReceipt } from '../src/historyEditorialSafety.js'
 
 test('American odds settle a fixed $25 risk correctly', () => {
   assert.equal(BET_UNIT_DOLLARS, 25)
@@ -92,4 +93,32 @@ test('combined season ROI uses total dollars risked across both sections', () =>
   assert.equal(combined.risked,50)
   assert.ok(Math.abs(combined.profit-(20+25*100/110))<1e-9)
   assert.ok(Math.abs(combined.roi-combined.profit/50)<1e-12)
+})
+
+test('historical receipt editorial fails closed after kickoff or grading', () => {
+  const gameId='2026_01_DEN_KC'
+  const preview={game_id:gameId,headline:'Pregame matchup read'}
+  assert.equal(canUseCurrentPreviewForReceipt({
+    gameId,
+    currentGame:{game_id:gameId,lifecycle_status:'GRADED',kickoff_utc:'2026-09-13T20:00:00Z',lock_timestamp_utc:'2026-09-13T19:55:00Z'},
+    preview,
+  }),false)
+  assert.equal(canUseCurrentPreviewForReceipt({
+    gameId,
+    currentGame:{game_id:gameId,lifecycle_status:'IN_PROGRESS',kickoff_utc:'2026-09-13T20:00:00Z',lock_timestamp_utc:'2026-09-13T19:55:00Z'},
+    preview,
+  }),false)
+  assert.equal(canUseCurrentPreviewForReceipt({gameId,currentGame:null,preview}),false)
+})
+
+test('receipt editorial accepts only the exact current FINAL_PREGAME preview', () => {
+  const gameId='2026_02_SEA_ARI'
+  const currentGame={game_id:gameId,lifecycle_status:'FINAL_PREGAME',kickoff_utc:'2026-09-20T20:00:00Z',lock_timestamp_utc:'2026-09-20T19:55:00Z'}
+  assert.equal(canUseCurrentPreviewForReceipt({gameId,currentGame,preview:{game_id:gameId}}),true)
+  assert.equal(canUseCurrentPreviewForReceipt({gameId,currentGame,preview:{game_id:'2026_02_OTHER'}}),false)
+  assert.equal(canUseCurrentPreviewForReceipt({
+    gameId,
+    currentGame:{...currentGame,lock_timestamp_utc:'2026-09-20T20:05:00Z'},
+    preview:{game_id:gameId},
+  }),false)
 })

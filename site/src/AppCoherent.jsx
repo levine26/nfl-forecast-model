@@ -5,6 +5,7 @@ import ForecastHelp from './ForecastHelp.jsx'
 import ExperienceLayer from './ExperienceLayer.jsx'
 import ExperienceDomFixes from './ExperienceDomFixes.jsx'
 import HistoryReceiptDetails from './HistoryReceiptDetails.jsx'
+import HistoryEditorialGuard from './HistoryEditorialGuard.jsx'
 import BetTracker from './BetTracker.jsx'
 import './signal-polish.css'
 
@@ -14,10 +15,10 @@ import './signal-polish.css'
  * AppCoherent remains the production entrypoint intentionally. The premium
  * Sunday Signal presentation lives in AppSignal, while SignalEnhancements,
  * ForecastClarity, ForecastHelp, ExperienceLayer, ExperienceDomFixes,
- * HistoryReceiptDetails, and BetTracker add presentation-only product
- * affordances around the same canonical data. No forecast, pick, lock, grading,
- * research-governance, or probability behavior is recomputed or replaced in
- * this wrapper.
+ * HistoryReceiptDetails, HistoryEditorialGuard, and BetTracker add presentation-only
+ * product affordances around the same canonical data. No forecast, pick, lock,
+ * grading, research-governance, or probability behavior is recomputed or replaced
+ * in this wrapper.
  *
  * public_forecasts.json
  * LEVLINE FORECAST
@@ -60,6 +61,7 @@ export default function AppCoherent() {
     <ExperienceDomFixes/>
     <ExperienceLayer/>
     <HistoryReceiptDetails/>
+    <HistoryEditorialGuard/>
     <BetTracker/>
   </>
 }
