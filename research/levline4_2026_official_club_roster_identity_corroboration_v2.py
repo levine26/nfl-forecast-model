@@ -53,7 +53,7 @@ def parse_utc(value: Any) -> datetime:
 
 
 def normalize_jersey(value: Any) -> str:
-    text = str(value or "").strip()
+    text = "" if value is None else str(value).strip()
     if not text:
         return ""
     if text.isascii() and text.isdigit():
