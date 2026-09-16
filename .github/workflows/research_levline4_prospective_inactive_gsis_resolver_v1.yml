@@ -1,0 +1,81 @@
+name: LevLine prospective inactive GSIS resolver V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_prospective_inactive_gsis_resolver_v1_contract.json'
+      - 'research/levline4_prospective_inactive_gsis_resolver_v1.py'
+      - 'research/test_levline4_prospective_inactive_gsis_resolver_v1.py'
+      - '.github/workflows/research_levline4_prospective_inactive_gsis_resolver_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-frozen-resolver:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest 'polars>=1.0'
+      - name: Run only synthetic resolver tests
+        run: pytest -q research/test_levline4_prospective_inactive_gsis_resolver_v1.py
+      - name: Assert prospective and non-qualifying authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c = json.loads(Path('research/levline4_prospective_inactive_gsis_resolver_v1_contract.json').read_text())
+          assert c['contract_id'] == 'LEVLINE-2026-PROSPECTIVE-INACTIVE-GSIS-RESOLVER-V1'
+          assert c['status'] == 'PREREGISTERED_PROSPECTIVE_RESOLVER_ONLY'
+          assert c['dependency']['source_projection_sha256'] == 'fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f'
+          assert c['dependency']['source_known_by_utc'] == '2026-09-16T12:35:57Z'
+          assert c['dependency']['status_fields_available_to_resolver'] is False
+          assert c['target_observation_contract']['week_1_rows_authorized'] is False
+          r = c['resolution_rule']
+          assert r['position_used'] is False
+          assert r['jersey_number_used'] is False
+          assert r['status_used'] is False
+          assert r['fuzzy_matching_used'] is False
+          assert r['phonetic_matching_used'] is False
+          assert r['adjacent_week_fallback_used'] is False
+          assert r['season_wide_fallback_used'] is False
+          assert r['manual_override_used'] is False
+          assert r['tie_breaking_used'] is False
+          a = c['authority']
+          assert a['resolver_execution_authorized_for_prospective_research'] is True
+          assert a['player_identity_to_gsis_qualified'] is False
+          assert a['player_value_join_authorized'] is False
+          assert a['forecast_probability_effect_authorized'] is False
+          assert a['production_authorized'] is False
+          q = c['qualification_policy']
+          assert q['this_pr_may_not_self_qualify_from_synthetic_tests'] is True
+          assert q['qualification_requires_separate_empirical_audit_identity'] is True
+          assert q['no_resolution_rate_threshold_is_authorized_until_independent_audit_truth_source_is_preregistered'] is True
+          assert c['governance']['completed_2026_outcomes_used'] == 0
+          PY
+      - name: Prove no real inactive rows are consumed in this PR
+        run: |
+          test ! -e research_outputs/levline4_2026_prospective_inactive_gsis_resolver_v1
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce research-only paths
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
