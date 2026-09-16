@@ -1,0 +1,183 @@
+name: LevLine 4 official club player profile surface probe V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_official_club_player_profile_surface_probe_v1_contract.json'
+      - 'research/levline4_2026_official_club_player_profile_surface_probe_v1.py'
+      - 'research/test_levline4_2026_official_club_player_profile_surface_probe_v1.py'
+      - '.github/workflows/research_levline4_2026_official_club_player_profile_surface_probe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: levline4-official-club-player-profile-surface-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight dependencies
+        run: python -m pip install pytest 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Run frozen source-probe tests
+        run: pytest -q research/test_levline4_2026_official_club_player_profile_surface_probe_v1.py
+      - name: Assert preregistered authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/levline4_2026_official_club_player_profile_surface_probe_v1_contract.json').read_text())
+          assert c['contract_id']=='LEVLINE-4-2026-OFFICIAL-CLUB-PLAYER-PROFILE-SURFACE-PROBE-V1'
+          assert c['status']=='PREREGISTERED_SOURCE_SURFACE_CAPTURE_AND_DIAGNOSTIC_ONLY'
+          assert c['frozen_dependency']['canonical_workflow_run_id']==35130069924
+          assert c['frozen_dependency']['canonical_artifact_id']==10461126275
+          assert c['sample_selection']['selection_rule'].startswith('lexicographically smallest profile_path')
+          assert c['sample_selection']['target_inactive_rows_consulted'] is False
+          assert c['sample_selection']['manual_player_selection_allowed'] is False
+          assert c['sample_selection']['same_version_sample_adaptation_after_live_capture'] is False
+          assert c['diagnostics_only']['candidate_presence_is_not_identifier_qualification'] is True
+          assert c['surface_capture_gate']['same_version_retry_may_replace_first_result'] is False
+          assert c['authority_even_if_gate_passes']['official_stable_player_identifier_exposed_qualified'] is False
+          assert c['authority_even_if_gate_passes']['official_identifier_parser_qualified'] is False
+          assert c['authority_even_if_gate_passes']['official_identifier_to_gsis_bridge_qualified'] is False
+          assert c['authority_even_if_gate_passes']['player_identity_to_gsis_qualified'] is False
+          assert c['authority_even_if_gate_passes']['availability_state_authorized'] is False
+          assert c['authority_even_if_gate_passes']['forecast_probability_effect_authorized'] is False
+          assert c['authority_even_if_gate_passes']['production_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert c['governance']['postgame_participation_used'] is False
+          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  first-profile-surface-probe:
+    needs: unit-and-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install capture dependencies
+        run: python -m pip install 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Prove frozen contract predates first live profile execution head
+        run: |
+          set -euo pipefail
+          contract_commit=$(git log -1 --format=%H -- research/levline4_2026_official_club_player_profile_surface_probe_v1_contract.json)
+          test -n "$contract_commit"
+          test "$contract_commit" != "$GITHUB_SHA"
+          echo "frozen_contract_commit=$contract_commit"
+      - name: Download exact canonical V2 roster metadata dependency
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: '10461126275'
+          EXPECTED_DIGEST: 'sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e'
+          EXPECTED_ROSTER_METADATA_SHA256: '90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f'
+        run: |
+          set -euo pipefail
+          digest=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}" --jq .digest)
+          test "$digest" = "$EXPECTED_DIGEST"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/v2.zip
+          rm -rf /tmp/v2
+          mkdir -p /tmp/v2
+          unzip -q /tmp/v2.zip -d /tmp/v2
+          python - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          p=Path('/tmp/v2/roster_metadata.jsonl')
+          assert p.is_file()
+          assert hashlib.sha256(p.read_bytes()).hexdigest()==os.environ['EXPECTED_ROSTER_METADATA_SHA256']
+          PY
+      - name: Execute frozen 32-club player-profile surface probe
+        id: probe
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m research.levline4_2026_official_club_player_profile_surface_probe_v1 \
+            --roster-metadata /tmp/v2/roster_metadata.jsonl
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Verify receipt preserves discovery-only authority
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research_outputs/levline4_2026_official_club_player_profile_surface_probe_v1/receipt.json')
+          assert p.is_file(), 'profile surface receipt missing'
+          r=json.loads(p.read_text())
+          assert r['contract_id']=='LEVLINE-4-2026-OFFICIAL-CLUB-PLAYER-PROFILE-SURFACE-PROBE-V1'
+          assert r['expected_team_count']==32
+          assert r['dependency_workflow_run_id']==35130069924
+          assert r['dependency_artifact_id']==10461126275
+          for key in (
+              'official_stable_player_identifier_exposed_qualified',
+              'official_identifier_parser_qualified',
+              'official_identifier_to_gsis_bridge_qualified',
+              'player_identity_to_gsis_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert r[key] is False, key
+          assert r['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert r['postgame_participation_used'] is False
+          assert r['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'status':r['status'],
+              'selected_profile_count':r['selected_profile_count'],
+              'captured_team_count':r['captured_team_count'],
+              'http_success_team_count':r['http_success_team_count'],
+              'pages_with_gsis_like_values':r['pages_with_gsis_like_values'],
+              'literal_token_page_counts':r['literal_token_page_counts'],
+              'observed_id_like_attribute_names':r['observed_id_like_attribute_names'],
+              'source_error_count':len(r['source_errors']),
+          },indent=2,sort_keys=True))
+          PY
+      - name: Upload immutable first profile-surface evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-official-club-player-profile-surface-probe-v1-${{ github.run_id }}
+          path: research_outputs/levline4_2026_official_club_player_profile_surface_probe_v1/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface frozen source-probe failure after evidence upload
+        if: always()
+        shell: bash
+        run: test "${{ steps.probe.outputs.exit_code }}" = "0"
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch is research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
