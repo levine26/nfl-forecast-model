@@ -197,6 +197,39 @@ def test_run_retries_gpt_oss_tool_use_failure_at_lower_temperature(monkeypatch):
     ]
 
 
+def test_run_retries_gpt_oss_output_parse_failure_at_lower_temperature(monkeypatch):
+    calls: list[tuple[str, float | None]] = []
+
+    def fake_request(
+        prompt: str,
+        *,
+        model: str,
+        timeout: int,
+        tool_temperature: float | None = None,
+    ) -> str:
+        calls.append((model, tool_temperature))
+        if len(calls) == 1:
+            raise _http_429(
+                body='{"error":{"message":"Rate limit reached for model meta-llama/llama-4-scout-17b-16e-instruct: tokens per day exceeded"}}'
+            )
+        if len(calls) == 2:
+            raise _http_error(
+                400,
+                body='{"error":{"message":"Provider could not parse tool output",'
+                '"type":"invalid_request_error","code":"output_parse_failed"}}',
+            )
+        return "accepted researched payload"
+
+    monkeypatch.setattr(module, "_request", fake_request)
+    result = module.run("prompt", model=module.DEFAULT_MODEL, timeout=10, attempts=3)
+    assert result == "accepted researched payload"
+    assert calls == [
+        (module.DEFAULT_MODEL, None),
+        (module.FALLBACK_MODEL, 0.6),
+        (module.FALLBACK_MODEL, 0.2),
+    ]
+
+
 def test_run_does_not_loop_when_fallback_hits_long_window_quota(monkeypatch):
     calls: list[tuple[str, float | None]] = []
 
