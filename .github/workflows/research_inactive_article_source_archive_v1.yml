@@ -7,6 +7,11 @@ on:
       - 'research/inactive_article_source_archive_v1.py'
       - 'research/run_inactive_article_source_archive_v1.py'
       - 'research/test_inactive_article_source_archive_v1.py'
+      - 'research/levline4_prospective_inactive_execution_v1_contract.json'
+      - 'research/levline4_prospective_inactive_execution_v1.py'
+      - 'research/run_levline4_prospective_inactive_execution_v1.py'
+      - 'research/test_levline4_prospective_inactive_execution_v1.py'
+      - 'research/test_run_levline4_prospective_inactive_execution_v1.py'
       - '.github/workflows/research_inactive_article_source_archive_v1.yml'
   workflow_dispatch:
   schedule:
@@ -32,31 +37,56 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
-      - run: python -m pip install pytest 'beautifulsoup4>=4.12' 'requests>=2.32'
-      - name: Validate raw article discovery, preservation and research firewall
-        run: pytest -q research/test_inactive_article_source_archive_v1.py
-      - name: Verify frozen raw-source-only contract
+      - run: python -m pip install pytest 'beautifulsoup4>=4.12' 'requests>=2.32' 'polars==1.44.2'
+      - name: Validate raw article discovery, preservation and prospective execution
+        run: |
+          pytest -q \
+            research/test_inactive_article_source_archive_v1.py \
+            research/test_levline4_prospective_inactive_execution_v1.py \
+            research/test_run_levline4_prospective_inactive_execution_v1.py
+      - name: Verify frozen raw-source and prospective execution contracts
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          contract = json.loads(Path('research/inactive_article_source_contract_v1.json').read_text())
-          assert contract['archive_id'] == 'NFL-INACTIVE-ARTICLE-SOURCE-2026-V1'
-          assert contract['season'] == 2026
-          assert contract['capture_policy']['eligible_window_minutes_to_kickoff'] == [20, 100]
-          assert contract['parser_policy']['player_level_parser_qualified'] is False
-          assert contract['parser_policy']['player_level_probability_feature_authorized'] is False
-          assert contract['research_firewall']['completed_2026_outcomes_used'] == 0
-          assert contract['research_firewall']['probability_feature_authorized'] is False
-          assert contract['research_firewall']['production_authorized'] is False
+          raw = json.loads(Path('research/inactive_article_source_contract_v1.json').read_text())
+          assert raw['archive_id'] == 'NFL-INACTIVE-ARTICLE-SOURCE-2026-V1'
+          assert raw['season'] == 2026
+          assert raw['capture_policy']['eligible_window_minutes_to_kickoff'] == [20, 100]
+          assert raw['parser_policy']['player_level_parser_qualified'] is False
+          assert raw['parser_policy']['player_level_probability_feature_authorized'] is False
+          assert raw['research_firewall']['completed_2026_outcomes_used'] == 0
+          assert raw['research_firewall']['probability_feature_authorized'] is False
+          assert raw['research_firewall']['production_authorized'] is False
+
+          c = json.loads(Path('research/levline4_prospective_inactive_execution_v1_contract.json').read_text())
+          assert c['contract_id'] == 'LEVLINE-4-2026-PROSPECTIVE-INACTIVE-EXECUTION-V1'
+          assert c['status'] == 'PREREGISTERED_BEFORE_FIRST_WEEK2_REAL_EXECUTION'
+          assert c['supported_weeks'] == [2]
+          assert c['dependencies']['resolver']['weekly_identity_projection_sha256'] == 'fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f'
+          assert c['dependencies']['resolver']['weekly_identity_projection_weeks_present'] == [1, 2]
+          assert c['dependencies']['resolver']['week_1_use_for_membership_or_availability_forbidden'] is True
+          assert c['dependencies']['resolver']['status_fields_available_to_resolver'] is False
+          assert c['dependencies']['global_identity_audit']['projection_sha256'] == '023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603'
+          assert c['dependencies']['global_identity_audit']['fallback_resolution_authorized'] is False
+          assert c['live_source_selection']['qualified_game_day_semantics'] == 'Week 2 Sunday in America/New_York only'
+          assert c['live_source_selection']['zero_matching_article_behavior'] == 'preserve waiting attempt and retry on a later scheduled capture'
+          assert c['global_audit_rule']['global_source_is_never_a_fallback_resolver'] is True
+          assert c['global_audit_rule']['cross_source_corroboration_alone_qualifies_player_identity_to_gsis'] is False
+          assert c['authority']['player_identity_to_gsis_qualified'] is False
+          assert c['authority']['availability_probability_feature_authorized'] is False
+          assert c['authority']['production_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
           PY
 
   capture:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -73,15 +103,20 @@ jobs:
             echo 'due=false' >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Restore append-only article source archive
+      - name: Restore append-only article and prospective execution archives
         if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
           set -euo pipefail
           git fetch origin research-data/inactive-snapshots-v1:refs/remotes/origin/research-data/inactive-snapshots-v1 || true
           if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
-            if git ls-tree -d --name-only origin/research-data/inactive-snapshots-v1 research_outputs/inactive_article_source_archive_v1 | grep -q '^research_outputs/inactive_article_source_archive_v1$'; then
-              git archive origin/research-data/inactive-snapshots-v1 research_outputs/inactive_article_source_archive_v1 | tar -xf -
-            fi
+            for DATA_DIR in \
+              research_outputs/inactive_article_source_archive_v1 \
+              research_outputs/levline4_prospective_inactive_execution_v1
+            do
+              if git ls-tree -d --name-only origin/research-data/inactive-snapshots-v1 "$DATA_DIR" | grep -q "^${DATA_DIR}$"; then
+                git archive origin/research-data/inactive-snapshots-v1 "$DATA_DIR" | tar -xf -
+              fi
+            done
           fi
 
       - uses: actions/setup-python@v5
@@ -90,9 +125,9 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - name: Install lightweight source collector dependencies
+      - name: Install lightweight source collector and identity dependencies
         if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
-        run: python -m pip install 'beautifulsoup4>=4.12' 'requests>=2.32'
+        run: python -m pip install 'beautifulsoup4>=4.12' 'requests>=2.32' 'polars==1.44.2'
 
       - name: Capture official NFL News and inactive article source bytes
         id: capture
@@ -100,18 +135,108 @@ jobs:
         continue-on-error: true
         run: PYTHONPATH="$PWD/src:$PWD" python -m research.run_inactive_article_source_archive_v1 ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }}
 
-      - name: Persist source evidence away from main
+      - name: Determine Week 2 and Sunday execution scope
+        id: semantics
+        if: steps.capture.outcome == 'success' && steps.gate.outputs.due == 'true'
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" python - <<'PY'
+          import os
+          from pathlib import Path
+          from research.levline4_prospective_inactive_execution_v1 import (
+              _latest_due_observation,
+              _week_from_due_games,
+          )
+          from research.run_levline4_prospective_inactive_execution_v1 import (
+              SUPPORTED_WEEK,
+              cohort_is_sunday_eastern,
+          )
+          observation = _latest_due_observation(Path('research_outputs/inactive_article_source_archive_v1'))
+          due_games = list((observation or {}).get('due_games') or [])
+          week = _week_from_due_games(due_games) if due_games else None
+          sunday = bool(due_games and cohort_is_sunday_eastern(due_games))
+          supported = week == SUPPORTED_WEEK
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as handle:
+              handle.write(f"sunday={'true' if sunday else 'false'}\n")
+              handle.write(f"supported={'true' if supported else 'false'}\n")
+              handle.write(f"week={'' if week is None else week}\n")
+          print(f"week={week} supported={supported} qualified_sunday={sunday}")
+          PY
+
+      - name: Preserve out-of-scope skip receipt without identity artifacts
+        id: scope_skip
+        if: >-
+          steps.capture.outcome == 'success' &&
+          steps.gate.outputs.due == 'true' &&
+          (steps.semantics.outputs.supported != 'true' || steps.semantics.outputs.sunday != 'true')
+        continue-on-error: true
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" python -m research.run_levline4_prospective_inactive_execution_v1 \
+            --weekly-projection /tmp/not-read-weekly.parquet \
+            --global-projection /tmp/not-read-global.parquet
+
+      - name: Download frozen status-free weekly identity source artifact
+        id: weekly_identity
+        if: >-
+          steps.capture.outcome == 'success' &&
+          steps.gate.outputs.due == 'true' &&
+          steps.semantics.outputs.supported == 'true' &&
+          steps.semantics.outputs.sunday == 'true'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: levline4-2026-status-free-identity-source-v1-35113550399
+          path: /tmp/weekly_identity_source_v1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 35113550399
+
+      - name: Download frozen global player identity audit artifact
+        id: global_identity
+        if: >-
+          steps.capture.outcome == 'success' &&
+          steps.gate.outputs.due == 'true' &&
+          steps.semantics.outputs.supported == 'true' &&
+          steps.semantics.outputs.sunday == 'true'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: levline4-2026-global-player-identity-source-v1-35119017721
+          path: /tmp/global_identity_source_v1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 35119017721
+
+      - name: Execute qualified Week 2 Sunday cohort parser and frozen resolver
+        id: sunday_execution
+        if: >-
+          steps.capture.outcome == 'success' &&
+          steps.gate.outputs.due == 'true' &&
+          steps.semantics.outputs.supported == 'true' &&
+          steps.semantics.outputs.sunday == 'true' &&
+          steps.weekly_identity.outcome == 'success' &&
+          steps.global_identity.outcome == 'success'
+        continue-on-error: true
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" python -m research.run_levline4_prospective_inactive_execution_v1 \
+            --weekly-projection /tmp/weekly_identity_source_v1/projections/2026-fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f.parquet \
+            --global-projection /tmp/global_identity_source_v1/projections/players-023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603.parquet
+
+      - name: Persist raw and prospective execution evidence away from main
         if: always() && (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true')
         run: |
           set -euo pipefail
-          DATA_DIR=research_outputs/inactive_article_source_archive_v1
-          if [ ! -s "$DATA_DIR/observations.jsonl" ]; then
+          RAW_DIR=research_outputs/inactive_article_source_archive_v1
+          EXEC_DIR=research_outputs/levline4_prospective_inactive_execution_v1
+          if [ ! -s "$RAW_DIR/observations.jsonl" ]; then
             echo 'No inactive article source observations to persist.'
             exit 0
           fi
-          rm -rf /tmp/inactive_article_source_archive_v1
-          cp -R "$DATA_DIR" /tmp/inactive_article_source_archive_v1
-          rm -rf "$DATA_DIR"
+          rm -rf /tmp/inactive_article_source_archive_v1 /tmp/levline4_prospective_inactive_execution_v1
+          cp -R "$RAW_DIR" /tmp/inactive_article_source_archive_v1
+          if [ -d "$EXEC_DIR" ]; then
+            cp -R "$EXEC_DIR" /tmp/levline4_prospective_inactive_execution_v1
+          fi
+          rm -rf "$RAW_DIR" "$EXEC_DIR"
           git config user.name 'levline-research-bot'
           git config user.email 'actions@users.noreply.github.com'
           if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
@@ -122,18 +247,50 @@ jobs:
           mkdir -p research_outputs
           rm -rf research_outputs/inactive_article_source_archive_v1
           cp -R /tmp/inactive_article_source_archive_v1 research_outputs/inactive_article_source_archive_v1
+          if [ -d /tmp/levline4_prospective_inactive_execution_v1 ]; then
+            rm -rf research_outputs/levline4_prospective_inactive_execution_v1
+            cp -R /tmp/levline4_prospective_inactive_execution_v1 research_outputs/levline4_prospective_inactive_execution_v1
+          fi
           git add research_outputs/inactive_article_source_archive_v1/
+          if [ -d research_outputs/levline4_prospective_inactive_execution_v1 ]; then
+            git add research_outputs/levline4_prospective_inactive_execution_v1/
+          fi
           if git diff --cached --quiet; then
-            echo 'Inactive article source archive unchanged.'
+            echo 'Inactive article and prospective execution archives unchanged.'
             exit 0
           fi
-          git commit -m 'Capture official NFL inactive article source evidence'
+          git commit -m 'Capture official NFL inactive and prospective identity evidence'
           git push origin HEAD:research-data/inactive-snapshots-v1
 
-      - name: Surface capture failure after preserving evidence
+      - name: Surface capture or execution dependency failure after preserving evidence
         if: always() && (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true')
         run: |
+          set -euo pipefail
           if [ "${{ steps.capture.outcome }}" != 'success' ]; then
             echo 'Official inactive article source capture failed; any evidence available was preserved.' >&2
+            exit 1
+          fi
+          if [ "${{ steps.gate.outputs.due }}" != 'true' ]; then
+            echo 'Manual no-due dispatch completed as raw-capture-only; prospective execution was intentionally skipped.'
+            exit 0
+          fi
+          if [ "${{ steps.semantics.outputs.supported }}" != 'true' ] || [ "${{ steps.semantics.outputs.sunday }}" != 'true' ]; then
+            if [ "${{ steps.scope_skip.outcome }}" != 'success' ]; then
+              echo 'Out-of-scope skip receipt failed after raw evidence preservation.' >&2
+              exit 1
+            fi
+            echo 'Due cohort is outside frozen Week 2 Sunday execution scope; raw evidence and skip receipt were preserved.'
+            exit 0
+          fi
+          if [ "${{ steps.weekly_identity.outcome }}" != 'success' ]; then
+            echo 'Frozen weekly identity artifact unavailable; raw evidence was preserved.' >&2
+            exit 1
+          fi
+          if [ "${{ steps.global_identity.outcome }}" != 'success' ]; then
+            echo 'Frozen global identity artifact unavailable; raw evidence was preserved.' >&2
+            exit 1
+          fi
+          if [ "${{ steps.sunday_execution.outcome }}" != 'success' ]; then
+            echo 'Prospective Week 2 Sunday inactive execution failed; raw and any downstream evidence were preserved.' >&2
             exit 1
           fi

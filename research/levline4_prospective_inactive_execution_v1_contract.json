@@ -1,0 +1,107 @@
+{
+  "contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-EXECUTION-V1",
+  "status": "PREREGISTERED_BEFORE_FIRST_WEEK2_REAL_EXECUTION",
+  "season": 2026,
+  "supported_weeks": [2],
+  "purpose": [
+    "preserve the first real Week 2 official inactive article cohort extraction under the already-qualified V2 parser semantics",
+    "execute the already-frozen same-week/team exact-name GSIS resolver without modifying its rule",
+    "cross-check resolver outputs against the separately frozen team/status-free global player dictionary without using that dictionary as a fallback",
+    "persist immutable pre-kickoff evidence for later identity qualification research"
+  ],
+  "dependencies": {
+    "inactive_parser": {
+      "contract_id": "LEVLINE-2026-INACTIVE-ARTICLE-COHORT-PARSER-V2",
+      "qualified_scope": "rendered player/team/position/emergency-third-QB extraction for due-cohort filtering under matching official NFL Sunday inactive-article semantics",
+      "full_day_completeness_assumed": false
+    },
+    "resolver": {
+      "contract_id": "LEVLINE-2026-PROSPECTIVE-INACTIVE-GSIS-RESOLVER-V1",
+      "weekly_identity_projection_sha256": "fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f",
+      "weekly_identity_projection_weeks_present": [1, 2],
+      "week_1_use_for_membership_or_availability_forbidden": true,
+      "artifact_run_id": 35113550399,
+      "artifact_name": "levline4-2026-status-free-identity-source-v1-35113550399",
+      "status_fields_available_to_resolver": false
+    },
+    "global_identity_audit": {
+      "contract_id": "LEVLINE-4-2026-GLOBAL-PLAYER-IDENTITY-SOURCE-V1",
+      "projection_sha256": "023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603",
+      "artifact_run_id": 35119017721,
+      "artifact_name": "levline4-2026-global-player-identity-source-v1-35119017721",
+      "team_fields_available": false,
+      "status_fields_available": false,
+      "fallback_resolution_authorized": false
+    }
+  },
+  "live_source_selection": {
+    "source_archive_id": "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
+    "eligible_window_minutes_to_kickoff": [20, 100],
+    "qualified_game_day_semantics": "Week 2 Sunday in America/New_York only",
+    "unsupported_week_behavior": "preserve raw source evidence and skip before downloading or reading identity sources",
+    "non_sunday_due_cohort_behavior": "preserve raw source evidence and skip parser/resolver execution",
+    "candidate_source_kind": "nfl_inactives_news_article",
+    "selection_rule": "parse every successfully captured candidate article; retain candidates with zero parser integrity failures and all currently due cohort teams present; require exactly one distinct raw-body SHA among matching candidates; otherwise do not execute authority-bearing downstream work",
+    "zero_matching_article_behavior": "preserve waiting attempt and retry on a later scheduled capture",
+    "extra_non_due_team_sections_allowed": true,
+    "missing_due_team_section_allowed": false,
+    "absence_of_team_or_player_means_active_or_healthy": false
+  },
+  "observation_construction": {
+    "week_source": "due game_id canonical 2026_<week>_... prefix",
+    "team_source": "parsed official inactive article team heading",
+    "player_name_source": "qualified rendered player name",
+    "source_known_by_utc_source": "raw article capture timestamp",
+    "raw_evidence_sha256_source": "content-addressed raw article body",
+    "observation_id": "sha256(contract_id|week|team|normalized_rendered_name|raw_evidence_sha256)",
+    "position_is_not_available_to_resolver": true,
+    "emergency_third_qb_is_not_available_to_resolver": true
+  },
+  "global_audit_rule": {
+    "name_field": "display_name only",
+    "normalization": "same deterministic NFKC/casefold/nonalnum/suffix-stripping normalization frozen in resolver V1",
+    "global_unique_same_gsis": "CROSS_SOURCE_CORROBORATED",
+    "global_unique_different_gsis": "CROSS_SOURCE_CONTRADICTION",
+    "global_zero_or_multiple_gsis": "NOT_AUDITABLE",
+    "resolver_unresolved_or_ambiguous_is_never_overridden": true,
+    "global_source_is_never_a_fallback_resolver": true,
+    "cross_source_corroboration_alone_qualifies_player_identity_to_gsis": false
+  },
+  "durability": {
+    "persist_raw_article_evidence": true,
+    "persist_waiting_and_skip_attempts": true,
+    "persist_parsed_due_cohort_rows": true,
+    "persist_resolver_rows": true,
+    "persist_cross_source_audit_rows": true,
+    "persist_execution_receipt": true,
+    "persist_exact_weekly_identity_projection_used": true,
+    "persist_exact_global_identity_projection_used": true,
+    "destination_branch": "research-data/inactive-snapshots-v1",
+    "append_only_or_content_addressed": true
+  },
+  "failure_policy": {
+    "raw_capture_must_be_preserved_before_execution_failure_is_surfaced": true,
+    "zero_matching_articles": "preserve_waiting_attempt_and_retry_later",
+    "multiple_distinct_matching_article_bodies": "fail_closed",
+    "projection_sha_mismatch": "fail_closed",
+    "resolver_ambiguity": "preserve_as_ambiguous",
+    "resolver_miss": "preserve_as_unresolved",
+    "global_audit_contradiction": "preserve_and_fail_execution_receipt",
+    "no_rule_changes_after_first_real_execution_to_rescue_results": true
+  },
+  "authority": {
+    "player_level_parser_qualified_for_due_cohort_filtering": true,
+    "player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_probability_feature_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
