@@ -60,13 +60,19 @@ def horizon_target(kickoff_utc: datetime, horizon: str) -> datetime:
 
 
 def due_horizons(kickoff_utc: datetime, now_utc: datetime) -> list[dict[str, Any]]:
+    """Return only observations knowable no later than the nominal horizon.
+
+    The preregistered exact-horizon window is [-7.5, 0] minutes relative to the
+    target. Positive timing error is later information and must never be captured as
+    a nominal T-120/T-60/T-45/T-30 state, even during a manual workflow dispatch.
+    """
     kickoff = kickoff_utc.astimezone(timezone.utc)
     now = now_utc.astimezone(timezone.utc)
     out = []
     for label, minutes in HORIZONS.items():
         target = kickoff - timedelta(minutes=minutes)
         error = (now - target).total_seconds() / 60.0
-        if abs(error) <= CAPTURE_TOLERANCE_MINUTES:
+        if -CAPTURE_TOLERANCE_MINUTES <= error <= 0.0:
             out.append({"horizon": label, "target_timestamp_utc": target, "timing_error_minutes": error})
     return out
 
