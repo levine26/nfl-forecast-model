@@ -1,0 +1,191 @@
+name: LevLine 4 preserve official club roster parser V2
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_official_club_roster_v2.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_official_club_roster_v2.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-official-club-roster-v2
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10461126275'
+  SOURCE_WORKFLOW_RUN_ID: '35130069924'
+  SOURCE_HEAD_SHA: '1280e4a06eacf3e30700f75d4dab9ecff99944a4'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e'
+  EXPECTED_RECEIPT_SHA256: 'ef8a8bae53798a544db7c24338c1598b16fcb109ee8ba51975f9dc9d30989294'
+  EXPECTED_DIAGNOSTICS_SHA256: '3ec7e04208138d791d9c4257580ed2439acab6ec6cd6b70bd78b6cbd517cd397'
+  EXPECTED_ROSTER_METADATA_SHA256: '90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f'
+  DATA_BRANCH: 'research-data/levline4-official-club-roster-v2'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable canonical V2 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          digest=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}" --jq .digest)
+          test "$digest" = "$EXPECTED_ARTIFACT_DIGEST"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/v2.zip
+          rm -rf /tmp/v2
+          mkdir -p /tmp/v2
+          unzip -q /tmp/v2.zip -d /tmp/v2
+      - name: Verify canonical bytes and authority boundary
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          root = Path('/tmp/v2')
+          sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          assert sha(root / 'receipt.json') == os.environ['EXPECTED_RECEIPT_SHA256']
+          assert sha(root / 'team_diagnostics.json') == os.environ['EXPECTED_DIAGNOSTICS_SHA256']
+          assert sha(root / 'roster_metadata.jsonl') == os.environ['EXPECTED_ROSTER_METADATA_SHA256']
+
+          manifest = json.loads(Path('research/levline4_2026_official_club_roster_parser_v2_first_held_out_manifest.json').read_text())
+          frozen = json.loads(Path('research/levline4_2026_official_club_roster_parser_v2_first_held_out_receipt.json').read_text())
+          observed = json.loads((root / 'receipt.json').read_text())
+          diagnostics = json.loads((root / 'team_diagnostics.json').read_text())
+
+          assert manifest['first_held_out_workflow_run_id'] == int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert manifest['first_held_out_artifact_id'] == int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert manifest['first_held_out_head_sha'] == os.environ['SOURCE_HEAD_SHA']
+          assert manifest['artifact_digest'] == os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert manifest['receipt_sha256'] == os.environ['EXPECTED_RECEIPT_SHA256']
+          assert manifest['team_diagnostics_sha256'] == os.environ['EXPECTED_DIAGNOSTICS_SHA256']
+          assert manifest['roster_metadata_sha256'] == os.environ['EXPECTED_ROSTER_METADATA_SHA256']
+          assert manifest['first_result_is_canonical'] is True
+          assert manifest['later_same_version_execution_may_replace_first_result'] is False
+          assert observed == frozen
+          assert observed['status'] == 'PASS'
+          assert observed['held_out_parser_gate_pass'] is True
+          assert observed['official_club_roster_metadata_parser_qualified'] is True
+          assert observed['official_club_roster_source_is_independent_gsis_ground_truth'] is False
+          assert observed['parsed_row_count'] == 2463
+          assert observed['captured_team_count'] == 32
+          assert observed['http_success_team_count'] == 32
+          assert observed['parser_gate_pass_team_count'] == 32
+          assert observed['parse_error_count'] == 0
+          assert observed['duplicate_profile_path_count'] == 0
+          assert observed['source_errors'] == []
+          assert len(diagnostics) == 32
+          assert len(list((root / 'raw').glob('*.html'))) == 32
+          for row in diagnostics:
+              raw = root / 'raw' / f"{row['team']}.html"
+              assert raw.is_file()
+              assert sha(raw) == row['raw_html_sha256']
+              assert row['http_success'] is True
+              assert row['parser_team_gate_pass'] is True
+          for key in (
+              'player_identity_to_gsis_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert observed[key] is False, key
+          assert observed['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert observed['postgame_participation_used'] is False
+          assert observed['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download immutable canonical V2 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          digest=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}" --jq .digest)
+          test "$digest" = "$EXPECTED_ARTIFACT_DIGEST"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/v2.zip
+          rm -rf /tmp/v2
+          mkdir -p /tmp/v2
+          unzip -q /tmp/v2.zip -d /tmp/v2
+      - name: Verify and add preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('/tmp/v2')
+          sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          assert sha(root / 'receipt.json') == os.environ['EXPECTED_RECEIPT_SHA256']
+          assert sha(root / 'team_diagnostics.json') == os.environ['EXPECTED_DIAGNOSTICS_SHA256']
+          assert sha(root / 'roster_metadata.jsonl') == os.environ['EXPECTED_ROSTER_METADATA_SHA256']
+          observed = json.loads((root / 'receipt.json').read_text())
+          diagnostics = json.loads((root / 'team_diagnostics.json').read_text())
+          assert observed['status'] == 'PASS'
+          assert observed['official_club_roster_metadata_parser_qualified'] is True
+          assert observed['official_club_roster_source_is_independent_gsis_ground_truth'] is False
+          assert len(diagnostics) == 32
+          for row in diagnostics:
+              assert sha(root / 'raw' / f"{row['team']}.html") == row['raw_html_sha256']
+          preservation = {
+              'schema_version': 'levline4-official-club-roster-parser-v2-preservation',
+              'source_actions_artifact_id': int(os.environ['SOURCE_ARTIFACT_ID']),
+              'source_workflow_run_id': int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'actions_artifact_digest': os.environ['EXPECTED_ARTIFACT_DIGEST'],
+              'receipt_sha256': os.environ['EXPECTED_RECEIPT_SHA256'],
+              'team_diagnostics_sha256': os.environ['EXPECTED_DIAGNOSTICS_SHA256'],
+              'roster_metadata_sha256': os.environ['EXPECTED_ROSTER_METADATA_SHA256'],
+              'preserved_at_utc': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+              'preserving_workflow_run_id': os.environ['GITHUB_RUN_ID'],
+              'research_only': True,
+              'official_club_roster_metadata_parser_qualified': True,
+              'official_club_roster_source_is_independent_gsis_ground_truth': False,
+              'player_identity_to_gsis_qualified': False,
+              'availability_state_authorized': False,
+              'forecast_probability_effect_authorized': False,
+              'production_authorized': False,
+              'completed_2026_outcomes_used': 0,
+          }
+          (root / 'preservation.json').write_text(json.dumps(preservation, indent=2, sort_keys=True) + '\n')
+          PY
+      - name: Persist on dedicated research-data branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}"
+          git checkout -B parser-v2-data "origin/${DATA_BRANCH}"
+          DEST='research_outputs/levline4_2026_official_club_roster_parser_v2/first_held_out_35130069924'
+          if [ -e "$DEST" ]; then
+            diff -qr /tmp/v2 "$DEST"
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/v2 "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve first official club roster parser V2 held-out evidence'
+          git push origin HEAD:"${DATA_BRANCH}"
