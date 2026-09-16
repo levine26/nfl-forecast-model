@@ -1,0 +1,179 @@
+{
+  "contract_id": "LEVLINE-4-EXPECTED-LINEUP-QB-CAPTURE-V1",
+  "status": "preregistered_prospective_capture_only",
+  "frozen_at_utc": "2026-09-16T14:28:00Z",
+  "depends_on": [
+    "LEVLINE-4-INFORMATION-RESIDUAL-V2",
+    "L4-H1-EXPECTED-LINEUP-RESIDUAL-V1",
+    "L4-H2-QB-SCENARIO-REPLACEMENT-V1"
+  ],
+  "purpose": "Prospectively preserve the point-in-time player, role, availability and QB-start state needed to evaluate H1/H2 without fabricating historical state or assigning editorial probability deltas.",
+  "production_authorized": false,
+  "probability_feature_authorized": false,
+  "forecast_mutation_authorized": false,
+  "conditional_win_probability_authorized": false,
+  "completed_2026_outcomes_used_for_design": 0,
+  "capture_horizons": [
+    "T-120m",
+    "T-90m_event_window",
+    "T-60m",
+    "T-45m",
+    "T-30m"
+  ],
+  "chronology": {
+    "published_at_must_be_lte_captured_at": true,
+    "captured_at_must_be_lte_forecast_asof": true,
+    "forecast_asof_must_be_lt_kickoff": true,
+    "later_source_revisions_may_not_rewrite_prior_snapshot": true,
+    "post_kickoff_participation_forbidden": true,
+    "postgame_snaps_forbidden": true,
+    "future_depth_chart_forbidden": true,
+    "retrospective_tminus_reconstruction_forbidden": true
+  },
+  "identity": {
+    "canonical_player_id_preference": "GSIS when available",
+    "stable_entity_resolution_required": true,
+    "ambiguous_identity_policy": "remain_unresolved",
+    "fuzzy_one_to_many_guessing_forbidden": true
+  },
+  "expected_lineup_observation": {
+    "required_state_fields": [
+      "membership_state",
+      "availability_state",
+      "expected_role_tier",
+      "unit"
+    ],
+    "membership_states": [
+      "confirmed_team_roster",
+      "expected_team_roster",
+      "uncertain_membership",
+      "not_expected_on_game_roster",
+      "unknown"
+    ],
+    "availability_states": [
+      "available_confirmed",
+      "expected_available",
+      "questionable",
+      "doubtful",
+      "out",
+      "suspended_or_exempt",
+      "reserve_or_ir",
+      "not_listed_on_qualified_report",
+      "unknown"
+    ],
+    "role_tiers": [
+      "starter",
+      "rotation",
+      "package",
+      "backup",
+      "emergency",
+      "special_teams_only",
+      "unknown"
+    ],
+    "units": [
+      "QB",
+      "OL",
+      "RB_WR_TE",
+      "DEFENSIVE_FRONT",
+      "LB",
+      "SECONDARY",
+      "SPECIAL_TEAMS"
+    ],
+    "absence_from_source_rule": "Absence from an incomplete or non-exhaustive source is never converted to healthy, active, starter, role share 1.0, or availability probability 1.0.",
+    "continuous_availability_probability": {
+      "optional": true,
+      "allowed_methods": [
+        "source_explicit_probability",
+        "frozen_pregame_estimator",
+        "deterministic_official_confirmation"
+      ],
+      "forbidden_methods": [
+        "llm_judgment",
+        "analyst_judgment",
+        "editorial_mapping",
+        "postgame_inference"
+      ],
+      "default_when_not_qualified": null
+    },
+    "continuous_expected_role_share": {
+      "optional": true,
+      "allowed_methods": [
+        "source_explicit_share",
+        "frozen_pregame_estimator",
+        "deterministic_role_rule"
+      ],
+      "forbidden_methods": [
+        "llm_judgment",
+        "analyst_judgment",
+        "postgame_snap_share"
+      ],
+      "default_when_not_qualified": null
+    }
+  },
+  "qb_state": {
+    "starter_states": [
+      "confirmed_starter",
+      "expected_starter",
+      "possible_starter",
+      "backup",
+      "emergency",
+      "ruled_out",
+      "unknown"
+    ],
+    "continuity_states": [
+      "same_starter_same_system",
+      "new_starter_same_system",
+      "new_team_or_material_system_change",
+      "returning_after_absence",
+      "unknown"
+    ],
+    "starter_probability": {
+      "optional": true,
+      "allowed_methods": [
+        "source_explicit_probability",
+        "frozen_pregame_estimator",
+        "deterministic_official_confirmation"
+      ],
+      "forbidden_methods": [
+        "llm_judgment",
+        "analyst_judgment",
+        "editorial_mapping"
+      ],
+      "complete_distribution_rule": "A QB snapshot may be marked probability_complete only when every plausible starter candidate is represented and non-null probabilities sum to 1 within tolerance."
+    },
+    "quality_or_replacement_delta_rule": "Do not store an editorial QB value or probability-point delta in this capture contract. Join only a separately versioned chronological player-value model during an authorized H2 experiment.",
+    "scenario_mixture_rule": "Capturing a complete starter probability distribution does not authorize conditional P(win|QB) values or a scenario-mixture official forecast."
+  },
+  "source_provenance_required": [
+    "source",
+    "source_url_or_id",
+    "raw_evidence_ref",
+    "raw_evidence_sha256",
+    "published_at_utc",
+    "captured_at_utc",
+    "forecast_asof_utc",
+    "extractor_or_parser_id",
+    "extractor_or_parser_version"
+  ],
+  "source_priority_guidance": [
+    "official_league_or_team_transaction_inactive_roster_statement",
+    "official_coach_or_team_statement",
+    "credentialed_beat_report_with_attributable_fact",
+    "qualified_structured_injury_report",
+    "other_source_requires_separate_qualification"
+  ],
+  "llm_boundary": {
+    "may_extract_timestamped_fact": true,
+    "may_assign_probability_delta": false,
+    "may_assign_starter_probability_by_judgment": false,
+    "may_infer_healthy_from_missing_report": false,
+    "may_override_official_forecast": false
+  },
+  "evaluation_authority": {
+    "capture_can_merge_without_forecast_win": true,
+    "H1_H2_fit_authorized_by_this_contract": false,
+    "future_fit_requires_separate_frozen_candidate": true,
+    "2026_outcomes_may_grade_pre_frozen_shadow_only": true,
+    "2026_outcomes_may_not_select_features_weights_thresholds_or_rescue_changes": true
+  }
+}

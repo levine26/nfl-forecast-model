@@ -1,0 +1,42 @@
+name: LevLine 4 expected lineup and QB capture V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/expected_lineup_qb_capture_v1_contract.json'
+      - 'research/expected_lineup_state_v1.py'
+      - 'research/qb_scenario_state_v1.py'
+      - 'research/test_expected_lineup_qb_capture_v1.py'
+      - '.github/workflows/research_levline4_expected_lineup_qb_capture_v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-prospective-capture-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project
+        run: pip install '.[dev]'
+      - name: Validate capture contract JSON
+        run: python -m json.tool research/expected_lineup_qb_capture_v1_contract.json >/dev/null
+      - name: Test expected-lineup and QB state capture
+        run: pytest -q research/test_expected_lineup_qb_capture_v1.py
+      - name: Prove research-only path firewall
+        run: |
+          git diff --name-only origin/main...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [p for p in changed if not (p.startswith('research/') or p.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/main...HEAD -- outputs/ site/ src/ scripts/ config/
