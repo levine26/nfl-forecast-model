@@ -1,0 +1,81 @@
+{
+  "receipt_version": 1,
+  "receipt_id": "V09B-NFL-TRANSACTION-EMPTY-SEMANTICS-V7-QUALIFIED",
+  "contract_id": "V09B-NFL-TRANSACTION-EMPTY-SEMANTICS-V7",
+  "status": "EXPLICIT_NO_TRANSACTIONS_EMPTY_AND_TERMINAL_SEMANTICS_QUALIFIED_NO_LEDGER_AUTHORITY",
+  "workflow_evidence": {
+    "run_id": 34768135967,
+    "validated_head_sha": "2dcfbae83afb20d69e1fd273931209d18851f91c",
+    "manifest_artifact_id": 10320778063,
+    "manifest_artifact_digest": "sha256:4bb41e064893b81cd197891f84a7104b136aac06a7494f75341a96756ce5226d",
+    "raw_artifact_id": 10320203886,
+    "raw_artifact_digest": "sha256:66d25b3cc45f2faadf34215d30f375a84d235a2650e6410715ae88ae9166fc03",
+    "unit_and_contract_passed": true,
+    "research_firewall_passed": true,
+    "source_governance_passed": true,
+    "exit_code": 0
+  },
+  "empirical_result": {
+    "positive_cases_accounted_for": 72,
+    "positive_rule_matches": 72,
+    "positive_false_negatives": 0,
+    "negative_controls_accounted_for": 32,
+    "negative_rule_matches": 0,
+    "negative_false_positives": 0,
+    "september_negative_controls": 30,
+    "september_negative_controls_pass": true,
+    "preterminal_negative_controls": 2,
+    "preterminal_negative_controls_pass": true,
+    "transport_errors": 0,
+    "http_status_failures": 0,
+    "raw_preservation_failures": 0,
+    "frozen_semantics_gate_pass": true
+  },
+  "qualified_semantics": {
+    "candidate_rule": {
+      "exact_heading": "No Transactions Available",
+      "standard_transaction_header_seen": false,
+      "standard_transaction_row_count": 0,
+      "html_table_count": 0,
+      "distinct_forward_after_cursor_count": 0
+    },
+    "explicit_no_transactions_empty_result_semantics_qualified": true,
+    "post_pagination_explicit_empty_terminal_semantics_qualified": true,
+    "qualification_scope": "NFL AMP transaction pages for the frozen 2017-2021 six-category research surface only",
+    "preterminal_evidence": [
+      {
+        "case_id": "negative-preterminal-2017-05-waivers",
+        "rows": 25,
+        "forward_cursor": "AAAH4QAAAAUAAAABAAAAAAAKlXA=",
+        "candidate_rule_match": false
+      },
+      {
+        "case_id": "negative-preterminal-2020-10-waivers",
+        "rows": 25,
+        "forward_cursor": "AAAH5AAAAAoAAAABAAAAAAAMEQ8=",
+        "candidate_rule_match": false
+      }
+    ]
+  },
+  "explicit_non_authority": {
+    "all_month_full_ledger_qualified": false,
+    "durable_full_ledger_source_archive_qualified": false,
+    "transaction_state_machine_defined": false,
+    "same_day_transaction_order_resolved": false,
+    "modern_game_day_roster_universe_qualified": false,
+    "training_label_semantics_qualified": false,
+    "training_source_chronology_qualified": false,
+    "v09b_model_fit_authorized": false
+  },
+  "scientific_disposition": {
+    "zero_false_negatives_observed": true,
+    "zero_false_positives_observed": true,
+    "next_authorized_research_step": "Separately preregister a successor full 2017-2021 all-month six-category NFL AMP ledger capture. Preserve every response before parsing. Treat only the V7-qualified exact explicit-empty rule as a valid empty initial endpoint or terminal cursor page; preserve all transaction pages under the V5/V4 cursor advancement and novel-row gates. Require all 360 endpoints to converge with zero source errors and keep roster-state, same-day ordering, game-day membership, labels, chronology, production, and model fitting unauthorized from capture alone."
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used": 0,
+    "model_fit_performed": false,
+    "production_dependency_authorized": false
+  }
+}
