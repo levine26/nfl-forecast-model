@@ -55,7 +55,7 @@ jobs:
           repository: ${{ github.repository }}
           run-id: 35119017721
 
-      - name: Verify frozen dependency bytes and firewall
+      - name: Verify frozen dependency bytes, week scope and firewall
         run: |
           python - <<'PY'
           import hashlib
@@ -70,6 +70,10 @@ jobs:
           assert hashlib.sha256(global_source.read_bytes()).hexdigest() == '023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603'
 
           contract = json.loads(Path('research/levline4_prospective_inactive_execution_v1_contract.json').read_text())
+          assert contract['supported_weeks'] == [2]
+          assert contract['dependencies']['resolver']['weekly_identity_projection_weeks_present'] == [1, 2]
+          assert contract['dependencies']['resolver']['week_1_use_for_membership_or_availability_forbidden'] is True
+          assert contract['live_source_selection']['qualified_game_day_semantics'] == 'Week 2 Sunday in America/New_York only'
           assert contract['dependencies']['resolver']['status_fields_available_to_resolver'] is False
           assert contract['dependencies']['global_identity_audit']['team_fields_available'] is False
           assert contract['dependencies']['global_identity_audit']['status_fields_available'] is False
