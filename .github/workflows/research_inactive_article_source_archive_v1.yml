@@ -134,7 +134,7 @@ jobs:
 
       - name: Determine whether latest due cohort is inside qualified Sunday semantics
         id: semantics
-        if: steps.capture.outcome == 'success'
+        if: steps.capture.outcome == 'success' && steps.gate.outputs.due == 'true'
         run: |
           RESULT=$(PYTHONPATH="$PWD/src:$PWD" python - <<'PY'
           from pathlib import Path
@@ -150,7 +150,7 @@ jobs:
 
       - name: Preserve non-Sunday skip receipt without reading identity sources
         id: nonsunday_execution
-        if: steps.capture.outcome == 'success' && steps.semantics.outputs.sunday == 'false'
+        if: steps.capture.outcome == 'success' && steps.gate.outputs.due == 'true' && steps.semantics.outputs.sunday == 'false'
         continue-on-error: true
         run: |
           PYTHONPATH="$PWD/src:$PWD" python -m research.run_levline4_prospective_inactive_execution_v1 \
@@ -159,7 +159,7 @@ jobs:
 
       - name: Download frozen status-free weekly identity source artifact
         id: weekly_identity
-        if: steps.capture.outcome == 'success' && steps.semantics.outputs.sunday == 'true'
+        if: steps.capture.outcome == 'success' && steps.gate.outputs.due == 'true' && steps.semantics.outputs.sunday == 'true'
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
@@ -171,7 +171,7 @@ jobs:
 
       - name: Download frozen global player identity audit artifact
         id: global_identity
-        if: steps.capture.outcome == 'success' && steps.semantics.outputs.sunday == 'true'
+        if: steps.capture.outcome == 'success' && steps.gate.outputs.due == 'true' && steps.semantics.outputs.sunday == 'true'
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
@@ -185,6 +185,7 @@ jobs:
         id: sunday_execution
         if: >-
           steps.capture.outcome == 'success' &&
+          steps.gate.outputs.due == 'true' &&
           steps.semantics.outputs.sunday == 'true' &&
           steps.weekly_identity.outcome == 'success' &&
           steps.global_identity.outcome == 'success'
@@ -242,6 +243,10 @@ jobs:
           if [ "${{ steps.capture.outcome }}" != 'success' ]; then
             echo 'Official inactive article source capture failed; any evidence available was preserved.' >&2
             exit 1
+          fi
+          if [ "${{ steps.gate.outputs.due }}" != 'true' ]; then
+            echo 'Manual no-due dispatch completed as raw-capture-only; prospective execution was intentionally skipped.'
+            exit 0
           fi
           if [ "${{ steps.semantics.outputs.sunday }}" = 'true' ]; then
             if [ "${{ steps.weekly_identity.outcome }}" != 'success' ]; then
