@@ -1,9 +1,13 @@
+import io
 import json
+import socket
+import urllib.error
 from pathlib import Path
 
 from research.levline4_2026_ngs_player_id_heldout_v2 import (
     GSIS_RE,
     normalize_name,
+    request_json,
     resolve_target,
     selection_key,
 )
@@ -75,6 +79,51 @@ def test_resolver_fails_closed_on_invalid_gsis():
     assert out["selected_gsis_id"] is None
 
 
+def test_non_timeout_urlerror_is_not_retried():
+    calls = []
+
+    def opener(*args, **kwargs):
+        calls.append(1)
+        raise urllib.error.URLError("dns failure")
+
+    out = request_json("https://example.test", urlopen=opener, sleep=lambda _: None)
+    assert len(calls) == 1
+    assert len(out["attempts"]) == 1
+    assert out["semantic_error"] == "transport_nonretryable"
+
+
+def test_timeout_is_retried_at_most_two_additional_times():
+    calls = []
+
+    def opener(*args, **kwargs):
+        calls.append(1)
+        raise socket.timeout("timed out")
+
+    out = request_json("https://example.test", urlopen=opener, sleep=lambda _: None)
+    assert len(calls) == 3
+    assert len(out["attempts"]) == 3
+    assert out["semantic_error"] == "transport_timeout_exhausted"
+
+
+def test_http_404_is_not_retried():
+    calls = []
+
+    def opener(request, timeout=None):
+        calls.append(1)
+        raise urllib.error.HTTPError(
+            request.full_url,
+            404,
+            "not found",
+            hdrs={},
+            fp=io.BytesIO(b'{"players":[]}'),
+        )
+
+    out = request_json("https://example.test", urlopen=opener, sleep=lambda _: None)
+    assert len(calls) == 1
+    assert out["http_status"] == 404
+    assert len(out["attempts"]) == 1
+
+
 def test_gsis_pattern_is_exact():
     assert GSIS_RE.fullmatch("00-0034857")
     assert not GSIS_RE.fullmatch("00-034857")
@@ -90,9 +139,11 @@ def test_contract_freezes_targets_gates_and_scoped_authority_only():
     assert contract["target_selection"]["source_name_ambiguity_stratum"]["expected_target_count"] == 6
     assert contract["target_selection"]["expected_total_target_count"] == 70
     assert contract["frozen_pass_gates"]["coverage_stratum_unique_resolution_minimum_count"] == 61
+    assert contract["frozen_pass_gates"]["coverage_stratum_unique_resolution_minimum_fraction"] == 0.953125
     assert contract["frozen_pass_gates"]["source_name_ambiguity_stratum_unique_resolution_required_count"] == 6
     assert contract["fixed_query_and_resolution_rule"]["fallback_matching_allowed"] is False
     assert contract["fixed_query_and_resolution_rule"]["manual_resolution_allowed"] is False
+    assert "network timeout" in contract["fixed_query_and_resolution_rule"]["request"]["transport_retry_policy"]
     authority = contract["authority_if_and_only_if_all_v2_gates_pass"]
     assert authority["ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population"] is True
     assert authority["official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application"] is True
