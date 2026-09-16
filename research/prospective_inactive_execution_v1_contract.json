@@ -1,0 +1,74 @@
+{
+  "contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-EXECUTION-V1",
+  "status": "PREREGISTERED_EXECUTION_ORCHESTRATION_ONLY",
+  "season": 2026,
+  "scope": {
+    "eligible_game_day": "Sunday only",
+    "eligible_week_minimum": 2,
+    "raw_archive_id": "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
+    "capture_window_minutes_to_kickoff": [20, 100],
+    "current_week_article_url_pattern": "https://www.nfl.com/news/inactive-reports-sunday-week-{week}-2026-nfl-season",
+    "article_selection_must_match_current_week_pattern_exactly": true,
+    "game_ready_only_when_both_due_team_sections_are_present": true,
+    "absence_of_team_or_player_means_active_or_healthy": false
+  },
+  "parser_dependency": {
+    "contract_id": "NFL-INACTIVE-ARTICLE-COHORT-PARSER-2026-V2",
+    "receipt_path": "research/inactive_article_cohort_parser_v2_receipt.json",
+    "receipt_status_required": "PASS",
+    "qualification_passed_required": true,
+    "player_level_parser_qualified_for_due_cohort_filtering_required": true
+  },
+  "resolver_dependency": {
+    "contract_id": "LEVLINE-2026-PROSPECTIVE-INACTIVE-GSIS-RESOLVER-V1",
+    "source_projection_sha256": "fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f",
+    "identity_source_artifact_id": 10452584328,
+    "identity_source_artifact_zip_sha256": "489e3f407b5704b142e9244234d0193848e87a7a4fa00d051906ba41a9923318",
+    "identity_source_known_by_utc": "2026-09-16T12:35:57Z",
+    "week_1_resolution_authorized": false,
+    "real_execution_is_self_qualifying": false
+  },
+  "observation_identity": {
+    "basis": [
+      "raw_article_sha256",
+      "captured_at_utc",
+      "game_id",
+      "team",
+      "player_name_rendered"
+    ],
+    "algorithm": "sha256 canonical JSON"
+  },
+  "execution_policy": {
+    "process_only_pre_kickoff_observations": true,
+    "process_only_source_observations_at_or_after_identity_source_known_by": true,
+    "process_each_raw_capture_game_identity_at_most_once": true,
+    "resolved_unresolved_ambiguous_all_preserved": true,
+    "manual_override_authorized": false,
+    "fuzzy_matching_authorized": false,
+    "postgame_repair_authorized": false,
+    "retrospective_week_1_backfill_authorized": false
+  },
+  "persistence": {
+    "raw_source_branch": "research-data/inactive-snapshots-v1",
+    "derived_output_branch": "research-data/inactive-derived-v1",
+    "append_only_manifest": "research_outputs/prospective_inactive_execution_v1/executions.jsonl",
+    "resolved_rows": "research_outputs/prospective_inactive_execution_v1/resolution_rows.jsonl"
+  },
+  "authority": {
+    "prospective_parser_execution_authorized": true,
+    "prospective_resolver_execution_authorized": true,
+    "player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_probability_feature_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": false,
+    "postgame_snaps_used": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
