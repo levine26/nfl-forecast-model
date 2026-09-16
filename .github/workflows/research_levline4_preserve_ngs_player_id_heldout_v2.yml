@@ -1,0 +1,230 @@
+name: LevLine 4 preserve NGS player ID held-out V2
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_heldout_v2.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_heldout_v2.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-ngs-player-id-heldout-v2
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10471546654'
+  SOURCE_WORKFLOW_RUN_ID: '35157178143'
+  SOURCE_HEAD_SHA: '00dc6765d781c83db657ee10172eb3000097703a'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:c7bce3e329fa21e0d0ae9d627a89273fd52bb03ed66fff9c5dad54b2ac78db33'
+  EXPECTED_ARTIFACT_SIZE: '35752'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_heldout_v2_first_result_manifest.json'
+  DATA_BRANCH: 'research-data/levline4-ngs-player-id-heldout-v2'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable canonical first artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v2.zip
+          rm -rf /tmp/ngs_v2
+          mkdir -p /tmp/ngs_v2
+          unzip -q /tmp/ngs_v2.zip -d /tmp/ngs_v2
+      - name: Verify canonical file set, hashes, negative result, and authority ceiling
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          root = Path('/tmp/ngs_v2')
+          manifest = json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          observed = {
+              p.relative_to(root).as_posix(): sha(p)
+              for p in sorted(root.rglob('*')) if p.is_file()
+          }
+          assert manifest['first_artifact_id'] == int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert manifest['first_workflow_run_id'] == int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert manifest['first_head_sha'] == os.environ['SOURCE_HEAD_SHA']
+          assert manifest['artifact_digest'] == os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert manifest['artifact_size_in_bytes'] == int(os.environ['EXPECTED_ARTIFACT_SIZE'])
+          assert manifest['file_count'] == len(observed) == 76
+          assert observed == manifest['file_sha256']
+          assert manifest['first_result_is_canonical'] is True
+          assert manifest['later_same_version_execution_may_replace_first_result'] is False
+          assert manifest['same_version_rule_adaptation_after_first_result'] is False
+          assert manifest['first_result_status'] == 'FAIL'
+          assert manifest['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert manifest['postgame_participation_used'] is False
+          assert manifest['week2_inactive_execution_evidence_used_for_design'] is False
+          assert manifest['f_st_01_frozen_2026_unchanged'] is True
+
+          receipt = json.loads((root / 'receipt.json').read_text())
+          assert receipt['status'] == 'FAIL'
+          assert receipt['metrics']['target_count'] == 70
+          assert receipt['metrics']['coverage_unique_resolution_count'] == 0
+          assert receipt['metrics']['source_name_ambiguity_unique_resolution_count'] == 0
+          assert receipt['gates']['all_70_targets_http_200_parseable_players_array'] is False
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert receipt['research_only'] is True
+          assert receipt['production_paths_changed'] is False
+          assert receipt['authority'] == manifest['authority']
+          for key in (
+              'ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population',
+              'official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application',
+              'general_2026_player_identity_to_gsis_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'availability_state_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert receipt['authority'][key] is False, key
+
+          response_hash = '3e7db788e384631f8a9f299d1797e6f8af6d16d643a1c91f9e83ae15212de45c'
+          response_files = sorted((root / 'responses').glob('target_*.json'))
+          assert len(response_files) == 70
+          for path in response_files:
+              assert sha(path) == response_hash, path
+              assert json.loads(path.read_text()) == {'message': 'Unauthorized'}, path
+
+          rows = [json.loads(line) for line in (root / 'target_results.jsonl').read_text().splitlines() if line.strip()]
+          assert len(rows) == 70
+          assert all(row['http_status'] == 401 for row in rows)
+          assert all(len(row['attempts']) == 1 for row in rows)
+          assert all(row['response_sha256'] == response_hash for row in rows)
+          assert all(row['parseable_players_array'] is False for row in rows)
+          assert all(row['resolved'] is False for row in rows)
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download immutable canonical first artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v2.zip
+          rm -rf /tmp/ngs_v2
+          mkdir -p /tmp/ngs_v2
+          unzip -q /tmp/ngs_v2.zip -d /tmp/ngs_v2
+      - name: Reverify and add preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('/tmp/ngs_v2')
+          manifest = json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          observed = {
+              p.relative_to(root).as_posix(): sha(p)
+              for p in sorted(root.rglob('*')) if p.is_file()
+          }
+          assert observed == manifest['file_sha256']
+          assert manifest['first_result_status'] == 'FAIL'
+          receipt = json.loads((root / 'receipt.json').read_text())
+          assert receipt['status'] == 'FAIL'
+          assert receipt['metrics']['target_count'] == 70
+          assert receipt['metrics']['coverage_unique_resolution_count'] == 0
+          assert receipt['metrics']['source_name_ambiguity_unique_resolution_count'] == 0
+          assert receipt['production_paths_changed'] is False
+          preservation = {
+              'schema_version': 'levline4-ngs-player-id-heldout-v2-preservation',
+              'source_actions_artifact_id': int(os.environ['SOURCE_ARTIFACT_ID']),
+              'source_workflow_run_id': int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'actions_artifact_digest': os.environ['EXPECTED_ARTIFACT_DIGEST'],
+              'actions_artifact_size_in_bytes': int(os.environ['EXPECTED_ARTIFACT_SIZE']),
+              'canonical_file_sha256': manifest['file_sha256'],
+              'canonical_result': 'FAIL',
+              'failure_characterization': '70/70 direct anonymous NGS API requests returned HTTP 401 Unauthorized; resolver semantics were not reached.',
+              'preserved_at_utc': datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+              'preserving_workflow_run_id': os.environ['GITHUB_RUN_ID'],
+              'research_only': True,
+              'direct_anonymous_ngs_http_surface_qualified': False,
+              'ngs_exact_display_name_plus_team_resolver_qualified': False,
+              'player_identity_to_gsis_qualified': False,
+              'game_day_membership_qualified': False,
+              'availability_state_authorized': False,
+              'player_value_join_authorized': False,
+              'forecast_probability_effect_authorized': False,
+              'model_fit_authorized': False,
+              'production_authorized': False,
+              'completed_2026_outcomes_used': 0,
+              'postgame_participation_used': False,
+              'f_st_01_frozen_2026_unchanged': True,
+          }
+          (root / 'preservation.json').write_text(json.dumps(preservation, indent=2, sort_keys=True) + '\n')
+          PY
+      - name: Persist on dedicated research-data branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B ngs-player-id-v2-data "origin/${DATA_BRANCH}"
+          else
+            git checkout -B ngs-player-id-v2-data
+          fi
+          DEST='research_outputs/levline4_2026_ngs_player_id_heldout_v2/first_result_35157178143'
+          if [ -e "$DEST/preservation.json" ]; then
+            DEST="$DEST" python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ['DEST'])
+          p = json.loads((root / 'preservation.json').read_text())
+          assert p['source_actions_artifact_id'] == int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert p['source_workflow_run_id'] == int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert p['source_head_sha'] == os.environ['SOURCE_HEAD_SHA']
+          assert p['actions_artifact_digest'] == os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert p['canonical_result'] == 'FAIL'
+          assert p['production_authorized'] is False
+          for rel, expected in p['canonical_file_sha256'].items():
+              actual = hashlib.sha256((root / rel).read_bytes()).hexdigest()
+              assert actual == expected, rel
+          PY
+            echo 'Canonical failed NGS player-ID held-out V2 evidence already preserved exactly.'
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/ngs_v2 "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve canonical failed NGS player ID held-out V2 evidence'
+          git push origin HEAD:"${DATA_BRANCH}"
