@@ -1,0 +1,144 @@
+name: LevLine 4 official club roster surface probe V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_official_club_roster_surface_probe_v1_contract.json'
+      - 'research/levline4_2026_official_club_roster_surface_probe_v1.py'
+      - 'research/test_levline4_2026_official_club_roster_surface_probe_v1.py'
+      - '.github/workflows/research_levline4_2026_official_club_roster_surface_probe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: levline4-official-club-roster-surface-probe-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install lightweight dependencies
+        run: python -m pip install pytest 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Run deterministic probe tests
+        run: pytest -q research/test_levline4_2026_official_club_roster_surface_probe_v1.py
+      - name: Validate frozen V1 authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          c = json.loads(Path('research/levline4_2026_official_club_roster_surface_probe_v1_contract.json').read_text())
+          assert c['contract_id'] == 'LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-SURFACE-PROBE-V1'
+          assert c['status'] == 'PREREGISTERED_SOURCE_SURFACE_CAPTURE_AND_DIAGNOSTIC_ONLY'
+          assert len(c['source_discovery']['clubs']) == 32
+          assert c['capture']['network_redirects_allowed_only_within_frozen_club_host_www_variant'] is True
+          assert c['projection_policy']['roster_section_or_status_selected'] is False
+          assert c['projection_policy']['roster_section_or_status_interpreted'] is False
+          assert c['projection_policy']['injury_status_selected'] is False
+          assert c['projection_policy']['starter_or_depth_role_selected'] is False
+          assert c['v1_disposition']['same_version_parser_rule_adaptation_after_live_probe'] is False
+          assert c['v1_disposition']['follow_up_requires_new_preregistered_version'] is True
+          assert c['authority']['official_club_roster_identity_parser_qualified'] is False
+          assert c['authority']['week2_sunday_due_inactive_player_identity_to_gsis_qualified'] is False
+          assert c['authority']['production_authorized'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert c['governance']['postgame_participation_used'] is False
+          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  live-surface-probe:
+    needs: unit-and-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install capture dependencies
+        run: python -m pip install 'requests>=2.32' 'beautifulsoup4>=4.12' 'lxml>=5.0'
+      - name: Execute frozen 32-club surface probe
+        id: probe
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m research.levline4_2026_official_club_roster_surface_probe_v1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Verify receipt preserves research-only authority
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p = Path('research_outputs/levline4_2026_official_club_roster_surface_probe_v1/receipt.json')
+          assert p.is_file(), 'probe receipt missing'
+          r = json.loads(p.read_text())
+          assert r['contract_id'] == 'LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-SURFACE-PROBE-V1'
+          assert r['expected_team_count'] == 32
+          for key in (
+              'name_jersey_position_parser_qualified',
+              'official_club_roster_identity_parser_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert r[key] is False, key
+          assert r['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert r['postgame_participation_used'] is False
+          assert r['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'status': r['status'],
+              'captured_team_count': r['captured_team_count'],
+              'http_success_team_count': r['http_success_team_count'],
+              'surface_presence_team_count': r['surface_presence_team_count'],
+              'profile_link_rows': r['profile_link_rows'],
+              'error_count': len(r['errors']),
+          }, indent=2, sort_keys=True))
+          PY
+      - name: Upload immutable V1 probe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-official-club-roster-surface-probe-v1-${{ github.run_id }}
+          path: research_outputs/levline4_2026_official_club_roster_surface_probe_v1/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface frozen probe failure after evidence upload
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.probe.outputs.exit_code }}" = "0"
+
+  research-firewall:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch is research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
