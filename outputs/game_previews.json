@@ -16,7 +16,7 @@
         "CAR protection vs ATL pass rush"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 0,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -114,7 +114,7 @@
     "matchup": "CAR @ ATL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:37:01.747672+00:00",
+        "as_of": "2026-09-16T09:31:08.293457+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "CAR",
@@ -124,7 +124,7 @@
         "title": "Bryce Young vs ATL: player history"
       },
       {
-        "as_of": "2026-09-16T06:36:51.925911+00:00",
+        "as_of": "2026-09-16T09:30:58.497606+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "ATL",
@@ -134,7 +134,7 @@
         "title": "CAR protection vs ATL pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:51.927836+00:00",
+        "as_of": "2026-09-16T09:30:58.499491+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ATL",
@@ -144,7 +144,7 @@
         "title": "ATL early-down approach vs CAR"
       },
       {
-        "as_of": "2026-09-16T06:34:53.904289+00:00",
+        "as_of": "2026-09-16T09:28:42.677164+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -332,7 +332,7 @@
     "matchup": "CIN @ HOU",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:37:03.243411+00:00",
+        "as_of": "2026-09-16T09:31:09.781020+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "CIN",
@@ -342,7 +342,7 @@
         "title": "Joe Burrow vs HOU: player history"
       },
       {
-        "as_of": "2026-09-16T06:36:53.710061+00:00",
+        "as_of": "2026-09-16T09:31:00.267834+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "CIN",
@@ -352,7 +352,7 @@
         "title": "HOU YAC creation vs CIN tackling"
       },
       {
-        "as_of": "2026-09-16T06:36:53.707989+00:00",
+        "as_of": "2026-09-16T09:31:00.265779+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "HOU",
@@ -362,7 +362,7 @@
         "title": "CIN protection vs HOU pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:53.708743+00:00",
+        "as_of": "2026-09-16T09:31:00.266547+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "CIN",
@@ -400,7 +400,7 @@
     ],
     "paragraphs": [
       "Cincinnati takes its first road trip after an opening win, while Houston is trying to convert an encouraging offensive debut into a better result. The Bengals\u2019 scouting report highlights David Montgomery\u2019s expanded role and the Texans\u2019 defensive front, and Houston\u2019s own recap points to a more promising ground game and C.J. Stroud spreading the ball around. Cincinnati must prevent Houston from staying comfortably ahead of the sticks; the Texans need their offense to finish the drives that were not enough against Buffalo.",
-      "LevLine 3.0 gives the Texans a 53.8% win probability over the Bengals. Its frozen F-ST engine reconciles a 60.4% football-only signal with a 56.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Houston Texans -1.2, a market line of Houston Texans -2.5, and an approximate coherent score of HOU 24 \u2013 CIN 23. Houston\u2019s run-game efficiency and Cincinnati\u2019s ability to create passing downs determine whether the Texans can keep C.J. The pick: Houston Texans moneyline."
+      "LevLine 3.0 gives the Texans a 54.9% win probability over the Bengals. Its frozen F-ST engine reconciles a 60.4% football-only signal with a 57.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Houston Texans -1.6, a market line of Houston Texans -3.0, and an approximate coherent score of HOU 24 \u2013 CIN 23. Houston\u2019s run-game efficiency and Cincinnati\u2019s ability to create passing downs determine whether the Texans can keep C.J. The pick: Houston Texans moneyline."
     ],
     "prediction": "HOU to win; HOU 25.0 \u2013 CIN 21.7 is the central score projection.",
     "reported_sources": [
@@ -503,6 +503,13 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "TB protection vs CLE pass rush"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=27.9759&longitude=-82.5033&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in TB"
       }
     ],
     "game_id": "2026_02_CLE_TB",
@@ -543,7 +550,7 @@
     "matchup": "CLE @ TB",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.795513+00:00",
+        "as_of": "2026-09-16T09:30:53.268834+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -553,7 +560,7 @@
         "title": "What Zac Robinson could change in TB"
       },
       {
-        "as_of": "2026-09-16T06:36:55.460333+00:00",
+        "as_of": "2026-09-16T09:31:02.035435+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TB",
@@ -563,7 +570,7 @@
         "title": "CLE explosives vs TB prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:55.460609+00:00",
+        "as_of": "2026-09-16T09:31:02.035715+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "TB",
@@ -573,7 +580,7 @@
         "title": "CLE early-down approach vs TB"
       },
       {
-        "as_of": "2026-09-16T06:36:55.461141+00:00",
+        "as_of": "2026-09-16T09:31:02.036208+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "CLE",
@@ -784,7 +791,7 @@
     "matchup": "DET @ BUF",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.791842+00:00",
+        "as_of": "2026-09-16T09:30:53.265006+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -794,7 +801,7 @@
         "title": "What Drew Petzing could change in DET"
       },
       {
-        "as_of": "2026-09-16T06:36:51.335325+00:00",
+        "as_of": "2026-09-16T09:30:57.905497+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BUF",
@@ -804,7 +811,7 @@
         "title": "BUF explosives vs DET prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:51.335592+00:00",
+        "as_of": "2026-09-16T09:30:57.905763+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BUF",
@@ -814,7 +821,7 @@
         "title": "BUF early-down approach vs DET"
       },
       {
-        "as_of": "2026-09-16T06:36:51.334285+00:00",
+        "as_of": "2026-09-16T09:30:57.904486+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DET",
@@ -868,7 +875,7 @@
     ],
     "paragraphs": [
       "Detroit and Buffalo both enter Thursday night unbeaten, but the short turnaround puts preparation and line health under an immediate microscope. The Lions\u2019 own update lists multiple offensive linemen managing injuries after their overtime opener, while Buffalo\u2019s Week 2 preview emphasizes the challenge of a short week before the first regular-season game at the new Highmark Stadium. Detroit needs enough protection to let Jared Goff operate cleanly; Buffalo wants Josh Allen and its defense to keep the Lions chasing the pace.",
-      "LevLine 3.0 gives the Bills a 65.1% win probability over the Lions. Its frozen F-ST engine reconciles a 64.8% football-only signal with a 66.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Buffalo Bills -5.0, a market line of Buffalo Bills -4.5, and an approximate coherent score of BUF 27 \u2013 DET 22. Detroit\u2019s protection on a short week determines whether the Lions can sustain their offense or Buffalo can create the disruptive possessions that tilt the game toward Josh Allen. The pick: Buffalo Bills moneyline."
+      "LevLine 3.0 gives the Bills a 64.4% win probability over the Lions. Its frozen F-ST engine reconciles a 64.8% football-only signal with a 65.7% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Buffalo Bills -4.7, a market line of Buffalo Bills -4.5, and an approximate coherent score of BUF 27 \u2013 DET 22. Detroit\u2019s protection on a short week determines whether the Lions can sustain their offense or Buffalo can create the disruptive possessions that tilt the game toward Josh Allen. The pick: Buffalo Bills moneyline."
     ],
     "prediction": "BUF to win; BUF 27.8 \u2013 DET 21.1 is the central score projection.",
     "reported_sources": [
@@ -965,6 +972,13 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "GB early-down approach vs NYJ"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=40.8135&longitude=-74.0745&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+        "strength": "Moderate",
+        "title": "Kickoff weather in NYJ"
       }
     ],
     "game_id": "2026_02_GB_NYJ",
@@ -1005,7 +1019,7 @@
     "matchup": "GB @ NYJ",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:34:59.538866+00:00",
+        "as_of": "2026-09-16T09:28:47.276836+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1015,7 +1029,7 @@
         "title": "New defensive coordinator in NYJ"
       },
       {
-        "as_of": "2026-09-16T06:36:54.882912+00:00",
+        "as_of": "2026-09-16T09:31:01.440603+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "NYJ",
@@ -1025,7 +1039,7 @@
         "title": "GB explosives vs NYJ prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:54.883820+00:00",
+        "as_of": "2026-09-16T09:31:01.441530+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYJ",
@@ -1035,7 +1049,7 @@
         "title": "NYJ protection vs GB pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:54.883202+00:00",
+        "as_of": "2026-09-16T09:31:01.440891+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYJ",
@@ -1170,13 +1184,6 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "KC YAC creation vs IND tackling"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Moderate",
-        "title": "Kickoff weather in KC"
       }
     ],
     "game_id": "2026_02_IND_KC",
@@ -1217,7 +1224,7 @@
     "matchup": "IND @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.799093+00:00",
+        "as_of": "2026-09-16T09:30:53.272523+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1227,7 +1234,7 @@
         "title": "What Eric Bieniemy could change in KC"
       },
       {
-        "as_of": "2026-09-16T06:36:59.594351+00:00",
+        "as_of": "2026-09-16T09:31:06.148913+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -1237,7 +1244,7 @@
         "title": "KC early-down approach vs IND"
       },
       {
-        "as_of": "2026-09-16T06:36:59.594428+00:00",
+        "as_of": "2026-09-16T09:31:06.148993+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "KC",
@@ -1247,7 +1254,7 @@
         "title": "KC YAC creation vs IND tackling"
       },
       {
-        "as_of": "2026-09-16T06:36:44.872335+00:00",
+        "as_of": "2026-09-16T09:30:31.860100+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1430,7 +1437,7 @@
     "matchup": "JAX @ DEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:01.208720+00:00",
+        "as_of": "2026-09-16T09:29:09.277997+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1440,7 +1447,7 @@
         "title": "DEN offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-16T06:36:56.626194+00:00",
+        "as_of": "2026-09-16T09:31:03.202068+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "JAX",
@@ -1450,7 +1457,7 @@
         "title": "JAX explosives vs DEN prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:56.625644+00:00",
+        "as_of": "2026-09-16T09:31:03.201567+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -1460,7 +1467,7 @@
         "title": "JAX protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:56.627846+00:00",
+        "as_of": "2026-09-16T09:31:03.203633+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DEN",
@@ -1550,7 +1557,7 @@
         "LV protection vs LAC pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 7,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -1648,7 +1655,7 @@
     "matchup": "LV @ LAC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:37:06.299500+00:00",
+        "as_of": "2026-09-16T09:31:12.819933+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "LAC",
@@ -1658,7 +1665,7 @@
         "title": "Justin Herbert vs LV: player history"
       },
       {
-        "as_of": "2026-09-16T06:36:57.219688+00:00",
+        "as_of": "2026-09-16T09:31:03.782012+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LV",
@@ -1668,7 +1675,7 @@
         "title": "LV protection vs LAC pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:57.220236+00:00",
+        "as_of": "2026-09-16T09:31:03.782545+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LAC",
@@ -1678,7 +1685,7 @@
         "title": "LV explosives vs LAC prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:57.221895+00:00",
+        "as_of": "2026-09-16T09:31:03.784118+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "LV",
@@ -1872,7 +1879,7 @@
     "matchup": "MIA @ SF",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.798384+00:00",
+        "as_of": "2026-09-16T09:30:53.271809+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1882,7 +1889,7 @@
         "title": "What Bobby Slowik could change in MIA"
       },
       {
-        "as_of": "2026-09-16T06:36:59.006088+00:00",
+        "as_of": "2026-09-16T09:31:05.570400+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIA",
@@ -1892,7 +1899,7 @@
         "title": "MIA protection vs SF pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:59.006912+00:00",
+        "as_of": "2026-09-16T09:31:05.571198+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "SF",
@@ -1902,7 +1909,7 @@
         "title": "MIA early-down approach vs SF"
       },
       {
-        "as_of": "2026-09-16T06:36:59.007974+00:00",
+        "as_of": "2026-09-16T09:31:05.572216+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "MIA",
@@ -2105,7 +2112,7 @@
     "matchup": "MIN @ CHI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.793567+00:00",
+        "as_of": "2026-09-16T09:30:53.266811+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2115,7 +2122,7 @@
         "title": "What Press Taylor could change in CHI"
       },
       {
-        "as_of": "2026-09-16T06:36:53.116281+00:00",
+        "as_of": "2026-09-16T09:30:59.683865+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
@@ -2125,7 +2132,7 @@
         "title": "CHI protection vs MIN pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:53.116795+00:00",
+        "as_of": "2026-09-16T09:30:59.684329+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CHI",
@@ -2135,7 +2142,7 @@
         "title": "CHI explosives vs MIN prevention"
       },
       {
-        "as_of": "2026-09-16T06:34:56.292715+00:00",
+        "as_of": "2026-09-16T09:28:44.655939+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2186,7 +2193,7 @@
     ],
     "paragraphs": [
       "Both teams entered Week 2 riding offensive fireworks and defensive swagger. Chicago\u2019s Ben Johnson looks to keep his 59\u2011point debut momentum alive, while Minnesota\u2019s Brian Flores boasts the league\u2019s top blitz rate after a four\u2011sack showing against Green Bay. The clash will hinge on whether the Bears can sustain big\u2011play passing against a Vikings front that thrives on pressure, and if Minnesota can force turnovers before Chicago\u2019s rhythm stalls.",
-      "LevLine 3.0 gives the Bears a 68.2% win probability over the Vikings. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 66.9% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -6.1, a market line of Chicago Bears -5.5, and an approximate coherent score of CHI 26 \u2013 MIN 19. Chicago's explosive passing will test Minnesota's aggressive blitz, while the Vikings' disciplined pass rush aims to disrupt Ben Johnson's tempo throughout the game and force. The pick: Chicago Bears moneyline."
+      "LevLine 3.0 gives the Bears a 67.6% win probability over the Vikings. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 66.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -5.9, a market line of Chicago Bears -5.5, and an approximate coherent score of CHI 25 \u2013 MIN 20. Chicago's explosive passing will test Minnesota's aggressive blitz, while the Vikings' disciplined pass rush aims to disrupt Ben Johnson's tempo throughout the game and force. The pick: Chicago Bears moneyline."
     ],
     "prediction": "CHI to win; CHI 22.7 \u2013 MIN 22.3 is the central score projection.",
     "reported_sources": [
@@ -2232,7 +2239,7 @@
         "BAL protection vs NO pass rush"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 10,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -2283,13 +2290,6 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "BAL early-down approach vs NO"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.278&longitude=-76.6227&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in BAL"
       }
     ],
     "game_id": "2026_02_NO_BAL",
@@ -2330,7 +2330,7 @@
     "matchup": "NO @ BAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:34:55.023149+00:00",
+        "as_of": "2026-09-16T09:28:43.505786+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2340,7 +2340,7 @@
         "title": "New defensive coordinator in BAL"
       },
       {
-        "as_of": "2026-09-16T06:36:52.527359+00:00",
+        "as_of": "2026-09-16T09:30:59.092993+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BAL",
@@ -2350,7 +2350,7 @@
         "title": "NO explosives vs BAL prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:52.528196+00:00",
+        "as_of": "2026-09-16T09:30:59.093792+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "BAL",
@@ -2360,7 +2360,7 @@
         "title": "BAL protection vs NO pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:52.528987+00:00",
+        "as_of": "2026-09-16T09:30:59.094572+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BAL",
@@ -2454,7 +2454,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 11,
-      "provider_freshness_advisory": null,
+      "provider_freshness_advisory": "newer_reporting_available",
       "reporting_first": true,
       "secondary_variant": 11,
       "slate_aware": true,
@@ -2557,7 +2557,7 @@
     "matchup": "NYG @ LA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.799440+00:00",
+        "as_of": "2026-09-16T09:30:53.272881+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2567,7 +2567,7 @@
         "title": "What Matt Nagy could change in NYG"
       },
       {
-        "as_of": "2026-09-16T06:37:00.176105+00:00",
+        "as_of": "2026-09-16T09:31:06.735271+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LA",
@@ -2577,7 +2577,7 @@
         "title": "LA explosives vs NYG prevention"
       },
       {
-        "as_of": "2026-09-16T06:37:00.174264+00:00",
+        "as_of": "2026-09-16T09:31:06.733514+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -2587,7 +2587,7 @@
         "title": "NYG protection vs LA pass rush"
       },
       {
-        "as_of": "2026-09-16T06:37:00.175085+00:00",
+        "as_of": "2026-09-16T09:31:06.734286+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYG",
@@ -2693,7 +2693,7 @@
         "PHI explosives vs TEN prevention"
       ],
       "media_led": true,
-      "media_source_count": 1,
+      "media_source_count": 3,
       "primary_variant": 12,
       "provider_freshness_advisory": null,
       "reporting_first": true,
@@ -2784,7 +2784,7 @@
     "matchup": "PHI @ TEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:35:40.388718+00:00",
+        "as_of": "2026-09-16T09:28:48.534863+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2794,7 +2794,7 @@
         "title": "PHI offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-16T06:36:56.046086+00:00",
+        "as_of": "2026-09-16T09:31:02.611165+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TEN",
@@ -2804,7 +2804,7 @@
         "title": "PHI explosives vs TEN prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:56.047715+00:00",
+        "as_of": "2026-09-16T09:31:02.612758+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "PHI",
@@ -2814,7 +2814,7 @@
         "title": "TEN early-down approach vs PHI"
       },
       {
-        "as_of": "2026-09-16T06:36:56.046437+00:00",
+        "as_of": "2026-09-16T09:31:02.611546+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "TEN",
@@ -3010,7 +3010,7 @@
     "matchup": "PIT @ NE",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.794146+00:00",
+        "as_of": "2026-09-16T09:30:53.267407+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3020,7 +3020,7 @@
         "title": "What Patrick Graham could change in PIT"
       },
       {
-        "as_of": "2026-09-16T06:36:54.290372+00:00",
+        "as_of": "2026-09-16T09:31:00.856671+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "PIT",
@@ -3030,7 +3030,7 @@
         "title": "PIT explosives vs NE prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:54.291198+00:00",
+        "as_of": "2026-09-16T09:31:00.857535+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NE",
@@ -3040,7 +3040,7 @@
         "title": "NE protection vs PIT pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:54.290660+00:00",
+        "as_of": "2026-09-16T09:31:00.856966+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "PIT",
@@ -3230,7 +3230,7 @@
     "matchup": "SEA @ ARI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:36:46.797492+00:00",
+        "as_of": "2026-09-16T09:30:53.270899+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3240,7 +3240,7 @@
         "title": "What Nathaniel Hackett could change in ARI"
       },
       {
-        "as_of": "2026-09-16T06:36:57.812241+00:00",
+        "as_of": "2026-09-16T09:31:04.373129+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "SEA",
@@ -3250,7 +3250,7 @@
         "title": "ARI explosives vs SEA prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:57.812507+00:00",
+        "as_of": "2026-09-16T09:31:04.373422+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ARI",
@@ -3260,7 +3260,7 @@
         "title": "ARI early-down approach vs SEA"
       },
       {
-        "as_of": "2026-09-16T06:36:22.072393+00:00",
+        "as_of": "2026-09-16T09:29:30.098288+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -3415,13 +3415,6 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "DAL YAC creation vs WAS tackling"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=32.7473&longitude=-97.0945&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in DAL"
       }
     ],
     "game_id": "2026_02_WAS_DAL",
@@ -3462,7 +3455,7 @@
     "matchup": "WAS @ DAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T06:37:07.331341+00:00",
+        "as_of": "2026-09-16T09:31:13.854731+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -3472,7 +3465,7 @@
         "title": "Dak Prescott vs WAS: player history"
       },
       {
-        "as_of": "2026-09-16T06:36:58.402899+00:00",
+        "as_of": "2026-09-16T09:31:04.951905+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -3482,7 +3475,7 @@
         "title": "WAS explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-16T06:36:58.403734+00:00",
+        "as_of": "2026-09-16T09:31:04.952757+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "WAS",
@@ -3492,7 +3485,7 @@
         "title": "DAL protection vs WAS pass rush"
       },
       {
-        "as_of": "2026-09-16T06:36:58.404540+00:00",
+        "as_of": "2026-09-16T09:31:04.953554+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "WAS",
