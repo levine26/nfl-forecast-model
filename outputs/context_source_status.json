@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-16T09:31:16.956430+00:00",
+    "as_of": "2026-09-16T12:36:13.096637+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-16T09:31:20.275512+00:00",
+    "as_of": "2026-09-16T12:36:17.117182+00:00",
     "conflicts": 0,
     "evidence_items_added": 26,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 26
   },
   "coaching": {
-    "as_of": "2026-09-16T09:28:38.253889+00:00",
+    "as_of": "2026-09-16T12:34:15.934720+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -103,7 +103,22 @@
   },
   "copilot_media": {
     "advisories": {
-      "2026_02_NYG_LA": "newer_reporting_available"
+      "2026_02_CAR_ATL": "provider_artifact_older_than_refresh_window",
+      "2026_02_CIN_HOU": "provider_artifact_older_than_refresh_window",
+      "2026_02_CLE_TB": "provider_artifact_older_than_refresh_window",
+      "2026_02_DET_BUF": "provider_artifact_older_than_refresh_window",
+      "2026_02_GB_NYJ": "provider_artifact_older_than_refresh_window",
+      "2026_02_IND_KC": "provider_artifact_older_than_refresh_window",
+      "2026_02_JAX_DEN": "provider_artifact_older_than_refresh_window",
+      "2026_02_LV_LAC": "provider_artifact_older_than_refresh_window",
+      "2026_02_MIA_SF": "provider_artifact_older_than_refresh_window",
+      "2026_02_MIN_CHI": "provider_artifact_older_than_refresh_window",
+      "2026_02_NO_BAL": "provider_artifact_older_than_refresh_window",
+      "2026_02_NYG_LA": "provider_artifact_older_than_refresh_window",
+      "2026_02_PHI_TEN": "provider_artifact_older_than_refresh_window",
+      "2026_02_PIT_NE": "provider_artifact_older_than_refresh_window",
+      "2026_02_SEA_ARI": "provider_artifact_older_than_refresh_window",
+      "2026_02_WAS_DAL": "provider_artifact_older_than_refresh_window"
     },
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
@@ -126,7 +141,7 @@
     "unique_headlines": 16
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-16T09:31:07.305498+00:00",
+    "as_of": "2026-09-16T12:36:02.880828+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -153,9 +168,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-16T09:28:35.563896+00:00",
+    "generated_utc": "2026-09-16T12:34:15.667817+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 143,
+    "signals": 145,
     "status": "healthy"
   },
   "ftn": {
@@ -168,9 +183,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-16T09:28:35.563896+00:00",
+  "generated_utc": "2026-09-16T12:34:15.667817+00:00",
   "injuries": {
-    "as_of": "2026-09-16T09:28:35.718719+00:00",
+    "as_of": "2026-09-16T12:34:15.807111+00:00",
     "players": 11,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg2",
@@ -178,14 +193,14 @@
     "teams_with_reported_players": 2
   },
   "media_reporting": {
-    "as_of": "2026-09-16T09:31:26.267004+00:00",
+    "as_of": "2026-09-16T12:36:23.926193+00:00",
     "cross_game_titles_rejected": 0,
     "games": 16,
     "games_with_display_reporting": 16,
     "games_with_reporting": 16,
-    "games_with_substantive_reporting": 15,
+    "games_with_substantive_reporting": 14,
     "games_with_trusted_reporting": 16,
-    "generic_titles_rejected": 17,
+    "generic_titles_rejected": 18,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -197,12 +212,12 @@
         "status": "unavailable"
       }
     },
-    "signals": 62,
+    "signals": 63,
     "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-16T09:31:19.471887+00:00",
+    "as_of": "2026-09-16T12:36:16.127886+00:00",
     "evidence_items_added": 25,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 25,
@@ -275,7 +290,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-16T09:28:40.676558+00:00",
+    "as_of": "2026-09-16T12:34:18.658505+00:00",
     "charted_plays": 2675,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -308,7 +323,7 @@
     "story_items_added": 16
   },
   "weather": {
-    "as_of": "2026-09-16T09:30:52.614696+00:00",
+    "as_of": "2026-09-16T12:35:47.619497+00:00",
     "games_checked": 14,
     "status": "degraded"
   }
