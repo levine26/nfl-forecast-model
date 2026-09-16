@@ -2,8 +2,9 @@
   "contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-EXECUTION-V1",
   "status": "PREREGISTERED_BEFORE_FIRST_WEEK2_REAL_EXECUTION",
   "season": 2026,
+  "supported_weeks": [2],
   "purpose": [
-    "preserve the first real Week 2+ official inactive article cohort extraction under the already-qualified V2 parser semantics",
+    "preserve the first real Week 2 official inactive article cohort extraction under the already-qualified V2 parser semantics",
     "execute the already-frozen same-week/team exact-name GSIS resolver without modifying its rule",
     "cross-check resolver outputs against the separately frozen team/status-free global player dictionary without using that dictionary as a fallback",
     "persist immutable pre-kickoff evidence for later identity qualification research"
@@ -17,6 +18,8 @@
     "resolver": {
       "contract_id": "LEVLINE-2026-PROSPECTIVE-INACTIVE-GSIS-RESOLVER-V1",
       "weekly_identity_projection_sha256": "fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f",
+      "weekly_identity_projection_weeks_present": [1, 2],
+      "week_1_use_for_membership_or_availability_forbidden": true,
       "artifact_run_id": 35113550399,
       "artifact_name": "levline4-2026-status-free-identity-source-v1-35113550399",
       "status_fields_available_to_resolver": false
@@ -34,7 +37,8 @@
   "live_source_selection": {
     "source_archive_id": "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
     "eligible_window_minutes_to_kickoff": [20, 100],
-    "qualified_game_day_semantics": "Sunday in America/New_York only",
+    "qualified_game_day_semantics": "Week 2 Sunday in America/New_York only",
+    "unsupported_week_behavior": "preserve raw source evidence and skip before downloading or reading identity sources",
     "non_sunday_due_cohort_behavior": "preserve raw source evidence and skip parser/resolver execution",
     "candidate_source_kind": "nfl_inactives_news_article",
     "selection_rule": "parse every successfully captured candidate article; retain candidates with zero parser integrity failures and all currently due cohort teams present; require exactly one distinct raw-body SHA among matching candidates; otherwise do not execute authority-bearing downstream work",
