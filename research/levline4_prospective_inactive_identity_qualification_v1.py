@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-"""Evaluate the preregistered first Week 2 Sunday inactive identity execution.
+"""Evaluate first Week 2 Sunday inactive identity mechanics under frozen gates.
 
 Research-only: this module evaluates immutable evidence already captured by the frozen
-prospective executor. It cannot repair resolver misses, substitute a later execution,
-attach player value, or affect forecasts.
+prospective executor. The weekly and global identity artifacts are both nflverse-derived,
+so cross-artifact agreement is a consistency audit, not source-independent identity truth.
+It cannot repair resolver misses, substitute a later execution, attach player value, or
+affect forecasts.
 """
 
 from collections import Counter
@@ -53,7 +55,8 @@ def wilson_lower(successes: int, total: int, z: float = 1.959963984540054) -> fl
 
 def _first_identity_execution(attempts: list[dict[str, Any]]) -> dict[str, Any]:
     candidates = [
-        row for row in attempts
+        row
+        for row in attempts
         if row.get("contract_id") == EXECUTION_CONTRACT_ID and row.get("execution_id")
     ]
     if not candidates:
@@ -81,7 +84,7 @@ def evaluate(*, execution_output_dir: Path) -> dict[str, Any]:
     total = len(resolver_rows)
     state_counts = Counter(str(row.get("resolution_state") or "") for row in resolver_rows)
     exact_unique = state_counts.get("RESOLVED_EXACT_UNIQUE", 0)
-    ambiguities = sum(count for state, count in state_counts.items() if "AMBIG" in state.upper())
+    ambiguities = state_counts.get("AMBIGUOUS", 0)
     exact_unique_rate = exact_unique / total if total else 0.0
 
     audit_counts = Counter(str(row.get("audit_state") or "") for row in audit_rows)
@@ -97,7 +100,10 @@ def evaluate(*, execution_output_dir: Path) -> dict[str, Any]:
     exact_due_team_coverage = bool(due_teams) and parsed_teams == due_teams
 
     lengths_consistent = (
-        len(parsed_rows) == len(resolver_inputs) == len(resolver_rows) == len(audit_rows)
+        len(parsed_rows)
+        == len(resolver_inputs)
+        == len(resolver_rows)
+        == len(audit_rows)
         == int(first.get("due_cohort_inactive_entries", -1))
     )
     observation_ids_consistent = (
@@ -132,39 +138,52 @@ def evaluate(*, execution_output_dir: Path) -> dict[str, Any]:
         "dependency_shas_match": dependency_shas_match,
         "exact_unique_resolution_rate_gte_0_995": exact_unique_rate >= MIN_EXACT_UNIQUE_RATE,
         "ambiguities_zero": ambiguities <= MAX_AMBIGUITIES,
-        "cross_source_contradictions_zero": contradictions <= MAX_CONTRADICTIONS,
-        "independent_auditable_fraction_gte_0_80": auditable_fraction >= MIN_AUDITABLE_FRACTION,
-        "independent_auditable_rows_gte_73": auditable >= MIN_AUDITABLE_ROWS,
-        "independent_audit_agreement_eq_1": math.isclose(audit_agreement, REQUIRED_AUDIT_AGREEMENT, rel_tol=0.0, abs_tol=0.0),
-        "independent_agreement_wilson95_lower_gte_0_95": audit_wilson_lower >= MIN_WILSON95_LOWER,
+        "cross_artifact_contradictions_zero": contradictions <= MAX_CONTRADICTIONS,
+        "cross_artifact_auditable_fraction_gte_0_80": auditable_fraction >= MIN_AUDITABLE_FRACTION,
+        "cross_artifact_auditable_rows_gte_73": auditable >= MIN_AUDITABLE_ROWS,
+        "cross_artifact_agreement_eq_1": math.isclose(
+            audit_agreement, REQUIRED_AUDIT_AGREEMENT, rel_tol=0.0, abs_tol=0.0
+        ),
+        "cross_artifact_agreement_wilson95_lower_gte_0_95": audit_wilson_lower >= MIN_WILSON95_LOWER,
         "global_source_never_used_as_fallback": no_global_fallback,
         "research_authority_firewall_intact": authority_firewall_intact,
     }
-    passed = all(gates.values())
+    mechanics_passed = all(gates.values())
 
     return {
         "schema_version": "levline4-2026-prospective-inactive-identity-qualification-v1",
         "contract_id": CONTRACT_ID,
-        "status": "PASS_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY" if passed else "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY",
+        "status": (
+            "PASS_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
+            if mechanics_passed
+            else "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
+        ),
         "evaluated_execution_id": execution_id,
         "evaluated_attempt_id": first.get("attempt_id"),
         "evaluated_captured_at_utc": first.get("captured_at_utc"),
         "first_identity_execution_only": True,
+        "source_lineage": {
+            "weekly_identity_provider": "nflverse",
+            "global_identity_provider": "nflverse",
+            "cross_artifact_audit_is_source_independent": False,
+        },
         "metrics": {
             "total_resolver_rows": total,
             "exact_unique_resolutions": exact_unique,
             "exact_unique_resolution_rate": exact_unique_rate,
             "ambiguities": ambiguities,
-            "independently_auditable_rows": auditable,
-            "independently_auditable_fraction_of_exact_unique": auditable_fraction,
-            "cross_source_corroborated": corroborated,
-            "cross_source_contradictions": contradictions,
-            "independent_audit_agreement": audit_agreement,
-            "independent_agreement_wilson95_lower_bound": audit_wilson_lower,
+            "cross_artifact_auditable_rows": auditable,
+            "cross_artifact_auditable_fraction_of_exact_unique": auditable_fraction,
+            "cross_artifact_corroborated": corroborated,
+            "cross_artifact_contradictions": contradictions,
+            "cross_artifact_agreement": audit_agreement,
+            "cross_artifact_agreement_wilson95_lower_bound": audit_wilson_lower,
         },
         "gates": gates,
         "authority": {
-            "week2_sunday_due_inactive_player_identity_to_gsis_qualified": passed,
+            "week2_sunday_due_inactive_identity_mechanics_validated": mechanics_passed,
+            "week2_sunday_due_inactive_player_identity_to_gsis_qualified": False,
+            "source_independent_identity_validation_still_required": True,
             "general_2026_player_identity_to_gsis_qualified": False,
             "game_day_membership_qualified": False,
             "active_or_healthy_inference_from_absence_authorized": False,
