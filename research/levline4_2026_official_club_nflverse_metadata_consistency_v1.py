@@ -110,14 +110,16 @@ def _week2_identity_metadata(frame: pl.DataFrame) -> tuple[dict[tuple[str, str],
     metadata: dict[tuple[str, str], dict[str, Any]] = {}
     conflicts: set[tuple[str, str]] = set()
     for key, rows in grouped.items():
-        variants = {
-            None if row.get("jersey_number") is None else str(row.get("jersey_number")).strip()
-            for row in rows
-        }
+        variants = {normalize_jersey(row.get("jersey_number")) for row in rows}
         if len(variants) != 1:
             conflicts.add(key)
             continue
-        metadata[key] = {"jersey_number": next(iter(variants)), "row_count": len(rows)}
+        jersey_number, jersey_invalid = next(iter(variants))
+        metadata[key] = {
+            "jersey_number": jersey_number,
+            "jersey_invalid": jersey_invalid,
+            "row_count": len(rows),
+        }
     return metadata, conflicts
 
 
@@ -164,7 +166,8 @@ def evaluate(
                 identity_metadata_conflict = True
             else:
                 meta = identity_metadata[key]
-                identity_jersey, identity_invalid = normalize_jersey(meta.get("jersey_number"))
+                identity_jersey = meta.get("jersey_number")
+                identity_invalid = bool(meta.get("jersey_invalid"))
                 if official_invalid:
                     invalid_jersey_count += 1
                 if identity_invalid:
