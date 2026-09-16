@@ -1,0 +1,89 @@
+{
+  "contract_id": "LEVLINE-2026-PROSPECTIVE-INACTIVE-GSIS-RESOLVER-V1",
+  "status": "PREREGISTERED_PROSPECTIVE_RESOLVER_ONLY",
+  "dependency": {
+    "source_capture_contract_id": "LEVLINE-4-2026-STATUS-FREE-IDENTITY-SOURCE-V1",
+    "source_capture_receipt_id": "LEVLINE-4-2026-STATUS-FREE-IDENTITY-SOURCE-V1-QUALIFIED",
+    "source_capture_receipt_path": "research/levline4_2026_identity_source_capture_v1_receipt.json",
+    "source_capture_empirical_status_required": "EMPIRICAL_SOURCE_CAPTURE_COMPLETE_SOURCE_QUALIFIED",
+    "source_projection_sha256": "fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f",
+    "source_known_by_utc": "2026-09-16T12:35:57Z",
+    "source_fields": [
+      "season",
+      "game_type",
+      "week",
+      "team",
+      "gsis_id",
+      "jersey_number",
+      "first_name",
+      "football_name",
+      "last_name"
+    ],
+    "status_fields_available_to_resolver": false
+  },
+  "target_observation_contract": {
+    "required_fields": [
+      "observation_id",
+      "week",
+      "team",
+      "player_name_rendered",
+      "source_known_by_utc",
+      "raw_evidence_sha256"
+    ],
+    "source_known_by_must_be_on_or_after_identity_source_known_by": true,
+    "week_1_rows_authorized": false,
+    "postgame_observations_authorized": false
+  },
+  "normalization": {
+    "unicode": "NFKC",
+    "case": "casefold",
+    "punctuation": "all non-alphanumeric characters become a single space",
+    "whitespace": "collapse and trim",
+    "terminal_suffix_tokens_removed_for_comparison": ["jr", "sr", "ii", "iii", "iv", "v"],
+    "suffix_removal_scope": "at most one terminal token on both source aliases and rendered observation",
+    "reason": "Common orthographic punctuation/suffix differences are normalized before matching, but uniqueness is still required after normalization."
+  },
+  "source_aliases": [
+    "first_name + last_name",
+    "football_name + last_name"
+  ],
+  "resolution_rule": {
+    "candidate_universe": "same 2026 REG week and exact normalized team only",
+    "resolved": "normalized rendered name maps to exactly one non-null GSIS id across all source aliases",
+    "unresolved": "normalized rendered name maps to zero GSIS ids",
+    "ambiguous": "normalized rendered name maps to more than one GSIS id",
+    "position_used": false,
+    "jersey_number_used": false,
+    "status_used": false,
+    "fuzzy_matching_used": false,
+    "phonetic_matching_used": false,
+    "adjacent_week_fallback_used": false,
+    "season_wide_fallback_used": false,
+    "manual_override_used": false,
+    "tie_breaking_used": false
+  },
+  "authority": {
+    "resolver_execution_authorized_for_prospective_research": true,
+    "week_1_retroactive_resolution_authorized": false,
+    "player_identity_to_gsis_qualified": false,
+    "player_value_join_authorized": false,
+    "game_day_membership_qualified": false,
+    "availability_probability_feature_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "qualification_policy": {
+    "this_pr_may_not_self_qualify_from_synthetic_tests": true,
+    "first_real_execution_must_use_only_observations_known_after_source_known_by": true,
+    "first_real_execution_result_must_be_preserved_without_rule_changes": true,
+    "qualification_requires_separate_empirical_audit_identity": true,
+    "no_resolution_rate_threshold_is_authorized_until_independent_audit_truth_source_is_preregistered": true
+  },
+  "governance": {
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": false,
+    "postgame_snaps_used": false,
+    "production_forecast_mutation": false
+  }
+}
