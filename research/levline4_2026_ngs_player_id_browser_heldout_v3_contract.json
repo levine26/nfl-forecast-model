@@ -1,0 +1,207 @@
+{
+  "authority_if_and_only_if_all_v3_gates_pass": {
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "game_day_membership_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "ngs_endpoint_as_independent_or_stable_production_api_qualified": false,
+    "ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population": true,
+    "ngs_is_independent_player_identity_ground_truth": false,
+    "ngs_public_page_browser_context_transport_qualified_for_frozen_official_roster_v2_population": true,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": true,
+    "player_value_join_authorized": false,
+    "production_authorized": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "authority_if_any_v3_gate_fails": {
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population": false,
+    "ngs_public_page_browser_context_transport_qualified_for_frozen_official_roster_v2_population": false,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": false,
+    "production_authorized": false,
+    "required_next_action": "Freeze the failed first result; any revised browser action, timeout, transport, resolver, threshold, selection rule, source, or retry behavior must be a new version.",
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "browser_transport": {
+    "alternate_name_query_allowed": false,
+    "browser_storage_state_must_not_be_persisted": true,
+    "context_locale": "en-US",
+    "context_user_agent": "LevLine-Research/1.0 (+https://github.com/levine26/nfl-forecast-model)",
+    "cookie_or_browser_state_export_allowed": false,
+    "direct_http_fallback_allowed": false,
+    "engine": "playwright chromium headless",
+    "explicit_retry_allowed": false,
+    "fuzzy_query_allowed": false,
+    "manual_headers_or_credentials_allowed": false,
+    "page_load_timeout_ms": 60000,
+    "page_load_wait_until": "domcontentloaded",
+    "page_url": "https://ngs.nfl.com/player-id-lookup",
+    "post_load_settle_ms": 1500,
+    "query_action": "For each frozen target in deterministic target order: fill the exact official visible_name into the unique exact-placeholder input, then press Enter exactly once.",
+    "query_input_placeholder_exact": "Search By Name (min 3 chars)",
+    "raw_response_bytes_must_be_preserved": true,
+    "required_success_shape": "HTTP 200 JSON object containing a players array for every one of the 70 target actions.",
+    "response_match": "First HTTPS response whose host is api.ngs.nfl.com, path is /league/player/search, and decoded term query parameter equals the exact target visible_name.",
+    "response_timeout_ms": 15000
+  },
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V3",
+  "corroboration_diagnostics": {
+    "jersey": {
+      "ngs_value": "integer-normalized selected candidate uniformNumber, else jerseyNumber, when nonempty and parseable",
+      "official_value": "integer-normalized target.jersey_number when nonempty and parseable",
+      "used_for_selection": false
+    },
+    "position": {
+      "record_ngs_position_and_position_group": true,
+      "record_official_position": true,
+      "used_as_qualification_gate": false,
+      "used_for_selection": false
+    },
+    "status": {
+      "availability_semantics_authorized": false,
+      "may_be_recorded_as_raw_source_metadata": true,
+      "used_for_availability": false,
+      "used_for_selection": false
+    }
+  },
+  "fixed_resolution_rule": {
+    "candidate_name_match": "normalize(players[].displayName) must equal normalize(target.visible_name) exactly",
+    "candidate_team_match": "strip(players[].teamAbbr).upper() must equal strip(target.team).upper() exactly; no team alias substitution",
+    "fallback_matching_allowed": false,
+    "fields_forbidden_from_selection": [
+      "position",
+      "positionGroup",
+      "jerseyNumber",
+      "uniformNumber",
+      "status",
+      "statusShortDescription",
+      "nflId",
+      "esbId",
+      "smartId"
+    ],
+    "manual_resolution_allowed": false,
+    "selected_candidate_rule": "Exactly one response candidate must satisfy both candidate_name_match and candidate_team_match, and its gsisId must match ^00-[0-9]{7}$. Zero or multiple matching candidates are unresolved.",
+    "unresolved_rows_fail_closed": true
+  },
+  "frozen_pass_gates": {
+    "all_70_targets_must_end_with_browser_observed_http_200_parseable_players_array": true,
+    "coverage_stratum_unique_resolution_minimum_count": 61,
+    "coverage_stratum_unique_resolution_minimum_fraction": 0.953125,
+    "duplicate_selected_gsis_across_distinct_target_rows_allowed": 0,
+    "invalid_selected_gsis_count_allowed": 0,
+    "manual_unresolved_repair_before_gate_allowed": false,
+    "page_loaded_and_unique_query_input_required": true,
+    "resolved_coverage_jersey_agreement_minimum_fraction": 0.95,
+    "resolved_coverage_jersey_comparable_minimum_fraction": 0.8,
+    "same_target_multiple_name_plus_team_candidate_count_allowed": 0,
+    "source_name_ambiguity_stratum_unique_resolution_required_count": 6,
+    "source_name_ambiguity_stratum_unique_resolution_required_fraction": 1.0,
+    "threshold_relaxation_after_first_result_allowed": false
+  },
+  "frozen_upstream_evidence": {
+    "ngs_heldout_v2": {
+      "artifact_digest": "sha256:c7bce3e329fa21e0d0ae9d627a89273fd52bb03ed66fff9c5dad54b2ac78db33",
+      "artifact_id": 10471546654,
+      "direct_anonymous_http_transport_qualified": false,
+      "head_sha": "00dc6765d781c83db657ee10172eb3000097703a",
+      "http_401_count": 70,
+      "resolver_semantics_falsified_by_v2": false,
+      "result": "FAIL",
+      "semantic_candidate_responses_observed": 0,
+      "target_count": 70,
+      "v2_result_may_change_only_v3_transport_choice": true,
+      "workflow_run_id": 35157178143
+    },
+    "ngs_surface_v1": {
+      "artifact_digest": "sha256:0559c6977c66c4c1ca5200fa805288f27a31f545c957948693b5c1de5f3f2bf9",
+      "artifact_id": 10470775804,
+      "browser_issued_player_search_http_200_observed": true,
+      "browser_page_url": "https://ngs.nfl.com/player-id-lookup",
+      "endpoint_template_observed": "https://api.ngs.nfl.com/league/player/search?term={query}",
+      "head_sha": "e0dc6ffe4651d858612176914c1728d83a88dc98",
+      "name_only_ambiguity_observed": true,
+      "name_to_gsis_parser_qualified": false,
+      "query_input_placeholder_exact": "Search By Name (min 3 chars)",
+      "result": "PASS",
+      "surface_capture_qualified": true,
+      "workflow_run_id": 35154092751
+    },
+    "official_club_roster_v2": {
+      "artifact_digest": "sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e",
+      "artifact_id": 10461126275,
+      "head_sha": "1280e4a06eacf3e30700f75d4dab9ecff99944a4",
+      "independent_gsis_ground_truth": false,
+      "official_club_roster_metadata_parser_qualified": true,
+      "roster_metadata_sha256": "90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f",
+      "row_count": 2463,
+      "team_count": 32,
+      "workflow_run_id": 35130069924
+    }
+  },
+  "governance": {
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "f_st_01_frozen_2026_unchanged": true,
+    "next_phase_after_pass": "Separately preregister a PIT inactive/availability identity application. V3 itself cannot authorize availability, player-value joins, forecast effects, model fitting, or production.",
+    "postgame_participation_used": false,
+    "production_paths_may_change": false,
+    "research_only": true,
+    "week2_inactive_execution_evidence_used_for_design": false
+  },
+  "preregistration_state": {
+    "contract_must_precede_executable_v3_probe": true,
+    "first_result_is_canonical_whether_pass_or_fail": true,
+    "later_same_version_execution_may_replace_first_result": false,
+    "no_v3_target_browser_ngs_responses_observed_before_contract_freeze": true,
+    "same_version_rule_adaptation_after_first_result": false,
+    "v2_semantic_candidate_data_observed_for_v3_targets": false,
+    "v2_transport_failure_may_inform_v3_transport_only": true
+  },
+  "purpose": "Held-out validation of the frozen official-roster exact-name-plus-team resolver using the public NFL NGS player-ID lookup page's own browser request context after V2 established that anonymous direct HTTP returned 401 for every target. V3 changes only transport/context; target selection, name normalization, semantic resolver, GSIS format, corroboration diagnostics, pass thresholds, and authority ceiling remain the V2 rules.",
+  "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v3-contract",
+  "target_selection": {
+    "coverage_stratum": {
+      "expected_target_count": 64,
+      "expected_team_count": 32,
+      "rule": "For each of the 32 teams in lexicographic team order, sort eligible non-sentinel rows by selection_key SHA-256 ascending, then visible_name ascending, then profile_path ascending; take exactly the first 2 rows."
+    },
+    "eligibility": {
+      "no_week2_inactive_or_availability_input_may_be_consulted": true,
+      "position_nonempty": true,
+      "team_nonempty": true,
+      "visible_name_nonempty": true
+    },
+    "expected_overlap_count": 0,
+    "expected_total_target_count": 70,
+    "name_normalization": "Unicode NFKD; encode ASCII with non-ASCII combining/content dropped; lowercase; replace each maximal run of non-[a-z0-9] with one space; trim; collapse whitespace. Token order is preserved and suffix tokens are not removed.",
+    "reason_reuse_is_heldout_for_semantics": "V2 observed no target players arrays or candidate identities; all 70 requests stopped at HTTP 401.",
+    "reuse_exact_v2_70_target_population": true,
+    "reuse_exact_v2_selection_rule": true,
+    "selection_key": {
+      "algorithm": "sha256",
+      "ordered_fields": [
+        "team",
+        "visible_name",
+        "position",
+        "jersey_number_or_empty",
+        "profile_path_or_empty"
+      ],
+      "separator": "U+001F"
+    },
+    "source": "Only the pinned official_club_roster_v2 roster_metadata.jsonl above.",
+    "source_name_ambiguity_stratum": {
+      "expected_duplicate_name_group_count": 3,
+      "expected_target_count": 6,
+      "rule": "Among all eligible non-sentinel source rows, group by normalized visible_name. Include every row in every group represented on more than one distinct team. Do not select or rank ambiguity groups using NGS data."
+    },
+    "union_rule": "Take the row-identity union of coverage_stratum and source_name_ambiguity_stratum keyed by team, visible_name, and profile_path.",
+    "v1_sentinel_visible_name_exclusions": [
+      "Patrick Mahomes",
+      "Josh Allen",
+      "Justin Jefferson"
+    ]
+  }
+}
