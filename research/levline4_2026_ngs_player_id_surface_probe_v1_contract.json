@@ -1,0 +1,91 @@
+{
+  "contract_version": 1,
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-SURFACE-PROBE-V1",
+  "status": "PREREGISTERED_DISCOVERY_CAPTURE_ONLY",
+  "purpose": "Prospectively characterize the first-party NFL Next Gen Stats Player ID Lookup surface and its network responses so a later version can preregister deterministic direct GSIS-ID validation without adapting rules to Week 2 inactive players.",
+  "source": {
+    "provider": "NFL Next Gen Stats",
+    "page_url": "https://ngs.nfl.com/player-id-lookup",
+    "first_party_nfl_surface": true,
+    "displayed_columns_observed_before_contract": [
+      "Name",
+      "Team",
+      "Pos",
+      "NFL Id",
+      "GSIS Id",
+      "ESB Id",
+      "Smart Id",
+      "Status"
+    ],
+    "direct_gsis_column_visible_on_public_surface": true,
+    "backend_endpoint_known_before_v1": false
+  },
+  "frozen_discovery_queries": [
+    "Patrick Mahomes",
+    "Josh Allen",
+    "Justin Jefferson"
+  ],
+  "browser_capture": {
+    "headless_browser_allowed": true,
+    "query_input_placeholder_exact": "Search By Name (min 3 chars)",
+    "query_names_may_not_change_after_first_execution": true,
+    "raw_initial_dom_preserved": true,
+    "post_query_dom_preserved_per_query": true,
+    "same_origin_network_response_metadata_preserved": true,
+    "json_response_bodies_preserved_when_readable": true,
+    "response_url_status_content_type_sha256_required": true,
+    "captured_at_utc_required": true,
+    "screenshots_not_required": true,
+    "no_week2_inactive_names_may_be_added_to_v1": true
+  },
+  "frozen_diagnostics": {
+    "record_query_input_count": true,
+    "record_search_button_count": true,
+    "record_table_header_vectors": true,
+    "record_visible_text_containing_query": true,
+    "record_visible_strings_matching_gsis_pattern": "^00-[0-9]{7}$",
+    "record_json_response_count": true,
+    "record_json_response_urls": true,
+    "record_json_object_key_paths": true,
+    "diagnostics_may_not_select_or_qualify_a_backend_endpoint": true,
+    "diagnostics_may_not_qualify_name_to_gsis_truth": true
+  },
+  "privacy_and_semantics": {
+    "public_player_identity_metadata_only": true,
+    "status_column_must_not_be_used_for_availability": true,
+    "active_retired_filter_must_not_be_used_for_game_day_membership": true,
+    "injury_or_health_inference_authorized": false,
+    "postgame_participation_used": false
+  },
+  "v1_disposition": {
+    "surface_probe_complete_requires_page_load": true,
+    "all_three_fixed_queries_must_execute": true,
+    "at_least_one_gsis_pattern_seen_per_query_required_to_call_surface_probe_complete": false,
+    "backend_endpoint_qualified": false,
+    "direct_name_to_gsis_parser_qualified": false,
+    "player_identity_to_gsis_qualified": false,
+    "same_version_rule_adaptation_after_live_probe": false,
+    "follow_up_requires_new_preregistered_version": true
+  },
+  "authority": {
+    "ngs_surface_capture_may_qualify": true,
+    "ngs_backend_endpoint_qualified": false,
+    "ngs_name_to_gsis_parser_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "week2_inactive_execution_evidence_used_for_design": false,
+    "f_st_01_frozen_2026_unchanged": true,
+    "production_dependency_authorized": false
+  }
+}
