@@ -1,0 +1,127 @@
+name: LevLine 4 official club profile canonical manifest replay V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_official_club_player_profile_surface_probe_v1_first_result_manifest.json'
+      - '.github/workflows/research_levline4_2026_official_club_player_profile_manifest_replay_v1.yml'
+      - '.github/workflows/research_levline4_2026_official_club_player_profile_surface_probe_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  verify-canonical-manifest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Read frozen canonical coordinates
+        id: manifest
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          p=Path('research/levline4_2026_official_club_player_profile_surface_probe_v1_first_result_manifest.json')
+          m=json.loads(p.read_text())
+          assert m['schema_version']=='levline4-2026-official-club-player-profile-surface-probe-v1-first-result-manifest-v3'
+          assert m['contract_id']=='LEVLINE-4-2026-OFFICIAL-CLUB-PLAYER-PROFILE-SURFACE-PROBE-V1'
+          assert m['first_result_is_canonical'] is True
+          assert m['later_same_version_execution_may_replace_first_result'] is False
+          assert m['first_workflow_run_id']==35136388628
+          assert m['first_artifact_id']==10463865079
+          assert m['first_head_sha']=='db98ab7b37add137c536b21df78aa0e0bef6e407'
+          assert m['artifact_digest']=='sha256:4817196a26820c68c6d2054aaa02758779f5454314b4e033bba850f42c553ff3'
+          assert 'raw_tree_sha256' not in m
+          print(f"artifact_id={m['first_artifact_id']}")
+          print(f"artifact_digest={m['artifact_digest']}")
+          print(f"head_sha={m['first_head_sha']}")
+          PY
+      - name: Download named immutable first artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}")
+          test "$(echo "$meta" | jq -r .digest)" = "${{ steps.manifest.outputs.artifact_digest }}"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "35136388628"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "${{ steps.manifest.outputs.head_sha }}"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}/zip" > /tmp/profile_first.zip
+          rm -rf /tmp/profile_first
+          mkdir -p /tmp/profile_first
+          unzip -q /tmp/profile_first.zip -d /tmp/profile_first
+      - name: Prove committed manifest equals canonical artifact
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          manifest=json.loads(Path('research/levline4_2026_official_club_player_profile_surface_probe_v1_first_result_manifest.json').read_text())
+          root=Path('/tmp/profile_first')
+          receipt=json.loads((root/'receipt.json').read_text())
+          diagnostics=json.loads((root/'team_diagnostics.json').read_text())
+          selected=json.loads((root/'selected_profiles.json').read_text())
+
+          for name, expected in manifest['canonical_artifact_file_hashes'].items():
+              observed=hashlib.sha256((root/name).read_bytes()).hexdigest()
+              assert observed==expected, (name, observed, expected)
+
+          raw_files=sorted((root/'raw').glob('*.html'))
+          assert len(raw_files)==manifest['raw_file_team_count']==32
+          raw_total=sum(p.stat().st_size for p in raw_files)
+          assert raw_total==manifest['raw_total_bytes']==11421601
+          artifact_total=sum(p.stat().st_size for p in root.rglob('*') if p.is_file())
+          assert artifact_total==manifest['artifact_uncompressed_total_bytes']==11509972
+
+          by_team={row['team']:row for row in diagnostics}
+          assert len(by_team)==32
+          for team,row in by_team.items():
+              raw=root/'raw'/f'{team}.html'
+              assert raw.is_file(), raw
+              assert hashlib.sha256(raw.read_bytes()).hexdigest()==row['raw_html_sha256']
+
+          direct_fields=(
+              'status','selected_profile_count','captured_team_count','http_success_team_count',
+              'raw_file_team_count','pages_with_gsis_like_values','literal_token_page_counts',
+              'observed_id_like_attribute_names',
+          )
+          for key in direct_fields:
+              assert manifest[key]==receipt[key], (key, manifest[key], receipt[key])
+          assert manifest['source_error_count']==len(receipt['source_errors'])==0
+          assert len(selected)==32
+
+          for key,value in manifest['authority'].items():
+              assert receipt[key] is value, (key, receipt[key], value)
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert manifest['governance']['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert manifest['governance']['postgame_participation_used'] is False
+          assert manifest['governance']['target_inactive_rows_used_for_sample_selection_or_parser_design'] is False
+          assert manifest['governance']['same_version_parser_adaptation_after_first_result'] is False
+          assert manifest['governance']['manifest_reconciled_only_to_named_immutable_first_artifact'] is True
+          assert manifest['governance']['f_st_01_frozen_2026_unchanged'] is True
+
+          later=manifest['noncanonical_later_live_capture_before_replay_hardening']
+          assert later['workflow_run_id']==35136870891
+          assert later['artifact_id']==10464126056
+          assert later['may_replace_first_result'] is False
+          assert later['used_for_scientific_conclusion'] is False
+          assert later['used_for_rule_or_threshold_changes'] is False
+          print(json.dumps({
+              'canonical_artifact_id':manifest['first_artifact_id'],
+              'raw_files_verified':len(raw_files),
+              'raw_total_bytes':raw_total,
+              'espn_literal_pages':receipt['literal_token_page_counts']['espn'],
+              'gsis_like_pages':receipt['pages_with_gsis_like_values'],
+              'manifest_replay_pass':True,
+          },indent=2,sort_keys=True))
+          PY
+      - name: Prove replay is research-only
+        run: git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/
