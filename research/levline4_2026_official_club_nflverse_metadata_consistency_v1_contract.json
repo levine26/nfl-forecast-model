@@ -25,7 +25,8 @@
       "season": 2026,
       "game_type": "REG",
       "week": 2,
-      "status_fields_present": false
+      "status_fields_present": false,
+      "position_field_present": false
     },
     "separate_publishers": true,
     "statistical_or_upstream_data_independence_proven": false
@@ -60,8 +61,8 @@
     "jersey_compared_only_after_exact_unique_resolution": true,
     "jersey_normalization": "missing remains missing; otherwise finite integral numeric value 0 through 99 becomes canonical decimal string; any other nonempty value is invalid",
     "jersey_used_as_rescue": false,
-    "position_compared_descriptively_only": true,
-    "position_used_as_gate": false,
+    "position_comparison_performed": false,
+    "position_comparison_reason": "the frozen status-free nflverse projection intentionally excludes position",
     "missing_jersey_imputed": false
   },
   "qualification_gate": {
