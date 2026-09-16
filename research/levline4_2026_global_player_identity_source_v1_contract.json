@@ -1,0 +1,61 @@
+{
+  "contract_version": 1,
+  "contract_id": "LEVLINE-4-2026-GLOBAL-PLAYER-IDENTITY-SOURCE-V1",
+  "status": "PREREGISTERED_SOURCE_PROVENANCE_CAPTURE_ONLY",
+  "purpose": "Freeze a current global player-ID dictionary that can support future rendered-name-to-GSIS research without using team membership or roster status.",
+  "source": {
+    "provider": "nflverse",
+    "release_tag": "players",
+    "asset_id": 567981040,
+    "asset_name": "players.parquet",
+    "asset_created_at_utc": "2026-09-16T13:00:58Z",
+    "asset_size_bytes": 3386516,
+    "download_url": "https://github.com/nflverse/nflverse-data/releases/download/players/players.parquet",
+    "expected_sha256": "a6874a809c67a4a0b8749206fe1820fe25f440e460d78394d2ff762b94a3d32b",
+    "upstream_role": "go-to source for position and ID mappings",
+    "exact_initial_source_required": true
+  },
+  "identity_projection": {
+    "allowed_fields": [
+      "gsis_id",
+      "display_name",
+      "common_first_name",
+      "first_name",
+      "last_name",
+      "position_group",
+      "position"
+    ],
+    "forbidden_membership_or_status_fields": [
+      "latest_team",
+      "status",
+      "last_season",
+      "jersey_number"
+    ],
+    "select_allowlist_before_row_conversion": true,
+    "team_membership_fields_selected": false,
+    "roster_status_fields_selected": false
+  },
+  "resolver_boundary": {
+    "name_normalization_rule_frozen_by_this_contract": false,
+    "position_tiebreak_rule_frozen_by_this_contract": false,
+    "player_identity_resolution_performed_by_this_contract": false,
+    "ambiguous_names_must_remain_unresolved_until_separate_preregistration": true
+  },
+  "authority": {
+    "source_capture_qualified_by_this_contract": false,
+    "player_identity_to_gsis_qualified": false,
+    "team_membership_authorized": false,
+    "availability_state_authorized": false,
+    "availability_probability_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "postgame_participation_authorized": false,
+    "game_outcomes_used": 0,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
