@@ -1,0 +1,223 @@
+name: LevLine 4 NGS player ID held-out V2
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_ngs_player_id_heldout_v2_contract.json'
+      - 'research/levline4_2026_ngs_player_id_heldout_v2.py'
+      - 'research/test_levline4_2026_ngs_player_id_heldout_v2.py'
+      - 'research/levline4_2026_ngs_player_id_heldout_v2_first_result_manifest.json'
+      - '.github/workflows/research_levline4_2026_ngs_player_id_heldout_v2.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-ngs-player-id-heldout-v2-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FROZEN_CONTRACT_COMMIT: 'ca2cbf8fb4e06af1aa3b59bc2939b612b5568965'
+  CONTRACT_PATH: 'research/levline4_2026_ngs_player_id_heldout_v2_contract.json'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_heldout_v2_first_result_manifest.json'
+  ROSTER_ARTIFACT_ID: '10461126275'
+  ROSTER_WORKFLOW_RUN_ID: '35130069924'
+  ROSTER_HEAD_SHA: '1280e4a06eacf3e30700f75d4dab9ecff99944a4'
+  ROSTER_ARTIFACT_DIGEST: 'sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e'
+  ROSTER_METADATA_SHA256: '90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f'
+
+jobs:
+  preregistration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove frozen contract predates executable V2 and is unchanged
+        run: |
+          set -euo pipefail
+          git cat-file -e "${FROZEN_CONTRACT_COMMIT}^{commit}"
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" HEAD
+          frozen_blob=$(git rev-parse "${FROZEN_CONTRACT_COMMIT}:${CONTRACT_PATH}")
+          current_blob=$(git rev-parse "HEAD:${CONTRACT_PATH}")
+          test "$frozen_blob" = "$current_blob"
+          test "$FROZEN_CONTRACT_COMMIT" != "$(git rev-parse HEAD)"
+      - name: Unit-test resolver and frozen contract
+        run: |
+          python -m pytest -q research/test_levline4_2026_ngs_player_id_heldout_v2.py
+      - name: Prove research-only diff
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=50
+          bad=$(git diff --name-only origin/main...HEAD | grep -Ev '^(research/|\.github/workflows/research_)' || true)
+          if [ -n "$bad" ]; then
+            echo "$bad"
+            exit 1
+          fi
+
+  mode:
+    needs: preregistration
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        run: |
+          if [ -f "$MANIFEST_PATH" ]; then
+            echo 'mode=replay' >> "$GITHUB_OUTPUT"
+          else
+            echo 'mode=live' >> "$GITHUB_OUTPUT"
+          fi
+
+  live-heldout:
+    if: needs.mode.outputs.mode == 'live'
+    needs: [preregistration, mode]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download pinned official-club roster V2 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ROSTER_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$ROSTER_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$ROSTER_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$ROSTER_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ROSTER_ARTIFACT_ID}/zip" > /tmp/roster_v2.zip
+          rm -rf /tmp/roster_v2
+          mkdir -p /tmp/roster_v2
+          unzip -q /tmp/roster_v2.zip -d /tmp/roster_v2
+          test "$(sha256sum /tmp/roster_v2/roster_metadata.jsonl | awk '{print $1}')" = "$ROSTER_METADATA_SHA256"
+      - name: Reproduce frozen 70-target selection before any NGS request
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.levline4_2026_ngs_player_id_heldout_v2 import load_jsonl, select_targets
+          contract=json.loads(Path('research/levline4_2026_ngs_player_id_heldout_v2_contract.json').read_text())
+          rows=load_jsonl(Path('/tmp/roster_v2/roster_metadata.jsonl'))
+          targets,diag=select_targets(rows,contract)
+          assert len(targets)==70
+          assert diag['coverage_target_count']==64
+          assert diag['source_name_ambiguity_group_count']==3
+          assert diag['source_name_ambiguity_target_count']==6
+          assert diag['overlap_count']==0
+          assert sorted(diag['ambiguity_groups'])==['byron young','devonta smith','marcus harris']
+          print(json.dumps(diag,indent=2,sort_keys=True))
+          PY
+      - name: Execute canonical first held-out V2
+        id: execute
+        run: |
+          set -uo pipefail
+          rm -rf research_outputs/levline4_2026_ngs_player_id_heldout_v2
+          mkdir -p research_outputs/levline4_2026_ngs_player_id_heldout_v2
+          set +e
+          python research/levline4_2026_ngs_player_id_heldout_v2.py \
+            --contract "$CONTRACT_PATH" \
+            --roster-metadata /tmp/roster_v2/roster_metadata.jsonl \
+            --output-dir research_outputs/levline4_2026_ngs_player_id_heldout_v2 \
+            > research_outputs/levline4_2026_ngs_player_id_heldout_v2/execution.log 2>&1
+          code=$?
+          set -e
+          echo "$code" > research_outputs/levline4_2026_ngs_player_id_heldout_v2/execution_exit_code.txt
+          cat research_outputs/levline4_2026_ngs_player_id_heldout_v2/execution.log
+          exit 0
+      - name: Upload immutable canonical first artifact even on FAIL
+        if: always()
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-ngs-player-id-heldout-v2-first-${{ github.run_id }}
+          path: research_outputs/levline4_2026_ngs_player_id_heldout_v2
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface scientific disposition after artifact upload
+        if: always()
+        run: |
+          set -euo pipefail
+          test -f research_outputs/levline4_2026_ngs_player_id_heldout_v2/execution_exit_code.txt
+          test "$(cat research_outputs/levline4_2026_ngs_player_id_heldout_v2/execution_exit_code.txt)" = '0'
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          receipt=json.loads(Path('research_outputs/levline4_2026_ngs_player_id_heldout_v2/receipt.json').read_text())
+          assert receipt['target_selection']['coverage_target_count']==64
+          assert receipt['target_selection']['source_name_ambiguity_target_count']==6
+          assert receipt['target_selection']['total_target_count']==70
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert receipt['research_only'] is True
+          assert receipt['production_paths_changed'] is False
+          if receipt['status'] != 'PASS':
+              raise SystemExit('Canonical first V2 result is scientifically FAIL; artifact is preserved and same-version adaptation is forbidden.')
+          assert all(receipt['gates'].values())
+          a=receipt['authority']
+          assert a['ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population'] is True
+          assert a['official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application'] is True
+          for key in ('ngs_is_independent_player_identity_ground_truth','general_2026_player_identity_to_gsis_qualified','week2_sunday_due_inactive_player_identity_to_gsis_qualified','game_day_membership_qualified','availability_state_authorized','player_value_join_authorized','forecast_probability_effect_authorized','model_fit_authorized','production_authorized'):
+              assert a[key] is False, key
+          PY
+
+  replay-canonical-first-result:
+    if: needs.mode.outputs.mode == 'replay'
+    needs: [preregistration, mode]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and verify immutable canonical V2 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > /tmp/manifest_env
+          import json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_heldout_v2_first_result_manifest.json').read_text())
+          for key in ('first_artifact_id','first_workflow_run_id','first_head_sha','artifact_digest'):
+              print(f"{key.upper()}={m[key]}")
+          PY
+          source /tmp/manifest_env
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${FIRST_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$FIRST_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$FIRST_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${FIRST_ARTIFACT_ID}/zip" > /tmp/v2.zip
+          rm -rf /tmp/v2
+          mkdir -p /tmp/v2
+          unzip -q /tmp/v2.zip -d /tmp/v2
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_heldout_v2_first_result_manifest.json').read_text())
+          root=Path('/tmp/v2')
+          sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          observed={p.relative_to(root).as_posix():sha(p) for p in sorted(root.rglob('*')) if p.is_file()}
+          assert observed==m['file_sha256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['status']==m['first_result_status']
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert m['first_result_is_canonical'] is True
+          assert m['later_same_version_execution_may_replace_first_result'] is False
+          assert m['same_version_rule_adaptation_after_first_result'] is False
+          assert receipt['authority']==m['authority']
+          PY
