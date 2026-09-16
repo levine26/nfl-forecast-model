@@ -1,7 +1,7 @@
 {
-  "contract_version": 1,
+  "contract_version": 2,
   "contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-IDENTITY-QUALIFICATION-V1",
-  "status": "PREREGISTERED_BEFORE_FIRST_WEEK2_SUNDAY_IDENTITY_EXECUTION",
+  "status": "PREREGISTERED_BEFORE_FIRST_WEEK2_SUNDAY_IDENTITY_EXECUTION_SOURCE_LINEAGE_CORRECTED",
   "season": 2026,
   "scope": {
     "week": 2,
@@ -15,40 +15,48 @@
   "frozen_dependencies": {
     "execution_contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-EXECUTION-V1",
     "weekly_identity_projection_sha256": "fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f",
+    "weekly_identity_provider": "nflverse",
+    "weekly_identity_asset": "roster_weekly_2026.parquet",
     "global_identity_projection_sha256": "023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603",
-    "global_source_is_audit_only": true,
+    "global_identity_provider": "nflverse",
+    "global_identity_asset": "players.parquet",
+    "global_source_is_consistency_audit_only": true,
+    "global_source_is_source_independent_truth": false,
     "global_source_fallback_authorized": false
   },
-  "frozen_gates": {
+  "frozen_mechanical_consistency_gates": {
     "execution_status_required": "PASS_EVIDENCE_CAPTURED",
     "exact_due_team_coverage_required": true,
     "matching_distinct_article_bodies_required": 1,
     "minimum_exact_unique_resolution_rate": 0.995,
     "ambiguities_allowed": 0,
-    "cross_source_contradictions_allowed": 0,
-    "minimum_independently_auditable_fraction_of_exact_unique_resolutions": 0.8,
-    "minimum_independently_auditable_rows": 73,
-    "required_independent_audit_agreement": 1.0,
-    "minimum_wilson95_lower_bound_for_independent_agreement": 0.95,
+    "cross_artifact_contradictions_allowed": 0,
+    "minimum_cross_artifact_auditable_fraction_of_exact_unique_resolutions": 0.8,
+    "minimum_cross_artifact_auditable_rows": 73,
+    "required_cross_artifact_agreement": 1.0,
+    "minimum_wilson95_lower_bound_for_cross_artifact_agreement": 0.95,
     "source_or_dependency_sha_mismatches_allowed": 0
   },
   "threshold_provenance": {
     "minimum_exact_unique_resolution_rate": "inherits V09B modern gamebook identity aggregate gate >=0.995",
-    "independent_audit_logic": "inherits the V09B V3 principle that target-specific resolution must be supported by an independently calibrated source rather than self-validation",
-    "minimum_independently_auditable_rows": "73 exact agreements yields Wilson 95% lower bound >0.95 when observed agreement is 1.0",
+    "cross_artifact_consistency_logic": "uses a separately frozen nflverse player-master artifact only to detect resolver inconsistency/collision; because both identity artifacts are nflverse-derived, this is not source-independent truth validation",
+    "minimum_cross_artifact_auditable_rows": "73 exact agreements yields a descriptive Wilson 95% lower bound >0.95 for cross-artifact agreement when observed agreement is 1.0; it does not imply a 95% lower bound on true identity accuracy because source lineage and row independence are not established",
     "wilson95_lower_bound_at_73_of_73": 0.9500079920442688,
-    "thresholds_may_not_be_relaxed_after_observing_week2_results": true
+    "thresholds_may_not_be_relaxed_after_observing_week2_results": true,
+    "source_lineage_correction_made_before_any_week2_sunday_identity_execution": true
   },
-  "qualification_rule": {
-    "all_frozen_gates_must_pass": true,
+  "mechanical_validation_rule": {
+    "all_frozen_mechanical_consistency_gates_must_pass": true,
     "partial_pass_authorized": false,
     "manual_override_authorized": false,
     "fuzzy_rescue_authorized": false,
     "later_capture_rescue_authorized": false,
     "unresolved_or_ambiguous_rows_must_remain_unresolved_or_ambiguous": true
   },
-  "authority_if_passed": {
-    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": true,
+  "authority_if_mechanical_gates_pass": {
+    "week2_sunday_due_inactive_identity_mechanics_validated": true,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "source_independent_identity_validation_still_required": true,
     "general_2026_player_identity_to_gsis_qualified": false,
     "game_day_membership_qualified": false,
     "active_or_healthy_inference_from_absence_authorized": false,
@@ -58,7 +66,8 @@
     "model_fit_authorized": false,
     "production_authorized": false
   },
-  "authority_if_failed": {
+  "authority_if_mechanical_gates_fail": {
+    "week2_sunday_due_inactive_identity_mechanics_validated": false,
     "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
     "same_version_rule_change_authorized": false,
     "new_version_preregistration_required_for_follow_up": true
