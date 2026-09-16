@@ -1,0 +1,131 @@
+{
+  "availability_state_authorized": false,
+  "canonical_gsis_source_object_count": 3893,
+  "capture_gate_pass": false,
+  "captured_at_utc": "2026-09-16T17:59:16.018259Z",
+  "completed_2026_outcomes_used_for_design_or_selection": 0,
+  "content_type": "application/json; charset=utf-8",
+  "contract_id": "LEVLINE-4-2026-SLEEPER-GSIS-IDENTITY-SOURCE-V1",
+  "duplicate_gsis_conflicting_name_count": 7,
+  "duplicate_gsis_conflicting_name_examples": [
+    {
+      "gsis_id": "00-0029981",
+      "normalized_names": [
+        "duplicate player",
+        "terrell sinkfield"
+      ],
+      "sleeper_player_ids": [
+        "1652",
+        "6735"
+      ]
+    },
+    {
+      "gsis_id": "00-0030500",
+      "normalized_names": [
+        "duplicate player",
+        "nick williams"
+      ],
+      "sleeper_player_ids": [
+        "1414",
+        "2618"
+      ]
+    },
+    {
+      "gsis_id": "00-0032876",
+      "normalized_names": [
+        "duplicate player",
+        "jordan williams lambert"
+      ],
+      "sleeper_player_ids": [
+        "3621",
+        "3639"
+      ]
+    },
+    {
+      "gsis_id": "00-0034641",
+      "normalized_names": [
+        "chris jones",
+        "christian jones"
+      ],
+      "sleeper_player_ids": [
+        "2110",
+        "5815"
+      ]
+    },
+    {
+      "gsis_id": "00-0035027",
+      "normalized_names": [
+        "duplicate player",
+        "iseoluwapo jegede"
+      ],
+      "sleeper_player_ids": [
+        "6441",
+        "6616"
+      ]
+    },
+    {
+      "gsis_id": "00-0035336",
+      "normalized_names": [
+        "deion calhoun",
+        "duplicate player"
+      ],
+      "sleeper_player_ids": [
+        "6570",
+        "6745"
+      ]
+    },
+    {
+      "gsis_id": "00-0035718",
+      "normalized_names": [
+        "isaiah searight",
+        "quinnen williams"
+      ],
+      "sleeper_player_ids": [
+        "6118",
+        "6618"
+      ]
+    }
+  ],
+  "duplicate_gsis_group_count": 7,
+  "embedded_player_id_mismatch_count": 0,
+  "endpoint": "https://api.sleeper.app/v1/players/nfl",
+  "f_st_01_frozen_2026_unchanged": true,
+  "forecast_probability_effect_authorized": false,
+  "game_day_membership_qualified": false,
+  "general_2026_player_identity_to_gsis_qualified": false,
+  "http_status": 200,
+  "invalid_gsis_row_count": 0,
+  "malformed_record_count": 0,
+  "missing_gsis_row_count": 8334,
+  "model_fit_authorized": false,
+  "player_identity_to_gsis_qualified": false,
+  "player_value_join_authorized": false,
+  "postgame_participation_used": false,
+  "production_authorized": false,
+  "projection_bytes": 968291,
+  "projection_contains_forbidden_fields": false,
+  "projection_fields": [
+    "sleeper_player_id",
+    "gsis_id",
+    "full_name",
+    "first_name",
+    "last_name",
+    "position",
+    "number",
+    "birth_date",
+    "espn_id",
+    "sportradar_id"
+  ],
+  "projection_row_count": 3893,
+  "projection_sha256": "35f3831650c6832217883f23044caca7ed8a6087d2f4184a15e668ec63b2b32a",
+  "raw_source_bytes": 14654895,
+  "raw_source_sha256": "857fde53af8b0605166c4e8388612af107e00c7c5f1dcf42390becd385e5137b",
+  "schema_version": "levline4-2026-sleeper-gsis-identity-source-v1",
+  "sleeper_external_identity_source_capture_qualified": false,
+  "sleeper_is_treated_as_a_separate_publisher_from_nflverse": true,
+  "source_error": null,
+  "statistical_independence_of_underlying_provider_data_proven": false,
+  "status": "FAIL",
+  "total_player_objects": 12227,
+  "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+}
