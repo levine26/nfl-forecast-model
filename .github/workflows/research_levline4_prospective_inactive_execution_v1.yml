@@ -1,0 +1,80 @@
+name: LevLine 4 prospective inactive execution V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_prospective_inactive_execution_v1_contract.json'
+      - 'research/levline4_prospective_inactive_execution_v1.py'
+      - 'research/run_levline4_prospective_inactive_execution_v1.py'
+      - 'research/test_levline4_prospective_inactive_execution_v1.py'
+      - 'research/test_run_levline4_prospective_inactive_execution_v1.py'
+      - '.github/workflows/research_levline4_prospective_inactive_execution_v1.yml'
+      - '.github/workflows/research_inactive_article_source_archive_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: levline4-prospective-inactive-execution-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  dependency-and-unit-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python -m pip install pytest 'beautifulsoup4>=4.12' 'polars==1.44.2'
+      - name: Run prospective execution tests
+        run: |
+          pytest -q \
+            research/test_levline4_prospective_inactive_execution_v1.py \
+            research/test_run_levline4_prospective_inactive_execution_v1.py
+
+      - name: Download exact frozen weekly identity artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: levline4-2026-status-free-identity-source-v1-35113550399
+          path: /tmp/weekly_identity_source_v1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 35113550399
+
+      - name: Download exact frozen global identity artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: levline4-2026-global-player-identity-source-v1-35119017721
+          path: /tmp/global_identity_source_v1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 35119017721
+
+      - name: Verify frozen dependency bytes and firewall
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          weekly = Path('/tmp/weekly_identity_source_v1/projections/2026-fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f.parquet')
+          global_source = Path('/tmp/global_identity_source_v1/projections/players-023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603.parquet')
+          assert weekly.exists()
+          assert global_source.exists()
+          assert hashlib.sha256(weekly.read_bytes()).hexdigest() == 'fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f'
+          assert hashlib.sha256(global_source.read_bytes()).hexdigest() == '023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603'
+
+          contract = json.loads(Path('research/levline4_prospective_inactive_execution_v1_contract.json').read_text())
+          assert contract['dependencies']['resolver']['status_fields_available_to_resolver'] is False
+          assert contract['dependencies']['global_identity_audit']['team_fields_available'] is False
+          assert contract['dependencies']['global_identity_audit']['status_fields_available'] is False
+          assert contract['dependencies']['global_identity_audit']['fallback_resolution_authorized'] is False
+          assert contract['authority']['player_identity_to_gsis_qualified'] is False
+          assert contract['authority']['production_authorized'] is False
+          assert contract['governance']['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          PY
