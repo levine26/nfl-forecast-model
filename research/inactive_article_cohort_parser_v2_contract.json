@@ -1,0 +1,106 @@
+{
+  "contract_id": "NFL-INACTIVE-ARTICLE-COHORT-PARSER-2026-V2",
+  "status": "preregistered_heldout_source_state_validation",
+  "frozen_at_utc": "2026-09-16T15:00:00Z",
+  "purpose": "Test whether the deterministic V1 article parser can be used with point-in-time due-game cohort filtering when the official NFL Sunday inactive article expands during the day. V1 remains failed and is not relaxed. V2 validates a materially different source-state hypothesis on a distinct archived late-afternoon article snapshot that was not parsed during V1 qualification.",
+  "depends_on": [
+    "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
+    "NFL-INACTIVE-ARTICLE-PLAYER-PARSER-2026-V1-FAILED",
+    "LEVLINE-4-INFORMATION-RESIDUAL-V2",
+    "L4-H6-INACTIVE-INFORMATION-SURPRISE-V1"
+  ],
+  "discovery_state": {
+    "artifact_sha256": "b501eb89b4e43a4e5630eb9a3e356fb625df9b1f9b1da623b307d178a70f2cd9",
+    "captured_at_utc": "2026-09-13T15:49:38.220127Z",
+    "interpretation": "The live Sunday article contained the eight 1 p.m. ET games then in their inactive window, yielding 16 team sections rather than V1's incorrect full-day 26-team assumption. Discovery state is not the V2 validation artifact."
+  },
+  "validation_artifact": {
+    "season": 2026,
+    "week": 1,
+    "article_url": "https://www.nfl.com/news/inactive-reports-sunday-week-1-2026-nfl-season",
+    "archive_branch": "research-data/inactive-snapshots-v1",
+    "archive_path": "research_outputs/inactive_article_source_archive_v1/raw/8d5cd6531f0ecea74c2fe25c9bd38b0849129849adc3797e8cee118605b25605.html.gz",
+    "raw_html_sha256": "8d5cd6531f0ecea74c2fe25c9bd38b0849129849adc3797e8cee118605b25605",
+    "captured_at_utc": "2026-09-13T19:32:16.500953Z",
+    "minutes_to_cohort_kickoff": 52.72498411666666,
+    "parsed_before_v2_freeze": false
+  },
+  "due_game_cohort": [
+    {"game_id": "2026_01_ARI_LAC", "away_team": "ARI", "home_team": "LAC"},
+    {"game_id": "2026_01_GB_MIN", "away_team": "GB", "home_team": "MIN"},
+    {"game_id": "2026_01_MIA_LV", "away_team": "MIA", "home_team": "LV"},
+    {"game_id": "2026_01_WAS_PHI", "away_team": "WAS", "home_team": "PHI"}
+  ],
+  "frozen_expected_cohort_truth": {
+    "source": "subset of the already-frozen V1 expected truth table, fixed before V2 validation parsing",
+    "team_sections": 8,
+    "inactive_entries": 47,
+    "emergency_third_qb_annotations": 6,
+    "team_entry_counts": {
+      "ARI": 6,
+      "GB": 6,
+      "LAC": 5,
+      "LV": 7,
+      "MIA": 6,
+      "MIN": 7,
+      "PHI": 5,
+      "WAS": 5
+    },
+    "sentinel_player_team_pairs": [
+      ["ARI", "Garrett Williams"],
+      ["LV", "Brock Bowers"],
+      ["MIN", "J.J. McCarthy"]
+    ],
+    "sentinel_emergency_third_qbs": [
+      ["ARI", "Carson Beck"],
+      ["MIA", "Brady Cook"],
+      ["LV", "Aidan O'Connell"],
+      ["MIN", "J.J. McCarthy"],
+      ["WAS", "Athan Kaliakmanis"],
+      ["PHI", "Tanner McKee"]
+    ]
+  },
+  "v2_semantics": {
+    "parse_full_article_with": "levline-inactive-article-player-parser-v1",
+    "cohort_filter_rule": "After deterministic full-article parsing, retain only rows whose team is one of the teams in the frozen due_game_cohort.",
+    "every_due_game_requires_both_team_sections": true,
+    "article_may_contain_prior_or_other_cohort_sections": true,
+    "extra_noncohort_sections_do_not_fail_v2": true,
+    "unknown_or_unparseable_entry_policy": "fail_closed_in_full_article_parser",
+    "duplicate_team_section_policy": "fail_closed_in_full_article_parser",
+    "duplicate_player_within_team_policy": "fail_closed_in_full_article_parser",
+    "identity_authority": "rendered player name plus team only; GSIS resolution is separate",
+    "chronology_basis": "archived captured_at; no later article revision may rewrite an earlier cohort snapshot"
+  },
+  "qualification_gates": {
+    "raw_sha256_exact": true,
+    "all_due_teams_present": true,
+    "cohort_team_section_count_exact": 8,
+    "cohort_inactive_entry_count_exact": 47,
+    "cohort_emergency_annotation_count_exact": 6,
+    "cohort_team_entry_counts_exact": true,
+    "all_cohort_sentinel_player_team_pairs_present": true,
+    "all_cohort_sentinel_emergency_qbs_present": true,
+    "full_parser_zero_unparseable_entries": true,
+    "full_parser_zero_duplicate_team_sections": true,
+    "full_parser_zero_duplicate_players_within_team": true
+  },
+  "advancement_rule": "PASS only if every frozen V2 gate passes on the held-out validation artifact in the first execution. A failed gate leaves V2 failed; no expected count, cohort identity, sentinel, artifact SHA or parsing rule may be changed under this candidate after execution.",
+  "authority_if_passed": {
+    "player_level_parser_qualified_for_due_cohort_filtering": true,
+    "qualification_scope": "official NFL Sunday inactive-report article states with recognized team headings and due-game cohort filtering under the frozen parser semantics",
+    "full_day_article_completeness_assumed": false,
+    "absence_of_team_section_means_active_or_healthy": false,
+    "player_identity_to_gsis_qualified": false,
+    "availability_probability_feature_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "production_authorized": false
+  },
+  "research_firewall": {
+    "completed_2026_game_outcomes_used": 0,
+    "postgame_participation_used": false,
+    "postgame_snaps_used": false,
+    "production_forecast_mutation": false
+  }
+}
