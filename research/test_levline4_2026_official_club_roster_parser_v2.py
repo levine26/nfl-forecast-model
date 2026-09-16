@@ -164,3 +164,31 @@ def test_one_team_below_frozen_minimum_fails_full_gate(tmp_path: Path):
     assert receipt["official_club_roster_metadata_parser_qualified"] is False
     assert receipt["player_identity_to_gsis_qualified"] is False
     assert receipt["production_authorized"] is False
+
+
+def test_non_2xx_body_is_preserved_before_gate_failure(tmp_path: Path):
+    normal = roster_html(70)
+    failure_body = "upstream temporarily unavailable"
+
+    def fake_get(url: str, **kwargs):
+        if "azcardinals.com" in url:
+            return FakeResponse(url, failure_body, status_code=503)
+        return FakeResponse(url, normal)
+
+    receipt = mod.run_held_out_capture(tmp_path / "out", get=fake_get)
+    assert receipt["status"] == "FAIL"
+    assert receipt["captured_team_count"] == 32
+    assert receipt["http_success_team_count"] == 31
+    assert receipt["parser_gate_pass_team_count"] == 31
+    assert receipt["parse_error_count"] == 1
+    assert receipt["source_errors"] == []
+    assert (tmp_path / "out" / "raw" / "ARI.html").read_text() == failure_body
+    diagnostics = json.loads((tmp_path / "out" / "team_diagnostics.json").read_text())
+    ari = next(row for row in diagnostics if row["team"] == "ARI")
+    assert ari["http_status"] == 503
+    assert ari["http_success"] is False
+    assert ari["parse_errors"] == [{"error": "http_status_not_success", "http_status": 503}]
+    assert ari["parser_team_gate_pass"] is False
+    assert receipt["official_club_roster_metadata_parser_qualified"] is False
+    assert receipt["player_identity_to_gsis_qualified"] is False
+    assert receipt["production_authorized"] is False
