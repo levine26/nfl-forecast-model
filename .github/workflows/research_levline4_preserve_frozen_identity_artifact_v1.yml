@@ -1,0 +1,187 @@
+name: LevLine 4 preserve frozen status-free identity artifact V1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_frozen_identity_artifact_v1.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/research_levline4_preserve_frozen_identity_artifact_v1.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-frozen-identity-artifact-v1
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10452584328'
+  SOURCE_WORKFLOW_RUN_ID: '35113550399'
+  SOURCE_HEAD_SHA: '46a6e968afee49c36531fcd5aa80c4e4fdc4f3a1'
+  EXPECTED_RAW_SHA256: '71ff033b7a835a73b8489f7c1fac4e26e94e5f0cb2036efe70f22e986de2369e'
+  EXPECTED_PROJECTION_SHA256: 'fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f'
+  DATA_BRANCH: 'research-data/levline4-identity-source-v1'
+
+jobs:
+  validate-frozen-artifact:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact qualified Actions artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -L --fail-with-body \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" \
+            -o /tmp/frozen_identity.zip
+          rm -rf /tmp/frozen_identity
+          mkdir -p /tmp/frozen_identity
+          unzip -q /tmp/frozen_identity.zip -d /tmp/frozen_identity
+      - name: Verify raw source, projection, receipt and authority firewall
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path('/tmp/frozen_identity')
+          receipt = json.loads((root / 'receipt.json').read_text())
+          raw = root / receipt['raw_source_relpath']
+          projection = root / receipt['projection_relpath']
+          assert raw.is_file(), raw
+          assert projection.is_file(), projection
+          assert hashlib.sha256(raw.read_bytes()).hexdigest() == os.environ['EXPECTED_RAW_SHA256']
+          assert hashlib.sha256(projection.read_bytes()).hexdigest() == os.environ['EXPECTED_PROJECTION_SHA256']
+          assert receipt['capture_gate_pass'] is True
+          assert receipt['raw_source_sha256'] == os.environ['EXPECTED_RAW_SHA256']
+          assert receipt['projection_sha256'] == os.environ['EXPECTED_PROJECTION_SHA256']
+          assert receipt['projection_contains_status_fields'] is False
+          assert receipt['status_fields_selected'] is False
+          assert receipt['status_fields_read_for_resolution'] is False
+          assert receipt['player_identity_to_gsis_qualified'] is False
+          assert receipt['weekly_roster_defines_game_day_membership'] is False
+          assert receipt['availability_state_authorized'] is False
+          assert receipt['player_value_join_authorized'] is False
+          assert receipt['forecast_probability_effect_authorized'] is False
+          assert receipt['production_authorized'] is False
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'artifact_id': int(os.environ['SOURCE_ARTIFACT_ID']),
+              'raw_source_sha256': receipt['raw_source_sha256'],
+              'projection_sha256': receipt['projection_sha256'],
+              'projection_bytes': receipt['projection_bytes'],
+              'source_rows_selected': receipt['source_rows_selected'],
+              'weeks_present': receipt['weeks_present'],
+          }, indent=2, sort_keys=True))
+          PY
+
+  preserve-on-main:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download exact qualified Actions artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -L --fail-with-body \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" \
+            -o /tmp/frozen_identity.zip
+          rm -rf /tmp/frozen_identity
+          mkdir -p /tmp/frozen_identity
+          unzip -q /tmp/frozen_identity.zip -d /tmp/frozen_identity
+      - name: Fail closed unless frozen bytes and research-only authority are exact
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root = Path('/tmp/frozen_identity')
+          receipt = json.loads((root / 'receipt.json').read_text())
+          raw = root / receipt['raw_source_relpath']
+          projection = root / receipt['projection_relpath']
+          assert hashlib.sha256(raw.read_bytes()).hexdigest() == os.environ['EXPECTED_RAW_SHA256']
+          assert hashlib.sha256(projection.read_bytes()).hexdigest() == os.environ['EXPECTED_PROJECTION_SHA256']
+          assert receipt['capture_gate_pass'] is True
+          assert receipt['projection_contains_status_fields'] is False
+          assert receipt['status_fields_selected'] is False
+          assert receipt['status_fields_read_for_resolution'] is False
+          for key in (
+              'player_identity_to_gsis_qualified',
+              'weekly_roster_defines_game_day_membership',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert receipt[key] is False, key
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection'] == 0
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          preservation = {
+              'schema_version': 'levline4-frozen-status-free-identity-preservation-v1',
+              'source_actions_artifact_id': int(os.environ['SOURCE_ARTIFACT_ID']),
+              'source_workflow_run_id': int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+              'source_head_sha': os.environ['SOURCE_HEAD_SHA'],
+              'expected_raw_sha256': os.environ['EXPECTED_RAW_SHA256'],
+              'expected_projection_sha256': os.environ['EXPECTED_PROJECTION_SHA256'],
+              'preserved_at_utc': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+              'preserving_workflow_run_id': os.environ['GITHUB_RUN_ID'],
+              'research_only': True,
+              'resolver_may_read_raw_source': False,
+              'resolver_may_read_status_fields': False,
+              'player_identity_to_gsis_qualified': False,
+              'availability_probability_feature_authorized': False,
+              'forecast_probability_effect_authorized': False,
+              'production_authorized': False,
+              'completed_2026_outcomes_used': 0,
+          }
+          (root / 'preservation.json').write_text(json.dumps(preservation, indent=2, sort_keys=True) + '\n')
+          PY
+      - name: Persist frozen source away from main
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B frozen-identity-data "origin/${DATA_BRANCH}"
+          else
+            git checkout -B frozen-identity-data
+          fi
+          DEST='research_outputs/levline4_2026_identity_source_v1'
+          rm -rf "$DEST"
+          mkdir -p research_outputs
+          cp -R /tmp/frozen_identity "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          if git diff --cached --quiet; then
+            echo 'Frozen identity artifact already preserved exactly.'
+            exit 0
+          fi
+          git commit -m 'Preserve frozen 2026 status-free identity source'
+          git push origin HEAD:"${DATA_BRANCH}"
