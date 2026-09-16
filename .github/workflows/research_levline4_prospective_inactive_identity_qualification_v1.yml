@@ -24,30 +24,40 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install pytest
-      - name: Validate frozen qualification contract and evaluator
+      - name: Validate frozen mechanics contract and evaluator
         run: pytest -q research/test_levline4_prospective_inactive_identity_qualification_v1.py
-      - name: Verify research firewall
+      - name: Verify research and source-lineage firewall
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           c = json.loads(Path('research/levline4_prospective_inactive_identity_qualification_v1_contract.json').read_text())
           assert c['contract_id'] == 'LEVLINE-4-2026-PROSPECTIVE-INACTIVE-IDENTITY-QUALIFICATION-V1'
-          assert c['status'] == 'PREREGISTERED_BEFORE_FIRST_WEEK2_SUNDAY_IDENTITY_EXECUTION'
+          assert c['status'] == 'PREREGISTERED_BEFORE_FIRST_WEEK2_SUNDAY_IDENTITY_EXECUTION_SOURCE_LINEAGE_CORRECTED'
           assert c['scope']['week'] == 2
           assert c['scope']['first_identity_execution_only'] is True
           assert c['scope']['later_execution_substitution_authorized'] is False
-          assert c['frozen_gates']['minimum_exact_unique_resolution_rate'] == 0.995
-          assert c['frozen_gates']['ambiguities_allowed'] == 0
-          assert c['frozen_gates']['cross_source_contradictions_allowed'] == 0
-          assert c['frozen_gates']['minimum_independently_auditable_fraction_of_exact_unique_resolutions'] == 0.8
-          assert c['frozen_gates']['minimum_independently_auditable_rows'] == 73
-          assert c['frozen_gates']['required_independent_audit_agreement'] == 1.0
-          assert c['frozen_gates']['minimum_wilson95_lower_bound_for_independent_agreement'] == 0.95
+          assert c['frozen_dependencies']['weekly_identity_provider'] == 'nflverse'
+          assert c['frozen_dependencies']['global_identity_provider'] == 'nflverse'
+          assert c['frozen_dependencies']['global_source_is_source_independent_truth'] is False
+          assert c['frozen_dependencies']['global_source_fallback_authorized'] is False
+          g = c['frozen_mechanical_consistency_gates']
+          assert g['minimum_exact_unique_resolution_rate'] == 0.995
+          assert g['ambiguities_allowed'] == 0
+          assert g['cross_artifact_contradictions_allowed'] == 0
+          assert g['minimum_cross_artifact_auditable_fraction_of_exact_unique_resolutions'] == 0.8
+          assert g['minimum_cross_artifact_auditable_rows'] == 73
+          assert g['required_cross_artifact_agreement'] == 1.0
+          assert g['minimum_wilson95_lower_bound_for_cross_artifact_agreement'] == 0.95
           assert c['threshold_provenance']['thresholds_may_not_be_relaxed_after_observing_week2_results'] is True
-          assert c['authority_if_passed']['general_2026_player_identity_to_gsis_qualified'] is False
-          assert c['authority_if_passed']['availability_probability_feature_authorized'] is False
-          assert c['authority_if_passed']['production_authorized'] is False
+          assert c['threshold_provenance']['source_lineage_correction_made_before_any_week2_sunday_identity_execution'] is True
+          a = c['authority_if_mechanical_gates_pass']
+          assert a['week2_sunday_due_inactive_identity_mechanics_validated'] is True
+          assert a['week2_sunday_due_inactive_player_identity_to_gsis_qualified'] is False
+          assert a['source_independent_identity_validation_still_required'] is True
+          assert a['general_2026_player_identity_to_gsis_qualified'] is False
+          assert a['availability_probability_feature_authorized'] is False
+          assert a['production_authorized'] is False
           assert c['governance']['completed_2026_outcomes_used_for_design_or_selection'] == 0
           assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
           PY
@@ -99,7 +109,7 @@ jobs:
           print(f"available={'true' if exists else 'false'}")
           PY
 
-      - name: Evaluate frozen first identity execution
+      - name: Evaluate frozen first identity execution mechanics
         id: qualify
         if: steps.restore.outputs.available == 'true'
         continue-on-error: true
@@ -107,7 +117,7 @@ jobs:
           PYTHONPATH="$PWD/src:$PWD" python -m research.levline4_prospective_inactive_identity_qualification_v1 \
             --receipt-out research_outputs/levline4_prospective_inactive_identity_qualification_v1/receipt.json
 
-      - name: Persist qualification receipt on research-data branch
+      - name: Persist mechanics receipt on research-data branch
         if: steps.restore.outputs.available == 'true'
         run: |
           set -euo pipefail
@@ -124,16 +134,16 @@ jobs:
           cp -R /tmp/levline4_prospective_inactive_identity_qualification_v1 "$QUAL_DIR"
           git add "$QUAL_DIR/"
           if git diff --cached --quiet; then
-            echo 'Frozen qualification receipt unchanged.'
+            echo 'Frozen mechanics receipt unchanged.'
             exit 0
           fi
-          git commit -m 'Evaluate frozen Week 2 inactive identity qualification'
+          git commit -m 'Evaluate frozen Week 2 inactive identity mechanics'
           git push origin HEAD:research-data/inactive-snapshots-v1
 
-      - name: Surface qualification failure after preserving receipt
+      - name: Surface mechanics failure after preserving receipt
         if: steps.restore.outputs.available == 'true'
         run: |
           if [ "${{ steps.qualify.outcome }}" != 'success' ]; then
-            echo 'Week 2 prospective inactive identity qualification failed; immutable receipt was preserved.' >&2
+            echo 'Week 2 prospective inactive identity mechanics gate failed; immutable receipt was preserved.' >&2
             exit 1
           fi
