@@ -1,0 +1,242 @@
+name: LevLine 4 preserve official club player profile surface V1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_official_club_player_profile_v1.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_official_club_player_profile_v1.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-official-club-player-profile-v1
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10463865079'
+  SOURCE_WORKFLOW_RUN_ID: '35136388628'
+  SOURCE_HEAD_SHA: 'db98ab7b37add137c536b21df78aa0e0bef6e407'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:4817196a26820c68c6d2054aaa02758779f5454314b4e033bba850f42c553ff3'
+  EXPECTED_RECEIPT_SHA256: '85c399f11cce83d704ec192c9014380e8a0effbbed58a6a41b680750746b9c8e'
+  EXPECTED_DIAGNOSTICS_SHA256: '34b56daa43f4639281de03b3681a9dae2b6b48e0b9757c8bf705a2ca84889578'
+  EXPECTED_SELECTED_PROFILES_SHA256: 'ee882e69d604f91eae198d880bb79a967984add67056fb5fb005b0634e2767be'
+  EXPECTED_RAW_TOTAL_BYTES: '11421601'
+  EXPECTED_ARTIFACT_TOTAL_BYTES: '11509972'
+  DATA_BRANCH: 'research-data/levline4-official-club-player-profile-surface-v1'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable canonical first artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/profile_v1.zip
+          rm -rf /tmp/profile_v1
+          mkdir -p /tmp/profile_v1
+          unzip -q /tmp/profile_v1.zip -d /tmp/profile_v1
+      - name: Verify canonical bytes and research-only authority
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          root=Path('/tmp/profile_v1')
+          sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          expected={
+              'receipt.json':os.environ['EXPECTED_RECEIPT_SHA256'],
+              'team_diagnostics.json':os.environ['EXPECTED_DIAGNOSTICS_SHA256'],
+              'selected_profiles.json':os.environ['EXPECTED_SELECTED_PROFILES_SHA256'],
+          }
+          for name,digest in expected.items():
+              assert sha(root/name)==digest, name
+
+          manifest=json.loads(Path('research/levline4_2026_official_club_player_profile_surface_probe_v1_first_result_manifest.json').read_text())
+          receipt=json.loads((root/'receipt.json').read_text())
+          diagnostics=json.loads((root/'team_diagnostics.json').read_text())
+          selected=json.loads((root/'selected_profiles.json').read_text())
+          assert manifest['first_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert manifest['first_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert manifest['first_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert manifest['artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert manifest['canonical_artifact_file_hashes']==expected
+          assert manifest['first_result_is_canonical'] is True
+          assert manifest['later_same_version_execution_may_replace_first_result'] is False
+
+          raw_files=sorted((root/'raw').glob('*.html'))
+          assert len(raw_files)==32==receipt['raw_file_team_count']
+          assert len(diagnostics)==32
+          assert len(selected)==32
+          assert sum(p.stat().st_size for p in raw_files)==int(os.environ['EXPECTED_RAW_TOTAL_BYTES'])
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())==int(os.environ['EXPECTED_ARTIFACT_TOTAL_BYTES'])
+          by_team={row['team']:row for row in diagnostics}
+          assert len(by_team)==32
+          for team,row in by_team.items():
+              raw=root/'raw'/f'{team}.html'
+              assert raw.is_file(), raw
+              assert sha(raw)==row['raw_html_sha256'], team
+
+          assert receipt['status']=='PASS'
+          assert receipt['official_club_player_profile_surface_capture_qualified'] is True
+          assert receipt['captured_team_count']==32
+          assert receipt['http_success_team_count']==32
+          assert receipt['source_errors']==[]
+          assert receipt['pages_with_gsis_like_values']==0
+          assert receipt['literal_token_page_counts']['espn']==4
+          for key in (
+              'official_stable_player_identifier_exposed_qualified',
+              'official_identifier_parser_qualified',
+              'official_identifier_to_gsis_bridge_qualified',
+              'player_identity_to_gsis_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert receipt[key] is False, key
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download immutable canonical first artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/profile_v1.zip
+          rm -rf /tmp/profile_v1
+          mkdir -p /tmp/profile_v1
+          unzip -q /tmp/profile_v1.zip -d /tmp/profile_v1
+      - name: Verify and add preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          root=Path('/tmp/profile_v1')
+          sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          assert sha(root/'receipt.json')==os.environ['EXPECTED_RECEIPT_SHA256']
+          assert sha(root/'team_diagnostics.json')==os.environ['EXPECTED_DIAGNOSTICS_SHA256']
+          assert sha(root/'selected_profiles.json')==os.environ['EXPECTED_SELECTED_PROFILES_SHA256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          diagnostics=json.loads((root/'team_diagnostics.json').read_text())
+          raw_files=sorted((root/'raw').glob('*.html'))
+          assert len(raw_files)==len(diagnostics)==32
+          assert sum(p.stat().st_size for p in raw_files)==int(os.environ['EXPECTED_RAW_TOTAL_BYTES'])
+          for row in diagnostics:
+              assert sha(root/'raw'/f"{row['team']}.html")==row['raw_html_sha256']
+          assert receipt['status']=='PASS'
+          assert receipt['official_club_player_profile_surface_capture_qualified'] is True
+          for key in (
+              'official_stable_player_identifier_exposed_qualified',
+              'official_identifier_parser_qualified',
+              'official_identifier_to_gsis_bridge_qualified',
+              'player_identity_to_gsis_qualified',
+              'availability_state_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert receipt[key] is False, key
+          preservation={
+              'schema_version':'levline4-official-club-player-profile-surface-v1-preservation',
+              'source_actions_artifact_id':int(os.environ['SOURCE_ARTIFACT_ID']),
+              'source_workflow_run_id':int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+              'source_head_sha':os.environ['SOURCE_HEAD_SHA'],
+              'actions_artifact_digest':os.environ['EXPECTED_ARTIFACT_DIGEST'],
+              'receipt_sha256':os.environ['EXPECTED_RECEIPT_SHA256'],
+              'team_diagnostics_sha256':os.environ['EXPECTED_DIAGNOSTICS_SHA256'],
+              'selected_profiles_sha256':os.environ['EXPECTED_SELECTED_PROFILES_SHA256'],
+              'raw_file_count':32,
+              'raw_total_bytes':int(os.environ['EXPECTED_RAW_TOTAL_BYTES']),
+              'preserved_at_utc':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+              'preserving_workflow_run_id':os.environ['GITHUB_RUN_ID'],
+              'research_only':True,
+              'official_club_player_profile_surface_capture_qualified':True,
+              'official_stable_player_identifier_exposed_qualified':False,
+              'official_identifier_to_gsis_bridge_qualified':False,
+              'player_identity_to_gsis_qualified':False,
+              'availability_state_authorized':False,
+              'forecast_probability_effect_authorized':False,
+              'model_fit_authorized':False,
+              'production_authorized':False,
+              'completed_2026_outcomes_used':0,
+          }
+          (root/'preservation.json').write_text(json.dumps(preservation,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist on dedicated research-data branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B profile-surface-v1-data "origin/${DATA_BRANCH}"
+          else
+            git checkout -B profile-surface-v1-data
+          fi
+          DEST='research_outputs/levline4_2026_official_club_player_profile_surface_probe_v1/first_result_35136388628'
+          if [ -e "$DEST/preservation.json" ]; then
+            DEST="$DEST" python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path(os.environ['DEST'])
+          sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          assert sha(root/'receipt.json')==os.environ['EXPECTED_RECEIPT_SHA256']
+          assert sha(root/'team_diagnostics.json')==os.environ['EXPECTED_DIAGNOSTICS_SHA256']
+          assert sha(root/'selected_profiles.json')==os.environ['EXPECTED_SELECTED_PROFILES_SHA256']
+          diagnostics=json.loads((root/'team_diagnostics.json').read_text())
+          assert len(diagnostics)==32
+          for row in diagnostics:
+              assert sha(root/'raw'/f"{row['team']}.html")==row['raw_html_sha256']
+          p=json.loads((root/'preservation.json').read_text())
+          assert p['source_actions_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert p['source_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert p['source_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert p['actions_artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert p['production_authorized'] is False
+          assert p['completed_2026_outcomes_used']==0
+          PY
+            echo 'Canonical profile-surface V1 evidence already preserved exactly.'
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/profile_v1 "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve first official club player profile surface V1 evidence'
+          git push origin HEAD:"${DATA_BRANCH}"
