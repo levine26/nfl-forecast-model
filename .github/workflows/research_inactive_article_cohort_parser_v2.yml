@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - 'research/inactive_article_cohort_parser_v2_contract.json'
+      - 'research/inactive_article_cohort_parser_v2_receipt.json'
       - 'research/qualify_inactive_article_cohort_parser_v2.py'
       - 'research/test_inactive_article_cohort_parser_v2.py'
       - '.github/workflows/research_inactive_article_cohort_parser_v2.yml'
@@ -26,8 +27,10 @@ jobs:
           cache: pip
       - name: Install parser dependencies
         run: python -m pip install pytest 'beautifulsoup4>=4.12'
-      - name: Validate frozen V2 contract
-        run: python -m json.tool research/inactive_article_cohort_parser_v2_contract.json >/dev/null
+      - name: Validate frozen V2 contract and first-run receipt
+        run: |
+          python -m json.tool research/inactive_article_cohort_parser_v2_contract.json >/dev/null
+          python -m json.tool research/inactive_article_cohort_parser_v2_receipt.json >/dev/null
       - name: Unit-test cohort semantics
         run: pytest -q research/test_inactive_article_cohort_parser_v2.py research/test_inactive_article_player_parser_v1.py
       - name: Restore held-out late-afternoon source artifact
@@ -37,29 +40,35 @@ jobs:
           ARCHIVE='research_outputs/inactive_article_source_archive_v1/raw/8d5cd6531f0ecea74c2fe25c9bd38b0849129849adc3797e8cee118605b25605.html.gz'
           git show "origin/research-data/inactive-snapshots-v1:${ARCHIVE}" > /tmp/week1-late-cohort-inactives.html.gz
           test -s /tmp/week1-late-cohort-inactives.html.gz
-      - name: First and only frozen V2 held-out qualification
+      - name: Reproduce frozen V2 held-out qualification
         run: |
           python -m research.qualify_inactive_article_cohort_parser_v2 \
             --contract research/inactive_article_cohort_parser_v2_contract.json \
             --archive-gzip /tmp/week1-late-cohort-inactives.html.gz \
             --receipt /tmp/inactive_article_cohort_parser_v2_receipt.json \
             --rows /tmp/inactive_article_cohort_parser_v2_rows.jsonl
-      - name: Verify narrow authority firewall
+      - name: Verify exact frozen PASS receipt and narrow authority firewall
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          receipt = json.loads(Path('/tmp/inactive_article_cohort_parser_v2_receipt.json').read_text())
-          assert receipt['qualification_passed'] is True
-          assert receipt['authority']['player_level_parser_qualified_for_due_cohort_filtering'] is True
-          assert receipt['authority']['full_day_article_completeness_assumed'] is False
-          assert receipt['authority']['absence_of_team_section_means_active_or_healthy'] is False
-          assert receipt['authority']['player_identity_to_gsis_qualified'] is False
-          assert receipt['authority']['availability_probability_feature_authorized'] is False
-          assert receipt['authority']['player_value_join_authorized'] is False
-          assert receipt['authority']['forecast_probability_effect_authorized'] is False
-          assert receipt['authority']['production_authorized'] is False
-          assert receipt['completed_2026_outcomes_used'] == 0
+          frozen = json.loads(Path('research/inactive_article_cohort_parser_v2_receipt.json').read_text())
+          reproduced = json.loads(Path('/tmp/inactive_article_cohort_parser_v2_receipt.json').read_text())
+          assert reproduced == frozen, (reproduced, frozen)
+          assert reproduced['status'] == 'PASS'
+          assert reproduced['qualification_passed'] is True
+          assert reproduced['observed']['cohort_team_sections'] == 8
+          assert reproduced['observed']['cohort_inactive_entries'] == 47
+          assert reproduced['observed']['cohort_emergency_third_qb_annotations'] == 6
+          assert reproduced['authority']['player_level_parser_qualified_for_due_cohort_filtering'] is True
+          assert reproduced['authority']['full_day_article_completeness_assumed'] is False
+          assert reproduced['authority']['absence_of_team_section_means_active_or_healthy'] is False
+          assert reproduced['authority']['player_identity_to_gsis_qualified'] is False
+          assert reproduced['authority']['availability_probability_feature_authorized'] is False
+          assert reproduced['authority']['player_value_join_authorized'] is False
+          assert reproduced['authority']['forecast_probability_effect_authorized'] is False
+          assert reproduced['authority']['production_authorized'] is False
+          assert reproduced['completed_2026_outcomes_used'] == 0
           PY
       - uses: actions/upload-artifact@v4
         if: always()
