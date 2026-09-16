@@ -4,8 +4,10 @@ from __future__ import annotations
 
 This experiment compares already-frozen, status-free official-club roster metadata with
 an already-frozen nflverse Week 2 identity projection. Resolution is team + exact
-normalized full name only. Jersey and position are post-resolution diagnostics and can
-never rescue a row. A PASS is metadata-consistency evidence only, not GSIS truth.
+normalized full name only. Jersey is a post-resolution corroboration diagnostic and can
+never rescue a row. The frozen nflverse projection does not contain position, so no
+position comparison is performed. A PASS is metadata-consistency evidence only, not
+GSIS truth.
 """
 
 import argparse
@@ -41,6 +43,8 @@ def load_contract(path: Path = CONTRACT_PATH) -> dict[str, Any]:
     assert c["qualification_gate"]["exact_unique_resolution_rate_min"] == 0.995
     assert c["qualification_gate"]["ambiguities_allowed"] == 0
     assert c["qualification_gate"]["jersey_agreement_rate_required"] == 1.0
+    assert c["frozen_sources"]["nflverse_identity"]["position_field_present"] is False
+    assert c["post_resolution_metadata_audit"]["position_comparison_performed"] is False
     assert c["frozen_resolution"]["jersey_used_for_resolution"] is False
     assert c["frozen_resolution"]["position_used_for_resolution"] is False
     assert c["frozen_resolution"]["fuzzy_matching_allowed"] is False
@@ -53,8 +57,7 @@ def load_official_rows(path: Path, expected_sha256: str) -> list[dict[str, Any]]
     observed = sha256_path(path)
     if observed != expected_sha256:
         raise RuntimeError(f"official roster metadata sha256 mismatch: {observed}")
-    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-    return rows
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 def load_identity_frame(path: Path, expected_sha256: str) -> pl.DataFrame:
@@ -108,17 +111,13 @@ def _week2_identity_metadata(frame: pl.DataFrame) -> tuple[dict[tuple[str, str],
     conflicts: set[tuple[str, str]] = set()
     for key, rows in grouped.items():
         variants = {
-            (
-                None if row.get("jersey_number") is None else str(row.get("jersey_number")).strip(),
-                str(row.get("position") or "").strip().upper(),
-            )
+            None if row.get("jersey_number") is None else str(row.get("jersey_number")).strip()
             for row in rows
         }
         if len(variants) != 1:
             conflicts.add(key)
             continue
-        raw_jersey, position = next(iter(variants))
-        metadata[key] = {"jersey_number": raw_jersey, "position": position, "row_count": len(rows)}
+        metadata[key] = {"jersey_number": next(iter(variants)), "row_count": len(rows)}
     return metadata, conflicts
 
 
@@ -135,8 +134,6 @@ def evaluate(
     invalid_jersey_count = 0
     comparable_jersey = 0
     jersey_agreements = 0
-    position_comparable = 0
-    position_agreements = 0
 
     for source in official_rows:
         team = normalize_team(source.get("team"))
@@ -158,10 +155,8 @@ def evaluate(
         jersey_comparable = False
         jersey_agrees = None
         identity_jersey = None
-        identity_position = None
         identity_metadata_conflict = False
         identity_invalid = False
-        position_agrees = None
 
         if resolved is not None:
             key = (team, resolved)
@@ -170,7 +165,6 @@ def evaluate(
             else:
                 meta = identity_metadata[key]
                 identity_jersey, identity_invalid = normalize_jersey(meta.get("jersey_number"))
-                identity_position = str(meta.get("position") or "").strip().upper() or None
                 if official_invalid:
                     invalid_jersey_count += 1
                 if identity_invalid:
@@ -180,11 +174,6 @@ def evaluate(
                     comparable_jersey += 1
                     jersey_agrees = official_jersey == identity_jersey
                     jersey_agreements += int(jersey_agrees)
-                official_position = str(source.get("position") or "").strip().upper() or None
-                if official_position is not None and identity_position is not None:
-                    position_comparable += 1
-                    position_agrees = official_position == identity_position
-                    position_agreements += int(position_agrees)
 
         results.append(
             {
@@ -205,9 +194,9 @@ def evaluate(
                 "nflverse_jersey_number": identity_jersey,
                 "jersey_comparable": jersey_comparable,
                 "jersey_agrees": jersey_agrees,
-                "official_position": str(source.get("position") or "").strip().upper() or None,
-                "nflverse_position": identity_position,
-                "position_agrees_descriptive_only": position_agrees,
+                "official_position_recorded_but_not_compared": str(source.get("position") or "").strip().upper() or None,
+                "nflverse_position_available": False,
+                "position_comparison_performed": False,
                 "identity_metadata_conflict": identity_metadata_conflict,
                 "player_identity_to_gsis_qualified": False,
                 "availability_state_authorized": False,
@@ -220,14 +209,14 @@ def evaluate(
     total = len(results)
     exact = counts["RESOLVED_EXACT_UNIQUE"]
     exact_rate = exact / total if total else 0.0
-    duplicate_assignments = sorted(
+    duplicate_assignments = [
         {"team": team, "candidate_gsis_id": gsis, "official_row_count": count}
         for (team, gsis), count in resolved_assignments.items()
         if count > 1
-    )
+    ]
+    duplicate_assignments.sort(key=lambda row: (row["team"], row["candidate_gsis_id"]))
     comparable_fraction = comparable_jersey / exact if exact else 0.0
     jersey_agreement_rate = jersey_agreements / comparable_jersey if comparable_jersey else 0.0
-    position_agreement_rate = position_agreements / position_comparable if position_comparable else None
     teams = sorted({normalize_team(row.get("team")) for row in official_rows if normalize_team(row.get("team"))})
     exact_identity_conflict_rows = sum(1 for row in results if row["identity_metadata_conflict"])
 
@@ -260,9 +249,7 @@ def evaluate(
         "jersey_agreement_count": jersey_agreements,
         "jersey_disagreement_count": comparable_jersey - jersey_agreements,
         "jersey_agreement_rate": jersey_agreement_rate,
-        "position_comparable_count": position_comparable,
-        "position_agreement_count": position_agreements,
-        "position_agreement_rate_descriptive_only": position_agreement_rate,
+        "position_comparison_performed": False,
         "gate_pass": gate_pass,
     }
     return results, summary, duplicate_assignments
