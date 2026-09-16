@@ -1,0 +1,35 @@
+name: LevLine 4 structured beat observations V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/structured_beat_observation_v1.py'
+      - 'research/test_structured_beat_observation_v1.py'
+      - '.github/workflows/research_levline4_structured_beat_v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-structured-beat-schema:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project
+        run: pip install '.[dev]'
+      - name: Test governed extraction schema
+        run: pytest -q research/test_structured_beat_observation_v1.py
+      - name: Prove no probability-model mutation
+        run: |
+          git diff --name-only origin/main...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [p for p in changed if not (p.startswith('research/') or p.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
