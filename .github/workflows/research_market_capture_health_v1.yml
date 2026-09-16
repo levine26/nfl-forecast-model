@@ -1,0 +1,101 @@
+name: LevLine 4 market capture health V1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'research/market_capture_v2.py'
+      - 'research/market_capture_health_v1.py'
+      - 'research/test_market_capture_strict_cutoff_v1.py'
+      - 'research/test_market_capture_health_v1.py'
+      - '.github/workflows/research_market_capture_health_v1.yml'
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project
+        run: pip install '.[dev]'
+      - name: Test strict cutoff and capture-health accounting
+        run: |
+          pytest -q \
+            research/test_market_capture_strict_cutoff_v1.py \
+            research/test_market_capture_health_v1.py \
+            research/test_market_capture_v2.py \
+            research/test_market_capture_t45.py \
+            research/test_levline4_horizon_eligibility_v1.py
+      - name: Prove research-only diff
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed = [x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad = [p for p in changed if not (p.startswith('research/') or p.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref }}...HEAD -- outputs/ site/ src/ scripts/ config/
+
+  audit:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-research-market-capture-v2
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore append-only market research ledger
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/market-capture-v2:refs/remotes/origin/research-data/market-capture-v2 || true
+          mkdir -p research_outputs/market_capture_v2
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
+            git archive origin/research-data/market-capture-v2 research_outputs/market_capture_v2 2>/dev/null | tar -xf - || true
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate outcome-blind strict capture-health receipt
+        run: python -m research.market_capture_health_v1
+      - name: Persist health receipt away from main
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/market_capture_v2
+          test -s "$DATA_DIR/capture_health.json"
+          rm -rf /tmp/market_capture_v2
+          cp -R "$DATA_DIR" /tmp/market_capture_v2
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
+            git checkout -B market-capture-v2-data origin/research-data/market-capture-v2
+          else
+            git checkout -B market-capture-v2-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/market_capture_v2
+          cp -R /tmp/market_capture_v2 research_outputs/market_capture_v2
+          git add research_outputs/market_capture_v2/
+          if git diff --cached --quiet; then
+            echo 'Capture health unchanged.'
+            exit 0
+          fi
+          git commit -m 'Audit strict LevLine 4 market capture health'
+          git push origin HEAD:research-data/market-capture-v2
