@@ -16,7 +16,7 @@
         "CAR protection vs ATL pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 4,
       "primary_variant": 0,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -74,6 +74,27 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "ATL third downs vs CAR"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "CAR: Darren Waller \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "CAR: Bobby Brown III \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "CAR: Patrick Jones II \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_02_CAR_ATL",
@@ -114,7 +135,7 @@
     "matchup": "CAR @ ATL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:28.549081+00:00",
+        "as_of": "2026-09-16T21:30:29.470366+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "CAR",
@@ -124,7 +145,7 @@
         "title": "Bryce Young vs ATL: player history"
       },
       {
-        "as_of": "2026-09-16T18:33:18.795494+00:00",
+        "as_of": "2026-09-16T21:30:22.428983+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "ATL",
@@ -134,7 +155,7 @@
         "title": "CAR protection vs ATL pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:18.797459+00:00",
+        "as_of": "2026-09-16T21:30:22.430385+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ATL",
@@ -144,7 +165,7 @@
         "title": "ATL early-down approach vs CAR"
       },
       {
-        "as_of": "2026-09-16T18:31:02.063099+00:00",
+        "as_of": "2026-09-16T21:28:30.236617+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -241,7 +262,7 @@
         "HOU YAC creation vs CIN tackling"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 4,
       "primary_variant": 1,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -332,7 +353,7 @@
     "matchup": "CIN @ HOU",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:30.048696+00:00",
+        "as_of": "2026-09-16T21:30:30.486784+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "CIN",
@@ -342,7 +363,7 @@
         "title": "Joe Burrow vs HOU: player history"
       },
       {
-        "as_of": "2026-09-16T18:33:20.564532+00:00",
+        "as_of": "2026-09-16T21:30:23.705154+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "CIN",
@@ -352,7 +373,7 @@
         "title": "HOU YAC creation vs CIN tackling"
       },
       {
-        "as_of": "2026-09-16T18:33:20.562500+00:00",
+        "as_of": "2026-09-16T21:30:23.703589+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "HOU",
@@ -362,7 +383,7 @@
         "title": "CIN protection vs HOU pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:20.563267+00:00",
+        "as_of": "2026-09-16T21:30:23.704146+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "CIN",
@@ -503,6 +524,34 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "TB protection vs CLE pass rush"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "CLE: Teven Jenkins \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Weak",
+        "title": "CLE: Dawand Jones \u2014 Limited Participation in Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Weak",
+        "title": "CLE: Parker Brailsford \u2014 Limited Participation in Practice"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=27.9759&longitude=-82.5033&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in TB"
       }
     ],
     "game_id": "2026_02_CLE_TB",
@@ -543,7 +592,7 @@
     "matchup": "CLE @ TB",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.713932+00:00",
+        "as_of": "2026-09-16T21:30:18.594269+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -553,7 +602,7 @@
         "title": "What Zac Robinson could change in TB"
       },
       {
-        "as_of": "2026-09-16T18:33:22.314066+00:00",
+        "as_of": "2026-09-16T21:30:24.965394+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TB",
@@ -563,7 +612,7 @@
         "title": "CLE explosives vs TB prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:22.314335+00:00",
+        "as_of": "2026-09-16T21:30:24.965652+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "TB",
@@ -573,7 +622,7 @@
         "title": "CLE early-down approach vs TB"
       },
       {
-        "as_of": "2026-09-16T18:33:22.314855+00:00",
+        "as_of": "2026-09-16T21:30:24.966038+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "CLE",
@@ -728,22 +777,22 @@
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "DET: Blake Miller \u2014 Did Not Participate In Practice"
+        "strength": "Strong",
+        "title": "DET: Christian Mahogany \u2014 Out"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Strong",
+        "title": "DET: Blake Miller \u2014 Out"
       },
       {
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
-        "title": "DET: Christian Mahogany \u2014 Did Not Participate In Practice"
-      },
-      {
-        "category": "personnel",
-        "source_name": "NFL.com official injury report",
-        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-        "strength": "Moderate",
-        "title": "BUF: T.J. Sanders \u2014 Did Not Participate In Practice"
+        "title": "DET: D.J. Reed \u2014 Questionable"
       }
     ],
     "game_id": "2026_02_DET_BUF",
@@ -761,6 +810,16 @@
         "title": "What Drew Petzing could change in DET"
       },
       {
+        "advantage_team": null,
+        "family": "availability",
+        "sample_size": null,
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Strong",
+        "summary": "The official NFL injury report lists Christian Mahogany (G) as Out. Hip. LevLine does not make up an injury point value for it. That matters a little more against BUF, which generated sacks on 5.8% of opponent pass plays last season.",
+        "title": "DET: Christian Mahogany \u2014 Out"
+      },
+      {
         "advantage_team": "BUF",
         "family": "explosives",
         "sample_size": 650,
@@ -769,22 +828,12 @@
         "strength": "Strong",
         "summary": "BUF hit a 20+ yard pass on 10.3% of pass plays; DET allowed one on 8.5%. The short version: BUF wants chunks, and DET would rather make it earn twelve-play drives.",
         "title": "BUF explosives vs DET prevention"
-      },
-      {
-        "advantage_team": "BUF",
-        "family": "early_down",
-        "sample_size": 650,
-        "source_name": "nflverse PBP + FTN charting",
-        "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
-        "strength": "Strong",
-        "summary": "BUF threw on 50% of first- and second-down plays and averaged +0.20 EPA per early-down pass. DET allowed -0.01. Win early downs and the playbook stays open; lose them and everybody knows what is coming.",
-        "title": "BUF early-down approach vs DET"
       }
     ],
     "matchup": "DET @ BUF",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.710113+00:00",
+        "as_of": "2026-09-16T21:30:18.590762+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -794,7 +843,7 @@
         "title": "What Drew Petzing could change in DET"
       },
       {
-        "as_of": "2026-09-16T18:33:18.209251+00:00",
+        "as_of": "2026-09-16T21:30:21.983894+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BUF",
@@ -804,7 +853,7 @@
         "title": "BUF explosives vs DET prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:18.209520+00:00",
+        "as_of": "2026-09-16T21:30:21.984103+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BUF",
@@ -814,14 +863,14 @@
         "title": "BUF early-down approach vs DET"
       },
       {
-        "as_of": "2026-09-16T18:33:18.208231+00:00",
-        "family": "yac",
-        "label": "YAC",
-        "leader": "DET",
-        "source_name": "nflverse PBP + FTN charting",
+        "as_of": "2026-09-16T21:28:29.160927+00:00",
+        "family": "availability",
+        "label": "Availability",
+        "leader": "Watch",
+        "source_name": "NFL.com official injury report",
         "strength": "Strong",
-        "summary": "DET averaged 6.1 yards after catch per completion; BUF allowed 4.7. The five-yard throw becoming a fifteen-yard gain is the thing to watch.",
-        "title": "DET YAC creation vs BUF tackling"
+        "summary": "The official NFL injury report lists Christian Mahogany (G) as Out. Hip. LevLine does not make up an injury point value for it. That matters a little more against BUF, which generated sacks on 5.8% of opponent pass plays last season.",
+        "title": "DET: Christian Mahogany \u2014 Out"
       }
     ],
     "notebook": [
@@ -868,7 +917,7 @@
     ],
     "paragraphs": [
       "Detroit and Buffalo both enter Thursday night unbeaten, but the short turnaround puts preparation and line health under an immediate microscope. The Lions\u2019 own update lists multiple offensive linemen managing injuries after their overtime opener, while Buffalo\u2019s Week 2 preview emphasizes the challenge of a short week before the first regular-season game at the new Highmark Stadium. Detroit needs enough protection to let Jared Goff operate cleanly; Buffalo wants Josh Allen and its defense to keep the Lions chasing the pace.",
-      "LevLine 3.0 gives the Bills a 65.8% win probability over the Lions. Its frozen F-ST engine reconciles a 64.8% football-only signal with a 66.9% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Buffalo Bills -5.2, a market line of Buffalo Bills -4.5, and an approximate coherent score of BUF 27 \u2013 DET 22. Detroit\u2019s protection on a short week determines whether the Lions can sustain their offense or Buffalo can create the disruptive possessions that tilt the game toward Josh Allen. The pick: Buffalo Bills moneyline."
+      "LevLine 3.0 gives the Bills a 66.5% win probability over the Lions. Its frozen F-ST engine reconciles a 64.8% football-only signal with a 67.5% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Buffalo Bills -5.5, a market line of Buffalo Bills -4.5, and an approximate coherent score of BUF 27 \u2013 DET 22. Detroit\u2019s protection on a short week determines whether the Lions can sustain their offense or Buffalo can create the disruptive possessions that tilt the game toward Josh Allen. The pick: Buffalo Bills moneyline."
     ],
     "prediction": "BUF to win; BUF 27.8 \u2013 DET 21.1 is the central score projection.",
     "reported_sources": [
@@ -914,7 +963,7 @@
         "NYJ protection vs GB pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 4,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -967,10 +1016,31 @@
         "title": "GB early-down approach vs NYJ"
       },
       {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "GB: Warren Brinson \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "NYJ: Omar Cooper Jr. \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "NYJ: Joseph Ossai \u2014 Did Not Participate In Practice"
+      },
+      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=40.8135&longitude=-74.0745&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Moderate",
+        "strength": "Strong",
         "title": "Kickoff weather in NYJ"
       }
     ],
@@ -1012,7 +1082,7 @@
     "matchup": "GB @ NYJ",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:31:07.315853+00:00",
+        "as_of": "2026-09-16T21:28:33.986494+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1022,7 +1092,7 @@
         "title": "New defensive coordinator in NYJ"
       },
       {
-        "as_of": "2026-09-16T18:33:21.740466+00:00",
+        "as_of": "2026-09-16T21:30:24.543864+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "NYJ",
@@ -1032,7 +1102,7 @@
         "title": "GB explosives vs NYJ prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:21.741318+00:00",
+        "as_of": "2026-09-16T21:30:24.544685+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYJ",
@@ -1042,7 +1112,7 @@
         "title": "NYJ protection vs GB pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:21.740740+00:00",
+        "as_of": "2026-09-16T21:30:24.544093+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYJ",
@@ -1080,7 +1150,7 @@
     ],
     "paragraphs": [
       "Green Bay visits New York for the Jets\u2019 home opener with a clear trench matchup in focus. The Jets\u2019 schedule breakdown points to former Packers center Josh Myers anchoring a young New York offensive line that must account for Micah Parsons and Green Bay\u2019s edge pressure. The Packers\u2019 schedule release also frames MetLife as an early road test. If New York can keep its quarterback out of obvious passing situations, the Jets can make Green Bay defend the full field instead of simply attacking protection.",
-      "LevLine 3.0 gives the Packers a 65.6% win probability over the Jets. Its frozen F-ST engine reconciles a 66.6% football-only signal with a 64.5% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Green Bay Packers -5.2, a market line of Green Bay Packers -4.5, and an approximate coherent score of GB 25 \u2013 NYJ 19. Green Bay\u2019s pressure against New York\u2019s protection determines whether the Packers can create predictable passing downs and keep the Jets from playing on schedule. The pick: Green Bay Packers moneyline."
+      "LevLine 3.0 gives the Packers a 64.0% win probability over the Jets. Its frozen F-ST engine reconciles a 66.6% football-only signal with a 63.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Green Bay Packers -4.6, a market line of Green Bay Packers -3.5, and an approximate coherent score of GB 24 \u2013 NYJ 20. Green Bay\u2019s pressure against New York\u2019s protection determines whether the Packers can create predictable passing downs and keep the Jets from playing on schedule. The pick: Green Bay Packers moneyline."
     ],
     "prediction": "GB to win; NYJ 19.6 \u2013 GB 24.5 is the central score projection.",
     "reported_sources": [
@@ -1126,7 +1196,7 @@
         "KC YAC creation vs IND tackling"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 3,
       "primary_variant": 5,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -1177,6 +1247,27 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "KC YAC creation vs IND tackling"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "IND: Anthony Richardson \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "IND: Ashton Dulin \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "KC: Josh Simmons \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_02_IND_KC",
@@ -1217,7 +1308,7 @@
     "matchup": "IND @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.717688+00:00",
+        "as_of": "2026-09-16T21:30:18.597563+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1227,7 +1318,7 @@
         "title": "What Eric Bieniemy could change in KC"
       },
       {
-        "as_of": "2026-09-16T18:33:26.409530+00:00",
+        "as_of": "2026-09-16T21:30:27.964389+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -1237,7 +1328,7 @@
         "title": "KC early-down approach vs IND"
       },
       {
-        "as_of": "2026-09-16T18:33:26.409608+00:00",
+        "as_of": "2026-09-16T21:30:27.964456+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "KC",
@@ -1247,7 +1338,7 @@
         "title": "KC YAC creation vs IND tackling"
       },
       {
-        "as_of": "2026-09-16T18:33:11.872542+00:00",
+        "as_of": "2026-09-16T21:29:57.532407+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1390,6 +1481,27 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "DEN YAC creation vs JAX tackling"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report + nflverse usage",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "DEN: Marvin Mims Jr. \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report + nflverse usage",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "DEN: RJ Harvey \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Weak",
+        "title": "JAX: Cole Van Lanen \u2014 Limited Participation in Practice"
       }
     ],
     "game_id": "2026_02_JAX_DEN",
@@ -1430,7 +1542,7 @@
     "matchup": "JAX @ DEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:31:49.294898+00:00",
+        "as_of": "2026-09-16T21:28:35.892949+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1440,7 +1552,7 @@
         "title": "DEN offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-16T18:33:23.475652+00:00",
+        "as_of": "2026-09-16T21:30:25.817454+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "JAX",
@@ -1450,7 +1562,7 @@
         "title": "JAX explosives vs DEN prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:23.475151+00:00",
+        "as_of": "2026-09-16T21:30:25.817042+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -1460,7 +1572,7 @@
         "title": "JAX protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:23.477210+00:00",
+        "as_of": "2026-09-16T21:30:25.818709+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DEN",
@@ -1550,7 +1662,7 @@
         "LV protection vs LAC pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 7,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -1608,6 +1720,20 @@
         "source_url": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
         "strength": "Strong",
         "title": "LAC early-down approach vs LV"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "LV: Darien Porter \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report + nflverse usage",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "LV: Brock Bowers \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_02_LV_LAC",
@@ -1648,7 +1774,7 @@
     "matchup": "LV @ LAC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:33.096303+00:00",
+        "as_of": "2026-09-16T21:30:32.571596+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "LAC",
@@ -1658,7 +1784,7 @@
         "title": "Justin Herbert vs LV: player history"
       },
       {
-        "as_of": "2026-09-16T18:33:24.064563+00:00",
+        "as_of": "2026-09-16T21:30:26.251152+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LV",
@@ -1668,7 +1794,7 @@
         "title": "LV protection vs LAC pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:24.065087+00:00",
+        "as_of": "2026-09-16T21:30:26.251585+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LAC",
@@ -1678,7 +1804,7 @@
         "title": "LV explosives vs LAC prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:24.066668+00:00",
+        "as_of": "2026-09-16T21:30:26.252812+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "LV",
@@ -1721,7 +1847,7 @@
     ],
     "paragraphs": [
       "Los Angeles returns home needing a sharper response after a Week 1 loss in which the Chargers turned the ball over and allowed Arizona to sustain too much offense. Las Vegas arrives with a depth chart built around veteran quarterback Kirk Cousins, Ashton Jeanty, Brock Bowers and Maxx Crosby. The Raiders have enough established pieces to punish another uneven Chargers performance, while Los Angeles needs its offense to finish drives and its defense to avoid giving Cousins comfortable, repeatable answers.",
-      "LevLine 3.0 gives the Chargers a 71.9% win probability over the Raiders. Its frozen F-ST engine reconciles a 63.3% football-only signal with a 71.8% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Los Angeles Chargers -7.5, a market line of Los Angeles Chargers -6.5, and an approximate coherent score of LAC 26 \u2013 LV 19. Los Angeles must finish drives and disrupt Las Vegas\u2019 veteran passing structure; if the Chargers control those situations, the Raiders lose their easiest path to sustained possessions. The pick: Los Angeles Chargers moneyline."
+      "LevLine 3.0 gives the Chargers a 72.4% win probability over the Raiders. Its frozen F-ST engine reconciles a 63.3% football-only signal with a 72.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Los Angeles Chargers -7.7, a market line of Los Angeles Chargers -6.5, and an approximate coherent score of LAC 26 \u2013 LV 19. Los Angeles must finish drives and disrupt Las Vegas\u2019 veteran passing structure; if the Chargers control those situations, the Raiders lose their easiest path to sustained possessions. The pick: Los Angeles Chargers moneyline."
     ],
     "prediction": "LAC to win; LAC 25.8 \u2013 LV 18.9 is the central score projection.",
     "reported_sources": [
@@ -1767,7 +1893,7 @@
         "MIA protection vs SF pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 8,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -1872,7 +1998,7 @@
     "matchup": "MIA @ SF",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.716989+00:00",
+        "as_of": "2026-09-16T21:30:18.596926+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1882,7 +2008,7 @@
         "title": "What Bobby Slowik could change in MIA"
       },
       {
-        "as_of": "2026-09-16T18:33:25.825305+00:00",
+        "as_of": "2026-09-16T21:30:27.546799+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIA",
@@ -1892,7 +2018,7 @@
         "title": "MIA protection vs SF pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:25.826096+00:00",
+        "as_of": "2026-09-16T21:30:27.547408+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "SF",
@@ -1902,7 +2028,7 @@
         "title": "MIA early-down approach vs SF"
       },
       {
-        "as_of": "2026-09-16T18:33:25.827145+00:00",
+        "as_of": "2026-09-16T21:30:27.548211+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "MIA",
@@ -2060,10 +2186,31 @@
         "title": "MIN third downs vs CHI"
       },
       {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "MIN: Jauan Jennings \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "CHI: Darnell Wright \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "CHI: Neville Gallimore \u2014 Did Not Participate In Practice"
+      },
+      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=41.8623&longitude=-87.6167&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Weak",
+        "strength": "Moderate",
         "title": "Kickoff weather in CHI"
       }
     ],
@@ -2105,7 +2252,7 @@
     "matchup": "MIN @ CHI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.711893+00:00",
+        "as_of": "2026-09-16T21:30:18.592414+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2115,7 +2262,7 @@
         "title": "What Press Taylor could change in CHI"
       },
       {
-        "as_of": "2026-09-16T18:33:19.974772+00:00",
+        "as_of": "2026-09-16T21:30:23.286229+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
@@ -2125,7 +2272,7 @@
         "title": "CHI protection vs MIN pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:19.975305+00:00",
+        "as_of": "2026-09-16T21:30:23.286695+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CHI",
@@ -2135,7 +2282,7 @@
         "title": "CHI explosives vs MIN prevention"
       },
       {
-        "as_of": "2026-09-16T18:31:04.338948+00:00",
+        "as_of": "2026-09-16T21:28:31.841348+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2186,7 +2333,7 @@
     ],
     "paragraphs": [
       "Both teams entered Week 2 riding offensive fireworks and defensive swagger. Chicago\u2019s Ben Johnson looks to keep his 59\u2011point debut momentum alive, while Minnesota\u2019s Brian Flores boasts the league\u2019s top blitz rate after a four\u2011sack showing against Green Bay. The clash will hinge on whether the Bears can sustain big\u2011play passing against a Vikings front that thrives on pressure, and if Minnesota can force turnovers before Chicago\u2019s rhythm stalls.",
-      "LevLine 3.0 gives the Bears a 66.9% win probability over the Vikings. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 65.7% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -5.6, a market line of Chicago Bears -4.5, and an approximate coherent score of CHI 25 \u2013 MIN 20. Chicago's explosive passing will test Minnesota's aggressive blitz, while the Vikings' disciplined pass rush aims to disrupt Ben Johnson's tempo throughout the game and force. The pick: Chicago Bears moneyline."
+      "LevLine 3.0 gives the Bears a 65.4% win probability over the Vikings. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 64.5% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -5.1, a market line of Chicago Bears -4.5, and an approximate coherent score of CHI 25 \u2013 MIN 20. Chicago's explosive passing will test Minnesota's aggressive blitz, while the Vikings' disciplined pass rush aims to disrupt Ben Johnson's tempo throughout the game and force. The pick: Chicago Bears moneyline."
     ],
     "prediction": "CHI to win; CHI 22.7 \u2013 MIN 22.3 is the central score projection.",
     "reported_sources": [
@@ -2232,7 +2379,7 @@
         "BAL protection vs NO pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 10,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -2285,6 +2432,27 @@
         "title": "BAL early-down approach vs NO"
       },
       {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report + nflverse usage",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "NO: Juwan Johnson \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "NO: Isaiah Stalbird \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "BAL: Ronnie Stanley \u2014 Did Not Participate In Practice"
+      },
+      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.278&longitude=-76.6227&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
@@ -2330,7 +2498,7 @@
     "matchup": "NO @ BAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:31:03.145326+00:00",
+        "as_of": "2026-09-16T21:28:30.919952+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2340,7 +2508,7 @@
         "title": "New defensive coordinator in BAL"
       },
       {
-        "as_of": "2026-09-16T18:33:19.394242+00:00",
+        "as_of": "2026-09-16T21:30:22.853349+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BAL",
@@ -2350,7 +2518,7 @@
         "title": "NO explosives vs BAL prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:19.395076+00:00",
+        "as_of": "2026-09-16T21:30:22.854025+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "BAL",
@@ -2360,7 +2528,7 @@
         "title": "BAL protection vs NO pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:19.395849+00:00",
+        "as_of": "2026-09-16T21:30:22.854611+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BAL",
@@ -2452,7 +2620,7 @@
         "NYG protection vs LA pass rush"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 3,
       "primary_variant": 11,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -2557,7 +2725,7 @@
     "matchup": "NYG @ LA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.718076+00:00",
+        "as_of": "2026-09-16T21:30:18.597876+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2567,7 +2735,7 @@
         "title": "What Matt Nagy could change in NYG"
       },
       {
-        "as_of": "2026-09-16T18:33:26.986443+00:00",
+        "as_of": "2026-09-16T21:30:28.393865+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LA",
@@ -2577,7 +2745,7 @@
         "title": "LA explosives vs NYG prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:26.984651+00:00",
+        "as_of": "2026-09-16T21:30:28.392457+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -2587,7 +2755,7 @@
         "title": "NYG protection vs LA pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:26.985458+00:00",
+        "as_of": "2026-09-16T21:30:28.393094+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYG",
@@ -2693,7 +2861,7 @@
         "PHI explosives vs TEN prevention"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 12,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -2744,6 +2912,20 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "PHI YAC creation vs TEN tackling"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Weak",
+        "title": "TEN: James Williams \u2014 Limited Participation in Practice"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=36.1665&longitude=-86.7713&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in TEN"
       }
     ],
     "game_id": "2026_02_PHI_TEN",
@@ -2784,7 +2966,7 @@
     "matchup": "PHI @ TEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:31:28.498689+00:00",
+        "as_of": "2026-09-16T21:28:35.008630+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2794,7 +2976,7 @@
         "title": "PHI offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-16T18:33:22.897290+00:00",
+        "as_of": "2026-09-16T21:30:25.394429+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TEN",
@@ -2804,7 +2986,7 @@
         "title": "PHI explosives vs TEN prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:22.898834+00:00",
+        "as_of": "2026-09-16T21:30:25.395652+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "PHI",
@@ -2814,7 +2996,7 @@
         "title": "TEN early-down approach vs PHI"
       },
       {
-        "as_of": "2026-09-16T18:33:22.897626+00:00",
+        "as_of": "2026-09-16T21:30:25.394751+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "TEN",
@@ -2898,7 +3080,7 @@
         "PIT explosives vs NE prevention"
       ],
       "media_led": true,
-      "media_source_count": 1,
+      "media_source_count": 2,
       "primary_variant": 13,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -2958,6 +3140,27 @@
         "title": "PIT YAC creation vs NE tackling"
       },
       {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "PIT: Troy Fautanu \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "PIT: Darnell Washington \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "NE: Dametrious Crownover \u2014 Did Not Participate In Practice"
+      },
+      {
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=42.0909&longitude=-71.2643&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
@@ -3010,7 +3213,7 @@
     "matchup": "PIT @ NE",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.712475+00:00",
+        "as_of": "2026-09-16T21:30:18.592973+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3020,7 +3223,7 @@
         "title": "What Patrick Graham could change in PIT"
       },
       {
-        "as_of": "2026-09-16T18:33:21.156361+00:00",
+        "as_of": "2026-09-16T21:30:24.126744+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "PIT",
@@ -3030,7 +3233,7 @@
         "title": "PIT explosives vs NE prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:21.157157+00:00",
+        "as_of": "2026-09-16T21:30:24.127346+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NE",
@@ -3040,7 +3243,7 @@
         "title": "NE protection vs PIT pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:21.156640+00:00",
+        "as_of": "2026-09-16T21:30:24.126975+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "PIT",
@@ -3230,7 +3433,7 @@
     "matchup": "SEA @ ARI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:13.716004+00:00",
+        "as_of": "2026-09-16T21:30:18.596119+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3240,7 +3443,7 @@
         "title": "What Nathaniel Hackett could change in ARI"
       },
       {
-        "as_of": "2026-09-16T18:33:24.644991+00:00",
+        "as_of": "2026-09-16T21:30:26.672547+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "SEA",
@@ -3250,7 +3453,7 @@
         "title": "ARI explosives vs SEA prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:24.645254+00:00",
+        "as_of": "2026-09-16T21:30:26.672757+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ARI",
@@ -3260,7 +3463,7 @@
         "title": "ARI early-down approach vs SEA"
       },
       {
-        "as_of": "2026-09-16T18:32:10.105616+00:00",
+        "as_of": "2026-09-16T21:28:56.354705+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -3415,6 +3618,27 @@
         "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
         "strength": "Strong",
         "title": "DAL YAC creation vs WAS tackling"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "WAS: Chig Okonkwo \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "WAS: Frankie Luvu \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "personnel",
+        "source_name": "NFL.com official injury report",
+        "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+        "strength": "Moderate",
+        "title": "DAL: Malik Hooker \u2014 Did Not Participate In Practice"
       }
     ],
     "game_id": "2026_02_WAS_DAL",
@@ -3455,7 +3679,7 @@
     "matchup": "WAS @ DAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-16T18:33:34.126670+00:00",
+        "as_of": "2026-09-16T21:30:33.278161+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -3465,7 +3689,7 @@
         "title": "Dak Prescott vs WAS: player history"
       },
       {
-        "as_of": "2026-09-16T18:33:25.229440+00:00",
+        "as_of": "2026-09-16T21:30:27.115310+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -3475,7 +3699,7 @@
         "title": "WAS explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-16T18:33:25.230298+00:00",
+        "as_of": "2026-09-16T21:30:27.115989+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "WAS",
@@ -3485,7 +3709,7 @@
         "title": "DAL protection vs WAS pass rush"
       },
       {
-        "as_of": "2026-09-16T18:33:25.231098+00:00",
+        "as_of": "2026-09-16T21:30:27.116596+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "WAS",
