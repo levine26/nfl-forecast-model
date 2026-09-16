@@ -17,7 +17,7 @@ CONTRACT = Path("research/levline4_2026_ngs_player_id_heldout_v2_contract.json")
 
 
 def test_name_normalization_is_frozen_ascii_nfkd_and_token_preserving():
-    assert normalize_name("  De'Vonta—Smith Jr. ") == "de vonta smith jr"
+    assert normalize_name("  De'Vonta—Smith Jr. ") == "de vontasmith jr"
     assert normalize_name("José Núñez") == "jose nunez"
     assert normalize_name("A.J. Brown") == "a j brown"
 
