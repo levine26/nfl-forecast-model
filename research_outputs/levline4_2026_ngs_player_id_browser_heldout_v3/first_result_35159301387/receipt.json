@@ -1,0 +1,125 @@
+{
+  "authority": {
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "ngs_exact_display_name_plus_team_resolver_qualified_for_frozen_official_roster_v2_population": false,
+    "ngs_public_page_browser_context_transport_qualified_for_frozen_official_roster_v2_population": false,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": false,
+    "production_authorized": false,
+    "required_next_action": "Freeze the failed first result; any revised browser action, timeout, transport, resolver, threshold, selection rule, source, or retry behavior must be a new version.",
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "browser_transport": {
+    "browser_error": null,
+    "browser_storage_state_persisted": false,
+    "direct_http_fallback_used": false,
+    "explicit_retry_used": false,
+    "manual_headers_or_credentials_used": false,
+    "page_loaded": true,
+    "page_url": "https://ngs.nfl.com/player-id-lookup",
+    "query_input_count": 1
+  },
+  "captured_at_utc": "2026-09-16T22:48:24.178548Z",
+  "completed_2026_outcomes_used_for_design_or_selection": 0,
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V3",
+  "f_st_01_frozen_2026_unchanged": true,
+  "gates": {
+    "all_70_targets_browser_http_200_parseable_players_array": true,
+    "coverage_unique_resolution_minimum": false,
+    "duplicate_selected_gsis_zero": true,
+    "invalid_selected_gsis_zero": true,
+    "page_loaded_and_unique_query_input": true,
+    "resolved_coverage_jersey_agreement_minimum": true,
+    "resolved_coverage_jersey_comparable_minimum": true,
+    "same_target_multiple_name_plus_team_candidate_zero": false,
+    "source_name_ambiguity_unique_resolution_required": true
+  },
+  "metrics": {
+    "all_http_200_parseable_players_array": true,
+    "coverage_target_count": 64,
+    "coverage_unique_resolution_count": 56,
+    "coverage_unique_resolution_fraction": 0.875,
+    "duplicate_selected_gsis_across_distinct_target_rows_count": 0,
+    "duplicate_selected_gsis_assignments": {},
+    "invalid_selected_gsis_count": 0,
+    "page_loaded": true,
+    "query_input_count": 1,
+    "resolved_coverage_jersey_agreement_count": 55,
+    "resolved_coverage_jersey_agreement_fraction": 0.9821428571428571,
+    "resolved_coverage_jersey_comparable_count": 56,
+    "resolved_coverage_jersey_comparable_fraction": 1.0,
+    "same_target_multiple_name_plus_team_candidate_count": 2,
+    "source_name_ambiguity_target_count": 6,
+    "source_name_ambiguity_unique_resolution_count": 6,
+    "source_name_ambiguity_unique_resolution_fraction": 1.0,
+    "target_count": 70
+  },
+  "postgame_participation_used": false,
+  "production_paths_changed": false,
+  "research_only": true,
+  "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v3-receipt",
+  "source_roster_metadata_sha256": "90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f",
+  "status": "FAIL",
+  "target_selection": {
+    "ambiguity_groups": {
+      "byron young": [
+        {
+          "jersey_number": "0",
+          "position": "OLB",
+          "profile_path": "/team/players-roster/byron-young/",
+          "team": "LAR",
+          "visible_name": "Byron Young"
+        },
+        {
+          "jersey_number": "94",
+          "position": "DT",
+          "profile_path": "/team/players-roster/byron-young/",
+          "team": "PHI",
+          "visible_name": "Byron Young"
+        }
+      ],
+      "devonta smith": [
+        {
+          "jersey_number": "43",
+          "position": "CB",
+          "profile_path": "/team/players-roster/devonta-smith-2/",
+          "team": "CAR",
+          "visible_name": "DeVonta Smith"
+        },
+        {
+          "jersey_number": "6",
+          "position": "WR",
+          "profile_path": "/team/players-roster/devonta-smith/",
+          "team": "PHI",
+          "visible_name": "DeVonta Smith"
+        }
+      ],
+      "marcus harris": [
+        {
+          "jersey_number": "96",
+          "position": "DT",
+          "profile_path": "/team/players-roster/marcus-harris/",
+          "team": "KC",
+          "visible_name": "Marcus Harris"
+        },
+        {
+          "jersey_number": "26",
+          "position": "CB",
+          "profile_path": "/team/players-roster/marcus-harris/",
+          "team": "TEN",
+          "visible_name": "Marcus Harris"
+        }
+      ]
+    },
+    "coverage_target_count": 64,
+    "eligible_row_count": 2459,
+    "overlap_count": 0,
+    "source_name_ambiguity_group_count": 3,
+    "source_name_ambiguity_target_count": 6,
+    "team_count": 32,
+    "total_target_count": 70
+  },
+  "week2_inactive_execution_evidence_used_for_design": false
+}
