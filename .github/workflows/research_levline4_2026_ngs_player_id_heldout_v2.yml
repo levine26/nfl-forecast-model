@@ -43,9 +43,13 @@ jobs:
           current_blob=$(git rev-parse "HEAD:${CONTRACT_PATH}")
           test "$frozen_blob" = "$current_blob"
           test "$FROZEN_CONTRACT_COMMIT" != "$(git rev-parse HEAD)"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install research test dependencies
+        run: python -m pip install '.[dev]'
       - name: Unit-test resolver and frozen contract
-        run: |
-          python -m pytest -q research/test_levline4_2026_ngs_player_id_heldout_v2.py
+        run: python -m pytest -q research/test_levline4_2026_ngs_player_id_heldout_v2.py
       - name: Prove research-only diff
         run: |
           set -euo pipefail
