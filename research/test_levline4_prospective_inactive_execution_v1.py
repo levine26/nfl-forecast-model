@@ -147,7 +147,7 @@ def test_matching_article_deduplicates_identical_bodies(tmp_path: Path) -> None:
     assert selected is not None
     assert selected["raw_sha256"] == sha
     assert len(matches) == 2
-    assert selected["source"]["url"].endswith("aaa-duplicate-current-body/")
+    assert selected["source"]["url"] == "https://www.nfl.com/news/2026-nfl-season-week-2-inactives/"
 
 
 def test_resolver_input_excludes_position_and_emergency_semantics() -> None:
