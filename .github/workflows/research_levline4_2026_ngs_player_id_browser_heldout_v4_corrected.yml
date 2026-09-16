@@ -1,0 +1,169 @@
+name: LevLine 4 NGS player ID browser held-out V4 frozen replay
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v4_contract.json'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v4_preexecution_addendum.json'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v4.py'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v4_corrected.py'
+      - 'research/test_levline4_2026_ngs_player_id_browser_heldout_v4.py'
+      - 'research/test_levline4_2026_ngs_player_id_browser_heldout_v4_corrected.py'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v4_first_result_manifest.json'
+      - '.github/workflows/research_levline4_2026_ngs_player_id_browser_heldout_v4_corrected.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: levline4-ngs-player-id-browser-heldout-v4-frozen-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  FROZEN_CONTRACT_COMMIT: '64ec8ce23dea248663a3366dde023479f812d0a2'
+  PREEXECUTION_ADDENDUM_COMMIT: '93ec4a14e19be62642479140648e88b3d72debc7'
+  FIRST_RESULT_MANIFEST_COMMIT: '84ff4121e08290862586be32dbad3e6534408a19'
+  CONTRACT_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v4_contract.json'
+  ADDENDUM_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v4_preexecution_addendum.json'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v4_first_result_manifest.json'
+
+jobs:
+  frozen-governance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove V4 is frozen before replay
+        run: |
+          set -euo pipefail
+          test -f "$MANIFEST_PATH"
+          git cat-file -e "${FROZEN_CONTRACT_COMMIT}^{commit}"
+          git cat-file -e "${PREEXECUTION_ADDENDUM_COMMIT}^{commit}"
+          git cat-file -e "${FIRST_RESULT_MANIFEST_COMMIT}^{commit}"
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" "$PREEXECUTION_ADDENDUM_COMMIT"
+          git merge-base --is-ancestor "$PREEXECUTION_ADDENDUM_COMMIT" "$FIRST_RESULT_MANIFEST_COMMIT"
+          git merge-base --is-ancestor "$FIRST_RESULT_MANIFEST_COMMIT" HEAD
+          test "$(git rev-parse "${FROZEN_CONTRACT_COMMIT}:${CONTRACT_PATH}")" = "$(git rev-parse "HEAD:${CONTRACT_PATH}")"
+          test "$(git rev-parse "${PREEXECUTION_ADDENDUM_COMMIT}:${ADDENDUM_PATH}")" = "$(git rev-parse "HEAD:${ADDENDUM_PATH}")"
+          test "$(git rev-parse "${FIRST_RESULT_MANIFEST_COMMIT}:${MANIFEST_PATH}")" = "$(git rev-parse "HEAD:${MANIFEST_PATH}")"
+          test "$FIRST_RESULT_MANIFEST_COMMIT" = "$(git log -1 --format=%H -- "$MANIFEST_PATH")"
+          test -z "$(git diff --name-only "${FIRST_RESULT_MANIFEST_COMMIT}"..HEAD -- \
+            research/levline4_2026_ngs_player_id_browser_heldout_v4.py \
+            research/levline4_2026_ngs_player_id_browser_heldout_v4_corrected.py \
+            research/test_levline4_2026_ngs_player_id_browser_heldout_v4.py \
+            research/test_levline4_2026_ngs_player_id_browser_heldout_v4_corrected.py \
+            "$CONTRACT_PATH" "$ADDENDUM_PATH" "$MANIFEST_PATH")"
+      - name: Validate frozen manifest semantics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v4_first_result_manifest.json').read_text())
+          assert m['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V4'
+          assert m['first_result_is_canonical'] is True
+          assert m['later_same_version_execution_may_replace_first_result'] is False
+          assert m['same_version_rule_adaptation_after_first_result'] is False
+          assert m['first_result_status']=='TECHNICAL_FAIL_PRE_REQUEST'
+          assert m['scientific_disposition']=='NOT_EVALUATED'
+          assert m['scientific_pass_or_fail_available'] is False
+          assert m['ngs_request_count']==0
+          assert m['ngs_response_count']==0
+          assert m['browser_query_execution_started'] is False
+          assert m['resolver_semantics_empirically_tested'] is False
+          assert m['receipt_created'] is False
+          assert m['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert m['postgame_participation_used'] is False
+          assert m['week2_inactive_execution_evidence_used_for_design'] is False
+          assert m['future_information_used_to_repair_point_in_time_state'] is False
+          assert m['f_st_01_frozen_2026_unchanged'] is True
+          assert m['research_only'] is True
+          assert m['production_paths_changed'] is False
+          for key,value in m['authority'].items():
+              if key == 'required_next_action':
+                  continue
+              assert value is False, key
+          PY
+      - name: Unit-test frozen V4 implementation without live execution
+        run: |
+          python -m pip install pytest
+          python -m pytest -q \
+            research/test_levline4_2026_ngs_player_id_browser_heldout_v4.py \
+            research/test_levline4_2026_ngs_player_id_browser_heldout_v4_corrected.py
+
+  replay-canonical-first-result:
+    needs: frozen-governance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and verify immutable canonical V4 technical-failure artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > /tmp/coords.env
+          import json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v4_first_result_manifest.json').read_text())
+          print(f"ARTIFACT_ID={m['first_artifact_id']}")
+          print(f"ARTIFACT_DIGEST={m['artifact_digest']}")
+          print(f"WORKFLOW_RUN_ID={m['first_workflow_run_id']}")
+          print(f"HEAD_SHA={m['first_head_sha']}")
+          PY
+          source /tmp/coords.env
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/ngs_v4.zip
+          rm -rf /tmp/ngs_v4 && mkdir -p /tmp/ngs_v4
+          unzip -q /tmp/ngs_v4.zip -d /tmp/ngs_v4
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v4_first_result_manifest.json').read_text())
+          root=Path('/tmp/ngs_v4')
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert observed==m['file_sha256']
+          assert len(observed)==m['file_count']==2
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())==m['artifact_uncompressed_file_bytes']==321
+          assert set(observed)=={'execution.log','execution_exit_code.txt'}
+          assert not (root/'receipt.json').exists()
+          assert not any(p.is_file() for p in (root/'responses').rglob('*')) if (root/'responses').exists() else True
+          assert (root/'execution_exit_code.txt').read_text().strip()=='1'
+          log=(root/'execution.log').read_text()
+          assert "ModuleNotFoundError: No module named 'research'" in log
+          assert 'levline4_2026_ngs_player_id_browser_heldout_v4_corrected.py", line 18' in log
+          assert m['failure_class']=='technical_pre_request_import_path'
+          assert m['failure_exception_type']=='ModuleNotFoundError'
+          assert m['failure_exception_message']=="No module named 'research'"
+          assert m['ngs_request_count']==0
+          assert m['raw_ngs_response_files']==0
+          print('Canonical V4 pre-request technical failure artifact verified byte-for-byte; no live NGS execution occurred.')
+          PY
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove research-only scope
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=100
+          git diff --name-only origin/main...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/main...HEAD -- outputs/ site/ src/ scripts/ config/

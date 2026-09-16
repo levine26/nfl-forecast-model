@@ -1,0 +1,44 @@
+{
+  "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v4-preexecution-addendum",
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V4",
+  "status": "PREEXECUTION_PREREGISTRATION_CORRECTION",
+  "supersedes_only": "conditional ARI<->AZ alias-capability qualification criterion",
+  "unchanged": [
+    "74-row frozen target population and hashes",
+    "all target-selection rules",
+    "browser transport and query cascade",
+    "name_key semantics",
+    "ARI<->AZ candidate equivalence used by the resolver",
+    "position+jersey tiebreak",
+    "all overall V4 pass/fail gates",
+    "all authority ceilings outside conditional alias capability",
+    "zero completed-2026 outcomes",
+    "no postgame participation",
+    "F-ST-01-FROZEN-2026"
+  ],
+  "corrected_conditional_capability_rule": {
+    "ari_az_team_alias_qualified_for_frozen_v4_population": "May be true only if every overall V4 gate passes, all 4 preregistered team_alias_ari targets resolve uniquely, and at least one resolved team_alias_ari target actually selects an NGS candidate whose teamAbbr is AZ while the official roster team is ARI. If no resolved target actually exercises ARI->AZ equivalence, this conditional capability remains false even if V4 otherwise passes."
+  },
+  "rationale": "The original unopened V4 preregistration could mark alias capability true from four successful Arizona resolutions without proving that any resolution actually required the ARI<->AZ equivalence. Requiring observed exercise prevents an unexercised rule from earning authority.",
+  "empirical_boundary": {
+    "v4_ngs_requests_observed_before_this_addendum": 0,
+    "v4_workflow_runs_before_this_addendum": 0,
+    "v4_first_result_exists": false,
+    "correction_uses_no_v4_empirical_response": true,
+    "prior_v4_branch_is_abandoned_without_execution": true,
+    "closed_staging_pr_335_had_no_v4_workflow_file_and_could_not_execute_ngs_requests": true
+  },
+  "required_implementation_behavior": {
+    "record_selected_candidate_team_abbr_for_each_resolved_target": true,
+    "record_ari_az_alias_exercised_count": true,
+    "conditional_alias_flag_requires_exercised_count_minimum": 1
+  },
+  "governance": {
+    "research_only": true,
+    "production_paths_may_change": false,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "week2_inactive_execution_evidence_used_for_design": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
