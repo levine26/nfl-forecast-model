@@ -359,13 +359,13 @@ def run(prompt: str, *, model: str, timeout: int, attempts: int) -> str:
                 last_error = RuntimeError(f"Groq HTTP 400 class={reason}")
                 if (
                     _is_gpt_oss_model(active_model)
-                    and "code=tool_use_failed" in reason
+                    and ("code=tool_use_failed" in reason or "code=output_parse_failed" in reason)
                     and attempt < attempts
                 ):
                     fallback_tool_failures += 1
                     next_temperature = _fallback_temperature(fallback_tool_failures)
                     print(
-                        "Groq browser-search tool call was malformed; retrying GPT-OSS "
+                        "Groq browser-search/tool output was not usable; retrying GPT-OSS "
                         f"with lower temperature {next_temperature:.1f}.",
                         file=sys.stderr,
                     )
