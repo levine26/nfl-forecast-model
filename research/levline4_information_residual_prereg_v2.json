@@ -1,0 +1,169 @@
+{
+  "program_id": "LEVLINE-4-INFORMATION-RESIDUAL-V2",
+  "status": "preregistered_research_only",
+  "frozen_at_utc": "2026-09-16T06:20:00Z",
+  "production_authorized": false,
+  "incumbent": {
+    "candidate_id": "F-ST-01-FROZEN-2026",
+    "official_lock_horizon_minutes": 120,
+    "mutation_allowed": false
+  },
+  "scientific_question": "Do structured point-in-time football-information states contain incremental predictive information after conditioning on the same-horizon betting market and the incumbent LevLine forecast?",
+  "primary_metric": "brier",
+  "secondary_metrics": [
+    "log_loss",
+    "winner_accuracy",
+    "calibration_intercept",
+    "calibration_slope",
+    "reliability",
+    "sharpness_conditional_on_calibration"
+  ],
+  "paired_inference": {
+    "unit": "identical game sample",
+    "primary_dependence_structure": "season-week block bootstrap",
+    "minimum_bootstrap_draws": 10000,
+    "report_candidate_minus_baseline_ci": true,
+    "subgroup_policy": "diagnostic_only_unless_separately_preregistered"
+  },
+  "chronology": {
+    "historical_selection_end": 2025,
+    "target_shadow_season": 2026,
+    "completed_2026_outcomes_allowed_for_candidate_selection": false,
+    "completed_2026_outcomes_allowed_for_rescue_tuning": false,
+    "post_kickoff_inputs_allowed": false,
+    "retrospective_tminus_reconstruction_allowed": false,
+    "missing_historical_state_policy": "remain_missing"
+  },
+  "baseline_order": [
+    "raw_same_horizon_market",
+    "F-ST-01-FROZEN-2026",
+    "best_existing_qualified_challenger",
+    "pure_football_model"
+  ],
+  "candidate_families": [
+    {
+      "id": "L4-H1-EXPECTED-LINEUP-RESIDUAL-V1",
+      "hypothesis": "Expected-lineup shock adds residual information beyond the same-horizon market and incumbent.",
+      "feature_definition": "For each unit, sum player_value * expected_role_share * probability_available; primary directional feature is current expected unit/team strength minus the previously expected or normal baseline state.",
+      "units": ["QB", "OL", "RB_WR_TE", "defensive_front", "LB", "secondary"],
+      "required_sources": ["stable_player_identity", "point_in_time_availability", "point_in_time_expected_role", "chronological_player_value", "baseline_lineup_state"],
+      "allowed_fit": "Only after one harmonized source contract proves chronology, stable identity, missingness, status normalization and feature semantics across the validation universe.",
+      "bounded_model_policy": "Market-offset regularized logistic residual; no feature subset tournament.",
+      "primary_gate": "Negative paired Brier delta versus same-horizon market with 95% week-block upper bound below zero, acceptable calibration/log loss, and no one-season concentration.",
+      "current_authorized_action": "data_infrastructure_and_prospective_capture_only"
+    },
+    {
+      "id": "L4-H2-QB-SCENARIO-REPLACEMENT-V1",
+      "hypothesis": "QB starter probability, starter quality, backup quality, replacement delta and continuity add residual information beyond the same-horizon market.",
+      "feature_definition": "Separate QB state from ordinary availability; preserve starter probability, backup/replacement state, continuity and uncertainty as distinct fields.",
+      "scenario_formula": "P(win)=sum_s P(QB_s starts)*P(win|QB_s) only after each conditional component is numerically validated.",
+      "bounded_model_policy": "No editorial QB point values; no scenario mixture until conditional forecasts pass chronological OOS validation.",
+      "primary_gate": "Same as H1, plus calibrated starter-probability and replacement-state provenance.",
+      "current_authorized_action": "data_infrastructure_and_prospective_capture_only"
+    },
+    {
+      "id": "L4-H3-PERSONNEL-CONDITIONED-MATCHUPS-V1",
+      "hypothesis": "A small predeclared set of personnel-conditioned unit interactions adds residual information after credible lineup state exists.",
+      "interactions": [
+        "expected_OL_strength_x_opponent_pass_rush_strength",
+        "expected_tackle_state_x_opponent_edge_strength",
+        "QB_pressure_sensitivity_x_opponent_pressure_generation",
+        "receiver_TE_state_x_opponent_secondary_state",
+        "run_block_state_x_defensive_front_state"
+      ],
+      "dependency": "Requires H1/H2 state qualification first.",
+      "bounded_model_policy": "Hierarchical shrinkage or equivalently conservative regularization; no generic offense-defense interaction soup.",
+      "primary_gate": "Incremental paired Brier improvement over the simpler H1/H2 model and same-horizon market.",
+      "current_authorized_action": "blocked_by_dependency"
+    },
+    {
+      "id": "L4-H4-MARKET-PATH-MICROSTRUCTURE-V1",
+      "hypothesis": "The path by which the same-horizon market probability was reached contains residual information conditional on the current probability.",
+      "features": [
+        "net_movement", "total_variation", "movement_acceleration", "reversal_count", "late_reversal",
+        "maximum_excursion", "book_dispersion", "dispersion_collapse", "move_breadth",
+        "cross_book_agreement", "stale_book_disagreement", "path_efficiency"
+      ],
+      "required_horizons": ["T-120m", "T-60m", "T-45m", "T-30m"],
+      "timing_gate_minutes_relative_to_target": [-7.5, 0.0],
+      "bounded_model_policy": "Use only genuinely captured same-game paths; no imputation from close and no path-rule selection from completed 2026 outcomes.",
+      "primary_gate": "Incremental paired Brier versus final same-horizon market probability on complete-case path rows.",
+      "current_authorized_action": "prospective_capture_and_diagnostics_only"
+    },
+    {
+      "id": "L4-H5-BOOKMAKER-CONSENSUS-V1",
+      "hypothesis": "A historically justified robust or bookmaker-quality-informed consensus can improve the market prior.",
+      "candidate_estimators": ["simple_mean", "median_probability", "median_logit", "fixed_historical_book_weights", "robust_estimator"],
+      "devig_ablations": ["proportional", "shin_two_outcome", "power"],
+      "restrictions": ["no folklore sharp-book labels", "no 2026 outcome-derived book weights", "same-request-batch comparisons only"],
+      "primary_gate": "Paired Brier improvement versus preregistered robust market consensus with corroborating log loss/calibration.",
+      "current_authorized_action": "prospective_capture_and_frozen_ablation_only"
+    },
+    {
+      "id": "L4-H6-INACTIVE-INFORMATION-SURPRISE-V1",
+      "hypothesis": "Official inactive announcements create identifiable information events whose football-state surprise and subsequent market response can be separated.",
+      "event_fields": [
+        "pre_event_expected_lineup", "official_inactive_timestamp", "post_event_expected_lineup",
+        "pre_event_market", "post_event_market", "football_implied_change", "market_change", "residual_disagreement"
+      ],
+      "restrictions": ["official timestamp provenance required", "no retrospective inactive labels", "event study precedes any directional correction model"],
+      "primary_gate": "First establish reproducible event alignment; forecasting correction requires a separately frozen residual candidate.",
+      "current_authorized_action": "research_infrastructure_and_prospective_event_capture"
+    },
+    {
+      "id": "L4-H7-STRUCTURAL-REGIME-CHANGE-V1",
+      "hypothesis": "Explicit football structural breaks may require faster state adaptation than generic rolling features.",
+      "events": ["new_starting_QB", "new_HC", "new_OC", "new_DC", "major_trade", "large_OL_reconfiguration", "clustered_starter_returns", "major_scheme_personnel_change"],
+      "dependency": "Materially distinct from rejected generic dynamic Elo residual.",
+      "bounded_model_policy": "Predeclare event labels and state-transition form before outcome evaluation; no generic Elo retuning.",
+      "primary_gate": "Paired Brier gain versus incumbent representation and same-horizon market with season stability.",
+      "current_authorized_action": "lower_priority_preregistration_only"
+    },
+    {
+      "id": "L4-H8-STRUCTURED-BEAT-INTELLIGENCE-V1",
+      "hypothesis": "Beat-reported facts may improve state measurement when converted to governed structured observations, not free-text sentiment or picks.",
+      "allowed_observations": [
+        "expected_starter", "expected_snap_role_tier", "position_change", "OL_combination",
+        "return_to_full_role", "limited_role_expectation", "coach_confirmed_personnel_change",
+        "scheme_or_personnel_usage_change", "uncertainty_state"
+      ],
+      "required_provenance": ["source", "source_url_or_id", "published_at", "captured_at", "entity_id", "confidence", "forecast_horizon", "raw_evidence_hash"],
+      "restrictions": ["LLM_may_extract_fact_but_not_probability_delta", "no sentiment feature", "no qualitative pick feature"],
+      "primary_gate": "Extraction accuracy/provenance first; any forecast effect requires a separately preregistered numeric residual model.",
+      "current_authorized_action": "schema_and_extraction_validation_only"
+    },
+    {
+      "id": "L4-H9-UNCERTAINTY-AWARE-SHRINKAGE-V1",
+      "hypothesis": "Residual corrections should shrink toward zero as input quality or state certainty deteriorates.",
+      "uncertainty_inputs": ["market_dispersion", "QB_start_probability_entropy", "lineup_state_uncertainty", "source_confidence", "identity_resolution_confidence", "role_uncertainty"],
+      "restriction": "Uncertainty controls magnitude only after a directional residual has independent validation; uncertainty is not itself a directional edge.",
+      "primary_gate": "Improved proper score/calibration versus identical directional model without uncertainty-aware shrinkage.",
+      "current_authorized_action": "capability_infrastructure_only"
+    },
+    {
+      "id": "L4-H10-CONDITIONAL-SCENARIO-ENGINE-V1",
+      "hypothesis": "Validated player/QB/lineup components can support auditable conditional forecasts distinct from the official forecast of record.",
+      "dependency": "Requires numerically validated conditional components from H1/H2 or later qualified candidates.",
+      "restrictions": ["no editorial deltas", "conditional_forecast_not_official_forecast", "timestamp_every_scenario_input"],
+      "primary_gate": "Conditional components must have chronological OOS validation before scenario probabilities are exposed.",
+      "current_authorized_action": "blocked_by_dependency_issue_4"
+    }
+  ],
+  "ablation_order_if_dependencies_clear": [
+    "A_market_only",
+    "B_market_plus_existing_FST_or_PURE_structure",
+    "C_B_plus_expected_lineup",
+    "D_C_plus_QB_state",
+    "E_D_plus_market_path",
+    "F_E_plus_personnel_conditioned_interactions"
+  ],
+  "stopping_rule": "Each candidate receives one execution under this frozen identity. PASS, FAIL, BLOCKED, or PROSPECTIVE_ONLY. A failed candidate cannot be rescued by changing features, thresholds, interactions, weights, model family or hyperparameters under the same identity.",
+  "promotion_firewall": {
+    "research_infrastructure_merge_allowed_without_model_win": true,
+    "frozen_challenger_merge_requires_retrospective_OOS_or_prospective_authorization": true,
+    "production_promotion_requires_existing_prospective_gate": true,
+    "minimum_eligible_graded_games": 200,
+    "minimum_distinct_nfl_weeks": 14,
+    "automatic_promotion": false
+  }
+}
