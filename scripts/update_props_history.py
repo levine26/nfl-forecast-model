@@ -68,17 +68,15 @@ def record_closes(args) -> int:
         captured = _aware(captured_value)
         if captured >= kickoff:
             raise PropsPublicationError(f"closing market timestamp is at/after kickoff for forecast_id={forecast_id}")
-        events.append(
-            make_closing_event(
-                forecast_id,
-                captured_utc=captured,
-                source=row.get("source"),
-                line=row.get("line"),
-                over_price_american=row.get("over_price_american"),
-                under_price_american=row.get("under_price_american"),
-                td_price_american=row.get("td_price_american"),
-            )
-        )
+        events.append(make_closing_event(
+            forecast_id,
+            captured_utc=captured,
+            source=row.get("source"),
+            line=row.get("line"),
+            over_price_american=row.get("over_price_american"),
+            under_price_american=row.get("under_price_american"),
+            td_price_american=row.get("td_price_american"),
+        ))
     count = append_jsonl_immutable(args.ledger, events, identity_key="event_id")
     print(f"recorded {count} new closing-market events -> {args.ledger}")
     return 0
@@ -98,7 +96,11 @@ def record_grades(args) -> int:
         receipt = receipts.get(forecast_id)
         if receipt is None:
             raise PropsPublicationError(f"cannot grade unknown forecast_id={forecast_id}")
-        events.append(grade_forecast_receipt(receipt, actual_result=row.get("actual_result"), graded_utc=row.get("graded_utc") or row.get("graded_at_utc")))
+        events.append(grade_forecast_receipt(
+            receipt,
+            actual_result=row.get("actual_result"),
+            graded_utc=row.get("graded_utc") or row.get("graded_at_utc"),
+        ))
     count = append_jsonl_immutable(args.ledger, events, identity_key="event_id")
     print(f"recorded {count} new grade events -> {args.ledger}; originals were not rewritten")
     return 0
@@ -122,7 +124,8 @@ def main() -> int:
     grade.add_argument("--forecast-ledger", type=Path, default=HISTORY_DIR / "forecast_originals.jsonl")
     grade.add_argument("--ledger", type=Path, default=HISTORY_DIR / "grades.jsonl")
     grade.set_defaults(func=record_grades)
-    return parser.parse_args().func(parser.parse_args())
+    args = parser.parse_args()
+    return args.func(args)
 
 
 if __name__ == "__main__":
