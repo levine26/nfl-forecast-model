@@ -2,20 +2,28 @@ from copy import deepcopy
 from datetime import datetime, timezone
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from nfl_forecast.challenger_props_simulation import (
     GameSimulationInput,
     PlayerSimulationInput,
     TeamSimulationInput,
+    build_game_input_from_upstream,
     simulate_game,
 )
 from nfl_forecast.props_integration import (
     assert_simulation_accounting,
+    build_efficiency_player_inputs,
+    build_efficiency_team_input,
     build_forecast_artifact,
     public_prop_type,
 )
+from nfl_forecast.props_efficiency_td import build_efficiency_td_parameters
 from nfl_forecast.props_market import PropMarketQuote, build_market_artifact
+from nfl_forecast.props_opportunity import ForecastContext
+from nfl_forecast.props_opportunity_handoff import build_simulation_ready_opportunity_projection
+from nfl_forecast.props_player_state import build_offensive_player_state_contract
 from nfl_forecast.props_publication import (
     build_history_view,
     build_public_props,
@@ -276,3 +284,269 @@ def test_forecast_lock_close_and_grade_lifecycle_preserves_original():
     assert view["original_forecast"]["market"]["line"] == 71.5
     assert view["closing_market"]["line"] == 74.5
     assert view["grade"]["actual_result"] == 80
+
+
+def _lane_team_history():
+    rows = []
+    for week in range(1, 9):
+        for team, opp, plays, dropbacks, attempts, targets in (
+            ("ARI", "LAR", 64, 38, 35, 33),
+            ("LAR", "ARI", 63, 39, 36, 34),
+        ):
+            rows.append(
+                {
+                    "game_id": f"2025_{week:02d}_{team}_{opp}",
+                    "season": 2025,
+                    "week": week,
+                    "team": team,
+                    "offensive_plays": plays + week % 2,
+                    "dropbacks": dropbacks,
+                    "pass_attempts": attempts,
+                    "sacks": 2,
+                    "qb_scrambles": dropbacks - attempts - 2,
+                    "designed_rush_attempts": plays - dropbacks,
+                    "team_targets": targets,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _lane_player_history():
+    role_rows = {
+        "ARI": (
+            ("qb-a", "QB", 3, 0, 0, 0, 1, 1, 0, 0),
+            ("rb-a1", "RB", 13, 18, 4, 3, 5, 3, 1, 0),
+            ("rb-a2", "RB", 6, 9, 2, 1, 2, 1, 0, 0),
+            ("wr-a1", "WR", 0, 34, 10, 7, 0, 0, 2, 1),
+            ("wr-a2", "WR", 0, 30, 7, 4, 0, 0, 1, 1),
+            ("te-a", "TE", 0, 25, 7, 5, 0, 0, 2, 1),
+        ),
+        "LAR": (
+            ("qb-l", "QB", 2, 0, 0, 0, 1, 1, 0, 0),
+            ("rb-l", "RB", 14, 17, 4, 3, 5, 3, 1, 0),
+            ("wr-l", "WR", 0, 35, 12, 8, 0, 0, 3, 2),
+            ("te-l", "TE", 0, 27, 7, 5, 0, 0, 2, 1),
+        ),
+    }
+    rows = []
+    for week in range(1, 9):
+        for team, players in role_rows.items():
+            opp = "LAR" if team == "ARI" else "ARI"
+            gid = f"2025_{week:02d}_{team}_{opp}"
+            for pid, pos, carries, routes, targets, rec, rz_c, gl_c, rz_t, ez_t in players:
+                rows.append(
+                    {
+                        "game_id": gid,
+                        "season": 2025,
+                        "week": week,
+                        "team": team,
+                        "player_id": pid,
+                        "position": pos,
+                        "designed_carries": carries,
+                        "routes": routes,
+                        "targets": targets,
+                        "receptions": rec,
+                        "red_zone_carries": rz_c,
+                        "goal_line_carries": gl_c,
+                        "red_zone_targets": rz_t,
+                        "end_zone_targets": ez_t,
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def _lane_player_state():
+    roster = pd.DataFrame(
+        [
+            {"gsis_id": pid, "full_name": name, "position": pos, "team": team, "status": "ACT"}
+            for pid, name, pos, team in (
+                ("qb-a", "ARI QB", "QB", "ARI"),
+                ("rb-a1", "ARI RB1", "RB", "ARI"),
+                ("rb-a2", "ARI RB2", "RB", "ARI"),
+                ("wr-a1", "ARI WR1", "WR", "ARI"),
+                ("wr-a2", "ARI WR2", "WR", "ARI"),
+                ("te-a", "ARI TE", "TE", "ARI"),
+                ("qb-l", "LAR QB", "QB", "LAR"),
+                ("rb-l", "LAR RB", "RB", "LAR"),
+                ("wr-l", "LAR WR", "WR", "LAR"),
+                ("te-l", "LAR TE", "TE", "LAR"),
+            )
+        ]
+    )
+    schedule = pd.DataFrame(
+        [
+            {
+                "season": 2026,
+                "week": 3,
+                "game_id": "2026_03_ARI_LAR",
+                "home_team": "ARI",
+                "away_team": "LAR",
+                "kickoff": KICKOFF.isoformat(),
+            }
+        ]
+    )
+    availability = pd.DataFrame(
+        [
+            {
+                "player_id": row["gsis_id"],
+                "team": row["team"],
+                "status": "Active",
+                "captured_at": "2026-09-17T21:30:00+00:00",
+                "source_name": "synthetic prospective fixture",
+            }
+            for _, row in roster.iterrows()
+        ]
+    )
+    return build_offensive_player_state_contract(
+        schedules=schedule,
+        roster=roster,
+        pbp=None,
+        season=2026,
+        week=3,
+        forecast_timestamp=FORECAST,
+        availability=availability,
+    ).player_state
+
+
+def _efficiency_baselines(player_ids):
+    rows = []
+    for pid, pos in player_ids:
+        is_qb = pos == "QB"
+        is_rb = pos == "RB"
+        is_receiver = pos in {"RB", "WR", "TE"}
+        rows.append(
+            {
+                "player_id": pid,
+                "hist_pass_attempts": 400 if is_qb else 0,
+                "hist_completions": 260 if is_qb else 0,
+                "hist_passing_yards": 3000 if is_qb else 0,
+                "hist_qb_rush_attempts": 55 if is_qb else 0,
+                "hist_qb_rush_yards": 275 if is_qb else 0,
+                "hist_carries": 180 if is_rb else 8 if pos == "WR" else 0,
+                "hist_rushing_yards": 780 if is_rb else 45 if pos == "WR" else 0,
+                "hist_targets": 70 if is_receiver else 0,
+                "hist_receptions": 48 if is_receiver else 0,
+                "hist_receiving_yards": 620 if is_receiver else 0,
+                "hist_red_zone_targets": 12 if is_receiver else 0,
+                "hist_end_zone_targets": 6 if is_receiver else 0,
+                "hist_goal_line_carries": 12 if is_rb else 2 if is_qb else 0,
+                "prior_completion_rate": .64,
+                "prior_yards_per_completion_mean": 11.2,
+                "prior_yards_per_completion_sd": 6.0,
+                "prior_qb_rush_ypc_mean": 5.0,
+                "prior_qb_rush_ypc_sd": 4.0,
+                "prior_rush_ypc_mean": 4.3,
+                "prior_rush_ypc_sd": 3.8,
+                "prior_catch_rate": .68,
+                "prior_receiving_ypr_mean": 10.5,
+                "prior_receiving_ypr_sd": 6.0,
+                "prior_red_zone_target_rate": .14,
+                "prior_end_zone_target_rate": .07,
+                "prior_goal_line_carry_rate": .08,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def test_actual_lane_interfaces_run_player_state_through_publication():
+    state = _lane_player_state()
+    team_history = _lane_team_history()
+    player_history = _lane_player_history()
+    projections = []
+    efficiency_inputs = []
+    team_inputs = []
+
+    for team, opponent, qb_id in (
+        ("ARI", "LAR", "qb-a"),
+        ("LAR", "ARI", "qb-l"),
+    ):
+        context = ForecastContext(
+            game_id="2026_03_ARI_LAR",
+            season=2026,
+            week=3,
+            team=team,
+            opponent=opponent,
+            forecast_timestamp=FORECAST.isoformat(),
+            data_horizon=FORECAST.isoformat(),
+        )
+        projection = build_simulation_ready_opportunity_projection(
+            team_history,
+            player_history,
+            state,
+            context,
+            route_prior_means={"RB": .55, "WR": .90, "TE": .75},
+            primary_qb_player_id=qb_id,
+            primary_qb_provenance="synthetic prospective starter fixture",
+        )
+        projections.append(projection.to_dict())
+        player_pairs = [
+            (row["player_id"], row["position"])
+            for row in projection.players
+        ]
+        efficiency_inputs.append(
+            build_efficiency_player_inputs(
+                projection.to_dict(),
+                _efficiency_baselines(player_pairs),
+                kickoff_timestamp=KICKOFF,
+            )
+        )
+        team_inputs.append(
+            build_efficiency_team_input(
+                projection.to_dict(),
+                {
+                    "expected_drives": 10.5,
+                    "expected_red_zone_trips": 3.4,
+                    "prior_red_zone_td_rate": .58,
+                    "prior_pass_td_fraction": .62,
+                    "expected_non_red_zone_pass_tds": .20,
+                    "expected_non_red_zone_rush_tds": .08,
+                },
+                kickoff_timestamp=KICKOFF,
+            )
+        )
+
+    efficiency = build_efficiency_td_parameters(
+        pd.concat(efficiency_inputs, ignore_index=True),
+        pd.concat(team_inputs, ignore_index=True),
+    )
+    assert efficiency.diagnostics["reconciled"].all()
+
+    game = build_game_input_from_upstream(
+        home_team="ARI",
+        away_team="LAR",
+        opportunity_projections=projections,
+        efficiency_player_parameters=efficiency.player_parameters.to_dict("records"),
+        team_td_parameters=efficiency.team_td_parameters.to_dict("records"),
+        residual_efficiency_by_team={
+            "ARI": {"catch_rate": .62, "receiving_yards_per_reception": 9.5, "rushing_yards_per_carry": 4.0},
+            "LAR": {"catch_rate": .63, "receiving_yards_per_reception": 9.8, "rushing_yards_per_carry": 4.0},
+        },
+    )
+    result = simulate_game(game, simulations=3000, seed=314159)
+    artifact = build_forecast_artifact(
+        result,
+        _markets(),
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    public = build_public_props(artifact, now_utc=FORECAST)
+
+    required = {
+        ("qb-a", "passing_yards"),
+        ("qb-a", "rushing_yards"),
+        ("qb-a", "passing_tds"),
+        ("rb-a1", "rushing_yards"),
+        ("rb-a1", "receiving_yards"),
+        ("rb-a1", "receptions"),
+        ("rb-a1", "rushing_td"),
+        ("rb-a1", "anytime_td"),
+        ("wr-a1", "receiving_yards"),
+        ("wr-a1", "receptions"),
+        ("wr-a1", "anytime_td"),
+        ("te-a", "receiving_yards"),
+        ("te-a", "receptions"),
+        ("te-a", "anytime_td"),
+    }
+    out = {(row["player_id"], row["prop_type"]): row for row in public["forecasts"]}
+    assert required.issubset(out)
+    assert all(out[key]["signal_state"] in {"WATCH", "MODEL EDGE"} for key in required)
