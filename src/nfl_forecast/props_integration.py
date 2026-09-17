@@ -25,6 +25,7 @@ from nfl_forecast.challenger_props_simulation import (
 )
 from nfl_forecast.props_market import american_to_implied
 
+# Integration candidate validated through the dedicated cross-lane suite.
 FORECAST_CONTRACT_VERSION = "levline-props-forecast-v0.1"
 RESEARCH_LABEL = "LEVLINE PROPS — RESEARCH BETA"
 
@@ -82,6 +83,12 @@ def _price_american(value: object) -> float | None:
     if isinstance(value, Mapping):
         return _finite(value.get("american"))
     return _finite(value)
+
+
+def _count_distribution(samples: np.ndarray) -> dict[str, float]:
+    values, counts = np.unique(np.asarray(samples, dtype=np.int64), return_counts=True)
+    total = float(counts.sum())
+    return {str(int(value)): float(count / total) for value, count in zip(values, counts, strict=True)}
 
 
 def _forecast_id(
@@ -164,13 +171,25 @@ def assert_simulation_accounting(result: GameSimulationResult) -> bool:
     return True
 
 
+def _validated_training_horizon(value: object) -> int:
+    try:
+        season = int(value)
+    except (TypeError, ValueError) as exc:
+        raise PropsIntegrationError("explicit prior_model_trained_through_season is required") from exc
+    if season > 2025:
+        raise PropsIntegrationError(
+            "integration refuses efficiency priors trained on completed 2026 outcomes"
+        )
+    return season
+
+
 def build_efficiency_player_inputs(
     projection: Mapping[str, Any],
     baselines: pd.DataFrame,
     *,
     kickoff_timestamp: object,
-    source_status: str = "qualified",
-    prior_model_trained_through_season: int = 2025,
+    source_status: str,
+    prior_model_trained_through_season: int,
 ) -> pd.DataFrame:
     """Join opportunity means to pre-2026 efficiency sufficient statistics and priors."""
     metadata = projection.get("metadata")
@@ -239,7 +258,7 @@ def build_efficiency_player_inputs(
                 "kickoff_timestamp": kickoff,
                 "feature_data_horizon": data_horizon,
                 "source_status": source_status,
-                "prior_model_trained_through_season": int(prior_model_trained_through_season),
+                "prior_model_trained_through_season": _validated_training_horizon(prior_model_trained_through_season),
                 "expected_pass_attempts": pass_attempts if bool(raw_player.get("is_primary_qb")) else 0.0,
                 "expected_qb_rush_attempts": qb_rushes if bool(raw_player.get("is_primary_qb")) else 0.0,
                 "expected_carries": _finite(raw_player.get("designed_carries_mean")) or 0.0,
@@ -255,8 +274,8 @@ def build_efficiency_team_input(
     scoring_context: Mapping[str, Any],
     *,
     kickoff_timestamp: object,
-    source_status: str = "qualified",
-    prior_model_trained_through_season: int = 2025,
+    source_status: str,
+    prior_model_trained_through_season: int,
 ) -> pd.DataFrame:
     metadata = projection.get("metadata")
     if not isinstance(metadata, Mapping):
@@ -283,7 +302,7 @@ def build_efficiency_team_input(
         "kickoff_timestamp": kickoff,
         "feature_data_horizon": str(metadata.get("data_horizon") or ""),
         "source_status": source_status,
-        "prior_model_trained_through_season": int(prior_model_trained_through_season),
+        "prior_model_trained_through_season": _validated_training_horizon(prior_model_trained_through_season),
         **{key: scoring_context[key] for key in required},
     }
     return pd.DataFrame([row])
@@ -359,13 +378,47 @@ def _market_provenance(market: Mapping[str, Any] | None) -> dict[str, Any]:
         "as_of_utc": market.get("as_of_utc"),
         "sportsbooks": market.get("sportsbooks"),
         "market_data_quality": market.get("market_data_quality"),
+        "consensus_line": market.get("consensus_line"),
+        "consensus_no_vig_p_over": market.get("consensus_no_vig_p_over"),
+        "consensus_no_vig_p_under": market.get("consensus_no_vig_p_under"),
+        "consensus_no_vig_probability": market.get("consensus_no_vig_probability"),
         "line_min": market.get("line_min"),
         "line_max": market.get("line_max"),
         "line_range": market.get("line_range"),
         "line_stddev": market.get("line_stddev"),
+        "best_over_price": market.get("best_over_price"),
+        "best_under_price": market.get("best_under_price"),
+        "best_yes_price": market.get("best_yes_price"),
+        "best_no_price": market.get("best_no_price"),
+        "individual_books": market.get("individual_books"),
+        "alternative_line_survival": market.get("alternative_line_survival"),
         "movement": market.get("movement"),
         "closing_evaluation_in_forecast": False,
     }
+
+
+def _market_eligibility(
+    market: Mapping[str, Any],
+    *,
+    forecast_dt: datetime,
+    kickoff_dt: datetime,
+) -> tuple[bool, str | None]:
+    if market.get("closing_evaluation") is not None:
+        return False, "closing evaluation attached to prospective market artifact"
+    try:
+        as_of = _aware_utc(market.get("as_of_utc"), label="market as_of_utc")
+    except PropsIntegrationError:
+        return False, "market as-of timestamp missing or invalid"
+    capture_raw = _market_capture_utc(market)
+    try:
+        captured = _aware_utc(capture_raw, label="market captured_utc")
+    except PropsIntegrationError:
+        return False, "market capture timestamp missing or invalid"
+    if as_of > forecast_dt or captured > forecast_dt:
+        return False, "market snapshot is after the forecast timestamp"
+    if as_of >= kickoff_dt or captured >= kickoff_dt:
+        return False, "market snapshot is not pregame"
+    return True, None
 
 
 def build_forecast_artifact(
@@ -396,9 +449,18 @@ def build_forecast_artifact(
         for internal_prop in SUPPORTED_PROPS[position]:
             public_prop = public_prop_type(internal_prop)
             market = markets.get((player.player_id, internal_prop))
+            market_rejection_reason = None
+            if market is not None:
+                eligible, market_rejection_reason = _market_eligibility(
+                    market, forecast_dt=forecast_dt, kickoff_dt=kickoff_dt
+                )
+                if not eligible:
+                    market = None
             samples = np.asarray(result.player_stats[player.player_id][internal_prop], dtype=float)
             quality_state = publication_quality_state(player.data_quality_state)
             notes: list[str] = []
+            if market_rejection_reason:
+                notes.append(market_rejection_reason)
             critical_ok = market is not None and quality_state != "LOW"
             market_block: dict[str, Any] = {"source": None, "sportsbook": None, "captured_utc": None}
             model_block: dict[str, Any] = {
@@ -461,6 +523,15 @@ def build_forecast_artifact(
                         "probability_difference": None if summary.p_over is None or no_vig_over is None else float(summary.p_over - no_vig_over),
                     }
                 )
+                if internal_prop == "passing_tds":
+                    model_block.update(
+                        {
+                            "expected_tds": float(np.mean(samples)),
+                            "probability_1_plus_td": float(np.mean(samples >= 1.0)),
+                            "probability_2_plus_td": float(np.mean(samples >= 2.0)),
+                            "td_count_distribution": _count_distribution(samples),
+                        }
+                    )
                 market_line_for_id = line
             elif public_prop in BINARY_PUBLIC_PROPS:
                 td_probability = float(np.mean(samples >= 1.0))
@@ -497,8 +568,10 @@ def build_forecast_artifact(
                 model_block.update(
                     {
                         "td_probability": td_probability,
+                        "probability_1_plus_td": td_probability,
                         "expected_tds": expected_tds,
                         "probability_2_plus_td": p2,
+                        "td_count_distribution": _count_distribution(samples),
                         "fair_odds_american": fair_td_odds,
                         "fair_td_odds_american": fair_td_odds,
                         "probability_difference": None if no_vig is None else td_probability - no_vig,
@@ -507,10 +580,6 @@ def build_forecast_artifact(
                 market_line_for_id = line
             else:
                 raise PropsIntegrationError(f"unsupported publication prop type: {public_prop}")
-
-            if market is not None and market.get("closing_evaluation") is not None:
-                critical_ok = False
-                notes.append("closing evaluation must not enter prospective forecast artifact")
 
             signal_state = "WATCH" if critical_ok else "NO SIGNAL"
             forecast_iso = forecast_dt.isoformat()

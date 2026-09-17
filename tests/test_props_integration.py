@@ -13,6 +13,7 @@ from nfl_forecast.challenger_props_simulation import (
     simulate_game,
 )
 from nfl_forecast.props_integration import (
+    PropsIntegrationError,
     assert_simulation_accounting,
     build_efficiency_player_inputs,
     build_efficiency_team_input,
@@ -158,16 +159,21 @@ def _markets():
         _market("qb-a", "ARI QB", "passing_yards", line=245.5),
         _market("qb-a", "ARI QB", "rushing_yards", line=27.5),
         _market("qb-a", "ARI QB", "passing_tds", line=1.5),
+        _market("qb-a", "ARI QB", "rushing_tds", line=.5),
+        _market("qb-a", "ARI QB", "anytime_td", yes_no=True),
         _market("rb-a1", "ARI RB1", "rushing_yards", line=68.5),
         _market("rb-a1", "ARI RB1", "receiving_yards", line=21.5),
         _market("rb-a1", "ARI RB1", "receptions", line=3.5),
         _market("rb-a1", "ARI RB1", "rushing_tds", line=.5),
+        _market("rb-a1", "ARI RB1", "receiving_tds", line=.5),
         _market("rb-a1", "ARI RB1", "anytime_td", yes_no=True),
         _market("wr-a1", "ARI WR1", "receiving_yards", line=71.5),
         _market("wr-a1", "ARI WR1", "receptions", line=5.5),
+        _market("wr-a1", "ARI WR1", "receiving_tds", line=.5),
         _market("wr-a1", "ARI WR1", "anytime_td", yes_no=True),
         _market("te-a", "ARI TE", "receiving_yards", line=43.5),
         _market("te-a", "ARI TE", "receptions", line=4.5),
+        _market("te-a", "ARI TE", "receiving_tds", line=.5),
         _market("te-a", "ARI TE", "anytime_td", yes_no=True),
     ]
 
@@ -195,16 +201,21 @@ def test_integrated_synthetic_game_generates_required_research_beta_markets():
         ("qb-a", "passing_yards"),
         ("qb-a", "rushing_yards"),
         ("qb-a", "passing_tds"),
+        ("qb-a", "rushing_td"),
+        ("qb-a", "anytime_td"),
         ("rb-a1", "rushing_yards"),
         ("rb-a1", "receiving_yards"),
         ("rb-a1", "receptions"),
         ("rb-a1", "rushing_td"),
+        ("rb-a1", "receiving_td"),
         ("rb-a1", "anytime_td"),
         ("wr-a1", "receiving_yards"),
         ("wr-a1", "receptions"),
+        ("wr-a1", "receiving_td"),
         ("wr-a1", "anytime_td"),
         ("te-a", "receiving_yards"),
         ("te-a", "receptions"),
+        ("te-a", "receiving_td"),
         ("te-a", "anytime_td"),
     }
     index = {(row["player_id"], row["prop_type"]): row for row in artifact["forecasts"]}
@@ -217,6 +228,9 @@ def test_integrated_synthetic_game_generates_required_research_beta_markets():
     assert qb_pass["model"]["over_probability"] + qb_pass["model"]["under_probability"] + qb_pass["model"]["push_probability"] == pytest.approx(1.0)
     assert qb_pass["market"]["raw_implied_over_probability"] is not None
     assert qb_pass["market"]["no_vig_over_probability"] is not None
+    qb_td = index[("qb-a", "passing_tds")]
+    assert qb_td["model"]["td_count_distribution"]
+    assert 0 <= qb_td["model"]["probability_2_plus_td"] <= qb_td["model"]["probability_1_plus_td"]
 
     rb_td = index[("rb-a1", "rushing_td")]
     assert rb_td["market"]["underlying_count_line"] == .5
@@ -232,6 +246,9 @@ def test_integrated_synthetic_game_generates_required_research_beta_markets():
     public_index = {(row["player_id"], row["prop_type"]): row for row in public["forecasts"]}
     assert public_index[("qb-a", "passing_yards")]["model"]["fair_line"] == qb_pass["model"]["fair_line"]
     assert public_index[("rb-a1", "rushing_td")]["model"]["td_probability"] == rb_td["model"]["td_probability"]
+    assert public_index[("rb-a1", "rushing_td")]["model"]["probability_2_plus_td"] == rb_td["model"]["probability_2_plus_td"]
+    assert public_index[("qb-a", "passing_tds")]["model"]["td_count_distribution"]
+    assert public_index[("qb-a", "passing_yards")]["market"]["raw_implied_over_probability"] is not None
 
 
 def test_non_half_rushing_td_count_market_fails_closed_for_binary_card():
@@ -488,6 +505,8 @@ def test_actual_lane_interfaces_run_player_state_through_publication():
                 projection.to_dict(),
                 _efficiency_baselines(player_pairs),
                 kickoff_timestamp=KICKOFF,
+                source_status="qualified",
+                prior_model_trained_through_season=2025,
             )
         )
         team_inputs.append(
@@ -502,6 +521,8 @@ def test_actual_lane_interfaces_run_player_state_through_publication():
                     "expected_non_red_zone_rush_tds": .08,
                 },
                 kickoff_timestamp=KICKOFF,
+                source_status="qualified",
+                prior_model_trained_through_season=2025,
             )
         )
 
@@ -535,18 +556,151 @@ def test_actual_lane_interfaces_run_player_state_through_publication():
         ("qb-a", "passing_yards"),
         ("qb-a", "rushing_yards"),
         ("qb-a", "passing_tds"),
+        ("qb-a", "rushing_td"),
+        ("qb-a", "anytime_td"),
         ("rb-a1", "rushing_yards"),
         ("rb-a1", "receiving_yards"),
         ("rb-a1", "receptions"),
         ("rb-a1", "rushing_td"),
+        ("rb-a1", "receiving_td"),
         ("rb-a1", "anytime_td"),
         ("wr-a1", "receiving_yards"),
         ("wr-a1", "receptions"),
+        ("wr-a1", "receiving_td"),
         ("wr-a1", "anytime_td"),
         ("te-a", "receiving_yards"),
         ("te-a", "receptions"),
+        ("te-a", "receiving_td"),
         ("te-a", "anytime_td"),
     }
     out = {(row["player_id"], row["prop_type"]): row for row in public["forecasts"]}
     assert required.issubset(out)
     assert all(out[key]["signal_state"] in {"WATCH", "MODEL EDGE"} for key in required)
+
+
+def test_integration_refuses_2026_trained_efficiency_provenance():
+    projection = {
+        "metadata": {
+            "game_id": "2026_03_ARI_LAR",
+            "season": 2026,
+            "week": 3,
+            "team": "ARI",
+            "opponent": "LAR",
+            "forecast_timestamp": FORECAST.isoformat(),
+            "data_horizon": FORECAST.isoformat(),
+        },
+        "marginals": {
+            "qb_dropbacks": {"mean": 36.0},
+            "qb_pass_attempts": {"mean": 33.0},
+            "qb_rushing_opportunities": {"mean": 4.0},
+        },
+        "players": [
+            {
+                "player_id": "qb-a",
+                "player_name": "ARI QB",
+                "position": "QB",
+                "is_primary_qb": True,
+                "availability_probability": 1.0,
+            }
+        ],
+    }
+    baseline = _efficiency_baselines([("qb-a", "QB")])
+    with pytest.raises(PropsIntegrationError, match="2026 outcomes"):
+        build_efficiency_player_inputs(
+            projection,
+            baseline,
+            kickoff_timestamp=KICKOFF,
+            source_status="qualified",
+            prior_model_trained_through_season=2026,
+        )
+
+
+def test_market_frozen_after_forecast_timestamp_is_rejected_before_evaluation():
+    result = simulate_game(_game(), simulations=1200, seed=99)
+    quote = PropMarketQuote(
+        provider="fixture",
+        sportsbook_key="a",
+        sportsbook_title="Book A",
+        captured_at_utc=FORECAST,
+        player_id="wr-a1",
+        player="ARI WR1",
+        game_id="2026_03_ARI_LAR",
+        prop_type="receiving_yards",
+        line=71.5,
+        over_american=-110,
+        under_american=-110,
+        team="ARI",
+        opponent="LAR",
+        position="WR",
+        kickoff_utc=KICKOFF,
+    )
+    late_frozen = build_market_artifact(
+        [quote],
+        as_of_utc=datetime(2026, 9, 17, 23, 0, tzinfo=UTC),
+    )
+    artifact = build_forecast_artifact(
+        result,
+        [late_frozen],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    row = next(
+        row for row in artifact["forecasts"]
+        if row["player_id"] == "wr-a1" and row["prop_type"] == "receiving_yards"
+    )
+    assert row["signal_state"] == "NO SIGNAL"
+    assert row["market"]["line"] is None
+    assert any("after the forecast timestamp" in note for note in row["data_quality"]["notes"])
+
+
+def test_valid_market_provenance_retains_book_level_snapshot_without_closing_data():
+    result = simulate_game(_game(), simulations=1200, seed=100)
+    artifact = build_forecast_artifact(
+        result,
+        [_market("wr-a1", "ARI WR1", "receiving_yards", line=71.5)],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    row = next(
+        row for row in artifact["forecasts"]
+        if row["player_id"] == "wr-a1" and row["prop_type"] == "receiving_yards"
+    )
+    provenance = row["provenance"]["market"]
+    assert len(provenance["individual_books"]) == 2
+    assert provenance["sportsbooks"] == ["a", "b"]
+    assert provenance["closing_evaluation_in_forecast"] is False
+    assert "closing_evaluation" not in provenance
+
+
+def test_market_line_changes_comparison_not_pure_model_distribution():
+    result = simulate_game(_game(), simulations=4000, seed=12345)
+    low_market = _market("qb-a", "ARI QB", "passing_yards", line=220.5)
+    high_market = _market("qb-a", "ARI QB", "passing_yards", line=280.5)
+
+    low = build_forecast_artifact(
+        result,
+        [low_market],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    high = build_forecast_artifact(
+        result,
+        [high_market],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    low_row = next(
+        row for row in low["forecasts"]
+        if row["player_id"] == "qb-a" and row["prop_type"] == "passing_yards"
+    )
+    high_row = next(
+        row for row in high["forecasts"]
+        if row["player_id"] == "qb-a" and row["prop_type"] == "passing_yards"
+    )
+
+    for key in ("mean", "median", "fair_line", "standard_deviation"):
+        assert low_row["model"][key] == pytest.approx(high_row["model"][key])
+    assert low_row["model"]["prediction_interval"] == high_row["model"]["prediction_interval"]
+    assert low_row["market"]["line"] == 220.5
+    assert high_row["market"]["line"] == 280.5
+    assert low_row["model"]["over_probability"] > high_row["model"]["over_probability"]
