@@ -1,0 +1,282 @@
+name: LevLine 4 NGS player ID browser held-out V7
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_2026_ngs_player_id_browser_heldout_v7.yml'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v7.py'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v7_contract.json'
+      - 'research/test_levline4_2026_ngs_player_id_browser_heldout_v7.py'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v7_first_result_manifest.json'
+
+concurrency:
+  group: levline4-ngs-player-id-browser-heldout-v7-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+env:
+  CONTRACT_PATH: research/levline4_2026_ngs_player_id_browser_heldout_v7_contract.json
+  MANIFEST_PATH: research/levline4_2026_ngs_player_id_browser_heldout_v7_first_result_manifest.json
+  FROZEN_CONTRACT_COMMIT: 6b7b11e4178795f1ee5580137ea6bc584690d787
+  FROZEN_IMPLEMENTATION_COMMIT: f1cd2d64f513d4c166b3bc4372425b9a9b80c996
+  FROZEN_TESTS_COMMIT: d80959a52de404fa04e23547d802f5bc10acaafa
+  FROZEN_CONTRACT_BLOB: ba754ff1dca7f224e07340796be36c34f8ad4be7
+  FROZEN_V6_BASE_BLOB: e21938b45180b5ed1db0ebb48aa3f8dc784bec33
+  FROZEN_V7_IMPLEMENTATION_BLOB: f07af078d5a0193a7ea9d2dc647e7b914a1c958a
+  FROZEN_V7_TESTS_BLOB: dcb7357dafb061b8159486f7c541cfaa064b3f93
+  OFFICIAL_ARTIFACT_ID: '10461126275'
+  OFFICIAL_RUN_ID: '35130069924'
+  OFFICIAL_HEAD_SHA: '1280e4a06eacf3e30700f75d4dab9ecff99944a4'
+  OFFICIAL_DIGEST: 'sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e'
+  OFFICIAL_ROSTER_SHA256: '90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f'
+  V3_ARTIFACT_ID: '10472217076'
+  V3_RUN_ID: '35159301387'
+  V3_HEAD_SHA: 'fd4224805a46712c6d240cced51ef7d93ac50f9b'
+  V3_DIGEST: 'sha256:af586ab4b827a8a99422d02d3265ca70f540cc5279770345acb5af5cd5037958'
+  V3_SELECTION_SHA256: '437a94fa92709d60f0c3b2d88a4e52ce8f3dfd7f6241109793f4d991b8222f8d'
+  V5_ARTIFACT_ID: '10473671117'
+  V5_RUN_ID: '35162079741'
+  V5_HEAD_SHA: '2fbd9cbb76efc12448581eb1ed393a579cfd60b9'
+  V5_DIGEST: 'sha256:961994eb487c59103f5388708456659e40e11d13ee4462494f7d093876787c90'
+  V5_SELECTION_SHA256: '6ae6e017cd24593657921ee82d023541b0feb679a37aa0051c17fe4ab2244e7a'
+  V6_ARTIFACT_ID: '10474626172'
+  V6_RUN_ID: '35164913626'
+  V6_HEAD_SHA: '89bf915cfbe3bb4b0194e34398f3043a2968899f'
+  V6_DIGEST: 'sha256:ee95d89fa0ac660b879eb79a647d408ed424b63c744d69a2e5f20ac0ee8180aa'
+  V6_SELECTION_SHA256: '79bc1ed98484b76cb565737e4093f6a6f2c9e1c44aa74e5deb6588561b3fef6e'
+  V6_DATA_BRANCH: research-data/levline4-ngs-player-id-browser-heldout-v6
+
+jobs:
+  preregistration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prove contract-first chronology and frozen blobs
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" "$FROZEN_IMPLEMENTATION_COMMIT"
+          git merge-base --is-ancestor "$FROZEN_IMPLEMENTATION_COMMIT" "$FROZEN_TESTS_COMMIT"
+          git merge-base --is-ancestor "$FROZEN_TESTS_COMMIT" HEAD
+          test "$(git rev-parse "${FROZEN_CONTRACT_COMMIT}:${CONTRACT_PATH}")" = "$FROZEN_CONTRACT_BLOB"
+          test "$(git hash-object "$CONTRACT_PATH")" = "$FROZEN_CONTRACT_BLOB"
+          test "$(git hash-object research/levline4_2026_ngs_player_id_browser_heldout_v6_frozen_base.py)" = "$FROZEN_V6_BASE_BLOB"
+          test "$(git hash-object research/levline4_2026_ngs_player_id_browser_heldout_v7.py)" = "$FROZEN_V7_IMPLEMENTATION_BLOB"
+          test "$(git hash-object research/test_levline4_2026_ngs_player_id_browser_heldout_v7.py)" = "$FROZEN_V7_TESTS_BLOB"
+      - name: Require durable frozen V6 negative evidence
+        run: |
+          set -euo pipefail
+          git fetch origin "${V6_DATA_BRANCH}:refs/remotes/origin/${V6_DATA_BRANCH}"
+          python - <<'PY'
+          import json, os, subprocess
+          path='research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6/first_result_35164913626/preservation.json'
+          raw=subprocess.check_output(['git','show',f"origin/{os.environ['V6_DATA_BRANCH']}:{path}"],text=True)
+          v6=json.loads(raw)
+          assert v6['source_actions_artifact_id']==int(os.environ['V6_ARTIFACT_ID'])
+          assert v6['source_workflow_run_id']==int(os.environ['V6_RUN_ID'])
+          assert v6['source_head_sha']==os.environ['V6_HEAD_SHA']
+          assert v6['actions_artifact_digest']==os.environ['V6_DIGEST']
+          assert v6['canonical_result']=='FAIL'
+          assert v6['scientific_disposition']=='FAIL'
+          assert v6['coverage_resolved_count']==60 and v6['coverage_target_count']==64
+          assert v6['ngs_request_count']==88 and v6['ngs_response_count']==88
+          assert v6['production_authorized'] is False
+          PY
+      - name: Unit-test frozen V7 contract parser resolver gates and authority
+        run: |
+          python -m pip install -q pytest
+          python -m pytest -q research/test_levline4_2026_ngs_player_id_browser_heldout_v7.py
+          python -m research.levline4_2026_ngs_player_id_browser_heldout_v7 --help >/dev/null
+      - name: Prove research-only effective diff
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          bad=0
+          while IFS= read -r path; do
+            case "$path" in
+              research/levline4_2026_ngs_player_id_browser_heldout_v7.py|research/levline4_2026_ngs_player_id_browser_heldout_v7_contract.json|research/test_levline4_2026_ngs_player_id_browser_heldout_v7.py|research/levline4_2026_ngs_player_id_browser_heldout_v7_first_result_manifest.json|.github/workflows/research_levline4_2026_ngs_player_id_browser_heldout_v7.yml) ;;
+              *) echo "Forbidden V7 diff path: $path"; bad=1 ;;
+            esac
+          done < <(git diff --name-only origin/main...HEAD)
+          test "$bad" = 0
+
+  mode:
+    runs-on: ubuntu-24.04
+    outputs:
+      manifest_exists: ${{ steps.mode.outputs.manifest_exists }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        run: |
+          if [ -f "$MANIFEST_PATH" ]; then
+            echo 'manifest_exists=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'manifest_exists=false' >> "$GITHUB_OUTPUT"
+          fi
+
+  live-heldout:
+    if: needs.mode.outputs.manifest_exists == 'false'
+    needs: [preregistration, mode]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download and verify all frozen source artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          verify_download() {
+            local artifact="$1" run="$2" head="$3" digest="$4" zip="$5" dir="$6"
+            meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact}")
+            test "$(echo "$meta" | jq -r .digest)" = "$digest"
+            test "$(echo "$meta" | jq -r .workflow_run.id)" = "$run"
+            test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$head"
+            gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact}/zip" > "$zip"
+            rm -rf "$dir"; mkdir -p "$dir"; unzip -q "$zip" -d "$dir"
+          }
+          verify_download "$OFFICIAL_ARTIFACT_ID" "$OFFICIAL_RUN_ID" "$OFFICIAL_HEAD_SHA" "$OFFICIAL_DIGEST" /tmp/official.zip /tmp/official
+          verify_download "$V3_ARTIFACT_ID" "$V3_RUN_ID" "$V3_HEAD_SHA" "$V3_DIGEST" /tmp/v3.zip /tmp/v3
+          verify_download "$V5_ARTIFACT_ID" "$V5_RUN_ID" "$V5_HEAD_SHA" "$V5_DIGEST" /tmp/v5.zip /tmp/v5
+          verify_download "$V6_ARTIFACT_ID" "$V6_RUN_ID" "$V6_HEAD_SHA" "$V6_DIGEST" /tmp/v6.zip /tmp/v6
+          test "$(sha256sum /tmp/official/roster_metadata.jsonl | cut -d' ' -f1)" = "$OFFICIAL_ROSTER_SHA256"
+          test "$(sha256sum /tmp/v3/target_selection.json | cut -d' ' -f1)" = "$V3_SELECTION_SHA256"
+          test "$(sha256sum /tmp/v5/target_selection.json | cut -d' ' -f1)" = "$V5_SELECTION_SHA256"
+          test "$(sha256sum /tmp/v6/target_selection.json | cut -d' ' -f1)" = "$V6_SELECTION_SHA256"
+      - name: Reproduce frozen 103-target V7 population before Playwright or NGS
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research import levline4_2026_ngs_player_id_browser_heldout_v7 as v7
+          from research import levline4_2026_ngs_player_id_browser_heldout_v6_frozen_base as frozen
+          contract=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v7_contract.json').read_text())
+          rows=frozen.load_jsonl(Path('/tmp/official/roster_metadata.jsonl'))
+          v3=json.loads(Path('/tmp/v3/target_selection.json').read_text())
+          v5=json.loads(Path('/tmp/v5/target_selection.json').read_text())
+          v6=json.loads(Path('/tmp/v6/target_selection.json').read_text())
+          targets,diag=v7.select_targets(rows,contract,v3,v5,v6)
+          assert len(targets)==103
+          assert diag['eligible_row_count']==2237
+          assert diag['coverage_target_count']==64
+          assert diag['team_alias_ari_target_count']==4
+          assert diag['source_name_variant_target_count']==16
+          assert diag['canonical_name_variant_target_count']==32
+          assert diag['canonical_name_variant_eligible_count']==317
+          assert diag['total_target_count']==103
+          assert diag['sorted_row_identity_sha256']=='8a6b4bd7f6f84f292a20f20ce378f69de74ea98ae34deeb09ad192bc64911d7c'
+          assert diag['target_projection_sha256']=='08170a782af614e79da43eaa201fc6898889b2001907adec72b6f259c2b7ef85'
+          prior={frozen.row_identity(x) for s in (v3,v5,v6) for x in s['targets']}
+          assert len(prior)==222
+          assert not ({frozen.row_identity(x) for x in targets} & prior)
+          Path('/tmp/v7_preflight_selection.json').write_text(json.dumps({'diagnostics':diag,'targets':targets},indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Install Playwright only after target freeze is reproduced
+        run: |
+          python -m pip install -q playwright
+          python -m playwright install --with-deps chromium
+      - name: Execute canonical V7 browser-context held-out probe
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/v7_result; mkdir -p /tmp/v7_result
+          set +e
+          python -m research.levline4_2026_ngs_player_id_browser_heldout_v7 \
+            --contract "$CONTRACT_PATH" \
+            --roster-metadata /tmp/official/roster_metadata.jsonl \
+            --v3-target-selection /tmp/v3/target_selection.json \
+            --v5-target-selection /tmp/v5/target_selection.json \
+            --v6-target-selection /tmp/v6/target_selection.json \
+            --output-dir /tmp/v7_result > /tmp/v7_result/execution.log 2>&1
+          rc=$?
+          set -e
+          printf '%s\n' "$rc" > /tmp/v7_result/execution_exit_code.txt
+          cp /tmp/v7_preflight_selection.json /tmp/v7_result/preflight_target_selection.json
+      - name: Upload immutable first V7 artifact before disposition
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-ngs-player-id-browser-heldout-v7-first-${{ github.run_id }}
+          path: /tmp/v7_result
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface canonical scientific or technical disposition
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/v7_result')
+          rc=int((root/'execution_exit_code.txt').read_text().strip()) if (root/'execution_exit_code.txt').exists() else 999
+          receipt=root/'receipt.json'
+          if rc != 0 or not receipt.exists():
+              raise SystemExit(f'canonical V7 technical failure after artifact upload: exit_code={rc}, receipt_exists={receipt.exists()}')
+          obj=json.loads(receipt.read_text())
+          print(json.dumps({'status':obj['status'],'metrics':obj['metrics'],'gates':obj['gates'],'authority':obj['authority']},indent=2,sort_keys=True))
+          if obj['status'] != 'PASS':
+              raise SystemExit('canonical V7 scientific FAIL after artifact upload')
+          print('canonical V7 scientific PASS')
+          PY
+
+  replay-canonical-first-result:
+    if: needs.mode.outputs.manifest_exists == 'true'
+    needs: [preregistration, mode]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and byte-verify immutable canonical V7 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > /tmp/v7_coords
+          import json, os
+          m=json.load(open(os.environ['MANIFEST_PATH']))
+          print(m['first_artifact_id'])
+          print(m['first_workflow_run_id'])
+          print(m['first_head_sha'])
+          print(m['first_artifact_digest'])
+          PY
+          mapfile -t coords < /tmp/v7_coords
+          artifact="${coords[0]}"; run="${coords[1]}"; head="${coords[2]}"; digest="${coords[3]}"
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact}")
+          test "$(echo "$meta" | jq -r .digest)" = "$digest"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$run"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$head"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact}/zip" > /tmp/v7_first.zip
+          rm -rf /tmp/v7_first; mkdir -p /tmp/v7_first; unzip -q /tmp/v7_first.zip -d /tmp/v7_first
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          m=json.load(open(os.environ['MANIFEST_PATH']))
+          root=Path('/tmp/v7_first')
+          observed={}
+          for path in sorted(p for p in root.rglob('*') if p.is_file()):
+              rel=path.relative_to(root).as_posix()
+              observed[rel]=hashlib.sha256(path.read_bytes()).hexdigest()
+          assert observed==m['canonical_file_sha256']
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['status']==m['canonical_status']
+          assert receipt['authority']['production_authorized'] is False
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          print(f"replayed canonical V7 {receipt['status']} with {len(observed)} byte-verified files")
+          PY
