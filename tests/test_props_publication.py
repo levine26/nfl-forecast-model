@@ -174,3 +174,16 @@ def test_watch_without_market_timestamp_still_fails_closed():
     row["market"]["captured_utc"] = None
     with pytest.raises(PropsPublicationError, match="market timestamp"):
         make_forecast_receipt(row, recorded_utc=NOW)
+
+
+def test_public_contract_preserves_extended_td_and_raw_market_fields():
+    raw = deepcopy(artifact()["forecasts"][2])
+    raw["model"]["probability_1_plus_td"] = 0.64
+    raw["model"]["probability_2_plus_td"] = 0.21
+    raw["model"]["td_count_distribution"] = {"0": 0.36, "1": 0.43, "2": 0.21}
+    raw["market"]["raw_implied_probability"] = 0.55
+    public = normalize_public_forecast(raw, now_utc=NOW)
+    assert public["model"]["probability_1_plus_td"] == pytest.approx(0.64)
+    assert public["model"]["probability_2_plus_td"] == pytest.approx(0.21)
+    assert public["model"]["td_count_distribution"]["2"] == pytest.approx(0.21)
+    assert public["market"]["raw_implied_probability"] == pytest.approx(0.55)
