@@ -164,9 +164,10 @@ def build_public_props(artifact, *, now_utc=None):
 def make_forecast_receipt(row, *, recorded_utc=None):
     recorded=recorded_utc or datetime.now(timezone.utc)
     if recorded.tzinfo is None: raise PropsPublicationError("recorded_utc must be timezone-aware for prospective history")
-    recorded=recorded.astimezone(timezone.utc); kickoff=_dt(row.get("kickoff_utc")); forecast=_dt(row.get("forecast_timestamp_utc")); market_at=_dt(_map(row.get("market")).get("captured_utc"))
-    if None in (kickoff,forecast,market_at): raise PropsPublicationError("prospective receipt requires valid forecast, market, and kickoff timestamps")
-    if forecast>=kickoff or market_at>=kickoff or recorded>=kickoff: raise PropsPublicationError("refusing to create a retrospective Props forecast receipt at/after kickoff")
+    recorded=recorded.astimezone(timezone.utc); kickoff=_dt(row.get("kickoff_utc")); forecast=_dt(row.get("forecast_timestamp_utc")); market_at=_dt(_map(row.get("market")).get("captured_utc")); signal=(_text(row.get("signal_state")) or "").upper()
+    if kickoff is None or forecast is None: raise PropsPublicationError("prospective receipt requires valid forecast and kickoff timestamps")
+    if market_at is None and signal!="NO SIGNAL": raise PropsPublicationError("normal prospective receipt requires a valid market timestamp")
+    if forecast>=kickoff or (market_at is not None and market_at>=kickoff) or recorded>=kickoff: raise PropsPublicationError("refusing to create a retrospective Props forecast receipt at/after kickoff")
     original=_copy(dict(row)); fid=_text(row.get("forecast_id")) or _forecast_id(row); original["forecast_id"]=fid
     return {"history_contract_version":HISTORY_CONTRACT_VERSION,"event_type":"FORECAST_ORIGINAL","forecast_id":fid,"recorded_utc":recorded.isoformat(),"original_sha256":_sha(original),"original_forecast":original}
 
