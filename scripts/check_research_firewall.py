@@ -62,7 +62,13 @@ ALLOWED_EXACT = {
     "src/nfl_forecast/props_player_state.py",
     "src/nfl_forecast/props_player_sources.py",
     "src/nfl_forecast/props_efficiency_td.py",
+    "src/nfl_forecast/props_opportunity.py",
+    "src/nfl_forecast/props_opportunity_adapter.py",
+    "src/nfl_forecast/props_opportunity_handoff.py",
     "tests/test_props_efficiency_td.py",
+    "tests/test_props_opportunity.py",
+    "tests/test_props_opportunity_adapter.py",
+    "tests/test_props_opportunity_handoff.py",
     "tests/test_props_player_state.py",
     "tests/test_props_player_sources.py",
 }
