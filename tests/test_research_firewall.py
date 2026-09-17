@@ -33,6 +33,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/props_opportunity_handoff.py",
         "src/nfl_forecast/props_market.py",
         "src/nfl_forecast/props_market_odds_api.py",
+        "src/nfl_forecast/props_integration.py",
         "scripts/run_challenger_v09.py",
         "scripts/run_fst_reconstruction_probe.py",
         "scripts/verify_fst_reconstruction_evidence.py",
@@ -60,6 +61,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "tests/test_props_opportunity_handoff.py",
         "tests/test_props_market.py",
         "tests/test_props_market_odds_api.py",
+        "tests/test_props_integration.py",
         ".github/workflows/research_firewall.yml",
         ".github/workflows/research_2025_availability_reconstruction.yml",
         "docs/LEVLINE_RESEARCH.md",
@@ -178,6 +180,7 @@ def test_production_prediction_path_does_not_import_research_modules():
         "props_opportunity_handoff",
         "props_market",
         "props_market_odds_api",
+        "props_integration",
     )
     for filename in protected:
         tree = ast.parse(Path(filename).read_text(encoding="utf-8"), filename=filename)
