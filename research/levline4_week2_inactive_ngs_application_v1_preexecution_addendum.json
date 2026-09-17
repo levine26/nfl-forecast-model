@@ -1,0 +1,37 @@
+{
+  "schema_version": "levline4-2026-week2-inactive-ngs-application-v1-preexecution-addendum",
+  "contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-NGS-APPLICATION-V1",
+  "frozen_parent_contract_commit": "bcd246bfb3957ef2076d3042c0b2aa11a943b55a",
+  "status": "PRE_EXECUTION_CLARIFICATION",
+  "empirical_boundary": {
+    "week2_inactive_player_targets_observed_before_addendum": 0,
+    "week2_inactive_ngs_target_requests_observed_before_addendum": 0,
+    "week2_inactive_ngs_target_responses_observed_before_addendum": 0,
+    "application_workflow_runs_before_addendum": 0,
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": false
+  },
+  "deterministic_issue_discovered_from_frozen_contract_and_existing_parser_architecture": {
+    "description": "The parent contract simultaneously says candidate articles are parsed to select a matching body and that a zero-matching-article state remains without player-level target exposure. The qualified parser extracts player names, so parsing all candidates would cross the target empirical boundary even when no authority-bearing source body is selected. This is internally inconsistent before any Week 2 target observation.",
+    "target_population_changed": false,
+    "ngs_resolver_changed": false,
+    "threshold_changed": false,
+    "authority_ceiling_changed": false
+  },
+  "frozen_clarification": {
+    "pre_target_source_discovery": "For successfully captured candidate article bodies, inspect only recognized official NFL team heading text using the already-frozen TEAM_HEADING_TO_ABBR mapping. Do not extract or retain player names, positions, emergency-QB annotations, list items, or other player-level content during this stage.",
+    "candidate_body_matching_rule": "A raw body is a structural candidate when its recognized team-heading set contains every currently due cohort team. Require exactly one distinct raw-body SHA among structural candidates. Multiple distinct matching bodies fail closed before player parsing; zero matching bodies remain WAITING without player-level target exposure.",
+    "empirical_boundary_crossing": "Only after exactly one structural raw body is selected may the already-qualified inactive article parser run on that body. The first invocation that extracts player-level rows from that selected real Week 2 body crosses the application empirical boundary and is canonical for that cohort key.",
+    "post_selection_parser_integrity": "After boundary crossing, require the qualified parser to succeed and require all due teams in parsed rows. Any parser integrity failure or missing due team is canonical non-PASS evidence for that cohort and may not be rescued by same-version source substitution or a later article revision.",
+    "all_other_contract_rules": "UNCHANGED"
+  },
+  "governance": {
+    "addendum_must_precede_implementation_tests_and_workflow": true,
+    "parent_contract_blob_must_remain_unchanged": true,
+    "same_version_empirical_adaptation": false,
+    "production_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "availability_probability_feature_authorized": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
