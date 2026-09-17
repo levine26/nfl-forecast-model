@@ -1,0 +1,43 @@
+{
+  "schema_version": "levline4-2026-week2-inactive-ngs-application-v1-preexecution-technical-addendum",
+  "contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-NGS-APPLICATION-V1",
+  "frozen_parent_contract_commit": "bcd246bfb3957ef2076d3042c0b2aa11a943b55a",
+  "frozen_source_selection_addendum_commit": "dccf6a2202c1eff347f37879094bee2780bee0dd",
+  "superseded_unexecuted_implementation_commit": "9a8ec12c772283b5360fbe2d5f5deb78cdb74183",
+  "superseded_unexecuted_tests_commit": "55bc1e25695666b5a99ddaab177059ad076c6c61",
+  "superseded_unexecuted_workflow_commit": "a436cfcd53008dc3313a25491db55b6f862b6a9f",
+  "status": "PRE_EXECUTION_TECHNICAL_HARDENING",
+  "empirical_boundary": {
+    "application_workflow_runs_before_addendum": 0,
+    "week2_inactive_player_targets_observed_before_addendum": 0,
+    "week2_inactive_ngs_target_requests_observed_before_addendum": 0,
+    "week2_inactive_ngs_target_responses_observed_before_addendum": 0,
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": false
+  },
+  "deterministic_issue": {
+    "description": "The unexecuted implementation verified the frozen official-roster file and loaded the optional frozen global audit projection only after invoking the real Week 2 player parser. A missing, corrupt, or schema-drifted immutable dependency could therefore cross the player-target empirical boundary and terminate before a canonical cohort receipt was frozen. This was identified by static code review before any workflow run or Week 2 player observation.",
+    "scientific_rule_changed": false,
+    "target_population_changed": false,
+    "source_selection_changed": false,
+    "ngs_query_or_resolution_rule_changed": false,
+    "gate_or_threshold_changed": false,
+    "authority_ceiling_changed": false
+  },
+  "frozen_hardening": {
+    "official_roster_dependency_validation": "must complete before the selected real Week 2 article is passed to the player-level parser",
+    "global_audit_projection_validation": "must complete before the selected real Week 2 article is passed to the player-level parser",
+    "playwright_import_validation": "must complete before the selected real Week 2 article is passed to the player-level parser",
+    "dependency_failure_before_player_parse": "PRE_TARGET_TECHNICAL_FAIL with zero target exposure; no NGS request",
+    "all_scientific_semantics": "UNCHANGED"
+  },
+  "governance": {
+    "this_addendum_must_precede_corrected_implementation_tests_and_final_workflow": true,
+    "parent_contract_and_first_addendum_blobs_must_remain_unchanged": true,
+    "same_version_empirical_adaptation": false,
+    "production_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "availability_probability_feature_authorized": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
