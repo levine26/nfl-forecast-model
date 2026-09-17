@@ -1,0 +1,347 @@
+name: LevLine 4 NGS player ID browser held-out V6
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v6_contract.json'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v6_frozen_base.py'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v6.py'
+      - 'research/test_levline4_2026_ngs_player_id_browser_heldout_v6.py'
+      - 'research/levline4_2026_ngs_player_id_browser_heldout_v6_first_result_manifest.json'
+      - '.github/workflows/research_levline4_2026_ngs_player_id_browser_heldout_v6.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: levline4-ngs-player-id-browser-heldout-v6-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  FROZEN_CONTRACT_COMMIT: '7e041e7f8528bc82af2f1784e72d5b933f0c37c3'
+  CONTRACT_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v6_contract.json'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v6_first_result_manifest.json'
+  V5_FROZEN_BASE_BLOB: 'e21938b45180b5ed1db0ebb48aa3f8dc784bec33'
+  ROSTER_ARTIFACT_ID: '10461126275'
+  ROSTER_WORKFLOW_RUN_ID: '35130069924'
+  ROSTER_HEAD_SHA: '1280e4a06eacf3e30700f75d4dab9ecff99944a4'
+  ROSTER_ARTIFACT_DIGEST: 'sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e'
+  ROSTER_METADATA_SHA256: '90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f'
+  V3_ARTIFACT_ID: '10472217076'
+  V3_WORKFLOW_RUN_ID: '35159301387'
+  V3_HEAD_SHA: 'fd4224805a46712c6d240cced51ef7d93ac50f9b'
+  V3_ARTIFACT_DIGEST: 'sha256:af586ab4b827a8a99422d02d3265ca70f540cc5279770345acb5af5cd5037958'
+  V3_TARGET_SELECTION_SHA256: '437a94fa92709d60f0c3b2d88a4e52ce8f3dfd7f6241109793f4d991b8222f8d'
+  V3_DATA_BRANCH: 'research-data/levline4-ngs-player-id-browser-heldout-v3'
+  V4_ARTIFACT_ID: '10473865589'
+  V4_WORKFLOW_RUN_ID: '35162256814'
+  V4_HEAD_SHA: '42bca8b57ac13b6fc44cc4ad1d50b9b806deaa3e'
+  V4_ARTIFACT_DIGEST: 'sha256:8d1220ddbf4406bd1656b85db2400246c7c4fe15e140d84c39ed0c303d7d5acd'
+  V4_DATA_BRANCH: 'research-data/levline4-ngs-player-id-browser-heldout-v4'
+  V5_ARTIFACT_ID: '10473671117'
+  V5_WORKFLOW_RUN_ID: '35162079741'
+  V5_HEAD_SHA: '2fbd9cbb76efc12448581eb1ed393a579cfd60b9'
+  V5_ARTIFACT_DIGEST: 'sha256:961994eb487c59103f5388708456659e40e11d13ee4462494f7d093876787c90'
+  V5_TARGET_SELECTION_SHA256: '6ae6e017cd24593657921ee82d023541b0feb679a37aa0051c17fe4ab2244e7a'
+
+jobs:
+  mode:
+    runs-on: ubuntu-24.04
+    outputs:
+      frozen: ${{ steps.mode.outputs.frozen }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        run: |
+          if [ -f "$MANIFEST_PATH" ]; then echo 'frozen=true' >> "$GITHUB_OUTPUT"; else echo 'frozen=false' >> "$GITHUB_OUTPUT"; fi
+
+  preregistration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Prove frozen V6 contract predates implementation, tests, and workflow
+        run: |
+          set -euo pipefail
+          git cat-file -e "${FROZEN_CONTRACT_COMMIT}^{commit}"
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" HEAD
+          test "$(git rev-parse "${FROZEN_CONTRACT_COMMIT}:${CONTRACT_PATH}")" = "$(git rev-parse "HEAD:${CONTRACT_PATH}")"
+          test "$FROZEN_CONTRACT_COMMIT" = "$(git log -1 --format=%H -- "$CONTRACT_PATH")"
+          test "$FROZEN_CONTRACT_COMMIT" != "$(git log -1 --format=%H -- research/levline4_2026_ngs_player_id_browser_heldout_v6.py)"
+          test "$FROZEN_CONTRACT_COMMIT" != "$(git log -1 --format=%H -- research/test_levline4_2026_ngs_player_id_browser_heldout_v6.py)"
+          test "$FROZEN_CONTRACT_COMMIT" != "$(git log -1 --format=%H -- .github/workflows/research_levline4_2026_ngs_player_id_browser_heldout_v6.yml)"
+          test "$(git rev-parse HEAD:research/levline4_2026_ngs_player_id_browser_heldout_v6_frozen_base.py)" = "$V5_FROZEN_BASE_BLOB"
+      - name: Install lightweight test dependency
+        run: python -m pip install pytest
+      - name: Unit-test V6 governance delta and exact frozen resolver base
+        run: python -m pytest -q research/test_levline4_2026_ngs_player_id_browser_heldout_v6.py
+      - name: Prove no V5 outcome-driven rule or threshold adaptation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v6_contract.json').read_text())
+          p=c['preregistration_state']
+          assert p['v5_outcome_metrics_used_for_rule_or_threshold_design'] is False
+          assert p['v5_target_rows_used_only_for_empirical_exposure_exclusion'] is True
+          assert p['v6_uses_frozen_v5_resolver_semantics_and_pass_gates_without_adaptation'] is True
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection']==0
+          PY
+      - name: Prove research-only diff
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=100
+          bad=$(git diff --name-only origin/main...HEAD | grep -Ev '^(research/|\.github/workflows/research_)' || true)
+          test -z "$bad" || { echo "$bad"; exit 1; }
+
+  live-heldout:
+    if: needs.mode.outputs.frozen == 'false'
+    needs: [mode, preregistration]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Prove this is the unfrozen canonical first-result path
+        run: |
+          set -euo pipefail
+          test ! -f "$MANIFEST_PATH"
+          test "$FROZEN_CONTRACT_COMMIT" = "$(git log -1 --format=%H -- "$CONTRACT_PATH")"
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" HEAD
+          test "$(git rev-parse HEAD:research/levline4_2026_ngs_player_id_browser_heldout_v6_frozen_base.py)" = "$V5_FROZEN_BASE_BLOB"
+      - name: Require durable V3 and V4 preservation before V6 empirical execution
+        run: |
+          set -euo pipefail
+          git fetch origin "${V3_DATA_BRANCH}:refs/remotes/origin/${V3_DATA_BRANCH}"
+          git fetch origin "${V4_DATA_BRANCH}:refs/remotes/origin/${V4_DATA_BRANCH}"
+          git show "origin/${V3_DATA_BRANCH}:research_outputs/levline4_2026_ngs_player_id_browser_heldout_v3/first_result_35159301387/preservation.json" > /tmp/v3_preservation.json
+          git show "origin/${V4_DATA_BRANCH}:research_outputs/levline4_2026_ngs_player_id_browser_heldout_v4/first_result_35162256814/preservation.json" > /tmp/v4_preservation.json
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          v3=json.loads(Path('/tmp/v3_preservation.json').read_text())
+          assert v3['source_actions_artifact_id']==int(os.environ['V3_ARTIFACT_ID'])
+          assert v3['source_workflow_run_id']==int(os.environ['V3_WORKFLOW_RUN_ID'])
+          assert v3['source_head_sha']==os.environ['V3_HEAD_SHA']
+          assert v3['actions_artifact_digest']==os.environ['V3_ARTIFACT_DIGEST']
+          assert v3['canonical_result']=='FAIL' and v3['production_authorized'] is False
+          v4=json.loads(Path('/tmp/v4_preservation.json').read_text())
+          assert v4['source_actions_artifact_id']==int(os.environ['V4_ARTIFACT_ID'])
+          assert v4['source_workflow_run_id']==int(os.environ['V4_WORKFLOW_RUN_ID'])
+          assert v4['source_head_sha']==os.environ['V4_HEAD_SHA']
+          assert v4['actions_artifact_digest']==os.environ['V4_ARTIFACT_DIGEST']
+          assert v4['canonical_result']=='TECHNICAL_FAIL_PRE_REQUEST'
+          assert v4['ngs_request_count']==0 and v4['ngs_response_count']==0
+          assert v4['production_authorized'] is False
+          PY
+      - name: Download pinned roster, V3 exclusions, and V5 empirical-exposure exclusions
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          set -euo pipefail
+          roster_meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ROSTER_ARTIFACT_ID}")
+          test "$(echo "$roster_meta" | jq -r .digest)" = "$ROSTER_ARTIFACT_DIGEST"
+          test "$(echo "$roster_meta" | jq -r .workflow_run.id)" = "$ROSTER_WORKFLOW_RUN_ID"
+          test "$(echo "$roster_meta" | jq -r .workflow_run.head_sha)" = "$ROSTER_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ROSTER_ARTIFACT_ID}/zip" > /tmp/roster.zip
+          rm -rf /tmp/roster && mkdir /tmp/roster && unzip -q /tmp/roster.zip -d /tmp/roster
+          test "$(sha256sum /tmp/roster/roster_metadata.jsonl | awk '{print $1}')" = "$ROSTER_METADATA_SHA256"
+
+          v3_meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${V3_ARTIFACT_ID}")
+          test "$(echo "$v3_meta" | jq -r .digest)" = "$V3_ARTIFACT_DIGEST"
+          test "$(echo "$v3_meta" | jq -r .workflow_run.id)" = "$V3_WORKFLOW_RUN_ID"
+          test "$(echo "$v3_meta" | jq -r .workflow_run.head_sha)" = "$V3_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${V3_ARTIFACT_ID}/zip" > /tmp/v3.zip
+          rm -rf /tmp/v3 && mkdir /tmp/v3 && unzip -q /tmp/v3.zip -d /tmp/v3
+          test "$(sha256sum /tmp/v3/target_selection.json | awk '{print $1}')" = "$V3_TARGET_SELECTION_SHA256"
+
+          v5_meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${V5_ARTIFACT_ID}")
+          test "$(echo "$v5_meta" | jq -r .digest)" = "$V5_ARTIFACT_DIGEST"
+          test "$(echo "$v5_meta" | jq -r .workflow_run.id)" = "$V5_WORKFLOW_RUN_ID"
+          test "$(echo "$v5_meta" | jq -r .workflow_run.head_sha)" = "$V5_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${V5_ARTIFACT_ID}/zip" > /tmp/v5.zip
+          rm -rf /tmp/v5 && mkdir /tmp/v5 && unzip -q /tmp/v5.zip -d /tmp/v5
+          test "$(sha256sum /tmp/v5/target_selection.json | awk '{print $1}')" = "$V5_TARGET_SELECTION_SHA256"
+      - name: Prove frozen fresh 78-row population before any V6 NGS request
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.levline4_2026_ngs_player_id_browser_heldout_v6 import select_targets
+          from research.levline4_2026_ngs_player_id_browser_heldout_v6_frozen_base import load_jsonl,row_identity
+          c=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v6_contract.json').read_text())
+          rows=load_jsonl(Path('/tmp/roster/roster_metadata.jsonl'))
+          v3=json.loads(Path('/tmp/v3/target_selection.json').read_text())
+          v5=json.loads(Path('/tmp/v5/target_selection.json').read_text())
+          targets,diag=select_targets(rows,c,v3,v5)
+          assert len(targets)==78
+          assert diag['eligible_row_count']==2315
+          assert diag['coverage_target_count']==64
+          assert diag['team_alias_ari_target_count']==4
+          assert diag['source_name_variant_target_count']==16
+          assert diag['overlap_counts']==c['target_selection']['expected_overlap_counts']
+          assert diag['sorted_row_identity_sha256']==c['target_selection']['expected_sorted_row_identity_sha256']
+          assert diag['target_projection_sha256']==c['target_selection']['expected_target_projection_sha256']
+          exposed={row_identity(x) for x in v3['targets']} | {row_identity(x) for x in v5['targets']}
+          assert not any(row_identity(x) in exposed for x in targets)
+          print(json.dumps(diag,indent=2,sort_keys=True))
+          PY
+      - name: Install browser dependency
+        run: |
+          python -m pip install 'playwright>=1.50,<2'
+          python -m playwright install --with-deps chromium
+      - name: Execute canonical first fresh-resolver V6 once
+        id: execute
+        continue-on-error: true
+        run: |
+          set +e
+          rm -rf research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6
+          python -m research.levline4_2026_ngs_player_id_browser_heldout_v6 \
+            --contract "$CONTRACT_PATH" \
+            --roster-metadata /tmp/roster/roster_metadata.jsonl \
+            --v3-target-selection /tmp/v3/target_selection.json \
+            --v5-target-selection /tmp/v5/target_selection.json \
+            --output-dir research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6 \
+            > /tmp/v6_execution.log 2>&1
+          code=$?
+          mkdir -p research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6
+          cp /tmp/v6_execution.log research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6/execution.log
+          echo "$code" > research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6/execution_exit_code.txt
+          cat /tmp/v6_execution.log
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
+      - name: Verify governance and browser context before artifact upload
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6')
+          receipt=json.loads((root/'receipt.json').read_text())
+          assert receipt['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V6'
+          assert receipt['target_selection']['total_target_count']==78
+          assert receipt['target_selection']['coverage_target_count']==64
+          assert receipt['target_selection']['team_alias_ari_target_count']==4
+          assert receipt['target_selection']['source_name_variant_target_count']==16
+          b=receipt['browser_transport']
+          assert b['context_locale']=='en-US'
+          assert b['context_user_agent']=='LevLine-Research/1.0 (+https://github.com/levine26/nfl-forecast-model)'
+          assert b['post_load_settle_ms']==1500
+          assert b['manual_headers_or_credentials_used'] is False
+          assert b['browser_storage_state_persisted'] is False
+          assert b['direct_http_fallback_used'] is False
+          assert b['explicit_retry_used'] is False
+          assert receipt['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert receipt['postgame_participation_used'] is False
+          assert receipt['week2_inactive_execution_evidence_used_for_design'] is False
+          assert receipt['v5_outcome_metrics_used_for_rule_or_threshold_design'] is False
+          assert receipt['f_st_01_frozen_2026_unchanged'] is True
+          assert receipt['research_only'] is True and receipt['production_paths_changed'] is False
+          for key in ('general_2026_player_identity_to_gsis_qualified','week2_sunday_due_inactive_player_identity_to_gsis_qualified','availability_state_authorized','forecast_probability_effect_authorized','model_fit_authorized','production_authorized'):
+              assert receipt['authority'][key] is False, key
+          PY
+      - name: Upload immutable canonical first V6 artifact even on scientific FAIL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-ngs-player-id-browser-heldout-v6-first-${{ github.run_id }}
+          path: research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface canonical scientific disposition after artifact upload
+        if: always()
+        env:
+          EXECUTE_OUTCOME: ${{ steps.execute.outcome }}
+          EXECUTE_EXIT_CODE: ${{ steps.execute.outputs.exit_code }}
+        run: |
+          set -euo pipefail
+          test "$EXECUTE_OUTCOME" = 'success'
+          test "${EXECUTE_EXIT_CODE:-1}" = '0'
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6/receipt.json').read_text())
+          if r['status']!='PASS':
+              raise SystemExit('Canonical first V6 result is scientific FAIL; freeze it exactly and version up before adaptation.')
+          assert all(r['gates'].values())
+          a=r['authority']
+          assert a['ngs_public_page_browser_context_transport_qualified_for_frozen_v6_population'] is True
+          assert a['ngs_repaired_name_team_resolver_qualified_for_frozen_v6_population'] is True
+          assert a['official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application'] is True
+          for key in ('ngs_endpoint_as_independent_or_stable_production_api_qualified','ngs_is_independent_player_identity_ground_truth','general_2026_player_identity_to_gsis_qualified','week2_sunday_due_inactive_player_identity_to_gsis_qualified','game_day_membership_qualified','availability_state_authorized','player_value_join_authorized','forecast_probability_effect_authorized','model_fit_authorized','production_authorized'):
+              assert a[key] is False, key
+          PY
+
+  replay-canonical-first-result:
+    if: needs.mode.outputs.frozen == 'true'
+    needs: [mode, preregistration]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read immutable first-result coordinates
+        id: manifest
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v6_first_result_manifest.json').read_text())
+          assert m['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V6'
+          assert m['first_result_is_canonical'] is True
+          assert m['later_same_version_execution_may_replace_first_result'] is False
+          assert m['same_version_rule_adaptation_after_first_result'] is False
+          print(f"artifact_id={m['first_artifact_id']}")
+          print(f"artifact_digest={m['artifact_digest']}")
+          print(f"workflow_run_id={m['first_workflow_run_id']}")
+          print(f"head_sha={m['first_head_sha']}")
+          PY
+      - name: Download and verify immutable canonical V6 artifact
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}")
+          test "$(echo "$meta" | jq -r .digest)" = "${{ steps.manifest.outputs.artifact_digest }}"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "${{ steps.manifest.outputs.workflow_run_id }}"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "${{ steps.manifest.outputs.head_sha }}"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}/zip" > /tmp/v6.zip
+          rm -rf /tmp/v6 && mkdir /tmp/v6 && unzip -q /tmp/v6.zip -d /tmp/v6
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_ngs_player_id_browser_heldout_v6_first_result_manifest.json').read_text())
+          root=Path('/tmp/v6')
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert observed==m['file_sha256']
+          r=json.loads((root/'receipt.json').read_text())
+          assert r['status']==m['first_result_status']
+          assert r['authority']==m['authority']
+          assert r['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert r['postgame_participation_used'] is False
+          assert r['week2_inactive_execution_evidence_used_for_design'] is False
+          assert r['v5_outcome_metrics_used_for_rule_or_threshold_design'] is False
+          assert r['f_st_01_frozen_2026_unchanged'] is True
+          assert r['research_only'] is True and r['production_paths_changed'] is False
+          PY
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Prove research-only scope
+        run: |
+          git fetch origin main --depth=100
+          git diff --name-only origin/main...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/main...HEAD -- outputs/ site/ src/ scripts/ config/
