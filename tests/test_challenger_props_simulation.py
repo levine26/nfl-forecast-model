@@ -10,6 +10,7 @@ from nfl_forecast.challenger_props_simulation import (
     SimulationInputError,
     TeamSimulationInput,
     build_forecasts,
+    build_game_input_from_upstream,
     evaluate_distribution,
     simulate_game,
 )
@@ -157,6 +158,179 @@ def _posterior_game() -> GameSimulationInput:
         }
     )
 
+
+
+def _upstream_payloads() -> tuple[list[dict], list[dict], list[dict], dict]:
+    game = _posterior_game()
+    projections: list[dict] = []
+    efficiency_rows: list[dict] = []
+    team_td_rows: list[dict] = []
+    residuals: dict[str, dict[str, float]] = {}
+
+    for team in game.teams:
+        roster = [player for player in game.players if player.team == team.team]
+        carry_players = [player for player in roster if player.carry_share > 0.0]
+        target_players = [player for player in roster if player.target_share > 0.0]
+        projections.append(
+            {
+                "metadata": {
+                    "game_id": game.game_id,
+                    "team": team.team,
+                    "opponent": team.opponent,
+                    "data_horizon": game.data_horizon,
+                },
+                "hierarchy": {
+                    "team_offensive_plays": {
+                        "mean": team.mean_offensive_plays,
+                        "sd": team.offensive_plays_sd,
+                        "gamma_shape": team.offensive_plays_gamma_shape,
+                        "gamma_rate": team.offensive_plays_gamma_rate,
+                    },
+                    "dropback_rate_given_team_plays": {
+                        "mean": team.neutral_pass_rate,
+                        "sd": team.pass_rate_sd,
+                        "alpha": team.dropback_rate_alpha,
+                        "beta": team.dropback_rate_beta,
+                    },
+                    "dropback_outcome_given_dropback": {
+                        "concentration": {
+                            "pass_attempts": team.pass_attempt_outcome_alpha,
+                            "sacks": team.sack_outcome_alpha,
+                            "qb_scrambles": team.scramble_outcome_alpha,
+                        }
+                    },
+                    "designed_carry_share_given_designed_rush": {
+                        "mean_share": {
+                            player.player_id: player.carry_share for player in carry_players
+                        },
+                        "concentration": {
+                            player.player_id: player.designed_carry_share_alpha
+                            for player in carry_players
+                        },
+                    },
+                    "route_participation_given_dropback": {
+                        player.player_id: {
+                            "mean": player.route_participation,
+                            "alpha": player.route_participation_alpha,
+                            "beta": player.route_participation_beta,
+                        }
+                        for player in target_players
+                    },
+                    "targetable_attempt_rate_given_pass_attempt": {
+                        "mean": 0.92,
+                        "alpha": team.targetable_attempt_alpha,
+                        "beta": team.targetable_attempt_beta,
+                    },
+                    "target_share_given_team_target": {
+                        "mean_share": {
+                            player.player_id: player.target_share for player in target_players
+                        },
+                        "concentration": {
+                            player.player_id: player.target_share_alpha
+                            for player in target_players
+                        },
+                    },
+                    "reception_probability_given_target": {
+                        player.player_id: {
+                            "mean": player.catch_rate,
+                            "alpha": player.catch_alpha,
+                            "beta": player.catch_beta,
+                        }
+                        for player in target_players
+                    },
+                },
+                "players": [
+                    {
+                        "player_id": player.player_id,
+                        "player_name": player.player,
+                        "position": player.position,
+                        "availability_probability": player.availability_probability,
+                        "is_primary_qb": player.is_primary_qb,
+                    }
+                    for player in roster
+                ],
+                "audit": {"data_quality": "mock_contract"},
+            }
+        )
+        team_td_rows.append(
+            {
+                "game_id": game.game_id,
+                "team": team.team,
+                "expected_passing_td_opportunities": team.expected_passing_tds,
+                "expected_rushing_td_opportunities": team.expected_rushing_tds,
+            }
+        )
+        residuals[team.team] = {
+            "catch_rate": team.residual_catch_rate,
+            "receiving_yards_per_reception": team.residual_yards_per_reception,
+            "rushing_yards_per_carry": team.residual_yards_per_carry,
+        }
+        for player in roster:
+            efficiency_rows.append(
+                {
+                    "game_id": game.game_id,
+                    "player_id": player.player_id,
+                    "player_name": player.player,
+                    "catch_alpha": player.catch_alpha,
+                    "catch_beta": player.catch_beta,
+                    "catch_rate_mean": player.catch_rate,
+                    "receiving_yards_per_reception_mean": player.receiving_yards_per_reception,
+                    "receiving_yards_per_reception_event_sd": (
+                        player.receiving_yards_per_reception_event_sd
+                    ),
+                    "receiving_yards_per_reception_mean_se": (
+                        player.receiving_yards_per_reception_mean_se
+                    ),
+                    "rushing_yards_per_attempt_mean": player.rushing_yards_per_carry,
+                    "rushing_yards_per_attempt_event_sd": player.rushing_yards_per_carry_event_sd,
+                    "rushing_yards_per_attempt_mean_se": player.rushing_yards_per_carry_mean_se,
+                    "passing_td_share_mean": player.passing_td_share,
+                    "receiving_td_share_mean": player.receiving_td_share,
+                    "rushing_td_share_mean": player.rushing_td_share,
+                    "passing_td_allocation_alpha": player.passing_td_allocation_alpha,
+                    "receiving_td_allocation_alpha": player.receiving_td_allocation_alpha,
+                    "rushing_td_allocation_alpha": player.rushing_td_allocation_alpha,
+                    "confidence_state": "mock_contract",
+                }
+            )
+    return projections, efficiency_rows, team_td_rows, residuals
+
+
+def test_upstream_handoff_adapter_builds_simulation_ready_game() -> None:
+    projections, efficiency_rows, team_td_rows, residuals = _upstream_payloads()
+    game = build_game_input_from_upstream(
+        home_team="ARI",
+        away_team="LAR",
+        opportunity_projections=projections,
+        efficiency_player_parameters=efficiency_rows,
+        team_td_parameters=team_td_rows,
+        residual_efficiency_by_team=residuals,
+        shared_pace_correlation=0.25,
+        shared_scoring_log_sd=0.10,
+        pass_rate_game_script_sensitivity=0.03,
+    )
+    assert game.game_id == "2026_03_ARI_LAR"
+    assert game.teams[0].offensive_plays_gamma_shape == 640.0
+    assert game.teams[0].targetable_attempt_alpha == 92.0
+    assert next(p for p in game.players if p.player_id == "wr-ari").catch_alpha is not None
+    result = simulate_game(game, simulations=2500, seed=901)
+    for stats in result.player_stats.values():
+        assert np.all(stats["targets"] <= stats["routes"])
+        assert np.all(stats["receptions"] <= stats["targets"])
+
+
+def test_upstream_handoff_requires_explicit_residual_efficiency() -> None:
+    projections, efficiency_rows, team_td_rows, residuals = _upstream_payloads()
+    residuals.pop("ARI")
+    with pytest.raises(SimulationInputError, match="residual efficiency prior"):
+        build_game_input_from_upstream(
+            home_team="ARI",
+            away_team="LAR",
+            opportunity_projections=projections,
+            efficiency_player_parameters=efficiency_rows,
+            team_td_parameters=team_td_rows,
+            residual_efficiency_by_team=residuals,
+        )
 
 def test_deterministic_execution() -> None:
     a = simulate_game(_posterior_game(), simulations=2500, seed=26)
