@@ -31,13 +31,22 @@ CORE_COLUMNS = (
     "position",
     "team",
     "opponent",
+    "kickoff_timestamp",
     "forecast_timestamp",
     "history_policy",
+    "roster_status_raw",
+    "roster_membership_state",
     "expected_active_state",
+    "availability_status_raw",
+    "practice_status_raw",
+    "availability_capture_timestamp",
+    "availability_source_name",
     "availability_source_status",
     "availability_prospective_only",
     "expected_role",
     "prior_games",
+    "history_last_season",
+    "history_last_week",
     "prior_dropbacks_pg_4",
     "prior_pass_attempts_pg_4",
     "prior_rush_attempts_pg_4",
@@ -62,6 +71,9 @@ CORE_COLUMNS = (
     "missing_snap_data",
     "missing_route_data",
     "missing_availability",
+    "missing_red_zone_history",
+    "kickoff_known",
+    "forecast_is_pregame",
     "data_quality_state",
 )
 
@@ -869,6 +881,8 @@ def build_offensive_player_state_contract(
 
     numeric_history = [
         "prior_games",
+        "history_last_season",
+        "history_last_week",
         "prior_dropbacks_pg_4",
         "prior_pass_attempts_pg_4",
         "prior_rush_attempts_pg_4",
@@ -1032,6 +1046,26 @@ def validate_offensive_player_state(frame: pd.DataFrame) -> None:
         raise ValueError("Player-state contract contains duplicate game_id/player_id rows")
     if (~frame["position"].isin(SUPPORTED_POSITIONS)).any():
         raise ValueError("Player-state contract contains unsupported position")
+    if (~frame["schema_version"].eq(SCHEMA_VERSION)).any():
+        raise ValueError("Player-state contract contains an unexpected schema_version")
+    if (~frame["history_policy"].eq("STRICT_PRIOR_WEEK")).any():
+        raise ValueError("Player-state contract contains an unexpected history_policy")
+
+    valid_membership = {
+        "ACTIVE_ROSTER",
+        "PRACTICE_SQUAD",
+        "INACTIVE_ROSTER",
+        "RESERVE_OR_UNAVAILABLE",
+        "UNKNOWN",
+        "OTHER",
+    }
+    if (~frame["roster_membership_state"].isin(valid_membership)).any():
+        raise ValueError("Player-state contract contains invalid roster_membership_state")
+
+    kickoff = pd.to_datetime(frame["kickoff_timestamp"], utc=True, errors="coerce")
+    kickoff_known = frame["kickoff_known"].astype(bool)
+    if (kickoff_known != kickoff.notna()).any():
+        raise ValueError("Player-state contract kickoff_known disagrees with kickoff_timestamp")
     if (~frame["forecast_is_pregame"].astype(bool)).any():
         raise ValueError("Player-state contract contains a row after known kickoff")
 
@@ -1041,3 +1075,7 @@ def validate_offensive_player_state(frame: pd.DataFrame) -> None:
     valid_states = {"OUT", "DOUBTFUL", "QUESTIONABLE", "AVAILABLE", "UNKNOWN"}
     if (~frame["expected_active_state"].isin(valid_states)).any():
         raise ValueError("Player-state contract contains invalid expected_active_state")
+
+    valid_quality = {"ENRICHED_HISTORY", "CORE_HISTORY", "LIMITED_NO_HISTORY"}
+    if (~frame["data_quality_state"].isin(valid_quality)).any():
+        raise ValueError("Player-state contract contains invalid data_quality_state")
