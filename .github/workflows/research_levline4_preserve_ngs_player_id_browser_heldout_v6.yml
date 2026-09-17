@@ -1,0 +1,211 @@
+name: LevLine 4 preserve NGS player ID browser held-out V6
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_browser_heldout_v6.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_browser_heldout_v6.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-ngs-player-id-browser-heldout-v6
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10474626172'
+  SOURCE_WORKFLOW_RUN_ID: '35164913626'
+  SOURCE_HEAD_SHA: '89bf915cfbe3bb4b0194e34398f3043a2968899f'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:ee95d89fa0ac660b879eb79a647d408ed424b63c744d69a2e5f20ac0ee8180aa'
+  EXPECTED_ARTIFACT_SIZE: '117277'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v6_first_result_manifest.json'
+  DATA_BRANCH: 'research-data/levline4-ngs-player-id-browser-heldout-v6'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable canonical V6 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v6.zip
+          rm -rf /tmp/ngs_v6 && mkdir -p /tmp/ngs_v6
+          unzip -q /tmp/ngs_v6.zip -d /tmp/ngs_v6
+      - name: Verify complete file map, frozen FAIL, and authority ceiling
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path('/tmp/ngs_v6')
+          m=json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert m['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V6'
+          assert m['first_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert m['first_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert m['first_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert m['artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert m['artifact_size_in_bytes']==int(os.environ['EXPECTED_ARTIFACT_SIZE'])
+          assert m['file_count']==94
+          assert len(observed)==94
+          assert observed==m['file_sha256']
+          assert m['first_result_is_canonical'] is True
+          assert m['first_result_status']=='FAIL'
+          assert m['scientific_disposition']=='FAIL'
+          assert m['later_same_version_execution_may_replace_first_result'] is False
+          assert m['same_version_rule_adaptation_after_first_result'] is False
+          s=m['target_selection']
+          assert s['eligible_row_count']==2315
+          assert s['total_target_count']==78
+          assert s['coverage_target_count']==64
+          assert s['team_alias_ari_target_count']==4
+          assert s['source_name_variant_target_count']==16
+          assert s['sorted_row_identity_sha256']=='ca06c3eadf135223bfe9695b255906f3b42f42263aacc7262119ec84b041df35'
+          assert s['target_projection_sha256']=='fac150229b3426fee077ab82a1ef3dcf3ce010dbb1b39ddfac23bbf00a421b2e'
+          metrics=m['metrics']; gates=m['gates']
+          assert metrics['target_count']==78
+          assert metrics['coverage_unique_resolution_count']==60
+          assert metrics['coverage_target_count']==64
+          assert metrics['executed_query_attempt_count']==88
+          assert metrics['all_executed_query_attempts_http_200_parseable_players_array'] is True
+          assert metrics['source_name_variant_unique_resolution_count']==16
+          assert metrics['team_alias_ari_unique_resolution_count']==4
+          assert metrics['invalid_selected_gsis_count']==0
+          assert metrics['duplicate_selected_gsis_across_distinct_target_rows_count']==0
+          assert metrics['tiebreak_exercised_count']==1 and metrics['tiebreak_success_count']==1
+          assert metrics['fallback_exercised_count']==10 and metrics['fallback_success_count']==6
+          assert gates['coverage_unique_resolution_minimum'] is False
+          assert all(v is True for k,v in gates.items() if k!='coverage_unique_resolution_minimum')
+          f=m['failure_characterization']
+          assert f['transport_failure'] is False
+          assert f['query_surface_http_or_parse_failure'] is False
+          assert f['failed_gate']=='coverage_unique_resolution_minimum'
+          assert [x['visible_name'] for x in f['unresolved_coverage_targets']]==['Josh Uche','JuJu Brents','Hollywood Brown',"Cor'Dale Flott"]
+          assert m['ngs_request_count']==88 and m['ngs_response_count']==88 and m['raw_ngs_response_files']==88
+          assert m['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert m['postgame_participation_used'] is False
+          assert m['week2_inactive_execution_evidence_used_for_design'] is False
+          assert m['future_information_used_to_repair_point_in_time_state'] is False
+          assert m['f_st_01_frozen_2026_unchanged'] is True
+          assert m['research_only'] is True and m['production_paths_changed'] is False
+          assert all(v is False for v in m['authority'].values() if isinstance(v,bool))
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download immutable canonical V6 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v6.zip
+          rm -rf /tmp/ngs_v6 && mkdir -p /tmp/ngs_v6
+          unzip -q /tmp/ngs_v6.zip -d /tmp/ngs_v6
+      - name: Reverify and add preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from datetime import datetime,timezone
+          from pathlib import Path
+          root=Path('/tmp/ngs_v6')
+          m=json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(root.rglob('*')) if p.is_file()}
+          assert observed==m['file_sha256'] and len(observed)==94
+          assert m['first_result_status']=='FAIL' and m['scientific_disposition']=='FAIL'
+          assert m['gates']['coverage_unique_resolution_minimum'] is False
+          preservation={
+            'schema_version':'levline4-ngs-player-id-browser-heldout-v6-preservation-v1',
+            'source_actions_artifact_id':int(os.environ['SOURCE_ARTIFACT_ID']),
+            'source_workflow_run_id':int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+            'source_head_sha':os.environ['SOURCE_HEAD_SHA'],
+            'actions_artifact_digest':os.environ['EXPECTED_ARTIFACT_DIGEST'],
+            'actions_artifact_size_in_bytes':int(os.environ['EXPECTED_ARTIFACT_SIZE']),
+            'canonical_file_sha256':m['file_sha256'],
+            'preserved_at_utc':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+            'preserving_workflow_run_id':os.environ['GITHUB_RUN_ID'],
+            'canonical_result':'FAIL',
+            'scientific_disposition':'FAIL',
+            'failure_gate':'coverage_unique_resolution_minimum',
+            'coverage_resolved_count':60,
+            'coverage_target_count':64,
+            'ngs_request_count':88,
+            'ngs_response_count':88,
+            'resolver_semantics_empirically_tested':True,
+            'research_only':True,
+            'general_2026_player_identity_to_gsis_qualified':False,
+            'game_day_membership_qualified':False,
+            'availability_state_authorized':False,
+            'player_value_join_authorized':False,
+            'forecast_probability_effect_authorized':False,
+            'model_fit_authorized':False,
+            'production_authorized':False,
+            'completed_2026_outcomes_used':0,
+            'postgame_participation_used':False,
+            'week2_inactive_execution_evidence_used_for_design':False,
+            'future_information_used_to_repair_point_in_time_state':False,
+            'f_st_01_frozen_2026_unchanged':True,
+          }
+          (root/'preservation.json').write_text(json.dumps(preservation,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Persist on dedicated research-data branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B ngs-v6-data "origin/${DATA_BRANCH}"
+          else
+            git checkout -B ngs-v6-data
+          fi
+          DEST='research_outputs/levline4_2026_ngs_player_id_browser_heldout_v6/first_result_35164913626'
+          if [ -e "$DEST/preservation.json" ]; then
+            DEST="$DEST" python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['DEST']); p=json.loads((root/'preservation.json').read_text())
+          assert p['source_actions_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert p['source_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert p['source_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert p['actions_artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert p['canonical_result']=='FAIL' and p['scientific_disposition']=='FAIL'
+          assert p['production_authorized'] is False
+          for rel,expected in p['canonical_file_sha256'].items():
+              assert hashlib.sha256((root/rel).read_bytes()).hexdigest()==expected, rel
+          PY
+            echo 'Canonical NGS browser held-out V6 evidence already preserved exactly.'
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/ngs_v6 "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve canonical failed NGS browser held-out V6 evidence'
+          git push origin HEAD:"${DATA_BRANCH}"
