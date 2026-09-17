@@ -140,23 +140,17 @@ def main() -> int:
         type=Path,
         default=ROOT / "outputs" / "props" / "history" / "forecast_originals.jsonl",
     )
-    parser.add_argument(
-        "--skip-history",
-        action="store_true",
-        help="Fixture/debug only: do not create immutable forecast receipts.",
-    )
     args = parser.parse_args()
     artifact = produce(
         _load(args.input),
         output=args.output,
         public_output=args.public_output,
-        history_ledger=None if args.skip_history else args.history_ledger,
+        history_ledger=args.history_ledger,
     )
     print(
         f"wrote {len(artifact['forecasts'])} Props Research Beta forecasts -> {args.output}"
     )
-    if not args.skip_history:
-        print(f"locked immutable originals -> {args.history_ledger}")
+    print(f"locked immutable originals -> {args.history_ledger}")
     return 0
 
 
