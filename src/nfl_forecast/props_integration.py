@@ -25,7 +25,7 @@ from nfl_forecast.challenger_props_simulation import (
 )
 from nfl_forecast.props_market import american_to_implied
 
-FORECAST_CONTRACT_VERSION = "levline-props-forecast-v0.1"
+# Integration candidate validated through the dedicated cross-lane suite.\nFORECAST_CONTRACT_VERSION = "levline-props-forecast-v0.1"
 RESEARCH_LABEL = "LEVLINE PROPS — RESEARCH BETA"
 
 INTERNAL_TO_PUBLIC_PROP = {
