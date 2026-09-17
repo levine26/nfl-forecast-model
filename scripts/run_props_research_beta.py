@@ -64,7 +64,7 @@ def produce(
     *,
     output: Path,
     public_output: Path | None,
-    history_ledger: Path | None,
+    history_ledger: Path,
 ) -> dict:
     forecast_timestamp = _aware(
         _required(payload, "forecast_timestamp_utc"), "forecast_timestamp_utc"
@@ -101,20 +101,24 @@ def produce(
         forecast_timestamp_utc=forecast_timestamp,
         interval_level=float(payload.get("prediction_interval_level", 0.80)),
     )
+    public = (
+        build_public_props(artifact, now_utc=datetime.now(timezone.utc))
+        if public_output is not None
+        else None
+    )
+
+    recorded = datetime.now(timezone.utc)
+    receipts = [
+        make_forecast_receipt(row, recorded_utc=recorded)
+        for row in artifact["forecasts"]
+    ]
+    append_jsonl_immutable(
+        history_ledger, receipts, identity_key="forecast_id"
+    )
+
+    # Publish only after every original receipt has passed immutable-history validation.
     _write_json(output, artifact)
-
-    if history_ledger is not None:
-        recorded = datetime.now(timezone.utc)
-        receipts = [
-            make_forecast_receipt(row, recorded_utc=recorded)
-            for row in artifact["forecasts"]
-        ]
-        append_jsonl_immutable(
-            history_ledger, receipts, identity_key="forecast_id"
-        )
-
-    if public_output is not None:
-        public = build_public_props(artifact, now_utc=datetime.now(timezone.utc))
+    if public_output is not None and public is not None:
         _write_json(public_output, public)
 
     return artifact
