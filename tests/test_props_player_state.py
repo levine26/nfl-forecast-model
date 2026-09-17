@@ -214,6 +214,32 @@ def test_future_availability_is_discarded():
     assert built.audit["availability"]["rows_future_discarded"] == 1
 
 
+def test_naive_availability_timestamp_is_rejected_not_assumed_utc():
+    availability = pd.DataFrame(
+        [
+            {
+                "player_id": "00-RB",
+                "team": "ARI",
+                "status": "Out",
+                "captured_at": "2026-09-17 20:00:00",
+            }
+        ]
+    )
+    built = build_offensive_player_state_contract(
+        schedules=_schedule(),
+        roster=_roster(),
+        pbp=_pbp(),
+        season=2026,
+        week=3,
+        forecast_timestamp="2026-09-17T21:00:00Z",
+        availability=availability,
+    )
+    rb = built.player_state[built.player_state["player_id"].eq("00-RB")].iloc[0]
+    assert rb["expected_active_state"] == "UNKNOWN"
+    assert rb["availability_source_status"] == "MISSING"
+    assert built.audit["availability"]["rows_missing_timestamp"] == 1
+
+
 def test_ambiguous_name_identity_fails_closed():
     roster = _roster()
     duplicate = pd.DataFrame(
@@ -377,6 +403,7 @@ def test_snap_history_without_pbp_is_explicit_missing_usage_not_zero():
     assert pd.isna(wr["prior_targets_pg_4"])
     assert bool(wr["missing_usage_history"])
     assert not bool(wr["missing_snap_data"])
+    assert wr["expected_role"] == "UNKNOWN_NO_USAGE_HISTORY"
     assert wr["data_quality_state"] == "LIMITED_NO_HISTORY"
     assert built.audit["sources"]["pbp"] == "missing_or_unusable"
     assert built.audit["sources"]["snap_counts"] == "historical_lagged"
