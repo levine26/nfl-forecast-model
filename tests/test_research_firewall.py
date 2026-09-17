@@ -62,6 +62,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "tests/test_props_opportunity_handoff.py",
         "tests/test_props_market.py",
         "tests/test_props_market_odds_api.py",
+        "tests/test_props_runner.py",
         "tests/test_props_integration.py",
         ".github/workflows/research_firewall.yml",
         ".github/workflows/research_2025_availability_reconstruction.yml",
