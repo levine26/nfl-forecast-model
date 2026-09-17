@@ -19,6 +19,9 @@ import pandas as pd
 SCHEMA_VERSION = "levline_props_player_state.v1"
 SUPPORTED_POSITIONS = frozenset({"QB", "RB", "WR", "TE"})
 TEAM_NORMALIZATION = {"JAC": "JAX"}
+NON_ROSTER_STATUSES = frozenset(
+    {"CUT", "UFA", "RFA", "NWT", "RET", "TRC", "TRD", "TRL", "TRT", "RSR"}
+)
 
 CORE_COLUMNS = (
     "schema_version",
@@ -141,6 +144,10 @@ def _normalize_roster(roster: pd.DataFrame) -> pd.DataFrame:
     name_col = _first_column(roster, ("player_name", "full_name", "display_name", "football_name"))
     pos_col = _first_column(roster, ("position", "position_group"))
     team_col = _first_column(roster, ("team", "recent_team", "club_code"))
+    status_col = _first_column(
+        roster,
+        ("status", "roster_status", "status_description_abbr"),
+    )
     missing = [
         label
         for label, col in (
@@ -160,10 +167,31 @@ def _normalize_roster(roster: pd.DataFrame) -> pd.DataFrame:
             "player_name": _text(roster, name_col).str.strip(),
             "position": _text(roster, pos_col).str.upper().str.strip(),
             "team": _text(roster, team_col).map(normalize_team_code),
+            "roster_status_raw": _text(roster, status_col).str.upper().str.strip(),
         }
     )
     out = out[_valid_id(out["player_id"]) & out["position"].isin(SUPPORTED_POSITIONS)].copy()
     out = out[out["team"].ne("") & out["player_name"].ne("")].copy()
+    out = out[~out["roster_status_raw"].isin(NON_ROSTER_STATUSES)].copy()
+
+    status = out["roster_status_raw"]
+    out["roster_membership_state"] = np.select(
+        [
+            status.eq("ACT"),
+            status.eq("DEV"),
+            status.eq("INA"),
+            status.isin({"RES", "PUP", "SUS", "EXE", "E14", "RSN"}),
+            status.eq(""),
+        ],
+        [
+            "ACTIVE_ROSTER",
+            "PRACTICE_SQUAD",
+            "INACTIVE_ROSTER",
+            "RESERVE_OR_UNAVAILABLE",
+            "UNKNOWN",
+        ],
+        default="OTHER",
+    )
 
     conflicts: list[str] = []
     for player_id, group in out.groupby("player_id", sort=False):
