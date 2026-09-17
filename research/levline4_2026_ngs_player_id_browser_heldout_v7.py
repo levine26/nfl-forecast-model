@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """LevLine 4 NGS browser-context held-out resolver V7 (research only).
 
-V7 extends the frozen V6/V5 resolver with exactly one preregistered source-native
-identity representation: official-club roster ``canonical_data_name``.  It does
-not use fuzzy matching, manual aliases, status, participation, outcomes, or
-availability evidence.
+V7 adds exactly one preregistered source-native identity representation to the
+frozen V6/V5 semantics: official-club roster ``canonical_data_name``. It does
+not use fuzzy matching, manual aliases, status, participation, outcomes,
+availability evidence, or post-observation repair.
 """
 from __future__ import annotations
 
@@ -21,14 +21,8 @@ _SUFFIX_TOKEN_RE = re.compile(r"^(?:jr\.?|sr\.?|ii|iii|iv|v)$", re.I)
 
 
 def canonical_query_name(value: Any) -> str | None:
-    """Convert the source-native ``family,given [suffix]`` field deterministically.
-
-    Empty comma components are discarded to tolerate source markup such as
-    ``murray,,kenneth jr.`` without inventing any token.  Exactly two nonempty
-    components must remain.  A terminal suffix on the given-name side is moved
-    to the end, preserving its source spelling.
-    """
-    parts = [base.clean(part) for part in base.clean(value).split(",") if base.clean(part)]
+    """Deterministically convert source ``family,given [suffix]`` to query form."""
+    parts = [base.clean(p) for p in base.clean(value).split(",") if base.clean(p)]
     if len(parts) != 2:
         return None
     family, given = parts
@@ -51,29 +45,31 @@ def source_name_keys(target: dict[str, Any]) -> tuple[str, str | None, set[str]]
     keys = {visible_key}
     if canonical_key:
         keys.add(canonical_key)
-    return visible_key, canonical if canonical else None, keys
+    return visible_key, canonical, keys
 
 
 def query_plan(target: dict[str, Any]) -> list[tuple[str, str]]:
     visible = base.clean(target.get("visible_name"))
     plan: list[tuple[str, str]] = [("exact_visible_name", visible)]
-
     stripped = base.strip_terminal_suffix(visible)
     if stripped and stripped != visible:
         plan.append(("terminal_suffix_stripped", stripped))
-
     canonical = canonical_query_name(target.get("canonical_data_name"))
-    if (
-        canonical
-        and base.name_key(canonical) != base.name_key(visible)
-        and canonical not in {query for _, query in plan}
-    ):
-        plan.append(("source_canonical_name", canonical))
-
+    if canonical and base.name_key(canonical) != base.name_key(visible):
+        if canonical not in {query for _, query in plan}:
+            plan.append(("source_canonical_name", canonical))
     surname = base.surname_only(visible)
     if surname and surname not in {query for _, query in plan}:
         plan.append(("surname_only", surname))
     return plan[:4]
+
+
+def _selection_order(row: dict[str, Any], contract: dict[str, Any]) -> tuple[str, str, str]:
+    return (
+        base.selection_key(row, contract),
+        base.clean(row.get("visible_name")),
+        base.clean(row.get("profile_path")),
+    )
 
 
 def select_targets(
@@ -84,18 +80,13 @@ def select_targets(
     v6_selection: dict[str, Any],
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     cfg = contract["target_selection"]
-    v3_targets = list(v3_selection.get("targets", []))
-    v5_targets = list(v5_selection.get("targets", []))
-    v6_targets = list(v6_selection.get("targets", []))
-    assert len(v3_targets) == 70
-    assert len(v5_targets) == 74
-    assert len(v6_targets) == 78
-
-    prior_sets = [
-        {base.row_identity(row) for row in v3_targets},
-        {base.row_identity(row) for row in v5_targets},
-        {base.row_identity(row) for row in v6_targets},
+    prior_groups = [
+        list(v3_selection.get("targets", [])),
+        list(v5_selection.get("targets", [])),
+        list(v6_selection.get("targets", [])),
     ]
+    assert [len(x) for x in prior_groups] == [70, 74, 78]
+    prior_sets = [{base.row_identity(r) for r in group} for group in prior_groups]
     assert not (prior_sets[0] & prior_sets[1])
     assert not (prior_sets[0] & prior_sets[2])
     assert not (prior_sets[1] & prior_sets[2])
@@ -120,39 +111,35 @@ def select_targets(
     for row in eligible:
         by_team[base.clean(row["team"])].append(row)
 
-    def order(row: dict[str, Any]):
-        return (
-            base.selection_key(row, contract),
-            base.clean(row.get("visible_name")),
-            base.clean(row.get("profile_path")),
-        )
-
     coverage: list[dict[str, Any]] = []
     for team in sorted(by_team):
         coverage.extend(
-            sorted(by_team[team], key=order)[: cfg["coverage_stratum"]["per_team_count"]]
+            sorted(by_team[team], key=lambda r: _selection_order(r, contract))[
+                : cfg["coverage_stratum"]["per_team_count"]
+            ]
         )
     alias = sorted(
-        by_team[cfg["team_alias_ari_stratum"]["team"]], key=order
+        by_team[cfg["team_alias_ari_stratum"]["team"]],
+        key=lambda r: _selection_order(r, contract),
     )[: cfg["team_alias_ari_stratum"]["expected_target_count"]]
 
     regexes = [
         re.compile(expr, re.I if "Jr" in expr else 0)
         for expr in cfg["source_name_variant_stratum"]["source_only_regexes"]
     ]
-    variants = [
+    source_variants = [
         row
         for row in eligible
-        if any(rx.search(base.clean(row["visible_name"])) for rx in regexes)
+        if any(rx.search(base.clean(row.get("visible_name"))) for rx in regexes)
     ]
-    assert len(variants) == cfg["source_name_variant_stratum"]["expected_eligible_count"]
-    variants = sorted(
-        variants,
-        key=lambda row: (
-            base.selection_key(row, contract),
-            base.clean(row["team"]),
-            base.clean(row["visible_name"]),
-            base.clean(row.get("profile_path")),
+    assert len(source_variants) == cfg["source_name_variant_stratum"]["expected_eligible_count"]
+    source_variants = sorted(
+        source_variants,
+        key=lambda r: (
+            base.selection_key(r, contract),
+            base.clean(r.get("team")),
+            base.clean(r.get("visible_name")),
+            base.clean(r.get("profile_path")),
         ),
     )[: cfg["source_name_variant_stratum"]["expected_target_count"]]
 
@@ -161,17 +148,14 @@ def select_targets(
         canonical = canonical_query_name(row.get("canonical_data_name"))
         if canonical and base.name_key(canonical) != base.name_key(row.get("visible_name")):
             canonical_variants.append(row)
-    assert (
-        len(canonical_variants)
-        == cfg["canonical_name_variant_stratum"]["expected_eligible_count"]
-    )
+    assert len(canonical_variants) == cfg["canonical_name_variant_stratum"]["expected_eligible_count"]
     canonical_variants = sorted(
         canonical_variants,
-        key=lambda row: (
-            base.selection_key(row, contract),
-            base.clean(row["team"]),
-            base.clean(row["visible_name"]),
-            base.clean(row.get("profile_path")),
+        key=lambda r: (
+            base.selection_key(r, contract),
+            base.clean(r.get("team")),
+            base.clean(r.get("visible_name")),
+            base.clean(r.get("profile_path")),
         ),
     )[: cfg["canonical_name_variant_stratum"]["expected_target_count"]]
 
@@ -184,16 +168,16 @@ def select_targets(
     subsets = (
         ("coverage", coverage),
         ("team_alias_ari", alias),
-        ("source_name_variant", variants),
+        ("source_name_variant", source_variants),
         ("canonical_name_variant", canonical_variants),
     )
     strata: dict[tuple[str, str, str], list[str]] = defaultdict(list)
     target_map: dict[tuple[str, str, str], dict[str, Any]] = {}
-    for name, subset in subsets:
+    for stratum_name, subset in subsets:
         for row in subset:
             rid = base.row_identity(row)
             target_map[rid] = row
-            strata[rid].append(name)
+            strata[rid].append(stratum_name)
 
     targets: list[dict[str, Any]] = []
     for rid in sorted(target_map):
@@ -203,87 +187,55 @@ def select_targets(
         row["_canonical_query_name"] = canonical_query_name(row.get("canonical_data_name"))
         targets.append(row)
 
-    sets = {
-        name: {base.row_identity(row) for row in subset}
-        for name, subset in subsets
-    }
-    overlap_counts = {
+    sets = {name: {base.row_identity(r) for r in subset} for name, subset in subsets}
+    overlaps = {
         "coverage_and_team_alias_ari": len(sets["coverage"] & sets["team_alias_ari"]),
-        "coverage_and_source_name_variant": len(
-            sets["coverage"] & sets["source_name_variant"]
-        ),
-        "coverage_and_canonical_name_variant": len(
-            sets["coverage"] & sets["canonical_name_variant"]
-        ),
-        "team_alias_and_source_name_variant": len(
-            sets["team_alias_ari"] & sets["source_name_variant"]
-        ),
-        "team_alias_and_canonical_name_variant": len(
-            sets["team_alias_ari"] & sets["canonical_name_variant"]
-        ),
-        "source_name_variant_and_canonical_name_variant": len(
-            sets["source_name_variant"] & sets["canonical_name_variant"]
-        ),
-        "coverage_team_alias_source_name_variant": len(
-            sets["coverage"] & sets["team_alias_ari"] & sets["source_name_variant"]
-        ),
-        "coverage_team_alias_canonical_name_variant": len(
-            sets["coverage"] & sets["team_alias_ari"] & sets["canonical_name_variant"]
-        ),
-        "coverage_source_name_variant_canonical_name_variant": len(
-            sets["coverage"] & sets["source_name_variant"] & sets["canonical_name_variant"]
-        ),
-        "team_alias_source_name_variant_canonical_name_variant": len(
-            sets["team_alias_ari"]
-            & sets["source_name_variant"]
-            & sets["canonical_name_variant"]
-        ),
-        "all_four": len(
-            sets["coverage"]
-            & sets["team_alias_ari"]
-            & sets["source_name_variant"]
-            & sets["canonical_name_variant"]
-        ),
+        "coverage_and_source_name_variant": len(sets["coverage"] & sets["source_name_variant"]),
+        "coverage_and_canonical_name_variant": len(sets["coverage"] & sets["canonical_name_variant"]),
+        "team_alias_and_source_name_variant": len(sets["team_alias_ari"] & sets["source_name_variant"]),
+        "team_alias_and_canonical_name_variant": len(sets["team_alias_ari"] & sets["canonical_name_variant"]),
+        "source_name_variant_and_canonical_name_variant": len(sets["source_name_variant"] & sets["canonical_name_variant"]),
+        "coverage_team_alias_source_name_variant": len(sets["coverage"] & sets["team_alias_ari"] & sets["source_name_variant"]),
+        "coverage_team_alias_canonical_name_variant": len(sets["coverage"] & sets["team_alias_ari"] & sets["canonical_name_variant"]),
+        "coverage_source_name_variant_canonical_name_variant": len(sets["coverage"] & sets["source_name_variant"] & sets["canonical_name_variant"]),
+        "team_alias_source_name_variant_canonical_name_variant": len(sets["team_alias_ari"] & sets["source_name_variant"] & sets["canonical_name_variant"]),
+        "all_four": len(sets["coverage"] & sets["team_alias_ari"] & sets["source_name_variant"] & sets["canonical_name_variant"]),
     }
 
     identities = [
-        [
-            base.clean(row["team"]),
-            base.clean(row["visible_name"]),
-            base.clean(row.get("profile_path")),
-        ]
-        for row in targets
+        [base.clean(r["team"]), base.clean(r["visible_name"]), base.clean(r.get("profile_path"))]
+        for r in targets
     ]
     projection = [
         {
-            "team": base.clean(row["team"]),
-            "visible_name": base.clean(row["visible_name"]),
-            "canonical_data_name": base.clean(row.get("canonical_data_name")),
-            "canonical_query_name": base.clean(row.get("_canonical_query_name")),
-            "position": base.clean(row.get("position")),
-            "jersey_number": base.clean(row.get("jersey_number")),
-            "profile_path": base.clean(row.get("profile_path")),
-            "strata": row["_strata"],
-            "selection_key_sha256": row["_selection_key_sha256"],
+            "team": base.clean(r["team"]),
+            "visible_name": base.clean(r["visible_name"]),
+            "canonical_data_name": base.clean(r.get("canonical_data_name")),
+            "canonical_query_name": base.clean(r.get("_canonical_query_name")),
+            "position": base.clean(r.get("position")),
+            "jersey_number": base.clean(r.get("jersey_number")),
+            "profile_path": base.clean(r.get("profile_path")),
+            "strata": r["_strata"],
+            "selection_key_sha256": r["_selection_key_sha256"],
         }
-        for row in targets
+        for r in targets
     ]
     diagnostics = {
         "eligible_row_count": len(eligible),
         "team_count": len(by_team),
         "coverage_target_count": len(coverage),
         "team_alias_ari_target_count": len(alias),
-        "source_name_variant_target_count": len(variants),
+        "source_name_variant_target_count": len(source_variants),
         "canonical_name_variant_target_count": len(canonical_variants),
         "canonical_name_variant_eligible_count": sum(
             1
             for row in eligible
-            if (canonical_query_name(row.get("canonical_data_name")))
+            if canonical_query_name(row.get("canonical_data_name"))
             and base.name_key(canonical_query_name(row.get("canonical_data_name")))
             != base.name_key(row.get("visible_name"))
         ),
         "total_target_count": len(targets),
-        "overlap_counts": overlap_counts,
+        "overlap_counts": overlaps,
         "sorted_row_identity_sha256": base.canonical_sha(identities),
         "target_projection_sha256": base.canonical_sha(projection),
     }
@@ -297,9 +249,7 @@ def select_targets(
     assert diagnostics["total_target_count"] == cfg["expected_total_target_count"]
     assert diagnostics["sorted_row_identity_sha256"] == cfg["expected_sorted_row_identity_sha256"]
     assert diagnostics["target_projection_sha256"] == cfg["expected_target_projection_sha256"]
-
-    selected = {base.row_identity(row) for row in targets}
-    assert not (selected & prior)
+    assert not ({base.row_identity(r) for r in targets} & prior)
     return targets, diagnostics
 
 
@@ -308,7 +258,6 @@ def resolve_target(target: dict[str, Any], payload: dict[str, Any] | None) -> di
     visible_key, canonical, allowed_keys = source_name_keys(target)
     canonical_key = base.name_key(canonical) if canonical else ""
     target_team = base.clean(target.get("team")).upper()
-
     primary = [
         player
         for player in players
@@ -319,26 +268,25 @@ def resolve_target(target: dict[str, Any], payload: dict[str, Any] | None) -> di
     tiebreak_applied = len(primary) > 1
     narrowed = primary
     if tiebreak_applied:
-        target_position = base.clean(target.get("position")).upper()
-        target_jersey = base.int_or_none(target.get("jersey_number"))
+        position = base.clean(target.get("position")).upper()
+        jersey = base.int_or_none(target.get("jersey_number"))
         narrowed = []
-        if target_position and target_jersey is not None:
+        if position and jersey is not None:
             for player in primary:
                 positions = {
                     base.clean(player.get("position")).upper(),
                     base.clean(player.get("positionGroup")).upper(),
                 }
-                jersey = base.int_or_none(player.get("uniformNumber"))
-                if jersey is None:
-                    jersey = base.int_or_none(player.get("jerseyNumber"))
-                if target_position in positions and jersey == target_jersey:
+                candidate_jersey = base.int_or_none(player.get("uniformNumber"))
+                if candidate_jersey is None:
+                    candidate_jersey = base.int_or_none(player.get("jerseyNumber"))
+                if position in positions and candidate_jersey == jersey:
                     narrowed.append(player)
 
     candidate = narrowed[0] if len(narrowed) == 1 else None
     gsis = base.clean(candidate.get("gsisId")) if candidate else ""
     gsis_valid = bool(candidate and base.GSIS_RE.fullmatch(gsis))
     resolved = bool(candidate and gsis_valid)
-
     official_jersey = base.int_or_none(target.get("jersey_number"))
     ngs_jersey = None
     if candidate:
@@ -346,14 +294,12 @@ def resolve_target(target: dict[str, Any], payload: dict[str, Any] | None) -> di
         if ngs_jersey is None:
             ngs_jersey = base.int_or_none(candidate.get("jerseyNumber"))
     comparable = resolved and official_jersey is not None and ngs_jersey is not None
-
     selected_key = base.name_key(candidate.get("displayName")) if candidate else ""
+    representation = None
     if candidate and canonical_key and canonical_key != visible_key and selected_key == canonical_key:
-        selected_representation = "source_canonical"
+        representation = "source_canonical"
     elif candidate and selected_key == visible_key:
-        selected_representation = "visible"
-    else:
-        selected_representation = None
+        representation = "visible"
 
     return {
         "target_visible_name_key": visible_key,
@@ -363,7 +309,7 @@ def resolve_target(target: dict[str, Any], payload: dict[str, Any] | None) -> di
         "target_team": target_team,
         "response_player_count": len(players),
         "primary_candidate_count": len(primary),
-        "primary_candidates": [base.candidate_projection(player) for player in primary],
+        "primary_candidates": [base.candidate_projection(p) for p in primary],
         "tiebreak_applied": tiebreak_applied,
         "tiebreak_candidate_count": len(narrowed) if tiebreak_applied else None,
         "tiebreak_succeeded": bool(tiebreak_applied and resolved),
@@ -371,7 +317,7 @@ def resolve_target(target: dict[str, Any], payload: dict[str, Any] | None) -> di
         "selected_candidate_gsis_raw": gsis if candidate else None,
         "selected_candidate_gsis_valid": gsis_valid,
         "selected_gsis_id": gsis if resolved else None,
-        "selected_name_representation": selected_representation,
+        "selected_name_representation": representation,
         "resolved": resolved,
         "official_jersey_int": official_jersey,
         "ngs_jersey_int": ngs_jersey,
@@ -388,101 +334,79 @@ def evaluate_gates(
     query_input_count: int,
 ) -> tuple[dict[str, Any], dict[str, bool], bool, dict[str, bool]]:
     cfg = contract["frozen_pass_gates"]
-    by_id = {tuple(result["target_row_identity"]): result for result in results}
+    by_id = {tuple(r["target_row_identity"]): r for r in results}
 
     def stratum(name: str) -> list[dict[str, Any]]:
-        return [by_id[base.row_identity(target)] for target in targets if name in target["_strata"]]
+        return [by_id[base.row_identity(t)] for t in targets if name in t["_strata"]]
 
     coverage = stratum("coverage")
     alias = stratum("team_alias_ari")
     variants = stratum("source_name_variant")
     canonical_variants = stratum("canonical_name_variant")
-
-    def resolved(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        return [row for row in rows if row["resolved"]]
-
+    resolved = lambda rows: [r for r in rows if r["resolved"]]
     coverage_resolved = resolved(coverage)
     alias_resolved = resolved(alias)
     variant_resolved = resolved(variants)
     canonical_resolved = resolved(canonical_variants)
-    all_attempts = [attempt for result in results for attempt in result["query_attempts"]]
-    all_parseable = bool(all_attempts) and all(
-        attempt["http_status"] == 200 and attempt["parseable_players_array"]
-        for attempt in all_attempts
+    attempts = [a for r in results for a in r["query_attempts"]]
+    all_parseable = bool(attempts) and all(
+        a["http_status"] == 200 and a["parseable_players_array"] for a in attempts
     )
-    invalid = [
-        result
-        for result in results
-        if result["selected_candidate"] is not None
-        and not result["selected_candidate_gsis_valid"]
-    ]
+    invalid = [r for r in results if r["selected_candidate"] is not None and not r["selected_candidate_gsis_valid"]]
     gsis_rows: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
     for result in results:
         if result["resolved"]:
             gsis_rows[result["selected_gsis_id"]].append(tuple(result["target_row_identity"]))
-    duplicates = {
-        gsis: identities
-        for gsis, identities in gsis_rows.items()
-        if len(set(identities)) > 1
-    }
-
-    independent_coverage = [
-        result for result in coverage_resolved if not result["tiebreak_applied"]
-    ]
-    comparable = [
-        result for result in independent_coverage if result["jersey_comparable"]
-    ]
-    agreements = [result for result in comparable if result["jersey_agrees"]]
-    fallback = [result for result in results if len(result["query_attempts"]) > 1]
-    fallback_success = [result for result in fallback if result["resolved"]]
-    tiebreak = [result for result in results if result["tiebreak_applied"]]
-    tiebreak_success = [result for result in tiebreak if result["tiebreak_succeeded"]]
-    alias_az_exercised = [
-        result
-        for result in alias_resolved
-        if base.clean((result.get("selected_candidate") or {}).get("teamAbbr")).upper()
-        == "AZ"
+    duplicates = {k: v for k, v in gsis_rows.items() if len(set(v)) > 1}
+    independent_coverage = [r for r in coverage_resolved if not r["tiebreak_applied"]]
+    comparable = [r for r in independent_coverage if r["jersey_comparable"]]
+    agreements = [r for r in comparable if r["jersey_agrees"]]
+    fallback = [r for r in results if len(r["query_attempts"]) > 1]
+    fallback_success = [r for r in fallback if r["resolved"]]
+    tiebreak = [r for r in results if r["tiebreak_applied"]]
+    tiebreak_success = [r for r in tiebreak if r["tiebreak_succeeded"]]
+    alias_az = [
+        r for r in alias_resolved
+        if base.clean((r.get("selected_candidate") or {}).get("teamAbbr")).upper() == "AZ"
     ]
     canonical_attempted = [
-        result
-        for result in results
-        if any(a["query_kind"] == "source_canonical_name" for a in result["query_attempts"])
+        r for r in results
+        if any(a["query_kind"] == "source_canonical_name" for a in r["query_attempts"])
     ]
     canonical_success = [
-        result
-        for result in canonical_attempted
-        if result["resolved"] and result["selected_name_representation"] == "source_canonical"
+        r for r in canonical_attempted
+        if r["resolved"] and r["selected_name_representation"] == "source_canonical"
     ]
 
-    def fraction(num: int, den: int) -> float:
-        return num / den if den else 0.0
+    def frac(n: int, d: int) -> float:
+        return n / d if d else 0.0
 
     metrics = {
         "target_count": len(results),
-        "executed_query_attempt_count": len(all_attempts),
+        "executed_query_attempt_count": len(attempts),
         "all_executed_query_attempts_http_200_parseable_players_array": all_parseable,
         "coverage_target_count": len(coverage),
         "coverage_unique_resolution_count": len(coverage_resolved),
-        "coverage_unique_resolution_fraction": fraction(len(coverage_resolved), len(coverage)),
+        "coverage_unique_resolution_fraction": frac(len(coverage_resolved), len(coverage)),
         "team_alias_ari_target_count": len(alias),
         "team_alias_ari_unique_resolution_count": len(alias_resolved),
-        "team_alias_ari_unique_resolution_fraction": fraction(len(alias_resolved), len(alias)),
-        "team_alias_ari_selected_ngs_az_count": len(alias_az_exercised),
+        "team_alias_ari_unique_resolution_fraction": frac(len(alias_resolved), len(alias)),
+        "team_alias_ari_selected_ngs_az_count": len(alias_az),
         "source_name_variant_target_count": len(variants),
         "source_name_variant_unique_resolution_count": len(variant_resolved),
-        "source_name_variant_unique_resolution_fraction": fraction(len(variant_resolved), len(variants)),
+        "source_name_variant_unique_resolution_fraction": frac(len(variant_resolved), len(variants)),
         "canonical_name_variant_target_count": len(canonical_variants),
         "canonical_name_variant_unique_resolution_count": len(canonical_resolved),
-        "canonical_name_variant_unique_resolution_fraction": fraction(len(canonical_resolved), len(canonical_variants)),
+        "canonical_name_variant_unique_resolution_fraction": frac(len(canonical_resolved), len(canonical_variants)),
         "source_canonical_query_exercised_count": len(canonical_attempted),
         "source_canonical_query_success_count": len(canonical_success),
         "invalid_selected_gsis_count": len(invalid),
         "duplicate_selected_gsis_across_distinct_target_rows_count": len(duplicates),
         "independent_resolved_coverage_count": len(independent_coverage),
         "independent_resolved_coverage_jersey_comparable_count": len(comparable),
-        "independent_resolved_coverage_jersey_comparable_fraction": fraction(len(comparable), len(independent_coverage)),
+        "independent_resolved_coverage_jersey_comparable_fraction": frac(len(comparable), len(independent_coverage)),
         "independent_resolved_coverage_jersey_agreement_count": len(agreements),
-        "independent_resolved_coverage_jersey_agreement_fraction": fraction(len(agreements), len(comparable)),
+        "independent_resolved_coverage_jersey_agreement_fraction": frac(len(agreements), len(comparable)),
         "fallback_exercised_count": len(fallback),
         "fallback_success_count": len(fallback_success),
         "tiebreak_exercised_count": len(tiebreak),
@@ -497,41 +421,35 @@ def evaluate_gates(
         "every_executed_query_attempt_http_200_parseable_players_array": all_parseable,
         "coverage_unique_resolution_minimum": (
             len(coverage_resolved) >= cfg["coverage_stratum_unique_resolution_minimum_count"]
-            and fraction(len(coverage_resolved), len(coverage))
-            >= cfg["coverage_stratum_unique_resolution_minimum_fraction"]
+            and frac(len(coverage_resolved), len(coverage)) >= cfg["coverage_stratum_unique_resolution_minimum_fraction"]
         ),
         "team_alias_ari_unique_resolution_required": (
             len(alias_resolved) == cfg["team_alias_ari_stratum_unique_resolution_required_count"]
-            and fraction(len(alias_resolved), len(alias))
-            == cfg["team_alias_ari_stratum_unique_resolution_required_fraction"]
+            and frac(len(alias_resolved), len(alias)) == cfg["team_alias_ari_stratum_unique_resolution_required_fraction"]
         ),
         "source_name_variant_unique_resolution_minimum": (
             len(variant_resolved) >= cfg["source_name_variant_stratum_unique_resolution_minimum_count"]
-            and fraction(len(variant_resolved), len(variants))
-            >= cfg["source_name_variant_stratum_unique_resolution_minimum_fraction"]
+            and frac(len(variant_resolved), len(variants)) >= cfg["source_name_variant_stratum_unique_resolution_minimum_fraction"]
         ),
         "canonical_name_variant_unique_resolution_minimum": (
             len(canonical_resolved) >= cfg["canonical_name_variant_stratum_unique_resolution_minimum_count"]
-            and fraction(len(canonical_resolved), len(canonical_variants))
-            >= cfg["canonical_name_variant_stratum_unique_resolution_minimum_fraction"]
+            and frac(len(canonical_resolved), len(canonical_variants)) >= cfg["canonical_name_variant_stratum_unique_resolution_minimum_fraction"]
         ),
         "invalid_selected_gsis_zero": len(invalid) <= cfg["invalid_selected_gsis_count_allowed"],
         "duplicate_selected_gsis_zero": len(duplicates) <= cfg["duplicate_selected_gsis_across_distinct_target_rows_allowed"],
         "independent_resolved_coverage_jersey_comparable_minimum": (
-            fraction(len(comparable), len(independent_coverage))
-            >= cfg["independent_resolved_coverage_jersey_comparable_minimum_fraction"]
+            frac(len(comparable), len(independent_coverage)) >= cfg["independent_resolved_coverage_jersey_comparable_minimum_fraction"]
         ),
         "independent_resolved_coverage_jersey_agreement_minimum": (
-            fraction(len(agreements), len(comparable))
-            >= cfg["independent_resolved_coverage_jersey_agreement_minimum_fraction"]
+            frac(len(agreements), len(comparable)) >= cfg["independent_resolved_coverage_jersey_agreement_minimum_fraction"]
         ),
     }
     passed = all(gates.values())
     conditional = {
-        "ari_az_team_alias_qualified": passed and len(alias_az_exercised) > 0,
-        "source_canonical_name_representation_qualified": passed and len(canonical_success) > 0,
-        "query_fallback_semantics_qualified": passed and len(fallback_success) > 0,
-        "multiple_candidate_tiebreak_qualified": passed and len(tiebreak_success) > 0,
+        "ari_az_team_alias_qualified": passed and bool(alias_az),
+        "source_canonical_name_representation_qualified": passed and bool(canonical_success),
+        "query_fallback_semantics_qualified": passed and bool(fallback_success),
+        "multiple_candidate_tiebreak_qualified": passed and bool(tiebreak_success),
     }
     return metrics, gates, passed, conditional
 
@@ -549,15 +467,15 @@ def run_probe(
     output_dir.mkdir(parents=True, exist_ok=True)
     response_dir = output_dir / "responses"
     response_dir.mkdir(parents=True, exist_ok=True)
-
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
     if contract["schema_version"] != "levline4-2026-ngs-player-id-browser-heldout-v7-contract":
         raise ValueError("unexpected V7 contract schema")
     rows = base.load_jsonl(roster_path)
-    v3_selection = json.loads(v3_selection_path.read_text(encoding="utf-8"))
-    v5_selection = json.loads(v5_selection_path.read_text(encoding="utf-8"))
-    v6_selection = json.loads(v6_selection_path.read_text(encoding="utf-8"))
-
+    selections = [
+        json.loads(v3_selection_path.read_text(encoding="utf-8")),
+        json.loads(v5_selection_path.read_text(encoding="utf-8")),
+        json.loads(v6_selection_path.read_text(encoding="utf-8")),
+    ]
     roster_cfg = contract["frozen_upstream_evidence"]["official_club_roster_v2"]
     if base.sha256_file(roster_path) != roster_cfg["roster_metadata_sha256"] or len(rows) != roster_cfg["row_count"]:
         raise ValueError("roster source mismatch")
@@ -569,26 +487,19 @@ def run_probe(
         if base.sha256_file(path) != contract["frozen_upstream_evidence"][key]["target_selection_sha256"]:
             raise ValueError(f"{key} selection mismatch")
 
-    targets, diagnostics = select_targets(
-        rows, contract, v3_selection, v5_selection, v6_selection
-    )
+    targets, diagnostics = select_targets(rows, contract, *selections)
+    selection_receipt = {
+        "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v7-target-selection",
+        "contract_id": contract["contract_id"],
+        "source_roster_metadata_sha256": base.sha256_file(roster_path),
+        "v3_target_selection_sha256": base.sha256_file(v3_selection_path),
+        "v5_target_selection_sha256": base.sha256_file(v5_selection_path),
+        "v6_target_selection_sha256": base.sha256_file(v6_selection_path),
+        "selection_diagnostics": diagnostics,
+        "targets": targets,
+    }
     (output_dir / "target_selection.json").write_text(
-        json.dumps(
-            {
-                "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v7-target-selection",
-                "contract_id": contract["contract_id"],
-                "source_roster_metadata_sha256": base.sha256_file(roster_path),
-                "v3_target_selection_sha256": base.sha256_file(v3_selection_path),
-                "v5_target_selection_sha256": base.sha256_file(v5_selection_path),
-                "v6_target_selection_sha256": base.sha256_file(v6_selection_path),
-                "selection_diagnostics": diagnostics,
-                "targets": targets,
-            },
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
-        encoding="utf-8",
+        json.dumps(selection_receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     (output_dir / "contract.json").write_text(
         json.dumps(contract, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -644,9 +555,7 @@ def run_probe(
                     attempt_error = None
                     try:
                         with page.expect_response(
-                            lambda response, expected=query: base.matches_player_search_response(
-                                response.url, expected
-                            ),
+                            lambda response, expected=query: base.matches_player_search_response(response.url, expected),
                             timeout=browser_cfg["response_timeout_ms"],
                         ) as response_info:
                             locator.fill(query)
@@ -660,18 +569,10 @@ def run_probe(
                         attempt_error = f"{type(exc).__name__}: {exc}"
                         action_error = attempt_error
 
-                    relpath = (
-                        f"responses/target_{target_index:03d}_attempt_{attempt_index}.json"
-                    )
+                    relpath = f"responses/target_{target_index:03d}_attempt_{attempt_index}.json"
                     (output_dir / relpath).write_bytes(body)
-                    parsed, parseable, semantic_error = base.parse_players_body(
-                        status, body
-                    )
-                    player_count = (
-                        len(parsed.get("players", []))
-                        if parseable and isinstance(parsed, dict)
-                        else 0
-                    )
+                    parsed, parseable, semantic_error = base.parse_players_body(status, body)
+                    player_count = len(parsed.get("players", [])) if parseable and isinstance(parsed, dict) else 0
                     attempts.append(
                         {
                             "attempt_index": attempt_index,
@@ -700,15 +601,11 @@ def run_probe(
                 {
                     "target_index": target_index,
                     "target_row_identity": list(base.row_identity(target)),
-                    "target_visible_name": base.clean(target["visible_name"]),
-                    "target_canonical_data_name": base.clean(
-                        target.get("canonical_data_name")
-                    ),
-                    "target_source_canonical_query_name": canonical_query_name(
-                        target.get("canonical_data_name")
-                    ),
-                    "target_team": base.clean(target["team"]),
-                    "target_position": base.clean(target["position"]),
+                    "target_visible_name": base.clean(target.get("visible_name")),
+                    "target_canonical_data_name": base.clean(target.get("canonical_data_name")),
+                    "target_source_canonical_query_name": canonical_query_name(target.get("canonical_data_name")),
+                    "target_team": base.clean(target.get("team")),
+                    "target_position": base.clean(target.get("position")),
                     "target_jersey_number": base.clean(target.get("jersey_number")),
                     "target_profile_path": base.clean(target.get("profile_path")),
                     "target_strata": target["_strata"],
@@ -730,18 +627,10 @@ def run_probe(
     )
     if passed:
         authority = dict(contract["authority_if_and_only_if_all_v7_gates_pass"])
-        authority["ari_az_team_alias_qualified_for_frozen_v7_population"] = conditional[
-            "ari_az_team_alias_qualified"
-        ]
-        authority[
-            "source_canonical_name_representation_qualified_for_frozen_v7_population"
-        ] = conditional["source_canonical_name_representation_qualified"]
-        authority[
-            "query_fallback_semantics_qualified_for_frozen_v7_population"
-        ] = conditional["query_fallback_semantics_qualified"]
-        authority[
-            "multiple_candidate_tiebreak_qualified_for_frozen_v7_population"
-        ] = conditional["multiple_candidate_tiebreak_qualified"]
+        authority["ari_az_team_alias_qualified_for_frozen_v7_population"] = conditional["ari_az_team_alias_qualified"]
+        authority["source_canonical_name_representation_qualified_for_frozen_v7_population"] = conditional["source_canonical_name_representation_qualified"]
+        authority["query_fallback_semantics_qualified_for_frozen_v7_population"] = conditional["query_fallback_semantics_qualified"]
+        authority["multiple_candidate_tiebreak_qualified_for_frozen_v7_population"] = conditional["multiple_candidate_tiebreak_qualified"]
     else:
         authority = dict(contract["authority_if_any_v7_gate_fails"])
 
@@ -759,22 +648,22 @@ def run_probe(
             "context_locale": browser_cfg["context_locale"],
             "context_user_agent": browser_cfg["context_user_agent"],
             "post_load_settle_ms": browser_cfg["post_load_settle_ms"],
-            "manual_headers_or_credentials_used": false,
-            "browser_storage_state_persisted": false,
-            "direct_http_fallback_used": false,
-            "explicit_retry_used": false
+            "manual_headers_or_credentials_used": False,
+            "browser_storage_state_persisted": False,
+            "direct_http_fallback_used": False,
+            "explicit_retry_used": False,
         },
         "metrics": metrics,
         "gates": gates,
         "conditional_capability_evidence": conditional,
         "authority": authority,
         "completed_2026_outcomes_used_for_design_or_selection": 0,
-        "postgame_participation_used": false,
-        "week2_inactive_execution_evidence_used_for_design": false,
-        "future_information_used_to_repair_point_in_time_state": false,
-        "f_st_01_frozen_2026_unchanged": true,
-        "research_only": true,
-        "production_paths_changed": false
+        "postgame_participation_used": False,
+        "week2_inactive_execution_evidence_used_for_design": False,
+        "future_information_used_to_repair_point_in_time_state": False,
+        "f_st_01_frozen_2026_unchanged": True,
+        "research_only": True,
+        "production_paths_changed": False,
     }
     (output_dir / "receipt.json").write_text(
         json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
