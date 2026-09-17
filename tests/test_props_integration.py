@@ -608,3 +608,60 @@ def test_integration_refuses_2026_trained_efficiency_provenance():
             source_status="qualified",
             prior_model_trained_through_season=2026,
         )
+
+
+def test_market_frozen_after_forecast_timestamp_is_rejected_before_evaluation():
+    result = simulate_game(_game(), simulations=1200, seed=99)
+    quote = PropMarketQuote(
+        provider="fixture",
+        sportsbook_key="a",
+        sportsbook_title="Book A",
+        captured_at_utc=FORECAST,
+        player_id="wr-a1",
+        player="ARI WR1",
+        game_id="2026_03_ARI_LAR",
+        prop_type="receiving_yards",
+        line=71.5,
+        over_american=-110,
+        under_american=-110,
+        team="ARI",
+        opponent="LAR",
+        position="WR",
+        kickoff_utc=KICKOFF,
+    )
+    late_frozen = build_market_artifact(
+        [quote],
+        as_of_utc=datetime(2026, 9, 17, 23, 0, tzinfo=UTC),
+    )
+    artifact = build_forecast_artifact(
+        result,
+        [late_frozen],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    row = next(
+        row for row in artifact["forecasts"]
+        if row["player_id"] == "wr-a1" and row["prop_type"] == "receiving_yards"
+    )
+    assert row["signal_state"] == "NO SIGNAL"
+    assert row["market"]["line"] is None
+    assert any("after the forecast timestamp" in note for note in row["data_quality"]["notes"])
+
+
+def test_valid_market_provenance_retains_book_level_snapshot_without_closing_data():
+    result = simulate_game(_game(), simulations=1200, seed=100)
+    artifact = build_forecast_artifact(
+        result,
+        [_market("wr-a1", "ARI WR1", "receiving_yards", line=71.5)],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    row = next(
+        row for row in artifact["forecasts"]
+        if row["player_id"] == "wr-a1" and row["prop_type"] == "receiving_yards"
+    )
+    provenance = row["provenance"]["market"]
+    assert len(provenance["individual_books"]) == 2
+    assert provenance["sportsbooks"] == ["a", "b"]
+    assert provenance["closing_evaluation_in_forecast"] is False
+    assert "closing_evaluation" not in provenance
