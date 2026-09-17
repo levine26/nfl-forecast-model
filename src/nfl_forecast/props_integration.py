@@ -426,10 +426,40 @@ def build_forecast_artifact(
             public_prop = public_prop_type(internal_prop)
             market = markets.get((player.player_id, internal_prop))
             samples = np.asarray(result.player_stats[player.player_id][internal_prop], dtype=float)
-            quality_state = publication_quality_state(player.data_quality_state)
+            player_quality = publication_quality_state(player.data_quality_state)
+            market_quality = market_quality_state(market)
+            quality_state = _combined_quality_state(player_quality, market_quality)
             notes: list[str] = []
-            critical_ok = market is not None and quality_state != "LOW"
-            market_block: dict[str, Any] = {"source": None, "sportsbook": None, "captured_utc": None}
+            critical_ok = market is not None and quality_state in {"HIGH", "MEDIUM"}
+            market_capture = _market_capture_utc(market) if market else None
+            if market is not None:
+                raw_as_of = market.get("as_of_utc")
+                if raw_as_of is None:
+                    critical_ok = False
+                    notes.append("market as_of timestamp unavailable")
+                else:
+                    market_as_of = _aware_utc(raw_as_of, label="market as_of_utc")
+                    if market_as_of > forecast_dt or market_as_of >= kickoff_dt:
+                        critical_ok = False
+                        notes.append("market as_of timestamp is not prospective for this forecast")
+                if market_capture is None:
+                    critical_ok = False
+                    notes.append("market capture timestamp unavailable")
+                else:
+                    capture_dt = _aware_utc(market_capture, label="market capture")
+                    if capture_dt > forecast_dt or capture_dt >= kickoff_dt:
+                        critical_ok = False
+                        notes.append("market capture is after forecast or at/after kickoff")
+            market_block: dict[str, Any] = {
+                "source": "consensus" if market else None,
+                "sportsbook": "consensus" if market else None,
+                "captured_utc": market_capture,
+                "sportsbooks": list(market.get("sportsbooks") or []) if market else [],
+                "sportsbook_count": int(_finite(market.get("sportsbook_count")) or 0) if market else 0,
+                "line_range": _finite(market.get("line_range")) if market else None,
+                "line_stddev": _finite(market.get("line_stddev")) if market else None,
+                "movement": market.get("movement") if market else None,
+            }
             model_block: dict[str, Any] = {
                 "version": result.model_version,
                 "simulation_count": int(result.simulations),
