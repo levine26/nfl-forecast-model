@@ -65,6 +65,8 @@ Each output row contains one supported offensive player for one target game:
 
 A stable ID conflict fails closed. Name matching is used only to resolve a timestamped current availability row against the current roster for the same team, and only when that team+normalized-name mapping is unique.
 
+When nflverse season-level roster data exposes a status field, clearly released/non-roster states (for example CUT/UFA/RFA/released/retired) are excluded before identity validation. Contracted reserve, PUP, suspended, inactive and practice-squad players remain visible with raw `roster_status_raw` plus `roster_membership_state`; those fields are context only and are not silently converted into an injury-derived availability probability.
+
 ## Historical opportunity state
 
 The v1 contract exposes last-four-game central state plus historical coverage:
@@ -134,6 +136,7 @@ Practice-only information is retained in raw fields but is not converted into an
 The opportunity lane may rely on:
 
 - stable player/game/team identity
+- current roster membership context without treating roster status as a calibrated availability probability
 - strictly lagged PBP opportunity state
 - explicit carry/target shares
 - QB dropback/rush state
@@ -160,6 +163,8 @@ The simulation lane should not infer availability probabilities directly from th
 
 - target-week leakage exclusion
 - lagged QB/RB/WR/TE opportunity state
+- released/free-agent roster filtering while retaining explicit reserve membership state
+- transaction-like duplicate roster rows not creating false identity conflicts after released rows are removed
 - current availability timestamp cutoff
 - ambiguous identity fail-closed behavior
 - explicit route/snap missingness
