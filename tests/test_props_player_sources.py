@@ -83,3 +83,27 @@ def test_snap_rows_without_any_supported_identity_fail_closed():
     assert normalized is None
     assert audit["status"] == "unusable_missing_identity"
     assert audit["rows_unmapped"] == 1
+
+
+
+def test_naive_existing_kickoff_is_not_assumed_utc_and_uses_nflverse_time():
+    schedules = pd.DataFrame(
+        [
+            {
+                "game_id": "2026_03_X_Y",
+                "kickoff": "2026-09-20 16:25:00",
+                "gameday": "2026-09-20",
+                "gametime": "16:25",
+            }
+        ]
+    )
+    converted = add_nflverse_kickoff_timestamp(schedules)
+    assert converted.loc[0, "kickoff"] == pd.Timestamp("2026-09-20T20:25:00Z")
+
+
+def test_naive_kickoff_without_source_timezone_remains_unknown():
+    schedules = pd.DataFrame(
+        [{"game_id": "2026_03_X_Y", "kickoff": "2026-09-20 16:25:00"}]
+    )
+    converted = add_nflverse_kickoff_timestamp(schedules)
+    assert pd.isna(converted.loc[0, "kickoff"])
