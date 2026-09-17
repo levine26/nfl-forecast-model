@@ -665,3 +665,37 @@ def test_valid_market_provenance_retains_book_level_snapshot_without_closing_dat
     assert provenance["sportsbooks"] == ["a", "b"]
     assert provenance["closing_evaluation_in_forecast"] is False
     assert "closing_evaluation" not in provenance
+
+
+def test_market_line_changes_comparison_not_pure_model_distribution():
+    result = simulate_game(_game(), simulations=4000, seed=12345)
+    low_market = _market("qb-a", "ARI QB", "passing_yards", line=220.5)
+    high_market = _market("qb-a", "ARI QB", "passing_yards", line=280.5)
+
+    low = build_forecast_artifact(
+        result,
+        [low_market],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    high = build_forecast_artifact(
+        result,
+        [high_market],
+        kickoff_utc=KICKOFF,
+        forecast_timestamp_utc=FORECAST,
+    )
+    low_row = next(
+        row for row in low["forecasts"]
+        if row["player_id"] == "qb-a" and row["prop_type"] == "passing_yards"
+    )
+    high_row = next(
+        row for row in high["forecasts"]
+        if row["player_id"] == "qb-a" and row["prop_type"] == "passing_yards"
+    )
+
+    for key in ("mean", "median", "fair_line", "standard_deviation"):
+        assert low_row["model"][key] == pytest.approx(high_row["model"][key])
+    assert low_row["model"]["prediction_interval"] == high_row["model"]["prediction_interval"]
+    assert low_row["market"]["line"] == 220.5
+    assert high_row["market"]["line"] == 280.5
+    assert low_row["model"]["over_probability"] > high_row["model"]["over_probability"]
