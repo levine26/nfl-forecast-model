@@ -617,6 +617,513 @@ def _team_latent_state(
     return shared_pace, script, scoring
 
 
+def _require_mapping(value: object, label: str) -> Mapping[str, object]:
+    if not isinstance(value, Mapping):
+        raise SimulationInputError(f"{label} must be a mapping")
+    return value
+
+
+def _require_value(mapping: Mapping[str, object], key: str, label: str) -> object:
+    if key not in mapping:
+        raise SimulationInputError(f"{label}.{key} is required")
+    return mapping[key]
+
+
+def _optional_finite_value(value: object) -> float | None:
+    if value is None:
+        return None
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    return parsed if isfinite(parsed) else None
+
+
+def _distribution_alpha_beta(
+    distribution: Mapping[str, object] | None,
+) -> tuple[float | None, float | None]:
+    if distribution is None:
+        return None, None
+    alpha = _optional_finite_value(distribution.get("alpha"))
+    beta = _optional_finite_value(distribution.get("beta"))
+    if alpha is None or beta is None:
+        return None, None
+    return alpha, beta
+
+
+def build_game_input_from_upstream(
+    *,
+    home_team: str,
+    away_team: str,
+    opportunity_projections: Sequence[Mapping[str, object]],
+    efficiency_player_parameters: Sequence[Mapping[str, object]],
+    team_td_parameters: Sequence[Mapping[str, object]],
+    residual_efficiency_by_team: Mapping[str, Mapping[str, float]],
+    model_version: str = DEFAULT_MODEL_VERSION,
+    shared_pace_correlation: float = 0.0,
+    shared_scoring_log_sd: float = 0.0,
+    pass_rate_game_script_sensitivity: float = 0.0,
+) -> GameSimulationInput:
+    """Map canonical opportunity + efficiency/TD handoffs into the simulator contract.
+
+    Opportunity projections should be OpportunityProjection.to_dict() outputs.
+    Efficiency and team-TD rows can be DataFrame to_dict("records") outputs.
+    Residual-bucket efficiency is intentionally explicit because neither upstream lane
+    is authorized to fabricate unmodeled-player efficiency.
+    """
+    if len(opportunity_projections) != 2:
+        raise SimulationInputError("exactly two opportunity projections are required")
+    teams_expected = {str(home_team), str(away_team)}
+    projection_by_team: dict[str, Mapping[str, object]] = {}
+    game_ids: set[str] = set()
+    horizons: set[str] = set()
+
+    for raw_projection in opportunity_projections:
+        projection = _require_mapping(raw_projection, "opportunity_projection")
+        metadata = _require_mapping(
+            _require_value(projection, "metadata", "opportunity_projection"),
+            "opportunity_projection.metadata",
+        )
+        team = str(_require_value(metadata, "team", "opportunity_projection.metadata"))
+        if team not in teams_expected:
+            raise SimulationInputError(f"unexpected opportunity team: {team}")
+        if team in projection_by_team:
+            raise SimulationInputError(f"duplicate opportunity projection for {team}")
+        projection_by_team[team] = projection
+        game_ids.add(str(_require_value(metadata, "game_id", "opportunity_projection.metadata")))
+        horizons.add(
+            str(_require_value(metadata, "data_horizon", "opportunity_projection.metadata"))
+        )
+
+    if set(projection_by_team) != teams_expected:
+        raise SimulationInputError("opportunity projections must cover home and away teams")
+    if len(game_ids) != 1:
+        raise SimulationInputError("opportunity projections disagree on game_id")
+    if len(horizons) != 1:
+        raise SimulationInputError("opportunity projections disagree on data_horizon")
+    game_id = next(iter(game_ids))
+    data_horizon = next(iter(horizons))
+
+    td_index: dict[str, Mapping[str, object]] = {}
+    for row in team_td_parameters:
+        if str(row.get("game_id")) != game_id:
+            continue
+        team = str(row.get("team"))
+        if team in td_index:
+            raise SimulationInputError(f"duplicate team TD row for {team}")
+        td_index[team] = row
+
+    efficiency_index: dict[str, Mapping[str, object]] = {}
+    for row in efficiency_player_parameters:
+        if str(row.get("game_id")) != game_id:
+            continue
+        player_id = str(row.get("player_id"))
+        if not player_id or player_id in efficiency_index:
+            raise SimulationInputError(f"invalid/duplicate efficiency player_id: {player_id}")
+        efficiency_index[player_id] = row
+
+    team_inputs: list[TeamSimulationInput] = []
+    player_inputs: list[PlayerSimulationInput] = []
+    seen_player_ids: set[str] = set()
+
+    for team in (str(home_team), str(away_team)):
+        projection = projection_by_team[team]
+        metadata = _require_mapping(projection["metadata"], f"{team}.metadata")
+        hierarchy = _require_mapping(
+            _require_value(projection, "hierarchy", team),
+            f"{team}.hierarchy",
+        )
+        audit = _require_mapping(
+            _require_value(projection, "audit", team),
+            f"{team}.audit",
+        )
+        td_row = td_index.get(team)
+        if td_row is None:
+            raise SimulationInputError(f"missing team TD parameters for {team}")
+        residual = residual_efficiency_by_team.get(team)
+        if residual is None:
+            raise SimulationInputError(f"missing explicit residual efficiency prior for {team}")
+
+        plays = _require_mapping(
+            _require_value(hierarchy, "team_offensive_plays", f"{team}.hierarchy"),
+            f"{team}.team_offensive_plays",
+        )
+        dropback = _require_mapping(
+            _require_value(hierarchy, "dropback_rate_given_team_plays", f"{team}.hierarchy"),
+            f"{team}.dropback_rate",
+        )
+        outcomes = _require_mapping(
+            _require_value(hierarchy, "dropback_outcome_given_dropback", f"{team}.hierarchy"),
+            f"{team}.dropback_outcome",
+        )
+        outcome_concentration = _require_mapping(
+            _require_value(outcomes, "concentration", f"{team}.dropback_outcome"),
+            f"{team}.dropback_outcome.concentration",
+        )
+        targetable = _require_mapping(
+            _require_value(
+                hierarchy,
+                "targetable_attempt_rate_given_pass_attempt",
+                f"{team}.hierarchy",
+            ),
+            f"{team}.targetable_attempt_rate",
+        )
+
+        team_inputs.append(
+            TeamSimulationInput(
+                team=team,
+                opponent=str(_require_value(metadata, "opponent", f"{team}.metadata")),
+                mean_offensive_plays=float(_require_value(plays, "mean", f"{team}.plays")),
+                offensive_plays_sd=float(_require_value(plays, "sd", f"{team}.plays")),
+                neutral_pass_rate=float(_require_value(dropback, "mean", f"{team}.dropback")),
+                pass_rate_sd=float(_require_value(dropback, "sd", f"{team}.dropback")),
+                pass_rate_game_script_sensitivity=float(pass_rate_game_script_sensitivity),
+                expected_passing_tds=float(
+                    _require_value(
+                        td_row,
+                        "expected_passing_td_opportunities",
+                        f"{team}.team_td",
+                    )
+                ),
+                expected_rushing_tds=float(
+                    _require_value(
+                        td_row,
+                        "expected_rushing_td_opportunities",
+                        f"{team}.team_td",
+                    )
+                ),
+                residual_catch_rate=float(
+                    _require_value(residual, "catch_rate", f"{team}.residual")
+                ),
+                residual_yards_per_reception=float(
+                    _require_value(
+                        residual,
+                        "receiving_yards_per_reception",
+                        f"{team}.residual",
+                    )
+                ),
+                residual_yards_per_carry=float(
+                    _require_value(
+                        residual,
+                        "rushing_yards_per_carry",
+                        f"{team}.residual",
+                    )
+                ),
+                offensive_plays_gamma_shape=_optional_finite_value(
+                    plays.get("gamma_shape")
+                ),
+                offensive_plays_gamma_rate=_optional_finite_value(plays.get("gamma_rate")),
+                dropback_rate_alpha=_optional_finite_value(dropback.get("alpha")),
+                dropback_rate_beta=_optional_finite_value(dropback.get("beta")),
+                pass_attempt_outcome_alpha=_optional_finite_value(
+                    outcome_concentration.get("pass_attempts")
+                ),
+                sack_outcome_alpha=_optional_finite_value(
+                    outcome_concentration.get("sacks")
+                ),
+                scramble_outcome_alpha=_optional_finite_value(
+                    outcome_concentration.get("qb_scrambles")
+                ),
+                targetable_attempt_alpha=_optional_finite_value(targetable.get("alpha")),
+                targetable_attempt_beta=_optional_finite_value(targetable.get("beta")),
+            )
+        )
+
+        carry_distribution = _require_mapping(
+            _require_value(
+                hierarchy,
+                "designed_carry_share_given_designed_rush",
+                f"{team}.hierarchy",
+            ),
+            f"{team}.carry_distribution",
+        )
+        target_distribution = _require_mapping(
+            _require_value(
+                hierarchy,
+                "target_share_given_team_target",
+                f"{team}.hierarchy",
+            ),
+            f"{team}.target_distribution",
+        )
+        carry_means = _require_mapping(
+            _require_value(carry_distribution, "mean_share", f"{team}.carry_distribution"),
+            f"{team}.carry_distribution.mean_share",
+        )
+        carry_alpha = _require_mapping(
+            _require_value(carry_distribution, "concentration", f"{team}.carry_distribution"),
+            f"{team}.carry_distribution.concentration",
+        )
+        target_means = _require_mapping(
+            _require_value(target_distribution, "mean_share", f"{team}.target_distribution"),
+            f"{team}.target_distribution.mean_share",
+        )
+        target_alpha = _require_mapping(
+            _require_value(target_distribution, "concentration", f"{team}.target_distribution"),
+            f"{team}.target_distribution.concentration",
+        )
+        route_distributions = _require_mapping(
+            _require_value(
+                hierarchy,
+                "route_participation_given_dropback",
+                f"{team}.hierarchy",
+            ),
+            f"{team}.route_distributions",
+        )
+        opportunity_catch_distributions = _require_mapping(
+            _require_value(
+                hierarchy,
+                "reception_probability_given_target",
+                f"{team}.hierarchy",
+            ),
+            f"{team}.catch_distributions",
+        )
+        end_zone_distribution = hierarchy.get("end_zone_target_share")
+        goal_line_distribution = hierarchy.get("goal_line_carry_share")
+        end_zone_mapping = (
+            _require_mapping(end_zone_distribution, f"{team}.end_zone_target_share")
+            if end_zone_distribution is not None
+            else None
+        )
+        goal_line_mapping = (
+            _require_mapping(goal_line_distribution, f"{team}.goal_line_carry_share")
+            if goal_line_distribution is not None
+            else None
+        )
+        end_zone_means = (
+            _require_mapping(end_zone_mapping["mean_share"], f"{team}.end_zone.mean_share")
+            if end_zone_mapping is not None
+            else {}
+        )
+        end_zone_alpha = (
+            _require_mapping(end_zone_mapping["concentration"], f"{team}.end_zone.concentration")
+            if end_zone_mapping is not None
+            else {}
+        )
+        goal_line_means = (
+            _require_mapping(goal_line_mapping["mean_share"], f"{team}.goal_line.mean_share")
+            if goal_line_mapping is not None
+            else {}
+        )
+        goal_line_alpha = (
+            _require_mapping(goal_line_mapping["concentration"], f"{team}.goal_line.concentration")
+            if goal_line_mapping is not None
+            else {}
+        )
+
+        raw_players = _require_value(projection, "players", team)
+        if not isinstance(raw_players, list):
+            raise SimulationInputError(f"{team}.players must be a list")
+        for opportunity_player in raw_players:
+            player_row = _require_mapping(opportunity_player, f"{team}.player")
+            player_id = str(_require_value(player_row, "player_id", f"{team}.player"))
+            if player_id in seen_player_ids:
+                raise SimulationInputError(f"duplicate player_id across projections: {player_id}")
+            seen_player_ids.add(player_id)
+            position = str(_require_value(player_row, "position", f"{team}.{player_id}")).upper()
+            efficiency = efficiency_index.get(player_id)
+            if position in SUPPORTED_POSITIONS and efficiency is None:
+                raise SimulationInputError(
+                    f"missing efficiency/TD parameters for supported player {player_id}"
+                )
+
+            route_dist_raw = route_distributions.get(player_id)
+            route_dist = (
+                _require_mapping(route_dist_raw, f"{team}.{player_id}.route")
+                if route_dist_raw is not None
+                else None
+            )
+            opp_catch_raw = opportunity_catch_distributions.get(player_id)
+            opp_catch = (
+                _require_mapping(opp_catch_raw, f"{team}.{player_id}.catch")
+                if opp_catch_raw is not None
+                else None
+            )
+            route_alpha, route_beta = _distribution_alpha_beta(route_dist)
+            opp_catch_alpha, opp_catch_beta = _distribution_alpha_beta(opp_catch)
+
+            if efficiency is not None:
+                catch_alpha = _optional_finite_value(efficiency.get("catch_alpha"))
+                catch_beta = _optional_finite_value(efficiency.get("catch_beta"))
+                catch_rate = _optional_finite_value(efficiency.get("catch_rate_mean"))
+                ypr = _optional_finite_value(
+                    efficiency.get("receiving_yards_per_reception_mean")
+                )
+                rush_ypc = _optional_finite_value(
+                    efficiency.get("rushing_yards_per_attempt_mean")
+                )
+                receiving_td_share = _optional_finite_value(
+                    efficiency.get("receiving_td_share_mean")
+                )
+                rushing_td_share = _optional_finite_value(
+                    efficiency.get("rushing_td_share_mean")
+                )
+                passing_td_share = _optional_finite_value(
+                    efficiency.get("passing_td_share_mean")
+                )
+                receiving_td_alpha = _optional_finite_value(
+                    efficiency.get("receiving_td_allocation_alpha")
+                )
+                rushing_td_alpha = _optional_finite_value(
+                    efficiency.get("rushing_td_allocation_alpha")
+                )
+                passing_td_alpha = _optional_finite_value(
+                    efficiency.get("passing_td_allocation_alpha")
+                )
+                data_quality = str(efficiency.get("confidence_state", "unknown"))
+            else:
+                catch_alpha, catch_beta = opp_catch_alpha, opp_catch_beta
+                catch_rate = (
+                    _optional_finite_value(opp_catch.get("mean"))
+                    if opp_catch is not None
+                    else None
+                )
+                ypr = None
+                rush_ypc = None
+                receiving_td_share = _optional_finite_value(end_zone_means.get(player_id))
+                rushing_td_share = _optional_finite_value(goal_line_means.get(player_id))
+                passing_td_share = None
+                receiving_td_alpha = _optional_finite_value(end_zone_alpha.get(player_id))
+                rushing_td_alpha = _optional_finite_value(goal_line_alpha.get(player_id))
+                passing_td_alpha = None
+                data_quality = "internal_explicit_residual_prior"
+
+            catch_rate = (
+                catch_rate
+                if catch_rate is not None
+                else float(_require_value(residual, "catch_rate", f"{team}.residual"))
+            )
+            ypr = (
+                ypr
+                if ypr is not None
+                else float(
+                    _require_value(
+                        residual,
+                        "receiving_yards_per_reception",
+                        f"{team}.residual",
+                    )
+                )
+            )
+            rush_ypc = (
+                rush_ypc
+                if rush_ypc is not None
+                else float(
+                    _require_value(
+                        residual,
+                        "rushing_yards_per_carry",
+                        f"{team}.residual",
+                    )
+                )
+            )
+
+            route_mean = (
+                _optional_finite_value(route_dist.get("mean"))
+                if route_dist is not None
+                else None
+            )
+            target_share = _optional_finite_value(target_means.get(player_id)) or 0.0
+            carry_share = _optional_finite_value(carry_means.get(player_id)) or 0.0
+            is_primary_qb = bool(player_row.get("is_primary_qb", False))
+            pass_attempt_share = 1.0 if is_primary_qb else 0.0
+            receiving_td_share = 0.0 if receiving_td_share is None else receiving_td_share
+            rushing_td_share = 0.0 if rushing_td_share is None else rushing_td_share
+            receiving_event_sd = (
+                _optional_finite_value(
+                    efficiency.get("receiving_yards_per_reception_event_sd")
+                )
+                if efficiency is not None
+                else None
+            )
+            receiving_mean_se = (
+                _optional_finite_value(
+                    efficiency.get("receiving_yards_per_reception_mean_se")
+                )
+                if efficiency is not None
+                else None
+            )
+            rushing_event_sd = (
+                _optional_finite_value(
+                    efficiency.get("rushing_yards_per_attempt_event_sd")
+                )
+                if efficiency is not None
+                else None
+            )
+            rushing_mean_se = (
+                _optional_finite_value(
+                    efficiency.get("rushing_yards_per_attempt_mean_se")
+                )
+                if efficiency is not None
+                else None
+            )
+
+            player_inputs.append(
+                PlayerSimulationInput(
+                    player_id=player_id,
+                    player=str(
+                        player_row.get(
+                            "player_name",
+                            efficiency.get("player_name") if efficiency is not None else player_id,
+                        )
+                    ),
+                    position=position,
+                    team=team,
+                    opponent=str(_require_value(metadata, "opponent", f"{team}.metadata")),
+                    availability_probability=float(
+                        _require_value(
+                            player_row,
+                            "availability_probability",
+                            f"{team}.{player_id}",
+                        )
+                    ),
+                    pass_attempt_share=pass_attempt_share,
+                    target_share=float(target_share),
+                    catch_rate=float(catch_rate),
+                    receiving_yards_per_reception=float(ypr),
+                    carry_share=float(carry_share),
+                    rushing_yards_per_carry=float(rush_ypc),
+                    receiving_td_share=float(receiving_td_share),
+                    rushing_td_share=float(rushing_td_share),
+                    data_quality_state=(
+                        f"opportunity:{audit.get('data_quality', 'unknown')};"
+                        f"efficiency:{data_quality}"
+                    ),
+                    route_participation=1.0 if route_mean is None else float(route_mean),
+                    route_participation_alpha=route_alpha,
+                    route_participation_beta=route_beta,
+                    designed_carry_share_alpha=_optional_finite_value(
+                        carry_alpha.get(player_id)
+                    ),
+                    target_share_alpha=_optional_finite_value(target_alpha.get(player_id)),
+                    catch_alpha=catch_alpha,
+                    catch_beta=catch_beta,
+                    receiving_yards_per_reception_event_sd=receiving_event_sd,
+                    receiving_yards_per_reception_mean_se=(
+                        0.0 if receiving_mean_se is None else receiving_mean_se
+                    ),
+                    rushing_yards_per_carry_event_sd=rushing_event_sd,
+                    rushing_yards_per_carry_mean_se=(
+                        0.0 if rushing_mean_se is None else rushing_mean_se
+                    ),
+                    passing_td_share=passing_td_share,
+                    passing_td_allocation_alpha=passing_td_alpha,
+                    receiving_td_allocation_alpha=receiving_td_alpha,
+                    rushing_td_allocation_alpha=rushing_td_alpha,
+                    is_primary_qb=is_primary_qb,
+                )
+            )
+
+    return GameSimulationInput(
+        game_id=game_id,
+        home_team=str(home_team),
+        away_team=str(away_team),
+        data_horizon=data_horizon,
+        teams=(team_inputs[0], team_inputs[1]),
+        players=tuple(player_inputs),
+        model_version=model_version,
+        shared_pace_correlation=shared_pace_correlation,
+        shared_scoring_log_sd=shared_scoring_log_sd,
+    )
+
+
 def simulate_game(
     game: GameSimulationInput,
     *,
