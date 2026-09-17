@@ -14,6 +14,8 @@ Provide the canonical point-in-time offensive player-state rows consumed by the 
 
 The adapter intentionally returns `routes=None`. A separate point-in-time-safe route source may be supplied when available, but the Sunday sprint does not fabricate or backfill live routes from postgame participation data.
 
+Kickoff timestamps must have an explicit timezone before the contract will treat them as known. The nflverse adapter derives `gameday + gametime` in `America/New_York` and converts to UTC. A naive standalone `kickoff` value is treated as unknown rather than silently assumed to be UTC.
+
 nflverse snap counts are PFR-sourced and may identify players with `pfr_player_id` rather than the GSIS IDs used by PBP and rosters. The adapter therefore crosswalks PFR IDs to `gsis_id` through nflverse player identity data. A PFR ID that maps to multiple GSIS IDs is discarded, an unmapped row remains missing, and a snap source with no safely mapped rows fails closed instead of being reported as usable.
 
 ```python
@@ -98,7 +100,7 @@ Participation data can be published for a period whose PBP is unavailable. In th
 
 Availability rows must have a parseable capture timestamp. Rows captured after the forecast timestamp are discarded. Rows without a timestamp are unusable. Current availability is marked `availability_prospective_only=True` unless a separate future lane produces a validated historical reconstruction.
 
-Known target games whose kickoff timestamp is at or before the forecast timestamp are dropped from the pregame contract. The source adapter converts canonical nflverse schedule date/time fields into UTC. If another schedule source lacks a parseable kickoff timestamp, `kickoff_known=False` is exposed so publication QA can fail closed if required.
+Known target games whose kickoff timestamp is at or before the forecast timestamp are dropped from the pregame contract. The source adapter converts canonical nflverse schedule date/time fields into UTC. If another schedule source lacks a timezone-aware kickoff timestamp, including a naive timestamp whose timezone is ambiguous, `kickoff_known=False` is exposed so publication QA can fail closed if required.
 
 ## Missing-data behavior
 
@@ -171,6 +173,8 @@ The simulation lane should not infer availability probabilities directly from th
 - nflverse `gameday` + `gametime` conversion from Eastern time to UTC
 - preservation/normalization of already timezone-aware kickoff values
 - explicit unknown kickoff when the source lacks time fields
+- naive standalone kickoff values failing closed instead of being assumed UTC
+- fallback to nflverse Eastern `gameday + gametime` when a naive `kickoff` field is present
 - PFR-to-GSIS snap-count identity crosswalk
 - ambiguous PFR identity fail-closed behavior
 - snap rows with no supported stable identity failing closed
