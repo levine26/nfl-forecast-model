@@ -476,3 +476,19 @@ def test_released_prior_team_row_does_not_create_false_identity_conflict():
     assert len(moved) == 1
     assert moved.iloc[0]["team"] == "ARI"
     assert moved.iloc[0]["roster_membership_state"] == "ACTIVE_ROSTER"
+
+
+
+def test_validation_rejects_invalid_roster_membership_state():
+    built = build_offensive_player_state_contract(
+        schedules=_schedule(),
+        roster=_roster(),
+        pbp=_pbp(),
+        season=2026,
+        week=3,
+        forecast_timestamp="2026-09-17T21:00:00Z",
+    )
+    broken = built.player_state.copy()
+    broken.loc[broken.index[0], "roster_membership_state"] = "GUESSED_ACTIVE"
+    with pytest.raises(ValueError, match="roster_membership_state"):
+        validate_offensive_player_state(broken)
