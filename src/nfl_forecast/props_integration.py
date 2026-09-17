@@ -84,6 +84,12 @@ def _price_american(value: object) -> float | None:
     return _finite(value)
 
 
+def _count_distribution(samples: np.ndarray) -> dict[str, float]:
+    values, counts = np.unique(np.asarray(samples, dtype=np.int64), return_counts=True)
+    total = float(counts.sum())
+    return {str(int(value)): float(count / total) for value, count in zip(values, counts, strict=True)}
+
+
 def _forecast_id(
     *,
     game_id: str,
@@ -461,6 +467,15 @@ def build_forecast_artifact(
                         "probability_difference": None if summary.p_over is None or no_vig_over is None else float(summary.p_over - no_vig_over),
                     }
                 )
+                if internal_prop == "passing_tds":
+                    model_block.update(
+                        {
+                            "expected_tds": float(np.mean(samples)),
+                            "probability_1_plus_td": float(np.mean(samples >= 1.0)),
+                            "probability_2_plus_td": float(np.mean(samples >= 2.0)),
+                            "td_count_distribution": _count_distribution(samples),
+                        }
+                    )
                 market_line_for_id = line
             elif public_prop in BINARY_PUBLIC_PROPS:
                 td_probability = float(np.mean(samples >= 1.0))
@@ -497,8 +512,10 @@ def build_forecast_artifact(
                 model_block.update(
                     {
                         "td_probability": td_probability,
+                        "probability_1_plus_td": td_probability,
                         "expected_tds": expected_tds,
                         "probability_2_plus_td": p2,
+                        "td_count_distribution": _count_distribution(samples),
                         "fair_odds_american": fair_td_odds,
                         "fair_td_odds_american": fair_td_odds,
                         "probability_difference": None if no_vig is None else td_probability - no_vig,
