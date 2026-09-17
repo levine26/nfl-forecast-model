@@ -8,9 +8,11 @@ on:
       - 'outputs/**'
       - 'src/nfl_forecast/public_forecast.py'
       - 'src/nfl_forecast/player_impact_monitor.py'
+      - 'src/nfl_forecast/props_publication.py'
       - 'scripts/build_public_forecasts.py'
       - 'scripts/build_public_impact_monitor.py'
       - 'scripts/build_site_history_compat.py'
+      - 'scripts/build_props_publication.py'
       - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
   pull_request:
@@ -18,9 +20,11 @@ on:
       - 'site/**'
       - 'src/nfl_forecast/public_forecast.py'
       - 'src/nfl_forecast/player_impact_monitor.py'
+      - 'src/nfl_forecast/props_publication.py'
       - 'scripts/build_public_forecasts.py'
       - 'scripts/build_public_impact_monitor.py'
       - 'scripts/build_site_history_compat.py'
+      - 'scripts/build_props_publication.py'
       - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
   workflow_run:
@@ -87,6 +91,17 @@ jobs:
         run: python scripts/build_public_forecasts.py --output site/public/data/public_forecasts.json
       - name: Build fail-closed public Impact Monitor
         run: python scripts/build_public_impact_monitor.py --output site/public/data/impact_monitor.json
+      - name: Build LevLine Props research beta when an upstream artifact exists
+        run: |
+          if [ -f outputs/props/forecasts.json ]; then
+            python scripts/build_props_publication.py \
+              --input outputs/props/forecasts.json \
+              --output outputs/props/public_props.json \
+              --site-output site/public/data/props_public.json \
+              --history-output site/public/data/props_history.json
+          else
+            echo 'Props artifact not present; leaving the research-beta surface in fail-closed unavailable state.'
+          fi
       - name: Install dashboard dependencies
         working-directory: site
         run: npm install
