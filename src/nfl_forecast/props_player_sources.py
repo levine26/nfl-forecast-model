@@ -27,6 +27,21 @@ def _pandas(frame):
     return frame.to_pandas() if hasattr(frame, "to_pandas") else frame.copy()
 
 
+def _timezone_aware_utc(value):
+    try:
+        if value is None or pd.isna(value):
+            return pd.NaT
+    except (TypeError, ValueError):
+        return pd.NaT
+    try:
+        ts = pd.Timestamp(value)
+    except (TypeError, ValueError):
+        return pd.NaT
+    if ts.tzinfo is None:
+        return pd.NaT
+    return ts.tz_convert("UTC")
+
+
 def normalize_snap_counts_player_ids(
     snap_counts: pd.DataFrame | None,
     players: pd.DataFrame | None = None,
@@ -113,14 +128,16 @@ def add_nflverse_kickoff_timestamp(schedules: pd.DataFrame) -> pd.DataFrame:
     naive timestamp. Existing timezone-aware ``kickoff`` values are preserved.
     """
     out = schedules.copy()
+    existing = pd.Series(pd.NaT, index=out.index, dtype="datetime64[ns, UTC]")
     if "kickoff" in out.columns:
-        parsed = pd.to_datetime(out["kickoff"], utc=True, errors="coerce")
-        if parsed.notna().any():
-            out["kickoff"] = parsed
-            return out
+        existing = pd.to_datetime(
+            out["kickoff"].map(_timezone_aware_utc),
+            utc=True,
+            errors="coerce",
+        )
 
     if not {"gameday", "gametime"}.issubset(out.columns):
-        out["kickoff"] = pd.NaT
+        out["kickoff"] = existing
         return out
 
     naive = pd.to_datetime(
@@ -132,7 +149,8 @@ def add_nflverse_kickoff_timestamp(schedules: pd.DataFrame) -> pd.DataFrame:
         ambiguous="NaT",
         nonexistent="NaT",
     )
-    out["kickoff"] = eastern.dt.tz_convert("UTC")
+    derived = eastern.dt.tz_convert("UTC")
+    out["kickoff"] = existing.where(existing.notna(), derived)
     return out
 
 
