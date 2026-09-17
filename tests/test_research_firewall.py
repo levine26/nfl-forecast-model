@@ -25,6 +25,8 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/player_impact_monitor.py",
         "src/nfl_forecast/availability_qualification.py",
         "src/nfl_forecast/availability_2025_reconstruction.py",
+        "src/nfl_forecast/props_player_state.py",
+        "src/nfl_forecast/props_player_sources.py",
         "scripts/run_challenger_v09.py",
         "scripts/run_fst_reconstruction_probe.py",
         "scripts/verify_fst_reconstruction_evidence.py",
@@ -44,6 +46,8 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "tests/test_player_impact_monitor.py",
         "tests/test_availability_qualification.py",
         "tests/test_availability_2025_reconstruction.py",
+        "tests/test_props_player_state.py",
+        "tests/test_props_player_sources.py",
         ".github/workflows/research_firewall.yml",
         ".github/workflows/research_2025_availability_reconstruction.yml",
         "docs/LEVLINE_RESEARCH.md",
@@ -63,6 +67,7 @@ def test_research_allowlist_rejects_production_surfaces():
         "src/nfl_forecast/fst_production.py",
         "src/nfl_forecast/fst_nested_pure.py",
         "src/nfl_forecast/unregistered_player_research.py",
+        "src/nfl_forecast/props_unregistered_surface.py",
         "scripts/run_week.py",
         "outputs/this_week.csv",
         "outputs/prediction_history.csv",
@@ -87,6 +92,10 @@ def test_research_scope_is_detected_from_changed_surfaces_not_only_branch_name()
         ["src/nfl_forecast/availability_2025_reconstruction.py"],
         "fix/availability-history",
     )
+    assert research_scope_triggered(
+        ["src/nfl_forecast/props_unregistered_surface.py"],
+        "fix/new-props-surface",
+    )
     assert research_scope_triggered(["src/nfl_forecast/pipeline.py"], "research/prototype")
     assert not research_scope_triggered(["src/nfl_forecast/pipeline.py"], "fix/production-bug")
     assert not research_scope_triggered(["src/nfl_forecast/fst_production.py"], "fix/fst-production-bug")
@@ -95,6 +104,12 @@ def test_research_scope_is_detected_from_changed_surfaces_not_only_branch_name()
 def test_unregistered_research_path_fails_closed():
     changed = ["src/nfl_forecast/unregistered_player_research.py"]
     assert research_scope_triggered(changed, "fix/new-player-research")
+    assert validate_changed_paths(changed) == changed
+
+
+def test_unregistered_props_path_fails_closed():
+    changed = ["src/nfl_forecast/props_unregistered_surface.py"]
+    assert research_scope_triggered(changed, "fix/new-props-surface")
     assert validate_changed_paths(changed) == changed
 
 
@@ -130,8 +145,8 @@ def test_production_prediction_path_does_not_import_research_modules():
         "scripts/run_week.py",
     ]
     # The deployed production F-ST path legitimately imports fst_production and
-    # fst_nested_pure. Research-only provenance/reconstruction/availability modules must
-    # remain isolated from production prediction code.
+    # fst_nested_pure. Research-only provenance/reconstruction/availability/Props modules
+    # must remain isolated from production prediction code.
     forbidden_tokens = (
         "challenger",
         "fst_provenance",
@@ -143,6 +158,8 @@ def test_production_prediction_path_does_not_import_research_modules():
         "player_impact_monitor",
         "availability_qualification",
         "availability_2025_reconstruction",
+        "props_player_state",
+        "props_player_sources",
     )
     for filename in protected:
         tree = ast.parse(Path(filename).read_text(encoding="utf-8"), filename=filename)

@@ -55,6 +55,10 @@ ALLOWED_PREFIXES = (
 ALLOWED_EXACT = {
     "src/nfl_forecast/fst_provenance.py",
     "src/nfl_forecast/fst_reconstruction.py",
+    "src/nfl_forecast/props_player_state.py",
+    "src/nfl_forecast/props_player_sources.py",
+    "tests/test_props_player_state.py",
+    "tests/test_props_player_sources.py",
 }
 
 PROTECTED_PREFIXES = (
@@ -94,6 +98,7 @@ RESEARCH_PATH_HINTS = (
     "availability_qualification",
     "availability_2025_reconstruction",
     "reconstruct_2025_availability",
+    "props_",
     "_research.",
     "research_",
 )
