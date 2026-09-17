@@ -1,0 +1,266 @@
+name: LevLine 4 prospective Week 2 inactive NGS application V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_week2_inactive_ngs_application_v1_contract.json'
+      - 'research/levline4_week2_inactive_ngs_application_v1_preexecution_addendum.json'
+      - 'research/levline4_week2_inactive_ngs_application_v1.py'
+      - 'research/test_levline4_week2_inactive_ngs_application_v1.py'
+      - '.github/workflows/research_levline4_week2_inactive_ngs_application_v1.yml'
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: levline4-prospective-week2-inactive-ngs-v1
+  cancel-in-progress: false
+
+env:
+  CONTRACT_PATH: research/levline4_week2_inactive_ngs_application_v1_contract.json
+  ADDENDUM_PATH: research/levline4_week2_inactive_ngs_application_v1_preexecution_addendum.json
+  FROZEN_CONTRACT_COMMIT: bcd246bfb3957ef2076d3042c0b2aa11a943b55a
+  FROZEN_ADDENDUM_COMMIT: dccf6a2202c1eff347f37879094bee2780bee0dd
+  FROZEN_IMPLEMENTATION_COMMIT: 9a8ec12c772283b5360fbe2d5f5deb78cdb74183
+  FROZEN_TESTS_COMMIT: 55bc1e25695666b5a99ddaab177059ad076c6c61
+  FROZEN_CONTRACT_BLOB: 71bacc52913a8d2bbc48e301e528f43eaf6880d9
+  FROZEN_ADDENDUM_BLOB: 0208a74a4629a6b6e4f8022137be1f94e8207b93
+  FROZEN_IMPLEMENTATION_BLOB: 452bccacccd8534cb71466cd1c59cd91630ed532
+  FROZEN_TESTS_BLOB: ca16ac8d9bb1b33a4e7217071cfebc69480db018
+  V8_DATA_BRANCH: research-data/levline4-ngs-player-id-browser-heldout-v8
+  V8_PRESERVATION_PATH: research_outputs/levline4_2026_ngs_player_id_browser_heldout_v8/first_result_35183093816/preservation.json
+  SOURCE_DATA_BRANCH: research-data/inactive-snapshots-v1
+  APP_DATA_BRANCH: research-data/levline4-prospective-inactive-ngs-v1
+  OFFICIAL_ROSTER_ARTIFACT_NAME: levline4-official-club-roster-parser-v2-first-held-out-35130069924
+  OFFICIAL_ROSTER_RUN_ID: '35130069924'
+  GLOBAL_IDENTITY_ARTIFACT_NAME: levline4-2026-global-player-identity-source-v1-35119017721
+  GLOBAL_IDENTITY_RUN_ID: '35119017721'
+
+jobs:
+  preregistration:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prove frozen chronology and blobs
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$FROZEN_CONTRACT_COMMIT" "$FROZEN_ADDENDUM_COMMIT"
+          git merge-base --is-ancestor "$FROZEN_ADDENDUM_COMMIT" "$FROZEN_IMPLEMENTATION_COMMIT"
+          git merge-base --is-ancestor "$FROZEN_IMPLEMENTATION_COMMIT" "$FROZEN_TESTS_COMMIT"
+          git merge-base --is-ancestor "$FROZEN_TESTS_COMMIT" HEAD
+          test "$(git rev-parse "${FROZEN_CONTRACT_COMMIT}:${CONTRACT_PATH}")" = "$FROZEN_CONTRACT_BLOB"
+          test "$(git hash-object "$CONTRACT_PATH")" = "$FROZEN_CONTRACT_BLOB"
+          test "$(git rev-parse "${FROZEN_ADDENDUM_COMMIT}:${ADDENDUM_PATH}")" = "$FROZEN_ADDENDUM_BLOB"
+          test "$(git hash-object "$ADDENDUM_PATH")" = "$FROZEN_ADDENDUM_BLOB"
+          test "$(git rev-parse "${FROZEN_IMPLEMENTATION_COMMIT}:research/levline4_week2_inactive_ngs_application_v1.py")" = "$FROZEN_IMPLEMENTATION_BLOB"
+          test "$(git hash-object research/levline4_week2_inactive_ngs_application_v1.py)" = "$FROZEN_IMPLEMENTATION_BLOB"
+          test "$(git rev-parse "${FROZEN_TESTS_COMMIT}:research/test_levline4_week2_inactive_ngs_application_v1.py")" = "$FROZEN_TESTS_BLOB"
+          test "$(git hash-object research/test_levline4_week2_inactive_ngs_application_v1.py)" = "$FROZEN_TESTS_BLOB"
+
+      - name: Require durable governance-clean V8 PASS evidence
+        run: |
+          set -euo pipefail
+          git fetch origin "${V8_DATA_BRANCH}:refs/remotes/origin/${V8_DATA_BRANCH}"
+          python - <<'PY'
+          import json, os, subprocess
+          raw=subprocess.check_output(
+              ['git','show',f"origin/{os.environ['V8_DATA_BRANCH']}:{os.environ['V8_PRESERVATION_PATH']}"],
+              text=True,
+          )
+          p=json.loads(raw)
+          assert p['source_actions_artifact_id']==10481385995
+          assert p['source_workflow_run_id']==35183093816
+          assert p['source_head_sha']=='4dbe2f94ffd2d30aac600747ce5fa7e1c29cec93'
+          assert p['actions_artifact_digest']=='sha256:b462438d7c6d6cdb292c634b264fafc151c9929f23b931ff36017e86e34199aa'
+          assert p['canonical_result']=='PASS'
+          assert p['bounded_official_roster_to_ngs_gsis_candidate_bridge_qualified'] is True
+          assert p['availability_state_authorized'] is False
+          assert p['forecast_probability_effect_authorized'] is False
+          assert p['model_fit_authorized'] is False
+          assert p['production_authorized'] is False
+          PY
+
+      - name: Unit-test frozen application without real Week 2 target data
+        run: |
+          python -m pip install -q '.[dev]'
+          python -m pytest -q research/test_levline4_week2_inactive_ngs_application_v1.py
+          python -m research.levline4_week2_inactive_ngs_application_v1 --help >/dev/null
+
+      - name: Prove PR workflow cannot execute real target path
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('.github/workflows/research_levline4_week2_inactive_ngs_application_v1.yml').read_text()
+          assert "if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'" in text
+          assert "week2_inactive_target_identities_observed_before_contract_freeze\": 0" in Path('research/levline4_week2_inactive_ngs_application_v1_contract.json').read_text()
+          PY
+
+      - name: Prove research-only effective diff
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          bad=0
+          while IFS= read -r path; do
+            case "$path" in
+              research/levline4_week2_inactive_ngs_application_v1_contract.json|research/levline4_week2_inactive_ngs_application_v1_preexecution_addendum.json|research/levline4_week2_inactive_ngs_application_v1.py|research/test_levline4_week2_inactive_ngs_application_v1.py|.github/workflows/research_levline4_week2_inactive_ngs_application_v1.yml) ;;
+              *) echo "Forbidden prospective inactive NGS V1 diff path: $path"; bad=1 ;;
+            esac
+          done < <(git diff --name-only origin/main...HEAD)
+          test "$bad" = 0
+
+  live:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Cheap schedule-only Week 2 Sunday due gate
+        id: scope
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from research.inactive_snapshot_due_v1 import due_games
+          from research.levline4_prospective_inactive_execution_v1 import _week_from_due_games
+          from research.run_levline4_prospective_inactive_execution_v1 import cohort_is_sunday_eastern
+          games=due_games(Path('outputs/this_week.csv'), datetime.now(timezone.utc))
+          week=_week_from_due_games(games) if games else None
+          sunday=bool(games and cohort_is_sunday_eastern(games))
+          supported=bool(games and week==2 and sunday)
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as handle:
+              handle.write(f"supported={'true' if supported else 'false'}\n")
+              handle.write(f"week={'' if week is None else week}\n")
+              handle.write(f"due_count={len(games)}\n")
+          print(f"supported={supported} week={week} due_count={len(games)}")
+          PY
+
+      - name: Restore read-only inactive source archive and prior application evidence
+        if: steps.scope.outputs.supported == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin "${SOURCE_DATA_BRANCH}:refs/remotes/origin/${SOURCE_DATA_BRANCH}"
+          if git ls-tree -d --name-only "origin/${SOURCE_DATA_BRANCH}" research_outputs/inactive_article_source_archive_v1 | grep -q '^research_outputs/inactive_article_source_archive_v1$'; then
+            git archive "origin/${SOURCE_DATA_BRANCH}" research_outputs/inactive_article_source_archive_v1 | tar -xf -
+          fi
+          git fetch origin "${APP_DATA_BRANCH}:refs/remotes/origin/${APP_DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${APP_DATA_BRANCH}"; then
+            if git ls-tree -d --name-only "origin/${APP_DATA_BRANCH}" research_outputs/levline4_prospective_inactive_ngs_v1 | grep -q '^research_outputs/levline4_prospective_inactive_ngs_v1$'; then
+              git archive "origin/${APP_DATA_BRANCH}" research_outputs/levline4_prospective_inactive_ngs_v1 | tar -xf -
+            fi
+          fi
+
+      - name: Restore and verify durable V8 prerequisite
+        if: steps.scope.outputs.supported == 'true'
+        run: |
+          set -euo pipefail
+          git fetch origin "${V8_DATA_BRANCH}:refs/remotes/origin/${V8_DATA_BRANCH}"
+          mkdir -p /tmp/v8_evidence
+          git show "origin/${V8_DATA_BRANCH}:${V8_PRESERVATION_PATH}" > /tmp/v8_evidence/preservation.json
+          python - <<'PY'
+          from pathlib import Path
+          from research.levline4_week2_inactive_ngs_application_v1 import verify_v8_preservation
+          verify_v8_preservation(Path('/tmp/v8_evidence/preservation.json'))
+          PY
+
+      - name: Download frozen official roster metadata
+        if: steps.scope.outputs.supported == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.OFFICIAL_ROSTER_ARTIFACT_NAME }}
+          path: /tmp/official_roster_v2
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ env.OFFICIAL_ROSTER_RUN_ID }}
+
+      - name: Download frozen global status-free identity audit source
+        if: steps.scope.outputs.supported == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.GLOBAL_IDENTITY_ARTIFACT_NAME }}
+          path: /tmp/global_identity_source_v1
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ env.GLOBAL_IDENTITY_RUN_ID }}
+
+      - name: Install frozen application dependencies
+        if: steps.scope.outputs.supported == 'true'
+        run: |
+          python -m pip install -q '.[dev]' playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Execute at most one canonical application attempt for the current due cohort
+        id: application
+        if: steps.scope.outputs.supported == 'true'
+        continue-on-error: true
+        run: |
+          python -m research.levline4_week2_inactive_ngs_application_v1 \
+            --contract "$CONTRACT_PATH" \
+            --archive-dir research_outputs/inactive_article_source_archive_v1 \
+            --roster-metadata /tmp/official_roster_v2/roster_metadata.jsonl \
+            --global-projection /tmp/global_identity_source_v1/projections/players-023d7e5b652f56c1b41c432f394d81da60e2ab4df287daeb3baa1be76d6f2603.parquet \
+            --v8-preservation /tmp/v8_evidence/preservation.json \
+            --output-dir research_outputs/levline4_prospective_inactive_ngs_v1 \
+            | tee /tmp/application_receipt_stdout.json
+
+      - name: Persist canonical application evidence away from main
+        if: always() && steps.scope.outputs.supported == 'true'
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/levline4_prospective_inactive_ngs_v1
+          if [ ! -d "$DATA_DIR" ] || [ -z "$(find "$DATA_DIR" -type f -print -quit 2>/dev/null)" ]; then
+            echo 'No application evidence to persist.'
+            exit 0
+          fi
+          rm -rf /tmp/levline4_prospective_inactive_ngs_v1
+          cp -R "$DATA_DIR" /tmp/levline4_prospective_inactive_ngs_v1
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet "refs/remotes/origin/${APP_DATA_BRANCH}"; then
+            git checkout -B prospective-inactive-ngs-v1-data "origin/${APP_DATA_BRANCH}"
+          else
+            git checkout -B prospective-inactive-ngs-v1-data
+          fi
+          mkdir -p research_outputs
+          rm -rf "$DATA_DIR"
+          cp -R /tmp/levline4_prospective_inactive_ngs_v1 "$DATA_DIR"
+          git add "$DATA_DIR"
+          if git diff --cached --quiet; then
+            echo 'Prospective inactive NGS application evidence unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture prospective Week 2 inactive NGS identity evidence'
+          git push origin HEAD:"${APP_DATA_BRANCH}"
+
+      - name: Surface canonical application failure only after evidence preservation
+        if: always() && steps.scope.outputs.supported == 'true'
+        run: |
+          if [ "${{ steps.application.outcome }}" != 'success' ]; then
+            echo 'Prospective inactive NGS application returned a canonical non-PASS or technical failure; evidence was preserved when available.' >&2
+            exit 1
+          fi
