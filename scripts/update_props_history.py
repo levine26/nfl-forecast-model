@@ -66,8 +66,8 @@ def record_closes(args) -> int:
         kickoff = _aware(original.get("kickoff_utc"))
         captured_value = row.get("captured_utc") or row.get("captured_at_utc")
         captured = _aware(captured_value)
-        if captured > kickoff:
-            raise PropsPublicationError(f"closing market timestamp is post-kickoff for forecast_id={forecast_id}")
+        if captured >= kickoff:
+            raise PropsPublicationError(f"closing market timestamp is at/after kickoff for forecast_id={forecast_id}")
         events.append(
             make_closing_event(
                 forecast_id,
@@ -98,13 +98,7 @@ def record_grades(args) -> int:
         receipt = receipts.get(forecast_id)
         if receipt is None:
             raise PropsPublicationError(f"cannot grade unknown forecast_id={forecast_id}")
-        events.append(
-            grade_forecast_receipt(
-                receipt,
-                actual_result=row.get("actual_result"),
-                graded_utc=row.get("graded_utc") or row.get("graded_at_utc"),
-            )
-        )
+        events.append(grade_forecast_receipt(receipt, actual_result=row.get("actual_result"), graded_utc=row.get("graded_utc") or row.get("graded_at_utc")))
     count = append_jsonl_immutable(args.ledger, events, identity_key="event_id")
     print(f"recorded {count} new grade events -> {args.ledger}; originals were not rewritten")
     return 0
@@ -113,27 +107,22 @@ def record_grades(args) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Append-only history operations for LevLine Props Research Beta.")
     sub = parser.add_subparsers(dest="command", required=True)
-
     record = sub.add_parser("record", help="Persist original prospective forecast receipts.")
     record.add_argument("--input", type=Path, default=ROOT / "outputs" / "props" / "forecasts.json")
     record.add_argument("--ledger", type=Path, default=HISTORY_DIR / "forecast_originals.jsonl")
     record.add_argument("--recorded-utc")
     record.set_defaults(func=record_forecasts)
-
     close = sub.add_parser("close", help="Append closing market snapshots without touching originals.")
     close.add_argument("--input", type=Path, required=True)
     close.add_argument("--forecast-ledger", type=Path, default=HISTORY_DIR / "forecast_originals.jsonl")
     close.add_argument("--ledger", type=Path, default=HISTORY_DIR / "market_closes.jsonl")
     close.set_defaults(func=record_closes)
-
     grade = sub.add_parser("grade", help="Append result/grade events without touching originals.")
     grade.add_argument("--input", type=Path, required=True)
     grade.add_argument("--forecast-ledger", type=Path, default=HISTORY_DIR / "forecast_originals.jsonl")
     grade.add_argument("--ledger", type=Path, default=HISTORY_DIR / "grades.jsonl")
     grade.set_defaults(func=record_grades)
-
-    args = parser.parse_args()
-    return args.func(args)
+    return parser.parse_args().func(parser.parse_args())
 
 
 if __name__ == "__main__":
