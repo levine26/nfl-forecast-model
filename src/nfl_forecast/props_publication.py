@@ -96,6 +96,7 @@ def _reasons(row, now):
     market=_map(row.get("market")); model=_map(row.get("model")); quality=_map(row.get("data_quality")); market_at=_dt(market.get("captured_utc"))
     if not _text(market.get("source")): out.append("market_source_missing")
     if market_at is None: out.append("market_timestamp_invalid")
+    elif forecast and market_at>forecast: out.append("market_after_forecast")
     elif kickoff and market_at>=kickoff: out.append("market_not_pregame")
     if _kind(prop)=="OVER_UNDER":
         if _num(market.get("line")) is None: out.append("market_line_invalid")
