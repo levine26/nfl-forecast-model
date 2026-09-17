@@ -59,8 +59,11 @@ Each output row contains one supported offensive player for one target game:
 - `position` (`QB`, `RB`, `WR`, `TE` only)
 - `team`
 - `opponent`
+- `kickoff_timestamp` plus `kickoff_known`
 - `forecast_timestamp`
 - `history_policy`
+- `roster_status_raw` plus `roster_membership_state`
+- timestamped availability provenance/raw status fields (nullable when unavailable)
 - `schema_version`
 
 A stable ID conflict fails closed. Name matching is used only to resolve a timestamped current availability row against the current roster for the same team, and only when that team+normalized-name mapping is unique.
@@ -119,6 +122,8 @@ The contract never fabricates routes, snaps or status evidence. It exposes:
 
 A player with no history can still appear with stable identity and current game mapping, but downstream models must apply their own rookie/no-history priors rather than treating nulls as observed zero usage.
 
+Validation requires the canonical identity, kickoff/PIT, roster-membership, availability-provenance, usage, missingness and quality columns even when their values are nullable. It also rejects unexpected schema/history-policy values, invalid roster-membership states, invalid quality states and any disagreement between `kickoff_known` and the parsed kickoff timestamp.
+
 ## Current availability states
 
 The contract emits conservative categorical state only:
@@ -170,6 +175,7 @@ The simulation lane should not infer availability probabilities directly from th
 - explicit route/snap missingness
 - known-started-game removal
 - duplicate identity/schema validation
+- canonical roster-membership validation
 - timezone-aware forecast requirement
 - flattening of the existing NFL.com injury-report adapter with capture time preserved
 
