@@ -1,0 +1,41 @@
+{
+  "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v8-preexecution-addendum",
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V8",
+  "frozen_parent_contract_commit": "c7557566b4c4456da1e69bfb0bc2e5f692463247",
+  "status": "PRE_EXECUTION_CLARIFICATION",
+  "empirical_boundary": {
+    "v8_ngs_target_requests_observed_before_addendum": 0,
+    "v8_ngs_target_responses_observed_before_addendum": 0,
+    "v8_workflow_runs_before_addendum": 0,
+    "completed_2026_outcomes_used": 0,
+    "postgame_participation_used": false,
+    "week2_inactive_execution_evidence_used": false
+  },
+  "deterministic_issue_discovered_from_frozen_source_and_code": {
+    "description": "The parent contract requires all six fresh query-grammar stress rows to skip invalid exact-visible pre-dispatch, execute source_canonical_name, and resolve. Literal reuse of V7 query-plan inclusion semantics would omit source_canonical_name whenever frozen name_key(canonical_query_name) equals frozen name_key(visible_name). Five of the six frozen fresh grammar-stress rows have equal semantic name keys because frozen name_key removes their unsupported surface characters/diacritics. Therefore the parent contract's required six canonical executions and literal V7 representation-generation wording are internally inconsistent before any V8 NGS observation.",
+    "fresh_query_grammar_stress_target_count": 6,
+    "stress_rows_with_equal_visible_and_canonical_name_key": 5,
+    "stress_rows_with_different_visible_and_canonical_name_key": 1,
+    "population_changed": false,
+    "threshold_changed": false,
+    "semantic_candidate_resolution_changed": false
+  },
+  "frozen_clarification": {
+    "query_representation_generation": "Preserve V7 ordered representations, except that when exact_visible_name fails the frozen NGS term_pattern and deterministic source_canonical_name exists, differs as a source string from visible_name, and passes the frozen term_pattern, source_canonical_name MUST be included as the next source-native representation even when its frozen semantic name_key equals visible_name's name_key. If a terminal_suffix_stripped representation exists before it under V7 ordering, retain that representation in order and subject it to the same pre-dispatch grammar guard. Surname-only remains after source_canonical_name.",
+    "invalid_representation_behavior": "A representation failing the frozen term_pattern is recorded as skipped_pre_dispatch_query_grammar and issues no request. No character deletion, replacement, transliteration, fuzzy repair, manual alias, or manual query construction is permitted.",
+    "semantic_resolution": "Unchanged from frozen V7/V8: candidate displayName may match the frozen semantic name_key of visible_name or deterministic source_canonical_name; team equivalence, GSIS validation, position+jersey tiebreak, fail-closed behavior, and all forbidden fields remain unchanged.",
+    "executed_query_stop_rule": "Unchanged from parent V8 contract: after an executed request, continue only after HTTP 200 + parseable players array length 0; stop on nonempty players array or any executed transport/parse failure.",
+    "query_grammar_stress_gate": "Unchanged: all six fresh stress targets must skip invalid exact-visible pre-dispatch, execute source_canonical_name, and resolve uniquely; every executed request must be HTTP 200 with a parseable players array.",
+    "all_other_population_hashes_gates_thresholds_and_authority_ceiling": "UNCHANGED"
+  },
+  "governance": {
+    "addendum_must_precede_v8_implementation_tests_and_workflow": true,
+    "parent_contract_blob_must_remain_unchanged": true,
+    "same_version_empirical_adaptation": false,
+    "production_authorized": false,
+    "model_fit_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "availability_state_authorized": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}

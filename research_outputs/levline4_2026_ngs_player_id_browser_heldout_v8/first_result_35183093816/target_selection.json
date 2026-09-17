@@ -1,0 +1,1991 @@
+{
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V8",
+  "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v8-target-selection",
+  "selection_diagnostics": {
+    "canonical_name_variant_eligible_count": 285,
+    "canonical_name_variant_target_count": 32,
+    "coverage_target_count": 64,
+    "eligible_row_count": 2134,
+    "pairwise_overlap_counts": {
+      "canonical_name_variant_and_query_grammar_stress": 0,
+      "coverage_and_canonical_name_variant": 9,
+      "coverage_and_query_grammar_stress": 0,
+      "coverage_and_source_name_variant": 5,
+      "coverage_and_team_alias_ari": 2,
+      "source_name_variant_and_canonical_name_variant": 4,
+      "source_name_variant_and_query_grammar_stress": 0,
+      "team_alias_ari_and_canonical_name_variant": 0,
+      "team_alias_ari_and_query_grammar_stress": 0,
+      "team_alias_ari_and_source_name_variant": 2
+    },
+    "query_grammar_stress_eligible_count": 6,
+    "query_grammar_stress_target_count": 6,
+    "sorted_row_identity_sha256": "54edf016256370f2aca87ba83953e3af77a4ac05e701a8003da612f84d2669a1",
+    "source_name_variant_eligible_count": 167,
+    "source_name_variant_target_count": 16,
+    "target_projection_sha256": "c357202611c24a31b4918a6201f996b9b15f53cda127dbc542551c6320a89368",
+    "team_alias_ari_target_count": 4,
+    "team_count": 32,
+    "total_target_count": 102
+  },
+  "targets": [
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "chase bisontis",
+      "_selection_key_sha256": "03d732f747ae935609cf9f067fdf1ddcf78a887539b81290425194e6d2f4496d",
+      "_strata": [
+        "coverage",
+        "team_alias_ari"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "bisontis,chase",
+      "captured_at_utc": "2026-09-16T17:45:10.431122Z",
+      "final_url": "https://www.azcardinals.com/team/players-roster/",
+      "jersey_number": "57",
+      "position": "OL",
+      "profile_path": "/team/players-roster/chase-bisontis/",
+      "raw_html_sha256": "9067b922512359d505662979d4e92b20df6451610bdfd7e7cad19e2b2dc842bb",
+      "source_url": "https://www.azcardinals.com/team/players-roster/",
+      "team": "ARI",
+      "visible_name": "Chase Bisontis"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "dante stills",
+      "_selection_key_sha256": "05a68a0501b6203c827bc228ddaafc44e46775b136bbe06149a108614dcfc244",
+      "_strata": [
+        "team_alias_ari"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "stills,dante",
+      "captured_at_utc": "2026-09-16T17:45:10.431122Z",
+      "final_url": "https://www.azcardinals.com/team/players-roster/",
+      "jersey_number": "55",
+      "position": "DL",
+      "profile_path": "/team/players-roster/dante-stills/",
+      "raw_html_sha256": "9067b922512359d505662979d4e92b20df6451610bdfd7e7cad19e2b2dc842bb",
+      "source_url": "https://www.azcardinals.com/team/players-roster/",
+      "team": "ARI",
+      "visible_name": "Dante Stills"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "marvin harrison jr.",
+      "_selection_key_sha256": "08748c19549ae661a77d21d5b84f80c5296aaf2a3533dabb4d19b4d1c400ffb7",
+      "_strata": [
+        "team_alias_ari",
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "harrison,marvin jr.",
+      "captured_at_utc": "2026-09-16T17:45:10.431122Z",
+      "final_url": "https://www.azcardinals.com/team/players-roster/",
+      "jersey_number": "18",
+      "position": "WR",
+      "profile_path": "/team/players-roster/marvin-harrison-jr/",
+      "raw_html_sha256": "9067b922512359d505662979d4e92b20df6451610bdfd7e7cad19e2b2dc842bb",
+      "source_url": "https://www.azcardinals.com/team/players-roster/",
+      "team": "ARI",
+      "visible_name": "Marvin Harrison Jr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "malachi melton",
+      "_selection_key_sha256": "0b87be05fed9b1b0111e36ce88b9be87f037298145e0379108cec352dda3f09d",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "melton,malachi",
+      "captured_at_utc": "2026-09-16T17:45:10.431122Z",
+      "final_url": "https://www.azcardinals.com/team/players-roster/",
+      "jersey_number": "16",
+      "position": "CB",
+      "profile_path": "/team/players-roster/max-melton/",
+      "raw_html_sha256": "9067b922512359d505662979d4e92b20df6451610bdfd7e7cad19e2b2dc842bb",
+      "source_url": "https://www.azcardinals.com/team/players-roster/",
+      "team": "ARI",
+      "visible_name": "Max Melton"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "walter nolen iii",
+      "_selection_key_sha256": "003d3e0c5c23799c8e4972a0d6177912853a73f0887394dd304d0193bda9327b",
+      "_strata": [
+        "coverage",
+        "team_alias_ari",
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "nolen,walter iii",
+      "captured_at_utc": "2026-09-16T17:45:10.431122Z",
+      "final_url": "https://www.azcardinals.com/team/players-roster/",
+      "jersey_number": "97",
+      "position": "DL",
+      "profile_path": "/team/players-roster/walter-nolen/",
+      "raw_html_sha256": "9067b922512359d505662979d4e92b20df6451610bdfd7e7cad19e2b2dc842bb",
+      "source_url": "https://www.azcardinals.com/team/players-roster/",
+      "team": "ARI",
+      "visible_name": "Walter Nolen III"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "bralen trice",
+      "_selection_key_sha256": "03df1e05b8052d402dd99385fdf356109f1d697fabfdd7860eaefce952d74d8b",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "trice,bralen",
+      "captured_at_utc": "2026-09-16T17:45:11.050554Z",
+      "final_url": "https://www.atlantafalcons.com/team/players-roster/",
+      "jersey_number": "48",
+      "position": "ED",
+      "profile_path": "/team/players-roster/bralen-trice/",
+      "raw_html_sha256": "9df0577afcf87b9cd98aa5e30bd128ed1814ca4a786f3f532341a202a4e246ff",
+      "source_url": "https://www.atlantafalcons.com/team/players-roster/",
+      "team": "ATL",
+      "visible_name": "Bralen Trice"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "josh woods",
+      "_selection_key_sha256": "1d906f31865c10ecda385e5d0bc3b86f27a658d389957fd714138d4cf2b1daab",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "woods,josh",
+      "captured_at_utc": "2026-09-16T17:45:11.050554Z",
+      "final_url": "https://www.atlantafalcons.com/team/players-roster/",
+      "jersey_number": "46",
+      "position": "LB",
+      "profile_path": "/team/players-roster/josh-woods/",
+      "raw_html_sha256": "9df0577afcf87b9cd98aa5e30bd128ed1814ca4a786f3f532341a202a4e246ff",
+      "source_url": "https://www.atlantafalcons.com/team/players-roster/",
+      "team": "ATL",
+      "visible_name": "Josh Woods"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "durham smythe",
+      "_selection_key_sha256": "0b66645cdf327d12bb55141ffab8a209dbb9f617ffa5aa309948e4b192c4982d",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "smythe,durham",
+      "captured_at_utc": "2026-09-16T17:45:11.342401Z",
+      "final_url": "https://www.baltimoreravens.com/team/players-roster/",
+      "jersey_number": "80",
+      "position": "TE",
+      "profile_path": "/team/players-roster/durham-smythe/",
+      "raw_html_sha256": "d06cec0a2a029dae1a47cfa9038804999796b029a3e21a2561f8132926826af6",
+      "source_url": "https://www.baltimoreravens.com/team/players-roster/",
+      "team": "BAL",
+      "visible_name": "Durham Smythe"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "kaimon rucker",
+      "_selection_key_sha256": "04ac2fab90970d7b593d0c8a052f838f2816378e3ca8a4d34df63c835f95886e",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "rucker,kaimon",
+      "captured_at_utc": "2026-09-16T17:45:11.342401Z",
+      "final_url": "https://www.baltimoreravens.com/team/players-roster/",
+      "jersey_number": "56",
+      "position": "OLB",
+      "profile_path": "/team/players-roster/kaimon-rucker/",
+      "raw_html_sha256": "d06cec0a2a029dae1a47cfa9038804999796b029a3e21a2561f8132926826af6",
+      "source_url": "https://www.baltimoreravens.com/team/players-roster/",
+      "team": "BAL",
+      "visible_name": "Kaimon Rucker"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "kani walker",
+      "_selection_key_sha256": "0c2b3ce1095e6a267d18a2bf9922d9f031cdbb48479abff56660331a14ddb3bb",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "walker,kani",
+      "captured_at_utc": "2026-09-16T17:45:11.654343Z",
+      "final_url": "https://www.buffalobills.com/team/players-roster/",
+      "jersey_number": "41",
+      "position": "CB",
+      "profile_path": "/team/players-roster/kani-walker/",
+      "raw_html_sha256": "d674ebea61a1c3f930a7762f463c83463a213e38a8a0fae58507dc5972b2cf5f",
+      "source_url": "https://www.buffalobills.com/team/players-roster/",
+      "team": "BUF",
+      "visible_name": "Kani Walker"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "michael danna",
+      "_selection_key_sha256": "1222e6cd780d4f862df88cf6e0eddfc9589b2573ce52bc58815b8459c7688262",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "danna,michael",
+      "captured_at_utc": "2026-09-16T17:45:11.654343Z",
+      "final_url": "https://www.buffalobills.com/team/players-roster/",
+      "jersey_number": "51",
+      "position": "OLB",
+      "profile_path": "/team/players-roster/mike-danna/",
+      "raw_html_sha256": "d674ebea61a1c3f930a7762f463c83463a213e38a8a0fae58507dc5972b2cf5f",
+      "source_url": "https://www.buffalobills.com/team/players-roster/",
+      "team": "BUF",
+      "visible_name": "Mike Danna"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "shane buechele",
+      "_selection_key_sha256": "0dd931e219217a8532e6fa329eb5b50b5ec0f30e8660a33de5ea5fa265567364",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "buechele,shane",
+      "captured_at_utc": "2026-09-16T17:45:11.654343Z",
+      "final_url": "https://www.buffalobills.com/team/players-roster/",
+      "jersey_number": "6",
+      "position": "QB",
+      "profile_path": "/team/players-roster/shane-buechele/",
+      "raw_html_sha256": "d674ebea61a1c3f930a7762f463c83463a213e38a8a0fae58507dc5972b2cf5f",
+      "source_url": "https://www.buffalobills.com/team/players-roster/",
+      "team": "BUF",
+      "visible_name": "Shane Buechele"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "algiers dillon",
+      "_selection_key_sha256": "1c1820428021af1768f7c0a8c1ee6936c831e1b46812c97f21eb4eeeed4a8e6f",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "dillon,algiers",
+      "captured_at_utc": "2026-09-16T17:45:11.857299Z",
+      "final_url": "https://www.panthers.com/team/players-roster/",
+      "jersey_number": "28",
+      "position": "RB",
+      "profile_path": "/team/players-roster/aj-dillon/",
+      "raw_html_sha256": "28c777087d967572730d37bbe41b31ffdf9bcadff5d1d44c541242166100ee03",
+      "source_url": "https://www.panthers.com/team/players-roster/",
+      "team": "CAR",
+      "visible_name": "AJ Dillon"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "chris brazzell ii",
+      "_selection_key_sha256": "0790f9fb3f951dd92fee9770932e4a3c9d7d12835b6fe1e80cf750ce07028327",
+      "_strata": [
+        "coverage",
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "brazzell,chris ii",
+      "captured_at_utc": "2026-09-16T17:45:11.857299Z",
+      "final_url": "https://www.panthers.com/team/players-roster/",
+      "jersey_number": "19",
+      "position": "WR",
+      "profile_path": "/team/players-roster/chris-brazzell-ii/",
+      "raw_html_sha256": "28c777087d967572730d37bbe41b31ffdf9bcadff5d1d44c541242166100ee03",
+      "source_url": "https://www.panthers.com/team/players-roster/",
+      "team": "CAR",
+      "visible_name": "Chris Brazzell II"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "damien lewis",
+      "_selection_key_sha256": "0378eda0d5fe5822719c34aa4f58fc57a699172864bfec305cb5076ea0857f0b",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "lewis,damien",
+      "captured_at_utc": "2026-09-16T17:45:11.857299Z",
+      "final_url": "https://www.panthers.com/team/players-roster/",
+      "jersey_number": "68",
+      "position": "G",
+      "profile_path": "/team/players-roster/damien-lewis/",
+      "raw_html_sha256": "28c777087d967572730d37bbe41b31ffdf9bcadff5d1d44c541242166100ee03",
+      "source_url": "https://www.panthers.com/team/players-roster/",
+      "team": "CAR",
+      "visible_name": "Damien Lewis"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "kenneth pickett",
+      "_selection_key_sha256": "1bc676287f4a555df4ad790467ff1e850cdbef75a34df3c83164bd4888a2f711",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "pickett,kenneth",
+      "captured_at_utc": "2026-09-16T17:45:11.857299Z",
+      "final_url": "https://www.panthers.com/team/players-roster/",
+      "jersey_number": "12",
+      "position": "QB",
+      "profile_path": "/team/players-roster/kenny-pickett/",
+      "raw_html_sha256": "28c777087d967572730d37bbe41b31ffdf9bcadff5d1d44c541242166100ee03",
+      "source_url": "https://www.panthers.com/team/players-roster/",
+      "team": "CAR",
+      "visible_name": "Kenny Pickett"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "d'andre swift",
+      "_selection_key_sha256": "04e3bc2b592ec4bb842ed93b64cad42b8dd6339065b79e5c6e589dac443d252d",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "swift,d'andre",
+      "captured_at_utc": "2026-09-16T17:45:12.389863Z",
+      "final_url": "https://www.chicagobears.com/team/players-roster/",
+      "jersey_number": "4",
+      "position": "RB",
+      "profile_path": "/team/players-roster/d-andre-swift/",
+      "raw_html_sha256": "26d28935d89eef4d52aeb45be99cce5a92d742c09c219ef74fd6b9e2933955c4",
+      "source_url": "https://www.chicagobears.com/team/players-roster/",
+      "team": "CHI",
+      "visible_name": "D'Andre Swift"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "dillon thieneman",
+      "_selection_key_sha256": "010e499f185565b7d2170f7c42e60023d5c84e74b0a7a818909d31bdd12b0371",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "thieneman,dillon",
+      "captured_at_utc": "2026-09-16T17:45:12.389863Z",
+      "final_url": "https://www.chicagobears.com/team/players-roster/",
+      "jersey_number": "31",
+      "position": "DB",
+      "profile_path": "/team/players-roster/dillon-thieneman/",
+      "raw_html_sha256": "26d28935d89eef4d52aeb45be99cce5a92d742c09c219ef74fd6b9e2933955c4",
+      "source_url": "https://www.chicagobears.com/team/players-roster/",
+      "team": "CHI",
+      "visible_name": "Dillon Thieneman"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "dj turner ii",
+      "_selection_key_sha256": "119455dee2ce14460840544535751fa0b539de273e27defd83329d8721c74bc2",
+      "_strata": [
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "turner,dj ii",
+      "captured_at_utc": "2026-09-16T17:45:12.664408Z",
+      "final_url": "https://www.bengals.com/team/players-roster/",
+      "jersey_number": "0",
+      "position": "CB",
+      "profile_path": "/team/players-roster/dj-turner-ii/",
+      "raw_html_sha256": "04a78adef608bf317442275c1a764c2192aaba79a9ba82fdc9b861b974de2bd6",
+      "source_url": "https://www.bengals.com/team/players-roster/",
+      "team": "CIN",
+      "visible_name": "DJ Turner II"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "garmon randolph",
+      "_selection_key_sha256": "01447374f7042b8021f0cde34cd6790e24cca490d81c1358cc6403225673b3ce",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "randolph,garmon",
+      "captured_at_utc": "2026-09-16T17:45:12.664408Z",
+      "final_url": "https://www.bengals.com/team/players-roster/",
+      "jersey_number": "56",
+      "position": "DE",
+      "profile_path": "/team/players-roster/garmon-randolph/",
+      "raw_html_sha256": "04a78adef608bf317442275c1a764c2192aaba79a9ba82fdc9b861b974de2bd6",
+      "source_url": "https://www.bengals.com/team/players-roster/",
+      "team": "CIN",
+      "visible_name": "Garmon Randolph"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "josh newton",
+      "_selection_key_sha256": "06bc33eb7cadca3c225113aab69f2a23874ddcc386a98e3a8678ff392212a6e5",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "newton,josh",
+      "captured_at_utc": "2026-09-16T17:45:12.664408Z",
+      "final_url": "https://www.bengals.com/team/players-roster/",
+      "jersey_number": "28",
+      "position": "CB",
+      "profile_path": "/team/players-roster/josh-newton/",
+      "raw_html_sha256": "04a78adef608bf317442275c1a764c2192aaba79a9ba82fdc9b861b974de2bd6",
+      "source_url": "https://www.bengals.com/team/players-roster/",
+      "team": "CIN",
+      "visible_name": "Josh Newton"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "tedarrell slaton jr.",
+      "_selection_key_sha256": "1833c29d06daa00aaa2c156f0c18bae16f523654f8b4e659c89e0c78c4ff4a9c",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "slaton,tedarrell jr.",
+      "captured_at_utc": "2026-09-16T17:45:12.664408Z",
+      "final_url": "https://www.bengals.com/team/players-roster/",
+      "jersey_number": "98",
+      "position": "DT",
+      "profile_path": "/team/players-roster/t-j-slaton-jr/",
+      "raw_html_sha256": "04a78adef608bf317442275c1a764c2192aaba79a9ba82fdc9b861b974de2bd6",
+      "source_url": "https://www.bengals.com/team/players-roster/",
+      "team": "CIN",
+      "visible_name": "T.J. Slaton Jr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "derrick watson",
+      "_selection_key_sha256": "1c0c528c8724e6e87f6c6cbe46c516a0e81131369724bb56103d5566100364ef",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "watson,derrick",
+      "captured_at_utc": "2026-09-16T17:45:12.885308Z",
+      "final_url": "https://www.clevelandbrowns.com/team/players-roster/",
+      "jersey_number": "4",
+      "position": "QB",
+      "profile_path": "/team/players-roster/deshaun-watson/",
+      "raw_html_sha256": "3c1e62b613c09bf5c298bd4462a8aad9754c11d01df8d4616b8f2617b8faf63d",
+      "source_url": "https://www.clevelandbrowns.com/team/players-roster/",
+      "team": "CLE",
+      "visible_name": "Deshaun Watson"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "harold fannin jr.",
+      "_selection_key_sha256": "0243b08412c5cfe4cea6166d9bb73b7124766e1692d97ea7f7fcdcc07684ef33",
+      "_strata": [
+        "coverage",
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "fannin,harold jr.",
+      "captured_at_utc": "2026-09-16T17:45:12.885308Z",
+      "final_url": "https://www.clevelandbrowns.com/team/players-roster/",
+      "jersey_number": "44",
+      "position": "TE",
+      "profile_path": "/team/players-roster/harold-fannin-jr/",
+      "raw_html_sha256": "3c1e62b613c09bf5c298bd4462a8aad9754c11d01df8d4616b8f2617b8faf63d",
+      "source_url": "https://www.clevelandbrowns.com/team/players-roster/",
+      "team": "CLE",
+      "visible_name": "Harold Fannin Jr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "tyson campbell",
+      "_selection_key_sha256": "0060a5666dab6984271859014647bc8e21f1f5c7e4c11d3b49c70ee3fdc48aa4",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "campbell,tyson",
+      "captured_at_utc": "2026-09-16T17:45:12.885308Z",
+      "final_url": "https://www.clevelandbrowns.com/team/players-roster/",
+      "jersey_number": "7",
+      "position": "CB",
+      "profile_path": "/team/players-roster/tyson-campbell/",
+      "raw_html_sha256": "3c1e62b613c09bf5c298bd4462a8aad9754c11d01df8d4616b8f2617b8faf63d",
+      "source_url": "https://www.clevelandbrowns.com/team/players-roster/",
+      "team": "CLE",
+      "visible_name": "Tyson Campbell"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "brevyn spann-ford",
+      "_selection_key_sha256": "075a820c6a1548881c0df8d266520e4374f89afdcf93350f5b9df818b26b67b1",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "spann-ford,brevyn",
+      "captured_at_utc": "2026-09-16T17:45:13.061861Z",
+      "final_url": "https://www.dallascowboys.com/team/players-roster/",
+      "jersey_number": "89",
+      "position": "TE",
+      "profile_path": "/team/players-roster/brevyn-spann-ford/",
+      "raw_html_sha256": "d7f3651e00c3a3676f0c7abe0b9263c70a948640659596efa7658b17e3f36028",
+      "source_url": "https://www.dallascowboys.com/team/players-roster/",
+      "team": "DAL",
+      "visible_name": "Brevyn Spann-Ford"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "labbeus overton",
+      "_selection_key_sha256": "1269b1bdcbe611576e723293f80400e9797aa1585f08b829af3c2de972fac416",
+      "_strata": [
+        "source_name_variant",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "overton,labbeus",
+      "captured_at_utc": "2026-09-16T17:45:13.061861Z",
+      "final_url": "https://www.dallascowboys.com/team/players-roster/",
+      "jersey_number": "99",
+      "position": "DT",
+      "profile_path": "/team/players-roster/lt-overton/",
+      "raw_html_sha256": "d7f3651e00c3a3676f0c7abe0b9263c70a948640659596efa7658b17e3f36028",
+      "source_url": "https://www.dallascowboys.com/team/players-roster/",
+      "team": "DAL",
+      "visible_name": "LT Overton"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "reddrick steward",
+      "_selection_key_sha256": "08ef4755a417e064d9a52843f720532bb60aef04e61b34fb67b12bf0f421a1c9",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "steward,reddrick",
+      "captured_at_utc": "2026-09-16T17:45:13.061861Z",
+      "final_url": "https://www.dallascowboys.com/team/players-roster/",
+      "jersey_number": "27",
+      "position": "CB",
+      "profile_path": "/team/players-roster/reddy-steward/",
+      "raw_html_sha256": "d7f3651e00c3a3676f0c7abe0b9263c70a948640659596efa7658b17e3f36028",
+      "source_url": "https://www.dallascowboys.com/team/players-roster/",
+      "team": "DAL",
+      "visible_name": "Reddy Steward"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "adam prentice",
+      "_selection_key_sha256": "0a3292d75d291afa7fd52c0654e2140ebce7086c323b8b0be3325c06a548f45e",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "prentice,adam",
+      "captured_at_utc": "2026-09-16T17:45:13.291877Z",
+      "final_url": "https://www.denverbroncos.com/team/players-roster/",
+      "jersey_number": "46",
+      "position": "FB",
+      "profile_path": "/team/players-roster/adam-prentice/",
+      "raw_html_sha256": "745026abbf3b15a92ede842a48e22ffcb8453fba58d1d3e1eb78b895a40a510e",
+      "source_url": "https://www.denverbroncos.com/team/players-roster/",
+      "team": "DEN",
+      "visible_name": "Adam Prentice"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "ja'quan mcmillian",
+      "_selection_key_sha256": "080db8235c63639941337be1e0bca4c576056ff80354ccdd8aa404a703217f5a",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "mcmillian,ja'quan",
+      "captured_at_utc": "2026-09-16T17:45:13.291877Z",
+      "final_url": "https://www.denverbroncos.com/team/players-roster/",
+      "jersey_number": "29",
+      "position": "CB",
+      "profile_path": "/team/players-roster/ja-quan-mcmillian/",
+      "raw_html_sha256": "745026abbf3b15a92ede842a48e22ffcb8453fba58d1d3e1eb78b895a40a510e",
+      "source_url": "https://www.denverbroncos.com/team/players-roster/",
+      "team": "DEN",
+      "visible_name": "Ja'Quan McMillian"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "quandarrius robinson",
+      "_selection_key_sha256": "0c295021af934515a59bee3912c0009aa997ee071c49a04ebda07abc2b68a626",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "robinson,quandarrius",
+      "captured_at_utc": "2026-09-16T17:45:13.291877Z",
+      "final_url": "https://www.denverbroncos.com/team/players-roster/",
+      "jersey_number": "51",
+      "position": "OLB",
+      "profile_path": "/team/players-roster/que-robinson/",
+      "raw_html_sha256": "745026abbf3b15a92ede842a48e22ffcb8453fba58d1d3e1eb78b895a40a510e",
+      "source_url": "https://www.denverbroncos.com/team/players-roster/",
+      "team": "DEN",
+      "visible_name": "Que Robinson"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "avonte maddox",
+      "_selection_key_sha256": "0fd5c07f22ff840a5d054aef758bc7b33ec559758cde4c511b560a840decfec5",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "maddox,avonte",
+      "captured_at_utc": "2026-09-16T17:45:13.578381Z",
+      "final_url": "https://www.detroitlions.com/team/players-roster/",
+      "jersey_number": "29",
+      "position": "DB",
+      "profile_path": "/team/players-roster/avonte-maddox/",
+      "raw_html_sha256": "74a1dc7add83ecc4e3cb227fa464459b85d395000c5e5d1e705250779a144af3",
+      "source_url": "https://www.detroitlions.com/team/players-roster/",
+      "team": "DET",
+      "visible_name": "Avonte Maddox"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jahmyr gibbs",
+      "_selection_key_sha256": "0ebe43e35e5497bebafa1cb5cbd3a7e3fcdd9a2ada32a063583841bbabf60caa",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "gibbs,jahmyr",
+      "captured_at_utc": "2026-09-16T17:45:13.578381Z",
+      "final_url": "https://www.detroitlions.com/team/players-roster/",
+      "jersey_number": "0",
+      "position": "RB",
+      "profile_path": "/team/players-roster/jahmyr-gibbs/",
+      "raw_html_sha256": "74a1dc7add83ecc4e3cb227fa464459b85d395000c5e5d1e705250779a144af3",
+      "source_url": "https://www.detroitlions.com/team/players-roster/",
+      "team": "DET",
+      "visible_name": "Jahmyr Gibbs"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "davontavean martin",
+      "_selection_key_sha256": "153f36ae6ea654646c52b1ade7b688c4dda9630071e5c806856533c5b9a45b53",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "martin,davontavean",
+      "captured_at_utc": "2026-09-16T17:45:13.578381Z",
+      "final_url": "https://www.detroitlions.com/team/players-roster/",
+      "jersey_number": "17",
+      "position": "WR",
+      "profile_path": "/team/players-roster/tay-martin/",
+      "raw_html_sha256": "74a1dc7add83ecc4e3cb227fa464459b85d395000c5e5d1e705250779a144af3",
+      "source_url": "https://www.detroitlions.com/team/players-roster/",
+      "team": "DET",
+      "visible_name": "Tay Martin"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "aaron banks",
+      "_selection_key_sha256": "03dbe46e233ede2272a6f26ae5c863410cfa6bcfff29c670346bce7193821ec9",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "banks,aaron",
+      "captured_at_utc": "2026-09-16T17:45:13.736462Z",
+      "final_url": "https://www.packers.com/team/players-roster/",
+      "jersey_number": "65",
+      "position": "G",
+      "profile_path": "/team/players-roster/aaron-banks/",
+      "raw_html_sha256": "b393266999eb93f8a309ebb2ee448a2f16191f8ec0e8c8dbdc2c1698552d7578",
+      "source_url": "https://www.packers.com/team/players-roster/",
+      "team": "GB",
+      "visible_name": "Aaron Banks"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "zaire franklin",
+      "_selection_key_sha256": "18e34fc7cbe5968b3a71858cc08fd6216d78ba9335cfe2912977685f26f626aa",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "franklin,zaire",
+      "captured_at_utc": "2026-09-16T17:45:13.736462Z",
+      "final_url": "https://www.packers.com/team/players-roster/",
+      "jersey_number": "44",
+      "position": "LB",
+      "profile_path": "/team/players-roster/zaire-franklin/",
+      "raw_html_sha256": "b393266999eb93f8a309ebb2ee448a2f16191f8ec0e8c8dbdc2c1698552d7578",
+      "source_url": "https://www.packers.com/team/players-roster/",
+      "team": "GB",
+      "visible_name": "Zaire Franklin"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "derek stingley jr.",
+      "_selection_key_sha256": "12f94c85c6b0b94a6b2aaaa1de81ca5dded647b451cb5259afbd81668f1e5f64",
+      "_strata": [
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "stingley,derek jr.",
+      "captured_at_utc": "2026-09-16T17:45:14.045729Z",
+      "final_url": "https://www.houstontexans.com/team/players-roster/",
+      "jersey_number": "24",
+      "position": "CB",
+      "profile_path": "/team/players-roster/derek-stingley-jr/",
+      "raw_html_sha256": "86b93afdd75013dfa25a0fea53b5488035a64789b07d77ede7779b641dcdc38c",
+      "source_url": "https://www.houstontexans.com/team/players-roster/",
+      "team": "HOU",
+      "visible_name": "Derek Stingley Jr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jaylin noel",
+      "_selection_key_sha256": "02a9ce123a695434dd710d605fdb33c506e657629b210256c8c13aed9a08d806",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "noel,jaylin",
+      "captured_at_utc": "2026-09-16T17:45:14.045729Z",
+      "final_url": "https://www.houstontexans.com/team/players-roster/",
+      "jersey_number": "13",
+      "position": "WR",
+      "profile_path": "/team/players-roster/jaylin-noel/",
+      "raw_html_sha256": "86b93afdd75013dfa25a0fea53b5488035a64789b07d77ede7779b641dcdc38c",
+      "source_url": "https://www.houstontexans.com/team/players-roster/",
+      "team": "HOU",
+      "visible_name": "Jaylin Noel"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "john fairbairn",
+      "_selection_key_sha256": "0c22fb0a89d1e4dd82c3d1b25e5859fa5036c1ffbf56aa19fdc7eaf0fa94a1fc",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "fairbairn,john",
+      "captured_at_utc": "2026-09-16T17:45:14.045729Z",
+      "final_url": "https://www.houstontexans.com/team/players-roster/",
+      "jersey_number": "15",
+      "position": "K",
+      "profile_path": "/team/players-roster/ka-imi-fairbairn/",
+      "raw_html_sha256": "86b93afdd75013dfa25a0fea53b5488035a64789b07d77ede7779b641dcdc38c",
+      "source_url": "https://www.houstontexans.com/team/players-roster/",
+      "team": "HOU",
+      "visible_name": "Ka'imi Fairbairn"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "nathan thomas",
+      "_selection_key_sha256": "041dcf14c6d8f4d980127619447c3b8339e5d878f95146b14ac1ca3caf65efee",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "thomas,nathan",
+      "captured_at_utc": "2026-09-16T17:45:14.045729Z",
+      "final_url": "https://www.houstontexans.com/team/players-roster/",
+      "jersey_number": "78",
+      "position": "T",
+      "profile_path": "/team/players-roster/nathan-thomas/",
+      "raw_html_sha256": "86b93afdd75013dfa25a0fea53b5488035a64789b07d77ede7779b641dcdc38c",
+      "source_url": "https://www.houstontexans.com/team/players-roster/",
+      "team": "HOU",
+      "visible_name": "Nate Thomas"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "adari haulcy",
+      "_selection_key_sha256": "1a1d1f504d6ac22a89efd181c0f80267451d46fa7536daa4357b200eb2972a90",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "haulcy,adari",
+      "captured_at_utc": "2026-09-16T17:45:14.280563Z",
+      "final_url": "https://www.colts.com/team/players-roster/",
+      "jersey_number": "25",
+      "position": "S",
+      "profile_path": "/team/players-roster/a-j-haulcy/",
+      "raw_html_sha256": "c06c6d34bde6eaeeb6157c1e5035ce8ea12c25a8c32c8a50c411434e2a8fc779",
+      "source_url": "https://www.colts.com/team/players-roster/",
+      "team": "IND",
+      "visible_name": "AJ Haulcy"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "hunter wohler",
+      "_selection_key_sha256": "0970e3a106855498aa4fbff7ac3411c4375a2f3541d84a461226d646fcc2b49d",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "wohler,hunter",
+      "captured_at_utc": "2026-09-16T17:45:14.280563Z",
+      "final_url": "https://www.colts.com/team/players-roster/",
+      "jersey_number": "30",
+      "position": "S",
+      "profile_path": "/team/players-roster/hunter-wohler/",
+      "raw_html_sha256": "c06c6d34bde6eaeeb6157c1e5035ce8ea12c25a8c32c8a50c411434e2a8fc779",
+      "source_url": "https://www.colts.com/team/players-roster/",
+      "team": "IND",
+      "visible_name": "Hunter Wohler"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "seth mcgowan",
+      "_selection_key_sha256": "01e747201039e79e674aa576e27eece9a40d4fc82cd4281f5f68aacc8ebc484e",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "mcgowan,seth",
+      "captured_at_utc": "2026-09-16T17:45:14.280563Z",
+      "final_url": "https://www.colts.com/team/players-roster/",
+      "jersey_number": "20",
+      "position": "RB",
+      "profile_path": "/team/players-roster/seth-mcgowan/",
+      "raw_html_sha256": "c06c6d34bde6eaeeb6157c1e5035ce8ea12c25a8c32c8a50c411434e2a8fc779",
+      "source_url": "https://www.colts.com/team/players-roster/",
+      "team": "IND",
+      "visible_name": "Seth McGowan"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "christian braswell",
+      "_selection_key_sha256": "00766211f90984862e60c64d41f7da090be3c5f3da0150a073f08afe2519ee38",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "braswell,christian",
+      "captured_at_utc": "2026-09-16T17:45:14.508667Z",
+      "final_url": "https://www.jaguars.com/team/players-roster/",
+      "jersey_number": "21",
+      "position": "CB",
+      "profile_path": "/team/players-roster/christian-braswell/",
+      "raw_html_sha256": "e31b900d4a535e02266c2cc05005eb50d81cc8eece66fceae617fd943bd8509e",
+      "source_url": "https://www.jaguars.com/team/players-roster/",
+      "team": "JAX",
+      "visible_name": "Christian Braswell"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jakobi meyers",
+      "_selection_key_sha256": "0021a8e531ab97af6b022f4e2778f02dfce49cd479b12e070afcd0c7c1187932",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "meyers,jakobi",
+      "captured_at_utc": "2026-09-16T17:45:14.508667Z",
+      "final_url": "https://www.jaguars.com/team/players-roster/",
+      "jersey_number": "3",
+      "position": "WR",
+      "profile_path": "/team/players-roster/jakobi-meyers/",
+      "raw_html_sha256": "e31b900d4a535e02266c2cc05005eb50d81cc8eece66fceae617fd943bd8509e",
+      "source_url": "https://www.jaguars.com/team/players-roster/",
+      "team": "JAX",
+      "visible_name": "Jakobi Meyers"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "rayuan lane iii",
+      "_selection_key_sha256": "1656301e1302d4129c90195ebd3f097b1f3ac045b2c4a245abaa4e4c7270609e",
+      "_strata": [
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "lane,rayuan iii",
+      "captured_at_utc": "2026-09-16T17:45:14.508667Z",
+      "final_url": "https://www.jaguars.com/team/players-roster/",
+      "jersey_number": "25",
+      "position": "S",
+      "profile_path": "/team/players-roster/rayuan-lane-iii/",
+      "raw_html_sha256": "e31b900d4a535e02266c2cc05005eb50d81cc8eece66fceae617fd943bd8509e",
+      "source_url": "https://www.jaguars.com/team/players-roster/",
+      "team": "JAX",
+      "visible_name": "Rayuan Lane III"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "trebor pena",
+      "_selection_key_sha256": "b2d602b6eb3b84b8fab854e0283238a1129bb5eda3d36a25ca9e6cfdeae1501d",
+      "_strata": [
+        "query_grammar_stress"
+      ],
+      "_visible_query_grammar_valid": false,
+      "canonical_data_name": "pena,trebor",
+      "captured_at_utc": "2026-09-16T17:45:14.508667Z",
+      "final_url": "https://www.jaguars.com/team/players-roster/",
+      "jersey_number": "86",
+      "position": "WR",
+      "profile_path": "/team/players-roster/trebor-pena/",
+      "raw_html_sha256": "e31b900d4a535e02266c2cc05005eb50d81cc8eece66fceae617fd943bd8509e",
+      "source_url": "https://www.jaguars.com/team/players-roster/",
+      "team": "JAX",
+      "visible_name": "Trebor Pe\u00f1a"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "hunter nourzad",
+      "_selection_key_sha256": "033ce1d0e0406861e271bb47ff105b54ac933bb48d805f21704064482dd5f4c7",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "nourzad,hunter",
+      "captured_at_utc": "2026-09-16T17:45:14.887398Z",
+      "final_url": "https://www.chiefs.com/team/players-roster/",
+      "jersey_number": "64",
+      "position": "OL",
+      "profile_path": "/team/players-roster/hunter-nourzad/",
+      "raw_html_sha256": "502567dcdfd0e49965afd4dd9f88d29e59f57b5c187cd739266bfbc84d670fdc",
+      "source_url": "https://www.chiefs.com/team/players-roster/",
+      "team": "KC",
+      "visible_name": "Hunter Nourzad"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "kristian fulton",
+      "_selection_key_sha256": "011f44a9ca0273b0680d4095208dbf6fcef4486ca7ba6da59058aec2d865d875",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "fulton,kristian",
+      "captured_at_utc": "2026-09-16T17:45:14.887398Z",
+      "final_url": "https://www.chiefs.com/team/players-roster/",
+      "jersey_number": "8",
+      "position": "CB",
+      "profile_path": "/team/players-roster/kristian-fulton/",
+      "raw_html_sha256": "502567dcdfd0e49965afd4dd9f88d29e59f57b5c187cd739266bfbc84d670fdc",
+      "source_url": "https://www.chiefs.com/team/players-roster/",
+      "team": "KC",
+      "visible_name": "Kristian Fulton"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "henry smith",
+      "_selection_key_sha256": "17316d8fd622b35df660c7b21c935047919f31e8630811ffb9149cb9a53c3dab",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "smith,henry",
+      "captured_at_utc": "2026-09-16T17:45:14.887398Z",
+      "final_url": "https://www.chiefs.com/team/players-roster/",
+      "jersey_number": "65",
+      "position": "G",
+      "profile_path": "/team/players-roster/trey-smith/",
+      "raw_html_sha256": "502567dcdfd0e49965afd4dd9f88d29e59f57b5c187cd739266bfbc84d670fdc",
+      "source_url": "https://www.chiefs.com/team/players-roster/",
+      "team": "KC",
+      "visible_name": "Trey Smith"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "justin eboigbe",
+      "_selection_key_sha256": "117fcc03be1f46c4b793eb3dc2222ca936c9769a8ebeef08c5765d92f1d1ec87",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "eboigbe,justin",
+      "captured_at_utc": "2026-09-16T17:45:15.419389Z",
+      "final_url": "https://www.chargers.com/team/players-roster/",
+      "jersey_number": "92",
+      "position": "DL",
+      "profile_path": "/team/players-roster/justin-eboigbe/",
+      "raw_html_sha256": "cff692146e9510129413db7e92b908e44880755f6c9a0c66d12270278390b77e",
+      "source_url": "https://www.chargers.com/team/players-roster/",
+      "team": "LAC",
+      "visible_name": "Justin Eboigbe"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "keaton mitchell",
+      "_selection_key_sha256": "0fc51faba76afb8681f1e08ba8308d0438b8f09a857409d5d43c33083e93916a",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "mitchell,keaton",
+      "captured_at_utc": "2026-09-16T17:45:15.419389Z",
+      "final_url": "https://www.chargers.com/team/players-roster/",
+      "jersey_number": "34",
+      "position": "RB",
+      "profile_path": "/team/players-roster/keaton-mitchell/",
+      "raw_html_sha256": "cff692146e9510129413db7e92b908e44880755f6c9a0c66d12270278390b77e",
+      "source_url": "https://www.chargers.com/team/players-roster/",
+      "team": "LAC",
+      "visible_name": "Keaton Mitchell"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "dean connors",
+      "_selection_key_sha256": "04b61fee8f37ea9e58bb0404c0b31563d32890cb2073643379bc7df4c0bd2389",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "connors,dean",
+      "captured_at_utc": "2026-09-16T17:45:15.731242Z",
+      "final_url": "https://www.therams.com/team/players-roster/",
+      "jersey_number": "33",
+      "position": "RB",
+      "profile_path": "/team/players-roster/dean-connors/",
+      "raw_html_sha256": "145550775472ade24534b7796ca8ab9b6375b33277891125382eeca3c4a0af20",
+      "source_url": "https://www.therams.com/team/players-roster/",
+      "team": "LAR",
+      "visible_name": "Dean Connors"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "trent mcduffie",
+      "_selection_key_sha256": "03d7cf5ef1720ba412d22c8e60822cbc2a38af3318643a8e01bbcc8b0834a0bf",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "mcduffie,trent",
+      "captured_at_utc": "2026-09-16T17:45:15.731242Z",
+      "final_url": "https://www.therams.com/team/players-roster/",
+      "jersey_number": "22",
+      "position": "CB",
+      "profile_path": "/team/players-roster/trent-mcduffie/",
+      "raw_html_sha256": "145550775472ade24534b7796ca8ab9b6375b33277891125382eeca3c4a0af20",
+      "source_url": "https://www.therams.com/team/players-roster/",
+      "team": "LAR",
+      "visible_name": "Trent McDuffie"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "brandon cleveland",
+      "_selection_key_sha256": "093af8703086bef5fd94801239488aa486c8dc48be50c22010c455ea31b2b318",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "cleveland,brandon",
+      "captured_at_utc": "2026-09-16T17:45:15.185743Z",
+      "final_url": "https://www.raiders.com/team/players-roster/",
+      "jersey_number": "90",
+      "position": "DT",
+      "profile_path": "/team/players-roster/brandon-cleveland/",
+      "raw_html_sha256": "d57530e3cddbc8704123e6502ff57d508bc614d7e2f2aba128f7d1c3e2674df6",
+      "source_url": "https://www.raiders.com/team/players-roster/",
+      "team": "LV",
+      "visible_name": "Brandon Cleveland"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "michael washington jr.",
+      "_selection_key_sha256": "0a9c9d16171732f34ad18321b3685e6fea62a84b9c233638c98853fb391e3881",
+      "_strata": [
+        "coverage",
+        "source_name_variant",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "washington,michael jr.",
+      "captured_at_utc": "2026-09-16T17:45:15.185743Z",
+      "final_url": "https://www.raiders.com/team/players-roster/",
+      "jersey_number": "4",
+      "position": "RB",
+      "profile_path": "/team/players-roster/mike-washington-jr/",
+      "raw_html_sha256": "d57530e3cddbc8704123e6502ff57d508bc614d7e2f2aba128f7d1c3e2674df6",
+      "source_url": "https://www.raiders.com/team/players-roster/",
+      "team": "LV",
+      "visible_name": "Mike Washington Jr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "nicolas turner",
+      "_selection_key_sha256": "133793e6cbd5498fdca23a3b93a0b5b8518ad66df5f5e7f9491c9c7eca0686e2",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "turner,nicolas",
+      "captured_at_utc": "2026-09-16T17:45:15.932922Z",
+      "final_url": "https://www.miamidolphins.com/team/players-roster/",
+      "jersey_number": "87",
+      "position": "TE",
+      "profile_path": "/team/players-roster/cole-turner/",
+      "raw_html_sha256": "9a5f4fb1be24eee02314dc2bb4908ce71d3c93ce69939f2993337a3f3b8108c7",
+      "source_url": "https://www.miamidolphins.com/team/players-roster/",
+      "team": "MIA",
+      "visible_name": "Cole Turner"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jalen tolbert",
+      "_selection_key_sha256": "06d51e58c38180aa7e30d694a75df2ec40c4c0a5727133aaf1976e4ea3feadcd",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "tolbert,jalen",
+      "captured_at_utc": "2026-09-16T17:45:15.932922Z",
+      "final_url": "https://www.miamidolphins.com/team/players-roster/",
+      "jersey_number": "1",
+      "position": "WR",
+      "profile_path": "/team/players-roster/jalen-tolbert/",
+      "raw_html_sha256": "9a5f4fb1be24eee02314dc2bb4908ce71d3c93ce69939f2993337a3f3b8108c7",
+      "source_url": "https://www.miamidolphins.com/team/players-roster/",
+      "team": "MIA",
+      "visible_name": "Jalen Tolbert"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "kenneth grant",
+      "_selection_key_sha256": "047b3bb46dafb73c67b1216e422070d390bd06dbf61e8fb3ad0860f29c1e608b",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "grant,kenneth",
+      "captured_at_utc": "2026-09-16T17:45:15.932922Z",
+      "final_url": "https://www.miamidolphins.com/team/players-roster/",
+      "jersey_number": "78",
+      "position": "DL",
+      "profile_path": "/team/players-roster/kenneth-grant/",
+      "raw_html_sha256": "9a5f4fb1be24eee02314dc2bb4908ce71d3c93ce69939f2993337a3f3b8108c7",
+      "source_url": "https://www.miamidolphins.com/team/players-roster/",
+      "team": "MIA",
+      "visible_name": "Kenneth Grant"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "aaron jones sr.",
+      "_selection_key_sha256": "0cb10ebb91e56a6ed7ba24e288b39aedcf0b2db1a3d5cd1a63c5e9bcd3307e6f",
+      "_strata": [
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "jones,aaron sr.",
+      "captured_at_utc": "2026-09-16T17:45:16.214821Z",
+      "final_url": "https://www.vikings.com/team/players-roster/",
+      "jersey_number": "33",
+      "position": "RB",
+      "profile_path": "/team/players-roster/aaron-jones/",
+      "raw_html_sha256": "63cbb14b8dc5c0d8e2607f1ba635b2dd0b8c5c157a12bbca08e4eec621179011",
+      "source_url": "https://www.vikings.com/team/players-roster/",
+      "team": "MIN",
+      "visible_name": "Aaron Jones Sr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "naquan jones",
+      "_selection_key_sha256": "06c9daec1be4c8aee7e24290525cb93b47ce182b3a4f3ba648b017827eb98118",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "jones,naquan",
+      "captured_at_utc": "2026-09-16T17:45:16.214821Z",
+      "final_url": "https://www.vikings.com/team/players-roster/",
+      "jersey_number": "91",
+      "position": "DL",
+      "profile_path": "/team/players-roster/naquan-jones/",
+      "raw_html_sha256": "63cbb14b8dc5c0d8e2607f1ba635b2dd0b8c5c157a12bbca08e4eec621179011",
+      "source_url": "https://www.vikings.com/team/players-roster/",
+      "team": "MIN",
+      "visible_name": "Naquan Jones"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "ryan van demark",
+      "_selection_key_sha256": "02d43039e296b524486f81b3700e61ee8e6fa55600531bbba6f794617a3bdb3c",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "van demark,ryan",
+      "captured_at_utc": "2026-09-16T17:45:16.214821Z",
+      "final_url": "https://www.vikings.com/team/players-roster/",
+      "jersey_number": "72",
+      "position": "T",
+      "profile_path": "/team/players-roster/ryan-van-demark/",
+      "raw_html_sha256": "63cbb14b8dc5c0d8e2607f1ba635b2dd0b8c5c157a12bbca08e4eec621179011",
+      "source_url": "https://www.vikings.com/team/players-roster/",
+      "team": "MIN",
+      "visible_name": "Ryan Van Demark"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "gregory van roten",
+      "_selection_key_sha256": "041955f394f3548768275d1a3963448f8949a8ecb8bfc32d12077fb05908c76b",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "van roten,gregory",
+      "captured_at_utc": "2026-09-16T17:45:16.508951Z",
+      "final_url": "https://www.patriots.com/team/players-roster/",
+      "jersey_number": "70",
+      "position": "OL",
+      "profile_path": "/team/players-roster/greg-van-roten/",
+      "raw_html_sha256": "5b73f314075c0119fbbc493264c3811cb474dbf8a5a3511f4f0182fcefd80262",
+      "source_url": "https://www.patriots.com/team/players-roster/",
+      "team": "NE",
+      "visible_name": "Greg Van Roten"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "mackenzie hollins",
+      "_selection_key_sha256": "13affa3f5ba88c8bd1ea570b3a9671a0f7a0ad702c8b200722f2ac4755396768",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "hollins,mackenzie",
+      "captured_at_utc": "2026-09-16T17:45:16.508951Z",
+      "final_url": "https://www.patriots.com/team/players-roster/",
+      "jersey_number": "13",
+      "position": "WR",
+      "profile_path": "/team/players-roster/mack-hollins/",
+      "raw_html_sha256": "5b73f314075c0119fbbc493264c3811cb474dbf8a5a3511f4f0182fcefd80262",
+      "source_url": "https://www.patriots.com/team/players-roster/",
+      "team": "NE",
+      "visible_name": "Mack Hollins"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "namdi obiazor",
+      "_selection_key_sha256": "019b670db5791bc06e5da09ed8ddec87108fb98dce28f77d58bf03c19969ba3e",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "obiazor,namdi",
+      "captured_at_utc": "2026-09-16T17:45:16.508951Z",
+      "final_url": "https://www.patriots.com/team/players-roster/",
+      "jersey_number": "48",
+      "position": "LB",
+      "profile_path": "/team/players-roster/namdi-obiazor/",
+      "raw_html_sha256": "5b73f314075c0119fbbc493264c3811cb474dbf8a5a3511f4f0182fcefd80262",
+      "source_url": "https://www.patriots.com/team/players-roster/",
+      "team": "NE",
+      "visible_name": "Namdi Obiazor"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "audric estime",
+      "_selection_key_sha256": "5a9440213150df2e19f464c5686ba7813defeb1e7946984795409cc15f04c381",
+      "_strata": [
+        "query_grammar_stress"
+      ],
+      "_visible_query_grammar_valid": false,
+      "canonical_data_name": "estime,audric",
+      "captured_at_utc": "2026-09-16T17:45:16.804529Z",
+      "final_url": "https://www.neworleanssaints.com/team/players-roster/",
+      "jersey_number": "30",
+      "position": "RB",
+      "profile_path": "/team/players-roster/audric-estime/",
+      "raw_html_sha256": "8309bfc13f0726985bbace318c8523cf748d1978367a9952ea171bf60678df1c",
+      "source_url": "https://www.neworleanssaints.com/team/players-roster/",
+      "team": "NO",
+      "visible_name": "Audric Estim\u00e9"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "michael reid",
+      "_selection_key_sha256": "019debef3586e1b27ef529c9f8b00ebd761571dfbabd9b6e0f190ea58ad68351",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "reid,michael",
+      "captured_at_utc": "2026-09-16T17:45:16.804529Z",
+      "final_url": "https://www.neworleanssaints.com/team/players-roster/",
+      "jersey_number": "42",
+      "position": "S",
+      "profile_path": "/team/players-roster/michael-reid/",
+      "raw_html_sha256": "8309bfc13f0726985bbace318c8523cf748d1978367a9952ea171bf60678df1c",
+      "source_url": "https://www.neworleanssaints.com/team/players-roster/",
+      "team": "NO",
+      "visible_name": "Mike Reid"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "treyton welch",
+      "_selection_key_sha256": "04e470544b43ae920dd21b214773773c393ef098887bf1a214ad54e6e26fe2d0",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "welch,treyton",
+      "captured_at_utc": "2026-09-16T17:45:16.804529Z",
+      "final_url": "https://www.neworleanssaints.com/team/players-roster/",
+      "jersey_number": "82",
+      "position": "TE",
+      "profile_path": "/team/players-roster/treyton-welch/",
+      "raw_html_sha256": "8309bfc13f0726985bbace318c8523cf748d1978367a9952ea171bf60678df1c",
+      "source_url": "https://www.neworleanssaints.com/team/players-roster/",
+      "team": "NO",
+      "visible_name": "Treyton Welch"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "francis mauigoa",
+      "_selection_key_sha256": "aa223cf7422f7c7befdd5b9e706a6c1a0dec2e530202782c7e5bc57ee8a18f8f",
+      "_strata": [
+        "query_grammar_stress"
+      ],
+      "_visible_query_grammar_valid": false,
+      "canonical_data_name": "mauigoa,francis",
+      "captured_at_utc": "2026-09-16T17:45:16.957944Z",
+      "final_url": "https://www.giants.com/team/players-roster/",
+      "jersey_number": "65",
+      "position": "OL",
+      "profile_path": "/team/players-roster/francis-mauigoa/",
+      "raw_html_sha256": "5efb33c6c7e6b33060d1c46fa8bdd9b7ae83feebae896a0be5829568b6991f21",
+      "source_url": "https://www.giants.com/team/players-roster/",
+      "team": "NYG",
+      "visible_name": "Francis \"Sisi\" Mauigoa"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "geno vandemark",
+      "_selection_key_sha256": "13dff7892714d045f2d1da0cbc3c5850eb056116ba76d32b1d09fe061b899abe",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "vandemark,geno",
+      "captured_at_utc": "2026-09-16T17:45:16.957944Z",
+      "final_url": "https://www.giants.com/team/players-roster/",
+      "jersey_number": "69",
+      "position": "OL",
+      "profile_path": "/team/players-roster/geno-vandemark/",
+      "raw_html_sha256": "5efb33c6c7e6b33060d1c46fa8bdd9b7ae83feebae896a0be5829568b6991f21",
+      "source_url": "https://www.giants.com/team/players-roster/",
+      "team": "NYG",
+      "visible_name": "Geno VanDeMark"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jevon holland",
+      "_selection_key_sha256": "48e9eca83c327d15d446eb8728ac7f0b1542795f7f195ac0871d31d64cfa4465",
+      "_strata": [
+        "query_grammar_stress"
+      ],
+      "_visible_query_grammar_valid": false,
+      "canonical_data_name": "holland,jevon",
+      "captured_at_utc": "2026-09-16T17:45:16.957944Z",
+      "final_url": "https://www.giants.com/team/players-roster/",
+      "jersey_number": "8",
+      "position": "S",
+      "profile_path": "/team/players-roster/jevon-holland/",
+      "raw_html_sha256": "5efb33c6c7e6b33060d1c46fa8bdd9b7ae83feebae896a0be5829568b6991f21",
+      "source_url": "https://www.giants.com/team/players-roster/",
+      "team": "NYG",
+      "visible_name": "Jev\u00f3n Holland"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "najee harris",
+      "_selection_key_sha256": "124f03b1c176bb422716f329ecbfc2ac6a03e3e786a69d352f7093bed9dd249f",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "harris,najee",
+      "captured_at_utc": "2026-09-16T17:45:16.957944Z",
+      "final_url": "https://www.giants.com/team/players-roster/",
+      "jersey_number": "23",
+      "position": "RB",
+      "profile_path": "/team/players-roster/najee-harris/",
+      "raw_html_sha256": "5efb33c6c7e6b33060d1c46fa8bdd9b7ae83feebae896a0be5829568b6991f21",
+      "source_url": "https://www.giants.com/team/players-roster/",
+      "team": "NYG",
+      "visible_name": "Najee Harris"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "andrew beck",
+      "_selection_key_sha256": "0459de8999f1a9a10fb71c799f6e9cab32f2aab3b9b93fff46fe4fb6fcaed06b",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "beck,andrew",
+      "captured_at_utc": "2026-09-16T17:45:17.450392Z",
+      "final_url": "https://www.newyorkjets.com/team/players-roster/",
+      "jersey_number": "47",
+      "position": "FB",
+      "profile_path": "/team/players-roster/andrew-beck/",
+      "raw_html_sha256": "3a2111d82cddd4d910dfc697502f35d039bf51548a1fb28b1b380acf51c62306",
+      "source_url": "https://www.newyorkjets.com/team/players-roster/",
+      "team": "NYJ",
+      "visible_name": "Andrew Beck"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "timothy stephens",
+      "_selection_key_sha256": "108c2479fa1977d7713138211dea0c277bf2e1ba4f7012997faea6fa8072348a",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "stephens,timothy",
+      "captured_at_utc": "2026-09-16T17:45:17.450392Z",
+      "final_url": "https://www.newyorkjets.com/team/players-roster/",
+      "jersey_number": "21",
+      "position": "CB",
+      "profile_path": "/team/players-roster/brandon-stephens/",
+      "raw_html_sha256": "3a2111d82cddd4d910dfc697502f35d039bf51548a1fb28b1b380acf51c62306",
+      "source_url": "https://www.newyorkjets.com/team/players-roster/",
+      "team": "NYJ",
+      "visible_name": "Brandon Stephens"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "minkah fitzpatrick",
+      "_selection_key_sha256": "02839e0524c4909671bad6455fb250eaf8546691af9dfde260a34f3721fb3148",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "fitzpatrick,minkah",
+      "captured_at_utc": "2026-09-16T17:45:17.450392Z",
+      "final_url": "https://www.newyorkjets.com/team/players-roster/",
+      "jersey_number": "29",
+      "position": "S",
+      "profile_path": "/team/players-roster/minkah-fitzpatrick/",
+      "raw_html_sha256": "3a2111d82cddd4d910dfc697502f35d039bf51548a1fb28b1b380acf51c62306",
+      "source_url": "https://www.newyorkjets.com/team/players-roster/",
+      "team": "NYJ",
+      "visible_name": "Minkah Fitzpatrick"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "olumuyiwa fashanu",
+      "_selection_key_sha256": "1b357c1be745ee7a4a7475c0a316a204d326575e97ba262b01f9bdb936133fa4",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "fashanu,olumuyiwa",
+      "captured_at_utc": "2026-09-16T17:45:17.450392Z",
+      "final_url": "https://www.newyorkjets.com/team/players-roster/",
+      "jersey_number": "74",
+      "position": "OL",
+      "profile_path": "/team/players-roster/olumuyiwa-fashanu/",
+      "raw_html_sha256": "3a2111d82cddd4d910dfc697502f35d039bf51548a1fb28b1b380acf51c62306",
+      "source_url": "https://www.newyorkjets.com/team/players-roster/",
+      "team": "NYJ",
+      "visible_name": "Olu Fashanu"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "will mcdonald iv",
+      "_selection_key_sha256": "12a511560c5807e6c407e9b7298c2acf9e378f2199f82bca3c4a1babe6901add",
+      "_strata": [
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "mcdonald,will iv",
+      "captured_at_utc": "2026-09-16T17:45:17.450392Z",
+      "final_url": "https://www.newyorkjets.com/team/players-roster/",
+      "jersey_number": "9",
+      "position": "EDGE",
+      "profile_path": "/team/players-roster/will-mcdonald-iv/",
+      "raw_html_sha256": "3a2111d82cddd4d910dfc697502f35d039bf51548a1fb28b1b380acf51c62306",
+      "source_url": "https://www.newyorkjets.com/team/players-roster/",
+      "team": "NYJ",
+      "visible_name": "Will McDonald IV"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "andrew dalton",
+      "_selection_key_sha256": "108a78c8e0d683df554fdc2e8d2bbb439d5111e639368202ec22f7f517b9ac66",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "dalton,andrew",
+      "captured_at_utc": "2026-09-16T17:45:17.720240Z",
+      "final_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "jersey_number": "14",
+      "position": "QB",
+      "profile_path": "/team/players-roster/andy-dalton/",
+      "raw_html_sha256": "8639455fbd8027e6bd9b4a9d074add5950ba53cc8ec585842c2ecf7ebe19e828",
+      "source_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "team": "PHI",
+      "visible_name": "Andy Dalton"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jeremiah trotter jr.",
+      "_selection_key_sha256": "00c47b734624e236135ecc71141565437a100e8ad3096a91533e177219b75c0d",
+      "_strata": [
+        "coverage",
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "trotter,jeremiah jr.",
+      "captured_at_utc": "2026-09-16T17:45:17.720240Z",
+      "final_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "jersey_number": "54",
+      "position": "LB",
+      "profile_path": "/team/players-roster/jeremiah-trotter-jr/",
+      "raw_html_sha256": "8639455fbd8027e6bd9b4a9d074add5950ba53cc8ec585842c2ecf7ebe19e828",
+      "source_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "team": "PHI",
+      "visible_name": "Jeremiah Trotter Jr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "landon dickerson",
+      "_selection_key_sha256": "01c3204df92cf49825a867228ab8c5151fa6672c6d7c06f15d997f1c91294c4a",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "dickerson,landon",
+      "captured_at_utc": "2026-09-16T17:45:17.720240Z",
+      "final_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "jersey_number": "69",
+      "position": "G",
+      "profile_path": "/team/players-roster/landon-dickerson/",
+      "raw_html_sha256": "8639455fbd8027e6bd9b4a9d074add5950ba53cc8ec585842c2ecf7ebe19e828",
+      "source_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "team": "PHI",
+      "visible_name": "Landon Dickerson"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "david johnson",
+      "_selection_key_sha256": "033255a81551e85f10bd7fa598411d39b1cbc1e70e2a54110d8d6875c9e60560",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "johnson,david",
+      "captured_at_utc": "2026-09-16T17:45:17.720240Z",
+      "final_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "jersey_number": "65",
+      "position": "T",
+      "profile_path": "/team/players-roster/lane-johnson/",
+      "raw_html_sha256": "8639455fbd8027e6bd9b4a9d074add5950ba53cc8ec585842c2ecf7ebe19e828",
+      "source_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "team": "PHI",
+      "visible_name": "Lane Johnson"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "michael carter ii",
+      "_selection_key_sha256": "0b309aa9fd565ac94b7188946d5fd3e653e9dfc4e9d82695f81dad3e12ab8e20",
+      "_strata": [
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "carter,michael ii",
+      "captured_at_utc": "2026-09-16T17:45:17.720240Z",
+      "final_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "jersey_number": "35",
+      "position": "DB",
+      "profile_path": "/team/players-roster/michael-carter-ii/",
+      "raw_html_sha256": "8639455fbd8027e6bd9b4a9d074add5950ba53cc8ec585842c2ecf7ebe19e828",
+      "source_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "team": "PHI",
+      "visible_name": "Michael Carter II"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "tariq woolen",
+      "_selection_key_sha256": "17e7a6d988c9bf579215530c845bf83004dd8b91c4e9de4d41feb03448c0d022",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "woolen,tariq",
+      "captured_at_utc": "2026-09-16T17:45:17.720240Z",
+      "final_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "jersey_number": "2",
+      "position": "CB",
+      "profile_path": "/team/players-roster/riq-woolen/",
+      "raw_html_sha256": "8639455fbd8027e6bd9b4a9d074add5950ba53cc8ec585842c2ecf7ebe19e828",
+      "source_url": "https://www.philadelphiaeagles.com/team/players-roster/",
+      "team": "PHI",
+      "visible_name": "Riq Woolen"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "cameron heyward",
+      "_selection_key_sha256": "068c6da0252d100ac2d7edad69c3ecf36869a0e40c1d970a3fec318324bea06f",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "heyward,cameron",
+      "captured_at_utc": "2026-09-16T17:45:18.018097Z",
+      "final_url": "https://www.steelers.com/team/players-roster/",
+      "jersey_number": "97",
+      "position": "DT",
+      "profile_path": "/team/players-roster/cameron-heyward/",
+      "raw_html_sha256": "67d03adbd6bf1b3296ded118f80e890763bfe07d516b3c180209eb404fad4e26",
+      "source_url": "https://www.steelers.com/team/players-roster/",
+      "team": "PIT",
+      "visible_name": "Cameron Heyward"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "dekaylin metcalf",
+      "_selection_key_sha256": "0a67366f16ede539ce87322daf4dcfe529d6af477ea1f93bf0b074df95bfccc0",
+      "_strata": [
+        "source_name_variant",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "metcalf,dekaylin",
+      "captured_at_utc": "2026-09-16T17:45:18.018097Z",
+      "final_url": "https://www.steelers.com/team/players-roster/",
+      "jersey_number": "4",
+      "position": "WR",
+      "profile_path": "/team/players-roster/dk-metcalf/",
+      "raw_html_sha256": "67d03adbd6bf1b3296ded118f80e890763bfe07d516b3c180209eb404fad4e26",
+      "source_url": "https://www.steelers.com/team/players-roster/",
+      "team": "PIT",
+      "visible_name": "DK Metcalf"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "armentae elliott",
+      "_selection_key_sha256": "05d952f0ecbd5e288bf600e4109c617bf1fe2a4d8a8575d2ec8e6eb0cffd335d",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "elliott,armentae",
+      "captured_at_utc": "2026-09-16T17:45:18.018097Z",
+      "final_url": "https://www.steelers.com/team/players-roster/",
+      "jersey_number": "25",
+      "position": "S",
+      "profile_path": "/team/players-roster/deshon-elliott/",
+      "raw_html_sha256": "67d03adbd6bf1b3296ded118f80e890763bfe07d516b3c180209eb404fad4e26",
+      "source_url": "https://www.steelers.com/team/players-roster/",
+      "team": "PIT",
+      "visible_name": "DeShon Elliott"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "allister finley",
+      "_selection_key_sha256": "0b44cb88939af2d900c8a53dff29136c14bcb1c9d5c9dad2c09c66290e769b78",
+      "_strata": [
+        "source_name_variant",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "finley,allister",
+      "captured_at_utc": "2026-09-16T17:45:18.302995Z",
+      "final_url": "https://www.seahawks.com/team/players-roster/",
+      "jersey_number": "30",
+      "position": "S",
+      "profile_path": "/team/players-roster/aj-finley/",
+      "raw_html_sha256": "2128b4423c8feda5bf08bd333197a1525e37f1f046e2178e9627ec3afd63c0b8",
+      "source_url": "https://www.seahawks.com/team/players-roster/",
+      "team": "SEA",
+      "visible_name": "AJ Finley"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jason myers",
+      "_selection_key_sha256": "01a78b06cc2974789126cf3cac2f70591a85d37a91f1f8a288ebaeb8a19ad103",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "myers,jason",
+      "captured_at_utc": "2026-09-16T17:45:18.302995Z",
+      "final_url": "https://www.seahawks.com/team/players-roster/",
+      "jersey_number": "5",
+      "position": "K",
+      "profile_path": "/team/players-roster/jason-myers/",
+      "raw_html_sha256": "2128b4423c8feda5bf08bd333197a1525e37f1f046e2178e9627ec3afd63c0b8",
+      "source_url": "https://www.seahawks.com/team/players-roster/",
+      "team": "SEA",
+      "visible_name": "Jason Myers"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "tyler okada",
+      "_selection_key_sha256": "00ca2a8f1bc3211efbfff87c11c9a9fefb850ba43c3f6f7afa2923df07e74f31",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "okada,tyler",
+      "captured_at_utc": "2026-09-16T17:45:18.302995Z",
+      "final_url": "https://www.seahawks.com/team/players-roster/",
+      "jersey_number": "39",
+      "position": "S",
+      "profile_path": "/team/players-roster/ty-okada/",
+      "raw_html_sha256": "2128b4423c8feda5bf08bd333197a1525e37f1f046e2178e9627ec3afd63c0b8",
+      "source_url": "https://www.seahawks.com/team/players-roster/",
+      "team": "SEA",
+      "visible_name": "Ty Okada"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "eddy pineiro",
+      "_selection_key_sha256": "46988b8aad490f41c137f1f3502578b5a870016600f62a58c41b80cb697ea07f",
+      "_strata": [
+        "query_grammar_stress"
+      ],
+      "_visible_query_grammar_valid": false,
+      "canonical_data_name": "pineiro,eddy",
+      "captured_at_utc": "2026-09-16T17:45:18.641371Z",
+      "final_url": "https://www.49ers.com/team/players-roster/",
+      "jersey_number": "18",
+      "position": "K",
+      "profile_path": "/team/players-roster/eddy-pineiro/",
+      "raw_html_sha256": "6e2f0b8617f4f850fd9b60b5ce3fdd93876f377a66738b2250baf643ac9f6f67",
+      "source_url": "https://www.49ers.com/team/players-roster/",
+      "team": "SF",
+      "visible_name": "Eddy Pi\u00f1eiro"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "enrique cruz jr.",
+      "_selection_key_sha256": "07513a1dea2ec2bf9c581ed1e825fff43c47cfed1baa808fa18644163151767a",
+      "_strata": [
+        "source_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "cruz,enrique jr.",
+      "captured_at_utc": "2026-09-16T17:45:18.641371Z",
+      "final_url": "https://www.49ers.com/team/players-roster/",
+      "jersey_number": "69",
+      "position": "OL",
+      "profile_path": "/team/players-roster/enrique-cruz/",
+      "raw_html_sha256": "6e2f0b8617f4f850fd9b60b5ce3fdd93876f377a66738b2250baf643ac9f6f67",
+      "source_url": "https://www.49ers.com/team/players-roster/",
+      "team": "SF",
+      "visible_name": "Enrique Cruz Jr."
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jonathan weeks",
+      "_selection_key_sha256": "0236b1d488690bc167184ecdc9d3c616426e84dd65a20f3ceb36cbc51a789db6",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "weeks,jonathan",
+      "captured_at_utc": "2026-09-16T17:45:18.641371Z",
+      "final_url": "https://www.49ers.com/team/players-roster/",
+      "jersey_number": "46",
+      "position": "LS",
+      "profile_path": "/team/players-roster/jon-weeks/",
+      "raw_html_sha256": "6e2f0b8617f4f850fd9b60b5ce3fdd93876f377a66738b2250baf643ac9f6f67",
+      "source_url": "https://www.49ers.com/team/players-roster/",
+      "team": "SF",
+      "visible_name": "Jon Weeks"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "marques sigle",
+      "_selection_key_sha256": "00315d9061d323be34643a9086aac194f97ff403ee7590a0d561dd58d92b1a70",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "sigle,marques",
+      "captured_at_utc": "2026-09-16T17:45:18.641371Z",
+      "final_url": "https://www.49ers.com/team/players-roster/",
+      "jersey_number": "36",
+      "position": "S",
+      "profile_path": "/team/players-roster/marques-sigle/",
+      "raw_html_sha256": "6e2f0b8617f4f850fd9b60b5ce3fdd93876f377a66738b2250baf643ac9f6f67",
+      "source_url": "https://www.49ers.com/team/players-roster/",
+      "team": "SF",
+      "visible_name": "Marques Sigle"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "nicholas bosa",
+      "_selection_key_sha256": "05f2bb0757237fc503da3adc0e1ff4c955df96e61aaad6486a1f9c5c0e8afe85",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "bosa,nicholas",
+      "captured_at_utc": "2026-09-16T17:45:18.641371Z",
+      "final_url": "https://www.49ers.com/team/players-roster/",
+      "jersey_number": "97",
+      "position": "DL",
+      "profile_path": "/team/players-roster/nick-bosa/",
+      "raw_html_sha256": "6e2f0b8617f4f850fd9b60b5ce3fdd93876f377a66738b2250baf643ac9f6f67",
+      "source_url": "https://www.49ers.com/team/players-roster/",
+      "team": "SF",
+      "visible_name": "Nick Bosa"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "alexander anzalone",
+      "_selection_key_sha256": "15e362a8dfd80dc3dcffee9da498e89a12b80076b8e0166c3854ccd5ceba433f",
+      "_strata": [
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "anzalone,alexander",
+      "captured_at_utc": "2026-09-16T17:45:18.910203Z",
+      "final_url": "https://www.buccaneers.com/team/players-roster/",
+      "jersey_number": "34",
+      "position": "LB",
+      "profile_path": "/team/players-roster/alex-anzalone/",
+      "raw_html_sha256": "c8962d9b778f4cbaa11e320115b1ef33f9295757fe9e40a350a06560fed4f073",
+      "source_url": "https://www.buccaneers.com/team/players-roster/",
+      "team": "TB",
+      "visible_name": "Alex Anzalone"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "emeka egbuka",
+      "_selection_key_sha256": "0957ca82e8b1973677c67ae561de46e1878bbf19e74334f06bb1103ea427ca12",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "egbuka,emeka",
+      "captured_at_utc": "2026-09-16T17:45:18.910203Z",
+      "final_url": "https://www.buccaneers.com/team/players-roster/",
+      "jersey_number": "2",
+      "position": "WR",
+      "profile_path": "/team/players-roster/emeka-egbuka/",
+      "raw_html_sha256": "c8962d9b778f4cbaa11e320115b1ef33f9295757fe9e40a350a06560fed4f073",
+      "source_url": "https://www.buccaneers.com/team/players-roster/",
+      "team": "TB",
+      "visible_name": "Emeka Egbuka"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "rakeem nunez-roches",
+      "_selection_key_sha256": "59c9e1b2fa0ab1fa16e4659ba7789d6e864ea3e6e6befda07fff8179bcbc5a5a",
+      "_strata": [
+        "query_grammar_stress"
+      ],
+      "_visible_query_grammar_valid": false,
+      "canonical_data_name": "nunez-roches,rakeem",
+      "captured_at_utc": "2026-09-16T17:45:18.910203Z",
+      "final_url": "https://www.buccaneers.com/team/players-roster/",
+      "jersey_number": "56",
+      "position": "DL",
+      "profile_path": "/team/players-roster/rakeem-nunez-roches/",
+      "raw_html_sha256": "c8962d9b778f4cbaa11e320115b1ef33f9295757fe9e40a350a06560fed4f073",
+      "source_url": "https://www.buccaneers.com/team/players-roster/",
+      "team": "TB",
+      "visible_name": "Rakeem Nu\u00f1ez-Roches"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "keyonteze johnson",
+      "_selection_key_sha256": "0940f0771110876e78bbac800d350c6f8ef61ad656d5b5b22c4a72784f8d1efb",
+      "_strata": [
+        "coverage",
+        "canonical_name_variant"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "johnson,keyonteze",
+      "captured_at_utc": "2026-09-16T17:45:18.910203Z",
+      "final_url": "https://www.buccaneers.com/team/players-roster/",
+      "jersey_number": "15",
+      "position": "WR",
+      "profile_path": "/team/players-roster/tez-johnson/",
+      "raw_html_sha256": "c8962d9b778f4cbaa11e320115b1ef33f9295757fe9e40a350a06560fed4f073",
+      "source_url": "https://www.buccaneers.com/team/players-roster/",
+      "team": "TB",
+      "visible_name": "Tez Johnson"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "julius chestnut",
+      "_selection_key_sha256": "0a712480ba0d26c99b9345972dfe2e90f69cf3525f3de589ce231367cd993268",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "chestnut,julius",
+      "captured_at_utc": "2026-09-16T17:45:19.135468Z",
+      "final_url": "https://www.tennesseetitans.com/team/players-roster/",
+      "jersey_number": "36",
+      "position": "RB",
+      "profile_path": "/team/players-roster/julius-chestnut/",
+      "raw_html_sha256": "a6097981736395d9d9b42f841a76d919007471f9a0a6c2feaa2af72206af1ff0",
+      "source_url": "https://www.tennesseetitans.com/team/players-roster/",
+      "team": "TEN",
+      "visible_name": "Julius Chestnut"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "laki tasi",
+      "_selection_key_sha256": "038942fa889f2c2b4fb34f5c48ad748adc40b5ed555a8a279e7e3d80dffefb39",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "tasi,laki",
+      "captured_at_utc": "2026-09-16T17:45:19.135468Z",
+      "final_url": "https://www.tennesseetitans.com/team/players-roster/",
+      "jersey_number": "68",
+      "position": "DT",
+      "profile_path": "/team/players-roster/laki-tasi/",
+      "raw_html_sha256": "a6097981736395d9d9b42f841a76d919007471f9a0a6c2feaa2af72206af1ff0",
+      "source_url": "https://www.tennesseetitans.com/team/players-roster/",
+      "team": "TEN",
+      "visible_name": "Laki Tasi"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "byron cowart",
+      "_selection_key_sha256": "0358b1fb77ee1bb791a0b9defde71d6d8bbb07eab10db80364b0520184996d1d",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "cowart,byron",
+      "captured_at_utc": "2026-09-16T17:45:19.592982Z",
+      "final_url": "https://www.commanders.com/team/players-roster/",
+      "jersey_number": "55",
+      "position": "DT",
+      "profile_path": "/team/players-roster/byron-cowart/",
+      "raw_html_sha256": "f66fb80de1d2792d2c6331026e8e71fd419cf33a4cbba30c35255230ee15a1df",
+      "source_url": "https://www.commanders.com/team/players-roster/",
+      "team": "WAS",
+      "visible_name": "Byron Cowart"
+    },
+    {
+      "_canonical_query_grammar_valid": true,
+      "_canonical_query_name": "jeremy reaves",
+      "_selection_key_sha256": "00c540b6397b0504c74a1016934c07a6824cc8e25d8f7c3cb44c3ec74110e0da",
+      "_strata": [
+        "coverage"
+      ],
+      "_visible_query_grammar_valid": true,
+      "canonical_data_name": "reaves,jeremy",
+      "captured_at_utc": "2026-09-16T17:45:19.592982Z",
+      "final_url": "https://www.commanders.com/team/players-roster/",
+      "jersey_number": "39",
+      "position": "S",
+      "profile_path": "/team/players-roster/jeremy-reaves/",
+      "raw_html_sha256": "f66fb80de1d2792d2c6331026e8e71fd419cf33a4cbba30c35255230ee15a1df",
+      "source_url": "https://www.commanders.com/team/players-roster/",
+      "team": "WAS",
+      "visible_name": "Jeremy Reaves"
+    }
+  ]
+}
