@@ -39,6 +39,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "scripts/verify_fst_reconstruction_evidence.py",
         "scripts/build_expected_lineup_impacts.py",
         "scripts/reconstruct_2025_availability.py",
+        "scripts/run_props_research_beta.py",
         "research/experiments.json",
         "research/fst/F-ST-01-FROZEN-2026.json",
         "research/player_impact/EXPECTED_LINEUP_CONTRACT.md",
