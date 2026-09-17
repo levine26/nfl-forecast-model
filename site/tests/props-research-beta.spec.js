@@ -12,6 +12,8 @@ for (const width of [390,1440]) {
     const fairLine=page.getByText('LEVLINE FAIR LINE').first()
     if (fixtureRequired || await fairLine.isVisible().catch(()=>false)) {
       await expect(fairLine).toBeVisible()
+      await expect(page.getByText('Market Line').first()).toBeVisible()
+      await expect(page.getByText('Line Difference').first()).toBeVisible()
       await expect(page.getByText('Puka Nacua')).toBeVisible()
       await expect(page.getByText('NO SIGNAL').first()).toBeVisible()
     } else {
