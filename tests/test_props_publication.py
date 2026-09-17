@@ -187,3 +187,12 @@ def test_public_contract_preserves_extended_td_and_raw_market_fields():
     assert public["model"]["probability_2_plus_td"] == pytest.approx(0.21)
     assert public["model"]["td_count_distribution"]["2"] == pytest.approx(0.21)
     assert public["market"]["raw_implied_probability"] == pytest.approx(0.55)
+
+
+def test_market_capture_after_forecast_timestamp_fails_closed():
+    row = deepcopy(artifact()["forecasts"][0])
+    row["market"]["captured_utc"] = "2026-09-17T21:05:00+00:00"
+    row["forecast_timestamp_utc"] = "2026-09-17T20:55:00+00:00"
+    public = normalize_public_forecast(row, now_utc=NOW)
+    assert public["signal_state"] == "NO SIGNAL"
+    assert "market_after_forecast" in public["unavailable_reasons"]
