@@ -10,6 +10,14 @@ on:
       - 'tests/test_challenger_props_simulation.py'
       - 'research/props/**'
       - '.github/workflows/research_props_integration.yml'
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/props_*.py'
+      - 'src/nfl_forecast/challenger_props_simulation.py'
+      - 'tests/test_props_*.py'
+      - 'tests/test_challenger_props_simulation.py'
+      - 'research/props/**'
+      - '.github/workflows/research_props_integration.yml'
   workflow_dispatch:
 
 permissions:
