@@ -251,7 +251,41 @@ def validate_game_input(game: GameSimulationInput) -> None:
             f"{team.team}.residual_yards_per_reception",
         )
         _nonnegative(team.residual_yards_per_carry, f"{team.team}.residual_yards_per_carry")
+        for alpha_name, beta_name in (
+            ("offensive_plays_gamma_shape", "offensive_plays_gamma_rate"),
+            ("dropback_rate_alpha", "dropback_rate_beta"),
+            ("targetable_attempt_alpha", "targetable_attempt_beta"),
+        ):
+            alpha_value = getattr(team, alpha_name)
+            beta_value = getattr(team, beta_name)
+            if (alpha_value is None) != (beta_value is None):
+                raise SimulationInputError(
+                    f"{team.team}.{alpha_name}/{beta_name} must be supplied together"
+                )
+            if alpha_value is not None:
+                if _nonnegative(alpha_value, f"{team.team}.{alpha_name}") <= 0.0:
+                    raise SimulationInputError(f"{team.team}.{alpha_name} must be positive")
+                if _nonnegative(beta_value, f"{team.team}.{beta_name}") <= 0.0:
+                    raise SimulationInputError(f"{team.team}.{beta_name} must be positive")
+        outcome_alpha = (
+            team.pass_attempt_outcome_alpha,
+            team.sack_outcome_alpha,
+            team.scramble_outcome_alpha,
+        )
+        supplied_outcome = [value is not None for value in outcome_alpha]
+        if any(supplied_outcome) and not all(supplied_outcome):
+            raise SimulationInputError(
+                f"{team.team} dropback outcome concentrations must be supplied together"
+            )
+        for name, value in zip(
+            ("pass_attempt_outcome_alpha", "sack_outcome_alpha", "scramble_outcome_alpha"),
+            outcome_alpha,
+            strict=True,
+        ):
+            if value is not None and _nonnegative(value, f"{team.team}.{name}") <= 0.0:
+                raise SimulationInputError(f"{team.team}.{name} must be positive")
 
+    primary_qb_by_team: dict[str, int] = {team_code: 0 for team_code in team_map}
     for player in game.players:
         pid = str(player.player_id).strip()
         if not pid or pid.lower() in {"nan", "none", "<na>"}:
@@ -268,6 +302,10 @@ def validate_game_input(game: GameSimulationInput) -> None:
             raise SimulationInputError(f"team/opponent mismatch for {pid}")
         if not str(player.data_quality_state).strip():
             raise SimulationInputError(f"data_quality_state is required for {pid}")
+        if player.is_primary_qb:
+            if position != "QB":
+                raise SimulationInputError(f"is_primary_qb requires QB position for {pid}")
+            primary_qb_by_team[player.team] += 1
         for field_name in (
             "availability_probability",
             "pass_attempt_share",
@@ -276,17 +314,57 @@ def validate_game_input(game: GameSimulationInput) -> None:
             "carry_share",
             "receiving_td_share",
             "rushing_td_share",
+            "route_participation",
         ):
             _probability(getattr(player, field_name), f"{pid}.{field_name}")
+        if player.passing_td_share is not None:
+            _probability(player.passing_td_share, f"{pid}.passing_td_share")
         for field_name in (
             "receiving_yards_per_reception",
             "rushing_yards_per_carry",
             "receiving_yards_shape_per_reception",
             "rushing_yards_shape_per_carry",
+            "receiving_yards_per_reception_mean_se",
+            "rushing_yards_per_carry_mean_se",
+            "yards_per_completion_mean_se",
         ):
             value = _nonnegative(getattr(player, field_name), f"{pid}.{field_name}")
             if "shape" in field_name and value <= 0:
                 raise SimulationInputError(f"{pid}.{field_name} must be positive")
+        for field_name in (
+            "receiving_yards_per_reception_event_sd",
+            "rushing_yards_per_carry_event_sd",
+            "yards_per_completion_mean",
+            "yards_per_completion_event_sd",
+            "designed_carry_share_alpha",
+            "target_share_alpha",
+            "passing_td_allocation_alpha",
+            "receiving_td_allocation_alpha",
+            "rushing_td_allocation_alpha",
+        ):
+            value = getattr(player, field_name)
+            if value is not None:
+                _nonnegative(value, f"{pid}.{field_name}")
+        for alpha_name, beta_name in (
+            ("route_participation_alpha", "route_participation_beta"),
+            ("catch_alpha", "catch_beta"),
+            ("completion_alpha", "completion_beta"),
+        ):
+            alpha_value = getattr(player, alpha_name)
+            beta_value = getattr(player, beta_name)
+            if (alpha_value is None) != (beta_value is None):
+                raise SimulationInputError(
+                    f"{pid}.{alpha_name}/{beta_name} must be supplied together"
+                )
+            if alpha_value is not None:
+                if _nonnegative(alpha_value, f"{pid}.{alpha_name}") <= 0.0:
+                    raise SimulationInputError(f"{pid}.{alpha_name} must be positive")
+                if _nonnegative(beta_value, f"{pid}.{beta_name}") <= 0.0:
+                    raise SimulationInputError(f"{pid}.{beta_name} must be positive")
+
+    for team_code, primary_count in primary_qb_by_team.items():
+        if primary_count > 1:
+            raise SimulationInputError(f"{team_code} has multiple primary QBs")
 
     for team_code in team_map:
         roster = [p for p in game.players if p.team == team_code]
