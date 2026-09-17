@@ -76,6 +76,7 @@ ALLOWED_EXACT = {
     "tests/test_props_opportunity_handoff.py",
     "tests/test_props_market.py",
     "tests/test_props_market_odds_api.py",
+    "tests/test_props_runner.py",
     "tests/test_props_player_state.py",
     "tests/test_props_player_sources.py",
 }
