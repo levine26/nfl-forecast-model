@@ -217,6 +217,9 @@ def test_integrated_synthetic_game_generates_required_research_beta_markets():
     assert qb_pass["model"]["over_probability"] + qb_pass["model"]["under_probability"] + qb_pass["model"]["push_probability"] == pytest.approx(1.0)
     assert qb_pass["market"]["raw_implied_over_probability"] is not None
     assert qb_pass["market"]["no_vig_over_probability"] is not None
+    qb_td = index[("qb-a", "passing_tds")]
+    assert qb_td["model"]["td_count_distribution"]
+    assert 0 <= qb_td["model"]["probability_2_plus_td"] <= qb_td["model"]["probability_1_plus_td"]
 
     rb_td = index[("rb-a1", "rushing_td")]
     assert rb_td["market"]["underlying_count_line"] == .5
@@ -232,6 +235,9 @@ def test_integrated_synthetic_game_generates_required_research_beta_markets():
     public_index = {(row["player_id"], row["prop_type"]): row for row in public["forecasts"]}
     assert public_index[("qb-a", "passing_yards")]["model"]["fair_line"] == qb_pass["model"]["fair_line"]
     assert public_index[("rb-a1", "rushing_td")]["model"]["td_probability"] == rb_td["model"]["td_probability"]
+    assert public_index[("rb-a1", "rushing_td")]["model"]["probability_2_plus_td"] == rb_td["model"]["probability_2_plus_td"]
+    assert public_index[("qb-a", "passing_tds")]["model"]["td_count_distribution"]
+    assert public_index[("qb-a", "passing_yards")]["market"]["raw_implied_over_probability"] is not None
 
 
 def test_non_half_rushing_td_count_market_fails_closed_for_binary_card():
