@@ -52,6 +52,15 @@ class TeamSimulationInput:
     residual_catch_rate: float
     residual_yards_per_reception: float
     residual_yards_per_carry: float
+    offensive_plays_gamma_shape: float | None = None
+    offensive_plays_gamma_rate: float | None = None
+    dropback_rate_alpha: float | None = None
+    dropback_rate_beta: float | None = None
+    pass_attempt_outcome_alpha: float | None = None
+    sack_outcome_alpha: float | None = None
+    scramble_outcome_alpha: float | None = None
+    targetable_attempt_alpha: float | None = None
+    targetable_attempt_beta: float | None = None
 
 
 @dataclass(frozen=True)
@@ -73,6 +82,27 @@ class PlayerSimulationInput:
     data_quality_state: str
     receiving_yards_shape_per_reception: float = 2.0
     rushing_yards_shape_per_carry: float = 2.0
+    route_participation: float = 1.0
+    route_participation_alpha: float | None = None
+    route_participation_beta: float | None = None
+    designed_carry_share_alpha: float | None = None
+    target_share_alpha: float | None = None
+    catch_alpha: float | None = None
+    catch_beta: float | None = None
+    receiving_yards_per_reception_event_sd: float | None = None
+    receiving_yards_per_reception_mean_se: float = 0.0
+    rushing_yards_per_carry_event_sd: float | None = None
+    rushing_yards_per_carry_mean_se: float = 0.0
+    passing_td_share: float | None = None
+    passing_td_allocation_alpha: float | None = None
+    receiving_td_allocation_alpha: float | None = None
+    rushing_td_allocation_alpha: float | None = None
+    completion_alpha: float | None = None
+    completion_beta: float | None = None
+    yards_per_completion_mean: float | None = None
+    yards_per_completion_event_sd: float | None = None
+    yards_per_completion_mean_se: float = 0.0
+    is_primary_qb: bool = False
 
 
 @dataclass(frozen=True)
@@ -284,6 +314,55 @@ def _weights_with_residual(base_shares: np.ndarray, active: np.ndarray) -> np.nd
     return weights
 
 
+def _sample_beta_or_fixed(
+    alpha: float | None,
+    beta: float | None,
+    fixed: float,
+    n: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    if alpha is None and beta is None:
+        return np.full(n, float(fixed), dtype=float)
+    if alpha is None or beta is None:
+        raise SimulationInputError("Beta posterior requires both alpha and beta")
+    return rng.beta(float(alpha), float(beta), size=n)
+
+
+def _sample_weights_with_residual(
+    base_shares: np.ndarray,
+    active: np.ndarray,
+    allocation_alpha: np.ndarray,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    alphas = np.asarray(allocation_alpha, dtype=float)
+    if not np.any(alphas > 0.0):
+        return _weights_with_residual(base_shares, active)
+    if np.any(alphas < 0.0) or np.any(~np.isfinite(alphas)):
+        raise SimulationInputError("allocation concentrations must be finite and nonnegative")
+
+    modeled_share = float(np.sum(base_shares))
+    modeled_alpha = float(np.sum(alphas))
+    residual_share = max(0.0, 1.0 - modeled_share)
+    residual_alpha = (
+        modeled_alpha * residual_share / modeled_share
+        if modeled_share > 0.0 and residual_share > 0.0
+        else 0.0
+    )
+    params = np.concatenate([alphas, np.array([residual_alpha], dtype=float)])
+    draws = np.zeros((active.shape[0], len(params)), dtype=float)
+    for j, value in enumerate(params):
+        if value > 0.0:
+            draws[:, j] = rng.gamma(shape=value, scale=1.0, size=active.shape[0])
+        elif j == len(params) - 1 and residual_share > 0.0:
+            draws[:, j] = residual_share
+        elif j < len(base_shares):
+            draws[:, j] = base_shares[j]
+    draws[:, :-1] *= active
+    empty = draws.sum(axis=1) <= 0.0
+    draws[empty, -1] = 1.0
+    return draws
+
+
 def _allocate_counts(
     totals: np.ndarray,
     weights: np.ndarray,
@@ -358,15 +437,36 @@ def _compound_yards(
     mean_per_event: float,
     shape_per_event: float,
     rng: np.random.Generator,
+    *,
+    event_sd: float | None = None,
+    mean_se: float = 0.0,
 ) -> np.ndarray:
     counts = np.asarray(counts, dtype=np.int64)
+    mean_per_event = float(mean_per_event)
+    mean_se = float(mean_se)
     if mean_per_event <= 0.0:
         return np.zeros_like(counts)
-    shapes = counts.astype(float) * float(shape_per_event)
-    scales = float(mean_per_event) / float(shape_per_event)
+
+    latent_mean = (
+        np.maximum(rng.normal(mean_per_event, mean_se, size=len(counts)), 0.0)
+        if mean_se > 0.0
+        else np.full(len(counts), mean_per_event, dtype=float)
+    )
     values = np.zeros(len(counts), dtype=float)
-    positive = shapes > 0
-    values[positive] = rng.gamma(shapes[positive], scales)
+    if event_sd is not None and float(event_sd) > 0.0:
+        sd = float(event_sd)
+        positive = (counts > 0) & (latent_mean > 0.0)
+        aggregate_shape = np.zeros(len(counts), dtype=float)
+        aggregate_scale = np.zeros(len(counts), dtype=float)
+        aggregate_shape[positive] = counts[positive] * np.square(latent_mean[positive] / sd)
+        aggregate_scale[positive] = np.square(sd) / latent_mean[positive]
+        values[positive] = rng.gamma(aggregate_shape[positive], aggregate_scale[positive])
+    else:
+        shapes = counts.astype(float) * float(shape_per_event)
+        positive = (shapes > 0.0) & (latent_mean > 0.0)
+        scales = np.zeros(len(counts), dtype=float)
+        scales[positive] = latent_mean[positive] / float(shape_per_event)
+        values[positive] = rng.gamma(shapes[positive], scales[positive])
     return np.rint(np.maximum(values, 0.0)).astype(np.int64)
 
 
