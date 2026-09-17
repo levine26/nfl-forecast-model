@@ -1,0 +1,142 @@
+{
+  "authority_if_and_only_if_all_v6_gates_pass": {
+    "ari_az_team_alias_qualified_for_frozen_v6_population": "conditional_capability_evidence",
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "game_day_membership_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "multiple_candidate_tiebreak_qualified_for_frozen_v6_population": "conditional_capability_evidence",
+    "ngs_endpoint_as_independent_or_stable_production_api_qualified": false,
+    "ngs_is_independent_player_identity_ground_truth": false,
+    "ngs_public_page_browser_context_transport_qualified_for_frozen_v6_population": true,
+    "ngs_repaired_name_team_resolver_qualified_for_frozen_v6_population": true,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": true,
+    "player_value_join_authorized": false,
+    "production_authorized": false,
+    "query_fallback_semantics_qualified_for_frozen_v6_population": "conditional_capability_evidence",
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "authority_if_any_v6_gate_fails": {
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "ngs_public_page_browser_context_transport_qualified_for_frozen_v6_population": false,
+    "ngs_repaired_name_team_resolver_qualified_for_frozen_v6_population": false,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": false,
+    "production_authorized": false,
+    "required_next_action": "Freeze the first V6 result; any changed target selection, browser context, query cascade, team equivalence, name key, tiebreak, independent corroboration gate, timeout, threshold, source, or retry behavior requires a new preregistered version.",
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "browser_transport": {
+    "browser_storage_state_must_not_be_persisted": true,
+    "context_locale": "en-US",
+    "context_user_agent": "LevLine-Research/1.0 (+https://github.com/levine26/nfl-forecast-model)",
+    "cookie_or_browser_state_export_allowed": false,
+    "direct_http_fallback_allowed": false,
+    "engine": "playwright chromium headless",
+    "explicit_retry_allowed": false,
+    "manual_headers_or_credentials_allowed": false,
+    "maximum_query_attempts_per_target": 3,
+    "page_load_timeout_ms": 60000,
+    "page_load_wait_until": "domcontentloaded",
+    "page_url": "https://ngs.nfl.com/player-id-lookup",
+    "post_load_settle_ms": 1500,
+    "query_cascade": [
+      {"name":"exact_visible_name","order":1,"rule":"Fill exact source visible_name and press Enter once."},
+      {"condition":"Only if prior response is HTTP 200 parseable players array with length 0 and stripping one terminal suffix token changes the query.","name":"terminal_suffix_stripped","order":2,"rule":"Remove exactly one terminal suffix token and surrounding whitespace; press Enter once.","suffix_tokens":["Jr.","Jr","Sr.","Sr","II","III","IV","V"]},
+      {"condition":"Only if every prior response is HTTP 200 parseable players array with length 0.","name":"surname_only","order":3,"rule":"From the suffix-stripped source visible_name, use the final whitespace-delimited token after trimming punctuation at token edges; minimum 3 alphanumeric characters; press Enter once."}
+    ],
+    "query_input_placeholder_exact": "Search By Name (min 3 chars)",
+    "raw_response_bytes_must_be_preserved": true,
+    "response_timeout_ms": 15000,
+    "stop_rule": "Stop at the first HTTP 200 parseable players array with length > 0. Do not broaden after a nonempty players array even if semantic resolution fails."
+  },
+  "conditional_capability_evidence": {
+    "ari_az_team_alias_qualified_only_if": "Every overall V6 gate passes, all four team_alias_ari targets resolve, and at least one selected ARI target candidate is observed with NGS teamAbbr AZ so the equivalence rule is actually exercised.",
+    "multiple_candidate_tiebreak_qualified_only_if": "Every overall V6 gate passes and at least one V6 target has >1 primary candidate and the frozen position+jersey tiebreak resolves exactly one valid GSIS.",
+    "query_fallback_semantics_qualified_only_if": "Every overall V6 gate passes and at least one V6 target requires query attempt 2 or 3 and then resolves uniquely under the frozen semantic rule."
+  },
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V6",
+  "corroboration_diagnostics": {
+    "independent_coverage_jersey": {"denominator":"Resolved coverage targets for which tiebreak_applied is false.","ngs_value":"integer-normalized selected candidate uniformNumber, else jerseyNumber, when nonempty and parseable","official_value":"integer-normalized target jersey_number when nonempty and parseable","reason":"Rows selected using jersey cannot independently corroborate jersey agreement.","tiebreak_resolved_rows_excluded":true,"used_for_selection":false},
+    "position": {"record_ngs_position_and_position_group":true,"record_official_position":true,"used_as_qualification_gate":false,"used_for_selection_only_in_frozen_multiple_candidate_tiebreak":true},
+    "status": {"availability_semantics_authorized":false,"may_be_recorded_as_raw_source_metadata":true,"used_for_availability":false,"used_for_selection":false}
+  },
+  "fixed_resolution_rule": {
+    "candidate_name_match": "candidate name_key(displayName) must equal target name_key(visible_name)",
+    "fallback_matching_allowed_beyond_frozen_rules": false,
+    "fields_forbidden_from_selection": ["status","statusDescriptionAbbr","statusShortDescription","nflId","esbId","smartId","birthDate","collegeName","entryYear","profile_path"],
+    "manual_resolution_allowed": false,
+    "multiple_candidate_tiebreak": "If more than one primary candidate exists, require target jersey_number to parse as integer and target position uppercase to equal candidate position uppercase OR positionGroup uppercase; require candidate jerseyNumber/uniformNumber integer to equal target jersey; keep only candidates satisfying both position and jersey. Resolve only if exactly one remains and its gsisId is valid.",
+    "name_key": "Unicode NFKD; ASCII-drop; lowercase; replace maximal non-[a-z0-9] runs with spaces; trim/collapse; remove one terminal generational suffix token jr/sr/ii/iii/iv/v; if the normalized name begins with two or more consecutive one-letter alphabetic tokens, compact that leading run into one token. No other token deletion, transposition, stemming, nickname, phonetic, or fuzzy rule.",
+    "primary_candidate_set": "Candidates satisfying candidate_name_match and frozen team_equivalence.",
+    "single_candidate_rule": "If exactly one primary candidate exists and gsisId matches ^00-[0-9]{7}$, resolve it.",
+    "team_equivalence": {"ARI":["ARI","AZ"],"all_other_official_teams":"exact uppercase equality only"},
+    "unresolved_rows_fail_closed": true
+  },
+  "frozen_pass_gates": {
+    "coverage_stratum_unique_resolution_minimum_count": 61,
+    "coverage_stratum_unique_resolution_minimum_fraction": 0.953125,
+    "duplicate_selected_gsis_across_distinct_target_rows_allowed": 0,
+    "every_executed_query_attempt_http_200_parseable_players_array": true,
+    "independent_resolved_coverage_jersey_agreement_minimum_fraction": 0.95,
+    "independent_resolved_coverage_jersey_comparable_minimum_fraction": 0.8,
+    "invalid_selected_gsis_count_allowed": 0,
+    "manual_unresolved_repair_before_gate_allowed": false,
+    "page_loaded_and_unique_query_input_required": true,
+    "source_name_variant_stratum_unique_resolution_minimum_count": 15,
+    "source_name_variant_stratum_unique_resolution_minimum_fraction": 0.9375,
+    "team_alias_ari_stratum_unique_resolution_required_count": 4,
+    "team_alias_ari_stratum_unique_resolution_required_fraction": 1.0,
+    "threshold_relaxation_after_first_result_allowed": false
+  },
+  "frozen_upstream_evidence": {
+    "ngs_browser_heldout_v3": {"artifact_digest":"sha256:af586ab4b827a8a99422d02d3265ca70f540cc5279770345acb5af5cd5037958","artifact_id":10472217076,"browser_http_200_parseable_count":70,"coverage_resolved_count":56,"coverage_target_count":64,"development_only_not_validation":true,"head_sha":"fd4224805a46712c6d240cced51ef7d93ac50f9b","observed_development_failure_classes":{"http_200_empty_players_rows":4,"official_ari_vs_ngs_az_team_code_rows":2,"same_name_plus_team_multiple_candidate_rows":2},"receipt_sha256":"18a6a8da87b6bdc0a52b57127ffeaa8175745968f9be658f9551f7c628b0187b","source_name_ambiguity_resolved_count":6,"source_name_ambiguity_target_count":6,"status":"FAIL","target_count":70,"target_selection_sha256":"437a94fa92709d60f0c3b2d88a4e52ce8f3dfd7f6241109793f4d991b8222f8d","workflow_run_id":35159301387},
+    "ngs_browser_heldout_v4_canonical": {"artifact_digest":"sha256:8d1220ddbf4406bd1656b85db2400246c7c4fe15e140d84c39ed0c303d7d5acd","artifact_id":10473865589,"head_sha":"42bca8b57ac13b6fc44cc4ad1d50b9b806deaa3e","manifest_commit":"84ff4121e08290862586be32dbad3e6534408a19","merged_replay_only_commit":"3f1f5a81525a2d84fcb393c23121f7c04a27b7e1","ngs_request_count":0,"ngs_response_count":0,"resolver_semantics_empirically_tested":false,"scientific_disposition":"NOT_EVALUATED","status":"TECHNICAL_FAIL_PRE_REQUEST","workflow_run_id":35162256814},
+    "ngs_browser_heldout_v5_empirical_exposure_only": {"artifact_digest":"sha256:961994eb487c59103f5388708456659e40e11d13ee4462494f7d093876787c90","artifact_id":10473671117,"authority_suspended_due_to_preregistration_sequence_conflict":true,"head_sha":"2fbd9cbb76efc12448581eb1ed393a579cfd60b9","observed_result":"PASS","target_count":74,"target_selection_sha256":"6ae6e017cd24593657921ee82d023541b0feb679a37aa0051c17fe4ab2244e7a","used_for_v6_rule_design":false,"used_for_v6_threshold_design":false,"used_only_to_exclude_empirically_observed_target_rows":true,"workflow_run_id":35162079741},
+    "ngs_surface_v1": {"artifact_digest":"sha256:0559c6977c66c4c1ca5200fa805288f27a31f545c957948693b5c1de5f3f2bf9","artifact_id":10470775804,"head_sha":"e0dc6ffe4651d858612176914c1728d83a88dc98","sentinel_visible_names":["Patrick Mahomes","Josh Allen","Justin Jefferson"],"workflow_run_id":35154092751},
+    "official_club_roster_v2": {"artifact_digest":"sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e","artifact_id":10461126275,"head_sha":"1280e4a06eacf3e30700f75d4dab9ecff99944a4","roster_metadata_sha256":"90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f","row_count":2463,"team_count":32,"workflow_run_id":35130069924}
+  },
+  "governance": {
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "f_st_01_frozen_2026_unchanged": true,
+    "next_phase_after_pass": "If every V6 gate passes, preserve/freeze the identity bridge before any target availability rows are observed. Then separately preregister a point-in-time inactive/availability identity application. V6 itself cannot authorize availability, player-value joins, forecast effects, model fitting, or production. Any target application row requiring an unobserved conditional fallback/tiebreak/alias capability must remain unresolved.",
+    "postgame_participation_used": false,
+    "production_paths_may_change": false,
+    "research_only": true,
+    "week2_inactive_execution_evidence_used_for_design": false
+  },
+  "preregistration_state": {
+    "contract_must_precede_executable_v6_probe": true,
+    "first_result_is_canonical_whether_pass_or_fail": true,
+    "later_same_version_execution_may_replace_first_result": false,
+    "same_version_rule_adaptation_after_first_result": false,
+    "v3_may_inform_v6_rule_design_only": true,
+    "v3_target_rows_may_not_be_used_for_v6_validation": true,
+    "v4_canonical_execution_had_zero_ngs_requests": true,
+    "v5_outcome_metrics_used_for_rule_or_threshold_design": false,
+    "v5_target_rows_may_not_be_used_for_v6_validation": true,
+    "v5_target_rows_used_only_for_empirical_exposure_exclusion": true,
+    "v6_uses_frozen_v5_resolver_semantics_and_pass_gates_without_adaptation": true
+  },
+  "purpose": "Prospective out-of-sample validation of the already-frozen V5 repaired official-roster-to-NGS GSIS resolver semantics on a fresh roster population after the canonical V4 execution ended before any NGS request and the out-of-sequence V5 run empirically exposed its 74 targets. V6 makes no rule, threshold, browser-context, query-cascade, team-equivalence, name-key, tiebreak, or gate adaptation from V5 outcomes; V5 target identities are used only as an exclusion set to prevent reuse of observed rows.",
+  "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v6-contract",
+  "target_selection": {
+    "coverage_stratum": {"expected_target_count":64,"expected_team_count":32,"per_team_count":2,"rule":"For each team in lexicographic team order, sort eligible rows by selection_key ascending, visible_name ascending, profile_path ascending; take first 2."},
+    "eligibility": {"position_nonempty":true,"team_nonempty":true,"visible_name_nonempty":true},
+    "exclusions": {"all_exact_v2_v3_target_row_identities_from_pinned_v3_target_selection":true,"all_exact_v5_empirical_target_row_identities_from_pinned_v5_target_selection":true,"normalized_v1_sentinel_visible_names":["Patrick Mahomes","Josh Allen","Justin Jefferson"],"row_identity_fields":["team","visible_name","profile_path"]},
+    "expected_eligible_row_count": 2315,
+    "expected_overlap_counts": {"all_three":0,"coverage_and_source_name_variant":4,"coverage_and_team_alias_ari":2,"team_alias_ari_and_source_name_variant":0},
+    "expected_sorted_row_identity_sha256": "ca06c3eadf135223bfe9695b255906f3b42f42263aacc7262119ec84b041df35",
+    "expected_target_projection_sha256": "fac150229b3426fee077ab82a1ef3dcf3ce010dbb1b39ddfac23bbf00a421b2e",
+    "expected_total_target_count": 78,
+    "selection_key": {"algorithm":"sha256","ordered_fields":["team","visible_name","position","jersey_number_or_empty","profile_path_or_empty"],"payload":"selection_salt + U+001E + U+001F-joined ordered fields"},
+    "selection_salt": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V6",
+    "source": "Only pinned official_club_roster_v2 roster_metadata.jsonl.",
+    "source_name_variant_stratum": {"expected_eligible_count":199,"expected_target_count":16,"rule":"Take rows whose visible_name matches either frozen source-only regex; sort by selection_key, team, visible_name, profile_path; take first 16.","source_only_regexes":["^[A-Z]{2,4}\\b","\\b(?:II|III|IV|V|Jr\\.?|Sr\\.?)$"]},
+    "team_alias_ari_stratum": {"expected_target_count":4,"rule":"Sort eligible ARI rows by the same frozen ordering and take first 4.","team":"ARI"},
+    "union_rule": "Row-identity union of coverage_stratum, team_alias_ari_stratum, and source_name_variant_stratum."
+  }
+}
