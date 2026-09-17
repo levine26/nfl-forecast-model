@@ -457,14 +457,14 @@ def test_skewed_fair_line_uses_median_not_mean() -> None:
 
 
 def test_symmetric_continuous_fair_line_tracks_center() -> None:
-    samples = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
+    samples = np.array([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5])
     summary = evaluate_distribution(samples, market_line=0.0, discrete=False)
     assert summary.model_mean == pytest.approx(0.0)
     assert summary.model_median == pytest.approx(0.0)
     assert summary.levline_fair_line == pytest.approx(0.0)
-    assert summary.p_over == pytest.approx(0.4)
-    assert summary.p_under == pytest.approx(0.4)
-    assert summary.p_push == pytest.approx(0.2)
+    assert summary.p_over == pytest.approx(0.5)
+    assert summary.p_under == pytest.approx(0.5)
+    assert summary.p_push == pytest.approx(0.0)
 
 
 def test_extreme_tail_market_line_evaluates_without_changing_fair_line() -> None:
