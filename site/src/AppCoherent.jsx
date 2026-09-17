@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import AppSignal from './AppSignal.jsx'
 import SignalEnhancements from './SignalEnhancements.jsx'
 import ForecastClarity from './ForecastClarity.jsx'
@@ -7,18 +8,18 @@ import ExperienceDomFixes from './ExperienceDomFixes.jsx'
 import HistoryReceiptDetails from './HistoryReceiptDetails.jsx'
 import HistoryEditorialGuard from './HistoryEditorialGuard.jsx'
 import BetTracker from './BetTracker.jsx'
+import PropsResearchBeta from './PropsResearchBeta.jsx'
 import './signal-polish.css'
 
 /**
  * Canonical consumer-surface compatibility contract.
  *
  * AppCoherent remains the production entrypoint intentionally. The premium
- * Sunday Signal presentation lives in AppSignal, while SignalEnhancements,
- * ForecastClarity, ForecastHelp, ExperienceLayer, ExperienceDomFixes,
- * HistoryReceiptDetails, HistoryEditorialGuard, and BetTracker add presentation-only
- * product affordances around the same canonical data. No forecast, pick, lock,
- * grading, research-governance, or probability behavior is recomputed or replaced
- * in this wrapper.
+ * Sunday Signal presentation lives in AppSignal, while the adjacent helpers add
+ * presentation-only affordances around the same canonical game data. The Props
+ * Research Beta is isolated behind its own hash namespace and consumes only the
+ * separate Props public contract; it does not recompute or mutate winner-model
+ * forecasts, picks, locks, grading, governance, or probabilities.
  *
  * public_forecasts.json
  * LEVLINE FORECAST
@@ -52,7 +53,19 @@ import './signal-polish.css'
  * Component diagnostics are supporting views, not competing official forecasts.
  * <details><summary>Model Consensus
  */
+function onPropsRoute() {
+  const raw = window.location.hash.replace(/^#\/?/, '')
+  return raw === 'props' || raw.startsWith('props/')
+}
+
 export default function AppCoherent() {
+  const [propsRoute, setPropsRoute] = useState(onPropsRoute)
+  useEffect(() => {
+    const update = () => setPropsRoute(onPropsRoute())
+    window.addEventListener('hashchange', update)
+    return () => window.removeEventListener('hashchange', update)
+  }, [])
+  if (propsRoute) return <PropsResearchBeta/>
   return <>
     <AppSignal/>
     <SignalEnhancements/>
@@ -63,5 +76,6 @@ export default function AppCoherent() {
     <HistoryReceiptDetails/>
     <HistoryEditorialGuard/>
     <BetTracker/>
+    <PropsResearchBeta/>
   </>
 }
