@@ -629,11 +629,15 @@ def _role_for_row(row: pd.Series) -> str:
     if games <= 0:
         return "UNKNOWN_NO_HISTORY"
     if position == "QB":
-        dropbacks = float(row.get("prior_dropbacks_pg_4") or 0.0)
-        return "QB_PRIMARY" if dropbacks >= 15.0 else "QB_RESERVE"
+        dropbacks = row.get("prior_dropbacks_pg_4")
+        if pd.isna(dropbacks):
+            return "UNKNOWN_NO_USAGE_HISTORY"
+        return "QB_PRIMARY" if float(dropbacks) >= 15.0 else "QB_RESERVE"
     if position == "RB":
         carry_share = row.get("prior_carry_share_4")
         target_share = row.get("prior_target_share_4")
+        if pd.isna(carry_share) and pd.isna(target_share):
+            return "UNKNOWN_NO_USAGE_HISTORY"
         carry_share = 0.0 if pd.isna(carry_share) else float(carry_share)
         target_share = 0.0 if pd.isna(target_share) else float(target_share)
         if carry_share >= 0.45:
@@ -643,7 +647,9 @@ def _role_for_row(row: pd.Series) -> str:
         return "RB_DEPTH"
     if position == "WR":
         target_share = row.get("prior_target_share_4")
-        target_share = 0.0 if pd.isna(target_share) else float(target_share)
+        if pd.isna(target_share):
+            return "UNKNOWN_NO_USAGE_HISTORY"
+        target_share = float(target_share)
         if target_share >= 0.22:
             return "WR_PRIMARY"
         if target_share >= 0.12:
@@ -651,7 +657,9 @@ def _role_for_row(row: pd.Series) -> str:
         return "WR_ROTATION"
     if position == "TE":
         target_share = row.get("prior_target_share_4")
-        target_share = 0.0 if pd.isna(target_share) else float(target_share)
+        if pd.isna(target_share):
+            return "UNKNOWN_NO_USAGE_HISTORY"
+        target_share = float(target_share)
         if target_share >= 0.16:
             return "TE_PRIMARY"
         if target_share >= 0.07:
@@ -739,7 +747,11 @@ def _resolve_availability(
         audit["rows_missing_timestamp"] = int(len(work))
         return pd.DataFrame(columns=output_columns), audit
 
-    captures = pd.to_datetime(work[capture_col], utc=True, errors="coerce")
+    captures = pd.to_datetime(
+        work[capture_col].map(_optional_utc_timestamp),
+        utc=True,
+        errors="coerce",
+    )
     missing_time = captures.isna()
     audit["rows_missing_timestamp"] = int(missing_time.sum())
     future = captures.gt(forecast_timestamp)
