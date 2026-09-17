@@ -55,6 +55,7 @@ CORE_COLUMNS = (
     "prior_red_zone_targets_pg_4",
     "prior_end_zone_targets_pg_4",
     "missing_history",
+    "missing_usage_history",
     "missing_snap_data",
     "missing_route_data",
     "missing_availability",
@@ -437,7 +438,28 @@ def _combine_history(
     for column in numeric:
         if column not in history.columns:
             history[column] = np.nan
-    for column in (
+
+    # Participation sources can publish when PBP does not. In that case, absence of a
+    # PBP row is missing evidence, not zero usage. Fill PBP-derived opportunity metrics
+    # with zero only for games whose PBP is actually present in the source horizon.
+    pbp_game_ids: set[str] = set()
+    if (
+        pbp is not None
+        and not pbp.empty
+        and {"game_id", "season", "week"}.issubset(pbp.columns)
+    ):
+        period = pbp[["game_id", "season", "week"]].copy()
+        period["season"] = pd.to_numeric(period["season"], errors="coerce")
+        period["week"] = pd.to_numeric(period["week"], errors="coerce")
+        safe_period = period["season"].lt(season) | (
+            period["season"].eq(season) & period["week"].lt(week)
+        )
+        pbp_game_ids = set(
+            period.loc[safe_period & period["game_id"].notna(), "game_id"].astype(str)
+        )
+    history["pbp_game_covered"] = history["game_id"].astype(str).isin(pbp_game_ids)
+
+    pbp_metrics = (
         "dropbacks",
         "pass_attempts",
         "rush_attempts",
@@ -447,8 +469,12 @@ def _combine_history(
         "goal_line_carries",
         "red_zone_targets",
         "end_zone_targets",
-    ):
-        history[column] = pd.to_numeric(history[column], errors="coerce").fillna(0.0)
+    )
+    for column in pbp_metrics:
+        values = pd.to_numeric(history[column], errors="coerce")
+        history[column] = values
+        covered = history["pbp_game_covered"]
+        history.loc[covered, column] = values.loc[covered].fillna(0.0)
 
     team_totals = (
         history.groupby(["game_id", "team"], as_index=False)
@@ -747,7 +773,7 @@ def _resolve_availability(
 
 
 def _quality_state(row: pd.Series) -> str:
-    if bool(row.get("missing_history", True)):
+    if bool(row.get("missing_history", True)) or bool(row.get("missing_usage_history", True)):
         return "LIMITED_NO_HISTORY"
     if not bool(row.get("missing_snap_data", True)) and not bool(
         row.get("missing_route_data", True)
@@ -839,6 +865,14 @@ def build_offensive_player_state_contract(
     state["expected_role"] = state.apply(_role_for_row, axis=1)
 
     state["missing_history"] = state["prior_games"].eq(0)
+    state["missing_usage_history"] = state[
+        [
+            "prior_dropbacks_pg_4",
+            "prior_rush_attempts_pg_4",
+            "prior_targets_pg_4",
+            "prior_receptions_pg_4",
+        ]
+    ].isna().all(axis=1)
     state["missing_snap_data"] = state["prior_offense_snaps_pg_4"].isna()
     state["missing_route_data"] = state["prior_routes_pg_4"].isna()
     state["missing_availability"] = state["availability_source_status"].eq("MISSING")
@@ -869,6 +903,32 @@ def build_offensive_player_state_contract(
         latest = history.sort_values(["season", "week"]).tail(1).iloc[0]
         historical_max = {"season": int(latest["season"]), "week": int(latest["week"])}
 
+    pbp_usable_rows = (
+        int(history["pbp_game_covered"].fillna(False).astype(bool).sum())
+        if not history.empty and "pbp_game_covered" in history.columns
+        else 0
+    )
+    snap_usable_rows = (
+        int(
+            (
+                history["offense_snaps"].notna()
+                | history["snap_share"].notna()
+            ).sum()
+        )
+        if not history.empty
+        else 0
+    )
+    route_usable_rows = (
+        int(
+            (
+                history["routes"].notna()
+                | history["route_participation"].notna()
+            ).sum()
+        )
+        if not history.empty
+        else 0
+    )
+
     audit = {
         "schema_version": SCHEMA_VERSION,
         "season": int(season),
@@ -881,20 +941,23 @@ def build_offensive_player_state_contract(
         "games_started_and_dropped": games_started,
         "availability": availability_audit,
         "sources": {
-            "pbp": "historical_lagged" if pbp is not None and not pbp.empty else "missing",
+            "pbp": "historical_lagged" if pbp_usable_rows > 0 else "missing_or_unusable",
             "snap_counts": (
-                "historical_lagged"
-                if snap_counts is not None and not snap_counts.empty
-                else "missing"
+                "historical_lagged" if snap_usable_rows > 0 else "missing_or_unusable"
             ),
             "routes": (
-                "historical_lagged" if routes is not None and not routes.empty else "missing"
+                "historical_lagged" if route_usable_rows > 0 else "missing_or_unusable"
             ),
             "availability": (
                 "prospective_only_timestamped"
                 if availability_audit["rows_resolved"] > 0
                 else "missing_or_unusable"
             ),
+        },
+        "source_usable_rows": {
+            "pbp": pbp_usable_rows,
+            "snap_counts": snap_usable_rows,
+            "routes": route_usable_rows,
         },
         "guardrails": [
             "No target-week PBP is used.",
