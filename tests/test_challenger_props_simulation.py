@@ -81,9 +81,86 @@ def _game() -> GameSimulationInput:
     )
 
 
+def _posterior_game() -> GameSimulationInput:
+    game = _game()
+    teams = tuple(
+        TeamSimulationInput(
+            **{
+                **team.__dict__,
+                "offensive_plays_gamma_shape": 640.0 if team.team == "ARI" else 620.0,
+                "offensive_plays_gamma_rate": 10.0,
+                "dropback_rate_alpha": 60.0 if team.team == "ARI" else 62.0,
+                "dropback_rate_beta": 40.0 if team.team == "ARI" else 38.0,
+                "pass_attempt_outcome_alpha": 90.0,
+                "sack_outcome_alpha": 7.0,
+                "scramble_outcome_alpha": 3.0,
+                "targetable_attempt_alpha": 92.0,
+                "targetable_attempt_beta": 8.0,
+            }
+        )
+        for team in game.teams
+    )
+    players = []
+    for player in game.players:
+        target_concentration = player.target_share * 60.0 if player.target_share > 0 else None
+        carry_concentration = player.carry_share * 60.0 if player.carry_share > 0 else None
+        receiving_td_alpha = (
+            player.receiving_td_share * 40.0 if player.receiving_td_share > 0 else None
+        )
+        rushing_td_alpha = (
+            player.rushing_td_share * 40.0 if player.rushing_td_share > 0 else None
+        )
+        route_alpha = 18.0 if player.target_share > 0 else None
+        route_beta = 6.0 if player.target_share > 0 else None
+        catch_alpha = player.catch_rate * 30.0 if player.target_share > 0 else None
+        catch_beta = (1.0 - player.catch_rate) * 30.0 if player.target_share > 0 else None
+        players.append(
+            PlayerSimulationInput(
+                **{
+                    **player.__dict__,
+                    "is_primary_qb": player.position == "QB",
+                    "route_participation": 0.75 if player.target_share > 0 else 0.0,
+                    "route_participation_alpha": route_alpha,
+                    "route_participation_beta": route_beta,
+                    "designed_carry_share_alpha": carry_concentration,
+                    "target_share_alpha": target_concentration,
+                    "catch_alpha": catch_alpha,
+                    "catch_beta": catch_beta,
+                    "receiving_yards_per_reception_event_sd": (
+                        8.0 if player.target_share > 0 else None
+                    ),
+                    "receiving_yards_per_reception_mean_se": (
+                        0.6 if player.target_share > 0 else 0.0
+                    ),
+                    "rushing_yards_per_carry_event_sd": (
+                        3.0 if player.carry_share > 0 else None
+                    ),
+                    "rushing_yards_per_carry_mean_se": (
+                        0.3 if player.carry_share > 0 else 0.0
+                    ),
+                    "passing_td_share": (
+                        1.0 if player.position == "QB" else 0.0
+                    ),
+                    "passing_td_allocation_alpha": (
+                        30.0 if player.position == "QB" else None
+                    ),
+                    "receiving_td_allocation_alpha": receiving_td_alpha,
+                    "rushing_td_allocation_alpha": rushing_td_alpha,
+                }
+            )
+        )
+    return GameSimulationInput(
+        **{
+            **game.__dict__,
+            "teams": teams,
+            "players": tuple(players),
+        }
+    )
+
+
 def test_deterministic_execution() -> None:
-    a = simulate_game(_game(), simulations=2500, seed=26)
-    b = simulate_game(_game(), simulations=2500, seed=26)
+    a = simulate_game(_posterior_game(), simulations=2500, seed=26)
+    b = simulate_game(_posterior_game(), simulations=2500, seed=26)
     for pid in a.player_stats:
         for stat in a.player_stats[pid]:
             np.testing.assert_array_equal(a.player_stats[pid][stat], b.player_stats[pid][stat])
@@ -93,15 +170,17 @@ def test_opportunity_and_yardage_accounting_identities() -> None:
     result = simulate_game(_game(), simulations=3000, seed=8)
     for team in result.team_stats.values():
         np.testing.assert_array_equal(
-            team["pass_attempts"] + team["rush_attempts"], team["offensive_plays"]
+            team["pass_attempts"] + team["sacks"] + team["rush_attempts"],
+            team["offensive_plays"],
         )
         np.testing.assert_array_equal(
             team["modeled_qb_pass_attempts"] + team["residual_qb_pass_attempts"],
             team["pass_attempts"],
         )
         np.testing.assert_array_equal(
-            team["targets"] + team["residual_targets"], team["pass_attempts"]
+            team["targets"] + team["residual_targets"], team["team_targets"]
         )
+        assert np.all(team["team_targets"] <= team["pass_attempts"])
         np.testing.assert_array_equal(
             team["modeled_receptions"] + team["residual_receptions"], team["completions"]
         )
@@ -113,8 +192,38 @@ def test_opportunity_and_yardage_accounting_identities() -> None:
             team["modeled_carries"] + team["residual_carries"], team["rush_attempts"]
         )
     for stats in result.player_stats.values():
+        assert np.all(stats["targets"] <= stats["routes"])
         assert np.all(stats["receptions"] <= stats["targets"])
         assert np.all(stats["completions"] <= stats["pass_attempts"])
+
+
+def test_posterior_hierarchy_reconciles_dropbacks_scrambles_routes_and_targets() -> None:
+    result = simulate_game(_posterior_game(), simulations=6000, seed=118)
+    for team_name, team in result.team_stats.items():
+        np.testing.assert_array_equal(
+            team["pass_attempts"] + team["sacks"] + team["scrambles"],
+            team["dropbacks"],
+        )
+        np.testing.assert_array_equal(
+            team["dropbacks"] + team["designed_rush_attempts"],
+            team["offensive_plays"],
+        )
+        np.testing.assert_array_equal(
+            team["designed_rush_attempts"] + team["scrambles"],
+            team["rush_attempts"],
+        )
+        assert np.any(team["sacks"] > 0)
+        assert np.any(team["scrambles"] > 0)
+        assert np.all(team["team_targets"] <= team["pass_attempts"])
+        np.testing.assert_array_equal(
+            team["targets"] + team["residual_targets"],
+            team["team_targets"],
+        )
+        qb_id = "qb-ari" if team_name == "ARI" else "qb-lar"
+        assert np.all(result.player_stats[qb_id]["carries"] >= team["scrambles"])
+    for stats in result.player_stats.values():
+        assert np.all(stats["targets"] <= stats["routes"])
+        assert np.all(stats["receptions"] <= stats["targets"])
 
 
 def test_qb_passing_yards_reconcile_to_receiving_yards() -> None:
@@ -240,6 +349,45 @@ def test_fail_closed_on_ambiguous_identity_invalid_share_and_nonfinite_input() -
                 **{
                     **game.__dict__,
                     "players": (game.players[0], game.players[1], bad_efficiency, *game.players[3:]),
+                }
+            ),
+            simulations=10,
+        )
+
+
+def test_fail_closed_on_partial_posterior_parameters() -> None:
+    game = _game()
+    bad_player = PlayerSimulationInput(
+        **{
+            **game.players[2].__dict__,
+            "catch_alpha": 12.0,
+            "catch_beta": None,
+        }
+    )
+    with pytest.raises(SimulationInputError, match="must be supplied together"):
+        simulate_game(
+            GameSimulationInput(
+                **{
+                    **game.__dict__,
+                    "players": (game.players[0], game.players[1], bad_player, *game.players[3:]),
+                }
+            ),
+            simulations=10,
+        )
+
+    bad_team = TeamSimulationInput(
+        **{
+            **game.teams[0].__dict__,
+            "dropback_rate_alpha": 55.0,
+            "dropback_rate_beta": None,
+        }
+    )
+    with pytest.raises(SimulationInputError, match="must be supplied together"):
+        simulate_game(
+            GameSimulationInput(
+                **{
+                    **game.__dict__,
+                    "teams": (bad_team, game.teams[1]),
                 }
             ),
             simulations=10,
