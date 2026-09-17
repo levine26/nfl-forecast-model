@@ -1,0 +1,223 @@
+name: LevLine 4 preserve NGS player ID browser held-out V8
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_browser_heldout_v8.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research_levline4_preserve_ngs_player_id_browser_heldout_v8.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: levline4-preserve-ngs-player-id-browser-heldout-v8
+  cancel-in-progress: false
+
+env:
+  SOURCE_ARTIFACT_ID: '10481385995'
+  SOURCE_WORKFLOW_RUN_ID: '35183093816'
+  SOURCE_HEAD_SHA: '4dbe2f94ffd2d30aac600747ce5fa7e1c29cec93'
+  EXPECTED_ARTIFACT_DIGEST: 'sha256:b462438d7c6d6cdb292c634b264fafc151c9929f23b931ff36017e86e34199aa'
+  EXPECTED_ARTIFACT_SIZE: '133139'
+  MANIFEST_PATH: 'research/levline4_2026_ngs_player_id_browser_heldout_v8_first_result_manifest.json'
+  DATA_BRANCH: 'research-data/levline4-ngs-player-id-browser-heldout-v8'
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download immutable canonical V8 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v8.zip
+          rm -rf /tmp/ngs_v8 && mkdir -p /tmp/ngs_v8
+          unzip -q /tmp/ngs_v8.zip -d /tmp/ngs_v8
+
+      - name: Verify complete file map, frozen PASS, and bounded authority
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path('/tmp/ngs_v8')
+          m=json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in sorted(root.rglob('*')) if p.is_file()}
+          assert m['contract_id']=='LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V8'
+          assert m['first_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert m['first_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert m['first_empirical_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert m['first_artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert m['first_artifact_size_in_bytes']==int(os.environ['EXPECTED_ARTIFACT_SIZE'])
+          assert m['first_artifact_file_count']==122
+          assert len(observed)==122
+          assert observed==m['canonical_file_sha256']
+          assert m['scientific_status']=='PASS' and m['scientific_disposition']=='PASS'
+          s=m['target_selection']
+          assert s['eligible_row_count']==2134
+          assert s['total_target_count']==102
+          assert s['coverage_target_count']==64
+          assert s['team_alias_ari_target_count']==4
+          assert s['source_name_variant_target_count']==16
+          assert s['canonical_name_variant_target_count']==32
+          assert s['query_grammar_stress_target_count']==6
+          assert s['sorted_row_identity_sha256']=='54edf016256370f2aca87ba83953e3af77a4ac05e701a8003da612f84d2669a1'
+          assert s['target_projection_sha256']=='c357202611c24a31b4918a6201f996b9b15f53cda127dbc542551c6320a89368'
+          metrics=m['metrics']; gates=m['gates']; authority=m['authority']
+          assert metrics['target_count']==102
+          assert metrics['executed_query_attempt_count']==114
+          assert metrics['coverage_unique_resolution_count']==63
+          assert metrics['source_name_variant_unique_resolution_count']==16
+          assert metrics['canonical_name_variant_unique_resolution_count']==31
+          assert metrics['team_alias_ari_unique_resolution_count']==4
+          assert metrics['query_grammar_stress_visible_skip_count']==6
+          assert metrics['query_grammar_stress_source_canonical_execution_count']==6
+          assert metrics['query_grammar_stress_unique_resolution_count']==6
+          assert metrics['invalid_selected_gsis_count']==0
+          assert metrics['duplicate_selected_gsis_across_distinct_target_rows_count']==0
+          assert metrics['fallback_exercised_count']==9 and metrics['fallback_success_count']==9
+          assert metrics['tiebreak_exercised_count']==0
+          assert all(v is True for v in gates.values())
+          assert authority['ngs_public_page_browser_context_transport_qualified_for_frozen_v8_population'] is True
+          assert authority['ngs_repaired_name_team_resolver_qualified_for_frozen_v8_population'] is True
+          assert authority['official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application'] is True
+          assert authority['query_grammar_guard_qualified_for_frozen_v8_population'] is True
+          assert authority['source_canonical_name_representation_qualified_for_frozen_v8_population'] is True
+          assert authority['query_fallback_semantics_qualified_for_frozen_v8_population'] is True
+          assert authority['ari_az_team_alias_qualified_for_frozen_v8_population'] is True
+          assert authority['multiple_candidate_tiebreak_qualified_for_frozen_v8_population'] is False
+          for key in ('general_2026_player_identity_to_gsis_qualified','week2_sunday_due_inactive_player_identity_to_gsis_qualified','game_day_membership_qualified','availability_state_authorized','player_value_join_authorized','forecast_probability_effect_authorized','model_fit_authorized','production_authorized'):
+              assert authority[key] is False, key
+          g=m['governance']
+          assert g['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert g['postgame_participation_used'] is False
+          assert g['week2_inactive_execution_evidence_used_for_design'] is False
+          assert g['future_information_used_to_repair_point_in_time_state'] is False
+          assert g['f_st_01_frozen_2026_unchanged'] is True
+          assert g['research_only'] is True and g['production_paths_changed'] is False
+          PY
+
+  preserve:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download immutable canonical V8 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          meta=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}")
+          test "$(echo "$meta" | jq -r .digest)" = "$EXPECTED_ARTIFACT_DIGEST"
+          test "$(echo "$meta" | jq -r .size_in_bytes)" = "$EXPECTED_ARTIFACT_SIZE"
+          test "$(echo "$meta" | jq -r .workflow_run.id)" = "$SOURCE_WORKFLOW_RUN_ID"
+          test "$(echo "$meta" | jq -r .workflow_run.head_sha)" = "$SOURCE_HEAD_SHA"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/ngs_v8.zip
+          rm -rf /tmp/ngs_v8 && mkdir -p /tmp/ngs_v8
+          unzip -q /tmp/ngs_v8.zip -d /tmp/ngs_v8
+
+      - name: Reverify and add preservation metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          root=Path('/tmp/ngs_v8')
+          m=json.loads(Path(os.environ['MANIFEST_PATH']).read_text())
+          observed={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in sorted(root.rglob('*')) if p.is_file()}
+          assert observed==m['canonical_file_sha256'] and len(observed)==122
+          assert m['scientific_status']=='PASS'
+          a=m['authority']
+          preservation={
+            'schema_version':'levline4-ngs-player-id-browser-heldout-v8-preservation-v1',
+            'source_actions_artifact_id':int(os.environ['SOURCE_ARTIFACT_ID']),
+            'source_workflow_run_id':int(os.environ['SOURCE_WORKFLOW_RUN_ID']),
+            'source_head_sha':os.environ['SOURCE_HEAD_SHA'],
+            'actions_artifact_digest':os.environ['EXPECTED_ARTIFACT_DIGEST'],
+            'actions_artifact_size_in_bytes':int(os.environ['EXPECTED_ARTIFACT_SIZE']),
+            'canonical_file_sha256':m['canonical_file_sha256'],
+            'preserved_at_utc':datetime.now(timezone.utc).isoformat().replace('+00:00','Z'),
+            'preserving_workflow_run_id':os.environ['GITHUB_RUN_ID'],
+            'canonical_result':'PASS',
+            'scientific_disposition':'PASS',
+            'coverage_resolved_count':m['metrics']['coverage_unique_resolution_count'],
+            'coverage_target_count':m['metrics']['coverage_target_count'],
+            'query_grammar_stress_resolved_count':m['metrics']['query_grammar_stress_unique_resolution_count'],
+            'query_grammar_stress_target_count':m['metrics']['query_grammar_stress_target_count'],
+            'bounded_official_roster_to_ngs_gsis_candidate_bridge_qualified':a['official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application'],
+            'query_grammar_guard_qualified':a['query_grammar_guard_qualified_for_frozen_v8_population'],
+            'source_canonical_name_representation_qualified':a['source_canonical_name_representation_qualified_for_frozen_v8_population'],
+            'multiple_candidate_tiebreak_qualified':a['multiple_candidate_tiebreak_qualified_for_frozen_v8_population'],
+            'general_2026_player_identity_to_gsis_qualified':False,
+            'week2_sunday_due_inactive_player_identity_to_gsis_qualified':False,
+            'game_day_membership_qualified':False,
+            'availability_state_authorized':False,
+            'player_value_join_authorized':False,
+            'forecast_probability_effect_authorized':False,
+            'model_fit_authorized':False,
+            'production_authorized':False,
+            'research_only':True,
+            'completed_2026_outcomes_used':0,
+            'postgame_participation_used':False,
+            'week2_inactive_execution_evidence_used_for_design':False,
+            'future_information_used_to_repair_point_in_time_state':False,
+            'f_st_01_frozen_2026_unchanged':True,
+          }
+          (root/'preservation.json').write_text(json.dumps(preservation,indent=2,sort_keys=True)+'\n')
+          PY
+
+      - name: Persist on dedicated research-data branch
+        run: |
+          set -euo pipefail
+          git fetch origin "${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}" || true
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            git checkout -B ngs-v8-data "origin/${DATA_BRANCH}"
+          else
+            git checkout -B ngs-v8-data
+          fi
+          DEST='research_outputs/levline4_2026_ngs_player_id_browser_heldout_v8/first_result_35183093816'
+          if [ -e "$DEST/preservation.json" ]; then
+            DEST="$DEST" python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ['DEST']); p=json.loads((root/'preservation.json').read_text())
+          assert p['source_actions_artifact_id']==int(os.environ['SOURCE_ARTIFACT_ID'])
+          assert p['source_workflow_run_id']==int(os.environ['SOURCE_WORKFLOW_RUN_ID'])
+          assert p['source_head_sha']==os.environ['SOURCE_HEAD_SHA']
+          assert p['actions_artifact_digest']==os.environ['EXPECTED_ARTIFACT_DIGEST']
+          assert p['canonical_result']=='PASS' and p['scientific_disposition']=='PASS'
+          assert p['bounded_official_roster_to_ngs_gsis_candidate_bridge_qualified'] is True
+          assert p['production_authorized'] is False
+          for rel,expected in p['canonical_file_sha256'].items():
+              assert hashlib.sha256((root/rel).read_bytes()).hexdigest()==expected, rel
+          PY
+            echo 'Canonical NGS browser held-out V8 evidence already preserved exactly.'
+            exit 0
+          fi
+          mkdir -p "$(dirname "$DEST")"
+          cp -R /tmp/ngs_v8 "$DEST"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Preserve canonical NGS browser held-out V8 PASS evidence'
+          git push origin HEAD:"${DATA_BRANCH}"
