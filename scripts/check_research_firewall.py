@@ -61,6 +61,8 @@ ALLOWED_EXACT = {
     "src/nfl_forecast/fst_reconstruction.py",
     "src/nfl_forecast/props_player_state.py",
     "src/nfl_forecast/props_player_sources.py",
+    "src/nfl_forecast/props_efficiency_td.py",
+    "tests/test_props_efficiency_td.py",
     "tests/test_props_player_state.py",
     "tests/test_props_player_sources.py",
 }
