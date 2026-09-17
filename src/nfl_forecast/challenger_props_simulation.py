@@ -20,6 +20,8 @@ import numpy as np
 RESEARCH_LABEL = "LEVLINE PROPS — RESEARCH BETA"
 DEFAULT_MODEL_VERSION = "levline-props-simulation-v0.1.0"
 SUPPORTED_POSITIONS = frozenset({"QB", "RB", "WR", "TE"})
+INTERNAL_ONLY_POSITIONS = frozenset({"FB"})
+SIMULATED_POSITIONS = SUPPORTED_POSITIONS | INTERNAL_ONLY_POSITIONS
 SUPPORTED_PROPS = {
     "QB": ("passing_yards", "rushing_yards", "passing_tds", "rushing_tds", "anytime_td"),
     "RB": (
@@ -294,7 +296,7 @@ def validate_game_input(game: GameSimulationInput) -> None:
         if not str(player.player).strip():
             raise SimulationInputError(f"player name missing for {pid}")
         position = str(player.position).upper()
-        if position not in SUPPORTED_POSITIONS:
+        if position not in SIMULATED_POSITIONS:
             raise SimulationInputError(f"unsupported position for {pid}: {player.position}")
         if player.team not in team_map or player.opponent != team_map[player.team].opponent:
             raise SimulationInputError(f"team/opponent mismatch for {pid}")
@@ -1168,6 +1170,8 @@ def build_forecasts(
     forecasts: list[ForecastRecord] = []
     for player in result.players:
         position = player.position.upper()
+        if position not in SUPPORTED_PROPS:
+            continue
         for prop_type in SUPPORTED_PROPS[position]:
             samples = result.player_stats[player.player_id][prop_type]
             quote = quotes.get((player.player_id, prop_type))
