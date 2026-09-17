@@ -456,6 +456,28 @@ def test_skewed_fair_line_uses_median_not_mean() -> None:
     assert summary.levline_fair_line != summary.model_mean
 
 
+def test_symmetric_continuous_fair_line_tracks_center() -> None:
+    samples = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
+    summary = evaluate_distribution(samples, market_line=0.0, discrete=False)
+    assert summary.model_mean == pytest.approx(0.0)
+    assert summary.model_median == pytest.approx(0.0)
+    assert summary.levline_fair_line == pytest.approx(0.0)
+    assert summary.p_over == pytest.approx(0.4)
+    assert summary.p_under == pytest.approx(0.4)
+    assert summary.p_push == pytest.approx(0.2)
+
+
+def test_extreme_tail_market_line_evaluates_without_changing_fair_line() -> None:
+    samples = np.arange(1.0, 101.0)
+    baseline = evaluate_distribution(samples, discrete=False)
+    extreme = evaluate_distribution(samples, market_line=10_000.5, discrete=False)
+    assert extreme.levline_fair_line == baseline.levline_fair_line
+    assert extreme.model_mean == baseline.model_mean
+    assert extreme.p_over == pytest.approx(0.0)
+    assert extreme.p_under == pytest.approx(1.0)
+    assert extreme.p_push == pytest.approx(0.0)
+
+
 def test_market_quote_does_not_change_simulation_and_canonical_forecast_fields() -> None:
     result = simulate_game(_game(), simulations=4000, seed=77)
     before = result.player_stats["wr-ari"]["receiving_yards"].copy()
