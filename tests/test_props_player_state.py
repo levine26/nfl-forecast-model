@@ -380,3 +380,19 @@ def test_snap_history_without_pbp_is_explicit_missing_usage_not_zero():
     assert wr["data_quality_state"] == "LIMITED_NO_HISTORY"
     assert built.audit["sources"]["pbp"] == "missing_or_unusable"
     assert built.audit["sources"]["snap_counts"] == "historical_lagged"
+
+
+
+def test_naive_schedule_kickoff_is_unknown_not_assumed_utc():
+    schedule = _schedule().copy()
+    schedule.loc[0, "kickoff"] = "2026-09-20 20:00:00"
+    built = build_offensive_player_state_contract(
+        schedules=schedule,
+        roster=_roster(),
+        pbp=_pbp(),
+        season=2026,
+        week=3,
+        forecast_timestamp="2026-09-17T21:00:00Z",
+    )
+    assert not built.player_state.empty
+    assert not built.player_state["kickoff_known"].any()
