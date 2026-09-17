@@ -170,13 +170,25 @@ def assert_simulation_accounting(result: GameSimulationResult) -> bool:
     return True
 
 
+def _validated_training_horizon(value: object) -> int:
+    try:
+        season = int(value)
+    except (TypeError, ValueError) as exc:
+        raise PropsIntegrationError("explicit prior_model_trained_through_season is required") from exc
+    if season > 2025:
+        raise PropsIntegrationError(
+            "integration refuses efficiency priors trained on completed 2026 outcomes"
+        )
+    return season
+
+
 def build_efficiency_player_inputs(
     projection: Mapping[str, Any],
     baselines: pd.DataFrame,
     *,
     kickoff_timestamp: object,
-    source_status: str = "qualified",
-    prior_model_trained_through_season: int = 2025,
+    source_status: str,
+    prior_model_trained_through_season: int,
 ) -> pd.DataFrame:
     """Join opportunity means to pre-2026 efficiency sufficient statistics and priors."""
     metadata = projection.get("metadata")
@@ -245,7 +257,7 @@ def build_efficiency_player_inputs(
                 "kickoff_timestamp": kickoff,
                 "feature_data_horizon": data_horizon,
                 "source_status": source_status,
-                "prior_model_trained_through_season": int(prior_model_trained_through_season),
+                "prior_model_trained_through_season": _validated_training_horizon(prior_model_trained_through_season),
                 "expected_pass_attempts": pass_attempts if bool(raw_player.get("is_primary_qb")) else 0.0,
                 "expected_qb_rush_attempts": qb_rushes if bool(raw_player.get("is_primary_qb")) else 0.0,
                 "expected_carries": _finite(raw_player.get("designed_carries_mean")) or 0.0,
@@ -261,8 +273,8 @@ def build_efficiency_team_input(
     scoring_context: Mapping[str, Any],
     *,
     kickoff_timestamp: object,
-    source_status: str = "qualified",
-    prior_model_trained_through_season: int = 2025,
+    source_status: str,
+    prior_model_trained_through_season: int,
 ) -> pd.DataFrame:
     metadata = projection.get("metadata")
     if not isinstance(metadata, Mapping):
@@ -289,7 +301,7 @@ def build_efficiency_team_input(
         "kickoff_timestamp": kickoff,
         "feature_data_horizon": str(metadata.get("data_horizon") or ""),
         "source_status": source_status,
-        "prior_model_trained_through_season": int(prior_model_trained_through_season),
+        "prior_model_trained_through_season": _validated_training_horizon(prior_model_trained_through_season),
         **{key: scoring_context[key] for key in required},
     }
     return pd.DataFrame([row])
