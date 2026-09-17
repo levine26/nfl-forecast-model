@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-17T18:34:15.507189+00:00",
+    "as_of": "2026-09-17T21:26:50.097097+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-17T18:34:20.790606+00:00",
+    "as_of": "2026-09-17T21:26:53.655266+00:00",
     "conflicts": 0,
     "evidence_items_added": 26,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 26
   },
   "coaching": {
-    "as_of": "2026-09-17T18:31:41.859897+00:00",
+    "as_of": "2026-09-17T21:26:28.298028+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -141,7 +141,7 @@
     "unique_headlines": 16
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-17T18:34:07.480290+00:00",
+    "as_of": "2026-09-17T21:26:44.129377+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -168,9 +168,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-17T18:31:41.312882+00:00",
+    "generated_utc": "2026-09-17T21:26:28.011737+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 220,
+    "signals": 230,
     "status": "healthy"
   },
   "ftn": {
@@ -183,24 +183,24 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-17T18:31:41.312882+00:00",
+  "generated_utc": "2026-09-17T21:26:28.011737+00:00",
   "injuries": {
-    "as_of": "2026-09-17T18:31:41.590529+00:00",
-    "players": 194,
+    "as_of": "2026-09-17T21:26:28.102985+00:00",
+    "players": 220,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg2",
     "status": "healthy",
-    "teams_with_reported_players": 30
+    "teams_with_reported_players": 31
   },
   "media_reporting": {
-    "as_of": "2026-09-17T18:34:29.179426+00:00",
+    "as_of": "2026-09-17T21:26:59.323949+00:00",
     "cross_game_titles_rejected": 0,
     "games": 16,
     "games_with_display_reporting": 16,
     "games_with_reporting": 16,
-    "games_with_substantive_reporting": 13,
+    "games_with_substantive_reporting": 14,
     "games_with_trusted_reporting": 16,
-    "generic_titles_rejected": 15,
+    "generic_titles_rejected": 13,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -217,7 +217,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-17T18:34:19.709831+00:00",
+    "as_of": "2026-09-17T21:26:52.943047+00:00",
     "evidence_items_added": 25,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 25,
@@ -239,10 +239,10 @@
   },
   "personnel_usage": {
     "ambiguous_player_keys_discarded": 2,
-    "eligible_skill_injuries": 54,
-    "evidence_items_enriched": 13,
+    "eligible_skill_injuries": 58,
+    "evidence_items_enriched": 17,
     "guardrail": "Prior usage clarifies role importance but is not converted into an unvalidated point-value injury adjustment; ambiguous abbreviated-name matches are discarded.",
-    "matched_injured_players": 30,
+    "matched_injured_players": 32,
     "season": 2025,
     "source": "NFL.com official injury report + nflverse PBP usage",
     "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
@@ -290,7 +290,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-17T18:31:45.377023+00:00",
+    "as_of": "2026-09-17T21:26:30.377746+00:00",
     "charted_plays": 2675,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -323,8 +323,8 @@
     "story_items_added": 16
   },
   "weather": {
-    "as_of": "2026-09-17T18:33:56.447271+00:00",
+    "as_of": "2026-09-17T21:26:35.739432+00:00",
     "games_checked": 14,
-    "status": "degraded"
+    "status": "healthy"
   }
 }
