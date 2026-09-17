@@ -89,7 +89,7 @@ The v1 contract exposes last-four-game central state plus historical coverage:
 - red-zone targets
 - end-zone targets (PBP-derived approximation from target depth reaching the goal line)
 
-Expected role is a deterministic classification derived from lagged usage only. It is not a calibrated availability probability or a production game-probability feature.
+Expected role is a deterministic classification derived from lagged usage only. It is not a calibrated availability probability or a production game-probability feature. If participation history exists but the relevant PBP-derived usage evidence is missing, the role fails closed to `UNKNOWN_NO_USAGE_HISTORY` instead of treating missing dropbacks/carry share/target share as zero.
 
 ## Point-in-time protections
 
@@ -103,7 +103,7 @@ Participation data can be published for a period whose PBP is unavailable. In th
 
 ### Current availability
 
-Availability rows must have a parseable capture timestamp. Rows captured after the forecast timestamp are discarded. Rows without a timestamp are unusable. Current availability is marked `availability_prospective_only=True` unless a separate future lane produces a validated historical reconstruction.
+Availability rows must have an explicitly timezone-aware capture timestamp. Naive or unparseable timestamps are unusable rather than being assumed to be UTC, and rows captured after the forecast timestamp are discarded. Current availability is marked `availability_prospective_only=True` unless a separate future lane produces a validated historical reconstruction.
 
 Known target games whose kickoff timestamp is at or before the forecast timestamp are dropped from the pregame contract. The source adapter converts canonical nflverse schedule date/time fields into UTC. If another schedule source lacks a timezone-aware kickoff timestamp, including a naive timestamp whose timezone is ambiguous, `kickoff_known=False` is exposed so publication QA can fail closed if required.
 
@@ -171,6 +171,8 @@ The simulation lane should not infer availability probabilities directly from th
 - released/free-agent roster filtering while retaining explicit reserve membership state
 - transaction-like duplicate roster rows not creating false identity conflicts after released rows are removed
 - current availability timestamp cutoff
+- naive availability timestamps failing closed instead of being assumed UTC
+- missing usage history producing `UNKNOWN_NO_USAGE_HISTORY` rather than a fabricated reserve/rotation role
 - ambiguous identity fail-closed behavior
 - explicit route/snap missingness
 - known-started-game removal
