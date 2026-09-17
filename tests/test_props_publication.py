@@ -157,3 +157,20 @@ def test_grade_timestamp_must_be_after_kickoff():
     receipt = make_forecast_receipt(artifact()["forecasts"][0], recorded_utc=NOW)
     with pytest.raises(PropsPublicationError, match="after the original forecast kickoff"):
         grade_forecast_receipt(receipt, actual_result=101, graded_utc="2026-09-20T16:59:00+00:00")
+
+
+def test_no_signal_without_market_timestamp_can_be_locked_without_fabrication():
+    row = deepcopy(artifact()["forecasts"][0])
+    row["signal_state"] = "NO SIGNAL"
+    row["market"] = {"source": None, "captured_utc": None, "line": None}
+    receipt = make_forecast_receipt(row, recorded_utc=NOW)
+    assert receipt["original_forecast"]["signal_state"] == "NO SIGNAL"
+    assert receipt["original_forecast"]["market"]["captured_utc"] is None
+
+
+def test_watch_without_market_timestamp_still_fails_closed():
+    row = deepcopy(artifact()["forecasts"][0])
+    row["signal_state"] = "WATCH"
+    row["market"]["captured_utc"] = None
+    with pytest.raises(PropsPublicationError, match="market timestamp"):
+        make_forecast_receipt(row, recorded_utc=NOW)
