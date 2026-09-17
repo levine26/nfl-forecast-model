@@ -504,6 +504,8 @@ def test_actual_lane_interfaces_run_player_state_through_publication():
                 projection.to_dict(),
                 _efficiency_baselines(player_pairs),
                 kickoff_timestamp=KICKOFF,
+                source_status="qualified",
+                prior_model_trained_through_season=2025,
             )
         )
         team_inputs.append(
@@ -518,6 +520,8 @@ def test_actual_lane_interfaces_run_player_state_through_publication():
                     "expected_non_red_zone_rush_tds": .08,
                 },
                 kickoff_timestamp=KICKOFF,
+                source_status="qualified",
+                prior_model_trained_through_season=2025,
             )
         )
 
@@ -566,3 +570,40 @@ def test_actual_lane_interfaces_run_player_state_through_publication():
     out = {(row["player_id"], row["prop_type"]): row for row in public["forecasts"]}
     assert required.issubset(out)
     assert all(out[key]["signal_state"] in {"WATCH", "MODEL EDGE"} for key in required)
+
+
+def test_integration_refuses_2026_trained_efficiency_provenance():
+    projection = {
+        "metadata": {
+            "game_id": "2026_03_ARI_LAR",
+            "season": 2026,
+            "week": 3,
+            "team": "ARI",
+            "opponent": "LAR",
+            "forecast_timestamp": FORECAST.isoformat(),
+            "data_horizon": FORECAST.isoformat(),
+        },
+        "marginals": {
+            "qb_dropbacks": {"mean": 36.0},
+            "qb_pass_attempts": {"mean": 33.0},
+            "qb_rushing_opportunities": {"mean": 4.0},
+        },
+        "players": [
+            {
+                "player_id": "qb-a",
+                "player_name": "ARI QB",
+                "position": "QB",
+                "is_primary_qb": True,
+                "availability_probability": 1.0,
+            }
+        ],
+    }
+    baseline = _efficiency_baselines([("qb-a", "QB")])
+    with pytest.raises(Exception, match="2026 outcomes"):
+        build_efficiency_player_inputs(
+            projection,
+            baseline,
+            kickoff_timestamp=KICKOFF,
+            source_status="qualified",
+            prior_model_trained_through_season=2026,
+        )
