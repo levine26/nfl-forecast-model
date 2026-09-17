@@ -36,6 +36,7 @@ ALLOWED_PREFIXES = (
     "scripts/build_player_impact_cards.py",
     "scripts/build_expected_lineup_impacts.py",
     "scripts/reconstruct_2025_availability.py",
+    "scripts/run_props_research_beta.py",
     "src/nfl_forecast/challenger",
     "src/nfl_forecast/experiment_registry.py",
     "src/nfl_forecast/player_state_research.py",
