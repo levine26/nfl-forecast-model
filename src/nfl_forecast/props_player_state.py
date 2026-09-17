@@ -118,6 +118,21 @@ def _utc_timestamp(value: Any, *, label: str) -> pd.Timestamp:
     return ts.tz_convert("UTC")
 
 
+def _optional_utc_timestamp(value: Any) -> pd.Timestamp:
+    try:
+        if value is None or pd.isna(value):
+            return pd.NaT
+    except (TypeError, ValueError):
+        return pd.NaT
+    try:
+        ts = pd.Timestamp(value)
+    except (TypeError, ValueError):
+        return pd.NaT
+    if ts.tzinfo is None:
+        return pd.NaT
+    return ts.tz_convert("UTC")
+
+
 def _normalize_roster(roster: pd.DataFrame) -> pd.DataFrame:
     if roster is None or roster.empty:
         raise ValueError("Current roster is required for stable offensive-player identity")
@@ -189,7 +204,11 @@ def _normalize_schedule(
         ("kickoff", "game_datetime", "start_time", "game_start", "datetime"),
     )
     if kickoff_col:
-        games["kickoff_timestamp"] = pd.to_datetime(games[kickoff_col], utc=True, errors="coerce")
+        games["kickoff_timestamp"] = pd.to_datetime(
+            games[kickoff_col].map(_optional_utc_timestamp),
+            utc=True,
+            errors="coerce",
+        )
     else:
         games["kickoff_timestamp"] = pd.NaT
 
