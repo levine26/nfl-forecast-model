@@ -3,8 +3,11 @@ from __future__ import annotations
 """Research-beta coherent Monte Carlo engine for LevLine offensive player props.
 
 The football simulator is deliberately market agnostic. Sportsbook lines/prices are
-accepted only by the post-simulation evaluator. This module does not import or mutate
-LevLine/F-ST winner-probability code.
+accepted only by the post-simulation evaluator. Optional opportunity/efficiency posterior
+parameters are sampled when supplied. QB passing yards remain receiver-led so QB and
+receiver yardage are one shared process; independent QB completion/YPC posteriors are
+intentionally not activated in this Sunday-beta interface. This module does not import or
+mutate LevLine/F-ST winner-probability code.
 """
 
 from dataclasses import asdict, dataclass
@@ -97,11 +100,6 @@ class PlayerSimulationInput:
     passing_td_allocation_alpha: float | None = None
     receiving_td_allocation_alpha: float | None = None
     rushing_td_allocation_alpha: float | None = None
-    completion_alpha: float | None = None
-    completion_beta: float | None = None
-    yards_per_completion_mean: float | None = None
-    yards_per_completion_event_sd: float | None = None
-    yards_per_completion_mean_se: float = 0.0
     is_primary_qb: bool = False
 
 
@@ -326,7 +324,6 @@ def validate_game_input(game: GameSimulationInput) -> None:
             "rushing_yards_shape_per_carry",
             "receiving_yards_per_reception_mean_se",
             "rushing_yards_per_carry_mean_se",
-            "yards_per_completion_mean_se",
         ):
             value = _nonnegative(getattr(player, field_name), f"{pid}.{field_name}")
             if "shape" in field_name and value <= 0:
@@ -334,8 +331,6 @@ def validate_game_input(game: GameSimulationInput) -> None:
         for field_name in (
             "receiving_yards_per_reception_event_sd",
             "rushing_yards_per_carry_event_sd",
-            "yards_per_completion_mean",
-            "yards_per_completion_event_sd",
             "designed_carry_share_alpha",
             "target_share_alpha",
             "passing_td_allocation_alpha",
@@ -348,7 +343,6 @@ def validate_game_input(game: GameSimulationInput) -> None:
         for alpha_name, beta_name in (
             ("route_participation_alpha", "route_participation_beta"),
             ("catch_alpha", "catch_beta"),
-            ("completion_alpha", "completion_beta"),
         ):
             alpha_value = getattr(player, alpha_name)
             beta_value = getattr(player, beta_name)
@@ -380,6 +374,37 @@ def validate_game_input(game: GameSimulationInput) -> None:
                 raise SimulationInputError(
                     f"{team_code} modeled {share_name} sums to {total:.6f}, above 1.0"
                 )
+        explicit_passing_td = [
+            p.passing_td_share for p in roster if p.passing_td_share is not None
+        ]
+        if explicit_passing_td and sum(explicit_passing_td) > 1.0 + 1e-9:
+            raise SimulationInputError(
+                f"{team_code} modeled passing_td_share sums above 1.0"
+            )
+        for share_name, alpha_name in (
+            ("target_share", "target_share_alpha"),
+            ("carry_share", "designed_carry_share_alpha"),
+            ("receiving_td_share", "receiving_td_allocation_alpha"),
+            ("rushing_td_share", "rushing_td_allocation_alpha"),
+        ):
+            posterior_mode = any(
+                getattr(p, alpha_name) is not None and getattr(p, alpha_name) > 0.0
+                for p in roster
+            )
+            if posterior_mode:
+                missing = [
+                    p.player_id
+                    for p in roster
+                    if getattr(p, share_name) > 0.0
+                    and (
+                        getattr(p, alpha_name) is None
+                        or getattr(p, alpha_name) <= 0.0
+                    )
+                ]
+                if missing:
+                    raise SimulationInputError(
+                        f"{team_code}.{alpha_name} missing positive concentration for {missing}"
+                    )
 
 
 def _weights_with_residual(base_shares: np.ndarray, active: np.ndarray) -> np.ndarray:
@@ -1038,6 +1063,7 @@ def simulate_game(
         player_stats=player_stats,
         team_stats=team_stats,
     )
+
 
 def american_to_implied_probability(odds: float) -> float:
     odds = _finite(odds, "american odds")
