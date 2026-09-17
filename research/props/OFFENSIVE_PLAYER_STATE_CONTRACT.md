@@ -14,6 +14,8 @@ Provide the canonical point-in-time offensive player-state rows consumed by the 
 
 The adapter intentionally returns `routes=None`. A separate point-in-time-safe route source may be supplied when available, but the Sunday sprint does not fabricate or backfill live routes from postgame participation data.
 
+nflverse snap counts are PFR-sourced and may identify players with `pfr_player_id` rather than the GSIS IDs used by PBP and rosters. The adapter therefore crosswalks PFR IDs to `gsis_id` through nflverse player identity data. A PFR ID that maps to multiple GSIS IDs is discarded, an unmapped row remains missing, and a snap source with no safely mapped rows fails closed instead of being reported as usable.
+
 ```python
 from nfl_forecast.props_player_sources import load_offensive_props_sources
 
@@ -90,6 +92,8 @@ Expected role is a deterministic classification derived from lagged usage only. 
 
 Historical availability is never reconstructed from final participation, snaps, targets, carries or box-score presence.
 
+Participation data can be published for a period whose PBP is unavailable. In that case the contract preserves PBP-derived usage as missing rather than filling it with zero. A zero carry/target/dropback value is created only when the relevant historical game has PBP coverage.
+
 ### Current availability
 
 Availability rows must have a parseable capture timestamp. Rows captured after the forecast timestamp are discarded. Rows without a timestamp are unusable. Current availability is marked `availability_prospective_only=True` unless a separate future lane produces a validated historical reconstruction.
@@ -101,6 +105,7 @@ Known target games whose kickoff timestamp is at or before the forecast timestam
 The contract never fabricates routes, snaps or status evidence. It exposes:
 
 - `missing_history`
+- `missing_usage_history` (no lagged PBP-derived opportunity evidence)
 - `missing_snap_data`
 - `missing_route_data`
 - `missing_availability`
@@ -166,6 +171,11 @@ The simulation lane should not infer availability probabilities directly from th
 - nflverse `gameday` + `gametime` conversion from Eastern time to UTC
 - preservation/normalization of already timezone-aware kickoff values
 - explicit unknown kickoff when the source lacks time fields
+- PFR-to-GSIS snap-count identity crosswalk
+- ambiguous PFR identity fail-closed behavior
+- snap rows with no supported stable identity failing closed
+
+`tests/test_props_player_state.py` additionally verifies that snap-only periods without PBP do not fabricate zero opportunities or dilute observed target/carry/dropback history.
 
 ## Production boundary
 
