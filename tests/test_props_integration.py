@@ -13,6 +13,7 @@ from nfl_forecast.challenger_props_simulation import (
     simulate_game,
 )
 from nfl_forecast.props_integration import (
+    PropsIntegrationError,
     assert_simulation_accounting,
     build_efficiency_player_inputs,
     build_efficiency_team_input,
@@ -599,7 +600,7 @@ def test_integration_refuses_2026_trained_efficiency_provenance():
         ],
     }
     baseline = _efficiency_baselines([("qb-a", "QB")])
-    with pytest.raises(Exception, match="2026 outcomes"):
+    with pytest.raises(PropsIntegrationError, match="2026 outcomes"):
         build_efficiency_player_inputs(
             projection,
             baseline,
