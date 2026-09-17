@@ -18,6 +18,7 @@ on:
       - 'tests/test_props_*.py'
       - 'tests/test_challenger_props_simulation.py'
       - 'research/props/**'
+      - 'scripts/run_props_research_beta.py'
       - '.github/workflows/research_props_integration.yml'
   workflow_dispatch:
 
