@@ -9,6 +9,7 @@ on:
       - 'tests/test_props_*.py'
       - 'tests/test_challenger_props_simulation.py'
       - 'research/props/**'
+      - 'scripts/run_props_research_beta.py'
       - '.github/workflows/research_props_integration.yml'
   pull_request:
     paths:
@@ -61,3 +62,4 @@ jobs:
           src/nfl_forecast/props_market_odds_api.py
           src/nfl_forecast/props_integration.py
           src/nfl_forecast/props_publication.py
+          scripts/run_props_research_beta.py
