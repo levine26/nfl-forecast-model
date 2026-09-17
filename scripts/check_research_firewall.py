@@ -98,7 +98,7 @@ RESEARCH_PATH_HINTS = (
     "availability_qualification",
     "availability_2025_reconstruction",
     "reconstruct_2025_availability",
-    "props_player_",
+    "props_",
     "_research.",
     "research_",
 )
