@@ -315,6 +315,26 @@ def publication_quality_state(data_quality_state: str) -> str:
     return "MEDIUM"
 
 
+def market_quality_state(market: Mapping[str, Any] | None) -> str:
+    if market is None:
+        return "INSUFFICIENT"
+    quality = market.get("market_data_quality")
+    state = str(quality.get("state") or "") if isinstance(quality, Mapping) else ""
+    if state in {"multi_book_two_way", "multi_book_binary_two_way"}:
+        return "HIGH"
+    if state in {"single_book_two_way", "single_book_binary_two_way"}:
+        return "MEDIUM"
+    return "LOW"
+
+
+def _combined_quality_state(player_quality: str, market_quality: str) -> str:
+    rank = {"INSUFFICIENT": 0, "LOW": 1, "MEDIUM": 2, "HIGH": 3}
+    return min(
+        (player_quality, market_quality),
+        key=lambda value: rank.get(value, 0),
+    )
+
+
 def _market_capture_utc(market: Mapping[str, Any]) -> str | None:
     captures: list[datetime] = []
     rows = market.get("individual_books")
