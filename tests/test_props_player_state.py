@@ -396,3 +396,83 @@ def test_naive_schedule_kickoff_is_unknown_not_assumed_utc():
     )
     assert not built.player_state.empty
     assert not built.player_state["kickoff_known"].any()
+
+
+
+def test_released_roster_rows_are_excluded_and_reserve_state_is_explicit():
+    roster = pd.concat(
+        [
+            _roster(),
+            pd.DataFrame(
+                [
+                    {
+                        "gsis_id": "00-CUT",
+                        "full_name": "Released Wide",
+                        "position": "WR",
+                        "team": "ARI",
+                        "status": "UFA",
+                    },
+                    {
+                        "gsis_id": "00-RES",
+                        "full_name": "Reserve Wide",
+                        "position": "WR",
+                        "team": "ARI",
+                        "status": "RES",
+                    },
+                ]
+            ),
+        ],
+        ignore_index=True,
+    )
+    built = build_offensive_player_state_contract(
+        schedules=_schedule(),
+        roster=roster,
+        pbp=_pbp(),
+        season=2026,
+        week=3,
+        forecast_timestamp="2026-09-17T21:00:00Z",
+    )
+    assert "00-CUT" not in set(built.player_state["player_id"])
+    reserve = built.player_state[built.player_state["player_id"].eq("00-RES")].iloc[0]
+    assert reserve["roster_status_raw"] == "RES"
+    assert reserve["roster_membership_state"] == "RESERVE_OR_UNAVAILABLE"
+    assert reserve["expected_active_state"] == "UNKNOWN"
+
+
+def test_released_prior_team_row_does_not_create_false_identity_conflict():
+    roster = pd.concat(
+        [
+            _roster(),
+            pd.DataFrame(
+                [
+                    {
+                        "gsis_id": "00-TRADE",
+                        "full_name": "Moved Wide",
+                        "position": "WR",
+                        "team": "LA",
+                        "status": "UFA",
+                    },
+                    {
+                        "gsis_id": "00-TRADE",
+                        "full_name": "Moved Wide",
+                        "position": "WR",
+                        "team": "ARI",
+                        "status": "ACT",
+                    },
+                ]
+            ),
+        ],
+        ignore_index=True,
+    )
+    built = build_offensive_player_state_contract(
+        schedules=_schedule(),
+        roster=roster,
+        pbp=_pbp(),
+        season=2026,
+        week=3,
+        forecast_timestamp="2026-09-17T21:00:00Z",
+    )
+    moved = built.player_state[built.player_state["player_id"].eq("00-TRADE")]
+    assert len(moved) == 1
+    assert moved.iloc[0]["team"] == "ARI"
+    assert moved.iloc[0]["roster_membership_state"] == "ACTIVE_ROSTER"
