@@ -611,6 +611,7 @@ def simulate_game(
             "completions": np.zeros(n, dtype=np.int64),
             "passing_yards": np.zeros(n, dtype=np.int64),
             "passing_tds": np.zeros(n, dtype=np.int64),
+            "routes": np.zeros(n, dtype=np.int64),
             "targets": np.zeros(n, dtype=np.int64),
             "receptions": np.zeros(n, dtype=np.int64),
             "receiving_yards": np.zeros(n, dtype=np.int64),
@@ -627,26 +628,100 @@ def simulate_game(
 
     for team in game.teams:
         roster = [p for p in game.players if p.team == team.team]
-        active = np.column_stack(
-            [rng.random(n) < float(p.availability_probability) for p in roster]
-        ) if roster else np.empty((n, 0), dtype=bool)
+        active = (
+            np.column_stack(
+                [rng.random(n) < float(p.availability_probability) for p in roster]
+            )
+            if roster
+            else np.empty((n, 0), dtype=bool)
+        )
         for j, p in enumerate(roster):
             player_stats[p.player_id]["active"] = active[:, j].astype(np.int64)
 
+        explicit_primary = [j for j, p in enumerate(roster) if p.is_primary_qb]
+        if explicit_primary:
+            primary_qb_index = explicit_primary[0]
+        else:
+            qb_candidates = [
+                j
+                for j, p in enumerate(roster)
+                if p.position.upper() == "QB" and p.pass_attempt_share > 0.0
+            ]
+            primary_qb_index = (
+                max(qb_candidates, key=lambda j: roster[j].pass_attempt_share)
+                if qb_candidates
+                else None
+            )
+
         independent_pace = rng.normal(size=n)
-        play_z = rho * shared_pace + np.sqrt(max(0.0, 1.0 - rho * rho)) * independent_pace
-        plays = np.rint(float(team.mean_offensive_plays) + float(team.offensive_plays_sd) * play_z)
+        if (
+            team.offensive_plays_gamma_shape is not None
+            and team.offensive_plays_gamma_rate is not None
+        ):
+            shape = float(team.offensive_plays_gamma_shape)
+            rate = float(team.offensive_plays_gamma_rate)
+            mean_plays = shape / rate
+            variance_plays = mean_plays + shape / (rate * rate)
+            raw_rate = rng.gamma(shape=shape, scale=1.0 / rate, size=n)
+            raw_plays = rng.poisson(raw_rate)
+            raw_z = (raw_plays - mean_plays) / np.sqrt(max(variance_plays, 1e-9))
+            play_z = rho * shared_pace + np.sqrt(max(0.0, 1.0 - rho * rho)) * raw_z
+            plays = np.rint(mean_plays + np.sqrt(variance_plays) * play_z)
+        else:
+            play_z = rho * shared_pace + np.sqrt(max(0.0, 1.0 - rho * rho)) * independent_pace
+            plays = np.rint(
+                float(team.mean_offensive_plays) + float(team.offensive_plays_sd) * play_z
+            )
         plays = np.maximum(plays, 0.0).astype(np.int64)
 
         trailing_signal = -script if team.team == game.home_team else script
-        pass_rate = (
-            float(team.neutral_pass_rate)
-            + float(team.pass_rate_game_script_sensitivity) * trailing_signal
-            + float(team.pass_rate_sd) * rng.normal(size=n)
-        )
-        pass_rate = np.clip(pass_rate, 0.0, 1.0)
-        pass_attempts = rng.binomial(plays, pass_rate)
-        rush_attempts = plays - pass_attempts
+        if team.dropback_rate_alpha is not None and team.dropback_rate_beta is not None:
+            dropback_rate = rng.beta(
+                float(team.dropback_rate_alpha),
+                float(team.dropback_rate_beta),
+                size=n,
+            )
+            dropback_rate = np.clip(
+                dropback_rate
+                + float(team.pass_rate_game_script_sensitivity) * trailing_signal,
+                0.0,
+                1.0,
+            )
+            dropbacks = rng.binomial(plays, dropback_rate)
+            designed_rush_attempts = plays - dropbacks
+            if (
+                team.pass_attempt_outcome_alpha is not None
+                and team.sack_outcome_alpha is not None
+                and team.scramble_outcome_alpha is not None
+            ):
+                outcome_weights = np.column_stack(
+                    [
+                        rng.gamma(float(team.pass_attempt_outcome_alpha), 1.0, size=n),
+                        rng.gamma(float(team.sack_outcome_alpha), 1.0, size=n),
+                        rng.gamma(float(team.scramble_outcome_alpha), 1.0, size=n),
+                    ]
+                )
+                dropback_alloc = _allocate_counts(dropbacks, outcome_weights, rng)
+                pass_attempts = dropback_alloc[:, 0]
+                sacks = dropback_alloc[:, 1]
+                scrambles = dropback_alloc[:, 2]
+            else:
+                pass_attempts = dropbacks.copy()
+                sacks = np.zeros(n, dtype=np.int64)
+                scrambles = np.zeros(n, dtype=np.int64)
+        else:
+            pass_rate = (
+                float(team.neutral_pass_rate)
+                + float(team.pass_rate_game_script_sensitivity) * trailing_signal
+                + float(team.pass_rate_sd) * rng.normal(size=n)
+            )
+            pass_rate = np.clip(pass_rate, 0.0, 1.0)
+            pass_attempts = rng.binomial(plays, pass_rate)
+            dropbacks = pass_attempts.copy()
+            sacks = np.zeros(n, dtype=np.int64)
+            scrambles = np.zeros(n, dtype=np.int64)
+            designed_rush_attempts = plays - dropbacks
+        rush_attempts = designed_rush_attempts + scrambles
 
         qb_shares = np.array([p.pass_attempt_share for p in roster], dtype=float)
         qb_weights = _weights_with_residual(qb_shares, active)
@@ -654,29 +729,96 @@ def simulate_game(
         for j, p in enumerate(roster):
             player_stats[p.player_id]["pass_attempts"] = qb_attempt_alloc[:, j]
 
+        modeled_routes: list[np.ndarray] = []
+        for j, p in enumerate(roster):
+            fixed_route = (
+                float(p.route_participation)
+                if p.target_share > 0.0
+                or p.route_participation_alpha is not None
+                or p.route_participation_beta is not None
+                else 0.0
+            )
+            route_probability = _sample_beta_or_fixed(
+                p.route_participation_alpha,
+                p.route_participation_beta,
+                fixed_route,
+                n,
+                rng,
+            )
+            routes = rng.binomial(dropbacks, np.clip(route_probability, 0.0, 1.0))
+            routes = routes * active[:, j].astype(np.int64)
+            player_stats[p.player_id]["routes"] = routes
+            modeled_routes.append(routes)
+
+        if (
+            team.targetable_attempt_alpha is not None
+            and team.targetable_attempt_beta is not None
+        ):
+            targetable_rate = rng.beta(
+                float(team.targetable_attempt_alpha),
+                float(team.targetable_attempt_beta),
+                size=n,
+            )
+            team_targets = rng.binomial(pass_attempts, targetable_rate)
+        else:
+            team_targets = pass_attempts.copy()
+
         target_shares = np.array([p.target_share for p in roster], dtype=float)
-        target_weights = _weights_with_residual(target_shares, active)
-        target_alloc = _allocate_counts(pass_attempts, target_weights, rng)
+        target_alphas = np.array(
+            [0.0 if p.target_share_alpha is None else p.target_share_alpha for p in roster],
+            dtype=float,
+        )
+        target_weights = _sample_weights_with_residual(
+            target_shares,
+            active,
+            target_alphas,
+            rng,
+        )
+        route_capacity = (
+            np.column_stack(modeled_routes + [team_targets])
+            if modeled_routes
+            else team_targets[:, None]
+        )
+        target_alloc = _allocate_events_with_capacity(
+            team_targets,
+            target_weights,
+            route_capacity,
+            rng,
+        )
+
         modeled_receptions: list[np.ndarray] = []
         modeled_receiving_yards: list[np.ndarray] = []
         for j, p in enumerate(roster):
             targets = target_alloc[:, j]
-            receptions = rng.binomial(targets, float(p.catch_rate))
+            catch_probability = _sample_beta_or_fixed(
+                p.catch_alpha,
+                p.catch_beta,
+                float(p.catch_rate),
+                n,
+                rng,
+            )
+            receptions = rng.binomial(targets, np.clip(catch_probability, 0.0, 1.0))
             receiving_yards = _compound_yards(
                 receptions,
                 float(p.receiving_yards_per_reception),
                 float(p.receiving_yards_shape_per_reception),
                 rng,
+                event_sd=p.receiving_yards_per_reception_event_sd,
+                mean_se=float(p.receiving_yards_per_reception_mean_se),
             )
             player_stats[p.player_id]["targets"] = targets
             player_stats[p.player_id]["receptions"] = receptions
             player_stats[p.player_id]["receiving_yards"] = receiving_yards
             modeled_receptions.append(receptions)
             modeled_receiving_yards.append(receiving_yards)
+
         residual_targets = target_alloc[:, -1]
         residual_receptions = rng.binomial(residual_targets, float(team.residual_catch_rate))
         residual_receiving_yards = _compound_yards(
-            residual_receptions, float(team.residual_yards_per_reception), 2.0, rng
+            residual_receptions,
+            float(team.residual_yards_per_reception),
+            2.0,
+            rng,
         )
         rec_matrix = (
             np.column_stack(modeled_receptions + [residual_receptions])
@@ -700,14 +842,38 @@ def simulate_game(
         qb_yard_weights = qb_completion_alloc.astype(float)
         no_completions = qb_yard_weights.sum(axis=1) <= 0
         qb_yard_weights[no_completions] = qb_attempt_alloc[no_completions]
-        qb_passing_yards = _allocate_integer_total_by_weight(team_passing_yards, qb_yard_weights)
+        qb_passing_yards = _allocate_integer_total_by_weight(
+            team_passing_yards,
+            qb_yard_weights,
+        )
         for j, p in enumerate(roster):
             player_stats[p.player_id]["completions"] = qb_completion_alloc[:, j]
             player_stats[p.player_id]["passing_yards"] = qb_passing_yards[:, j]
 
         carry_shares = np.array([p.carry_share for p in roster], dtype=float)
-        carry_weights = _weights_with_residual(carry_shares, active)
-        carry_alloc = _allocate_counts(rush_attempts, carry_weights, rng)
+        carry_alphas = np.array(
+            [
+                0.0 if p.designed_carry_share_alpha is None else p.designed_carry_share_alpha
+                for p in roster
+            ],
+            dtype=float,
+        )
+        carry_weights = _sample_weights_with_residual(
+            carry_shares,
+            active,
+            carry_alphas,
+            rng,
+        )
+        carry_alloc = _allocate_counts(designed_rush_attempts, carry_weights, rng)
+        if np.any(scrambles > 0):
+            if primary_qb_index is None:
+                carry_alloc[:, -1] += scrambles
+            else:
+                primary_active = active[:, primary_qb_index].astype(np.int64)
+                assigned_scrambles = scrambles * primary_active
+                carry_alloc[:, primary_qb_index] += assigned_scrambles
+                carry_alloc[:, -1] += scrambles - assigned_scrambles
+
         modeled_rush_yards: list[np.ndarray] = []
         for j, p in enumerate(roster):
             carries = carry_alloc[:, j]
@@ -716,13 +882,18 @@ def simulate_game(
                 float(p.rushing_yards_per_carry),
                 float(p.rushing_yards_shape_per_carry),
                 rng,
+                event_sd=p.rushing_yards_per_carry_event_sd,
+                mean_se=float(p.rushing_yards_per_carry_mean_se),
             )
             player_stats[p.player_id]["carries"] = carries
             player_stats[p.player_id]["rushing_yards"] = rushing_yards
             modeled_rush_yards.append(rushing_yards)
         residual_carries = carry_alloc[:, -1]
         residual_rushing_yards = _compound_yards(
-            residual_carries, float(team.residual_yards_per_carry), 2.0, rng
+            residual_carries,
+            float(team.residual_yards_per_carry),
+            2.0,
+            rng,
         )
         team_rushing_yards = (
             np.column_stack(modeled_rush_yards + [residual_rushing_yards]).sum(axis=1)
@@ -732,8 +903,25 @@ def simulate_game(
 
         passing_tds = rng.poisson(float(team.expected_passing_tds) * scoring_multiplier)
         passing_tds = np.minimum(passing_tds, team_completions)
-        receiving_td_shares = np.array([p.receiving_td_share for p in roster], dtype=float)
-        receiving_td_weights = _weights_with_residual(receiving_td_shares, active)
+        receiving_td_shares = np.array(
+            [p.receiving_td_share for p in roster],
+            dtype=float,
+        )
+        receiving_td_alphas = np.array(
+            [
+                0.0
+                if p.receiving_td_allocation_alpha is None
+                else p.receiving_td_allocation_alpha
+                for p in roster
+            ],
+            dtype=float,
+        )
+        receiving_td_weights = _sample_weights_with_residual(
+            receiving_td_shares,
+            active,
+            receiving_td_alphas,
+            rng,
+        )
         receiving_td_alloc = _allocate_events_with_capacity(
             passing_tds,
             receiving_td_weights,
@@ -741,9 +929,30 @@ def simulate_game(
             rng,
         )
         passing_tds = receiving_td_alloc.sum(axis=1)
+
+        passing_td_shares = np.array(
+            [
+                p.pass_attempt_share if p.passing_td_share is None else p.passing_td_share
+                for p in roster
+            ],
+            dtype=float,
+        )
+        passing_td_alphas = np.array(
+            [
+                0.0 if p.passing_td_allocation_alpha is None else p.passing_td_allocation_alpha
+                for p in roster
+            ],
+            dtype=float,
+        )
+        qb_td_weights = _sample_weights_with_residual(
+            passing_td_shares,
+            active,
+            passing_td_alphas,
+            rng,
+        )
         qb_td_alloc = _allocate_events_with_capacity(
             passing_tds,
-            qb_weights,
+            qb_td_weights,
             qb_completion_alloc,
             rng,
         )
@@ -754,7 +963,19 @@ def simulate_game(
         rushing_tds = rng.poisson(float(team.expected_rushing_tds) * scoring_multiplier)
         rushing_tds = np.minimum(rushing_tds, rush_attempts)
         rushing_td_shares = np.array([p.rushing_td_share for p in roster], dtype=float)
-        rushing_td_weights = _weights_with_residual(rushing_td_shares, active)
+        rushing_td_alphas = np.array(
+            [
+                0.0 if p.rushing_td_allocation_alpha is None else p.rushing_td_allocation_alpha
+                for p in roster
+            ],
+            dtype=float,
+        )
+        rushing_td_weights = _sample_weights_with_residual(
+            rushing_td_shares,
+            active,
+            rushing_td_alphas,
+            rng,
+        )
         rushing_td_alloc = _allocate_events_with_capacity(
             rushing_tds,
             rushing_td_weights,
@@ -769,12 +990,23 @@ def simulate_game(
                 + player_stats[p.player_id]["rushing_tds"]
             )
 
+        route_matrix = (
+            np.column_stack(modeled_routes)
+            if modeled_routes
+            else np.empty((n, 0), dtype=np.int64)
+        )
         team_stats[team.team] = {
             "offensive_plays": plays,
+            "dropbacks": dropbacks,
             "pass_attempts": pass_attempts,
+            "sacks": sacks,
+            "scrambles": scrambles,
+            "designed_rush_attempts": designed_rush_attempts,
             "rush_attempts": rush_attempts,
             "modeled_qb_pass_attempts": qb_attempt_alloc[:, :-1].sum(axis=1),
             "residual_qb_pass_attempts": qb_attempt_alloc[:, -1],
+            "modeled_routes": route_matrix.sum(axis=1),
+            "team_targets": team_targets,
             "targets": target_alloc[:, :-1].sum(axis=1),
             "residual_targets": residual_targets,
             "completions": team_completions,
@@ -806,7 +1038,6 @@ def simulate_game(
         player_stats=player_stats,
         team_stats=team_stats,
     )
-
 
 def american_to_implied_probability(odds: float) -> float:
     odds = _finite(odds, "american odds")
