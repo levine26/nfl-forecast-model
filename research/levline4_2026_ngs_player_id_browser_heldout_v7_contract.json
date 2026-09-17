@@ -1,0 +1,380 @@
+{
+  "authority_if_and_only_if_all_v7_gates_pass": {
+    "ari_az_team_alias_qualified_for_frozen_v7_population": "conditional_capability_evidence",
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "game_day_membership_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "multiple_candidate_tiebreak_qualified_for_frozen_v7_population": "conditional_capability_evidence",
+    "ngs_endpoint_as_independent_or_stable_production_api_qualified": false,
+    "ngs_is_independent_player_identity_ground_truth": false,
+    "ngs_public_page_browser_context_transport_qualified_for_frozen_v7_population": true,
+    "ngs_repaired_name_team_resolver_qualified_for_frozen_v7_population": true,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": true,
+    "player_value_join_authorized": false,
+    "production_authorized": false,
+    "query_fallback_semantics_qualified_for_frozen_v7_population": "conditional_capability_evidence",
+    "source_canonical_name_representation_qualified_for_frozen_v7_population": "conditional_capability_evidence",
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "authority_if_any_v7_gate_fails": {
+    "ari_az_team_alias_qualified_for_frozen_v7_population": false,
+    "availability_state_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "game_day_membership_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "multiple_candidate_tiebreak_qualified_for_frozen_v7_population": false,
+    "ngs_public_page_browser_context_transport_qualified_for_frozen_v7_population": false,
+    "ngs_repaired_name_team_resolver_qualified_for_frozen_v7_population": false,
+    "official_roster_to_ngs_gsis_candidate_bridge_qualified_for_separately_preregistered_heldout_application": false,
+    "player_value_join_authorized": false,
+    "production_authorized": false,
+    "query_fallback_semantics_qualified_for_frozen_v7_population": false,
+    "required_next_action": "Freeze the first V7 result. Any changed source-canonical parser, query order, name-key semantics, team equivalence, tiebreak, target selection, source, timeout, retry behavior, gate, or threshold requires a new preregistered version.",
+    "source_canonical_name_representation_qualified_for_frozen_v7_population": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "browser_transport": {
+    "browser_storage_state_must_not_be_persisted": true,
+    "context_locale": "en-US",
+    "context_user_agent": "LevLine-Research/1.0 (+https://github.com/levine26/nfl-forecast-model)",
+    "cookie_or_browser_state_export_allowed": false,
+    "direct_http_fallback_allowed": false,
+    "engine": "playwright chromium headless",
+    "explicit_retry_allowed": false,
+    "manual_headers_or_credentials_allowed": false,
+    "maximum_query_attempts_per_target": 4,
+    "page_load_timeout_ms": 60000,
+    "page_load_wait_until": "domcontentloaded",
+    "page_url": "https://ngs.nfl.com/player-id-lookup",
+    "post_load_settle_ms": 1500,
+    "query_cascade": [
+      {
+        "name": "exact_visible_name",
+        "order": 1,
+        "rule": "Fill exact source visible_name and press Enter once."
+      },
+      {
+        "condition": "Only if prior response is HTTP 200 parseable players array length 0 and stripping exactly one frozen terminal suffix from visible_name changes the query.",
+        "name": "terminal_suffix_stripped",
+        "order": 2,
+        "rule": "Use visible_name with one frozen terminal suffix removed."
+      },
+      {
+        "condition": "Only if every prior executed response is HTTP 200 parseable players array length 0, canonical_data_name parses under the frozen source rule, and canonical name_key differs from visible name_key.",
+        "name": "source_canonical_name",
+        "order": 3,
+        "rule": "Query the deterministic source canonical query name exactly once."
+      },
+      {
+        "condition": "Only if every prior executed response is HTTP 200 parseable players array length 0.",
+        "name": "surname_only",
+        "order": 4,
+        "rule": "Use the final whitespace-delimited token of suffix-stripped visible_name after trimming punctuation at token edges; require at least 3 alphanumeric characters."
+      }
+    ],
+    "query_input_placeholder_exact": "Search By Name (min 3 chars)",
+    "raw_response_bytes_must_be_preserved": true,
+    "response_timeout_ms": 15000,
+    "stop_rule": "Stop at the first HTTP 200 parseable players array with length > 0. Do not broaden after a nonempty players array even if semantic resolution fails."
+  },
+  "conditional_capability_evidence": {
+    "ari_az_team_alias_qualified_only_if": "Every overall V7 gate passes, all four ARI stress targets resolve, and at least one selected ARI target candidate uses NGS teamAbbr AZ.",
+    "multiple_candidate_tiebreak_qualified_only_if": "Every overall V7 gate passes and at least one target has >1 primary candidate and frozen position+jersey tiebreak resolves exactly one valid GSIS.",
+    "query_fallback_semantics_qualified_only_if": "Every overall V7 gate passes and at least one target requires a post-exact query attempt and then resolves uniquely under a frozen semantic name key.",
+    "source_canonical_name_representation_qualified_only_if": "Every overall V7 gate passes and at least one V7 target executes source_canonical_name after prior empty response(s), then resolves uniquely using the canonical source name key with valid GSIS."
+  },
+  "contract_id": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V7",
+  "corroboration_diagnostics": {
+    "independent_coverage_jersey": {
+      "denominator": "Resolved coverage targets for which tiebreak_applied is false.",
+      "ngs_value": "integer-normalized selected candidate uniformNumber, else jerseyNumber, when nonempty and parseable",
+      "official_value": "integer-normalized target jersey_number when nonempty and parseable",
+      "tiebreak_resolved_rows_excluded": true,
+      "used_for_selection": false
+    },
+    "position": {
+      "record_ngs_position_and_position_group": true,
+      "record_official_position": true,
+      "used_as_qualification_gate": false,
+      "used_for_selection_only_in_frozen_multiple_candidate_tiebreak": true
+    },
+    "status": {
+      "availability_semantics_authorized": false,
+      "may_be_recorded_as_raw_source_metadata": true,
+      "used_for_availability": false,
+      "used_for_selection": false
+    }
+  },
+  "fixed_resolution_rule": {
+    "candidate_name_match": "candidate name_key(displayName) must equal either target name_key(visible_name) or, when available, target name_key(source_canonical_query_name)",
+    "fallback_matching_allowed_beyond_frozen_rules": false,
+    "fields_forbidden_from_selection": [
+      "status",
+      "statusDescriptionAbbr",
+      "statusShortDescription",
+      "nflId",
+      "esbId",
+      "smartId",
+      "birthDate",
+      "collegeName",
+      "entryYear",
+      "profile_path"
+    ],
+    "manual_resolution_allowed": false,
+    "multiple_candidate_tiebreak": "If more than one primary candidate exists, require target jersey_number to parse as integer and target position uppercase to equal candidate position uppercase OR positionGroup uppercase; require candidate jerseyNumber/uniformNumber integer to equal target jersey; keep only candidates satisfying both position and jersey. Resolve only if exactly one remains and its gsisId is valid.",
+    "single_candidate_rule": "If exactly one primary candidate exists and gsisId matches ^00-[0-9]{7}$, resolve it.",
+    "team_equivalence": {
+      "ARI": [
+        "ARI",
+        "AZ"
+      ],
+      "all_other_official_teams": "exact uppercase equality only"
+    },
+    "unresolved_rows_fail_closed": true
+  },
+  "frozen_pass_gates": {
+    "canonical_name_variant_stratum_unique_resolution_minimum_count": 30,
+    "canonical_name_variant_stratum_unique_resolution_minimum_fraction": 0.9375,
+    "coverage_stratum_unique_resolution_minimum_count": 61,
+    "coverage_stratum_unique_resolution_minimum_fraction": 0.953125,
+    "duplicate_selected_gsis_across_distinct_target_rows_allowed": 0,
+    "every_executed_query_attempt_http_200_parseable_players_array": true,
+    "independent_resolved_coverage_jersey_agreement_minimum_fraction": 0.95,
+    "independent_resolved_coverage_jersey_comparable_minimum_fraction": 0.8,
+    "invalid_selected_gsis_count_allowed": 0,
+    "manual_unresolved_repair_before_gate_allowed": false,
+    "page_loaded_and_unique_query_input_required": true,
+    "source_name_variant_stratum_unique_resolution_minimum_count": 15,
+    "source_name_variant_stratum_unique_resolution_minimum_fraction": 0.9375,
+    "team_alias_ari_stratum_unique_resolution_required_count": 4,
+    "team_alias_ari_stratum_unique_resolution_required_fraction": 1.0,
+    "threshold_relaxation_after_first_result_allowed": false
+  },
+  "frozen_upstream_evidence": {
+    "ngs_browser_heldout_v3": {
+      "artifact_digest": "sha256:af586ab4b827a8a99422d02d3265ca70f540cc5279770345acb5af5cd5037958",
+      "artifact_id": 10472217076,
+      "development_only_not_validation": true,
+      "head_sha": "fd4224805a46712c6d240cced51ef7d93ac50f9b",
+      "status": "FAIL",
+      "target_count": 70,
+      "target_selection_sha256": "437a94fa92709d60f0c3b2d88a4e52ce8f3dfd7f6241109793f4d991b8222f8d",
+      "workflow_run_id": 35159301387
+    },
+    "ngs_browser_heldout_v4": {
+      "artifact_digest": "sha256:8d1220ddbf4406bd1656b85db2400246c7c4fe15e140d84c39ed0c303d7d5acd",
+      "artifact_id": 10473865589,
+      "head_sha": "42bca8b57ac13b6fc44cc4ad1d50b9b806deaa3e",
+      "ngs_request_count": 0,
+      "ngs_response_count": 0,
+      "scientific_disposition": "NOT_EVALUATED",
+      "status": "TECHNICAL_FAIL_PRE_REQUEST",
+      "workflow_run_id": 35162256814
+    },
+    "ngs_browser_heldout_v5_empirical_exposure_only": {
+      "artifact_digest": "sha256:961994eb487c59103f5388708456659e40e11d13ee4462494f7d093876787c90",
+      "artifact_id": 10473671117,
+      "authority_suspended_due_to_preregistration_sequence_conflict": true,
+      "head_sha": "2fbd9cbb76efc12448581eb1ed393a579cfd60b9",
+      "observed_result": "PASS",
+      "target_count": 74,
+      "target_selection_sha256": "6ae6e017cd24593657921ee82d023541b0feb679a37aa0051c17fe4ab2244e7a",
+      "used_only_to_exclude_empirically_observed_target_rows": true,
+      "workflow_run_id": 35162079741
+    },
+    "ngs_browser_heldout_v6": {
+      "artifact_digest": "sha256:ee95d89fa0ac660b879eb79a647d408ed424b63c744d69a2e5f20ac0ee8180aa",
+      "artifact_id": 10474626172,
+      "coverage_resolved_count": 60,
+      "coverage_target_count": 64,
+      "development_only_for_v7_rule_design": true,
+      "development_rows": [
+        {
+          "canonical_data_name": "uche,joshua",
+          "ngs_same_team_surname_candidate_display_name": "Joshua Uche",
+          "team": "MIA",
+          "visible_name": "Josh Uche"
+        },
+        {
+          "canonical_data_name": "brents,julius",
+          "ngs_same_team_surname_candidate_display_name": "Julius Brents",
+          "team": "MIA",
+          "visible_name": "JuJu Brents"
+        },
+        {
+          "canonical_data_name": "brown,marquise",
+          "ngs_same_team_surname_candidate_display_name": "Marquise Brown",
+          "team": "PHI",
+          "visible_name": "Hollywood Brown"
+        },
+        {
+          "canonical_data_name": "flott,cordale",
+          "ngs_same_team_surname_candidate_display_name": "Cordale Flott",
+          "team": "TEN",
+          "visible_name": "Cor'Dale Flott"
+        }
+      ],
+      "failed_gate": "coverage_unique_resolution_minimum",
+      "head_sha": "89bf915cfbe3bb4b0194e34398f3043a2968899f",
+      "observed_failure_class": "exact_visible_name_empty_then_fallback_no_exact_name_plus_team_candidate",
+      "status": "FAIL",
+      "target_count": 78,
+      "target_selection_sha256": "79bc1ed98484b76cb565737e4093f6a6f2c9e1c44aa74e5deb6588561b3fef6e",
+      "v6_target_rows_may_not_be_used_for_v7_validation": true,
+      "workflow_run_id": 35164913626
+    },
+    "official_club_roster_v2": {
+      "artifact_digest": "sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e",
+      "artifact_id": 10461126275,
+      "canonical_data_name_is_source_native": true,
+      "head_sha": "1280e4a06eacf3e30700f75d4dab9ecff99944a4",
+      "roster_metadata_sha256": "90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f",
+      "row_count": 2463,
+      "source_native_evidence": "Official roster HTML player-name elements expose data-name while the anchor text exposes visible_name; both were captured before NGS V7.",
+      "team_count": 32,
+      "workflow_run_id": 35130069924
+    }
+  },
+  "governance": {
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "f_st_01_frozen_2026_unchanged": true,
+    "first_result_is_canonical_whether_pass_or_fail": true,
+    "future_information_used_to_repair_point_in_time_state": false,
+    "identity_resolution_alone_authorizes_forecast_effect": false,
+    "identity_resolution_alone_authorizes_model_fit": false,
+    "later_same_version_execution_may_replace_first_result": false,
+    "next_phase_after_pass": "Freeze and durably preserve V7 before observing any target inactive/availability rows. A separate preregistered point-in-time availability application must distinguish identity, game-day membership, injury designation, inactive status, and replacement/role consequences.",
+    "postgame_participation_used": false,
+    "production_paths_may_change": false,
+    "research_only": true,
+    "same_version_rule_adaptation_after_first_result": false,
+    "threshold_relaxation_after_first_result_allowed": false,
+    "week2_inactive_execution_evidence_used_for_design": false
+  },
+  "preregistration_state": {
+    "contract_must_precede_v7_implementation_tests_and_workflow": true,
+    "fuzzy_or_phonetic_matching_allowed": false,
+    "manual_alias_dictionary_allowed": false,
+    "no_v7_target_ngs_responses_observed_before_contract_freeze": true,
+    "v3_v5_v6_target_rows_may_not_be_used_for_v7_validation": true,
+    "v6_failure_did_not_change_v7_pass_thresholds": true,
+    "v6_may_inform_v7_rule_design_only": true,
+    "v7_new_rule_is_limited_to_source_native_canonical_data_name": true
+  },
+  "purpose": "Prospective out-of-sample validation of a narrowly extended official-roster-to-NGS GSIS resolver on a fresh roster population after V6 failed only the frozen coverage gate. V7 adds one source-native identity representation derived deterministically from the official club roster HTML data-name field (canonical_data_name). It makes no fuzzy, nickname-dictionary, status, outcome, participation, availability, or manual-knowledge repair.",
+  "schema_version": "levline4-2026-ngs-player-id-browser-heldout-v7-contract",
+  "source_canonical_name_rule": {
+    "parser": {
+      "comma_split": "Split canonical_data_name on comma; trim each component; discard empty components; require exactly two nonempty components or the canonical representation is unavailable.",
+      "component_order": "First component is family name; second component is given-name string.",
+      "normalization": "No nickname table, stemming, token substitution, edit distance, phonetic transform, or manual correction.",
+      "suffix_rule": "If the final whitespace-delimited token of the given-name string is a frozen suffix token (case-insensitive, optional period for Jr/Sr), move that exact token after the family name; otherwise emit given-name string + space + family name.",
+      "suffix_tokens": [
+        "Jr.",
+        "Jr",
+        "Sr.",
+        "Sr",
+        "II",
+        "III",
+        "IV",
+        "V"
+      ]
+    },
+    "provenance": "Captured directly from official club roster HTML player-name data-name attribute before V7 NGS execution.",
+    "qualification_ceiling": "The canonical representation is a source-native alternate identity string, not independent truth. It can qualify only as a bounded resolver input if V7 overall passes and the rule is empirically exercised successfully.",
+    "semantic_name_keys": "Candidate displayName may match exactly under frozen name_key to either source visible_name or the deterministic source canonical query name when available.",
+    "source_field": "canonical_data_name"
+  },
+  "target_selection": {
+    "canonical_name_variant_stratum": {
+      "expected_eligible_count": 317,
+      "expected_target_count": 32,
+      "rule": "Take eligible rows whose canonical_data_name parses under the frozen source rule and whose canonical query name has a different frozen name_key from visible_name; sort by selection_key, team, visible_name, profile_path; take first 32."
+    },
+    "coverage_stratum": {
+      "expected_target_count": 64,
+      "expected_team_count": 32,
+      "per_team_count": 2,
+      "rule": "For each team in lexicographic team order, sort eligible rows by selection_key ascending, visible_name ascending, profile_path ascending; take first 2."
+    },
+    "eligibility": {
+      "position_nonempty": true,
+      "team_nonempty": true,
+      "visible_name_nonempty": true
+    },
+    "exclusions": {
+      "all_exact_v2_v3_target_row_identities_from_pinned_v3_target_selection": true,
+      "all_exact_v5_empirical_target_row_identities_from_pinned_v5_target_selection": true,
+      "all_exact_v6_empirical_target_row_identities_from_pinned_v6_target_selection": true,
+      "normalized_v1_sentinel_visible_names": [
+        "Patrick Mahomes",
+        "Josh Allen",
+        "Justin Jefferson"
+      ],
+      "row_identity_fields": [
+        "team",
+        "visible_name",
+        "profile_path"
+      ]
+    },
+    "expected_eligible_row_count": 2237,
+    "expected_overlap_counts": {
+      "all_four": 0,
+      "coverage_and_canonical_name_variant": 7,
+      "coverage_and_source_name_variant": 2,
+      "coverage_and_team_alias_ari": 2,
+      "coverage_source_name_variant_canonical_name_variant": 0,
+      "coverage_team_alias_canonical_name_variant": 0,
+      "coverage_team_alias_source_name_variant": 0,
+      "source_name_variant_and_canonical_name_variant": 2,
+      "team_alias_and_canonical_name_variant": 0,
+      "team_alias_and_source_name_variant": 0,
+      "team_alias_source_name_variant_canonical_name_variant": 0
+    },
+    "expected_sorted_row_identity_sha256": "8a6b4bd7f6f84f292a20f20ce378f69de74ea98ae34deeb09ad192bc64911d7c",
+    "expected_target_projection_sha256": "08170a782af614e79da43eaa201fc6898889b2001907adec72b6f259c2b7ef85",
+    "expected_total_target_count": 103,
+    "selection_key": {
+      "algorithm": "sha256",
+      "ordered_fields": [
+        "team",
+        "visible_name",
+        "position",
+        "jersey_number_or_empty",
+        "profile_path_or_empty"
+      ],
+      "payload": "selection_salt + U+001E + U+001F-joined ordered fields"
+    },
+    "selection_salt": "LEVLINE-4-2026-NGS-PLAYER-ID-BROWSER-HELDOUT-V7",
+    "source": "Only pinned official_club_roster_v2 roster_metadata.jsonl.",
+    "source_name_variant_stratum": {
+      "expected_eligible_count": 183,
+      "expected_target_count": 16,
+      "rule": "Take eligible rows whose visible_name matches either frozen source-only regex; sort by selection_key, team, visible_name, profile_path; take first 16.",
+      "source_only_regexes": [
+        "^[A-Z]{2,4}\\b",
+        "\\b(?:II|III|IV|V|Jr\\.?|Sr\\.?)$"
+      ]
+    },
+    "target_projection_fields": [
+      "team",
+      "visible_name",
+      "canonical_data_name",
+      "canonical_query_name",
+      "position",
+      "jersey_number",
+      "profile_path",
+      "strata",
+      "selection_key_sha256"
+    ],
+    "team_alias_ari_stratum": {
+      "expected_target_count": 4,
+      "rule": "Sort eligible ARI rows by the same frozen ordering and take first 4.",
+      "team": "ARI"
+    },
+    "union_rule": "Row-identity union of coverage, team_alias_ari, source_name_variant, and canonical_name_variant strata."
+  }
+}
