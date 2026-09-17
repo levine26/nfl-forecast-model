@@ -6,6 +6,10 @@ Research isolation may not depend solely on a branch-name convention. A pull req
 research-scoped when either its head uses a registered research prefix or its diff touches
 an explicitly isolated or research-looking surface. Pure production changes remain outside
 this firewall; mixed research/production diffs fail closed.
+
+The Props Sunday sprint has one deliberately enumerated exception: its product/QA lane is
+assigned a small set of publication/UI integration files. Those exact paths are allowed;
+generic site/output/winner-model paths remain protected.
 """
 
 import argparse
@@ -57,6 +61,23 @@ ALLOWED_EXACT = {
     "src/nfl_forecast/fst_reconstruction.py",
 }
 
+# Exact carve-out authorized by the Props sprint charter. Keep this enumerated: do not
+# broaden to site/, outputs/, scripts/, or src/nfl_forecast/ prefixes.
+PROPS_PRODUCT_ALLOWED_EXACT = {
+    ".github/workflows/dashboard.yml",
+    ".github/workflows/props_product_qa.yml",
+    "scripts/build_props_publication.py",
+    "scripts/update_props_history.py",
+    "src/nfl_forecast/props_publication.py",
+    "tests/test_props_publication.py",
+    "site/src/AppCoherent.jsx",
+    "site/src/PropsResearchBeta.jsx",
+    "site/src/props-research-beta.css",
+    "site/src/propsPresentation.js",
+    "site/tests/props-research-beta.spec.js",
+    "site/tests/propsPresentation.test.mjs",
+}
+
 PROTECTED_PREFIXES = (
     "site/",
     "outputs/",
@@ -105,6 +126,8 @@ def _normalize(path: str) -> str:
 
 def path_allowed(path: str) -> bool:
     normalized = _normalize(path)
+    if normalized in PROPS_PRODUCT_ALLOWED_EXACT:
+        return True
     if normalized in PROTECTED_EXACT or normalized.startswith(PROTECTED_PREFIXES):
         return False
     return normalized in ALLOWED_EXACT or normalized.startswith(ALLOWED_PREFIXES)
@@ -116,21 +139,9 @@ def _looks_research_scoped(path: str) -> bool:
 
 
 def research_scope_triggered(paths: list[str], head_ref: str = "") -> bool:
-    """Return whether the diff must satisfy the isolated-research allowlist.
-
-    Registered research/challenger branch names always trigger the firewall. For other
-    branch names, touching an allowlisted research surface or any research-looking path
-    also triggers it. The latter is deliberately broader than the allowlist so a new,
-    unregistered research file fails closed instead of silently escaping on ``fix/...``.
-    """
-
     if head_ref.startswith(RESEARCH_HEAD_PREFIXES):
         return True
-    return any(
-        path_allowed(path) or _looks_research_scoped(path)
-        for path in paths
-        if path
-    )
+    return any(path_allowed(path) or _looks_research_scoped(path) for path in paths if path)
 
 
 def validate_changed_paths(paths: list[str]) -> list[str]:
@@ -149,12 +160,10 @@ def main() -> int:
     parser.add_argument("--head-ref", default="")
     parser.add_argument("paths", nargs="*")
     args = parser.parse_args()
-
     paths = args.paths or changed_paths(args.base)
     if not research_scope_triggered(paths, args.head_ref):
         print(f"research firewall skipped for production-only diff: {args.head_ref or '<unnamed>'}")
         return 0
-
     violations = validate_changed_paths(paths)
     print("research changed paths:")
     for path in paths:
