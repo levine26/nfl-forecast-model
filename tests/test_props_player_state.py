@@ -318,3 +318,65 @@ def test_existing_nfl_injury_adapter_can_be_flattened_with_capture_time():
     )
     assert frame.loc[0, "team"] == "ARI"
     assert frame.loc[0, "captured_at"] == "2026-09-17T20:00:00Z"
+
+
+
+def test_snap_only_period_does_not_dilute_usage_when_pbp_game_is_missing():
+    pbp = _pbp()
+    pbp = pbp[pd.to_numeric(pbp["week"], errors="coerce").eq(1)].copy()
+    snaps = pd.DataFrame(
+        [
+            {
+                "season": 2026,
+                "week": 2,
+                "game_id": "2026_02_ARI_X",
+                "player_id": "00-WR",
+                "offense_snaps": 58,
+                "offense_pct": 0.91,
+            }
+        ]
+    )
+    built = build_offensive_player_state_contract(
+        schedules=_schedule(),
+        roster=_roster(),
+        pbp=pbp,
+        season=2026,
+        week=3,
+        forecast_timestamp="2026-09-17T21:00:00Z",
+        snap_counts=snaps,
+    )
+    wr = built.player_state[built.player_state["player_id"].eq("00-WR")].iloc[0]
+    assert wr["prior_targets_pg_4"] == pytest.approx(12.0)
+    assert not bool(wr["missing_usage_history"])
+    assert built.audit["source_usable_rows"]["snap_counts"] == 1
+
+
+def test_snap_history_without_pbp_is_explicit_missing_usage_not_zero():
+    snaps = pd.DataFrame(
+        [
+            {
+                "season": 2026,
+                "week": 2,
+                "game_id": "2026_02_ARI_X",
+                "player_id": "00-WR",
+                "offense_snaps": 58,
+                "offense_pct": 0.91,
+            }
+        ]
+    )
+    built = build_offensive_player_state_contract(
+        schedules=_schedule(),
+        roster=_roster(),
+        pbp=None,
+        season=2026,
+        week=3,
+        forecast_timestamp="2026-09-17T21:00:00Z",
+        snap_counts=snaps,
+    )
+    wr = built.player_state[built.player_state["player_id"].eq("00-WR")].iloc[0]
+    assert pd.isna(wr["prior_targets_pg_4"])
+    assert bool(wr["missing_usage_history"])
+    assert not bool(wr["missing_snap_data"])
+    assert wr["data_quality_state"] == "LIMITED_NO_HISTORY"
+    assert built.audit["sources"]["pbp"] == "missing_or_unusable"
+    assert built.audit["sources"]["snap_counts"] == "historical_lagged"
