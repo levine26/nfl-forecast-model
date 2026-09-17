@@ -120,6 +120,8 @@ def assert_simulation_accounting(result: GameSimulationResult) -> bool:
             "modeled_receptions",
             "residual_receptions",
             "passing_yards",
+            "modeled_carries",
+            "residual_carries",
             "modeled_receiving_yards",
             "residual_receiving_yards",
             "passing_tds",
@@ -140,6 +142,7 @@ def assert_simulation_accounting(result: GameSimulationResult) -> bool:
             (team["pass_attempts"] + team["sacks"] + team["rush_attempts"], team["offensive_plays"], "plays"),
             (team["targets"] + team["residual_targets"], team["team_targets"], "targets"),
             (team["modeled_receptions"] + team["residual_receptions"], team["completions"], "receptions"),
+            (team["modeled_carries"] + team["residual_carries"], team["rush_attempts"], "carries"),
             (team["modeled_receiving_yards"] + team["residual_receiving_yards"], team["passing_yards"], "passing_yards"),
             (team["modeled_receiving_tds"] + team["residual_receiving_tds"], team["passing_tds"], "receiving_tds"),
             (team["modeled_qb_passing_tds"] + team["residual_qb_passing_tds"], team["passing_tds"], "qb_passing_tds"),
@@ -158,7 +161,13 @@ def assert_simulation_accounting(result: GameSimulationResult) -> bool:
             raise PropsIntegrationError(f"{player_id} receptions exceed targets")
         if np.any(
             (stats["active"] == 0)
-            & ((stats["targets"] > 0) | (stats["carries"] > 0) | (stats["pass_attempts"] > 0))
+            & (
+                (stats["routes"] > 0)
+                | (stats["targets"] > 0)
+                | (stats["receptions"] > 0)
+                | (stats["carries"] > 0)
+                | (stats["pass_attempts"] > 0)
+            )
         ):
             raise PropsIntegrationError(f"{player_id} received normal opportunity while inactive")
     return True
