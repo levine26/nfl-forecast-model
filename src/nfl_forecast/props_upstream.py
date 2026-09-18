@@ -999,6 +999,8 @@ def build_game_upstream_package(
     source_status: str,
     prior_model_trained_through_season: int,
     primary_qb_by_team: Mapping[str, Mapping[str, str]] | None = None,
+    role_adjustments_by_team: Mapping[str, Mapping[str, Mapping[str, float]]] | None = None,
+    role_adjustments_provenance: str | None = None,
 ) -> PropsGameUpstreamPackage:
     """Build validated opportunity + efficiency handoffs for one canonical game."""
 
@@ -1030,6 +1032,11 @@ def build_game_upstream_package(
     team_inputs: list[pd.DataFrame] = []
     team_audit: dict[str, Any] = {}
     qb_overrides = primary_qb_by_team or {}
+    role_overrides = role_adjustments_by_team or {}
+    if role_overrides and str(role_adjustments_provenance or "").strip().lower() in {
+        "", "none", "unknown"
+    }:
+        raise PropsUpstreamError("role adjustments require explicit point-in-time provenance")
 
     for team in teams:
         team_rows = state[state["team"].map(normalize_team_code).eq(team)]
@@ -1067,6 +1074,10 @@ def build_game_upstream_package(
             context,
             availability_priors=availability_priors,
             route_prior_means=route_prior_means,
+            role_adjustments=role_overrides.get(team),
+            role_adjustments_provenance=(
+                role_adjustments_provenance if role_overrides.get(team) else None
+            ),
             **kwargs,
         )
         projection_dict = projection.to_dict()
@@ -1108,6 +1119,10 @@ def build_game_upstream_package(
             "opportunity_data_quality": projection.audit.get("data_quality"),
             "opportunity_pricing_ready": projection.audit.get("pricing_ready"),
             "unseen_current_player_ids": projection.audit.get("unseen_current_player_ids", []),
+            "role_adjustments_applied": bool(role_overrides.get(team)),
+            "role_adjustments_provenance": (
+                role_adjustments_provenance if role_overrides.get(team) else None
+            ),
         }
 
     residual = {
