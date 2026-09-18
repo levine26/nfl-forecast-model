@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   MARKET_FILTERS,
   directionFor,
@@ -495,6 +496,7 @@ export default function PropsResearchBeta() {
   const [route,setRoute]=useState(routeState)
   const [publicPayload,setPublicPayload]=useState(undefined)
   const [historyPayload,setHistoryPayload]=useState(undefined)
+  const [hostTargets,setHostTargets]=useState({desktop:null,mobile:null})
 
   useEffect(()=>{
     const onHash=()=>setRoute(routeState())
@@ -508,6 +510,20 @@ export default function PropsResearchBeta() {
   },[route.active])
 
   useEffect(()=>{
+    if(route.active) {
+      setHostTargets({desktop:null,mobile:null})
+      return
+    }
+    const sync=()=>setHostTargets({
+      desktop:document.querySelector('.ss-desktop-nav'),
+      mobile:document.querySelector('.ss-mobile-nav'),
+    })
+    sync()
+    const frame=window.requestAnimationFrame(sync)
+    return ()=>window.cancelAnimationFrame(frame)
+  },[route.active])
+
+  useEffect(()=>{
     if(!route.active) return
     let cancelled=false
     Promise.all([fetchJson('props_public.json',null),fetchJson('props_history.json',{records:[]})]).then(([published,history])=>{
@@ -518,7 +534,10 @@ export default function PropsResearchBeta() {
     return ()=>{cancelled=true}
   },[route.active])
 
-  if(!route.active) return null
+  if(!route.active) return <>
+    {hostTargets.desktop && createPortal(<button className="lp-host-props-link" onClick={()=>navigate('props')}>Props</button>,hostTargets.desktop)}
+    {hostTargets.mobile && createPortal(<button className="lp-host-props-mobile" onClick={()=>navigate('props')} aria-label="LevLine Props"><span aria-hidden="true">◇</span><small>Props</small></button>,hostTargets.mobile)}
+  </>
 
   const rows=publicPayload?.forecasts || []
   const loading=publicPayload===undefined || historyPayload===undefined
