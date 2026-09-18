@@ -517,7 +517,7 @@ export default function PropsResearchBeta() {
     return ()=>{cancelled=true}
   },[route.active])
 
-  if(!route.active) return <button className="lp-entry" onClick={()=>navigate('props')} aria-label="Open LevLine Props">Props <b>β</b></button>
+  if(!route.active) return null
 
   const rows=publicPayload?.forecasts || []
   const loading=publicPayload===undefined || historyPayload===undefined
