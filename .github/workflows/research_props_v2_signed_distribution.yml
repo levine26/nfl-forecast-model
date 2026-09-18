@@ -1,0 +1,76 @@
+name: LevLine Props 2.0 signed yardage distribution
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-challenger
+    paths:
+      - 'research/props/v2/signed_event_distribution.py'
+      - 'research/props/v2/test_signed_event_distribution.py'
+      - 'research/props/v2/run_signed_event_distribution.py'
+      - 'research/props/v2/SIGNED_EVENT_DISTRIBUTION_CONTRACT.md'
+      - '.github/workflows/research_props_v2_signed_distribution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: python -m pip install -e '.[dev]'
+      - name: Validate signed distribution component
+        run: python -m pytest -q research/props/v2/test_signed_event_distribution.py
+
+  component:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: python -m pip install -e '.[dev]'
+      - name: Run 2023-2025 conditional distribution study
+        run: |
+          python research/props/v2/run_signed_event_distribution.py \
+            --output-dir research_outputs/props_v2/signed_distribution \
+            --simulations 5000
+      - name: Enforce component-isolation boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("research_outputs/props_v2/signed_distribution/summary.json").read_text())
+          assert d["contract_version"]=="levline-props-v2-signed-event-distribution-v0.1.0"
+          assert d["component_isolation_only"] is True
+          assert d["conditioned_on_actual_event_count"] is True
+          assert d["pregame_prop_forecast"] is False
+          assert d["prop_outcomes_used_for_fit"]==0
+          assert d["completed_2026_outcomes_used"]==0
+          assert d["production_authorized"] is False
+          assert d["n"]>0
+          print(json.dumps({
+              "n":d["n"],
+              "gamma_crps":d["gamma_crps"],
+              "signed_crps":d["signed_crps"],
+              "signed_minus_gamma_crps":d["signed_minus_gamma_crps"],
+              "signed_minus_gamma_crps_ci95":d["signed_minus_gamma_crps_ci95"],
+              "gamma_coverage_80":d["gamma_coverage_80"],
+              "signed_coverage_80":d["signed_coverage_80"],
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-signed-distribution
+          path: research_outputs/props_v2/signed_distribution/
+          if-no-files-found: error
