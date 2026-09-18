@@ -6,6 +6,9 @@ on:
       - 'research/props/v2/archive_live_prop_market.py'
       - 'research/props/v2/test_live_prop_market_archive.py'
       - 'research/props/v2/PROPS_V2_MARKET_ARCHIVE_CONTRACT.md'
+      - 'research/props/v2/select_prop_market_horizons.py'
+      - 'research/props/v2/test_prop_market_horizons.py'
+      - 'research/props/v2/PROPS_V2_MARKET_HORIZON_CONTRACT.md'
       - '.github/workflows/research_props_v2_market_archive.yml'
   workflow_dispatch:
     inputs:
@@ -31,7 +34,10 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install pytest
-      - run: python -m pytest -q research/props/v2/test_live_prop_market_archive.py
+      - run: >-
+          python -m pytest -q
+          research/props/v2/test_live_prop_market_archive.py
+          research/props/v2/test_prop_market_horizons.py
 
   archive:
     if: >-
@@ -82,21 +88,32 @@ jobs:
             exit 1
           fi
 
-      - name: Restore prior archive manifest
+      - name: Restore full append-only market archive
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
+          rm -rf "$DATA_DIR"
           mkdir -p "$DATA_DIR"
           git fetch origin research-data/props-v2-market-archive:refs/remotes/origin/research-data/props-v2-market-archive || true
           if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-market-archive; then
-            git show "origin/research-data/props-v2-market-archive:$DATA_DIR/manifest.jsonl" > "$DATA_DIR/manifest.jsonl" 2>/dev/null || true
+            git archive --format=tar origin/research-data/props-v2-market-archive "$DATA_DIR" 2>/dev/null | tar -xf - || true
           fi
+          mkdir -p "$DATA_DIR"
 
       - name: Archive normalized multi-book player-prop state
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
           python research/props/v2/archive_live_prop_market.py             --artifact-root /tmp/props-live-artifacts             --output-dir "$DATA_DIR"             --manifest "$DATA_DIR/manifest.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --status "$DATA_DIR/last_archive_status.json"
+
+      - name: Derive preregistered PIT horizons from accumulated captures
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/market_archive
+          python research/props/v2/select_prop_market_horizons.py \
+            --archive-root "$DATA_DIR" \
+            --output "$DATA_DIR/horizons.jsonl" \
+            --status "$DATA_DIR/horizon_status.json"
 
       - name: Persist evidence off main
         run: |
