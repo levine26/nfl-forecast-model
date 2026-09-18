@@ -77,7 +77,7 @@ test('TD markets use probability language rather than forcing a continuous Fair 
   if (!fixtureRequired && !await page.getByText('Christian McCaffrey').isVisible().catch(()=>false)) return
   const card=page.getByText('Christian McCaffrey').locator('xpath=ancestor::article')
   await expect(card.getByText('ANYTIME TD')).toBeVisible()
-  await expect(card.getByText('64.0%')).toBeVisible()
+  await expect(card.getByText('64.0%').first()).toBeVisible()
   await expect(card.getByText('LevLine Fair Line')).toHaveCount(0)
 })
 
