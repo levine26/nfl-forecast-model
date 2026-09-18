@@ -32,7 +32,7 @@ from nfl_forecast.challenger_props_simulation import (  # noqa: E402
     simulate_game,
 )
 from nfl_forecast.data import load_advanced_data, load_core_data  # noqa: E402
-from nfl_forecast.props_dynamic_role import (  # noqa: E402
+from props_dynamic_role import (  # noqa: E402
     ENGINE_VERSION as DYNAMIC_ROLE_VERSION,
     build_dynamic_role_adjustments,
 )
