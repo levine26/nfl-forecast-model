@@ -20,7 +20,10 @@ from nfl_forecast.challenger_props_simulation import (  # noqa: E402
     simulate_game,
 )
 from nfl_forecast.props_integration import build_forecast_artifact  # noqa: E402
-from nfl_forecast.props_manifest import verify_manifest_fingerprint  # noqa: E402
+from nfl_forecast.props_manifest import (  # noqa: E402
+    verify_manifest_fingerprint,
+    verify_manifest_slate_index,
+)
 from nfl_forecast.props_publication import (  # noqa: E402
     append_jsonl_immutable,
     build_public_props,
@@ -37,6 +40,66 @@ def _load(path: Path) -> dict:
     verify_manifest_fingerprint(payload)
     return payload
 
+
+
+def _resolve_slate_manifest_path(root: Path, relative: object) -> Path:
+    value = str(relative or "").strip()
+    if not value:
+        raise ValueError("manifest slate entry missing manifest_file")
+    candidate = (root / value).resolve()
+    root_resolved = root.resolve()
+    try:
+        candidate.relative_to(root_resolved)
+    except ValueError as exc:
+        raise ValueError("manifest slate path escapes its root") from exc
+    return candidate
+
+
+def _load_manifest_slate(path: Path) -> list[dict]:
+    if not path.exists():
+        raise FileNotFoundError(f"missing manifest slate: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("manifest slate must be a JSON object")
+    verify_manifest_slate_index(payload)
+
+    root = path.parent
+    expected_forecast = _aware(
+        payload["forecast_timestamp_utc"],
+        "manifest slate forecast_timestamp_utc",
+    )
+    manifests: list[dict] = []
+    seen_game_ids: set[str] = set()
+    for entry in payload["games"]:
+        game_id = str(entry["game_id"]).strip()
+        manifest_path = _resolve_slate_manifest_path(
+            root,
+            entry["manifest_file"],
+        )
+        manifest = _load(manifest_path)
+        if str(manifest.get("game_id") or "").strip() != game_id:
+            raise ValueError(
+                f"manifest slate game_id {game_id} disagrees with {manifest_path.name}"
+            )
+        if str(manifest.get("manifest_sha256") or "").strip() != str(
+            entry["manifest_sha256"]
+        ).strip():
+            raise ValueError(
+                f"manifest slate fingerprint disagrees for game {game_id}"
+            )
+        manifest_forecast = _aware(
+            manifest.get("forecast_timestamp_utc"),
+            f"{game_id} forecast_timestamp_utc",
+        )
+        if manifest_forecast != expected_forecast:
+            raise ValueError(
+                f"manifest slate forecast timestamp disagrees for game {game_id}"
+            )
+        if game_id in seen_game_ids:
+            raise ValueError(f"duplicate game_id in manifest slate: {game_id}")
+        seen_game_ids.add(game_id)
+        manifests.append(manifest)
+    return manifests
 
 def _required(payload: dict, key: str):
     if key not in payload:
@@ -205,12 +268,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Run the integrated LevLine Props Research Beta from frozen lane artifacts."
     )
-    parser.add_argument(
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument(
         "--input",
         type=Path,
         nargs="+",
-        required=True,
         help="One or more frozen game manifests. Multiple inputs publish one atomic slate.",
+    )
+    source.add_argument(
+        "--manifest-slate",
+        type=Path,
+        help="Frozen manifest_slate.json; referenced game manifests are verified and loaded atomically.",
     )
     parser.add_argument(
         "--output",
@@ -228,7 +296,11 @@ def main() -> int:
         default=ROOT / "outputs" / "props" / "history" / "forecast_originals.jsonl",
     )
     args = parser.parse_args()
-    payloads = [_load(path) for path in args.input]
+    payloads = (
+        _load_manifest_slate(args.manifest_slate)
+        if args.manifest_slate is not None
+        else [_load(path) for path in args.input]
+    )
     artifact = produce_many(
         payloads,
         output=args.output,
