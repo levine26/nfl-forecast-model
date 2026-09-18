@@ -142,7 +142,12 @@ def main() -> int:
         help="First season loaded for strictly lagged state. This is data coverage, not tuning.",
     )
     parser.add_argument("--priors", type=Path, required=True)
-    parser.add_argument(\n        "--scoring-context",\n        type=Path,\n        help="Optional explicit scoring/residual context; otherwise derive strictly lagged context.",\n    )\n    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument(
+        "--scoring-context",
+        type=Path,
+        help="Optional explicit scoring/residual context; otherwise derive strictly lagged context.",
+    )
+    parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--cache-dir", default=".cache/nflreadpy")
     parser.add_argument(
         "--skip-injury-fetch",
