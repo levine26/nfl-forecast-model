@@ -37,6 +37,7 @@ from nfl_forecast.props_upstream import (  # noqa: E402
     build_lagged_props_history,
     fit_pre2026_efficiency_priors,
     fit_pre2026_injury_availability_priors,
+    normalize_nflverse_scramble_semantics,
     residual_efficiency_by_team_from_empirical_priors,
 )
 
@@ -243,6 +244,9 @@ def main() -> int:
         cache_dir=args.cache_dir,
     )
     identity = _pandas(nfl.load_players())
+    props_pbp, pbp_normalization_audit = normalize_nflverse_scramble_semantics(
+        sources.pbp
+    )
 
     availability = None
     availability_audit = {
@@ -274,7 +278,7 @@ def main() -> int:
     state_build = build_offensive_player_state_contract(
         schedules=sources.schedules,
         roster=sources.roster,
-        pbp=sources.pbp,
+        pbp=props_pbp,
         season=args.season,
         week=args.week,
         forecast_timestamp=forecast_timestamp.isoformat(),
@@ -320,7 +324,7 @@ def main() -> int:
         )
 
     history = build_lagged_props_history(
-        sources.pbp,
+        props_pbp,
         identity,
         season=args.season,
         week=args.week,
@@ -378,7 +382,7 @@ def main() -> int:
     }
 
     fitted_empirical = fit_pre2026_efficiency_priors(
-        sources.pbp,
+        props_pbp,
         identity,
         trained_through_season=2025,
     )
@@ -426,7 +430,7 @@ def main() -> int:
             empirical_scoring_audit = None
         else:
             empirical_scoring = build_empirical_scoring_context(
-                sources.pbp,
+                props_pbp,
                 teams=game_teams,
                 season=args.season,
                 week=args.week,
@@ -504,7 +508,10 @@ def main() -> int:
                 "contract_version": "levline-props-player-state-snapshot-v0.1",
                 "captured_at_utc": forecast_timestamp.isoformat(),
                 "player_state": player_state.to_dict("records"),
-                "audit": state_build.audit,
+                "audit": {
+                    **state_build.audit,
+                    "pbp_source_normalization": pbp_normalization_audit,
+                },
             },
         )
     ]
@@ -565,6 +572,7 @@ def main() -> int:
                         "production_authorized": False,
                         "captured_at_utc": forecast_timestamp.isoformat(),
                         "source_status": sources.source_status,
+                        "pbp_source_normalization": pbp_normalization_audit,
                         "availability": availability_audit,
                         "availability_prior_fit": availability_prior_fit_audit,
                         "availability_priors_applied": availability_priors,
