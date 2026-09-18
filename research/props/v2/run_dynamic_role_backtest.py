@@ -877,6 +877,38 @@ def run(
                     role_adjustments_by_team[role_team] = adjustments
 
             try:
+                baseline_package = build_game_upstream_package(
+                    player_state=state,
+                    history=lagged,
+                    game_id=game_id,
+                    season=season,
+                    week=week,
+                    forecast_timestamp=(
+                        pd.Timestamp(schedule_row["kickoff"]) - pd.Timedelta(seconds=1)
+                    ).isoformat(),
+                    route_prior_means=ROUTE_PRIORS,
+                    availability_priors={},
+                    position_efficiency_priors=position_priors,
+                    scoring_context_by_team=scoring,
+                    residual_efficiency_by_team=residual,
+                    source_status="qualified",
+                    prior_model_trained_through_season=trained_through,
+                    primary_qb_by_team=qb_overrides,
+                )
+                baseline_input = build_game_input_from_upstream(
+                    home_team=_team(schedule_row["home_team"]),
+                    away_team=_team(schedule_row["away_team"]),
+                    opportunity_projections=baseline_package.opportunity_projections,
+                    efficiency_player_parameters=baseline_package.efficiency_player_parameters,
+                    team_td_parameters=baseline_package.team_td_parameters,
+                    residual_efficiency_by_team=baseline_package.residual_efficiency_by_team,
+                )
+                baseline_simulation = simulate_game(
+                    baseline_input,
+                    simulations=int(simulations),
+                    seed=seed_for_game(game_id),
+                )
+
                 package = build_game_upstream_package(
                     player_state=state,
                     history=lagged,
@@ -923,6 +955,14 @@ def run(
                 continue
 
             sim_players = set(simulation.player_stats)
+            baseline_players = set(baseline_simulation.player_stats)
+            if sim_players != baseline_players:
+                exclusions["paired_player_set_mismatch"] += len(obs_by_event[event_id])
+                game_build_audit[game_id] = {
+                    **state_audit,
+                    "error": "paired V1/challenger simulation player sets differ",
+                }
+                continue
             for _, obs in obs_by_event[event_id].iterrows():
                 player_id = str(obs["player_id"])
                 prop_type = str(obs["prop_type"])
@@ -956,6 +996,25 @@ def run(
                     if model_side is None or market_outcome == "PUSH"
                     else "WIN"
                     if model_side == market_outcome
+                    else "LOSS"
+                )
+
+                baseline_samples = baseline_simulation.player_stats[player_id][prop_type]
+                baseline_dist = evaluate_distribution(
+                    baseline_samples,
+                    market_line=line,
+                    discrete=prop_type in DISCRETE_PROPS,
+                    interval_level=0.80,
+                )
+                v1_fair = float(baseline_dist.levline_fair_line)
+                v1_side = (
+                    "OVER" if v1_fair > line else "UNDER" if v1_fair < line else None
+                )
+                v1_grading_result = (
+                    None
+                    if v1_side is None or market_outcome == "PUSH"
+                    else "WIN"
+                    if v1_side == market_outcome
                     else "LOSS"
                 )
                 l5 = prior_five_average(
@@ -1007,16 +1066,53 @@ def run(
                         "simulations": int(simulations),
                         "seed": seed_for_game(game_id),
                         "prior_trained_through": trained_through,
+                        "v1_model_mean": float(baseline_dist.model_mean),
+                        "v1_fair_line": v1_fair,
+                        "v1_model_sd": float(baseline_dist.standard_deviation),
+                        "v1_p_over": baseline_dist.p_over,
+                        "v1_p_under": baseline_dist.p_under,
+                        "v1_model_side": v1_side,
+                        "v1_grading_result": v1_grading_result,
                     }
                 )
             game_build_audit[game_id] = {
                 **state_audit,
                 "simulation_players": len(sim_players),
                 "opportunity_audit": package.audit,
+                "v1_opportunity_audit": baseline_package.audit,
                 "dynamic_role": role_audit_by_team,
             }
 
     results = pd.DataFrame(result_rows)
+    paired_decided = results[
+        results["grading_result"].isin(["WIN", "LOSS"])
+        & results["v1_grading_result"].isin(["WIN", "LOSS"])
+    ].copy() if not results.empty else pd.DataFrame()
+    if not paired_decided.empty:
+        challenger_correct = paired_decided["grading_result"].eq("WIN").astype(float)
+        v1_correct = paired_decided["v1_grading_result"].eq("WIN").astype(float)
+        paired_v1 = {
+            "n": int(len(paired_decided)),
+            "challenger_accuracy": float(challenger_correct.mean()),
+            "v1_accuracy": float(v1_correct.mean()),
+            "accuracy_difference": float((challenger_correct - v1_correct).mean()),
+            "challenger_mae": float(
+                np.mean(np.abs(paired_decided["fair_line"] - paired_decided["actual_result"]))
+            ),
+            "v1_mae": float(
+                np.mean(np.abs(paired_decided["v1_fair_line"] - paired_decided["actual_result"]))
+            ),
+        }
+    else:
+        paired_v1 = {
+            "n": 0,
+            "challenger_accuracy": None,
+            "v1_accuracy": None,
+            "accuracy_difference": None,
+            "challenger_mae": None,
+            "v1_mae": None,
+        }
+
     summary = {
         "contract_version": CONTRACT_VERSION,
         "frozen_model_ref": "research/props-integration@db5478fd735ef0cad8fd1215e8b1fb6a96a3a21d",
@@ -1037,6 +1133,7 @@ def run(
         "participation": participation_audit,
         "exclusions": dict(exclusions),
         "headline": summarize(results),
+        "paired_v1": paired_v1,
         "clustered_accuracy_ci95": clustered_accuracy_interval(results),
         "by_prop": {
             str(key): summarize(group)
