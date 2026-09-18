@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -877,5 +878,99 @@ def test_all_games_cli_failure_writes_no_partial_slate(monkeypatch, tmp_path):
     )
 
     with pytest.raises(PropsUpstreamError, match="fixture game failure"):
+        module.main()
+    assert not output.exists()
+
+
+
+def test_scheduled_pregame_game_ids_exclude_already_started_games():
+    module = _upstream_cli_module()
+    schedules = pd.DataFrame(
+        [
+            {
+                "season": 2026,
+                "week": 3,
+                "game_id": "thu",
+                "kickoff": "2026-09-18T00:00:00Z",
+            },
+            {
+                "season": 2026,
+                "week": 3,
+                "game_id": "sun",
+                "kickoff": "2026-09-20T20:00:00Z",
+            },
+        ]
+    )
+    pregame, started = module._scheduled_pregame_game_ids(
+        schedules,
+        season=2026,
+        week=3,
+        forecast_timestamp=datetime(2026, 9, 19, 12, 0, tzinfo=timezone.utc),
+    )
+    assert pregame == ["sun"]
+    assert started == ["thu"]
+
+
+def test_all_games_cli_fails_if_upcoming_schedule_game_has_no_player_state(
+    monkeypatch,
+    tmp_path,
+):
+    module = _upstream_cli_module()
+    _patch_upstream_cli(monkeypatch, module)
+    original_loader = module.load_offensive_props_sources
+
+    def loader_with_missing_state_game(**kwargs):
+        sources = original_loader(**kwargs)
+        schedules = pd.concat(
+            [
+                sources.schedules,
+                pd.DataFrame(
+                    [
+                        {
+                            "game_id": "g3",
+                            "home_team": "SEA",
+                            "away_team": "SF",
+                            "kickoff": KICKOFF,
+                        }
+                    ]
+                ),
+            ],
+            ignore_index=True,
+        )
+        return SimpleNamespace(**{**sources.__dict__, "schedules": schedules})
+
+    monkeypatch.setattr(module, "load_offensive_props_sources", loader_with_missing_state_game)
+    priors_path = tmp_path / "priors.json"
+    priors_path.write_text(
+        json.dumps(
+            {
+                "route_prior_means": {"RB": 0.5, "WR": 0.9, "TE": 0.7},
+                "availability_beta_priors": {
+                    "UNKNOWN": {"alpha": 1.0, "beta": 1.0}
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "upstream"
+    monkeypatch.setattr(
+        __import__("sys"),
+        "argv",
+        [
+            str(UPSTREAM_SCRIPT),
+            "--season",
+            "2026",
+            "--week",
+            "3",
+            "--all-games",
+            "--priors",
+            str(priors_path),
+            "--output-dir",
+            str(output),
+            "--skip-injury-fetch",
+        ],
+    )
+
+    with pytest.raises(PropsUpstreamError, match="missing canonical player state"):
         module.main()
     assert not output.exists()
