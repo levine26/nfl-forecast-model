@@ -20,6 +20,7 @@ from nfl_forecast.challenger_props_simulation import (  # noqa: E402
     simulate_game,
 )
 from nfl_forecast.props_integration import build_forecast_artifact  # noqa: E402
+from nfl_forecast.props_manifest import verify_manifest_fingerprint  # noqa: E402
 from nfl_forecast.props_publication import (  # noqa: E402
     append_jsonl_immutable,
     build_public_props,
@@ -33,6 +34,7 @@ def _load(path: Path) -> dict:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError("integration manifest must be a JSON object")
+    verify_manifest_fingerprint(payload)
     return payload
 
 
