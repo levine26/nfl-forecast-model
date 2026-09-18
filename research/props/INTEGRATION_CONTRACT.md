@@ -124,3 +124,33 @@ python scripts/build_props_market_snapshot.py \
 ```
 
 The normalized file exposes `market_artifacts`; copy that array into the frozen integration manifest without changing its timestamps or identities. Existing output files are never overwritten.
+
+
+## Frozen manifest assembly
+
+Use `scripts/build_props_integration_manifest.py` instead of hand-editing the coordinator JSON. It combines separately frozen opportunity, efficiency, TD, residual-efficiency, and sportsbook artifacts only after validating that they describe the same game and obey the same point-in-time horizon.
+
+Example:
+
+```bash
+python scripts/build_props_integration_manifest.py \
+  --game-spec /secure/path/game_spec.json \
+  --opportunity /secure/path/opportunity.json \
+  --efficiency-player /secure/path/efficiency_player.json \
+  --team-td /secure/path/team_td.json \
+  --residual-efficiency /secure/path/residual_efficiency.json \
+  --market-snapshot /secure/path/market_snapshot_20260920T160000Z.json \
+  --output /secure/path/props_integration_manifest_20260920T160500Z.json
+```
+
+The assembler fails closed when:
+
+- the two opportunity projections do not correspond to the two game teams;
+- efficiency or TD rows disagree on game identity, kickoff, or point-in-time ordering;
+- a prior claims training through 2026;
+- residual efficiency does not cover both teams;
+- a market snapshot or individual market artifact is newer than the declared forecast time;
+- closing/evaluation market state is attached to the prospective manifest;
+- duplicate sportsbook market identities are present.
+
+Every source component is SHA-256 fingerprinted into `input_provenance`, and the completed manifest receives its own deterministic fingerprint. The resulting file is written with create-only semantics and is suitable for the coordinator producer.
