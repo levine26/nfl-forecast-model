@@ -258,3 +258,28 @@ export function summarizeCombined(entries) {
     roi: profit == null || risked <= 0 ? null : profit / risked,
   }
 }
+
+
+export function buildSeasonPerformance(entries) {
+  const weeks=[...new Set((entries||[]).map(entry=>Number(entry.week)).filter(Number.isFinite))].sort((a,b)=>a-b)
+  let cumulativeMl=0
+  let cumulativeSpread=0
+  let mlValid=true
+  let spreadValid=true
+  return weeks.map(week=>{
+    const weekEntries=(entries||[]).filter(entry=>Number(entry.week)===week)
+    const ml=summarizeBets(weekEntries,'ml')
+    const spread=summarizeBets(weekEntries,'spread')
+    if (ml.profit==null) mlValid=false
+    else if (mlValid) cumulativeMl+=ml.profit
+    if (spread.profit==null) spreadValid=false
+    else if (spreadValid) cumulativeSpread+=spread.profit
+    return {
+      week,
+      mlProfit: ml.profit,
+      spreadProfit: spread.profit,
+      cumulativeMl: mlValid ? cumulativeMl : null,
+      cumulativeSpread: spreadValid ? cumulativeSpread : null,
+    }
+  })
+}
