@@ -96,10 +96,10 @@ def _clip_multiplier(value: float) -> float:
     return float(np.clip(value, MIN_MULTIPLIER, MAX_MULTIPLIER))
 
 
-def _sequence_differences(frame: pd.DataFrame) -> list[float]:
-    diffs: list[float] = []
+def _difference_sequences(frame: pd.DataFrame) -> list[np.ndarray]:
+    sequences: list[np.ndarray] = []
     if frame.empty:
-        return diffs
+        return sequences
     for _, group in frame.groupby(["player_id", "team", "season"], sort=False):
         g = group.sort_values(["week", "game_id"])
         weeks = g["week"].to_numpy(dtype=float)
@@ -107,35 +107,61 @@ def _sequence_differences(frame: pd.DataFrame) -> list[float]:
         if len(shares) < 2:
             continue
         logits = np.asarray([_logit(v) for v in shares], dtype=float)
+        current: list[float] = []
         for idx in range(1, len(logits)):
             gap = weeks[idx] - weeks[idx - 1]
             if not math.isfinite(float(gap)) or gap < 1 or gap > 2:
+                if current:
+                    sequences.append(np.asarray(current, dtype=float))
+                    current = []
                 continue
-            diffs.append(float(logits[idx] - logits[idx - 1]))
-    return diffs
+            current.append(float(logits[idx] - logits[idx - 1]))
+        if current:
+            sequences.append(np.asarray(current, dtype=float))
+    return sequences
 
 
-def _moments(differences: list[float]) -> tuple[float, float, int]:
+def _moments(sequences: list[np.ndarray]) -> tuple[float, float, int]:
     """Method-of-moments random-walk / measurement variance estimate.
 
-    For y_t = x_t + e_t and x_t = x_{t-1} + w_t:
-      Var(Delta y) = q + 2r
-      Cov(Delta y_t, Delta y_{t-1}) = -r
+    For y_t = x_t + e_t and x_t = x_(t-1) + w_t:
+      Var(Delta y_t) = q + 2r
+      Cov(Delta y_t, Delta y_(t-1)) = -r
 
-    The lag covariance requires player-contiguous differences, but the pooled fallback below
-    intentionally uses a conservative split when that information is not available.
+    We estimate the lag-one covariance only within contiguous player/season sequences.
+    Fixed floors/caps prevent a small or noisy historical sample from generating a degenerate
+    state filter.
     """
-    arr = np.asarray(differences, dtype=float)
-    arr = arr[np.isfinite(arr)]
-    n = int(arr.size)
+    arrays = [np.asarray(seq, dtype=float) for seq in sequences if len(seq)]
+    if not arrays:
+        return 0.10, 0.10, 0
+    all_diffs = np.concatenate(arrays)
+    all_diffs = all_diffs[np.isfinite(all_diffs)]
+    n = int(all_diffs.size)
     if n < 2:
         return 0.10, 0.10, n
-    variance = float(np.var(arr, ddof=1))
-    # Without sequence labels at this stage, use a conservative equal-noise decomposition.
-    # q + 2r = Var(diff) => set q=r=Var(diff)/3 before fixed safety floors/caps.
-    base = variance / 3.0
-    q = float(np.clip(base, MIN_PROCESS_VARIANCE, MAX_VARIANCE))
-    r = float(np.clip(base, MIN_OBSERVATION_VARIANCE, MAX_VARIANCE))
+
+    variance = float(np.var(all_diffs, ddof=1))
+    lag_pairs: list[tuple[float, float]] = []
+    for seq in arrays:
+        finite = seq[np.isfinite(seq)]
+        if len(finite) >= 2:
+            lag_pairs.extend(zip(finite[:-1], finite[1:]))
+
+    if len(lag_pairs) >= 2:
+        first = np.asarray([row[0] for row in lag_pairs], dtype=float)
+        second = np.asarray([row[1] for row in lag_pairs], dtype=float)
+        covariance = float(np.cov(first, second, ddof=1)[0, 1])
+        r_raw = max(0.0, -covariance)
+        q_raw = max(0.0, variance - 2.0 * r_raw)
+    else:
+        # Sparse histories cannot identify q and r separately. Use the symmetric decomposition
+        # implied by q + 2r = Var(diff) rather than estimating from prop outcomes.
+        q_raw = variance / 3.0
+        r_raw = variance / 3.0
+
+    q = float(np.clip(q_raw, MIN_PROCESS_VARIANCE, MAX_VARIANCE))
+    r = float(np.clip(r_raw, MIN_OBSERVATION_VARIANCE, MAX_VARIANCE))
     return q, r, n
 
 
@@ -163,11 +189,11 @@ def fit_role_dynamics(
     if train.empty:
         raise DynamicRoleError("no role rows exist through trained_through_season")
 
-    pooled_diffs = _sequence_differences(train)
+    pooled_diffs = _difference_sequences(train)
     pooled_q, pooled_r, pooled_n = _moments(pooled_diffs)
     result: dict[str, RoleDynamics] = {}
     for position in sorted(SUPPORTED_POSITIONS):
-        diffs = _sequence_differences(train[train["position"].eq(position)])
+        diffs = _difference_sequences(train[train["position"].eq(position)])
         q, r, n = _moments(diffs)
         if n < MIN_POSITION_TRANSITIONS:
             q, r, n_for_record = pooled_q, pooled_r, n
@@ -183,6 +209,29 @@ def fit_role_dynamics(
             estimation_scope=scope,
         )
     return result
+
+
+def fit_role_dynamics_from_snap_counts(
+    snap_counts: pd.DataFrame,
+    *,
+    target_season: int,
+) -> tuple[dict[str, RoleDynamics], dict[str, Any]]:
+    """Freeze season-forward state variances using only seasons before target_season."""
+    history, audit = normalize_lagged_snap_history(
+        snap_counts,
+        season=int(target_season),
+        week=1,
+    )
+    if history.empty:
+        raise DynamicRoleError("no prior-season snap history available for V2 dynamics")
+    trained_through = int(target_season) - 1
+    dynamics = fit_role_dynamics(history, trained_through_season=trained_through)
+    return dynamics, {
+        "trained_through_season": trained_through,
+        "history": audit,
+        "prop_outcomes_used_for_state_fit": 0,
+        "completed_2026_outcomes_used": 0,
+    }
 
 
 def _latent_filter(
@@ -234,6 +283,7 @@ def build_dynamic_role_v2_adjustments(
     team: str,
     route_prior_means: Mapping[str, float] | None = None,
     mode: str = "full",
+    frozen_dynamics: Mapping[str, RoleDynamics] | None = None,
 ) -> tuple[dict[str, dict[str, float]], dict[str, Any]]:
     mode = str(mode).strip().lower()
     if mode not in {"route_only", "full"}:
@@ -259,7 +309,17 @@ def build_dynamic_role_v2_adjustments(
         }
 
     trained_through = int(season) - 1
-    dynamics = fit_role_dynamics(history, trained_through_season=trained_through)
+    if frozen_dynamics is None:
+        dynamics = fit_role_dynamics(history, trained_through_season=trained_through)
+        dynamics_source = "fit_inside_builder_from_prior_seasons_only"
+    else:
+        dynamics = {str(key): value for key, value in frozen_dynamics.items()}
+        missing_dynamics = set(SUPPORTED_POSITIONS) - set(dynamics)
+        if missing_dynamics:
+            raise DynamicRoleError(
+                f"frozen dynamics missing positions: {sorted(missing_dynamics)}"
+            )
+        dynamics_source = "season_forward_frozen"
 
     team_code = str(team or "").upper().strip()
     team_code = {"JAC": "JAX", "LA": "LAR"}.get(team_code, team_code)
@@ -357,6 +417,7 @@ def build_dynamic_role_v2_adjustments(
         "team": team_code,
         "trained_through_season_for_state_variance": trained_through,
         "dynamics": {key: value.to_dict() for key, value in dynamics.items()},
+        "dynamics_source": dynamics_source,
         "adjusted_players": len(adjustments),
         "fallback_player_ids": sorted(fallback_players),
         "estimates": estimates,
