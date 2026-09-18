@@ -1,6 +1,14 @@
 name: LevLine Props accuracy evaluation
 
 on:
+  push:
+    branches:
+      - research/props-integration
+    paths:
+      - "outputs/props/history/**"
+      - "src/nfl_forecast/props_evaluation.py"
+      - "scripts/evaluate_props_accuracy.py"
+      - "research/props/evaluation/**"
   pull_request:
     branches:
       - research/props-integration
