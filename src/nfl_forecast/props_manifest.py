@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import hashlib
+import hmac
 import json
 from typing import Any, Mapping, Sequence
 
@@ -39,6 +40,26 @@ def _canonical_json_bytes(value: object) -> bytes:
 
 def payload_sha256(value: object) -> str:
     return hashlib.sha256(_canonical_json_bytes(value)).hexdigest()
+
+
+def verify_manifest_fingerprint(payload: Mapping[str, Any]) -> None:
+    """Verify assembler envelope when present; legacy unfingerprinted manifests remain readable."""
+
+    version = payload.get("manifest_contract_version")
+    supplied = payload.get("manifest_sha256")
+    if version is None and supplied is None:
+        return
+    if version != MANIFEST_CONTRACT_VERSION:
+        raise PropsManifestError(
+            f"unexpected manifest_contract_version: {version!r}"
+        )
+    if not isinstance(supplied, str) or not supplied.strip():
+        raise PropsManifestError("fingerprinted manifest is missing manifest_sha256")
+    material = dict(payload)
+    material.pop("manifest_sha256", None)
+    expected = payload_sha256(material)
+    if not hmac.compare_digest(supplied.strip(), expected):
+        raise PropsManifestError("manifest SHA-256 fingerprint mismatch")
 
 
 def _aware(value: object, label: str) -> datetime:
