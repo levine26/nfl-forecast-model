@@ -1,0 +1,68 @@
+name: LevLine Props 2.0 NGS efficiency gate
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-advanced-efficiency-r2
+      - research/props-v2-challenger
+    paths:
+      - "research/props/v2/props_ngs_efficiency_state.py"
+      - "research/props/v2/props_ngs_efficiency_model.py"
+      - "research/props/v2/test_props_ngs_efficiency_model.py"
+      - "research/props/v2/run_ngs_efficiency_challenger.py"
+      - ".github/workflows/research_props_v2_ngs_efficiency_gate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ngs-efficiency-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Compile and test NGS efficiency challenger
+        run: |
+          python -m py_compile research/props/v2/props_ngs_efficiency_model.py
+          python -m py_compile research/props/v2/run_ngs_efficiency_challenger.py
+          pytest -q research/props/v2/test_props_ngs_efficiency_state.py research/props/v2/test_props_ngs_efficiency_model.py
+      - name: Run real rolling-origin NGS efficiency gate
+        run: |
+          python research/props/v2/run_ngs_efficiency_challenger.py             --season-start 2020             --season-end 2025             --output-dir research_outputs/props_v2/ngs_efficiency_gate
+      - name: Enforce research boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          p=Path("research_outputs/props_v2/ngs_efficiency_gate/summary.json")
+          d=json.loads(p.read_text())
+          assert d["promotion_authorized"] is False
+          assert d["learning_table_audit"]["completed_2026_outcomes_used"] == 0
+          assert d["learning_table_audit"]["target_week_state_rows_used"] == 0
+          r=d["rolling_origin"]
+          assert r["hyperparameter_tuning_performed"] is False
+          assert r["completed_2026_outcomes_used"] == 0
+          evaluated=0
+          for season, metrics in r["evaluation"].items():
+              for metric, payload in metrics.items():
+                  if payload["status"] == "evaluated":
+                      evaluated += 1
+                      assert payload["model"]["training_season_max"] < int(season)
+                      assert payload["metrics"]["n"] > 0
+          assert evaluated >= 3
+          print(Path("research_outputs/props_v2/ngs_efficiency_gate/report.md").read_text())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-ngs-efficiency-gate
+          path: research_outputs/props_v2/ngs_efficiency_gate/
+          if-no-files-found: error
