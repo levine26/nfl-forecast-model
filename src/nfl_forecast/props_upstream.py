@@ -778,6 +778,8 @@ def build_empirical_scoring_context(
     pass_td = _number(work, "pass_touchdown").eq(1)
     rush_td = _number(work, "rush_touchdown").eq(1)
     work["_rz_play"] = yardline.le(20)
+    work["_pass_td"] = pass_td
+    work["_rush_td"] = rush_td
     work["_off_td"] = pass_td | rush_td
     work["_non_rz_pass_td"] = pass_td & yardline.gt(20)
     work["_non_rz_rush_td"] = rush_td & yardline.gt(20)
@@ -794,6 +796,8 @@ def build_empirical_scoring_context(
         .agg(
             reached_red_zone=("_rz_play", "max"),
             offensive_td=("_off_td", "max"),
+            passing_td=("_pass_td", "max"),
+            rushing_td=("_rush_td", "max"),
         )
     )
     team_games = (
@@ -828,13 +832,18 @@ def build_empirical_scoring_context(
         float(pre_rz["offensive_td"].sum()) / float(len(pre_rz)),
         label="prior_red_zone_td_rate",
     )
-    pre_pass_td = _number(pre, "pass_touchdown").eq(1)
-    pre_rush_td = _number(pre, "rush_touchdown").eq(1)
-    total_off_tds = int(pre_pass_td.sum() + pre_rush_td.sum())
-    if total_off_tds <= 0:
-        raise PropsUpstreamError("no pre-2026 offensive TD evidence")
+    red_zone_scoring_drives = pre_rz[
+        pre_rz["passing_td"].astype(bool) | pre_rz["rushing_td"].astype(bool)
+    ]
+    red_zone_td_events = int(
+        red_zone_scoring_drives["passing_td"].sum()
+        + red_zone_scoring_drives["rushing_td"].sum()
+    )
+    if red_zone_td_events <= 0:
+        raise PropsUpstreamError("no pre-2026 red-zone passing/rushing TD evidence")
     pass_td_fraction = _clip_probability(
-        float(pre_pass_td.sum()) / float(total_off_tds),
+        float(red_zone_scoring_drives["passing_td"].sum())
+        / float(red_zone_td_events),
         label="prior_pass_td_fraction",
     )
 
