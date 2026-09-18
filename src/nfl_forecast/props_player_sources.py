@@ -9,6 +9,7 @@ import nflreadpy as nfl
 import pandas as pd
 
 from .data import load_advanced_data, load_core_data
+from .props_player_state import normalize_team_code
 
 
 @dataclass(frozen=True)
