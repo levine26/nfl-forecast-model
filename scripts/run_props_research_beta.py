@@ -61,13 +61,7 @@ def _write_json(path: Path, payload: dict) -> None:
     tmp.replace(path)
 
 
-def produce(
-    payload: dict,
-    *,
-    output: Path,
-    public_output: Path | None,
-    history_ledger: Path,
-) -> dict:
+def _build_artifact(payload: dict) -> dict:
     forecast_timestamp = _aware(
         _required(payload, "forecast_timestamp_utc"), "forecast_timestamp_utc"
     )
@@ -96,41 +90,128 @@ def produce(
         simulations=int(payload.get("simulations", 20_000)),
         seed=int(payload.get("seed", 0)),
     )
-    artifact = build_forecast_artifact(
+    return build_forecast_artifact(
         result,
         _required(payload, "market_artifacts"),
         kickoff_utc=kickoff,
         forecast_timestamp_utc=forecast_timestamp,
         interval_level=float(payload.get("prediction_interval_level", 0.80)),
     )
+
+
+def _combine_artifacts(artifacts: list[dict], *, generated_utc: datetime) -> dict:
+    if not artifacts:
+        raise ValueError("at least one Props game manifest is required")
+    contracts = {str(artifact.get("contract_version") or "") for artifact in artifacts}
+    if len(contracts) != 1 or "" in contracts:
+        raise ValueError("Props game artifacts must share one non-empty contract_version")
+    research_labels = {
+        str(artifact.get("research_label") or "") for artifact in artifacts
+        if artifact.get("research_label") is not None
+    }
+    scopes = {
+        str(artifact.get("scope") or "") for artifact in artifacts
+        if artifact.get("scope") is not None
+    }
+    if len(research_labels) > 1:
+        raise ValueError("Props game artifacts disagree on research_label")
+    if len(scopes) > 1:
+        raise ValueError("Props game artifacts disagree on scope")
+
+    forecasts: list[dict] = []
+    seen_ids: set[str] = set()
+    for artifact in artifacts:
+        rows = artifact.get("forecasts")
+        if not isinstance(rows, list):
+            raise ValueError("Props game artifact must contain a forecasts list")
+        for row in rows:
+            if not isinstance(row, dict):
+                raise ValueError("Props forecast rows must be JSON objects")
+            forecast_id = str(row.get("forecast_id") or "").strip()
+            if not forecast_id:
+                raise ValueError("Props forecast row missing forecast_id")
+            if forecast_id in seen_ids:
+                raise ValueError(f"duplicate forecast_id across slate: {forecast_id}")
+            seen_ids.add(forecast_id)
+            forecasts.append(row)
+
+    first = artifacts[0]
+    return {
+        "contract_version": next(iter(contracts)),
+        "generated_utc": generated_utc.astimezone(timezone.utc).isoformat(),
+        "research_label": (
+            next(iter(research_labels))
+            if research_labels
+            else first.get("research_label")
+        ),
+        "scope": next(iter(scopes)) if scopes else first.get("scope"),
+        "game_count": len(artifacts),
+        "forecasts": forecasts,
+    }
+
+
+def produce_many(
+    payloads: list[dict],
+    *,
+    output: Path,
+    public_output: Path | None,
+    history_ledger: Path,
+) -> dict:
+    """Build and publish a complete Props slate as one fail-closed transaction."""
+
+    artifacts = [_build_artifact(payload) for payload in payloads]
+    recorded = datetime.now(timezone.utc)
+    combined = _combine_artifacts(artifacts, generated_utc=recorded)
     public = (
-        build_public_props(artifact, now_utc=datetime.now(timezone.utc))
+        build_public_props(combined, now_utc=recorded)
         if public_output is not None
         else None
     )
 
-    recorded = datetime.now(timezone.utc)
     receipts = [
         make_forecast_receipt(row, recorded_utc=recorded)
-        for row in artifact["forecasts"]
+        for row in combined["forecasts"]
     ]
     append_jsonl_immutable(
         history_ledger, receipts, identity_key="forecast_id"
     )
 
-    # Publish only after every original receipt has passed immutable-history validation.
-    _write_json(output, artifact)
+    # Publish only after every game built successfully and every original receipt has
+    # passed immutable-history validation. A single failing game cannot expose a partial
+    # Sunday slate.
+    _write_json(output, combined)
     if public_output is not None and public is not None:
         _write_json(public_output, public)
+    return combined
 
-    return artifact
 
+def produce(
+    payload: dict,
+    *,
+    output: Path,
+    public_output: Path | None,
+    history_ledger: Path,
+) -> dict:
+    """Backward-compatible one-game producer using the slate transaction path."""
+
+    return produce_many(
+        [payload],
+        output=output,
+        public_output=public_output,
+        history_ledger=history_ledger,
+    )
 
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Run the integrated LevLine Props Research Beta from frozen lane artifacts."
     )
-    parser.add_argument("--input", type=Path, required=True)
+    parser.add_argument(
+        "--input",
+        type=Path,
+        nargs="+",
+        required=True,
+        help="One or more frozen game manifests. Multiple inputs publish one atomic slate.",
+    )
     parser.add_argument(
         "--output",
         type=Path,
@@ -147,14 +228,16 @@ def main() -> int:
         default=ROOT / "outputs" / "props" / "history" / "forecast_originals.jsonl",
     )
     args = parser.parse_args()
-    artifact = produce(
-        _load(args.input),
+    payloads = [_load(path) for path in args.input]
+    artifact = produce_many(
+        payloads,
         output=args.output,
         public_output=args.public_output,
         history_ledger=args.history_ledger,
     )
     print(
-        f"wrote {len(artifact['forecasts'])} Props Research Beta forecasts -> {args.output}"
+        f"wrote {len(artifact['forecasts'])} Props Research Beta forecasts "
+        f"across {artifact['game_count']} game(s) -> {args.output}"
     )
     print(f"locked immutable originals -> {args.history_ledger}")
     return 0
