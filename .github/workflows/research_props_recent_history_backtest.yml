@@ -1,0 +1,67 @@
+name: LevLine Props 2023-2025 historical backtest
+
+on:
+  pull_request:
+    branches:
+      - research/props-integration
+    paths:
+      - "scripts/backtest_props_recent_history.py"
+      - "research/props/evaluation/RECENT_HISTORY_BACKTEST_PROTOCOL.md"
+      - ".github/workflows/research_props_recent_history_backtest.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: pip install '.[dev]'
+      - name: Compile replay harness
+        run: python -m py_compile scripts/backtest_props_recent_history.py
+      - name: Smoke replay
+        run: >-
+          python scripts/backtest_props_recent_history.py
+          --season 2023
+          --simulations 1000
+          --max-events 3
+          --output-dir research_outputs/props_accuracy/recent_history_smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-recent-history-smoke
+          path: research_outputs/props_accuracy/recent_history_smoke
+          if-no-files-found: error
+
+  backtest:
+    needs: smoke
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2023, 2024, 2025]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: pip install '.[dev]'
+      - name: Run season replay
+        run: >-
+          python scripts/backtest_props_recent_history.py
+          --season ${{ matrix.season }}
+          --simulations 5000
+          --output-dir research_outputs/props_accuracy/recent_history
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-backtest-${{ matrix.season }}
+          path: research_outputs/props_accuracy/recent_history
+          if-no-files-found: error
