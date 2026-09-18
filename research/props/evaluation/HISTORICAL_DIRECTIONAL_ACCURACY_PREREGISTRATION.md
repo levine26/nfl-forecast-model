@@ -114,6 +114,16 @@ Market-listed players are treated as the pregame modeled player set. Players wit
 
 This is a **market-listed population reconstruction**, not a claim that the complete historical roster has been reconstructed.
 
+### Pre-outcome source clarification — opening-snapshot player population
+
+Recorded before the first historical outcome-scoring run completed.
+
+For the primary genuine-OPEN experiment, the modeled player population and QB-market existence evidence are restricted to genuine OPEN rows (`book_id == 30`, `open_inferred == False`). Later consensus/book listings may not add players to an opening-line forecast.
+
+For a preregistered book-specific sensitivity analysis, player-population/QB evidence is restricted to that book's rows.
+
+This clarification narrows the information set to the same market horizon being evaluated and is not outcome-driven.
+
 ## 6. Availability rule
 
 A market-listed offensive player is supplied to the football model as available because the sportsbook had published a pregame player market for that player.
