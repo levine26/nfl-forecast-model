@@ -397,6 +397,7 @@ def market_observations(
     *,
     book_id: int,
     require_genuine_open: bool,
+    role_mode: str = "full",
 ) -> tuple[pd.DataFrame, dict]:
     work = market[
         market["book_id"].eq(int(book_id))
@@ -871,6 +872,7 @@ def run(
                     week=week,
                     team=role_team,
                     route_prior_means=ROUTE_PRIORS,
+                    mode=role_mode,
                 )
                 role_audit_by_team[role_team] = role_audit
                 if adjustments:
@@ -928,7 +930,7 @@ def run(
                     primary_qb_by_team=qb_overrides,
                     role_adjustments_by_team=role_adjustments_by_team,
                     role_adjustments_provenance=(
-                        f"{DYNAMIC_ROLE_VERSION}:strictly_lagged_offensive_snap_share"
+                        f"{DYNAMIC_ROLE_VERSION}:{role_mode}:strictly_lagged_offensive_snap_share"
                     ),
                 )
                 game_input = build_game_input_from_upstream(
@@ -1118,6 +1120,7 @@ def run(
         "frozen_model_ref": "research/props-integration@db5478fd735ef0cad8fd1215e8b1fb6a96a3a21d",
         "challenger": "dynamic_role_snap_proxy",
         "challenger_version": DYNAMIC_ROLE_VERSION,
+        "role_mode": str(role_mode),
         "research_label": "RETROSPECTIVE CHALLENGER DEVELOPMENT - NOT PROMOTION EVIDENCE",
         "promotion_authorized": False,
         "season": int(season),
@@ -1165,6 +1168,12 @@ def main() -> int:
     parser.add_argument("--simulations", type=int, default=20_000)
     parser.add_argument("--book-id", type=int, default=PRIMARY_BOOK)
     parser.add_argument("--allow-inferred-open", action="store_true")
+    parser.add_argument(
+        "--role-mode",
+        choices=("route_only", "full"),
+        default="full",
+        help="Frozen ablation: route-only level adjustment or full route+target/carry trend.",
+    )
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     if args.week_start < 1 or args.week_end > 18 or args.week_start > args.week_end:
@@ -1179,6 +1188,7 @@ def main() -> int:
         simulations=args.simulations,
         book_id=args.book_id,
         require_genuine_open=(args.book_id == PRIMARY_BOOK and not args.allow_inferred_open),
+        role_mode=args.role_mode,
     )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     results.to_csv(args.output_dir / f"{args.season}_forecast_level.csv", index=False)
