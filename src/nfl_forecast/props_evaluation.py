@@ -463,7 +463,11 @@ def _log_loss(work: pd.DataFrame, column: str) -> float:
     return float(np.mean(-(y * np.log(p) + (1.0 - y) * np.log(1.0 - p))))
 
 
-def calibration_table(\n    prob_rows: pd.DataFrame,\n    *,\n    bootstrap_replicates: int = BOOTSTRAP_REPLICATES,\n) -> list[dict[str, Any]]:
+def calibration_table(
+    prob_rows: pd.DataFrame,
+    *,
+    bootstrap_replicates: int = BOOTSTRAP_REPLICATES,
+) -> list[dict[str, Any]]:
     if prob_rows.empty:
         return []
     out: list[dict[str, Any]] = []
@@ -492,6 +496,7 @@ def calibration_table(\n    prob_rows: pd.DataFrame,\n    *,\n    bootstrap_repl
         ci = _cluster_bootstrap(
             bucket,
             lambda x: float(x["favored_observed"].mean()),
+            replicates=bootstrap_replicates,
         )
         out.append(
             {
@@ -786,8 +791,10 @@ def _group_summary(frame: pd.DataFrame, column: str) -> dict[str, Any]:
     for value, group in frame.groupby(column, dropna=False):
         key = "<MISSING>" if pd.isna(value) else str(value)
         counts = _counts(group)
-        cont = continuous_metrics(group, bootstrap_replicates=1000)
-        prob = probability_metrics(group, bootstrap_replicates=1000)
+        # Subgroup output exposes point estimates only. Keep internal resampling
+        # lightweight so descriptive tables do not repeat headline bootstraps.
+        cont = continuous_metrics(group, bootstrap_replicates=25)
+        prob = probability_metrics(group, bootstrap_replicates=25)
         out[key] = {
             "sample": counts.__dict__,
             "continuous": {
