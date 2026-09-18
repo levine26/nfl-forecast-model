@@ -5,9 +5,9 @@ from nfl_forecast.props_player_state import (
     SCHEMA_VERSION,
     build_offensive_player_state_contract,
     flatten_current_injury_report,
+    normalize_team_code,
     validate_offensive_player_state,
-,
-    normalize_team_code)
+)
 
 
 def _schedule():
