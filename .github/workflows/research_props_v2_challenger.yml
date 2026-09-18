@@ -1,0 +1,184 @@
+name: LevLine Props 2.0 challenger research
+
+on:
+  pull_request:
+    branches:
+      - research/props-accuracy-evaluation
+      - research/props-integration
+    paths:
+      - "src/nfl_forecast/props_dynamic_role.py"
+      - "src/nfl_forecast/props_market_residual.py"
+      - "src/nfl_forecast/props_upstream.py"
+      - "tests/test_props_dynamic_role.py"
+      - "tests/test_props_market_residual.py"
+      - "research/props/v2/**"
+      - ".github/workflows/research_props_v2_challenger.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Compile challenger research
+        run: |
+          python -m py_compile src/nfl_forecast/props_dynamic_role.py
+          python -m py_compile src/nfl_forecast/props_market_residual.py
+          python -m py_compile research/props/v2/evaluate_market_prior_challenger.py
+          python -m py_compile research/props/v2/run_dynamic_role_backtest.py
+          python -m py_compile research/props/v2/aggregate_dynamic_role_backtest.py
+      - name: Run focused tests
+        run: |
+          pytest -q tests/test_props_dynamic_role.py tests/test_props_market_residual.py
+
+  pilot:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pyarrow
+      - name: Run paired real-data engineering pilot
+        run: |
+          python research/props/v2/run_dynamic_role_backtest.py             --season 2024             --week-start 4             --week-end 4             --simulations 1000             --book-id 30             --output-dir research_outputs/props_v2/dynamic_role_pilot
+      - name: Enforce pilot firewall and paired execution
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("research_outputs/props_v2/dynamic_role_pilot/2024_summary.json").read_text())
+          assert d["contract_version"] == "levline-props-v2-dynamic-role-development-v0.1.0"
+          assert d["promotion_authorized"] is False
+          assert d["paired_v1"]["n"] > 0
+          assert d["game_build_errors"] == {}, d["game_build_errors"]
+          assert d["headline"]["wins"] + d["headline"]["losses"] > 0
+          print(json.dumps({"headline":d["headline"],"paired_v1":d["paired_v1"]}, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-dynamic-role-pilot
+          path: research_outputs/props_v2/dynamic_role_pilot/
+          if-no-files-found: error
+
+  primary:
+    needs: pilot
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2023, 2024, 2025]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pyarrow
+      - name: Run paired dynamic-role season reconstruction
+        run: |
+          python research/props/v2/run_dynamic_role_backtest.py             --season ${{ matrix.season }}             --week-start 1             --week-end 18             --simulations 20000             --book-id 30             --output-dir research_outputs/props_v2/dynamic_role/${{ matrix.season }}
+      - name: Assert research contract
+        env:
+          SEASON: ${{ matrix.season }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          season=int(os.environ["SEASON"])
+          d=json.loads(Path(f"research_outputs/props_v2/dynamic_role/{season}/{season}_summary.json").read_text())
+          assert d["contract_version"] == "levline-props-v2-dynamic-role-development-v0.1.0"
+          assert d["promotion_authorized"] is False
+          assert d["simulations_per_game"] == 20000
+          assert d["market_pairing"]["book_id"] == 30
+          assert d["market_pairing"]["require_genuine_open"] is True
+          assert d["paired_v1"]["n"] > 0
+          assert d["game_build_errors"] == {}, d["game_build_errors"]
+          print(json.dumps(d["paired_v1"], indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-dynamic-role-${{ matrix.season }}
+          path: research_outputs/props_v2/dynamic_role/${{ matrix.season }}/
+          if-no-files-found: error
+
+  aggregate:
+    needs: primary
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install analysis dependencies
+        run: python -m pip install pandas numpy scipy
+      - name: Download paired season artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: levline-props-v2-dynamic-role-*
+          path: research_outputs/props_v2/downloads
+          merge-multiple: true
+      - name: Aggregate paired dynamic-role result
+        run: |
+          python research/props/v2/aggregate_dynamic_role_backtest.py             --input-dir research_outputs/props_v2/downloads             --output-dir research_outputs/props_v2/aggregate
+      - name: Reconstruct frozen-V1 ledger for market-prior challenger
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import pandas as pd
+          root=Path("research_outputs/props_v2/downloads")
+          out=Path("research_outputs/props_v2/v1_for_market_residual")
+          out.mkdir(parents=True, exist_ok=True)
+          for path in sorted(root.rglob("*_forecast_level.csv")):
+              frame=pd.read_csv(path)
+              frame["p_over"]=frame["v1_p_over"]
+              frame["p_under"]=frame["v1_p_under"]
+              frame["model_side"]=frame["v1_model_side"]
+              frame["fair_line"]=frame["v1_fair_line"]
+              season=int(frame["season"].iloc[0])
+              frame.to_csv(out/f"{season}_forecast_level.csv", index=False)
+          PY
+      - name: Evaluate low-dimensional market-prior residual challenger
+        run: |
+          python research/props/v2/evaluate_market_prior_challenger.py             --input research_outputs/props_v2/v1_for_market_residual/2023_forecast_level.csv             --input research_outputs/props_v2/v1_for_market_residual/2024_forecast_level.csv             --input research_outputs/props_v2/v1_for_market_residual/2025_forecast_level.csv             --output-dir research_outputs/props_v2/market_prior
+      - name: Print research findings
+        run: |
+          cat research_outputs/props_v2/aggregate/report.md
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("research_outputs/props_v2/market_prior/summary.json").read_text())
+          print(json.dumps({
+              "fixed_anchor":d["fixed_anchor"]["evaluation"],
+              "rolling_origin":d["rolling_origin"]["evaluation"],
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-challenger-aggregate
+          path: |
+            research_outputs/props_v2/aggregate/
+            research_outputs/props_v2/market_prior/
+          if-no-files-found: error
