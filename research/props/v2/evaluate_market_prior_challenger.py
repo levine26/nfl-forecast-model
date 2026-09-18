@@ -88,18 +88,31 @@ def _evaluate(scored: pd.DataFrame, *, replicates: int, seed: int) -> dict:
 
     y_over = decided["market_outcome_recomputed"].eq("OVER").astype(float).to_numpy()
     v1 = decided["v1_correct"].astype(float)
-    market = decided["market_price_correct"].astype(float)
     challenger = decided["challenger_correct"].astype(float)
+    market_informative = decided["market_price_correct"].notna()
+    market = decided.loc[market_informative, "market_price_correct"].astype(float)
+    challenger_market_rows = decided.loc[
+        market_informative, "challenger_correct"
+    ].astype(float)
 
     result = {
         "rows": int(len(decided)),
         "unique_games": int(decided["game_id"].astype(str).nunique()),
         "unique_players": int(decided["player_id"].astype(str).nunique()),
         "v1_accuracy": float(v1.mean()),
-        "market_price_direction_accuracy": float(market.mean()),
+        "market_price_direction_rows": int(market_informative.sum()),
+        "market_price_tie_rows": int((~market_informative).sum()),
+        "market_price_direction_accuracy": (
+            float(market.mean()) if len(market) else None
+        ),
         "challenger_accuracy": float(challenger.mean()),
         "challenger_minus_v1_accuracy": float((challenger - v1).mean()),
-        "challenger_minus_market_accuracy": float((challenger - market).mean()),
+        "challenger_on_market_informative_rows_accuracy": (
+            float(challenger_market_rows.mean()) if len(challenger_market_rows) else None
+        ),
+        "challenger_minus_market_accuracy": (
+            float((challenger_market_rows - market).mean()) if len(market) else None
+        ),
         "market_brier": _brier(y_over, decided["market_no_vig_p_over"].to_numpy(float)),
         "challenger_brier": _brier(y_over, decided["challenger_p_over"].to_numpy(float)),
         "v1_brier": _brier(y_over, decided["p_over"].to_numpy(float)),
@@ -111,7 +124,15 @@ def _evaluate(scored: pd.DataFrame, *, replicates: int, seed: int) -> dict:
         ),
         "v1_log_loss": _binary_log_loss(y_over, decided["p_over"].to_numpy(float)),
         "challenger_over_call_rate": float(decided["challenger_side"].eq("OVER").mean()),
-        "market_over_call_rate": float(decided["market_price_side"].eq("OVER").mean()),
+        "market_over_call_rate": (
+            float(
+                decided.loc[market_informative, "market_price_side"]
+                .eq("OVER")
+                .mean()
+            )
+            if market_informative.any()
+            else None
+        ),
     }
     result["clustered_vs_v1"] = _cluster_bootstrap(
         decided,
@@ -130,10 +151,17 @@ def _evaluate(scored: pd.DataFrame, *, replicates: int, seed: int) -> dict:
 
     by_prop = {}
     for prop, group in decided.groupby("prop_type", sort=True):
+        market_rows = group["market_price_correct"].notna()
         by_prop[str(prop)] = {
             "rows": int(len(group)),
             "v1_accuracy": float(group["v1_correct"].mean()),
-            "market_accuracy": float(group["market_price_correct"].mean()),
+            "market_direction_rows": int(market_rows.sum()),
+            "market_price_tie_rows": int((~market_rows).sum()),
+            "market_accuracy": (
+                float(group.loc[market_rows, "market_price_correct"].mean())
+                if market_rows.any()
+                else None
+            ),
             "challenger_accuracy": float(group["challenger_correct"].mean()),
         }
     result["by_prop_type"] = by_prop
