@@ -20,7 +20,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from nfl_forecast.injuries import fetch_nfl_injuries  # noqa: E402
-from nfl_forecast.props_player_sources import load_offensive_props_sources  # noqa: E402
+from nfl_forecast.props_player_sources import (  # noqa: E402
+    load_offensive_props_sources,
+    resolve_primary_qbs_from_depth_charts,
+)
 from nfl_forecast.props_player_state import (  # noqa: E402
     build_offensive_player_state_contract,
     flatten_current_injury_report,
@@ -197,6 +200,12 @@ def main() -> int:
         availability=availability,
     )
     player_state = state_build.player_state
+    depth_qbs, depth_qb_audit = resolve_primary_qbs_from_depth_charts(
+        sources.depth_charts,
+        player_state,
+        game_id=args.game_id,
+        forecast_timestamp=forecast_timestamp,
+    )
 
     history = build_lagged_props_history(
         sources.pbp,
@@ -227,9 +236,11 @@ def main() -> int:
     trained_through = priors.get("prior_model_trained_through_season")
     if trained_through is None:
         raise ValueError("priors require prior_model_trained_through_season")
-    qb_overrides = game_config.get("primary_qb_by_team")
-    if qb_overrides is not None and not isinstance(qb_overrides, dict):
+    explicit_qb_overrides = game_config.get("primary_qb_by_team")
+    if explicit_qb_overrides is not None and not isinstance(explicit_qb_overrides, dict):
         raise ValueError("primary_qb_by_team must be an object when supplied")
+    qb_overrides = dict(depth_qbs)
+    qb_overrides.update(explicit_qb_overrides or {})
 
     package = build_game_upstream_package(
         player_state=player_state,
@@ -310,6 +321,7 @@ def main() -> int:
             "captured_at_utc": forecast_timestamp.isoformat(),
             "source_status": sources.source_status,
             "availability": availability_audit,
+            "depth_chart_primary_qb": depth_qb_audit,
             "player_state": state_build.audit,
             "upstream": package.audit,
             "priors_source_file": args.priors.name,
