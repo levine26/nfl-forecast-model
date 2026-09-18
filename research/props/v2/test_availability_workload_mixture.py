@@ -64,6 +64,11 @@ def _injuries():
             "season":2022,"week":3,"team":"BUF","gsis_id":f"q{j}",
             "position":"WR","report_status":"Questionable",
         })
+        # Preserve a genuine prior-season DOUBTFUL training population in the synthetic fixture.
+        rows.append({
+            "season":2022,"week":3,"team":"BUF","gsis_id":f"q{j}",
+            "position":"WR","report_status":"Doubtful" if j % 2 == 0 else "Questionable",
+        })
     return pd.DataFrame(rows)
 
 
