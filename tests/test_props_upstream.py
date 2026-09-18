@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import importlib.util
+import json
+from pathlib import Path
+from types import SimpleNamespace
+
 import pandas as pd
 import pytest
 
@@ -611,3 +616,266 @@ def test_non_red_zone_tds_do_not_contaminate_red_zone_pass_fraction_prior():
         changed["scoring_context_by_team"]["ARI"]["prior_pass_td_fraction"]
         == baseline["scoring_context_by_team"]["ARI"]["prior_pass_td_fraction"]
     )
+
+
+
+ROOT = Path(__file__).resolve().parents[1]
+UPSTREAM_SCRIPT = ROOT / "scripts" / "build_props_upstream_snapshot.py"
+
+
+def _upstream_cli_module():
+    spec = importlib.util.spec_from_file_location(
+        "build_props_upstream_snapshot_tested",
+        UPSTREAM_SCRIPT,
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _cli_player_state():
+    rows = []
+    for game_id, home, away in (
+        ("g1", "ARI", "LAR"),
+        ("g2", "BUF", "MIA"),
+    ):
+        for team, opponent, prefix in (
+            (home, away, home),
+            (away, home, away),
+        ):
+            rows.append(
+                {
+                    "game_id": game_id,
+                    "player_id": f"{prefix}-QB",
+                    "player_name": f"{team} QB",
+                    "position": "QB",
+                    "team": team,
+                    "opponent": opponent,
+                    "kickoff_timestamp": KICKOFF,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _cli_package(game_id):
+    return SimpleNamespace(
+        game_id=game_id,
+        opportunity_projections=(
+            {"metadata": {"game_id": game_id, "team": "T1"}},
+            {"metadata": {"game_id": game_id, "team": "T2"}},
+        ),
+        efficiency_player_parameters=({"game_id": game_id, "player_id": "p"},),
+        team_td_parameters=({"game_id": game_id, "team": "T1"}, {"game_id": game_id, "team": "T2"}),
+        residual_efficiency_by_team={"T1": {}, "T2": {}},
+        audit={"ok": True},
+    )
+
+
+def _patch_upstream_cli(monkeypatch, module, *, fail_game=None):
+    state = _cli_player_state()
+    schedules = pd.DataFrame(
+        [
+            {
+                "game_id": "g1",
+                "home_team": "ARI",
+                "away_team": "LA",
+                "kickoff": KICKOFF,
+            },
+            {
+                "game_id": "g2",
+                "home_team": "BUF",
+                "away_team": "MIA",
+                "kickoff": KICKOFF,
+            },
+        ]
+    )
+    monkeypatch.setattr(
+        module,
+        "load_offensive_props_sources",
+        lambda **kwargs: SimpleNamespace(
+            schedules=schedules,
+            roster=pd.DataFrame(),
+            pbp=pd.DataFrame(),
+            snap_counts=None,
+            depth_charts=None,
+            routes=None,
+            source_status={"test": "qualified"},
+        ),
+    )
+    monkeypatch.setattr(
+        module.nfl,
+        "load_players",
+        lambda: pd.DataFrame([{"gsis_id": "p", "position": "QB"}]),
+    )
+    monkeypatch.setattr(
+        module.nfl,
+        "load_injuries",
+        lambda seasons: (_ for _ in ()).throw(RuntimeError("offline fixture")),
+    )
+    monkeypatch.setattr(
+        module,
+        "build_offensive_player_state_contract",
+        lambda **kwargs: SimpleNamespace(
+            player_state=state,
+            audit={"state": "qualified"},
+        ),
+    )
+    monkeypatch.setattr(
+        module,
+        "build_lagged_props_history",
+        lambda *args, **kwargs: SimpleNamespace(audit={"history": "qualified"}),
+    )
+    monkeypatch.setattr(
+        module,
+        "fit_pre2026_efficiency_priors",
+        lambda *args, **kwargs: {
+            "trained_through_season": 2025,
+            "efficiency_position_priors": {"QB": {}},
+            "residual_efficiency": {
+                "catch_rate": 0.6,
+                "receiving_yards_per_reception": 10.0,
+                "rushing_yards_per_carry": 4.0,
+            },
+            "audit": {"fit": "qualified"},
+        },
+    )
+    monkeypatch.setattr(
+        module,
+        "resolve_primary_qbs_from_depth_charts",
+        lambda *args, **kwargs: ({}, {"status": "missing"}),
+    )
+    monkeypatch.setattr(
+        module,
+        "build_empirical_scoring_context",
+        lambda pbp, *, teams, **kwargs: {
+            "scoring_context_by_team": {
+                team: {
+                    "expected_drives": 10.0,
+                    "expected_red_zone_trips": 3.0,
+                    "prior_red_zone_td_rate": 0.55,
+                    "prior_pass_td_fraction": 0.6,
+                    "expected_non_red_zone_pass_tds": 0.2,
+                    "expected_non_red_zone_rush_tds": 0.1,
+                }
+                for team in teams
+            },
+            "audit": {"scoring": "qualified"},
+        },
+    )
+    monkeypatch.setattr(
+        module,
+        "residual_efficiency_by_team_from_empirical_priors",
+        lambda teams, fitted: {
+            team: {
+                "catch_rate": 0.6,
+                "receiving_yards_per_reception": 10.0,
+                "rushing_yards_per_carry": 4.0,
+            }
+            for team in teams
+        },
+    )
+
+    calls = []
+
+    def build_package(**kwargs):
+        game_id = kwargs["game_id"]
+        calls.append(game_id)
+        if game_id == fail_game:
+            raise PropsUpstreamError("fixture game failure")
+        return _cli_package(game_id)
+
+    monkeypatch.setattr(module, "build_game_upstream_package", build_package)
+    monkeypatch.setattr(
+        module,
+        "_schedule_game",
+        lambda schedules, game_id: (
+            ("ARI", "LAR", KICKOFF)
+            if game_id == "g1"
+            else ("BUF", "MIA", KICKOFF)
+        ),
+    )
+    return calls
+
+
+def test_all_games_cli_builds_one_atomic_upstream_slate(monkeypatch, tmp_path):
+    module = _upstream_cli_module()
+    calls = _patch_upstream_cli(monkeypatch, module)
+    priors_path = tmp_path / "priors.json"
+    priors_path.write_text(
+        json.dumps(
+            {
+                "route_prior_means": {"RB": 0.5, "WR": 0.9, "TE": 0.7},
+                "availability_beta_priors": {
+                    "UNKNOWN": {"alpha": 1.0, "beta": 1.0}
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "upstream"
+    monkeypatch.setattr(
+        __import__("sys"),
+        "argv",
+        [
+            str(UPSTREAM_SCRIPT),
+            "--season",
+            "2026",
+            "--week",
+            "3",
+            "--all-games",
+            "--priors",
+            str(priors_path),
+            "--output-dir",
+            str(output),
+            "--skip-injury-fetch",
+        ],
+    )
+
+    assert module.main() == 0
+    assert calls == ["g1", "g2"]
+    index = json.loads((output / "upstream_slate.json").read_text(encoding="utf-8"))
+    assert index["game_count"] == 2
+    assert [row["game_id"] for row in index["games"]] == ["g1", "g2"]
+    assert (output / "player_state.json").exists()
+    assert (output / "games" / "g1" / "g1.game_spec.json").exists()
+    assert (output / "games" / "g2" / "g2.game_spec.json").exists()
+
+
+def test_all_games_cli_failure_writes_no_partial_slate(monkeypatch, tmp_path):
+    module = _upstream_cli_module()
+    _patch_upstream_cli(monkeypatch, module, fail_game="g2")
+    priors_path = tmp_path / "priors.json"
+    priors_path.write_text(
+        json.dumps(
+            {
+                "route_prior_means": {"RB": 0.5, "WR": 0.9, "TE": 0.7},
+                "availability_beta_priors": {
+                    "UNKNOWN": {"alpha": 1.0, "beta": 1.0}
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "upstream"
+    monkeypatch.setattr(
+        __import__("sys"),
+        "argv",
+        [
+            str(UPSTREAM_SCRIPT),
+            "--season",
+            "2026",
+            "--week",
+            "3",
+            "--all-games",
+            "--priors",
+            str(priors_path),
+            "--output-dir",
+            str(output),
+            "--skip-injury-fetch",
+        ],
+    )
+
+    with pytest.raises(PropsUpstreamError, match="fixture game failure"):
+        module.main()
+    assert not output.exists()
