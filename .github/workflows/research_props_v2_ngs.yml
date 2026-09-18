@@ -1,0 +1,80 @@
+name: LevLine Props 2.0 NGS efficiency research
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-challenger
+    paths:
+      - "research/props/v2/props_ngs_efficiency_state.py"
+      - "research/props/v2/test_props_ngs_efficiency_state.py"
+      - ".github/workflows/research_props_v2_ngs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ngs-state:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Compile and test state builder
+        run: |
+          python -m py_compile research/props/v2/props_ngs_efficiency_state.py
+          pytest -q research/props/v2/test_props_ngs_efficiency_state.py
+      - name: Audit real historical NGS coverage without outcomes
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path("src").resolve()))
+          from research.props.v2.props_ngs_efficiency_state import (
+              build_lagged_ngs_state,
+              load_ngs_efficiency_history,
+          )
+
+          data = load_ngs_efficiency_history([2023, 2024, 2025])
+          ids = set()
+          for frame in data.values():
+              if frame is not None and not frame.empty and "player_gsis_id" in frame:
+                  ids.update(frame["player_gsis_id"].dropna().astype(str))
+          state, audit = build_lagged_ngs_state(
+              passing=data["passing"],
+              receiving=data["receiving"],
+              rushing=data["rushing"],
+              season=2025,
+              week=10,
+              player_ids=sorted(ids),
+          )
+          assert audit["target_week_rows_used"] == 0
+          assert audit["players_with_any_state"] > 0
+          coverage = {
+              "audit": audit,
+              "rows": int(len(state)),
+              "passing_players": int((state["ngs_pass_rows"] > 0).sum()),
+              "receiving_players": int((state["ngs_rec_rows"] > 0).sum()),
+              "rushing_players": int((state["ngs_rush_rows"] > 0).sum()),
+          }
+          assert coverage["passing_players"] > 20
+          assert coverage["receiving_players"] > 50
+          assert coverage["rushing_players"] > 20
+          Path("research_outputs/props_v2/ngs").mkdir(parents=True, exist_ok=True)
+          Path("research_outputs/props_v2/ngs/coverage.json").write_text(
+              json.dumps(coverage, indent=2, sort_keys=True) + "\n"
+          )
+          print(json.dumps(coverage, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-ngs-coverage
+          path: research_outputs/props_v2/ngs/
+          if-no-files-found: error
