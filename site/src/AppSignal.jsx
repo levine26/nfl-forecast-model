@@ -158,7 +158,7 @@ function BrandLockup({compact=false}) {
 }
 
 function Header({route,week}) {
-  const primary=[['forecasts','Forecasts'],['props','Props'],['power','Power'],['history','History'],['methodology','Methodology']]
+  const primary=[['forecasts','Forecasts'],['power','Power'],['history','History'],['methodology','Methodology']]
   return <>
     <header className="ss-header">
       <button className="ss-brand-button" onClick={()=>navigateHash('forecasts')} aria-label="Sunday Signal forecasts">
@@ -181,7 +181,7 @@ function Header({route,week}) {
 }
 
 function MobileNav({route}) {
-  const items=[['forecasts','Forecasts','◈'],['props','Props','◇'],['power','Power','⌁'],['history','History','◷'],['more','More','•••']]
+  const items=[['forecasts','Forecasts','◈'],['power','Power','⌁'],['history','History','◷'],['more','More','•••']]
   const active=route.page==='teams'||route.page==='methodology'?'more':route.page
   return <nav className="ss-mobile-nav" aria-label="Mobile navigation">
     {items.map(([key,label,icon])=><button key={key} className={active===key?'active':''} onClick={()=>navigateHash(key)}><span aria-hidden="true">{icon}</span><small>{label}</small></button>)}
@@ -610,10 +610,9 @@ function MethodologyPage({models}) {
 function MorePage() {
   return <main className="ss-page"><PageHead kicker="MORE" title="Explore Sunday Signal." copy="Secondary product and trust surfaces."/>
     <section className="ss-more-grid">
-      <button onClick={()=>navigateHash('props')}><span>01</span><b>LevLine Props</b><p>Fair Lines, market comparison, signals, and prospective performance receipts.</p></button>
-      <button onClick={()=>navigateHash('methodology')}><span>02</span><b>Methodology</b><p>How LevLine works, including Why LevLine?</p></button>
-      <button onClick={()=>navigateHash('teams')}><span>03</span><b>Teams</b><p>Team profiles using the existing published profile data.</p></button>
-      <button onClick={()=>navigateHash('history')}><span>04</span><b>Official History</b><p>2026 picks of record and immutable pregame receipts.</p></button>
+      <button onClick={()=>navigateHash('methodology')}><span>01</span><b>Methodology</b><p>How LevLine works, including Why LevLine?</p></button>
+      <button onClick={()=>navigateHash('teams')}><span>02</span><b>Teams</b><p>Team profiles using the existing published profile data.</p></button>
+      <button onClick={()=>navigateHash('history')}><span>03</span><b>Official History</b><p>2026 picks of record and immutable pregame receipts.</p></button>
     </section>
   </main>
 }
