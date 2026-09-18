@@ -13,6 +13,8 @@ from pathlib import Path
 import sys
 
 import nflreadpy as nfl
+import numpy as np
+import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -42,13 +44,30 @@ def _load(path: Path) -> dict:
     return payload
 
 
+def _json_safe(value):
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, pd.Timestamp):
+        return None if pd.isna(value) else value.isoformat()
+    if isinstance(value, np.generic):
+        return _json_safe(value.item())
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+    return value
+
+
 def _write_new(path: Path, payload: object) -> None:
     if path.exists():
         raise FileExistsError(f"refusing to overwrite frozen upstream artifact: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x", encoding="utf-8") as handle:
         json.dump(
-            payload,
+            _json_safe(payload),
             handle,
             indent=2,
             sort_keys=True,
