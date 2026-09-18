@@ -6,7 +6,7 @@ async function hasFixture(page) {
   return fixtureRequired || await page.getByText('Puka Nacua').first().isVisible().catch(()=>false)
 }
 
-for (const width of [320,390,768,1440]) {
+for (const width of [320,390,430,768,1440]) {
   test('Props board has no essential horizontal overflow at ' + width + 'px',async({page})=>{
     await page.setViewportSize({width,height:1000})
     await page.goto('./#/props')
