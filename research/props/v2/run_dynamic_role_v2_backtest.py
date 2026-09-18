@@ -31,6 +31,11 @@ from nfl_forecast.challenger_props_simulation import (  # noqa: E402
     evaluate_distribution,
     simulate_game,
 )
+from distribution_metrics import (  # noqa: E402
+    central_interval_score,
+    empirical_crps,
+    interval_covered,
+)
 from nfl_forecast.data import load_advanced_data, load_core_data  # noqa: E402
 from props_dynamic_role_v2 import (  # noqa: E402
     ENGINE_VERSION as DYNAMIC_ROLE_VERSION,
@@ -1001,6 +1006,18 @@ def run(
                     interval_level=0.80,
                 )
                 fair = float(dist.levline_fair_line)
+                crps = empirical_crps(samples, actual)
+                interval_score_80 = central_interval_score(
+                    dist.prediction_interval_lower,
+                    dist.prediction_interval_upper,
+                    actual,
+                    level=0.80,
+                )
+                interval_covered_80 = interval_covered(
+                    dist.prediction_interval_lower,
+                    dist.prediction_interval_upper,
+                    actual,
+                )
                 line = float(obs["market_line"])
                 model_side = "OVER" if fair > line else "UNDER" if fair < line else None
                 market_outcome = "OVER" if actual > line else "UNDER" if actual < line else "PUSH"
@@ -1020,6 +1037,18 @@ def run(
                     interval_level=0.80,
                 )
                 v1_fair = float(baseline_dist.levline_fair_line)
+                v1_crps = empirical_crps(baseline_samples, actual)
+                v1_interval_score_80 = central_interval_score(
+                    baseline_dist.prediction_interval_lower,
+                    baseline_dist.prediction_interval_upper,
+                    actual,
+                    level=0.80,
+                )
+                v1_interval_covered_80 = interval_covered(
+                    baseline_dist.prediction_interval_lower,
+                    baseline_dist.prediction_interval_upper,
+                    actual,
+                )
                 v1_side = (
                     "OVER" if v1_fair > line else "UNDER" if v1_fair < line else None
                 )
@@ -1070,6 +1099,9 @@ def run(
                         "p_push": dist.p_push,
                         "pi_low": float(dist.prediction_interval_lower),
                         "pi_high": float(dist.prediction_interval_upper),
+                        "crps": float(crps),
+                        "interval_score_80": float(interval_score_80),
+                        "interval_covered_80": bool(interval_covered_80),
                         "actual_result": actual,
                         "model_side": model_side,
                         "market_outcome": market_outcome,
@@ -1083,6 +1115,11 @@ def run(
                         "v1_model_mean": float(baseline_dist.model_mean),
                         "v1_fair_line": v1_fair,
                         "v1_model_sd": float(baseline_dist.standard_deviation),
+                        "v1_pi_low": float(baseline_dist.prediction_interval_lower),
+                        "v1_pi_high": float(baseline_dist.prediction_interval_upper),
+                        "v1_crps": float(v1_crps),
+                        "v1_interval_score_80": float(v1_interval_score_80),
+                        "v1_interval_covered_80": bool(v1_interval_covered_80),
                         "v1_p_over": baseline_dist.p_over,
                         "v1_p_under": baseline_dist.p_under,
                         "v1_model_side": v1_side,
