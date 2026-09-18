@@ -113,27 +113,27 @@ def main() -> int:
 
     provenance = {
         "game_spec": {
-            "path": str(args.game_spec),
+            "source_file": args.game_spec.name,
             "sha256": payload_sha256(raw_game),
         },
         "opportunity": {
-            "path": str(args.opportunity),
+            "source_file": args.opportunity.name,
             "sha256": payload_sha256(raw_opportunity),
         },
         "efficiency_player": {
-            "path": str(args.efficiency_player),
+            "source_file": args.efficiency_player.name,
             "sha256": payload_sha256(raw_efficiency),
         },
         "team_td": {
-            "path": str(args.team_td),
+            "source_file": args.team_td.name,
             "sha256": payload_sha256(raw_team_td),
         },
         "residual_efficiency": {
-            "path": str(args.residual_efficiency),
+            "source_file": args.residual_efficiency.name,
             "sha256": payload_sha256(raw_residual),
         },
         "market_snapshot": {
-            "path": str(args.market_snapshot),
+            "source_file": args.market_snapshot.name,
             "sha256": payload_sha256(raw_market),
         },
     }
