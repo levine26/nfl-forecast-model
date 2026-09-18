@@ -1,0 +1,138 @@
+name: LevLine Props 2.0 NGS residual research
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-advanced-efficiency-r2
+      - research/props-v2-challenger
+    paths:
+      - "research/props/v2/props_ngs_efficiency_state.py"
+      - "research/props/v2/props_ngs_market_residual.py"
+      - "research/props/v2/evaluate_ngs_market_residual.py"
+      - "research/props/v2/test_props_ngs_market_residual.py"
+      - ".github/workflows/research_props_v2_ngs_residual.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Compile and test NGS residual challenger
+        run: |
+          python -m py_compile research/props/v2/props_ngs_market_residual.py
+          python -m py_compile research/props/v2/evaluate_ngs_market_residual.py
+          pytest -q research/props/v2/test_props_ngs_market_residual.py
+
+  frozen-v1-receipts:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2023, 2024, 2025]
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pyarrow
+      - name: Reconstruct frozen V1 forecast ledger
+        run: |
+          python research/props/evaluation/run_historical_directional_backtest.py \
+            --season ${{ matrix.season }} \
+            --week-start 1 \
+            --week-end 18 \
+            --simulations 20000 \
+            --book-id 30 \
+            --output-dir research_outputs/props_v2/ngs_residual/v1/${{ matrix.season }}
+      - name: Assert frozen V1 contract
+        env:
+          SEASON: ${{ matrix.season }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          season=int(os.environ["SEASON"])
+          root=Path(f"research_outputs/props_v2/ngs_residual/v1/{season}")
+          d=json.loads((root/f"{season}_summary.json").read_text())
+          assert d["contract_version"] == "levline-props-historical-directional-v1.0"
+          assert d["simulations_per_game"] == 20000
+          assert d["market_pairing"]["book_id"] == 30
+          assert d["market_pairing"]["require_genuine_open"] is True
+          assert d["headline"]["wins"] + d["headline"]["losses"] > 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-ngs-v1-${{ matrix.season }}
+          path: research_outputs/props_v2/ngs_residual/v1/${{ matrix.season }}/
+          if-no-files-found: error
+
+  evaluate:
+    needs: frozen-v1-receipts
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pyarrow
+      - name: Download frozen V1 receipts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: levline-props-v2-ngs-v1-*
+          path: research_outputs/props_v2/ngs_residual/downloads
+          merge-multiple: true
+      - name: Evaluate chronological NGS residual
+        run: |
+          python research/props/v2/evaluate_ngs_market_residual.py \
+            --input research_outputs/props_v2/ngs_residual/downloads/2023_forecast_level.csv \
+            --input research_outputs/props_v2/ngs_residual/downloads/2024_forecast_level.csv \
+            --input research_outputs/props_v2/ngs_residual/downloads/2025_forecast_level.csv \
+            --output-dir research_outputs/props_v2/ngs_residual/evaluation
+      - name: Enforce research-only interpretation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("research_outputs/props_v2/ngs_residual/evaluation/summary.json")
+          d=json.loads(p.read_text())
+          assert d["contract_version"] == "levline-props-v2-ngs-residual-development-v0.1.0"
+          assert d["promotion_authorized"] is False
+          assert d["selective_threshold_used"] is False
+          assert d["completed_2026_outcomes_used_for_tuning"] == 0
+          assert d["ngs_state_coverage"]["target_week_rows_used"] == 0
+          print(json.dumps({
+              "fixed_anchor": d["fixed_anchor"]["evaluation"],
+              "rolling_origin": {
+                  k: v["evaluation"]
+                  for k, v in d["rolling_origin"]["by_evaluation_season"].items()
+              },
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-ngs-residual-evaluation
+          path: research_outputs/props_v2/ngs_residual/evaluation/
+          if-no-files-found: error
