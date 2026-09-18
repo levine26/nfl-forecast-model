@@ -425,7 +425,10 @@ function FullMarket({ rows }) {
 }
 
 function PropsBoard({ rows, payload, history }) {
-  return <><BoardHeader payload={payload} history={history}/><Radar rows={rows}/><FullMarket rows={rows}/></>
+  return <>
+    <BoardHeader payload={payload} history={history}/>
+    {payload ? <><Radar rows={rows}/><FullMarket rows={rows}/></> : <EmptyState/>}
+  </>
 }
 
 function gameGroups(rows) {
@@ -622,10 +625,8 @@ export default function PropsResearchBeta() {
     <PropsHeader view={route.view}/>
     <main>
       {loading ? <LoadingState/> : <>
-        {!publicPayload && route.view!=='about' && route.view!=='history' ? <EmptyState/> : <>
-          {route.view==='board' && <PropsBoard rows={rows} payload={publicPayload} history={historyPayload}/>}
-          {route.view==='games' && (route.gameId ? <GameDetail rows={rows} gameId={route.gameId}/> : <GamesIndex rows={rows}/>)}
-        </>}
+        {route.view==='board' && <PropsBoard rows={rows} payload={publicPayload} history={historyPayload}/>}
+        {route.view==='games' && (!publicPayload ? <><BoardHeader payload={publicPayload} history={historyPayload}/><EmptyState/></> : (route.gameId ? <GameDetail rows={rows} gameId={route.gameId}/> : <GamesIndex rows={rows}/>))}
         {route.view==='history' && <History payload={historyPayload}/>}
         {route.view==='about' && <About/>}
       </>}
