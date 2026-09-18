@@ -158,6 +158,14 @@ Rows with free-agent/invalid team codes or ambiguous event-to-game mapping are e
 
 Kickoff comes only from the nflverse schedule.
 
+### Pre-outcome nflverse scramble normalization
+
+Recorded after the first pilot failed during input validation and before any historical outcome was scored.
+
+The frozen upstream contract requires every `qb_scramble == 1` row to also be a rushing attempt. Where the nflverse source has `qb_scramble == 1` and `rush_attempt != 1`, the historical source adapter sets `rush_attempt = 1` before constructing lagged opportunity history.
+
+This is a deterministic event-schema normalization: a QB scramble is a rushing play. It does not inspect player totals, market outcomes, forecast errors, or evaluation results. The number of normalized source rows must be reported.
+
 ## 9. Forecast chronology
 
 For every target week:
