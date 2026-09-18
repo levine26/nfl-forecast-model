@@ -183,12 +183,20 @@ def canonical_schedule(bundle, season: int) -> pd.DataFrame:
     return schedule
 
 
-def roster_metadata(market: pd.DataFrame) -> pd.DataFrame:
+def roster_metadata(
+    market: pd.DataFrame,
+    *,
+    book_id: int,
+    require_genuine_open: bool,
+) -> pd.DataFrame:
     work = market[
-        market["position"].isin(SUPPORTED_POSITIONS)
+        market["book_id"].eq(int(book_id))
+        & market["position"].isin(SUPPORTED_POSITIONS)
         & market["player_id"].map(_valid_player_id)
         & market["bet_type"].isin(PLAYER_POPULATION_BET_TYPES)
     ].copy()
+    if require_genuine_open:
+        work = work[~work["open_inferred"].astype(bool)].copy()
     return work[
         ["event_id", "week", "player_id", "join_name", "position", "team", "bet_type"]
     ].drop_duplicates()
@@ -649,7 +657,11 @@ def run(
     market = market[market["week"].between(int(week_start), int(week_end))].copy()
     schedule = canonical_schedule(bundle, season)
     schedule = schedule[schedule["week"].between(int(week_start), int(week_end))].copy()
-    roster = roster_metadata(market)
+    roster = roster_metadata(
+        market,
+        book_id=book_id,
+        require_genuine_open=require_genuine_open,
+    )
     event_map, event_map_audit = map_events_to_schedule(roster, schedule)
     observations, market_pair_audit = market_observations(
         market,
