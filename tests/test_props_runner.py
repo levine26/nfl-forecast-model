@@ -5,6 +5,12 @@ from pathlib import Path
 
 import pytest
 
+from nfl_forecast.props_manifest import (
+    MANIFEST_CONTRACT_VERSION,
+    MANIFEST_SLATE_CONTRACT_VERSION,
+    payload_sha256,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "run_props_research_beta.py"
@@ -249,3 +255,121 @@ def test_slate_rejects_duplicate_forecast_ids_before_history_lock(monkeypatch, t
             history_ledger=tmp_path / "forecast_originals.jsonl",
         )
     assert events == []
+
+
+
+def _fingerprinted_manifest(game_id, forecast="2026-09-17T22:00:00+00:00"):
+    manifest = {
+        "manifest_contract_version": MANIFEST_CONTRACT_VERSION,
+        "game_id": game_id,
+        "forecast_timestamp_utc": forecast,
+    }
+    manifest["manifest_sha256"] = payload_sha256(manifest)
+    return manifest
+
+
+def _write_manifest_slate(tmp_path, entries, forecast="2026-09-17T22:00:00+00:00"):
+    slate = {
+        "contract_version": MANIFEST_SLATE_CONTRACT_VERSION,
+        "research_only": True,
+        "production_authorized": False,
+        "forecast_timestamp_utc": forecast,
+        "game_count": len(entries),
+        "upstream_slate": {"source_file": "upstream.json", "sha256": "a" * 64},
+        "market_snapshot": {"source_file": "market.json", "sha256": "b" * 64},
+        "games": entries,
+    }
+    slate["slate_sha256"] = payload_sha256(slate)
+    path = tmp_path / "manifest_slate.json"
+    path.write_text(__import__("json").dumps(slate), encoding="utf-8")
+    return path
+
+
+def test_runner_loads_and_verifies_frozen_manifest_slate(tmp_path):
+    module = _module()
+    games_dir = tmp_path / "games"
+    games_dir.mkdir()
+    entries = []
+    for game_id in ("g1", "g2"):
+        manifest = _fingerprinted_manifest(game_id)
+        path = games_dir / f"{game_id}.manifest.json"
+        path.write_text(__import__("json").dumps(manifest), encoding="utf-8")
+        entries.append(
+            {
+                "game_id": game_id,
+                "manifest_file": f"games/{game_id}.manifest.json",
+                "manifest_sha256": manifest["manifest_sha256"],
+            }
+        )
+    slate_path = _write_manifest_slate(tmp_path, entries)
+
+    loaded = module._load_manifest_slate(slate_path)
+    assert [row["game_id"] for row in loaded] == ["g1", "g2"]
+
+
+def test_runner_rejects_manifest_slate_file_fingerprint_mismatch(tmp_path):
+    module = _module()
+    manifest = _fingerprinted_manifest("g1")
+    games_dir = tmp_path / "games"
+    games_dir.mkdir()
+    path = games_dir / "g1.manifest.json"
+    path.write_text(__import__("json").dumps(manifest), encoding="utf-8")
+    slate_path = _write_manifest_slate(
+        tmp_path,
+        [
+            {
+                "game_id": "g1",
+                "manifest_file": "games/g1.manifest.json",
+                "manifest_sha256": "0" * 64,
+            }
+        ],
+    )
+
+    with pytest.raises(ValueError, match="fingerprint disagrees"):
+        module._load_manifest_slate(slate_path)
+
+
+def test_runner_rejects_manifest_slate_path_escape(tmp_path):
+    module = _module()
+    outside = tmp_path.parent / "outside-props-manifest.json"
+    manifest = _fingerprinted_manifest("g1")
+    outside.write_text(__import__("json").dumps(manifest), encoding="utf-8")
+    slate_path = _write_manifest_slate(
+        tmp_path,
+        [
+            {
+                "game_id": "g1",
+                "manifest_file": "../outside-props-manifest.json",
+                "manifest_sha256": manifest["manifest_sha256"],
+            }
+        ],
+    )
+
+    with pytest.raises(ValueError, match="escapes its root"):
+        module._load_manifest_slate(slate_path)
+
+
+def test_runner_rejects_mixed_freeze_timestamps_in_slate(tmp_path):
+    module = _module()
+    manifest = _fingerprinted_manifest(
+        "g1",
+        forecast="2026-09-17T22:01:00+00:00",
+    )
+    games_dir = tmp_path / "games"
+    games_dir.mkdir()
+    path = games_dir / "g1.manifest.json"
+    path.write_text(__import__("json").dumps(manifest), encoding="utf-8")
+    slate_path = _write_manifest_slate(
+        tmp_path,
+        [
+            {
+                "game_id": "g1",
+                "manifest_file": "games/g1.manifest.json",
+                "manifest_sha256": manifest["manifest_sha256"],
+            }
+        ],
+        forecast="2026-09-17T22:00:00+00:00",
+    )
+
+    with pytest.raises(ValueError, match="forecast timestamp disagrees"):
+        module._load_manifest_slate(slate_path)
