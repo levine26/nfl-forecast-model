@@ -31,8 +31,11 @@ from nfl_forecast.props_player_state import (  # noqa: E402
 )
 from nfl_forecast.props_upstream import (  # noqa: E402
     PropsUpstreamError,
+    build_empirical_scoring_context,
     build_game_upstream_package,
     build_lagged_props_history,
+    fit_pre2026_efficiency_priors,
+    residual_efficiency_by_team_from_empirical_priors,
 )
 
 
@@ -139,8 +142,7 @@ def main() -> int:
         help="First season loaded for strictly lagged state. This is data coverage, not tuning.",
     )
     parser.add_argument("--priors", type=Path, required=True)
-    parser.add_argument("--scoring-context", type=Path, required=True)
-    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument(\n        "--scoring-context",\n        type=Path,\n        help="Optional explicit scoring/residual context; otherwise derive strictly lagged context.",\n    )\n    parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--cache-dir", default=".cache/nflreadpy")
     parser.add_argument(
         "--skip-injury-fetch",
@@ -153,7 +155,7 @@ def main() -> int:
         raise ValueError("--week must be positive")
     seasons = list(range(int(args.history_start_season), int(args.season) + 1))
     priors = _load(args.priors)
-    scoring = _load(args.scoring_context)
+    scoring = _load(args.scoring_context) if args.scoring_context is not None else {}
 
     sources = load_offensive_props_sources(
         seasons=seasons,
@@ -214,28 +216,74 @@ def main() -> int:
         week=args.week,
     )
 
-    game_config = _game_config(scoring, args.game_id)
-    scoring_by_team = game_config.get("scoring_context_by_team")
-    residual = game_config.get("residual_efficiency_by_team")
-    if not isinstance(scoring_by_team, dict):
-        raise ValueError("game scoring context requires scoring_context_by_team")
-    if not isinstance(residual, dict):
-        raise ValueError("game scoring context requires residual_efficiency_by_team")
+    game_config = _game_config(scoring, args.game_id) if scoring else {}
+    game_rows = player_state[player_state["game_id"].astype(str).eq(str(args.game_id))]
+    game_teams = sorted(set(game_rows["team"].map(normalize_team_code)))
+    if len(game_teams) != 2:
+        raise ValueError(f"{args.game_id} must resolve to exactly two teams")
 
     route_priors = priors.get("route_prior_means")
     availability_priors = priors.get("availability_beta_priors")
-    efficiency_priors = priors.get("efficiency_position_priors")
     if not isinstance(route_priors, dict):
         raise ValueError("priors require route_prior_means")
     if not isinstance(availability_priors, dict):
         raise ValueError("priors require availability_beta_priors")
-    if not isinstance(efficiency_priors, dict):
-        raise ValueError("priors require efficiency_position_priors")
 
-    source_status = str(priors.get("source_status") or "").strip()
-    trained_through = priors.get("prior_model_trained_through_season")
-    if trained_through is None:
-        raise ValueError("priors require prior_model_trained_through_season")
+    fitted_empirical = fit_pre2026_efficiency_priors(
+        sources.pbp,
+        identity,
+        trained_through_season=2025,
+    )
+    explicit_efficiency = priors.get("efficiency_position_priors")
+    if explicit_efficiency is not None:
+        if not isinstance(explicit_efficiency, dict):
+            raise ValueError("efficiency_position_priors must be an object")
+        efficiency_priors = explicit_efficiency
+        trained_through = priors.get("prior_model_trained_through_season")
+        if trained_through is None:
+            raise ValueError(
+                "explicit efficiency_position_priors require prior_model_trained_through_season"
+            )
+        efficiency_prior_source = "explicit_preregistered_file"
+    else:
+        efficiency_priors = fitted_empirical["efficiency_position_priors"]
+        trained_through = fitted_empirical["trained_through_season"]
+        efficiency_prior_source = "empirical_pre2026_pbp"
+
+    source_status = str(priors.get("source_status") or "qualified").strip()
+
+    explicit_scoring = game_config.get("scoring_context_by_team")
+    if explicit_scoring is not None:
+        if not isinstance(explicit_scoring, dict):
+            raise ValueError("scoring_context_by_team must be an object")
+        scoring_by_team = explicit_scoring
+        scoring_source = "explicit_preregistered_file"
+        empirical_scoring_audit = None
+    else:
+        empirical_scoring = build_empirical_scoring_context(
+            sources.pbp,
+            teams=game_teams,
+            season=args.season,
+            week=args.week,
+            trained_through_season=2025,
+        )
+        scoring_by_team = empirical_scoring["scoring_context_by_team"]
+        scoring_source = "strictly_lagged_pbp"
+        empirical_scoring_audit = empirical_scoring["audit"]
+
+    explicit_residual = game_config.get("residual_efficiency_by_team")
+    if explicit_residual is not None:
+        if not isinstance(explicit_residual, dict):
+            raise ValueError("residual_efficiency_by_team must be an object")
+        residual = explicit_residual
+        residual_source = "explicit_preregistered_file"
+    else:
+        residual = residual_efficiency_by_team_from_empirical_priors(
+            game_teams,
+            fitted_empirical,
+        )
+        residual_source = "empirical_pre2026_pbp"
+
     explicit_qb_overrides = game_config.get("primary_qb_by_team")
     if explicit_qb_overrides is not None and not isinstance(explicit_qb_overrides, dict):
         raise ValueError("primary_qb_by_team must be an object when supplied")
@@ -324,8 +372,15 @@ def main() -> int:
             "depth_chart_primary_qb": depth_qb_audit,
             "player_state": state_build.audit,
             "upstream": package.audit,
+            "empirical_prior_fit": fitted_empirical["audit"],
+            "empirical_scoring_context": empirical_scoring_audit,
+            "efficiency_prior_source": efficiency_prior_source,
+            "scoring_context_source": scoring_source,
+            "residual_efficiency_source": residual_source,
             "priors_source_file": args.priors.name,
-            "scoring_context_source_file": args.scoring_context.name,
+            "scoring_context_source_file": (
+                args.scoring_context.name if args.scoring_context is not None else None
+            ),
         },
     )
 
