@@ -18,6 +18,9 @@ on:
       - 'tests/test_levline_markets_live.py'
       - '.github/workflows/levline_markets_live.yml'
       - 'config/levline_markets_priors_v1.json'
+      - 'config/props_v2_prospective_shadow_v0_1.json'
+      - 'research/props/v2/record_prospective_shadow.py'
+      - 'tests/test_props_v2_prospective_shadow.py'
       - 'scripts/build_props_upstream_snapshot.py'
       - 'scripts/build_props_market_snapshot.py'
       - 'scripts/build_props_integration_manifest.py'
@@ -68,6 +71,7 @@ jobs:
           tests/test_props_publication.py
           tests/test_props_market_live.py
           tests/test_props_upstream.py
+          tests/test_props_v2_prospective_shadow.py
 
   publish:
     if: github.event_name != 'pull_request'
@@ -139,11 +143,18 @@ jobs:
                 "${EXTRA_ARGS[@]}" \
                 "${BOOK_ARGS[@]}"
 
+            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+              python research/props/v2/record_prospective_shadow.py \
+                --forecasts outputs/props/forecasts.json \
+                --config config/props_v2_prospective_shadow_v0_1.json \
+                --ledger outputs/props/history/challenger_originals.jsonl
+
             git add \
               outputs/props/forecasts.json \
               outputs/props/public_props.json \
               outputs/props/status.json \
-              outputs/props/history/forecast_originals.jsonl
+              outputs/props/history/forecast_originals.jsonl \
+              outputs/props/history/challenger_originals.jsonl
 
             if git diff --cached --quiet; then
               echo "No Props publication changes to publish."
