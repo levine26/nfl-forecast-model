@@ -109,6 +109,8 @@ body.levline-props-route{margin:0;background:var(--lp-bg);color-scheme:dark}
 .lp-direction>small{color:var(--lp-dim);font-size:9px}
 .lp-direction.under{border-color:rgba(159,196,175,.16);background:rgba(159,196,175,.028)}
 .lp-direction.market-aligned{border-color:var(--lp-line);background:rgba(255,255,255,.012)}
+.lp-direction.unavailable{border-color:var(--lp-line);background:rgba(255,255,255,.012)}
+.lp-direction.unavailable>strong{color:var(--lp-muted)}
 .lp-direction.td{grid-template-columns:1fr auto;grid-template-areas:"label prob" "note prob";align-items:center}
 .lp-direction.td>span{grid-area:label}
 .lp-direction.td>strong{grid-area:prob;font-size:35px;color:var(--lp-accent)}
