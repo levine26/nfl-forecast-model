@@ -178,3 +178,29 @@ def test_manifest_fingerprint_detects_tampering():
     tampered["seed"] = 999
     with pytest.raises(PropsManifestError, match="fingerprint mismatch"):
         verify_manifest_fingerprint(tampered)
+
+
+def test_slate_wide_market_snapshot_selects_only_target_game():
+    market = _market_snapshot()
+    market["market_artifacts"].append(
+        {
+            "game_id": "2026_03_BUF_MIA",
+            "player_id": "OTHER",
+            "prop_type": "passing_yards",
+            "as_of_utc": "2026-09-20T16:02:00Z",
+            "closing_evaluation": None,
+        }
+    )
+    manifest = _assemble(market_snapshot=market)
+    assert len(manifest["market_artifacts"]) == 1
+    assert manifest["market_artifacts"][0]["game_id"] == GAME_ID
+
+
+def test_residual_team_aliases_are_canonicalized():
+    manifest = _assemble(
+        residual_efficiency_by_team={
+            "ARI": {"receiving_ypr_mean": 10.0},
+            "LAR": {"receiving_ypr_mean": 10.0},
+        }
+    )
+    assert set(manifest["residual_efficiency_by_team"]) == {"ARI", "LAR"}
