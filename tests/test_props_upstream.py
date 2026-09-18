@@ -92,7 +92,7 @@ def _play(
     }
 
 
-def test_nflverse_scramble_normalization_repairs_only_explicit_scrambles():
+def test_nflverse_scramble_normalization_suppresses_non_statistical_labels():
     frame = pd.DataFrame(
         [
             _play(
@@ -103,6 +103,17 @@ def test_nflverse_scramble_normalization_repairs_only_explicit_scrambles():
                 passer="A-QB",
                 rusher="",
                 rush_attempt=0,
+                qb_scramble=1,
+                rushing_yards=0,
+            ),
+            _play(
+                game_id="2026_01_ARI_LAR",
+                season=2026,
+                week=1,
+                team="ARI",
+                passer="A-QB",
+                rusher="",
+                rush_attempt=1,
                 qb_scramble=1,
                 rushing_yards=7,
             ),
@@ -121,18 +132,23 @@ def test_nflverse_scramble_normalization_repairs_only_explicit_scrambles():
 
     normalized, audit = normalize_nflverse_scramble_semantics(frame)
 
-    assert normalized.loc[0, "rush_attempt"] == 1
-    assert normalized.loc[0, "rusher_player_id"] == "A-QB"
-    assert normalized.loc[1, "rush_attempt"] == 0
-    assert normalized.loc[1, "rusher_player_id"] == "A-RB"
-    assert audit["scramble_rows"] == 1
-    assert audit["rush_attempt_repairs"] == 1
+    assert normalized.loc[0, "rush_attempt"] == 0
+    assert normalized.loc[0, "qb_scramble"] == 0
+    assert normalized.loc[1, "rush_attempt"] == 1
+    assert normalized.loc[1, "qb_scramble"] == 1
+    assert normalized.loc[1, "rusher_player_id"] == "A-QB"
+    assert normalized.loc[2, "rush_attempt"] == 0
+    assert normalized.loc[2, "rusher_player_id"] == "A-RB"
+    assert audit["raw_scramble_rows"] == 2
+    assert audit["countable_scramble_rows"] == 1
+    assert audit["non_statistical_scramble_labels_suppressed"] == 1
+    assert audit["rush_attempt_promotions"] == 0
     assert audit["rusher_identity_repairs"] == 1
     assert audit["non_scramble_rows_modified"] == 0
     assert audit["outcome_or_market_fields_used_for_repair"] is False
 
 
-def test_nflverse_scramble_normalization_refuses_missing_qb_identity():
+def test_nflverse_scramble_normalization_refuses_missing_qb_identity_on_countable_rush():
     frame = pd.DataFrame(
         [
             _play(
@@ -142,7 +158,7 @@ def test_nflverse_scramble_normalization_refuses_missing_qb_identity():
                 team="ARI",
                 passer="",
                 rusher="",
-                rush_attempt=0,
+                rush_attempt=1,
                 qb_scramble=1,
                 rushing_yards=4,
             )
@@ -158,6 +174,7 @@ def test_core_history_still_refuses_unadapted_scramble_mismatch():
     frame.loc[scramble_index, "rush_attempt"] = 0
     with pytest.raises(PropsUpstreamError, match="qb_scramble rows"):
         build_lagged_props_history(frame, _identity(), season=2026, week=3)
+
 
 
 def _pbp():
