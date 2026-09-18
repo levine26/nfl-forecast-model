@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from nfl_forecast.props_market_residual import (
+from research.props.v2.props_market_residual import (
     ENGINE_VERSION,
     apply_market_prior_residual,
     fit_market_prior_residual,
