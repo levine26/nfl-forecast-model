@@ -54,6 +54,11 @@ jobs:
           assert d["event_mapping"]["mapped_events"] > 0
           assert d["headline"]["qualified"] > 0
           assert d["headline"]["wins"] + d["headline"]["losses"] > 0
+          assert d.get("game_build_errors") == {}, d.get("game_build_errors")
+          assert not any(
+              str(key).startswith("game_build_or_simulation")
+              for key in d.get("exclusions", {})
+          ), d.get("exclusions")
           PY
       - uses: actions/upload-artifact@v4
         with:
