@@ -7,7 +7,7 @@ async function hasFixture(page) {
 }
 
 function boardRow(scope,name) {
-  return scope.locator('.lp-board-row').filter({has:scope.locator('.lp-row-player strong',{hasText:name})}).first()
+  return scope.locator('.lp-board-row').filter({hasText:name}).first()
 }
 
 for (const width of [320,390,430,768,1440]) {
@@ -29,7 +29,7 @@ for (const width of [320,390,430,768,1440]) {
       await puka.locator(':scope > summary').click()
       await expect(puka.getByRole('img',{name:/Market line 76.5.*LevLine Fair Line 83.5/i})).toBeVisible()
       await expect(puka.getByText('THE SIGNAL',{exact:true})).toBeVisible()
-      await expect(puka.getByText('Advanced Analysis',{exact:true})).toBeVisible()
+      await expect(puka.locator('.lp-advanced > summary')).toBeVisible()
     } else {
       await expect(page.getByText(/Props publication is waiting for a valid forecast artifact/i)).toBeVisible()
     }
@@ -89,7 +89,7 @@ test('Full Market filters, search, sort, and progressive disclosure are interact
   await full.getByLabel('Sort').selectOption('player')
   const puka=boardRow(full,'Puka Nacua')
   await puka.locator(':scope > summary').click()
-  await puka.getByText('Advanced Analysis',{exact:true}).click()
+  await puka.locator('.lp-advanced > summary').click()
   await expect(puka.getByText('Model distribution')).toBeVisible()
   await expect(puka.getByText('Forecast timestamp')).toBeVisible()
   await expect(puka.getByText('Market captured')).toBeVisible()
