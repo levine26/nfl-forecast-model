@@ -1,0 +1,58 @@
+name: LevLine Props historical directional pilot
+
+on:
+  pull_request:
+    branches:
+      - research/props-integration
+    paths:
+      - "research/props/evaluation/run_historical_directional_backtest.py"
+      - "research/props/evaluation/HISTORICAL_DIRECTIONAL_ACCURACY_PREREGISTRATION.md"
+      - ".github/workflows/research_props_historical_backtest.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pyarrow
+      - name: Compile historical backtest
+        run: python -m py_compile research/props/evaluation/run_historical_directional_backtest.py
+      - name: Run 2025 Week 1 pilot
+        run: |
+          python research/props/evaluation/run_historical_directional_backtest.py \
+            --season 2025 \
+            --week-start 1 \
+            --week-end 1 \
+            --simulations 1000 \
+            --book-id 30 \
+            --output-dir research_outputs/props_accuracy/historical_pilot
+      - name: Require real graded observations
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path=Path("research_outputs/props_accuracy/historical_pilot/2025_summary.json")
+          d=json.loads(path.read_text())
+          print(json.dumps(d["headline"], indent=2))
+          print(json.dumps(d["exclusions"], indent=2))
+          assert d["market_pairing"]["paired_observations"] > 0
+          assert d["headline"]["qualified"] > 0
+          assert d["headline"]["wins"] + d["headline"]["losses"] > 0
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-historical-pilot
+          path: research_outputs/props_accuracy/historical_pilot/
+          if-no-files-found: error
