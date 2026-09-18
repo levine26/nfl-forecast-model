@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-"""Aggregate retrospective Props 2.0 dynamic-role challenger artifacts.
+"""Aggregate paired Props 2.0 dynamic-role ablations.
 
-This report is development evidence only. It compares the challenger with the paired
-frozen-V1 replay and with the sportsbook opening threshold/price on the same rows.
+Both route_only and full were frozen before outcome evaluation. This aggregator
+reports them side-by-side and deliberately does not select a retrospective winner.
 """
 
 import argparse
@@ -15,6 +15,7 @@ import pandas as pd
 
 CONTRACT_VERSION = "levline-props-v2-dynamic-role-development-v0.1.0"
 BOOTSTRAP_SEED = 20260918
+FROZEN_MODES = ("route_only", "full")
 
 
 def implied_probability(american: float) -> float:
@@ -32,15 +33,19 @@ def no_vig_over(over: float, under: float) -> float:
 
 def _prepare(frame: pd.DataFrame) -> pd.DataFrame:
     required = {
-        "contract_version", "game_id", "player_id", "prop_type", "market_line",
-        "actual_result", "grading_result", "v1_grading_result", "fair_line",
-        "v1_fair_line", "over_odds", "under_odds",
+        "contract_version", "role_mode", "game_id", "player_id", "prop_type",
+        "market_line", "actual_result", "grading_result", "v1_grading_result",
+        "fair_line", "v1_fair_line", "over_odds", "under_odds",
     }
     missing = required - set(frame.columns)
     if missing:
         raise ValueError(f"challenger artifact missing fields: {sorted(missing)}")
     if set(frame["contract_version"].astype(str)) != {CONTRACT_VERSION}:
         raise ValueError("mixed or unexpected challenger contract version")
+    modes = set(frame["role_mode"].astype(str))
+    unknown = modes - set(FROZEN_MODES)
+    if unknown:
+        raise ValueError(f"unexpected role-mode result(s): {sorted(unknown)}")
 
     out = frame.copy()
     out = out[
@@ -97,7 +102,7 @@ def _metrics(frame: pd.DataFrame) -> dict:
     }
 
 
-def _cluster_bootstrap(frame: pd.DataFrame, replicates: int) -> dict:
+def _cluster_bootstrap(frame: pd.DataFrame, replicates: int, seed: int) -> dict:
     games = np.asarray(sorted(frame["game_id"].astype(str).unique()))
     if len(games) < 2:
         return {
@@ -106,7 +111,7 @@ def _cluster_bootstrap(frame: pd.DataFrame, replicates: int) -> dict:
             "challenger_minus_market_ci95": [None, None],
         }
     grouped = {game: frame[frame["game_id"].astype(str).eq(game)] for game in games}
-    rng = np.random.default_rng(BOOTSTRAP_SEED)
+    rng = np.random.default_rng(seed)
     acc = np.empty(replicates)
     dv1 = np.empty(replicates)
     dmkt = np.empty(replicates)
@@ -124,6 +129,24 @@ def _cluster_bootstrap(frame: pd.DataFrame, replicates: int) -> dict:
     }
 
 
+def _mode_summary(frame: pd.DataFrame, *, replicates: int, seed: int) -> dict:
+    result = _metrics(frame)
+    result.update(_cluster_bootstrap(frame, replicates, seed))
+    result["by_season"] = {
+        str(int(season)): _metrics(group)
+        for season, group in frame.groupby("season", sort=True)
+    }
+    result["by_prop_type"] = {
+        str(prop): _metrics(group)
+        for prop, group in frame.groupby("prop_type", sort=True)
+    }
+    result["by_position"] = {
+        str(position): _metrics(group)
+        for position, group in frame.groupby("position", sort=True)
+    }
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-dir", type=Path, required=True)
@@ -136,38 +159,37 @@ def main() -> int:
         raise ValueError("no challenger forecast-level artifacts found")
     frame = pd.concat([pd.read_csv(path) for path in paths], ignore_index=True)
     paired = _prepare(frame)
-    overall = _metrics(paired)
-    overall.update(_cluster_bootstrap(paired, args.bootstrap_replicates))
 
-    by_season = {
-        str(int(season)): _metrics(group)
-        for season, group in paired.groupby("season", sort=True)
-    }
-    by_prop = {
-        str(prop): _metrics(group)
-        for prop, group in paired.groupby("prop_type", sort=True)
-    }
-    by_position = {
-        str(position): _metrics(group)
-        for position, group in paired.groupby("position", sort=True)
-    }
+    by_mode = {}
+    for index, mode in enumerate(FROZEN_MODES):
+        group = paired[paired["role_mode"].astype(str).eq(mode)].copy()
+        if group.empty:
+            continue
+        by_mode[mode] = _mode_summary(
+            group,
+            replicates=args.bootstrap_replicates,
+            seed=BOOTSTRAP_SEED + index,
+        )
+
+    missing_modes = [mode for mode in FROZEN_MODES if mode not in by_mode]
+    if missing_modes:
+        raise ValueError(f"missing frozen role-mode result(s): {missing_modes}")
 
     summary = {
         "contract_version": CONTRACT_VERSION,
         "research_label": "RETROSPECTIVE CHALLENGER DEVELOPMENT - NOT PROMOTION EVIDENCE",
         "promotion_authorized": False,
-        "headline": overall,
-        "by_season": by_season,
-        "by_prop_type": by_prop,
-        "by_position": by_position,
+        "frozen_ablation_modes": list(FROZEN_MODES),
+        "retrospective_winner_selected": False,
+        "by_role_mode": by_mode,
         "bootstrap": {
             "cluster": "game_id",
             "replicates": int(args.bootstrap_replicates),
-            "seed": BOOTSTRAP_SEED,
+            "seed_base": BOOTSTRAP_SEED,
         },
         "interpretation_boundary": (
-            "2023-2025 outcomes were previously inspected during V1 diagnosis. "
-            "This challenger result is research-development evidence and cannot authorize production."
+            "route_only and full were frozen before outcome evaluation. Results are reported "
+            "side-by-side and no retrospective winner is promoted or selected as the headline."
         ),
     }
 
@@ -177,29 +199,36 @@ def main() -> int:
     )
     paired.to_csv(args.output_dir / "paired_rows.csv", index=False)
 
-    h = overall
     report = [
-        "# LevLine Props 2.0 — Dynamic Role Challenger",
+        "# LevLine Props 2.0 — Dynamic Role Ablation",
         "",
         "**RETROSPECTIVE CHALLENGER DEVELOPMENT — NOT PROMOTION EVIDENCE**",
         "",
-        f"Paired decided props: {h['n']}",
-        f"Unique games: {h['unique_games']}",
-        f"Dynamic-role accuracy: {100*h['challenger_accuracy']:.2f}%",
-        f"Paired frozen-V1 accuracy: {100*h['v1_accuracy']:.2f}%",
-        f"Opening-price direction accuracy: {100*h['market_price_direction_accuracy']:.2f}%",
-        f"Dynamic minus V1: {100*h['challenger_minus_v1_accuracy']:.2f} pp",
-        f"Dynamic minus market-price direction: {100*h['challenger_minus_market_accuracy']:.2f} pp",
-        f"Dynamic Fair-Line MAE: {h['challenger_fair_line_mae']:.3f}",
-        f"V1 Fair-Line MAE: {h['v1_fair_line_mae']:.3f}",
-        f"Sportsbook line MAE: {h['sportsbook_line_mae']:.3f}",
-        f"Game-clustered challenger accuracy 95% CI: {h['challenger_accuracy_ci95']}",
-        f"Game-clustered challenger-minus-V1 95% CI: {h['challenger_minus_v1_ci95']}",
-        "",
-        "The result is diagnostic only. It cannot promote Props 2.0 because these seasons "
-        "were already inspected while formulating the challenger.",
-        "",
     ]
+    for mode in FROZEN_MODES:
+        h = by_mode[mode]
+        report.extend([
+            f"## {mode}",
+            "",
+            f"Paired decided props: {h['n']}",
+            f"Unique games: {h['unique_games']}",
+            f"Challenger accuracy: {100*h['challenger_accuracy']:.2f}%",
+            f"Paired frozen-V1 accuracy: {100*h['v1_accuracy']:.2f}%",
+            f"Opening-price direction accuracy: {100*h['market_price_direction_accuracy']:.2f}%",
+            f"Challenger minus V1: {100*h['challenger_minus_v1_accuracy']:.2f} pp",
+            f"Challenger minus market direction: {100*h['challenger_minus_market_accuracy']:.2f} pp",
+            f"Challenger Fair-Line MAE: {h['challenger_fair_line_mae']:.3f}",
+            f"V1 Fair-Line MAE: {h['v1_fair_line_mae']:.3f}",
+            f"Sportsbook line MAE: {h['sportsbook_line_mae']:.3f}",
+            f"Game-clustered accuracy 95% CI: {h['challenger_accuracy_ci95']}",
+            f"Game-clustered challenger-minus-V1 95% CI: {h['challenger_minus_v1_ci95']}",
+            "",
+        ])
+    report.extend([
+        "No retrospective winner is selected. The ablation is diagnostic only and cannot "
+        "authorize production because 2023–2025 outcomes were previously inspected.",
+        "",
+    ])
     (args.output_dir / "report.md").write_text("\n".join(report), encoding="utf-8")
     print((args.output_dir / "report.md").read_text(encoding="utf-8"))
     return 0
