@@ -82,7 +82,7 @@ const noSignal = forecast({
 
 const payload = {
   generated_utc: '2026-09-18T17:04:00Z',
-  forecasts: [baseForecast && forecast(), tdForecast, noSignal],
+  forecasts: [forecast(), tdForecast, noSignal],
 }
 
 async function mockProps(page, customPayload=payload) {
