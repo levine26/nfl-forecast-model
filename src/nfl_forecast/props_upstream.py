@@ -87,6 +87,87 @@ def _valid_id(series: pd.Series) -> pd.Series:
     return text.ne("") & text.ne("<NA>") & text.str.lower().ne("nan")
 
 
+def normalize_nflverse_scramble_semantics(
+    pbp: pd.DataFrame,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Normalize explicit nflverse QB scrambles into coherent rushing semantics.
+
+    nflverse exposes `qb_scramble` as an explicit play classification. Live/current
+    PBP can contain scramble rows where the generic `rush_attempt` flag or rusher ID
+    is absent even though the play is a QB scramble. LevLine treats scrambles as QB
+    rushing opportunities, so the source adapter repairs only those explicitly marked
+    scramble rows while preserving the raw signal in an audit trail.
+
+    This is an ingestion normalization, not model tuning: no outcome, market, or target
+    variable is consulted.
+    """
+
+    required = {"qb_scramble", "rush_attempt", "rushing_yards"}
+    missing = required - set(pbp.columns)
+    if missing:
+        raise PropsUpstreamError(
+            f"PBP missing scramble-normalization fields: {sorted(missing)}"
+        )
+
+    out = pbp.copy()
+    scramble = pd.to_numeric(out["qb_scramble"], errors="coerce").fillna(0.0).eq(1)
+    raw_rush = pd.to_numeric(out["rush_attempt"], errors="coerce").fillna(0.0)
+    mismatch = scramble & ~raw_rush.eq(1)
+
+    passer = _text(out, "passer_player_id", "passer_id")
+    rusher_col = next(
+        (name for name in ("rusher_player_id", "rusher_id") if name in out.columns),
+        None,
+    )
+    if rusher_col is None:
+        out["rusher_player_id"] = ""
+        rusher_col = "rusher_player_id"
+    rusher = out[rusher_col].astype("string").fillna("").str.strip()
+
+    missing_qb_identity = scramble & ~_valid_id(passer)
+    if missing_qb_identity.any():
+        examples = []
+        for idx in out.index[missing_qb_identity][:5]:
+            examples.append(
+                {
+                    "game_id": str(out.at[idx, "game_id"]) if "game_id" in out.columns else None,
+                    "play_id": _jsonable_play_id(out.at[idx, "play_id"]) if "play_id" in out.columns else None,
+                }
+            )
+        raise PropsUpstreamError(
+            "qb_scramble row is missing stable QB identity; refusing source repair: "
+            f"{examples}"
+        )
+
+    scramble_yards = pd.to_numeric(out.loc[scramble, "rushing_yards"], errors="coerce")
+    if scramble_yards.isna().any():
+        raise PropsUpstreamError(
+            "qb_scramble row is missing numeric rushing_yards; refusing source repair"
+        )
+
+    out.loc[mismatch, "rush_attempt"] = 1
+    missing_rusher = scramble & ~_valid_id(rusher)
+    out.loc[missing_rusher, rusher_col] = passer[missing_rusher].astype(str)
+
+    audit = {
+        "policy": "explicit_qb_scramble_implies_qb_rush_attempt",
+        "scramble_rows": int(scramble.sum()),
+        "rush_attempt_repairs": int(mismatch.sum()),
+        "rusher_identity_repairs": int(missing_rusher.sum()),
+        "non_scramble_rows_modified": 0,
+        "outcome_or_market_fields_used_for_repair": False,
+    }
+    return out, audit
+
+
+def _jsonable_play_id(value: Any) -> Any:
+    if pd.isna(value):
+        return None
+    if isinstance(value, np.generic):
+        return value.item()
+    return value
+
+
 def _safe_history(pbp: pd.DataFrame, *, season: int, week: int) -> pd.DataFrame:
     required = {"game_id", "season", "week", "posteam"}
     missing = required - set(pbp.columns)
