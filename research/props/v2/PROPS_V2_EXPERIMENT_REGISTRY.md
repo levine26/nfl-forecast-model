@@ -11,12 +11,12 @@ Status: **ACTIVE / APPEND-ONLY SCIENTIFIC RECORD**
 | P2-MKT-FAMILY | Separate calibration by prop family beats pooled global residual | Retrospective | COMPLETE | REJECT; preregistered gate failed |
 | P2-SHADOW-MKT-V1-V01 | Frozen global residual improves market-only probability prospectively | Prospective untouched | PR #379 | Freeze/collect only; no 2026 fitting |
 | P2-MICRO-V2 | Player-prop multi-book state / movement adds value vs one OPEN quote | Prospective + historical where licensed | PR #381 — capture layer | Archive exact pregame multi-book states first; no outcome-tuned horizon selection |
-| P2-GAME-ENV-V2 | Causal game environment improves opportunity forecasts | Retrospective development | PLANNED | V1 vs game-env-only ablation first |
+| P2-GAME-ENV-V2 | Pregame spread/total context improves top-level opportunity forecasts | Retrospective development | PR #389 — component study | Gate first on team plays/dropback MAE; no player-prop integration unless component improves |
 | P2-ROLE-V2 | Latent dynamic role beats static/EWMA proxy | Retrospective + prospective | PR #382 — preregistered/run pending | Estimate state dynamics from role observations only; judge MAE, CRPS, interval calibration and direction |
-| P2-AVAIL-MIX | Workload mixtures improve distribution quality vs P(active) | Prospective if history inadequate | PLANNED | No fabricated historical limited-state labels |
-| P2-ROUTE-TARGET | Route → target hierarchy improves receiving process | Retrospective | PLANNED | Source-quality gate before fit |
+| P2-AVAIL-MIX | Q/D workload-state mixtures improve conditional workload vs P(active) × normal role | Retrospective component + prospective follow-up | PR #388 — season-forward component study | Fit from injury designation + snap participation only; no prop outcomes |
+| P2-ROUTE-TARGET | Route → target hierarchy improves receiving process | Source audit | BLOCKED on verified live all-player routes | nflverse participation can support season-lagged pass-play participation, not true all-player routes; see route audit |
 | P2-EFF-V2 | Contextual expected outcome + shrunk player residual improves efficiency | Retrospective | PLANNED | Standalone proper-score/Fair-Line test |
-| P2-DIST-V2 | Event-level mixtures improve calibration/CRPS/tails | Retrospective | PLANNED | Proper-score improvement required |
+| P2-DIST-V2 | Signed empirical event-yard distributions improve conditional yardage CRPS vs nonnegative Gamma | Retrospective component isolation | PR #390 — component study | Conditions on actual event count only for isolation; cannot be called pregame prop evidence |
 | P2-TD-V2 | Hierarchical scoring-opportunity allocation improves TD distributions | Retrospective/prospective | PLANNED | Rare-event distribution metrics required |
 | P2-CLV-V1 | LevLine disagreement predicts subsequent market movement | Prospective | DATA CAPTURE STARTED via #381 | Freeze horizon/close selection before grading; no outcome-tuned horizon selection |
 
