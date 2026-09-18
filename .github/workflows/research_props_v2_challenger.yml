@@ -183,7 +183,6 @@ jobs:
         with:
           pattern: levline-props-v2-dynamic-role-primary-*
           path: research_outputs/props_v2/downloads
-          merge-multiple: true
       - name: Aggregate frozen dynamic-role ablations
         run: |
           python research/props/v2/aggregate_dynamic_role_backtest.py \
