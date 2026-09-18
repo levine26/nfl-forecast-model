@@ -92,7 +92,7 @@ def _play(
     }
 
 
-def test_nflverse_scramble_normalization_suppresses_non_statistical_labels():
+def test_nflverse_scramble_normalization_uses_rusher_then_passer_fallback():
     frame = pd.DataFrame(
         [
             _play(
@@ -111,11 +111,22 @@ def test_nflverse_scramble_normalization_suppresses_non_statistical_labels():
                 season=2026,
                 week=1,
                 team="ARI",
-                passer="A-QB",
-                rusher="",
+                passer="",
+                rusher="A-QB",
                 rush_attempt=1,
                 qb_scramble=1,
                 rushing_yards=7,
+            ),
+            _play(
+                game_id="2026_01_ARI_LAR",
+                season=2026,
+                week=1,
+                team="ARI",
+                passer="L-QB",
+                rusher="",
+                rush_attempt=1,
+                qb_scramble=1,
+                rushing_yards=5,
             ),
             _play(
                 game_id="2026_01_ARI_LAR",
@@ -137,18 +148,20 @@ def test_nflverse_scramble_normalization_suppresses_non_statistical_labels():
     assert normalized.loc[1, "rush_attempt"] == 1
     assert normalized.loc[1, "qb_scramble"] == 1
     assert normalized.loc[1, "rusher_player_id"] == "A-QB"
-    assert normalized.loc[2, "rush_attempt"] == 0
-    assert normalized.loc[2, "rusher_player_id"] == "A-RB"
-    assert audit["raw_scramble_rows"] == 2
-    assert audit["countable_scramble_rows"] == 1
+    assert normalized.loc[2, "rusher_player_id"] == "L-QB"
+    assert normalized.loc[3, "rush_attempt"] == 0
+    assert normalized.loc[3, "rusher_player_id"] == "A-RB"
+    assert audit["raw_scramble_rows"] == 3
+    assert audit["countable_scramble_rows"] == 2
     assert audit["non_statistical_scramble_labels_suppressed"] == 1
     assert audit["rush_attempt_promotions"] == 0
-    assert audit["rusher_identity_repairs"] == 1
+    assert audit["countable_scrambles_with_existing_rusher_id"] == 1
+    assert audit["rusher_identity_repairs_from_passer"] == 1
     assert audit["non_scramble_rows_modified"] == 0
     assert audit["outcome_or_market_fields_used_for_repair"] is False
 
 
-def test_nflverse_scramble_normalization_refuses_missing_qb_identity_on_countable_rush():
+def test_nflverse_scramble_normalization_refuses_only_when_all_identity_missing():
     frame = pd.DataFrame(
         [
             _play(
@@ -164,7 +177,7 @@ def test_nflverse_scramble_normalization_refuses_missing_qb_identity_on_countabl
             )
         ]
     )
-    with pytest.raises(PropsUpstreamError, match="missing stable QB identity"):
+    with pytest.raises(PropsUpstreamError, match="missing stable rusher/QB identity"):
         normalize_nflverse_scramble_semantics(frame)
 
 
