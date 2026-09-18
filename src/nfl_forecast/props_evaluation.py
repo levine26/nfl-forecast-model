@@ -759,6 +759,14 @@ def market_relative_metrics(
         {
             "mae_fair_line": float(fair_abs.mean()),
             "mae_original_market_line": float(market_abs.mean()),
+            "mean_fair_minus_original_market_line": float(
+                (matched["fair_line"].astype(float) - matched["market_line"].astype(float)).mean()
+            ),
+            "mean_absolute_fair_minus_original_market_line": float(
+                np.abs(
+                    matched["fair_line"].astype(float) - matched["market_line"].astype(float)
+                ).mean()
+            ),
             "paired_absolute_error_difference_fair_minus_market": float((fair_abs - market_abs).mean()),
             "paired_absolute_error_difference_ci95_game_clustered": list(
                 _cluster_bootstrap(
@@ -782,6 +790,14 @@ def market_relative_metrics(
         close_abs = np.abs(close["close_line"].astype(float) - close["actual_result"].astype(float))
         fair_close_abs = np.abs(close["fair_line"].astype(float) - close["actual_result"].astype(float))
         out["mae_closing_market_line"] = float(close_abs.mean())
+        out["mean_fair_minus_closing_line"] = float(
+            (close["fair_line"].astype(float) - close["close_line"].astype(float)).mean()
+        )
+        out["mean_absolute_fair_minus_closing_line"] = float(
+            np.abs(
+                close["fair_line"].astype(float) - close["close_line"].astype(float)
+            ).mean()
+        )
         out["paired_absolute_error_difference_fair_minus_close"] = float(
             (fair_close_abs - close_abs).mean()
         )
@@ -799,6 +815,7 @@ def market_relative_metrics(
         )
 
         clv_values: list[float] = []
+        same_threshold_price_clv: list[float] = []
         for _, row in close.iterrows():
             original_line = _num(row.get("market_line"))
             closing_line = _num(row.get("close_line"))
@@ -809,12 +826,41 @@ def market_relative_metrics(
             side = "OVER" if model_over > market_over else "UNDER" if model_over < market_over else None
             if side == "OVER":
                 clv_values.append(float(closing_line - original_line))
+                original_price = _num(row.get("market_over_price_american"))
+                closing_price = _num(row.get("close_over_price_american"))
             elif side == "UNDER":
                 clv_values.append(float(original_line - closing_line))
+                original_price = _num(row.get("market_under_price_american"))
+                closing_price = _num(row.get("close_under_price_american"))
+            else:
+                continue
+
+            if abs(float(closing_line) - float(original_line)) <= 1e-9:
+                original_decimal = american_to_decimal(original_price)
+                closing_decimal = american_to_decimal(closing_price)
+                if original_decimal is not None and closing_decimal is not None:
+                    same_threshold_price_clv.append(
+                        (1.0 / closing_decimal) - (1.0 / original_decimal)
+                    )
+
         if clv_values:
-            out["threshold_clv_mean"] = float(np.mean(clv_values))
-            out["positive_threshold_clv_rate"] = float(np.mean(np.asarray(clv_values) > 0.0))
+            clv_array = np.asarray(clv_values, dtype=float)
+            out["threshold_clv_mean"] = float(np.mean(clv_array))
+            out["positive_threshold_clv_rate"] = float(np.mean(clv_array > 0.0))
+            nonzero = clv_array[np.abs(clv_array) > 1e-12]
+            out["levline_direction_move_rate_nonzero"] = (
+                float(np.mean(nonzero > 0.0)) if len(nonzero) else None
+            )
             out["threshold_clv_n"] = len(clv_values)
+        if same_threshold_price_clv:
+            price_clv = np.asarray(same_threshold_price_clv, dtype=float)
+            out["same_threshold_price_clv_implied_probability_mean"] = float(
+                np.mean(price_clv)
+            )
+            out["positive_same_threshold_price_clv_rate"] = float(
+                np.mean(price_clv > 0.0)
+            )
+            out["same_threshold_price_clv_n"] = len(price_clv)
 
     out["status"] = (
         "STABLE_MATCHED_SAMPLE"
