@@ -35,6 +35,7 @@ from nfl_forecast.data import load_advanced_data, load_core_data  # noqa: E402
 from props_dynamic_role_v2 import (  # noqa: E402
     ENGINE_VERSION as DYNAMIC_ROLE_VERSION,
     build_dynamic_role_v2_adjustments,
+    fit_role_dynamics_from_snap_counts,
 )
 from nfl_forecast.props_player_sources import (  # noqa: E402
     add_nflverse_kickoff_timestamp,
@@ -765,6 +766,10 @@ def run(
     pbp, pbp_normalization_audit = normalize_historical_pbp(bundle.pbp)
     players = _pandas(nfl.load_players())
     snap_counts, snap_identity_audit = normalize_snap_counts_player_ids(bundle.snap_counts, players)
+    frozen_role_dynamics, frozen_role_dynamics_audit = fit_role_dynamics_from_snap_counts(
+        snap_counts,
+        target_season=season,
+    )
 
     market, market_source_audit = load_market_source(season)
     market = market[market["week"].between(int(week_start), int(week_end))].copy()
@@ -878,6 +883,7 @@ def run(
                     team=role_team,
                     route_prior_means=ROUTE_PRIORS,
                     mode=role_mode,
+                    frozen_dynamics=frozen_role_dynamics,
                 )
                 role_audit_by_team[role_team] = role_audit
                 if adjustments:
@@ -1139,6 +1145,12 @@ def run(
         "market_pairing": market_pair_audit,
         "event_mapping": event_map_audit,
         "snap_identity": snap_identity_audit,
+        "frozen_role_dynamics": {
+            "audit": frozen_role_dynamics_audit,
+            "parameters": {
+                key: value.to_dict() for key, value in frozen_role_dynamics.items()
+            },
+        },
         "participation": participation_audit,
         "exclusions": dict(exclusions),
         "headline": summarize(results),
