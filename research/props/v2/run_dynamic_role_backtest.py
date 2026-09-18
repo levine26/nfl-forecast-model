@@ -1037,6 +1037,7 @@ def run(
                 result_rows.append(
                     {
                         "contract_version": CONTRACT_VERSION,
+                        "role_mode": str(role_mode),
                         "season": int(season),
                         "week": int(week),
                         "game_id": game_id,
