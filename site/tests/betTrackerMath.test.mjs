@@ -6,6 +6,7 @@ import {
   americanWinProfit,
   buildBetLedger,
   buildCurrentWeekSlate,
+  buildSeasonPerformance,
   combinedEntryProfit,
   roundSpreadToHalfPoint,
   settleBet,
@@ -185,4 +186,29 @@ test('game P/L combines settled moneyline and spread wagers', () => {
   }])
   const expected=25*100/245 + 25*100/110
   assert.ok(Math.abs(combinedEntryProfit(ledger[0])-expected)<1e-9)
+})
+
+
+test('season performance accumulates Moneyline and spread P/L by week', () => {
+  const ledger=buildBetLedger([
+    {
+      game_id:'2026_01_A_B', season:'2026', week:'1', lock_status:'LOCKED',
+      away_team:'A', home_team:'B', pick:'B', final_home_prob:'0.60',
+      expected_margin:'3.5', actual_home_score:'24', actual_away_score:'20',
+      locked_home_moneyline:'-125', locked_home_spread_price:'-110',
+    },
+    {
+      game_id:'2026_02_C_D', season:'2026', week:'2', lock_status:'LOCKED',
+      away_team:'C', home_team:'D', pick:'D', final_home_prob:'0.60',
+      expected_margin:'3.5', actual_home_score:'20', actual_away_score:'24',
+      locked_home_moneyline:'-125', locked_home_spread_price:'-110',
+    },
+  ])
+  const series=buildSeasonPerformance(ledger)
+  assert.equal(series.length,2)
+  assert.equal(series[0].week,1)
+  assert.ok(series[0].cumulativeMl>0)
+  assert.ok(series[0].cumulativeSpread>0)
+  assert.ok(series[1].cumulativeMl<series[0].cumulativeMl)
+  assert.ok(series[1].cumulativeSpread<series[0].cumulativeSpread)
 })
