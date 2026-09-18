@@ -32,6 +32,16 @@ location/speed/distance/acceleration sampled 10 times per second and used for ro
 Completion Probability and Expected Rushing Yards. Public NGS methodology is therefore valuable for
 mechanistic model design, but does not imply LevLine has access to raw tracking feeds.
 
+## Route-participation clarification
+
+The nflverse participation release is not a general all-player routes table. It preserves all
+offensive players on the field, while its `route` field describes the primary receiver. From 2023
+onward, those participation files are provided only after the postseason. See
+`PROPS_V2_ROUTE_SOURCE_AUDIT.md`.
+
+Accordingly, season-lagged pass-play participation may be researched as a proxy, but it must not be
+called routes-per-dropback and cannot reconstruct same-season live route state.
+
 ## Highest-value data gaps
 
 - timestamped **multi-book player-prop** histories at several pre-kickoff horizons;
