@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from nfl_forecast.props_dynamic_role import (
+from research.props.v2.props_dynamic_role import (
     DynamicRoleError,
     build_dynamic_role_adjustments,
     normalize_lagged_snap_history,
