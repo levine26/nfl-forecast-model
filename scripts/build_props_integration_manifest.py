@@ -72,7 +72,11 @@ def main() -> int:
     parser.add_argument("--residual-efficiency", type=Path, required=True)
     parser.add_argument("--market-snapshot", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument(\n        "--forecast-timestamp",\n        help="Final manifest freeze timestamp. Defaults to current UTC when game spec omits one.",\n    )\n    args = parser.parse_args()
+    parser.add_argument(
+        "--forecast-timestamp",
+        help="Final manifest freeze timestamp. Defaults to current UTC when game spec omits one.",
+    )
+    args = parser.parse_args()
 
     raw_game = _load(args.game_spec)
     raw_opportunity = _load(args.opportunity)
