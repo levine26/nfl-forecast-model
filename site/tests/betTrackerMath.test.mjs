@@ -5,6 +5,8 @@ import {
   BET_UNIT_DOLLARS,
   americanWinProfit,
   buildBetLedger,
+  buildCurrentWeekSlate,
+  combinedEntryProfit,
   roundSpreadToHalfPoint,
   settleBet,
   summarizeBets,
@@ -121,4 +123,66 @@ test('receipt editorial accepts only the exact current FINAL_PREGAME preview', (
     currentGame:{...currentGame,lock_timestamp_utc:'2026-09-20T20:05:00Z'},
     preview:{game_id:gameId},
   }),false)
+})
+
+
+test('current-week slate includes pending public games and uses locked history when available', () => {
+  const ledger=buildBetLedger([{
+    game_id:'2026_02_DET_BUF', season:'2026', week:'2', lock_status:'LOCKED',
+    away_team:'DET', home_team:'BUF', pick:'BUF', final_home_prob:'0.67',
+    expected_margin:'6.7', actual_home_score:'41', actual_away_score:'31',
+    locked_home_moneyline:'-245',
+  }])
+  const slate=buildCurrentWeekSlate([
+    {
+      game_id:'2026_02_DET_BUF', week:2, away_team:'DET', home_team:'BUF',
+      official_winner:'BUF', kickoff_utc:'2026-09-18T00:15:00+00:00',
+      diagnostics:{independent_margin_home:6.7},
+    },
+    {
+      game_id:'2026_02_NYG_DAL', week:2, away_team:'NYG', home_team:'DAL',
+      official_winner:'DAL', kickoff_utc:'2026-09-20T17:00:00+00:00',
+      diagnostics:{independent_margin_home:3.4},
+    },
+  ],ledger)
+  assert.equal(slate.week,2)
+  assert.equal(slate.entries.length,2)
+  assert.equal(slate.entries[0].gameId,'2026_02_DET_BUF')
+  assert.equal(slate.entries[0].locked,true)
+  assert.equal(slate.entries[0].ml.result,'win')
+  assert.equal(slate.entries[1].gameId,'2026_02_NYG_DAL')
+  assert.equal(slate.entries[1].locked,false)
+  assert.equal(slate.entries[1].ml.result,'pending')
+  assert.equal(slate.entries[1].spread.side,'DAL')
+  assert.equal(slate.entries[1].spread.line,3.5)
+})
+
+test('pending wagers do not enter weekly record, profit, or ROI', () => {
+  const ledger=buildBetLedger([{
+    game_id:'2026_02_A_B', season:'2026', week:'2', lock_status:'LOCKED',
+    away_team:'A', home_team:'B', pick:'B', final_home_prob:'0.60',
+    expected_margin:'3.5', locked_home_moneyline:'-125',
+  }])
+  assert.equal(ledger.length,1)
+  assert.equal(ledger[0].ml.result,'pending')
+  assert.equal(ledger[0].spread.result,'pending')
+  const ml=summarizeBets(ledger,'ml')
+  assert.equal(ml.pending,1)
+  assert.equal(ml.wins,0)
+  assert.equal(ml.losses,0)
+  assert.equal(ml.risked,0)
+  assert.equal(ml.profit,0)
+  assert.equal(ml.roi,null)
+  assert.equal(combinedEntryProfit(ledger[0]),null)
+})
+
+test('game P/L combines settled moneyline and spread wagers', () => {
+  const ledger=buildBetLedger([{
+    game_id:'2026_02_DET_BUF', season:'2026', week:'2', lock_status:'LOCKED',
+    away_team:'DET', home_team:'BUF', pick:'BUF', final_home_prob:'0.67',
+    expected_margin:'6.5', actual_home_score:'41', actual_away_score:'31',
+    locked_home_moneyline:'-245', locked_home_spread_price:'-110',
+  }])
+  const expected=25*100/245 + 25*100/110
+  assert.ok(Math.abs(combinedEntryProfit(ledger[0])-expected)<1e-9)
 })
