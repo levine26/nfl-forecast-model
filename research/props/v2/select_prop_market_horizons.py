@@ -121,6 +121,9 @@ def _selected_record(
         "line_stddev": artifact.get("line_stddev"),
         "best_over_price": artifact.get("best_over_price"),
         "best_under_price": artifact.get("best_under_price"),
+        "market_data_quality": artifact.get("market_data_quality"),
+        "individual_books": artifact.get("individual_books"),
+        "movement": artifact.get("movement"),
         "research_only": True,
         "production_authorized": False,
     }
