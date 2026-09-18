@@ -1,0 +1,124 @@
+name: LevLine Props 2.0 market archive
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/archive_live_prop_market.py'
+      - 'research/props/v2/test_live_prop_market_archive.py'
+      - 'research/props/v2/PROPS_V2_MARKET_ARCHIVE_CONTRACT.md'
+      - '.github/workflows/research_props_v2_market_archive.yml'
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful LevLine Props live refresh workflow run to archive
+        required: true
+        type: string
+  workflow_run:
+    workflows:
+      - 'LevLine Props live refresh'
+    types:
+      - completed
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - run: python -m pytest -q research/props/v2/test_live_prop_market_archive.py
+
+  archive:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    concurrency:
+      group: levline-props-v2-market-archive
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Resolve source live workflow run
+        id: source
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RUN_ID="${{ inputs.source_run_id }}"
+          else
+            RUN_ID="${{ github.event.workflow_run.id }}"
+          fi
+          test -n "$RUN_ID"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download existing live audit artifact
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/props-live-artifacts
+          mkdir -p /tmp/props-live-artifacts
+          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
+          if ! find /tmp/props-live-artifacts -name market.json -print -quit | grep -q .; then
+            echo "::error::Source live run did not contain market.json."
+            exit 1
+          fi
+
+      - name: Restore prior archive manifest
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/market_archive
+          mkdir -p "$DATA_DIR"
+          git fetch origin research-data/props-v2-market-archive:refs/remotes/origin/research-data/props-v2-market-archive || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-market-archive; then
+            git show "origin/research-data/props-v2-market-archive:$DATA_DIR/manifest.jsonl" > "$DATA_DIR/manifest.jsonl" 2>/dev/null || true
+          fi
+
+      - name: Archive normalized multi-book player-prop state
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/market_archive
+          python research/props/v2/archive_live_prop_market.py             --artifact-root /tmp/props-live-artifacts             --output-dir "$DATA_DIR"             --manifest "$DATA_DIR/manifest.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --status "$DATA_DIR/last_archive_status.json"
+
+      - name: Persist evidence off main
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/market_archive
+          rm -rf /tmp/props-v2-market-archive-new
+          mkdir -p /tmp/props-v2-market-archive-new
+          cp -R "$DATA_DIR"/. /tmp/props-v2-market-archive-new/
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-market-archive; then
+            git checkout -B props-v2-market-archive-data origin/research-data/props-v2-market-archive
+          else
+            git checkout -B props-v2-market-archive-data
+          fi
+          mkdir -p "$DATA_DIR"
+          cp -R /tmp/props-v2-market-archive-new/. "$DATA_DIR"/
+          git add "$DATA_DIR"/
+          if git diff --cached --quiet; then
+            echo 'Props market archive unchanged.'
+            exit 0
+          fi
+          git commit -m 'Archive prospective Props multi-book market state'
+          git push origin HEAD:research-data/props-v2-market-archive
