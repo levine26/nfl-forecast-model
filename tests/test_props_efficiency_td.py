@@ -165,6 +165,31 @@ def test_small_sample_efficiency_is_shrunk_toward_prior() -> None:
     assert abs(wr.receiving_yards_per_reception_mean - 10.5) < abs(20.0 - 10.5)
 
 
+def test_signed_historical_yardage_is_valid_and_shrunk() -> None:
+    players, teams = _inputs()
+
+    players.loc[players.player_id.eq("qb1"), "hist_passing_yards"] = -8.0
+    players.loc[players.player_id.eq("qb1"), "hist_qb_rush_yards"] = -6.0
+    players.loc[players.player_id.eq("rb1"), "hist_rushing_yards"] = -12.0
+    players.loc[players.player_id.eq("wr1"), "hist_receiving_yards"] = -5.0
+
+    build = build_efficiency_td_parameters(players, teams)
+    out = build.player_parameters.set_index("player_id")
+
+    assert pd.notna(out.loc["qb1", "yards_per_completion_mean"])
+    assert pd.notna(out.loc["qb1", "rushing_yards_per_attempt_mean"])
+    assert pd.notna(out.loc["rb1", "rushing_yards_per_attempt_mean"])
+    assert pd.notna(out.loc["wr1", "receiving_yards_per_reception_mean"])
+
+
+def test_negative_historical_counts_still_fail_closed() -> None:
+    players, teams = _inputs()
+    players.loc[players.player_id.eq("rb1"), "hist_carries"] = -1.0
+
+    with pytest.raises(ValueError, match="hist_carries must be non-negative"):
+        build_efficiency_td_parameters(players, teams)
+
+
 def test_matchup_adjustment_requires_pre_2026_coefficients() -> None:
     players, teams = _inputs()
     players["explosive_pass_suppression_z"] = 0.0
