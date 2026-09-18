@@ -39,14 +39,16 @@ The minimal priors file now contains only assumptions that the repository cannot
     "TE": "<preregistered mean in (0,1)>"
   },
   "availability_beta_priors": {
-    "UNKNOWN": {"alpha": "<positive>", "beta": "<positive>"},
-    "QUESTIONABLE": {"alpha": "<positive>", "beta": "<positive>"},
-    "DOUBTFUL": {"alpha": "<positive>", "beta": "<positive>"}
+    "UNKNOWN": {"alpha": "<positive>", "beta": "<positive>"}
   }
 }
 ```
 
 Those values are deliberately not invented by this contract.
+
+`QUESTIONABLE` and `DOUBTFUL` priors are fit automatically when historical sources are available. The fit joins official historical injury-report designations to PFR offensive snap counts for the overlapping 2012–2024 regular seasons, uses a fixed structural Beta(1,1) prior, and treats a missing player snap row as zero only when that team-week is present in the snap source. The historical nflverse injury pipeline currently ends after 2024, so this fit is necessarily pre-2026. Explicit configured Q/D priors may override the empirical fit. If the historical source is unavailable, the operator falls back to explicit configuration and otherwise fails closed when a Q/D player needs a prior.
+
+`UNKNOWN` remains explicit because it includes absence of a trustworthy current availability source. That state is not statistically equivalent to a player being listed as Questionable or Doubtful, so the builder does not infer an UNKNOWN probability from historical injury-report omissions.
 
 By default, conditional-efficiency priors are fit empirically from regular-season PBP ending in 2025. Completed 2026 outcomes are structurally excluded from this prior fit. The fitter produces position priors for completion rate, yards/completion, rushing YPC, catch rate, receiving YPR, red-zone/end-zone target rate and goal-line carry rate, plus residual-bucket efficiency.
 
@@ -113,7 +115,8 @@ This layer:
 - never imports sportsbook prices into opportunity/efficiency modeling;
 - never mutates official LevLine/F-ST winner probabilities;
 - never uses target-week or current-game PBP;
-- never supplies hidden route or availability defaults;
+- never supplies a hidden route or UNKNOWN-availability default;
+- fits Q/D availability only from historical injury designations and offensive snaps ending in 2024, with explicit source-coverage checks;
 - fits default efficiency/residual priors only from regular-season data through 2025;
 - allows prior completed 2026 games only to update chronological team state, never prior fitting/tuning;
 - never treats missing current availability as `AVAILABLE`;
