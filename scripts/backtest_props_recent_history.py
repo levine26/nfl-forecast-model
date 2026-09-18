@@ -608,6 +608,8 @@ def run(season: int, simulations: int, output_dir: Path, cache_dir: str, max_eve
 
     rows: list[dict] = []
     game_failures: list[dict] = []
+    history_cache: dict[int, object] = {}
+    scoring_cache: dict[int, dict] = {}
     mapped_events = sorted(set(int(x) for x in open_markets["event_id"].dropna().astype(int)))
     if max_events is not None:
         mapped_events = mapped_events[: int(max_events)]
@@ -647,19 +649,34 @@ def run(season: int, simulations: int, output_dir: Path, cache_dir: str, max_eve
                 kickoff=kickoff,
                 forecast=forecast,
             )
-            history = build_lagged_props_history(
-                pbp,
-                players,
-                season=season,
-                week=week,
-            )
-            scoring = build_empirical_scoring_context(
-                pbp,
-                teams=[home, away],
-                season=season,
-                week=week,
-                trained_through_season=season - 1,
-            )
+            if week not in history_cache:
+                history_cache[week] = build_lagged_props_history(
+                    pbp,
+                    players,
+                    season=season,
+                    week=week,
+                )
+            history = history_cache[week]
+            if week not in scoring_cache:
+                week_games = schedules[
+                    pd.to_numeric(schedules["season"], errors="coerce").eq(season)
+                    & pd.to_numeric(schedules["week"], errors="coerce").eq(week)
+                ]
+                week_teams = sorted(
+                    {
+                        normalize_team_code(team)
+                        for column in ("home_team", "away_team")
+                        for team in week_games[column].dropna().astype(str)
+                    }
+                )
+                scoring_cache[week] = build_empirical_scoring_context(
+                    pbp,
+                    teams=week_teams,
+                    season=season,
+                    week=week,
+                    trained_through_season=season - 1,
+                )
+            scoring = scoring_cache[week]
             residual = residual_efficiency_by_team_from_empirical_priors(
                 [home, away],
                 fitted,
