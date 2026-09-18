@@ -6,11 +6,11 @@ on:
       - research/props-accuracy-evaluation
       - research/props-integration
     paths:
-      - "src/nfl_forecast/props_dynamic_role.py"
-      - "src/nfl_forecast/props_market_residual.py"
+      - "research/props/v2/props_dynamic_role.py"
+      - "research/props/v2/props_market_residual.py"
       - "src/nfl_forecast/props_upstream.py"
-      - "tests/test_props_dynamic_role.py"
-      - "tests/test_props_market_residual.py"
+      - "research/props/v2/test_props_dynamic_role.py"
+      - "research/props/v2/test_props_market_residual.py"
       - "research/props/v2/**"
       - ".github/workflows/research_props_v2_challenger.yml"
   workflow_dispatch:
@@ -33,14 +33,14 @@ jobs:
           python -m pip install -e ".[dev]"
       - name: Compile challenger research
         run: |
-          python -m py_compile src/nfl_forecast/props_dynamic_role.py
-          python -m py_compile src/nfl_forecast/props_market_residual.py
+          python -m py_compile research/props/v2/props_dynamic_role.py
+          python -m py_compile research/props/v2/props_market_residual.py
           python -m py_compile research/props/v2/evaluate_market_prior_challenger.py
           python -m py_compile research/props/v2/run_dynamic_role_backtest.py
           python -m py_compile research/props/v2/aggregate_dynamic_role_backtest.py
       - name: Run focused tests
         run: |
-          pytest -q tests/test_props_dynamic_role.py tests/test_props_market_residual.py
+          pytest -q research/props/v2/test_props_dynamic_role.py research/props/v2/test_props_market_residual.py
 
   pilot:
     needs: unit
