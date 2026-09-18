@@ -2,10 +2,14 @@ from __future__ import annotations
 
 """Chronological evaluation of the NGS + sportsbook-prior Props challenger.
 
-Inputs are frozen V1 forecast-level historical ledgers. For every forecast week this
-runner attaches only NGS state from strictly earlier weeks, then evaluates a regularized
-market-offset residual model in rolling-origin season blocks.
+Inputs are the exact frozen V1 forecast-level historical ledgers from the original
+51.02% reconstruction. For every forecast week this runner attaches only NGS state
+from strictly earlier weeks, then evaluates two matched regularized models:
 
+1. market + frozen-V1 residual only;
+2. market + frozen-V1 residual + NGS state.
+
+The difference between (2) and (1) is the primary incremental-football diagnostic.
 2023-2025 are development evidence only. No selective betting threshold is used.
 """
 
@@ -27,6 +31,7 @@ from research.props.v2.props_ngs_efficiency_state import (
     load_ngs_efficiency_history,
 )
 from research.props.v2.props_ngs_market_residual import (
+    COMMON_FEATURES,
     FEATURES_BY_PROP,
     RESEARCH_LABEL,
     add_market_features,
@@ -34,7 +39,7 @@ from research.props.v2.props_ngs_market_residual import (
     fit_ngs_market_residual,
 )
 
-CONTRACT_VERSION = "levline-props-v2-ngs-market-residual-development-v0.1.0"
+CONTRACT_VERSION = "levline-props-v2-ngs-market-residual-development-v0.2.0"
 BOOTSTRAP_SEED = 20260918
 BOOTSTRAP_REPLICATES = 3000
 SUPPORTED_PROPS = tuple(FEATURES_BY_PROP)
@@ -99,24 +104,17 @@ def attach_strictly_lagged_ngs(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         )
         key = f"{int(season)}-W{int(week)}"
         audits[key] = audit
-        if state.empty:
-            enriched = group.copy()
-        else:
-            enriched = group.merge(
-                state,
-                left_on="player_id",
-                right_on="player_id",
-                how="left",
-                validate="many_to_one",
-            )
+        enriched = group.copy() if state.empty else group.merge(
+            state,
+            on="player_id",
+            how="left",
+            validate="many_to_one",
+        )
         pieces.append(enriched)
+
     out = pd.concat(pieces, ignore_index=True)
     feature_columns = sorted(
-        {
-            column
-            for columns in FEATURES_BY_PROP.values()
-            for column in columns
-        }
+        {column for columns in FEATURES_BY_PROP.values() for column in columns}
     )
     for column in feature_columns:
         if column not in out.columns:
@@ -128,6 +126,11 @@ def attach_strictly_lagged_ngs(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         "rows": int(len(out)),
         "rows_with_any_ngs_feature": int(
             out[feature_columns].notna().any(axis=1).sum()
+        ),
+        "row_coverage": (
+            float(out[feature_columns].notna().any(axis=1).mean())
+            if len(out)
+            else None
         ),
     }
 
@@ -147,23 +150,39 @@ def _log_loss(y: np.ndarray, p: np.ndarray) -> float:
     return float(-np.mean(y * np.log(p) + (1.0 - y) * np.log(1.0 - p)))
 
 
+def _market_side(probabilities: np.ndarray) -> np.ndarray:
+    p = np.asarray(probabilities, float)
+    return np.where(
+        p > 0.5 + 1e-12,
+        "OVER",
+        np.where(p < 0.5 - 1e-12, "UNDER", None),
+    )
+
+
 def _metrics(frame: pd.DataFrame) -> dict:
     work = frame.copy()
     work["market_outcome"] = _outcome(work)
     work = work[work["market_outcome"].isin(["OVER", "UNDER"])].copy()
-    work = work[work["ngs_challenger_side"].isin(["OVER", "UNDER"])].copy()
+    work = work[
+        work["ngs_challenger_side"].isin(["OVER", "UNDER"])
+        & work["matched_baseline_side"].isin(["OVER", "UNDER"])
+    ].copy()
     if work.empty:
         return {"n": 0}
 
     market = add_market_features(work)
-    y = market["market_outcome"].eq("OVER").astype(float).to_numpy()
+    y = work["market_outcome"].eq("OVER").astype(float).to_numpy()
     market_p = market["market_no_vig_p_over"].to_numpy(float)
-    market_side = np.where(
-        market_p > 0.5 + 1e-12,
-        "OVER",
-        np.where(market_p < 0.5 - 1e-12, "UNDER", None),
-    )
+    market_side = _market_side(market_p)
+
     v1_correct = work["model_side"].eq(work["market_outcome"]).astype(float)
+    matched_correct = work["matched_baseline_side"].eq(
+        work["market_outcome"]
+    ).astype(float)
+    challenger_correct = work["ngs_challenger_side"].eq(
+        work["market_outcome"]
+    ).astype(float)
+
     market_informative = pd.Series(
         pd.notna(market_side), index=work.index, dtype=bool
     )
@@ -172,82 +191,92 @@ def _metrics(frame: pd.DataFrame) -> dict:
         market_side[market_informative.to_numpy()]
         == work.loc[market_informative, "market_outcome"].to_numpy()
     ).astype(float)
-    challenger_correct = work["ngs_challenger_side"].eq(
-        work["market_outcome"]
-    ).astype(float)
-    challenger_market = challenger_correct.loc[market_informative]
-    market_direction = market_correct.loc[market_informative]
 
+    market_rows = market_informative.to_numpy()
     return {
         "n": int(len(work)),
         "games": int(work["game_id"].astype(str).nunique()),
         "players": int(work["player_id"].astype(str).nunique()),
         "v1_accuracy": float(v1_correct.mean()),
+        "matched_market_v1_residual_accuracy": float(matched_correct.mean()),
+        "ngs_challenger_accuracy": float(challenger_correct.mean()),
+        "ngs_minus_matched_residual_accuracy": float(
+            (challenger_correct - matched_correct).mean()
+        ),
+        "ngs_minus_v1_accuracy": float((challenger_correct - v1_correct).mean()),
         "market_price_direction_rows": int(market_informative.sum()),
         "market_price_tie_rows": int((~market_informative).sum()),
         "market_price_accuracy": (
-            float(market_direction.mean()) if len(market_direction) else None
-        ),
-        "ngs_challenger_accuracy": float(challenger_correct.mean()),
-        "ngs_minus_v1_accuracy": float((challenger_correct - v1_correct).mean()),
-        "ngs_on_market_informative_rows_accuracy": (
-            float(challenger_market.mean()) if len(challenger_market) else None
+            float(market_correct.loc[market_informative].mean())
+            if market_informative.any()
+            else None
         ),
         "ngs_minus_market_accuracy": (
-            float((challenger_market - market_direction).mean())
-            if len(market_direction)
+            float(
+                challenger_correct.loc[market_informative].mean()
+                - market_correct.loc[market_informative].mean()
+            )
+            if market_informative.any()
             else None
         ),
         "v1_brier": float(np.mean((work["p_over"].to_numpy(float) - y) ** 2)),
-        "market_brier": float(
-            np.mean((market["market_no_vig_p_over"].to_numpy(float) - y) ** 2)
+        "market_brier": float(np.mean((market_p - y) ** 2)),
+        "matched_residual_brier": float(
+            np.mean((work["matched_baseline_p_over"].to_numpy(float) - y) ** 2)
         ),
         "ngs_brier": float(
             np.mean((work["ngs_challenger_p_over"].to_numpy(float) - y) ** 2)
         ),
         "v1_log_loss": _log_loss(y, work["p_over"].to_numpy(float)),
-        "market_log_loss": _log_loss(
-            y, market["market_no_vig_p_over"].to_numpy(float)
+        "market_log_loss": _log_loss(y, market_p),
+        "matched_residual_log_loss": _log_loss(
+            y, work["matched_baseline_p_over"].to_numpy(float)
         ),
         "ngs_log_loss": _log_loss(
             y, work["ngs_challenger_p_over"].to_numpy(float)
         ),
-        "v1_correct_vector": v1_correct.to_numpy(float),
-        "market_correct_vector": market_correct.to_numpy(float),
-        "challenger_correct_vector": challenger_correct.to_numpy(float),
     }
 
 
-def _cluster_ci(frame: pd.DataFrame, *, baseline: str, seed: int) -> list[float | None]:
+def _cluster_ci(
+    frame: pd.DataFrame,
+    *,
+    baseline: str,
+    seed: int,
+) -> list[float | None]:
     work = frame.copy()
     work["market_outcome"] = _outcome(work)
     work = work[
         work["market_outcome"].isin(["OVER", "UNDER"])
         & work["ngs_challenger_side"].isin(["OVER", "UNDER"])
+        & work["matched_baseline_side"].isin(["OVER", "UNDER"])
     ].copy()
+
+    challenger = work["ngs_challenger_side"].eq(work["market_outcome"]).astype(float)
     if baseline == "v1":
         base_correct = work["model_side"].eq(work["market_outcome"]).astype(float)
+    elif baseline == "matched":
+        base_correct = work["matched_baseline_side"].eq(
+            work["market_outcome"]
+        ).astype(float)
     elif baseline == "market":
         priced = add_market_features(work)
-        market_p = priced["market_no_vig_p_over"].to_numpy(float)
-        market_side = np.where(
-            market_p > 0.5 + 1e-12,
-            "OVER",
-            np.where(market_p < 0.5 - 1e-12, "UNDER", None),
-        )
+        market_side = _market_side(priced["market_no_vig_p_over"].to_numpy(float))
         informative = pd.notna(market_side)
-        base_correct = pd.Series(np.nan, index=work.index, dtype=float)
-        base_correct.loc[informative] = (
-            market_side[informative]
-            == work.loc[informative, "market_outcome"].to_numpy()
-        ).astype(float)
+        work = work.loc[informative].copy()
+        challenger = challenger.loc[informative]
+        base_correct = pd.Series(
+            (
+                market_side[informative]
+                == work["market_outcome"].to_numpy()
+            ).astype(float),
+            index=work.index,
+        )
     else:
-        raise ValueError("baseline must be v1 or market")
-    work["_base"] = base_correct
-    work["_challenger"] = work["ngs_challenger_side"].eq(
-        work["market_outcome"]
-    ).astype(float)
+        raise ValueError("baseline must be v1, matched, or market")
 
+    work["_base"] = base_correct.to_numpy(float)
+    work["_challenger"] = challenger.to_numpy(float)
     games = np.asarray(sorted(work["game_id"].astype(str).unique()))
     if len(games) < 2:
         return [None, None]
@@ -264,12 +293,34 @@ def _cluster_ci(frame: pd.DataFrame, *, baseline: str, seed: int) -> list[float 
     ]
 
 
-def _strip_vectors(metrics: dict) -> dict:
-    return {
-        key: value
-        for key, value in metrics.items()
-        if not key.endswith("_vector")
-    }
+def _fit_matched_models(
+    train: pd.DataFrame,
+) -> tuple[dict, dict, dict]:
+    ngs_models = {}
+    matched_models = {}
+    metadata = {}
+    for prop in SUPPORTED_PROPS:
+        try:
+            ngs_model = fit_ngs_market_residual(train, prop_type=prop)
+            matched_model = fit_ngs_market_residual(
+                train,
+                prop_type=prop,
+                feature_columns=COMMON_FEATURES,
+            )
+        except Exception as exc:
+            metadata[prop] = {
+                "status": "unavailable",
+                "reason": f"{type(exc).__name__}: {str(exc)[:300]}",
+            }
+            continue
+        ngs_models[prop] = ngs_model
+        matched_models[prop] = matched_model
+        metadata[prop] = {
+            "status": "fitted",
+            "ngs_model": ngs_model.to_dict(),
+            "matched_market_v1_model": matched_model.to_dict(),
+        }
+    return ngs_models, matched_models, metadata
 
 
 def evaluate(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
@@ -280,33 +331,27 @@ def evaluate(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         test = data[data["season"].eq(season)].copy()
         if train.empty or test.empty:
             continue
-        models = {}
-        model_meta = {}
-        for prop in SUPPORTED_PROPS:
-            try:
-                model = fit_ngs_market_residual(
-                    train,
-                    prop_type=prop,
-                )
-            except Exception as exc:
-                model_meta[prop] = {
-                    "status": "unavailable",
-                    "reason": f"{type(exc).__name__}: {str(exc)[:300]}",
-                }
-                continue
-            models[prop] = model
-            model_meta[prop] = {
-                "status": "fitted",
-                "training_season_min": int(train["season"].min()),
-                "training_season_max": int(train["season"].max()),
-                "evaluation_season": int(season),
-                "model": model.to_dict(),
-            }
-        if not models:
+
+        ngs_models, matched_models, model_meta = _fit_matched_models(train)
+        common_props = sorted(set(ngs_models) & set(matched_models))
+        if not common_props:
             continue
-        scored = apply_ngs_market_residual(test, models)
+        test = test[test["prop_type"].astype(str).isin(common_props)].copy()
+
+        scored = apply_ngs_market_residual(test, ngs_models)
+        matched = apply_ngs_market_residual(test, matched_models)
+        if not scored.index.equals(matched.index):
+            raise ValueError("matched residual evaluation lost row alignment")
+        scored["matched_baseline_p_over"] = matched["ngs_challenger_p_over"]
+        scored["matched_baseline_side"] = matched["ngs_challenger_side"]
         scored["evaluation_season"] = season
         scored_parts.append(scored)
+
+        for prop in model_meta:
+            if model_meta[prop].get("status") == "fitted":
+                model_meta[prop]["training_season_min"] = int(train["season"].min())
+                model_meta[prop]["training_season_max"] = int(train["season"].max())
+                model_meta[prop]["evaluation_season"] = int(season)
         models_by_season[str(season)] = model_meta
 
     if not scored_parts:
@@ -314,23 +359,30 @@ def evaluate(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     scored = pd.concat(scored_parts, ignore_index=True)
     evaluated = scored[scored["ngs_challenger_side"].notna()].copy()
 
-    summary = _strip_vectors(_metrics(evaluated))
+    summary = _metrics(evaluated)
+    summary["ngs_minus_matched_game_clustered_ci95"] = _cluster_ci(
+        evaluated,
+        baseline="matched",
+        seed=BOOTSTRAP_SEED,
+    )
     summary["ngs_minus_v1_game_clustered_ci95"] = _cluster_ci(
         evaluated,
         baseline="v1",
-        seed=BOOTSTRAP_SEED,
+        seed=BOOTSTRAP_SEED + 1,
     )
     summary["ngs_minus_market_game_clustered_ci95"] = _cluster_ci(
         evaluated,
         baseline="market",
-        seed=BOOTSTRAP_SEED + 1,
+        seed=BOOTSTRAP_SEED + 2,
     )
-    summary["by_season"] = {}
-    for season, group in evaluated.groupby("evaluation_season", sort=True):
-        summary["by_season"][str(int(season))] = _strip_vectors(_metrics(group))
-    summary["by_prop"] = {}
-    for prop, group in evaluated.groupby("prop_type", sort=True):
-        summary["by_prop"][str(prop)] = _strip_vectors(_metrics(group))
+    summary["by_season"] = {
+        str(int(season)): _metrics(group)
+        for season, group in evaluated.groupby("evaluation_season", sort=True)
+    }
+    summary["by_prop"] = {
+        str(prop): _metrics(group)
+        for prop, group in evaluated.groupby("prop_type", sort=True)
+    }
 
     return scored, {
         "contract_version": CONTRACT_VERSION,
@@ -339,11 +391,13 @@ def evaluate(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         "selective_threshold_used": False,
         "hyperparameter_search_performed": False,
         "market_coefficient_fixed_as_offset": True,
+        "primary_incremental_comparator": "matched_market_plus_v1_residual_without_ngs",
         "rolling_origin_models": models_by_season,
         "evaluation": summary,
         "interpretation": (
-            "Retrospective development evidence only. 2023-2025 outcomes were already "
-            "inspected during V1 diagnosis and cannot authorize production promotion."
+            "Retrospective development evidence only. The primary incremental statistic "
+            "is NGS challenger minus a same-prop, same-regularization market+V1 residual "
+            "baseline. 2023-2025 outcomes cannot authorize production promotion."
         ),
     }
 
