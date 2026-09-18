@@ -99,3 +99,18 @@ def test_validate_priors_rejects_implicit_or_invalid_unknown_prior(tmp_path):
     )
     with pytest.raises(ValueError, match="within"):
         module.validate_priors(priors)
+
+
+def test_repository_frozen_priors_are_preregistered_and_valid():
+    module = _module()
+    priors_path = ROOT / "config" / "levline_markets_priors_v1.json"
+    payload = module.validate_priors(priors_path)
+    assert payload["contract_version"] == "levline-markets-priors-v1"
+    assert payload["governance"]["frozen_before_first_live_production_cycle"] is True
+    assert payload["governance"]["completed_2026_outcomes_used_for_selection"] is False
+    assert payload["governance"]["props_evaluation_results_used_for_selection"] is False
+    assert payload["route_prior_means"] == {"RB": 0.55, "WR": 0.90, "TE": 0.75}
+    assert payload["availability_beta_priors"]["UNKNOWN"] == {
+        "alpha": 9.0,
+        "beta": 1.0,
+    }
