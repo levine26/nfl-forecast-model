@@ -181,7 +181,7 @@ function Header({route,week}) {
 }
 
 function MobileNav({route}) {
-  const items=[['forecasts','Forecasts','◈'],['props','Props','◇'],['history','History','◷'],['more','More','•••']]
+  const items=[['forecasts','Forecasts','◈'],['props','Props','◇'],['power','Power','⌁'],['history','History','◷'],['more','More','•••']]
   const active=route.page==='teams'||route.page==='methodology'?'more':route.page
   return <nav className="ss-mobile-nav" aria-label="Mobile navigation">
     {items.map(([key,label,icon])=><button key={key} className={active===key?'active':''} onClick={()=>navigateHash(key)}><span aria-hidden="true">{icon}</span><small>{label}</small></button>)}
