@@ -7,6 +7,7 @@ from nfl_forecast.props_manifest import (
     PropsManifestError,
     assemble_manifest,
     payload_sha256,
+    verify_manifest_fingerprint,
 )
 
 
@@ -166,3 +167,14 @@ def test_closing_evaluation_cannot_enter_prospective_manifest():
 
 def test_payload_hash_is_deterministic_across_mapping_order():
     assert payload_sha256({"a": 1, "b": 2}) == payload_sha256({"b": 2, "a": 1})
+
+
+def test_manifest_fingerprint_detects_tampering():
+    manifest = _assemble()
+    manifest["manifest_sha256"] = payload_sha256(manifest)
+    verify_manifest_fingerprint(manifest)
+
+    tampered = dict(manifest)
+    tampered["seed"] = 999
+    with pytest.raises(PropsManifestError, match="fingerprint mismatch"):
+        verify_manifest_fingerprint(tampered)
