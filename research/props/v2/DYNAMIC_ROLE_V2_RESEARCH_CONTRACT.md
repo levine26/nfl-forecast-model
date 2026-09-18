@@ -52,7 +52,12 @@ For evaluation season S:
 
 Primary football-process metrics:
 - paired Fair-Line MAE;
+- exact empirical CRPS from the Monte Carlo distribution;
+- 80% interval score and empirical coverage;
 - paired directional accuracy.
+
+CRPS is computed as E|X-y| - 0.5 E|X-X'| from the full simulation sample using the exact
+O(n log n) empirical formula. Distribution scoring is frozen before primary V2 outcome evaluation.
 
 Also report:
 - N / games / players;
