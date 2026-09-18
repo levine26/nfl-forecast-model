@@ -370,6 +370,180 @@ def build_lagged_props_history(
 
 
 
+
+def fit_pre2026_injury_availability_priors(
+    injuries: pd.DataFrame,
+    snap_counts: pd.DataFrame,
+    *,
+    trained_through_season: int = 2024,
+) -> dict[str, Any]:
+    """Fit Q/D offensive-participation priors from historical pregame designations.
+
+    The outcome is whether the player recorded at least one offensive snap in that
+    week. This is intentionally narrower than generic roster membership and matches
+    the Props engine's question of whether offensive opportunity can be allocated.
+    A fixed Beta(1,1) structural prior provides finite smoothing; no 2026 data or
+    outcome-driven hyperparameter selection is used.
+    """
+
+    if int(trained_through_season) > 2025:
+        raise PropsUpstreamError("availability priors may not be fit on completed 2026 outcomes")
+    injury_required = {
+        "season", "week", "team", "gsis_id", "position", "report_status",
+    }
+    missing = injury_required - set(injuries.columns)
+    if missing:
+        raise PropsUpstreamError(f"injury history missing fields: {sorted(missing)}")
+    snap_required = {"season", "week", "team", "player_id", "offense_snaps"}
+    missing = snap_required - set(snap_counts.columns)
+    if missing:
+        raise PropsUpstreamError(f"snap history missing fields: {sorted(missing)}")
+
+    inj = injuries.copy()
+    inj["season"] = pd.to_numeric(inj["season"], errors="coerce")
+    inj["week"] = pd.to_numeric(inj["week"], errors="coerce")
+    inj["team"] = inj["team"].map(normalize_team_code)
+    inj["player_id"] = inj["gsis_id"].astype("string").fillna("").str.strip()
+    inj["position"] = inj["position"].astype("string").fillna("").str.upper().str.strip()
+    inj = inj[
+        inj["season"].notna()
+        & inj["week"].notna()
+        & inj["season"].le(int(trained_through_season))
+        & inj["position"].isin(SUPPORTED_POSITIONS)
+        & _valid_id(inj["player_id"])
+    ].copy()
+    season_type_col = next(
+        (column for column in ("season_type", "game_type") if column in inj.columns),
+        None,
+    )
+    if season_type_col is not None:
+        inj = inj[inj[season_type_col].astype(str).str.upper().eq("REG")].copy()
+
+    status = inj["report_status"].astype("string").fillna("").str.lower().str.strip()
+    inj["_state"] = np.select(
+        [
+            status.str.contains("questionable", regex=False),
+            status.str.contains("doubtful", regex=False),
+        ],
+        ["QUESTIONABLE", "DOUBTFUL"],
+        default="",
+    )
+    inj = inj[inj["_state"].ne("")].copy()
+    if inj.empty:
+        raise PropsUpstreamError("no historical QUESTIONABLE/DOUBTFUL injury rows available")
+
+    if "date_modified" in inj.columns:
+        modified = pd.to_datetime(inj["date_modified"], utc=True, errors="coerce")
+        inj["_modified"] = modified
+        inj = inj.sort_values(
+            ["season", "week", "team", "player_id", "_modified"],
+            na_position="first",
+        ).drop_duplicates(
+            ["season", "week", "team", "player_id"],
+            keep="last",
+        )
+    else:
+        inj = inj.drop_duplicates(
+            ["season", "week", "team", "player_id"],
+            keep="last",
+        )
+
+    snaps = snap_counts.copy()
+    snaps["season"] = pd.to_numeric(snaps["season"], errors="coerce")
+    snaps["week"] = pd.to_numeric(snaps["week"], errors="coerce")
+    snaps["team"] = snaps["team"].map(normalize_team_code)
+    snaps["player_id"] = snaps["player_id"].astype("string").fillna("").str.strip()
+    snaps["offense_snaps"] = pd.to_numeric(snaps["offense_snaps"], errors="coerce")
+    snaps = snaps[
+        snaps["season"].notna()
+        & snaps["week"].notna()
+        & snaps["season"].le(int(trained_through_season))
+        & _valid_id(snaps["player_id"])
+    ].copy()
+    game_type_col = next(
+        (column for column in ("game_type", "season_type") if column in snaps.columns),
+        None,
+    )
+    if game_type_col is not None:
+        snaps = snaps[snaps[game_type_col].astype(str).str.upper().eq("REG")].copy()
+    if snaps.empty:
+        raise PropsUpstreamError("no historical snap-count rows available for availability fit")
+
+    team_week_coverage = set(
+        zip(
+            snaps["season"].astype(int),
+            snaps["week"].astype(int),
+            snaps["team"].astype(str),
+        )
+    )
+    injury_keys = list(
+        zip(
+            inj["season"].astype(int),
+            inj["week"].astype(int),
+            inj["team"].astype(str),
+        )
+    )
+    covered = pd.Series(
+        [key in team_week_coverage for key in injury_keys],
+        index=inj.index,
+        dtype=bool,
+    )
+    uncovered_rows = int((~covered).sum())
+    inj = inj[covered].copy()
+    if inj.empty:
+        raise PropsUpstreamError("injury rows have no matching team-week snap coverage")
+
+    snap_player = (
+        snaps.groupby(
+            ["season", "week", "team", "player_id"],
+            as_index=False,
+            sort=False,
+        )["offense_snaps"]
+        .max()
+    )
+    joined = inj.merge(
+        snap_player,
+        on=["season", "week", "team", "player_id"],
+        how="left",
+        validate="one_to_one",
+    )
+    joined["offense_snaps"] = pd.to_numeric(
+        joined["offense_snaps"], errors="coerce"
+    ).fillna(0.0)
+    joined["_offensive_available"] = joined["offense_snaps"].gt(0)
+
+    priors: dict[str, dict[str, float]] = {}
+    state_audit: dict[str, Any] = {}
+    for state in ("QUESTIONABLE", "DOUBTFUL"):
+        rows = joined[joined["_state"].eq(state)]
+        if rows.empty:
+            continue
+        successes = int(rows["_offensive_available"].sum())
+        failures = int(len(rows) - successes)
+        alpha = 1.0 + successes
+        beta = 1.0 + failures
+        priors[state] = {"alpha": alpha, "beta": beta}
+        state_audit[state] = {
+            "observations": int(len(rows)),
+            "offensive_snap_positive": successes,
+            "offensive_snap_zero": failures,
+            "posterior_mean": alpha / (alpha + beta),
+        }
+    if not priors:
+        raise PropsUpstreamError("no covered injury designations available for availability fit")
+
+    return {
+        "trained_through_season": int(trained_through_season),
+        "availability_beta_priors": priors,
+        "audit": {
+            "method": "injury_report_status_to_offensive_snap_beta_1_1",
+            "trained_through_season": int(trained_through_season),
+            "uncovered_team_week_rows_dropped": uncovered_rows,
+            "states": state_audit,
+            "completed_2026_outcomes_used_for_prior_fit": 0,
+        },
+    }
+
 def _clip_probability(value: float, *, label: str) -> float:
     if not math.isfinite(value):
         raise PropsUpstreamError(f"{label} is non-finite")
