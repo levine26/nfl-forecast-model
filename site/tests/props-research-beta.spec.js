@@ -46,8 +46,9 @@ test('Games view groups the slate and preserves WATCH and NO SIGNAL states',asyn
   await expect(page.getByText('NO SIGNAL').first()).toBeVisible()
 
   const allen=page.getByText('Josh Allen').locator('xpath=ancestor::summary')
+  const allenDetails=allen.locator('xpath=ancestor::details')
   await allen.click()
-  await expect(page.getByText('Expected dropbacks')).toBeVisible()
+  await expect(allenDetails.getByText('Expected dropbacks').first()).toBeVisible()
 })
 
 test('All Props filters, search, sort, and progressive disclosure are interactive',async({page})=>{
@@ -66,17 +67,18 @@ test('All Props filters, search, sort, and progressive disclosure are interactiv
   await page.getByRole('button',{name:'All',exact:true}).last().click()
   await page.getByLabel('Sort props').selectOption('player')
   const pukaSummary=page.getByText('Puka Nacua').locator('xpath=ancestor::summary')
+  const pukaDetails=pukaSummary.locator('xpath=ancestor::details')
   await pukaSummary.click()
-  await expect(page.getByText('Model distribution')).toBeVisible()
-  await expect(page.getByText('Forecast timestamp')).toBeVisible()
-  await expect(page.getByText('Market captured')).toBeVisible()
+  await expect(pukaDetails.getByText('Model distribution')).toBeVisible()
+  await expect(pukaDetails.getByText('Forecast timestamp')).toBeVisible()
+  await expect(pukaDetails.getByText('Market captured')).toBeVisible()
 })
 
 test('TD markets use probability language rather than forcing a continuous Fair Line chart',async({page})=>{
   await page.goto('./#/props')
   if (!fixtureRequired && !await page.getByText('Christian McCaffrey').isVisible().catch(()=>false)) return
   const card=page.getByText('Christian McCaffrey').locator('xpath=ancestor::article')
-  await expect(card.getByText('ANYTIME TD')).toBeVisible()
+  await expect(card.locator('.lp-direction').getByText('ANYTIME TD',{exact:true})).toBeVisible()
   await expect(card.getByText('64.0%').first()).toBeVisible()
   await expect(card.locator('.lp-fair-viz')).toHaveCount(0)
 })
@@ -92,10 +94,11 @@ test('Performance page is empirical-data gated and retains immutable receipts',a
 
   if (fixtureRequired || await page.getByText('Puka Nacua').isVisible().catch(()=>false)) {
     const receipt=page.getByText('Puka Nacua').locator('xpath=ancestor::summary')
+    const receiptDetails=receipt.locator('xpath=ancestor::details')
     await receipt.click()
-    await expect(page.getByText('Original sportsbook line / price')).toBeVisible()
-    await expect(page.getByText('Forecast timestamp')).toBeVisible()
-    await expect(page.getByText('Model version')).toBeVisible()
+    await expect(receiptDetails.getByText('Original sportsbook line / price')).toBeVisible()
+    await expect(receiptDetails.getByText('Forecast timestamp')).toBeVisible()
+    await expect(receiptDetails.getByText('Model version')).toBeVisible()
   }
 })
 
