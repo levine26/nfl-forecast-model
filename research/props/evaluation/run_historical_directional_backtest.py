@@ -40,7 +40,6 @@ from nfl_forecast.props_player_sources import (  # noqa: E402
     normalize_snap_counts_player_ids,
 )
 from nfl_forecast.props_player_state import SCHEMA_VERSION, normalize_team_code  # noqa: E402
-from nfl_forecast.props_role_state import build_lagged_snap_route_adjustments  # noqa: E402
 from nfl_forecast.props_upstream import (  # noqa: E402
     build_empirical_scoring_context,
     build_game_upstream_package,
@@ -751,7 +750,6 @@ def run(
     simulations: int,
     book_id: int,
     require_genuine_open: bool,
-    use_snap_route_role: bool = False,
 ) -> tuple[pd.DataFrame, dict]:
     history_start = 2021
     seasons = list(range(history_start, int(season) + 1))
@@ -799,7 +797,6 @@ def run(
     exclusions = defaultdict(int)
     efficiency_adapter_totals = defaultdict(int)
     game_build_audit: dict[str, dict] = {}
-    snap_role_audit: dict[str, dict] = {}
 
     obs_by_event = {int(event): rows.copy() for event, rows in observations.groupby("event_id")}
     roster_by_event = {int(event): rows.copy() for event, rows in roster.groupby("event_id")}
@@ -862,22 +859,6 @@ def run(
 
             teams = [_team(schedule_row["home_team"]), _team(schedule_row["away_team"])]
             residual = residual_efficiency_by_team_from_empirical_priors(teams, fitted_priors)
-            role_adjustments = None
-            role_provenance = None
-            if use_snap_route_role:
-                role_build = build_lagged_snap_route_adjustments(
-                    snap_counts,
-                    state,
-                    season=season,
-                    week=week,
-                    route_prior_means=ROUTE_PRIORS,
-                )
-                role_adjustments = role_build.adjustments_by_team
-                role_provenance = (
-                    "PFR/nflverse offensive snap share; strictly prior weeks; "
-                    "last-four-game route-role proxy"
-                )
-                snap_role_audit[game_id] = role_build.audit
             try:
                 package = build_game_upstream_package(
                     player_state=state,
@@ -896,8 +877,6 @@ def run(
                     source_status="qualified",
                     prior_model_trained_through_season=trained_through,
                     primary_qb_by_team=qb_overrides,
-                    role_adjustments_by_team=role_adjustments,
-                    role_adjustments_provenance=role_provenance,
                 )
                 game_input = build_game_input_from_upstream(
                     home_team=_team(schedule_row["home_team"]),
@@ -1030,12 +1009,6 @@ def run(
         "event_mapping": event_map_audit,
         "snap_identity": snap_identity_audit,
         "participation": participation_audit,
-        "snap_route_role_challenger": {
-            "enabled": bool(use_snap_route_role),
-            "research_only": True,
-            "games_with_role_audit": int(len(snap_role_audit)),
-            "audit_by_game": snap_role_audit if use_snap_route_role else {},
-        },
         "exclusions": dict(exclusions),
         "headline": summarize(results),
         "clustered_accuracy_ci95": clustered_accuracy_interval(results),
@@ -1069,14 +1042,6 @@ def main() -> int:
     parser.add_argument("--simulations", type=int, default=20_000)
     parser.add_argument("--book-id", type=int, default=PRIMARY_BOOK)
     parser.add_argument("--allow-inferred-open", action="store_true")
-    parser.add_argument(
-        "--snap-route-role",
-        action="store_true",
-        help=(
-            "Research challenger: use strictly lagged PFR/nflverse offensive snap share "
-            "to adjust route participation. Default off preserves the frozen V1 path."
-        ),
-    )
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     if args.week_start < 1 or args.week_end > 18 or args.week_start > args.week_end:
@@ -1091,7 +1056,6 @@ def main() -> int:
         simulations=args.simulations,
         book_id=args.book_id,
         require_genuine_open=(args.book_id == PRIMARY_BOOK and not args.allow_inferred_open),
-        use_snap_route_role=bool(args.snap_route_role),
     )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     results.to_csv(args.output_dir / f"{args.season}_forecast_level.csv", index=False)
