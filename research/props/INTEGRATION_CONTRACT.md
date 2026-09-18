@@ -123,7 +123,7 @@ python scripts/build_props_market_snapshot.py \
   --output /secure/path/market_snapshot_20260920T160000Z.json
 ```
 
-The normalized file exposes `market_artifacts`; copy that array into the frozen integration manifest without changing its timestamps or identities. Existing output files are never overwritten.
+The normalized file exposes `market_artifacts` and is passed intact to the frozen-manifest assembler. The assembler selects only the target game's artifacts while fingerprinting the entire slate capture. Existing output files are never overwritten.
 
 
 ## Frozen manifest assembly
