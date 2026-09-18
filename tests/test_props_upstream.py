@@ -569,3 +569,45 @@ def test_injury_availability_fit_rejects_2026_training_horizon():
             pd.DataFrame(),
             trained_through_season=2026,
         )
+
+
+
+def test_non_red_zone_tds_do_not_contaminate_red_zone_pass_fraction_prior():
+    base = _combined_pbp()
+    baseline = build_empirical_scoring_context(
+        base,
+        teams=["ARI"],
+        season=2026,
+        week=3,
+    )
+    extra = []
+    for idx in range(20):
+        extra.append(
+            _play(
+                game_id=f"2025_10_ARI_LAR_{idx}",
+                season=2025,
+                week=10,
+                team="ARI",
+                passer="A-QB",
+                receiver="A-WR",
+                pass_attempt=1,
+                complete_pass=1,
+                passing_yards=60,
+                receiving_yards=60,
+                yardline_100=60,
+                air_yards=60,
+                drive=idx + 1,
+                pass_touchdown=1,
+            )
+        )
+    poisoned = pd.concat([base, pd.DataFrame(extra)], ignore_index=True)
+    changed = build_empirical_scoring_context(
+        poisoned,
+        teams=["ARI"],
+        season=2026,
+        week=3,
+    )
+    assert (
+        changed["scoring_context_by_team"]["ARI"]["prior_pass_td_fraction"]
+        == baseline["scoring_context_by_team"]["ARI"]["prior_pass_td_fraction"]
+    )
