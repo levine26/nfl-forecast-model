@@ -6,7 +6,8 @@ from nfl_forecast.props_player_state import (
     build_offensive_player_state_contract,
     flatten_current_injury_report,
     validate_offensive_player_state,
-)
+,
+    normalize_team_code)
 
 
 def _schedule():
@@ -519,3 +520,10 @@ def test_validation_rejects_invalid_roster_membership_state():
     broken.loc[broken.index[0], "roster_membership_state"] = "GUESSED_ACTIVE"
     with pytest.raises(ValueError, match="roster_membership_state"):
         validate_offensive_player_state(broken)
+
+
+
+def test_props_team_normalization_maps_nflverse_la_to_lar():
+    assert normalize_team_code("LA") == "LAR"
+    assert normalize_team_code("LAR") == "LAR"
+    assert normalize_team_code("JAC") == "JAX"
