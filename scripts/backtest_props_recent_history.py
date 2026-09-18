@@ -253,35 +253,66 @@ def _actual_stats(pbp: pd.DataFrame, season: int) -> dict[tuple[str, str], dict[
             return pd.Series("", index=work.index, dtype="string")
         return work[col].astype("string").fillna("").str.strip()
 
+    game = work["game_id"].astype("string").fillna("").str.strip()
     passer = ids("passer_player_id", "passer_id")
     rusher = ids("rusher_player_id", "rusher_id")
     receiver = ids("receiver_player_id", "receiver_id")
-    complete = pd.to_numeric(work.get("complete_pass", 0), errors="coerce").fillna(0).eq(1)
-    pass_td = pd.to_numeric(work.get("pass_touchdown", 0), errors="coerce").fillna(0).eq(1)
-    rush_td = pd.to_numeric(work.get("rush_touchdown", 0), errors="coerce").fillna(0).eq(1)
+    complete = pd.to_numeric(work.get("complete_pass", 0), errors="coerce").fillna(0.0)
+    pass_td = pd.to_numeric(work.get("pass_touchdown", 0), errors="coerce").fillna(0.0)
+    rush_td = pd.to_numeric(work.get("rush_touchdown", 0), errors="coerce").fillna(0.0)
 
-    for idx, row in work.iterrows():
-        game_id = str(row.get("game_id") or "")
-        if not game_id:
+    def aggregate(pid: pd.Series, fields: dict[str, pd.Series]) -> pd.DataFrame:
+        valid = _valid_id(pid) & game.ne("")
+        if not bool(valid.any()):
+            return pd.DataFrame()
+        frame = pd.DataFrame(
+            {
+                "game_id": game.loc[valid].astype(str),
+                "player_id": pid.loc[valid].astype(str),
+                **{
+                    name: pd.to_numeric(values.loc[valid], errors="coerce").fillna(0.0)
+                    for name, values in fields.items()
+                },
+            }
+        )
+        return frame.groupby(["game_id", "player_id"], as_index=False, sort=False).sum(
+            numeric_only=True
+        )
+
+    passing = aggregate(
+        passer,
+        {
+            "passing_yards": pd.to_numeric(work.get("passing_yards", 0), errors="coerce").fillna(0.0),
+            "passing_tds": pass_td,
+        },
+    )
+    rushing = aggregate(
+        rusher,
+        {
+            "rushing_yards": pd.to_numeric(work.get("rushing_yards", 0), errors="coerce").fillna(0.0),
+            "rushing_tds": rush_td,
+            "anytime_td": rush_td,
+        },
+    )
+    receiving = aggregate(
+        receiver,
+        {
+            "receiving_yards": pd.to_numeric(work.get("receiving_yards", 0), errors="coerce").fillna(0.0),
+            "receptions": complete,
+            "receiving_tds": pass_td,
+            "anytime_td": pass_td,
+        },
+    )
+
+    for frame in (passing, rushing, receiving):
+        if frame.empty:
             continue
-        pid = str(passer.loc[idx])
-        if pid and pid not in {"<NA>", "nan"}:
-            stat = out[(game_id, pid)]
-            stat["passing_yards"] += float(pd.to_numeric(pd.Series([row.get("passing_yards")]), errors="coerce").fillna(0).iloc[0])
-            stat["passing_tds"] += float(pass_td.loc[idx])
-        pid = str(rusher.loc[idx])
-        if pid and pid not in {"<NA>", "nan"}:
-            stat = out[(game_id, pid)]
-            stat["rushing_yards"] += float(pd.to_numeric(pd.Series([row.get("rushing_yards")]), errors="coerce").fillna(0).iloc[0])
-            stat["rushing_tds"] += float(rush_td.loc[idx])
-            stat["anytime_td"] += float(rush_td.loc[idx])
-        pid = str(receiver.loc[idx])
-        if pid and pid not in {"<NA>", "nan"}:
-            stat = out[(game_id, pid)]
-            stat["receiving_yards"] += float(pd.to_numeric(pd.Series([row.get("receiving_yards")]), errors="coerce").fillna(0).iloc[0])
-            stat["receptions"] += float(complete.loc[idx])
-            stat["receiving_tds"] += float(pass_td.loc[idx])
-            stat["anytime_td"] += float(pass_td.loc[idx])
+        value_cols = [c for c in frame.columns if c not in {"game_id", "player_id"}]
+        for row in frame.itertuples(index=False):
+            key = (str(row.game_id), str(row.player_id))
+            stat = out[key]
+            for column in value_cols:
+                stat[column] += float(getattr(row, column))
     return out
 
 
