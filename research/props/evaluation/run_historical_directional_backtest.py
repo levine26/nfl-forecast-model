@@ -582,18 +582,50 @@ def build_game_stats_and_participation(
 def sanitize_efficiency_history_for_frozen_validator(history):
     frame = history.efficiency_history.copy()
     audit = {
-        "negative_nonqb_rushing_history_rows_reset": 0,
+        "negative_passing_history_rows_reset": 0,
         "negative_qb_rushing_history_rows_reset": 0,
+        "negative_nonqb_rushing_history_rows_reset": 0,
+        "negative_receiving_history_rows_reset": 0,
     }
     if not frame.empty:
-        nonqb = pd.to_numeric(frame.get("hist_rushing_yards"), errors="coerce").fillna(0).lt(0)
-        if nonqb.any():
-            audit["negative_nonqb_rushing_history_rows_reset"] = int(nonqb.sum())
-            frame.loc[nonqb, ["hist_carries", "hist_rushing_yards"]] = 0.0
+        passing = pd.to_numeric(frame.get("hist_passing_yards"), errors="coerce").fillna(0).lt(0)
+        if passing.any():
+            audit["negative_passing_history_rows_reset"] = int(passing.sum())
+            frame.loc[
+                passing,
+                ["hist_pass_attempts", "hist_completions", "hist_passing_yards"],
+            ] = 0.0
+
         qb = pd.to_numeric(frame.get("hist_qb_rush_yards"), errors="coerce").fillna(0).lt(0)
         if qb.any():
             audit["negative_qb_rushing_history_rows_reset"] = int(qb.sum())
-            frame.loc[qb, ["hist_qb_rush_attempts", "hist_qb_rush_yards"]] = 0.0
+            frame.loc[
+                qb,
+                ["hist_qb_rush_attempts", "hist_qb_rush_yards", "hist_goal_line_carries"],
+            ] = 0.0
+
+        nonqb = pd.to_numeric(frame.get("hist_rushing_yards"), errors="coerce").fillna(0).lt(0)
+        if nonqb.any():
+            audit["negative_nonqb_rushing_history_rows_reset"] = int(nonqb.sum())
+            frame.loc[
+                nonqb,
+                ["hist_carries", "hist_rushing_yards", "hist_goal_line_carries"],
+            ] = 0.0
+
+        receiving = pd.to_numeric(frame.get("hist_receiving_yards"), errors="coerce").fillna(0).lt(0)
+        if receiving.any():
+            audit["negative_receiving_history_rows_reset"] = int(receiving.sum())
+            frame.loc[
+                receiving,
+                [
+                    "hist_targets",
+                    "hist_receptions",
+                    "hist_receiving_yards",
+                    "hist_red_zone_targets",
+                    "hist_end_zone_targets",
+                ],
+            ] = 0.0
+
     return type(history)(
         team_history=history.team_history,
         player_history=history.player_history,
@@ -603,7 +635,6 @@ def sanitize_efficiency_history_for_frozen_validator(history):
             "historical_efficiency_validator_adapter": audit,
         },
     ), audit
-
 
 def prior_five_average(
     stats: dict[tuple[str, str], dict[str, float]],
