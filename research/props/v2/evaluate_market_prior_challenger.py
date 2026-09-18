@@ -18,7 +18,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "src"))
 
-from nfl_forecast.props_market_residual import (  # noqa: E402
+from props_market_residual import (  # noqa: E402
     RESEARCH_LABEL,
     apply_market_prior_residual,
     fit_market_prior_residual,
