@@ -40,6 +40,10 @@ from nfl_forecast.props_player_sources import (  # noqa: E402
     normalize_snap_counts_player_ids,
 )
 from nfl_forecast.props_player_state import SCHEMA_VERSION, normalize_team_code  # noqa: E402
+from nfl_forecast.props_role_state import (  # noqa: E402
+    ENGINE_VERSION as ROLE_STATE_ENGINE_VERSION,
+    build_snap_trend_role_adjustments,
+)
 from nfl_forecast.props_upstream import (  # noqa: E402
     build_empirical_scoring_context,
     build_game_upstream_package,
@@ -396,6 +400,7 @@ def market_observations(
     *,
     book_id: int,
     require_genuine_open: bool,
+    role_state_mode: str = "none",
 ) -> tuple[pd.DataFrame, dict]:
     work = market[
         market["book_id"].eq(int(book_id))
@@ -751,6 +756,9 @@ def run(
     book_id: int,
     require_genuine_open: bool,
 ) -> tuple[pd.DataFrame, dict]:
+    if role_state_mode not in {"none", "snap_trend"}:
+        raise ValueError("role_state_mode must be one of: none, snap_trend")
+
     history_start = 2021
     seasons = list(range(history_start, int(season) + 1))
     bundle = load_core_data(seasons)
@@ -797,6 +805,7 @@ def run(
     exclusions = defaultdict(int)
     efficiency_adapter_totals = defaultdict(int)
     game_build_audit: dict[str, dict] = {}
+    role_state_totals = defaultdict(int)
 
     obs_by_event = {int(event): rows.copy() for event, rows in observations.groupby("event_id")}
     roster_by_event = {int(event): rows.copy() for event, rows in roster.groupby("event_id")}
@@ -858,6 +867,48 @@ def run(
                 continue
 
             teams = [_team(schedule_row["home_team"]), _team(schedule_row["away_team"])]
+            role_adjustments_by_team: dict[str, dict[str, dict[str, float]]] = {}
+            role_adjustments_provenance = None
+            role_state_audit: dict[str, dict] = {}
+            if role_state_mode == "snap_trend":
+                if snap_counts is None:
+                    exclusions["role_state_snap_counts_unavailable"] += len(obs_by_event[event_id])
+                    game_build_audit[game_id] = {
+                        **state_audit,
+                        "reason": "role_state_snap_counts_unavailable",
+                    }
+                    continue
+                try:
+                    for role_team in teams:
+                        adjustments, audit = build_snap_trend_role_adjustments(
+                            snap_counts,
+                            state,
+                            season=season,
+                            week=week,
+                            team=role_team,
+                        )
+                        if adjustments:
+                            role_adjustments_by_team[role_team] = adjustments
+                        role_state_audit[role_team] = audit
+                        role_state_totals["eligible_current_players"] += int(
+                            audit.get("eligible_current_players", 0)
+                        )
+                        role_state_totals["adjusted_players"] += int(
+                            audit.get("adjusted_players", 0)
+                        )
+                    role_state_totals["games_processed"] += 1
+                    role_adjustments_provenance = (
+                        f"strictly_lagged_pfr_offense_pct:{ROLE_STATE_ENGINE_VERSION}"
+                    )
+                except Exception as exc:
+                    exclusions[f"role_state:{type(exc).__name__}"] += len(obs_by_event[event_id])
+                    game_build_audit[game_id] = {
+                        **state_audit,
+                        "reason": f"role_state:{type(exc).__name__}",
+                        "error": str(exc)[:400],
+                    }
+                    continue
+
             residual = residual_efficiency_by_team_from_empirical_priors(teams, fitted_priors)
             try:
                 package = build_game_upstream_package(
@@ -877,6 +928,8 @@ def run(
                     source_status="qualified",
                     prior_model_trained_through_season=trained_through,
                     primary_qb_by_team=qb_overrides,
+                    role_adjustments_by_team=role_adjustments_by_team or None,
+                    role_adjustments_provenance=role_adjustments_provenance,
                 )
                 game_input = build_game_input_from_upstream(
                     home_team=_team(schedule_row["home_team"]),
@@ -955,6 +1008,12 @@ def run(
                 result_rows.append(
                     {
                         "contract_version": CONTRACT_VERSION,
+                        "research_variant": (
+                            "v1_frozen_baseline"
+                            if role_state_mode == "none"
+                            else f"v2_challenger:{role_state_mode}"
+                        ),
+                        "role_state_mode": role_state_mode,
                         "season": int(season),
                         "week": int(week),
                         "game_id": game_id,
@@ -990,6 +1049,7 @@ def run(
                 )
             game_build_audit[game_id] = {
                 **state_audit,
+                "role_state": role_state_audit,
                 "simulation_players": len(sim_players),
                 "opportunity_audit": package.audit,
             }
@@ -1001,6 +1061,17 @@ def run(
         "season": int(season),
         "weeks": [int(week_start), int(week_end)],
         "simulations_per_game": int(simulations),
+        "research_variant": (
+            "v1_frozen_baseline"
+            if role_state_mode == "none"
+            else f"v2_challenger:{role_state_mode}"
+        ),
+        "promotion_authorized": False if role_state_mode != "none" else None,
+        "role_state_mode": role_state_mode,
+        "role_state_engine_version": (
+            ROLE_STATE_ENGINE_VERSION if role_state_mode == "snap_trend" else None
+        ),
+        "role_state_totals": dict(role_state_totals),
         "market_source": market_source_audit,
         "game_line_source": game_line_source_audit,
         "pbp_source_normalization": pbp_normalization_audit,
@@ -1042,6 +1113,12 @@ def main() -> int:
     parser.add_argument("--simulations", type=int, default=20_000)
     parser.add_argument("--book-id", type=int, default=PRIMARY_BOOK)
     parser.add_argument("--allow-inferred-open", action="store_true")
+    parser.add_argument(
+        "--role-state-mode",
+        choices=("none", "snap_trend"),
+        default="none",
+        help="Research challenger only; default none preserves the frozen V1 path.",
+    )
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
     if args.week_start < 1 or args.week_end > 18 or args.week_start > args.week_end:
@@ -1056,6 +1133,7 @@ def main() -> int:
         simulations=args.simulations,
         book_id=args.book_id,
         require_genuine_open=(args.book_id == PRIMARY_BOOK and not args.allow_inferred_open),
+        role_state_mode=args.role_state_mode,
     )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     results.to_csv(args.output_dir / f"{args.season}_forecast_level.csv", index=False)
