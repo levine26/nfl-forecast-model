@@ -557,7 +557,7 @@ def _summarize(frame: pd.DataFrame, *, season: int, simulations: int, audit: dic
     }
 
 
-def run(season: int, simulations: int, output_dir: Path, cache_dir: str) -> int:
+def run(season: int, simulations: int, output_dir: Path, cache_dir: str, max_events: int | None = None) -> int:
     if season not in {2023, 2024, 2025}:
         raise ValueError("historical headline window is frozen to 2023-2025")
     if simulations < 1000:
@@ -609,6 +609,8 @@ def run(season: int, simulations: int, output_dir: Path, cache_dir: str) -> int:
     rows: list[dict] = []
     game_failures: list[dict] = []
     mapped_events = sorted(set(int(x) for x in open_markets["event_id"].dropna().astype(int)))
+    if max_events is not None:
+        mapped_events = mapped_events[: int(max_events)]
     events_total = len(mapped_events)
 
     for n_event, event_id in enumerate(mapped_events, start=1):
@@ -831,8 +833,9 @@ def main() -> int:
         default=Path("research_outputs/props_accuracy/recent_history"),
     )
     parser.add_argument("--cache-dir", default=".cache/nflreadpy")
+    parser.add_argument("--max-events", type=int, default=None, help="QA smoke-test cap; never use for headline reporting")
     args = parser.parse_args()
-    return run(args.season, args.simulations, args.output_dir, args.cache_dir)
+    return run(args.season, args.simulations, args.output_dir, args.cache_dir, args.max_events)
 
 
 if __name__ == "__main__":
