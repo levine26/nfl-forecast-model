@@ -3,6 +3,7 @@ import pandas as pd
 from nfl_forecast.props_player_sources import (
     add_nflverse_kickoff_timestamp,
     normalize_snap_counts_player_ids,
+    resolve_primary_qbs_from_depth_charts,
 )
 
 
@@ -107,3 +108,120 @@ def test_naive_kickoff_without_source_timezone_remains_unknown():
     )
     converted = add_nflverse_kickoff_timestamp(schedules)
     assert pd.isna(converted.loc[0, "kickoff"])
+
+
+
+def _depth_player_state():
+    return pd.DataFrame(
+        [
+            {
+                "game_id": "2026_03_LAR_ARI",
+                "player_id": "A-QB1",
+                "position": "QB",
+                "team": "ARI",
+            },
+            {
+                "game_id": "2026_03_LAR_ARI",
+                "player_id": "A-QB2",
+                "position": "QB",
+                "team": "ARI",
+            },
+            {
+                "game_id": "2026_03_LAR_ARI",
+                "player_id": "L-QB1",
+                "position": "QB",
+                "team": "LAR",
+            },
+        ]
+    )
+
+
+def test_timestamped_depth_chart_resolves_unique_qb1_before_forecast():
+    depth = pd.DataFrame(
+        [
+            {
+                "dt": "2026-09-17T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB1",
+                "pos_abb": "QB",
+                "pos_rank": 1,
+            },
+            {
+                "dt": "2026-09-17T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB2",
+                "pos_abb": "QB",
+                "pos_rank": 2,
+            },
+            {
+                "dt": "2026-09-17T18:00:00Z",
+                "team": "LAR",
+                "gsis_id": "L-QB1",
+                "pos_abb": "QB",
+                "pos_rank": 1,
+            },
+        ]
+    )
+    resolved, audit = resolve_primary_qbs_from_depth_charts(
+        depth,
+        _depth_player_state(),
+        game_id="2026_03_LAR_ARI",
+        forecast_timestamp="2026-09-17T22:00:00Z",
+    )
+    assert resolved["ARI"]["player_id"] == "A-QB1"
+    assert resolved["LAR"]["player_id"] == "L-QB1"
+    assert "nflverse_timestamped_depth_chart" in resolved["ARI"]["provenance"]
+    assert audit["teams_resolved"] == 2
+    assert audit["status"] == "qualified"
+
+
+def test_future_depth_chart_snapshot_is_discarded():
+    depth = pd.DataFrame(
+        [
+            {
+                "dt": "2026-09-17T23:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB1",
+                "pos_abb": "QB",
+                "pos_rank": 1,
+            }
+        ]
+    )
+    resolved, audit = resolve_primary_qbs_from_depth_charts(
+        depth,
+        _depth_player_state(),
+        game_id="2026_03_LAR_ARI",
+        forecast_timestamp="2026-09-17T22:00:00Z",
+    )
+    assert resolved == {}
+    assert audit["future_rows_discarded"] == 1
+    assert audit["status"] == "unusable_no_pregame_rows"
+
+
+def test_ambiguous_rank_one_depth_chart_fails_closed_for_team():
+    depth = pd.DataFrame(
+        [
+            {
+                "dt": "2026-09-17T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB1",
+                "pos_abb": "QB",
+                "pos_rank": 1,
+            },
+            {
+                "dt": "2026-09-17T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB2",
+                "pos_abb": "QB",
+                "pos_rank": 1,
+            },
+        ]
+    )
+    resolved, audit = resolve_primary_qbs_from_depth_charts(
+        depth,
+        _depth_player_state(),
+        game_id="2026_03_LAR_ARI",
+        forecast_timestamp="2026-09-17T22:00:00Z",
+    )
+    assert "ARI" not in resolved
+    assert audit["teams_ambiguous"][0]["team"] == "ARI"
