@@ -18,7 +18,7 @@ import pandas as pd
 
 SCHEMA_VERSION = "levline_props_player_state.v1"
 SUPPORTED_POSITIONS = frozenset({"QB", "RB", "WR", "TE"})
-TEAM_NORMALIZATION = {"JAC": "JAX"}
+TEAM_NORMALIZATION = {"JAC": "JAX", "LA": "LAR"}
 NON_ROSTER_STATUSES = frozenset(
     {"CUT", "UFA", "RFA", "NWT", "RET", "TRC", "TRD", "TRL", "TRT", "RSR"}
 )
