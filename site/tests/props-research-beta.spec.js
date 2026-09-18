@@ -3,7 +3,11 @@ import { test, expect } from '@playwright/test'
 const fixtureRequired = process.env.PROPS_FIXTURE_REQUIRED === '1'
 
 async function hasFixture(page) {
-  return fixtureRequired || await page.getByText('Puka Nacua').first().isVisible().catch(()=>false)
+  return fixtureRequired || await page.locator('.lp-board-row > summary .lp-row-player strong').filter({hasText:'Puka Nacua'}).first().isVisible().catch(()=>false)
+}
+
+function boardRow(scope,name) {
+  return scope.locator('.lp-board-row').filter({has:scope.locator('.lp-row-player strong',{hasText:name})}).first()
 }
 
 for (const width of [320,390,430,768,1440]) {
@@ -16,17 +20,16 @@ for (const width of [320,390,430,768,1440]) {
     if (await hasFixture(page)) {
       await expect(page.getByText("ON LEVLINE'S RADAR",{exact:true})).toBeVisible()
       await expect(page.getByText('FULL MARKET',{exact:true})).toBeVisible()
-      const puka=page.locator('.lp-board-row').filter({hasText:'Puka Nacua'}).first()
-      await expect(puka).toBeVisible()
-      await expect(puka).toContainText('76.5')
-      await expect(puka).toContainText('83.5')
-      await expect(puka).toContainText('OVER')
-      await expect(puka).toContainText('MODEL EDGE')
+      const puka=boardRow(page,'Puka Nacua')
+      await expect(puka.locator(':scope > summary')).toContainText('76.5')
+      await expect(puka.locator(':scope > summary')).toContainText('83.5')
+      await expect(puka.locator(':scope > summary')).toContainText('OVER')
+      await expect(puka.locator(':scope > summary')).toContainText('MODEL EDGE')
 
       await puka.locator(':scope > summary').click()
       await expect(puka.getByRole('img',{name:/Market line 76.5.*LevLine Fair Line 83.5/i})).toBeVisible()
       await expect(puka.getByText('THE SIGNAL',{exact:true})).toBeVisible()
-      await expect(puka.locator('.lp-advanced > summary')).toBeVisible()
+      await expect(puka.getByText('Advanced Analysis',{exact:true})).toBeVisible()
     } else {
       await expect(page.getByText(/Props publication is waiting for a valid forecast artifact/i)).toBeVisible()
     }
@@ -40,28 +43,30 @@ test('Radar includes only upstream MODEL EDGE and WATCH classifications',async({
   if (!await hasFixture(page)) return
 
   const radar=page.locator('.lp-radar')
-  await expect(radar.getByText('Puka Nacua').first()).toBeVisible()
-  await expect(radar.getByText('Christian McCaffrey').first()).toBeVisible()
-  await expect(radar.getByText('Josh Allen').first()).toBeVisible()
-  await expect(radar.getByText('Research Fixture Receiver')).toHaveCount(0)
-  await expect(radar.getByText('MODEL EDGE').first()).toBeVisible()
-  await expect(radar.getByText('WATCH').first()).toBeVisible()
+  await expect(radar.locator('.lp-row-player strong',{hasText:'Puka Nacua'}).first()).toBeVisible()
+  await expect(radar.locator('.lp-row-player strong',{hasText:'Christian McCaffrey'}).first()).toBeVisible()
+  await expect(radar.locator('.lp-row-player strong',{hasText:'Josh Allen'}).first()).toBeVisible()
+  await expect(radar.locator('.lp-row-player strong',{hasText:'Research Fixture Receiver'})).toHaveCount(0)
+  await expect(radar.locator('.lp-board-row.model-edge').first()).toBeVisible()
+  await expect(radar.locator('.lp-board-row.watch').first()).toBeVisible()
 })
 
 test('Games is a matchup index before opening a game-specific board',async({page})=>{
   await page.goto('./#/props/games')
-  if (!fixtureRequired && !await page.getByText(/BUF|MIA/).first().isVisible().catch(()=>false)) return
-
   await expect(page.getByRole('heading',{name:'Browse the slate, then go deep.'})).toBeVisible()
-  await expect(page.getByText('Josh Allen')).toHaveCount(0)
+  if (!fixtureRequired && !await page.locator('.lp-game-index-row').first().isVisible().catch(()=>false)) {
+    await expect(page.getByText(/No game-level Props slate is published yet/i)).toBeVisible()
+    return
+  }
 
+  await expect(page.locator('.lp-row-player strong',{hasText:'Josh Allen'})).toHaveCount(0)
   const allenGame=page.locator('.lp-game-index-row').filter({hasText:'BUF'}).filter({hasText:'MIA'}).first()
   await expect(allenGame).toBeVisible()
   await allenGame.click()
   await expect(page).toHaveURL(/#\/props\/games\//)
 
-  const allen=page.locator('.lp-board-row').filter({hasText:'Josh Allen'})
-  await expect(allen).toContainText('WATCH')
+  const allen=boardRow(page,'Josh Allen')
+  await expect(allen.locator(':scope > summary')).toContainText('WATCH')
   await allen.locator(':scope > summary').click()
   await expect(allen.getByText('Expected dropbacks').first()).toBeVisible()
 })
@@ -72,19 +77,19 @@ test('Full Market filters, search, sort, and progressive disclosure are interact
 
   const full=page.locator('.lp-full-market')
   await full.getByLabel('Search players').fill('Puka')
-  await expect(full.getByText('Puka Nacua').first()).toBeVisible()
-  await expect(full.getByText('Josh Allen')).toHaveCount(0)
+  await expect(full.locator('.lp-row-player strong',{hasText:'Puka Nacua'}).first()).toBeVisible()
+  await expect(full.locator('.lp-row-player strong',{hasText:'Josh Allen'})).toHaveCount(0)
   await full.getByLabel('Search players').fill('')
 
   await full.getByLabel('Signal').selectOption('WATCH')
-  await expect(full.getByText('Josh Allen').first()).toBeVisible()
-  await expect(full.getByText('Puka Nacua')).toHaveCount(0)
+  await expect(full.locator('.lp-row-player strong',{hasText:'Josh Allen'}).first()).toBeVisible()
+  await expect(full.locator('.lp-row-player strong',{hasText:'Puka Nacua'})).toHaveCount(0)
 
   await full.getByLabel('Signal').selectOption('ALL')
   await full.getByLabel('Sort').selectOption('player')
-  const puka=full.locator('.lp-board-row').filter({hasText:'Puka Nacua'})
+  const puka=boardRow(full,'Puka Nacua')
   await puka.locator(':scope > summary').click()
-  await puka.locator('.lp-advanced > summary').click()
+  await puka.getByText('Advanced Analysis',{exact:true}).click()
   await expect(puka.getByText('Model distribution')).toBeVisible()
   await expect(puka.getByText('Forecast timestamp')).toBeVisible()
   await expect(puka.getByText('Market captured')).toBeVisible()
@@ -94,9 +99,9 @@ test('TD markets use probability and price language instead of a continuous Fair
   await page.goto('./#/props')
   if (!await hasFixture(page)) return
 
-  const cmc=page.locator('.lp-board-row').filter({hasText:'Christian McCaffrey'}).first()
-  await expect(cmc).toContainText('-120')
-  await expect(cmc).toContainText('64.0%')
+  const cmc=boardRow(page,'Christian McCaffrey')
+  await expect(cmc.locator(':scope > summary')).toContainText('-120')
+  await expect(cmc.locator(':scope > summary')).toContainText('64.0%')
   await cmc.locator(':scope > summary').click()
   await expect(cmc.getByText('ANYTIME TD',{exact:true})).toBeVisible()
   await expect(cmc.getByText(/64\.0%/).first()).toBeVisible()
@@ -112,14 +117,12 @@ test('Performance page is empirical-data gated and retains immutable receipts',a
   await expect(page.getByText('Betting Performance')).toBeVisible()
   await expect(page.getByText('INSUFFICIENT EVALUATION DATA').first()).toBeVisible()
 
-  if (fixtureRequired || await page.getByText('Puka Nacua').first().isVisible().catch(()=>false)) {
-    const receiptDetails=page.locator('.lp-receipt').filter({hasText:'Puka Nacua'}).first()
+  const receiptDetails=page.locator('.lp-receipt').filter({has:page.locator('summary strong',{hasText:'Puka Nacua'})}).first()
+  if (fixtureRequired || await receiptDetails.isVisible().catch(()=>false)) {
     await receiptDetails.locator(':scope > summary').click()
-    const receiptGrid=receiptDetails.locator('.lp-receipt-grid')
-    await expect(receiptGrid).toBeVisible()
-    await expect(receiptGrid).toContainText('Original sportsbook line / price')
-    await expect(receiptGrid).toContainText('Forecast timestamp')
-    await expect(receiptGrid).toContainText('Model version')
+    await expect(receiptDetails.getByText('Original sportsbook line / price')).toBeVisible()
+    await expect(receiptDetails.getByText('Forecast timestamp')).toBeVisible()
+    await expect(receiptDetails.getByText('Model version')).toBeVisible()
   }
 })
 
