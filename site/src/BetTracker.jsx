@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import {
   BET_UNIT_DOLLARS,
   buildBetLedger,
+  buildCurrentWeekSlate,
+  combinedEntryProfit,
   summarizeBets,
   summarizeCombined,
 } from './betTrackerMath.js'
@@ -36,6 +38,13 @@ async function fetchCSV(name) {
   } catch { return [] }
 }
 
+async function fetchJSON(name,fallback={}) {
+  try {
+    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
+    return response.ok ? await response.json() : fallback
+  } catch { return fallback }
+}
+
 function onHistoryRoute() {
   const page=window.location.hash.replace(/^#\/?/,'').split('/').filter(Boolean)[0] || 'forecasts'
   return page==='history'
@@ -47,17 +56,13 @@ function dollars(value) {
   return `${value>0?'+':value<0?'-':''}$${abs}`
 }
 
-function money(value) {
-  return `$${Number(value||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})}`
-}
-
 function roi(value) {
   if (value == null) return '—'
   return `${value>=0?'+':''}${(value*100).toFixed(1)}%`
 }
 
 function odds(value) {
-  if (value == null) return 'Not captured'
+  if (value == null) return '—'
   const rounded=Math.round(value)
   return rounded>0 ? `+${rounded}` : `${rounded}`
 }
@@ -67,7 +72,7 @@ function record(summary) {
 }
 
 function resultLabel(result) {
-  return result==='win' ? 'WIN' : result==='loss' ? 'LOSS' : 'PUSH'
+  return result==='win' ? 'HIT' : result==='loss' ? 'MISS' : result==='push' ? 'PUSH' : 'PENDING'
 }
 
 function lineLabel(bet) {
@@ -76,110 +81,167 @@ function lineLabel(bet) {
   return `${bet.side} -${bet.line.toFixed(1)}`
 }
 
-function SummaryMetric({label,value,tone=''}) {
-  return <div className={tone}><span>{label}</span><strong>{value}</strong></div>
+function toneForProfit(value) {
+  return value==null ? '' : value>0 ? 'positive' : value<0 ? 'negative' : ''
 }
 
-function WeekSummary({summary}) {
-  const tone=summary.profit==null?'':summary.profit>0?'positive':summary.profit<0?'negative':''
-  return <div className="ss-bet-week-summary">
-    <SummaryMetric label="Record" value={record(summary)}/>
-    <SummaryMetric label="Amount wagered" value={money(summary.risked)}/>
-    <SummaryMetric label="P/L" value={dollars(summary.profit)} tone={tone}/>
-    <SummaryMetric label="ROI" value={roi(summary.roi)} tone={tone}/>
-  </div>
-}
-
-function SeasonCard({label,summary}) {
-  const tone=summary.profit==null?'':summary.profit>0?'positive':summary.profit<0?'negative':''
-  return <article className={`ss-bet-season-card ${tone}`}>
+function HistoryCard({label,summary}) {
+  const tone=toneForProfit(summary.profit)
+  return <article className="ss-bet-history-card">
     <span>{label}</span>
-    <strong>{dollars(summary.profit)}</strong>
-    <div><small>ROI</small><b>{roi(summary.roi)}</b></div>
-    <div><small>Risked</small><b>{money(summary.risked)}</b></div>
+    <strong>{record(summary)}</strong>
+    <small>2026 RECORD</small>
+    <div className={tone}><span>ROI</span><b>{roi(summary.roi)}</b></div>
     {summary.missingProfit>0&&<em>{summary.missingProfit} winning price{summary.missingProfit===1?'':'s'} unavailable</em>}
   </article>
 }
 
-function MoneylineRows({entries}) {
-  return <div className="ss-bet-ledger">
-    <div className="ss-bet-ledger-head"><span>Matchup</span><span>LevLine ML</span><span>Odds at lock</span><span>Result</span><span>P/L</span></div>
-    {entries.map(entry=><article key={`${entry.gameId}-ml`}>
-      <span>{entry.awayTeam} @ {entry.homeTeam}</span>
-      <b>{entry.ml.pick}</b>
-      <span className={entry.ml.odds==null?'unpriced':''}>{odds(entry.ml.odds)}</span>
-      <span className={`result ${entry.ml.result}`}>{resultLabel(entry.ml.result)}</span>
-      <strong className={entry.ml.profit==null?'unpriced':entry.ml.profit>0?'positive':entry.ml.profit<0?'negative':''}>{entry.ml.profit==null?'Awaiting price':dollars(entry.ml.profit)}</strong>
-    </article>)}
-  </div>
+function ResultChip({result}) {
+  return <span className={`ss-bet-result ${result||'pending'}`}>{resultLabel(result)}</span>
 }
 
-function SpreadRows({entries}) {
-  return <div className="ss-bet-ledger">
-    <div className="ss-bet-ledger-head"><span>Matchup</span><span>LevLine spread</span><span>Price</span><span>Result</span><span>P/L</span></div>
-    {entries.map(entry=>entry.spread&&<article key={`${entry.gameId}-spread`}>
-      <span>{entry.awayTeam} @ {entry.homeTeam}</span>
-      <b>{lineLabel(entry.spread)}</b>
-      <span>{odds(entry.spread.odds)}{entry.spread.usedFallbackPrice&&<small> fallback</small>}</span>
-      <span className={`result ${entry.spread.result}`}>{resultLabel(entry.spread.result)}</span>
-      <strong className={entry.spread.profit>0?'positive':entry.spread.profit<0?'negative':''}>{dollars(entry.spread.profit)}</strong>
-    </article>)}
-  </div>
+function MoneylineValue({entry}) {
+  const bet=entry.ml
+  if (!bet) return <span>—</span>
+  return <span className="ss-bet-bet-value">
+    <b>{bet.pick}</b>
+    {bet.odds==null
+      ? <small>{entry.locked?'Price unavailable':'Awaiting lock'}</small>
+      : <small>{odds(bet.odds)}</small>}
+  </span>
 }
 
-function BetTrackerPanel({history}) {
+function SpreadValue({entry}) {
+  const bet=entry.spread
+  if (!bet) return <span>—</span>
+  return <span className="ss-bet-bet-value">
+    <b>{lineLabel(bet)}</b>
+    {entry.locked
+      ? <small>{odds(bet.odds)}{bet.usedFallbackPrice?' fallback':''}</small>
+      : <small>Awaiting lock</small>}
+  </span>
+}
+
+function entryState(entry) {
+  const pending=[entry.ml,entry.spread].filter(Boolean).some(bet=>bet.result==='pending')
+  if (!entry.locked) return 'AWAITING LOCK'
+  return pending ? 'LOCKED · PENDING' : 'FINAL'
+}
+
+function profitDisplay(entry) {
+  const value=combinedEntryProfit(entry)
+  if (value != null) return {label:dollars(value),tone:toneForProfit(value)}
+  const pending=[entry.ml,entry.spread].filter(Boolean).some(bet=>bet.result==='pending')
+  return {label:pending?'—':'PRICE GAP',tone:'unpriced'}
+}
+
+function WeekLedger({entries}) {
+  return <>
+    <div className="ss-bet-week-ledger">
+      <div className="ss-bet-week-ledger-head">
+        <span>MATCHUP</span><span>MONEYLINE</span><span>ML RESULT</span><span>LEVLINE SPREAD</span><span>SPREAD RESULT</span><span>GAME P/L</span>
+      </div>
+      {entries.map(entry=>{
+        const gameProfit=profitDisplay(entry)
+        return <article key={entry.gameId}>
+          <span className="ss-bet-matchup"><b>{entry.awayTeam} @ {entry.homeTeam}</b><small>{entryState(entry)}</small></span>
+          <MoneylineValue entry={entry}/>
+          <ResultChip result={entry.ml?.result}/>
+          <SpreadValue entry={entry}/>
+          <ResultChip result={entry.spread?.result}/>
+          <strong className={gameProfit.tone}>{gameProfit.label}</strong>
+        </article>
+      })}
+    </div>
+    <div className="ss-bet-week-mobile">
+      {entries.map(entry=>{
+        const gameProfit=profitDisplay(entry)
+        return <article key={`${entry.gameId}-mobile`}>
+          <header>
+            <div><b>{entry.awayTeam} @ {entry.homeTeam}</b><small>{entryState(entry)}</small></div>
+            <strong className={gameProfit.tone}>{gameProfit.label}</strong>
+          </header>
+          <div><span>MONEYLINE</span><MoneylineValue entry={entry}/><ResultChip result={entry.ml?.result}/></div>
+          <div><span>LEVLINE SPREAD</span><SpreadValue entry={entry}/><ResultChip result={entry.spread?.result}/></div>
+        </article>
+      })}
+    </div>
+  </>
+}
+
+function MarketTotal({label,summary}) {
+  const tone=toneForProfit(summary.profit)
+  return <article className="ss-bet-market-total">
+    <span>{label}</span>
+    <strong>{record(summary)}</strong>
+    <small>RECORD</small>
+    <div><span>P/L</span><b className={tone}>{dollars(summary.profit)}</b></div>
+    <div><span>ROI</span><b className={tone}>{roi(summary.roi)}</b></div>
+    {summary.pending>0&&<em>{summary.pending} pending</em>}
+  </article>
+}
+
+function WeekTotals({week,entries}) {
+  const ml=summarizeBets(entries,'ml')
+  const spread=summarizeBets(entries,'spread')
+  const combined=summarizeCombined(entries)
+  const tone=toneForProfit(combined.profit)
+  return <section className="ss-bet-week-totals">
+    <header>
+      <div><span>WEEK {week} TOTALS</span><h3>Current week performance</h3></div>
+      <small>{combined.settled} settled wager{combined.settled===1?'':'s'} · {combined.pending} pending</small>
+    </header>
+    <div className="ss-bet-market-totals">
+      <MarketTotal label="MONEYLINE" summary={ml}/>
+      <MarketTotal label="LEVLINE SPREAD" summary={spread}/>
+    </div>
+    <div className="ss-bet-combined-total">
+      <span>WEEK TOTAL</span>
+      <strong className={tone}>{dollars(combined.profit)}</strong>
+      <div><small>COMBINED ROI</small><b className={tone}>{roi(combined.roi)}</b></div>
+    </div>
+    {(ml.missingProfit>0||spread.missingProfit>0)&&<p className="ss-bet-disclosure"><b>Verified-price gap:</b> P/L and ROI stay blank whenever a winning locked wager is missing a verifiable sportsbook price.</p>}
+    {combined.pending>0&&<p className="ss-bet-disclosure">Pending or not-yet-locked games are excluded from record, P/L and ROI until their immutable pregame receipt is graded.</p>}
+  </section>
+}
+
+function BetTrackerPanel({history,currentGames}) {
   const ledger=useMemo(()=>buildBetLedger(history),[history])
-  const weeks=useMemo(()=>[...new Set(ledger.map(entry=>entry.week).filter(Number.isFinite))].sort((a,b)=>a-b),[ledger])
-  const [week,setWeek]=useState(()=>weeks.at(-1) ?? '')
+  const seasonMl=useMemo(()=>summarizeBets(ledger,'ml'),[ledger])
+  const seasonSpread=useMemo(()=>summarizeBets(ledger,'spread'),[ledger])
+  const slate=useMemo(()=>buildCurrentWeekSlate(currentGames,ledger),[currentGames,ledger])
 
-  useEffect(()=>{
-    if (!weeks.length) return
-    if (!weeks.includes(Number(week))) setWeek(weeks.at(-1))
-  },[weeks,week])
-
-  if (!ledger.length) return null
-
-  const selected=ledger.filter(entry=>entry.week===Number(week))
-  const weeklyMl=summarizeBets(selected,'ml')
-  const weeklySpread=summarizeBets(selected,'spread')
-  const seasonMl=summarizeBets(ledger,'ml')
-  const seasonSpread=summarizeBets(ledger,'spread')
-  const seasonCombined=summarizeCombined(ledger)
-  const missingMl=weeklyMl.missingProfit>0
+  if (!ledger.length && !slate.entries.length) return null
 
   return <section className="ss-bet-tracker" aria-label="LevLine Bet Tracker">
     <header className="ss-bet-tracker-head">
-      <div><span>BET TRACKER</span><h2>What 1 unit on every LevLine pick would have done.</h2><p>Hypothetical tracking only · 1 unit = ${BET_UNIT_DOLLARS} risked per bet · graded from immutable pregame receipts.</p></div>
-      <label><span>Week</span><select value={week} onChange={event=>setWeek(Number(event.target.value))}>{weeks.map(value=><option key={value} value={value}>Week {value}</option>)}</select></label>
+      <div>
+        <span>PERFORMANCE HISTORY</span>
+        <h2>Every official LevLine bet, tracked.</h2>
+        <p>2026 season · 1 unit = $${BET_UNIT_DOLLARS} risked per bet · immutable pregame receipts determine the record.</p>
+      </div>
     </header>
 
-    <div className="ss-bet-season">
-      <SeasonCard label="Season · Moneyline" summary={seasonMl}/>
-      <SeasonCard label="Season · LevLine Spread" summary={seasonSpread}/>
-      <SeasonCard label="Season · Combined" summary={seasonCombined}/>
+    <div className="ss-bet-history-grid">
+      <HistoryCard label="MONEYLINE" summary={seasonMl}/>
+      <HistoryCard label="LEVLINE SPREAD" summary={seasonSpread}/>
     </div>
 
-    <div className="ss-bet-sections">
-      <section className="ss-bet-market">
-        <div className="ss-bet-market-title"><div><span>MONEYLINE</span><h3>1 unit on every LevLine ML pick</h3></div><small>Sportsbook ML captured at LevLine lock</small></div>
-        <WeekSummary summary={weeklyMl}/>
-        <MoneylineRows entries={selected}/>
-        {missingMl&&<p className="ss-bet-disclosure"><b>Historical pricing gap:</b> a winning ML receipt is missing its verified sportsbook price, so that week’s aggregate ML P/L and ROI remain blank rather than substituting LevLine fair odds or a later market price. Losses still grade at -1 unit.</p>}
-      </section>
-
-      <section className="ss-bet-market">
-        <div className="ss-bet-market-title"><div><span>LEVLINE SPREAD</span><h3>1 unit on every final modeled spread</h3></div><small>LevLine line, not the market spread</small></div>
-        <WeekSummary summary={weeklySpread}/>
-        <SpreadRows entries={selected}/>
-        <p className="ss-bet-disclosure">Spread wagers use LevLine’s immutable modeled margin rounded to the nearest 0.5 point, sportsbook-style, and are graded against that rounded line. Captured spread-side juice is used when stored; otherwise the approved -110 fallback is applied. Pushes return the stake and remain in the ROI denominator.</p>
-      </section>
-    </div>
+    {slate.week!=null&&<section className="ss-bet-this-week">
+      <header className="ss-bet-this-week-head">
+        <div><span>THIS WEEK</span><h3>Week {slate.week} slate</h3></div>
+        <small>{slate.entries.length} game{slate.entries.length===1?'':'s'} · moneyline + modeled spread</small>
+      </header>
+      <WeekLedger entries={slate.entries}/>
+      <WeekTotals week={slate.week} entries={slate.entries}/>
+    </section>}
   </section>
 }
 
 export default function BetTracker() {
   const [history,setHistory]=useState([])
   const [prices,setPrices]=useState([])
+  const [forecastPayload,setForecastPayload]=useState({games:[]})
   const [active,setActive]=useState(()=>onHistoryRoute())
   const [host,setHost]=useState(null)
 
@@ -190,9 +252,14 @@ export default function BetTracker() {
   },[])
 
   useEffect(()=>{
-    Promise.all([fetchCSV('prediction_history.csv'),fetchCSV('bet_price_history.csv')]).then(([historyRows,priceRows])=>{
+    Promise.all([
+      fetchCSV('prediction_history.csv'),
+      fetchCSV('bet_price_history.csv'),
+      fetchJSON('public_forecasts.json',{games:[]}),
+    ]).then(([historyRows,priceRows,publicForecasts])=>{
       setHistory(historyRows)
       setPrices(priceRows)
+      setForecastPayload(publicForecasts)
     })
   },[])
 
@@ -229,5 +296,7 @@ export default function BetTracker() {
     }
   },[active])
 
-  return active && host ? createPortal(<BetTrackerPanel history={enrichedHistory}/>,host) : null
+  return active && host
+    ? createPortal(<BetTrackerPanel history={enrichedHistory} currentGames={forecastPayload.games||[]}/>,host)
+    : null
 }
