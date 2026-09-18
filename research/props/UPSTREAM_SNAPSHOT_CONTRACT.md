@@ -64,7 +64,7 @@ For current QB identity, the operator first consumes timestamped 2025+ nflverse 
 
 ## Operator flow
 
-For the complete target week:
+For every still-pregame game on the target week's schedule:
 
 ```bash
 python scripts/build_props_upstream_snapshot.py \
@@ -86,7 +86,7 @@ python scripts/build_props_upstream_snapshot.py \
   --output-dir /secure/path/props_upstream
 ```
 
-The script loads/fits weekly shared inputs once, builds every selected game in memory, and writes nothing until all games validate and all output destinations pass create-only preflight.
+The script loads/fits weekly shared inputs once, excludes games whose scheduled kickoff is already at/before the freeze, requires every remaining scheduled game to have canonical player state, builds every selected game in memory, and writes nothing until all games validate and all output destinations pass create-only preflight.
 
 The script:
 
@@ -103,7 +103,7 @@ The script:
 Output files include:
 
 - `player_state.json` — one full target-week canonical state for stable-ID sportsbook resolution;
-- `upstream_slate.json` — immutable index of every selected game and its component paths;
+- `upstream_slate.json` — immutable index of every selected pregame game and its component paths, plus any already-started target-week game IDs explicitly excluded from the build;
 - for multi-game builds, `games/<game_id>/` containing:
   - `<game>.opportunity.json`;
   - `<game>.efficiency_player.json`;
