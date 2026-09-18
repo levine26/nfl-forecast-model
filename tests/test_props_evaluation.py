@@ -384,3 +384,80 @@ def test_closing_line_is_separate_and_clv_is_side_aware():
     assert summary["market_relative"]["threshold_clv_mean"] == pytest.approx(4.0)
     assert summary["market_relative"]["positive_threshold_clv_rate"] == pytest.approx(1.0)
     assert set(detail["close_line"]) == {74.5, 66.5}
+
+
+def test_retrospective_original_is_excluded_even_with_valid_hash():
+    original = _original(
+        forecast_id="late-original",
+        game_id="2026_03_ARI_LAR",
+        player_id="p1",
+    )
+    original["forecast_timestamp_utc"] = "2026-09-20T20:01:00+00:00"
+    original["data_horizon_utc"] = "2026-09-20T19:00:00+00:00"
+    receipt = _receipt(original)
+    summary, detail = evaluate_history(
+        [receipt],
+        grade_events=[_grade("late-original", 80.0)],
+        frozen_model_ref="test",
+        bootstrap_replicates=5,
+    )
+    assert summary["sample"]["forecasts"] == 0
+    assert summary["audit"]["excluded_reasons"]["original_not_point_in_time"] == 1
+    assert detail.empty
+
+
+def test_postkickoff_close_is_rejected_without_dropping_projection_grade():
+    original = _original(
+        forecast_id="late-close",
+        game_id="2026_03_ARI_LAR",
+        player_id="p1",
+    )
+    close = _close("late-close", 75.5)
+    close["captured_utc"] = "2026-09-20T20:01:00+00:00"
+    summary, detail = evaluate_history(
+        [_receipt(original)],
+        closing_events=[close],
+        grade_events=[_grade("late-close", 80.0)],
+        frozen_model_ref="test",
+        bootstrap_replicates=5,
+    )
+    assert summary["graded_sample"]["forecasts"] == 1
+    assert summary["audit"]["excluded_reasons"]["closing_event_invalid_or_not_pregame"] == 1
+    assert detail.iloc[0]["close_line"] is None or pytest.approx(detail.iloc[0]["close_line"]) != 75.5
+
+
+def test_same_threshold_price_clv_uses_selected_side_price():
+    original = _original(
+        forecast_id="price-clv",
+        game_id="2026_03_ARI_LAR",
+        player_id="p1",
+        actual_line=70.5,
+        fair_line=80.0,
+        p_over=0.62,
+        p_under=0.38,
+        market_p_over=0.50,
+        market_p_under=0.50,
+        over_price=120,
+        under_price=-140,
+    )
+    close = {
+        "event_type": "MARKET_CLOSE",
+        "forecast_id": "price-clv",
+        "captured_utc": "2026-09-20T19:55:00+00:00",
+        "source": "test-close",
+        "line": 70.5,
+        "over_price_american": -110,
+        "under_price_american": -110,
+    }
+    summary, _ = evaluate_history(
+        [_receipt(original)],
+        closing_events=[close],
+        grade_events=[_grade("price-clv", 80.0)],
+        frozen_model_ref="test",
+        bootstrap_replicates=5,
+    )
+    expected = (1.0 / american_to_decimal(-110)) - (1.0 / american_to_decimal(120))
+    market = summary["market_relative"]
+    assert market["same_threshold_price_clv_n"] == 1
+    assert market["same_threshold_price_clv_implied_probability_mean"] == pytest.approx(expected)
+    assert market["positive_same_threshold_price_clv_rate"] == pytest.approx(1.0)
