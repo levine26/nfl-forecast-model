@@ -1,0 +1,47 @@
+{
+  "contract_version": "levline-props-forecast-v0.1",
+  "generated_utc": "2026-09-17T21:00:00+00:00",
+  "forecasts": [
+    {
+      "forecast_id": "fixture_puka_rec_yards",
+      "player_identity_resolved": true,
+      "player_id": "00-0039075",
+      "player": "Puka Nacua",
+      "position": "WR",
+      "team": "LA",
+      "opponent": "PHI",
+      "game_id": "2026_03_LA_PHI",
+      "kickoff_utc": "2026-09-20T17:00:00+00:00",
+      "forecast_timestamp_utc": "2026-09-17T20:55:00+00:00",
+      "data_horizon_utc": "2026-09-17T20:45:00+00:00",
+      "prop_type": "receiving_yards",
+      "signal_state": "MODEL EDGE",
+      "market": {"source":"consensus","captured_utc":"2026-09-17T20:50:00+00:00","line":76.5,"over_price_american":-110,"under_price_american":-110,"no_vig_over_probability":0.5,"no_vig_under_probability":0.5,"consensus_line":76.5},
+      "model": {"version":"props-sim-fixture-v0.1","mean":86.2,"median":83.5,"fair_line":83.5,"over_probability":0.618,"under_probability":0.382,"push_probability":0.0,"prediction_interval":{"low":55.0,"high":113.0,"coverage":0.8},"simulation_count":50000,"simulation_accounting_ok":true},
+      "data_quality": {"state":"HIGH","critical_ok":true,"confidence":"HIGH","notes":["Role inputs complete","Market snapshot fresh"]},
+      "drivers": [{"label":"Route expectation","direction":"UP"},{"label":"Target share","direction":"UP"},{"label":"Passing environment","direction":"UP"},{"label":"Coverage matchup","direction":"NEUTRAL"},{"label":"Availability confidence","direction":"UP","detail":"High"}],
+      "simulation_artifact_id":"fixture-sim-001","market_artifact_id":"fixture-market-001","player_state_artifact_id":"fixture-state-001"
+    },
+    {
+      "forecast_id":"fixture_allen_pass_tds","player_identity_resolved":true,"player_id":"00-0034857","player":"Josh Allen","position":"QB","team":"BUF","opponent":"MIA","game_id":"2026_03_MIA_BUF","kickoff_utc":"2026-09-20T17:00:00+00:00","forecast_timestamp_utc":"2026-09-17T20:55:00+00:00","data_horizon_utc":"2026-09-17T20:45:00+00:00","prop_type":"passing_tds","signal_state":"WATCH",
+      "market":{"source":"consensus","captured_utc":"2026-09-17T20:50:00+00:00","line":1.5,"over_price_american":-125,"under_price_american":105,"no_vig_over_probability":0.543,"no_vig_under_probability":0.457},
+      "model":{"version":"props-sim-fixture-v0.1","mean":2.04,"median":2.0,"fair_line":2.0,"over_probability":0.579,"under_probability":0.421,"push_probability":0.0,"prediction_interval":{"low":0.0,"high":4.0,"coverage":0.8},"simulation_count":50000,"simulation_accounting_ok":true},
+      "data_quality":{"state":"MEDIUM","critical_ok":true,"confidence":"MEDIUM","notes":["Red-zone allocation carries normal early-season uncertainty"]},
+      "drivers":[{"label":"Expected dropbacks","direction":"UP"},{"label":"Red-zone pass share","direction":"NEUTRAL"}]
+    },
+    {
+      "forecast_id":"fixture_cmc_anytime_td","player_identity_resolved":true,"player_id":"00-0033280","player":"Christian McCaffrey","position":"RB","team":"SF","opponent":"ARI","game_id":"2026_03_ARI_SF","kickoff_utc":"2026-09-20T20:25:00+00:00","forecast_timestamp_utc":"2026-09-17T20:55:00+00:00","data_horizon_utc":"2026-09-17T20:45:00+00:00","prop_type":"anytime_td","signal_state":"MODEL EDGE",
+      "market":{"source":"consensus","captured_utc":"2026-09-17T20:50:00+00:00","td_price_american":-120,"no_vig_probability":0.52},
+      "model":{"version":"props-sim-fixture-v0.1","td_probability":0.64,"expected_tds":0.91,"simulation_count":50000,"simulation_accounting_ok":true},
+      "data_quality":{"state":"HIGH","critical_ok":true,"confidence":"HIGH","notes":["Goal-line role resolved"]},
+      "drivers":[{"label":"Goal-line carry share","direction":"UP"},{"label":"Red-zone receiving role","direction":"UP"}]
+    },
+    {
+      "forecast_id":"fixture_low_quality_receptions","player_identity_resolved":true,"player_id":"fixture-player-004","player":"Research Fixture Receiver","position":"WR","team":"SEA","opponent":"NO","game_id":"2026_03_NO_SEA","kickoff_utc":"2026-09-20T20:05:00+00:00","forecast_timestamp_utc":"2026-09-17T20:55:00+00:00","data_horizon_utc":"2026-09-17T20:45:00+00:00","prop_type":"receptions","signal_state":"MODEL EDGE",
+      "market":{"source":"consensus","captured_utc":"2026-09-17T20:50:00+00:00","line":5.0,"over_price_american":-115,"under_price_american":-105,"no_vig_over_probability":0.511,"no_vig_under_probability":0.489},
+      "model":{"version":"props-sim-fixture-v0.1","mean":6.2,"median":6.0,"fair_line":6.0,"over_probability":0.55,"under_probability":0.34,"push_probability":0.11,"prediction_interval":{"low":3.0,"high":9.0,"coverage":0.8},"simulation_count":50000,"simulation_accounting_ok":true},
+      "data_quality":{"state":"LOW","critical_ok":true,"confidence":"LOW","notes":["Route role unresolved"]},
+      "drivers":[{"label":"Route expectation","direction":"UP","detail":"Uncertain"}]
+    }
+  ]
+}

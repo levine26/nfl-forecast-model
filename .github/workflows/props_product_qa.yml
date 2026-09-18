@@ -1,0 +1,81 @@
+name: LevLine Props product QA
+
+on:
+  push:
+    branches: [research/props-product-qa]
+    paths:
+      - 'src/nfl_forecast/props_publication.py'
+      - 'scripts/build_props_publication.py'
+      - 'scripts/update_props_history.py'
+      - 'research/props/**'
+      - 'tests/test_props_publication.py'
+      - 'site/src/PropsResearchBeta.jsx'
+      - 'site/src/props-research-beta.css'
+      - 'site/src/propsPresentation.js'
+      - 'site/src/AppCoherent.jsx'
+      - 'site/tests/props*'
+      - '.github/workflows/props_product_qa.yml'
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/props_publication.py'
+      - 'scripts/build_props_publication.py'
+      - 'scripts/update_props_history.py'
+      - 'research/props/**'
+      - 'tests/test_props_publication.py'
+      - 'site/src/PropsResearchBeta.jsx'
+      - 'site/src/props-research-beta.css'
+      - 'site/src/propsPresentation.js'
+      - 'site/src/AppCoherent.jsx'
+      - 'site/tests/props*'
+      - '.github/workflows/props_product_qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  props-product-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Python package
+        run: pip install '.[dev]'
+      - name: Validate Props publication and immutable history
+        run: python -m pytest -q tests/test_props_publication.py
+      - name: Build deterministic research-beta fixture
+        run: |
+          mkdir -p site/public/data outputs/props/history
+          python scripts/update_props_history.py record \
+            --input research/props/fixtures/props_forecasts.json \
+            --recorded-utc 2026-09-17T21:00:00+00:00
+          python scripts/build_props_publication.py \
+            --input research/props/fixtures/props_forecasts.json \
+            --now 2026-09-17T21:00:00+00:00 \
+            --output outputs/props/fixture_public_props.json \
+            --site-output site/public/data/props_public.json \
+            --history-output site/public/data/props_history.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: site/package.json
+      - name: Install dashboard dependencies
+        working-directory: site
+        run: npm install
+      - name: Validate Props presentation helpers
+        working-directory: site
+        run: node --test tests/propsPresentation.test.mjs
+      - name: Build dashboard with isolated Props surface
+        working-directory: site
+        run: npm run build
+      - name: Install Chromium for responsive smoke test
+        working-directory: site
+        run: npx playwright install --with-deps chromium
+      - name: Run Props mobile and desktop smoke tests
+        working-directory: site
+        env:
+          PROPS_FIXTURE_REQUIRED: '1'
+        run: npx playwright test tests/props-research-beta.spec.js

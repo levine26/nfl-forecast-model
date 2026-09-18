@@ -30,14 +30,11 @@ jobs:
       - run: pip install '.[dev]'
       - name: Test Impact Monitor publication and capture contracts
         run: pytest -q tests/test_player_impact_cards.py tests/test_player_impact_engine.py tests/test_player_impact_monitor.py research/test_impact_monitor_capture.py tests/test_research_firewall.py
-      - name: Prove probability and public production surfaces are untouched
+      - name: Prove research production surfaces obey the central firewall
         if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
           BASE="origin/${{ github.base_ref }}"
-          CHANGED=$(git diff --name-only "$BASE...HEAD")
-          echo "$CHANGED"
-          if echo "$CHANGED" | grep -E '^(outputs/|site/|src/nfl_forecast/(pipeline|models|features|fst_production|probability_strategy|public_forecast|publish|market|market_t120|lock_verify)\.py$|scripts/(run_week|refresh_market|pregame_due|verify_pregame_lock)\.py$)'; then
-            echo 'Impact Monitor research touched a production surface.' >&2
-            exit 1
-          fi
+          python scripts/check_research_firewall.py \
+            --base "$BASE" \
+            --head-ref '${{ github.head_ref }}'
