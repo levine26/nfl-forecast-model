@@ -337,6 +337,7 @@ def join_history_events(
             "close_td_price_american": _num(close.get("td_price_american")) if close else None,
             "graded": grade is not None and actual is not None,
             "grade_result": _text(grade.get("grading_result")) if grade else None,
+            "grade_result_source": _text(grade.get("result_source")) if grade else None,
         }
 
         if fair_line is not None and market_line is not None and std and std > 0:
