@@ -29,12 +29,10 @@ The build fails closed when explicit `qb_scramble` evidence or the required yard
 
 ## Mandatory explicit assumptions
 
-The priors file must contain:
+The minimal priors file now contains only assumptions that the repository cannot derive from a trustworthy live/point-in-time source:
 
 ```json
 {
-  "source_status": "qualified | prospective_unqualified | unknown",
-  "prior_model_trained_through_season": 2025,
   "route_prior_means": {
     "RB": "<preregistered mean in (0,1)>",
     "WR": "<preregistered mean in (0,1)>",
@@ -44,31 +42,23 @@ The priors file must contain:
     "UNKNOWN": {"alpha": "<positive>", "beta": "<positive>"},
     "QUESTIONABLE": {"alpha": "<positive>", "beta": "<positive>"},
     "DOUBTFUL": {"alpha": "<positive>", "beta": "<positive>"}
-  },
-  "efficiency_position_priors": {
-    "QB": {"<all efficiency prior fields>": "<pre-2026 value>"},
-    "RB": {"<all efficiency prior fields>": "<pre-2026 value>"},
-    "WR": {"<all efficiency prior fields>": "<pre-2026 value>"},
-    "TE": {"<all efficiency prior fields>": "<pre-2026 value>"}
   }
 }
 ```
 
-No values are supplied by this contract. A prior claiming training through 2026 is rejected.
+Those values are deliberately not invented by this contract.
 
-The scoring-context file must provide, per target game and team:
+By default, conditional-efficiency priors are fit empirically from regular-season PBP ending in 2025. Completed 2026 outcomes are structurally excluded from this prior fit. The fitter produces position priors for completion rate, yards/completion, rushing YPC, catch rate, receiving YPR, red-zone/end-zone target rate and goal-line carry rate, plus residual-bucket efficiency.
 
-- `expected_drives`
-- `expected_red_zone_trips`
-- `prior_red_zone_td_rate`
-- `prior_pass_td_fraction`
-- `expected_non_red_zone_pass_tds`
-- `expected_non_red_zone_rush_tds`
-- explicit residual-bucket efficiency for both teams
+By default, team scoring context is also derived rather than hand-entered:
 
-These are upstream model inputs, not sportsbook-derived values.
+- expected drives and red-zone trips use strictly lagged team history, so prior completed 2026 games may update current state;
+- expected non-red-zone passing/rushing TD volume uses the same strictly lagged team state;
+- red-zone TD conversion and pass-vs-rush TD fraction are frozen to league regular-season evidence ending in 2025.
 
-If the canonical lagged role cannot uniquely identify the current starting QB, `primary_qb_by_team` must contain a stable player ID and explicit point-in-time provenance. The builder does not guess a starter from depth-chart order or actual game participation.
+An optional scoring-context file may override these quantities for a controlled preregistered experiment. Explicit efficiency priors may likewise be supplied in the priors file, but then `prior_model_trained_through_season` is mandatory and values trained through 2026 are rejected.
+
+For current QB identity, the operator first consumes timestamped 2025+ nflverse depth charts at or before the forecast timestamp. A unique rank-1 QB with a stable GSIS ID is accepted with snapshot provenance. Ambiguous/future/missing depth-chart evidence fails closed. An explicit `primary_qb_by_team` entry with point-in-time provenance may override the depth-chart resolution when needed.
 
 ## Operator flow
 
@@ -80,7 +70,6 @@ python scripts/build_props_upstream_snapshot.py \
   --week 3 \
   --game-id <canonical_game_id> \
   --priors /secure/path/preregistered_props_priors.json \
-  --scoring-context /secure/path/pregame_scoring_context.json \
   --output-dir /secure/path/props_upstream/<canonical_game_id>
 ```
 
@@ -90,10 +79,11 @@ The script:
 2. loads the nflverse stable player identity table;
 3. attempts to capture the current NFL injury report unless `--skip-injury-fetch` is specified;
 4. timestamps the forecast only after live source requests complete;
-5. builds canonical current player state;
-6. derives strictly lagged opportunity and efficiency history;
-7. executes the actual opportunity and efficiency/TD lane interfaces;
-8. writes immutable create-only artifacts.
+5. builds canonical current player state and resolves QB1 from the latest eligible timestamped depth chart when possible;
+6. derives strictly lagged opportunity/efficiency history;
+7. fits efficiency priors only through 2025 and derives current scoring-volume state from strictly prior weeks unless explicit preregistered overrides are supplied;
+8. executes the actual opportunity and efficiency/TD lane interfaces;
+9. writes immutable create-only artifacts.
 
 Output files include:
 
@@ -123,6 +113,8 @@ This layer:
 - never imports sportsbook prices into opportunity/efficiency modeling;
 - never mutates official LevLine/F-ST winner probabilities;
 - never uses target-week or current-game PBP;
-- never supplies route, availability, efficiency, scoring or residual-efficiency defaults;
+- never supplies hidden route or availability defaults;
+- fits default efficiency/residual priors only from regular-season data through 2025;
+- allows prior completed 2026 games only to update chronological team state, never prior fitting/tuning;
 - never treats missing current availability as `AVAILABLE`;
 - refuses priors trained through completed 2026 outcomes.
