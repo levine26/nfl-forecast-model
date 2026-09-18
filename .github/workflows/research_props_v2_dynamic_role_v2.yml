@@ -10,6 +10,8 @@ on:
       - 'research/props/v2/run_dynamic_role_v2_backtest.py'
       - 'research/props/v2/aggregate_dynamic_role_v2_backtest.py'
       - 'research/props/v2/DYNAMIC_ROLE_V2_RESEARCH_CONTRACT.md'
+      - 'research/props/v2/distribution_metrics.py'
+      - 'research/props/v2/test_distribution_metrics.py'
       - '.github/workflows/research_props_v2_dynamic_role_v2.yml'
   workflow_dispatch:
 
@@ -34,8 +36,9 @@ jobs:
           python -m py_compile research/props/v2/props_dynamic_role_v2.py
           python -m py_compile research/props/v2/run_dynamic_role_v2_backtest.py
           python -m py_compile research/props/v2/aggregate_dynamic_role_v2_backtest.py
+          python -m py_compile research/props/v2/distribution_metrics.py
       - name: Test chronology and latent-state semantics
-        run: pytest -q research/props/v2/test_props_dynamic_role.py research/props/v2/test_props_dynamic_role_v2.py
+        run: pytest -q research/props/v2/test_props_dynamic_role.py research/props/v2/test_props_dynamic_role_v2.py research/props/v2/test_distribution_metrics.py
 
   pilot:
     needs: unit
