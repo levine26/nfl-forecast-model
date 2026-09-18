@@ -95,6 +95,13 @@
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
         "title": "ATL: Jawaan Taylor \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=33.7554&longitude=-84.4008&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in ATL"
       }
     ],
     "game_id": "2026_02_CAR_ATL",
@@ -135,7 +142,7 @@
     "matchup": "CAR @ ATL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:32.998949+00:00",
+        "as_of": "2026-09-18T18:30:03.416640+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "CAR",
@@ -145,7 +152,7 @@
         "title": "Bryce Young vs ATL: player history"
       },
       {
-        "as_of": "2026-09-18T15:29:23.681023+00:00",
+        "as_of": "2026-09-18T18:29:57.864331+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "ATL",
@@ -155,7 +162,7 @@
         "title": "CAR protection vs ATL pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:23.682993+00:00",
+        "as_of": "2026-09-18T18:29:57.865519+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ATL",
@@ -165,7 +172,7 @@
         "title": "ATL early-down approach vs CAR"
       },
       {
-        "as_of": "2026-09-18T15:27:28.324526+00:00",
+        "as_of": "2026-09-18T18:29:50.651496+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -216,7 +223,7 @@
     ],
     "paragraphs": [
       "Carolina and Atlanta both arrive at their first division game looking for a reset after opening losses. The Panthers\u2019 Week 2 scouting report notes that Carolina has won the last three meetings, while Atlanta\u2019s current depth-chart story says Kevin Stefanski had not yet named his starting quarterback. That uncertainty changes the preparation problem for Carolina, but Atlanta still has to solve the mistakes that hurt it in Pittsburgh. The Panthers\u2019 best path is to make whichever Falcons quarterback starts play from uncomfortable down-and-distance.",
-      "LevLine 3.0 gives the Panthers a 64.6% win probability over the Falcons. Its frozen F-ST engine reconciles a 39.8% football-only signal with a 59.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Carolina Panthers -4.8, a market line of Carolina Panthers -2.5, and an approximate coherent score of CAR 25 \u2013 ATL 20. Carolina\u2019s ability to create predictable passing situations matters most while Atlanta sorts through its quarterback decision and tries to stabilize an offense coming off an uneven opener. The pick: Carolina Panthers moneyline."
+      "LevLine 3.0 gives the Panthers a 62.1% win probability over the Falcons. Its frozen F-ST engine reconciles a 39.8% football-only signal with a 57.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Carolina Panthers -4.0, a market line of Carolina Panthers -2.5, and an approximate coherent score of CAR 24 \u2013 ATL 20. Carolina\u2019s ability to create predictable passing situations matters most while Atlanta sorts through its quarterback decision and tries to stabilize an offense coming off an uneven opener. The pick: Carolina Panthers moneyline."
     ],
     "prediction": "CAR to win; ATL 24.2 \u2013 CAR 20.7 is the central score projection.",
     "reported_sources": [
@@ -262,7 +269,7 @@
         "HOU YAC creation vs CIN tackling"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 3,
       "primary_variant": 1,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -374,7 +381,7 @@
     "matchup": "CIN @ HOU",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:18.467039+00:00",
+        "as_of": "2026-09-18T18:29:54.645210+00:00",
         "family": "availability",
         "label": "Availability",
         "leader": "Watch",
@@ -384,7 +391,7 @@
         "title": "CIN: Jonathan Allen \u2014 Did Not Participate In Practice"
       },
       {
-        "as_of": "2026-09-18T15:29:25.452445+00:00",
+        "as_of": "2026-09-18T18:29:58.928301+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "CIN",
@@ -394,7 +401,7 @@
         "title": "HOU YAC creation vs CIN tackling"
       },
       {
-        "as_of": "2026-09-18T15:29:25.450394+00:00",
+        "as_of": "2026-09-18T18:29:58.927087+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "HOU",
@@ -404,7 +411,7 @@
         "title": "CIN protection vs HOU pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:25.451127+00:00",
+        "as_of": "2026-09-18T18:29:58.927580+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "CIN",
@@ -613,7 +620,7 @@
     "matchup": "CLE @ TB",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:19.110709+00:00",
+        "as_of": "2026-09-18T18:29:54.978726+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -623,7 +630,7 @@
         "title": "What Zac Robinson could change in TB"
       },
       {
-        "as_of": "2026-09-18T15:29:27.219084+00:00",
+        "as_of": "2026-09-18T18:29:59.981771+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TB",
@@ -633,7 +640,7 @@
         "title": "CLE explosives vs TB prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:27.219409+00:00",
+        "as_of": "2026-09-18T18:29:59.981938+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "TB",
@@ -643,7 +650,7 @@
         "title": "CLE early-down approach vs TB"
       },
       {
-        "as_of": "2026-09-18T15:29:27.219902+00:00",
+        "as_of": "2026-09-18T18:29:59.982237+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "CLE",
@@ -812,7 +819,7 @@
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=40.8135&longitude=-74.0745&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-        "strength": "Moderate",
+        "strength": "Strong",
         "title": "Kickoff weather in NYJ"
       }
     ],
@@ -854,7 +861,7 @@
     "matchup": "GB @ NYJ",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:27:32.870512+00:00",
+        "as_of": "2026-09-18T18:29:52.252452+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -864,7 +871,7 @@
         "title": "New defensive coordinator in NYJ"
       },
       {
-        "as_of": "2026-09-18T15:29:26.626326+00:00",
+        "as_of": "2026-09-18T18:29:59.626795+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "NYJ",
@@ -874,7 +881,7 @@
         "title": "GB explosives vs NYJ prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:26.627272+00:00",
+        "as_of": "2026-09-18T18:29:59.627311+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYJ",
@@ -884,7 +891,7 @@
         "title": "NYJ protection vs GB pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:26.626615+00:00",
+        "as_of": "2026-09-18T18:29:59.626970+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYJ",
@@ -1040,6 +1047,13 @@
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
         "title": "IND: Grover Stewart \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+        "strength": "Moderate",
+        "title": "Kickoff weather in KC"
       }
     ],
     "game_id": "2026_02_IND_KC",
@@ -1080,7 +1094,7 @@
     "matchup": "IND @ KC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:19.114273+00:00",
+        "as_of": "2026-09-18T18:29:54.981198+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1090,7 +1104,7 @@
         "title": "What Eric Bieniemy could change in KC"
       },
       {
-        "as_of": "2026-09-18T15:29:31.340020+00:00",
+        "as_of": "2026-09-18T18:30:02.450226+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "KC",
@@ -1100,7 +1114,7 @@
         "title": "KC early-down approach vs IND"
       },
       {
-        "as_of": "2026-09-18T15:29:31.340098+00:00",
+        "as_of": "2026-09-18T18:30:02.450282+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "KC",
@@ -1110,7 +1124,7 @@
         "title": "KC YAC creation vs IND tackling"
       },
       {
-        "as_of": "2026-09-18T15:28:57.709950+00:00",
+        "as_of": "2026-09-18T18:29:54.210028+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1156,7 +1170,7 @@
     ],
     "paragraphs": [
       "Indianapolis heads to Kansas City after a difficult defensive opener in which the Colts allowed Baltimore to move the ball efficiently and left coordinator Lou Anarumo with clear correction points. Kansas City, meanwhile, opens with back-to-back prime-time home games and brings the Colts into Arrowhead for Sunday night. Indianapolis must generate disruption without losing structure against Patrick Mahomes, while the Chiefs can stress a defense still sorting through its first-week issues by forcing it to defend every level of the field.",
-      "LevLine 3.0 gives the Chiefs a 71.4% win probability over the Colts. Its frozen F-ST engine reconciles a 60.5% football-only signal with a 71.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -7.3, a market line of Kansas City Chiefs -6.5, and an approximate coherent score of KC 27 \u2013 IND 19. Kansas City\u2019s ability to stress Indianapolis across the field determines whether the Chiefs can keep Patrick Mahomes comfortable while the Colts search for more defensive disruption. The pick: Kansas City Chiefs moneyline."
+      "LevLine 3.0 gives the Chiefs a 71.9% win probability over the Colts. Its frozen F-ST engine reconciles a 60.5% football-only signal with a 71.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -7.5, a market line of Kansas City Chiefs -6.5, and an approximate coherent score of KC 27 \u2013 IND 19. Kansas City\u2019s ability to stress Indianapolis across the field determines whether the Chiefs can keep Patrick Mahomes comfortable while the Colts search for more defensive disruption. The pick: Kansas City Chiefs moneyline."
     ],
     "prediction": "KC to win; KC 25.3 \u2013 IND 20.8 is the central score projection.",
     "reported_sources": [
@@ -1202,7 +1216,7 @@
         "JAX explosives vs DEN prevention"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 3,
       "primary_variant": 5,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -1274,6 +1288,13 @@
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Weak",
         "title": "JAX: Jakobi Meyers \u2014 Limited Participation in Practice"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.7439&longitude=-105.0201&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FDenver&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in DEN"
       }
     ],
     "game_id": "2026_02_JAX_DEN",
@@ -1314,7 +1335,7 @@
     "matchup": "JAX @ DEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:27:35.251778+00:00",
+        "as_of": "2026-09-18T18:29:53.036188+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -1324,7 +1345,7 @@
         "title": "DEN offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-18T15:29:28.388120+00:00",
+        "as_of": "2026-09-18T18:30:00.670919+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "JAX",
@@ -1334,7 +1355,7 @@
         "title": "JAX explosives vs DEN prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:28.387615+00:00",
+        "as_of": "2026-09-18T18:30:00.670591+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "DEN",
@@ -1344,7 +1365,7 @@
         "title": "JAX protection vs DEN pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:28.389674+00:00",
+        "as_of": "2026-09-18T18:30:00.671814+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "DEN",
@@ -1553,7 +1574,7 @@
     "matchup": "LV @ LAC",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:37.546440+00:00",
+        "as_of": "2026-09-18T18:30:05.983882+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "LAC",
@@ -1563,7 +1584,7 @@
         "title": "Justin Herbert vs LV: player history"
       },
       {
-        "as_of": "2026-09-18T15:29:28.973349+00:00",
+        "as_of": "2026-09-18T18:30:01.024909+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "LV",
@@ -1573,7 +1594,7 @@
         "title": "LV protection vs LAC pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:28.973852+00:00",
+        "as_of": "2026-09-18T18:30:01.025227+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LAC",
@@ -1583,7 +1604,7 @@
         "title": "LV explosives vs LAC prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:28.975456+00:00",
+        "as_of": "2026-09-18T18:30:01.026161+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "LV",
@@ -1672,7 +1693,7 @@
         "MIA protection vs SF pass rush"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 7,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -1798,7 +1819,7 @@
     "matchup": "MIA @ SF",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:19.113593+00:00",
+        "as_of": "2026-09-18T18:29:54.980728+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -1808,7 +1829,7 @@
         "title": "What Bobby Slowik could change in MIA"
       },
       {
-        "as_of": "2026-09-18T15:29:30.760562+00:00",
+        "as_of": "2026-09-18T18:30:02.099651+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIA",
@@ -1818,7 +1839,7 @@
         "title": "MIA protection vs SF pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:30.761375+00:00",
+        "as_of": "2026-09-18T18:30:02.100128+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "SF",
@@ -1828,7 +1849,7 @@
         "title": "MIA early-down approach vs SF"
       },
       {
-        "as_of": "2026-09-18T15:29:30.762380+00:00",
+        "as_of": "2026-09-18T18:30:02.100734+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "MIA",
@@ -2010,7 +2031,7 @@
         "category": "weather",
         "source_name": "Open-Meteo",
         "source_url": "https://api.open-meteo.com/v1/forecast?latitude=41.8623&longitude=-87.6167&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Strong",
+        "strength": "Moderate",
         "title": "Kickoff weather in CHI"
       }
     ],
@@ -2052,7 +2073,7 @@
     "matchup": "MIN @ CHI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:19.108776+00:00",
+        "as_of": "2026-09-18T18:29:54.977301+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2062,7 +2083,7 @@
         "title": "What Press Taylor could change in CHI"
       },
       {
-        "as_of": "2026-09-18T15:29:24.871256+00:00",
+        "as_of": "2026-09-18T18:29:58.570164+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "MIN",
@@ -2072,7 +2093,7 @@
         "title": "CHI protection vs MIN pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:24.871770+00:00",
+        "as_of": "2026-09-18T18:29:58.570495+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "CHI",
@@ -2082,7 +2103,7 @@
         "title": "CHI explosives vs MIN prevention"
       },
       {
-        "as_of": "2026-09-18T15:27:30.295507+00:00",
+        "as_of": "2026-09-18T18:29:51.407812+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2133,7 +2154,7 @@
     ],
     "paragraphs": [
       "Both teams entered Week 2 riding offensive fireworks and defensive swagger. Chicago\u2019s Ben Johnson looks to keep his 59\u2011point debut momentum alive, while Minnesota\u2019s Brian Flores boasts the league\u2019s top blitz rate after a four\u2011sack showing against Green Bay. The clash will hinge on whether the Bears can sustain big\u2011play passing against a Vikings front that thrives on pressure, and if Minnesota can force turnovers before Chicago\u2019s rhythm stalls.",
-      "LevLine 3.0 gives the Bears a 64.5% win probability over the Vikings. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 63.7% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -4.8, a market line of Chicago Bears -4.5, and an approximate coherent score of CHI 25 \u2013 MIN 20. Chicago's explosive passing will test Minnesota's aggressive blitz, while the Vikings' disciplined pass rush aims to disrupt Ben Johnson's tempo throughout the game and force. The pick: Chicago Bears moneyline."
+      "LevLine 3.0 gives the Bears a 65.4% win probability over the Vikings. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 64.5% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Chicago Bears -5.1, a market line of Chicago Bears -4.5, and an approximate coherent score of CHI 25 \u2013 MIN 20. Chicago's explosive passing will test Minnesota's aggressive blitz, while the Vikings' disciplined pass rush aims to disrupt Ben Johnson's tempo throughout the game and force. The pick: Chicago Bears moneyline."
     ],
     "prediction": "CHI to win; CHI 23.1 \u2013 MIN 22.2 is the central score projection.",
     "reported_sources": [
@@ -2236,14 +2257,14 @@
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
-        "title": "NO: Davon Godchaux \u2014 Did Not Participate In Practice"
+        "title": "NO: Isaiah Stalbird \u2014 Did Not Participate In Practice"
       },
       {
         "category": "personnel",
         "source_name": "NFL.com official injury report",
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
-        "title": "NO: Isaiah Stalbird \u2014 Did Not Participate In Practice"
+        "title": "NO: Zach Wood \u2014 Did Not Participate In Practice"
       },
       {
         "category": "personnel",
@@ -2291,7 +2312,7 @@
     "matchup": "NO @ BAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:27:29.254319+00:00",
+        "as_of": "2026-09-18T18:29:50.949054+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2301,7 +2322,7 @@
         "title": "New defensive coordinator in BAL"
       },
       {
-        "as_of": "2026-09-18T15:29:24.273096+00:00",
+        "as_of": "2026-09-18T18:29:58.220713+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "BAL",
@@ -2311,7 +2332,7 @@
         "title": "NO explosives vs BAL prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:24.273902+00:00",
+        "as_of": "2026-09-18T18:29:58.221176+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "BAL",
@@ -2321,7 +2342,7 @@
         "title": "BAL protection vs NO pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:24.274670+00:00",
+        "as_of": "2026-09-18T18:29:58.221660+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "BAL",
@@ -2367,7 +2388,7 @@
     ],
     "paragraphs": [
       "The Ravens are riding high after a dominant Week 1 performance, while the Saints are looking to bounce back from a tough loss. The key to the game will be the Ravens' ability to protect quarterback Lamar Jackson and the Saints' ability to generate pressure. The Ravens' running game, led by Derrick Henry, will also be crucial in controlling the clock and wearing down the Saints' defense. The Saints' offense, led by Tyler Shough, will need to find ways to exploit the Ravens' secondary.",
-      "LevLine 3.0 gives the Ravens a 76.4% win probability over the Saints. Its frozen F-ST engine reconciles a 70.6% football-only signal with a 76.6% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Baltimore Ravens -9.3, a market line of Baltimore Ravens -7.5, and an approximate coherent score of BAL 27 \u2013 NO 17. Ravens' protection against Saints' pressure determines whether Ravens can stay on schedule; if Ravens holds up, Saints' cleanest disruption path narrows. The pick: Baltimore Ravens moneyline."
+      "LevLine 3.0 gives the Ravens a 77.1% win probability over the Saints. Its frozen F-ST engine reconciles a 70.6% football-only signal with a 77.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Baltimore Ravens -9.6, a market line of Baltimore Ravens -8.5, and an approximate coherent score of BAL 27 \u2013 NO 17. Ravens' protection against Saints' pressure determines whether Ravens can stay on schedule; if Ravens holds up, Saints' cleanest disruption path narrows. The pick: Baltimore Ravens moneyline."
     ],
     "prediction": "BAL to win; BAL 25.4 \u2013 NO 18.6 is the central score projection.",
     "reported_sources": [
@@ -2539,7 +2560,7 @@
     "matchup": "NYG @ LA",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:19.114613+00:00",
+        "as_of": "2026-09-18T18:29:54.981474+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -2549,7 +2570,7 @@
         "title": "What Matt Nagy could change in NYG"
       },
       {
-        "as_of": "2026-09-18T15:29:31.928779+00:00",
+        "as_of": "2026-09-18T18:30:02.797040+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "LA",
@@ -2559,7 +2580,7 @@
         "title": "LA explosives vs NYG prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:31.926957+00:00",
+        "as_of": "2026-09-18T18:30:02.795950+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NYG",
@@ -2569,7 +2590,7 @@
         "title": "NYG protection vs LA pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:31.927756+00:00",
+        "as_of": "2026-09-18T18:30:02.796468+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "NYG",
@@ -2675,7 +2696,7 @@
         "PHI explosives vs TEN prevention"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 11,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -2747,13 +2768,6 @@
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Weak",
         "title": "PHI: Jalen Carter \u2014 Limited Participation in Practice"
-      },
-      {
-        "category": "weather",
-        "source_name": "Open-Meteo",
-        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=36.1665&longitude=-86.7713&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-        "strength": "Weak",
-        "title": "Kickoff weather in TEN"
       }
     ],
     "game_id": "2026_02_PHI_TEN",
@@ -2794,7 +2808,7 @@
     "matchup": "PHI @ TEN",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:27:34.200124+00:00",
+        "as_of": "2026-09-18T18:29:52.592839+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -2804,7 +2818,7 @@
         "title": "PHI offense changed its decision-makers"
       },
       {
-        "as_of": "2026-09-18T15:29:27.795917+00:00",
+        "as_of": "2026-09-18T18:30:00.326887+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "TEN",
@@ -2814,7 +2828,7 @@
         "title": "PHI explosives vs TEN prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:27.797535+00:00",
+        "as_of": "2026-09-18T18:30:00.327823+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "PHI",
@@ -2824,7 +2838,7 @@
         "title": "TEN early-down approach vs PHI"
       },
       {
-        "as_of": "2026-09-18T15:29:27.796315+00:00",
+        "as_of": "2026-09-18T18:30:00.327107+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "TEN",
@@ -2908,7 +2922,7 @@
         "PIT explosives vs NE prevention"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 12,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -3034,7 +3048,7 @@
     "matchup": "PIT @ NE",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:19.109357+00:00",
+        "as_of": "2026-09-18T18:29:54.977760+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3044,7 +3058,7 @@
         "title": "What Patrick Graham could change in PIT"
       },
       {
-        "as_of": "2026-09-18T15:29:26.042712+00:00",
+        "as_of": "2026-09-18T18:29:59.276314+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "PIT",
@@ -3054,7 +3068,7 @@
         "title": "PIT explosives vs NE prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:26.043533+00:00",
+        "as_of": "2026-09-18T18:29:59.276824+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "NE",
@@ -3064,7 +3078,7 @@
         "title": "NE protection vs PIT pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:26.042994+00:00",
+        "as_of": "2026-09-18T18:29:59.276527+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "PIT",
@@ -3156,7 +3170,7 @@
         "ARI early-down approach vs SEA"
       ],
       "media_led": true,
-      "media_source_count": 4,
+      "media_source_count": 2,
       "primary_variant": 13,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -3235,6 +3249,13 @@
         "source_url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
         "strength": "Moderate",
         "title": "Rest differential favors SEA"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=33.528&longitude=-112.263&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FPhoenix&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in ARI"
       }
     ],
     "game_id": "2026_02_SEA_ARI",
@@ -3275,7 +3296,7 @@
     "matchup": "SEA @ ARI",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:19.112706+00:00",
+        "as_of": "2026-09-18T18:29:54.980113+00:00",
         "family": "staff_impact",
         "label": "Staff Impact",
         "leader": "Watch",
@@ -3285,7 +3306,7 @@
         "title": "What Nathaniel Hackett could change in ARI"
       },
       {
-        "as_of": "2026-09-18T15:29:29.566860+00:00",
+        "as_of": "2026-09-18T18:30:01.371903+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "SEA",
@@ -3295,7 +3316,7 @@
         "title": "ARI explosives vs SEA prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:29.567125+00:00",
+        "as_of": "2026-09-18T18:30:01.372059+00:00",
         "family": "early_down",
         "label": "Early downs",
         "leader": "ARI",
@@ -3305,7 +3326,7 @@
         "title": "ARI early-down approach vs SEA"
       },
       {
-        "as_of": "2026-09-18T15:27:56.025299+00:00",
+        "as_of": "2026-09-18T18:29:53.377019+00:00",
         "family": "coaching",
         "label": "Staff",
         "leader": "Watch",
@@ -3402,7 +3423,7 @@
         "DAL protection vs WAS pass rush"
       ],
       "media_led": true,
-      "media_source_count": 2,
+      "media_source_count": 1,
       "primary_variant": 14,
       "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
       "reporting_first": true,
@@ -3481,6 +3502,13 @@
         "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
         "strength": "Moderate",
         "title": "WAS: Frankie Luvu \u2014 Did Not Participate In Practice"
+      },
+      {
+        "category": "weather",
+        "source_name": "Open-Meteo",
+        "source_url": "https://api.open-meteo.com/v1/forecast?latitude=32.7473&longitude=-97.0945&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+        "strength": "Weak",
+        "title": "Kickoff weather in DAL"
       }
     ],
     "game_id": "2026_02_WAS_DAL",
@@ -3521,7 +3549,7 @@
     "matchup": "WAS @ DAL",
     "matchup_meter": [
       {
-        "as_of": "2026-09-18T15:29:38.581052+00:00",
+        "as_of": "2026-09-18T18:30:06.558663+00:00",
         "family": "qb_opponent_history",
         "label": "QB history",
         "leader": "DAL",
@@ -3531,7 +3559,7 @@
         "title": "Dak Prescott vs WAS: player history"
       },
       {
-        "as_of": "2026-09-18T15:29:30.147185+00:00",
+        "as_of": "2026-09-18T18:30:01.718913+00:00",
         "family": "explosives",
         "label": "Explosives",
         "leader": "DAL",
@@ -3541,7 +3569,7 @@
         "title": "WAS explosives vs DAL prevention"
       },
       {
-        "as_of": "2026-09-18T15:29:30.148083+00:00",
+        "as_of": "2026-09-18T18:30:01.719463+00:00",
         "family": "pressure",
         "label": "Pressure",
         "leader": "WAS",
@@ -3551,7 +3579,7 @@
         "title": "DAL protection vs WAS pass rush"
       },
       {
-        "as_of": "2026-09-18T15:29:30.148850+00:00",
+        "as_of": "2026-09-18T18:30:01.719916+00:00",
         "family": "yac",
         "label": "YAC",
         "leader": "WAS",
@@ -3594,7 +3622,7 @@
     ],
     "paragraphs": [
       "Dallas and Washington meet with both teams already carrying an early divisional loss, which raises the leverage of the Cowboys\u2019 home opener. Dallas\u2019 Week 2 preview emphasizes the urgency on both sides after narrow opening setbacks, while Washington\u2019s opponent breakdown focuses on a Cowboys defense reshaped during the offseason. The Commanders need to identify those new defensive answers quickly; Dallas needs its revamped unit to create enough disruption for the Cowboys\u2019 offense to avoid playing from behind.",
-      "LevLine 3.0 gives the Cowboys a 66.9% win probability over the Commanders. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 65.7% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Dallas Cowboys -5.6, a market line of Dallas Cowboys -3.5, and an approximate coherent score of DAL 25 \u2013 WAS 19. Dallas\u2019 reworked defense against Washington\u2019s offensive adjustments determines whether the Cowboys can create disruption early and keep the Commanders from controlling the game script. The pick: Dallas Cowboys moneyline."
+      "LevLine 3.0 gives the Cowboys a 66.9% win probability over the Commanders. Its frozen F-ST engine reconciles a 50.8% football-only signal with a 65.7% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Dallas Cowboys -5.6, a market line of Dallas Cowboys -4.5, and an approximate coherent score of DAL 25 \u2013 WAS 19. Dallas\u2019 reworked defense against Washington\u2019s offensive adjustments determines whether the Cowboys can create disruption early and keep the Commanders from controlling the game script. The pick: Dallas Cowboys moneyline."
     ],
     "prediction": "DAL to win; DAL 22.5 \u2013 WAS 21.3 is the central score projection.",
     "reported_sources": [

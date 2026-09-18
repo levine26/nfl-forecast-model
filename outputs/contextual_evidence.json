@@ -1,7 +1,7 @@
 {
   "2026_02_CAR_ATL": [
     {
-      "as_of": "2026-09-18T15:29:23.681023+00:00",
+      "as_of": "2026-09-18T18:29:57.864331+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ATL",
@@ -19,7 +19,7 @@
       "title": "CAR protection vs ATL pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:23.682993+00:00",
+      "as_of": "2026-09-18T18:29:57.865519+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ATL",
@@ -37,7 +37,7 @@
       "title": "ATL early-down approach vs CAR"
     },
     {
-      "as_of": "2026-09-18T15:29:23.683042+00:00",
+      "as_of": "2026-09-18T18:29:57.865561+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "CAR",
@@ -55,7 +55,7 @@
       "title": "ATL third downs vs CAR"
     },
     {
-      "as_of": "2026-09-18T15:27:28.537099+00:00",
+      "as_of": "2026-09-18T18:29:50.820253+00:00",
       "category": "history",
       "metadata": {
         "dc": "Ejiro Evero",
@@ -80,7 +80,7 @@
       "title": "Michael Penix Jr. vs Ejiro Evero's CAR defense"
     },
     {
-      "as_of": "2026-09-18T15:27:28.324526+00:00",
+      "as_of": "2026-09-18T18:29:50.651496+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Raheem Morris",
@@ -96,7 +96,7 @@
       "title": "ATL offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:19.107836+00:00",
+      "as_of": "2026-09-18T18:29:54.976597+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Tommy Rees",
@@ -148,7 +148,7 @@
       "title": "What Tommy Rees could change in ATL"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466736+00:00",
+      "as_of": "2026-09-18T18:29:54.645007+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -168,7 +168,7 @@
       "title": "CAR: Bobby Brown III \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466770+00:00",
+      "as_of": "2026-09-18T18:29:54.645032+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -188,7 +188,7 @@
       "title": "ATL: Tua Tagovailoa \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466774+00:00",
+      "as_of": "2026-09-18T18:29:54.645035+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -208,7 +208,7 @@
       "title": "ATL: Jawaan Taylor \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466778+00:00",
+      "as_of": "2026-09-18T18:29:54.645038+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -228,42 +228,26 @@
       "title": "ATL: Za'Darius Smith \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466746+00:00",
-      "category": "personnel",
+      "as_of": "2026-09-18T18:29:50.904856+00:00",
+      "category": "weather",
       "metadata": {
-        "family": "availability",
-        "game_status": "",
-        "opponent": "ATL",
-        "person_key": "jcoker",
-        "position": "WR",
-        "practice_status": "Limited Participation in Practice",
-        "supporting_sources": [
-          "https://www.nfl.com/injuries/league/2026/reg2",
-          "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
-        ],
-        "team": "CAR",
-        "usage_as_of": "2026-09-18T15:29:19.868760+00:00",
-        "usage_context": {
-          "dropback_share": 0.0,
-          "dropbacks": 0,
-          "rush_share": 0.0,
-          "rushes": 0,
-          "season": 2025,
-          "target_share": 0.10982658959537572,
-          "targets": 57
-        }
+        "gust_mph": 4.3,
+        "precip_pct": 2.0,
+        "roof": "retractable",
+        "temp_f": 89.5,
+        "wind_mph": 4.9
       },
       "promoted_to_model": false,
-      "relevance": "Official availability status plus position-specific matchup context; no automatic point penalty",
-      "side": "away",
-      "source_name": "NFL.com official injury report + nflverse usage",
-      "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=33.7554&longitude=-84.4008&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
       "strength": "Weak",
-      "summary": "The official NFL injury report lists Jalen Coker (WR) as Limited Participation in Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive. In 2025, he accounted for 11% of the team's recorded targets (57). Usage is context for the role at risk, not an automatic forecast adjustment. The passing-game backdrop: the relevant opponent-side profile was +0.03 EPA/play last season.",
-      "title": "CAR: Jalen Coker \u2014 Limited Participation in Practice"
+      "summary": "Open-Meteo's forecast nearest kickoff is 90\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 2% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in ATL"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466751+00:00",
+      "as_of": "2026-09-18T18:29:54.645015+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -283,7 +267,7 @@
       "title": "CAR: Patrick Jones II \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:32.998949+00:00",
+      "as_of": "2026-09-18T18:30:03.416640+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CAR",
@@ -399,7 +383,7 @@
       "title": "Bryce Young vs ATL: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:33.024404+00:00",
+      "as_of": "2026-09-18T18:30:03.434596+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CAR",
@@ -487,7 +471,7 @@
       "title": "Michael Penix Jr. vs CAR: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.819592+00:00",
+      "as_of": "2026-09-18T18:30:08.740661+00:00",
       "category": "history",
       "metadata": {
         "family": "rivalry",
@@ -503,7 +487,7 @@
       "title": "CAR-ATL: division rivalry"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 12.133891213389122,
@@ -526,7 +510,7 @@
       "title": "Bryce Young: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -563,7 +547,7 @@
       "title": "Bryce Young vs ATL: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -598,7 +582,7 @@
   ],
   "2026_02_CIN_HOU": [
     {
-      "as_of": "2026-09-18T15:29:25.452445+00:00",
+      "as_of": "2026-09-18T18:29:58.928301+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "CIN",
@@ -616,7 +600,7 @@
       "title": "HOU YAC creation vs CIN tackling"
     },
     {
-      "as_of": "2026-09-18T15:29:25.450394+00:00",
+      "as_of": "2026-09-18T18:29:58.927087+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "HOU",
@@ -634,7 +618,7 @@
       "title": "CIN protection vs HOU pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:25.451127+00:00",
+      "as_of": "2026-09-18T18:29:58.927580+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CIN",
@@ -652,7 +636,7 @@
       "title": "CIN early-down approach vs HOU"
     },
     {
-      "as_of": "2026-09-18T15:27:31.334651+00:00",
+      "as_of": "2026-09-18T18:29:51.849309+00:00",
       "category": "history",
       "metadata": {
         "dc": "Matt Burke",
@@ -677,7 +661,7 @@
       "title": "Joe Burrow vs Matt Burke's HOU defense"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467039+00:00",
+      "as_of": "2026-09-18T18:29:54.645210+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -697,7 +681,7 @@
       "title": "CIN: Jonathan Allen \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467043+00:00",
+      "as_of": "2026-09-18T18:29:54.645212+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -711,7 +695,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "CIN",
-        "usage_as_of": "2026-09-18T15:29:19.869407+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551280+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -732,7 +716,7 @@
       "title": "CIN: Samaje Perine \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467053+00:00",
+      "as_of": "2026-09-18T18:29:54.645220+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -746,7 +730,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "HOU",
-        "usage_as_of": "2026-09-18T15:29:19.869449+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551312+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -767,7 +751,7 @@
       "title": "HOU: Nico Collins \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467056+00:00",
+      "as_of": "2026-09-18T18:29:54.645223+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -787,7 +771,7 @@
       "title": "HOU: Jadeveon Clowney \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467059+00:00",
+      "as_of": "2026-09-18T18:29:54.645225+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -801,7 +785,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "HOU",
-        "usage_as_of": "2026-09-18T15:29:19.869492+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551359+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -822,14 +806,14 @@
       "title": "HOU: Dalton Schultz \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:27:32.036495+00:00",
+      "as_of": "2026-09-18T18:29:52.087293+00:00",
       "category": "weather",
       "metadata": {
-        "gust_mph": 6.9,
-        "precip_pct": 4.0,
+        "gust_mph": 7.4,
+        "precip_pct": 2.0,
         "roof": "retractable",
-        "temp_f": 91.0,
-        "wind_mph": 6.9
+        "temp_f": 91.2,
+        "wind_mph": 6.7
       },
       "promoted_to_model": false,
       "relevance": "Nearest-hour forecast at home venue",
@@ -837,11 +821,11 @@
       "source_name": "Open-Meteo",
       "source_url": "https://api.open-meteo.com/v1/forecast?latitude=29.6847&longitude=-95.4107&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
       "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 91\u00b0F, 7 mph sustained wind with gusts near 7 mph, and 4% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "summary": "Open-Meteo's forecast nearest kickoff is 91\u00b0F, 7 mph sustained wind with gusts near 7 mph, and 2% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
       "title": "Kickoff weather in HOU"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467034+00:00",
+      "as_of": "2026-09-18T18:29:54.645207+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -855,7 +839,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "CIN",
-        "usage_as_of": "2026-09-18T15:29:19.869372+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551253+00:00",
         "usage_context": {
           "dropback_share": 0.4088235294117647,
           "dropbacks": 278,
@@ -876,7 +860,7 @@
       "title": "CIN: Joe Burrow \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:34.491316+00:00",
+      "as_of": "2026-09-18T18:30:04.263111+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CIN",
@@ -936,7 +920,7 @@
       "title": "Joe Burrow vs HOU: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:34.511760+00:00",
+      "as_of": "2026-09-18T18:30:04.276808+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "HOU",
@@ -996,7 +980,7 @@
       "title": "C.J. Stroud vs CIN: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.856250+00:00",
+      "as_of": "2026-09-18T18:30:08.764416+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -1012,7 +996,7 @@
       "title": "CIN-HOU: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 17.374517374517374,
@@ -1035,7 +1019,7 @@
       "title": "Joe Burrow: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 12.76595744680851,
@@ -1058,7 +1042,7 @@
       "title": "C.J. Stroud: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -1087,7 +1071,7 @@
       "title": "Joe Burrow vs HOU: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -1118,7 +1102,7 @@
   ],
   "2026_02_CLE_TB": [
     {
-      "as_of": "2026-09-18T15:29:27.219084+00:00",
+      "as_of": "2026-09-18T18:29:59.981771+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TB",
@@ -1136,7 +1120,7 @@
       "title": "CLE explosives vs TB prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:27.219409+00:00",
+      "as_of": "2026-09-18T18:29:59.981938+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TB",
@@ -1154,7 +1138,7 @@
       "title": "CLE early-down approach vs TB"
     },
     {
-      "as_of": "2026-09-18T15:29:27.219902+00:00",
+      "as_of": "2026-09-18T18:29:59.982237+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CLE",
@@ -1172,7 +1156,7 @@
       "title": "TB protection vs CLE pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:19.110709+00:00",
+      "as_of": "2026-09-18T18:29:54.978726+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Zac Robinson",
@@ -1229,7 +1213,7 @@
       "title": "What Zac Robinson could change in TB"
     },
     {
-      "as_of": "2026-09-18T15:27:33.488762+00:00",
+      "as_of": "2026-09-18T18:29:52.474821+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Kevin Stefanski",
@@ -1245,7 +1229,7 @@
       "title": "CLE offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:33.488790+00:00",
+      "as_of": "2026-09-18T18:29:52.474847+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Todd Bowles",
@@ -1261,7 +1245,7 @@
       "title": "TB offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:33.488799+00:00",
+      "as_of": "2026-09-18T18:29:52.474854+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1273,7 +1257,7 @@
       "title": "New defensive coordinator in CLE"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467319+00:00",
+      "as_of": "2026-09-18T18:29:54.645384+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1293,7 +1277,7 @@
       "title": "CLE: Tyson Campbell \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467324+00:00",
+      "as_of": "2026-09-18T18:29:54.645389+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1313,7 +1297,7 @@
       "title": "CLE: Teven Jenkins \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467335+00:00",
+      "as_of": "2026-09-18T18:29:54.645399+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1333,14 +1317,14 @@
       "title": "TB: A'Shawn Robinson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:27:33.991083+00:00",
+      "as_of": "2026-09-18T18:29:52.548961+00:00",
       "category": "weather",
       "metadata": {
-        "gust_mph": 4.3,
-        "precip_pct": 6.0,
+        "gust_mph": 4.0,
+        "precip_pct": 7.0,
         "roof": "outdoor",
-        "temp_f": 89.0,
-        "wind_mph": 3.7
+        "temp_f": 89.7,
+        "wind_mph": 4.7
       },
       "promoted_to_model": false,
       "relevance": "Nearest-hour forecast at home venue",
@@ -1348,11 +1332,11 @@
       "source_name": "Open-Meteo",
       "source_url": "https://api.open-meteo.com/v1/forecast?latitude=27.9759&longitude=-82.5033&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
       "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 89\u00b0F, 4 mph sustained wind with gusts near 4 mph, and 6% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "summary": "Open-Meteo's forecast nearest kickoff is 90\u00b0F, 5 mph sustained wind with gusts near 4 mph, and 7% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
       "title": "Kickoff weather in TB"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467327+00:00",
+      "as_of": "2026-09-18T18:29:54.645392+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1372,7 +1356,7 @@
       "title": "CLE: Parker Brailsford \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467339+00:00",
+      "as_of": "2026-09-18T18:29:54.645402+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1392,7 +1376,7 @@
       "title": "TB: Jacob Parrish \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467346+00:00",
+      "as_of": "2026-09-18T18:29:54.645404+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1412,7 +1396,7 @@
       "title": "TB: Miles Killebrew \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:35.991101+00:00",
+      "as_of": "2026-09-18T18:30:05.112615+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CLE",
@@ -1472,7 +1456,7 @@
       "title": "Baker Mayfield vs CLE: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.891851+00:00",
+      "as_of": "2026-09-18T18:30:08.787508+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -1488,7 +1472,7 @@
       "title": "CLE-TB: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 16.390423572744016,
@@ -1511,7 +1495,7 @@
       "title": "Baker Mayfield: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -1542,7 +1526,7 @@
   ],
   "2026_02_GB_NYJ": [
     {
-      "as_of": "2026-09-18T15:29:26.626326+00:00",
+      "as_of": "2026-09-18T18:29:59.626795+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1560,7 +1544,7 @@
       "title": "GB explosives vs NYJ prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:26.627272+00:00",
+      "as_of": "2026-09-18T18:29:59.627311+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1578,7 +1562,7 @@
       "title": "NYJ protection vs GB pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:26.626615+00:00",
+      "as_of": "2026-09-18T18:29:59.626970+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYJ",
@@ -1596,7 +1580,26 @@
       "title": "GB early-down approach vs NYJ"
     },
     {
-      "as_of": "2026-09-18T15:27:32.870512+00:00",
+      "as_of": "2026-09-18T18:29:52.430701+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 17.2,
+        "precip_pct": 60.0,
+        "roof": "outdoor",
+        "temp_f": 65.5,
+        "wind_mph": 9.3
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=40.8135&longitude=-74.0745&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
+      "strength": "Strong",
+      "summary": "Open-Meteo's forecast nearest kickoff is 66\u00b0F, 9 mph sustained wind with gusts near 17 mph, and 60% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in NYJ"
+    },
+    {
+      "as_of": "2026-09-18T18:29:52.252452+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1608,7 +1611,7 @@
       "title": "New defensive coordinator in NYJ"
     },
     {
-      "as_of": "2026-09-18T15:27:32.870548+00:00",
+      "as_of": "2026-09-18T18:29:52.252485+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Aaron Glenn",
@@ -1624,7 +1627,7 @@
       "title": "NYJ offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:32.870557+00:00",
+      "as_of": "2026-09-18T18:29:52.252492+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -1636,26 +1639,7 @@
       "title": "New defensive coordinator in GB"
     },
     {
-      "as_of": "2026-09-18T15:27:33.278944+00:00",
-      "category": "weather",
-      "metadata": {
-        "gust_mph": 18.1,
-        "precip_pct": 50.0,
-        "roof": "outdoor",
-        "temp_f": 63.8,
-        "wind_mph": 6.8
-      },
-      "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=40.8135&longitude=-74.0745&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=16",
-      "strength": "Moderate",
-      "summary": "Open-Meteo's forecast nearest kickoff is 64\u00b0F, 7 mph sustained wind with gusts near 18 mph, and 50% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
-      "title": "Kickoff weather in NYJ"
-    },
-    {
-      "as_of": "2026-09-18T15:29:18.467198+00:00",
+      "as_of": "2026-09-18T18:29:54.645302+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1675,7 +1659,7 @@
       "title": "GB: Warren Brinson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467223+00:00",
+      "as_of": "2026-09-18T18:29:54.645305+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1695,7 +1679,7 @@
       "title": "GB: Javon Hargrave \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467238+00:00",
+      "as_of": "2026-09-18T18:29:54.645315+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1715,7 +1699,7 @@
       "title": "NYJ: Omar Cooper Jr. \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467241+00:00",
+      "as_of": "2026-09-18T18:29:54.645317+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1735,7 +1719,7 @@
       "title": "NYJ: Joseph Ossai \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467245+00:00",
+      "as_of": "2026-09-18T18:29:54.645320+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1755,7 +1739,7 @@
       "title": "NYJ: Minkah Fitzpatrick \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467227+00:00",
+      "as_of": "2026-09-18T18:29:54.645307+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -1775,7 +1759,7 @@
       "title": "GB: Zach Bako-Bewele \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:35.502857+00:00",
+      "as_of": "2026-09-18T18:30:04.834119+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "GB",
@@ -1835,7 +1819,7 @@
       "title": "Geno Smith vs GB: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.880293+00:00",
+      "as_of": "2026-09-18T18:30:08.779950+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -1851,7 +1835,7 @@
       "title": "GB-NYJ: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 15.401785714285715,
@@ -1874,7 +1858,7 @@
       "title": "Geno Smith: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -1906,7 +1890,7 @@
   ],
   "2026_02_IND_KC": [
     {
-      "as_of": "2026-09-18T15:29:31.340020+00:00",
+      "as_of": "2026-09-18T18:30:02.450226+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "KC",
@@ -1924,7 +1908,7 @@
       "title": "KC early-down approach vs IND"
     },
     {
-      "as_of": "2026-09-18T15:29:31.340098+00:00",
+      "as_of": "2026-09-18T18:30:02.450282+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "KC",
@@ -1942,7 +1926,7 @@
       "title": "KC YAC creation vs IND tackling"
     },
     {
-      "as_of": "2026-09-18T15:28:57.906780+00:00",
+      "as_of": "2026-09-18T18:29:54.365965+00:00",
       "category": "history",
       "metadata": {
         "dc": "Lou Anarumo",
@@ -1965,7 +1949,7 @@
       "title": "Patrick Mahomes vs Lou Anarumo's IND defense"
     },
     {
-      "as_of": "2026-09-18T15:29:19.114273+00:00",
+      "as_of": "2026-09-18T18:29:54.981198+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Eric Bieniemy",
@@ -2022,7 +2006,7 @@
       "title": "What Eric Bieniemy could change in KC"
     },
     {
-      "as_of": "2026-09-18T15:28:57.709950+00:00",
+      "as_of": "2026-09-18T18:29:54.210028+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Andy Reid",
@@ -2038,7 +2022,26 @@
       "title": "KC offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467853+00:00",
+      "as_of": "2026-09-18T18:29:54.439832+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 17.9,
+        "precip_pct": 43.0,
+        "roof": "outdoor",
+        "temp_f": 74.1,
+        "wind_mph": 9.5
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.0489&longitude=-94.4839&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+      "strength": "Moderate",
+      "summary": "Open-Meteo's forecast nearest kickoff is 74\u00b0F, 10 mph sustained wind with gusts near 18 mph, and 43% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in KC"
+    },
+    {
+      "as_of": "2026-09-18T18:29:54.645708+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2058,7 +2061,7 @@
       "title": "IND: Ashton Dulin \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467862+00:00",
+      "as_of": "2026-09-18T18:29:54.645710+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2072,7 +2075,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "IND",
-        "usage_as_of": "2026-09-18T15:29:19.870864+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.552291+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -2093,7 +2096,7 @@
       "title": "IND: Alec Pierce \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467866+00:00",
+      "as_of": "2026-09-18T18:29:54.645712+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2113,7 +2116,7 @@
       "title": "IND: Grover Stewart \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467876+00:00",
+      "as_of": "2026-09-18T18:29:54.645719+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2133,7 +2136,7 @@
       "title": "KC: Josh Simmons \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467879+00:00",
+      "as_of": "2026-09-18T18:29:54.645722+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2153,7 +2156,7 @@
       "title": "KC: Chamarri Conner \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467882+00:00",
+      "as_of": "2026-09-18T18:29:54.645724+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2173,7 +2176,7 @@
       "title": "KC: L'Jarius Sneed \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:39.551467+00:00",
+      "as_of": "2026-09-18T18:30:07.090820+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "KC",
@@ -2248,7 +2251,7 @@
       "title": "Daniel Jones vs KC: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:39.573850+00:00",
+      "as_of": "2026-09-18T18:30:07.106003+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "KC",
@@ -2322,7 +2325,7 @@
       "title": "Patrick Mahomes vs IND: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.978527+00:00",
+      "as_of": "2026-09-18T18:30:08.843241+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -2338,7 +2341,7 @@
       "title": "IND-KC: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 17.708333333333336,
@@ -2361,7 +2364,7 @@
       "title": "Daniel Jones: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 13.346613545816732,
@@ -2384,7 +2387,7 @@
       "title": "Patrick Mahomes: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -2415,7 +2418,7 @@
       "title": "Daniel Jones vs KC: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -2450,7 +2453,7 @@
   ],
   "2026_02_JAX_DEN": [
     {
-      "as_of": "2026-09-18T15:29:28.388120+00:00",
+      "as_of": "2026-09-18T18:30:00.670919+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "JAX",
@@ -2468,7 +2471,7 @@
       "title": "JAX explosives vs DEN prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:28.387615+00:00",
+      "as_of": "2026-09-18T18:30:00.670591+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DEN",
@@ -2486,7 +2489,7 @@
       "title": "JAX protection vs DEN pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:28.389674+00:00",
+      "as_of": "2026-09-18T18:30:00.671814+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "DEN",
@@ -2504,7 +2507,7 @@
       "title": "DEN YAC creation vs JAX tackling"
     },
     {
-      "as_of": "2026-09-18T15:27:35.451596+00:00",
+      "as_of": "2026-09-18T18:29:53.195137+00:00",
       "category": "history",
       "metadata": {
         "dc": "Anthony Campanile",
@@ -2527,7 +2530,7 @@
       "title": "Bo Nix vs Anthony Campanile's JAX defense"
     },
     {
-      "as_of": "2026-09-18T15:27:35.251778+00:00",
+      "as_of": "2026-09-18T18:29:53.036188+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean Payton",
@@ -2543,7 +2546,7 @@
       "title": "DEN offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467486+00:00",
+      "as_of": "2026-09-18T18:29:54.645500+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2557,7 +2560,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "DEN",
-        "usage_as_of": "2026-09-18T15:29:19.870138+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551819+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -2578,7 +2581,26 @@
       "title": "DEN: Marvin Mims Jr. \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467470+00:00",
+      "as_of": "2026-09-18T18:29:53.284157+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 4.9,
+        "precip_pct": 35.0,
+        "roof": "outdoor",
+        "temp_f": 73.0,
+        "wind_mph": 8.5
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=39.7439&longitude=-105.0201&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FDenver&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 73\u00b0F, 8 mph sustained wind with gusts near 5 mph, and 35% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in DEN"
+    },
+    {
+      "as_of": "2026-09-18T18:29:54.645489+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2598,7 +2620,7 @@
       "title": "JAX: Cole Van Lanen \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467476+00:00",
+      "as_of": "2026-09-18T18:29:54.645492+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2612,7 +2634,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "JAX",
-        "usage_as_of": "2026-09-18T15:29:19.869996+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551713+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -2633,7 +2655,7 @@
       "title": "JAX: Jakobi Meyers \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467479+00:00",
+      "as_of": "2026-09-18T18:29:54.645494+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2647,7 +2669,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "JAX",
-        "usage_as_of": "2026-09-18T15:29:19.870030+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551738+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -2668,7 +2690,7 @@
       "title": "JAX: Brian Thomas Jr. \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467489+00:00",
+      "as_of": "2026-09-18T18:29:54.645502+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -2682,7 +2704,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "DEN",
-        "usage_as_of": "2026-09-18T15:29:19.870106+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551796+00:00",
         "usage_context": {
           "dropback_share": 0.0013869625520110957,
           "dropbacks": 1,
@@ -2703,7 +2725,7 @@
       "title": "DEN: RJ Harvey \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:36.993075+00:00",
+      "as_of": "2026-09-18T18:30:05.674576+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DEN",
@@ -2791,7 +2813,7 @@
       "title": "Trevor Lawrence vs DEN: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:37.013441+00:00",
+      "as_of": "2026-09-18T18:30:05.688279+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DEN",
@@ -2851,7 +2873,7 @@
       "title": "Bo Nix vs JAX: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.915957+00:00",
+      "as_of": "2026-09-18T18:30:08.803240+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -2867,7 +2889,7 @@
       "title": "JAX-DEN: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 16.785714285714285,
@@ -2890,7 +2912,7 @@
       "title": "Trevor Lawrence: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 11.11111111111111,
@@ -2913,7 +2935,7 @@
       "title": "Bo Nix: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -2946,7 +2968,7 @@
       "title": "Trevor Lawrence vs DEN: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -2977,7 +2999,7 @@
   ],
   "2026_02_LV_LAC": [
     {
-      "as_of": "2026-09-18T15:29:28.973349+00:00",
+      "as_of": "2026-09-18T18:30:01.024909+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LV",
@@ -2995,7 +3017,7 @@
       "title": "LV protection vs LAC pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:28.973852+00:00",
+      "as_of": "2026-09-18T18:30:01.025227+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LAC",
@@ -3013,7 +3035,7 @@
       "title": "LV explosives vs LAC prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:28.975456+00:00",
+      "as_of": "2026-09-18T18:30:01.026161+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LV",
@@ -3031,7 +3053,7 @@
       "title": "LAC early-down approach vs LV"
     },
     {
-      "as_of": "2026-09-18T15:27:55.808756+00:00",
+      "as_of": "2026-09-18T18:29:53.328709+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Pete Carroll",
@@ -3047,7 +3069,7 @@
       "title": "LV offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:55.808781+00:00",
+      "as_of": "2026-09-18T18:29:53.328730+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3059,7 +3081,7 @@
       "title": "New defensive coordinator in LAC"
     },
     {
-      "as_of": "2026-09-18T15:27:55.808813+00:00",
+      "as_of": "2026-09-18T18:29:53.328750+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Jim Harbaugh",
@@ -3075,7 +3097,7 @@
       "title": "LAC offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:55.808852+00:00",
+      "as_of": "2026-09-18T18:29:53.328756+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3087,7 +3109,7 @@
       "title": "New defensive coordinator in LV"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467541+00:00",
+      "as_of": "2026-09-18T18:29:54.645529+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3107,7 +3129,7 @@
       "title": "LV: Aidan O'Connell \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467547+00:00",
+      "as_of": "2026-09-18T18:29:54.645532+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3127,7 +3149,7 @@
       "title": "LV: Darien Porter \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467550+00:00",
+      "as_of": "2026-09-18T18:29:54.645534+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3141,7 +3163,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "LV",
-        "usage_as_of": "2026-09-18T15:29:19.870240+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551869+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -3162,7 +3184,7 @@
       "title": "LV: Brock Bowers \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467560+00:00",
+      "as_of": "2026-09-18T18:29:54.645543+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3182,7 +3204,7 @@
       "title": "LAC: Trey Pipkins \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467563+00:00",
+      "as_of": "2026-09-18T18:29:54.645545+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3196,7 +3218,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "LAC",
-        "usage_as_of": "2026-09-18T15:29:19.870336+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551938+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -3217,7 +3239,7 @@
       "title": "LAC: Ladd McConkey \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467566+00:00",
+      "as_of": "2026-09-18T18:29:54.645548+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3237,7 +3259,7 @@
       "title": "LAC: Bud Dupree \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:37.502180+00:00",
+      "as_of": "2026-09-18T18:30:05.955276+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
@@ -3326,7 +3348,7 @@
       "title": "Kirk Cousins vs LAC: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:37.546440+00:00",
+      "as_of": "2026-09-18T18:30:05.983882+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LAC",
@@ -3498,7 +3520,7 @@
       "title": "Justin Herbert vs LV: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.928554+00:00",
+      "as_of": "2026-09-18T18:30:08.811335+00:00",
       "category": "history",
       "metadata": {
         "family": "rivalry",
@@ -3514,7 +3536,7 @@
       "title": "LV-LAC: division rivalry"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 17.472118959107807,
@@ -3537,7 +3559,7 @@
       "title": "Kirk Cousins: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 14.6484375,
@@ -3560,7 +3582,7 @@
       "title": "Justin Herbert: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -3595,7 +3617,7 @@
       "title": "Kirk Cousins vs LAC: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -3644,7 +3666,7 @@
   ],
   "2026_02_MIA_SF": [
     {
-      "as_of": "2026-09-18T15:29:30.760562+00:00",
+      "as_of": "2026-09-18T18:30:02.099651+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -3662,7 +3684,7 @@
       "title": "MIA protection vs SF pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:30.761375+00:00",
+      "as_of": "2026-09-18T18:30:02.100128+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SF",
@@ -3680,7 +3702,7 @@
       "title": "MIA early-down approach vs SF"
     },
     {
-      "as_of": "2026-09-18T15:29:30.762380+00:00",
+      "as_of": "2026-09-18T18:30:02.100734+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIA",
@@ -3698,7 +3720,7 @@
       "title": "SF explosives vs MIA prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:19.113593+00:00",
+      "as_of": "2026-09-18T18:29:54.980728+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Bobby Slowik",
@@ -3755,7 +3777,7 @@
       "title": "What Bobby Slowik could change in MIA"
     },
     {
-      "as_of": "2026-09-18T15:28:37.142100+00:00",
+      "as_of": "2026-09-18T18:29:53.933893+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike McDaniel",
@@ -3771,7 +3793,7 @@
       "title": "MIA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:28:37.142121+00:00",
+      "as_of": "2026-09-18T18:29:53.933914+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3783,7 +3805,7 @@
       "title": "New defensive coordinator in SF"
     },
     {
-      "as_of": "2026-09-18T15:28:37.142146+00:00",
+      "as_of": "2026-09-18T18:29:53.933936+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -3795,7 +3817,7 @@
       "title": "New defensive coordinator in MIA"
     },
     {
-      "as_of": "2026-09-18T15:28:37.143997+00:00",
+      "as_of": "2026-09-18T18:29:53.935555+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -3807,7 +3829,7 @@
       "title": "Long travel spot for MIA"
     },
     {
-      "as_of": "2026-09-18T15:28:37.147721+00:00",
+      "as_of": "2026-09-18T18:29:53.938580+00:00",
       "category": "travel",
       "metadata": {
         "away_rest_days": 7,
@@ -3823,7 +3845,7 @@
       "title": "Rest differential favors SF"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467776+00:00",
+      "as_of": "2026-09-18T18:29:54.645663+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3843,7 +3865,7 @@
       "title": "MIA: Ronnie Harrison \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467781+00:00",
+      "as_of": "2026-09-18T18:29:54.645665+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3863,7 +3885,7 @@
       "title": "MIA: Chop Robinson \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467795+00:00",
+      "as_of": "2026-09-18T18:29:54.645676+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3883,7 +3905,7 @@
       "title": "SF: De'Zhaun Stribling \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467798+00:00",
+      "as_of": "2026-09-18T18:29:54.645679+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3903,7 +3925,7 @@
       "title": "SF: Eddy Pineiro \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467784+00:00",
+      "as_of": "2026-09-18T18:29:54.645667+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3923,7 +3945,7 @@
       "title": "MIA: Seydou Traore \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467800+00:00",
+      "as_of": "2026-09-18T18:29:54.645681+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -3943,7 +3965,7 @@
       "title": "SF: Nick Bosa \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:39.069535+00:00",
+      "as_of": "2026-09-18T18:30:06.827453+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SF",
@@ -4017,7 +4039,7 @@
       "title": "Brock Purdy vs MIA: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.966363+00:00",
+      "as_of": "2026-09-18T18:30:08.835402+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -4033,7 +4055,7 @@
       "title": "MIA-SF: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 15.845070422535212,
@@ -4056,7 +4078,7 @@
       "title": "Brock Purdy: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -4089,7 +4111,7 @@
   ],
   "2026_02_MIN_CHI": [
     {
-      "as_of": "2026-09-18T15:29:24.871256+00:00",
+      "as_of": "2026-09-18T18:29:58.570164+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "MIN",
@@ -4107,7 +4129,7 @@
       "title": "CHI protection vs MIN pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:24.871770+00:00",
+      "as_of": "2026-09-18T18:29:58.570495+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "CHI",
@@ -4125,7 +4147,7 @@
       "title": "CHI explosives vs MIN prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:24.870720+00:00",
+      "as_of": "2026-09-18T18:29:58.569854+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "CHI",
@@ -4143,7 +4165,7 @@
       "title": "MIN third downs vs CHI"
     },
     {
-      "as_of": "2026-09-18T15:27:30.501386+00:00",
+      "as_of": "2026-09-18T18:29:51.572492+00:00",
       "category": "history",
       "metadata": {
         "dc": "Brian Flores",
@@ -4168,7 +4190,7 @@
       "title": "Caleb Williams vs Brian Flores's MIN defense"
     },
     {
-      "as_of": "2026-09-18T15:29:19.108776+00:00",
+      "as_of": "2026-09-18T18:29:54.977301+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Press Taylor",
@@ -4230,26 +4252,7 @@
       "title": "What Press Taylor could change in CHI"
     },
     {
-      "as_of": "2026-09-18T15:27:30.922380+00:00",
-      "category": "weather",
-      "metadata": {
-        "gust_mph": 17.2,
-        "precip_pct": 72.0,
-        "roof": "outdoor",
-        "temp_f": 65.3,
-        "wind_mph": 9.1
-      },
-      "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=41.8623&longitude=-87.6167&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-      "strength": "Strong",
-      "summary": "Open-Meteo's forecast nearest kickoff is 65\u00b0F, 9 mph sustained wind with gusts near 17 mph, and 72% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
-      "title": "Kickoff weather in CHI"
-    },
-    {
-      "as_of": "2026-09-18T15:27:30.295507+00:00",
+      "as_of": "2026-09-18T18:29:51.407812+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Ben Johnson",
@@ -4265,7 +4268,26 @@
       "title": "CHI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466945+00:00",
+      "as_of": "2026-09-18T18:29:51.642894+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 12.3,
+        "precip_pct": 57.0,
+        "roof": "outdoor",
+        "temp_f": 66.2,
+        "wind_mph": 12.3
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=41.8623&longitude=-87.6167&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+      "strength": "Moderate",
+      "summary": "Open-Meteo's forecast nearest kickoff is 66\u00b0F, 12 mph sustained wind with gusts near 12 mph, and 57% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in CHI"
+    },
+    {
+      "as_of": "2026-09-18T18:29:54.645147+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4285,7 +4307,7 @@
       "title": "MIN: Brian O'Neill \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466948+00:00",
+      "as_of": "2026-09-18T18:29:54.645149+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4305,7 +4327,7 @@
       "title": "MIN: Jauan Jennings \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466968+00:00",
+      "as_of": "2026-09-18T18:29:54.645159+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4325,7 +4347,7 @@
       "title": "CHI: Joe Thuney \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466940+00:00",
+      "as_of": "2026-09-18T18:29:54.645144+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4345,7 +4367,7 @@
       "title": "MIN: Kyler Murray \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466971+00:00",
+      "as_of": "2026-09-18T18:29:54.645162+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4365,7 +4387,7 @@
       "title": "CHI: Ozzy Trapilo \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466974+00:00",
+      "as_of": "2026-09-18T18:29:54.645164+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4385,7 +4407,7 @@
       "title": "CHI: Darnell Wright \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:33.987584+00:00",
+      "as_of": "2026-09-18T18:30:03.976540+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "CHI",
@@ -4473,7 +4495,7 @@
       "title": "Kyler Murray vs CHI: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:34.016231+00:00",
+      "as_of": "2026-09-18T18:30:03.996570+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "MIN",
@@ -4575,7 +4597,7 @@
       "title": "Caleb Williams vs MIN: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.844498+00:00",
+      "as_of": "2026-09-18T18:30:08.756830+00:00",
       "category": "history",
       "metadata": {
         "family": "rivalry",
@@ -4591,7 +4613,7 @@
       "title": "MIN-CHI: division rivalry"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 13.043478260869565,
@@ -4614,7 +4636,7 @@
       "title": "Kyler Murray: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 11.267605633802818,
@@ -4637,7 +4659,7 @@
       "title": "Caleb Williams: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -4670,7 +4692,7 @@
       "title": "Kyler Murray vs CHI: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -4707,7 +4729,7 @@
   ],
   "2026_02_NO_BAL": [
     {
-      "as_of": "2026-09-18T15:29:24.273096+00:00",
+      "as_of": "2026-09-18T18:29:58.220713+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -4725,7 +4747,7 @@
       "title": "NO explosives vs BAL prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:24.273902+00:00",
+      "as_of": "2026-09-18T18:29:58.221176+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -4743,7 +4765,7 @@
       "title": "BAL protection vs NO pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:24.274670+00:00",
+      "as_of": "2026-09-18T18:29:58.221660+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "BAL",
@@ -4761,7 +4783,7 @@
       "title": "BAL early-down approach vs NO"
     },
     {
-      "as_of": "2026-09-18T15:27:29.254319+00:00",
+      "as_of": "2026-09-18T18:29:50.949054+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -4773,7 +4795,7 @@
       "title": "New defensive coordinator in BAL"
     },
     {
-      "as_of": "2026-09-18T15:27:29.254361+00:00",
+      "as_of": "2026-09-18T18:29:50.949095+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "John Harbaugh",
@@ -4789,7 +4811,7 @@
       "title": "BAL offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:19.108240+00:00",
+      "as_of": "2026-09-18T18:29:54.976912+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Declan Doyle",
@@ -4841,27 +4863,7 @@
       "title": "What Declan Doyle could change in BAL"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466851+00:00",
-      "category": "personnel",
-      "metadata": {
-        "family": "availability",
-        "game_status": "",
-        "opponent": "BAL",
-        "position": "DT",
-        "practice_status": "Did Not Participate In Practice",
-        "team": "NO"
-      },
-      "promoted_to_model": false,
-      "relevance": "Official availability status plus position-specific matchup context; no automatic point penalty",
-      "side": "away",
-      "source_name": "NFL.com official injury report",
-      "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
-      "strength": "Moderate",
-      "summary": "The official NFL injury report lists Davon Godchaux (DT) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive.",
-      "title": "NO: Davon Godchaux \u2014 Did Not Participate In Practice"
-    },
-    {
-      "as_of": "2026-09-18T15:29:18.466857+00:00",
+      "as_of": "2026-09-18T18:29:54.645084+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4881,7 +4883,27 @@
       "title": "NO: Isaiah Stalbird \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466872+00:00",
+      "as_of": "2026-09-18T18:29:54.645091+00:00",
+      "category": "personnel",
+      "metadata": {
+        "family": "availability",
+        "game_status": "",
+        "opponent": "BAL",
+        "position": "LS",
+        "practice_status": "Did Not Participate In Practice",
+        "team": "NO"
+      },
+      "promoted_to_model": false,
+      "relevance": "Official availability status plus position-specific matchup context; no automatic point penalty",
+      "side": "away",
+      "source_name": "NFL.com official injury report",
+      "source_url": "https://www.nfl.com/injuries/league/2026/reg2",
+      "strength": "Moderate",
+      "summary": "The official NFL injury report lists Zach Wood (LS) as Did Not Participate In Practice. No game-status designation is posted yet, so this is treated as availability context rather than an assumption the player will be inactive.",
+      "title": "NO: Zach Wood \u2014 Did Not Participate In Practice"
+    },
+    {
+      "as_of": "2026-09-18T18:29:54.645101+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4901,7 +4923,7 @@
       "title": "BAL: Ronnie Stanley \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466876+00:00",
+      "as_of": "2026-09-18T18:29:54.645104+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4915,7 +4937,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "BAL",
-        "usage_as_of": "2026-09-18T15:29:19.869082+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551054+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -4936,7 +4958,7 @@
       "title": "BAL: Zay Flowers \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466879+00:00",
+      "as_of": "2026-09-18T18:29:54.645106+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4956,7 +4978,7 @@
       "title": "BAL: T.J. Tampa \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.466861+00:00",
+      "as_of": "2026-09-18T18:29:54.645088+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -4970,7 +4992,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "NO",
-        "usage_as_of": "2026-09-18T15:29:19.869029+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551002+00:00",
         "usage_context": {
           "dropback_share": 0.0015600624024961,
           "dropbacks": 1,
@@ -4991,7 +5013,7 @@
       "title": "NO: Chris Olave \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:33.507715+00:00",
+      "as_of": "2026-09-18T18:30:03.706569+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "BAL",
@@ -5051,7 +5073,7 @@
       "title": "Lamar Jackson vs NO: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.831522+00:00",
+      "as_of": "2026-09-18T18:30:08.748578+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -5067,7 +5089,7 @@
       "title": "NO-BAL: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 11.589403973509933,
@@ -5090,7 +5112,7 @@
       "title": "Lamar Jackson: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -5121,7 +5143,7 @@
   ],
   "2026_02_NYG_LA": [
     {
-      "as_of": "2026-09-18T15:29:31.928779+00:00",
+      "as_of": "2026-09-18T18:30:02.797040+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "LA",
@@ -5139,7 +5161,7 @@
       "title": "LA explosives vs NYG prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:31.926957+00:00",
+      "as_of": "2026-09-18T18:30:02.795950+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYG",
@@ -5157,7 +5179,7 @@
       "title": "NYG protection vs LA pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:31.927756+00:00",
+      "as_of": "2026-09-18T18:30:02.796468+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NYG",
@@ -5175,7 +5197,7 @@
       "title": "NYG early-down approach vs LA"
     },
     {
-      "as_of": "2026-09-18T15:29:19.114613+00:00",
+      "as_of": "2026-09-18T18:29:54.981474+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Matt Nagy",
@@ -5237,7 +5259,7 @@
       "title": "What Matt Nagy could change in NYG"
     },
     {
-      "as_of": "2026-09-18T15:29:19.114789+00:00",
+      "as_of": "2026-09-18T18:29:54.981606+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Dennard Wilson",
@@ -5284,7 +5306,7 @@
       "title": "What Dennard Wilson could change in NYG"
     },
     {
-      "as_of": "2026-09-18T15:29:18.264533+00:00",
+      "as_of": "2026-09-18T18:29:54.483506+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Brian Daboll (fired November 10, 2\u20138 record) Mike Kafka (interim, 2\u20135 record)",
@@ -5300,7 +5322,7 @@
       "title": "NYG offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:18.460086+00:00",
+      "as_of": "2026-09-18T18:29:54.639506+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Sean McVay",
@@ -5316,7 +5338,7 @@
       "title": "LA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:18.460108+00:00",
+      "as_of": "2026-09-18T18:29:54.639526+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -5328,7 +5350,7 @@
       "title": "New defensive coordinator in NYG"
     },
     {
-      "as_of": "2026-09-18T15:29:18.462060+00:00",
+      "as_of": "2026-09-18T18:29:54.641252+00:00",
       "category": "travel",
       "promoted_to_model": false,
       "relevance": "Long-distance multi-time-zone road trip",
@@ -5340,7 +5362,7 @@
       "title": "Long travel spot for NYG"
     },
     {
-      "as_of": "2026-09-18T15:29:18.465700+00:00",
+      "as_of": "2026-09-18T18:29:54.644073+00:00",
       "category": "travel",
       "metadata": {
         "away_rest_days": 8,
@@ -5356,7 +5378,7 @@
       "title": "Rest differential favors LA"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467938+00:00",
+      "as_of": "2026-09-18T18:29:54.645753+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5376,7 +5398,7 @@
       "title": "NYG: Paulson Adebo \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467955+00:00",
+      "as_of": "2026-09-18T18:29:54.645767+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5390,7 +5412,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "LA",
-        "usage_as_of": "2026-09-18T15:29:19.871059+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.552441+00:00",
         "usage_context": {
           "dropback_share": 0.0,
           "dropbacks": 0,
@@ -5411,7 +5433,7 @@
       "title": "LA: Davante Adams \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467958+00:00",
+      "as_of": "2026-09-18T18:29:54.645769+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5431,7 +5453,7 @@
       "title": "LA: Kamren Kinchens \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467943+00:00",
+      "as_of": "2026-09-18T18:29:54.645756+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5451,7 +5473,7 @@
       "title": "NYG: Francis Mauigoa \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467947+00:00",
+      "as_of": "2026-09-18T18:29:54.645758+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5471,7 +5493,7 @@
       "title": "NYG: Andrew Thomas \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:40.063028+00:00",
+      "as_of": "2026-09-18T18:30:07.376843+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "LA",
@@ -5545,7 +5567,7 @@
       "title": "Matthew Stafford vs NYG: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.990682+00:00",
+      "as_of": "2026-09-18T18:30:08.851045+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -5561,7 +5583,7 @@
       "title": "NYG-LA: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 19.262981574539364,
@@ -5584,7 +5606,7 @@
       "title": "Matthew Stafford: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -5622,7 +5644,7 @@
   ],
   "2026_02_PHI_TEN": [
     {
-      "as_of": "2026-09-18T15:29:27.795917+00:00",
+      "as_of": "2026-09-18T18:30:00.326887+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "TEN",
@@ -5640,7 +5662,7 @@
       "title": "PHI explosives vs TEN prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:27.797535+00:00",
+      "as_of": "2026-09-18T18:30:00.327823+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "PHI",
@@ -5658,7 +5680,7 @@
       "title": "TEN early-down approach vs PHI"
     },
     {
-      "as_of": "2026-09-18T15:29:27.796315+00:00",
+      "as_of": "2026-09-18T18:30:00.327107+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "TEN",
@@ -5676,7 +5698,7 @@
       "title": "PHI YAC creation vs TEN tackling"
     },
     {
-      "as_of": "2026-09-18T15:27:34.200124+00:00",
+      "as_of": "2026-09-18T18:29:52.592839+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Nick Sirianni",
@@ -5692,7 +5714,7 @@
       "title": "PHI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:34.200156+00:00",
+      "as_of": "2026-09-18T18:29:52.592860+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -5704,7 +5726,7 @@
       "title": "New defensive coordinator in TEN"
     },
     {
-      "as_of": "2026-09-18T15:27:34.200188+00:00",
+      "as_of": "2026-09-18T18:29:52.592887+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Brian Callahan (fired October 13, 1\u20135 record) Mike McCoy (interim, 2\u20139 record)",
@@ -5720,7 +5742,7 @@
       "title": "TEN offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467402+00:00",
+      "as_of": "2026-09-18T18:29:54.645445+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5740,26 +5762,7 @@
       "title": "PHI: Andrew Mukuba \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:27:34.840510+00:00",
-      "category": "weather",
-      "metadata": {
-        "gust_mph": 6.7,
-        "precip_pct": 0.0,
-        "roof": "outdoor",
-        "temp_f": 92.9,
-        "wind_mph": 5.6
-      },
-      "promoted_to_model": false,
-      "relevance": "Nearest-hour forecast at home venue",
-      "side": "neutral",
-      "source_name": "Open-Meteo",
-      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=36.1665&longitude=-86.7713&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
-      "strength": "Weak",
-      "summary": "Open-Meteo's forecast nearest kickoff is 93\u00b0F, 6 mph sustained wind with gusts near 7 mph, and 0% precipitation probability. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
-      "title": "Kickoff weather in TEN"
-    },
-    {
-      "as_of": "2026-09-18T15:29:18.467407+00:00",
+      "as_of": "2026-09-18T18:29:54.645451+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5779,7 +5782,7 @@
       "title": "PHI: Cooper DeJean \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467410+00:00",
+      "as_of": "2026-09-18T18:29:54.645454+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5799,7 +5802,7 @@
       "title": "PHI: Jalen Carter \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467416+00:00",
+      "as_of": "2026-09-18T18:29:54.645458+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -5819,7 +5822,7 @@
       "title": "TEN: James Williams \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:36.472754+00:00",
+      "as_of": "2026-09-18T18:30:05.377497+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PHI",
@@ -5879,7 +5882,7 @@
       "title": "Jalen Hurts vs TEN: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.903584+00:00",
+      "as_of": "2026-09-18T18:30:08.795125+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -5895,7 +5898,7 @@
       "title": "PHI-TEN: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 17.841409691629956,
@@ -5918,7 +5921,7 @@
       "title": "Jalen Hurts: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -5949,7 +5952,7 @@
   ],
   "2026_02_PIT_NE": [
     {
-      "as_of": "2026-09-18T15:29:26.042712+00:00",
+      "as_of": "2026-09-18T18:29:59.276314+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "PIT",
@@ -5967,7 +5970,7 @@
       "title": "PIT explosives vs NE prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:26.043533+00:00",
+      "as_of": "2026-09-18T18:29:59.276824+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "NE",
@@ -5985,7 +5988,7 @@
       "title": "NE protection vs PIT pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:26.042994+00:00",
+      "as_of": "2026-09-18T18:29:59.276527+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "PIT",
@@ -6003,7 +6006,7 @@
       "title": "PIT YAC creation vs NE tackling"
     },
     {
-      "as_of": "2026-09-18T15:29:19.109357+00:00",
+      "as_of": "2026-09-18T18:29:54.977760+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Patrick Graham",
@@ -6060,7 +6063,7 @@
       "title": "What Patrick Graham could change in PIT"
     },
     {
-      "as_of": "2026-09-18T15:27:32.247025+00:00",
+      "as_of": "2026-09-18T18:29:52.130595+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike Tomlin",
@@ -6076,7 +6079,7 @@
       "title": "PIT offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:32.247048+00:00",
+      "as_of": "2026-09-18T18:29:52.130616+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -6088,7 +6091,7 @@
       "title": "New defensive coordinator in NE"
     },
     {
-      "as_of": "2026-09-18T15:27:32.247074+00:00",
+      "as_of": "2026-09-18T18:29:52.130637+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -6100,7 +6103,7 @@
       "title": "New defensive coordinator in PIT"
     },
     {
-      "as_of": "2026-09-18T15:27:32.252818+00:00",
+      "as_of": "2026-09-18T18:29:52.135140+00:00",
       "category": "travel",
       "metadata": {
         "away_rest_days": 7,
@@ -6116,7 +6119,7 @@
       "title": "Rest differential favors NE"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467114+00:00",
+      "as_of": "2026-09-18T18:29:54.645255+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6136,7 +6139,7 @@
       "title": "PIT: Michael Pittman \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467119+00:00",
+      "as_of": "2026-09-18T18:29:54.645257+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6156,7 +6159,7 @@
       "title": "PIT: Darnell Washington \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467122+00:00",
+      "as_of": "2026-09-18T18:29:54.645260+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6176,7 +6179,7 @@
       "title": "PIT: Cameron Heyward \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467130+00:00",
+      "as_of": "2026-09-18T18:29:54.645266+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6196,7 +6199,7 @@
       "title": "NE: Dametrious Crownover \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467133+00:00",
+      "as_of": "2026-09-18T18:29:54.645268+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6216,7 +6219,7 @@
       "title": "NE: Carlton Davis III \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467137+00:00",
+      "as_of": "2026-09-18T18:29:54.645271+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6236,7 +6239,7 @@
       "title": "NE: Ben Brown \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:34.993368+00:00",
+      "as_of": "2026-09-18T18:30:04.548573+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "PIT",
@@ -6340,7 +6343,7 @@
       "title": "Aaron Rodgers vs NE: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:35.013914+00:00",
+      "as_of": "2026-09-18T18:30:04.562406+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "NE",
@@ -6400,7 +6403,7 @@
       "title": "Drake Maye vs PIT: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.868670+00:00",
+      "as_of": "2026-09-18T18:30:08.772327+00:00",
       "category": "history",
       "metadata": {
         "family": "recent_series",
@@ -6416,7 +6419,7 @@
       "title": "PIT-NE: recent series"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 14.457831325301203,
@@ -6439,7 +6442,7 @@
       "title": "Aaron Rodgers: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 17.88617886178862,
@@ -6462,7 +6465,7 @@
       "title": "Drake Maye: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -6500,7 +6503,7 @@
       "title": "Aaron Rodgers vs NE: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -6531,7 +6534,7 @@
   ],
   "2026_02_SEA_ARI": [
     {
-      "as_of": "2026-09-18T15:29:29.566860+00:00",
+      "as_of": "2026-09-18T18:30:01.371903+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "SEA",
@@ -6549,7 +6552,7 @@
       "title": "ARI explosives vs SEA prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:29.567125+00:00",
+      "as_of": "2026-09-18T18:30:01.372059+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "ARI",
@@ -6567,7 +6570,7 @@
       "title": "ARI early-down approach vs SEA"
     },
     {
-      "as_of": "2026-09-18T15:27:56.422551+00:00",
+      "as_of": "2026-09-18T18:29:53.695906+00:00",
       "category": "history",
       "metadata": {
         "dc": "Aden Durde",
@@ -6591,7 +6594,7 @@
       "title": "Jacoby Brissett vs Aden Durde's SEA defense"
     },
     {
-      "as_of": "2026-09-18T15:29:19.112706+00:00",
+      "as_of": "2026-09-18T18:29:54.980113+00:00",
       "category": "coaching",
       "metadata": {
         "coordinator": "Nathaniel Hackett",
@@ -6648,7 +6651,7 @@
       "title": "What Nathaniel Hackett could change in ARI"
     },
     {
-      "as_of": "2026-09-18T15:27:56.025299+00:00",
+      "as_of": "2026-09-18T18:29:53.377019+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Mike Macdonald",
@@ -6664,7 +6667,7 @@
       "title": "SEA offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:56.224597+00:00",
+      "as_of": "2026-09-18T18:29:53.536527+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Jonathan Gannon",
@@ -6680,7 +6683,7 @@
       "title": "ARI offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:27:56.428803+00:00",
+      "as_of": "2026-09-18T18:29:53.700968+00:00",
       "category": "travel",
       "metadata": {
         "away_rest_days": 11,
@@ -6696,7 +6699,7 @@
       "title": "Rest differential favors SEA"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467620+00:00",
+      "as_of": "2026-09-18T18:29:54.645576+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6710,7 +6713,7 @@
           "https://github.com/nflverse/nflverse-data/releases/tag/pbp"
         ],
         "team": "SEA",
-        "usage_as_of": "2026-09-18T15:29:19.870425+00:00",
+        "usage_as_of": "2026-09-18T18:29:55.551988+00:00",
         "usage_context": {
           "dropback_share": 0.9934102141680395,
           "dropbacks": 603,
@@ -6731,7 +6734,7 @@
       "title": "SEA: Sam Darnold \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467625+00:00",
+      "as_of": "2026-09-18T18:29:54.645578+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6751,7 +6754,7 @@
       "title": "SEA: Ty Okada \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467641+00:00",
+      "as_of": "2026-09-18T18:29:54.645590+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6771,7 +6774,26 @@
       "title": "ARI: Roy Lopez \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467629+00:00",
+      "as_of": "2026-09-18T18:29:53.769032+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 5.6,
+        "precip_pct": 0.0,
+        "roof": "retractable",
+        "temp_f": 96.8,
+        "wind_mph": 3.9
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=33.528&longitude=-112.263&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FPhoenix&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 97\u00b0F, 4 mph sustained wind with gusts near 6 mph, and 0% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in ARI"
+    },
+    {
+      "as_of": "2026-09-18T18:29:54.645580+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6791,7 +6813,7 @@
       "title": "SEA: Josh Jones \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467644+00:00",
+      "as_of": "2026-09-18T18:29:54.645592+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6811,7 +6833,7 @@
       "title": "ARI: Max Melton \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467647+00:00",
+      "as_of": "2026-09-18T18:29:54.645594+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -6831,7 +6853,7 @@
       "title": "ARI: Garrett Williams \u2014 Limited Participation in Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:38.033349+00:00",
+      "as_of": "2026-09-18T18:30:06.254103+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -6936,7 +6958,7 @@
       "title": "Sam Darnold vs ARI: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:38.056327+00:00",
+      "as_of": "2026-09-18T18:30:06.269519+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "SEA",
@@ -7011,7 +7033,7 @@
       "title": "Jacoby Brissett vs SEA: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.941197+00:00",
+      "as_of": "2026-09-18T18:30:08.819427+00:00",
       "category": "history",
       "metadata": {
         "family": "rivalry",
@@ -7027,7 +7049,7 @@
       "title": "SEA-ARI: division rivalry"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 13.20754716981132,
@@ -7050,7 +7072,7 @@
       "title": "Sam Darnold: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 16.49484536082474,
@@ -7073,7 +7095,7 @@
       "title": "Jacoby Brissett: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -7106,7 +7128,7 @@
       "title": "Sam Darnold vs ARI: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -7140,7 +7162,7 @@
   ],
   "2026_02_WAS_DAL": [
     {
-      "as_of": "2026-09-18T15:29:30.147185+00:00",
+      "as_of": "2026-09-18T18:30:01.718913+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "DAL",
@@ -7158,7 +7180,7 @@
       "title": "WAS explosives vs DAL prevention"
     },
     {
-      "as_of": "2026-09-18T15:29:30.148083+00:00",
+      "as_of": "2026-09-18T18:30:01.719463+00:00",
       "category": "scheme",
       "metadata": {
         "advantage_team": "WAS",
@@ -7176,7 +7198,7 @@
       "title": "DAL protection vs WAS pass rush"
     },
     {
-      "as_of": "2026-09-18T15:29:30.148850+00:00",
+      "as_of": "2026-09-18T18:30:01.719916+00:00",
       "category": "matchup",
       "metadata": {
         "advantage_team": "WAS",
@@ -7194,7 +7216,7 @@
       "title": "DAL YAC creation vs WAS tackling"
     },
     {
-      "as_of": "2026-09-18T15:28:16.780948+00:00",
+      "as_of": "2026-09-18T18:29:53.813088+00:00",
       "category": "coaching",
       "metadata": {
         "previous_head_coach": "Dan Quinn",
@@ -7210,7 +7232,7 @@
       "title": "WAS offense changed its decision-makers"
     },
     {
-      "as_of": "2026-09-18T15:28:16.780970+00:00",
+      "as_of": "2026-09-18T18:29:53.813109+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -7222,7 +7244,7 @@
       "title": "New defensive coordinator in DAL"
     },
     {
-      "as_of": "2026-09-18T15:28:16.780996+00:00",
+      "as_of": "2026-09-18T18:29:53.813130+00:00",
       "category": "coaching",
       "promoted_to_model": false,
       "relevance": "Prevents stale head-to-head history from being attributed to a new coordinator",
@@ -7234,7 +7256,7 @@
       "title": "New defensive coordinator in WAS"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467705+00:00",
+      "as_of": "2026-09-18T18:29:54.645625+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -7254,7 +7276,7 @@
       "title": "WAS: Chig Okonkwo \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467710+00:00",
+      "as_of": "2026-09-18T18:29:54.645628+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -7274,7 +7296,7 @@
       "title": "WAS: Javon Kinlaw \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467713+00:00",
+      "as_of": "2026-09-18T18:29:54.645630+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -7294,7 +7316,7 @@
       "title": "WAS: Frankie Luvu \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467720+00:00",
+      "as_of": "2026-09-18T18:29:54.645635+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -7314,7 +7336,7 @@
       "title": "DAL: Malik Hooker \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:18.467723+00:00",
+      "as_of": "2026-09-18T18:29:54.645637+00:00",
       "category": "personnel",
       "metadata": {
         "family": "availability",
@@ -7334,7 +7356,26 @@
       "title": "DAL: DeMarvion Overshown \u2014 Did Not Participate In Practice"
     },
     {
-      "as_of": "2026-09-18T15:29:38.543472+00:00",
+      "as_of": "2026-09-18T18:29:53.890211+00:00",
+      "category": "weather",
+      "metadata": {
+        "gust_mph": 6.7,
+        "precip_pct": 8.0,
+        "roof": "retractable",
+        "temp_f": 99.8,
+        "wind_mph": 7.7
+      },
+      "promoted_to_model": false,
+      "relevance": "Nearest-hour forecast at home venue",
+      "side": "neutral",
+      "source_name": "Open-Meteo",
+      "source_url": "https://api.open-meteo.com/v1/forecast?latitude=32.7473&longitude=-97.0945&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FChicago&forecast_days=16",
+      "strength": "Weak",
+      "summary": "Open-Meteo's forecast nearest kickoff is 100\u00b0F, 8 mph sustained wind with gusts near 7 mph, and 8% precipitation probability. The venue has a retractable roof, so this matters only if the roof is open. For now, weather stays in the scouting report rather than becoming a hand-entered adjustment.",
+      "title": "Kickoff weather in DAL"
+    },
+    {
+      "as_of": "2026-09-18T18:30:06.533666+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DAL",
@@ -7422,7 +7463,7 @@
       "title": "Jayden Daniels vs DAL: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:38.581052+00:00",
+      "as_of": "2026-09-18T18:30:06.558663+00:00",
       "category": "history",
       "metadata": {
         "advantage_team": "DAL",
@@ -7566,7 +7607,7 @@
       "title": "Dak Prescott vs WAS: player history"
     },
     {
-      "as_of": "2026-09-18T15:29:41.954011+00:00",
+      "as_of": "2026-09-18T18:30:08.827452+00:00",
       "category": "history",
       "metadata": {
         "family": "rivalry",
@@ -7582,7 +7623,7 @@
       "title": "WAS-DAL: division rivalry"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 12.76595744680851,
@@ -7605,7 +7646,7 @@
       "title": "Jayden Daniels: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:44.607129+00:00",
+      "as_of": "2026-09-18T18:30:11.019249+00:00",
       "category": "personnel",
       "metadata": {
         "aggressiveness": 20.333333333333332,
@@ -7628,7 +7669,7 @@
       "title": "Dak Prescott: Next Gen passing profile"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
@@ -7661,7 +7702,7 @@
       "title": "Jayden Daniels vs DAL: career game ledger"
     },
     {
-      "as_of": "2026-09-18T15:29:45.414296+00:00",
+      "as_of": "2026-09-18T18:30:11.665764+00:00",
       "category": "history",
       "metadata": {
         "attempt_threshold": 10,
