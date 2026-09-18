@@ -173,7 +173,7 @@ def build_lagged_props_history(
     receiver_id = _text(work, "receiver_player_id", "receiver_id")
     passer_id = _text(work, "passer_player_id", "passer_id")
     rusher_id = _text(work, "rusher_player_id", "rusher_id")
-    target = _valid_id(receiver_id)
+    target = pass_attempt & _valid_id(receiver_id)
 
     event_counts = work[["game_id", "season", "week", "team"]].copy()
     event_counts["pass_attempts"] = pass_attempt.astype(float)
@@ -200,14 +200,18 @@ def build_lagged_props_history(
     if (team_history["team_targets"] > team_history["pass_attempts"] + 1e-9).any():
         raise PropsUpstreamError("derived team targets exceed pass attempts")
 
-    yardline = pd.to_numeric(work.get("yardline_100"), errors="coerce")
-    if yardline is None:
-        yardline = pd.Series(np.nan, index=work.index)
+    yardline = (
+        pd.to_numeric(work["yardline_100"], errors="coerce")
+        if "yardline_100" in work.columns
+        else pd.Series(np.nan, index=work.index, dtype=float)
+    )
     red_zone = yardline.le(20)
     goal_line = yardline.le(5)
-    air_yards = pd.to_numeric(work.get("air_yards"), errors="coerce")
-    if air_yards is None:
-        air_yards = pd.Series(np.nan, index=work.index)
+    air_yards = (
+        pd.to_numeric(work["air_yards"], errors="coerce")
+        if "air_yards" in work.columns
+        else pd.Series(np.nan, index=work.index, dtype=float)
+    )
     end_zone_target = target & yardline.notna() & air_yards.notna() & air_yards.ge(yardline)
 
     events: list[pd.DataFrame] = []
