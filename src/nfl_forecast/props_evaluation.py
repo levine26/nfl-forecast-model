@@ -588,6 +588,66 @@ def calibration_table(
     return out
 
 
+def adaptive_calibration_table(
+    prob_rows: pd.DataFrame,
+    *,
+    bootstrap_replicates: int = BOOTSTRAP_REPLICATES,
+) -> list[dict[str, Any]]:
+    """Preregistered equal-frequency fallback for sparse fixed calibration bins."""
+
+    n = len(prob_rows)
+    requested_bins = 5 if n >= 250 else 3 if n >= 100 else 0
+    if requested_bins == 0:
+        return []
+
+    work = prob_rows.sort_values(
+        ["favored_probability", "game_id", "forecast_id"],
+        kind="stable",
+    ).copy()
+    try:
+        work["_adaptive_bin"] = pd.qcut(
+            work["favored_probability"],
+            q=requested_bins,
+            labels=False,
+            duplicates="drop",
+        )
+    except ValueError:
+        return []
+    if work["_adaptive_bin"].isna().all():
+        return []
+
+    out: list[dict[str, Any]] = []
+    for raw_bin, bucket in work.groupby("_adaptive_bin", dropna=True, sort=True):
+        bucket = bucket.copy()
+        counts = _counts(bucket)
+        predicted = float(bucket["favored_probability"].mean())
+        observed = float(bucket["favored_observed"].mean())
+        ci = _cluster_bootstrap(
+            bucket,
+            lambda x: float(x["favored_observed"].mean()),
+            replicates=bootstrap_replicates,
+        )
+        out.append(
+            {
+                "bin": f"Q{int(raw_bin) + 1}",
+                "n": counts.forecasts,
+                "unique_games": counts.unique_games,
+                "min_predicted_probability": float(bucket["favored_probability"].min()),
+                "max_predicted_probability": float(bucket["favored_probability"].max()),
+                "mean_predicted_probability": predicted,
+                "observed_frequency": observed,
+                "calibration_gap": observed - predicted,
+                "observed_frequency_ci95_game_clustered": list(ci),
+                "status": (
+                    "INFERENTIAL"
+                    if counts.forecasts >= 25 and counts.unique_games >= 10
+                    else "DESCRIPTIVE_SPARSE"
+                ),
+            }
+        )
+    return out
+
+
 def probability_metrics(frame: pd.DataFrame, *, bootstrap_replicates: int = BOOTSTRAP_REPLICATES) -> dict[str, Any]:
     work = _probability_rows(frame)
     counts = _counts(work)
@@ -597,6 +657,29 @@ def probability_metrics(frame: pd.DataFrame, *, bootstrap_replicates: int = BOOT
             "status": "NO_GRADED_PROBABILITY_FORECASTS",
             "calibration": [],
         }
+    fixed_calibration = calibration_table(
+        work,
+        bootstrap_replicates=bootstrap_replicates,
+    )
+    adaptive_calibration = adaptive_calibration_table(
+        work,
+        bootstrap_replicates=bootstrap_replicates,
+    )
+    fixed_nonempty = [row for row in fixed_calibration if row["n"] > 0]
+    fixed_supported = bool(fixed_nonempty) and all(
+        row["n"] >= 25 and row["unique_games"] >= 10
+        for row in fixed_nonempty
+    )
+    if fixed_supported:
+        primary_calibration = fixed_nonempty
+        primary_calibration_scheme = "FIXED_PREREGISTERED"
+    elif adaptive_calibration:
+        primary_calibration = adaptive_calibration
+        primary_calibration_scheme = "ADAPTIVE_EQUAL_FREQUENCY_FALLBACK"
+    else:
+        primary_calibration = fixed_nonempty
+        primary_calibration_scheme = "FIXED_DESCRIPTIVE_ONLY"
+
     out: dict[str, Any] = {
         "sample": counts.__dict__,
         "brier_model": _brier(work, "model_probability"),
@@ -604,13 +687,14 @@ def probability_metrics(frame: pd.DataFrame, *, bootstrap_replicates: int = BOOT
         "calibration_in_the_large": float(
             work["event_observed"].mean() - work["model_probability"].mean()
         ),
-        "calibration": calibration_table(work, bootstrap_replicates=bootstrap_replicates),
+        "calibration": fixed_calibration,
+        "adaptive_calibration": adaptive_calibration,
+        "primary_calibration_scheme": primary_calibration_scheme,
     }
-    nonempty_bins = [row for row in out["calibration"] if row["n"] > 0]
-    if nonempty_bins:
-        total = sum(row["n"] for row in nonempty_bins)
+    if primary_calibration:
+        total = sum(row["n"] for row in primary_calibration)
         out["expected_calibration_error"] = float(
-            sum(row["n"] * abs(row["calibration_gap"]) for row in nonempty_bins) / total
+            sum(row["n"] * abs(row["calibration_gap"]) for row in primary_calibration) / total
         )
 
     matched = work[work["market_probability"].notna()].copy()
