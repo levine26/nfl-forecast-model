@@ -99,10 +99,13 @@ def normalize_nflverse_scramble_semantics(
     strict subset of official rushing attempts so it can separate QB scrambles from
     designed carries without creating phantom opportunities.
 
-    The adapter therefore suppresses only scramble labels that are not official
-    rush attempts. For countable scrambles, it fills a missing rusher ID from the
-    explicit QB/passser identity. It never promotes a non-rush into a rush and never
-    consults outcomes, markets, or evaluation targets.
+    For an official scramble, nflverse may identify the player in the rusher field
+    rather than `passer_player_id`. Existing stable rusher identity is authoritative;
+    only when it is absent do we fill it from the passer/QB identity. We fail closed
+    only when an official scramble has neither stable rusher nor passer identity.
+
+    This adapter never promotes a non-rush into a rush and never consults outcomes,
+    markets, or evaluation targets.
     """
 
     required = {"qb_scramble", "rush_attempt"}
@@ -123,10 +126,21 @@ def normalize_nflverse_scramble_semantics(
     countable_scramble = scramble_raw & rush
 
     passer = _text(out, "passer_player_id", "passer_id")
-    missing_qb_identity = countable_scramble & ~_valid_id(passer)
-    if missing_qb_identity.any():
+    rusher_col = next(
+        (name for name in ("rusher_player_id", "rusher_id") if name in out.columns),
+        None,
+    )
+    if rusher_col is None:
+        out["rusher_player_id"] = ""
+        rusher_col = "rusher_player_id"
+    rusher = out[rusher_col].astype("string").fillna("").str.strip()
+
+    rusher_valid = _valid_id(rusher)
+    passer_valid = _valid_id(passer)
+    missing_all_identity = countable_scramble & ~rusher_valid & ~passer_valid
+    if missing_all_identity.any():
         examples = []
-        for idx in out.index[missing_qb_identity][:5]:
+        for idx in out.index[missing_all_identity][:5]:
             examples.append(
                 {
                     "game_id": str(out.at[idx, "game_id"])
@@ -138,28 +152,24 @@ def normalize_nflverse_scramble_semantics(
                 }
             )
         raise PropsUpstreamError(
-            "countable qb_scramble row is missing stable QB identity; "
+            "countable qb_scramble row is missing stable rusher/QB identity; "
             f"refusing source repair: {examples}"
         )
 
-    rusher_col = next(
-        (name for name in ("rusher_player_id", "rusher_id") if name in out.columns),
-        None,
-    )
-    if rusher_col is None:
-        out["rusher_player_id"] = ""
-        rusher_col = "rusher_player_id"
-    rusher = out[rusher_col].astype("string").fillna("").str.strip()
-    missing_rusher = countable_scramble & ~_valid_id(rusher)
+    missing_rusher = countable_scramble & ~rusher_valid & passer_valid
     out.loc[missing_rusher, rusher_col] = passer[missing_rusher].astype(str)
 
     audit = {
         "policy": "qb_scramble_must_be_official_rush_attempt",
+        "identity_policy": "existing_rusher_then_passer_fallback",
         "raw_scramble_rows": int(scramble_raw.sum()),
         "countable_scramble_rows": int(countable_scramble.sum()),
         "non_statistical_scramble_labels_suppressed": int(non_stat_scramble.sum()),
         "rush_attempt_promotions": 0,
-        "rusher_identity_repairs": int(missing_rusher.sum()),
+        "countable_scrambles_with_existing_rusher_id": int(
+            (countable_scramble & rusher_valid).sum()
+        ),
+        "rusher_identity_repairs_from_passer": int(missing_rusher.sum()),
         "non_scramble_rows_modified": 0,
         "outcome_or_market_fields_used_for_repair": False,
     }
