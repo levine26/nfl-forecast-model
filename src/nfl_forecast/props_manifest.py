@@ -192,14 +192,20 @@ def _validate_team_td_rows(
         raise PropsManifestError("team TD rows do not cover both game teams")
 
 
-def _validate_residual(
+def _canonical_residual(
     residual: Mapping[str, Any],
     *,
     expected_teams: set[str],
-) -> None:
-    normalized = {normalize_team_code(key) for key in residual}
-    if not expected_teams.issubset(normalized):
+) -> dict[str, Any]:
+    canonical: dict[str, Any] = {}
+    for key, value in residual.items():
+        team = normalize_team_code(key)
+        if team in canonical:
+            raise PropsManifestError(f"duplicate residual efficiency team after normalization: {team}")
+        canonical[team] = value
+    if not expected_teams.issubset(canonical):
         raise PropsManifestError("residual_efficiency_by_team must cover both teams")
+    return canonical
 
 
 def _market_artifacts(
@@ -227,7 +233,7 @@ def _market_artifacts(
             raise PropsManifestError("market artifact must be an object")
         row = dict(raw)
         if str(row.get("game_id") or "") != game_id:
-            raise PropsManifestError("market artifact game_id does not match opportunity game")
+            continue
         player_id = _required_text(row, "player_id", "market artifact")
         prop_type = _required_text(row, "prop_type", "market artifact")
         key = (player_id, prop_type)
@@ -269,7 +275,10 @@ def assemble_manifest(
     projections = [dict(row) for row in opportunity_projections]
     efficiency = [dict(row) for row in efficiency_player_parameters]
     team_td = [dict(row) for row in team_td_parameters]
-    residual = dict(residual_efficiency_by_team)
+    residual = _canonical_residual(
+        residual_efficiency_by_team,
+        expected_teams=expected_teams,
+    )
     game_id = _validate_projection_set(
         projections,
         expected_teams=expected_teams,
@@ -289,7 +298,6 @@ def assemble_manifest(
         forecast=forecast,
         kickoff=kickoff,
     )
-    _validate_residual(residual, expected_teams=expected_teams)
     markets = _market_artifacts(
         market_snapshot,
         game_id=game_id,
