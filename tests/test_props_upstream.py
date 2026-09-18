@@ -766,7 +766,15 @@ def _patch_upstream_cli(monkeypatch, module, *, fail_game=None):
         lambda **kwargs: SimpleNamespace(
             schedules=schedules,
             roster=pd.DataFrame(),
-            pbp=pd.DataFrame(),
+            pbp=pd.DataFrame(
+                columns=[
+                    "qb_scramble",
+                    "rush_attempt",
+                    "rushing_yards",
+                    "passer_player_id",
+                    "rusher_player_id",
+                ]
+            ),
             snap_counts=None,
             depth_charts=None,
             routes=None,
