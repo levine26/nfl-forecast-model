@@ -90,28 +90,36 @@ def build_event_rows(
     if rusher_col is None or receiver_col is None:
         raise SignedDistributionError("PBP missing rusher/receiver stable IDs")
 
-    yard_col=next((c for c in ("yards_gained","receiving_yards") if c in work.columns),None)
-    if yard_col is None:
-        raise SignedDistributionError("PBP missing event yardage")
-    yards=pd.to_numeric(work[yard_col],errors="coerce")
+    rush_yard_col=next(
+        (c for c in ("rushing_yards","yards_gained") if c in work.columns),
+        None,
+    )
+    receiving_yard_col=next(
+        (c for c in ("receiving_yards","yards_gained") if c in work.columns),
+        None,
+    )
+    if rush_yard_col is None or receiving_yard_col is None:
+        raise SignedDistributionError("PBP missing rushing/receiving event yardage")
+    rush_yards=pd.to_numeric(work[rush_yard_col],errors="coerce")
+    receiving_yards=pd.to_numeric(work[receiving_yard_col],errors="coerce")
 
     pieces=[]
     rusher=work[rusher_col].astype("string").fillna("").str.strip()
-    rmask=rush & rusher.ne("") & yards.notna()
+    rmask=rush & rusher.ne("") & rush_yards.notna()
     if rmask.any():
         frame=work.loc[rmask,["game_id","season","week"]].copy()
         frame["player_id"]=rusher.loc[rmask].astype(str).to_numpy()
         frame["event_type"]="rushing"
-        frame["yards"]=yards.loc[rmask].astype(float).to_numpy()
+        frame["yards"]=rush_yards.loc[rmask].astype(float).to_numpy()
         pieces.append(frame)
 
     receiver=work[receiver_col].astype("string").fillna("").str.strip()
-    recmask=pass_attempt & complete & receiver.ne("") & yards.notna()
+    recmask=pass_attempt & complete & receiver.ne("") & receiving_yards.notna()
     if recmask.any():
         frame=work.loc[recmask,["game_id","season","week"]].copy()
         frame["player_id"]=receiver.loc[recmask].astype(str).to_numpy()
         frame["event_type"]="receiving"
-        frame["yards"]=yards.loc[recmask].astype(float).to_numpy()
+        frame["yards"]=receiving_yards.loc[recmask].astype(float).to_numpy()
         pieces.append(frame)
 
     if not pieces:
