@@ -26,7 +26,7 @@ for (const width of [320,390,430,768,1440]) {
       await puka.locator(':scope > summary').click()
       await expect(puka.getByRole('img',{name:/Market line 76.5.*LevLine Fair Line 83.5/i})).toBeVisible()
       await expect(puka.getByText('THE SIGNAL',{exact:true})).toBeVisible()
-      await expect(puka.getByText('Advanced Analysis',{exact:true})).toBeVisible()
+      await expect(puka.locator('.lp-advanced > summary')).toBeVisible()
     } else {
       await expect(page.getByText(/Props publication is waiting for a valid forecast artifact/i)).toBeVisible()
     }
@@ -84,7 +84,7 @@ test('Full Market filters, search, sort, and progressive disclosure are interact
   await full.getByLabel('Sort').selectOption('player')
   const puka=full.locator('.lp-board-row').filter({hasText:'Puka Nacua'})
   await puka.locator(':scope > summary').click()
-  await puka.getByText('Advanced Analysis',{exact:true}).click()
+  await puka.locator('.lp-advanced > summary').click()
   await expect(puka.getByText('Model distribution')).toBeVisible()
   await expect(puka.getByText('Forecast timestamp')).toBeVisible()
   await expect(puka.getByText('Market captured')).toBeVisible()
@@ -115,9 +115,11 @@ test('Performance page is empirical-data gated and retains immutable receipts',a
   if (fixtureRequired || await page.getByText('Puka Nacua').first().isVisible().catch(()=>false)) {
     const receiptDetails=page.locator('.lp-receipt').filter({hasText:'Puka Nacua'}).first()
     await receiptDetails.locator(':scope > summary').click()
-    await expect(receiptDetails.getByText('Original sportsbook line / price')).toBeVisible()
-    await expect(receiptDetails.getByText('Forecast timestamp')).toBeVisible()
-    await expect(receiptDetails.getByText('Model version')).toBeVisible()
+    const receiptGrid=receiptDetails.locator('.lp-receipt-grid')
+    await expect(receiptGrid).toBeVisible()
+    await expect(receiptGrid).toContainText('Original sportsbook line / price')
+    await expect(receiptGrid).toContainText('Forecast timestamp')
+    await expect(receiptGrid).toContainText('Model version')
   }
 })
 
