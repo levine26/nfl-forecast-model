@@ -64,16 +64,29 @@ For current QB identity, the operator first consumes timestamped 2025+ nflverse 
 
 ## Operator flow
 
-For one game:
+For the complete target week:
 
 ```bash
 python scripts/build_props_upstream_snapshot.py \
   --season 2026 \
   --week 3 \
-  --game-id <canonical_game_id> \
+  --all-games \
   --priors /secure/path/preregistered_props_priors.json \
-  --output-dir /secure/path/props_upstream/<canonical_game_id>
+  --output-dir /secure/path/props_upstream
 ```
+
+A restricted research subset can instead pass one or more explicit game IDs:
+
+```bash
+python scripts/build_props_upstream_snapshot.py \
+  --season 2026 \
+  --week 3 \
+  --game-id <game_id_1> <game_id_2> \
+  --priors /secure/path/preregistered_props_priors.json \
+  --output-dir /secure/path/props_upstream
+```
+
+The script loads/fits weekly shared inputs once, builds every selected game in memory, and writes nothing until all games validate and all output destinations pass create-only preflight.
 
 The script:
 
@@ -89,23 +102,27 @@ The script:
 
 Output files include:
 
-- `player_state.json` — full target-week canonical state for stable-ID sportsbook resolution;
-- `<game>.opportunity.json`;
-- `<game>.efficiency_player.json`;
-- `<game>.team_td.json`;
-- `<game>.residual_efficiency.json`;
-- `<game>.game_spec.json`;
-- `<game>.upstream_audit.json`.
+- `player_state.json` — one full target-week canonical state for stable-ID sportsbook resolution;
+- `upstream_slate.json` — immutable index of every selected game and its component paths;
+- for multi-game builds, `games/<game_id>/` containing:
+  - `<game>.opportunity.json`;
+  - `<game>.efficiency_player.json`;
+  - `<game>.team_td.json`;
+  - `<game>.residual_efficiency.json`;
+  - `<game>.game_spec.json`;
+  - `<game>.upstream_audit.json`.
+
+Single-game mode preserves the component files directly under the requested output directory while still emitting `upstream_slate.json`.
 
 If injury fetching is unavailable, the builder does not silently mark unlisted players healthy. Availability remains `UNKNOWN` and therefore requires the explicit configured Beta prior.
 
 ## Final freeze ordering
 
-The upstream snapshot is intentionally created before the sportsbook capture. The final integration manifest must therefore receive a freeze timestamp **after** the market snapshot exists.
+The upstream slate is intentionally created before the sportsbook capture. The final integration manifests therefore receive one common freeze timestamp **after** the market snapshot exists.
 
-`scripts/build_props_integration_manifest.py` uses the game-spec timestamp when one is explicitly supplied; otherwise it stamps current UTC at manifest assembly. `--forecast-timestamp` can supply an explicit timezone-aware final freeze time.
+In slate mode, `scripts/build_props_integration_manifest.py` consumes `upstream_slate.json`, fingerprints the entire upstream index and sportsbook snapshot, applies one current-UTC final freeze time to every selected game unless an explicit timezone-aware `--forecast-timestamp` is supplied, and emits `manifest_slate.json`.
 
-The manifest assembler still requires every component timestamp to be no later than that final forecast time and strictly before kickoff.
+The manifest assembler still requires every component timestamp to be no later than that final forecast time and strictly before each game's kickoff. If any selected game violates that ordering, the slate assembly fails before writing any manifest file.
 
 ## Governance
 
