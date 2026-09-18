@@ -1,0 +1,25 @@
+{
+  "contract_version": "levline-markets-priors-v1",
+  "governance": {
+    "status": "PREREGISTERED_STRUCTURAL_ASSUMPTIONS",
+    "frozen_before_first_live_production_cycle": true,
+    "completed_2026_outcomes_used_for_selection": false,
+    "props_evaluation_results_used_for_selection": false,
+    "notes": [
+      "Route priors are explicit missing-route structural assumptions already exercised by the integrated Props validation suite; they are not fitted to 2026 outcomes.",
+      "UNKNOWN availability uses a Beta(9,1) structural prior (mean 0.90, effective sample size 10) so missing current-status evidence remains probabilistic rather than being silently treated as AVAILABLE.",
+      "QUESTIONABLE and DOUBTFUL priors remain empirically fit from pre-2026 historical injury/snap evidence by the upstream builder when available."
+    ]
+  },
+  "route_prior_means": {
+    "RB": 0.55,
+    "WR": 0.90,
+    "TE": 0.75
+  },
+  "availability_beta_priors": {
+    "UNKNOWN": {
+      "alpha": 9.0,
+      "beta": 1.0
+    }
+  }
+}
