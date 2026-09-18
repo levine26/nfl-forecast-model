@@ -15,6 +15,7 @@ on:
       - 'scripts/build_props_publication.py'
       - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
+      - '.github/workflows/props_live.yml'
   pull_request:
     paths:
       - 'site/**'
@@ -27,6 +28,7 @@ on:
       - 'scripts/build_props_publication.py'
       - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
+      - '.github/workflows/props_live.yml'
   workflow_run:
     workflows:
       - 'Daily NFL model refresh'
@@ -37,6 +39,7 @@ on:
       - 'Sunday Signal ChatGPT free ingestion'
       - 'Sunday Signal ChatGPT failed-game fallback'
       - 'Pregame NFL refresh'
+      - 'LevLine Props live refresh'
     types: [completed]
   workflow_dispatch:
 
