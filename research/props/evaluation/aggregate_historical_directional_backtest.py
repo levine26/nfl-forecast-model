@@ -20,11 +20,12 @@ from run_historical_directional_backtest import (
 
 PRIMARY_SEASONS = (2023, 2024, 2025)
 EXPECTED_SIMULATIONS = 20_000
-PRIMARY_BOOK_ID = 30
+DEFAULT_BOOK_ID = 30
+BOOK_NAMES = {30: "OPEN", 15: "CONSENSUS", 68: "DRAFTKINGS", 69: "FANDUEL"}
 FROZEN_MODEL_REF = "research/props-integration@db5478fd735ef0cad8fd1215e8b1fb6a96a3a21d"
 
 
-def _load(input_dir: Path) -> pd.DataFrame:
+def _load(input_dir: Path, book_id: int) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     seen: set[int] = set()
     for season in PRIMARY_SEASONS:
@@ -75,8 +76,10 @@ def _load(input_dir: Path) -> pd.DataFrame:
         raise RuntimeError(f"unexpected historical contract(s): {sorted(contracts)}")
 
     books = set(pd.to_numeric(combined["book_id"], errors="coerce").dropna().astype(int))
-    if books != {PRIMARY_BOOK_ID}:
-        raise RuntimeError(f"primary aggregate requires genuine OPEN book 30 only, got {sorted(books)}")
+    if books != {int(book_id)}:
+        raise RuntimeError(
+            f"aggregate requires only book {book_id}, got {sorted(books)}"
+        )
 
     simulations = set(
         pd.to_numeric(combined["simulations"], errors="coerce").dropna().astype(int)
@@ -115,8 +118,8 @@ def _grouped(frame: pd.DataFrame, column: str) -> dict:
     }
 
 
-def aggregate(input_dir: Path) -> tuple[pd.DataFrame, dict]:
-    combined = _load(input_dir)
+def aggregate(input_dir: Path, book_id: int = DEFAULT_BOOK_ID) -> tuple[pd.DataFrame, dict]:
+    combined = _load(input_dir, book_id)
     primary = summarize(combined)
     decided = combined[combined["grading_result"].isin(["WIN", "LOSS"])].copy()
     seasons_present = sorted(
@@ -146,7 +149,13 @@ def aggregate(input_dir: Path) -> tuple[pd.DataFrame, dict]:
         "contract_version": CONTRACT_VERSION,
         "frozen_model_ref": FROZEN_MODEL_REF,
         "primary_window": "2023-2025 regular seasons, Weeks 1-18",
-        "market_source": "Action Network genuine OPEN (book_id=30, inferred opens excluded)",
+        "market_source": (
+            "Action Network genuine OPEN (book_id=30, inferred opens excluded)"
+            if int(book_id) == 30
+            else f"Action Network {BOOK_NAMES.get(int(book_id), str(book_id))} (book_id={int(book_id)})"
+        ),
+        "book_id": int(book_id),
+        "book_name": BOOK_NAMES.get(int(book_id), str(book_id)),
         "simulations_per_game": EXPECTED_SIMULATIONS,
         "headline": primary,
         "clustered_accuracy_ci95": clustered_accuracy_interval(combined),
@@ -234,9 +243,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--book-id", type=int, default=DEFAULT_BOOK_ID)
     args = parser.parse_args()
 
-    combined, payload = aggregate(args.input_dir)
+    combined, payload = aggregate(args.input_dir, args.book_id)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     combined.to_csv(args.output_dir / "2023_2025_forecast_level.csv", index=False)
     (args.output_dir / "2023_2025_summary.json").write_text(
