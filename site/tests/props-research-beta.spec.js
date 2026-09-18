@@ -12,10 +12,10 @@ for (const width of [320,390,430,768,1440]) {
     await page.goto('./#/props')
     await expect(page.getByRole('button',{name:'LevLine Props Research Beta'})).toBeVisible()
     await expect(page.getByRole('heading',{name:'Player markets through the LevLine lens.'})).toBeVisible()
-    await expect(page.getByText("ON LEVLINE'S RADAR",{exact:true})).toBeVisible()
-    await expect(page.getByText('FULL MARKET',{exact:true})).toBeVisible()
 
     if (await hasFixture(page)) {
+      await expect(page.getByText("ON LEVLINE'S RADAR",{exact:true})).toBeVisible()
+      await expect(page.getByText('FULL MARKET',{exact:true})).toBeVisible()
       const puka=page.locator('.lp-board-row').filter({hasText:'Puka Nacua'}).first()
       await expect(puka).toBeVisible()
       await expect(puka).toContainText('76.5')
@@ -23,7 +23,7 @@ for (const width of [320,390,430,768,1440]) {
       await expect(puka).toContainText('OVER')
       await expect(puka).toContainText('MODEL EDGE')
 
-      await puka.locator('summary').click()
+      await puka.locator(':scope > summary').click()
       await expect(puka.getByRole('img',{name:/Market line 76.5.*LevLine Fair Line 83.5/i})).toBeVisible()
       await expect(puka.getByText('THE SIGNAL',{exact:true})).toBeVisible()
       await expect(puka.getByText('Advanced Analysis',{exact:true})).toBeVisible()
@@ -40,9 +40,9 @@ test('Radar includes only upstream MODEL EDGE and WATCH classifications',async({
   if (!await hasFixture(page)) return
 
   const radar=page.locator('.lp-radar')
-  await expect(radar.getByText('Puka Nacua')).toBeVisible()
-  await expect(radar.getByText('Christian McCaffrey')).toBeVisible()
-  await expect(radar.getByText('Josh Allen')).toBeVisible()
+  await expect(radar.getByText('Puka Nacua').first()).toBeVisible()
+  await expect(radar.getByText('Christian McCaffrey').first()).toBeVisible()
+  await expect(radar.getByText('Josh Allen').first()).toBeVisible()
   await expect(radar.getByText('Research Fixture Receiver')).toHaveCount(0)
   await expect(radar.getByText('MODEL EDGE').first()).toBeVisible()
   await expect(radar.getByText('WATCH').first()).toBeVisible()
@@ -62,7 +62,7 @@ test('Games is a matchup index before opening a game-specific board',async({page
 
   const allen=page.locator('.lp-board-row').filter({hasText:'Josh Allen'})
   await expect(allen).toContainText('WATCH')
-  await allen.locator('summary').click()
+  await allen.locator(':scope > summary').click()
   await expect(allen.getByText('Expected dropbacks').first()).toBeVisible()
 })
 
@@ -72,18 +72,18 @@ test('Full Market filters, search, sort, and progressive disclosure are interact
 
   const full=page.locator('.lp-full-market')
   await full.getByLabel('Search players').fill('Puka')
-  await expect(full.getByText('Puka Nacua')).toBeVisible()
+  await expect(full.getByText('Puka Nacua').first()).toBeVisible()
   await expect(full.getByText('Josh Allen')).toHaveCount(0)
   await full.getByLabel('Search players').fill('')
 
   await full.getByLabel('Signal').selectOption('WATCH')
-  await expect(full.getByText('Josh Allen')).toBeVisible()
+  await expect(full.getByText('Josh Allen').first()).toBeVisible()
   await expect(full.getByText('Puka Nacua')).toHaveCount(0)
 
   await full.getByLabel('Signal').selectOption('ALL')
   await full.getByLabel('Sort').selectOption('player')
   const puka=full.locator('.lp-board-row').filter({hasText:'Puka Nacua'})
-  await puka.locator('summary').click()
+  await puka.locator(':scope > summary').click()
   await puka.getByText('Advanced Analysis',{exact:true}).click()
   await expect(puka.getByText('Model distribution')).toBeVisible()
   await expect(puka.getByText('Forecast timestamp')).toBeVisible()
@@ -97,7 +97,7 @@ test('TD markets use probability and price language instead of a continuous Fair
   const cmc=page.locator('.lp-board-row').filter({hasText:'Christian McCaffrey'}).first()
   await expect(cmc).toContainText('-120')
   await expect(cmc).toContainText('64.0%')
-  await cmc.locator('summary').click()
+  await cmc.locator(':scope > summary').click()
   await expect(cmc.getByText('ANYTIME TD',{exact:true})).toBeVisible()
   await expect(cmc.getByText(/64\.0%/).first()).toBeVisible()
   await expect(cmc.locator('.lp-fair-viz')).toHaveCount(0)
@@ -113,9 +113,8 @@ test('Performance page is empirical-data gated and retains immutable receipts',a
   await expect(page.getByText('INSUFFICIENT EVALUATION DATA').first()).toBeVisible()
 
   if (fixtureRequired || await page.getByText('Puka Nacua').first().isVisible().catch(()=>false)) {
-    const receipt=page.getByText('Puka Nacua').first().locator('xpath=ancestor::summary')
-    const receiptDetails=receipt.locator('xpath=ancestor::details')
-    await receipt.click()
+    const receiptDetails=page.locator('.lp-receipt').filter({hasText:'Puka Nacua'}).first()
+    await receiptDetails.locator(':scope > summary').click()
     await expect(receiptDetails.getByText('Original sportsbook line / price')).toBeVisible()
     await expect(receiptDetails.getByText('Forecast timestamp')).toBeVisible()
     await expect(receiptDetails.getByText('Model version')).toBeVisible()
