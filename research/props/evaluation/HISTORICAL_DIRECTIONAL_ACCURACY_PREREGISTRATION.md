@@ -166,6 +166,17 @@ The frozen upstream contract requires every `qb_scramble == 1` row to also be a 
 
 This is a deterministic event-schema normalization: a QB scramble is a rushing play. It does not inspect player totals, market outcomes, forecast errors, or evaluation results. The number of normalized source rows must be reported.
 
+### Engineering-pilot source amendments
+
+The 2025 Week-1 reduced-simulation engineering pilot is permanently excluded from threshold/rule selection and from the reported X. Its only purpose is validating source joins and executable contracts.
+
+Two source-compatibility amendments are fixed before the full 2023–2025 run:
+
+1. **Event identity:** Action Network event-to-NFL-game mapping uses the companion historical game-lines dataset's `event_id` and team metadata, not the subset of player-prop rows. This avoids falsely requiring both teams to have a particular player-prop book listing.
+2. **Negative cumulative rushing yards:** if a player's strictly prior-game rushing sufficient statistic has positive carries but negative cumulative yards, the historical adapter marks that rushing-efficiency history unavailable by setting its rushing attempts/yards sufficient statistics to zero for efficiency fitting. Negative NFL rushing outcomes are legitimate, but the frozen efficiency input validator requires non-negative historical yard totals. This fallback therefore reverts that channel to the fixed position prior rather than clipping the observed mean or altering the model.
+
+Neither amendment depends on whether the pilot predictions won or lost. The full three-season scoring rules, books, prop families, simulation size, and directional rule remain unchanged.
+
 ## 9. Forecast chronology
 
 For every target week:
