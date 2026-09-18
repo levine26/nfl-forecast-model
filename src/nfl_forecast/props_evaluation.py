@@ -463,7 +463,7 @@ def _log_loss(work: pd.DataFrame, column: str) -> float:
     return float(np.mean(-(y * np.log(p) + (1.0 - y) * np.log(1.0 - p))))
 
 
-def calibration_table(prob_rows: pd.DataFrame) -> list[dict[str, Any]]:
+def calibration_table(\n    prob_rows: pd.DataFrame,\n    *,\n    bootstrap_replicates: int = BOOTSTRAP_REPLICATES,\n) -> list[dict[str, Any]]:
     if prob_rows.empty:
         return []
     out: list[dict[str, Any]] = []
@@ -528,7 +528,7 @@ def probability_metrics(frame: pd.DataFrame, *, bootstrap_replicates: int = BOOT
         "calibration_in_the_large": float(
             work["event_observed"].mean() - work["model_probability"].mean()
         ),
-        "calibration": calibration_table(work),
+        "calibration": calibration_table(work, bootstrap_replicates=bootstrap_replicates),
     }
     nonempty_bins = [row for row in out["calibration"] if row["n"] > 0]
     if nonempty_bins:
