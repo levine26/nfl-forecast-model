@@ -345,6 +345,13 @@ def _wilson(successes: int, total: int, level: float = 0.95) -> tuple[float | No
 
 
 def continuous_metrics(frame: pd.DataFrame, *, bootstrap_replicates: int = BOOTSTRAP_REPLICATES) -> dict[str, Any]:
+    if frame.empty:
+        return {
+            "sample": SampleCounts(0, 0, 0, 0).__dict__,
+            "status": "NO_GRADED_CONTINUOUS_FORECASTS",
+            "crps_status": "UNAVAILABLE_UNLESS_EXACT_FROZEN_DISTRIBUTION_IS_PRESERVED",
+            "pit_status": "UNAVAILABLE_UNLESS_EXACT_FROZEN_DISTRIBUTION_IS_PRESERVED",
+        }
     work = frame[
         frame["prop_type"].isin(CONTINUOUS_EVAL_MARKETS)
         & frame["actual_result"].notna()
@@ -581,6 +588,11 @@ def probability_metrics(frame: pd.DataFrame, *, bootstrap_replicates: int = BOOT
 def market_relative_metrics(
     frame: pd.DataFrame, *, bootstrap_replicates: int = BOOTSTRAP_REPLICATES
 ) -> dict[str, Any]:
+    if frame.empty:
+        return {
+            "sample": SampleCounts(0, 0, 0, 0).__dict__,
+            "status": "NO_MATCHED_MARKET_OUTCOMES",
+        }
     matched = frame[
         frame["prop_type"].isin(LINE_MARKETS)
         & frame["actual_result"].notna()
@@ -665,6 +677,16 @@ def market_relative_metrics(
 
 
 def betting_metrics(frame: pd.DataFrame, *, bootstrap_replicates: int = BOOTSTRAP_REPLICATES) -> dict[str, Any]:
+    if frame.empty:
+        return {
+            "sample": SampleCounts(0, 0, 0, 0).__dict__,
+            "wins": 0,
+            "losses": 0,
+            "pushes": 0,
+            "net_units": None,
+            "roi": None,
+            "status": "NOT_MEASURABLE_NO_ORIGINAL_MODEL_EDGE_OBSERVATIONS",
+        }
     edges = frame[frame["signal_state"].eq("MODEL EDGE") & frame["actual_result"].notna()].copy()
     counts = _counts(edges)
     if edges.empty:
