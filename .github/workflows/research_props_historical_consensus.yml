@@ -1,0 +1,114 @@
+name: LevLine Props consensus coverage backtest
+
+on:
+  pull_request:
+    branches:
+      - research/props-integration
+    paths:
+      - "research/props/evaluation/run_historical_directional_backtest.py"
+      - "research/props/evaluation/aggregate_historical_directional_backtest.py"
+      - "research/props/evaluation/HISTORICAL_DIRECTIONAL_ACCURACY_PREREGISTRATION.md"
+      - ".github/workflows/research_props_historical_consensus.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fallback:
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2023, 2024, 2025]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pyarrow
+      - name: Run preregistered consensus coverage fallback
+        run: |
+          python research/props/evaluation/run_historical_directional_backtest.py \
+            --season ${{ matrix.season }} \
+            --week-start 1 \
+            --week-end 18 \
+            --simulations 20000 \
+            --book-id 15 \
+            --output-dir research_outputs/props_accuracy/historical_consensus/${{ matrix.season }}
+      - name: Assert frozen fallback contract
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          season=int(os.environ["SEASON"])
+          path=Path(f"research_outputs/props_accuracy/historical_consensus/{season}/{season}_summary.json")
+          d=json.loads(path.read_text())
+          assert d["contract_version"] == "levline-props-historical-directional-v1.0"
+          assert d["simulations_per_game"] == 20000
+          assert d["market_pairing"]["book_id"] == 15
+          assert d["market_pairing"]["require_genuine_open"] is False
+          assert d["headline"]["wins"] + d["headline"]["losses"] > 0
+          assert d.get("game_build_errors") == {}, d.get("game_build_errors")
+          assert not any(
+              str(key).startswith("game_build_or_simulation")
+              for key in d.get("exclusions", {})
+          ), d.get("exclusions")
+          print(json.dumps({
+              "market_pairing": d["market_pairing"],
+              "headline": d["headline"],
+              "exclusions": d["exclusions"],
+          }, indent=2))
+          PY
+        env:
+          SEASON: ${{ matrix.season }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-consensus-fallback-${{ matrix.season }}
+          path: research_outputs/props_accuracy/historical_consensus/${{ matrix.season }}/
+          if-no-files-found: error
+
+  aggregate:
+    needs: fallback
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install aggregation dependencies
+        run: python -m pip install pandas numpy
+      - name: Download consensus season artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: levline-props-consensus-fallback-*
+          path: research_outputs/props_accuracy/consensus_downloads
+          merge-multiple: true
+      - name: Aggregate coverage fallback
+        run: |
+          python research/props/evaluation/aggregate_historical_directional_backtest.py \
+            --input-dir research_outputs/props_accuracy/consensus_downloads \
+            --output-dir research_outputs/props_accuracy/consensus_aggregate \
+            --book-id 15
+      - name: Verify coverage fallback qualifies
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("research_outputs/props_accuracy/consensus_aggregate/2023_2025_summary.json")
+          d=json.loads(p.read_text())
+          print(json.dumps(d["headline"], indent=2))
+          print(json.dumps(d["coverage_rule"], indent=2))
+          assert d["coverage_rule"]["passes"] is True
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-consensus-fallback-aggregate
+          path: research_outputs/props_accuracy/consensus_aggregate/
+          if-no-files-found: error
