@@ -626,7 +626,7 @@ export default function PropsResearchBeta() {
     <main>
       {loading ? <LoadingState/> : <>
         {route.view==='board' && <PropsBoard rows={rows} payload={publicPayload} history={historyPayload}/>}
-        {route.view==='games' && (!publicPayload ? <><BoardHeader payload={publicPayload} history={historyPayload}/><EmptyState/></> : (route.gameId ? <GameDetail rows={rows} gameId={route.gameId}/> : <GamesIndex rows={rows}/>))}
+        {route.view==='games' && (!publicPayload ? <GamesIndex rows={[]}/> : (route.gameId ? <GameDetail rows={rows} gameId={route.gameId}/> : <GamesIndex rows={rows}/>))}
         {route.view==='history' && <History payload={historyPayload}/>}
         {route.view==='about' && <About/>}
       </>}
