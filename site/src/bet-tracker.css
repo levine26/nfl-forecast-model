@@ -1,39 +1,109 @@
 .ss-bet-tracker{margin:0 0 22px;padding:22px;border:1px solid var(--ss-border);border-radius:16px;background:linear-gradient(145deg,rgba(158,27,50,.08),rgba(17,19,20,.96) 28%,rgba(13,15,16,.98));box-shadow:var(--ss-shadow)}
-.ss-bet-tracker-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding-bottom:18px;border-bottom:1px solid var(--ss-border-soft)}
-.ss-bet-tracker-head>div>span,.ss-bet-market-title>div>span{color:var(--ss-gold);font-family:var(--ss-display);font-size:10px;font-weight:900;letter-spacing:.09em}
+.ss-bet-tracker-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding-bottom:17px;border-bottom:1px solid var(--ss-border-soft)}
+.ss-bet-tracker-head>div>span,.ss-bet-this-week-head>div>span,.ss-bet-week-totals>header>div>span{color:var(--ss-gold);font-family:var(--ss-display);font-size:10px;font-weight:900;letter-spacing:.09em}
 .ss-bet-tracker-head h2{margin:5px 0 5px;font-family:var(--ss-display);font-size:28px;line-height:1.02;letter-spacing:-.02em}
 .ss-bet-tracker-head p{margin:0;color:var(--ss-muted);font-size:10px;line-height:1.5}
-.ss-bet-tracker-head label{display:flex;align-items:center;gap:9px;white-space:nowrap}
-.ss-bet-tracker-head label>span{color:var(--ss-muted);font-size:9px;text-transform:uppercase;letter-spacing:.08em}
-.ss-bet-tracker-head select{min-width:112px;padding:9px 30px 9px 11px;border:1px solid var(--ss-border);border-radius:8px;background:var(--ss-card);color:var(--ss-cream);font-size:11px;font-weight:800}
-.ss-bet-season{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-.ss-bet-season-card{display:grid;grid-template-columns:1fr auto;grid-template-areas:"label label" "profit profit" "roi risk" "note note";gap:4px 14px;padding:16px;border:1px solid var(--ss-border-soft);border-radius:11px;background:rgba(8,9,9,.48)}
-.ss-bet-season-card>span{grid-area:label;color:var(--ss-muted);font-size:9px;text-transform:uppercase;letter-spacing:.065em}
-.ss-bet-season-card>strong{grid-area:profit;margin:3px 0 7px;font-family:var(--ss-display);font-size:29px;line-height:1}
-.ss-bet-season-card>div:first-of-type{grid-area:roi}.ss-bet-season-card>div:last-of-type{grid-area:risk;text-align:right}
-.ss-bet-season-card>div{display:flex;flex-direction:column;gap:2px}.ss-bet-season-card small{color:var(--ss-muted-2);font-size:8px;text-transform:uppercase}.ss-bet-season-card b{font-size:11px}
-.ss-bet-season-card em{grid-area:note;margin-top:5px;color:var(--ss-gold);font-size:8px;font-style:normal}
-.ss-bet-season-card.positive>strong,.ss-bet-season-card.positive>div:first-of-type b{color:var(--ss-green)}
-.ss-bet-season-card.negative>strong,.ss-bet-season-card.negative>div:first-of-type b{color:#f0a7a7}
-.ss-bet-sections{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ss-bet-market{min-width:0;border:1px solid var(--ss-border-soft);border-radius:12px;background:rgba(17,19,20,.68);overflow:hidden}
-.ss-bet-market-title{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:15px 16px 12px}
-.ss-bet-market-title h3{margin:4px 0 0;font-family:var(--ss-display);font-size:17px}
-.ss-bet-market-title>small{max-width:180px;color:var(--ss-muted-2);font-size:8px;text-align:right;line-height:1.35}
-.ss-bet-week-summary{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ss-border-soft);border-bottom:1px solid var(--ss-border-soft)}
-.ss-bet-week-summary>div{display:flex;flex-direction:column;gap:3px;padding:11px 10px;border-right:1px solid var(--ss-border-soft)}
-.ss-bet-week-summary>div:last-child{border-right:0}
-.ss-bet-week-summary span{color:var(--ss-muted-2);font-size:7px;text-transform:uppercase;letter-spacing:.06em}
-.ss-bet-week-summary strong{font-family:var(--ss-display);font-size:17px}
-.ss-bet-week-summary .positive strong{color:var(--ss-green)}.ss-bet-week-summary .negative strong{color:#f0a7a7}
-.ss-bet-ledger{overflow:hidden}
-.ss-bet-ledger-head,.ss-bet-ledger>article{display:grid;grid-template-columns:minmax(105px,1.3fr) minmax(85px,.85fr) minmax(82px,.75fr) 58px minmax(76px,.7fr);align-items:center;gap:9px}
-.ss-bet-ledger-head{padding:8px 12px;color:var(--ss-muted-2);font-size:7px;text-transform:uppercase;letter-spacing:.055em;border-bottom:1px solid rgba(245,241,232,.055)}
-.ss-bet-ledger>article{min-height:44px;padding:8px 12px;border-bottom:1px solid rgba(245,241,232,.055);font-size:9px}
-.ss-bet-ledger>article:last-child{border-bottom:0}
-.ss-bet-ledger>article>b{font-family:var(--ss-display);font-size:11px}.ss-bet-ledger>article>strong{font-size:10px}
-.ss-bet-ledger small{display:block;margin-top:2px;color:var(--ss-muted-2);font-size:7px}
-.ss-bet-ledger .result{font-weight:900;font-size:8px}.ss-bet-ledger .result.win,.ss-bet-ledger .positive{color:var(--ss-green)}.ss-bet-ledger .result.loss,.ss-bet-ledger .negative{color:#f0a7a7}.ss-bet-ledger .result.push{color:var(--ss-gold)}.ss-bet-ledger .unpriced{color:var(--ss-gold)}
-.ss-bet-disclosure{margin:0;padding:10px 12px;border-top:1px solid var(--ss-border-soft);color:var(--ss-muted-2);font-size:8px;line-height:1.5}.ss-bet-disclosure b{color:var(--ss-gold)}
-@media(max-width:1024px){.ss-bet-sections{grid-template-columns:1fr}.ss-bet-ledger-head,.ss-bet-ledger>article{grid-template-columns:minmax(150px,1.5fr) 1fr 1fr 70px 1fr}}
-@media(max-width:768px){.ss-bet-tracker{padding:14px;margin-bottom:16px}.ss-bet-tracker-head{align-items:flex-start;flex-direction:column;gap:12px}.ss-bet-tracker-head h2{font-size:23px}.ss-bet-tracker-head label{width:100%;justify-content:space-between}.ss-bet-tracker-head select{min-width:130px}.ss-bet-season{grid-template-columns:1fr}.ss-bet-season-card{padding:13px}.ss-bet-season-card>strong{font-size:25px}.ss-bet-market-title{align-items:flex-start;flex-direction:column}.ss-bet-market-title>small{text-align:left}.ss-bet-week-summary{grid-template-columns:repeat(2,1fr)}.ss-bet-week-summary>div:nth-child(2){border-right:0}.ss-bet-week-summary>div:nth-child(-n+2){border-bottom:1px solid var(--ss-border-soft)}.ss-bet-ledger{overflow-x:auto}.ss-bet-ledger-head,.ss-bet-ledger>article{min-width:575px;grid-template-columns:150px 110px 105px 70px 100px}.ss-bet-disclosure{font-size:8px}}
+
+.ss-bet-history-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0 20px}
+.ss-bet-history-card{position:relative;min-height:145px;padding:18px;border:1px solid var(--ss-border-soft);border-radius:12px;background:rgba(8,9,9,.5)}
+.ss-bet-history-card>span{color:var(--ss-gold);font-family:var(--ss-display);font-size:10px;font-weight:900;letter-spacing:.08em}
+.ss-bet-history-card>strong{display:block;margin:12px 0 2px;font-family:var(--ss-display);font-size:36px;line-height:1}
+.ss-bet-history-card>small{color:var(--ss-muted-2);font-size:8px;letter-spacing:.07em}
+.ss-bet-history-card>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:17px;padding-top:12px;border-top:1px solid var(--ss-border-soft)}
+.ss-bet-history-card>div>span{color:var(--ss-muted-2);font-size:8px;letter-spacing:.07em}
+.ss-bet-history-card>div>b{font-family:var(--ss-display);font-size:22px}
+.ss-bet-history-card>div.positive>b,.ss-bet-history-card .positive{color:var(--ss-green)}
+.ss-bet-history-card>div.negative>b,.ss-bet-history-card .negative{color:#f0a7a7}
+.ss-bet-history-card>em{display:block;margin-top:8px;color:var(--ss-gold);font-size:8px;font-style:normal}
+
+.ss-bet-this-week{overflow:hidden;border:1px solid var(--ss-border-soft);border-radius:13px;background:rgba(17,19,20,.68)}
+.ss-bet-this-week-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:17px 18px 14px;border-bottom:1px solid var(--ss-border-soft)}
+.ss-bet-this-week-head h3,.ss-bet-week-totals h3{margin:4px 0 0;font-family:var(--ss-display);font-size:20px}
+.ss-bet-this-week-head>small,.ss-bet-week-totals>header>small{color:var(--ss-muted-2);font-size:8px;text-align:right;line-height:1.4}
+
+.ss-bet-week-ledger{display:block}
+.ss-bet-week-ledger-head,.ss-bet-week-ledger>article{display:grid;grid-template-columns:minmax(118px,1.25fr) minmax(92px,.9fr) 72px minmax(108px,1fr) 84px minmax(78px,.75fr);align-items:center;gap:10px}
+.ss-bet-week-ledger-head{padding:9px 13px;color:var(--ss-muted-2);font-size:7px;text-transform:uppercase;letter-spacing:.055em;border-bottom:1px solid rgba(245,241,232,.055)}
+.ss-bet-week-ledger>article{min-height:58px;padding:10px 13px;border-bottom:1px solid rgba(245,241,232,.055);font-size:9px}
+.ss-bet-week-ledger>article:last-child{border-bottom:0}
+.ss-bet-week-ledger>article>strong{font-family:var(--ss-display);font-size:12px}
+.ss-bet-matchup{display:flex;flex-direction:column;gap:4px}
+.ss-bet-matchup>b{font-family:var(--ss-display);font-size:11px}
+.ss-bet-matchup>small{color:var(--ss-muted-2);font-size:7px;letter-spacing:.04em}
+.ss-bet-bet-value{display:flex;flex-direction:column;gap:3px}
+.ss-bet-bet-value>b{font-family:var(--ss-display);font-size:11px}
+.ss-bet-bet-value>small{color:var(--ss-muted-2);font-size:7px}
+.ss-bet-result{display:inline-flex;align-items:center;justify-content:center;width:max-content;min-width:48px;padding:5px 7px;border:1px solid var(--ss-border-soft);border-radius:999px;font-size:7px;font-weight:900;letter-spacing:.04em}
+.ss-bet-result.win{border-color:rgba(88,211,140,.25);background:rgba(88,211,140,.08);color:var(--ss-green)}
+.ss-bet-result.loss{border-color:rgba(240,167,167,.24);background:rgba(240,167,167,.07);color:#f0a7a7}
+.ss-bet-result.push{border-color:rgba(201,179,122,.28);background:rgba(201,179,122,.08);color:var(--ss-gold)}
+.ss-bet-result.pending{color:var(--ss-muted)}
+.ss-bet-week-ledger .positive,.ss-bet-week-mobile .positive,.ss-bet-week-totals .positive{color:var(--ss-green)}
+.ss-bet-week-ledger .negative,.ss-bet-week-mobile .negative,.ss-bet-week-totals .negative{color:#f0a7a7}
+.ss-bet-week-ledger .unpriced,.ss-bet-week-mobile .unpriced{color:var(--ss-gold)}
+.ss-bet-week-mobile{display:none}
+
+.ss-bet-week-totals{border-top:1px solid var(--ss-border-soft);background:rgba(7,8,8,.42)}
+.ss-bet-week-totals>header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:16px 18px 12px}
+.ss-bet-market-totals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--ss-border-soft);border-bottom:1px solid var(--ss-border-soft)}
+.ss-bet-market-total{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"label label" "record record" "recordlabel recordlabel" "pl roi" "pending pending";gap:3px 18px;padding:15px 18px}
+.ss-bet-market-total:first-child{border-right:1px solid var(--ss-border-soft)}
+.ss-bet-market-total>span{grid-area:label;color:var(--ss-gold);font-family:var(--ss-display);font-size:9px;font-weight:900;letter-spacing:.07em}
+.ss-bet-market-total>strong{grid-area:record;margin-top:5px;font-family:var(--ss-display);font-size:25px}
+.ss-bet-market-total>small{grid-area:recordlabel;color:var(--ss-muted-2);font-size:7px}
+.ss-bet-market-total>div{display:flex;flex-direction:column;gap:3px;margin-top:8px}
+.ss-bet-market-total>div:first-of-type{grid-area:pl}.ss-bet-market-total>div:last-of-type{grid-area:roi}
+.ss-bet-market-total>div>span{color:var(--ss-muted-2);font-size:7px;letter-spacing:.06em}
+.ss-bet-market-total>div>b{font-size:12px}
+.ss-bet-market-total>em{grid-area:pending;margin-top:5px;color:var(--ss-muted-2);font-size:7px;font-style:normal}
+
+.ss-bet-combined-total{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:22px;padding:15px 18px}
+.ss-bet-combined-total>span{color:var(--ss-muted-2);font-size:8px;font-weight:800;letter-spacing:.07em}
+.ss-bet-combined-total>strong{font-family:var(--ss-display);font-size:24px}
+.ss-bet-combined-total>div{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.ss-bet-combined-total>div>small{color:var(--ss-muted-2);font-size:7px;letter-spacing:.06em}
+.ss-bet-combined-total>div>b{font-family:var(--ss-display);font-size:18px}
+.ss-bet-disclosure{margin:0;padding:10px 18px;border-top:1px solid var(--ss-border-soft);color:var(--ss-muted-2);font-size:8px;line-height:1.5}
+.ss-bet-disclosure b{color:var(--ss-gold)}
+
+@media(max-width:1024px){
+  .ss-bet-week-ledger-head,.ss-bet-week-ledger>article{grid-template-columns:minmax(105px,1.1fr) minmax(80px,.85fr) 66px minmax(96px,.95fr) 76px 74px;gap:7px}
+}
+
+@media(max-width:768px){
+  .ss-bet-tracker{padding:14px;margin-bottom:16px}
+  .ss-bet-tracker-head{align-items:flex-start;flex-direction:column;gap:10px}
+  .ss-bet-tracker-head h2{font-size:23px}
+  .ss-bet-history-grid{gap:9px;margin:13px 0 16px}
+  .ss-bet-history-card{min-height:128px;padding:13px}
+  .ss-bet-history-card>strong{font-size:29px}
+  .ss-bet-history-card>div{margin-top:13px;padding-top:9px}
+  .ss-bet-history-card>div>b{font-size:18px}
+  .ss-bet-this-week-head,.ss-bet-week-totals>header{align-items:flex-start;flex-direction:column;gap:5px;padding:14px}
+  .ss-bet-this-week-head>small,.ss-bet-week-totals>header>small{text-align:left}
+  .ss-bet-week-ledger{display:none}
+  .ss-bet-week-mobile{display:block}
+  .ss-bet-week-mobile>article{padding:13px 14px;border-bottom:1px solid rgba(245,241,232,.065)}
+  .ss-bet-week-mobile>article:last-child{border-bottom:0}
+  .ss-bet-week-mobile>article>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:10px}
+  .ss-bet-week-mobile>article>header>div{display:flex;flex-direction:column;gap:3px}
+  .ss-bet-week-mobile>article>header b{font-family:var(--ss-display);font-size:13px}
+  .ss-bet-week-mobile>article>header small{color:var(--ss-muted-2);font-size:7px;letter-spacing:.05em}
+  .ss-bet-week-mobile>article>header>strong{font-family:var(--ss-display);font-size:14px}
+  .ss-bet-week-mobile>article>div{display:grid;grid-template-columns:minmax(84px,.9fr) minmax(105px,1fr) auto;align-items:center;gap:8px;padding:7px 0;border-top:1px solid rgba(245,241,232,.045)}
+  .ss-bet-week-mobile>article>div>span:first-child{color:var(--ss-muted-2);font-size:7px;letter-spacing:.05em}
+  .ss-bet-market-totals{grid-template-columns:1fr}
+  .ss-bet-market-total:first-child{border-right:0;border-bottom:1px solid var(--ss-border-soft)}
+  .ss-bet-combined-total{grid-template-columns:1fr auto;gap:10px 16px;padding:13px 14px}
+  .ss-bet-combined-total>div{grid-column:1/-1;display:grid;grid-template-columns:1fr auto;width:100%;align-items:baseline}
+}
+
+@media(max-width:390px){
+  .ss-bet-tracker{padding:12px}
+  .ss-bet-history-grid{grid-template-columns:1fr 1fr;gap:7px}
+  .ss-bet-history-card{padding:11px}
+  .ss-bet-history-card>strong{font-size:26px}
+  .ss-bet-history-card>div>b{font-size:16px}
+  .ss-bet-week-mobile>article>div{grid-template-columns:78px 1fr auto;gap:6px}
+  .ss-bet-result{min-width:44px;padding:5px 6px}
+}
