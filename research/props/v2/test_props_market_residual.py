@@ -58,7 +58,10 @@ def test_fit_and_apply_are_deterministic():
     scored = apply_market_prior_residual(prediction_only, first)
     assert scored["challenger_p_over"].between(0, 1).all()
     assert set(scored["challenger_side"]) <= {"OVER", "UNDER"}
-    assert set(scored["market_price_side"]) <= {"OVER", "UNDER"}
+    informative = set(scored["market_price_side"].dropna())
+    assert informative <= {"OVER", "UNDER"}
+    tied = scored["over_odds"].eq(scored["under_odds"])
+    assert scored.loc[tied, "market_price_side"].isna().all()
 
 
 def test_fit_excludes_pushes():
