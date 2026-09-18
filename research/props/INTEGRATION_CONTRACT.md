@@ -89,3 +89,68 @@ Closing prices are evaluation-only. They are never admitted to the prospective m
 ## Production boundary
 
 This integration is not imported by the official winner pipeline. Official LevLine/F-ST winner code remains unchanged. Props sportsbook information is not a winner-probability input.
+
+
+## Live sportsbook capture helper
+
+`scripts/build_props_market_snapshot.py` converts an authorized The Odds API capture into the exact `market_artifacts` consumed by the coordinator while preserving stable canonical player IDs and point-in-time timestamps.
+
+Live mode requires an API credential supplied only through an environment variable:
+
+```bash
+THE_ODDS_API_KEY=... python scripts/build_props_market_snapshot.py \
+  --player-state /secure/path/player_state.json \
+  --output /secure/path/market_snapshot_20260920T160000Z.json
+```
+
+The helper:
+
+- discovers current NFL events, matches only events present in the canonical player-state slate, and fetches only the charter-authorized prop keys;
+- resolves sportsbook player names only through the canonical player-state roster;
+- rejects ambiguous/unresolved player identity instead of synthesizing IDs;
+- rejects provider kickoff mismatches and at/after-kickoff captures;
+- builds no-vig/consensus artifacts through the existing market engine;
+- writes an immutable normalized snapshot plus the raw provider response bundle;
+- never serializes the API credential.
+
+For deterministic QA or replay, an already captured event-odds payload can be supplied with an explicit capture timestamp:
+
+```bash
+python scripts/build_props_market_snapshot.py \
+  --player-state /secure/path/player_state.json \
+  --provider-payload /secure/path/raw_event_odds.json \
+  --captured-at 2026-09-20T16:00:00Z \
+  --output /secure/path/market_snapshot_20260920T160000Z.json
+```
+
+The normalized file exposes `market_artifacts` and is passed intact to the frozen-manifest assembler. The assembler selects only the target game's artifacts while fingerprinting the entire slate capture. Existing output files are never overwritten.
+
+
+## Frozen manifest assembly
+
+Use `scripts/build_props_integration_manifest.py` instead of hand-editing the coordinator JSON. It combines separately frozen opportunity, efficiency, TD, residual-efficiency, and sportsbook artifacts only after validating that they describe the same game and obey the same point-in-time horizon.
+
+Example:
+
+```bash
+python scripts/build_props_integration_manifest.py \
+  --game-spec /secure/path/game_spec.json \
+  --opportunity /secure/path/opportunity.json \
+  --efficiency-player /secure/path/efficiency_player.json \
+  --team-td /secure/path/team_td.json \
+  --residual-efficiency /secure/path/residual_efficiency.json \
+  --market-snapshot /secure/path/market_snapshot_20260920T160000Z.json \
+  --output /secure/path/props_integration_manifest_20260920T160500Z.json
+```
+
+The assembler fails closed when:
+
+- the two opportunity projections do not correspond to the two game teams;
+- efficiency or TD rows disagree on game identity, kickoff, or point-in-time ordering;
+- a prior claims training through 2026;
+- residual efficiency does not cover both teams;
+- a market snapshot or individual market artifact is newer than the declared forecast time;
+- closing/evaluation market state is attached to the prospective manifest;
+- duplicate sportsbook market identities are present.
+
+Every source component is SHA-256 fingerprinted into `input_provenance`, and the completed manifest receives its own deterministic fingerprint. The resulting file is written with create-only semantics and is suitable for the coordinator producer.
