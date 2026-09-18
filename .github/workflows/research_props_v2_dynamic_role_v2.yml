@@ -1,0 +1,170 @@
+name: LevLine Props 2.0 Dynamic Role V2 research
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-challenger
+    paths:
+      - 'research/props/v2/props_dynamic_role_v2.py'
+      - 'research/props/v2/test_props_dynamic_role_v2.py'
+      - 'research/props/v2/run_dynamic_role_v2_backtest.py'
+      - 'research/props/v2/aggregate_dynamic_role_v2_backtest.py'
+      - 'research/props/v2/DYNAMIC_ROLE_V2_RESEARCH_CONTRACT.md'
+      - '.github/workflows/research_props_v2_dynamic_role_v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+      - name: Compile V2 research
+        run: |
+          python -m py_compile research/props/v2/props_dynamic_role_v2.py
+          python -m py_compile research/props/v2/run_dynamic_role_v2_backtest.py
+          python -m py_compile research/props/v2/aggregate_dynamic_role_v2_backtest.py
+      - name: Test chronology and latent-state semantics
+        run: pytest -q research/props/v2/test_props_dynamic_role_v2.py
+
+  pilot:
+    needs: unit
+    strategy:
+      fail-fast: false
+      matrix:
+        role_mode: [route_only, full]
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          python -m pip install pyarrow
+      - name: Run one-week paired V2 engineering pilot
+        run: |
+          python research/props/v2/run_dynamic_role_v2_backtest.py             --season 2024             --week-start 4             --week-end 4             --simulations 1000             --book-id 30             --role-mode ${{ matrix.role_mode }}             --output-dir research_outputs/props_v2/dynamic_role_v2_pilot/${{ matrix.role_mode }}
+      - name: Enforce V2 research contract
+        env:
+          ROLE_MODE: ${{ matrix.role_mode }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          mode=os.environ["ROLE_MODE"]
+          path=Path(f"research_outputs/props_v2/dynamic_role_v2_pilot/{mode}/2024_summary.json")
+          d=json.loads(path.read_text())
+          assert d["contract_version"] == "levline-props-v2-dynamic-role-development-v0.2.0"
+          assert d["promotion_authorized"] is False
+          assert d["role_mode"] == mode
+          assert d["paired_v1"]["n"] > 0
+          approved={"primary_qb_ambiguous","no_supported_market_listed_players"}
+          unexpected={
+              game_id:audit
+              for game_id,audit in d["game_build_errors"].items()
+              if audit.get("error") or audit.get("reason") not in approved
+          }
+          assert unexpected == {}, unexpected
+          assert d["headline"]["wins"] + d["headline"]["losses"] > 0
+          print(json.dumps({"role_mode":mode,"paired_v1":d["paired_v1"]},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-dynamic-role-v2-pilot-${{ matrix.role_mode }}
+          path: research_outputs/props_v2/dynamic_role_v2_pilot/${{ matrix.role_mode }}/
+          if-no-files-found: error
+
+  primary:
+    needs: pilot
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2023, 2024, 2025]
+        role_mode: [route_only, full]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          python -m pip install pyarrow
+      - name: Run season-forward latent-role backtest
+        run: |
+          python research/props/v2/run_dynamic_role_v2_backtest.py             --season ${{ matrix.season }}             --week-start 1             --week-end 18             --simulations 20000             --book-id 30             --role-mode ${{ matrix.role_mode }}             --output-dir research_outputs/props_v2/dynamic_role_v2/${{ matrix.role_mode }}/${{ matrix.season }}
+      - name: Assert no promotion or chronology relaxation
+        env:
+          SEASON: ${{ matrix.season }}
+          ROLE_MODE: ${{ matrix.role_mode }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          season=int(os.environ["SEASON"])
+          mode=os.environ["ROLE_MODE"]
+          path=Path(f"research_outputs/props_v2/dynamic_role_v2/{mode}/{season}/{season}_summary.json")
+          d=json.loads(path.read_text())
+          assert d["contract_version"] == "levline-props-v2-dynamic-role-development-v0.2.0"
+          assert d["promotion_authorized"] is False
+          assert d["role_mode"] == mode
+          assert d["simulations_per_game"] == 20000
+          assert d["market_pairing"]["book_id"] == 30
+          assert d["market_pairing"]["require_genuine_open"] is True
+          assert d["paired_v1"]["n"] > 0
+          approved={"primary_qb_ambiguous","no_supported_market_listed_players"}
+          unexpected={
+              game_id:audit
+              for game_id,audit in d["game_build_errors"].items()
+              if audit.get("error") or audit.get("reason") not in approved
+          }
+          assert unexpected == {}, unexpected
+          print(json.dumps({"season":season,"role_mode":mode,"paired_v1":d["paired_v1"]},indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-dynamic-role-v2-primary-${{ matrix.role_mode }}-${{ matrix.season }}
+          path: research_outputs/props_v2/dynamic_role_v2/${{ matrix.role_mode }}/${{ matrix.season }}/
+          if-no-files-found: error
+
+  aggregate:
+    needs: primary
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pandas numpy scipy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: levline-props-v2-dynamic-role-v2-primary-*
+          path: research_outputs/props_v2/dynamic_role_v2_downloads
+          merge-multiple: true
+      - name: Aggregate frozen V2 ablations
+        run: |
+          python research/props/v2/aggregate_dynamic_role_v2_backtest.py             --input-dir research_outputs/props_v2/dynamic_role_v2_downloads             --output-dir research_outputs/props_v2/dynamic_role_v2_aggregate
+          cat research_outputs/props_v2/dynamic_role_v2_aggregate/report.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-dynamic-role-v2-aggregate
+          path: research_outputs/props_v2/dynamic_role_v2_aggregate/
+          if-no-files-found: error
