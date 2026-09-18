@@ -89,3 +89,38 @@ Closing prices are evaluation-only. They are never admitted to the prospective m
 ## Production boundary
 
 This integration is not imported by the official winner pipeline. Official LevLine/F-ST winner code remains unchanged. Props sportsbook information is not a winner-probability input.
+
+
+## Live sportsbook capture helper
+
+`scripts/build_props_market_snapshot.py` converts an authorized The Odds API capture into the exact `market_artifacts` consumed by the coordinator while preserving stable canonical player IDs and point-in-time timestamps.
+
+Live mode requires an API credential supplied only through an environment variable:
+
+```bash
+THE_ODDS_API_KEY=... python scripts/build_props_market_snapshot.py \
+  --player-state /secure/path/player_state.json \
+  --output /secure/path/market_snapshot_20260920T160000Z.json
+```
+
+The helper:
+
+- discovers current NFL events, matches only events present in the canonical player-state slate, and fetches only the charter-authorized prop keys;
+- resolves sportsbook player names only through the canonical player-state roster;
+- rejects ambiguous/unresolved player identity instead of synthesizing IDs;
+- rejects provider kickoff mismatches and at/after-kickoff captures;
+- builds no-vig/consensus artifacts through the existing market engine;
+- writes an immutable normalized snapshot plus the raw provider response bundle;
+- never serializes the API credential.
+
+For deterministic QA or replay, an already captured event-odds payload can be supplied with an explicit capture timestamp:
+
+```bash
+python scripts/build_props_market_snapshot.py \
+  --player-state /secure/path/player_state.json \
+  --provider-payload /secure/path/raw_event_odds.json \
+  --captured-at 2026-09-20T16:00:00Z \
+  --output /secure/path/market_snapshot_20260920T160000Z.json
+```
+
+The normalized file exposes `market_artifacts`; copy that array into the frozen integration manifest without changing its timestamps or identities. Existing output files are never overwritten.
