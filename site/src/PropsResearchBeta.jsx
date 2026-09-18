@@ -286,9 +286,10 @@ function DirectionBlock({ forecast }) {
     return <div className="lp-direction td"><span>{propLabel(forecast.prop_type).toUpperCase()}</span><strong>{formatPercent(forecast?.model?.td_probability)}</strong><small>LevLine probability · market {formatAmerican(primaryMarketPrice(forecast))}</small></div>
   }
   const direction=directionFor(forecast), line=forecast?.market?.line
+  const label=direction==='UNAVAILABLE' ? 'MARKET UNAVAILABLE' : direction==='MARKET ALIGNED' ? direction : direction + ' ' + formatLine(line)
   return <div className={'lp-direction ' + direction.toLowerCase().replaceAll(' ','-')}>
     <span>MODEL DIRECTION</span>
-    <strong>{direction==='MARKET ALIGNED' ? direction : direction + ' ' + formatLine(line)}</strong>
+    <strong>{label}</strong>
     <small>Signal classification remains {forecast.signal_state || 'NO SIGNAL'}</small>
   </div>
 }
