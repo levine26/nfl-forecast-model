@@ -9,7 +9,8 @@ Status: **LIVING AUDIT**
 | LevLine market-capture v2 | T−120/T−60/T−45/T−30 multi-book game markets | Strong PIT; provider IDs, request times, book timestamps | Yes | Built for game markets, not player props | Reuse patterns/contracts, not data semantics |
 | LevLine market-state v1 | Movement/dispersion derivatives | Strong PIT, retries resolved by closest target | Yes | Game-market scope | Reuse implementation pattern for Props |
 | nflverse play-by-play | PBP back to 1999 | Historical event chronology | Yes/reproducible | Release timing differs from true live tracking | Core football history |
-| nflverse / repository participation & snap sources | Lagged role state | Historical; target week excluded | Repository-supported | Snap share is not route participation | Valid proxy with explicit source quality |
+| nflverse snap counts | Lagged role state | Historical; target week excluded | Repository-supported | Snap share is not route participation | Valid live-compatible proxy with explicit source quality |
+| nflverse play-level participation | On-field participation / formation research, 2016+ | Historical; 2023+ FTN-backed releases occur only after all postseason games complete | Historical loader available; **not a qualified in-season 2026 feed** | Cannot be treated as live current-season route evidence; on-field participation is not automatically a route | Historical mechanism/proxy validation only |
 | FTN charting integration | Historical/live-capable matchup state | Strictly lagged in experiment; exact historical publication timestamps not claimed | Source-dependent | Prior residual experiment was null | Preserve state as possible mechanism input, not generic residual |
 | NGS public metrics / methodology | Expected rushing, completion, tracking concepts | Public aggregate/metric dependent | Limited public live fields | Raw tracking generally unavailable | Architectural inspiration + available fields only |
 | Injury/practice/depth-chart state | Availability mixtures | Must be source-qualified and timestamped | Partial | Historical workload labels may be incomplete | Prospective capture if reconstruction is not defensible |
@@ -41,3 +42,25 @@ mechanistic model design, but does not imply LevLine has access to raw tracking 
 
 Paid historical data are blockers unless credentials/licensing are actually available. The program
 must not assume access.
+
+
+## Route / participation release-latency finding
+
+The nflverse `load_participation()` documentation states that participation data prior to 2023
+comes from NFL Next Gen Stats, while 2023 onward is provided by FTN **after all postseason games
+are completed**. Therefore LevLine may use those seasons for retrospective mechanism/proxy
+research, but it must not present that source as information that would have been available
+pregame during the same season.
+
+Sources:
+- https://github.com/nflverse/nflreadr/blob/main/R/load_participation.R
+- https://github.com/nflverse/nflreadpy
+
+This creates a real live-data blocker for exact 2026 route participation. The scientifically safe
+paths are:
+1. train and validate a live-compatible proxy using fields actually available in-season (lagged
+   snaps, targets, dropbacks, depth chart / personnel where timestamp-qualified); or
+2. add a licensed live route source if credentials and redistribution rights actually exist.
+
+Do not backfill 2026 route state later from a postseason participation release and call it a
+pregame feature.
