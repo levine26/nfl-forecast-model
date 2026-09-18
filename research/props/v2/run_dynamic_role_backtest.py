@@ -752,7 +752,12 @@ def run(
     simulations: int,
     book_id: int,
     require_genuine_open: bool,
+    role_mode: str = "full",
 ) -> tuple[pd.DataFrame, dict]:
+    role_mode = str(role_mode).strip().lower()
+    if role_mode not in {"route_only", "full"}:
+        raise ValueError("role_mode must be route_only or full")
+
     history_start = 2021
     seasons = list(range(history_start, int(season) + 1))
     bundle = load_core_data(seasons)
