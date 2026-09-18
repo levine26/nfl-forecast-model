@@ -12,10 +12,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from nfl_forecast.props_manifest import assemble_manifest, payload_sha256  # noqa: E402
-
-
-SLATE_CONTRACT_VERSION = "levline-props-integration-slate-v0.1"
+from nfl_forecast.props_manifest import (  # noqa: E402
+    MANIFEST_SLATE_CONTRACT_VERSION,
+    assemble_manifest,
+    payload_sha256,
+)
 
 
 def _load(path: Path):
@@ -326,7 +327,7 @@ def _slate_mode(args, raw_market: dict[str, Any], forecast: datetime) -> int:
         )
 
     slate_index = {
-        "contract_version": SLATE_CONTRACT_VERSION,
+        "contract_version": MANIFEST_SLATE_CONTRACT_VERSION,
         "research_only": True,
         "production_authorized": False,
         "forecast_timestamp_utc": forecast.isoformat(),
