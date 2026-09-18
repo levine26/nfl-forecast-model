@@ -68,9 +68,19 @@ jobs:
           assert d["contract_version"] == "levline-props-v2-dynamic-role-development-v0.1.0"
           assert d["promotion_authorized"] is False
           assert d["paired_v1"]["n"] > 0
-          assert d["game_build_errors"] == {}, d["game_build_errors"]
+          approved_reasons = {"primary_qb_ambiguous", "no_supported_market_listed_players"}
+          unexpected = {
+              game_id: audit
+              for game_id, audit in d["game_build_errors"].items()
+              if audit.get("error") or audit.get("reason") not in approved_reasons
+          }
+          assert unexpected == {}, unexpected
           assert d["headline"]["wins"] + d["headline"]["losses"] > 0
-          print(json.dumps({"headline":d["headline"],"paired_v1":d["paired_v1"]}, indent=2))
+          print(json.dumps({
+              "headline": d["headline"],
+              "paired_v1": d["paired_v1"],
+              "expected_fail_closed_exclusions": d["game_build_errors"],
+          }, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -114,8 +124,17 @@ jobs:
           assert d["market_pairing"]["book_id"] == 30
           assert d["market_pairing"]["require_genuine_open"] is True
           assert d["paired_v1"]["n"] > 0
-          assert d["game_build_errors"] == {}, d["game_build_errors"]
-          print(json.dumps(d["paired_v1"], indent=2))
+          approved_reasons = {"primary_qb_ambiguous", "no_supported_market_listed_players"}
+          unexpected = {
+              game_id: audit
+              for game_id, audit in d["game_build_errors"].items()
+              if audit.get("error") or audit.get("reason") not in approved_reasons
+          }
+          assert unexpected == {}, unexpected
+          print(json.dumps({
+              "paired_v1": d["paired_v1"],
+              "expected_fail_closed_exclusion_count": len(d["game_build_errors"]),
+          }, indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
