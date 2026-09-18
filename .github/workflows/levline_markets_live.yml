@@ -61,7 +61,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
-      PROPS_PRIORS_JSON: ${{ secrets.PROPS_PRIORS_JSON }}
       PROPS_BOOKMAKERS: ${{ vars.PROPS_BOOKMAKERS }}
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -72,27 +71,16 @@ jobs:
         with:
           python-version: '3.11.16'
           cache: pip
-      - name: Fail closed unless live credentials and preregistered priors exist
+      - name: Fail closed unless live sportsbook credential exists
         run: |
           set -euo pipefail
           if [ -z "${THE_ODDS_API_KEY:-}" ]; then
             echo "::error::THE_ODDS_API_KEY repository secret is not configured."
             exit 1
           fi
-          if [ -z "${PROPS_PRIORS_JSON:-}" ]; then
-            echo "::error::PROPS_PRIORS_JSON repository secret is not configured."
-            exit 1
-          fi
-          umask 077
-          printf '%s' "$PROPS_PRIORS_JSON" > /tmp/props_priors.json
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          payload = json.loads(Path('/tmp/props_priors.json').read_text())
-          if not isinstance(payload, dict):
-              raise SystemExit('PROPS_PRIORS_JSON must decode to an object')
-          print('Preregistered Props priors loaded without exposing secret contents.')
-          PY
+          python scripts/run_levline_markets_live.py \
+            --validate-priors-only \
+            --priors config/levline_markets_priors_v1.json
       - run: pip install '.[dev]'
       - uses: actions/cache@v4
         with:
@@ -132,7 +120,7 @@ jobs:
 
             PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/run_levline_markets_live.py \
-                --priors /tmp/props_priors.json \
+                --priors config/levline_markets_priors_v1.json \
                 --work-root .artifacts/props-live \
                 "${EXTRA_ARGS[@]}" \
                 "${BOOK_ARGS[@]}"
