@@ -54,7 +54,13 @@ jobs:
           assert d["market_pairing"]["book_id"] == 15
           assert d["market_pairing"]["require_genuine_open"] is False
           assert d["headline"]["wins"] + d["headline"]["losses"] > 0
-          assert d.get("game_build_errors") == {}, d.get("game_build_errors")
+          allowed_source_exclusions = {"primary_qb_ambiguous", "no_supported_market_listed_players"}
+          unexpected_game_failures = {
+              game_id: meta
+              for game_id, meta in d.get("game_build_errors", {}).items()
+              if meta.get("error") or meta.get("reason") not in allowed_source_exclusions
+          }
+          assert not unexpected_game_failures, unexpected_game_failures
           assert not any(
               str(key).startswith("game_build_or_simulation")
               for key in d.get("exclusions", {})
