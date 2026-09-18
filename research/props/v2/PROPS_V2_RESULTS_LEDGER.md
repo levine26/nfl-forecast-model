@@ -70,32 +70,42 @@ Rolling-origin 2024–2025:
 **Disposition:** REJECT; preregistered gate failed. Permanent record is
 `PROP_FAMILY_MARKET_RESIDUAL_DEVELOPMENT_RESULT.md`.
 
-## Dynamic role v0.1 — workflow still completing
+## Dynamic role v0.1 — complete primary evidence
 
-2023 full role adjustment:
-- paired N **1,549**;
-- challenger **51.26%** vs V1 **50.48%**;
-- gain **+0.77 pp**;
-- Fair-Line MAE **23.77** vs **23.97** V1.
+All six frozen season/mode primary artifacts from workflow `35375788109` completed successfully.
+The first aggregate job had a file-flattening defect; the aggregate below was independently
+reconstructed from the six immutable primary artifacts and is preserved in
+`DYNAMIC_ROLE_V01_DEVELOPMENT_RESULT.md`.
 
-2023 route-only:
-- paired N **1,550**;
-- challenger **50.77%** vs V1 **50.45%**;
-- gain **+0.32 pp**;
-- MAE **24.10** vs **23.96** V1 (worse).
+### Full role adjustment
 
-2025 full (small genuine-OPEN sample, 16 games):
-- paired N **413**;
-- directional accuracy tied at **54.96%**;
-- MAE **16.73** vs **16.81** V1.
+- paired N **5,658**, 230 unique games, 307 unique players;
+- challenger accuracy **51.47%** vs V1 **51.03%**;
+- gain **+0.44 pp**;
+- game-clustered 95% interval for accuracy difference approximately **−0.11 to +1.02 pp**;
+- challenger Fair-Line MAE **19.107** vs V1 **19.230**;
+- paired MAE improvement approximately **−0.124**;
+- game-clustered 95% interval for challenger-minus-V1 MAE approximately **−0.200 to −0.044**;
+- sportsbook OPEN line MAE on the paired rows **15.973**.
 
-2025 route-only:
-- paired N **413**;
-- challenger **55.21%** vs V1 **54.96%**;
-- gain **+0.24 pp**;
-- MAE **16.80** vs **16.81** V1.
+**Disposition:** PROMISING FOOTBALL-PROCESS COMPONENT, NOT PROMOTION EVIDENCE. The Fair-Line error
+improvement is stable enough to motivate a new role-state candidate, but directional improvement is
+not established and the sportsbook line remains materially better.
 
-2024 jobs remain in progress at the time of this ledger entry. No dynamic-role variant is promoted.
+### Route-only adjustment
+
+- paired N **5,658**;
+- challenger accuracy **51.06%** vs V1 **51.03%**;
+- gain **+0.04 pp**;
+- Fair-Line MAE **19.268** vs V1 **19.228**;
+- clustered MAE-difference interval approximately **+0.015 to +0.071**.
+
+**Disposition:** REJECT route-only V0.1 as a standalone improvement.
+
+Dynamic Role V2 is a new candidate rather than a rescue tune of V0.1. Its state-transition parameters
+are estimated from historical participation trajectories only, season-forward, with no prop outcomes
+in the state fit. Proper distribution scoring (empirical CRPS and interval score/coverage) was frozen
+before V2 primary evaluation.
 
 ## Prospective shadow
 
