@@ -32,7 +32,7 @@ export function marketFamily(propType){
   return 'OTHER'
 }
 export function directionFor(forecast){
-  if (forecast?.market_kind==='BINARY_TD') return 'ANYTIME TD'
+  if (forecast?.market_kind==='BINARY_TD') return String(PROP_LABELS[forecast?.prop_type] || 'TD').toUpperCase()
   const diff=numberValue(forecast?.model?.line_difference)
   if (diff==null || Math.abs(diff)<1e-9) return 'MARKET ALIGNED'
   return diff>0?'OVER':'UNDER'
