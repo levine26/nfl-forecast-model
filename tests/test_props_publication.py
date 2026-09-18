@@ -101,7 +101,7 @@ def test_closing_and_grading_overlay_never_mutates_original():
     receipt = make_forecast_receipt(raw, recorded_utc=NOW)
     before = deepcopy(receipt["original_forecast"])
     close = make_closing_event(receipt["forecast_id"], captured_utc="2026-09-20T16:55:00+00:00", source="consensus", line=82.5, over_price_american=-112, under_price_american=-108)
-    grade = grade_forecast_receipt(receipt, actual_result=101, graded_utc="2026-09-20T21:00:00+00:00")
+    grade = grade_forecast_receipt(receipt, actual_result=101, graded_utc="2026-09-20T21:00:00+00:00", result_source="official-stat-feed")
     view = build_history_view([receipt], [close], [grade])[0]
     assert receipt["original_forecast"] == before
     assert view["original_forecast"]["market"]["line"] == 76.5
@@ -109,6 +109,7 @@ def test_closing_and_grading_overlay_never_mutates_original():
     assert view["closing_market"]["line"] == 82.5
     assert view["grade"]["actual_result"] == 101
     assert view["grade"]["grading_result"] == "WIN"
+    assert view["grade"]["result_source"] == "official-stat-feed"
 
 
 def test_reception_push_is_graded_without_rewriting_forecast():
