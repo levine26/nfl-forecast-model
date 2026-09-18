@@ -206,8 +206,11 @@ def apply_market_prior_residual(
     p = _inv_logit(z)
     out = frame.copy()
     out["market_no_vig_p_over"] = features["market_p_over"].to_numpy(float)
+    market_p = out["market_no_vig_p_over"].to_numpy(float)
     out["market_price_side"] = np.where(
-        out["market_no_vig_p_over"].to_numpy(float) >= 0.5, "OVER", "UNDER"
+        market_p > 0.5 + 1e-12,
+        "OVER",
+        np.where(market_p < 0.5 - 1e-12, "UNDER", None),
     )
     out["challenger_p_over"] = p
     out["challenger_p_under"] = 1.0 - p
@@ -234,8 +237,9 @@ def grade_directional_rows(frame: pd.DataFrame) -> pd.DataFrame:
     outcome = np.where(actual > line, "OVER", np.where(actual < line, "UNDER", "PUSH"))
     out["market_outcome_recomputed"] = outcome
     decided = out["market_outcome_recomputed"].ne("PUSH")
+    market_informative = decided & out["market_price_side"].notna()
     out["market_price_correct"] = np.where(
-        decided,
+        market_informative,
         out["market_price_side"].eq(out["market_outcome_recomputed"]).astype(float),
         np.nan,
     )
