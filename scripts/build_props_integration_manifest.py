@@ -3,6 +3,7 @@ from __future__ import annotations
 """Assemble a validated immutable LevLine Props integration manifest from frozen inputs."""
 
 import argparse
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import sys
@@ -71,7 +72,7 @@ def main() -> int:
     parser.add_argument("--residual-efficiency", type=Path, required=True)
     parser.add_argument("--market-snapshot", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
+    parser.add_argument(\n        "--forecast-timestamp",\n        help="Final manifest freeze timestamp. Defaults to current UTC when game spec omits one.",\n    )\n    args = parser.parse_args()
 
     raw_game = _load(args.game_spec)
     raw_opportunity = _load(args.opportunity)
@@ -82,6 +83,21 @@ def main() -> int:
 
     if not isinstance(raw_game, dict):
         raise ValueError("game spec must be a JSON object")
+    if args.forecast_timestamp:
+        parsed_forecast = datetime.fromisoformat(
+            str(args.forecast_timestamp).replace("Z", "+00:00")
+        )
+        if parsed_forecast.tzinfo is None:
+            raise ValueError("--forecast-timestamp must be timezone-aware")
+        raw_game = {
+            **raw_game,
+            "forecast_timestamp_utc": parsed_forecast.astimezone(timezone.utc).isoformat(),
+        }
+    elif not raw_game.get("forecast_timestamp_utc"):
+        raw_game = {
+            **raw_game,
+            "forecast_timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        }
     if not isinstance(raw_market, dict):
         raise ValueError("market snapshot must be a JSON object")
 
