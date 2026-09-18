@@ -349,7 +349,7 @@ a{color:var(--ss-cream)}
   .ss-mobile-week{justify-self:end;color:var(--ss-muted);font-family:var(--ss-display);font-size:11px}
   .ss-brand-lockup.compact b{font-size:15px}
   .ss-brand-lockup.compact small{font-size:7px}
-  .ss-mobile-nav{position:fixed;z-index:50;left:0;right:0;bottom:0;height:66px;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--ss-border-soft);background:rgba(8,9,9,.97);backdrop-filter:blur(18px);padding-bottom:env(safe-area-inset-bottom)}
+  .ss-mobile-nav{position:fixed;z-index:50;left:0;right:0;bottom:0;height:66px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ss-border-soft);background:rgba(8,9,9,.97);backdrop-filter:blur(18px);padding-bottom:env(safe-area-inset-bottom)}
   .ss-mobile-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;color:var(--ss-muted-2);cursor:pointer}
   .ss-mobile-nav button.active{color:var(--ss-cream)}
   .ss-mobile-nav button.active:before{content:"";position:absolute;top:0;width:28px;height:2px;background:var(--ss-red-bright)}
