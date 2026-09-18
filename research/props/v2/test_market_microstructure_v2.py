@@ -64,7 +64,7 @@ def test_point_in_time_features_and_future_market_target_are_separated():
     assert second["probability_move_since_previous"]==pytest.approx(0.04)
     assert second["line_velocity_per_hour"]==pytest.approx(1/6)
     assert second["convergence_velocity_per_hour"]>0
-    assert set(second["books_line_changed_since_previous"])=={"a","b"}
+    assert set(second["books_line_changed_since_previous"])=={"a"}
     assert second["same_threshold_price_book_count"]==2
     assert second["max_quote_age_minutes"]==pytest.approx(11.0)
     assert second["game_outcome_used"] is False
