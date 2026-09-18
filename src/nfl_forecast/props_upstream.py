@@ -369,6 +369,376 @@ def build_lagged_props_history(
     )
 
 
+
+def _clip_probability(value: float, *, label: str) -> float:
+    if not math.isfinite(value):
+        raise PropsUpstreamError(f"{label} is non-finite")
+    return float(min(1.0 - 1e-4, max(1e-4, value)))
+
+
+def _event_mean_sd(values: pd.Series, *, label: str) -> tuple[float, float]:
+    clean = pd.to_numeric(values, errors="coerce").dropna().astype(float)
+    if clean.empty:
+        raise PropsUpstreamError(f"no pre-2026 event evidence for {label}")
+    mean = float(clean.mean())
+    sd = float(clean.std(ddof=0)) if len(clean) > 1 else 0.0
+    return mean, max(sd, 0.25)
+
+
+def fit_pre2026_efficiency_priors(
+    pbp: pd.DataFrame,
+    player_identity: pd.DataFrame,
+    *,
+    trained_through_season: int = 2025,
+) -> dict[str, Any]:
+    """Fit empirical efficiency priors using only seasons at/before the frozen horizon."""
+
+    if int(trained_through_season) > 2025:
+        raise PropsUpstreamError("efficiency priors may not be fit on completed 2026 outcomes")
+    required = {
+        "season",
+        "pass_attempt",
+        "rush_attempt",
+        "complete_pass",
+        "passing_yards",
+        "rushing_yards",
+        "receiving_yards",
+        "yardline_100",
+        "air_yards",
+    }
+    missing = required - set(pbp.columns)
+    if missing:
+        raise PropsUpstreamError(f"PBP missing prior-fit fields: {sorted(missing)}")
+
+    positions, identity_audit = _position_lookup(player_identity)
+    work = pbp.copy()
+    work["season"] = pd.to_numeric(work["season"], errors="coerce")
+    work = work[work["season"].notna() & work["season"].le(int(trained_through_season))].copy()
+    if "season_type" in work.columns:
+        work = work[work["season_type"].astype(str).str.upper().eq("REG")].copy()
+    if work.empty:
+        raise PropsUpstreamError("no pre-2026 regular-season PBP is available for priors")
+
+    pass_attempt = _number(work, "pass_attempt").eq(1)
+    rush_attempt = _number(work, "rush_attempt").eq(1)
+    complete = _number(work, "complete_pass").eq(1)
+    passer_id = _text(work, "passer_player_id", "passer_id")
+    rusher_id = _text(work, "rusher_player_id", "rusher_id")
+    receiver_id = _text(work, "receiver_player_id", "receiver_id")
+    passer_pos = passer_id.map(positions)
+    rusher_pos = rusher_id.map(positions)
+    receiver_pos = receiver_id.map(positions)
+    target = pass_attempt & _valid_id(receiver_id) & receiver_pos.isin(SUPPORTED_POSITIONS)
+
+    qb_pass = pass_attempt & passer_pos.eq("QB")
+    qb_completions = qb_pass & complete
+    qb_attempts_n = int(qb_pass.sum())
+    if qb_attempts_n <= 0:
+        raise PropsUpstreamError("no pre-2026 QB pass-attempt evidence for efficiency priors")
+    completion_rate = _clip_probability(
+        float(qb_completions.sum()) / qb_attempts_n,
+        label="prior_completion_rate",
+    )
+    ypc_mean, ypc_sd = _event_mean_sd(
+        pd.to_numeric(work.loc[qb_completions, "passing_yards"], errors="coerce"),
+        label="yards_per_completion",
+    )
+
+    qb_rush = rush_attempt & rusher_pos.eq("QB")
+    qb_rush_mean, qb_rush_sd = _event_mean_sd(
+        pd.to_numeric(work.loc[qb_rush, "rushing_yards"], errors="coerce"),
+        label="qb_rushing_yards_per_attempt",
+    )
+
+    supported_rush = rush_attempt & rusher_pos.isin(SUPPORTED_POSITIONS)
+    non_qb_rush = supported_rush & ~rusher_pos.eq("QB")
+    fallback_rush = non_qb_rush if bool(non_qb_rush.any()) else supported_rush
+    fallback_rush_mean, fallback_rush_sd = _event_mean_sd(
+        pd.to_numeric(work.loc[fallback_rush, "rushing_yards"], errors="coerce"),
+        label="fallback_rushing_yards_per_attempt",
+    )
+
+    if int(target.sum()) <= 0:
+        raise PropsUpstreamError("no pre-2026 receiving target evidence for efficiency priors")
+    global_catch_rate = _clip_probability(
+        float((target & complete).sum()) / float(target.sum()),
+        label="global_prior_catch_rate",
+    )
+    global_rec = target & complete
+    global_rec_mean, global_rec_sd = _event_mean_sd(
+        pd.to_numeric(work.loc[global_rec, "receiving_yards"], errors="coerce"),
+        label="fallback_receiving_yards_per_reception",
+    )
+    yardline = pd.to_numeric(work["yardline_100"], errors="coerce")
+    air_yards = pd.to_numeric(work["air_yards"], errors="coerce")
+    red_zone_target = target & yardline.le(20)
+    end_zone_target = target & yardline.notna() & air_yards.notna() & air_yards.ge(yardline)
+    global_rz_target_rate = _clip_probability(
+        float(red_zone_target.sum()) / float(target.sum()),
+        label="global_prior_red_zone_target_rate",
+    )
+    global_ez_target_rate = _clip_probability(
+        float(end_zone_target.sum()) / float(target.sum()),
+        label="global_prior_end_zone_target_rate",
+    )
+    goal_line = supported_rush & yardline.le(5)
+    global_goal_line_rate = _clip_probability(
+        float(goal_line.sum()) / float(supported_rush.sum()),
+        label="global_prior_goal_line_carry_rate",
+    )
+
+    priors: dict[str, dict[str, float]] = {}
+    for position in sorted(SUPPORTED_POSITIONS):
+        pos_rush = supported_rush & rusher_pos.eq(position)
+        if bool(pos_rush.any()):
+            rush_mean, rush_sd = _event_mean_sd(
+                pd.to_numeric(work.loc[pos_rush, "rushing_yards"], errors="coerce"),
+                label=f"{position}_rushing_yards_per_attempt",
+            )
+            goal_rate = _clip_probability(
+                float((pos_rush & yardline.le(5)).sum()) / float(pos_rush.sum()),
+                label=f"{position}_prior_goal_line_carry_rate",
+            )
+        else:
+            rush_mean, rush_sd = fallback_rush_mean, fallback_rush_sd
+            goal_rate = global_goal_line_rate
+
+        pos_targets = target & receiver_pos.eq(position)
+        if bool(pos_targets.any()):
+            catch_rate = _clip_probability(
+                float((pos_targets & complete).sum()) / float(pos_targets.sum()),
+                label=f"{position}_prior_catch_rate",
+            )
+            rz_rate = _clip_probability(
+                float((pos_targets & yardline.le(20)).sum()) / float(pos_targets.sum()),
+                label=f"{position}_prior_red_zone_target_rate",
+            )
+            ez_rate = _clip_probability(
+                float(
+                    (
+                        pos_targets
+                        & yardline.notna()
+                        & air_yards.notna()
+                        & air_yards.ge(yardline)
+                    ).sum()
+                )
+                / float(pos_targets.sum()),
+                label=f"{position}_prior_end_zone_target_rate",
+            )
+            pos_receptions = pos_targets & complete
+            if bool(pos_receptions.any()):
+                rec_mean, rec_sd = _event_mean_sd(
+                    pd.to_numeric(work.loc[pos_receptions, "receiving_yards"], errors="coerce"),
+                    label=f"{position}_receiving_yards_per_reception",
+                )
+            else:
+                rec_mean, rec_sd = global_rec_mean, global_rec_sd
+        else:
+            catch_rate = global_catch_rate
+            rz_rate = global_rz_target_rate
+            ez_rate = global_ez_target_rate
+            rec_mean, rec_sd = global_rec_mean, global_rec_sd
+
+        priors[position] = {
+            "prior_completion_rate": completion_rate,
+            "prior_yards_per_completion_mean": ypc_mean,
+            "prior_yards_per_completion_sd": ypc_sd,
+            "prior_qb_rush_ypc_mean": qb_rush_mean,
+            "prior_qb_rush_ypc_sd": qb_rush_sd,
+            "prior_rush_ypc_mean": rush_mean,
+            "prior_rush_ypc_sd": rush_sd,
+            "prior_catch_rate": catch_rate,
+            "prior_receiving_ypr_mean": rec_mean,
+            "prior_receiving_ypr_sd": rec_sd,
+            "prior_red_zone_target_rate": rz_rate,
+            "prior_end_zone_target_rate": ez_rate,
+            "prior_goal_line_carry_rate": goal_rate,
+        }
+
+    return {
+        "trained_through_season": int(trained_through_season),
+        "efficiency_position_priors": priors,
+        "residual_efficiency": {
+            "catch_rate": global_catch_rate,
+            "receiving_yards_per_reception": global_rec_mean,
+            "rushing_yards_per_carry": fallback_rush_mean,
+        },
+        "audit": {
+            "method": "empirical_pre2026_regular_season_pbp",
+            "trained_through_season": int(trained_through_season),
+            "pbp_rows": int(len(work)),
+            "qb_pass_attempts": qb_attempts_n,
+            "receiving_targets": int(target.sum()),
+            "supported_rush_attempts": int(supported_rush.sum()),
+            "completed_2026_outcomes_used_for_prior_fit": 0,
+            "identity": identity_audit,
+        },
+    }
+
+
+def build_empirical_scoring_context(
+    pbp: pd.DataFrame,
+    *,
+    teams: Sequence[str],
+    season: int,
+    week: int,
+    trained_through_season: int = 2025,
+) -> dict[str, Any]:
+    """Build current team scoring-volume state with priors frozen through 2025."""
+
+    if int(trained_through_season) > 2025:
+        raise PropsUpstreamError("scoring priors may not be fit on completed 2026 outcomes")
+    for field in ("drive", "yardline_100", "pass_touchdown", "rush_touchdown"):
+        if field not in pbp.columns:
+            raise PropsUpstreamError(
+                f"PBP missing scoring-context field {field}; provide explicit scoring context"
+            )
+    work = _safe_history(pbp, season=season, week=week)
+    if "season_type" in work.columns:
+        work = work[work["season_type"].astype(str).str.upper().eq("REG")].copy()
+    if work.empty:
+        raise PropsUpstreamError("no strictly lagged regular-season PBP for scoring context")
+
+    work["_drive"] = pd.to_numeric(work["drive"], errors="coerce")
+    yardline = pd.to_numeric(work["yardline_100"], errors="coerce")
+    pass_td = _number(work, "pass_touchdown").eq(1)
+    rush_td = _number(work, "rush_touchdown").eq(1)
+    work["_rz_play"] = yardline.le(20)
+    work["_off_td"] = pass_td | rush_td
+    work["_non_rz_pass_td"] = pass_td & yardline.gt(20)
+    work["_non_rz_rush_td"] = rush_td & yardline.gt(20)
+
+    drive_rows = work[work["_drive"].notna()].copy()
+    if drive_rows.empty:
+        raise PropsUpstreamError("no valid drive identifiers in lagged PBP")
+    drives = (
+        drive_rows.groupby(
+            ["game_id", "season", "week", "team", "_drive"],
+            as_index=False,
+            sort=False,
+        )
+        .agg(
+            reached_red_zone=("_rz_play", "max"),
+            offensive_td=("_off_td", "max"),
+        )
+    )
+    team_games = (
+        drives.groupby(["game_id", "season", "week", "team"], as_index=False, sort=False)
+        .agg(
+            drives=("_drive", "nunique"),
+            red_zone_trips=("reached_red_zone", "sum"),
+        )
+    )
+    non_rz = (
+        work.groupby(["game_id", "season", "week", "team"], as_index=False, sort=False)
+        .agg(
+            non_red_zone_pass_tds=("_non_rz_pass_td", "sum"),
+            non_red_zone_rush_tds=("_non_rz_rush_td", "sum"),
+        )
+    )
+    team_games = team_games.merge(
+        non_rz,
+        on=["game_id", "season", "week", "team"],
+        how="left",
+        validate="one_to_one",
+    )
+
+    pre = work[work["season"].le(int(trained_through_season))].copy()
+    if pre.empty:
+        raise PropsUpstreamError("no pre-2026 PBP available for scoring priors")
+    pre_drives = drives[drives["season"].le(int(trained_through_season))].copy()
+    pre_rz = pre_drives[pre_drives["reached_red_zone"].astype(bool)]
+    if pre_rz.empty:
+        raise PropsUpstreamError("no pre-2026 red-zone drive evidence")
+    red_zone_td_rate = _clip_probability(
+        float(pre_rz["offensive_td"].sum()) / float(len(pre_rz)),
+        label="prior_red_zone_td_rate",
+    )
+    pre_pass_td = _number(pre, "pass_touchdown").eq(1)
+    pre_rush_td = _number(pre, "rush_touchdown").eq(1)
+    total_off_tds = int(pre_pass_td.sum() + pre_rush_td.sum())
+    if total_off_tds <= 0:
+        raise PropsUpstreamError("no pre-2026 offensive TD evidence")
+    pass_td_fraction = _clip_probability(
+        float(pre_pass_td.sum()) / float(total_off_tds),
+        label="prior_pass_td_fraction",
+    )
+
+    normalized_teams = [normalize_team_code(team) for team in teams]
+    league_means = {
+        column: float(pd.to_numeric(team_games[column], errors="coerce").mean())
+        for column in (
+            "drives",
+            "red_zone_trips",
+            "non_red_zone_pass_tds",
+            "non_red_zone_rush_tds",
+        )
+    }
+    contexts: dict[str, dict[str, float]] = {}
+    team_audit: dict[str, Any] = {}
+    for team in normalized_teams:
+        rows = team_games[team_games["team"].map(normalize_team_code).eq(team)].copy()
+        source = "team_strictly_lagged_history"
+        if rows.empty:
+            source = "league_strictly_lagged_fallback"
+        def avg(column: str) -> float:
+            if rows.empty:
+                return league_means[column]
+            value = float(pd.to_numeric(rows[column], errors="coerce").mean())
+            return league_means[column] if not math.isfinite(value) else value
+
+        expected_drives = max(avg("drives"), 0.0)
+        expected_rz = max(min(avg("red_zone_trips"), expected_drives), 0.0)
+        contexts[team] = {
+            "expected_drives": expected_drives,
+            "expected_red_zone_trips": expected_rz,
+            "prior_red_zone_td_rate": red_zone_td_rate,
+            "prior_pass_td_fraction": pass_td_fraction,
+            "expected_non_red_zone_pass_tds": max(avg("non_red_zone_pass_tds"), 0.0),
+            "expected_non_red_zone_rush_tds": max(avg("non_red_zone_rush_tds"), 0.0),
+        }
+        team_audit[team] = {
+            "state_source": source,
+            "historical_team_games": int(len(rows)),
+        }
+
+    return {
+        "scoring_context_by_team": contexts,
+        "audit": {
+            "method": "strictly_lagged_team_means_with_pre2026_league_scoring_priors",
+            "trained_through_season": int(trained_through_season),
+            "red_zone_td_prior_source": "league_pre2026",
+            "pass_td_fraction_prior_source": "league_pre2026",
+            "completed_2026_outcomes_used_for_prior_fit": 0,
+            "prior_2026_games_allowed_for_chronological_team_state": True,
+            "teams": team_audit,
+        },
+    }
+
+
+def residual_efficiency_by_team_from_empirical_priors(
+    teams: Sequence[str],
+    fitted_priors: Mapping[str, Any],
+) -> dict[str, dict[str, float]]:
+    residual = fitted_priors.get("residual_efficiency")
+    if not isinstance(residual, Mapping):
+        raise PropsUpstreamError("fitted empirical priors missing residual_efficiency")
+    required = {
+        "catch_rate",
+        "receiving_yards_per_reception",
+        "rushing_yards_per_carry",
+    }
+    missing = required - set(residual)
+    if missing:
+        raise PropsUpstreamError(f"residual empirical priors missing: {sorted(missing)}")
+    values = {key: float(residual[key]) for key in required}
+    if not all(math.isfinite(value) for value in values.values()):
+        raise PropsUpstreamError("residual empirical priors must be finite")
+    return {
+        normalize_team_code(team): dict(values)
+        for team in teams
+    }
+
 def build_efficiency_baselines(
     *,
     projection_players: Sequence[Mapping[str, Any]],
