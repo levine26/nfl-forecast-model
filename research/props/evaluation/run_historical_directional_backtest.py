@@ -81,8 +81,17 @@ def _team(value) -> str:
 
 
 def _valid_player_id(value) -> bool:
-    text = str(value or "").strip()
+    try:
+        if value is None or pd.isna(value):
+            return False
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip()
     return bool(text) and text not in {"<NA>", "nan", "None", "null"}
+
+
+def _scalar_id(value) -> str:
+    return str(value).strip() if _valid_player_id(value) else ""
 
 
 def _download(url: str, target: Path) -> None:
@@ -414,6 +423,14 @@ def _candidate_col(frame: pd.DataFrame, names: tuple[str, ...]) -> str | None:
     return next((name for name in names if name in frame.columns), None)
 
 
+def _scalar_number(value, default: float = 0.0) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return float(default)
+    return number if math.isfinite(number) else float(default)
+
+
 def build_game_stats_and_participation(
     pbp: pd.DataFrame,
     snap_counts: pd.DataFrame | None,
@@ -447,34 +464,17 @@ def build_game_stats_and_participation(
 
     for _, row in pbp.iterrows():
         game_id = str(row[game_col])
-        passer = str(row.get(passer_col) or "").strip()
+        passer = _scalar_id(row.get(passer_col))
         if _valid_player_id(passer):
-            stats[(game_id, passer)]["passing_yards"] += float(
-                pd.to_numeric(row.get("passing_yards"), errors="coerce")
-                if pd.notna(pd.to_numeric(row.get("passing_yards"), errors="coerce"))
-                else 0.0
-            )
-            stats[(game_id, passer)]["passing_tds"] += float(
-                pd.to_numeric(row.get("pass_touchdown"), errors="coerce")
-                if pd.notna(pd.to_numeric(row.get("pass_touchdown"), errors="coerce"))
-                else 0.0
-            )
-        rusher = str(row.get(rusher_col) or "").strip()
+            stats[(game_id, passer)]["passing_yards"] += _scalar_number(row.get("passing_yards"))
+            stats[(game_id, passer)]["passing_tds"] += _scalar_number(row.get("pass_touchdown"))
+        rusher = _scalar_id(row.get(rusher_col))
         if _valid_player_id(rusher):
-            stats[(game_id, rusher)]["rushing_yards"] += float(
-                pd.to_numeric(row.get("rushing_yards"), errors="coerce")
-                if pd.notna(pd.to_numeric(row.get("rushing_yards"), errors="coerce"))
-                else 0.0
-            )
-        receiver = str(row.get(receiver_col) or "").strip()
+            stats[(game_id, rusher)]["rushing_yards"] += _scalar_number(row.get("rushing_yards"))
+        receiver = _scalar_id(row.get(receiver_col))
         if _valid_player_id(receiver):
-            stats[(game_id, receiver)]["receiving_yards"] += float(
-                pd.to_numeric(row.get("receiving_yards"), errors="coerce")
-                if pd.notna(pd.to_numeric(row.get("receiving_yards"), errors="coerce"))
-                else 0.0
-            )
-            complete = pd.to_numeric(row.get("complete_pass"), errors="coerce")
-            stats[(game_id, receiver)]["receptions"] += float(complete if pd.notna(complete) else 0.0)
+            stats[(game_id, receiver)]["receiving_yards"] += _scalar_number(row.get("receiving_yards"))
+            stats[(game_id, receiver)]["receptions"] += _scalar_number(row.get("complete_pass"))
 
     participation: dict[tuple[str, str], dict[str, int]] = {}
     snap_audit = {"available": snap_counts is not None and not snap_counts.empty}
