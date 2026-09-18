@@ -54,6 +54,10 @@ SOURCE_URL = (
     "https://raw.githubusercontent.com/gcampb41/nfl_data-/main/"
     "data/processed/football/nfl/player_props/{season}.parquet"
 )
+GAME_LINE_SOURCE_URL = (
+    "https://raw.githubusercontent.com/gcampb41/nfl_data-/main/"
+    "data/processed/football/nfl/game_lines/{season}.parquet"
+)
 SUPPORTED_POSITIONS = frozenset({"QB", "RB", "WR", "TE"})
 HEADLINE_BET_TYPES = frozenset(
     {"passing_yards", "passing_tds", "rushing_yards", "receiving_yards", "receptions"}
@@ -176,6 +180,36 @@ def normalize_historical_pbp(pbp: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     }
 
 
+def load_game_line_source(season: int) -> tuple[pd.DataFrame, dict]:
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / f"game_lines_{season}.parquet"
+        _download(GAME_LINE_SOURCE_URL.format(season=season), path)
+        raw = pd.read_parquet(path)
+    required = {"event_id", "team", "season", "week"}
+    missing = required - set(raw.columns)
+    if missing:
+        raise RuntimeError(f"historical game-line source missing columns: {sorted(missing)}")
+    work = raw.copy()
+    work["season"] = pd.to_numeric(work["season"], errors="coerce")
+    work["week"] = pd.to_numeric(work["week"], errors="coerce")
+    work["event_id"] = pd.to_numeric(work["event_id"], errors="coerce")
+    work["team"] = work["team"].map(_team)
+    work = work[
+        work["season"].eq(int(season))
+        & work["week"].between(1, 18)
+        & work["event_id"].notna()
+    ].copy()
+    work["event_id"] = work["event_id"].astype(int)
+    work["week"] = work["week"].astype(int)
+    return work, {
+        "source_repository": SOURCE_REPOSITORY,
+        "season": int(season),
+        "raw_rows": int(len(raw)),
+        "regular_season_rows": int(len(work)),
+        "regular_season_events": int(work["event_id"].nunique()),
+    }
+
+
 def canonical_schedule(bundle, season: int) -> pd.DataFrame:
     schedule = add_nflverse_kickoff_timestamp(bundle.schedules)
     if "game_type" in schedule.columns:
@@ -218,7 +252,7 @@ def roster_metadata(
 
 
 def map_events_to_schedule(
-    roster: pd.DataFrame,
+    event_team_rows: pd.DataFrame,
     schedule: pd.DataFrame,
 ) -> tuple[dict[int, dict], dict]:
     by_week_pair: dict[tuple[int, frozenset[str]], list[dict]] = defaultdict(list)
@@ -230,7 +264,7 @@ def map_events_to_schedule(
     reasons = defaultdict(int)
     schedule_teams = set(schedule["home_team"]) | set(schedule["away_team"])
 
-    for event_id, rows in roster.groupby("event_id", sort=False):
+    for event_id, rows in event_team_rows.groupby("event_id", sort=False):
         week_values = sorted(set(pd.to_numeric(rows["week"], errors="coerce").dropna().astype(int)))
         if len(week_values) != 1:
             reasons["ambiguous_event_week"] += 1
@@ -252,7 +286,7 @@ def map_events_to_schedule(
 
     return mapped, {
         "mapped_events": len(mapped),
-        "unmapped_events": int(roster["event_id"].nunique() - len(mapped)),
+        "unmapped_events": int(event_team_rows["event_id"].nunique() - len(mapped)),
         "unmapped_reasons": dict(reasons),
     }
 
@@ -545,6 +579,32 @@ def build_game_stats_and_participation(
     return dict(stats), participation, snap_audit
 
 
+def sanitize_efficiency_history_for_frozen_validator(history):
+    frame = history.efficiency_history.copy()
+    audit = {
+        "negative_nonqb_rushing_history_rows_reset": 0,
+        "negative_qb_rushing_history_rows_reset": 0,
+    }
+    if not frame.empty:
+        nonqb = pd.to_numeric(frame.get("hist_rushing_yards"), errors="coerce").fillna(0).lt(0)
+        if nonqb.any():
+            audit["negative_nonqb_rushing_history_rows_reset"] = int(nonqb.sum())
+            frame.loc[nonqb, ["hist_carries", "hist_rushing_yards"]] = 0.0
+        qb = pd.to_numeric(frame.get("hist_qb_rush_yards"), errors="coerce").fillna(0).lt(0)
+        if qb.any():
+            audit["negative_qb_rushing_history_rows_reset"] = int(qb.sum())
+            frame.loc[qb, ["hist_qb_rush_attempts", "hist_qb_rush_yards"]] = 0.0
+    return type(history)(
+        team_history=history.team_history,
+        player_history=history.player_history,
+        efficiency_history=frame,
+        audit={
+            **history.audit,
+            "historical_efficiency_validator_adapter": audit,
+        },
+    ), audit
+
+
 def prior_five_average(
     stats: dict[tuple[str, str], dict[str, float]],
     participation: dict[tuple[str, str], dict[str, int]],
@@ -670,6 +730,10 @@ def run(
 
     market, market_source_audit = load_market_source(season)
     market = market[market["week"].between(int(week_start), int(week_end))].copy()
+    game_lines, game_line_source_audit = load_game_line_source(season)
+    game_lines = game_lines[
+        game_lines["week"].between(int(week_start), int(week_end))
+    ].copy()
     schedule = canonical_schedule(bundle, season)
     schedule = schedule[schedule["week"].between(int(week_start), int(week_end))].copy()
     roster = roster_metadata(
@@ -677,7 +741,7 @@ def run(
         book_id=book_id,
         require_genuine_open=require_genuine_open,
     )
-    event_map, event_map_audit = map_events_to_schedule(roster, schedule)
+    event_map, event_map_audit = map_events_to_schedule(game_lines, schedule)
     observations, market_pair_audit = market_observations(
         market,
         book_id=book_id,
@@ -700,6 +764,7 @@ def run(
 
     result_rows: list[dict] = []
     exclusions = defaultdict(int)
+    efficiency_adapter_totals = defaultdict(int)
     game_build_audit: dict[str, dict] = {}
 
     obs_by_event = {int(event): rows.copy() for event, rows in observations.groupby("event_id")}
@@ -719,6 +784,11 @@ def run(
             season=season,
             week=week,
         )
+        lagged, efficiency_history_adapter_audit = sanitize_efficiency_history_for_frozen_validator(
+            lagged
+        )
+        for key, value in efficiency_history_adapter_audit.items():
+            efficiency_adapter_totals[key] += int(value)
         week_teams = sorted(
             {
                 _team(event_map[event]["home_team"])
@@ -901,7 +971,9 @@ def run(
         "weeks": [int(week_start), int(week_end)],
         "simulations_per_game": int(simulations),
         "market_source": market_source_audit,
+        "game_line_source": game_line_source_audit,
         "pbp_source_normalization": pbp_normalization_audit,
+        "efficiency_history_adapter": dict(efficiency_adapter_totals),
         "market_pairing": market_pair_audit,
         "event_mapping": event_map_audit,
         "snap_identity": snap_identity_audit,
