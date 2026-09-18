@@ -1,0 +1,42 @@
+{
+  "evaluation_contract_version": "levline-props-eval-v1.0",
+  "frozen_model_ref": "research/props-integration@db5478fd735ef0cad8fd1215e8b1fb6a96a3a21d",
+  "evidence_scope": "accessible committed repository artifacts on research/props-integration",
+  "sample": {
+    "forecasts": 0,
+    "unique_players": 0,
+    "unique_games": 0,
+    "unique_weeks": 0,
+    "graded_forecasts": 0,
+    "matched_market": 0,
+    "matched_close": 0,
+    "model_edge_bets": 0
+  },
+  "metrics": {
+    "fair_line_mae": null,
+    "model_mean_mae": null,
+    "rmse": null,
+    "brier": null,
+    "log_loss": null,
+    "ece": null,
+    "market_brier": null,
+    "roi": null,
+    "net_units": null,
+    "threshold_clv": null
+  },
+  "claim_readiness": {
+    "projection_accuracy": false,
+    "calibration": false,
+    "market_superiority": false,
+    "roi": false
+  },
+  "evidence_files": {
+    "outputs/props/forecasts.json": "not committed/unavailable",
+    "outputs/props/public_props.json": "not committed/unavailable",
+    "outputs/props/history/forecast_originals.jsonl": "not committed/unavailable",
+    "outputs/props/history/market_closes.jsonl": "not committed/unavailable",
+    "outputs/props/history/grades.jsonl": "not committed/unavailable"
+  },
+  "historical_backtest_status": "not admitted; complete point-in-time roster/availability source not yet qualified",
+  "synthetic_tests_count_as_predictive_evidence": false
+}
