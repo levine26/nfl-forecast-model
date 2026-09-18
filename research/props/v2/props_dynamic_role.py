@@ -259,8 +259,18 @@ def build_dynamic_role_adjustments(
     week: int,
     team: str,
     route_prior_means: Mapping[str, float] | None = None,
+    mode: str = "full",
 ) -> tuple[dict[str, dict[str, float]], dict[str, Any]]:
-    """Build role multipliers for one current offense from prior-game snap shares."""
+    """Build role multipliers for one current offense from prior-game snap shares.
+
+    Modes are frozen research ablations:
+    - route_only: change only route participation level;
+    - full: route level plus recent-vs-long target/carry role trends.
+    """
+
+    mode = str(mode).strip().lower()
+    if mode not in {"route_only", "full"}:
+        raise DynamicRoleError("mode must be route_only or full")
 
     history, history_audit = normalize_lagged_snap_history(
         snap_counts,
@@ -337,8 +347,9 @@ def build_dynamic_role_adjustments(
         adjustment = {}
         if position in RECEIVING_POSITIONS:
             adjustment["route_role_multiplier"] = route_multiplier
-            adjustment["target_role_multiplier"] = target_multiplier
-        if position in CARRY_POSITIONS:
+            if mode == "full":
+                adjustment["target_role_multiplier"] = target_multiplier
+        if position in CARRY_POSITIONS and mode == "full":
             adjustment["carry_role_multiplier"] = carry_multiplier
         if adjustment:
             adjustments[pid] = adjustment
@@ -360,6 +371,7 @@ def build_dynamic_role_adjustments(
     return adjustments, {
         "engine_version": ENGINE_VERSION,
         "research_label": RESEARCH_LABEL,
+        "mode": mode,
         "history": history_audit,
         "team": team_code,
         "adjusted_players": len(adjustments),
