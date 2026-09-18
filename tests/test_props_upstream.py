@@ -11,6 +11,7 @@ from nfl_forecast.props_upstream import (
     build_game_upstream_package,
     build_lagged_props_history,
     fit_pre2026_efficiency_priors,
+    fit_pre2026_injury_availability_priors,
     residual_efficiency_by_team_from_empirical_priors,
 )
 
@@ -438,3 +439,133 @@ def test_residual_efficiency_is_derived_from_pre2026_empirical_priors():
     assert set(residual) == {"ARI", "LAR"}
     assert residual["ARI"] == residual["LAR"]
     assert 0 < residual["ARI"]["catch_rate"] < 1
+
+
+
+def test_historical_injury_availability_priors_use_only_pre2026_snap_outcomes():
+    injuries = pd.DataFrame(
+        [
+            {
+                "season": 2024,
+                "season_type": "REG",
+                "week": 1,
+                "team": "ARI",
+                "gsis_id": "A-WR",
+                "position": "WR",
+                "report_status": "Questionable",
+                "date_modified": "2024-09-05T18:00:00Z",
+            },
+            {
+                "season": 2024,
+                "season_type": "REG",
+                "week": 2,
+                "team": "ARI",
+                "gsis_id": "A-WR",
+                "position": "WR",
+                "report_status": "Questionable",
+                "date_modified": "2024-09-12T18:00:00Z",
+            },
+            {
+                "season": 2024,
+                "season_type": "REG",
+                "week": 3,
+                "team": "LAR",
+                "gsis_id": "L-RB",
+                "position": "RB",
+                "report_status": "Doubtful",
+                "date_modified": "2024-09-19T18:00:00Z",
+            },
+            {
+                "season": 2026,
+                "season_type": "REG",
+                "week": 1,
+                "team": "ARI",
+                "gsis_id": "A-WR",
+                "position": "WR",
+                "report_status": "Questionable",
+                "date_modified": "2026-09-05T18:00:00Z",
+            },
+        ]
+    )
+    snaps = pd.DataFrame(
+        [
+            {
+                "season": 2024, "week": 1, "team": "ARI", "player_id": "A-WR",
+                "offense_snaps": 55, "game_type": "REG",
+            },
+            {
+                "season": 2024, "week": 2, "team": "ARI", "player_id": "OTHER",
+                "offense_snaps": 60, "game_type": "REG",
+            },
+            {
+                "season": 2024, "week": 3, "team": "LAR", "player_id": "OTHER",
+                "offense_snaps": 60, "game_type": "REG",
+            },
+            {
+                "season": 2026, "week": 1, "team": "ARI", "player_id": "A-WR",
+                "offense_snaps": 99, "game_type": "REG",
+            },
+        ]
+    )
+
+    fitted = fit_pre2026_injury_availability_priors(
+        injuries,
+        snaps,
+        trained_through_season=2024,
+    )
+    q = fitted["availability_beta_priors"]["QUESTIONABLE"]
+    d = fitted["availability_beta_priors"]["DOUBTFUL"]
+    assert q == {"alpha": 2.0, "beta": 2.0}
+    assert d == {"alpha": 1.0, "beta": 2.0}
+    assert fitted["audit"]["states"]["QUESTIONABLE"]["observations"] == 2
+    assert fitted["audit"]["states"]["DOUBTFUL"]["observations"] == 1
+    assert fitted["audit"]["completed_2026_outcomes_used_for_prior_fit"] == 0
+
+
+def test_injury_availability_fit_drops_team_weeks_without_snap_source_coverage():
+    injuries = pd.DataFrame(
+        [
+            {
+                "season": 2024,
+                "week": 1,
+                "team": "ARI",
+                "gsis_id": "A-WR",
+                "position": "WR",
+                "report_status": "Questionable",
+            },
+            {
+                "season": 2024,
+                "week": 2,
+                "team": "LAR",
+                "gsis_id": "L-WR",
+                "position": "WR",
+                "report_status": "Questionable",
+            },
+        ]
+    )
+    snaps = pd.DataFrame(
+        [
+            {
+                "season": 2024,
+                "week": 1,
+                "team": "ARI",
+                "player_id": "A-WR",
+                "offense_snaps": 10,
+            }
+        ]
+    )
+    fitted = fit_pre2026_injury_availability_priors(injuries, snaps)
+    assert fitted["audit"]["uncovered_team_week_rows_dropped"] == 1
+    assert fitted["availability_beta_priors"]["QUESTIONABLE"] == {
+        "alpha": 2.0,
+        "beta": 1.0,
+    }
+
+
+def test_injury_availability_fit_rejects_2026_training_horizon():
+    with pytest.raises(PropsUpstreamError, match="2026 outcomes"):
+        fit_pre2026_injury_availability_priors(
+            pd.DataFrame(),
+            pd.DataFrame(),
+            trained_through_season=2026,
+        )
