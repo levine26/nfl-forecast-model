@@ -13,3 +13,69 @@ export function sortForecasts(rows=[]){return [...rows].sort((a,b)=>{const s=sig
 export function primaryMarketPrice(forecast){const m=forecast?.market||{};return forecast?.market_kind==='BINARY_TD'?m.td_price_american:m.over_price_american}
 export function rangeText(forecast){const i=forecast?.model?.prediction_interval||{},lo=numberValue(i.low),hi=numberValue(i.high);if(lo==null||hi==null)return '—';const c=numberValue(i.coverage);return `${c==null?'Model range':`${Math.round(c*100)}% model range`}: ${formatLine(lo)}–${formatLine(hi)}`}
 export function qualityLabel(forecast){const q=forecast?.data_quality||{};return `${q.state||'UNKNOWN'} data · ${q.confidence||'UNAVAILABLE'} confidence`}
+
+
+export const MARKET_FILTERS = {
+  ALL: null,
+  PASSING: ['passing_yards','passing_tds'],
+  RUSHING: ['rushing_yards','rushing_td'],
+  RECEIVING: ['receiving_yards','receiving_td'],
+  RECEPTIONS: ['receptions'],
+  TDS: ['passing_tds','rushing_td','receiving_td','anytime_td'],
+}
+export function marketFamily(propType){
+  if (String(propType||'').includes('passing')) return 'PASSING'
+  if (propType==='receptions') return 'RECEPTIONS'
+  if (String(propType||'').includes('rushing')) return 'RUSHING'
+  if (String(propType||'').includes('receiving')) return 'RECEIVING'
+  if (propType==='anytime_td') return 'TDS'
+  return 'OTHER'
+}
+export function directionFor(forecast){
+  if (forecast?.market_kind==='BINARY_TD') return 'ANYTIME TD'
+  const diff=numberValue(forecast?.model?.line_difference)
+  if (diff==null || Math.abs(diff)<1e-9) return 'MARKET ALIGNED'
+  return diff>0?'OVER':'UNDER'
+}
+export function unitFor(forecast){
+  if (forecast?.prop_type==='receptions') return 'REC'
+  if (forecast?.prop_type==='passing_tds') return 'TD'
+  return 'YDS'
+}
+export function kickoffValue(forecast){
+  const value=Date.parse(forecast?.kickoff_utc||'')
+  return Number.isFinite(value)?value:Number.MAX_SAFE_INTEGER
+}
+export function qualityRank(forecast){
+  return ({HIGH:0,MEDIUM:1,LOW:2,INSUFFICIENT:3})[String(forecast?.data_quality?.state||'').toUpperCase()]??4
+}
+export function sortTopSignals(rows=[]){
+  return rows.filter(row=>row?.signal_state==='MODEL EDGE').sort((a,b)=>{
+    const edge=Math.abs(numberValue(b?.model?.probability_edge)??-1)-Math.abs(numberValue(a?.model?.probability_edge)??-1)
+    if(edge) return edge
+    const quality=qualityRank(a)-qualityRank(b)
+    if(quality) return quality
+    const kickoff=kickoffValue(a)-kickoffValue(b)
+    if(kickoff) return kickoff
+    return String(a?.forecast_id||a?.player||'').localeCompare(String(b?.forecast_id||b?.player||''))
+  })
+}
+export function sortForBrowse(rows=[],mode='signal'){
+  const copy=[...rows]
+  if(mode==='kickoff') return copy.sort((a,b)=>kickoffValue(a)-kickoffValue(b)||String(a?.player||'').localeCompare(String(b?.player||'')))
+  if(mode==='player') return copy.sort((a,b)=>String(a?.player||'').localeCompare(String(b?.player||''))||String(a?.prop_type||'').localeCompare(String(b?.prop_type||'')))
+  if(mode==='fair-line-gap') return copy.sort((a,b)=>Math.abs(numberValue(b?.model?.line_difference)??-1)-Math.abs(numberValue(a?.model?.line_difference)??-1)||signalRank(a?.signal_state)-signalRank(b?.signal_state))
+  return sortForecasts(copy)
+}
+export function formatTimestamp(value){
+  if(!value) return '—'
+  const date=new Date(value)
+  if(Number.isNaN(date.getTime())) return '—'
+  return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/Los_Angeles',timeZoneName:'short'}).format(date)
+}
+export function formatKickoff(value){
+  if(!value) return 'TBD'
+  const date=new Date(value)
+  if(Number.isNaN(date.getTime())) return 'TBD'
+  return new Intl.DateTimeFormat('en-US',{weekday:'short',hour:'numeric',minute:'2-digit',timeZone:'America/Los_Angeles'}).format(date)
+}
