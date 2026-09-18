@@ -84,6 +84,22 @@ route data must fail back to preregistered priors rather than inferred postgame 
 Historical nflverse participation data may be used only where it was genuinely available for
 retrospective reconstruction. It must never be mistaken for a live in-season source.
 
+### C2 ablation frozen before outcome evaluation
+
+The dynamic-role historical experiment must distinguish two mechanisms rather than
+crediting them jointly:
+
+- `route_only`: use strictly lagged offensive snap share only to replace the fixed
+  player route-participation level proxy; leave target-share and carry-share allocation
+  unchanged.
+- `full`: apply the same route-level adjustment plus a short-vs-long snap-share trend
+  multiplier to target and RB carry allocation.
+
+Both variants use the same V1 paired simulation rows, market population, seeds, and
+20,000-simulation setting. Neither variant may be selected as the headline because it
+wins retrospectively; results are an ablation/diagnostic and require prospective
+validation.
+
 ### C3 — Decomposed efficiency
 
 Research challenger decomposition:
