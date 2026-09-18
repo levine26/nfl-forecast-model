@@ -271,3 +271,11 @@ def test_2026_trained_priors_fail_closed_before_lane_build():
             prior_model_trained_through_season=2026,
             primary_qb_by_team={},
         )
+
+
+def test_missing_scoring_area_columns_degrade_to_zero_without_crash():
+    pbp = _pbp().drop(columns=["yardline_100", "air_yards"])
+    history = build_lagged_props_history(pbp, _identity(), season=2026, week=3)
+    assert history.player_history["red_zone_targets"].sum() == 0.0
+    assert history.player_history["end_zone_targets"].sum() == 0.0
+    assert history.player_history["goal_line_carries"].sum() == 0.0
