@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - research/props-integration
+      - research/props-accuracy-evaluation
     paths:
       - "research/props/evaluation/run_historical_directional_backtest.py"
       - "research/props/evaluation/aggregate_historical_directional_backtest.py"
