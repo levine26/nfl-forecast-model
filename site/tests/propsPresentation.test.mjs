@@ -49,7 +49,7 @@ test('direction is a presentation of supplied Fair Line versus market and never 
   assert.equal(directionFor({market_kind:'OVER_UNDER',model:{line_difference:7}}),'OVER')
   assert.equal(directionFor({market_kind:'OVER_UNDER',model:{line_difference:-2}}),'UNDER')
   assert.equal(directionFor({market_kind:'OVER_UNDER',model:{line_difference:0}}),'MARKET ALIGNED')
-  assert.equal(directionFor({market_kind:'BINARY_TD',model:{td_probability:.64}}),'ANYTIME TD')
+  assert.equal(directionFor({prop_type:'anytime_td',market_kind:'BINARY_TD',model:{td_probability:.64}}),'ANYTIME TD')
 })
 
 test('legacy forecast sorting prioritizes supplied signal state then edge magnitude',()=>{
