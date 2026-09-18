@@ -7,8 +7,11 @@ from nfl_forecast.props_upstream import (
     EFFICIENCY_PRIOR_FIELDS,
     PropsUpstreamError,
     build_efficiency_baselines,
+    build_empirical_scoring_context,
     build_game_upstream_package,
     build_lagged_props_history,
+    fit_pre2026_efficiency_priors,
+    residual_efficiency_by_team_from_empirical_priors,
 )
 
 
@@ -51,6 +54,10 @@ def _play(
     receiving_yards=0,
     yardline_100=50,
     air_yards=0,
+    drive=1,
+    pass_touchdown=0,
+    rush_touchdown=0,
+    season_type="REG",
 ):
     return {
         "game_id": game_id,
@@ -70,6 +77,10 @@ def _play(
         "receiving_yards": receiving_yards,
         "yardline_100": yardline_100,
         "air_yards": air_yards,
+        "drive": drive,
+        "pass_touchdown": pass_touchdown,
+        "rush_touchdown": rush_touchdown,
+        "season_type": season_type,
     }
 
 
@@ -118,6 +129,52 @@ def _pbp():
     )
     return pd.DataFrame(rows)
 
+
+
+def _training_pbp():
+    rows = []
+    for week in (1, 2):
+        for team, qb, rb, wr, te, opponent in (
+            ("ARI", "A-QB", "A-RB", "A-WR", "A-TE", "LAR"),
+            ("LAR", "L-QB", "L-RB", "L-WR", "L-TE", "ARI"),
+        ):
+            gid = f"2025_{week:02d}_{team}_{opponent}"
+            rows.extend(
+                [
+                    _play(
+                        game_id=gid, season=2025, week=week, team=team,
+                        passer=qb, receiver=wr, pass_attempt=1, complete_pass=1,
+                        passing_yards=31, receiving_yards=31, yardline_100=31,
+                        air_yards=18, drive=1, pass_touchdown=1,
+                    ),
+                    _play(
+                        game_id=gid, season=2025, week=week, team=team,
+                        passer=qb, receiver=te, pass_attempt=1, complete_pass=1,
+                        passing_yards=11, receiving_yards=11, yardline_100=15,
+                        air_yards=8, drive=2,
+                    ),
+                    _play(
+                        game_id=gid, season=2025, week=week, team=team,
+                        rusher=rb, rush_attempt=1, rushing_yards=4, yardline_100=4,
+                        drive=2, rush_touchdown=1,
+                    ),
+                    _play(
+                        game_id=gid, season=2025, week=week, team=team,
+                        passer=qb, receiver=rb, pass_attempt=1, complete_pass=0,
+                        yardline_100=45, air_yards=4, drive=3,
+                    ),
+                    _play(
+                        game_id=gid, season=2025, week=week, team=team,
+                        rusher=qb, rush_attempt=1, qb_scramble=1, rushing_yards=5,
+                        yardline_100=40, drive=4,
+                    ),
+                ]
+            )
+    return pd.DataFrame(rows)
+
+
+def _combined_pbp():
+    return pd.concat([_training_pbp(), _pbp()], ignore_index=True)
 
 def _player_state():
     rows = []
@@ -279,3 +336,105 @@ def test_missing_scoring_area_columns_degrade_to_zero_without_crash():
     assert history.player_history["red_zone_targets"].sum() == 0.0
     assert history.player_history["end_zone_targets"].sum() == 0.0
     assert history.player_history["goal_line_carries"].sum() == 0.0
+
+
+
+def test_pre2026_empirical_priors_ignore_all_2026_outcomes():
+    base = _combined_pbp()
+    fitted = fit_pre2026_efficiency_priors(base, _identity())
+
+    poisoned = base.copy()
+    mask_2026 = poisoned["season"].eq(2026)
+    poisoned.loc[mask_2026, "passing_yards"] = 9999
+    poisoned.loc[mask_2026, "rushing_yards"] = 9999
+    poisoned.loc[mask_2026, "receiving_yards"] = 9999
+    poisoned.loc[mask_2026, "complete_pass"] = 1
+    poisoned_fit = fit_pre2026_efficiency_priors(poisoned, _identity())
+
+    assert fitted["trained_through_season"] == 2025
+    assert fitted["efficiency_position_priors"] == poisoned_fit["efficiency_position_priors"]
+    assert fitted["residual_efficiency"] == poisoned_fit["residual_efficiency"]
+    assert fitted["audit"]["completed_2026_outcomes_used_for_prior_fit"] == 0
+    for position in ("QB", "RB", "WR", "TE"):
+        assert set(fitted["efficiency_position_priors"][position]) == EFFICIENCY_PRIOR_FIELDS
+
+
+def test_empirical_scoring_uses_pre2026_conversion_priors_but_prior_week_live_state():
+    base = _combined_pbp()
+    context = build_empirical_scoring_context(
+        base,
+        teams=["ARI", "LAR"],
+        season=2026,
+        week=3,
+    )
+    ari = context["scoring_context_by_team"]["ARI"]
+    assert ari["expected_drives"] > 0
+    assert 0 < ari["prior_red_zone_td_rate"] < 1
+    assert 0 < ari["prior_pass_td_fraction"] < 1
+    assert context["audit"]["completed_2026_outcomes_used_for_prior_fit"] == 0
+    assert context["audit"]["prior_2026_games_allowed_for_chronological_team_state"] is True
+
+    poisoned = base.copy()
+    mask_2026 = poisoned["season"].eq(2026)
+    poisoned.loc[mask_2026, "pass_touchdown"] = 1
+    poisoned.loc[mask_2026, "rush_touchdown"] = 1
+    poisoned_context = build_empirical_scoring_context(
+        poisoned,
+        teams=["ARI", "LAR"],
+        season=2026,
+        week=3,
+    )
+    poisoned_ari = poisoned_context["scoring_context_by_team"]["ARI"]
+    assert poisoned_ari["prior_red_zone_td_rate"] == ari["prior_red_zone_td_rate"]
+    assert poisoned_ari["prior_pass_td_fraction"] == ari["prior_pass_td_fraction"]
+    # Chronological state is allowed to change from completed prior-week 2026 games.
+    assert (
+        poisoned_ari["expected_non_red_zone_pass_tds"]
+        != ari["expected_non_red_zone_pass_tds"]
+    )
+
+
+def test_empirical_scoring_excludes_target_week_poison_rows():
+    base = _combined_pbp()
+    context = build_empirical_scoring_context(
+        base,
+        teams=["ARI"],
+        season=2026,
+        week=3,
+    )
+    with_poison = base.copy()
+    poison = _play(
+        game_id=GAME_ID,
+        season=2026,
+        week=3,
+        team="ARI",
+        passer="A-QB",
+        receiver="A-WR",
+        pass_attempt=1,
+        complete_pass=1,
+        passing_yards=500,
+        receiving_yards=500,
+        yardline_100=50,
+        air_yards=50,
+        drive=99,
+        pass_touchdown=1,
+    )
+    with_poison = pd.concat([with_poison, pd.DataFrame([poison])], ignore_index=True)
+    poisoned = build_empirical_scoring_context(
+        with_poison,
+        teams=["ARI"],
+        season=2026,
+        week=3,
+    )
+    assert poisoned["scoring_context_by_team"] == context["scoring_context_by_team"]
+
+
+def test_residual_efficiency_is_derived_from_pre2026_empirical_priors():
+    fitted = fit_pre2026_efficiency_priors(_combined_pbp(), _identity())
+    residual = residual_efficiency_by_team_from_empirical_priors(
+        ["ARI", "LAR"],
+        fitted,
+    )
+    assert set(residual) == {"ARI", "LAR"}
+    assert residual["ARI"] == residual["LAR"]
+    assert 0 < residual["ARI"]["catch_rate"] < 1
