@@ -118,6 +118,11 @@ def main() -> int:
     )
     parser.add_argument("--priors", type=Path, required=True)
     parser.add_argument(
+        "--validate-priors-only",
+        action="store_true",
+        help="Validate the frozen preregistered priors and exit without live network access.",
+    )
+    parser.add_argument(
         "--work-root",
         type=Path,
         default=ROOT / ".artifacts" / "props-live",
@@ -140,6 +145,9 @@ def main() -> int:
         raise ValueError("invalid target season/week")
 
     validate_priors(args.priors)
+    if args.validate_priors_only:
+        print(f"validated frozen LevLine Props priors -> {args.priors}")
+        return 0
     if not str(os.environ.get(args.api_key_env, "")).strip():
         raise RuntimeError(
             f"live Props market capture requires configured {args.api_key_env}"
