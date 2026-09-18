@@ -136,7 +136,16 @@ def main() -> int:
     )
     parser.add_argument("--season", type=int, required=True)
     parser.add_argument("--week", type=int, required=True)
-    parser.add_argument("--game-id", required=True)
+    parser.add_argument(
+        "--game-id",
+        nargs="+",
+        help="One or more canonical game IDs from the target week.",
+    )
+    parser.add_argument(
+        "--all-games",
+        action="store_true",
+        help="Build every canonical pregame player-state game in the target week.",
+    )
     parser.add_argument(
         "--history-start-season",
         type=int,
@@ -160,6 +169,11 @@ def main() -> int:
 
     if args.week < 1:
         raise ValueError("--week must be positive")
+    if args.all_games and args.game_id:
+        raise ValueError("use either --all-games or --game-id, not both")
+    if not args.all_games and not args.game_id:
+        raise ValueError("one of --all-games or --game-id is required")
+
     seasons = list(range(int(args.history_start_season), int(args.season) + 1))
     priors = _load(args.priors)
     scoring = _load(args.scoring_context) if args.scoring_context is not None else {}
@@ -170,6 +184,7 @@ def main() -> int:
         cache_dir=args.cache_dir,
     )
     identity = _pandas(nfl.load_players())
+
     availability = None
     availability_audit = {
         "status": "skipped" if args.skip_injury_fetch else "not_attempted",
@@ -193,8 +208,8 @@ def main() -> int:
                 "error": f"{type(exc).__name__}: {str(exc)[:240]}",
             }
 
-    # The forecast timestamp is captured only after every live source request above has
-    # completed. This prevents a source fetched later from masquerading as an earlier state.
+    # Capture only after live-source requests complete, so no later source can masquerade
+    # as knowledge available at an earlier forecast timestamp.
     forecast_timestamp = datetime.now(timezone.utc)
 
     state_build = build_offensive_player_state_contract(
@@ -209,12 +224,29 @@ def main() -> int:
         availability=availability,
     )
     player_state = state_build.player_state
-    depth_qbs, depth_qb_audit = resolve_primary_qbs_from_depth_charts(
-        sources.depth_charts,
-        player_state,
-        game_id=args.game_id,
-        forecast_timestamp=forecast_timestamp,
+    available_game_ids = sorted(
+        {
+            str(value)
+            for value in player_state["game_id"].dropna().astype(str)
+            if str(value).strip()
+        }
     )
+    if not available_game_ids:
+        raise PropsUpstreamError("canonical player state contains no pregame target games")
+
+    if args.all_games:
+        game_ids = available_game_ids
+    else:
+        game_ids = list(dict.fromkeys(str(value) for value in args.game_id))
+        missing_games = sorted(set(game_ids) - set(available_game_ids))
+        if missing_games:
+            raise PropsUpstreamError(
+                f"requested game_id(s) absent from canonical pregame player state: {missing_games}"
+            )
+    if len(game_ids) > 1 and scoring and not isinstance(scoring.get("games"), dict):
+        raise ValueError(
+            "multi-game explicit scoring context must use a top-level 'games' mapping"
+        )
 
     history = build_lagged_props_history(
         sources.pbp,
@@ -222,12 +254,6 @@ def main() -> int:
         season=args.season,
         week=args.week,
     )
-
-    game_config = _game_config(scoring, args.game_id) if scoring else {}
-    game_rows = player_state[player_state["game_id"].astype(str).eq(str(args.game_id))]
-    game_teams = sorted(set(game_rows["team"].map(normalize_team_code)))
-    if len(game_teams) != 2:
-        raise ValueError(f"{args.game_id} must resolve to exactly two teams")
 
     route_priors = priors.get("route_prior_means")
     configured_availability_priors = priors.get("availability_beta_priors", {})
@@ -246,7 +272,9 @@ def main() -> int:
         try:
             availability_fit_seasons = list(range(2012, availability_fit_end + 1))
             historical_injuries = _pandas(nfl.load_injuries(availability_fit_seasons))
-            raw_availability_snaps = _pandas(nfl.load_snap_counts(availability_fit_seasons))
+            raw_availability_snaps = _pandas(
+                nfl.load_snap_counts(availability_fit_seasons)
+            )
             availability_snaps, availability_snap_audit = normalize_snap_counts_player_ids(
                 raw_availability_snaps,
                 identity,
@@ -300,150 +328,243 @@ def main() -> int:
         efficiency_prior_source = "empirical_pre2026_pbp"
 
     source_status = str(priors.get("source_status") or "qualified").strip()
+    builds: list[dict] = []
 
-    explicit_scoring = game_config.get("scoring_context_by_team")
-    if explicit_scoring is not None:
-        if not isinstance(explicit_scoring, dict):
-            raise ValueError("scoring_context_by_team must be an object")
-        scoring_by_team = explicit_scoring
-        scoring_source = "explicit_preregistered_file"
-        empirical_scoring_audit = None
-    else:
-        empirical_scoring = build_empirical_scoring_context(
-            sources.pbp,
-            teams=game_teams,
+    for game_id in game_ids:
+        game_config = _game_config(scoring, game_id) if scoring else {}
+        game_rows = player_state[player_state["game_id"].astype(str).eq(game_id)]
+        game_teams = sorted(set(game_rows["team"].map(normalize_team_code)))
+        if len(game_teams) != 2:
+            raise PropsUpstreamError(
+                f"{game_id} must resolve to exactly two canonical teams"
+            )
+
+        depth_qbs, depth_qb_audit = resolve_primary_qbs_from_depth_charts(
+            sources.depth_charts,
+            player_state,
+            game_id=game_id,
+            forecast_timestamp=forecast_timestamp,
+        )
+
+        explicit_scoring = game_config.get("scoring_context_by_team")
+        if explicit_scoring is not None:
+            if not isinstance(explicit_scoring, dict):
+                raise ValueError("scoring_context_by_team must be an object")
+            scoring_by_team = explicit_scoring
+            scoring_source = "explicit_preregistered_file"
+            empirical_scoring_audit = None
+        else:
+            empirical_scoring = build_empirical_scoring_context(
+                sources.pbp,
+                teams=game_teams,
+                season=args.season,
+                week=args.week,
+                trained_through_season=2025,
+            )
+            scoring_by_team = empirical_scoring["scoring_context_by_team"]
+            scoring_source = "strictly_lagged_pbp"
+            empirical_scoring_audit = empirical_scoring["audit"]
+
+        explicit_residual = game_config.get("residual_efficiency_by_team")
+        if explicit_residual is not None:
+            if not isinstance(explicit_residual, dict):
+                raise ValueError("residual_efficiency_by_team must be an object")
+            residual = explicit_residual
+            residual_source = "explicit_preregistered_file"
+        else:
+            residual = residual_efficiency_by_team_from_empirical_priors(
+                game_teams,
+                fitted_empirical,
+            )
+            residual_source = "empirical_pre2026_pbp"
+
+        explicit_qb_overrides = game_config.get("primary_qb_by_team")
+        if explicit_qb_overrides is not None and not isinstance(
+            explicit_qb_overrides, dict
+        ):
+            raise ValueError("primary_qb_by_team must be an object when supplied")
+        qb_overrides = dict(depth_qbs)
+        qb_overrides.update(explicit_qb_overrides or {})
+
+        package = build_game_upstream_package(
+            player_state=player_state,
+            history=history,
+            game_id=game_id,
             season=args.season,
             week=args.week,
-            trained_through_season=2025,
+            forecast_timestamp=forecast_timestamp,
+            route_prior_means=route_priors,
+            availability_priors=availability_priors,
+            position_efficiency_priors=efficiency_priors,
+            scoring_context_by_team=scoring_by_team,
+            residual_efficiency_by_team=residual,
+            source_status=source_status,
+            prior_model_trained_through_season=int(trained_through),
+            primary_qb_by_team=qb_overrides,
         )
-        scoring_by_team = empirical_scoring["scoring_context_by_team"]
-        scoring_source = "strictly_lagged_pbp"
-        empirical_scoring_audit = empirical_scoring["audit"]
 
-    explicit_residual = game_config.get("residual_efficiency_by_team")
-    if explicit_residual is not None:
-        if not isinstance(explicit_residual, dict):
-            raise ValueError("residual_efficiency_by_team must be an object")
-        residual = explicit_residual
-        residual_source = "explicit_preregistered_file"
-    else:
-        residual = residual_efficiency_by_team_from_empirical_priors(
-            game_teams,
-            fitted_empirical,
+        home, away, kickoff = _schedule_game(sources.schedules, game_id)
+        kickoff_dt = datetime.fromisoformat(kickoff)
+        if forecast_timestamp >= kickoff_dt:
+            raise PropsUpstreamError(f"upstream build completed at/after kickoff: {game_id}")
+
+        builds.append(
+            {
+                "game_id": game_id,
+                "home_team": home,
+                "away_team": away,
+                "kickoff_utc": kickoff,
+                "package": package,
+                "depth_qb_audit": depth_qb_audit,
+                "empirical_scoring_audit": empirical_scoring_audit,
+                "scoring_context_source": scoring_source,
+                "residual_efficiency_source": residual_source,
+            }
         )
-        residual_source = "empirical_pre2026_pbp"
-
-    explicit_qb_overrides = game_config.get("primary_qb_by_team")
-    if explicit_qb_overrides is not None and not isinstance(explicit_qb_overrides, dict):
-        raise ValueError("primary_qb_by_team must be an object when supplied")
-    qb_overrides = dict(depth_qbs)
-    qb_overrides.update(explicit_qb_overrides or {})
-
-    package = build_game_upstream_package(
-        player_state=player_state,
-        history=history,
-        game_id=args.game_id,
-        season=args.season,
-        week=args.week,
-        forecast_timestamp=forecast_timestamp,
-        route_prior_means=route_priors,
-        availability_priors=availability_priors,
-        position_efficiency_priors=efficiency_priors,
-        scoring_context_by_team=scoring_by_team,
-        residual_efficiency_by_team=residual,
-        source_status=source_status,
-        prior_model_trained_through_season=int(trained_through),
-        primary_qb_by_team=qb_overrides,
-    )
-
-    home, away, kickoff = _schedule_game(sources.schedules, args.game_id)
-    if forecast_timestamp >= datetime.fromisoformat(kickoff):
-        raise PropsUpstreamError("upstream build completed at/after kickoff")
 
     root = args.output_dir
-    stem = args.game_id
-    outputs = {
-        "player_state": root / "player_state.json",
-        "opportunity": root / f"{stem}.opportunity.json",
-        "efficiency_player": root / f"{stem}.efficiency_player.json",
-        "team_td": root / f"{stem}.team_td.json",
-        "residual_efficiency": root / f"{stem}.residual_efficiency.json",
-        "game_spec": root / f"{stem}.game_spec.json",
-        "audit": root / f"{stem}.upstream_audit.json",
-    }
-    if any(path.exists() for path in outputs.values()):
-        existing = [str(path) for path in outputs.values() if path.exists()]
-        raise FileExistsError(f"refusing partial overwrite; output already exists: {existing}")
+    multi = len(builds) > 1
+    common_player_state = root / "player_state.json"
+    slate_index = root / "upstream_slate.json"
+    planned: list[tuple[Path, object]] = [
+        (
+            common_player_state,
+            {
+                "contract_version": "levline-props-player-state-snapshot-v0.1",
+                "captured_at_utc": forecast_timestamp.isoformat(),
+                "player_state": player_state.to_dict("records"),
+                "audit": state_build.audit,
+            },
+        )
+    ]
+    index_games: list[dict] = []
 
-    _write_new(
-        outputs["player_state"],
-        {
-            "contract_version": "levline-props-player-state-snapshot-v0.1",
-            "captured_at_utc": forecast_timestamp.isoformat(),
-            "player_state": player_state.to_dict("records"),
-            "audit": state_build.audit,
-        },
-    )
-    _write_new(
-        outputs["opportunity"],
-        {"opportunity_projections": list(package.opportunity_projections)},
-    )
-    _write_new(
-        outputs["efficiency_player"],
-        {"efficiency_player_parameters": list(package.efficiency_player_parameters)},
-    )
-    _write_new(
-        outputs["team_td"],
-        {"team_td_parameters": list(package.team_td_parameters)},
-    )
-    _write_new(
-        outputs["residual_efficiency"],
-        {"residual_efficiency_by_team": package.residual_efficiency_by_team},
-    )
-    _write_new(
-        outputs["game_spec"],
-        {
-            "game_id": args.game_id,
-            "home_team": home,
-            "away_team": away,
-            "kickoff_utc": kickoff,
-            "upstream_forecast_timestamp_utc": forecast_timestamp.isoformat(),
-        },
-    )
-    _write_new(
-        outputs["audit"],
-        {
-            "research_only": True,
-            "production_authorized": False,
-            "captured_at_utc": forecast_timestamp.isoformat(),
-            "source_status": sources.source_status,
-            "availability": availability_audit,
-            "availability_prior_fit": availability_prior_fit_audit,
-            "availability_priors_applied": availability_priors,
-            "depth_chart_primary_qb": depth_qb_audit,
-            "player_state": state_build.audit,
-            "upstream": package.audit,
-            "empirical_prior_fit": fitted_empirical["audit"],
-            "empirical_scoring_context": empirical_scoring_audit,
-            "efficiency_prior_source": efficiency_prior_source,
-            "scoring_context_source": scoring_source,
-            "residual_efficiency_source": residual_source,
-            "priors_source_file": args.priors.name,
-            "scoring_context_source_file": (
-                args.scoring_context.name if args.scoring_context is not None else None
-            ),
-        },
-    )
+    for build in builds:
+        game_id = build["game_id"]
+        package = build["package"]
+        game_root = root / "games" / game_id if multi else root
+        outputs = {
+            "opportunity": game_root / f"{game_id}.opportunity.json",
+            "efficiency_player": game_root / f"{game_id}.efficiency_player.json",
+            "team_td": game_root / f"{game_id}.team_td.json",
+            "residual_efficiency": game_root / f"{game_id}.residual_efficiency.json",
+            "game_spec": game_root / f"{game_id}.game_spec.json",
+            "audit": game_root / f"{game_id}.upstream_audit.json",
+        }
+        planned.extend(
+            [
+                (
+                    outputs["opportunity"],
+                    {"opportunity_projections": list(package.opportunity_projections)},
+                ),
+                (
+                    outputs["efficiency_player"],
+                    {
+                        "efficiency_player_parameters": list(
+                            package.efficiency_player_parameters
+                        )
+                    },
+                ),
+                (
+                    outputs["team_td"],
+                    {"team_td_parameters": list(package.team_td_parameters)},
+                ),
+                (
+                    outputs["residual_efficiency"],
+                    {
+                        "residual_efficiency_by_team":
+                            package.residual_efficiency_by_team
+                    },
+                ),
+                (
+                    outputs["game_spec"],
+                    {
+                        "game_id": game_id,
+                        "home_team": build["home_team"],
+                        "away_team": build["away_team"],
+                        "kickoff_utc": build["kickoff_utc"],
+                        "upstream_forecast_timestamp_utc":
+                            forecast_timestamp.isoformat(),
+                    },
+                ),
+                (
+                    outputs["audit"],
+                    {
+                        "research_only": True,
+                        "production_authorized": False,
+                        "captured_at_utc": forecast_timestamp.isoformat(),
+                        "source_status": sources.source_status,
+                        "availability": availability_audit,
+                        "availability_prior_fit": availability_prior_fit_audit,
+                        "availability_priors_applied": availability_priors,
+                        "depth_chart_primary_qb": build["depth_qb_audit"],
+                        "player_state": state_build.audit,
+                        "upstream": package.audit,
+                        "empirical_prior_fit": fitted_empirical["audit"],
+                        "empirical_scoring_context":
+                            build["empirical_scoring_audit"],
+                        "efficiency_prior_source": efficiency_prior_source,
+                        "scoring_context_source":
+                            build["scoring_context_source"],
+                        "residual_efficiency_source":
+                            build["residual_efficiency_source"],
+                        "priors_source_file": args.priors.name,
+                        "scoring_context_source_file": (
+                            args.scoring_context.name
+                            if args.scoring_context is not None
+                            else None
+                        ),
+                    },
+                ),
+            ]
+        )
+        index_games.append(
+            {
+                "game_id": game_id,
+                "home_team": build["home_team"],
+                "away_team": build["away_team"],
+                "kickoff_utc": build["kickoff_utc"],
+                "files": {
+                    key: str(path.relative_to(root))
+                    for key, path in outputs.items()
+                },
+            }
+        )
+
+    index_payload = {
+        "contract_version": "levline-props-upstream-slate-v0.1",
+        "research_only": True,
+        "production_authorized": False,
+        "season": int(args.season),
+        "week": int(args.week),
+        "captured_at_utc": forecast_timestamp.isoformat(),
+        "player_state_file": str(common_player_state.relative_to(root)),
+        "game_count": len(index_games),
+        "games": index_games,
+    }
+    planned.append((slate_index, index_payload))
+
+    existing = [str(path) for path, _ in planned if path.exists()]
+    if existing:
+        raise FileExistsError(
+            f"refusing partial overwrite; upstream output already exists: {existing}"
+        )
+
+    # No output is written until every selected game has built and every destination is
+    # preflighted. This prevents a source/model failure from leaving a partial Sunday slate.
+    for path, payload in planned:
+        _write_new(path, payload)
 
     print(
         json.dumps(
             {
-                "game_id": args.game_id,
+                "season": int(args.season),
+                "week": int(args.week),
                 "captured_at_utc": forecast_timestamp.isoformat(),
-                "outputs": {key: str(value) for key, value in outputs.items()},
-                "opportunity_projections": len(package.opportunity_projections),
-                "efficiency_player_parameters": len(package.efficiency_player_parameters),
-                "team_td_parameters": len(package.team_td_parameters),
+                "game_count": len(builds),
+                "game_ids": [build["game_id"] for build in builds],
+                "player_state": str(common_player_state),
+                "slate_index": str(slate_index),
             },
             indent=2,
         )
