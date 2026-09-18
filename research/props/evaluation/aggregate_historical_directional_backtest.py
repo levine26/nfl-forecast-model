@@ -193,6 +193,8 @@ def _report(payload: dict) -> str:
     lines = [
         "# LevLine Props Accuracy — 2023–2025 Historical Evidence",
         "",
+        f"Market source: **{payload.get('market_source')}**",
+        "",
         f"**Directional accuracy: {_pct(h.get('accuracy'))} "
         f"({h.get('wins', 0)} wins / {h.get('wins', 0) + h.get('losses', 0)} decided non-push props).**",
         "",
@@ -230,9 +232,10 @@ def _report(payload: dict) -> str:
             "## Interpretation boundary",
             "",
             "This is a preregistered historical out-of-sample reconstruction of the frozen "
-            "LevLine Props Research Beta, not prospective 2026 evidence. It uses real "
-            "Action Network genuine opening thresholds, strict lagged football state, "
-            "prior-season structural prior fits, and postgame snaps only for grading/void logic.",
+            "LevLine Props Research Beta, not prospective 2026 evidence. It uses the "
+            f"declared historical market source ({payload.get('market_source')}), strict lagged "
+            "football state, prior-season structural prior fits, and postgame snaps only "
+            "for grading/void logic.",
             "",
         ]
     )
