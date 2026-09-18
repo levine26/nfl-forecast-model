@@ -17,18 +17,18 @@ export function qualityLabel(forecast){const q=forecast?.data_quality||{};return
 
 export const MARKET_FILTERS = {
   ALL: null,
-  PASSING: ['passing_yards','passing_tds'],
-  RUSHING: ['rushing_yards','rushing_td'],
-  RECEIVING: ['receiving_yards','receiving_td'],
+  PASSING: ['passing_yards'],
+  RUSHING: ['rushing_yards'],
+  RECEIVING: ['receiving_yards'],
   RECEPTIONS: ['receptions'],
   TDS: ['passing_tds','rushing_td','receiving_td','anytime_td'],
 }
 export function marketFamily(propType){
-  if (String(propType||'').includes('passing')) return 'PASSING'
+  if (['passing_tds','rushing_td','receiving_td','anytime_td'].includes(propType)) return 'TDS'
+  if (propType==='passing_yards') return 'PASSING'
+  if (propType==='rushing_yards') return 'RUSHING'
+  if (propType==='receiving_yards') return 'RECEIVING'
   if (propType==='receptions') return 'RECEPTIONS'
-  if (String(propType||'').includes('rushing')) return 'RUSHING'
-  if (String(propType||'').includes('receiving')) return 'RECEIVING'
-  if (propType==='anytime_td') return 'TDS'
   return 'OTHER'
 }
 export function directionFor(forecast){
