@@ -1,0 +1,28 @@
+name: LevLine Props 2.0 market microstructure
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-market-archive
+    paths:
+      - 'research/props/v2/market_microstructure_v2.py'
+      - 'research/props/v2/test_market_microstructure_v2.py'
+      - 'research/props/v2/PROPS_V2_MARKET_MICROSTRUCTURE_CONTRACT.md'
+      - '.github/workflows/research_props_v2_market_microstructure.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - run: python -m py_compile research/props/v2/market_microstructure_v2.py
+      - run: pytest -q research/props/v2/test_market_microstructure_v2.py
