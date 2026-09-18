@@ -27,6 +27,11 @@ body.levline-props-route{margin:0;background:var(--lp-bg);color-scheme:dark}
 .lp-app main{width:min(1220px,calc(100% - 40px));margin:0 auto;padding:28px 0 76px}
 .lp-entry{position:fixed;z-index:90;top:14px;right:92px;height:34px;padding:0 13px;border:1px solid rgba(215,239,88,.32);border-radius:999px;background:rgba(7,11,9,.94);color:var(--lp-text);font:750 12px/1 system-ui,sans-serif;letter-spacing:.03em;cursor:pointer;backdrop-filter:blur(12px)}
 .lp-entry b{color:var(--lp-accent)}
+.ss-mobile-nav:has(.lp-host-props-mobile){grid-template-columns:repeat(5,1fr)}
+.ss-mobile-nav .lp-host-props-mobile>span{color:var(--lp-accent)}
+.ss-desktop-nav .lp-host-props-link{position:relative}
+.ss-desktop-nav .lp-host-props-link:after{content:"β";margin-left:3px;color:var(--lp-accent);font-size:7px;vertical-align:top}
+
 .lp-header{position:sticky;top:0;z-index:80;height:70px;padding:0 max(22px,calc((100vw - 1380px)/2));display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;border-bottom:1px solid var(--lp-line);background:rgba(7,11,9,.88);backdrop-filter:blur(18px) saturate(130%)}
 .lp-brand-button,.lp-header-actions button,.lp-product-nav button,.lp-footer button{border:0;background:transparent;cursor:pointer}
 .lp-brand-button{justify-self:start;padding:0}
