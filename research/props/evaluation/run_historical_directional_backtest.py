@@ -161,6 +161,21 @@ def load_market_source(season: int) -> tuple[pd.DataFrame, dict]:
     return work, audit
 
 
+def normalize_historical_pbp(pbp: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    work = pbp.copy()
+    if "qb_scramble" not in work.columns or "rush_attempt" not in work.columns:
+        return work, {"qb_scramble_rush_attempt_rows_normalized": 0}
+    scramble = pd.to_numeric(work["qb_scramble"], errors="coerce").fillna(0).eq(1)
+    rush = pd.to_numeric(work["rush_attempt"], errors="coerce").fillna(0).eq(1)
+    fix = scramble & ~rush
+    if fix.any():
+        work.loc[fix, "rush_attempt"] = 1
+    return work, {
+        "qb_scramble_rush_attempt_rows_normalized": int(fix.sum()),
+        "rule": "qb_scramble_1_implies_rush_attempt_1",
+    }
+
+
 def canonical_schedule(bundle, season: int) -> pd.DataFrame:
     schedule = add_nflverse_kickoff_timestamp(bundle.schedules)
     if "game_type" in schedule.columns:
@@ -649,7 +664,7 @@ def run(
     seasons = list(range(history_start, int(season) + 1))
     bundle = load_core_data(seasons)
     bundle = load_advanced_data(bundle, seasons)
-    pbp = bundle.pbp.copy()
+    pbp, pbp_normalization_audit = normalize_historical_pbp(bundle.pbp)
     players = _pandas(nfl.load_players())
     snap_counts, snap_identity_audit = normalize_snap_counts_player_ids(bundle.snap_counts, players)
 
@@ -886,6 +901,7 @@ def run(
         "weeks": [int(week_start), int(week_end)],
         "simulations_per_game": int(simulations),
         "market_source": market_source_audit,
+        "pbp_source_normalization": pbp_normalization_audit,
         "market_pairing": market_pair_audit,
         "event_mapping": event_map_audit,
         "snap_identity": snap_identity_audit,
