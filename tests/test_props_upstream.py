@@ -18,6 +18,7 @@ from nfl_forecast.props_upstream import (
     build_lagged_props_history,
     fit_pre2026_efficiency_priors,
     fit_pre2026_injury_availability_priors,
+    normalize_nflverse_scramble_semantics,
     residual_efficiency_by_team_from_empirical_priors,
 )
 
@@ -89,6 +90,74 @@ def _play(
         "rush_touchdown": rush_touchdown,
         "season_type": season_type,
     }
+
+
+def test_nflverse_scramble_normalization_repairs_only_explicit_scrambles():
+    frame = pd.DataFrame(
+        [
+            _play(
+                game_id="2026_01_ARI_LAR",
+                season=2026,
+                week=1,
+                team="ARI",
+                passer="A-QB",
+                rusher="",
+                rush_attempt=0,
+                qb_scramble=1,
+                rushing_yards=7,
+            ),
+            _play(
+                game_id="2026_01_ARI_LAR",
+                season=2026,
+                week=1,
+                team="ARI",
+                rusher="A-RB",
+                rush_attempt=0,
+                qb_scramble=0,
+                rushing_yards=0,
+            ),
+        ]
+    )
+
+    normalized, audit = normalize_nflverse_scramble_semantics(frame)
+
+    assert normalized.loc[0, "rush_attempt"] == 1
+    assert normalized.loc[0, "rusher_player_id"] == "A-QB"
+    assert normalized.loc[1, "rush_attempt"] == 0
+    assert normalized.loc[1, "rusher_player_id"] == "A-RB"
+    assert audit["scramble_rows"] == 1
+    assert audit["rush_attempt_repairs"] == 1
+    assert audit["rusher_identity_repairs"] == 1
+    assert audit["non_scramble_rows_modified"] == 0
+    assert audit["outcome_or_market_fields_used_for_repair"] is False
+
+
+def test_nflverse_scramble_normalization_refuses_missing_qb_identity():
+    frame = pd.DataFrame(
+        [
+            _play(
+                game_id="2026_01_ARI_LAR",
+                season=2026,
+                week=1,
+                team="ARI",
+                passer="",
+                rusher="",
+                rush_attempt=0,
+                qb_scramble=1,
+                rushing_yards=4,
+            )
+        ]
+    )
+    with pytest.raises(PropsUpstreamError, match="missing stable QB identity"):
+        normalize_nflverse_scramble_semantics(frame)
+
+
+def test_core_history_still_refuses_unadapted_scramble_mismatch():
+    frame = _pbp()
+    scramble_index = frame.index[frame["qb_scramble"].eq(1)][0]
+    frame.loc[scramble_index, "rush_attempt"] = 0
+    with pytest.raises(PropsUpstreamError, match="qb_scramble rows"):
+        build_lagged_props_history(frame, _identity(), season=2026, week=3)
 
 
 def _pbp():
