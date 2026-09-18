@@ -35,7 +35,7 @@ jobs:
           python -m py_compile research/props/v2/run_dynamic_role_v2_backtest.py
           python -m py_compile research/props/v2/aggregate_dynamic_role_v2_backtest.py
       - name: Test chronology and latent-state semantics
-        run: pytest -q research/props/v2/test_props_dynamic_role_v2.py
+        run: pytest -q research/props/v2/test_props_dynamic_role.py research/props/v2/test_props_dynamic_role_v2.py
 
   pilot:
     needs: unit
@@ -72,6 +72,11 @@ jobs:
           assert d["promotion_authorized"] is False
           assert d["role_mode"] == mode
           assert d["paired_v1"]["n"] > 0
+          frozen=d["frozen_role_dynamics"]
+          assert frozen["audit"]["trained_through_season"] == 2023
+          assert frozen["audit"]["prop_outcomes_used_for_state_fit"] == 0
+          assert frozen["audit"]["completed_2026_outcomes_used"] == 0
+          assert set(frozen["parameters"]) >= {"QB","RB","WR","TE"}
           approved={"primary_qb_ambiguous","no_supported_market_listed_players"}
           unexpected={
               game_id:audit
@@ -80,7 +85,7 @@ jobs:
           }
           assert unexpected == {}, unexpected
           assert d["headline"]["wins"] + d["headline"]["losses"] > 0
-          print(json.dumps({"role_mode":mode,"paired_v1":d["paired_v1"]},indent=2))
+          print(json.dumps({"role_mode":mode,"paired_v1":d["paired_v1"],"frozen_role_dynamics":frozen},indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
@@ -129,6 +134,11 @@ jobs:
           assert d["market_pairing"]["book_id"] == 30
           assert d["market_pairing"]["require_genuine_open"] is True
           assert d["paired_v1"]["n"] > 0
+          frozen=d["frozen_role_dynamics"]
+          assert frozen["audit"]["trained_through_season"] == season-1
+          assert frozen["audit"]["prop_outcomes_used_for_state_fit"] == 0
+          assert frozen["audit"]["completed_2026_outcomes_used"] == 0
+          assert set(frozen["parameters"]) >= {"QB","RB","WR","TE"}
           approved={"primary_qb_ambiguous","no_supported_market_listed_players"}
           unexpected={
               game_id:audit
@@ -158,6 +168,7 @@ jobs:
         with:
           pattern: levline-props-v2-dynamic-role-v2-primary-*
           path: research_outputs/props_v2/dynamic_role_v2_downloads
+          merge-multiple: true
       - name: Aggregate frozen V2 ablations
         run: |
           python research/props/v2/aggregate_dynamic_role_v2_backtest.py             --input-dir research_outputs/props_v2/dynamic_role_v2_downloads             --output-dir research_outputs/props_v2/dynamic_role_v2_aggregate
