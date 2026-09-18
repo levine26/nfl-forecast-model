@@ -77,3 +77,30 @@ def test_missing_required_horizon_fields_fail_closed():
             season=2024,
             week=2,
         )
+
+
+def test_route_only_ablation_does_not_change_target_or_carry_channels():
+    adjustments, audit = build_dynamic_role_adjustments(
+        _snaps(),
+        _current(),
+        season=2024,
+        week=4,
+        team="ARI",
+        mode="route_only",
+    )
+    assert audit["mode"] == "route_only"
+    assert adjustments["wr1"]
+    assert set(adjustments["wr1"]) == {"route_role_multiplier"}
+    assert set(adjustments["wr3"]) == {"route_role_multiplier"}
+
+
+def test_unknown_ablation_mode_fails_closed():
+    with pytest.raises(DynamicRoleError):
+        build_dynamic_role_adjustments(
+            _snaps(),
+            _current(),
+            season=2024,
+            week=4,
+            team="ARI",
+            mode="posthoc_magic",
+        )
