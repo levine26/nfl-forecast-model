@@ -262,3 +262,30 @@ def test_live_fetch_discovers_only_canonical_slate_events(monkeypatch):
 def test_missing_api_key_fails_before_network():
     with pytest.raises(live.PropsMarketLiveError, match="authorized"):
         live._provider_get_json("/sports/test/events", api_key="")
+
+
+
+def test_nflverse_la_player_state_matches_rams_provider_event():
+    state = []
+    for row in _player_state():
+        updated = dict(row)
+        if updated["team"] == "LAR":
+            updated["team"] = "LA"
+        if updated["opponent"] == "LAR":
+            updated["opponent"] = "LA"
+        updated["game_id"] = "2026_03_ARI_LA"
+        state.append(updated)
+
+    event = _event()
+    snapshot = live.build_market_snapshot(
+        player_state_rows=state,
+        provider_events=[event],
+        captured_at_utc=CAPTURE,
+    )
+    assert snapshot["audit"]["matched_event_count"] == 1
+    assert snapshot["audit"]["unmatched_event_count"] == 0
+    assert snapshot["market_artifacts"]
+    assert all(
+        row["game_id"] == "2026_03_ARI_LA"
+        for row in snapshot["market_artifacts"]
+    )

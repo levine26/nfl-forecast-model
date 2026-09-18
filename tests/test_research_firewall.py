@@ -35,6 +35,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/props_market_odds_api.py",
         "src/nfl_forecast/props_market_live.py",
         "src/nfl_forecast/props_manifest.py",
+        "src/nfl_forecast/props_upstream.py",
         "src/nfl_forecast/props_integration.py",
         "scripts/run_challenger_v09.py",
         "scripts/run_fst_reconstruction_probe.py",
@@ -44,6 +45,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "scripts/run_props_research_beta.py",
         "scripts/build_props_market_snapshot.py",
         "scripts/build_props_integration_manifest.py",
+        "scripts/build_props_upstream_snapshot.py",
         "research/experiments.json",
         "research/fst/F-ST-01-FROZEN-2026.json",
         "research/player_impact/EXPECTED_LINEUP_CONTRACT.md",
@@ -68,6 +70,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "tests/test_props_market_odds_api.py",
         "tests/test_props_market_live.py",
         "tests/test_props_manifest.py",
+        "tests/test_props_upstream.py",
         "tests/test_props_runner.py",
         "tests/test_props_integration.py",
         ".github/workflows/research_firewall.yml",
@@ -190,6 +193,7 @@ def test_production_prediction_path_does_not_import_research_modules():
         "props_market_odds_api",
         "props_market_live",
         "props_manifest",
+        "props_upstream",
         "props_integration",
     )
     for filename in protected:

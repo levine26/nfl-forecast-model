@@ -12,6 +12,7 @@ from .props_player_state import normalize_team_code
 
 
 MANIFEST_CONTRACT_VERSION = "levline-props-integration-manifest-v0.1"
+MANIFEST_SLATE_CONTRACT_VERSION = "levline-props-integration-slate-v0.1"
 MAX_TRAINING_SEASON = 2025
 OPTIONAL_CONTROLS = (
     "model_version",
@@ -61,6 +62,68 @@ def verify_manifest_fingerprint(payload: Mapping[str, Any]) -> None:
     if not hmac.compare_digest(supplied.strip(), expected):
         raise PropsManifestError("manifest SHA-256 fingerprint mismatch")
 
+
+
+def verify_manifest_slate_index(payload: Mapping[str, Any]) -> None:
+    """Verify a frozen manifest-slate index before following any referenced files."""
+
+    if payload.get("contract_version") != MANIFEST_SLATE_CONTRACT_VERSION:
+        raise PropsManifestError(
+            "unexpected manifest slate contract_version: "
+            f"{payload.get('contract_version')!r}"
+        )
+    supplied = payload.get("slate_sha256")
+    if not isinstance(supplied, str) or not supplied.strip():
+        raise PropsManifestError("manifest slate is missing slate_sha256")
+    material = dict(payload)
+    material.pop("slate_sha256", None)
+    expected = payload_sha256(material)
+    if not hmac.compare_digest(supplied.strip(), expected):
+        raise PropsManifestError("manifest slate SHA-256 fingerprint mismatch")
+
+    games = payload.get("games")
+    if not isinstance(games, list) or not games:
+        raise PropsManifestError("manifest slate requires a non-empty games list")
+    try:
+        declared_count = int(payload.get("game_count"))
+    except (TypeError, ValueError) as exc:
+        raise PropsManifestError("manifest slate requires integer game_count") from exc
+    if declared_count != len(games):
+        raise PropsManifestError("manifest slate game_count does not match games list")
+
+    seen_game_ids: set[str] = set()
+    seen_files: set[str] = set()
+    for raw in games:
+        if not isinstance(raw, Mapping):
+            raise PropsManifestError("manifest slate game entries must be objects")
+        game_id = _required_text(raw, "game_id", "manifest slate game")
+        manifest_file = _required_text(
+            raw, "manifest_file", "manifest slate game"
+        )
+        manifest_sha = _required_text(
+            raw, "manifest_sha256", "manifest slate game"
+        )
+        if len(manifest_sha) != 64 or any(
+            char not in "0123456789abcdefABCDEF" for char in manifest_sha
+        ):
+            raise PropsManifestError(
+                f"manifest slate has invalid manifest_sha256 for {game_id}"
+            )
+        if game_id in seen_game_ids:
+            raise PropsManifestError(
+                f"duplicate game_id in manifest slate: {game_id}"
+            )
+        if manifest_file in seen_files:
+            raise PropsManifestError(
+                f"duplicate manifest_file in manifest slate: {manifest_file}"
+            )
+        seen_game_ids.add(game_id)
+        seen_files.add(manifest_file)
+
+    _aware(
+        payload.get("forecast_timestamp_utc"),
+        "manifest slate forecast_timestamp_utc",
+    )
 
 def _aware(value: object, label: str) -> datetime:
     try:

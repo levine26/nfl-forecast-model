@@ -22,11 +22,21 @@ The football simulation remains market-agnostic. Sportsbook thresholds and price
 
 The producer always attempts to lock originals before reporting success. Running at or after kickoff fails closed.
 
-Example:
+Single-game compatibility remains available:
 
 ```bash
-python scripts/run_props_research_beta.py --input /secure/path/props_integration_manifest.json
+python scripts/run_props_research_beta.py \
+  --input /secure/path/props_integration_manifest.json
 ```
+
+For a Sunday slate, use the frozen manifest index so every referenced game manifest is fingerprint-verified and published as one transaction:
+
+```bash
+python scripts/run_props_research_beta.py \
+  --manifest-slate /secure/path/props_manifests/manifest_slate.json
+```
+
+The slate path builds every game before publication, validates every manifest fingerprint and shared freeze timestamp, creates all immutable original receipts, locks those receipts, and only then writes the aggregate forecast/public artifacts. A failure in any game produces no partial public slate.
 
 ## Integration manifest
 
@@ -128,9 +138,27 @@ The normalized file exposes `market_artifacts` and is passed intact to the froze
 
 ## Frozen manifest assembly
 
-Use `scripts/build_props_integration_manifest.py` instead of hand-editing the coordinator JSON. It combines separately frozen opportunity, efficiency, TD, residual-efficiency, and sportsbook artifacts only after validating that they describe the same game and obey the same point-in-time horizon.
+Use `scripts/build_props_integration_manifest.py` instead of hand-editing coordinator JSON.
 
-Example:
+### Full-slate mode
+
+The preferred Sunday flow consumes the atomic upstream index plus one frozen sportsbook snapshot:
+
+```bash
+python scripts/build_props_integration_manifest.py \
+  --upstream-slate /secure/path/props_upstream/upstream_slate.json \
+  --market-snapshot /secure/path/market_snapshot_20260920T160000Z.json \
+  --output-dir /secure/path/props_manifests
+```
+
+The assembler chooses one final UTC freeze timestamp after the sportsbook snapshot exists, applies that same timestamp to every game, validates every upstream component against its game/kickoff, filters the slate-wide market snapshot to each target game, fingerprints every input and completed game manifest, and writes:
+
+- `games/<game_id>.manifest.json` for each game;
+- `manifest_slate.json` containing the game list, manifest paths/fingerprints, common final freeze timestamp, upstream-slate fingerprint, and sportsbook-snapshot fingerprint.
+
+No manifest file is written until every game has assembled successfully and every destination passes create-only preflight. Indexed paths are constrained to the frozen upstream root.
+
+### Single-game compatibility
 
 ```bash
 python scripts/build_props_integration_manifest.py \
@@ -151,6 +179,38 @@ The assembler fails closed when:
 - residual efficiency does not cover both teams;
 - a market snapshot or individual market artifact is newer than the declared forecast time;
 - closing/evaluation market state is attached to the prospective manifest;
-- duplicate sportsbook market identities are present.
+- duplicate sportsbook market identities are present;
+- a slate index is malformed, duplicated, path-escaping, or internally inconsistent.
 
-Every source component is SHA-256 fingerprinted into `input_provenance`, and the completed manifest receives its own deterministic fingerprint. The resulting file is written with create-only semantics and is suitable for the coordinator producer.
+Every source component is SHA-256 fingerprinted into `input_provenance`; each completed manifest has its own deterministic fingerprint, and the slate index is separately fingerprinted.
+
+## Sunday research-beta operator sequence
+
+With preregistered route-participation priors and an UNKNOWN-availability prior already frozen:
+
+```bash
+# 1. Build all current offensive-player upstream handoffs once.
+python scripts/build_props_upstream_snapshot.py \
+  --season 2026 \
+  --week 3 \
+  --all-games \
+  --priors /secure/path/preregistered_props_priors.json \
+  --output-dir /secure/path/props_upstream
+
+# 2. Capture one authorized sportsbook snapshot for the entire player-state slate.
+THE_ODDS_API_KEY=... python scripts/build_props_market_snapshot.py \
+  --player-state /secure/path/props_upstream/player_state.json \
+  --output /secure/path/market_snapshot_20260920T160000Z.json
+
+# 3. Freeze every per-game integration manifest at one post-market pre-kickoff horizon.
+python scripts/build_props_integration_manifest.py \
+  --upstream-slate /secure/path/props_upstream/upstream_slate.json \
+  --market-snapshot /secure/path/market_snapshot_20260920T160000Z.json \
+  --output-dir /secure/path/props_manifests
+
+# 4. Simulate, lock immutable originals, and publish the complete slate atomically.
+python scripts/run_props_research_beta.py \
+  --manifest-slate /secure/path/props_manifests/manifest_slate.json
+```
+
+If any selected game is already at/after kickoff, any source horizon is invalid, any manifest/fingerprint disagrees, any player identity cannot be resolved, or immutable-history validation fails, the affected stage fails closed instead of publishing a partial Sunday slate.
