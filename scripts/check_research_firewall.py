@@ -61,6 +61,7 @@ ALLOWED_PREFIXES = (
 )
 
 ALLOWED_EXACT = {
+    "scripts/evaluate_props_accuracy.py",
     "src/nfl_forecast/fst_provenance.py",
     "src/nfl_forecast/fst_reconstruction.py",
     "src/nfl_forecast/props_player_state.py",
@@ -75,8 +76,10 @@ ALLOWED_EXACT = {
     "src/nfl_forecast/props_manifest.py",
     "src/nfl_forecast/props_upstream.py",
     "src/nfl_forecast/props_integration.py",
+    "src/nfl_forecast/props_evaluation.py",
     "tests/test_props_efficiency_td.py",
     "tests/test_props_integration.py",
+    "tests/test_props_evaluation.py",
     "tests/test_props_opportunity.py",
     "tests/test_props_opportunity_adapter.py",
     "tests/test_props_opportunity_handoff.py",

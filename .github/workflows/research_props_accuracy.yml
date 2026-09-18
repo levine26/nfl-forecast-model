@@ -1,0 +1,76 @@
+name: LevLine Props accuracy evaluation
+
+on:
+  push:
+    branches:
+      - research/props-integration
+    paths:
+      - "outputs/props/history/**"
+      - "src/nfl_forecast/props_evaluation.py"
+      - "scripts/evaluate_props_accuracy.py"
+      - "research/props/evaluation/**"
+  pull_request:
+    branches:
+      - research/props-integration
+    paths:
+      - "research/props/evaluation/**"
+      - "research_outputs/props_accuracy/**"
+      - "src/nfl_forecast/props_evaluation.py"
+      - "scripts/evaluate_props_accuracy.py"
+      - "tests/test_props_evaluation.py"
+      - "scripts/check_research_firewall.py"
+      - "tests/test_research_firewall.py"
+      - ".github/workflows/research_props_accuracy.yml"
+  workflow_dispatch:
+
+jobs:
+  props-accuracy-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Compile evaluation surfaces
+        run: |
+          python -m py_compile src/nfl_forecast/props_evaluation.py
+          python -m py_compile scripts/evaluate_props_accuracy.py
+
+      - name: Validate evaluator and research isolation
+        run: |
+          pytest -q tests/test_props_evaluation.py tests/test_research_firewall.py
+
+      - name: Run current evidence evaluation
+        run: |
+          python scripts/evaluate_props_accuracy.py
+
+      - name: Verify N=0 is explicit when no real history ledger is present
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("research_outputs/props_accuracy/summary.json")
+          data = json.loads(path.read_text())
+          assert data["evaluation_contract_version"] == "levline-props-eval-v1.0"
+          if not Path("outputs/props/history/forecast_originals.jsonl").exists():
+              assert data["sample"]["forecasts"] == 0
+              assert data["graded_sample"]["forecasts"] == 0
+              assert not any(data["claim_readiness"].values())
+          assert data["evaluation_metadata"]["synthetic_test_results_count_as_predictive_evidence"] is False
+          PY
+
+      - name: Upload evaluation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-accuracy-evaluation
+          path: research_outputs/props_accuracy/
+          if-no-files-found: error

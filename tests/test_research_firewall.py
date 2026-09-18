@@ -37,6 +37,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/props_manifest.py",
         "src/nfl_forecast/props_upstream.py",
         "src/nfl_forecast/props_integration.py",
+        "src/nfl_forecast/props_evaluation.py",
         "scripts/run_challenger_v09.py",
         "scripts/run_fst_reconstruction_probe.py",
         "scripts/verify_fst_reconstruction_evidence.py",
@@ -46,6 +47,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "scripts/build_props_market_snapshot.py",
         "scripts/build_props_integration_manifest.py",
         "scripts/build_props_upstream_snapshot.py",
+        "scripts/evaluate_props_accuracy.py",
         "research/experiments.json",
         "research/fst/F-ST-01-FROZEN-2026.json",
         "research/player_impact/EXPECTED_LINEUP_CONTRACT.md",
@@ -73,6 +75,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "tests/test_props_upstream.py",
         "tests/test_props_runner.py",
         "tests/test_props_integration.py",
+        "tests/test_props_evaluation.py",
         ".github/workflows/research_firewall.yml",
         ".github/workflows/research_2025_availability_reconstruction.yml",
         "docs/LEVLINE_RESEARCH.md",
@@ -195,6 +198,7 @@ def test_production_prediction_path_does_not_import_research_modules():
         "props_manifest",
         "props_upstream",
         "props_integration",
+        "props_evaluation",
     )
     for filename in protected:
         tree = ast.parse(Path(filename).read_text(encoding="utf-8"), filename=filename)

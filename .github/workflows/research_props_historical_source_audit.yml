@@ -1,0 +1,39 @@
+name: LevLine Props historical source audit
+
+on:
+  pull_request:
+    branches:
+      - research/props-integration
+    paths:
+      - "research/props/evaluation/audit_historical_source.py"
+      - ".github/workflows/research_props_historical_source_audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pandas pyarrow
+
+      - name: Audit 2023-2025 historical player props
+        run: python research/props/evaluation/audit_historical_source.py
+
+      - name: Upload source audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-historical-source-audit
+          path: research_outputs/props_accuracy/historical_source_audit.json
+          if-no-files-found: error

@@ -177,7 +177,7 @@ def make_closing_event(forecast_id, *, captured_utc, source, line, over_price_am
     if not forecast_id or captured is None: raise PropsPublicationError("closing event requires forecast_id and timezone-aware captured_utc")
     e={"history_contract_version":HISTORY_CONTRACT_VERSION,"event_type":"MARKET_CLOSE","forecast_id":str(forecast_id),"captured_utc":captured.isoformat(),"source":_text(source),"line":_num(line),"over_price_american":_num(over_price_american),"under_price_american":_num(under_price_american),"td_price_american":_num(td_price_american)}; e["event_id"]="close_"+_sha(e)[:24]; return e
 
-def grade_forecast_receipt(receipt, *, actual_result, graded_utc):
+def grade_forecast_receipt(receipt, *, actual_result, graded_utc, result_source=None):
     if receipt.get("event_type")!="FORECAST_ORIGINAL" or not isinstance(receipt.get("original_forecast"),Mapping): raise PropsPublicationError("grading requires an immutable FORECAST_ORIGINAL receipt")
     graded,actual=_dt(graded_utc),_num(actual_result); original=receipt["original_forecast"]; kickoff=_dt(original.get("kickoff_utc"))
     if graded is None or actual is None: raise PropsPublicationError("grading requires finite actual_result and timezone-aware graded_utc")
@@ -190,7 +190,7 @@ def grade_forecast_receipt(receipt, *, actual_result, graded_utc):
     elif _kind(prop)=="BINARY_TD":
         outcome="TD" if actual>=1 else "NO_TD"; p=_prob(model.get("td_probability")); side=None if p is None else "TD" if p>=.5 else "NO_TD"; result=None if side is None else "WIN" if side==outcome else "LOSS"
     else: raise PropsPublicationError("cannot grade unsupported market")
-    e={"history_contract_version":HISTORY_CONTRACT_VERSION,"event_type":"GRADE","forecast_id":receipt.get("forecast_id"),"graded_utc":graded.isoformat(),"actual_result":actual,"market_outcome":outcome,"model_side":side,"grading_result":result,"original_sha256":receipt.get("original_sha256")}; e["event_id"]="grade_"+_sha(e)[:24]; return e
+    e={"history_contract_version":HISTORY_CONTRACT_VERSION,"event_type":"GRADE","forecast_id":receipt.get("forecast_id"),"graded_utc":graded.isoformat(),"actual_result":actual,"result_source":_text(result_source),"market_outcome":outcome,"model_side":side,"grading_result":result,"original_sha256":receipt.get("original_sha256")}; e["event_id"]="grade_"+_sha(e)[:24]; return e
 
 def read_jsonl(path:Path):
     if not path.exists(): return []

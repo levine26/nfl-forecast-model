@@ -1,0 +1,152 @@
+{
+  "contract_version": "levline-props-historical-directional-v1.0",
+  "frozen_model_ref": "research/props-integration@db5478fd735ef0cad8fd1215e8b1fb6a96a3a21d",
+  "market_source": "Action Network genuine OPEN",
+  "book_id": 30,
+  "inferred_open_allowed": false,
+  "seasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "weeks": [
+    1,
+    18
+  ],
+  "simulations_per_game": 20000,
+  "headline": {
+    "qualified": 5682,
+    "wins": 2888,
+    "losses": 2772,
+    "pushes": 12,
+    "no_calls": 15,
+    "decided_nonpush": 5660,
+    "accuracy": 0.5102473498233215,
+    "wilson95": [
+      0.4972215867492631,
+      0.5232592125180513
+    ],
+    "game_clustered95": [
+      0.49470431832238726,
+      0.525634373166305
+    ],
+    "unique_games": 230,
+    "unique_players": 307
+  },
+  "baselines": {
+    "majority_side_naive_accuracy": 0.517636684303351,
+    "trailing5_accuracy": 0.49982078853046596,
+    "trailing5_n": 5580
+  },
+  "error": {
+    "fair_line_mae": 19.178898275255193,
+    "market_line_mae": 15.925906370996127
+  },
+  "by_season": {
+    "2023": {
+      "wins": 783,
+      "losses": 768,
+      "accuracy": 0.504835589941973,
+      "unique_games": 77
+    },
+    "2024": {
+      "wins": 1878,
+      "losses": 1818,
+      "accuracy": 0.5081168831168831,
+      "unique_games": 137
+    },
+    "2025": {
+      "wins": 227,
+      "losses": 186,
+      "accuracy": 0.549636803874092,
+      "unique_games": 16
+    }
+  },
+  "by_prop": {
+    "passing_yards": {
+      "wins": 239,
+      "losses": 212,
+      "accuracy": 0.5299334811529933
+    },
+    "passing_tds": {
+      "wins": 227,
+      "losses": 211,
+      "accuracy": 0.5182648401826484
+    },
+    "receptions": {
+      "wins": 962,
+      "losses": 885,
+      "accuracy": 0.5208446128857607
+    },
+    "receiving_yards": {
+      "wins": 980,
+      "losses": 963,
+      "accuracy": 0.5043746783324755
+    },
+    "rushing_yards": {
+      "wins": 480,
+      "losses": 501,
+      "accuracy": 0.4892966360856269
+    }
+  },
+  "by_position": {
+    "QB": {
+      "wins": 674,
+      "losses": 654,
+      "accuracy": 0.5075301204819277
+    },
+    "RB": {
+      "wins": 730,
+      "losses": 745,
+      "accuracy": 0.49491525423728816
+    },
+    "TE": {
+      "wins": 523,
+      "losses": 478,
+      "accuracy": 0.5224775224775224
+    },
+    "WR": {
+      "wins": 961,
+      "losses": 895,
+      "accuracy": 0.5177801724137931
+    }
+  },
+  "by_model_side": {
+    "OVER": {
+      "wins": 1707,
+      "losses": 1747,
+      "accuracy": 0.49420961204400693
+    },
+    "UNDER": {
+      "wins": 1181,
+      "losses": 1025,
+      "accuracy": 0.5353581142339076
+    }
+  },
+  "coverage_rule": {
+    "minimum_nonpush_calls": 1000,
+    "minimum_unique_games": 100,
+    "required_seasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "passes": true
+  },
+  "provenance": {
+    "workflow_run_id": 35363701921,
+    "artifact_ids": {
+      "2023": 10554984276,
+      "2024": 10555732152,
+      "2025": 10555634880
+    },
+    "bootstrap_seed": 20260917
+  },
+  "claims": {
+    "historical_directional_accuracy_measurable": true,
+    "above_chance_established": false,
+    "market_fair_line_superiority_established": false,
+    "profitability_established": false,
+    "prospective_2026_evidence": false
+  }
+}

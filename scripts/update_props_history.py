@@ -100,6 +100,7 @@ def record_grades(args) -> int:
             receipt,
             actual_result=row.get("actual_result"),
             graded_utc=row.get("graded_utc") or row.get("graded_at_utc"),
+            result_source=row.get("result_source") or row.get("source"),
         ))
     count = append_jsonl_immutable(args.ledger, events, identity_key="event_id")
     print(f"recorded {count} new grade events -> {args.ledger}; originals were not rewritten")
