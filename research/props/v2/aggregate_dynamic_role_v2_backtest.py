@@ -36,6 +36,9 @@ def _prepare(frame: pd.DataFrame) -> pd.DataFrame:
         "contract_version", "role_mode", "game_id", "player_id", "prop_type",
         "market_line", "actual_result", "grading_result", "v1_grading_result",
         "fair_line", "v1_fair_line", "over_odds", "under_odds",
+        "crps", "v1_crps", "interval_score_80", "v1_interval_score_80",
+        "interval_covered_80", "v1_interval_covered_80",
+        "pi_low", "pi_high", "v1_pi_low", "v1_pi_high",
     }
     missing = required - set(frame.columns)
     if missing:
@@ -99,6 +102,21 @@ def _metrics(frame: pd.DataFrame) -> dict:
         "sportsbook_line_mae": float(
             np.mean(np.abs(frame["market_line"] - frame["actual_result"]))
         ),
+        "challenger_crps": float(frame["crps"].mean()),
+        "v1_crps": float(frame["v1_crps"].mean()),
+        "challenger_minus_v1_crps": float(
+            (frame["crps"] - frame["v1_crps"]).mean()
+        ),
+        "challenger_interval_score_80": float(frame["interval_score_80"].mean()),
+        "v1_interval_score_80": float(frame["v1_interval_score_80"].mean()),
+        "challenger_interval_coverage_80": float(
+            frame["interval_covered_80"].astype(float).mean()
+        ),
+        "v1_interval_coverage_80": float(
+            frame["v1_interval_covered_80"].astype(float).mean()
+        ),
+        "challenger_interval_width_80": float((frame["pi_high"] - frame["pi_low"]).mean()),
+        "v1_interval_width_80": float((frame["v1_pi_high"] - frame["v1_pi_low"]).mean()),
     }
 
 
@@ -220,6 +238,13 @@ def main() -> int:
             f"Challenger Fair-Line MAE: {h['challenger_fair_line_mae']:.3f}",
             f"V1 Fair-Line MAE: {h['v1_fair_line_mae']:.3f}",
             f"Sportsbook line MAE: {h['sportsbook_line_mae']:.3f}",
+            f"Challenger CRPS: {h['challenger_crps']:.4f}",
+            f"V1 CRPS: {h['v1_crps']:.4f}",
+            f"Challenger minus V1 CRPS: {h['challenger_minus_v1_crps']:.4f}",
+            f"Challenger 80% interval score: {h['challenger_interval_score_80']:.3f}",
+            f"V1 80% interval score: {h['v1_interval_score_80']:.3f}",
+            f"Challenger 80% coverage: {100*h['challenger_interval_coverage_80']:.2f}%",
+            f"V1 80% coverage: {100*h['v1_interval_coverage_80']:.2f}%",
             f"Game-clustered accuracy 95% CI: {h['challenger_accuracy_ci95']}",
             f"Game-clustered challenger-minus-V1 95% CI: {h['challenger_minus_v1_ci95']}",
             "",
