@@ -105,29 +105,52 @@ def _week_from_row(game_id: str | None, kickoff: Any) -> str | None:
     return None
 
 
-def _choose_latest_close(events: Sequence[Mapping[str, Any]]) -> Mapping[str, Any] | None:
+def _timestamp(value: Any) -> pd.Timestamp | None:
+    ts = pd.to_datetime(value, utc=True, errors="coerce")
+    return None if pd.isna(ts) else pd.Timestamp(ts)
+
+
+def _choose_latest_close(
+    events: Sequence[Mapping[str, Any]],
+    *,
+    kickoff: pd.Timestamp,
+) -> tuple[Mapping[str, Any] | None, int]:
     valid: list[tuple[pd.Timestamp, Mapping[str, Any]]] = []
+    rejected = 0
     for event in events:
-        ts = pd.to_datetime(event.get("captured_utc"), utc=True, errors="coerce")
-        if pd.notna(ts):
-            valid.append((ts, event))
-    return max(valid, key=lambda pair: pair[0])[1] if valid else None
+        ts = _timestamp(event.get("captured_utc"))
+        if ts is None or ts >= kickoff:
+            rejected += 1
+            continue
+        valid.append((ts, event))
+    return (max(valid, key=lambda pair: pair[0])[1] if valid else None), rejected
 
 
-def _choose_grade(events: Sequence[Mapping[str, Any]]) -> tuple[Mapping[str, Any] | None, str | None]:
+def _choose_grade(
+    events: Sequence[Mapping[str, Any]],
+    *,
+    kickoff: pd.Timestamp,
+    original_hash: str | None,
+) -> tuple[Mapping[str, Any] | None, str | None]:
     if not events:
         return None, None
-    actuals = {_num(event.get("actual_result")) for event in events}
+    valid: list[tuple[pd.Timestamp, Mapping[str, Any]]] = []
+    for event in events:
+        ts = _timestamp(event.get("graded_utc"))
+        if ts is None or ts <= kickoff:
+            continue
+        linked_hash = _text(event.get("original_sha256"))
+        if linked_hash is not None and original_hash is not None and linked_hash != original_hash:
+            continue
+        if _num(event.get("actual_result")) is None:
+            continue
+        valid.append((ts, event))
+    if not valid:
+        return None, "grade_invalid_or_not_postgame"
+    actuals = {_num(event.get("actual_result")) for _, event in valid}
     actuals.discard(None)
     if len(actuals) > 1:
         return None, "conflicting_grade_actuals"
-    valid: list[tuple[pd.Timestamp, Mapping[str, Any]]] = []
-    for event in events:
-        ts = pd.to_datetime(event.get("graded_utc"), utc=True, errors="coerce")
-        if pd.notna(ts):
-            valid.append((ts, event))
-    if not valid:
-        return None, "grade_timestamp_invalid"
     return max(valid, key=lambda pair: pair[0])[1], None
 
 
@@ -168,6 +191,21 @@ def join_history_events(
             audit["invalid_original_hashes"] += 1
             exclude("original_sha256_mismatch")
             continue
+        kickoff_dt = _timestamp(original.get("kickoff_utc"))
+        forecast_dt = _timestamp(original.get("forecast_timestamp_utc"))
+        horizon_dt = _timestamp(original.get("data_horizon_utc"))
+        recorded_dt = _timestamp(receipt.get("recorded_utc"))
+        if None in {kickoff_dt, forecast_dt, horizon_dt, recorded_dt}:
+            exclude("original_timestamp_invalid")
+            continue
+        assert kickoff_dt is not None and forecast_dt is not None
+        assert horizon_dt is not None and recorded_dt is not None
+        if not (horizon_dt <= forecast_dt < kickoff_dt):
+            exclude("original_not_point_in_time")
+            continue
+        if recorded_dt >= kickoff_dt:
+            exclude("receipt_recorded_at_or_after_kickoff")
+            continue
         if fid in originals:
             if _canonical(originals[fid]) == _canonical(receipt):
                 audit["duplicate_identical_originals"] += 1
@@ -198,22 +236,30 @@ def join_history_events(
             if isinstance(original.get("data_quality"), Mapping)
             else {}
         )
-        close = _choose_latest_close(closes_by.get(fid, []))
-        grade, grade_problem = _choose_grade(grades_by.get(fid, []))
+        kickoff = original.get("kickoff_utc")
+        forecast_ts = original.get("forecast_timestamp_utc")
+        kickoff_dt = _timestamp(kickoff)
+        forecast_dt = _timestamp(forecast_ts)
+        assert kickoff_dt is not None and forecast_dt is not None
+
+        close, rejected_closes = _choose_latest_close(
+            closes_by.get(fid, []),
+            kickoff=kickoff_dt,
+        )
+        for _ in range(rejected_closes):
+            exclude("closing_event_invalid_or_not_pregame")
+
+        grade, grade_problem = _choose_grade(
+            grades_by.get(fid, []),
+            kickoff=kickoff_dt,
+            original_hash=_text(receipt.get("original_sha256")),
+        )
         if grade_problem:
             audit["grade_conflicts"] += 1
             exclude(grade_problem)
         actual = _num(grade.get("actual_result")) if grade else None
         game_id = _text(original.get("game_id"))
-        kickoff = original.get("kickoff_utc")
-        forecast_ts = original.get("forecast_timestamp_utc")
-        kickoff_dt = pd.to_datetime(kickoff, utc=True, errors="coerce")
-        forecast_dt = pd.to_datetime(forecast_ts, utc=True, errors="coerce")
-        horizon_hours = (
-            float((kickoff_dt - forecast_dt).total_seconds() / 3600.0)
-            if pd.notna(kickoff_dt) and pd.notna(forecast_dt)
-            else np.nan
-        )
+        horizon_hours = float((kickoff_dt - forecast_dt).total_seconds() / 3600.0)
         prop = _text(original.get("prop_type"))
         market_line = _num(market.get("line"))
         fair_line = _num(model.get("fair_line"))
@@ -225,6 +271,17 @@ def join_history_events(
         market_over = _prob(market.get("no_vig_over_probability"))
         market_under = _prob(market.get("no_vig_under_probability"))
         market_td = _prob(market.get("no_vig_probability"))
+        market_at = _timestamp(market.get("captured_utc"))
+        market_point_in_time = (
+            market_at is not None
+            and market_at <= forecast_dt
+            and market_at < kickoff_dt
+        )
+        if not market_point_in_time:
+            market_line = None
+            market_over = None
+            market_under = None
+            market_td = None
 
         row = {
             "forecast_id": fid,
@@ -260,13 +317,20 @@ def join_history_events(
             "model_p_under": model_under,
             "model_p_push": model_push,
             "model_td_probability": model_td,
+            "market_point_in_time_eligible": bool(market_point_in_time),
             "market_line": market_line,
             "market_p_over": market_over,
             "market_p_under": market_under,
             "market_td_probability": market_td,
-            "market_over_price_american": _num(market.get("over_price_american")),
-            "market_under_price_american": _num(market.get("under_price_american")),
-            "market_td_price_american": _num(market.get("td_price_american")),
+            "market_over_price_american": (
+                _num(market.get("over_price_american")) if market_point_in_time else None
+            ),
+            "market_under_price_american": (
+                _num(market.get("under_price_american")) if market_point_in_time else None
+            ),
+            "market_td_price_american": (
+                _num(market.get("td_price_american")) if market_point_in_time else None
+            ),
             "close_line": _num(close.get("line")) if close else None,
             "close_over_price_american": _num(close.get("over_price_american")) if close else None,
             "close_under_price_american": _num(close.get("under_price_american")) if close else None,
