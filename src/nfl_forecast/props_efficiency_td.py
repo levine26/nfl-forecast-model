@@ -141,7 +141,22 @@ def validate_player_inputs(frame: pd.DataFrame) -> None:
     pos = frame.position.astype(str).str.upper()
     if set(pos) - POSITIONS:
         raise ValueError(f"Unsupported offensive positions: {sorted(set(pos) - POSITIONS)}")
-    for col in [c for c in PLAYER_REQUIRED if c.startswith("expected_") or c.startswith("hist_")]:
+    signed_historical_yardage = {
+        "hist_passing_yards",
+        "hist_qb_rush_yards",
+        "hist_rushing_yards",
+        "hist_receiving_yards",
+    }
+    non_negative_player_fields = [
+        col
+        for col in PLAYER_REQUIRED
+        if (
+            col.startswith("expected_")
+            or col.startswith("hist_")
+        )
+        and col not in signed_historical_yardage
+    ]
+    for col in non_negative_player_fields:
         if (pd.to_numeric(frame[col]) < 0).any():
             raise ValueError(f"{col} must be non-negative")
     for col in [
