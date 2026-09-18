@@ -130,6 +130,65 @@ def _schedule_game(schedules, game_id: str) -> tuple[str, str, str]:
     return home, away, ts.astimezone(timezone.utc).isoformat()
 
 
+
+def _scheduled_pregame_game_ids(
+    schedules,
+    *,
+    season: int,
+    week: int,
+    forecast_timestamp: datetime,
+) -> tuple[list[str], list[str]]:
+    """Return upcoming target-week game IDs and already-started game IDs."""
+
+    if "game_id" not in schedules.columns:
+        raise PropsUpstreamError("schedule source missing game_id")
+    work = schedules.copy()
+    if "season" in work.columns:
+        work = work[
+            pd.to_numeric(work["season"], errors="coerce").eq(int(season))
+        ].copy()
+    if "week" in work.columns:
+        work = work[
+            pd.to_numeric(work["week"], errors="coerce").eq(int(week))
+        ].copy()
+    if work.empty:
+        raise PropsUpstreamError(
+            f"schedule source has no rows for season={season}, week={week}"
+        )
+    kickoff_col = next(
+        (
+            column
+            for column in (
+                "kickoff",
+                "game_datetime",
+                "start_time",
+                "game_start",
+                "datetime",
+            )
+            if column in work.columns
+        ),
+        None,
+    )
+    if kickoff_col is None:
+        raise PropsUpstreamError("schedule source missing kickoff timestamp")
+    kickoff = pd.to_datetime(work[kickoff_col], utc=True, errors="coerce")
+    if kickoff.isna().any():
+        bad = work.loc[kickoff.isna(), "game_id"].astype(str).tolist()
+        raise PropsUpstreamError(
+            f"target-week schedule has unknown kickoff timestamp: {bad}"
+        )
+    ids = work["game_id"].astype("string").fillna("").str.strip()
+    if ids.eq("").any() or ids.duplicated().any():
+        raise PropsUpstreamError("target-week schedule has missing/duplicate game_id")
+
+    forecast = pd.Timestamp(forecast_timestamp)
+    if forecast.tzinfo is None:
+        raise PropsUpstreamError("forecast timestamp must be timezone-aware")
+    forecast = forecast.tz_convert("UTC")
+    pregame = sorted(ids[kickoff.gt(forecast)].astype(str).tolist())
+    started = sorted(ids[~kickoff.gt(forecast)].astype(str).tolist())
+    return pregame, started
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Build frozen point-in-time upstream artifacts for LevLine Props."
@@ -224,24 +283,36 @@ def main() -> int:
         availability=availability,
     )
     player_state = state_build.player_state
-    available_game_ids = sorted(
-        {
-            str(value)
-            for value in player_state["game_id"].dropna().astype(str)
-            if str(value).strip()
-        }
+    schedule_pregame_ids, started_game_ids = _scheduled_pregame_game_ids(
+        sources.schedules,
+        season=args.season,
+        week=args.week,
+        forecast_timestamp=forecast_timestamp,
     )
+    state_game_ids = {
+        str(value)
+        for value in player_state["game_id"].dropna().astype(str)
+        if str(value).strip()
+    }
+    missing_upcoming_state = sorted(set(schedule_pregame_ids) - state_game_ids)
+    if missing_upcoming_state:
+        raise PropsUpstreamError(
+            "upcoming scheduled game(s) missing canonical player state: "
+            f"{missing_upcoming_state}"
+        )
+    available_game_ids = sorted(set(schedule_pregame_ids) & state_game_ids)
     if not available_game_ids:
-        raise PropsUpstreamError("canonical player state contains no pregame target games")
+        raise PropsUpstreamError("canonical player state contains no scheduled pregame games")
 
     if args.all_games:
         game_ids = available_game_ids
     else:
         game_ids = list(dict.fromkeys(str(value) for value in args.game_id))
-        missing_games = sorted(set(game_ids) - set(available_game_ids))
-        if missing_games:
+        invalid_games = sorted(set(game_ids) - set(available_game_ids))
+        if invalid_games:
             raise PropsUpstreamError(
-                f"requested game_id(s) absent from canonical pregame player state: {missing_games}"
+                "requested game_id(s) are not scheduled pregame games with canonical state: "
+                f"{invalid_games}"
             )
     if len(game_ids) > 1 and scoring and not isinstance(scoring.get("games"), dict):
         raise ValueError(
@@ -540,6 +611,8 @@ def main() -> int:
         "captured_at_utc": forecast_timestamp.isoformat(),
         "player_state_file": str(common_player_state.relative_to(root)),
         "game_count": len(index_games),
+        "scheduled_pregame_game_count": len(schedule_pregame_ids),
+        "excluded_started_game_ids": started_game_ids,
         "games": index_games,
     }
     planned.append((slate_index, index_payload))
