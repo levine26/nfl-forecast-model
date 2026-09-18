@@ -325,7 +325,7 @@ function PropDetail({ forecast }) {
     <div className="lp-detail-comparison">
       {binary ? <>
         <Metric label="Sportsbook price" value={formatAmerican(primaryMarketPrice(forecast))}/>
-        <Metric label="LevLine TD probability" value={formatPercent(probability.model)} accent/>
+        <Metric label="LevLine probability · fair price" value={formatPercent(probability.model) + (numberValue(forecast?.model?.fair_odds_american)!=null ? ' · ' + formatAmerican(forecast.model.fair_odds_american) : '')} accent/>
         <Metric label="Probability disagreement" value={formatPoints(probability.edge)} accent/>
       </> : <>
         <Metric label="Market" value={formatLine(forecast?.market?.line)}/>
@@ -402,7 +402,7 @@ function Radar({ rows }) {
       <div><span>ON LEVLINE'S RADAR</span><h2>Markets worth a closer look.</h2><p>MODEL EDGE appears first when published; WATCH remains clearly distinct and is never upgraded by the interface.</p></div>
       <b>{radar.length}</b>
     </div>
-    {!edges && <div className="lp-edge-empty"><SignalPill state="NO SIGNAL"/><div><strong>No MODEL EDGE signals right now.</strong><span>LevLine is not upgrading WATCH forecasts simply to populate the board.</span></div></div>}
+    {!edges && <div className="lp-edge-empty"><span className="lp-edge-empty-mark" aria-hidden="true">◇</span><div><strong>No MODEL EDGE signals right now.</strong><span>LevLine is not upgrading WATCH forecasts simply to populate the board.</span></div></div>}
     {radar.length ? <BoardTable rows={radar}/> : <EmptyState compact title="Nothing is on LevLine's radar right now." copy="The full published market remains available below."/>}
   </section>
 }
