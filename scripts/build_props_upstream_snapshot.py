@@ -22,6 +22,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from nfl_forecast.injuries import fetch_nfl_injuries  # noqa: E402
 from nfl_forecast.props_player_sources import (  # noqa: E402
     load_offensive_props_sources,
+    normalize_snap_counts_player_ids,
     resolve_primary_qbs_from_depth_charts,
 )
 from nfl_forecast.props_player_state import (  # noqa: E402
@@ -35,6 +36,7 @@ from nfl_forecast.props_upstream import (  # noqa: E402
     build_game_upstream_package,
     build_lagged_props_history,
     fit_pre2026_efficiency_priors,
+    fit_pre2026_injury_availability_priors,
     residual_efficiency_by_team_from_empirical_priors,
 )
 
@@ -228,11 +230,53 @@ def main() -> int:
         raise ValueError(f"{args.game_id} must resolve to exactly two teams")
 
     route_priors = priors.get("route_prior_means")
-    availability_priors = priors.get("availability_beta_priors")
+    configured_availability_priors = priors.get("availability_beta_priors", {})
     if not isinstance(route_priors, dict):
         raise ValueError("priors require route_prior_means")
-    if not isinstance(availability_priors, dict):
-        raise ValueError("priors require availability_beta_priors")
+    if not isinstance(configured_availability_priors, dict):
+        raise ValueError("availability_beta_priors must be an object when supplied")
+
+    fitted_availability_priors: dict = {}
+    availability_prior_fit_audit = {
+        "status": "unavailable",
+        "reason": None,
+    }
+    availability_fit_end = min(2024, int(args.season) - 1)
+    if availability_fit_end >= 2012:
+        try:
+            availability_fit_seasons = list(range(2012, availability_fit_end + 1))
+            historical_injuries = _pandas(nfl.load_injuries(availability_fit_seasons))
+            raw_availability_snaps = _pandas(nfl.load_snap_counts(availability_fit_seasons))
+            availability_snaps, availability_snap_audit = normalize_snap_counts_player_ids(
+                raw_availability_snaps,
+                identity,
+            )
+            if availability_snaps is None or availability_snaps.empty:
+                raise PropsUpstreamError(
+                    "historical snap-count crosswalk produced no stable-ID rows"
+                )
+            availability_fit = fit_pre2026_injury_availability_priors(
+                historical_injuries,
+                availability_snaps,
+                trained_through_season=availability_fit_end,
+            )
+            fitted_availability_priors = dict(
+                availability_fit["availability_beta_priors"]
+            )
+            availability_prior_fit_audit = {
+                "status": "qualified",
+                "snap_identity": availability_snap_audit,
+                **availability_fit["audit"],
+            }
+        except Exception as exc:
+            availability_prior_fit_audit = {
+                "status": "unavailable_fail_closed_to_explicit_config",
+                "reason": f"{type(exc).__name__}: {str(exc)[:240]}",
+            }
+    availability_priors = {
+        **fitted_availability_priors,
+        **configured_availability_priors,
+    }
 
     fitted_empirical = fit_pre2026_efficiency_priors(
         sources.pbp,
@@ -374,6 +418,8 @@ def main() -> int:
             "captured_at_utc": forecast_timestamp.isoformat(),
             "source_status": sources.source_status,
             "availability": availability_audit,
+            "availability_prior_fit": availability_prior_fit_audit,
+            "availability_priors_applied": availability_priors,
             "depth_chart_primary_qb": depth_qb_audit,
             "player_state": state_build.audit,
             "upstream": package.audit,
