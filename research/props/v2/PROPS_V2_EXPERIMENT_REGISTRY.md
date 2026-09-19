@@ -17,7 +17,7 @@ Status: **ACTIVE / APPEND-ONLY SCIENTIFIC RECORD**
 | P2-ROUTE-TARGET | Route → target hierarchy improves receiving process | Source audit | BLOCKED on verified live all-player routes | nflverse participation can support season-lagged pass-play participation, not true all-player routes; see route audit |
 | P2-EFF-V2 | Strictly lagged opponent defensive efficiency improves conditional rushing/receiving yardage beyond player baseline | Retrospective component isolation | PR #391 — preregistered component study | Rushing and receiving have separate frozen gates; actual event count conditioning forbids pregame claim |
 | P2-DIST-V2 | Signed empirical event-yard distributions improve conditional yardage CRPS vs nonnegative Gamma | Retrospective component isolation | COMPLETE — PR #390 | ADVANCE mechanism only: aggregate CRPS improves; strongest for rushing; actual event count conditioning forbids pregame claim |
-| P2-TD-V2 | Hierarchical scoring-opportunity allocation improves TD distributions | Retrospective/prospective | PLANNED | Rare-event distribution metrics required |
+| P2-TD-V2 | Overdispersed team offensive TD counts improve rare-event distribution quality vs Poisson at the same mean | Retrospective component isolation | PR #392 — preregistered component study | Gate on CRPS, clustered uncertainty and log loss before any player-TD integration |
 | P2-CLV-V1 | LevLine disagreement predicts subsequent market movement | Prospective | DATA CAPTURE STARTED via #381 | Freeze horizon/close selection before grading; no outcome-tuned horizon selection |
 
 ## Experiment discipline
