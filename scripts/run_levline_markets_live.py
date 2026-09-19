@@ -9,7 +9,6 @@ one atomic production handoff for Sunday Signal.
 
 import argparse
 import csv
-import hashlib
 from datetime import datetime, timezone
 import json
 import os
@@ -107,17 +106,6 @@ def _write_json(path: Path, payload: object) -> None:
     os.replace(tmp, path)
 
 
-def _validated_sha(value: object, *, label: str) -> str:
-    text = str(value or "").strip().lower()
-    if len(text) not in {40, 64} or any(char not in "0123456789abcdef" for char in text):
-        raise ValueError(f"{label} must be a git SHA")
-    return text
-
-
-def _sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run one governed live LevLine Props cycle.")
     parser.add_argument("--season", type=int)
@@ -144,9 +132,6 @@ def main() -> int:
     parser.add_argument("--api-key-env", default="THE_ODDS_API_KEY")
     parser.add_argument("--regions", default="us")
     parser.add_argument("--bookmakers")
-    parser.add_argument("--source-workflow-run")
-    parser.add_argument("--trigger-head-sha")
-    parser.add_argument("--generation-base-sha")
     args = parser.parse_args()
 
     if (args.season is None) != (args.week is None):
@@ -163,15 +148,6 @@ def main() -> int:
     if args.validate_priors_only:
         print(f"validated frozen LevLine Props priors -> {args.priors}")
         return 0
-
-    source_workflow_run = str(args.source_workflow_run or "").strip()
-    if not source_workflow_run:
-        raise ValueError("--source-workflow-run is required for live publication")
-    trigger_head_sha = _validated_sha(args.trigger_head_sha, label="--trigger-head-sha")
-    generation_base_sha = _validated_sha(
-        args.generation_base_sha,
-        label="--generation-base-sha",
-    )
     if not str(os.environ.get(args.api_key_env, "")).strip():
         raise RuntimeError(
             f"live Props market capture requires configured {args.api_key_env}"
@@ -215,7 +191,6 @@ def main() -> int:
     _run(*market_command)
 
     market_payload = _load_json(market)
-    raw_market_payload = _load_json(raw_market)
     market_rows = market_payload.get("market_artifacts")
     if not isinstance(market_rows, list) or not market_rows:
         raise RuntimeError(
@@ -248,38 +223,6 @@ def main() -> int:
     if not isinstance(summary, dict) or int(summary.get("total") or 0) != len(forecasts):
         raise RuntimeError("live Props public summary does not reconcile to forecast rows")
 
-    market_provider = str(market_payload.get("provider") or "").strip()
-    if not market_provider:
-        raise RuntimeError("live Props market snapshot is missing provider provenance")
-    credential_mode = str(raw_market_payload.get("credential_mode") or "configured").strip()
-    provider_attempts = raw_market_payload.get("provider_attempts")
-    if provider_attempts is None:
-        provider_attempts = []
-    if not isinstance(provider_attempts, list):
-        raise RuntimeError("live Props raw market provider_attempts must be a list")
-
-    source_provenance = {
-        "contract_version": "levline-props-live-source-provenance-v0.1.0",
-        "source_workflow_run": source_workflow_run,
-        "trigger_head_sha": trigger_head_sha,
-        "generation_base_sha": generation_base_sha,
-        "live_run_id": run_id,
-        "created_utc": datetime.now(timezone.utc).isoformat(),
-        "market_provider": market_provider,
-        "market_credential_mode": credential_mode,
-        "market_capture_mode": raw_market_payload.get("capture_mode"),
-        "provider_attempts": provider_attempts,
-        "market_snapshot_sha256": _sha256_file(market),
-        "raw_market_sha256": _sha256_file(raw_market),
-        "forecasts_sha256": _sha256_file(staged_forecasts),
-        "manifest_slate_sha256": _sha256_file(manifests / "manifest_slate.json"),
-        "research_only": True,
-        "production_authorized": False,
-    }
-    source_provenance_path = run_root / "source_provenance.json"
-    _write_json(source_provenance_path, source_provenance)
-    source_provenance_sha256 = _sha256_file(source_provenance_path)
-
     receipts = read_jsonl(staged_ledger)
     if len(receipts) != len(forecasts):
         raise RuntimeError("live Props immutable receipt count does not reconcile")
@@ -301,12 +244,6 @@ def main() -> int:
         "completed_utc": datetime.now(timezone.utc).isoformat(),
         "forecast_count": len(forecasts),
         "market_artifact_count": len(market_rows),
-        "source_workflow_run": source_workflow_run,
-        "trigger_head_sha": trigger_head_sha,
-        "generation_base_sha": generation_base_sha,
-        "market_provider": market_provider,
-        "market_credential_mode": credential_mode,
-        "source_provenance_sha256": source_provenance_sha256,
         "public_summary": summary,
         "current_forecasts": str(current_forecasts.relative_to(ROOT)),
         "current_public": str(current_public.relative_to(ROOT)),
