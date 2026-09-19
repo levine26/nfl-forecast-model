@@ -14,6 +14,11 @@ def _row(minutes, stamp, line=60.5):
     return {
         "snapshot_id": f"s{stamp}",
         "source_workflow_run": "1",
+        "source_head_sha": "a" * 40,
+        "source_trigger_head_sha": "b" * 40,
+        "source_market_provider": "the_odds_api",
+        "source_market_credential_mode": "configured",
+        "source_provenance_sha256": "c" * 64,
         "captured_at_utc": stamp,
         "kickoff_utc": "2026-09-20T20:00:00+00:00",
         "minutes_to_kickoff": float(minutes),
@@ -77,3 +82,15 @@ def test_earliest_observed_is_not_labeled_open():
     names={row["horizon"] for row in selected}
     assert "EARLIEST_OBSERVED" in names
     assert "OPEN" not in names
+
+
+def test_legacy_pre_provenance_rows_are_preserved_but_not_selected():
+    legacy=_row(1460,"2026-09-19T19:40:00+00:00",62.5)
+    for key in (
+        "source_trigger_head_sha",
+        "source_market_provider",
+        "source_market_credential_mode",
+        "source_provenance_sha256",
+    ):
+        legacy.pop(key)
+    assert select_horizons([legacy]) == []
