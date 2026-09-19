@@ -46,7 +46,7 @@ from nfl_forecast.props_player_sources import normalize_snap_counts_player_ids
 from nfl_forecast.props_publication import append_jsonl_immutable, read_jsonl
 
 from props_dynamic_role import (
-    DYNAMIC_ROLE_VERSION,
+    ENGINE_VERSION as DYNAMIC_ROLE_VERSION,
     build_dynamic_role_adjustments,
 )
 from record_prospective_football_shadow import (
