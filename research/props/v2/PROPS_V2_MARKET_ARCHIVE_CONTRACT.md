@@ -3,7 +3,7 @@
 Status: **FROZEN PROSPECTIVE DATA CAPTURE / RESEARCH ONLY**  
 Version: `levline-props-v2-market-archive-v0.1.0`  
 Exact-source provenance amendment: 2026-09-19, before first persistent archive capture  
-Live-generation provenance amendment: 2026-09-19, before first persistent archive capture
+Live-generation provenance amendment: 2026-09-19, before first provenance-eligible persistent archive capture
 
 ## Objective
 
@@ -59,8 +59,12 @@ Every archive capture must:
 7. check out the actual generation-base SHA;
 8. persist workflow run, generation SHA, trigger SHA, provider/mode and provenance SHA-256.
 
-A live run predating the live-generation provenance listener is permanently ineligible for prospective
-archive evidence. Manual dispatch may not backfill it. Missing captures stay missing.
+A live run predating the live-generation provenance listener is permanently ineligible for
+provenance-eligible archive evidence. The first persistence event occurred before this amendment became
+active and archived one 1,033-row normalized snapshot from source run `35428763144`. That snapshot
+remains immutable for auditability but is excluded from preregistered horizon/CLV selection and all
+promotion thresholds. It may not be rewritten, deleted, or retroactively upgraded. Manual dispatch may
+not backfill it. Missing captures stay missing.
 
 ## Horizon policy
 
