@@ -161,12 +161,32 @@ jobs:
           assert d["winner_model_mutated"] is False
           assert d["published_v1_props_mutated"] is False
           assert d["outcomes_read"]==0
+          ledger=Path("research_outputs/props_v2/football_shadow/shadow_a_originals.jsonl")
+          rows=[]
+          if ledger.exists():
+              rows=[json.loads(line) for line in ledger.read_text().splitlines() if line.strip()]
+          if d["new_receipts"]>0:
+              assert rows, "capture reported new receipts but ledger is empty"
+          for row in rows:
+              assert row["contract_version"]=="levline-props-v2-football-shadow-a-v0.1.0"
+              assert row["shadow_version"]=="P2-SHADOW-A-DEFENSE-v0.1.0"
+              assert int(row["source_season"])>=2026
+              assert 1<=int(row["source_week"])<=18
+              assert "actual_result" not in row
+              assert "grading_result" not in row
+              for model_key in ("v1","shadow_a"):
+                  dist=row[model_key]["empirical_distribution"]
+                  assert int(dist["sample_count"])>0
+                  assert sum(int(x) for x in dist["counts"])==int(dist["sample_count"])
+                  assert len(dist["support"])==len(dist["counts"])
+                  assert len(str(dist["sha256"]))==64
           print(json.dumps({
               "source_workflow_run":d["source_workflow_run"],
               "source_season":d["source_season"],
               "source_week":d["source_week"],
               "new_receipts":d["new_receipts"],
               "skipped_started_games":d["skipped_started_games"],
+              "ledger_receipts":len(rows),
           },indent=2))
           PY
 
