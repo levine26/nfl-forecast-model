@@ -413,12 +413,17 @@ Frozen candidates:
 This is a calibration/market-anchor experiment and is distinct from the football-mechanism shadow.
 No completed 2026 outcome may change the candidate. Grading is evaluation-only.
 
-Source run `35428763144` created the first persistence event while the final live-generation/provider
-provenance amendment was still under CI: **545 market-anchor receipts**. Those rows contain no
-outcomes, remain immutable for auditability, and are classified as **legacy pre-provenance**. They do
-not count toward any prospective evaluation or promotion threshold. PR #418 is the pending
-live-generation/provider provenance freeze; the first provenance-eligible market-anchor receipt is
-still pending.
+Source run `35428763144` created **545 legacy pre-provenance market-anchor receipts**. They remain
+immutable for auditability and count toward no prospective evaluation or promotion threshold.
+
+PR #418 is merged and the live producer now emits cryptographically bound generation/provider
+provenance. Successful source run `35457112800` generated **465 provenance-valid market-anchor rows
+in the capture workspace**, but the workflow's post-capture enforcement incorrectly required the new
+provenance fields on the 545 legacy rows and failed before persistence. Those 465 rows were therefore
+never committed and are **not evidence**. They will not be replayed or backfilled. PR #430 repairs the
+legacy-vs-partial-provenance enforcement distinction for the next natural source run.
+
+Persisted provenance-eligible market-anchor receipts: **0**.
 
 ## Prospective football Shadow A
 
@@ -439,12 +444,18 @@ Each receipt is designed to preserve:
 - frozen defense state and coefficients;
 - explicit zero-outcome-read / no-production governance.
 
-Source run `35428763144` created **289 Shadow A receipts** before the final
-live-generation/provider provenance amendment became active. Those receipts contain no outcomes and
-remain immutable on the research-data branch, but they are **legacy pre-provenance** and contribute
-zero rows to grading, minimum-evidence, or promotion thresholds. The amended grader verifies their
-original receipt hash/source hashes/chronology and then excludes them before any outcome lookup.
-PR #418 is pending; provenance-eligible Shadow A receipts accumulated so far: **0**.
+Source run `35428763144` created **289 legacy pre-provenance Shadow A receipts**. Those receipts
+contain no outcomes, remain immutable, and contribute zero rows to grading, minimum-evidence, or
+promotion thresholds. The amended grader verifies their original receipt hash/source
+hashes/chronology and excludes them before any outcome lookup.
+
+PR #418 is merged. Successful source run `35457112800` generated **245 provenance-valid Shadow A
+rows in the capture workspace**, with `outcomes_read=0`, but the workflow's post-capture enforcement
+incorrectly required the new provenance fields on the 289 legacy rows and failed before persistence.
+The 245 rows were never committed and are not evidence; they will not be replayed/backfilled. PR #430
+repairs that enforcement boundary for the next natural source run.
+
+Persisted provenance-eligible Shadow A receipts: **0**.
 
 Grading implementation: **PR #406 — merged to `main`**. PR #418 adds the provenance-eligibility
 boundary without changing any scoring metric or threshold. The grader uses finalized outcomes only,
@@ -453,8 +464,17 @@ CRPS/MAE/Brier/log loss/fixed-80%-interval/directional metrics, and never auto-a
 
 Secondary **Shadow B (defense + Dynamic Role V0.1 full)** is implemented by **PR #405**. PR #411,
 also merged, makes unavailable strictly-lagged role history fail closed rather than silently degrading
-to a unit-role fallback. Shadow B receipts accumulated so far: **0** and its research-data branch does
-not yet exist. PR #418 adds exact live-generation/provider provenance before its first eligible receipt.
+to a unit-role fallback. PR #418 adds exact live-generation/provider provenance.
+
+Source run `35457112800` exposed a pre-receipt exact-replay defect: the Shadow B transform rebuilt
+carry/target concentration using only active IDs emitted by the captured Dirichlet, while canonical V1
+computes its availability-uncertainty concentration scale over the full eligible roster before
+removing zero-availability players. The failing Atlanta example differed only by this normalization;
+restoring the unavailable eligible QB reproduces the captured concentration exactly. No receipt was
+persisted and no outcome was read. PR #430 repairs the algebra using the canonical full eligible
+position sets and retains the original exact tolerance.
+
+Persisted provenance-eligible Shadow B receipts: **0**.
 
 Shadow B grading is frozen separately in **PR #409 — merged before the first B receipt/outcome**.
 Its primary comparison is B vs matched Shadow A; B vs V1 is supporting context only. Exact A/B
@@ -470,18 +490,30 @@ T48H/T24H/T12H/T6H/T90M/T30M/near-close horizon selection.
 
 PR #381 is merged to `main`; exact-source-run provenance hardening in **PR #413** is also merged.
 
-Source run `35428763144` created the first persistent archive before the final live-generation/provider
-provenance amendment became active: **one normalized snapshot containing 1,033 player-prop market
-rows across 15 games**. The snapshot is immutable and retained for auditability, but it is
-**legacy pre-provenance** and is excluded from all preregistered horizon/CLV selection and promotion
-thresholds. The selector now distinguishes complete provenance, no-amendment legacy rows, and invalid
-partial provenance; partial provenance fails closed.
+The immutable archive currently contains **4 legacy pre-provenance snapshots / 3,700 rows**:
+the initial 1,033-row snapshot from run `35428763144` plus three 889-row snapshots from run
+`35451747461`. These rows remain audit-only and are excluded from preregistered horizon/CLV
+selection and promotion thresholds.
 
-PR #418 is pending. Provenance-eligible market archive captures accumulated so far: **0**.
+PR #418 is merged. Successful source run `35457112800` persisted the first
+**provenance-eligible market snapshot: 892 rows across 15 games**, with generation SHA
+`cd65056d3c9af0d5ef1fc5d7f2f44a7f5192692f`, trigger SHA
+`426cc98bd63ce4a3bf8226f8b80f360ba405b998`, provider `propline`, and credential mode
+`shared_public_demo`. Its source provenance record and forecast/market/raw-market/manifest hashes
+were verified before persistence.
 
-**Disposition:** collection is active, but CLV/movement grading remains blocked until sufficient
-provenance-eligible timestamp-qualified captures accumulate. The legacy snapshot may not be rewritten,
-deleted, backfilled, or retroactively upgraded.
+The horizon selector now reports:
+- archive rows **4,592**;
+- provenance-eligible rows **892**;
+- legacy rows excluded **3,700**;
+- eligible identities **892**;
+- selected horizon rows **1,724**;
+- EARLIEST_OBSERVED **892**, T24H **777**, T48H **55**; later/near-close horizons **0** so far.
+
+**Disposition:** prospective archive collection is genuinely active. CLV/movement grading remains
+blocked until repeated provenance-eligible timestamp-qualified captures accumulate; one source
+snapshot is not a market-movement sample. Legacy rows may not be rewritten, deleted, backfilled, or
+retroactively upgraded.
 
 ## Production conclusion
 
