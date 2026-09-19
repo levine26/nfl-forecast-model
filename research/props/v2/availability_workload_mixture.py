@@ -456,6 +456,10 @@ def fit_workload_mixtures(
     *,
     trained_through_season: int,
 ) -> dict[tuple[str, str], MixtureFit]:
+    if int(trained_through_season) > 2025:
+        raise AvailabilityMixtureError(
+            "availability/workload mixtures may not be fit through completed 2026"
+        )
     train = examples[
         pd.to_numeric(examples["season"], errors="coerce").le(int(trained_through_season))
     ].copy()
@@ -490,6 +494,10 @@ def fit_active_only_priors(
     *,
     trained_through_season: int,
 ) -> dict[str, float]:
+    if int(trained_through_season) > 2025:
+        raise AvailabilityMixtureError(
+            "active-only comparator may not be fit through completed 2026"
+        )
     train = examples[
         pd.to_numeric(examples["season"], errors="coerce").le(int(trained_through_season))
     ].copy()
@@ -558,6 +566,8 @@ def evaluate_season_forward(
                 "active_only_expected_workload_ratio": active_expected,
                 "mixture_abs_error": abs(mix_expected - actual),
                 "active_only_abs_error": abs(active_expected - actual),
+                "mixture_sq_error": (mix_expected - actual) ** 2,
+                "active_only_sq_error": (active_expected - actual) ** 2,
                 "mixture_active_probability": mix_active,
                 "active_only_probability": active_expected,
                 "mixture_active_brier": (mix_active - actual_active) ** 2,
@@ -581,6 +591,16 @@ def evaluate_season_forward(
         "active_only_workload_mae": float(scored["active_only_abs_error"].mean()),
         "mixture_minus_active_only_mae": float(
             (scored["mixture_abs_error"] - scored["active_only_abs_error"]).mean()
+        ),
+        "mixture_workload_rmse": float(
+            math.sqrt(scored["mixture_sq_error"].mean())
+        ),
+        "active_only_workload_rmse": float(
+            math.sqrt(scored["active_only_sq_error"].mean())
+        ),
+        "mixture_minus_active_only_rmse": float(
+            math.sqrt(scored["mixture_sq_error"].mean())
+            - math.sqrt(scored["active_only_sq_error"].mean())
         ),
         "mixture_active_brier": float(scored["mixture_active_brier"].mean()),
         "active_only_brier": float(scored["active_only_brier"].mean()),
