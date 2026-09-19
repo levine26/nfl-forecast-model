@@ -79,6 +79,21 @@ def _stable_seed(*parts: Any)->int:
     return int.from_bytes(digest[:8],"big")%(2**32-1)
 
 
+def _empirical_distribution_snapshot(samples: Any)->dict[str,Any]:
+    values=np.asarray(samples,dtype=float)
+    values=values[np.isfinite(values)]
+    if values.size==0:
+        raise FootballShadowError("empirical distribution snapshot requires finite samples")
+    support,counts=np.unique(values,return_counts=True)
+    snapshot={
+        "sample_count":int(values.size),
+        "support":[float(value) for value in support.tolist()],
+        "counts":[int(count) for count in counts.tolist()],
+    }
+    snapshot["sha256"]=_sha(snapshot)
+    return snapshot
+
+
 def _aware(value: Any, *, label: str)->datetime:
     try:
         parsed=datetime.fromisoformat(str(value).replace("Z","+00:00"))
@@ -489,6 +504,8 @@ def build_receipt(
     recorded_utc: datetime,
     source_workflow_run: str,
     source_head_sha: str,
+    v1_samples: Any,
+    shadow_samples: Any,
 )->dict[str,Any]|None:
     source_id=str(source.get("forecast_id") or "").strip()
     prop_type=str(source.get("prop_type") or "").strip()
@@ -557,6 +574,7 @@ def build_receipt(
             "under_probability":_finite(source_model.get("under_probability")),
             "standard_deviation":_finite(source_model.get("standard_deviation")),
             "prediction_interval":source_model.get("prediction_interval"),
+            "empirical_distribution":_empirical_distribution_snapshot(v1_samples),
         },
         "shadow_a":{
             "model_version":shadow_model.get("version"),
@@ -565,6 +583,7 @@ def build_receipt(
             "under_probability":_finite(shadow_model.get("under_probability")),
             "standard_deviation":_finite(shadow_model.get("standard_deviation")),
             "prediction_interval":shadow_model.get("prediction_interval"),
+            "empirical_distribution":_empirical_distribution_snapshot(shadow_samples),
         },
         "defensive_efficiency":{
             "event_type":event_type,
@@ -691,6 +710,8 @@ def record_shadow_a(
                 recorded_utc=recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
+                v1_samples=baseline.player_stats[str(source.get("player_id") or "")][key[2]],
+                shadow_samples=shadow.player_stats[str(source.get("player_id") or "")][key[2]],
             )
             if receipt is None:
                 continue
