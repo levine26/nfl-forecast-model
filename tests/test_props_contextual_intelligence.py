@@ -197,3 +197,19 @@ def test_confirmed_starter_with_source_title_support_overrides_without_competing
     assert audit["status"] == "qualified"
     accepted = [row for row in audit["claims"] if row.get("accepted")]
     assert accepted[0]["strength"] == "confirmed"
+
+
+def test_replacement_sentence_does_not_misclassify_displaced_qb_as_starter():
+    state = _player_state()
+    state.loc[state["player_id"].eq("SEA-DARNOLD"), "expected_active_state"] = "QUESTIONABLE"
+
+    resolved, audit = resolve_primary_qbs_from_levline_media(
+        _media(),
+        state,
+        game_id=GAME_ID,
+        forecast_timestamp=FORECAST,
+    )
+
+    assert resolved["SEA"]["player_id"] == "SEA-LOCK"
+    accepted = [row for row in audit["claims"] if row.get("accepted")]
+    assert [row["player_id"] for row in accepted] == ["SEA-LOCK"]
