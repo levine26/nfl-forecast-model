@@ -54,11 +54,12 @@ from record_prospective_football_shadow import (
     _assert_replay_matches_source,
     _aware,
     _build_game_from_manifest,
+    _empirical_distribution_snapshot,
     _finite,
     _forecast_index,
     _load_object,
     _sha,
-    adjusted_mean,
+    apply_shadow_a,
     build_defense_state,
     load_frozen_coefficients,
     load_manifests,
@@ -379,6 +380,8 @@ def build_receipt(
     recorded_utc: datetime,
     source_workflow_run: str,
     source_head_sha: str,
+    v1_samples: Any,
+    shadow_samples: Any,
 )->dict[str,Any]|None:
     source_id=str(source.get("forecast_id") or "").strip()
     prop_type=str(source.get("prop_type") or "").strip()
@@ -425,7 +428,10 @@ def build_receipt(
         "source_forecast_sha256":_sha(dict(source)),
         "source_manifest_sha256":str(manifest.get("manifest_sha256") or ""),
         "source_forecast_timestamp_utc":forecast_at.isoformat(),
+        "source_data_horizon_utc":source.get("data_horizon_utc"),
         "source_market_captured_utc":market_at.isoformat(),
+        "source_signal_state":str(source.get("signal_state") or ""),
+        "source_data_quality":dict(source.get("data_quality")) if isinstance(source.get("data_quality"),Mapping) else {},
         "kickoff_utc":kickoff.isoformat(),
         "game_id":str(source.get("game_id") or ""),
         "player_id":pid,
@@ -447,6 +453,7 @@ def build_receipt(
             "under_probability":_finite(source_model.get("under_probability")),
             "standard_deviation":_finite(source_model.get("standard_deviation")),
             "prediction_interval":source_model.get("prediction_interval"),
+            "empirical_distribution":_empirical_distribution_snapshot(v1_samples),
         },
         "shadow_b":{
             "model_version":shadow_model.get("version"),
@@ -455,6 +462,7 @@ def build_receipt(
             "under_probability":_finite(shadow_model.get("under_probability")),
             "standard_deviation":_finite(shadow_model.get("standard_deviation")),
             "prediction_interval":shadow_model.get("prediction_interval"),
+            "empirical_distribution":_empirical_distribution_snapshot(shadow_samples),
         },
         "defensive_efficiency":{
             "event_type":event_type,
@@ -546,26 +554,27 @@ def record_shadow_b(
         )
 
         transformed_projections,role_audit=role_adjustments_for_manifest(manifest,snap_counts)
-        shadow_game=build_game_input_from_upstream(
+        role_game=build_game_input_from_upstream(
             home_team=str(manifest["home_team"]),
             away_team=str(manifest["away_team"]),
             opportunity_projections=transformed_projections,
             efficiency_player_parameters=manifest["efficiency_player_parameters"],
             team_td_parameters=manifest["team_td_parameters"],
             residual_efficiency_by_team=manifest["residual_efficiency_by_team"],
-            model_version=SHADOW_VERSION,
+            model_version="P2-DYNAMIC-ROLE-V01-FULL-PREGAME",
             shared_pace_correlation=float(manifest.get("shared_pace_correlation",0.0)),
             shared_scoring_log_sd=float(manifest.get("shared_scoring_log_sd",0.0)),
             pass_rate_game_script_sensitivity=float(manifest.get("pass_rate_game_script_sensitivity",0.0)),
         )
-        shadow_game,defense_player_audit=_apply_defense_to_game(
-            shadow_game,defense_state,frozen
-        )
-        shadow=simulate_game(
-            shadow_game,
+        role_result=simulate_game(
+            role_game,
             simulations=int(manifest.get("simulations",20000)),
             seed=int(manifest.get("seed",0)),
         )
+        defense_result,defense_player_audit=apply_shadow_a(
+            role_result,defense_state=defense_state,frozen=frozen
+        )
+        shadow=replace(defense_result,model_version=SHADOW_VERSION)
         shadow_artifact=build_forecast_artifact(
             shadow,manifest["market_artifacts"],
             kickoff_utc=manifest["kickoff_utc"],
@@ -599,6 +608,8 @@ def record_shadow_b(
                 recorded_utc=recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
+                v1_samples=baseline.player_stats[str(source["player_id"])][str(source["prop_type"])],
+                shadow_samples=shadow.player_stats[str(source["player_id"])][str(source["prop_type"])],
             )
             if receipt is None:
                 continue
