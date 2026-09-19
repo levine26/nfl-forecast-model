@@ -43,6 +43,7 @@ from nfl_forecast.props_upstream import normalize_nflverse_scramble_semantics  #
 CONTRACT_VERSION="levline-props-v2-football-shadow-a-v0.1.0"
 SHADOW_VERSION="P2-SHADOW-A-DEFENSE-v0.1.0"
 FROZEN_COEFFICIENT_VERSION="levline-props-v2-defensive-efficiency-shadow-v0.1.0"
+RETROSPECTIVE_MECHANISM_VERSION="levline-props-v2-defensive-efficiency-pregame-v0.1.0"
 EVENT_TYPE="FOOTBALL_SHADOW_FORECAST_ORIGINAL"
 SUPPORTED_PROPS=frozenset({"rushing_yards","receiving_yards"})
 HISTORY_START=2019
@@ -302,7 +303,7 @@ def build_defense_state(
 
 
 def adjusted_mean(base_mean: float, defense_delta: float, fit: Mapping[str,Any])->float:
-    x_sd=max(float(fit["x_sd"]),1e-12)
+    x_sd=max(float(fit["x_sd"]),1e-9)
     z=(float(defense_delta)-float(fit["x_mean"]))/x_sd
     correction=float(fit["intercept"])+float(fit["beta_standardized"])*z
     return float(max(MIN_ADJUSTED_MEAN,float(base_mean)+correction))
@@ -339,10 +340,10 @@ def apply_shadow_a(
         )
 
         rush_rng=np.random.default_rng(
-            _stable_seed(CONTRACT_VERSION,"rushing",baseline.game_id,player.player_id)
+            _stable_seed(RETROSPECTIVE_MECHANISM_VERSION,"rushing",baseline.game_id,player.player_id)
         )
         rec_rng=np.random.default_rng(
-            _stable_seed(CONTRACT_VERSION,"receiving",baseline.game_id,player.player_id)
+            _stable_seed(RETROSPECTIVE_MECHANISM_VERSION,"receiving",baseline.game_id,player.player_id)
         )
         stats["rushing_yards"]=_compound_yards(
             np.asarray(stats["carries"]),
