@@ -432,3 +432,47 @@ def test_summary_reports_clustered_uncertainty_for_all_paired_metrics():
     ):
         assert len(summary[key])==2
         assert all(value is not None for value in summary[key])
+
+
+def test_legacy_pre_provenance_receipt_is_preserved_but_excluded(tmp_path):
+    module=_module()
+    row={
+        "contract_version":module.RECEIPT_CONTRACT_VERSION,
+        "shadow_version":module.SHADOW_VERSION,
+        "shadow_id":"legacy-shadow",
+        "source_forecast_sha256":"a"*64,
+        "source_manifest_sha256":"b"*64,
+        "source_season":2026,
+        "source_week":2,
+        "source_workflow_run":"35428763144",
+        "source_head_sha":"c"*40,
+        "recorded_utc":"2026-09-19T07:22:52+00:00",
+        "source_forecast_timestamp_utc":"2026-09-19T07:19:42+00:00",
+        "source_market_captured_utc":"2026-09-19T07:19:42+00:00",
+        "kickoff_utc":"2026-09-20T20:00:00+00:00",
+        "prop_type":"rushing_yards",
+        "governance":{
+            "production_authorized":False,
+            "published_v1_props_mutated":False,
+            "winner_model_mutated":False,
+            "opportunity_arrays_preserved":True,
+            "target_week_outcomes_used":0,
+            "completed_2026_outcomes_used_for_coefficient_fit":0,
+        },
+        "defensive_efficiency":{
+            "coefficient_contract_version":module.FROZEN_COEFFICIENT_VERSION,
+            "fit":{"trained_through_season":2025},
+        },
+        "v1":{"empirical_distribution":_snapshot([1,2,3])},
+        "shadow_a":{"empirical_distribution":_snapshot([1,2,4])},
+    }
+    row["shadow_sha256"]=module._sha(row)
+    path=tmp_path/"legacy.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    receipts,audit=module.read_receipts_with_audit(path)
+    assert receipts==[]
+    assert audit=={
+        "ledger_rows":1,
+        "provenance_eligible_receipts":0,
+        "legacy_pre_provenance_receipts":1,
+    }
