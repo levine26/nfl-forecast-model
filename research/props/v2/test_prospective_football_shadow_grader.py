@@ -115,10 +115,13 @@ def test_minimum_discussion_threshold_is_not_automatic_promotion():
                 "shadow_minus_v1_log_loss":-0.01,
                 "v1_interval_score_80":30.0,
                 "shadow_interval_score_80":29.0,
+                "shadow_minus_v1_interval_score_80":-1.0,
                 "v1_covered_80":True,
                 "shadow_covered_80":True,
+                "shadow_minus_v1_coverage_80":0.0,
                 "v1_direction_hit":1.0,
                 "shadow_direction_hit":1.0,
+                "shadow_minus_v1_direction_hit":0.0,
                 "v1_over_probability":0.55,
                 "shadow_over_probability":0.56,
                 "over_outcome":1.0,
@@ -366,3 +369,53 @@ def test_receipt_integrity_rejects_governance_or_coefficient_drift(tmp_path):
     path.write_text(json.dumps(bad)+"\n",encoding="utf-8")
     with pytest.raises(module.ShadowGradingError,match="frozen through 2025"):
         module.read_receipts(path)
+
+
+def test_summary_reports_clustered_uncertainty_for_all_paired_metrics():
+    module=_module()
+    rows=[]
+    for game in range(12):
+        rows.append({
+            "source_season":2026,
+            "source_week":1+(game%4),
+            "game_id":f"G{game}",
+            "player_id":f"P{game}",
+            "prop_type":"rushing_yards",
+            "push":False,
+            "v1_crps":10.0,
+            "shadow_crps":9.8,
+            "shadow_minus_v1_crps":-0.2,
+            "v1_abs_error":8.0,
+            "shadow_abs_error":7.8,
+            "shadow_minus_v1_abs_error":-0.2,
+            "v1_brier":0.25,
+            "shadow_brier":0.24,
+            "shadow_minus_v1_brier":-0.01,
+            "v1_log_loss":0.70,
+            "shadow_log_loss":0.68,
+            "shadow_minus_v1_log_loss":-0.02,
+            "v1_interval_score_80":25.0,
+            "shadow_interval_score_80":24.0,
+            "shadow_minus_v1_interval_score_80":-1.0,
+            "v1_covered_80":False,
+            "shadow_covered_80":True,
+            "shadow_minus_v1_coverage_80":1.0,
+            "v1_direction_hit":0.0,
+            "shadow_direction_hit":1.0,
+            "shadow_minus_v1_direction_hit":1.0,
+            "v1_over_probability":0.45,
+            "shadow_over_probability":0.55,
+            "over_outcome":1.0,
+        })
+    summary=module.summarize(pd.DataFrame(rows),seed=9)
+    for key in (
+        "crps_difference_ci95",
+        "mae_difference_ci95",
+        "brier_difference_ci95",
+        "log_loss_difference_ci95",
+        "interval_score_difference_ci95",
+        "coverage_difference_ci95",
+        "direction_accuracy_difference_ci95",
+    ):
+        assert len(summary[key])==2
+        assert all(value is not None for value in summary[key])
