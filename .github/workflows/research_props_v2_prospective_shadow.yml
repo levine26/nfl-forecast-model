@@ -23,6 +23,9 @@ on:
 permissions:
   contents: read
 
+env:
+  EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-shadow-exact-source-v0.1.0
+
 jobs:
   test:
     if: github.event_name == 'pull_request'
@@ -87,6 +90,11 @@ jobs:
               exit 1
             fi
           done
+          WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_prospective_shadow.yml?ref=$SHA" | jq -r '.content // empty')
+          if [ -z "$WORKFLOW_B64" ] || ! printf '%s' "$WORKFLOW_B64" | base64 -d | grep -Fq 'EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-shadow-exact-source-v0.1.0'; then
+            echo "::error::source run predates the exact-source-run prospective market shadow listener; retrospective backfill is prohibited"
+            exit 1
+          fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
           echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
 
