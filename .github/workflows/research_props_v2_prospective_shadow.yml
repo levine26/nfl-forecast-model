@@ -1,0 +1,104 @@
+name: LevLine Props 2.0 prospective shadow archive
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/record_prospective_shadow.py'
+      - 'research/props/v2/props_v2_prospective_shadow_v0_1.json'
+      - 'research/props/v2/test_prospective_shadow_isolated.py'
+      - 'research/props/v2/PROSPECTIVE_MARKET_ANCHOR_SHADOW_CONTRACT.md'
+      - '.github/workflows/research_props_v2_prospective_shadow.yml'
+  workflow_run:
+    workflows:
+      - 'LevLine Props live refresh'
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q research/props/v2/test_prospective_shadow_isolated.py
+
+  archive:
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: levline-props-v2-prospective-shadow-archive
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+
+      - name: Require published pregame Props artifact
+        run: |
+          set -euo pipefail
+          test -f outputs/props/forecasts.json
+
+      - name: Restore prior append-only shadow ledger
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/prospective_shadow
+          rm -rf "$DATA_DIR"
+          mkdir -p "$DATA_DIR"
+          git fetch origin research-data/props-v2-prospective-shadow:refs/remotes/origin/research-data/props-v2-prospective-shadow || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-prospective-shadow; then
+            git archive --format=tar origin/research-data/props-v2-prospective-shadow "$DATA_DIR" 2>/dev/null | tar -xf - || true
+          fi
+          mkdir -p "$DATA_DIR"
+
+      - name: Record immutable pregame shadow receipts
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/prospective_shadow
+          python research/props/v2/record_prospective_shadow.py \
+            --forecasts outputs/props/forecasts.json \
+            --config research/props/v2/props_v2_prospective_shadow_v0_1.json \
+            --ledger "$DATA_DIR/challenger_originals.jsonl" \
+            > "$DATA_DIR/last_record_status.json"
+
+      - name: Persist shadow evidence off main
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/prospective_shadow
+          rm -rf /tmp/props-v2-shadow-new
+          mkdir -p /tmp/props-v2-shadow-new
+          cp -R "$DATA_DIR"/. /tmp/props-v2-shadow-new/
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-prospective-shadow; then
+            git checkout -B props-v2-shadow-data origin/research-data/props-v2-prospective-shadow
+          else
+            git checkout -B props-v2-shadow-data
+          fi
+          mkdir -p "$DATA_DIR"
+          cp -R /tmp/props-v2-shadow-new/. "$DATA_DIR"/
+          git add "$DATA_DIR"/
+          if git diff --cached --quiet; then
+            echo 'Prospective shadow ledger unchanged.'
+            exit 0
+          fi
+          git commit -m 'Archive prospective Props shadow receipts'
+          git push origin HEAD:research-data/props-v2-prospective-shadow
