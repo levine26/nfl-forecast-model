@@ -280,12 +280,14 @@ def grade_receipts(
     receipts:list[dict[str,Any]],
     *,
     completed_games:set[str],
+    outcome_pbp_games:set[str],
     actuals:Mapping[tuple[str,str,str],float],
     participation:Mapping[tuple[str,str],int],
 )->tuple[pd.DataFrame,dict[str,int]]:
     rows=[]
     audit={
         "not_final":0,
+        "missing_final_pbp":0,
         "missing_participation":0,
         "zero_offense_snaps_void":0,
         "graded":0,
@@ -294,6 +296,9 @@ def grade_receipts(
         game_id=str(receipt["game_id"])
         if game_id not in completed_games:
             audit["not_final"]+=1
+            continue
+        if game_id not in outcome_pbp_games:
+            audit["missing_final_pbp"]+=1
             continue
         player_id=str(receipt["player_id"])
         snaps=participation.get((game_id,player_id))
@@ -513,10 +518,14 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
         raise ShadowGradingError(f"snap identity normalization failed: {snap_identity_audit}")
     participation,participation_audit=offense_participation(normalized_snaps)
     completed=_completed_games(schedules)
+    if "game_id" not in pbp.columns:
+        raise ShadowGradingError("PBP missing game_id")
+    outcome_pbp_games=set(pbp.loc[pbp["game_id"].notna(),"game_id"].astype(str))
     actuals=actual_player_yards(pbp)
     graded,eligibility_audit=grade_receipts(
         receipts,
         completed_games=completed,
+        outcome_pbp_games=outcome_pbp_games,
         actuals=actuals,
         participation=participation,
     )
