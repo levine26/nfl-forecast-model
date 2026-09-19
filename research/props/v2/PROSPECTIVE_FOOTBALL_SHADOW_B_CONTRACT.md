@@ -30,7 +30,7 @@ Target-week and target-game results are excluded.
 
 The source workflow trigger SHA and the SHA that actually generated the live artifact are distinct
 provenance concepts. Shadow B requires exactly one `source_provenance.json` under
-`levline-props-live-source-provenance-v0.1.0` and verifies its forecast/manifest hashes before
+`levline-props-live-source-provenance-v0.1.0` and verifies its forecast/manifest/market hashes plus market-provider identity before
 simulation.
 
 Every receipt preserves the source workflow run ID, actual generation-base SHA
