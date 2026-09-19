@@ -27,6 +27,8 @@ because GitHub artifact flattening combined same-named CSVs. The results below w
 directly from the six immutable primary artifacts; the workflow has been corrected to retain
 per-artifact directories.
 
+Canonical aggregate workflow completed successfully after the artifact-layout fix. Canonical aggregate artifact: `10577640488`.
+
 Primary artifact IDs:
 - 2023 route_only: `10564975561`
 - 2023 full: `10564227643`
@@ -42,23 +44,23 @@ Unique games: **230**
 Unique players: **307**
 
 - challenger accuracy: **50.96%**
-- paired V1 accuracy: **51.02%**
-- challenger minus V1: **−0.05 pp**
-- game-clustered 95% interval for challenger-minus-V1: **−0.29 to +0.18 pp**
+- paired V1 accuracy: **51.03%**
+- challenger minus V1: **−0.07 pp**
+- game-clustered 95% interval for challenger-minus-V1: **−0.31 to +0.16 pp**
 - sportsbook price-direction accuracy: **53.51%**
 - challenger minus sportsbook direction: **−2.54 pp**
 - game-clustered 95% interval versus sportsbook direction: **−4.44 to −0.56 pp**
-- challenger Fair-Line MAE: **19.294**
+- challenger Fair-Line MAE: **19.291**
 - V1 Fair-Line MAE: **19.229**
 - challenger minus V1 MAE: **+0.065** (worse)
 - sportsbook line MAE: **15.973**
-- challenger CRPS: **13.8988**
-- V1 CRPS: **13.8455**
-- challenger minus V1 CRPS: **+0.0532** (worse)
-- challenger 80% interval score: **89.802**
-- V1 80% interval score: **89.278**
-- challenger 80% coverage: **73.07%**
-- V1 80% coverage: **73.03%**
+- challenger CRPS: **13.8983**
+- V1 CRPS: **13.8461**
+- challenger minus V1 CRPS: **+0.0522** (worse)
+- challenger 80% interval score: **89.793**
+- V1 80% interval score: **89.290**
+- challenger 80% coverage: **73.03%**
+- V1 80% coverage: **73.00%**
 
 ### Route-only by season
 
@@ -76,23 +78,23 @@ Paired decided props: **5,659**
 Unique games: **230**  
 Unique players: **307**
 
-- challenger accuracy: **51.09%**
+- challenger accuracy: **51.12%**
 - paired V1 accuracy: **51.03%**
-- challenger minus V1: **+0.05 pp**
-- game-clustered 95% interval for challenger-minus-V1: **−0.98 to +1.10 pp**
+- challenger minus V1: **+0.09 pp**
+- game-clustered 95% interval for challenger-minus-V1: **−0.95 to +1.15 pp**
 - sportsbook price-direction accuracy: **53.51%**
 - challenger minus sportsbook direction: **−2.42 pp**
 - game-clustered 95% interval versus sportsbook direction: **−4.30 to −0.61 pp**
-- challenger Fair-Line MAE: **19.819**
-- V1 Fair-Line MAE: **19.232**
+- challenger Fair-Line MAE: **19.820**
+- V1 Fair-Line MAE: **19.233**
 - challenger minus V1 MAE: **+0.587** (materially worse)
 - sportsbook line MAE: **15.976**
-- challenger CRPS: **14.3209**
+- challenger CRPS: **14.3212**
 - V1 CRPS: **13.8481**
-- challenger minus V1 CRPS: **+0.4728** (materially worse)
-- challenger 80% interval score: **92.930**
+- challenger minus V1 CRPS: **+0.4731** (materially worse)
+- challenger 80% interval score: **92.931**
 - V1 80% interval score: **89.297**
-- challenger 80% coverage: **71.80%**
+- challenger 80% coverage: **71.78%**
 - V1 80% coverage: **73.00%**
 
 ### Full by season
