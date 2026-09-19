@@ -13,6 +13,8 @@ on:
       - 'scripts/build_public_impact_monitor.py'
       - 'scripts/build_site_history_compat.py'
       - 'scripts/build_props_publication.py'
+      - 'scripts/build_props21_challenger.py'
+      - 'challenger_outputs/props21/**'
       - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
   pull_request:
@@ -25,6 +27,8 @@ on:
       - 'scripts/build_public_impact_monitor.py'
       - 'scripts/build_site_history_compat.py'
       - 'scripts/build_props_publication.py'
+      - 'scripts/build_props21_challenger.py'
+      - 'challenger_outputs/props21/**'
       - 'tests/test_site_history_compat.py'
       - '.github/workflows/dashboard.yml'
   workflow_run:
@@ -101,6 +105,14 @@ jobs:
               --history-output site/public/data/props_history.json
           else
             echo 'Props artifact not present; leaving the research-beta surface in fail-closed unavailable state.'
+          fi
+      - name: Publish the separate Props 2.1 Challenger surface
+        run: |
+          if [ -f challenger_outputs/props21/public_challenger.json ]; then
+            mkdir -p site/public/data/props21
+            cp challenger_outputs/props21/public_challenger.json site/public/data/props21/public_challenger.json
+          else
+            echo 'Props 2.1 Challenger artifact unavailable; its route will remain fail-closed.'
           fi
       - name: Install dashboard dependencies
         working-directory: site
