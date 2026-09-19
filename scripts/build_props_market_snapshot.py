@@ -99,16 +99,23 @@ def main() -> int:
     )
     parser.add_argument(
         "--provider",
-        choices=("auto", "the_odds_api", "propline"),
+        choices=("auto", "the_odds_api", "propline", "sportsgameodds"),
         default="auto",
-        help="Live sportsbook provider. auto uses The Odds API first and PropLine as fallback.",
+        help=(
+            "Live sportsbook provider. auto tries The Odds API, PropLine, "
+            "then SportsGameOdds."
+        ),
     )
     parser.add_argument("--api-key-env", default="THE_ODDS_API_KEY")
     parser.add_argument("--propline-api-key-env", default="PROPLINE_API_KEY")
+    parser.add_argument(
+        "--sportsgameodds-api-key-env",
+        default="SPORTSGAMEODDS_API_KEY",
+    )
     parser.add_argument("--regions", default="us")
     parser.add_argument(
         "--bookmakers",
-        help="Optional comma-separated The Odds API bookmaker keys.",
+        help="Optional comma-separated bookmaker keys/IDs for the selected provider.",
     )
     parser.add_argument("--timeout-seconds", type=float, default=20.0)
     args = parser.parse_args()
@@ -138,26 +145,33 @@ def main() -> int:
     else:
         the_odds_api_key = os.environ.get(args.api_key_env, "")
         propline_api_key = os.environ.get(args.propline_api_key_env, "")
+        sportsgameodds_api_key = os.environ.get(
+            args.sportsgameodds_api_key_env,
+            "",
+        )
         if args.provider == "auto":
             provider_events, raw_bundle = fetch_live_nfl_prop_events_with_fallback(
                 player_state_rows=player_state_rows,
                 the_odds_api_key=the_odds_api_key,
                 propline_api_key=propline_api_key,
+                sportsgameodds_api_key=sportsgameodds_api_key,
                 regions=args.regions,
                 bookmakers=args.bookmakers,
                 timeout_seconds=args.timeout_seconds,
             )
         else:
-            key = (
-                the_odds_api_key
-                if args.provider == "the_odds_api"
-                else propline_api_key
-            )
-            key_env = (
-                args.api_key_env
-                if args.provider == "the_odds_api"
-                else args.propline_api_key_env
-            )
+            key_by_provider = {
+                "the_odds_api": the_odds_api_key,
+                "propline": propline_api_key,
+                "sportsgameodds": sportsgameodds_api_key,
+            }
+            env_by_provider = {
+                "the_odds_api": args.api_key_env,
+                "propline": args.propline_api_key_env,
+                "sportsgameodds": args.sportsgameodds_api_key_env,
+            }
+            key = key_by_provider[args.provider]
+            key_env = env_by_provider[args.provider]
             if not key.strip():
                 raise RuntimeError(
                     f"live capture requires an authorized {args.provider} credential in {key_env}"

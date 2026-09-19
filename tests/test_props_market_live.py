@@ -299,6 +299,199 @@ def test_propline_fetch_uses_compatible_nfl_prop_shape(monkeypatch):
     assert "propline-secret" not in str(raw)
 
 
+
+def _sportsgameodds_event():
+    return {
+        "eventID": "sgo-evt-ari-lar",
+        "leagueID": "NFL",
+        "teams": {
+            "home": {"names": {"long": "Arizona Cardinals"}},
+            "away": {"names": {"long": "Los Angeles Rams"}},
+        },
+        "status": {"startsAt": KICKOFF},
+        "players": {
+            "KYLER": {"name": "Kyler Murray"},
+            "RUNNER": {"name": "Example Runner"},
+        },
+        "odds": {
+            "passing_yards-KYLER-game-ou-over": {
+                "statID": "passing_yards",
+                "statEntityID": "KYLER",
+                "playerID": "KYLER",
+                "periodID": "game",
+                "betTypeID": "ou",
+                "sideID": "over",
+                "byBookmaker": {
+                    "draftkings": {
+                        "available": True,
+                        "odds": "-110",
+                        "overUnder": "244.5",
+                        "lastUpdatedAt": "2026-09-20T15:58:00Z",
+                    },
+                    "prizepicks": {
+                        "available": True,
+                        "odds": "+100",
+                        "overUnder": "244.5",
+                    },
+                },
+            },
+            "passing_yards-KYLER-game-ou-under": {
+                "statID": "passing_yards",
+                "statEntityID": "KYLER",
+                "playerID": "KYLER",
+                "periodID": "game",
+                "betTypeID": "ou",
+                "sideID": "under",
+                "byBookmaker": {
+                    "draftkings": {
+                        "available": True,
+                        "odds": "-110",
+                        "overUnder": "244.5",
+                        "lastUpdatedAt": "2026-09-20T15:58:30Z",
+                    },
+                    "prizepicks": {
+                        "available": True,
+                        "odds": "+100",
+                        "overUnder": "244.5",
+                    },
+                },
+            },
+            "touchdowns-RUNNER-game-yn-yes": {
+                "statID": "touchdowns",
+                "statEntityID": "RUNNER",
+                "playerID": "RUNNER",
+                "periodID": "game",
+                "betTypeID": "yn",
+                "sideID": "yes",
+                "byBookmaker": {
+                    "fanduel": {
+                        "available": True,
+                        "odds": "+120",
+                        "lastUpdatedAt": "2026-09-20T15:59:00Z",
+                    }
+                },
+            },
+            "touchdowns-RUNNER-game-yn-no": {
+                "statID": "touchdowns",
+                "statEntityID": "RUNNER",
+                "playerID": "RUNNER",
+                "periodID": "game",
+                "betTypeID": "yn",
+                "sideID": "no",
+                "byBookmaker": {
+                    "fanduel": {
+                        "available": True,
+                        "odds": "-140",
+                        "lastUpdatedAt": "2026-09-20T15:59:00Z",
+                    }
+                },
+            },
+        },
+    }
+
+
+def test_sportsgameodds_normalizes_supported_props_and_excludes_pickem_sources():
+    normalized = live._sportsgameodds_event_to_odds_api(_sportsgameodds_event())
+
+    assert normalized["id"] == "sgo-evt-ari-lar"
+    by_book = {row["key"]: row for row in normalized["bookmakers"]}
+    assert set(by_book) == {"draftkings", "fanduel"}
+
+    dk_market = by_book["draftkings"]["markets"][0]
+    assert dk_market["key"] == "player_pass_yds"
+    assert {row["name"] for row in dk_market["outcomes"]} == {"Over", "Under"}
+    assert {row["point"] for row in dk_market["outcomes"]} == {244.5}
+
+    fd_market = by_book["fanduel"]["markets"][0]
+    assert fd_market["key"] == "player_anytime_td"
+    assert {row["name"] for row in fd_market["outcomes"]} == {"Yes", "No"}
+
+    snapshot = live.build_market_snapshot(
+        player_state_rows=_player_state(),
+        provider_events=[normalized],
+        captured_at_utc=CAPTURE,
+        provider="sportsgameodds",
+    )
+    by_key = {
+        (row["player_id"], row["prop_type"]): row
+        for row in snapshot["market_artifacts"]
+    }
+    assert by_key[("QB1", "passing_yards")]["sportsbook_count"] == 1
+    assert by_key[("RB1", "anytime_td")]["consensus_no_vig_probability"] is not None
+
+
+def test_sportsgameodds_fetch_is_bounded_to_canonical_slate(monkeypatch):
+    calls = []
+
+    def fake_get(path, *, api_key, params=None, timeout_seconds=20.0):
+        calls.append((path, dict(params or {}), api_key))
+        return {"data": [_sportsgameodds_event()], "nextCursor": None}
+
+    monkeypatch.setattr(live, "_sportsgameodds_get_json", fake_get)
+    events, raw = live.fetch_sportsgameodds_nfl_prop_events(
+        player_state_rows=_player_state(),
+        api_key="sgo-secret",
+    )
+
+    assert len(events) == 1
+    assert raw["provider"] == "sportsgameodds"
+    assert calls[0][0] == "/events"
+    assert calls[0][1]["leagueID"] == "NFL"
+    assert calls[0][1]["includeAltLines"] == "false"
+    assert calls[0][1]["includeOpposingOdds"] == "true"
+    assert calls[0][1]["startsAfter"]
+    assert calls[0][1]["startsBefore"]
+    assert "sgo-secret" not in str(raw)
+
+
+def test_live_provider_fallback_selects_sportsgameodds_after_prior_failures(monkeypatch):
+    monkeypatch.setattr(
+        live,
+        "_provider_get_json",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            live.PropsMarketLiveError("primary unavailable")
+        ),
+    )
+    monkeypatch.setattr(
+        live,
+        "_propline_get_json",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            live.PropsMarketLiveError("propline unavailable")
+        ),
+    )
+    monkeypatch.setattr(
+        live,
+        "_sportsgameodds_get_json",
+        lambda *args, **kwargs: {
+            "data": [_sportsgameodds_event()],
+            "nextCursor": None,
+        },
+    )
+
+    events, raw = live.fetch_live_nfl_prop_events_with_fallback(
+        player_state_rows=_player_state(),
+        the_odds_api_key="primary",
+        propline_api_key="propline",
+        sportsgameodds_api_key="sgo",
+    )
+
+    assert events
+    assert raw["provider"] == "sportsgameodds"
+    assert raw["provider_attempts"] == [
+        {
+            "provider": "the_odds_api",
+            "status": "failed",
+            "detail": "primary unavailable",
+        },
+        {
+            "provider": "propline",
+            "status": "failed",
+            "detail": "propline unavailable",
+        },
+        {"provider": "sportsgameodds", "status": "selected"},
+    ]
+
+
 def test_live_provider_fallback_selects_propline_after_primary_failure(monkeypatch):
     def primary_fail(*args, **kwargs):
         raise live.PropsMarketLiveError(
@@ -359,12 +552,20 @@ def test_live_provider_fallback_fails_closed_when_all_configured_sources_fail(mo
             live.PropsMarketLiveError("fallback unavailable")
         ),
     )
+    monkeypatch.setattr(
+        live,
+        "_sportsgameodds_get_json",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            live.PropsMarketLiveError("tertiary unavailable")
+        ),
+    )
 
     with pytest.raises(live.PropsMarketLiveError, match="all configured"):
         live.fetch_live_nfl_prop_events_with_fallback(
             player_state_rows=_player_state(),
             the_odds_api_key="primary",
             propline_api_key="fallback",
+            sportsgameodds_api_key="tertiary",
         )
 
 

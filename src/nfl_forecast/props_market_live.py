@@ -8,7 +8,7 @@ No credential is serialized, logged, or written to artifacts.
 """
 
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 from typing import Any, Mapping, Sequence
@@ -25,9 +25,31 @@ SNAPSHOT_CONTRACT_VERSION = "levline-props-market-snapshot-v0.1"
 SPORT_KEY = "americanfootball_nfl"
 API_BASE = "https://api.the-odds-api.com/v4"
 PROPLINE_API_BASE = "https://api.prop-line.com/v1"
+SPORTSGAMEODDS_API_BASE = "https://api.sportsgameodds.com/v2"
 DEFAULT_REGIONS = "us"
 DEFAULT_ODDS_FORMAT = "american"
 KICKOFF_TOLERANCE_SECONDS = 30 * 60
+
+SPORTSGAMEODDS_STAT_MAP = {
+    "passing_yards": "player_pass_yds",
+    "rushing_yards": "player_rush_yds",
+    "receiving_yards": "player_reception_yds",
+    "receiving_receptions": "player_receptions",
+    "passing_touchdowns": "player_pass_tds",
+    "rushing_touchdowns": "player_rush_tds",
+    "receiving_touchdowns": "player_reception_tds",
+    "touchdowns": "player_anytime_td",
+}
+
+# DFS pick'em and exchange prices are not sportsbook quotes. Keep them out of the
+# sportsbook consensus even if a higher-tier SportsGameOdds account exposes them.
+SPORTSGAMEODDS_NON_SPORTSBOOKS = {
+    "prizepicks",
+    "underdog",
+    "polymarket",
+    "kalshi",
+}
+
 
 # Provider display names are used only to identify the canonical game. Player identity
 # is always resolved from the canonical player-state roster and never guessed here.
@@ -390,6 +412,271 @@ def _propline_get_json(
     )
 
 
+def _sportsgameodds_get_json(
+    path: str,
+    *,
+    api_key: str,
+    params: Mapping[str, object] | None = None,
+    timeout_seconds: float = 20.0,
+) -> object:
+    if not str(api_key or "").strip():
+        raise PropsMarketLiveError("authorized SportsGameOdds key is required")
+    query = {k: v for k, v in (params or {}).items() if v is not None}
+    url = f"{SPORTSGAMEODDS_API_BASE}{path}"
+    if query:
+        url = f"{url}?{urlencode(query)}"
+    request = Request(
+        url,
+        headers={
+            "User-Agent": "LevLine-Props-Research-Beta/0.1",
+            "x-api-key": api_key,
+        },
+    )
+    try:
+        with urlopen(request, timeout=timeout_seconds) as response:
+            payload = response.read()
+    except HTTPError as exc:
+        raise PropsMarketLiveError(
+            f"SportsGameOdds request failed for {path} with HTTP {exc.code}"
+        ) from exc
+    except URLError as exc:
+        raise PropsMarketLiveError(
+            f"SportsGameOdds request failed for {path}"
+        ) from exc
+    try:
+        return json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise PropsMarketLiveError(
+            f"SportsGameOdds returned invalid JSON for {path}"
+        ) from exc
+
+
+def _sportsgameodds_player_name(
+    players: Mapping[str, Any],
+    player_id: str,
+) -> str | None:
+    raw = players.get(player_id)
+    if not isinstance(raw, Mapping):
+        return None
+    name = str(raw.get("name") or "").strip()
+    if name:
+        return name
+    first = str(raw.get("firstName") or "").strip()
+    last = str(raw.get("lastName") or "").strip()
+    combined = " ".join(part for part in (first, last) if part)
+    return combined or None
+
+
+def _sportsgameodds_event_to_odds_api(
+    event: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Normalize one SportsGameOdds NFL event into LevLine's stable market adapter shape."""
+
+    event_id = str(event.get("eventID") or "").strip()
+    teams = event.get("teams")
+    status = event.get("status")
+    players = event.get("players")
+    odds = event.get("odds")
+    if not event_id or not isinstance(teams, Mapping) or not isinstance(status, Mapping):
+        raise PropsMarketLiveError("SportsGameOdds event is missing event/team/status identity")
+    if not isinstance(players, Mapping):
+        players = {}
+    if not isinstance(odds, Mapping):
+        odds = {}
+
+    home = teams.get("home")
+    away = teams.get("away")
+    home_names = home.get("names") if isinstance(home, Mapping) else None
+    away_names = away.get("names") if isinstance(away, Mapping) else None
+    home_name = (
+        str(home_names.get("long") or "").strip()
+        if isinstance(home_names, Mapping)
+        else ""
+    )
+    away_name = (
+        str(away_names.get("long") or "").strip()
+        if isinstance(away_names, Mapping)
+        else ""
+    )
+    commence = status.get("startsAt")
+    if not home_name or not away_name or not commence:
+        raise PropsMarketLiveError(
+            f"SportsGameOdds event {event_id} is missing canonical team or kickoff fields"
+        )
+
+    grouped: dict[str, dict[str, dict[str, Any]]] = defaultdict(
+        lambda: defaultdict(lambda: {"outcomes": [], "last_update": None})
+    )
+
+    for raw_odd in odds.values():
+        if not isinstance(raw_odd, Mapping):
+            continue
+        if str(raw_odd.get("periodID") or "") != "game":
+            continue
+        stat_id = str(raw_odd.get("statID") or "").strip()
+        market_key = SPORTSGAMEODDS_STAT_MAP.get(stat_id)
+        if market_key is None:
+            continue
+
+        bet_type = str(raw_odd.get("betTypeID") or "").strip().lower()
+        side = str(raw_odd.get("sideID") or "").strip().lower()
+        if market_key == "player_anytime_td":
+            if bet_type != "yn" or side not in {"yes", "no"}:
+                continue
+        elif bet_type != "ou" or side not in {"over", "under"}:
+            continue
+
+        player_id = str(
+            raw_odd.get("playerID") or raw_odd.get("statEntityID") or ""
+        ).strip()
+        player_name = _sportsgameodds_player_name(players, player_id)
+        if not player_id or not player_name:
+            continue
+
+        by_book = raw_odd.get("byBookmaker")
+        if not isinstance(by_book, Mapping):
+            continue
+        for book_key_raw, book_raw in by_book.items():
+            if not isinstance(book_raw, Mapping) or book_raw.get("available") is not True:
+                continue
+            book_key = str(book_key_raw or "").strip().lower()
+            if not book_key or book_key in SPORTSGAMEODDS_NON_SPORTSBOOKS:
+                continue
+            try:
+                price = float(book_raw.get("odds"))
+            except (TypeError, ValueError):
+                continue
+
+            if market_key == "player_anytime_td":
+                outcome = {
+                    "name": side.title(),
+                    "description": player_name,
+                    "price": price,
+                }
+            else:
+                try:
+                    line = float(book_raw.get("overUnder"))
+                except (TypeError, ValueError):
+                    continue
+                outcome = {
+                    "name": side.title(),
+                    "description": player_name,
+                    "price": price,
+                    "point": line,
+                }
+
+            bucket = grouped[book_key][market_key]
+            bucket["outcomes"].append(outcome)
+            updated = book_raw.get("lastUpdatedAt")
+            if updated and (bucket["last_update"] is None or str(updated) > str(bucket["last_update"])):
+                bucket["last_update"] = str(updated)
+
+    bookmakers: list[dict[str, Any]] = []
+    for book_key in sorted(grouped):
+        markets: list[dict[str, Any]] = []
+        book_last_update: str | None = None
+        for market_key in sorted(grouped[book_key]):
+            row = grouped[book_key][market_key]
+            outcomes = row["outcomes"]
+            if not outcomes:
+                continue
+            last_update = row["last_update"]
+            market = {"key": market_key, "outcomes": outcomes}
+            if last_update:
+                market["last_update"] = last_update
+                if book_last_update is None or last_update > book_last_update:
+                    book_last_update = last_update
+            markets.append(market)
+        if markets:
+            bookmaker = {
+                "key": book_key,
+                "title": book_key,
+                "markets": markets,
+            }
+            if book_last_update:
+                bookmaker["last_update"] = book_last_update
+            bookmakers.append(bookmaker)
+
+    return {
+        "id": event_id,
+        "home_team": home_name,
+        "away_team": away_name,
+        "commence_time": commence,
+        "bookmakers": bookmakers,
+    }
+
+
+def fetch_sportsgameodds_nfl_prop_events(
+    *,
+    player_state_rows: Sequence[Mapping[str, Any]],
+    api_key: str,
+    bookmakers: str | None = None,
+    timeout_seconds: float = 20.0,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Fetch one bounded NFL slate from SportsGameOdds and normalize it for LevLine."""
+
+    game_directory = _game_directory(player_state_rows)
+    kickoffs = sorted(game["kickoff_utc"] for game in game_directory.values())
+    if not kickoffs:
+        raise PropsMarketLiveError("cannot query SportsGameOdds without a canonical slate")
+
+    params: dict[str, object] = {
+        "leagueID": "NFL",
+        "oddsAvailable": "true",
+        "started": "false",
+        "includeAltLines": "false",
+        "includeOpposingOdds": "true",
+        "limit": 50,
+        "startsAfter": (kickoffs[0] - timedelta(hours=1)).isoformat(),
+        "startsBefore": (kickoffs[-1] + timedelta(hours=1)).isoformat(),
+    }
+    if bookmakers:
+        params["bookmakerID"] = bookmakers
+
+    payload = _sportsgameodds_get_json(
+        "/events",
+        api_key=api_key,
+        params=params,
+        timeout_seconds=timeout_seconds,
+    )
+    if not isinstance(payload, Mapping):
+        raise PropsMarketLiveError("SportsGameOdds events response must be an object")
+    raw_events = payload.get("data")
+    if not isinstance(raw_events, list):
+        raise PropsMarketLiveError("SportsGameOdds events response must contain a data list")
+    if payload.get("nextCursor"):
+        raise PropsMarketLiveError(
+            "SportsGameOdds slate exceeded one page; refusing partial live market capture"
+        )
+
+    normalized: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    for event in raw_events:
+        if not isinstance(event, Mapping):
+            rejected.append({"reason": "invalid_event_payload"})
+            continue
+        try:
+            normalized.append(_sportsgameodds_event_to_odds_api(event))
+        except PropsMarketLiveError as exc:
+            rejected.append(
+                {
+                    "provider_event_id": str(event.get("eventID") or "") or None,
+                    "reason": "normalization_failed",
+                    "detail": str(exc),
+                }
+            )
+
+    raw_bundle = {
+        "provider": "sportsgameodds",
+        "sport_key": SPORT_KEY,
+        "provider_response_sha256": payload_sha256(payload),
+        "raw_provider_events": raw_events,
+        "normalization_rejected": rejected,
+        "event_odds": normalized,
+    }
+    return normalized, raw_bundle
+
+
 def fetch_live_nfl_prop_events(
     *,
     player_state_rows: Sequence[Mapping[str, Any]],
@@ -418,6 +705,13 @@ def fetch_live_nfl_prop_events(
             "markets": ",".join(sorted(DEFAULT_MARKET_MAP)),
             "bookmakers": bookmakers,
         }
+    elif provider == "sportsgameodds":
+        return fetch_sportsgameodds_nfl_prop_events(
+            player_state_rows=player_state_rows,
+            api_key=api_key,
+            bookmakers=bookmakers,
+            timeout_seconds=timeout_seconds,
+        )
     else:
         raise PropsMarketLiveError(f"unsupported live Props market provider: {provider}")
 
@@ -482,20 +776,22 @@ def fetch_live_nfl_prop_events_with_fallback(
     player_state_rows: Sequence[Mapping[str, Any]],
     the_odds_api_key: str = "",
     propline_api_key: str = "",
+    sportsgameodds_api_key: str = "",
     regions: str = DEFAULT_REGIONS,
     bookmakers: str | None = None,
     timeout_seconds: float = 20.0,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Use The Odds API first, then PropLine, preserving fail-closed audit provenance."""
+    """Try independent sportsbook providers in order while preserving fail-closed provenance."""
 
     attempts: list[dict[str, Any]] = []
     configured = [
         ("the_odds_api", str(the_odds_api_key or "").strip()),
         ("propline", str(propline_api_key or "").strip()),
+        ("sportsgameodds", str(sportsgameodds_api_key or "").strip()),
     ]
     if not any(key for _, key in configured):
         raise PropsMarketLiveError(
-            "live Props market capture requires The Odds API or PropLine credential"
+            "live Props market capture requires The Odds API, PropLine, or SportsGameOdds credential"
         )
 
     errors: list[str] = []
