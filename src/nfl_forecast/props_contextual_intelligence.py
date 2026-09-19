@@ -312,3 +312,223 @@ def load_levline_media_payload(path: object) -> dict[str, Any] | None:
     except Exception:
         return None
     return payload if isinstance(payload, dict) else None
+
+
+MAX_CURRENT_REPORT_AGE_HOURS = 48.0
+
+
+def _current_source_claim_strength(title: str, player_name: str) -> str | None:
+    """Resolve starter language in a source headline and bind it to one named QB."""
+
+    clean = re.sub(r"\s+", " ", str(title or "")).strip()
+    if not clean or not player_name:
+        return None
+    match = re.search(re.escape(player_name), clean, flags=re.I)
+    if match is None:
+        return None
+
+    base = _claim_strength(clean, player_name)
+    if base is not None:
+        return base
+
+    before = clean[max(0, match.start() - 70): match.start()].lower()
+    after = clean[match.end(): min(len(clean), match.end() + 90)].lower()
+    local = clean[max(0, match.start() - 60): min(len(clean), match.end() + 90)].lower()
+    if any(re.search(pattern, local, flags=re.I) for pattern in _UNCERTAIN_PATTERNS):
+        return None
+
+    if re.search(r"\b(?:name|names|named)\b.{0,45}$", before, flags=re.I) and re.search(
+        r"\b(?:starter|starting quarterback|starting qb)\b",
+        after,
+        flags=re.I,
+    ):
+        return "confirmed"
+    if re.search(r"\b(?:to start|starts|will start)\b", after, flags=re.I):
+        return "confirmed"
+    if re.search(r"\b(?:starter|starting quarterback|starting qb)\b.{0,35}$", before, flags=re.I):
+        return "confirmed"
+    return None
+
+
+def resolve_primary_qbs_from_current_reporting(
+    previews_payload: Mapping[str, Any] | None,
+    player_state: pd.DataFrame,
+    *,
+    game_id: str,
+    forecast_timestamp: object,
+    max_age_hours: float = MAX_CURRENT_REPORT_AGE_HOURS,
+) -> tuple[dict[str, dict[str, str]], dict[str, Any]]:
+    """Resolve QB starters from LevLine's persisted current-reporting source list.
+
+    current_reported_sources is produced by the same ranked Google/Bing/team-source
+    media pass used by Sunday Signal, before any provider/Copilot presentation overlay.
+    Each source must be timestamped at or before the forecast and recent enough for the
+    weekly starter decision. Conflicting older claims lose to a newer qualified claim;
+    an exact-time conflict fails closed.
+    """
+
+    audit: dict[str, Any] = {
+        "status": "missing",
+        "game_id": str(game_id),
+        "max_age_hours": float(max_age_hours),
+        "sources_received": 0,
+        "sources_qualified": 0,
+        "sources_future_discarded": 0,
+        "sources_stale_discarded": 0,
+        "sources_missing_timestamp": 0,
+        "teams_resolved": 0,
+        "teams_ambiguous": [],
+        "teams_unresolved": [],
+        "claims": [],
+        "completed_game_outcomes_used": False,
+        "betting_fields_used": False,
+    }
+    if not isinstance(previews_payload, Mapping):
+        return {}, audit
+
+    games = previews_payload.get("games")
+    game_map = games if isinstance(games, Mapping) else previews_payload
+    preview = game_map.get(str(game_id)) if isinstance(game_map, Mapping) else None
+    if not isinstance(preview, Mapping):
+        audit["status"] = "unavailable_game_entry"
+        return {}, audit
+
+    raw_sources = preview.get("current_reported_sources")
+    if not isinstance(raw_sources, list) or not raw_sources:
+        audit["status"] = "unavailable_current_reporting"
+        return {}, audit
+    audit["sources_received"] = len(raw_sources)
+
+    forecast = _utc(forecast_timestamp)
+    if forecast is None:
+        raise ValueError("forecast_timestamp must be timezone-aware")
+
+    qualified_sources: list[dict[str, Any]] = []
+    for source in raw_sources:
+        if not isinstance(source, Mapping):
+            continue
+        stamp = _utc(source.get("as_of"))
+        if stamp is None:
+            audit["sources_missing_timestamp"] += 1
+            continue
+        age_hours = (forecast - stamp).total_seconds() / 3600.0
+        if age_hours < -1e-6:
+            audit["sources_future_discarded"] += 1
+            continue
+        if age_hours > float(max_age_hours):
+            audit["sources_stale_discarded"] += 1
+            continue
+        title = re.sub(r"\s+", " ", str(source.get("title") or "")).strip()
+        url = str(source.get("source_url") or source.get("url") or "").strip()
+        if not title or not url or not _host(url):
+            continue
+        qualified_sources.append(
+            {
+                "title": title,
+                "source_name": str(source.get("source_name") or source.get("name") or "").strip(),
+                "source_url": url,
+                "as_of": stamp,
+            }
+        )
+
+    audit["sources_qualified"] = len(qualified_sources)
+    if not qualified_sources:
+        audit["status"] = "no_qualified_current_reporting"
+        return {}, audit
+
+    qbs = _qb_rows(player_state, str(game_id))
+    resolved: dict[str, dict[str, str]] = {}
+
+    for team, group in qbs.groupby("_team", sort=True):
+        team_claims: list[dict[str, Any]] = []
+        for _, row in group.iterrows():
+            player_name = str(row.get("player_name") or "").strip()
+            player_id = str(row.get("player_id") or "").strip()
+            if not player_name or not player_id:
+                continue
+            if str(row.get("expected_active_state") or "UNKNOWN").upper() == "OUT":
+                continue
+            for source in qualified_sources:
+                strength = _current_source_claim_strength(source["title"], player_name)
+                if strength is None:
+                    continue
+                claim = {
+                    "team": str(team),
+                    "player_id": player_id,
+                    "player_name": player_name,
+                    "strength": strength,
+                    "as_of": source["as_of"],
+                    "source_name": source["source_name"],
+                    "source_url": source["source_url"],
+                    "title": source["title"],
+                }
+                team_claims.append(claim)
+                audit["claims"].append(
+                    {
+                        **{k: v for k, v in claim.items() if k != "as_of"},
+                        "as_of": source["as_of"].isoformat(),
+                        "accepted": False,
+                    }
+                )
+
+        if not team_claims:
+            audit["teams_unresolved"].append(str(team))
+            continue
+
+        newest = max(claim["as_of"] for claim in team_claims)
+        newest_claims = [claim for claim in team_claims if claim["as_of"] == newest]
+        newest_ids = sorted({claim["player_id"] for claim in newest_claims})
+        if len(newest_ids) != 1:
+            audit["teams_ambiguous"].append(
+                {
+                    "team": str(team),
+                    "as_of": newest.isoformat(),
+                    "candidate_ids": newest_ids,
+                }
+            )
+            continue
+
+        player_id = newest_ids[0]
+        candidate_claims = [claim for claim in newest_claims if claim["player_id"] == player_id]
+        candidate_claims.sort(
+            key=lambda claim: (claim["strength"] == "confirmed", bool(claim["source_name"])),
+            reverse=True,
+        )
+        winner = candidate_claims[0]
+        resolved[str(team)] = {
+            "player_id": player_id,
+            "provenance": (
+                "levline_current_reporting:"
+                f"{winner['as_of'].isoformat()}:{winner['strength']}:"
+                f"{winner['source_url']}"
+            ),
+        }
+        for claim in audit["claims"]:
+            if (
+                claim.get("team") == str(team)
+                and claim.get("player_id") == player_id
+                and claim.get("as_of") == winner["as_of"].isoformat()
+                and claim.get("source_url") == winner["source_url"]
+            ):
+                claim["accepted"] = True
+                break
+
+    audit["teams_resolved"] = len(resolved)
+    audit["status"] = "qualified" if resolved else "no_qualified_starter_claim"
+    return resolved, audit
+
+
+def load_levline_game_previews(path: object) -> dict[str, Any] | None:
+    """Load Sunday Signal game previews with persisted current reporting."""
+
+    from pathlib import Path
+    import json
+
+    source = Path(path)
+    if not source.exists():
+        return None
+    try:
+        payload = json.loads(source.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return payload if isinstance(payload, dict) else None
