@@ -205,3 +205,10 @@ def test_missing_live_source_provenance_fails_closed():
             source_market_credential_mode=SOURCE_CREDENTIAL_MODE,
             source_provenance_sha256=SOURCE_PROVENANCE_SHA,
         )
+
+
+def test_market_shadow_workflow_accepts_legacy_rows_but_rejects_partial_provenance():
+    text=WORKFLOW.read_text(encoding="utf-8")
+    assert 'partial live-source provenance is invalid' in text
+    assert '"legacy_pre_provenance_receipts":legacy' in text
+    assert 'for row in current:' in text
