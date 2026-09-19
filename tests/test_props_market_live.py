@@ -736,3 +736,13 @@ def test_live_workflow_does_not_cross_wire_provider_credentials():
     assert "PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}" in text
     assert "SPORTSGAMEODDS_API_KEY: ${{ secrets.SPORTSGAMEODDS_API_KEY }}" in text
     assert "secrets.THE_ODDS_API_KEY || secrets.PROPLINE_API_KEY" not in text
+
+
+def test_live_workflow_rebases_only_challenger_output_races():
+    text = LIVE_WORKFLOW.read_text(encoding="utf-8")
+    assert 'git diff --name-only "$base_sha" origin/main' in text
+    assert 'challenger_outputs/*) ;;' in text
+    assert '*) challenger_only=false ;;' in text
+    assert 'if ! git rebase origin/main; then' in text
+    assert 'Published Props outputs after safe challenger-output rebase' in text
+    assert 'main changed materially during all three Props refresh attempts' in text
