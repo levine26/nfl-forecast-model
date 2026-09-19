@@ -86,7 +86,8 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     env:
-      THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
+      THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY || secrets.PROPLINE_API_KEY }}
+      PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}
       PROPS_BOOKMAKERS: ${{ vars.PROPS_BOOKMAKERS }}
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -101,8 +102,8 @@ jobs:
       - name: Fail closed unless live sportsbook credential exists
         run: |
           set -euo pipefail
-          if [ -z "${THE_ODDS_API_KEY:-}" ]; then
-            echo "::error::THE_ODDS_API_KEY repository secret is not configured."
+          if [ -z "${THE_ODDS_API_KEY:-}" ] && [ -z "${PROPLINE_API_KEY:-}" ]; then
+            echo "::error::Neither THE_ODDS_API_KEY nor PROPLINE_API_KEY repository secret is configured."
             exit 1
           fi
           python scripts/run_levline_markets_live.py \
