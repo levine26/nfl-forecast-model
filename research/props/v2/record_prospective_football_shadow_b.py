@@ -43,6 +43,7 @@ from nfl_forecast.props_opportunity import (
     _route_redistribution,
 )
 from nfl_forecast.props_player_sources import normalize_snap_counts_player_ids
+from nfl_forecast.props_player_state import normalize_team_code
 from nfl_forecast.props_publication import append_jsonl_immutable, read_jsonl
 
 from props_dynamic_role import (
@@ -307,7 +308,7 @@ def _apply_defense_to_game(game, defense_state: Mapping[str,Any], frozen: Mappin
     players=[]
     audit={}
     for player in game.players:
-        opponent=str(player.opponent).upper()
+        opponent=normalize_team_code(str(player.opponent))
         if opponent not in defense_state:
             raise FootballShadowBError(f"missing defense state for {opponent}")
         rush=defense_state[opponent]["rushing"]
@@ -421,7 +422,8 @@ def build_receipt(
         "event_type":EVENT_TYPE,
         "shadow_id":_shadow_id(source_id),
         "shadow_version":SHADOW_VERSION,
-        "recorded_utc":recorded.isoformat(),
+        "capture_started_utc":capture_started.isoformat(),
+        "capture_completed_utc":capture_clock().isoformat(),
         "source_workflow_run":str(source_workflow_run),
         "source_head_sha":str(source_head_sha),
         "source_forecast_id":source_id,
@@ -501,8 +503,13 @@ def record_shadow_b(
     upstream=_load_object(run_root/"upstream"/"upstream_slate.json")
     season=int(upstream["season"]); week=int(upstream["week"])
     captured=_aware(upstream.get("captured_at_utc"),label="upstream captured_at_utc")
-    recorded=(recorded_utc or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    if recorded<captured:
+    def capture_clock()->datetime:
+        if recorded_utc is not None:
+            return recorded_utc.astimezone(timezone.utc)
+        return datetime.now(timezone.utc)
+
+    capture_started=capture_clock()
+    if capture_started<captured:
         raise FootballShadowBError("shadow cannot precede source upstream capture")
 
     _,manifests=load_manifests(run_root)
@@ -517,7 +524,9 @@ def record_shadow_b(
     players=players.to_pandas() if hasattr(players,"to_pandas") else players.copy()
     snap_counts,snap_identity_audit=normalize_snap_counts_player_ids(bundle.snap_counts,players)
 
-    teams={str(m["home_team"]).upper() for m in manifests}|{str(m["away_team"]).upper() for m in manifests}
+    teams={normalize_team_code(str(m["home_team"])) for m in manifests}|{
+        normalize_team_code(str(m["away_team"])) for m in manifests
+    }
     defense_state,defense_audit=build_defense_state(
         pbp,target_season=season,target_week=week,teams=teams
     )
@@ -536,7 +545,7 @@ def record_shadow_b(
 
     for manifest in manifests:
         kickoff=_aware(manifest["kickoff_utc"],label="manifest kickoff_utc")
-        if recorded>=kickoff:
+        if capture_clock()>=kickoff:
             skipped_started+=1
             continue
 
@@ -588,6 +597,11 @@ def record_shadow_b(
         game_id=str(manifest["game_id"])
         game_receipts=0
 
+        receipt_recorded=capture_clock()
+        if receipt_recorded>=kickoff:
+            skipped_started+=1
+            continue
+
         for key,replay in baseline_index.items():
             if key[0]!=game_id or key[2] not in SUPPORTED_PROPS:
                 continue
@@ -605,7 +619,7 @@ def record_shadow_b(
                 source=source,shadow=shadow_row,manifest=manifest,
                 defense_player_audit=defense_player_audit,
                 role_player_audit=role_player,frozen=frozen,
-                recorded_utc=recorded,
+                recorded_utc=receipt_recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
                 v1_samples=baseline.player_stats[str(source["player_id"])][str(source["prop_type"])],
