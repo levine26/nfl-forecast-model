@@ -158,6 +158,7 @@ def test_shadow_b_transform_matches_canonical_opportunity_engine():
         })
         player_rows.extend([
             {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"QB1","position":"QB","designed_carries":3.0,"routes":0.0,"targets":0.0,"receptions":0.0},
+            {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"QB_OUT","position":"QB","designed_carries":2.0,"routes":0.0,"targets":0.0,"receptions":0.0},
             {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"RB1","position":"RB","designed_carries":16.0,"routes":21.0,"targets":5.0,"receptions":4.0},
             {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"RB2","position":"RB","designed_carries":6.0,"routes":10.0,"targets":2.0,"receptions":1.0},
             {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"WR1","position":"WR","designed_carries":0.0,"routes":36.0,"targets":11.0,"receptions":7.0},
@@ -167,6 +168,7 @@ def test_shadow_b_transform_matches_canonical_opportunity_engine():
     player_history=pd.DataFrame(player_rows)
     players=pd.DataFrame([
         {"player_id":"QB1","player_name":"QB","position":"QB","availability_probability":1.0,"availability_uncertainty":0.0,"is_primary_qb":True},
+        {"player_id":"QB_OUT","player_name":"Unavailable QB","position":"QB","availability_probability":0.0,"availability_uncertainty":0.0,"is_primary_qb":False},
         {"player_id":"RB1","player_name":"RB One","position":"RB","availability_probability":0.95,"availability_uncertainty":0.04,"is_primary_qb":False},
         {"player_id":"RB2","player_name":"RB Two","position":"RB","availability_probability":0.90,"availability_uncertainty":0.05,"is_primary_qb":False},
         {"player_id":"WR1","player_name":"WR One","position":"WR","availability_probability":0.98,"availability_uncertainty":0.02,"is_primary_qb":False},
@@ -199,6 +201,9 @@ def test_shadow_b_transform_matches_canonical_opportunity_engine():
         baseline,adjustments
     )
     assert audit["baseline_reconstruction_verified"] is True
+    baseline_carry_ids=baseline["hierarchy"]["designed_carry_share_given_designed_rush"]["player_ids"]
+    assert "QB_OUT" not in baseline_carry_ids
+    assert audit["carry_eligible_player_count"]==audit["carry_active_player_count"]+1
 
     dynamic_players=players.copy()
     for col in (
@@ -387,3 +392,10 @@ def test_shadow_b_workflow_requires_live_generation_and_market_provenance():
     assert "Shadow B market provider provenance mismatch" in text
     assert "--source-trigger-head-sha" in text
     assert "--source-provenance-sha256" in text
+
+
+def test_shadow_b_replay_uses_full_eligible_roster_before_active_dirichlet_filter():
+    text=SCRIPT.read_text(encoding="utf-8")
+    assert 'base_players["position"].isin(["QB","RB","FB","WR"])' in text
+    assert 'base_players["position"].isin(["RB","FB","WR","TE"])' in text
+    assert '"carry_eligible_player_count"' in text
