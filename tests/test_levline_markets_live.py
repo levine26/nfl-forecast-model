@@ -8,6 +8,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "run_levline_markets_live.py"
+WORKFLOW = ROOT / ".github" / "workflows" / "levline_markets_live.yml"
 
 
 def _module():
@@ -114,3 +115,21 @@ def test_repository_frozen_priors_are_preregistered_and_valid():
         "alpha": 9.0,
         "beta": 1.0,
     }
+
+
+def test_live_source_git_sha_validation_is_fail_closed():
+    module = _module()
+    assert module._validated_sha("a" * 40, label="sha") == "a" * 40
+    assert module._validated_sha("B" * 40, label="sha") == "b" * 40
+    with pytest.raises(ValueError, match="must be a git SHA"):
+        module._validated_sha("not-a-sha", label="sha")
+
+
+def test_live_workflow_records_actual_generation_sha_and_cleans_retry_root():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert "rm -rf .artifacts/props-live" in text
+    assert "GENERATION_BASE_SHA=$(git rev-parse HEAD)" in text
+    assert 'TRIGGER_HEAD_SHA=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}" --jq \'.head_sha\')' in text
+    assert '--source-workflow-run "${{ github.run_id }}"' in text
+    assert '--trigger-head-sha "$TRIGGER_HEAD_SHA"' in text
+    assert '--generation-base-sha "$GENERATION_BASE_SHA"' in text
