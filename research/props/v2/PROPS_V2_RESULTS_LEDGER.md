@@ -1,6 +1,6 @@
 # LevLine Props 2.0 — Results Ledger
 
-Status: **CURRENT THROUGH 2026-09-18**
+Status: **CURRENT THROUGH 2026-09-19**
 
 ## Frozen V1 benchmark
 
@@ -405,13 +405,20 @@ betting-edge improvement. No production promotion. Permanent record:
 
 ## Prospective market-anchor shadow
 
-Clean firewall-compliant implementation: **PR #379**.
+Base listener: **PR #379**. Exact-source-run hardening: **PR #407 — merged to main**.
 Frozen candidates:
 - market-only no-vig probability;
 - market + frozen pre-2026 V1 residual.
 
 This is a calibration/market-anchor experiment and is distinct from the football-mechanism shadow.
 No completed 2026 outcome may change the candidate. Grading is evaluation-only.
+
+Source run `35428763144` created the first persistence event while the final live-generation/provider
+provenance amendment was still under CI: **545 market-anchor receipts**. Those rows contain no
+outcomes, remain immutable for auditability, and are classified as **legacy pre-provenance**. They do
+not count toward any prospective evaluation or promotion threshold. PR #418 is the pending
+live-generation/provider provenance freeze; the first provenance-eligible market-anchor receipt is
+still pending.
 
 ## Prospective football Shadow A
 
@@ -432,30 +439,49 @@ Each receipt is designed to preserve:
 - frozen defense state and coefficients;
 - explicit zero-outcome-read / no-production governance.
 
-Prospective football Shadow A receipts accumulated so far: **0**.
-No pre-listener live run may be backfilled as prospective.
+Source run `35428763144` created **289 Shadow A receipts** before the final
+live-generation/provider provenance amendment became active. Those receipts contain no outcomes and
+remain immutable on the research-data branch, but they are **legacy pre-provenance** and contribute
+zero rows to grading, minimum-evidence, or promotion thresholds. The amended grader verifies their
+original receipt hash/source hashes/chronology and then excludes them before any outcome lookup.
+PR #418 is pending; provenance-eligible Shadow A receipts accumulated so far: **0**.
 
-Grading implementation: **PR #406 — merged to `main`, frozen before the first eligible receipt/outcome**.
-The grader uses finalized outcomes only, requires positive offensive snaps, preserves sportsbook void
-semantics, computes CRPS/MAE/Brier/log loss/fixed-80%-interval/directional metrics, and never
-auto-authorizes promotion.
+Grading implementation: **PR #406 — merged to `main`**. PR #418 adds the provenance-eligibility
+boundary without changing any scoring metric or threshold. The grader uses finalized outcomes only,
+requires positive offensive snaps, preserves sportsbook void semantics, computes
+CRPS/MAE/Brier/log loss/fixed-80%-interval/directional metrics, and never auto-authorizes promotion.
 
-Secondary **Shadow B (defense + Dynamic Role V0.1 full)** is now implemented by **PR #405**, merged to `main` with a separate immutable listener and separate evidence branch. Shadow B receipts accumulated so far: **0**. It replays V1, reconstructs the captured V1 opportunity distributions before applying the exact Dynamic Role V0.1 full transform, then applies the exact #394 defensive-efficiency overlay. No outcome before Shadow B's own first immutable receipt may count toward its prospective sample.
+Secondary **Shadow B (defense + Dynamic Role V0.1 full)** is implemented by **PR #405**. PR #411,
+also merged, makes unavailable strictly-lagged role history fail closed rather than silently degrading
+to a unit-role fallback. Shadow B receipts accumulated so far: **0** and its research-data branch does
+not yet exist. PR #418 adds exact live-generation/provider provenance before its first eligible receipt.
 
-Shadow B grading is frozen separately in **PR #409** before the first B receipt/outcome. Its primary comparison is B vs matched Shadow A; B vs V1 is supporting context only. Unmatched B receipts cannot enter the B-vs-A minimum-evidence threshold. Before any promotion discussion, the matched B-vs-A sample must meet the frozen size thresholds and show no mean degradation versus Shadow A on CRPS, Brier score, log loss, or 80% interval score.
+Shadow B grading is frozen separately in **PR #409 — merged before the first B receipt/outcome**.
+Its primary comparison is B vs matched Shadow A; B vs V1 is supporting context only. Exact A/B
+pairing includes source workflow run, generation SHA, trigger SHA, provider/mode and provenance
+record hash. Unmatched B receipts cannot enter the B-vs-A minimum-evidence threshold. Before any
+promotion discussion, the matched B-vs-A sample must meet the frozen size thresholds and show no
+mean degradation versus Shadow A on CRPS, Brier score, log loss, or 80% interval score.
 
 ## Prospective market archive activation status
 
 The capture implementation exists in **PR #381**, including frozen exact-timestamp archive and
 T48H/T24H/T12H/T6H/T90M/T30M/near-close horizon selection.
 
-PR #381 has now been merged to `main`, so the automatic `workflow_run` listener is active.
-The persistent branch `research-data/props-v2-market-archive` still does **not** exist, which means
-no qualifying post-merge live refresh has produced the first immutable capture yet.
+PR #381 is merged to `main`; exact-source-run provenance hardening in **PR #413** is also merged.
 
-**Disposition:** prospective market evidence collection is **activated but has zero captures so far**.
-Do not grade CLV/movement or describe evidence as accumulated until the first successful live refresh
-creates the persistent archive branch and manifest.
+Source run `35428763144` created the first persistent archive before the final live-generation/provider
+provenance amendment became active: **one normalized snapshot containing 1,033 player-prop market
+rows across 15 games**. The snapshot is immutable and retained for auditability, but it is
+**legacy pre-provenance** and is excluded from all preregistered horizon/CLV selection and promotion
+thresholds. The selector now distinguishes complete provenance, no-amendment legacy rows, and invalid
+partial provenance; partial provenance fails closed.
+
+PR #418 is pending. Provenance-eligible market archive captures accumulated so far: **0**.
+
+**Disposition:** collection is active, but CLV/movement grading remains blocked until sufficient
+provenance-eligible timestamp-qualified captures accumulate. The legacy snapshot may not be rewritten,
+deleted, backfilled, or retroactively upgraded.
 
 ## Production conclusion
 
