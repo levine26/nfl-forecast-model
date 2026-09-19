@@ -498,7 +498,7 @@ function History({ payload }) {
   const graded=records.filter(record=>record?.grade?.grading_result)
   const closed=records.filter(record=>record?.closing_market)
   return <section className="lp-performance">
-    <div className="lp-page-head"><span>LEVLINE PROPS PERFORMANCE</span><h1>Prospective validation, with receipts.</h1><p>Projection error, calibration, market-relative performance, and betting outcomes remain separate until the evaluation artifacts support them.</p></div>
+    <div className="lp-performance-head"><span>LEVLINE PROPS PERFORMANCE</span><h1>Prospective validation, with receipts.</h1><p>Projection error, calibration, market-relative performance, and betting outcomes remain separate until the evaluation artifacts support them.</p></div>
     <section className="lp-validation-stats">
       <Metric label="Immutable forecasts" value={records.length}/>
       <Metric label="Graded forecasts" value={graded.length} accent={graded.length>0}/>
