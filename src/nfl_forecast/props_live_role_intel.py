@@ -577,3 +577,190 @@ def validate_live_role_intelligence(payload: Mapping[str, Any]) -> None:
                 raise PropsLiveRoleIntelError("live primary-QB override missing player_id")
             if not str(row.get("provenance") or "").strip():
                 raise PropsLiveRoleIntelError("live primary-QB override missing provenance")
+
+
+_CONTEXT_AVAILABILITY_TITLE = re.compile(
+    r"^[A-Z]{2,4}:\\s+(?P<name>.+?)\\s+[—-]\\s+"
+    r"(?P<status>Out|Doubtful|Questionable|Available|No Injury Status)\\b",
+    re.IGNORECASE,
+)
+
+
+def contextual_availability_rows(
+    contextual_evidence: Mapping[str, Any] | None,
+    *,
+    as_of_utc: object,
+) -> list[dict[str, Any]]:
+    """Convert Sunday Signal's qualified availability evidence to canonical input rows.
+
+    This does not infer availability from generic media prose. Only the structured
+    availability items emitted by the contextual-intelligence layer from NFL.com or
+    ESPN are eligible, and every row must have a timestamp at/before the requested
+    point-in-time cutoff.
+    """
+
+    cutoff = _utc(as_of_utc, "as_of_utc")
+    if not isinstance(contextual_evidence, Mapping):
+        return []
+
+    rows: list[dict[str, Any]] = []
+    for game_id, items in contextual_evidence.items():
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if not isinstance(item, Mapping):
+                continue
+            metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+            family = str(metadata.get("family") or "").strip().lower()
+            if family != "availability":
+                continue
+
+            source_name = str(item.get("source_name") or "").strip()
+            source_lower = source_name.lower()
+            if "nfl.com official injury report" not in source_lower and "espn" not in source_lower:
+                continue
+
+            observed_raw = item.get("as_of")
+            if not observed_raw:
+                continue
+            try:
+                observed = _utc(observed_raw, "contextual availability as_of")
+            except PropsLiveRoleIntelError:
+                continue
+            if observed > cutoff:
+                continue
+
+            title = str(item.get("title") or "").strip()
+            match = _CONTEXT_AVAILABILITY_TITLE.match(title)
+            if not match:
+                continue
+            team = normalize_team_code(metadata.get("team") or title.split(":", 1)[0])
+            player_name = match.group("name").strip()
+            status = match.group("status").strip()
+            if not team or not player_name:
+                continue
+
+            rows.append(
+                {
+                    "game_id": str(game_id),
+                    "team": team,
+                    "name": player_name,
+                    "position": str(metadata.get("position") or "").upper().strip(),
+                    "status": status,
+                    "game_status": status,
+                    "practice_status": "",
+                    "source_name": source_name,
+                    "source_url": item.get("source_url"),
+                    "captured_at": observed.isoformat(),
+                    "shared_context_evidence": True,
+                }
+            )
+
+    # The canonical availability resolver handles identity and latest-row semantics.
+    # De-duplicate only byte-identical evidence here.
+    unique: dict[tuple[str, ...], dict[str, Any]] = {}
+    for row in rows:
+        key = (
+            str(row.get("game_id") or ""),
+            str(row.get("team") or ""),
+            _norm_name(row.get("name")),
+            str(row.get("status") or "").upper(),
+            str(row.get("captured_at") or ""),
+            str(row.get("source_url") or ""),
+        )
+        unique[key] = row
+    return sorted(
+        unique.values(),
+        key=lambda row: (
+            str(row.get("game_id") or ""),
+            str(row.get("team") or ""),
+            str(row.get("name") or ""),
+            str(row.get("captured_at") or ""),
+        ),
+    )
+
+
+def validate_market_backed_primary_qb_forecasts(
+    role_intelligence: Mapping[str, Any],
+    forecast_payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Fail closed when a market-backed expected QB still simulates as a zero-role QB.
+
+    This is a state-consistency guard, not market anchoring: it does not compare the
+    model projection with the sportsbook line. It only requires that a player selected
+    as the expected primary QB from a unique multi-book passing market receives a
+    positive model passing-yard distribution.
+    """
+
+    validate_live_role_intelligence(role_intelligence)
+    forecasts = forecast_payload.get("forecasts")
+    if not isinstance(forecasts, list):
+        raise PropsLiveRoleIntelError("forecast payload missing forecasts list")
+
+    forecast_index: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+    for row in forecasts:
+        if not isinstance(row, Mapping):
+            continue
+        key = (
+            str(row.get("game_id") or ""),
+            str(row.get("player_id") or ""),
+            str(row.get("prop_type") or ""),
+        )
+        forecast_index[key] = row
+
+    checked: list[dict[str, Any]] = []
+    games = role_intelligence.get("primary_qb_by_game")
+    if not isinstance(games, Mapping):
+        raise PropsLiveRoleIntelError("live role intelligence missing primary_qb_by_game")
+
+    for game_id, teams in games.items():
+        if not isinstance(teams, Mapping):
+            continue
+        for team, selection in teams.items():
+            if not isinstance(selection, Mapping):
+                continue
+            evidence = selection.get("evidence")
+            market_backed = any(
+                isinstance(item, Mapping)
+                and str(item.get("source") or "").startswith(
+                    "the_odds_api_multi_book_passing_market_presence"
+                )
+                for item in (evidence if isinstance(evidence, list) else [])
+            )
+            if not market_backed:
+                continue
+
+            player_id = str(selection.get("player_id") or "").strip()
+            key = (str(game_id), player_id, "passing_yards")
+            forecast = forecast_index.get(key)
+            if forecast is None:
+                raise PropsLiveRoleIntelError(
+                    "market-backed primary QB missing passing-yards forecast: "
+                    f"game={game_id} team={team} player_id={player_id}"
+                )
+            model = forecast.get("model") if isinstance(forecast.get("model"), Mapping) else {}
+            mean = _finite(model.get("mean"))
+            fair_line = _finite(model.get("fair_line"))
+            if mean is None or mean <= 0 or fair_line is None or fair_line <= 0:
+                raise PropsLiveRoleIntelError(
+                    "market-backed primary QB has non-positive passing projection: "
+                    f"game={game_id} team={team} player_id={player_id} "
+                    f"mean={mean} fair_line={fair_line}"
+                )
+            checked.append(
+                {
+                    "game_id": str(game_id),
+                    "team": normalize_team_code(team),
+                    "player_id": player_id,
+                    "mean": mean,
+                    "fair_line": fair_line,
+                }
+            )
+
+    return {
+        "status": "passed",
+        "market_backed_primary_qbs_checked": len(checked),
+        "rows": checked,
+        "market_line_magnitude_compared": False,
+        "market_price_compared": False,
+    }
