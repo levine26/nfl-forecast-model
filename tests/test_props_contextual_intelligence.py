@@ -128,3 +128,72 @@ def test_out_player_cannot_be_promoted_by_media_claim():
 
     assert resolved == {}
     assert audit["status"] == "no_qualified_starter_claim"
+
+
+def test_confirmed_starter_with_source_title_support_overrides_without_competing_injury():
+    game_id = "2026_02_CAR_ATL"
+    state = pd.DataFrame(
+        [
+            {
+                "game_id": game_id,
+                "player_id": "ATL-RUSH",
+                "player_name": "Cooper Rush",
+                "position": "QB",
+                "team": "ATL",
+                "expected_active_state": "AVAILABLE",
+            },
+            {
+                "game_id": game_id,
+                "player_id": "ATL-QB2",
+                "player_name": "Taylor Heinicke",
+                "position": "QB",
+                "team": "ATL",
+                "expected_active_state": "AVAILABLE",
+            },
+            {
+                "game_id": game_id,
+                "player_id": "CAR-QB1",
+                "player_name": "Bryce Young",
+                "position": "QB",
+                "team": "CAR",
+                "expected_active_state": "AVAILABLE",
+            },
+        ]
+    )
+    media = {
+        "generated_utc": "2026-09-18T21:00:00Z",
+        "games": {
+            game_id: {
+                "generated_utc": "2026-09-18T21:00:00Z",
+                "paragraph1": (
+                    "Atlanta confirmed Cooper Rush will start against Carolina. "
+                    "The Falcons are adjusting the passing plan around Rush while the "
+                    "Panthers prepare for the newly named starter."
+                ),
+                "sources": [
+                    {
+                        "name": "Atlanta Falcons",
+                        "title": "Cooper Rush will start at quarterback against Carolina",
+                        "url": "https://www.atlantafalcons.com/news/cooper-rush-start-quarterback-carolina",
+                    },
+                    {
+                        "name": "NFL",
+                        "title": "Falcons name Cooper Rush starter for Week 2",
+                        "url": "https://www.nfl.com/news/falcons-cooper-rush-starter-week-2",
+                    },
+                ],
+            }
+        },
+    }
+
+    resolved, audit = resolve_primary_qbs_from_levline_media(
+        media,
+        state,
+        game_id=game_id,
+        forecast_timestamp=FORECAST,
+    )
+
+    assert resolved["ATL"]["player_id"] == "ATL-RUSH"
+    assert audit["status"] == "qualified"
+    accepted = [row for row in audit["claims"] if row.get("accepted")]
+    assert accepted[0]["strength"] == "confirmed"
