@@ -741,6 +741,9 @@ def fetch_live_nfl_prop_events(
             discovery_unmatched.append(
                 {
                     "provider_event_id": str(event.get("id") or "") or None,
+                    "home_team": event.get("home_team"),
+                    "away_team": event.get("away_team"),
+                    "commence_time": event.get("commence_time"),
                     "reason": reason,
                 }
             )
