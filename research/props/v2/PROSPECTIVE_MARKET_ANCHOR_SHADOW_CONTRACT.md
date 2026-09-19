@@ -2,7 +2,7 @@
 
 Status: **FROZEN BEFORE PROSPECTIVE SHADOW GRADES**  
 Created: 2026-09-18  
-Branch: `research/props-v2-prospective-shadow-r2`
+Exact-source provenance amendment: 2026-09-19, before first prospective receipt
 
 ## Purpose
 
@@ -62,6 +62,9 @@ No completed 2026 outcome was used to choose or fit these coefficients.
 ## Eligibility
 
 A shadow receipt may be created only when:
+- the source is the exact audit artifact from a successful **main-branch** `LevLine Props live refresh`;
+- the source workflow run and source head SHA are preserved in the receipt;
+- the source head SHA already contains this prospective listener/config (no retrospective backfill);
 - the source V1 forecast has a stable `forecast_id`;
 - the source forecast was recorded pregame;
 - the shadow receipt itself is recorded before kickoff;
@@ -73,9 +76,31 @@ A shadow receipt may be created only when:
 
 Started games fail closed. A candidate is never reconstructed after kickoff.
 
+
+## Exact source-run boundary
+
+The workflow-run trigger is only a notification. It may **not** read whatever forecast happens to be
+on latest `main`.
+
+For every capture:
+1. resolve the triggering live workflow run through the GitHub Actions API;
+2. require workflow name `LevLine Props live refresh`, branch `main`, and conclusion `success`;
+3. require the source head SHA to already contain this prospective listener and frozen config;
+4. check out that exact source head SHA;
+5. download that exact workflow run's full audit artifact;
+6. require exactly one source `forecasts.json`;
+7. record receipts only from that artifact.
+
+This prevents an overlapping or later live refresh from being mislabeled under an earlier trigger.
+
+A live run whose source commit predates this exact-run listener cannot be replayed later and called
+prospective evidence. Missing pregame receipts remain missing.
+
 ## Immutable identity
 
 Every shadow receipt must preserve:
+- source workflow run ID;
+- source head SHA;
 - source `forecast_id`;
 - source forecast timestamp;
 - source market capture timestamp;
