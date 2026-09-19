@@ -25,6 +25,7 @@ const MARKET_OPTIONS = [['ALL','All markets'],['PASSING','Passing'],['RUSHING','
 const POSITION_OPTIONS = ['ALL','QB','RB','WR','TE']
 const SIGNAL_OPTIONS = [['ALL','All signals'],['MODEL EDGE','Model Edge'],['WATCH','Watch'],['NO SIGNAL','No Signal']]
 const SORT_OPTIONS = [['signal','Signal'],['kickoff','Kickoff'],['player','Player'],['fair-line-gap','Gap']]
+const HISTORY_PAGE_SIZE = 100
 
 async function fetchJson(name, fallback) {
   try {
@@ -497,8 +498,13 @@ function History({ payload }) {
   const records=payload?.records || []
   const graded=records.filter(record=>record?.grade?.grading_result)
   const closed=records.filter(record=>record?.closing_market)
+  const [visibleCount,setVisibleCount]=useState(HISTORY_PAGE_SIZE)
+  const visibleRecords=useMemo(
+    ()=>records.slice(Math.max(0,records.length-visibleCount)).reverse(),
+    [records,visibleCount],
+  )
   return <section className="lp-performance">
-    <div className="lp-performance-head"><span>LEVLINE PROPS PERFORMANCE</span><h1>Prospective validation, with receipts.</h1><p>Projection error, calibration, market-relative performance, and betting outcomes remain separate until the evaluation artifacts support them.</p></div>
+    <div className="lp-page-head"><span>LEVLINE PROPS PERFORMANCE</span><h1>Prospective validation, with receipts.</h1><p>Projection error, calibration, market-relative performance, and betting outcomes remain separate until the evaluation artifacts support them.</p></div>
     <section className="lp-validation-stats">
       <Metric label="Immutable forecasts" value={records.length}/>
       <Metric label="Graded forecasts" value={graded.length} accent={graded.length>0}/>
@@ -516,28 +522,32 @@ function History({ payload }) {
     <section className="lp-calibration-empty"><div><span>CALIBRATION</span><h2>Calibration visualization is data-gated.</h2><p>No fixture or tiny-sample percentages are presented as real calibration results.</p></div><b>N = {graded.length}</b></section>
     <div className="lp-receipts-head"><div><span>HISTORY RECEIPTS</span><h2>Forecasts of record.</h2></div><p>Original forecast, closing market, and result remain separate append-only facts.</p></div>
     {!records.length ? <EmptyState title="No prospective Props receipts have been published yet." copy="Original forecasts will appear here after the first valid pregame publication. Grading never rewrites the original."/> :
-    <section className="lp-receipts">{records.map(record=>{
-      const original=record.original_forecast || {}, market=original.market || {}, model=original.model || {}, close=record.closing_market || {}, grade=record.grade || {}
-      return <details key={record.forecast_id} className="lp-receipt">
-        <summary>
-          <div><strong>{original.player || 'Unknown player'}</strong><span>{propLabel(original.prop_type)} · {original.team || '—'} vs {original.opponent || '—'}</span></div>
-          <div><span>ORIGINAL</span><b>{marketReceipt(market)}</b></div>
-          <div><span>LEVLINE FAIR</span><b>{formatLine(model.fair_line)}</b></div>
-          <div><span>RESULT</span><b className={'lp-grade ' + String(grade.grading_result||'pending').toLowerCase()}>{grade.grading_result || 'Pending'}</b></div>
-          <i aria-hidden="true">+</i>
-        </summary>
-        <div className="lp-receipt-grid">
-          <Metric label="Original sportsbook line / price" value={marketReceipt(market)}/>
-          <Metric label="Original model probability" value={receiptProbability(original)}/>
-          <Metric label="Closing line / price" value={record.closing_market ? marketReceipt(close) : 'Not captured'}/>
-          <Metric label="Actual result" value={formatLine(grade.actual_result)}/>
-          <Metric label="Grade" value={grade.grading_result || 'Pending'}/>
-          <Metric label="Forecast timestamp" value={formatTimestamp(original.forecast_timestamp_utc)}/>
-          <Metric label="Recorded timestamp" value={formatTimestamp(record.recorded_utc)}/>
-          <Metric label="Model version" value={model.version || '—'}/>
-        </div>
-      </details>
-    })}</section>}
+    <>
+      <div className="lp-history-window" aria-live="polite">Showing newest {visibleRecords.length.toLocaleString()} of {records.length.toLocaleString()} immutable receipts.</div>
+      <section className="lp-receipts">{visibleRecords.map(record=>{
+        const original=record.original_forecast || {}, market=original.market || {}, model=original.model || {}, close=record.closing_market || {}, grade=record.grade || {}
+        return <details key={record.forecast_id} className="lp-receipt">
+          <summary>
+            <div><strong>{original.player || 'Unknown player'}</strong><span>{propLabel(original.prop_type)} · {original.team || '—'} vs {original.opponent || '—'}</span></div>
+            <div><span>ORIGINAL</span><b>{marketReceipt(market)}</b></div>
+            <div><span>LEVLINE FAIR</span><b>{formatLine(model.fair_line)}</b></div>
+            <div><span>RESULT</span><b className={'lp-grade ' + String(grade.grading_result||'pending').toLowerCase()}>{grade.grading_result || 'Pending'}</b></div>
+            <i aria-hidden="true">+</i>
+          </summary>
+          <div className="lp-receipt-grid">
+            <Metric label="Original sportsbook line / price" value={marketReceipt(market)}/>
+            <Metric label="Original model probability" value={receiptProbability(original)}/>
+            <Metric label="Closing line / price" value={record.closing_market ? marketReceipt(close) : 'Not captured'}/>
+            <Metric label="Actual result" value={formatLine(grade.actual_result)}/>
+            <Metric label="Grade" value={grade.grading_result || 'Pending'}/>
+            <Metric label="Forecast timestamp" value={formatTimestamp(original.forecast_timestamp_utc)}/>
+            <Metric label="Recorded timestamp" value={formatTimestamp(record.recorded_utc)}/>
+            <Metric label="Model version" value={model.version || '—'}/>
+          </div>
+        </details>
+      })}</section>
+      {visibleRecords.length < records.length && <div className="lp-load-more lp-history-more"><button onClick={()=>setVisibleCount(count=>Math.min(records.length,count+HISTORY_PAGE_SIZE))}>Load older receipts <span>{(records.length-visibleRecords.length).toLocaleString()} remaining</span></button></div>}
+    </>}
   </section>
 }
 
