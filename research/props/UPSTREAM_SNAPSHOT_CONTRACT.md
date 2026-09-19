@@ -60,7 +60,11 @@ By default, team scoring context is also derived rather than hand-entered:
 
 An optional scoring-context file may override these quantities for a controlled preregistered experiment. Explicit efficiency priors may likewise be supplied in the priors file, but then `prior_model_trained_through_season` is mandatory and values trained through 2026 are rejected.
 
-For current QB identity, the operator first consumes timestamped 2025+ nflverse depth charts at or before the forecast timestamp. A unique rank-1 QB with a stable GSIS ID is accepted with snapshot provenance. Ambiguous/future/missing depth-chart evidence fails closed. An explicit `primary_qb_by_team` entry with point-in-time provenance may override the depth-chart resolution when needed.
+For current QB identity, the operator first consumes timestamped 2025+ nflverse depth charts at or before the forecast timestamp. The depth fallback is availability-aware: QBs already marked `OUT`, inactive, or reserve/unavailable are excluded before rank selection. `QUESTIONABLE` and `DOUBTFUL` remain probabilistic availability states; they are not converted into a replacement starter unless fresher qualified reporting explicitly identifies one.
+
+The builder then consumes the already-validated Sunday Signal / LevLine shared media artifact (`outputs/copilot_media_reads.json` by default). This is the same researched reporting surface used by LevLine editorial intelligence; Props does not run a second news crawler. A fresh, game-matched, explicit starter claim may override the depth-chart fallback only when the named quarterback resolves uniquely to the canonical game roster, is not `OUT`, and the reporting passes the contextual adapter's corroboration rules. Stale, future, ambiguous, conditional, or missing reporting does not override anything. The frozen upstream audit records both depth-chart and shared-media resolution.
+
+An explicit preregistered `primary_qb_by_team` entry with point-in-time provenance remains the final override for controlled research. The precedence is therefore: availability-aware depth chart → qualified shared LevLine media → explicit preregistered override.
 
 ## Operator flow
 
@@ -93,12 +97,13 @@ The script:
 1. loads nflverse schedule/PBP/snap/current-roster sources through the existing Props source adapter;
 2. loads the nflverse stable player identity table;
 3. attempts to capture the current NFL injury report unless `--skip-injury-fetch` is specified;
-4. timestamps the forecast only after live source requests complete;
-5. builds canonical current player state and resolves QB1 from the latest eligible timestamped depth chart when possible;
-6. derives strictly lagged opportunity/efficiency history;
-7. fits efficiency priors only through 2025 and derives current scoring-volume state from strictly prior weeks unless explicit preregistered overrides are supplied;
-8. executes the actual opportunity and efficiency/TD lane interfaces;
-9. writes immutable create-only artifacts.
+4. loads the validated shared LevLine media artifact unless `--skip-levline-media` is specified;
+5. timestamps the forecast only after live source requests complete;
+6. builds canonical current player state, resolves an availability-aware QB depth fallback, and applies only qualified fresh shared-media starter evidence;
+7. derives strictly lagged opportunity/efficiency history;
+8. fits efficiency priors only through 2025 and derives current scoring-volume state from strictly prior weeks unless explicit preregistered overrides are supplied;
+9. executes the actual opportunity and efficiency/TD lane interfaces;
+10. writes immutable create-only artifacts.
 
 Output files include:
 

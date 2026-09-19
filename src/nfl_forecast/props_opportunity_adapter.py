@@ -134,7 +134,14 @@ def current_players_from_canonical_state(
         uncertainties.append(math.sqrt(variance))
         prior_sources.append(f"explicit_beta_prior:{state}:alpha={alpha:g}:beta={beta:g}")
 
-    inferred_primary = work["expected_role"].astype(str).eq("QB_PRIMARY")
+    availability_by_id = {
+        str(player_id): float(probability)
+        for player_id, probability in zip(ids.astype(str), probabilities)
+    }
+    inferred_primary = (
+        work["expected_role"].astype(str).eq("QB_PRIMARY")
+        & ids.astype(str).map(lambda player_id: availability_by_id.get(str(player_id), 0.0) > 0.0)
+    )
     qb_override_source = "canonical_expected_role"
     if primary_qb_player_id is not None:
         qb_override_source = _provenance(primary_qb_provenance, label="primary QB override")
@@ -142,6 +149,8 @@ def current_players_from_canonical_state(
         matched = work[ids.astype(str).eq(primary_id)]
         if len(matched) != 1 or str(matched.iloc[0]["position"]).upper() != "QB":
             raise ValueError("primary_qb_player_id must identify exactly one canonical QB row")
+        if availability_by_id.get(primary_id, 0.0) <= 0.0:
+            raise ValueError("primary_qb_player_id cannot identify a canonical OUT QB")
         inferred_primary = ids.astype(str).eq(primary_id)
 
     adjustments = {str(k): v for k, v in (role_adjustments or {}).items()}

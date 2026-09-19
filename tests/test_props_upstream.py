@@ -415,6 +415,72 @@ def test_game_upstream_package_runs_real_lane_interfaces_without_hidden_defaults
     assert package.audit["history"]["target_week_rows_used"] == 0
 
 
+
+def test_replacement_qb_override_propagates_into_opportunity_package():
+    history = build_lagged_props_history(_pbp(), _identity(), season=2026, week=3)
+    state = _player_state().copy()
+    backup = state[
+        state["player_id"].eq("A-QB")
+    ].iloc[0].to_dict()
+    backup["player_id"] = "A-QB2"
+    backup["player_name"] = "ARI Backup QB"
+    backup["expected_role"] = "QB_RESERVE"
+    state = pd.concat([state, pd.DataFrame([backup])], ignore_index=True)
+
+    scoring = {
+        team: {
+            "expected_drives": 10.5,
+            "expected_red_zone_trips": 3.2,
+            "prior_red_zone_td_rate": 0.58,
+            "prior_pass_td_fraction": 0.62,
+            "expected_non_red_zone_pass_tds": 0.2,
+            "expected_non_red_zone_rush_tds": 0.08,
+        }
+        for team in ("ARI", "LAR")
+    }
+    residual = {
+        team: {
+            "catch_rate": 0.62,
+            "receiving_yards_per_reception": 9.5,
+            "rushing_yards_per_carry": 4.0,
+        }
+        for team in ("ARI", "LAR")
+    }
+
+    package = build_game_upstream_package(
+        player_state=state,
+        history=history,
+        game_id=GAME_ID,
+        season=2026,
+        week=3,
+        forecast_timestamp=FORECAST,
+        route_prior_means={"RB": 0.55, "WR": 0.90, "TE": 0.75},
+        availability_priors={},
+        position_efficiency_priors=_priors(),
+        scoring_context_by_team=scoring,
+        residual_efficiency_by_team=residual,
+        source_status="qualified",
+        prior_model_trained_through_season=2025,
+        primary_qb_by_team={
+            "ARI": {
+                "player_id": "A-QB2",
+                "provenance": "qualified shared LevLine starter reporting",
+            },
+            "LAR": {"player_id": "L-QB", "provenance": "pregame starter fixture"},
+        },
+    )
+
+    ari = next(
+        projection
+        for projection in package.opportunity_projections
+        if projection["metadata"]["team"] == "ARI"
+    )
+    assert ari["marginals"]["primary_qb_player_id"] == "A-QB2"
+    players = {row["player_id"]: row for row in ari["players"]}
+    assert players["A-QB2"]["is_primary_qb"] is True
+    assert players["A-QB"]["is_primary_qb"] is False
+    assert ari["marginals"]["qb_pass_attempts"]["mean"] > 0
+
 def test_2026_trained_priors_fail_closed_before_lane_build():
     history = build_lagged_props_history(_pbp(), _identity(), season=2026, week=3)
     with pytest.raises(PropsUpstreamError, match="2026 outcomes"):

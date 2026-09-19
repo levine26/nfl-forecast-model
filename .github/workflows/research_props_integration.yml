@@ -46,6 +46,7 @@ jobs:
           python -m pytest -q
           tests/test_props_player_state.py
           tests/test_props_player_sources.py
+          tests/test_props_contextual_intelligence.py
           tests/test_props_opportunity.py
           tests/test_props_opportunity_adapter.py
           tests/test_props_opportunity_handoff.py
@@ -65,6 +66,7 @@ jobs:
           python -m py_compile
           src/nfl_forecast/props_player_state.py
           src/nfl_forecast/props_player_sources.py
+          src/nfl_forecast/props_contextual_intelligence.py
           src/nfl_forecast/props_opportunity.py
           src/nfl_forecast/props_opportunity_adapter.py
           src/nfl_forecast/props_opportunity_handoff.py

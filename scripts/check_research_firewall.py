@@ -61,10 +61,12 @@ ALLOWED_PREFIXES = (
 )
 
 ALLOWED_EXACT = {
+    ".github/workflows/levline_markets_live.yml",
     "src/nfl_forecast/fst_provenance.py",
     "src/nfl_forecast/fst_reconstruction.py",
     "src/nfl_forecast/props_player_state.py",
     "src/nfl_forecast/props_player_sources.py",
+    "src/nfl_forecast/props_contextual_intelligence.py",
     "src/nfl_forecast/props_efficiency_td.py",
     "src/nfl_forecast/props_opportunity.py",
     "src/nfl_forecast/props_opportunity_adapter.py",
@@ -88,6 +90,7 @@ ALLOWED_EXACT = {
     "tests/test_props_runner.py",
     "tests/test_props_player_state.py",
     "tests/test_props_player_sources.py",
+    "tests/test_props_contextual_intelligence.py",
 }
 
 # Exact carve-out authorized by the Props sprint charter. Keep this enumerated: do not
