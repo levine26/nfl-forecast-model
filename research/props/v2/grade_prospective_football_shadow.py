@@ -82,6 +82,44 @@ def live_source_provenance_eligibility(row: Mapping[str,Any])->str:
     return "eligible"
 
 
+def verify_legacy_receipt_integrity(row: Mapping[str,Any])->None:
+    supplied=str(row.get("shadow_sha256") or "")
+    if len(supplied)!=64:
+        raise ShadowGradingError("legacy prospective receipt missing shadow_sha256")
+    material=dict(row)
+    material.pop("shadow_sha256",None)
+    if supplied!=_sha(material):
+        raise ShadowGradingError("legacy prospective receipt SHA-256 mismatch")
+    for field in ("source_forecast_sha256","source_manifest_sha256"):
+        value=str(row.get(field) or "").lower()
+        if len(value)!=64 or any(char not in "0123456789abcdef" for char in value):
+            raise ShadowGradingError(f"invalid legacy receipt provenance hash: {field}")
+    season=int(row.get("source_season",-1))
+    week=int(row.get("source_week",-1))
+    if season<2026 or not 1<=week<=18:
+        raise ShadowGradingError("invalid legacy prospective season/week provenance")
+    source_run=str(row.get("source_workflow_run") or "").strip()
+    source_sha=str(row.get("source_head_sha") or "").strip().lower()
+    if not source_run:
+        raise ShadowGradingError("legacy prospective receipt missing source workflow run")
+    if len(source_sha) not in {40,64} or any(c not in "0123456789abcdef" for c in source_sha):
+        raise ShadowGradingError("legacy prospective receipt has invalid source head SHA")
+    kickoff=_aware_timestamp(row.get("kickoff_utc"),label="kickoff_utc")
+    forecast_at=_aware_timestamp(
+        row.get("source_forecast_timestamp_utc"),
+        label="source_forecast_timestamp_utc",
+    )
+    market_at=_aware_timestamp(
+        row.get("source_market_captured_utc"),
+        label="source_market_captured_utc",
+    )
+    recorded_at=_aware_timestamp(row.get("recorded_utc"),label="recorded_utc")
+    if not (forecast_at<kickoff and market_at<kickoff and recorded_at<kickoff):
+        raise ShadowGradingError("legacy prospective receipt is not strictly pre-kickoff")
+    if forecast_at>recorded_at or market_at>recorded_at:
+        raise ShadowGradingError("legacy prospective receipt chronology is internally inconsistent")
+
+
 def verify_receipt_integrity(row: Mapping[str,Any])->None:
     supplied=str(row.get("shadow_sha256") or "")
     if len(supplied)!=64:
@@ -149,13 +187,14 @@ def read_receipts_with_audit(path: Path)->tuple[list[dict[str,Any]],dict[str,int
             raise ShadowGradingError(f"receipt line {line_number} is not an object")
         audit["ledger_rows"]+=1
         provenance_state=live_source_provenance_eligibility(row)
-        if provenance_state=="legacy_pre_provenance":
-            audit["legacy_pre_provenance_receipts"]+=1
-            continue
         if row.get("contract_version")!=RECEIPT_CONTRACT_VERSION:
             raise ShadowGradingError("unexpected receipt contract version")
         if row.get("shadow_version")!=SHADOW_VERSION:
             raise ShadowGradingError("unexpected shadow version")
+        if provenance_state=="legacy_pre_provenance":
+            verify_legacy_receipt_integrity(row)
+            audit["legacy_pre_provenance_receipts"]+=1
+            continue
         verify_receipt_integrity(row)
         shadow_id=str(row.get("shadow_id") or "")
         if not shadow_id or shadow_id in seen:
