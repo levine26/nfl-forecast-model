@@ -30,7 +30,7 @@ The exact tested V0.1 engine is reused:
 - short snap-share half-life: 2 games;
 - long snap-share half-life: 8 games;
 - prior equivalent games: 2;
-- multiplier bounds: 0.55 to 1.45;
+- multiplier bounds: 0.20 to 2.00;
 - route level from short snap share / frozen position route prior;
 - target and carry multipliers from short-vs-long snap-share trend;
 - mode: `full`.
