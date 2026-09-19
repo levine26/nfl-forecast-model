@@ -215,16 +215,24 @@ def test_receipt_fails_closed_after_kickoff():
     receipt=module.build_receipt(
         source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
         frozen=frozen,recorded_utc=before,source_workflow_run="1",source_head_sha="b"*40,
+        v1_samples=np.array([40,50,60,70,80],dtype=float),
+        shadow_samples=np.array([42,52,62,72,82],dtype=float),
     )
     assert receipt is not None
     assert receipt["governance"]["production_authorized"] is False
     assert receipt["source_signal_state"]=="WATCH"
     assert receipt["source_data_quality"]["state"]=="HIGH"
     assert receipt["source_data_horizon_utc"]=="2026-09-20T17:59:00+00:00"
+    assert receipt["v1"]["empirical_distribution"]["sample_count"]==5
+    assert sum(receipt["v1"]["empirical_distribution"]["counts"])==5
+    assert receipt["shadow_a"]["empirical_distribution"]["sample_count"]==5
+    assert len(receipt["v1"]["empirical_distribution"]["sha256"])==64
     after=datetime(2026,9,20,21,0,tzinfo=timezone.utc)
     assert module.build_receipt(
         source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
         frozen=frozen,recorded_utc=after,source_workflow_run="1",source_head_sha="b"*40,
+        v1_samples=np.array([40,50,60,70,80],dtype=float),
+        shadow_samples=np.array([42,52,62,72,82],dtype=float),
     ) is None
 
 
@@ -273,6 +281,8 @@ def test_marketless_v1_row_is_ineligible_not_fatal():
         recorded_utc=datetime(2026,9,20,19,0,tzinfo=timezone.utc),
         source_workflow_run="1",
         source_head_sha="b"*40,
+        v1_samples=np.array([40,50,60,70,80],dtype=float),
+        shadow_samples=np.array([42,52,62,72,82],dtype=float),
     )
     assert receipt is None
 
@@ -413,3 +423,15 @@ def test_v1_replay_verification_is_strict():
     drift["market"]["line"]=61.5
     with pytest.raises(module.FootballShadowError,match="market.line"):
         module._assert_replay_matches_source(drift,source)
+
+
+def test_empirical_distribution_snapshot_is_lossless():
+    module=_module()
+    snapshot=module._empirical_distribution_snapshot(
+        np.array([1.0,1.0,2.0,4.0,4.0,4.0])
+    )
+    assert snapshot["sample_count"]==6
+    assert snapshot["support"]==[1.0,2.0,4.0]
+    assert snapshot["counts"]==[2,1,3]
+    assert sum(snapshot["counts"])==snapshot["sample_count"]
+    assert len(snapshot["sha256"])==64
