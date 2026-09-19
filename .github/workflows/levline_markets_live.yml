@@ -41,6 +41,9 @@ on:
     - cron: '20 15,22 * * 4,5,6,1'
     # Denser Sunday snapshots as the main slate approaches and rolls through kickoff.
     - cron: '20 13,16,19,22 * * 0'
+  workflow_run:
+    workflows: ['Sunday Signal Groq media writer']
+    types: [completed]
 
 permissions:
   contents: write
@@ -52,6 +55,10 @@ concurrency:
 
 jobs:
   validate:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -68,9 +75,14 @@ jobs:
           tests/test_props_publication.py
           tests/test_props_market_live.py
           tests/test_props_upstream.py
+          tests/test_props_contextual_intelligence.py
 
   publish:
-    if: github.event_name != 'pull_request'
+    if: >-
+      github.event_name != 'pull_request' &&
+      (github.event_name != 'workflow_run' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main'))
     needs: validate
     runs-on: ubuntu-latest
     env:
@@ -80,6 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
