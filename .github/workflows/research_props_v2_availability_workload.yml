@@ -65,7 +65,17 @@ jobs:
           assert d["prop_outcomes_used_for_fit_or_evaluation"] == 0
           assert d["sportsbook_results_used_for_fit_or_evaluation"] == 0
           assert d["completed_2026_outcomes_used"] == 0
-          assert set(d["by_season"]) == {"2023","2024","2025"}
+          eligible=d["source_qualified_evaluation_seasons"]
+          excluded=d["source_excluded_seasons"]
+          assert len(eligible) >= 2
+          assert set(map(str,eligible)) == set(d["by_season"])
+          assert set(eligible).issubset({2023,2024,2025})
+          assert set(excluded).issubset({"2023","2024","2025"})
+          for season,reason in excluded.items():
+              assert reason["reason"] in {
+                  "no_prior_training_examples",
+                  "no_target_evaluation_examples",
+              }
           assert d["aggregate"]["n"] > 0
           print(json.dumps({
               "aggregate":d["aggregate"],
