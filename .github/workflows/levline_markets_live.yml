@@ -149,21 +149,10 @@ jobs:
               git clean -fd outputs/props/
             fi
 
-            # The audit artifact must describe exactly one generation attempt. A retry may use a
-            # newer main SHA, so clear any superseded attempt before regenerating.
-            rm -rf .artifacts/props-live
-            GENERATION_BASE_SHA=$(git rev-parse HEAD)
-            TRIGGER_HEAD_SHA=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}" --jq '.head_sha')
-            test -n "$GENERATION_BASE_SHA"
-            test -n "$TRIGGER_HEAD_SHA"
-
             PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/run_levline_markets_live.py \
                 --priors config/levline_markets_priors_v1.json \
                 --work-root .artifacts/props-live \
-                --source-workflow-run "${{ github.run_id }}" \
-                --trigger-head-sha "$TRIGGER_HEAD_SHA" \
-                --generation-base-sha "$GENERATION_BASE_SHA" \
                 "${EXTRA_ARGS[@]}" \
                 "${BOOK_ARGS[@]}"
 
