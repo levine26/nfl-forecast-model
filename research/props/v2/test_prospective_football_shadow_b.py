@@ -340,3 +340,31 @@ def test_role_player_audit_preserves_unit_fallback_provenance():
     assert players["P_FALLBACK"]["adjustment"]=={}
     assert players["P_FALLBACK"]["estimate"] is None
     assert players["P_ADJ"]["fallback_to_unit_role"] is False
+
+
+def test_shadow_b_fails_closed_when_strictly_lagged_snap_history_is_unavailable(monkeypatch):
+    module=_module()
+    projection=_projection()
+
+    def unavailable_history(*args, **kwargs):
+        return {}, {
+            "engine_version":"levline-props-dynamic-role-v0.1.0",
+            "mode":"full",
+            "history":{
+                "status":"unavailable",
+                "reason":"no_strictly_lagged_snap_rows",
+            },
+            "fallback_player_ids":[],
+            "estimates":[],
+        }
+
+    monkeypatch.setattr(module,"build_dynamic_role_adjustments",unavailable_history)
+    manifest={"opportunity_projections":[projection,projection]}
+    with pytest.raises(
+        module.FootballShadowBError,
+        match="strictly lagged snap history unavailable",
+    ):
+        module.role_adjustments_for_manifest(
+            manifest,
+            pd.DataFrame([{"player_id":"RB1"}]),
+        )

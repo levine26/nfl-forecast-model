@@ -296,6 +296,11 @@ def role_adjustments_for_manifest(
             snap_counts,current,season=season,week=week,team=team,
             route_prior_means=ROUTE_PRIORS,mode="full",
         )
+        history_audit=role_audit.get("history") if isinstance(role_audit,Mapping) else None
+        if not isinstance(history_audit,Mapping) or history_audit.get("status")!="available":
+            raise FootballShadowBError(
+                f"strictly lagged snap history unavailable for {team}: {history_audit}"
+            )
         updated,transform_audit=transform_opportunity_projection(projection,adjustments)
         transformed.append(updated)
         audit[team]={
