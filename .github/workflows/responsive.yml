@@ -39,6 +39,14 @@ jobs:
           cp outputs/*.json site/public/data/ 2>/dev/null || true
           python scripts/build_public_forecasts.py --output site/public/data/public_forecasts.json
           python scripts/build_public_impact_monitor.py --output site/public/data/impact_monitor.json
+          mkdir -p site/public/data/props21
+          python scripts/build_props21_challenger.py \
+            --input outputs/props/forecasts.json \
+            --previews outputs/game_previews.json \
+            --credential-mode shared_public_demo \
+            --output site/public/data/props21/public_challenger.json \
+            --receipts /tmp/props21_forecast_originals.jsonl \
+            --report /tmp/props21_live_slate_audit.md
       - name: Install dashboard dependencies
         working-directory: site
         run: npm install
