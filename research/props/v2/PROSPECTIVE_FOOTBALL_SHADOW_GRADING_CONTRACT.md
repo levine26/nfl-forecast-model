@@ -31,6 +31,13 @@ Receiving yards:
 
 Only games identified as finalized by the schedule source are graded.
 
+Participation / void policy:
+- stable player identity must resolve in the canonical snap-count source;
+- offense snaps must be **> 0**;
+- zero offensive snaps are excluded as void;
+- missing snap participation remains ungraded until the source is available;
+- a positive-snap player with no qualifying rush/reception grades as 0 yards.
+
 ## Frozen metrics
 
 For rushing yards and receiving yards separately, plus pooled descriptive results:
