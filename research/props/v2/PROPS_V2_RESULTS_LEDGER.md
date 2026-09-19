@@ -107,6 +107,37 @@ are estimated from historical participation trajectories only, season-forward, w
 in the state fit. Proper distribution scoring (empirical CRPS and interval score/coverage) was frozen
 before V2 primary evaluation.
 
+## Dynamic role V2 v0.2 — rejected
+
+All six primary season/mode jobs from workflow `35381482900` completed successfully. The first
+aggregate job failed only because same-named artifact files were flattened; the immutable primary
+artifacts were recovered directly and the workflow was corrected to retain per-artifact directories.
+
+### Route-only V2
+
+- paired N **5,659**, 230 unique games, 307 unique players;
+- challenger accuracy **50.96%** vs V1 **51.02%**;
+- gain **−0.05 pp**;
+- game-clustered 95% interval for accuracy difference approximately **−0.29 to +0.18 pp**;
+- Fair-Line MAE **19.294** vs V1 **19.229**;
+- CRPS **13.8988** vs V1 **13.8455**;
+- 80% interval score **89.802** vs V1 **89.278**.
+
+### Full V2
+
+- paired N **5,659**;
+- challenger accuracy **51.09%** vs V1 **51.03%**;
+- gain **+0.05 pp**;
+- game-clustered 95% interval for accuracy difference approximately **−0.98 to +1.10 pp**;
+- Fair-Line MAE **19.819** vs V1 **19.232**;
+- CRPS **14.3209** vs V1 **13.8481**;
+- 80% interval coverage **71.80%** vs V1 **73.00%**.
+
+**Disposition:** REJECT Dynamic Role V2 V0.2. The latent state-space specification does not improve
+the football distribution and full mode materially degrades it. The favorable small 2025 full
+directional point estimate is not a rescue criterion. Permanent record:
+`DYNAMIC_ROLE_V2_DEVELOPMENT_RESULT.md`.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
