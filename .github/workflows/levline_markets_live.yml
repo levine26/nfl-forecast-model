@@ -50,7 +50,17 @@ permissions:
   actions: write
 
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('levline-props-live-pr-{0}', github.event.pull_request.number) || 'levline-props-live' }}
+  # A completed-but-nonqualifying upstream workflow_run still instantiates this workflow before
+  # the job-level `if` can skip it. Give those ignored events their own group so they cannot
+  # cancel an active live refresh that is already generating/preserving a prospective source artifact.
+  group: >-
+    ${{ github.event_name == 'pull_request'
+        && format('levline-props-live-pr-{0}', github.event.pull_request.number)
+        || (github.event_name == 'workflow_run'
+            && (github.event.workflow_run.conclusion != 'success'
+                || github.event.workflow_run.head_branch != 'main'))
+           && format('levline-props-live-ignored-{0}', github.event.workflow_run.id)
+        || 'levline-props-live' }}
   cancel-in-progress: true
 
 jobs:
