@@ -97,7 +97,26 @@ def run(output_dir: Path) -> dict:
     output_dir.mkdir(parents=True, exist_ok=True)
     frames = []
     per_season = {}
+    source_excluded_seasons = {}
+    eligible_seasons = []
     for season in EVALUATION_SEASONS:
+        prior_n = int((examples["season"].astype(int) < int(season)).sum())
+        target_n = int((examples["season"].astype(int) == int(season)).sum())
+        if prior_n == 0:
+            source_excluded_seasons[str(season)] = {
+                "reason": "no_prior_training_examples",
+                "prior_training_examples": prior_n,
+                "target_examples": target_n,
+            }
+            continue
+        if target_n == 0:
+            source_excluded_seasons[str(season)] = {
+                "reason": "no_target_evaluation_examples",
+                "prior_training_examples": prior_n,
+                "target_examples": target_n,
+            }
+            continue
+        eligible_seasons.append(int(season))
         scored, summary = evaluate_season_forward(
             examples, evaluation_season=season
         )
@@ -110,19 +129,25 @@ def run(output_dir: Path) -> dict:
             encoding="utf-8",
         )
 
+    if len(eligible_seasons) < 2:
+        raise RuntimeError(
+            "availability/workload study requires at least two source-qualified "
+            f"season-forward evaluation seasons; eligible={eligible_seasons}, "
+            f"excluded={source_excluded_seasons}"
+        )
     pooled = pd.concat(frames, ignore_index=True)
     aggregate = _pooled_summary(pooled)
     subgroup = _subgroups(pooled)
     improving_seasons = sum(
         float(per_season[str(season)]["mixture_minus_active_only_mae"]) < 0.0
-        for season in EVALUATION_SEASONS
+        for season in eligible_seasons
     )
     active_brier_delta = float(aggregate["mixture_minus_active_only_brier"])
     development_gate = {
         "aggregate_workload_mae_improved": bool(
             aggregate["mixture_minus_active_only_mae"] < 0.0
         ),
-        "at_least_two_of_three_seasons_improved": bool(improving_seasons >= 2),
+        "at_least_two_source_qualified_seasons_improved": bool(improving_seasons >= 2),
         "active_brier_not_materially_degraded": bool(
             active_brier_delta <= ACTIVE_BRIER_MAX_DEGRADATION
         ),
@@ -131,13 +156,15 @@ def run(output_dir: Path) -> dict:
     }
     development_gate["passed"] = bool(all([
         development_gate["aggregate_workload_mae_improved"],
-        development_gate["at_least_two_of_three_seasons_improved"],
+        development_gate["at_least_two_source_qualified_seasons_improved"],
         development_gate["active_brier_not_materially_degraded"],
     ]))
 
     result = {
         "contract_version": CONTRACT_VERSION,
-        "evaluation_seasons": list(EVALUATION_SEASONS),
+        "requested_evaluation_seasons": list(EVALUATION_SEASONS),
+        "source_qualified_evaluation_seasons": eligible_seasons,
+        "source_excluded_seasons": source_excluded_seasons,
         "source_audit": {
             "injuries": injury_audit,
             "snaps": snap_audit,
@@ -177,7 +204,7 @@ def run(output_dir: Path) -> dict:
         "",
         "## Season-forward",
     ]
-    for season in EVALUATION_SEASONS:
+    for season in eligible_seasons:
         item = per_season[str(season)]
         report.extend([
             "",
