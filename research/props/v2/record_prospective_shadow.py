@@ -148,6 +148,8 @@ def build_shadow_receipt(
     config: Mapping[str, Any],
     *,
     recorded_utc: datetime,
+    source_workflow_run: str,
+    source_head_sha: str,
 ) -> dict[str, Any] | None:
     if recorded_utc.tzinfo is None:
         raise ShadowError("recorded_utc must be timezone-aware")
@@ -155,6 +157,12 @@ def build_shadow_receipt(
 
     source_id = str(row.get("forecast_id") or "").strip()
     prop_type = str(row.get("prop_type") or "").strip()
+    source_run = str(source_workflow_run or "").strip()
+    source_sha = str(source_head_sha or "").strip().lower()
+    if not source_run:
+        raise ShadowError("source_workflow_run is required")
+    if len(source_sha) not in {40, 64} or any(c not in "0123456789abcdef" for c in source_sha):
+        raise ShadowError("source_head_sha must be a git SHA")
     if not source_id or prop_type not in set(config["supported_prop_types"]):
         return None
 
@@ -192,6 +200,8 @@ def build_shadow_receipt(
         "event_type": EVENT_TYPE,
         "shadow_id": shadow_id,
         "recorded_utc": recorded.isoformat(),
+        "source_workflow_run": source_run,
+        "source_head_sha": source_sha,
         "source_forecast_id": source_id,
         "source_forecast_sha256": _sha(source_copy),
         "source_forecast_timestamp_utc": forecast_at.isoformat(),
@@ -240,6 +250,8 @@ def record_shadow_receipts(
     config: Mapping[str, Any],
     ledger: Path,
     *,
+    source_workflow_run: str,
+    source_head_sha: str,
     recorded_utc: datetime | None = None,
 ) -> dict[str, Any]:
     rows = artifact.get("forecasts")
@@ -268,7 +280,13 @@ def record_shadow_receipts(
         if candidate_id and candidate_id in existing_ids:
             skipped_existing += 1
             continue
-        receipt = build_shadow_receipt(row, config, recorded_utc=recorded)
+        receipt = build_shadow_receipt(
+            row,
+            config,
+            recorded_utc=recorded,
+            source_workflow_run=source_workflow_run,
+            source_head_sha=source_head_sha,
+        )
         if receipt is None:
             ineligible += 1
             continue
@@ -279,6 +297,8 @@ def record_shadow_receipts(
     return {
         "contract_version": config["contract_version"],
         "recorded_utc": recorded.astimezone(timezone.utc).isoformat(),
+        "source_workflow_run": str(source_workflow_run),
+        "source_head_sha": str(source_head_sha).lower(),
         "forecast_rows_received": len(rows),
         "eligible_new_shadow_receipts": len(receipts),
         "appended": int(appended),
@@ -296,13 +316,21 @@ def main() -> int:
     parser.add_argument("--forecasts", type=Path, required=True)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--ledger", type=Path, required=True)
+    parser.add_argument("--source-workflow-run", required=True)
+    parser.add_argument("--source-head-sha", required=True)
     args = parser.parse_args()
 
     artifact = json.loads(args.forecasts.read_text(encoding="utf-8"))
     if not isinstance(artifact, dict):
         raise ShadowError("forecast artifact must be a JSON object")
     config = load_config(args.config)
-    result = record_shadow_receipts(artifact, config, args.ledger)
+    result = record_shadow_receipts(
+        artifact,
+        config,
+        args.ledger,
+        source_workflow_run=args.source_workflow_run,
+        source_head_sha=args.source_head_sha,
+    )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 
