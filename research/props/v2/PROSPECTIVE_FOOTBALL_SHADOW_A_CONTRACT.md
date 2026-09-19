@@ -104,6 +104,10 @@ Fail closed unless:
 
 Started games are skipped, never reconstructed later.
 
+Timing is evaluated twice for each game: before simulation and again after simulation immediately
+before receipt creation. The authoritative receipt `recorded_utc` is the post-simulation timestamp.
+If the job crosses kickoff while computing, no receipt may be written for that game.
+
 
 ## No retrospective backfill
 
