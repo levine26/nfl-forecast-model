@@ -300,7 +300,7 @@ def rewrite_reads_with_media(
 
         preview["headline"] = headline
         preview["paragraphs"] = [paragraph1, paragraph2]
-        preview["reported_sources"] = [
+        current_reported_sources = [
             {
                 "source_name": report.get("source_name"),
                 "source_url": report.get("source_url"),
@@ -309,6 +309,12 @@ def rewrite_reads_with_media(
             }
             for report in media[:6]
         ]
+        # Preserve the deterministic current-reporting snapshot independently from
+        # any later provider/Copilot overlay. reported_sources remains the
+        # presentation field for backward compatibility; current_reported_sources
+        # is the machine-readable point-in-time handoff for downstream consumers.
+        preview["current_reported_sources"] = current_reported_sources
+        preview["reported_sources"] = list(current_reported_sources)
         voice = dict(preview.get("editorial_voice") or {})
         voice.update({
             "media_led": bool(media),

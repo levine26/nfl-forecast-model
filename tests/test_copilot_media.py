@@ -96,6 +96,14 @@ def test_newer_reporting_is_advisory_and_does_not_erase_successful_provider_read
                     "as_of": (now - pd.Timedelta(minutes=5)).isoformat(),
                 }
             ],
+            "current_reported_sources": [
+                {
+                    "source_name": "ESPN",
+                    "source_url": "https://www.espn.com/nfl/story/fresh",
+                    "title": "New starter update",
+                    "as_of": (now - pd.Timedelta(minutes=5)).isoformat(),
+                }
+            ],
         }
     }
     result, status = apply_copilot_reads(previews, _predictions(), generated)
@@ -104,6 +112,8 @@ def test_newer_reporting_is_advisory_and_does_not_erase_successful_provider_read
     assert status["advisories"]["2026_01_DEN_KC"] == "newer_reporting_available"
     assert result["2026_01_DEN_KC"]["headline"].startswith("Broncos-Chiefs")
     assert result["2026_01_DEN_KC"]["editorial_voice"]["provider_freshness_advisory"] == "newer_reporting_available"
+    assert result["2026_01_DEN_KC"]["current_reported_sources"][0]["title"] == "New starter update"
+    assert result["2026_01_DEN_KC"]["reported_sources"][0]["title"] == "Mahomes expected to start"
 
 
 def test_old_but_validated_provider_read_is_not_dropped_by_blanket_age_cutoff(tmp_path: Path):
