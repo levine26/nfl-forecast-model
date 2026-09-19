@@ -24,6 +24,7 @@ on:
 
 env:
   EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-archive-exact-source-v0.1.0
+  LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0
 
 jobs:
   test:
@@ -59,7 +60,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Resolve and validate exact source live workflow run
+      - name: Resolve exact source live workflow run
         id: source
         run: |
           set -euo pipefail
@@ -72,7 +73,7 @@ jobs:
           META=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID")
           NAME=$(printf '%s' "$META" | jq -r '.name')
           BRANCH=$(printf '%s' "$META" | jq -r '.head_branch')
-          SHA=$(printf '%s' "$META" | jq -r '.head_sha')
+          TRIGGER_SHA=$(printf '%s' "$META" | jq -r '.head_sha')
           CONCLUSION=$(printf '%s' "$META" | jq -r '.conclusion')
           if [ "$NAME" != "LevLine Props live refresh" ]; then
             echo "::error::source run is not LevLine Props live refresh: $NAME"
@@ -82,33 +83,62 @@ jobs:
             echo "::error::source run must be successful on main; branch=$BRANCH conclusion=$CONCLUSION"
             exit 1
           fi
-          WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_market_archive.yml?ref=$SHA" | jq -r '.content // empty')
-          if [ -z "$WORKFLOW_B64" ] || ! printf '%s' "$WORKFLOW_B64" | base64 -d | grep -Fq 'EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-archive-exact-source-v0.1.0'; then
-            echo "::error::source run predates the exact-source market archive listener; retrospective backfill is prohibited"
-            exit 1
-          fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
-          echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "trigger_head_sha=$TRIGGER_SHA" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.source.outputs.head_sha }}
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Download exact source live audit artifact
+      - name: Download and validate exact live source provenance
+        id: artifact
         run: |
           set -euo pipefail
           rm -rf /tmp/props-live-artifacts
           mkdir -p /tmp/props-live-artifacts
           gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
-          if ! find /tmp/props-live-artifacts -name market.json -print -quit | grep -q .; then
-            echo "::error::Source live run did not contain market.json."
+          mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
+          mapfile -t MARKETS < <(find /tmp/props-live-artifacts -name market.json -type f | sort)
+          if [ "${#PROVENANCE[@]}" -ne 1 ] || [ "${#MARKETS[@]}" -ne 1 ]; then
+            echo "::error::market archive source must contain exactly one source_provenance.json and market.json"
             exit 1
           fi
+
+          PROV="${PROVENANCE[0]}"
+          CONTRACT=$(jq -r '.contract_version // empty' "$PROV")
+          PROV_RUN=$(jq -r '.source_workflow_run // empty' "$PROV")
+          PROV_TRIGGER=$(jq -r '.trigger_head_sha // empty' "$PROV")
+          GENERATION_SHA=$(jq -r '.generation_base_sha // empty' "$PROV")
+          PROVIDER=$(jq -r '.market_provider // empty' "$PROV")
+          CREDENTIAL_MODE=$(jq -r '.market_credential_mode // empty' "$PROV")
+          EXPECTED_MARKET_SHA=$(jq -r '.market_snapshot_sha256 // empty' "$PROV")
+          ACTUAL_MARKET_SHA=$(sha256sum "${MARKETS[0]}" | awk '{print $1}')
+          PROVENANCE_SHA=$(sha256sum "$PROV" | awk '{print $1}')
+
+          [ "$CONTRACT" = "$LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION" ] || { echo "::error::unexpected live source provenance contract"; exit 1; }
+          [ "$PROV_RUN" = "${{ steps.source.outputs.run_id }}" ] || { echo "::error::market archive source run provenance mismatch"; exit 1; }
+          [ "$PROV_TRIGGER" = "${{ steps.source.outputs.trigger_head_sha }}" ] || { echo "::error::market archive trigger SHA provenance mismatch"; exit 1; }
+          [[ "$GENERATION_SHA" =~ ^[0-9a-f]{40}$|^[0-9a-f]{64}$ ]] || { echo "::error::invalid market archive generation SHA"; exit 1; }
+          [ -n "$PROVIDER" ] && [ -n "$CREDENTIAL_MODE" ] || { echo "::error::market archive source missing provider/mode"; exit 1; }
+          [ "$EXPECTED_MARKET_SHA" = "$ACTUAL_MARKET_SHA" ] || { echo "::error::market archive source market SHA mismatch"; exit 1; }
+
+          for SHA in "${{ steps.source.outputs.trigger_head_sha }}" "$GENERATION_SHA"; do
+            WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_market_archive.yml?ref=$SHA" | jq -r '.content // empty')
+            if [ -z "$WORKFLOW_B64" ] || ! printf '%s' "$WORKFLOW_B64" | base64 -d | grep -Fq 'LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0'; then
+              echo "::error::source SHA predates the live-source-provenance market archive listener: $SHA"
+              exit 1
+            fi
+          done
+
+          echo "generation_sha=$GENERATION_SHA" >> "$GITHUB_OUTPUT"
+          echo "market_provider=$PROVIDER" >> "$GITHUB_OUTPUT"
+          echo "market_credential_mode=$CREDENTIAL_MODE" >> "$GITHUB_OUTPUT"
+          echo "provenance_sha256=$PROVENANCE_SHA" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.artifact.outputs.generation_sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Restore full append-only market archive
         run: |
@@ -126,7 +156,7 @@ jobs:
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
-          python research/props/v2/archive_live_prop_market.py             --artifact-root /tmp/props-live-artifacts             --output-dir "$DATA_DIR"             --manifest "$DATA_DIR/manifest.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --source-head-sha "${{ steps.source.outputs.head_sha }}"             --status "$DATA_DIR/last_archive_status.json"
+          python research/props/v2/archive_live_prop_market.py             --artifact-root /tmp/props-live-artifacts             --output-dir "$DATA_DIR"             --manifest "$DATA_DIR/manifest.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --source-head-sha "${{ steps.artifact.outputs.generation_sha }}"             --source-trigger-head-sha "${{ steps.source.outputs.trigger_head_sha }}"             --source-market-provider "${{ steps.artifact.outputs.market_provider }}"             --source-market-credential-mode "${{ steps.artifact.outputs.market_credential_mode }}"             --source-provenance-sha256 "${{ steps.artifact.outputs.provenance_sha256 }}"             --status "$DATA_DIR/last_archive_status.json"
 
       - name: Derive preregistered PIT horizons from accumulated captures
         run: |
