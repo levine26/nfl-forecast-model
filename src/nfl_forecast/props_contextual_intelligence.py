@@ -10,22 +10,35 @@ The adapter never parses betting recommendations, probabilities, or completed-ga
 outcomes. Ambiguous/stale reporting fails closed.
 """
 
-from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta, timezone
+import math
 import re
 from typing import Any, Mapping
-from urllib.parse import urlparse
+from urllib.parse import quote_plus, urlparse
 
 import pandas as pd
+import requests
 
+from .media_context import (
+    BING_NEWS_RSS,
+    GOOGLE_NEWS_RSS,
+    _fetch_feed as _levline_fetch_feed,
+    _is_low_trust_source as _levline_is_low_trust_source,
+    _source_priority as _levline_source_priority,
+    _team_name as _levline_team_name,
+)
 from .props_player_state import normalize_player_name, normalize_team_code
+from .source_policy import OFFICIAL_TEAM_MEDIA_DOMAINS
 
 MAX_MEDIA_AGE_HOURS = 6.0
+MAX_LIVE_STARTER_REPORT_AGE_HOURS = 72.0
 
 _CONFIRMED_PATTERNS = (
     r"\bwill start\b",
     r"\bis starting\b",
     r"\bwill be (?:the )?(?:starting quarterback|starter)\b",
-    r"\bnamed (?:the )?(?:starting quarterback|starter)\b",
+    r"\bnamed (?:the )?(?:starting quarterback|starting qb|starter)\b",
     r"\bconfirmed (?:that )?.{0,40}\b(?:will start|is starting)\b",
 )
 
