@@ -2,8 +2,8 @@ from __future__ import annotations
 
 """Live/offline sportsbook capture orchestration for LevLine Props Research Beta.
 
-The pure builder accepts already captured provider payloads. The optional network client
-fetches The Odds API only when the caller explicitly supplies an authorized API key.
+The pure builder accepts already captured provider payloads. Live capture supports
+authorized sportsbook providers with deterministic failover and explicit provenance.
 No credential is serialized, logged, or written to artifacts.
 """
 
@@ -24,6 +24,7 @@ from .props_player_state import normalize_player_name, normalize_team_code
 SNAPSHOT_CONTRACT_VERSION = "levline-props-market-snapshot-v0.1"
 SPORT_KEY = "americanfootball_nfl"
 API_BASE = "https://api.the-odds-api.com/v4"
+PROPLINE_API_BASE = "https://api.prop-line.com/v1"
 DEFAULT_REGIONS = "us"
 DEFAULT_ODDS_FORMAT = "american"
 KICKOFF_TOLERANCE_SECONDS = 30 * 60
@@ -326,6 +327,35 @@ def build_market_snapshot(
     }
 
 
+def _request_provider_json(
+    path: str,
+    *,
+    api_key: str,
+    api_base: str,
+    provider_label: str,
+    params: Mapping[str, object] | None = None,
+    timeout_seconds: float = 20.0,
+) -> object:
+    if not str(api_key or "").strip():
+        raise PropsMarketLiveError(f"authorized {provider_label} key is required")
+    query = {"apiKey": api_key, **{k: v for k, v in (params or {}).items() if v is not None}}
+    url = f"{api_base}{path}?{urlencode(query)}"
+    request = Request(url, headers={"User-Agent": "LevLine-Props-Research-Beta/0.1"})
+    try:
+        with urlopen(request, timeout=timeout_seconds) as response:
+            payload = response.read()
+    except HTTPError as exc:
+        raise PropsMarketLiveError(
+            f"{provider_label} request failed for {path} with HTTP {exc.code}"
+        ) from exc
+    except URLError as exc:
+        raise PropsMarketLiveError(f"{provider_label} request failed for {path}") from exc
+    try:
+        return json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise PropsMarketLiveError(f"{provider_label} returned invalid JSON for {path}") from exc
+
+
 def _provider_get_json(
     path: str,
     *,
@@ -333,24 +363,31 @@ def _provider_get_json(
     params: Mapping[str, object] | None = None,
     timeout_seconds: float = 20.0,
 ) -> object:
-    if not str(api_key or "").strip():
-        raise PropsMarketLiveError("authorized The Odds API key is required")
-    query = {"apiKey": api_key, **{k: v for k, v in (params or {}).items() if v is not None}}
-    url = f"{API_BASE}{path}?{urlencode(query)}"
-    request = Request(url, headers={"User-Agent": "LevLine-Props-Research-Beta/0.1"})
-    try:
-        with urlopen(request, timeout=timeout_seconds) as response:
-            payload = response.read()
-    except HTTPError as exc:
-        raise PropsMarketLiveError(
-            f"The Odds API request failed for {path} with HTTP {exc.code}"
-        ) from exc
-    except URLError as exc:
-        raise PropsMarketLiveError(f"The Odds API request failed for {path}") from exc
-    try:
-        return json.loads(payload.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise PropsMarketLiveError(f"The Odds API returned invalid JSON for {path}") from exc
+    return _request_provider_json(
+        path,
+        api_key=api_key,
+        api_base=API_BASE,
+        provider_label="The Odds API",
+        params=params,
+        timeout_seconds=timeout_seconds,
+    )
+
+
+def _propline_get_json(
+    path: str,
+    *,
+    api_key: str,
+    params: Mapping[str, object] | None = None,
+    timeout_seconds: float = 20.0,
+) -> object:
+    return _request_provider_json(
+        path,
+        api_key=api_key,
+        api_base=PROPLINE_API_BASE,
+        provider_label="PropLine",
+        params=params,
+        timeout_seconds=timeout_seconds,
+    )
 
 
 def fetch_live_nfl_prop_events(
@@ -360,23 +397,43 @@ def fetch_live_nfl_prop_events(
     regions: str = DEFAULT_REGIONS,
     bookmakers: str | None = None,
     timeout_seconds: float = 20.0,
+    provider: str = "the_odds_api",
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Fetch only canonical-slate NFL events, then request supported prop markets per event."""
+    """Fetch canonical-slate NFL events and supported props from one authorized provider."""
+
+    if provider == "the_odds_api":
+        getter = _provider_get_json
+        discovery_params: dict[str, object] = {"dateFormat": "iso"}
+        odds_params = {
+            "regions": regions,
+            "markets": ",".join(sorted(DEFAULT_MARKET_MAP)),
+            "oddsFormat": DEFAULT_ODDS_FORMAT,
+            "dateFormat": "iso",
+            "bookmakers": bookmakers,
+        }
+    elif provider == "propline":
+        getter = _propline_get_json
+        discovery_params = {}
+        odds_params = {
+            "markets": ",".join(sorted(DEFAULT_MARKET_MAP)),
+            "bookmakers": bookmakers,
+        }
+    else:
+        raise PropsMarketLiveError(f"unsupported live Props market provider: {provider}")
 
     game_directory = _game_directory(player_state_rows)
-    raw_events = _provider_get_json(
+    raw_events = getter(
         f"/sports/{SPORT_KEY}/events",
         api_key=api_key,
-        params={"dateFormat": "iso"},
+        params=discovery_params,
         timeout_seconds=timeout_seconds,
     )
     if not isinstance(raw_events, list):
-        raise PropsMarketLiveError("The Odds API events response must be a list")
+        raise PropsMarketLiveError(f"{provider} events response must be a list")
 
     matched_events: list[dict[str, Any]] = []
     event_odds: list[dict[str, Any]] = []
     discovery_unmatched: list[dict[str, Any]] = []
-    market_keys = ",".join(sorted(DEFAULT_MARKET_MAP))
 
     for event in raw_events:
         if not isinstance(event, Mapping):
@@ -397,26 +454,20 @@ def fetch_live_nfl_prop_events(
             )
             continue
         matched_events.append(dict(event))
-        payload = _provider_get_json(
+        payload = getter(
             f"/sports/{SPORT_KEY}/events/{event_id}/odds",
             api_key=api_key,
-            params={
-                "regions": regions,
-                "markets": market_keys,
-                "oddsFormat": DEFAULT_ODDS_FORMAT,
-                "dateFormat": "iso",
-                "bookmakers": bookmakers,
-            },
+            params=odds_params,
             timeout_seconds=timeout_seconds,
         )
         if not isinstance(payload, Mapping):
             raise PropsMarketLiveError(
-                f"The Odds API event odds response must be an object for event {event_id}"
+                f"{provider} event odds response must be an object for event {event_id}"
             )
         event_odds.append(dict(payload))
 
     raw_bundle = {
-        "provider": "the_odds_api",
+        "provider": provider,
         "sport_key": SPORT_KEY,
         "discovery_event_count": len(raw_events),
         "matched_discovery_events": matched_events,
@@ -425,6 +476,54 @@ def fetch_live_nfl_prop_events(
     }
     return event_odds, raw_bundle
 
+
+def fetch_live_nfl_prop_events_with_fallback(
+    *,
+    player_state_rows: Sequence[Mapping[str, Any]],
+    the_odds_api_key: str = "",
+    propline_api_key: str = "",
+    regions: str = DEFAULT_REGIONS,
+    bookmakers: str | None = None,
+    timeout_seconds: float = 20.0,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Use The Odds API first, then PropLine, preserving fail-closed audit provenance."""
+
+    attempts: list[dict[str, Any]] = []
+    configured = [
+        ("the_odds_api", str(the_odds_api_key or "").strip()),
+        ("propline", str(propline_api_key or "").strip()),
+    ]
+    if not any(key for _, key in configured):
+        raise PropsMarketLiveError(
+            "live Props market capture requires The Odds API or PropLine credential"
+        )
+
+    errors: list[str] = []
+    for provider, api_key in configured:
+        if not api_key:
+            attempts.append({"provider": provider, "status": "not_configured"})
+            continue
+        try:
+            events, raw_bundle = fetch_live_nfl_prop_events(
+                player_state_rows=player_state_rows,
+                api_key=api_key,
+                regions=regions,
+                bookmakers=bookmakers,
+                timeout_seconds=timeout_seconds,
+                provider=provider,
+            )
+        except PropsMarketLiveError as exc:
+            detail = str(exc)
+            attempts.append({"provider": provider, "status": "failed", "detail": detail})
+            errors.append(f"{provider}: {detail}")
+            continue
+
+        attempts.append({"provider": provider, "status": "selected"})
+        return events, {**raw_bundle, "provider_attempts": attempts}
+
+    raise PropsMarketLiveError(
+        "all configured live Props market providers failed: " + "; ".join(errors)
+    )
 
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
