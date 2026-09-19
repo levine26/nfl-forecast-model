@@ -537,6 +537,43 @@ def test_live_provider_fallback_selects_propline_after_primary_failure(monkeypat
     ]
 
 
+def test_live_provider_fallback_uses_public_propline_demo_when_secrets_missing(monkeypatch):
+    calls = []
+    fallback_event = _event()
+    fallback_event["id"] = "pl-demo-evt-ari-lar"
+
+    def demo_get(path, *, api_key, params=None, timeout_seconds=20.0):
+        calls.append((path, api_key))
+        assert api_key == live.PROPLINE_PUBLIC_DEMO_KEY
+        if path.endswith("/events"):
+            return [
+                {
+                    "id": "pl-demo-evt-ari-lar",
+                    "home_team": "Arizona Cardinals",
+                    "away_team": "Los Angeles Rams",
+                    "commence_time": KICKOFF,
+                }
+            ]
+        return fallback_event
+
+    monkeypatch.setattr(live, "_propline_get_json", demo_get)
+
+    events, raw = live.fetch_live_nfl_prop_events_with_fallback(
+        player_state_rows=_player_state(),
+    )
+
+    assert len(events) == 1
+    assert raw["provider"] == "propline"
+    assert raw["credential_mode"] == "shared_public_demo"
+    assert raw["provider_attempts"] == [
+        {"provider": "the_odds_api", "status": "not_configured"},
+        {"provider": "propline", "status": "not_configured"},
+        {"provider": "sportsgameodds", "status": "not_configured"},
+        {"provider": "propline_demo", "status": "selected"},
+    ]
+    assert len(calls) == 2
+
+
 def test_live_provider_fallback_fails_closed_when_all_configured_sources_fail(monkeypatch):
     monkeypatch.setattr(
         live,
