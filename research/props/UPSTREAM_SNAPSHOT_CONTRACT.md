@@ -100,10 +100,10 @@ The script:
 4. loads the validated shared LevLine media artifact unless `--skip-levline-media` is specified;
 5. timestamps the forecast only after live source requests complete;
 6. builds canonical current player state, resolves an availability-aware QB depth fallback, and applies only qualified fresh shared-media starter evidence;
-6. derives strictly lagged opportunity/efficiency history;
-7. fits efficiency priors only through 2025 and derives current scoring-volume state from strictly prior weeks unless explicit preregistered overrides are supplied;
-8. executes the actual opportunity and efficiency/TD lane interfaces;
-9. writes immutable create-only artifacts.
+7. derives strictly lagged opportunity/efficiency history;
+8. fits efficiency priors only through 2025 and derives current scoring-volume state from strictly prior weeks unless explicit preregistered overrides are supplied;
+9. executes the actual opportunity and efficiency/TD lane interfaces;
+10. writes immutable create-only artifacts.
 
 Output files include:
 
