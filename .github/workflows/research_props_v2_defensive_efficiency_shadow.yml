@@ -29,20 +29,23 @@ jobs:
         run: |
           python research/props/v2/freeze_defensive_efficiency_shadow.py \
             --output research_outputs/props_v2/defensive_efficiency_shadow/frozen_coefficients.json
-      - name: Enforce prospective firewall
+      - name: Enforce prospective firewall and immutable coefficient lock
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          d=json.loads(Path("research_outputs/props_v2/defensive_efficiency_shadow/frozen_coefficients.json").read_text())
-          assert d["contract_version"]=="levline-props-v2-defensive-efficiency-shadow-v0.1.0"
-          assert d["trained_through_season"]==2025
-          assert d["completed_2026_outcomes_used"]==0
-          assert d["prop_outcomes_used"]==0
-          assert d["sportsbook_results_used"]==0
-          assert d["production_authorized"] is False
-          assert set(d["fits"])=={"rushing","receiving"}
-          print(json.dumps(d,indent=2,sort_keys=True))
+          generated=json.loads(Path("research_outputs/props_v2/defensive_efficiency_shadow/frozen_coefficients.json").read_text())
+          frozen=json.loads(Path("research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json").read_text())
+          assert generated["contract_version"]=="levline-props-v2-defensive-efficiency-shadow-v0.1.0"
+          assert generated["trained_through_season"]==2025
+          assert generated["completed_2026_outcomes_used"]==0
+          assert generated["prop_outcomes_used"]==0
+          assert generated["sportsbook_results_used"]==0
+          assert generated["production_authorized"] is False
+          assert set(generated["fits"])=={"rushing","receiving"}
+          for key in ("contract_version","component_contract_version","trained_through_season","history_start_season","fit_population","fits","completed_2026_outcomes_used","prop_outcomes_used","sportsbook_results_used","production_authorized"):
+              assert generated[key]==frozen[key], f"frozen coefficient drift in {key}"
+          print(json.dumps(frozen,indent=2,sort_keys=True))
           PY
       - uses: actions/upload-artifact@v4
         with:
