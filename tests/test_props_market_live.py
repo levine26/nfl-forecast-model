@@ -344,6 +344,183 @@ def test_live_provider_fallback_selects_propline_after_primary_failure(monkeypat
     ]
 
 
+def _draftkings_root():
+    unrelated_market = {
+        "label": "Passing Yards",
+        "outcomes": [
+            {
+                "label": "Over",
+                "participant": "Josh Allen",
+                "line": 260.5,
+                "oddsAmerican": -110,
+            },
+            {
+                "label": "Under",
+                "participant": "Josh Allen",
+                "line": 260.5,
+                "oddsAmerican": -110,
+            },
+        ],
+    }
+    passing_market = {
+        "label": "Passing Yards",
+        "outcomes": [
+            {
+                "label": "Over",
+                "participant": "Kyler Murray",
+                "line": 244.5,
+                "oddsAmerican": -105,
+            },
+            {
+                "label": "Under",
+                "participant": "Kyler Murray",
+                "line": 244.5,
+                "oddsAmerican": -115,
+            },
+        ],
+    }
+    receptions_market = {
+        "label": "Receptions",
+        "outcomes": [
+            {
+                "label": "Over",
+                "participant": "Example Receiver",
+                "line": 5.5,
+                "oddsAmerican": -120,
+            },
+            {
+                "label": "Under",
+                "participant": "Example Receiver",
+                "line": 5.5,
+                "oddsAmerican": 100,
+            },
+        ],
+    }
+    return {
+        "eventGroup": {
+            "events": [
+                {
+                    "eventId": "dk-other",
+                    "homeTeam": "Miami Dolphins",
+                    "awayTeam": "Buffalo Bills",
+                    "startDate": KICKOFF,
+                },
+                {
+                    "eventId": "dk-ari-lar",
+                    "homeTeam": "Arizona Cardinals",
+                    "awayTeam": "Los Angeles Rams",
+                    "startDate": KICKOFF,
+                },
+            ],
+            "offerCategories": [
+                {
+                    "name": "Passing Props",
+                    "offerSubcategoryDescriptors": [
+                        {
+                            "offerSubcategory": {
+                                "name": "Player Passing Yards",
+                                "offers": [
+                                    [unrelated_market],
+                                    [passing_market],
+                                ],
+                            }
+                        }
+                    ],
+                },
+                {
+                    "name": "Receiving Props",
+                    "offerSubcategoryDescriptors": [
+                        {
+                            "offerSubcategory": {
+                                "name": "Player Receptions",
+                                "offers": [
+                                    [],
+                                    [receptions_market],
+                                ],
+                            }
+                        }
+                    ],
+                },
+            ],
+        }
+    }
+
+
+def test_draftkings_public_normalizes_canonical_two_sided_props(monkeypatch):
+    root = _draftkings_root()
+    source_url = (
+        "https://sportsbook.draftkings.com/sites/US-SB/api/v5/"
+        "eventgroups/88808?format=json"
+    )
+    monkeypatch.setattr(
+        live,
+        "_draftkings_public_get_json",
+        lambda **kwargs: (root, source_url),
+    )
+
+    events, raw = live.fetch_live_nfl_prop_events_draftkings(
+        player_state_rows=_player_state()
+    )
+
+    assert raw["provider"] == "draftkings_public"
+    assert raw["source_url"] == source_url
+    assert len(events) == 1
+    event = events[0]
+    assert event["id"] == "dk-ari-lar"
+    markets = {
+        market["key"]: market
+        for market in event["bookmakers"][0]["markets"]
+    }
+    assert set(markets) == {"player_pass_yds", "player_receptions"}
+    passing = markets["player_pass_yds"]["outcomes"]
+    assert {row["name"] for row in passing} == {"Over", "Under"}
+    assert {row["description"] for row in passing} == {"Kyler Murray"}
+    assert {row["point"] for row in passing} == {244.5}
+
+    snapshot = live.build_market_snapshot(
+        player_state_rows=_player_state(),
+        provider_events=events,
+        captured_at_utc=CAPTURE,
+        provider="draftkings_public",
+    )
+    by_key = {
+        (row["player_id"], row["prop_type"]): row
+        for row in snapshot["market_artifacts"]
+    }
+    assert by_key[("QB1", "passing_yards")]["consensus_line"] == 244.5
+    assert by_key[("WR1", "receptions")]["consensus_line"] == 5.5
+
+
+def test_live_provider_fallback_selects_draftkings_without_secondary_key(monkeypatch):
+    def primary_fail(*args, **kwargs):
+        raise live.PropsMarketLiveError("primary unauthorized")
+
+    monkeypatch.setattr(live, "_provider_get_json", primary_fail)
+    monkeypatch.setattr(
+        live,
+        "_draftkings_public_get_json",
+        lambda **kwargs: (_draftkings_root(), "https://draftkings.example/nfl"),
+    )
+
+    events, raw = live.fetch_live_nfl_prop_events_with_fallback(
+        player_state_rows=_player_state(),
+        the_odds_api_key="bad-primary",
+        propline_api_key="",
+    )
+
+    assert events
+    assert raw["provider"] == "draftkings_public"
+    assert raw["provider_attempts"] == [
+        {
+            "provider": "the_odds_api",
+            "status": "failed",
+            "detail": "primary unauthorized",
+        },
+        {"provider": "propline", "status": "not_configured"},
+        {"provider": "draftkings_public", "status": "selected"},
+    ]
+
+
 def test_live_provider_fallback_fails_closed_when_all_configured_sources_fail(monkeypatch):
     monkeypatch.setattr(
         live,
@@ -359,8 +536,15 @@ def test_live_provider_fallback_fails_closed_when_all_configured_sources_fail(mo
             live.PropsMarketLiveError("fallback unavailable")
         ),
     )
+    monkeypatch.setattr(
+        live,
+        "fetch_live_nfl_prop_events_draftkings",
+        lambda **kwargs: (_ for _ in ()).throw(
+            live.PropsMarketLiveError("draftkings unavailable")
+        ),
+    )
 
-    with pytest.raises(live.PropsMarketLiveError, match="all configured"):
+    with pytest.raises(live.PropsMarketLiveError, match="all live Props"):
         live.fetch_live_nfl_prop_events_with_fallback(
             player_state_rows=_player_state(),
             the_odds_api_key="primary",
