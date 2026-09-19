@@ -476,3 +476,29 @@ def test_legacy_pre_provenance_receipt_is_preserved_but_excluded(tmp_path):
         "provenance_eligible_receipts":0,
         "legacy_pre_provenance_receipts":1,
     }
+
+
+def test_corrupted_legacy_pre_provenance_receipt_fails_closed(tmp_path):
+    module=_module()
+    row={
+        "contract_version":module.RECEIPT_CONTRACT_VERSION,
+        "shadow_version":module.SHADOW_VERSION,
+        "shadow_id":"legacy-corrupt",
+        "source_forecast_sha256":"a"*64,
+        "source_manifest_sha256":"b"*64,
+        "source_season":2026,
+        "source_week":2,
+        "source_workflow_run":"35428763144",
+        "source_head_sha":"c"*40,
+        "recorded_utc":"2026-09-19T07:22:52+00:00",
+        "source_forecast_timestamp_utc":"2026-09-19T07:19:42+00:00",
+        "source_market_captured_utc":"2026-09-19T07:19:42+00:00",
+        "kickoff_utc":"2026-09-20T20:00:00+00:00",
+        "prop_type":"rushing_yards",
+    }
+    row["shadow_sha256"]=module._sha(row)
+    row["source_week"]=3
+    path=tmp_path/"legacy-corrupt.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowGradingError,match="legacy prospective receipt SHA-256 mismatch"):
+        module.read_receipts_with_audit(path)
