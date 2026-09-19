@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -17,6 +18,7 @@ from nfl_forecast.props_opportunity import (
 
 ROOT=Path(__file__).resolve().parents[3]
 SCRIPT=ROOT/"research"/"props"/"v2"/"record_prospective_football_shadow_b.py"
+FROZEN=ROOT/"research"/"props"/"v2"/"DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json"
 
 
 def _module():
@@ -236,3 +238,74 @@ def test_shadow_b_transform_matches_canonical_opportunity_engine():
                 assert left_routes[pid].get(field)==pytest.approx(
                     right_routes[pid].get(field),abs=1e-12
                 )
+
+
+def test_shadow_b_receipt_uses_explicit_capture_timestamps():
+    module=_module()
+    frozen=module.load_frozen_coefficients(FROZEN)
+    source={
+        "forecast_id":"f-b",
+        "game_id":"G1",
+        "player_id":"P1",
+        "player":"Player",
+        "position":"RB",
+        "team":"ARI",
+        "opponent":"LAR",
+        "prop_type":"rushing_yards",
+        "kickoff_utc":"2026-09-20T20:00:00+00:00",
+        "forecast_timestamp_utc":"2026-09-20T18:00:00+00:00",
+        "market":{
+            "captured_utc":"2026-09-20T18:05:00+00:00",
+            "line":60.5,
+            "no_vig_over_probability":0.51,
+            "over_price_american":-110,
+            "under_price_american":-110,
+        },
+        "model":{
+            "version":"V1",
+            "fair_line":62.0,
+            "over_probability":0.54,
+            "under_probability":0.46,
+            "standard_deviation":20.0,
+            "prediction_interval":{"low":30.0,"high":90.0,"coverage":0.8},
+        },
+    }
+    shadow={
+        **source,
+        "model":{
+            **source["model"],
+            "version":module.SHADOW_VERSION,
+            "fair_line":63.0,
+        },
+    }
+    defense={
+        "P1":{
+            "base_rushing_yards_per_carry":4.2,
+            "shadow_rushing_yards_per_carry":4.4,
+            "rushing_defense_state":{"opponent_defense_delta":0.2},
+            "base_receiving_yards_per_reception":10.0,
+            "shadow_receiving_yards_per_reception":10.1,
+            "receiving_defense_state":{"opponent_defense_delta":0.1},
+        }
+    }
+    started=datetime(2026,9,20,18,30,tzinfo=timezone.utc)
+    recorded=datetime(2026,9,20,19,0,tzinfo=timezone.utc)
+    receipt=module.build_receipt(
+        source=source,
+        shadow=shadow,
+        manifest={"manifest_sha256":"a"*64},
+        defense_player_audit=defense,
+        role_player_audit={},
+        frozen=frozen,
+        capture_started_utc=started,
+        recorded_utc=recorded,
+        source_workflow_run="1",
+        source_head_sha="b"*40,
+        v1_samples=np.array([40,50,60,70],dtype=float),
+        shadow_samples=np.array([42,52,62,72],dtype=float),
+    )
+    assert receipt is not None
+    assert receipt["capture_started_utc"]==started.isoformat()
+    assert receipt["capture_completed_utc"]==recorded.isoformat()
+    assert receipt["recorded_utc"]==recorded.isoformat()
+    assert receipt["governance"]["production_authorized"] is False
