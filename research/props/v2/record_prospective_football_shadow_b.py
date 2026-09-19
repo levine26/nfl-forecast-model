@@ -177,8 +177,14 @@ def transform_opportunity_projection(
     if not isinstance(captured_carry,Mapping):
         raise FootballShadowBError("missing designed carry distribution")
     carry_ids=[str(x) for x in captured_carry.get("player_ids",[])]
-    carry_base=_ordered(base_players,carry_ids)
-    carry_dynamic=_ordered(dynamic_players,carry_ids)
+    carry_base=base_players[
+        base_players["position"].isin(["QB","RB","FB","WR"])
+    ].copy().reset_index(drop=True)
+    carry_dynamic=dynamic_players[
+        dynamic_players["position"].isin(["QB","RB","FB","WR"])
+    ].copy().reset_index(drop=True)
+    if not carry_ids:
+        raise FootballShadowBError("captured carry distribution has no active player IDs")
     if "carry_history_effective_opportunities" not in carry_base.columns:
         raise FootballShadowBError("carry history evidence missing from captured projection")
     carry_alpha=(
@@ -203,8 +209,14 @@ def transform_opportunity_projection(
     if not isinstance(captured_target,Mapping):
         raise FootballShadowBError("missing target distribution")
     target_ids=[str(x) for x in captured_target.get("player_ids",[])]
-    target_base=_ordered(base_players,target_ids)
-    target_dynamic=_ordered(dynamic_players,target_ids)
+    target_base=base_players[
+        base_players["position"].isin(["RB","FB","WR","TE"])
+    ].copy().reset_index(drop=True)
+    target_dynamic=dynamic_players[
+        dynamic_players["position"].isin(["RB","FB","WR","TE"])
+    ].copy().reset_index(drop=True)
+    if not target_ids:
+        raise FootballShadowBError("captured target distribution has no active player IDs")
     if "target_history_effective_opportunities" not in target_base.columns:
         raise FootballShadowBError("target history evidence missing from captured projection")
     target_alpha=(
@@ -232,9 +244,9 @@ def transform_opportunity_projection(
     baseline_participation=route_info.get("baseline_participation")
     if not isinstance(baseline_participation,Mapping):
         raise FootballShadowBError("captured route baseline participation missing")
-    route_ids=target_ids
-    route_base=_ordered(base_players,route_ids)
-    route_dynamic=_ordered(dynamic_players,route_ids)
+    route_base=target_base.copy().reset_index(drop=True)
+    route_dynamic=target_dynamic.copy().reset_index(drop=True)
+    route_ids=route_base["player_id"].astype(str).tolist()
     if "route_history_effective_dropbacks" not in route_base.columns:
         raise FootballShadowBError("route history evidence missing from captured projection")
     try:
@@ -258,8 +270,10 @@ def transform_opportunity_projection(
 
     audit.update({
         "baseline_reconstruction_verified":True,
-        "carry_player_count":len(carry_ids),
-        "target_player_count":len(target_ids),
+        "carry_active_player_count":len(carry_ids),
+        "carry_eligible_player_count":len(carry_base),
+        "target_active_player_count":len(target_ids),
+        "target_eligible_player_count":len(target_base),
         "route_player_count":len(route_ids),
     })
     return out,audit
