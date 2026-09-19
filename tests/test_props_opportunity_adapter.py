@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from nfl_forecast.props_opportunity import _player_beta_posterior
+from nfl_forecast.props_opportunity import _player_beta_posterior, _primary_qb
 from nfl_forecast.props_opportunity_adapter import (
     current_players_from_canonical_state,
     prepare_player_history_for_opportunity,
@@ -83,6 +83,33 @@ def test_adapter_preserves_explicit_states_and_beta_uncertainty():
     assert out.loc["WR1", "availability_probability"] == pytest.approx(0.6)
     assert out.loc["WR1", "availability_uncertainty"] > 0
     assert str(out.loc["WR1", "availability_prior_source"]).startswith("explicit_beta_prior")
+
+
+def test_out_historical_primary_cannot_remain_primary_qb():
+    state = _state()
+    state.loc[state["player_id"].eq("QB1"), "expected_active_state"] = "OUT"
+
+    out = current_players_from_canonical_state(
+        state,
+        game_id="2026_03_LA_ARI",
+        team="ARI",
+        availability_priors={"QUESTIONABLE": (3.0, 2.0)},
+    )
+
+    by_id = out.set_index("player_id")
+    assert by_id.loc["QB1", "availability_probability"] == 0.0
+    assert bool(by_id.loc["QB1", "is_primary_qb"]) is False
+    assert _primary_qb(out) == "QB2"
+
+    with pytest.raises(ValueError, match="canonical OUT QB"):
+        current_players_from_canonical_state(
+            state,
+            game_id="2026_03_LA_ARI",
+            team="ARI",
+            availability_priors={"QUESTIONABLE": (3.0, 2.0)},
+            primary_qb_player_id="QB1",
+            primary_qb_provenance="stale depth chart should be rejected",
+        )
 
 
 def test_governed_qb_and_role_overrides_require_provenance():
