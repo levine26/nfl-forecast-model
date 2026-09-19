@@ -24,6 +24,7 @@ from nfl_forecast.props_upstream import normalize_nflverse_scramble_semantics  #
 CONTRACT_VERSION="levline-props-v2-football-shadow-grading-v0.1.0"
 RECEIPT_CONTRACT_VERSION="levline-props-v2-football-shadow-a-v0.1.0"
 SHADOW_VERSION="P2-SHADOW-A-DEFENSE-v0.1.0"
+FROZEN_COEFFICIENT_VERSION="levline-props-v2-defensive-efficiency-shadow-v0.1.0"
 SUPPORTED_PROPS=("rushing_yards","receiving_yards")
 CALIBRATION_EDGES=np.linspace(0.0,1.0,11)
 BOOTSTRAP_REPLICATES=5000
@@ -126,8 +127,26 @@ def read_receipts(path: Path)->list[dict[str,Any]]:
             raise ShadowGradingError("receipt missing governance")
         if governance.get("production_authorized") is not False:
             raise ShadowGradingError("prospective receipt cannot be production authorized")
+        if governance.get("published_v1_props_mutated") is not False:
+            raise ShadowGradingError("prospective receipt indicates published V1 mutation")
+        if governance.get("winner_model_mutated") is not False:
+            raise ShadowGradingError("prospective receipt indicates winner-model mutation")
+        if governance.get("opportunity_arrays_preserved") is not True:
+            raise ShadowGradingError("prospective receipt did not preserve opportunity arrays")
         if int(governance.get("target_week_outcomes_used",-1))!=0:
             raise ShadowGradingError("prospective receipt used target-week outcomes")
+        if int(governance.get("completed_2026_outcomes_used_for_coefficient_fit",-1))!=0:
+            raise ShadowGradingError("prospective receipt used completed 2026 outcomes for coefficient fit")
+
+        defense=row.get("defensive_efficiency")
+        if not isinstance(defense,Mapping):
+            raise ShadowGradingError("prospective receipt missing defensive-efficiency provenance")
+        if str(defense.get("coefficient_contract_version") or "")!=FROZEN_COEFFICIENT_VERSION:
+            raise ShadowGradingError("unexpected defensive-efficiency coefficient contract")
+        fit=defense.get("fit")
+        if not isinstance(fit,Mapping) or int(fit.get("trained_through_season",-1))!=2025:
+            raise ShadowGradingError("defensive-efficiency coefficients are not frozen through 2025")
+
         if str(row.get("prop_type") or "") not in SUPPORTED_PROPS:
             raise ShadowGradingError("unsupported prospective prop type")
         validate_distribution(row["v1"]["empirical_distribution"])
