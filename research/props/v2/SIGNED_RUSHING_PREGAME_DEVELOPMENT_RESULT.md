@@ -1,30 +1,23 @@
 # LevLine Props 2.0 — Signed Rushing True-Pregame Development Result
 
-Status: **RETROSPECTIVE TRUE-PREGAME ABLATION — REJECTED**  
-Primary workflow: `35420043916`  
-Primary artifacts:
-- 2023: `10576698018`
-- 2024: `10577307344`
-- 2025: `10577196966`
+Status: **RETROSPECTIVE PAIRED PREGAME ABLATION — REJECTED**  
+Primary workflow: `35420676818`  
 Contract: `levline-props-v2-signed-rushing-pregame-v0.1.0`  
 Production promotion authorized: **NO**
 
 ## Question
 
-The component-isolation study showed that signed empirical rushing-event support improved CRPS when
-the realized carry count was held fixed.
+The conditional event-level study showed that signed rushing-yard support improved CRPS when actual
+event count was held fixed. This follow-up tested whether that mechanism improves the **full pregame
+rushing-yard distribution** when V1's simulated carry counts are preserved exactly.
 
-This follow-up tested whether that mechanism improves a **true pregame rushing-yard distribution**
-when V1's sampled carry uncertainty is restored and preserved exactly.
-
-For every player-game:
-- the frozen V1 pregame state was used;
-- the exact V1 sampled carry array was preserved;
-- V1 mean rushing yards/carry and mean uncertainty were preserved;
-- only the conditional rushing-yard draw changed from nonnegative Gamma to centered signed empirical
-  rushing-event residuals fitted through season S−1.
-
-Target-game carries and target-game yards were not used for fitting or forecast construction.
+For every paired forecast:
+- V1 pregame state is unchanged;
+- sampled carry arrays are byte-for-byte identical;
+- V1 rushing yards/carry mean and uncertainty are preserved;
+- only the conditional rushing-yard draw changes from the nonnegative Gamma aggregate to centered
+  signed empirical event residuals fitted through season S−1;
+- target-game carries and target-game yards are not used in the fit.
 
 ## Aggregate result
 
@@ -32,54 +25,53 @@ Target-game carries and target-game yards were not used for fitting or forecast 
 - N: **982** rushing-yard props;
 - unique games: **230**;
 - unique players: **114**;
-- V1 CRPS: **18.26395**;
-- challenger CRPS: **18.30303**;
-- challenger minus V1 CRPS: **+0.03907** (worse);
-- game-clustered 95% interval: **+0.01652 to +0.06379**;
-- V1 Fair-Line MAE: **24.92210**;
-- challenger Fair-Line MAE: **24.93534**;
-- challenger minus V1 MAE: **+0.01324** (worse);
-- game-clustered MAE-difference interval: **−0.04285 to +0.07040**;
-- V1 80% coverage: **62.42%**;
-- challenger 80% coverage: **63.24%**.
+- V1 CRPS: **18.26136**;
+- signed-rushing CRPS: **18.30030**;
+- challenger minus V1 CRPS: **+0.03894** (worse);
+- game-clustered 95% interval: **+0.01676 to +0.06300**;
+- V1 Fair-Line MAE: **24.90733**;
+- signed-rushing Fair-Line MAE: **24.93737**;
+- challenger minus V1 MAE: **+0.03004** (worse);
+- game-clustered MAE-difference interval: **−0.02264 to +0.08299**;
+- V1 80% coverage: **62.22%**;
+- challenger 80% coverage: **63.14%**.
 
-Coverage improves by approximately **+0.81 pp**, but this cannot rescue worse CRPS and Fair-Line MAE.
+Coverage improves by about **+0.92 pp**, but the primary CRPS criterion fails clearly and Fair-Line
+MAE also moves in the wrong direction.
 
 ## By season
 
 | Season | N | Δ CRPS | Δ Fair-Line MAE | V1 80% cov. | Challenger 80% cov. |
 |---|---:|---:|---:|---:|---:|
-| 2023 | 279 | **+0.08278** | **+0.09498** | 56.63% | 58.06% |
-| 2024 | 628 | **+0.02813** | −0.01831 | 64.81% | 65.45% |
-| 2025* | 75 | −0.03189 | −0.02667 | 64.00% | 64.00% |
+| 2023 | 279 | **+0.08908** | **+0.11470** | 56.27% | 58.06% |
+| 2024 | 628 | **+0.02573** | −0.00239 | 64.65% | 65.29% |
+| 2025* | 75 | −0.03703 | −0.01333 | 64.00% | 64.00% |
 
-*2025 is a small genuine-OPEN sample and cannot rescue the pooled failure.
+Only 2025 improves CRPS, and that genuine-OPEN slice is very small. The preregistered requirement
+was improvement in at least two of three seasons.
 
-CRPS improves in only **one of three seasons**.
+## Scientific interpretation
 
-## Frozen gate
+The earlier signed-event component result was real but **does not survive composition with the
+pregame carry-count distribution and V1 player mean**.
 
-- pooled CRPS improves: **FAIL**
-- pooled Fair-Line MAE improves: **FAIL**
-- at least two seasons improve CRPS: **FAIL**
-- pooled clustered CRPS CI upper bound <= 0: **FAIL**
-- coverage deterioration <= 1.5 pp: **PASS**
+This is an important negative result: structural realism at the event level is not sufficient by
+itself to improve the full player-prop distribution. The residual resampling broadens/reshapes the
+aggregate in a way that slightly improves coverage but worsens probabilistic accuracy.
 
-Overall gate: **FAIL**.
+## Disposition
 
-## Scientific disposition
+**REJECT P2-DIST-RUSH-PREGAME-V01.**
 
-**REJECT P2-DIST-RUSH-PREGAME-V01 AS IMPLEMENTED.**
+Do not:
+- tune residual centering, pooling thresholds, tail clipping, or event sampling against these
+  evaluated outcomes;
+- rescue the candidate using the small 2025 slice;
+- promote signed event support into production merely because the conditional component test passed.
 
-The earlier component result was real but conditional on realized event count. Once pregame carry
-uncertainty is restored, the signed empirical event-support overlay slightly degrades the full
-rushing-yard predictive distribution.
+The conditional signed-rushing mechanism remains useful scientific evidence about support
+misspecification, but this specific pregame implementation fails its frozen gate.
 
-Do not tune residual pools, minimum pool size, centering rule, support, or blending weight against
-these evaluated outcomes. The correct inference is that signed support alone is not sufficient to
-improve the current pregame rushing-yard model.
+No F-ST, Props V1, Sunday Signal, threshold, or production change is authorized.
 
-This result does not invalidate the component finding; it shows that the component gain does not
-translate into a full pregame gain under the frozen V1 opportunity process.
-
-No production forecast, F-ST model, Props V1 output, or market threshold changes from this result.
+*2025 genuine-OPEN evidence is a small sample.
