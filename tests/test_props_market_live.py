@@ -264,6 +264,110 @@ def test_missing_api_key_fails_before_network():
         live._provider_get_json("/sports/test/events", api_key="")
 
 
+def test_propline_fetch_uses_compatible_nfl_prop_shape(monkeypatch):
+    calls = []
+
+    def fake_get(path, *, api_key, params=None, timeout_seconds=20.0):
+        calls.append((path, dict(params or {}), api_key))
+        if path.endswith("/events"):
+            return [
+                {
+                    "id": "pl-evt-ari-lar",
+                    "home_team": "Arizona Cardinals",
+                    "away_team": "Los Angeles Rams",
+                    "commence_time": KICKOFF,
+                }
+            ]
+        assert path.endswith("/events/pl-evt-ari-lar/odds")
+        event = _event()
+        event["id"] = "pl-evt-ari-lar"
+        return event
+
+    monkeypatch.setattr(live, "_propline_get_json", fake_get)
+    events, raw = live.fetch_live_nfl_prop_events(
+        player_state_rows=_player_state(),
+        api_key="propline-secret",
+        provider="propline",
+    )
+
+    assert len(events) == 1
+    assert raw["provider"] == "propline"
+    assert raw["discovery_event_count"] == 1
+    assert calls[0][1] == {}
+    assert "player_pass_yds" in calls[1][1]["markets"]
+    assert "regions" not in calls[1][1]
+    assert "propline-secret" not in str(raw)
+
+
+def test_live_provider_fallback_selects_propline_after_primary_failure(monkeypatch):
+    def primary_fail(*args, **kwargs):
+        raise live.PropsMarketLiveError(
+            "The Odds API request failed for /sports/americanfootball_nfl/events with HTTP 401"
+        )
+
+    fallback_event = _event()
+    fallback_event["id"] = "pl-evt-ari-lar"
+
+    def fallback_get(path, *, api_key, params=None, timeout_seconds=20.0):
+        if path.endswith("/events"):
+            return [
+                {
+                    "id": "pl-evt-ari-lar",
+                    "home_team": "Arizona Cardinals",
+                    "away_team": "Los Angeles Rams",
+                    "commence_time": KICKOFF,
+                }
+            ]
+        return fallback_event
+
+    monkeypatch.setattr(live, "_provider_get_json", primary_fail)
+    monkeypatch.setattr(live, "_propline_get_json", fallback_get)
+
+    events, raw = live.fetch_live_nfl_prop_events_with_fallback(
+        player_state_rows=_player_state(),
+        the_odds_api_key="bad-primary",
+        propline_api_key="good-fallback",
+    )
+
+    assert len(events) == 1
+    assert raw["provider"] == "propline"
+    assert raw["provider_attempts"] == [
+        {
+            "provider": "the_odds_api",
+            "status": "failed",
+            "detail": (
+                "The Odds API request failed for /sports/americanfootball_nfl/events "
+                "with HTTP 401"
+            ),
+        },
+        {"provider": "propline", "status": "selected"},
+    ]
+
+
+def test_live_provider_fallback_fails_closed_when_all_configured_sources_fail(monkeypatch):
+    monkeypatch.setattr(
+        live,
+        "_provider_get_json",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            live.PropsMarketLiveError("primary unavailable")
+        ),
+    )
+    monkeypatch.setattr(
+        live,
+        "_propline_get_json",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            live.PropsMarketLiveError("fallback unavailable")
+        ),
+    )
+
+    with pytest.raises(live.PropsMarketLiveError, match="all configured"):
+        live.fetch_live_nfl_prop_events_with_fallback(
+            player_state_rows=_player_state(),
+            the_odds_api_key="primary",
+            propline_api_key="fallback",
+        )
+
+
 
 def test_nflverse_la_player_state_matches_rams_provider_event():
     state = []
