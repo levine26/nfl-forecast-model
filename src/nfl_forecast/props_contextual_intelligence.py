@@ -345,6 +345,8 @@ def _current_source_claim_strength(title: str, player_name: str) -> str | None:
         return "confirmed"
     if re.search(r"\b(?:to start|starts|will start)\b", after, flags=re.I):
         return "confirmed"
+    if re.search(r"\bwith (?:a )?start (?:at|against)\b", after, flags=re.I):
+        return "confirmed"
     if re.search(r"\b(?:starter|starting quarterback|starting qb)\b.{0,35}$", before, flags=re.I):
         return "confirmed"
     return None
