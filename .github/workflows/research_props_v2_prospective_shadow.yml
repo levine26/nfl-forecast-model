@@ -96,8 +96,9 @@ jobs:
 
           mapfile -t FORECASTS < <(find /tmp/props-live-artifacts -name forecasts.json -type f | sort)
           mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
-          if [ "${#FORECASTS[@]}" -ne 1 ] || [ "${#PROVENANCE[@]}" -ne 1 ]; then
-            echo "::error::source artifact must contain exactly one forecasts.json and one source_provenance.json"
+          mapfile -t MARKETS < <(find /tmp/props-live-artifacts -name market.json -type f | sort)
+          if [ "${#FORECASTS[@]}" -ne 1 ] || [ "${#PROVENANCE[@]}" -ne 1 ] || [ "${#MARKETS[@]}" -ne 1 ]; then
+            echo "::error::source artifact must contain exactly one forecasts.json, source_provenance.json, and market.json"
             exit 1
           fi
 
@@ -109,7 +110,10 @@ jobs:
           PROVIDER=$(jq -r '.market_provider // empty' "$PROV")
           CREDENTIAL_MODE=$(jq -r '.market_credential_mode // empty' "$PROV")
           EXPECTED_FORECAST_SHA=$(jq -r '.forecasts_sha256 // empty' "$PROV")
+          EXPECTED_MARKET_SHA=$(jq -r '.market_snapshot_sha256 // empty' "$PROV")
           ACTUAL_FORECAST_SHA=$(sha256sum "${FORECASTS[0]}" | awk '{print $1}')
+          ACTUAL_MARKET_SHA=$(sha256sum "${MARKETS[0]}" | awk '{print $1}')
+          SNAPSHOT_PROVIDER=$(jq -r '.provider // empty' "${MARKETS[0]}")
           PROVENANCE_SHA=$(sha256sum "$PROV" | awk '{print $1}')
 
           if [ "$CONTRACT" != "$LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION" ]; then
@@ -134,6 +138,10 @@ jobs:
           fi
           if [ "$EXPECTED_FORECAST_SHA" != "$ACTUAL_FORECAST_SHA" ]; then
             echo "::error::live source forecast artifact SHA mismatch"
+            exit 1
+          fi
+          if [ "$EXPECTED_MARKET_SHA" != "$ACTUAL_MARKET_SHA" ] || [ "$SNAPSHOT_PROVIDER" != "$PROVIDER" ]; then
+            echo "::error::live source market snapshot provenance mismatch"
             exit 1
           fi
 
