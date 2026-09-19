@@ -314,3 +314,68 @@ def test_shadow_overlay_normalizes_opponent_alias():
     )
     assert shadow.model_version==module.SHADOW_VERSION
     assert audit["P1"]["opponent"]=="JAX"
+
+
+def test_shadow_overlay_uses_retrospective_candidate_rng_namespace():
+    module=_module()
+    player=SimpleNamespace(
+        player_id="P1",
+        opponent="LAR",
+        rushing_yards_per_carry=4.3,
+        rushing_yards_shape_per_carry=2.0,
+        rushing_yards_per_carry_event_sd=3.0,
+        rushing_yards_per_carry_mean_se=0.1,
+        receiving_yards_per_reception=10.0,
+        receiving_yards_shape_per_reception=2.0,
+        receiving_yards_per_reception_event_sd=5.0,
+        receiving_yards_per_reception_mean_se=0.1,
+    )
+    n=40
+    carries=np.arange(n)%9
+    stats={
+        "active":np.ones(n,dtype=int),
+        "pass_attempts":np.zeros(n,dtype=int),
+        "routes":np.arange(n)%12,
+        "targets":np.arange(n)%7,
+        "receptions":np.arange(n)%5,
+        "carries":carries.copy(),
+        "rushing_yards":np.zeros(n,dtype=int),
+        "receiving_yards":np.zeros(n,dtype=int),
+    }
+    baseline=DummyResult(
+        game_id="G-SEED",
+        model_version="V1",
+        players=(player,),
+        player_stats={"P1":{k:v.copy() for k,v in stats.items()}},
+    )
+    frozen=module.load_frozen_coefficients(FROZEN)
+    defense={
+        "LAR":{
+            "rushing":{"opponent_defense_delta":0.3},
+            "receiving":{"opponent_defense_delta":0.5},
+        }
+    }
+    shadow,_=module.apply_shadow_a(
+        baseline,defense_state=defense,frozen=frozen
+    )
+    rush_mean=module.adjusted_mean(
+        player.rushing_yards_per_carry,
+        defense["LAR"]["rushing"]["opponent_defense_delta"],
+        frozen["fits"]["rushing"],
+    )
+    rng=np.random.default_rng(module._stable_seed(
+        module.RETROSPECTIVE_MECHANISM_VERSION,
+        "rushing",
+        baseline.game_id,
+        player.player_id,
+    ))
+    expected=module._compound_yards(
+        carries,
+        rush_mean,
+        player.rushing_yards_shape_per_carry,
+        rng,
+        event_sd=player.rushing_yards_per_carry_event_sd,
+        mean_se=player.rushing_yards_per_carry_mean_se,
+    )
+    assert module.RETROSPECTIVE_MECHANISM_VERSION=="levline-props-v2-defensive-efficiency-pregame-v0.1.0"
+    assert np.array_equal(shadow.player_stats["P1"]["rushing_yards"],expected)
