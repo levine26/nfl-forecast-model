@@ -50,7 +50,19 @@ permissions:
   actions: write
 
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('levline-props-live-pr-{0}', github.event.pull_request.number) || 'levline-props-live' }}
+  # Keep direct refreshes and qualifying media-trigger refreshes from cancelling one another.
+  # Nonqualifying workflow_run events instantiate this workflow before job-level if guards can
+  # skip them, so isolate each ignored event as well.
+  group: >-
+    ${{ github.event_name == 'pull_request'
+        && format('levline-props-live-pr-{0}', github.event.pull_request.number)
+        || (github.event_name == 'workflow_run'
+            && (github.event.workflow_run.conclusion != 'success'
+                || github.event.workflow_run.head_branch != 'main'))
+           && format('levline-props-live-ignored-{0}', github.event.workflow_run.id)
+        || github.event_name == 'workflow_run'
+           && 'levline-props-live-media-trigger'
+        || 'levline-props-live-direct' }}
   cancel-in-progress: true
 
 jobs:
@@ -86,7 +98,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     env:
-      THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY || secrets.PROPLINE_API_KEY || secrets.SPORTSGAMEODDS_API_KEY }}
+      THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
       PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}
       SPORTSGAMEODDS_API_KEY: ${{ secrets.SPORTSGAMEODDS_API_KEY }}
       PROPS_BOOKMAKERS: ${{ vars.PROPS_BOOKMAKERS }}
