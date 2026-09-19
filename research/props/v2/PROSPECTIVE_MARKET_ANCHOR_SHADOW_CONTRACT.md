@@ -3,7 +3,7 @@
 Status: **FROZEN BEFORE PROSPECTIVE SHADOW GRADES**  
 Created: 2026-09-18  
 Exact-source provenance amendment: 2026-09-19, before first prospective receipt  
-Live-generation provenance amendment: 2026-09-19, before first prospective receipt
+Live-generation provenance amendment: 2026-09-19, before first provenance-eligible prospective receipt/outcome
 
 ## Purpose
 
@@ -112,7 +112,10 @@ must report provider/mode composition and, when sample size permits, provider-st
 No provider may be retrospectively excluded because of performance.
 
 A live run predating this live-generation provenance amendment cannot be replayed later and called
-prospective evidence. Missing pregame receipts remain missing.
+provenance-eligible prospective evidence. The first persistence event occurred before this amendment
+became active and wrote 545 legacy market-anchor receipts from source run `35428763144`. Those rows
+remain immutable for auditability but are permanently excluded from promotion/evaluation thresholds.
+They may not be rewritten, deleted, or retroactively upgraded. Missing pregame receipts remain missing.
 
 ## Immutable identity
 
