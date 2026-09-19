@@ -275,6 +275,7 @@ def test_b_vs_a_threshold_uses_only_matched_receipts_and_never_auto_promotes():
     summary=module.summarize(frame,comparison="b_vs_a",seed=11)
     assert summary["decided_n"]==300
     assert summary["minimum_discussion_threshold"]["sample_size_conditions_met"] is True
+    assert summary["minimum_discussion_threshold"]["proper_score_nondegradation_conditions_met"] is True
     assert summary["automatic_promotion_authorized"] is False
 
     unpaired=_summary_rows(paired=False)
@@ -328,3 +329,15 @@ def test_b_receipt_integrity_rejects_source_or_role_schema_drift(tmp_path):
     path.write_text(json.dumps(bad)+"\n",encoding="utf-8")
     with pytest.raises(module.ShadowBGradingError,match="capture timestamps"):
         module.read_b_receipts(path)
+
+
+def test_b_vs_a_proper_score_nondegradation_is_joint():
+    module=_module()
+    frame=_summary_rows()
+    frame["b_minus_a_brier"]=0.01
+    frame["shadow_b_brier"]=frame["shadow_a_brier"]+0.01
+    summary=module.summarize(frame,comparison="b_vs_a",seed=23)
+    threshold=summary["minimum_discussion_threshold"]
+    assert threshold["no_material_crps_degradation_vs_shadow_a"] is True
+    assert threshold["no_material_brier_degradation_vs_shadow_a"] is False
+    assert threshold["proper_score_nondegradation_conditions_met"] is False
