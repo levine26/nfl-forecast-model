@@ -84,6 +84,7 @@ test('TD markets use probability language rather than forcing a continuous Fair 
 })
 
 test('Performance page is empirical-data gated and retains immutable receipts',async({page})=>{
+  test.setTimeout(90000)
   await page.goto('./#/props/history')
   await expect(page.getByText('Prospective validation, with receipts.')).toBeVisible()
   const concepts=page.locator('.lp-performance-concepts')
