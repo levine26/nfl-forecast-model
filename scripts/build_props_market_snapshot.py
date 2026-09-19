@@ -2,9 +2,9 @@ from __future__ import annotations
 
 """Capture and freeze sportsbook inputs for LevLine Props Research Beta.
 
-Live mode requires an authorized The Odds API credential supplied through an environment
+Live mode requires an authorized sportsbook credential supplied through an environment
 variable. Offline mode accepts an already captured provider payload for deterministic QA.
-The credential is never written to disk.
+Credentials are never written to disk.
 """
 
 import argparse
@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from nfl_forecast.props_market_live import (  # noqa: E402
     build_market_snapshot,
     fetch_live_nfl_prop_events,
+    fetch_live_nfl_prop_events_with_fallback,
     payload_sha256,
 )
 
@@ -96,7 +97,14 @@ def main() -> int:
         "--captured-at",
         help="Required in offline mode. In live mode the truthful post-fetch UTC time is used.",
     )
+    parser.add_argument(
+        "--provider",
+        choices=("auto", "the_odds_api", "propline"),
+        default="auto",
+        help="Live sportsbook provider. auto uses The Odds API first and PropLine as fallback.",
+    )
     parser.add_argument("--api-key-env", default="THE_ODDS_API_KEY")
+    parser.add_argument("--propline-api-key-env", default="PROPLINE_API_KEY")
     parser.add_argument("--regions", default="us")
     parser.add_argument(
         "--bookmakers",
@@ -120,25 +128,49 @@ def main() -> int:
         captured = _aware(args.captured_at, "--captured-at")
         raw_payload = _load_json(args.provider_payload)
         provider_events = _provider_events(raw_payload)
+        selected_provider = "the_odds_api" if args.provider == "auto" else args.provider
         raw_bundle = {
-            "provider": "the_odds_api",
+            "provider": selected_provider,
             "capture_mode": "offline_payload",
             "captured_at_utc": captured.isoformat(),
             "event_odds": provider_events,
         }
     else:
-        api_key = os.environ.get(args.api_key_env, "")
-        if not api_key.strip():
-            raise RuntimeError(
-                f"live capture requires an authorized API credential in {args.api_key_env}"
+        the_odds_api_key = os.environ.get(args.api_key_env, "")
+        propline_api_key = os.environ.get(args.propline_api_key_env, "")
+        if args.provider == "auto":
+            provider_events, raw_bundle = fetch_live_nfl_prop_events_with_fallback(
+                player_state_rows=player_state_rows,
+                the_odds_api_key=the_odds_api_key,
+                propline_api_key=propline_api_key,
+                regions=args.regions,
+                bookmakers=args.bookmakers,
+                timeout_seconds=args.timeout_seconds,
             )
-        provider_events, raw_bundle = fetch_live_nfl_prop_events(
-            player_state_rows=player_state_rows,
-            api_key=api_key,
-            regions=args.regions,
-            bookmakers=args.bookmakers,
-            timeout_seconds=args.timeout_seconds,
-        )
+        else:
+            key = (
+                the_odds_api_key
+                if args.provider == "the_odds_api"
+                else propline_api_key
+            )
+            key_env = (
+                args.api_key_env
+                if args.provider == "the_odds_api"
+                else args.propline_api_key_env
+            )
+            if not key.strip():
+                raise RuntimeError(
+                    f"live capture requires an authorized {args.provider} credential in {key_env}"
+                )
+            provider_events, raw_bundle = fetch_live_nfl_prop_events(
+                player_state_rows=player_state_rows,
+                api_key=key,
+                regions=args.regions,
+                bookmakers=args.bookmakers,
+                timeout_seconds=args.timeout_seconds,
+                provider=args.provider,
+            )
+        selected_provider = str(raw_bundle.get("provider") or "")
         captured = datetime.now(timezone.utc)
         raw_bundle = {
             **raw_bundle,
@@ -150,6 +182,7 @@ def main() -> int:
         player_state_rows=player_state_rows,
         provider_events=provider_events,
         captured_at_utc=captured,
+        provider=selected_provider,
     )
     raw_bundle = {
         **raw_bundle,
