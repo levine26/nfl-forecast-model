@@ -67,6 +67,74 @@ def _finite(value: Any)->float|None:
     return out if math.isfinite(out) else None
 
 
+LIVE_SOURCE_PROVENANCE_FIELDS=(
+    "source_trigger_head_sha",
+    "source_market_provider",
+    "source_market_credential_mode",
+    "source_provenance_sha256",
+)
+
+
+def live_source_provenance_eligibility(row: Mapping[str,Any])->str:
+    present=[bool(str(row.get(field) or "").strip()) for field in LIVE_SOURCE_PROVENANCE_FIELDS]
+    if not any(present):
+        return "legacy_pre_provenance"
+    if not all(present):
+        missing=[
+            field for field,is_present in zip(LIVE_SOURCE_PROVENANCE_FIELDS,present)
+            if not is_present
+        ]
+        raise ShadowBGradingError(
+            f"partial Shadow B live-source provenance is invalid; missing {missing}"
+        )
+    return "eligible"
+
+
+def verify_legacy_b_receipt_integrity(row: Mapping[str,Any])->None:
+    if row.get("contract_version")!=SHADOW_B_RECEIPT_CONTRACT:
+        raise ShadowBGradingError("unexpected legacy Shadow B receipt contract")
+    if row.get("shadow_version")!=SHADOW_B_VERSION:
+        raise ShadowBGradingError("unexpected legacy Shadow B version")
+    supplied=str(row.get("shadow_sha256") or "")
+    material=dict(row)
+    material.pop("shadow_sha256",None)
+    if len(supplied)!=64 or supplied!=_sha(material):
+        raise ShadowBGradingError("legacy Shadow B receipt SHA-256 mismatch")
+    for field in ("source_forecast_sha256","source_manifest_sha256"):
+        value=str(row.get(field) or "").lower()
+        if len(value)!=64 or any(ch not in "0123456789abcdef" for ch in value):
+            raise ShadowBGradingError(f"invalid legacy Shadow B provenance hash: {field}")
+    season=int(row.get("source_season",-1))
+    week=int(row.get("source_week",-1))
+    if season<2026 or not 1<=week<=18:
+        raise ShadowBGradingError("invalid legacy Shadow B season/week")
+    source_run=str(row.get("source_workflow_run") or "").strip()
+    source_sha=str(row.get("source_head_sha") or "").strip().lower()
+    if not source_run:
+        raise ShadowBGradingError("legacy Shadow B receipt missing source workflow run")
+    if len(source_sha) not in {40,64} or any(ch not in "0123456789abcdef" for ch in source_sha):
+        raise ShadowBGradingError("legacy Shadow B receipt has invalid source head SHA")
+
+    kickoff=_aware(row.get("kickoff_utc"),"kickoff_utc")
+    forecast_at=_aware(row.get("source_forecast_timestamp_utc"),"source_forecast_timestamp_utc")
+    market_at=_aware(row.get("source_market_captured_utc"),"source_market_captured_utc")
+    capture_started=_aware(row.get("capture_started_utc"),"capture_started_utc")
+    capture_completed=_aware(row.get("capture_completed_utc"),"capture_completed_utc")
+    recorded_at=_aware(row.get("recorded_utc"),"recorded_utc")
+    if not (
+        forecast_at<kickoff
+        and market_at<kickoff
+        and capture_started<kickoff
+        and capture_completed<kickoff
+        and recorded_at<kickoff
+    ):
+        raise ShadowBGradingError("legacy Shadow B receipt is not strictly pre-kickoff")
+    if forecast_at>capture_started or market_at>capture_started:
+        raise ShadowBGradingError("legacy Shadow B capture began before source forecast/market existed")
+    if capture_started>capture_completed or capture_completed!=recorded_at:
+        raise ShadowBGradingError("legacy Shadow B capture timestamps are inconsistent")
+
+
 def verify_b_receipt(row: Mapping[str,Any])->None:
     if row.get("contract_version")!=SHADOW_B_RECEIPT_CONTRACT:
         raise ShadowBGradingError("unexpected Shadow B receipt contract")
@@ -160,11 +228,16 @@ def verify_b_receipt(row: Mapping[str,Any])->None:
     shadow_a_grader.validate_distribution(row["shadow_b"]["empirical_distribution"])
 
 
-def read_b_receipts(path: Path)->list[dict[str,Any]]:
+def read_b_receipts_with_audit(path: Path)->tuple[list[dict[str,Any]],dict[str,int]]:
     if not path.is_file():
         raise ShadowBGradingError(f"Shadow B ledger not found: {path}")
     rows=[]
     seen=set()
+    audit={
+        "ledger_rows":0,
+        "provenance_eligible_receipts":0,
+        "legacy_pre_provenance_receipts":0,
+    }
     for line_number,line in enumerate(path.read_text(encoding="utf-8").splitlines(),start=1):
         if not line.strip():
             continue
@@ -174,12 +247,24 @@ def read_b_receipts(path: Path)->list[dict[str,Any]]:
             raise ShadowBGradingError(f"invalid Shadow B JSONL at line {line_number}") from exc
         if not isinstance(row,dict):
             raise ShadowBGradingError(f"Shadow B line {line_number} is not an object")
+        audit["ledger_rows"]+=1
+        provenance_state=live_source_provenance_eligibility(row)
+        if provenance_state=="legacy_pre_provenance":
+            verify_legacy_b_receipt_integrity(row)
+            audit["legacy_pre_provenance_receipts"]+=1
+            continue
         verify_b_receipt(row)
         sid=str(row.get("shadow_id") or "")
         if not sid or sid in seen:
             raise ShadowBGradingError(f"invalid/duplicate Shadow B shadow_id: {sid!r}")
         seen.add(sid)
         rows.append(row)
+        audit["provenance_eligible_receipts"]+=1
+    return rows,audit
+
+
+def read_b_receipts(path: Path)->list[dict[str,Any]]:
+    rows,_=read_b_receipts_with_audit(path)
     return rows
 
 
@@ -500,10 +585,28 @@ def concentration(frame: pd.DataFrame)->dict[str,Any]:
 
 
 def run(a_ledger: Path,b_ledger: Path,output_dir: Path)->dict[str,Any]:
-    a_receipts=shadow_a_grader.read_receipts(a_ledger)
-    b_receipts=read_b_receipts(b_ledger)
+    a_receipts,a_provenance_audit=shadow_a_grader.read_receipts_with_audit(a_ledger)
+    b_receipts,b_provenance_audit=read_b_receipts_with_audit(b_ledger)
+    output_dir.mkdir(parents=True,exist_ok=True)
     if not b_receipts:
-        raise ShadowBGradingError("no prospective Shadow B receipts")
+        result={
+            "contract_version":CONTRACT_VERSION,
+            "shadow_a_grading_contract":SHADOW_A_GRADING_CONTRACT,
+            "shadow_b_receipt_contract":SHADOW_B_RECEIPT_CONTRACT,
+            "shadow_b_version":SHADOW_B_VERSION,
+            "b_receipt_count":0,
+            "matched_a_receipt_count":0,
+            "graded_count":0,
+            "status":"NO_PROVENANCE_ELIGIBLE_B_RECEIPTS_YET",
+            "shadow_a_provenance_eligibility_audit":a_provenance_audit,
+            "shadow_b_provenance_eligibility_audit":b_provenance_audit,
+            "automatic_promotion_authorized":False,
+        }
+        (output_dir/"summary.json").write_text(
+            json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8"
+        )
+        print(json.dumps(result,indent=2,sort_keys=True))
+        return result
     matched_a,pair_audit=match_a_receipts(a_receipts,b_receipts)
 
     seasons=sorted({int(row["source_season"]) for row in b_receipts})
@@ -530,8 +633,6 @@ def run(a_ledger: Path,b_ledger: Path,output_dir: Path)->dict[str,Any]:
         actuals=actuals,
         participation=participation,
     )
-    output_dir.mkdir(parents=True,exist_ok=True)
-
     if graded.empty:
         result={
             "contract_version":CONTRACT_VERSION,
@@ -543,6 +644,8 @@ def run(a_ledger: Path,b_ledger: Path,output_dir: Path)->dict[str,Any]:
             "graded_count":0,
             "status":"NO_GRADED_RECEIPTS_YET",
             "pair_audit":pair_audit,
+            "shadow_a_provenance_eligibility_audit":a_provenance_audit,
+            "shadow_b_provenance_eligibility_audit":b_provenance_audit,
             "eligibility_audit":eligibility_audit,
             "automatic_promotion_authorized":False,
         }
@@ -574,6 +677,8 @@ def run(a_ledger: Path,b_ledger: Path,output_dir: Path)->dict[str,Any]:
         "by_prop":by_prop,
         "concentration":concentration(graded),
         "pair_audit":pair_audit,
+        "shadow_a_provenance_eligibility_audit":a_provenance_audit,
+        "shadow_b_provenance_eligibility_audit":b_provenance_audit,
         "eligibility_audit":eligibility_audit,
         "outcome_source_audit":{
             "pbp_normalization":scramble_audit,
