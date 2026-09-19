@@ -3,7 +3,7 @@
 Status: **FROZEN BEFORE SHADOW A PROSPECTIVE GRADING**  
 Version: `levline-props-v2-football-shadow-a-v0.1.0`  
 Production authorization: **NONE**  
-Live-generation provenance amendment: 2026-09-19, before first Shadow A receipt
+Live-generation provenance amendment: 2026-09-19, before first provenance-eligible Shadow A receipt/outcome
 
 ## Candidate
 
@@ -51,8 +51,12 @@ Every receipt preserves:
 - SHA-256 of the live source-provenance record.
 
 Both the trigger SHA and generation-base SHA must already contain this provenance-aware listener.
-Runs predating this amendment are permanently ineligible for prospective Shadow A evidence. Provider
-failover is metadata/provenance only and does not alter the frozen defensive-efficiency candidate.
+Runs predating this amendment are permanently ineligible for provenance-eligible Shadow A evidence.
+The first persistence event occurred before this amendment became active and wrote 289 legacy Shadow A
+receipts from source run `35428763144`. Those rows remain immutable for auditability but are excluded
+from all grading, minimum-evidence and promotion thresholds. They may not be rewritten, deleted, or
+retroactively upgraded. Provider failover is metadata/provenance only and does not alter the frozen
+defensive-efficiency candidate.
 
 ## Frozen defense coefficients
 
