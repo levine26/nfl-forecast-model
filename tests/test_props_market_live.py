@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
@@ -715,3 +716,16 @@ def test_live_fetch_audits_unmatched_provider_event_identity(monkeypatch):
             "reason": "unresolved_provider_team",
         }
     ]
+
+
+def test_live_workflow_ignored_upstream_runs_cannot_cancel_active_refresh():
+    workflow = (
+        Path(__file__).resolve().parents[1]
+        / ".github"
+        / "workflows"
+        / "levline_markets_live.yml"
+    ).read_text(encoding="utf-8")
+    assert "levline-props-live-ignored-{0}" in workflow
+    assert "github.event.workflow_run.conclusion != 'success'" in workflow
+    assert "github.event.workflow_run.head_branch != 'main'" in workflow
+    assert "cancel-in-progress: true" in workflow
