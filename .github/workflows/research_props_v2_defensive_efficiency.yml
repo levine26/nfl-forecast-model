@@ -1,0 +1,74 @@
+name: LevLine Props 2.0 defensive efficiency residual
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/defensive_efficiency_residual.py'
+      - 'research/props/v2/test_defensive_efficiency_residual.py'
+      - 'research/props/v2/run_defensive_efficiency_residual.py'
+      - 'research/props/v2/DEFENSIVE_EFFICIENCY_RESIDUAL_CONTRACT.md'
+      - '.github/workflows/research_props_v2_defensive_efficiency.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: python -m pip install -e '.[dev]'
+      - name: Validate defensive efficiency component
+        run: python -m pytest -q research/props/v2/test_defensive_efficiency_residual.py
+
+  component:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: |
+          python -m pip install -e '.[dev]'
+          python -m pip install pyarrow
+      - name: Run frozen season-forward study
+        run: |
+          python research/props/v2/run_defensive_efficiency_residual.py             --output-dir research_outputs/props_v2/defensive_efficiency
+      - name: Enforce component boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("research_outputs/props_v2/defensive_efficiency/summary.json").read_text())
+          assert d["contract_version"]=="levline-props-v2-defensive-efficiency-v0.1.0"
+          assert d["component_isolation_only"] is True
+          assert d["conditioned_on_actual_event_count"] is True
+          assert d["pregame_prop_forecast"] is False
+          assert d["sportsbook_data_used"]==0
+          assert d["completed_2026_outcomes_used"]==0
+          assert d["production_authorized"] is False
+          assert set(d["by_event_type"])=={"rushing","receiving"}
+          print(json.dumps({
+              k:{
+                  "n":v["n"],
+                  "delta_mae":v["challenger_minus_baseline_total_mae"],
+                  "ci95":v["mae_difference_ci95"],
+                  "gate":v["advance_gate"],
+              }
+              for k,v in d["by_event_type"].items()
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-defensive-efficiency
+          path: research_outputs/props_v2/defensive_efficiency/
+          if-no-files-found: error
