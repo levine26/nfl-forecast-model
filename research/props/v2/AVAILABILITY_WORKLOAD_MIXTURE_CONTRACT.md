@@ -88,3 +88,24 @@ rescue a failed aggregate gate.
 
 This component can advance to prospective shadow testing only if the complete frozen gate passes.
 It cannot authorize production from retrospective evidence.
+
+## Source-coverage amendment before scored evaluation
+
+The first real-data execution failed before any evaluation-season workload score was produced because
+the source-qualified example set contained no training examples before 2023. This is a source
+coverage failure, not a model-performance result.
+
+The evaluation population is therefore governed by this frozen fail-closed rule:
+
+- requested evaluation seasons remain 2023, 2024 and 2025;
+- before scoring a season, count source-qualified prior-season training examples and target-season
+  evaluation examples;
+- exclude a season only when prior training count is zero or target evaluation count is zero;
+- record every excluded season and its exact source-coverage reason;
+- require at least **two** source-qualified evaluation seasons or stop without a result;
+- the development gate still requires improvement in at least **two** source-qualified seasons.
+
+This amendment does not inspect workload errors, state frequencies, prop outcomes, sportsbook
+results, or 2026 outcomes. Once a season has nonzero source-qualified train and test rows it may not
+be excluded because its result is unfavorable.
+
