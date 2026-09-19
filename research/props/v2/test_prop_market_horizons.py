@@ -3,11 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 
+import pytest
+
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
-from select_prop_market_horizons import select_horizons
+from select_prop_market_horizons import HorizonError, select_horizons
 
 
 def _row(minutes, stamp, line=60.5):
@@ -94,3 +96,10 @@ def test_legacy_pre_provenance_rows_are_preserved_but_not_selected():
     ):
         legacy.pop(key)
     assert select_horizons([legacy]) == []
+
+
+def test_partial_live_source_provenance_fails_closed():
+    partial=_row(1460,"2026-09-19T19:40:00+00:00",62.5)
+    partial.pop("source_market_provider")
+    with pytest.raises(HorizonError,match="partial live-source provenance"):
+        select_horizons([partial])
