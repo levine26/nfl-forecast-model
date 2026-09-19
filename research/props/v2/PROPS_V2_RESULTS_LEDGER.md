@@ -209,6 +209,51 @@ Team-play MAE worsened in **2023, 2024 and 2025**.
 **Disposition:** REJECT `P2-GAME-ENV-V01`. Do not retune the evaluated formulation. Permanent
 record: `GAME_ENVIRONMENT_DEVELOPMENT_RESULT.md`.
 
+## Opponent defensive-efficiency residual — positive component isolation
+
+Workflow `35418742120`, artifact `10576851625`.
+
+Actual event count was held fixed, so this isolates the conditional efficiency mechanism and is not
+a pregame prop forecast.
+
+Receiving:
+- N **11,492**, 816 games, 681 players;
+- baseline conditional total-yard MAE **12.08785**;
+- challenger MAE **11.89335**;
+- improvement **−0.19450**;
+- clustered 95% interval **−0.22350 to −0.16535**;
+- improvement occurs in 2023, 2024 and 2025.
+
+Rushing:
+- N **6,690**, 816 games, 520 players;
+- baseline conditional total-yard MAE **11.02170**;
+- challenger MAE **10.89129**;
+- improvement **−0.13041**;
+- clustered 95% interval **−0.16407 to −0.09864**;
+- improvement occurs in 2023, 2024 and 2025.
+
+**Disposition:** ADVANCE both rushing and receiving opponent-defense residual mechanisms to a true
+pregame simulator ablation. Do not report these component gains as Props accuracy. Permanent record:
+`DEFENSIVE_EFFICIENCY_DEVELOPMENT_RESULT.md`.
+
+## Team offensive TD count overdispersion — rejected
+
+Workflow `35418843763`, artifact `10577161142`.
+
+2023–2025 aggregate:
+- N **1,632 team-games / 816 games**;
+- Poisson CRPS **0.746728**;
+- negative-binomial CRPS **0.746728**;
+- Poisson log loss **1.710151**;
+- negative-binomial log loss **1.710151**;
+- 80% coverage **92.95%** for both.
+
+The frozen method-of-moments overdispersion estimate was **alpha = 0.0** in 2023, 2024 and 2025.
+The challenger therefore collapses exactly to Poisson, zero seasons improve and the gate fails.
+
+**Disposition:** REJECT `P2-TD-COUNT-V01`. Do not force a nonzero dispersion floor or retune the
+evaluated mechanism. Permanent record: `TEAM_TD_COUNT_DEVELOPMENT_RESULT.md`.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
