@@ -724,6 +724,9 @@ def test_live_workflow_separates_direct_and_workflow_run_concurrency():
     text = LIVE_WORKFLOW.read_text(encoding="utf-8")
     assert "'levline-props-live-media-trigger'" in text
     assert "'levline-props-live-direct'" in text
+    assert "levline-props-live-ignored-{0}" in text
+    assert "github.event.workflow_run.conclusion != 'success'" in text
+    assert "github.event.workflow_run.head_branch != 'main'" in text
     assert "cancel-in-progress: true" in text
 
 
