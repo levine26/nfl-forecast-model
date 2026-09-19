@@ -725,3 +725,11 @@ def test_live_workflow_separates_direct_and_workflow_run_concurrency():
     assert "'levline-props-live-media-trigger'" in text
     assert "'levline-props-live-direct'" in text
     assert "cancel-in-progress: true" in text
+
+
+def test_live_workflow_does_not_cross_wire_provider_credentials():
+    text = LIVE_WORKFLOW.read_text(encoding="utf-8")
+    assert "THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}" in text
+    assert "PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}" in text
+    assert "SPORTSGAMEODDS_API_KEY: ${{ secrets.SPORTSGAMEODDS_API_KEY }}" in text
+    assert "secrets.THE_ODDS_API_KEY || secrets.PROPLINE_API_KEY" not in text
