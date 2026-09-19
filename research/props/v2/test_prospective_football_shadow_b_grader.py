@@ -38,6 +38,8 @@ def _b_receipt():
         "contract_version":module.SHADOW_B_RECEIPT_CONTRACT,
         "shadow_version":module.SHADOW_B_VERSION,
         "shadow_id":"b-shadow-1",
+        "capture_started_utc":"2026-09-20T18:30:00+00:00",
+        "capture_completed_utc":"2026-09-20T19:00:00+00:00",
         "recorded_utc":"2026-09-20T19:00:00+00:00",
         "source_workflow_run":"12345",
         "source_head_sha":"c"*40,
@@ -298,3 +300,31 @@ def test_b_vs_v1_is_supporting_context_and_reports_clustered_uncertainty():
         assert all(value is not None for value in summary[key])
     assert "minimum_discussion_threshold" not in summary
     assert summary["automatic_promotion_authorized"] is False
+
+
+def test_b_receipt_integrity_rejects_source_or_role_schema_drift(tmp_path):
+    module=_module()
+    row=_b_receipt()
+    path=tmp_path/"b.jsonl"
+
+    bad=json.loads(json.dumps(row))
+    bad["source_head_sha"]="not-a-sha"
+    bad["shadow_sha256"]=module._sha({k:v for k,v in bad.items() if k!="shadow_sha256"})
+    path.write_text(json.dumps(bad)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowBGradingError,match="source head SHA"):
+        module.read_b_receipts(path)
+
+    bad=json.loads(json.dumps(row))
+    bad["dynamic_role_v01"].pop("mode")
+    bad["shadow_sha256"]=module._sha({k:v for k,v in bad.items() if k!="shadow_sha256"})
+    path.write_text(json.dumps(bad)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowBGradingError,match="Dynamic Role mode"):
+        module.read_b_receipts(path)
+
+    bad=json.loads(json.dumps(row))
+    bad["capture_started_utc"]="2026-09-20T19:10:00+00:00"
+    bad["capture_completed_utc"]="2026-09-20T19:00:00+00:00"
+    bad["shadow_sha256"]=module._sha({k:v for k,v in bad.items() if k!="shadow_sha256"})
+    path.write_text(json.dumps(bad)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowBGradingError,match="capture timestamps"):
+        module.read_b_receipts(path)
