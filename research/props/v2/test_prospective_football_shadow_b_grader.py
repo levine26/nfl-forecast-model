@@ -53,6 +53,7 @@ def _b_receipt():
         "kickoff_utc":"2026-09-20T20:00:00+00:00",
         "game_id":"G1",
         "player_id":"P1",
+        "team":"ARI",
         "prop_type":"rushing_yards",
         "market":{"line":50.5,"no_vig_over_probability":0.51},
         "v1":{
@@ -223,6 +224,7 @@ def _summary_rows(n_games=100,rows_per_game=3,paired=True):
                 "source_week":1+(game%8),
                 "game_id":f"G{game}",
                 "player_id":f"P{game}_{j}",
+                "team":"ARI" if game%2==0 else "LAR",
                 "prop_type":"receiving_yards",
                 "push":False,
                 "has_shadow_a_pair":paired,
@@ -341,3 +343,25 @@ def test_b_vs_a_proper_score_nondegradation_is_joint():
     assert threshold["no_material_crps_degradation_vs_shadow_a"] is True
     assert threshold["no_material_brier_degradation_vs_shadow_a"] is False
     assert threshold["proper_score_nondegradation_conditions_met"] is False
+
+
+def test_concentration_reports_team_week_player_and_prop():
+    module=_module()
+    frame=_summary_rows(n_games=12,rows_per_game=1)
+    report=module.concentration(frame)
+    assert report["largest_week_share"]>0.0
+    assert report["largest_team_share"]==pytest.approx(0.5)
+    assert report["largest_team"] in {"ARI","LAR"}
+    assert report["largest_player_share"]>0.0
+    assert report["prop_counts"]["receiving_yards"]==12
+
+
+def test_b_receipt_integrity_requires_team_identity(tmp_path):
+    module=_module()
+    row=_b_receipt()
+    row["team"]=""
+    row["shadow_sha256"]=module._sha({k:v for k,v in row.items() if k!="shadow_sha256"})
+    path=tmp_path/"b.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowBGradingError,match="team identity"):
+        module.read_b_receipts(path)
