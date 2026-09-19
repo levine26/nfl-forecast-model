@@ -86,11 +86,13 @@ test('TD markets use probability language rather than forcing a continuous Fair 
 test('Performance page is empirical-data gated and retains immutable receipts',async({page})=>{
   await page.goto('./#/props/history')
   await expect(page.getByText('Prospective validation, with receipts.')).toBeVisible()
-  await expect(page.getByText('Projection Accuracy')).toBeAttached()
-  await expect(page.getByText('Probability Calibration')).toBeAttached()
-  await expect(page.getByText('Market Performance')).toBeAttached()
-  await expect(page.getByText('Betting Performance')).toBeAttached()
-  await expect(page.getByText('INSUFFICIENT EVALUATION DATA').first()).toBeAttached()
+  const concepts=page.locator('.lp-performance-concepts')
+  await expect(concepts).toBeAttached()
+  await expect(concepts).toContainText('Projection Accuracy')
+  await expect(concepts).toContainText('Probability Calibration')
+  await expect(concepts).toContainText('Market Performance')
+  await expect(concepts).toContainText('Betting Performance')
+  await expect(concepts).toContainText('INSUFFICIENT EVALUATION DATA')
 
   const originalLineLabel=page.getByText('Original sportsbook line / price',{exact:true}).first()
   if (fixtureRequired) {
