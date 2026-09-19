@@ -313,3 +313,30 @@ def test_shadow_b_receipt_uses_explicit_capture_timestamps():
     assert receipt["source_season"]==2026
     assert receipt["source_week"]==2
     assert receipt["governance"]["production_authorized"] is False
+
+
+def test_role_player_audit_preserves_unit_fallback_provenance():
+    module=_module()
+    audit={
+        "ARI":{
+            "dynamic_role":{
+                "engine_version":"levline-props-dynamic-role-v0.1.0",
+                "mode":"full",
+                "history":{"status":"available"},
+                "fallback_player_ids":["P_FALLBACK"],
+                "estimates":[
+                    {"player_id":"P_ADJ","history_games":4}
+                ],
+            },
+            "transform":{
+                "adjustments":{
+                    "P_ADJ":{"target_role_multiplier":1.1}
+                }
+            },
+        }
+    }
+    players=module._role_player_audit(audit)
+    assert players["P_FALLBACK"]["fallback_to_unit_role"] is True
+    assert players["P_FALLBACK"]["adjustment"]=={}
+    assert players["P_FALLBACK"]["estimate"] is None
+    assert players["P_ADJ"]["fallback_to_unit_role"] is False
