@@ -662,12 +662,14 @@ def fetch_live_nfl_prop_events_draftkings(
 
     canonical_events: dict[str, dict[str, Any]] = {}
     discovery_unmatched: list[dict[str, Any]] = []
+    event_ids_by_position: list[str | None] = []
     ordered_event_ids: list[str] = []
     for raw in raw_events:
         if not isinstance(raw, Mapping):
             continue
         event = _draftkings_event(raw)
         event_id = str(event.get("id") or "")
+        event_ids_by_position.append(event_id or None)
         game, reason = _match_event(event, game_directory)
         if game is None:
             discovery_unmatched.append(
@@ -725,8 +727,8 @@ def fetch_live_nfl_prop_events_draftkings(
                     if not isinstance(block, Sequence) or isinstance(block, (str, bytes)):
                         continue
                     default_id = (
-                        ordered_event_ids[index]
-                        if index < len(ordered_event_ids)
+                        event_ids_by_position[index]
+                        if index < len(event_ids_by_position)
                         else None
                     )
                     blocks.append((default_id, block))
