@@ -48,6 +48,16 @@ def _sha(value: Any)->str:
     return hashlib.sha256(_canon(value).encode("utf-8")).hexdigest()
 
 
+def _aware_timestamp(value: Any, *, label: str)->pd.Timestamp:
+    try:
+        ts=pd.Timestamp(value)
+    except Exception as exc:
+        raise ShadowGradingError(f"invalid receipt timestamp: {label}") from exc
+    if pd.isna(ts) or ts.tzinfo is None:
+        raise ShadowGradingError(f"receipt timestamp must be timezone-aware: {label}")
+    return ts.tz_convert("UTC")
+
+
 def verify_receipt_integrity(row: Mapping[str,Any])->None:
     supplied=str(row.get("shadow_sha256") or "")
     if len(supplied)!=64:
@@ -64,6 +74,28 @@ def verify_receipt_integrity(row: Mapping[str,Any])->None:
     week=int(row.get("source_week",-1))
     if season<2026 or not 1<=week<=18:
         raise ShadowGradingError("invalid prospective season/week provenance")
+
+    kickoff=_aware_timestamp(row.get("kickoff_utc"),label="kickoff_utc")
+    forecast_at=_aware_timestamp(
+        row.get("source_forecast_timestamp_utc"),
+        label="source_forecast_timestamp_utc",
+    )
+    market_at=_aware_timestamp(
+        row.get("source_market_captured_utc"),
+        label="source_market_captured_utc",
+    )
+    recorded_at=_aware_timestamp(row.get("recorded_utc"),label="recorded_utc")
+    if not (forecast_at<kickoff and market_at<kickoff and recorded_at<kickoff):
+        raise ShadowGradingError("prospective receipt is not strictly pre-kickoff")
+    if forecast_at>recorded_at or market_at>recorded_at:
+        raise ShadowGradingError("prospective receipt chronology is internally inconsistent")
+
+    source_run=str(row.get("source_workflow_run") or "").strip()
+    source_sha=str(row.get("source_head_sha") or "").strip().lower()
+    if not source_run:
+        raise ShadowGradingError("prospective receipt missing source workflow run")
+    if len(source_sha) not in {40,64} or any(c not in "0123456789abcdef" for c in source_sha):
+        raise ShadowGradingError("prospective receipt has invalid source head SHA")
 
 
 def read_receipts(path: Path)->list[dict[str,Any]]:
