@@ -109,29 +109,29 @@ before V2 primary evaluation.
 
 ## Dynamic role V2 v0.2 — rejected
 
-All six primary season/mode jobs from workflow `35381482900` completed successfully. The first
+All six primary season/mode jobs completed successfully; the repaired canonical aggregate is from workflow `35417823424`, artifact `10577640488`. The earlier workflow `35381482900` supplied the same primary evidence but its first aggregate job failed on artifact flattening. The first
 aggregate job failed only because same-named artifact files were flattened; the immutable primary
 artifacts were recovered directly and the workflow was corrected to retain per-artifact directories.
 
 ### Route-only V2
 
 - paired N **5,659**, 230 unique games, 307 unique players;
-- challenger accuracy **50.96%** vs V1 **51.02%**;
-- gain **−0.05 pp**;
-- game-clustered 95% interval for accuracy difference approximately **−0.29 to +0.18 pp**;
-- Fair-Line MAE **19.294** vs V1 **19.229**;
-- CRPS **13.8988** vs V1 **13.8455**;
-- 80% interval score **89.802** vs V1 **89.278**.
+- challenger accuracy **50.96%** vs V1 **51.03%**;
+- gain **−0.07 pp**;
+- game-clustered 95% interval for accuracy difference approximately **−0.31 to +0.16 pp**;
+- Fair-Line MAE **19.291** vs V1 **19.229**;
+- CRPS **13.8983** vs V1 **13.8461**;
+- 80% interval score **89.793** vs V1 **89.290**.
 
 ### Full V2
 
 - paired N **5,659**;
-- challenger accuracy **51.09%** vs V1 **51.03%**;
-- gain **+0.05 pp**;
-- game-clustered 95% interval for accuracy difference approximately **−0.98 to +1.10 pp**;
-- Fair-Line MAE **19.819** vs V1 **19.232**;
-- CRPS **14.3209** vs V1 **13.8481**;
-- 80% interval coverage **71.80%** vs V1 **73.00%**.
+- challenger accuracy **51.12%** vs V1 **51.03%**;
+- gain **+0.09 pp**;
+- game-clustered 95% interval for accuracy difference approximately **−0.95 to +1.15 pp**;
+- Fair-Line MAE **19.820** vs V1 **19.233**;
+- CRPS **14.3212** vs V1 **13.8481**;
+- 80% interval coverage **71.78%** vs V1 **73.00%**.
 
 **Disposition:** REJECT Dynamic Role V2 V0.2. The latent state-space specification does not improve
 the football distribution and full mode materially degrades it. The favorable small 2025 full
