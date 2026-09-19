@@ -21,6 +21,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from nfl_forecast.props_live_role_intel import (  # noqa: E402
+    validate_market_backed_primary_qb_forecasts,
+)
 from nfl_forecast.props_publication import append_jsonl_immutable, read_jsonl  # noqa: E402
 
 RESEARCH_LABEL = "LEVLINE PROPS — RESEARCH BETA"
@@ -159,14 +162,22 @@ def main() -> int:
     if run_root.exists():
         raise FileExistsError(f"refusing to reuse live Props run directory: {run_root}")
 
+    discovery_upstream = run_root / "upstream_discovery"
     upstream = run_root / "upstream"
     market = run_root / "market.json"
+    live_role_intel = run_root / "live_role_intel.json"
     raw_market = run_root / "market.raw.json"
     manifests = run_root / "manifests"
     staged_forecasts = run_root / "forecasts.json"
     staged_public = run_root / "public_props.json"
     staged_ledger = run_root / "forecast_originals.jsonl"
 
+    contextual_evidence = ROOT / "outputs" / "contextual_evidence.json"
+    media_reads = ROOT / "outputs" / "copilot_media_reads.json"
+
+    # Stage 1: discover the canonical current roster/availability universe without using
+    # market prices to construct player projections. This produces the stable-ID player
+    # directory required for a live sportsbook capture.
     _run(
         sys.executable,
         ROOT / "scripts" / "build_props_upstream_snapshot.py",
@@ -174,13 +185,14 @@ def main() -> int:
         "--week", week,
         "--all-games",
         "--priors", args.priors,
-        "--output-dir", upstream,
+        "--contextual-evidence", contextual_evidence,
+        "--output-dir", discovery_upstream,
     )
 
     market_command: list[object] = [
         sys.executable,
         ROOT / "scripts" / "build_props_market_snapshot.py",
-        "--player-state", upstream / "player_state.json",
+        "--player-state", discovery_upstream / "player_state.json",
         "--output", market,
         "--raw-output", raw_market,
         "--api-key-env", args.api_key_env,
@@ -197,6 +209,40 @@ def main() -> int:
             "live Props capture returned no normalized market artifacts; "
             "refusing to replace the current published slate"
         )
+
+    # Stage 2: reconcile the shared Sunday Signal news/injury layer with the *presence*
+    # of live multi-book player markets. Market line and price magnitude are explicitly
+    # prohibited from entering the football projection.
+    _run(
+        sys.executable,
+        ROOT / "scripts" / "build_props_live_role_intel.py",
+        "--player-state", discovery_upstream / "player_state.json",
+        "--market-snapshot", market,
+        "--contextual-evidence", contextual_evidence,
+        "--media-reads", media_reads,
+        "--output", live_role_intel,
+    )
+    role_payload = _load_json(live_role_intel)
+    blocking_conflicts = role_payload.get("blocking_conflicts")
+    if isinstance(blocking_conflicts, list) and blocking_conflicts:
+        raise RuntimeError(
+            "live Props role intelligence has unresolved news/market conflicts; "
+            f"refusing publication: {blocking_conflicts[:3]}"
+        )
+
+    # Stage 3: rebuild the football upstream with the frozen role-intelligence snapshot.
+    # This is the only upstream used for simulation/manifests.
+    _run(
+        sys.executable,
+        ROOT / "scripts" / "build_props_upstream_snapshot.py",
+        "--season", season,
+        "--week", week,
+        "--all-games",
+        "--priors", args.priors,
+        "--contextual-evidence", contextual_evidence,
+        "--primary-qb-intel", live_role_intel,
+        "--output-dir", upstream,
+    )
 
     _run(
         sys.executable,
@@ -223,6 +269,11 @@ def main() -> int:
     if not isinstance(summary, dict) or int(summary.get("total") or 0) != len(forecasts):
         raise RuntimeError("live Props public summary does not reconcile to forecast rows")
 
+    role_consistency_audit = validate_market_backed_primary_qb_forecasts(
+        role_payload,
+        forecast_payload,
+    )
+
     receipts = read_jsonl(staged_ledger)
     if len(receipts) != len(forecasts):
         raise RuntimeError("live Props immutable receipt count does not reconcile")
@@ -245,6 +296,22 @@ def main() -> int:
         "forecast_count": len(forecasts),
         "market_artifact_count": len(market_rows),
         "public_summary": summary,
+        "live_role_intelligence": {
+            "contract_version": role_payload.get("contract_version"),
+            "resolved_team_qbs": int(
+                role_payload.get("audit", {}).get("resolved_team_qbs", 0)
+            ),
+            "blocking_conflicts": int(
+                role_payload.get("audit", {}).get("blocking_conflict_count", 0)
+            ),
+            "market_line_magnitude_used_for_projection": role_payload.get(
+                "market_line_magnitude_used_for_projection"
+            ),
+            "market_price_used_for_projection": role_payload.get(
+                "market_price_used_for_projection"
+            ),
+            "market_backed_primary_qb_consistency": role_consistency_audit,
+        },
         "current_forecasts": str(current_forecasts.relative_to(ROOT)),
         "current_public": str(current_public.relative_to(ROOT)),
         "immutable_forecast_ledger": str(permanent_ledger.relative_to(ROOT)),
