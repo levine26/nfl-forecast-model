@@ -438,11 +438,29 @@ def summarize(frame: pd.DataFrame, *, comparison: str, seed: int)->dict[str,Any]
                 result["shadow_b_minus_reference_crps"] is not None
                 and result["shadow_b_minus_reference_crps"]<=0.0
             ),
+            "no_material_brier_degradation_vs_shadow_a":(
+                result["shadow_b_minus_reference_brier"] is not None
+                and result["shadow_b_minus_reference_brier"]<=0.0
+            ),
+            "no_material_log_loss_degradation_vs_shadow_a":(
+                result["shadow_b_minus_reference_log_loss"] is not None
+                and result["shadow_b_minus_reference_log_loss"]<=0.0
+            ),
+            "no_material_interval_score_degradation_vs_shadow_a":(
+                result["shadow_b_minus_reference_interval_score_80"] is not None
+                and result["shadow_b_minus_reference_interval_score_80"]<=0.0
+            ),
         }
         threshold["sample_size_conditions_met"]=all([
             threshold["decided_props_at_least_300"],
             threshold["unique_games_at_least_100"],
             threshold["weeks_at_least_8"],
+        ])
+        threshold["proper_score_nondegradation_conditions_met"]=all([
+            threshold["no_material_crps_degradation_vs_shadow_a"],
+            threshold["no_material_brier_degradation_vs_shadow_a"],
+            threshold["no_material_log_loss_degradation_vs_shadow_a"],
+            threshold["no_material_interval_score_degradation_vs_shadow_a"],
         ])
         result["minimum_discussion_threshold"]=threshold
     result["automatic_promotion_authorized"]=False
