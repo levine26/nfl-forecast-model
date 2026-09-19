@@ -260,3 +260,37 @@ def test_out_rank_one_qb_does_not_block_next_available_depth_qb():
 
     assert resolved["ARI"]["player_id"] == "A-QB2"
     assert audit["teams_resolved"] == 1
+
+
+def test_doubtful_rank_one_qb_yields_to_non_doubtful_backup_without_media():
+    depth = pd.DataFrame(
+        [
+            {
+                "dt": "2026-09-18T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB1",
+                "pos_abb": "QB",
+                "pos_rank": 1,
+            },
+            {
+                "dt": "2026-09-18T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB2",
+                "pos_abb": "QB",
+                "pos_rank": 2,
+            },
+        ]
+    )
+    state = _depth_player_state().copy()
+    state["expected_active_state"] = "UNKNOWN"
+    state.loc[state["player_id"].eq("A-QB1"), "expected_active_state"] = "DOUBTFUL"
+    state["roster_membership_state"] = "ACTIVE_ROSTER"
+
+    resolved, _ = resolve_primary_qbs_from_depth_charts(
+        depth,
+        state,
+        game_id="2026_03_LAR_ARI",
+        forecast_timestamp="2026-09-18T22:00:00Z",
+    )
+
+    assert resolved["ARI"]["player_id"] == "A-QB2"
