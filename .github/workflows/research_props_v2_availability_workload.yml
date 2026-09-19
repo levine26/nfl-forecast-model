@@ -1,0 +1,98 @@
+name: LevLine Props 2.0 availability workload mixture
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/availability_workload_mixture.py'
+      - 'research/props/v2/test_availability_workload_mixture.py'
+      - 'research/props/v2/run_availability_workload_mixture.py'
+      - 'research/props/v2/evaluate_availability_workload_mixture.py'
+      - 'research/props/v2/AVAILABILITY_WORKLOAD_MIXTURE_CONTRACT.md'
+      - '.github/workflows/research_props_v2_availability_workload.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+      - name: Compile research
+        run: |
+          python -m py_compile research/props/v2/availability_workload_mixture.py
+          python -m py_compile research/props/v2/run_availability_workload_mixture.py
+          python -m py_compile research/props/v2/evaluate_availability_workload_mixture.py
+      - name: Validate workload-state chronology
+        run: python -m pytest -q research/props/v2/test_availability_workload_mixture.py
+
+  season_forward:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+          python -m pip install pyarrow
+      - name: Run frozen 2023-2025 football-state evaluation
+        run: |
+          python research/props/v2/evaluate_availability_workload_mixture.py             --output-dir research_outputs/props_v2/availability_workload
+      - name: Enforce frozen research boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("research_outputs/props_v2/availability_workload/aggregate_summary.json")
+          d=json.loads(p.read_text())
+          assert d["contract_version"] == "levline-props-v2-availability-workload-v0.1.0"
+          assert d["research_only"] is True
+          assert d["production_authorized"] is False
+          assert d["prop_outcomes_used_for_fit_or_evaluation"] == 0
+          assert d["sportsbook_results_used_for_fit_or_evaluation"] == 0
+          assert d["completed_2026_outcomes_used"] == 0
+          eligible=d["source_qualified_evaluation_seasons"]
+          excluded=d["source_excluded_seasons"]
+          assert set(eligible).issubset({2023,2024,2025})
+          assert set(excluded).issubset({"2023","2024","2025"})
+          for season,reason in excluded.items():
+              assert reason["reason"] in {
+                  "no_prior_training_examples",
+                  "no_target_evaluation_examples",
+              }
+          if d.get("status")=="BLOCKED_SOURCE_COVERAGE":
+              assert len(eligible) < 2
+              assert d["aggregate"] is None
+              assert d["development_gate"]["passed"] is False
+              assert d["development_gate"]["reason"]=="insufficient_source_qualified_seasons"
+          else:
+              assert len(eligible) >= 2
+              assert set(map(str,eligible)) == set(d["by_season"])
+              assert d["aggregate"]["n"] > 0
+          print(json.dumps({
+              "status":d.get("status","EVALUATED"),
+              "aggregate":d["aggregate"],
+              "development_gate":d["development_gate"],
+          },indent=2))
+          PY
+      - name: Print research report
+        run: cat research_outputs/props_v2/availability_workload/report.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-availability-workload
+          path: research_outputs/props_v2/availability_workload/
+          if-no-files-found: error

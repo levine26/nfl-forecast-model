@@ -1,0 +1,111 @@
+# LevLine Props 2.0 — Availability / Workload Mixture Contract
+
+Status: **PREREGISTERED BEFORE PROP-OUTCOME EVALUATION**  
+Candidate: `P2-AVAIL-MIX-V01`  
+Version: `levline-props-v2-availability-workload-v0.1.0`
+
+## Problem
+
+The current Props availability layer reduces QUESTIONABLE / DOUBTFUL uncertainty to
+`P(any offensive snap)`. If active, the opportunity engine effectively treats the player as
+normal-role unless a separate role adjustment exists.
+
+That conflates two distinct questions:
+
+1. Will the player play?
+2. Conditional on playing, what workload state will the player have?
+
+## Research target
+
+Use historical injury designations and offensive participation only. No player-prop result,
+sportsbook result, Fair-Line error, betting outcome, or completed 2026 outcome is used.
+
+For each historical QUESTIONABLE / DOUBTFUL player-week:
+- build a strictly prior baseline snap share from the previous four observed player games;
+- require at least two prior games;
+- exclude tiny baseline roles below 15% snap share;
+- compare target-week snap share with the prior baseline.
+
+## Frozen workload states
+
+Let `r = current snap share / prior baseline snap share`, clipped only for modeling at 2.0.
+
+- `OUT`: zero offensive participation;
+- `ACTIVE_LIMITED`: active and r < 0.75;
+- `ACTIVE_NORMAL`: 0.75 <= r <= 1.25;
+- `ACTIVE_ELEVATED`: r > 1.25.
+
+These thresholds are semantic preregistration choices. They may not be changed because a different
+threshold improves prop accuracy.
+
+## Model
+
+For each designation × position with at least 40 training rows:
+- Dirichlet(1,1,1,1)-smoothed workload-state probabilities;
+- empirical mean/SD workload multiplier inside each active state.
+
+Sparse designation × position cells fall back to the designation-pooled historical sample.
+
+Comparator:
+- season-forward Beta(1,1) `P(active)` for the designation;
+- expected workload ratio = P(active) × 1.0.
+
+Mixture expected workload:
+- sum over workload states of P(state) × mean workload multiplier(state).
+
+## Chronology
+
+For evaluation season S:
+- all parameters are fit using seasons <= S−1;
+- the evaluated player-week baseline uses only games before that player-week;
+- target-week snap share is evaluation target only;
+- 2026 outcomes are prohibited.
+
+The nflverse historical injury source is retrospective development evidence. Exact historical
+publication timestamps are not claimed. Any production/prospective use still requires the existing
+timestamped current-injury capture path.
+
+## Evaluation
+
+Primary component metric:
+- workload-ratio MAE: mixture versus active-only comparator.
+
+Secondary:
+- active/inactive Brier score;
+- four-state multiclass Brier score;
+- four-state log loss;
+- sample sizes by designation and position;
+- season-forward stability.
+
+The development gate is frozen before the real-data evaluation:
+1. pooled 2023–2025 workload-ratio MAE must improve versus the active-only comparator;
+2. mixture MAE must improve in at least two of the three evaluation seasons;
+3. mixture active/inactive Brier score may not be worse than the active-only comparator by more
+   than **0.005 absolute Brier**.
+
+RMSE is reported as a secondary workload metric. Subgroup results are diagnostic only and may not
+rescue a failed aggregate gate.
+
+This component can advance to prospective shadow testing only if the complete frozen gate passes.
+It cannot authorize production from retrospective evidence.
+
+## Source-coverage amendment before scored evaluation
+
+The first real-data execution failed before any evaluation-season workload score was produced because
+the source-qualified example set contained no training examples before 2023. This is a source
+coverage failure, not a model-performance result.
+
+The evaluation population is therefore governed by this frozen fail-closed rule:
+
+- requested evaluation seasons remain 2023, 2024 and 2025;
+- before scoring a season, count source-qualified prior-season training examples and target-season
+  evaluation examples;
+- exclude a season only when prior training count is zero or target evaluation count is zero;
+- record every excluded season and its exact source-coverage reason;
+- require at least **two** source-qualified evaluation seasons or stop without a result;
+- the development gate still requires improvement in at least **two** source-qualified seasons.
+
+This amendment does not inspect workload errors, state frequencies, prop outcomes, sportsbook
+results, or 2026 outcomes. Once a season has nonzero source-qualified train and test rows it may not
+be excluded because its result is unfavorable.
+
