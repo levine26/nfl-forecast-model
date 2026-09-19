@@ -1153,6 +1153,21 @@ def build_game_upstream_package(
                 raise PropsUpstreamError(
                     f"primary QB override for {team} requires player_id and provenance"
                 )
+            selected = team_rows[
+                team_rows["player_id"].astype(str).eq(player_id)
+                & team_rows["position"].astype(str).str.upper().eq("QB")
+            ]
+            if len(selected) != 1:
+                raise PropsUpstreamError(
+                    f"primary QB override for {team} does not identify exactly one canonical QB"
+                )
+            active_state = str(
+                selected.iloc[0].get("expected_active_state") or "UNKNOWN"
+            ).upper().strip()
+            if active_state == "OUT":
+                raise PropsUpstreamError(
+                    f"primary QB override for {team} selects a player explicitly OUT: {player_id}"
+                )
             kwargs.update(
                 primary_qb_player_id=player_id,
                 primary_qb_provenance=provenance,
