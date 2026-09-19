@@ -22,6 +22,9 @@ on:
     types:
       - completed
 
+env:
+  EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-archive-exact-source-v0.1.0
+
 jobs:
   test:
     if: github.event_name == 'pull_request'
@@ -56,16 +59,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Resolve source live workflow run
+      - name: Resolve and validate exact source live workflow run
         id: source
         run: |
           set -euo pipefail
@@ -75,9 +69,37 @@ jobs:
             RUN_ID="${{ github.event.workflow_run.id }}"
           fi
           test -n "$RUN_ID"
+          META=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID")
+          NAME=$(printf '%s' "$META" | jq -r '.name')
+          BRANCH=$(printf '%s' "$META" | jq -r '.head_branch')
+          SHA=$(printf '%s' "$META" | jq -r '.head_sha')
+          CONCLUSION=$(printf '%s' "$META" | jq -r '.conclusion')
+          if [ "$NAME" != "LevLine Props live refresh" ]; then
+            echo "::error::source run is not LevLine Props live refresh: $NAME"
+            exit 1
+          fi
+          if [ "$BRANCH" != "main" ] || [ "$CONCLUSION" != "success" ]; then
+            echo "::error::source run must be successful on main; branch=$BRANCH conclusion=$CONCLUSION"
+            exit 1
+          fi
+          WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_market_archive.yml?ref=$SHA" | jq -r '.content // empty')
+          if [ -z "$WORKFLOW_B64" ] || ! printf '%s' "$WORKFLOW_B64" | base64 -d | grep -Fq 'EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-archive-exact-source-v0.1.0'; then
+            echo "::error::source run predates the exact-source market archive listener; retrospective backfill is prohibited"
+            exit 1
+          fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Download existing live audit artifact
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.head_sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download exact source live audit artifact
         run: |
           set -euo pipefail
           rm -rf /tmp/props-live-artifacts
@@ -104,7 +126,7 @@ jobs:
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
-          python research/props/v2/archive_live_prop_market.py             --artifact-root /tmp/props-live-artifacts             --output-dir "$DATA_DIR"             --manifest "$DATA_DIR/manifest.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --status "$DATA_DIR/last_archive_status.json"
+          python research/props/v2/archive_live_prop_market.py             --artifact-root /tmp/props-live-artifacts             --output-dir "$DATA_DIR"             --manifest "$DATA_DIR/manifest.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --source-head-sha "${{ steps.source.outputs.head_sha }}"             --status "$DATA_DIR/last_archive_status.json"
 
       - name: Derive preregistered PIT horizons from accumulated captures
         run: |
