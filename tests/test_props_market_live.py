@@ -161,9 +161,45 @@ def test_live_snapshot_matches_provider_event_to_canonical_game_and_stable_ids()
     )
 
 
-def test_provider_team_aliases_cover_los_angeles_teams_without_guessing_player_identity():
+def test_provider_team_aliases_cover_propline_nfl_labels_without_guessing_player_identity():
+    provider_labels = {
+        "ARI Cardinals": "ARI",
+        "ATL Falcons": "ATL",
+        "BAL Ravens": "BAL",
+        "BUF Bills": "BUF",
+        "CAR Panthers": "CAR",
+        "CHI Bears": "CHI",
+        "CIN Bengals": "CIN",
+        "CLE Browns": "CLE",
+        "DAL Cowboys": "DAL",
+        "DEN Broncos": "DEN",
+        "DET Lions": "DET",
+        "GB Packers": "GB",
+        "HOU Texans": "HOU",
+        "IND Colts": "IND",
+        "JAX Jaguars": "JAX",
+        "KC Chiefs": "KC",
+        "LV Raiders": "LV",
+        "LA Chargers": "LAC",
+        "LA Rams": "LAR",
+        "MIA Dolphins": "MIA",
+        "MIN Vikings": "MIN",
+        "NE Patriots": "NE",
+        "NO Saints": "NO",
+        "NY Giants": "NYG",
+        "NY Jets": "NYJ",
+        "PHI Eagles": "PHI",
+        "PIT Steelers": "PIT",
+        "SF 49ers": "SF",
+        "SEA Seahawks": "SEA",
+        "TB Buccaneers": "TB",
+        "TEN Titans": "TEN",
+        "WAS Commanders": "WAS",
+    }
+    for label, expected in provider_labels.items():
+        assert live.provider_team_code(label) == expected
+
     assert live.provider_team_code("Los Angeles Rams") == "LAR"
-    assert live.provider_team_code("LA Rams") == "LAR"
     assert live.provider_team_code("Los Angeles Chargers") == "LAC"
 
 
