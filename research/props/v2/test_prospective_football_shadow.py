@@ -183,6 +183,9 @@ def test_receipt_fails_closed_after_kickoff():
         "prop_type":"rushing_yards",
         "kickoff_utc":"2026-09-20T20:00:00+00:00",
         "forecast_timestamp_utc":"2026-09-20T18:00:00+00:00",
+        "data_horizon_utc":"2026-09-20T17:59:00+00:00",
+        "signal_state":"WATCH",
+        "data_quality":{"state":"HIGH","critical_ok":True,"confidence":"HIGH","notes":[]},
         "market":{
             "captured_utc":"2026-09-20T18:00:00+00:00",
             "line":60.5,
@@ -215,6 +218,9 @@ def test_receipt_fails_closed_after_kickoff():
     )
     assert receipt is not None
     assert receipt["governance"]["production_authorized"] is False
+    assert receipt["source_signal_state"]=="WATCH"
+    assert receipt["source_data_quality"]["state"]=="HIGH"
+    assert receipt["source_data_horizon_utc"]=="2026-09-20T17:59:00+00:00"
     after=datetime(2026,9,20,21,0,tzinfo=timezone.utc)
     assert module.build_receipt(
         source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
