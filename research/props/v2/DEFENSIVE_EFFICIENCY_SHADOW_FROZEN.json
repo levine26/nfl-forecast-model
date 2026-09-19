@@ -1,0 +1,45 @@
+{
+  "contract_version": "levline-props-v2-defensive-efficiency-shadow-v0.1.0",
+  "component_contract_version": "levline-props-v2-defensive-efficiency-v0.1.0",
+  "trained_through_season": 2025,
+  "history_start_season": 2019,
+  "fit_population": {
+    "event_rows": 180791,
+    "component_rows": 36168
+  },
+  "fits": {
+    "receiving": {
+      "event_type": "receiving",
+      "trained_through_season": 2025,
+      "n_rows": 22925,
+      "x_mean": -0.09374149580377532,
+      "x_sd": 0.6346858199104516,
+      "intercept": -0.3343087513477907,
+      "beta_standardized": 0.21008097583610338,
+      "ridge_alpha": 25.0
+    },
+    "rushing": {
+      "event_type": "rushing",
+      "trained_through_season": 2025,
+      "n_rows": 13243,
+      "x_mean": 0.007969870308112657,
+      "x_sd": 0.35506207168677745,
+      "intercept": -0.12662087877233424,
+      "beta_standardized": 0.1060375269278496,
+      "ridge_alpha": 25.0
+    }
+  },
+  "source_audit": {
+    "pbp_normalization": {
+      "rule": "qb_scramble_1_implies_rush_attempt_1",
+      "qb_scramble_rush_attempt_rows_normalized": 466
+    },
+    "freeze_workflow_run": 35421236153,
+    "freeze_artifact_id": 10577713358,
+    "artifact_sha256": "97bc1e819c9b0095c9d0ba79b797865fca33e3663fd9b77e161782d4fc4c9103"
+  },
+  "completed_2026_outcomes_used": 0,
+  "prop_outcomes_used": 0,
+  "sportsbook_results_used": 0,
+  "production_authorized": false
+}
