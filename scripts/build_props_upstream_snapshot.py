@@ -20,6 +20,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from nfl_forecast.injuries import fetch_nfl_injuries  # noqa: E402
+from nfl_forecast.props_live_role_intel import (  # noqa: E402
+    contextual_availability_rows,
+    primary_qbs_for_game,
+    validate_live_role_intelligence,
+)
 from nfl_forecast.props_player_sources import (  # noqa: E402
     load_offensive_props_sources,
     normalize_snap_counts_player_ids,
@@ -221,6 +226,22 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--cache-dir", default=".cache/nflreadpy")
     parser.add_argument(
+        "--contextual-evidence",
+        type=Path,
+        help=(
+            "Optional timestamped Sunday Signal contextual evidence. Qualified NFL.com/"
+            "ESPN availability items are merged through the canonical availability resolver."
+        ),
+    )
+    parser.add_argument(
+        "--primary-qb-intel",
+        type=Path,
+        help=(
+            "Optional frozen live-role intelligence artifact built after sportsbook capture. "
+            "It may supersede stale depth-chart QB identity but never supplies market line magnitude."
+        ),
+    )
+    parser.add_argument(
         "--skip-injury-fetch",
         action="store_true",
         help="Use UNKNOWN availability plus explicit availability priors.",
@@ -274,6 +295,69 @@ def main() -> int:
     # Capture only after live-source requests complete, so no later source can masquerade
     # as knowledge available at an earlier forecast timestamp.
     forecast_timestamp = datetime.now(timezone.utc)
+
+    shared_context_audit = {
+        "status": "not_supplied",
+        "path": None,
+        "rows": 0,
+    }
+    if args.contextual_evidence is not None:
+        shared_context_audit["path"] = str(args.contextual_evidence)
+        if args.contextual_evidence.exists():
+            contextual_payload = _load(args.contextual_evidence)
+            shared_rows = contextual_availability_rows(
+                contextual_payload,
+                as_of_utc=forecast_timestamp,
+            )
+            shared_frame = pd.DataFrame(shared_rows)
+            if not shared_frame.empty:
+                availability = (
+                    shared_frame
+                    if availability is None or availability.empty
+                    else pd.concat([availability, shared_frame], ignore_index=True, sort=False)
+                )
+            shared_context_audit.update(
+                status="loaded",
+                rows=int(len(shared_frame)),
+            )
+        else:
+            shared_context_audit["status"] = "missing_optional_file"
+
+    live_role_intel = None
+    live_role_intel_audit = {
+        "status": "not_supplied",
+        "path": None,
+        "resolved_team_qbs": 0,
+    }
+    if args.primary_qb_intel is not None:
+        live_role_intel_audit["path"] = str(args.primary_qb_intel)
+        live_role_intel = _load(args.primary_qb_intel)
+        validate_live_role_intelligence(live_role_intel)
+        intel_capture = datetime.fromisoformat(
+            str(live_role_intel["market_captured_at_utc"]).replace("Z", "+00:00")
+        )
+        if intel_capture.tzinfo is None or intel_capture.astimezone(timezone.utc) > forecast_timestamp:
+            raise PropsUpstreamError(
+                "live role intelligence capture must be timezone-aware and no later than final upstream forecast timestamp"
+            )
+        conflicts = live_role_intel.get("blocking_conflicts")
+        if isinstance(conflicts, list) and conflicts:
+            raise PropsUpstreamError(
+                f"live role intelligence contains blocking conflicts: {conflicts[:3]}"
+            )
+        live_role_intel_audit.update(
+            status="loaded",
+            resolved_team_qbs=int(
+                live_role_intel.get("audit", {}).get("resolved_team_qbs", 0)
+            ),
+            market_captured_at_utc=live_role_intel.get("market_captured_at_utc"),
+            market_line_magnitude_used_for_projection=live_role_intel.get(
+                "market_line_magnitude_used_for_projection"
+            ),
+            market_price_used_for_projection=live_role_intel.get(
+                "market_price_used_for_projection"
+            ),
+        )
 
     state_build = build_offensive_player_state_contract(
         schedules=sources.schedules,
@@ -458,7 +542,13 @@ def main() -> int:
             explicit_qb_overrides, dict
         ):
             raise ValueError("primary_qb_by_team must be an object when supplied")
+        live_qb_overrides = (
+            primary_qbs_for_game(live_role_intel, game_id)
+            if live_role_intel is not None
+            else {}
+        )
         qb_overrides = dict(depth_qbs)
+        qb_overrides.update(live_qb_overrides)
         qb_overrides.update(explicit_qb_overrides or {})
 
         package = build_game_upstream_package(
@@ -491,6 +581,7 @@ def main() -> int:
                 "kickoff_utc": kickoff,
                 "package": package,
                 "depth_qb_audit": depth_qb_audit,
+                "live_qb_overrides": live_qb_overrides,
                 "empirical_scoring_audit": empirical_scoring_audit,
                 "scoring_context_source": scoring_source,
                 "residual_efficiency_source": residual_source,
@@ -511,6 +602,9 @@ def main() -> int:
                 "audit": {
                     **state_build.audit,
                     "pbp_source_normalization": pbp_normalization_audit,
+                    "direct_availability_source": availability_audit,
+                    "shared_contextual_availability": shared_context_audit,
+                    "live_role_intelligence": live_role_intel_audit,
                 },
             },
         )
