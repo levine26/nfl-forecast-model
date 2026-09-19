@@ -43,6 +43,7 @@ from nfl_forecast.props_opportunity import (
     _route_redistribution,
 )
 from nfl_forecast.props_player_sources import normalize_snap_counts_player_ids
+from nfl_forecast.props_manifest import verify_manifest_fingerprint
 from nfl_forecast.props_player_state import normalize_team_code
 from nfl_forecast.props_publication import append_jsonl_immutable, read_jsonl
 
@@ -544,6 +545,7 @@ def record_shadow_b(
     game_audit={}
 
     for manifest in manifests:
+        verify_manifest_fingerprint(manifest)
         kickoff=_aware(manifest["kickoff_utc"],label="manifest kickoff_utc")
         if capture_clock()>=kickoff:
             skipped_started+=1
