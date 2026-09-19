@@ -172,6 +172,25 @@ rushing. Do not treat this as prop accuracy or production evidence until event c
 generated exclusively from pregame information. Permanent record:
 `SIGNED_EVENT_DISTRIBUTION_DEVELOPMENT_RESULT.md`.
 
+## Availability / workload mixture — retrospective source blocker
+
+The preregistered Q/D four-state workload study reached no scientific model result because the
+historical source cannot support a legal season-forward train/test chronology.
+
+Source-qualified example counts:
+- 2023: **0** prior training, **0** target examples;
+- 2024: **0** prior training, **0** target examples;
+- 2025: **0** prior training, **318** target examples.
+
+Eligible evaluation seasons: **0**.
+
+**Disposition:** STOP retrospective evaluation. Do not fit and evaluate on the same 2025 season,
+infer historical injury state from final participation, or weaken the chronology gate. Continue only
+as prospective timestamped injury/practice/status plus workload collection. Permanent record:
+`AVAILABILITY_WORKLOAD_DATA_COVERAGE_RESULT.md`.
+
+This is a data-coverage result, not evidence for or against the workload-mixture hypothesis.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
