@@ -10,6 +10,7 @@ PUBLIC_CONTRACT_VERSION = "levline-props-public-v0.1"
 UPSTREAM_CONTRACT_VERSION = "levline-props-forecast-v0.1"
 HISTORY_CONTRACT_VERSION = "levline-props-history-v0.1"
 RESEARCH_LABEL = "LEVLINE PROPS — RESEARCH BETA"
+DEFAULT_JSONL_SHARD_MAX_BYTES = 64 * 1024 * 1024
 QUALITY_STATES = {"HIGH", "MEDIUM", "LOW", "INSUFFICIENT"}
 SIGNAL_STATES = {"MODEL EDGE", "WATCH", "NO SIGNAL"}
 POSITION_MARKETS = {
@@ -192,8 +193,19 @@ def grade_forecast_receipt(receipt, *, actual_result, graded_utc):
     else: raise PropsPublicationError("cannot grade unsupported market")
     e={"history_contract_version":HISTORY_CONTRACT_VERSION,"event_type":"GRADE","forecast_id":receipt.get("forecast_id"),"graded_utc":graded.isoformat(),"actual_result":actual,"market_outcome":outcome,"model_side":side,"grading_result":result,"original_sha256":receipt.get("original_sha256")}; e["event_id"]="grade_"+_sha(e)[:24]; return e
 
-def read_jsonl(path:Path):
-    if not path.exists(): return []
+def _jsonl_parts_dir(path:Path)->Path:
+    return path.parent / f"{path.stem}.parts"
+
+
+def jsonl_ledger_paths(path:Path)->list[Path]:
+    parts_dir=_jsonl_parts_dir(path)
+    parts=sorted(parts_dir.glob("part-*.jsonl")) if parts_dir.is_dir() else []
+    if path.is_file():
+        parts.append(path)
+    return parts
+
+
+def _read_jsonl_file(path:Path):
     out=[]
     for i,line in enumerate(path.read_text(encoding="utf-8").splitlines(),1):
         if not line.strip(): continue
@@ -203,8 +215,104 @@ def read_jsonl(path:Path):
         out.append(row)
     return out
 
+
+def read_jsonl(path:Path):
+    out=[]
+    for source in jsonl_ledger_paths(path):
+        out.extend(_read_jsonl_file(source))
+    return out
+
+
+def shard_jsonl_immutable(
+    path:Path,
+    *,
+    max_part_bytes:int=DEFAULT_JSONL_SHARD_MAX_BYTES,
+)->list[Path]:
+    """Rotate an oversized active JSONL ledger into immutable line-boundary parts.
+
+    Existing bytes are copied exactly. The active path is truncated only after every
+    new part has been finalized. On a failed CI runner no repository state is changed,
+    so an interrupted local rotation cannot silently rewrite committed evidence.
+    """
+    if max_part_bytes<=0:
+        raise PropsPublicationError("max_part_bytes must be positive")
+    if not path.is_file() or path.stat().st_size<=max_part_bytes:
+        return []
+
+    parts_dir=_jsonl_parts_dir(path)
+    parts_dir.mkdir(parents=True,exist_ok=True)
+    existing=sorted(parts_dir.glob("part-*.jsonl"))
+    indices=[]
+    for item in existing:
+        try:
+            indices.append(int(item.stem.rsplit("-",1)[1]))
+        except (IndexError,ValueError):
+            raise PropsPublicationError(f"invalid immutable history shard name: {item}")
+    next_index=max(indices,default=0)+1
+    created=[]
+    handle=None
+    tmp_path=None
+    final_path=None
+    current_size=0
+
+    def finish_part():
+        nonlocal handle,tmp_path,final_path,current_size
+        if handle is None:
+            return
+        handle.flush()
+        handle.close()
+        tmp_path.replace(final_path)
+        created.append(final_path)
+        handle=None
+        tmp_path=None
+        final_path=None
+        current_size=0
+
+    try:
+        with path.open("rb") as source:
+            for line_number,line in enumerate(source,1):
+                if len(line)>max_part_bytes:
+                    raise PropsPublicationError(
+                        f"history JSONL row exceeds shard limit at {path}:{line_number}"
+                    )
+                if handle is None or (current_size and current_size+len(line)>max_part_bytes):
+                    finish_part()
+                    final_path=parts_dir / f"part-{next_index:06d}.jsonl"
+                    if final_path.exists():
+                        raise PropsPublicationError(f"refusing to overwrite immutable history shard: {final_path}")
+                    tmp_path=final_path.with_suffix(final_path.suffix+".tmp")
+                    if tmp_path.exists():
+                        tmp_path.unlink()
+                    handle=tmp_path.open("wb")
+                    next_index+=1
+                handle.write(line)
+                current_size+=len(line)
+        finish_part()
+    except Exception:
+        if handle is not None:
+            handle.close()
+        if tmp_path is not None and tmp_path.exists():
+            tmp_path.unlink()
+        for created_path in created:
+            if created_path.exists():
+                created_path.unlink()
+        raise
+
+    # All archived bytes are finalized. Keep a small active ledger for future appends.
+    path.write_bytes(b"")
+    return created
+
+
 def append_jsonl_immutable(path:Path, events:Iterable[Mapping[str,Any]], *, identity_key:str):
-    existing=read_jsonl(path); by={str(r.get(identity_key)):r for r in existing if r.get(identity_key)}; additions=[]
+    existing=read_jsonl(path); by={}
+    for row in existing:
+        ident=_text(row.get(identity_key))
+        if not ident:
+            continue
+        if ident in by and _canon(by[ident])!=_canon(row):
+            raise PropsPublicationError(f"immutable history collision for {identity_key}={ident}")
+        by[ident]=row
+    additions=[]
     for event in events:
         c=_copy(dict(event)); ident=_text(c.get(identity_key))
         if not ident: raise PropsPublicationError(f"history event missing {identity_key}")
@@ -217,6 +325,19 @@ def append_jsonl_immutable(path:Path, events:Iterable[Mapping[str,Any]], *, iden
         with path.open("a",encoding="utf-8") as h:
             for e in additions: h.write(_canon(e)+"\n")
     return len(additions)
+
+
+def append_jsonl_immutable_sharded(
+    path:Path,
+    events:Iterable[Mapping[str,Any]],
+    *,
+    identity_key:str,
+    max_active_bytes:int=DEFAULT_JSONL_SHARD_MAX_BYTES,
+):
+    shard_jsonl_immutable(path,max_part_bytes=max_active_bytes)
+    added=append_jsonl_immutable(path,events,identity_key=identity_key)
+    shard_jsonl_immutable(path,max_part_bytes=max_active_bytes)
+    return added
 
 def build_history_view(receipts, closing_events=(), grade_events=()):
     closes={}; grades={}

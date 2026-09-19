@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from nfl_forecast.props_publication import (  # noqa: E402
     PropsPublicationError,
     append_jsonl_immutable,
+    append_jsonl_immutable_sharded,
     grade_forecast_receipt,
     make_closing_event,
     make_forecast_receipt,
@@ -43,7 +44,7 @@ def record_forecasts(args) -> int:
         raise PropsPublicationError("forecast artifact must contain a forecasts list")
     recorded = _aware(args.recorded_utc)
     receipts = [make_forecast_receipt(row, recorded_utc=recorded) for row in rows if isinstance(row, dict)]
-    count = append_jsonl_immutable(args.ledger, receipts, identity_key="forecast_id")
+    count = append_jsonl_immutable_sharded(args.ledger, receipts, identity_key="forecast_id")
     print(f"recorded {count} new immutable forecast originals -> {args.ledger}")
     return 0
 

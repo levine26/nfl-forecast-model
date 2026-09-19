@@ -8,6 +8,7 @@ import pytest
 from nfl_forecast.props_publication import (
     PropsPublicationError,
     append_jsonl_immutable,
+    append_jsonl_immutable_sharded,
     build_history_view,
     build_public_props,
     grade_forecast_receipt,
@@ -15,6 +16,7 @@ from nfl_forecast.props_publication import (
     make_forecast_receipt,
     normalize_public_forecast,
     read_jsonl,
+    shard_jsonl_immutable,
 )
 
 FIXTURE = Path(__file__).resolve().parents[1] / "research" / "props" / "fixtures" / "props_forecasts.json"
@@ -196,3 +198,55 @@ def test_market_capture_after_forecast_timestamp_fails_closed():
     public = normalize_public_forecast(row, now_utc=NOW)
     assert public["signal_state"] == "NO SIGNAL"
     assert "market_after_forecast" in public["unavailable_reasons"]
+
+
+def test_shard_rotation_preserves_exact_jsonl_bytes_and_read_order(tmp_path):
+    ledger = tmp_path / "forecast_originals.jsonl"
+    original = b'{"forecast_id":"a","value":1}\n{"forecast_id":"b","value":2}\n{"forecast_id":"c","value":3}\n'
+    ledger.write_bytes(original)
+    parts = shard_jsonl_immutable(ledger, max_part_bytes=62)
+    assert len(parts) == 2
+    assert all(part.stat().st_size <= 62 for part in parts)
+    assert b"".join(part.read_bytes() for part in parts) + ledger.read_bytes() == original
+    assert [row["forecast_id"] for row in read_jsonl(ledger)] == ["a", "b", "c"]
+
+
+def test_sharded_append_detects_collisions_across_archived_parts(tmp_path):
+    ledger = tmp_path / "forecast_originals.jsonl"
+    first = {"forecast_id":"a","payload":"x" * 40}
+    second = {"forecast_id":"b","payload":"y" * 40}
+    assert append_jsonl_immutable_sharded(
+        ledger, [first, second], identity_key="forecast_id", max_active_bytes=80
+    ) == 2
+    assert list((tmp_path / "forecast_originals.parts").glob("part-*.jsonl"))
+    assert read_jsonl(ledger) == [first, second]
+    assert append_jsonl_immutable_sharded(
+        ledger, [first], identity_key="forecast_id", max_active_bytes=80
+    ) == 0
+    conflicting = deepcopy(first)
+    conflicting["payload"] = "changed"
+    with pytest.raises(PropsPublicationError, match="immutable history collision"):
+        append_jsonl_immutable_sharded(
+            ledger, [conflicting], identity_key="forecast_id", max_active_bytes=80
+        )
+
+
+def test_multiple_shard_rotations_keep_every_original_once(tmp_path):
+    ledger = tmp_path / "forecast_originals.jsonl"
+    expected = []
+    for batch in range(4):
+        rows = [
+            {"forecast_id":f"{batch}-{i}","payload":str(batch) * 35}
+            for i in range(3)
+        ]
+        expected.extend(rows)
+        append_jsonl_immutable_sharded(
+            ledger, rows, identity_key="forecast_id", max_active_bytes=100
+        )
+    observed = read_jsonl(ledger)
+    assert observed == expected
+    assert len({row["forecast_id"] for row in observed}) == len(expected)
+    assert all(
+        part.stat().st_size <= 100
+        for part in (tmp_path / "forecast_originals.parts").glob("part-*.jsonl")
+    )

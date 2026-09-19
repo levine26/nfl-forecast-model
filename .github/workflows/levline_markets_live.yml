@@ -240,11 +240,14 @@ jobs:
                 production_authorized:false
               }' > "$RUN_ROOT/source_provenance.json"
 
-            git add \
+            # History originals may rotate into immutable sub-100 MiB shards.
+            # Stage the complete history tree so rotations preserve every row and stage the
+            # tracked monolith deletion plus new shard files atomically with current outputs.
+            git add -A \
               outputs/props/forecasts.json \
               outputs/props/public_props.json \
               outputs/props/status.json \
-              outputs/props/history/forecast_originals.jsonl
+              outputs/props/history
 
             if git diff --cached --quiet; then
               echo "No Props publication changes to publish."
