@@ -49,10 +49,19 @@ def open_game_environment(seasons, bundle)->tuple[pd.DataFrame,dict]:
         schedule=canonical_schedule(bundle,int(season))
         event_map,map_audit=map_events_to_schedule(raw,schedule)
 
+        line_type_col = next(
+            (column for column in ("line_type", "type") if column in raw.columns),
+            None,
+        )
+        if line_type_col is None:
+            raise RuntimeError(
+                "historical game-line source missing line_type/type; "
+                f"columns={sorted(raw.columns.astype(str).tolist())}"
+            )
         work=raw[
             raw["book_id"].eq(BOOK_ID)
             & raw["period"].astype(str).str.lower().eq("event")
-            & raw["type"].astype(str).str.lower().isin({"spread","total"})
+            & raw[line_type_col].astype(str).str.lower().isin({"spread","total"})
         ].copy()
         work["value"]=pd.to_numeric(work["value"],errors="coerce")
         work=work[work["value"].notna()].copy()
@@ -76,14 +85,14 @@ def open_game_environment(seasons, bundle)->tuple[pd.DataFrame,dict]:
             home=str(mapped["home_team"])
             away=str(mapped["away_team"])
             total_values=group.loc[
-                group["type"].astype(str).str.lower().eq("total"),"value"
+                group[line_type_col].astype(str).str.lower().eq("total"),"value"
             ].dropna()
             if total_values.empty:
                 excluded+=1
                 continue
             total=float(total_values.median())
 
-            spreads=group[group["type"].astype(str).str.lower().eq("spread")].copy()
+            spreads=group[group[line_type_col].astype(str).str.lower().eq("spread")].copy()
             spread_map={}
             for team,tg in spreads.groupby("team",sort=False):
                 team=str(team).upper().replace("JAC","JAX").replace("LA","LAR")
