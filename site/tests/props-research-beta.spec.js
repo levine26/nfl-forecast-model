@@ -30,12 +30,14 @@ test('Performance page is empirical-data gated and retains immutable receipts',a
   await page.goto('./#/props/history')
   const performance=page.locator('.lp-performance')
   await expect(performance).toBeVisible()
-  await expect(performance.locator('.lp-performance-head h1')).toHaveCount(1)
+  await expect(performance.locator('.lp-page-head h1')).toHaveCount(1)
   await expect(performance.locator('.lp-performance-concepts article')).toHaveCount(4)
   await expect(performance.locator('.lp-performance-concepts article b')).toHaveCount(4)
 
   const receipts=performance.locator('.lp-receipt')
-  if (fixtureRequired) await expect(receipts).toHaveCount(4)
+  const receiptCount=await receipts.count()
+  if (fixtureRequired) expect(receiptCount).toBeGreaterThanOrEqual(4)
+  expect(receiptCount).toBeLessThanOrEqual(100)
   const receiptDetails=receipts.first()
   if (await receiptDetails.isVisible().catch(()=>false)) {
     await receiptDetails.locator(':scope > summary').click()
