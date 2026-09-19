@@ -39,3 +39,5 @@ Every new row must specify:
 
 Experiments that fail remain in this table. A new scientific idea receives a new ID rather than
 mutating the failed specification.
+
+| P2-SHADOW-A-DEFENSE | Frozen rushing + receiving opponent-defense residuals improve untouched future pregame distributions vs V1 | Prospective shadow | PR #402 — immutable capture listener in validation | Primary prospective football challenger; exact V1 manifest replay; no outcomes read; evidence persists off main |
