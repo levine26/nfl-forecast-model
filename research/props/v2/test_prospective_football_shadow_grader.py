@@ -77,6 +77,7 @@ def test_pushes_are_excluded_only_from_threshold_binary_metrics():
     frame,audit=module.grade_receipts(
         [receipt],
         completed_games={"G1"},
+        outcome_pbp_games={"G1"},
         actuals={("G1","P1","rushing_yards"):50.0},
         participation={("G1","P1"):25},
     )
@@ -154,6 +155,7 @@ def test_zero_offense_snaps_are_void_but_positive_snaps_zero_events_grade_zero()
     frame,audit=module.grade_receipts(
         [base],
         completed_games={"G1"},
+        outcome_pbp_games={"G1"},
         actuals={},
         participation={("G1","P1"):0},
     )
@@ -163,6 +165,7 @@ def test_zero_offense_snaps_are_void_but_positive_snaps_zero_events_grade_zero()
     frame,audit=module.grade_receipts(
         [base],
         completed_games={"G1"},
+        outcome_pbp_games={"G1"},
         actuals={},
         participation={("G1","P1"):12},
     )
@@ -249,3 +252,38 @@ def test_receipt_integrity_rejects_post_kickoff_chronology(tmp_path):
     path.write_text(json.dumps(row)+"\n",encoding="utf-8")
     with pytest.raises(module.ShadowGradingError,match="pre-kickoff"):
         module.read_receipts(path)
+
+
+def test_final_schedule_without_pbp_remains_ungraded():
+    module=_module()
+    receipt={
+        "shadow_id":"s-missing-pbp",
+        "source_season":2026,
+        "source_week":2,
+        "game_id":"G1",
+        "player_id":"P1",
+        "prop_type":"rushing_yards",
+        "market":{"line":40.5},
+        "v1":{
+            "fair_line":42.0,
+            "over_probability":0.55,
+            "prediction_interval":{"low":10.0,"high":70.0,"coverage":0.8},
+            "empirical_distribution":_snapshot([10,30,40,50,70]),
+        },
+        "shadow_a":{
+            "fair_line":41.0,
+            "over_probability":0.53,
+            "prediction_interval":{"low":10.0,"high":68.0,"coverage":0.8},
+            "empirical_distribution":_snapshot([10,28,40,49,68]),
+        },
+    }
+    frame,audit=module.grade_receipts(
+        [receipt],
+        completed_games={"G1"},
+        outcome_pbp_games=set(),
+        actuals={},
+        participation={("G1","P1"):30},
+    )
+    assert frame.empty
+    assert audit["missing_final_pbp"]==1
+    assert audit["graded"]==0
