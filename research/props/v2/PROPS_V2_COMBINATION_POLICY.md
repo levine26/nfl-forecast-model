@@ -45,15 +45,15 @@ A mechanism can advance through these stages:
 - Availability/workload mixture: **not evaluable retrospectively** — prospective data collection only.
 - Dynamic Role V0.1 full: **prospective-hypothesis eligible, not production eligible**; retrospective
   Fair-Line MAE improved but directional gain was not established.
-- Defensive-efficiency rushing/receiving: component gates passed; eligibility depends separately on
-  the still-running true-pregame ablations in PR #394.
+- Defensive-efficiency rushing/receiving: **both true-pregame gates passed in PR #394** and both are
+  eligible for a prospectively frozen shadow challenger. Retrospective directional accuracy did not improve.
 - Market microstructure/CLV: prospective capture workflow is active; no grading until sufficient
   timestamp-qualified evidence accumulates.
 
 ## Prospective combination rule
 
-If a PR #394 event type passes its frozen true-pregame gate, that event-type defensive-efficiency
-residual becomes eligible for the future prospective shadow challenger.
+Both PR #394 event types passed their frozen true-pregame gates. The rushing and receiving
+opponent-defense residuals are therefore eligible for the future prospective shadow challenger.
 
 The future prospective challenger may include:
 - Dynamic Role V0.1 full as a separately frozen role hypothesis;
