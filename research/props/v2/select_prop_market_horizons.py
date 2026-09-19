@@ -35,12 +35,32 @@ class HorizonError(ValueError):
     pass
 
 
-def has_live_source_provenance(row: Mapping[str, Any]) -> bool:
+LIVE_SOURCE_PROVENANCE_FIELDS = (
+    "source_trigger_head_sha",
+    "source_market_provider",
+    "source_market_credential_mode",
+    "source_provenance_sha256",
+)
+
+
+def live_source_provenance_state(row: Mapping[str, Any]) -> str:
+    presence = [
+        bool(str(row.get(field) or "").strip())
+        for field in LIVE_SOURCE_PROVENANCE_FIELDS
+    ]
+    if not any(presence):
+        return "legacy_pre_provenance"
+    if not all(presence):
+        missing = [
+            field
+            for field, present in zip(LIVE_SOURCE_PROVENANCE_FIELDS, presence)
+            if not present
+        ]
+        raise HorizonError(f"partial live-source provenance is invalid; missing {missing}")
+
     run_id = str(row.get("source_workflow_run") or "").strip()
     generation_sha = str(row.get("source_head_sha") or "").strip().lower()
     trigger_sha = str(row.get("source_trigger_head_sha") or "").strip().lower()
-    provider = str(row.get("source_market_provider") or "").strip()
-    credential_mode = str(row.get("source_market_credential_mode") or "").strip()
     provenance_sha = str(row.get("source_provenance_sha256") or "").strip().lower()
     git_sha = lambda value: len(value) in {40, 64} and all(
         char in "0123456789abcdef" for char in value
@@ -48,14 +68,13 @@ def has_live_source_provenance(row: Mapping[str, Any]) -> bool:
     sha256 = len(provenance_sha) == 64 and all(
         char in "0123456789abcdef" for char in provenance_sha
     )
-    return bool(
-        run_id
-        and git_sha(generation_sha)
-        and git_sha(trigger_sha)
-        and provider
-        and credential_mode
-        and sha256
-    )
+    if not run_id or not git_sha(generation_sha) or not git_sha(trigger_sha) or not sha256:
+        raise HorizonError("invalid live-source provenance identity")
+    return "eligible"
+
+
+def has_live_source_provenance(row: Mapping[str, Any]) -> bool:
+    return live_source_provenance_state(row) == "eligible"
 
 
 def _canon(value: Any) -> str:
