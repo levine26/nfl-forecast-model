@@ -123,22 +123,28 @@ def empirical_crps(snapshot: Mapping[str,Any], observation: float)->float:
     return float(max(0.0,first-half_pairwise))
 
 
-def interval_score(interval: Mapping[str,Any], observation: float)->tuple[float,bool]:
-    if not isinstance(interval,Mapping):
-        raise ShadowGradingError("prediction interval missing")
-    low=float(interval["low"])
-    high=float(interval["high"])
-    level=float(interval["coverage"])
-    if not (math.isfinite(low) and math.isfinite(high) and low<=high and 0.0<level<1.0):
-        raise ShadowGradingError("invalid prediction interval")
+def fixed_interval_score(
+    snapshot: Mapping[str,Any],
+    observation: float,
+    *,
+    level: float=0.80,
+)->tuple[float,bool,float,float]:
+    validate_distribution(snapshot)
+    if not 0.0<level<1.0:
+        raise ShadowGradingError("interval level must be in (0,1)")
+    support=np.asarray(snapshot["support"],dtype=float)
+    counts=np.asarray(snapshot["counts"],dtype=float)
+    cdf=np.cumsum(counts)/float(snapshot["sample_count"])
     alpha=1.0-level
+    low=float(support[int(np.searchsorted(cdf,alpha/2.0,side="left"))])
+    high=float(support[int(np.searchsorted(cdf,1.0-alpha/2.0,side="left"))])
     y=float(observation)
     penalty=0.0
     if y<low:
         penalty=(2.0/alpha)*(low-y)
     elif y>high:
         penalty=(2.0/alpha)*(y-high)
-    return float((high-low)+penalty),bool(low<=y<=high)
+    return float((high-low)+penalty),bool(low<=y<=high),low,high
 
 
 def _completed_games(schedule: pd.DataFrame)->set[str]:
@@ -256,8 +262,12 @@ def grade_receipts(
         shadow=receipt["shadow_a"]
         v1_crps=empirical_crps(v1["empirical_distribution"],actual)
         shadow_crps=empirical_crps(shadow["empirical_distribution"],actual)
-        v1_interval,v1_covered=interval_score(v1["prediction_interval"],actual)
-        shadow_interval,shadow_covered=interval_score(shadow["prediction_interval"],actual)
+        v1_interval,v1_covered,v1_low,v1_high=fixed_interval_score(
+            v1["empirical_distribution"],actual,level=0.80
+        )
+        shadow_interval,shadow_covered,shadow_low,shadow_high=fixed_interval_score(
+            shadow["empirical_distribution"],actual,level=0.80
+        )
 
         v1_p=float(v1["over_probability"])
         shadow_p=float(shadow["over_probability"])
@@ -303,6 +313,10 @@ def grade_receipts(
             "shadow_minus_v1_log_loss":shadow_log-v1_log if outcome is not None else math.nan,
             "v1_interval_score_80":v1_interval,
             "shadow_interval_score_80":shadow_interval,
+            "v1_interval_low_80":v1_low,
+            "v1_interval_high_80":v1_high,
+            "shadow_interval_low_80":shadow_low,
+            "shadow_interval_high_80":shadow_high,
             "v1_covered_80":v1_covered,
             "shadow_covered_80":shadow_covered,
             "v1_direction_hit":v1_dir,
