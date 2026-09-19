@@ -14,6 +14,7 @@ import pytest
 ROOT=Path(__file__).resolve().parents[3]
 SCRIPT=ROOT/"research"/"props"/"v2"/"record_prospective_football_shadow.py"
 FROZEN=ROOT/"research"/"props"/"v2"/"DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json"
+WORKFLOW=ROOT/".github"/"workflows"/"research_props_v2_football_shadow.yml"
 
 
 def _module():
@@ -453,3 +454,13 @@ def test_empirical_distribution_snapshot_is_lossless():
     assert snapshot["counts"]==[2,1,3]
     assert sum(snapshot["counts"])==snapshot["sample_count"]
     assert len(snapshot["sha256"])==64
+
+
+def test_shadow_a_workflow_requires_live_generation_and_market_provenance():
+    text=WORKFLOW.read_text(encoding="utf-8")
+    assert "LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0" in text
+    assert "source_provenance.json" in text
+    assert "Shadow A market snapshot SHA mismatch" in text
+    assert "Shadow A market provider provenance mismatch" in text
+    assert "--source-trigger-head-sha" in text
+    assert "--source-provenance-sha256" in text
