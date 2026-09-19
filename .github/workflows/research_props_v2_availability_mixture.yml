@@ -1,0 +1,70 @@
+name: LevLine Props 2.0 availability workload mixture
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-challenger
+    paths:
+      - 'research/props/v2/availability_workload_mixture.py'
+      - 'research/props/v2/run_availability_workload_mixture.py'
+      - 'research/props/v2/test_availability_workload_mixture.py'
+      - 'research/props/v2/AVAILABILITY_WORKLOAD_MIXTURE_CONTRACT.md'
+      - '.github/workflows/research_props_v2_availability_mixture.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: |
+          python -m py_compile research/props/v2/availability_workload_mixture.py
+          python -m py_compile research/props/v2/run_availability_workload_mixture.py
+          pytest -q research/props/v2/test_availability_workload_mixture.py
+
+  fit-pre2026:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install -e '.[dev]'
+          python -m pip install pyarrow
+      - run: |
+          python research/props/v2/run_availability_workload_mixture.py             --start-season 2021             --end-season 2025             --output-dir research_outputs/props_v2/availability_mixture
+      - name: Enforce mechanism gate boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("research_outputs/props_v2/availability_mixture/workload_mixture.json").read_text())
+          assert d["production_authorized"] is False
+          assert d["prop_outcomes_used"] == 0
+          assert d["completed_2026_outcomes_used"] == 0
+          assert d["source_audit"]["completed_2026_outcomes_used"] == 0
+          print(json.dumps({
+            "n_observations":d["n_observations"],
+            "n_active":d["n_active"],
+            "out_rate":d["out_rate"],
+            "states":d["active_state_parameters"],
+            "diagnostic_gate":d["diagnostic_gate"],
+            "source_audit":d["source_audit"],
+          },indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-availability-workload-mixture
+          path: research_outputs/props_v2/availability_mixture/
+          if-no-files-found: error
