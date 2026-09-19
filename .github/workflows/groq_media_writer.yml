@@ -476,15 +476,7 @@ jobs:
           for publish_attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
-            python - <<'PY'
-            import json
-            from pathlib import Path
-            status_path = Path('outputs/context_source_status.json')
-            status = json.loads(status_path.read_text(encoding='utf-8'))
-            section = json.loads(Path('/tmp/groq-provider-fallback-section.json').read_text(encoding='utf-8'))
-            status['groq_provider_fallback'] = section
-            status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n', encoding='utf-8')
-            PY
+            python -c "import json; from pathlib import Path; status_path = Path('outputs/context_source_status.json'); status = json.loads(status_path.read_text(encoding='utf-8')); section = json.loads(Path('/tmp/groq-provider-fallback-section.json').read_text(encoding='utf-8')); status['groq_provider_fallback'] = section; status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\\n', encoding='utf-8')"
             git add outputs/context_source_status.json
             if git diff --cached --quiet; then
               echo "Latest main already contains this exact Groq failure state."
