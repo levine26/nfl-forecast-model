@@ -80,7 +80,9 @@ Every receipt must preserve:
 - kickoff;
 - original market line/probability;
 - original V1 Fair Line/probability;
+- lossless empirical V1 yardage distribution (support + counts) for proper-score grading;
 - Shadow A Fair Line/probability/distribution summary;
+- lossless empirical Shadow A yardage distribution (support + counts) for proper-score grading;
 - frozen coefficient version and values;
 - defensive-state feature and provenance;
 - explicit production_authorized=false.
