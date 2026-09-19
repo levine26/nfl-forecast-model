@@ -317,6 +317,10 @@ def test_propline_fetch_uses_compatible_nfl_prop_shape(monkeypatch):
         assert path.endswith("/events/pl-evt-ari-lar/odds")
         event = _event()
         event["id"] = "pl-evt-ari-lar"
+        event["bookmakers"][0]["key"] = "draftkings"
+        event["bookmakers"][0]["title"] = "DraftKings"
+        event["bookmakers"][1]["key"] = "prizepicks"
+        event["bookmakers"][1]["title"] = "PrizePicks"
         return event
 
     monkeypatch.setattr(live, "_propline_get_json", fake_get)
@@ -331,8 +335,21 @@ def test_propline_fetch_uses_compatible_nfl_prop_shape(monkeypatch):
     assert raw["discovery_event_count"] == 1
     assert calls[0][1] == {}
     assert "player_pass_yds" in calls[1][1]["markets"]
+    assert calls[1][1]["bookmakers"] == ",".join(
+        sorted(live.PROPLINE_SPORTSBOOK_KEYS)
+    )
     assert "regions" not in calls[1][1]
+    assert [book["key"] for book in events[0]["bookmakers"]] == ["draftkings"]
     assert "propline-secret" not in str(raw)
+
+
+def test_propline_bookmaker_filter_excludes_dfs_and_exchange_sources():
+    assert live._propline_sportsbook_filter(
+        "draftkings,prizepicks,kalshi,polymarket_us,underdog"
+    ) == "draftkings"
+
+    with pytest.raises(live.PropsMarketLiveError, match="no approved sportsbook"):
+        live._propline_sportsbook_filter("prizepicks,kalshi,underdog")
 
 
 

@@ -29,6 +29,17 @@ PROPLINE_API_BASE = "https://api.prop-line.com/v1"
 # credential in its MIT-licensed MCP server so zero-config clients can make their
 # first request. Keep it LAST in the fallback order; personal credentials always win.
 PROPLINE_PUBLIC_DEMO_KEY = "be2b8487fcfacb1fbc292a8aa925a84c"
+PROPLINE_SPORTSBOOK_KEYS = {
+    "betmgm",
+    "betrivers",
+    "betway",
+    "bovada",
+    "draftkings",
+    "fanatics",
+    "fanduel",
+    "hardrock",
+    "pinnacle",
+}
 SPORTSGAMEODDS_API_BASE = "https://api.sportsgameodds.com/v2"
 DEFAULT_REGIONS = "us"
 DEFAULT_ODDS_FORMAT = "american"
@@ -716,6 +727,40 @@ def fetch_sportsgameodds_nfl_prop_events(
     return normalized, raw_bundle
 
 
+def _propline_sportsbook_filter(bookmakers: str | None) -> str:
+    """Return the requested PropLine sportsbook subset, excluding DFS/exchanges."""
+
+    if bookmakers:
+        requested = {
+            value.strip().lower()
+            for value in str(bookmakers).split(",")
+            if value.strip()
+        }
+        allowed = requested & PROPLINE_SPORTSBOOK_KEYS
+        if not allowed:
+            raise PropsMarketLiveError(
+                "PropLine bookmaker filter contains no approved sportsbook keys"
+            )
+        return ",".join(sorted(allowed))
+    return ",".join(sorted(PROPLINE_SPORTSBOOK_KEYS))
+
+
+def _filter_propline_event_books(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Defense-in-depth filter so non-sportsbook prices cannot enter consensus."""
+
+    normalized = dict(payload)
+    raw_books = payload.get("bookmakers")
+    if not isinstance(raw_books, list):
+        return normalized
+    normalized["bookmakers"] = [
+        dict(book)
+        for book in raw_books
+        if isinstance(book, Mapping)
+        and str(book.get("key") or "").strip().lower() in PROPLINE_SPORTSBOOK_KEYS
+    ]
+    return normalized
+
+
 def fetch_live_nfl_prop_events(
     *,
     player_state_rows: Sequence[Mapping[str, Any]],
@@ -742,7 +787,7 @@ def fetch_live_nfl_prop_events(
         discovery_params = {}
         odds_params = {
             "markets": ",".join(sorted(DEFAULT_MARKET_MAP)),
-            "bookmakers": bookmakers,
+            "bookmakers": _propline_sportsbook_filter(bookmakers),
         }
     elif provider == "sportsgameodds":
         return fetch_sportsgameodds_nfl_prop_events(
@@ -800,7 +845,12 @@ def fetch_live_nfl_prop_events(
             raise PropsMarketLiveError(
                 f"{provider} event odds response must be an object for event {event_id}"
             )
-        event_odds.append(dict(payload))
+        normalized_payload = (
+            _filter_propline_event_books(payload)
+            if provider == "propline"
+            else dict(payload)
+        )
+        event_odds.append(normalized_payload)
 
     raw_bundle = {
         "provider": provider,
