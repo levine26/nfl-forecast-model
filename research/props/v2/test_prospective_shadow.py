@@ -205,3 +205,11 @@ def test_missing_live_source_provenance_fails_closed():
             source_market_credential_mode=SOURCE_CREDENTIAL_MODE,
             source_provenance_sha256=SOURCE_PROVENANCE_SHA,
         )
+
+
+def test_market_shadow_workflow_legacy_enforcement_is_provenance_aware():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert 'partial live-source provenance is invalid' in text
+    assert 'if any(present):' in text
+    assert 'for row in current:' in text
+    assert 'row["source_provenance_sha256"]==status["source_provenance_sha256"]' in text
