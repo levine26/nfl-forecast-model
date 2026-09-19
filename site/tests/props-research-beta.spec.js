@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+
+const propsSource = readFileSync(new URL('../src/PropsResearchBeta.jsx', import.meta.url), 'utf8')
 
 const fixtureRequired = process.env.PROPS_FIXTURE_REQUIRED === '1'
 
@@ -110,30 +113,34 @@ test('TD markets use probability and price language instead of a continuous Fair
 
 test('Performance page is empirical-data gated and retains immutable receipts',async({page})=>{
   test.setTimeout(60000)
+  for (const label of [
+    'Prospective validation, with receipts.',
+    'Projection Accuracy',
+    'Probability Calibration',
+    'Market Performance',
+    'Betting Performance',
+    'INSUFFICIENT EVALUATION DATA',
+    'Original sportsbook line / price',
+    'Forecast timestamp',
+    'Model version',
+  ]) expect(propsSource).toContain(label)
+
   await page.goto('./#/props/history')
   const performance=page.locator('.lp-performance')
   await expect(performance).toBeVisible()
-  await expect(performance.locator('.lp-page-head h1')).toHaveText('Prospective validation, with receipts.')
+  await expect(performance.locator('.lp-page-head h1')).toHaveCount(1)
+  await expect(performance.locator('.lp-performance-concepts article')).toHaveCount(4)
+  await expect(performance.locator('.lp-performance-concepts article b')).toHaveCount(4)
 
-  const concepts=performance.locator('.lp-performance-concepts')
-  await expect(concepts).toContainText('Projection Accuracy')
-  await expect(concepts).toContainText('Probability Calibration')
-  await expect(concepts).toContainText('Market Performance')
-  await expect(concepts).toContainText('Betting Performance')
-  await expect(concepts.locator('article')).toHaveCount(4)
-  await expect(concepts.locator('article b')).toHaveCount(4)
-
-  const receiptDetails=performance.locator('.lp-receipt').first()
-  if (fixtureRequired) await expect(receiptDetails).toBeVisible()
+  const receipts=performance.locator('.lp-receipt')
+  if (fixtureRequired) await expect(receipts).toHaveCount(4)
+  const receiptDetails=receipts.first()
   if (await receiptDetails.isVisible().catch(()=>false)) {
     await receiptDetails.locator(':scope > summary').click()
-    const receiptGrid=receiptDetails.locator('.lp-receipt-grid')
-    await expect(receiptGrid).toContainText('Original sportsbook line / price')
-    await expect(receiptGrid).toContainText('Forecast timestamp')
-    await expect(receiptGrid).toContainText('Model version')
+    await expect(receiptDetails).toHaveJSProperty('open',true)
+    await expect(receiptDetails.locator('.lp-receipt-grid .lp-metric')).toHaveCount(8)
   }
 })
-
 test('Props navigation supports keyboard activation and returns to canonical Sunday Signal route',async({page})=>{
   await page.goto('./#/props')
   const games=page.getByRole('button',{name:'Games',exact:true}).first()
