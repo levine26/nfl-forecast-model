@@ -1,0 +1,118 @@
+name: LevLine Props 2.0 FTN residual research
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-challenger
+    paths:
+      - "research/props/v2/FTN_RESIDUAL_EXPERIMENT_CONTRACT.md"
+      - "research/props/v2/props_ftn_matchup_state.py"
+      - "research/props/v2/props_ftn_market_residual.py"
+      - "research/props/v2/evaluate_ftn_market_residual.py"
+      - "research/props/v2/test_props_ftn_matchup_state.py"
+      - "research/props/v2/test_props_ftn_market_residual.py"
+      - ".github/workflows/research_props_v2_ftn_residual.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Compile and test FTN residual research
+        run: |
+          python -m py_compile research/props/v2/props_ftn_matchup_state.py
+          python -m py_compile research/props/v2/props_ftn_market_residual.py
+          python -m py_compile research/props/v2/evaluate_ftn_market_residual.py
+          pytest -q             research/props/v2/test_props_ftn_matchup_state.py             research/props/v2/test_props_ftn_market_residual.py
+
+  evaluate:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pyarrow
+      - name: Download exact frozen V1 historical receipts
+        run: |
+          mkdir -p research_outputs/props_v2/ftn_residual/v1/2023
+          mkdir -p research_outputs/props_v2/ftn_residual/v1/2024
+          mkdir -p research_outputs/props_v2/ftn_residual/v1/2025
+          gh run download 35363701921             -n levline-props-historical-primary-2023             -D research_outputs/props_v2/ftn_residual/v1/2023
+          gh run download 35363701921             -n levline-props-historical-primary-2024             -D research_outputs/props_v2/ftn_residual/v1/2024
+          gh run download 35363701921             -n levline-props-historical-primary-2025             -D research_outputs/props_v2/ftn_residual/v1/2025
+          test -f research_outputs/props_v2/ftn_residual/v1/2023/2023_forecast_level.csv
+          test -f research_outputs/props_v2/ftn_residual/v1/2024/2024_forecast_level.csv
+          test -f research_outputs/props_v2/ftn_residual/v1/2025/2025_forecast_level.csv
+      - name: Verify exact authoritative receipt hashes
+        run: |
+          python - <<'PY'
+          from hashlib import sha256
+          from pathlib import Path
+          expected={
+            2023:"b89835c777fbef531afbdbadda3e07c6ac4da72b6a22178aa8dbc4e9ef29d4bd",
+            2024:"cf9e31d0e80cc141e47db3c4f6d167e52f66302e8e0085c16d8e9bfa0bb98e12",
+            2025:"6d2d8aaf95a549b1cc6841f23d49b07c3d9f9d38c1e7ee1be6242cced34d085a",
+          }
+          for season,digest in expected.items():
+              p=Path(f"research_outputs/props_v2/ftn_residual/v1/{season}/{season}_forecast_level.csv")
+              got=sha256(p.read_bytes()).hexdigest()
+              assert got == digest, (season, got, digest)
+          PY
+      - name: Evaluate chronology-constrained FTN residual
+        run: |
+          python research/props/v2/evaluate_ftn_market_residual.py             --input research_outputs/props_v2/ftn_residual/v1/2023/2023_forecast_level.csv             --input research_outputs/props_v2/ftn_residual/v1/2024/2024_forecast_level.csv             --input research_outputs/props_v2/ftn_residual/v1/2025/2025_forecast_level.csv             --output-dir research_outputs/props_v2/ftn_residual/evaluation
+      - name: Enforce frozen experiment boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("research_outputs/props_v2/ftn_residual/evaluation/summary.json")
+          d=json.loads(p.read_text())
+          assert d["contract_version"] == "levline-props-v2-ftn-residual-development-v0.1.0"
+          assert d["promotion_authorized"] is False
+          assert d["selective_threshold_used"] is False
+          assert d["completed_2026_outcomes_used_for_tuning"] == 0
+          c=d["ftn_state_coverage"]
+          assert c["target_week_rows_used"] == 0
+          assert c["completed_2026_outcomes_used_for_tuning"] == 0
+          assert c["live_source_capable"] is True
+          assert c["opponent_coverage"] >= 0.99
+          assert c["row_coverage"] >= 0.85
+          print(json.dumps({
+              "decision": d["preregistered_incremental_signal_decision"],
+              "fixed_anchor": d["fixed_anchor"]["evaluation"],
+              "rolling_2024": d["rolling_origin"]["by_evaluation_season"].get("2024",{}).get("evaluation"),
+              "rolling_2025": d["rolling_origin"]["by_evaluation_season"].get("2025",{}).get("evaluation"),
+              "coverage": {
+                  "row_coverage": c["row_coverage"],
+                  "opponent_coverage": c["opponent_coverage"],
+              },
+          }, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-ftn-residual-evaluation
+          path: research_outputs/props_v2/ftn_residual/evaluation/
+          if-no-files-found: error
