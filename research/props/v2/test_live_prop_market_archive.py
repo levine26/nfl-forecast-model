@@ -132,6 +132,7 @@ def test_post_kickoff_capture_fails_closed(tmp_path):
             output_dir=tmp_path / "archive",
             manifest_path=tmp_path / "archive" / "manifest.jsonl",
             source_workflow_run="123",
+            source_head_sha=SOURCE_SHA,
         )
 
 
@@ -148,6 +149,7 @@ def test_production_authorized_snapshot_is_rejected(tmp_path):
             output_dir=tmp_path / "archive",
             manifest_path=tmp_path / "archive" / "manifest.jsonl",
             source_workflow_run="123",
+            source_head_sha=SOURCE_SHA,
         )
 
 
