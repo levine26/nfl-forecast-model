@@ -378,3 +378,36 @@ def test_b_receipt_integrity_requires_team_identity(tmp_path):
     path.write_text(json.dumps(row)+"\n",encoding="utf-8")
     with pytest.raises(module.ShadowBGradingError,match="team identity"):
         module.read_b_receipts(path)
+
+
+def test_legacy_shadow_b_receipt_is_preserved_but_excluded(tmp_path):
+    module=_module()
+    row=_b_receipt()
+    for key in (
+        "source_trigger_head_sha",
+        "source_market_provider",
+        "source_market_credential_mode",
+        "source_provenance_sha256",
+    ):
+        row.pop(key)
+    row["shadow_sha256"]=module._sha({k:v for k,v in row.items() if k!="shadow_sha256"})
+    path=tmp_path/"legacy-b.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    receipts,audit=module.read_b_receipts_with_audit(path)
+    assert receipts==[]
+    assert audit=={
+        "ledger_rows":1,
+        "provenance_eligible_receipts":0,
+        "legacy_pre_provenance_receipts":1,
+    }
+
+
+def test_partial_shadow_b_provenance_fails_closed(tmp_path):
+    module=_module()
+    row=_b_receipt()
+    row.pop("source_market_provider")
+    row["shadow_sha256"]=module._sha({k:v for k,v in row.items() if k!="shadow_sha256"})
+    path=tmp_path/"partial-b.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowBGradingError,match="partial Shadow B live-source provenance"):
+        module.read_b_receipts_with_audit(path)
