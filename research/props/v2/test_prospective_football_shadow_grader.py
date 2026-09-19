@@ -287,3 +287,17 @@ def test_final_schedule_without_pbp_remains_ungraded():
     assert frame.empty
     assert audit["missing_final_pbp"]==1
     assert audit["graded"]==0
+
+
+def test_complete_outcome_pbp_games_requires_zero_seconds_when_available():
+    module=_module()
+    pbp=pd.DataFrame([
+        {"game_id":"G1","game_seconds_remaining":3600},
+        {"game_id":"G1","game_seconds_remaining":0},
+        {"game_id":"G2","game_seconds_remaining":3600},
+        {"game_id":"G2","game_seconds_remaining":120},
+    ])
+    games,audit=module.complete_outcome_pbp_games(pbp)
+    assert games=={"G1"}
+    assert audit["mode"]=="game_seconds_remaining_zero"
+    assert audit["game_count"]==1
