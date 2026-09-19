@@ -252,6 +252,12 @@ def resolve_primary_qbs_from_depth_charts(
         (str(row["_team"]), str(row["player_id"]))
         for _, row in qb_state.iterrows()
     }
+    state_availability = {
+        (str(row["_team"]), str(row["player_id"])): str(
+            row.get("expected_active_state") or "UNKNOWN"
+        ).upper()
+        for _, row in qb_state.iterrows()
+    }
     game_teams = sorted(set(state["_team"].astype(str)))
     resolved: dict[str, dict[str, str]] = {}
 
@@ -275,6 +281,12 @@ def resolve_primary_qbs_from_depth_charts(
         if rows.empty:
             audit["teams_missing"].append(team)
             continue
+        rows["_active_state"] = rows["_gsis_id"].map(
+            lambda value: state_availability.get((team, str(value)), "UNKNOWN")
+        )
+        non_doubtful = rows[~rows["_active_state"].eq("DOUBTFUL")].copy()
+        if not non_doubtful.empty:
+            rows = non_doubtful
         best_rank = float(rows["_rank"].min())
         candidates = rows[rows["_rank"].eq(best_rank)]["_gsis_id"]
         candidate_ids = sorted(
