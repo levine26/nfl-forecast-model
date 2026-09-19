@@ -336,14 +336,13 @@ No completed 2026 outcome may change the candidate. Grading is evaluation-only.
 The capture implementation exists in **PR #381**, including frozen exact-timestamp archive and
 T48H/T24H/T12H/T6H/T90M/T30M/near-close horizon selection.
 
-As of this record, the persistent branch
-`research-data/props-v2-market-archive` does **not** exist and no manifest/horizon archive is
-available. The workflow's automatic `workflow_run` trigger operates only after the archive workflow
-is present on `main`.
+PR #381 has now been merged to `main`, so the automatic `workflow_run` listener is active.
+The persistent branch `research-data/props-v2-market-archive` still does **not** exist, which means
+no qualifying post-merge live refresh has produced the first immutable capture yet.
 
-**Disposition:** prospective market evidence collection is implementation-ready but **not yet
-active**. Do not describe CLV/movement capture as started until #381 is merged and the first
-successful live refresh produces a persistent archive commit.
+**Disposition:** prospective market evidence collection is **activated but has zero captures so far**.
+Do not grade CLV/movement or describe evidence as accumulated until the first successful live refresh
+creates the persistent archive branch and manifest.
 
 ## Production conclusion
 
