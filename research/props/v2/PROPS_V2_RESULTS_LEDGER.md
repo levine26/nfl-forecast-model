@@ -352,6 +352,57 @@ Firewall audit:
 **Disposition:** coefficients are eligible only for untouched prospective shadow once the validated
 pregame mechanism PR is merged. They may not be changed because of 2026 performance.
 
+## Opponent defensive efficiency — true-pregame gates passed
+
+Canonical PR **#394**, primary workflow `35419926356`.
+
+The ablation preserved every V1 sampled opportunity-count array, used opponent-defense state only
+from weeks strictly before the target week, fit residual coefficients only through season S−1, and
+regenerated only the relevant yards/event distribution.
+
+### Rushing
+
+2023–2025:
+- N **941**, 230 games, 112 players;
+- V1 CRPS **18.19360**;
+- challenger CRPS **17.93138**;
+- challenger minus V1 **−0.26222**;
+- game-clustered 95% interval **−0.34455 to −0.17871**;
+- V1 Fair-Line MAE **24.85228**;
+- challenger MAE **24.56642**;
+- MAE improvement **−0.28587**;
+- MAE clustered interval **−0.41022 to −0.16561**;
+- coverage improves **62.17% → 62.91%**;
+- CRPS improves in **3/3** seasons.
+
+Frozen rushing gate: **PASS 5/5**.
+
+Directional diagnostic: **48.51% V1 → 48.09% challenger** (slightly worse).
+
+### Receiving
+
+2023–2025:
+- N **1,864**, 230 games, 256 players;
+- V1 CRPS **19.18091**;
+- challenger CRPS **18.77232**;
+- challenger minus V1 **−0.40859**;
+- game-clustered 95% interval **−0.50123 to −0.32632**;
+- V1 Fair-Line MAE **26.87741**;
+- challenger MAE **26.31626**;
+- MAE improvement **−0.56116**;
+- MAE clustered interval **−0.68187 to −0.44671**;
+- coverage improves **71.51% → 71.78%**;
+- CRPS improves in **2/3** seasons.
+
+Frozen receiving gate: **PASS 5/5**.
+
+Directional diagnostic: **50.13% V1 → 49.81% challenger** (slightly worse).
+
+**Disposition:** ADVANCE both defensive-efficiency residuals to **prospective shadow eligibility**.
+This is a full pregame distribution/Fair-Line improvement, not a demonstrated directional hit-rate or
+betting-edge improvement. No production promotion. Permanent record:
+`DEFENSIVE_EFFICIENCY_PREGAME_RESULT.md`.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
