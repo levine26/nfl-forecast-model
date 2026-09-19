@@ -130,11 +130,53 @@ def run(output_dir: Path) -> dict:
         )
 
     if len(eligible_seasons) < 2:
-        raise RuntimeError(
-            "availability/workload study requires at least two source-qualified "
-            f"season-forward evaluation seasons; eligible={eligible_seasons}, "
-            f"excluded={source_excluded_seasons}"
+        result = {
+            "contract_version": CONTRACT_VERSION,
+            "status": "BLOCKED_SOURCE_COVERAGE",
+            "requested_evaluation_seasons": list(EVALUATION_SEASONS),
+            "source_qualified_evaluation_seasons": eligible_seasons,
+            "source_excluded_seasons": source_excluded_seasons,
+            "source_audit": {
+                "injuries": injury_audit,
+                "snaps": snap_audit,
+                "snap_identity": identity_audit,
+                "examples": examples_audit,
+            },
+            "aggregate": None,
+            "by_season": per_season,
+            "by_designation_position": {},
+            "development_gate": {
+                "passed": False,
+                "reason": "insufficient_source_qualified_seasons",
+                "required_source_qualified_seasons": 2,
+                "observed_source_qualified_seasons": len(eligible_seasons),
+            },
+            "prop_outcomes_used_for_fit_or_evaluation": 0,
+            "sportsbook_results_used_for_fit_or_evaluation": 0,
+            "completed_2026_outcomes_used": 0,
+            "research_only": True,
+            "production_authorized": False,
+        }
+        (output_dir / "aggregate_summary.json").write_text(
+            json.dumps(result, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
         )
+        report = [
+            "# LevLine Props 2.0 — Availability / Workload Mixture",
+            "",
+            "**BLOCKED_SOURCE_COVERAGE — no model-performance result.**",
+            "",
+            f"- requested seasons: {list(EVALUATION_SEASONS)}",
+            f"- source-qualified seasons: {eligible_seasons}",
+            f"- excluded seasons: {source_excluded_seasons}",
+            "- chronology gate remains intact;",
+            "- no prop outcomes, sportsbook results, or completed 2026 outcomes were used.",
+        ]
+        (output_dir / "report.md").write_text(
+            "\n".join(report) + "\n", encoding="utf-8"
+        )
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return result
     pooled = pd.concat(frames, ignore_index=True)
     aggregate = _pooled_summary(pooled)
     subgroup = _subgroups(pooled)
