@@ -98,16 +98,30 @@ def _claim_strength(text: str, player_name: str) -> str | None:
     if match is None:
         return None
 
-    left = max(0, match.start() - 80)
-    right = min(len(clean), match.end() + 120)
-    window = clean[left:right].lower()
+    # Bind starter language to the named player instead of accepting any starter
+    # phrase in a symmetric context window. This avoids misreading constructions such
+    # as "Drew Lock expected to start after Sam Darnold was ruled out" as a starter
+    # claim about Darnold.
+    after = clean[match.start(): min(len(clean), match.end() + 120)].lower()
+    before = clean[max(0, match.start() - 80): match.start()].lower()
+    local = (before + clean[match.start(): min(len(clean), match.end() + 80)]).lower()
 
-    if any(re.search(pattern, window, flags=re.I) for pattern in _UNCERTAIN_PATTERNS):
+    if any(re.search(pattern, after, flags=re.I) for pattern in _UNCERTAIN_PATTERNS):
         return None
-    if any(re.search(pattern, window, flags=re.I) for pattern in _CONFIRMED_PATTERNS):
+
+    name = re.escape(player_name.lower())
+    if any(re.search(rf"{name}.{{0,55}}{pattern}", after, flags=re.I) for pattern in _CONFIRMED_PATTERNS):
         return "confirmed"
-    if any(re.search(pattern, window, flags=re.I) for pattern in _EXPECTED_PATTERNS):
+    if re.search(r"\bnamed\b.{0,45}$", before, flags=re.I) and re.search(
+        r"\b(?:the )?(?:starter|starting quarterback)\b",
+        after,
+        flags=re.I,
+    ):
+        return "confirmed"
+    if any(re.search(rf"{name}.{{0,55}}{pattern}", after, flags=re.I) for pattern in _EXPECTED_PATTERNS):
         return "expected"
+    if any(re.search(pattern, local, flags=re.I) for pattern in _UNCERTAIN_PATTERNS):
+        return None
     return None
 
 
