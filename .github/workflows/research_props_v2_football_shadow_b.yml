@@ -1,0 +1,212 @@
+name: LevLine Props 2.0 football shadow B capture
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/record_prospective_football_shadow_b.py'
+      - 'research/props/v2/test_prospective_football_shadow_b.py'
+      - 'research/props/v2/props_dynamic_role.py'
+      - 'research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json'
+      - 'research/props/v2/PROSPECTIVE_FOOTBALL_SHADOW_B_CONTRACT.md'
+      - '.github/workflows/research_props_v2_football_shadow_b.yml'
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful main-branch LevLine Props live refresh run ID
+        required: true
+        type: string
+  workflow_run:
+    workflows:
+      - 'LevLine Props live refresh'
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: python -m pip install -e '.[dev]'
+      - name: Compile and test prospective football Shadow B
+        run: |
+          python -m py_compile research/props/v2/record_prospective_football_shadow_b.py
+          python -m pytest -q research/props/v2/test_prospective_football_shadow_b.py
+
+  capture:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      actions: read
+      contents: write
+    concurrency:
+      group: levline-props-v2-football-shadow-b-capture
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Resolve and validate source live workflow run
+        id: source
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RUN_ID="${{ inputs.source_run_id }}"
+          else
+            RUN_ID="${{ github.event.workflow_run.id }}"
+          fi
+          test -n "$RUN_ID"
+          META=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID")
+          NAME=$(printf '%s' "$META" | jq -r '.name')
+          BRANCH=$(printf '%s' "$META" | jq -r '.head_branch')
+          SHA=$(printf '%s' "$META" | jq -r '.head_sha')
+          CONCLUSION=$(printf '%s' "$META" | jq -r '.conclusion')
+          if [ "$NAME" != "LevLine Props live refresh" ]; then
+            echo "::error::source run is not LevLine Props live refresh: $NAME"
+            exit 1
+          fi
+          if [ "$BRANCH" != "main" ] || [ "$CONCLUSION" != "success" ]; then
+            echo "::error::source run must be successful on main; branch=$BRANCH conclusion=$CONCLUSION"
+            exit 1
+          fi
+          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/record_prospective_football_shadow_b.py?ref=$SHA" >/dev/null 2>&1; then
+            echo "::error::source run predates the prospective Shadow B listener; retrospective backfill is prohibited"
+            exit 1
+          fi
+          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/props_dynamic_role.py?ref=$SHA" >/dev/null 2>&1; then
+            echo "::error::source run lacks the frozen Dynamic Role V0.1 engine"
+            exit 1
+          fi
+          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json?ref=$SHA" >/dev/null 2>&1; then
+            echo "::error::source run lacks the frozen defensive-efficiency coefficient file"
+            exit 1
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.head_sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: props-football-shadow-b-nflreadpy-${{ runner.os }}-${{ steps.source.outputs.run_id }}
+          restore-keys: |
+            props-live-nflreadpy-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+
+      - name: Install project
+        run: |
+          python -m pip install -e .
+          python -m pip install pyarrow
+
+      - name: Download exact source live audit artifact
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/props-live-artifacts
+          mkdir -p /tmp/props-live-artifacts
+          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
+          test -n "$(find /tmp/props-live-artifacts -name manifest_slate.json -print -quit)"
+          test -n "$(find /tmp/props-live-artifacts -name upstream_slate.json -print -quit)"
+          test -n "$(find /tmp/props-live-artifacts -name forecasts.json -print -quit)"
+
+      - name: Restore immutable Shadow B ledger
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/football_shadow_b
+          rm -rf "$DATA_DIR"
+          mkdir -p "$DATA_DIR"
+          git fetch origin research-data/props-v2-football-shadow-b:refs/remotes/origin/research-data/props-v2-football-shadow-b || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-football-shadow-b; then
+            git archive --format=tar origin/research-data/props-v2-football-shadow-b "$DATA_DIR" 2>/dev/null | tar -xf - || true
+          fi
+
+      - name: Record immutable prospective Shadow B receipts
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/football_shadow_b
+          python research/props/v2/record_prospective_football_shadow_b.py             --artifact-root /tmp/props-live-artifacts             --frozen-coefficients research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json             --ledger "$DATA_DIR/shadow_b_originals.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --source-head-sha "${{ steps.source.outputs.head_sha }}"             | tee "$DATA_DIR/last_record_status.json"
+
+      - name: Enforce research-only capture
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("research_outputs/props_v2/football_shadow_b/last_record_status.json").read_text())
+          assert d["contract_version"]=="levline-props-v2-football-shadow-b-v0.1.0"
+          assert d["shadow_version"]=="P2-SHADOW-B-DEFENSE-ROLE-v0.1.0"
+          assert d["production_authorized"] is False
+          assert d["winner_model_mutated"] is False
+          assert d["published_v1_props_mutated"] is False
+          assert d["target_outcomes_read"]==0
+          ledger=Path("research_outputs/props_v2/football_shadow_b/shadow_b_originals.jsonl")
+          rows=[]
+          if ledger.exists():
+              rows=[json.loads(line) for line in ledger.read_text().splitlines() if line.strip()]
+          if d["new_receipts"]>0:
+              assert rows, "capture reported new receipts but Shadow B ledger is empty"
+          for row in rows:
+              assert row["contract_version"]=="levline-props-v2-football-shadow-b-v0.1.0"
+              assert row["shadow_version"]=="P2-SHADOW-B-DEFENSE-ROLE-v0.1.0"
+              assert int(row["source_season"])>=2026
+              assert 1<=int(row["source_week"])<=18
+              assert "actual_result" not in row
+              assert "grading_result" not in row
+              for model_key in ("v1","shadow_b"):
+                  dist=row[model_key]["empirical_distribution"]
+                  assert int(dist["sample_count"])>0
+                  assert sum(int(x) for x in dist["counts"])==int(dist["sample_count"])
+                  assert len(dist["support"])==len(dist["counts"])
+                  assert len(str(dist["sha256"]))==64
+          print(json.dumps({
+              "source_workflow_run":d["source_workflow_run"],
+              "source_season":d["source_season"],
+              "source_week":d["source_week"],
+              "new_receipts":d["new_receipts"],
+              "skipped_started_games":d["skipped_started_games"],
+          },indent=2))
+          PY
+
+      - name: Persist Shadow B evidence off main
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/football_shadow_b
+          rm -rf /tmp/props-v2-football-shadow-b-new
+          mkdir -p /tmp/props-v2-football-shadow-b-new
+          cp -R "$DATA_DIR"/. /tmp/props-v2-football-shadow-b-new/
+          rm -rf "$DATA_DIR"
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-football-shadow-b; then
+            git checkout -B props-v2-football-shadow-b-data origin/research-data/props-v2-football-shadow-b
+          else
+            git checkout -B props-v2-football-shadow-b-data
+          fi
+          mkdir -p "$DATA_DIR"
+          cp -R /tmp/props-v2-football-shadow-b-new/. "$DATA_DIR"/
+          git add "$DATA_DIR"/
+          if git diff --cached --quiet; then
+            echo 'Prospective Shadow B ledger unchanged.'
+            exit 0
+          fi
+          git commit -m 'Record immutable Props 2.0 football Shadow B receipts'
+          git push origin HEAD:research-data/props-v2-football-shadow-b
