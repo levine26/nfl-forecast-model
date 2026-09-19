@@ -96,8 +96,9 @@ jobs:
           mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
           mapfile -t FORECASTS < <(find /tmp/props-live-artifacts -name forecasts.json -type f | sort)
           mapfile -t MANIFESTS < <(find /tmp/props-live-artifacts -name manifest_slate.json -type f | sort)
-          if [ "${#PROVENANCE[@]}" -ne 1 ] || [ "${#FORECASTS[@]}" -ne 1 ] || [ "${#MANIFESTS[@]}" -ne 1 ]; then
-            echo "::error::Shadow A source artifact must contain one provenance, forecast, and manifest-slate file"
+          mapfile -t MARKETS < <(find /tmp/props-live-artifacts -name market.json -type f | sort)
+          if [ "${#PROVENANCE[@]}" -ne 1 ] || [ "${#FORECASTS[@]}" -ne 1 ] || [ "${#MANIFESTS[@]}" -ne 1 ] || [ "${#MARKETS[@]}" -ne 1 ]; then
+            echo "::error::Shadow A source artifact must contain one provenance, forecast, manifest-slate, and market file"
             exit 1
           fi
           test -n "$(find /tmp/props-live-artifacts -name upstream_slate.json -print -quit)"
@@ -111,8 +112,11 @@ jobs:
           CREDENTIAL_MODE=$(jq -r '.market_credential_mode // empty' "$PROV")
           EXPECTED_FORECAST_SHA=$(jq -r '.forecasts_sha256 // empty' "$PROV")
           EXPECTED_MANIFEST_SHA=$(jq -r '.manifest_slate_sha256 // empty' "$PROV")
+          EXPECTED_MARKET_SHA=$(jq -r '.market_snapshot_sha256 // empty' "$PROV")
           ACTUAL_FORECAST_SHA=$(sha256sum "${FORECASTS[0]}" | awk '{print $1}')
           ACTUAL_MANIFEST_SHA=$(sha256sum "${MANIFESTS[0]}" | awk '{print $1}')
+          ACTUAL_MARKET_SHA=$(sha256sum "${MARKETS[0]}" | awk '{print $1}')
+          SNAPSHOT_PROVIDER=$(jq -r '.provider // empty' "${MARKETS[0]}")
           PROVENANCE_SHA=$(sha256sum "$PROV" | awk '{print $1}')
 
           [ "$CONTRACT" = "$LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION" ] || { echo "::error::unexpected live source provenance contract"; exit 1; }
@@ -122,6 +126,8 @@ jobs:
           [ -n "$PROVIDER" ] && [ -n "$CREDENTIAL_MODE" ] || { echo "::error::Shadow A source missing market provider/mode"; exit 1; }
           [ "$EXPECTED_FORECAST_SHA" = "$ACTUAL_FORECAST_SHA" ] || { echo "::error::Shadow A forecast artifact SHA mismatch"; exit 1; }
           [ "$EXPECTED_MANIFEST_SHA" = "$ACTUAL_MANIFEST_SHA" ] || { echo "::error::Shadow A manifest-slate SHA mismatch"; exit 1; }
+          [ "$EXPECTED_MARKET_SHA" = "$ACTUAL_MARKET_SHA" ] || { echo "::error::Shadow A market snapshot SHA mismatch"; exit 1; }
+          [ "$SNAPSHOT_PROVIDER" = "$PROVIDER" ] || { echo "::error::Shadow A market provider provenance mismatch"; exit 1; }
 
           for SHA in "${{ steps.source.outputs.trigger_head_sha }}" "$GENERATION_SHA"; do
             WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_football_shadow.yml?ref=$SHA" | jq -r '.content // empty')
