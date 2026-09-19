@@ -118,6 +118,34 @@ def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _current_git_head_sha() -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return _validated_sha(completed.stdout.strip(), label="generation base SHA")
+
+
+def _github_run_head_sha(run_id: str) -> str:
+    repository = str(os.environ.get("GITHUB_REPOSITORY") or "").strip()
+    if not repository:
+        fallback = str(os.environ.get("GITHUB_SHA") or "").strip()
+        if fallback:
+            return _validated_sha(fallback, label="workflow trigger SHA")
+        raise ValueError("GITHUB_REPOSITORY is required to resolve workflow trigger SHA")
+    completed = subprocess.run(
+        ["gh", "api", f"repos/{repository}/actions/runs/{run_id}", "--jq", ".head_sha"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return _validated_sha(completed.stdout.strip(), label="workflow trigger SHA")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run one governed live LevLine Props cycle.")
     parser.add_argument("--season", type=int)
@@ -164,18 +192,32 @@ def main() -> int:
         print(f"validated frozen LevLine Props priors -> {args.priors}")
         return 0
 
-    source_workflow_run = str(args.source_workflow_run or "").strip()
+    source_workflow_run = str(
+        args.source_workflow_run or os.environ.get("GITHUB_RUN_ID") or ""
+    ).strip()
     if not source_workflow_run:
-        raise ValueError("--source-workflow-run is required for live publication")
-    trigger_head_sha = _validated_sha(args.trigger_head_sha, label="--trigger-head-sha")
-    generation_base_sha = _validated_sha(
-        args.generation_base_sha,
-        label="--generation-base-sha",
+        raise ValueError(
+            "live publication requires --source-workflow-run or GITHUB_RUN_ID"
+        )
+    trigger_head_sha = (
+        _validated_sha(args.trigger_head_sha, label="--trigger-head-sha")
+        if args.trigger_head_sha
+        else _github_run_head_sha(source_workflow_run)
+    )
+    generation_base_sha = (
+        _validated_sha(args.generation_base_sha, label="--generation-base-sha")
+        if args.generation_base_sha
+        else _current_git_head_sha()
     )
     if not str(os.environ.get(args.api_key_env, "")).strip():
         raise RuntimeError(
             f"live Props market capture requires configured {args.api_key_env}"
         )
+
+    # The work-root is audit-only and ephemeral. Cleaning it here guarantees a
+    # push-race retry leaves exactly one surviving generation attempt.
+    if args.work_root.exists():
+        shutil.rmtree(args.work_root)
 
     started = datetime.now(timezone.utc)
     run_id = started.strftime("%Y%m%dT%H%M%S%fZ")
