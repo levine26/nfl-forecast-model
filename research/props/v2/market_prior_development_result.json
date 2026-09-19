@@ -1,0 +1,83 @@
+{
+  "contract_version": "levline-props-v2-market-prior-development-v0.1.0",
+  "status": "RETROSPECTIVE CHALLENGER DEVELOPMENT - NOT PROMOTION EVIDENCE",
+  "promotion_authorized": false,
+  "frozen_v1_run_id": 35363701921,
+  "frozen_v1_headline_accuracy": 0.510247349823,
+  "comparator_rule": "market direction abstains when no-vig P(over) equals 0.50",
+  "rolling_origin": {
+    "evaluation_seasons": [
+      2024,
+      2025
+    ],
+    "n": 4109,
+    "unique_games": 153,
+    "v1_accuracy": 0.5122900949136043,
+    "challenger_accuracy": 0.5373570211730349,
+    "challenger_minus_v1": 0.02506692625943052,
+    "challenger_minus_v1_game_clustered_ci95": [
+      0.0014343163079766253,
+      0.04914084994307445
+    ],
+    "market_price_direction_rows": 3002,
+    "market_price_tie_rows": 1107,
+    "market_price_direction_accuracy": 0.5512991339107262,
+    "challenger_on_market_informative_rows_accuracy": 0.5506329113924051,
+    "challenger_minus_market": -0.0006662225183211193,
+    "challenger_minus_market_game_clustered_ci95": [
+      -0.011100270199035518,
+      0.009771466963608666
+    ],
+    "v1_brier": 0.28599828923095644,
+    "market_brier": 0.24607989929958435,
+    "challenger_brier": 0.2462096188143346,
+    "v1_log_loss": 0.8324787750267663,
+    "market_log_loss": 0.6851352079410635,
+    "challenger_log_loss": 0.6854028452495329,
+    "models": {
+      "2024": {
+        "training_seasons": [
+          2023
+        ],
+        "intercept": 0.04087081,
+        "residual_beta": -0.00538263
+      },
+      "2025": {
+        "training_seasons": [
+          2023,
+          2024
+        ],
+        "intercept": -0.05513361,
+        "residual_beta": 0.02949614
+      }
+    }
+  },
+  "fixed_anchor": {
+    "training_period": "2023 Weeks 1-9",
+    "n": 5030,
+    "unique_games": 197,
+    "v1_accuracy": 0.5127236580516898,
+    "challenger_accuracy": 0.5359840954274354,
+    "challenger_minus_v1": 0.023260437375745527,
+    "challenger_minus_v1_game_clustered_ci95": [
+      0.001953927499383831,
+      0.04516646478177135
+    ],
+    "market_price_direction_rows": 3728,
+    "market_price_tie_rows": 1302,
+    "market_price_direction_accuracy": 0.5485515021459227,
+    "challenger_on_market_informative_rows_accuracy": 0.5485515021459227,
+    "challenger_minus_market": 0,
+    "challenger_minus_market_game_clustered_ci95": [
+      -0.004366842030597489,
+      0.0042469079544720225
+    ],
+    "intercept": 0.00902742,
+    "residual_beta": -0.0100181
+  },
+  "input_sha256": {
+    "2023_forecast_level.csv": "b89835c777fbef531afbdbadda3e07c6ac4da72b6a22178aa8dbc4e9ef29d4bd",
+    "2024_forecast_level.csv": "cf9e31d0e80cc141e47db3c4f6d167e52f66302e8e0085c16d8e9bfa0bb98e12",
+    "2025_forecast_level.csv": "6d2d8aaf95a549b1cc6841f23d49b07c3d9f9d38c1e7ee1be6242cced34d085a"
+  }
+}
