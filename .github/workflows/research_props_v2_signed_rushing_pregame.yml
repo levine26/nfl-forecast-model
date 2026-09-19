@@ -1,0 +1,92 @@
+name: LevLine Props 2.0 signed rushing pregame
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/signed_rushing_pregame.py'
+      - 'research/props/v2/test_signed_rushing_pregame.py'
+      - 'research/props/v2/run_signed_rushing_pregame_backtest.py'
+      - 'research/props/v2/aggregate_signed_rushing_pregame.py'
+      - 'research/props/v2/SIGNED_RUSHING_PREGAME_CONTRACT.md'
+      - '.github/workflows/research_props_v2_signed_rushing_pregame.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q research/props/v2/test_signed_rushing_pregame.py
+
+  primary:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        season: [2023, 2024, 2025]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install -e '.[dev]'
+          python -m pip install pyarrow
+      - name: Run paired pregame rushing distribution ablation
+        run: |
+          python research/props/v2/run_signed_rushing_pregame_backtest.py \
+            --season ${{ matrix.season }} \
+            --simulations 5000 \
+            --output-dir research_outputs/props_v2/signed_rushing/${{ matrix.season }}
+      - name: Enforce pregame isolation
+        run: |
+          python - <<'PY'
+          import json,glob
+          p=glob.glob("research_outputs/props_v2/signed_rushing/*/*_summary.json")[0]
+          d=json.load(open(p))
+          assert d["contract_version"]=="levline-props-v2-signed-rushing-pregame-v0.1.0"
+          assert d["all_carry_samples_identical"] is True
+          assert d["target_game_carries_used_for_fit"]==0
+          assert d["target_game_yards_used_for_fit"]==0
+          assert d["completed_2026_outcomes_used"]==0
+          assert d["production_authorized"] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-signed-rushing-${{ matrix.season }}
+          path: research_outputs/props_v2/signed_rushing/${{ matrix.season }}/
+          if-no-files-found: error
+
+  aggregate:
+    needs: primary
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pandas numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: levline-props-v2-signed-rushing-*
+          path: research_outputs/props_v2/signed_rushing_downloads
+      - run: |
+          python research/props/v2/aggregate_signed_rushing_pregame.py \
+            --input-dir research_outputs/props_v2/signed_rushing_downloads \
+            --output-dir research_outputs/props_v2/signed_rushing_aggregate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-signed-rushing-aggregate
+          path: research_outputs/props_v2/signed_rushing_aggregate/
+          if-no-files-found: error
