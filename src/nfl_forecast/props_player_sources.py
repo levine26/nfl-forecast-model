@@ -235,10 +235,22 @@ def resolve_primary_qbs_from_depth_charts(
     if state.empty:
         raise ValueError(f"player_state has no rows for game={game_id}")
     state["_team"] = state["team"].map(normalize_team_code)
+    qb_state = state[
+        state["position"].astype("string").fillna("").str.upper().eq("QB")
+    ].copy()
+    if "expected_active_state" in qb_state.columns:
+        qb_state = qb_state[
+            ~qb_state["expected_active_state"].astype("string").fillna("UNKNOWN").str.upper().eq("OUT")
+        ].copy()
+    if "roster_membership_state" in qb_state.columns:
+        qb_state = qb_state[
+            ~qb_state["roster_membership_state"].astype("string").fillna("UNKNOWN").isin(
+                {"RESERVE_OR_UNAVAILABLE", "INACTIVE_ROSTER"}
+            )
+        ].copy()
     state_ids = {
         (str(row["_team"]), str(row["player_id"]))
-        for _, row in state.iterrows()
-        if str(row.get("position") or "").upper() == "QB"
+        for _, row in qb_state.iterrows()
     }
     game_teams = sorted(set(state["_team"].astype(str)))
     resolved: dict[str, dict[str, str]] = {}
@@ -256,14 +268,20 @@ def resolve_primary_qbs_from_depth_charts(
             audit["teams_missing"].append(team)
             continue
         rows["_rank"] = pd.to_numeric(rows["pos_rank"], errors="coerce")
+        rows["_gsis_id"] = rows["gsis_id"].astype("string").fillna("").str.strip()
+        rows = rows[
+            rows.apply(lambda row: (team, str(row["_gsis_id"])) in state_ids, axis=1)
+        ].copy()
+        if rows.empty:
+            audit["teams_missing"].append(team)
+            continue
         best_rank = float(rows["_rank"].min())
-        candidates = rows[rows["_rank"].eq(best_rank)]["gsis_id"].astype("string").fillna("").str.strip()
+        candidates = rows[rows["_rank"].eq(best_rank)]["_gsis_id"]
         candidate_ids = sorted(
             {
                 str(value)
                 for value in candidates
                 if value and value != "<NA>" and str(value).lower() != "nan"
-                and (team, str(value)) in state_ids
             }
         )
         if len(candidate_ids) != 1:
