@@ -138,6 +138,40 @@ the football distribution and full mode materially degrades it. The favorable sm
 directional point estimate is not a rescue criterion. Permanent record:
 `DYNAMIC_ROLE_V2_DEVELOPMENT_RESULT.md`.
 
+## Signed event-yard distribution — positive component isolation
+
+Workflow `35383358262`, artifact `10562609890`.
+
+This experiment conditions on the realized event count for each player-game and therefore isolates
+yardage-per-event distribution quality. It is **not** a pregame prop forecast.
+
+2023–2025 aggregate:
+- N **19,038**, 855 unique games;
+- Gamma CRPS **8.22001**;
+- signed empirical CRPS **8.20688**;
+- signed minus Gamma **−0.01313**;
+- game-clustered 95% interval **−0.01908 to −0.00761**;
+- Gamma 80% coverage **78.82%**;
+- signed 80% coverage **78.13%**.
+
+Rushing carries most of the benefit:
+- N **6,993**;
+- CRPS improvement **−0.02854**;
+- clustered interval **−0.03869 to −0.01840**;
+- coverage improves **75.72% → 77.45%**;
+- historical negative-event rate approximately **11.14%**.
+
+Receiving is weaker:
+- N **12,045**;
+- CRPS improvement **−0.00419**;
+- clustered interval **−0.01043 to +0.00230**;
+- coverage declines **80.61% → 78.52%**.
+
+**Disposition:** ADVANCE signed event support as a new pregame mechanism candidate, especially for
+rushing. Do not treat this as prop accuracy or production evidence until event count is also
+generated exclusively from pregame information. Permanent record:
+`SIGNED_EVENT_DISTRIBUTION_DEVELOPMENT_RESULT.md`.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
