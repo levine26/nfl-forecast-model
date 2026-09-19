@@ -1,5 +1,8 @@
 name: LevLine Props live refresh
 
+# Prospective collectors download this run's audit artifact with an explicit repository binding
+# before checking out the generation SHA; changing this workflow triggers a fresh direct source run.
+
 on:
   workflow_dispatch:
     inputs:

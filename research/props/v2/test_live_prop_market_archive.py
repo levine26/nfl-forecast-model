@@ -204,6 +204,7 @@ def test_market_archive_workflow_has_exact_source_no_backfill_gate():
     assert exact_marker in text
     assert provenance_marker in text
     assert "source_provenance.json" in text
+    assert '--repo "${{ github.repository }}"' in text
     assert "market archive trigger SHA provenance mismatch" in text
     assert "--source-trigger-head-sha" in text
     assert "--source-provenance-sha256" in text
