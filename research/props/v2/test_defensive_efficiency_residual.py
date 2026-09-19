@@ -20,8 +20,8 @@ from defensive_efficiency_residual import (
 
 def _events():
     rows=[]
-    for season in (2020,2021,2022,2023):
-        for week in range(1,9):
+    for season in (2018,2019,2020,2021,2022,2023):
+        for week in range(1,19):
             for game_suffix,(offense,defense) in enumerate((("A","B"),("B","A"))):
                 game=f"{season}_{week}_{game_suffix}"
                 # Player p has stable skill; defense B allows more yards than A.
