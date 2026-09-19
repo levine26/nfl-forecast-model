@@ -73,6 +73,7 @@ A receipt is invalid if any paired opportunity array changes.
 
 Every receipt must preserve:
 - source workflow run;
+- source season and NFL week;
 - source forecast ID and SHA-256;
 - source manifest SHA-256;
 - game/player/prop identity;
