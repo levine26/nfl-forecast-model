@@ -379,6 +379,7 @@ def build_receipt(
     defense_player_audit: Mapping[str,Any],
     role_player_audit: Mapping[str,Any],
     frozen: Mapping[str,Any],
+    capture_started_utc: datetime,
     recorded_utc: datetime,
     source_workflow_run: str,
     source_head_sha: str,
@@ -423,8 +424,9 @@ def build_receipt(
         "event_type":EVENT_TYPE,
         "shadow_id":_shadow_id(source_id),
         "shadow_version":SHADOW_VERSION,
-        "capture_started_utc":capture_started.isoformat(),
-        "capture_completed_utc":capture_clock().isoformat(),
+        "capture_started_utc":capture_started_utc.astimezone(timezone.utc).isoformat(),
+        "capture_completed_utc":recorded.isoformat(),
+        "recorded_utc":recorded.isoformat(),
         "source_workflow_run":str(source_workflow_run),
         "source_head_sha":str(source_head_sha),
         "source_forecast_id":source_id,
@@ -524,6 +526,10 @@ def record_shadow_b(
     players=nfl.load_players()
     players=players.to_pandas() if hasattr(players,"to_pandas") else players.copy()
     snap_counts,snap_identity_audit=normalize_snap_counts_player_ids(bundle.snap_counts,players)
+    if snap_counts is None or snap_counts.empty:
+        raise FootballShadowBError(
+            f"stable snap identity unavailable: {snap_identity_audit}"
+        )
 
     teams={normalize_team_code(str(m["home_team"])) for m in manifests}|{
         normalize_team_code(str(m["away_team"])) for m in manifests
@@ -621,6 +627,7 @@ def record_shadow_b(
                 source=source,shadow=shadow_row,manifest=manifest,
                 defense_player_audit=defense_player_audit,
                 role_player_audit=role_player,frozen=frozen,
+                capture_started_utc=capture_started,
                 recorded_utc=receipt_recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
@@ -642,10 +649,13 @@ def record_shadow_b(
 
     ledger.parent.mkdir(parents=True,exist_ok=True)
     appended=append_jsonl_immutable(ledger,receipts,identity_key="shadow_id") if receipts else 0
+    capture_completed=capture_clock()
     return {
         "contract_version":CONTRACT_VERSION,
         "shadow_version":SHADOW_VERSION,
-        "recorded_utc":recorded.isoformat(),
+        "capture_started_utc":capture_started.isoformat(),
+        "capture_completed_utc":capture_completed.isoformat(),
+        "recorded_utc":capture_completed.isoformat(),
         "source_workflow_run":str(source_workflow_run),
         "source_head_sha":str(source_head_sha),
         "source_season":season,
