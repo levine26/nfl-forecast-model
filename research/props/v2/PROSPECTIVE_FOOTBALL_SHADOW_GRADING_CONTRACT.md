@@ -50,13 +50,16 @@ Secondary:
 - Over-probability Brier score;
 - Over-probability log loss;
 - fixed-decile reliability table with edges 0.0, 0.1, ..., 1.0;
-- 80% interval coverage;
-- 80% interval score;
+- 80% interval coverage recomputed from the immutable empirical distribution;
+- 80% interval score recomputed from the immutable empirical distribution;
 - directional accuracy.
 
 Push policy:
 - pushes remain in CRPS, Fair-Line MAE and interval metrics;
 - pushes are excluded from Brier, log loss and directional accuracy.
+
+The 80% central interval is recalculated from the receipt's lossless empirical PMF with fixed
+10th/90th-percentile cutoffs. Display/UI interval settings are not used for grading.
 
 Paired Shadow A minus V1 differences use a **5,000-replicate game-cluster bootstrap** with frozen
 seed `20260919` plus deterministic metric/family offsets.
