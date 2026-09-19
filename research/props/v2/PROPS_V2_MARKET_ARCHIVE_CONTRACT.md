@@ -57,3 +57,12 @@ idempotent. New live states create new archive files. Existing archive rows are 
 - No edge threshold.
 - No production output mutation.
 - Persistent evidence lives only on `research-data/props-v2-market-archive`.
+
+## Activation boundary
+
+The automatic `workflow_run` collector is not active merely because this research branch exists.
+Prospective evidence collection begins only after this workflow is merged to `main` and a subsequent
+successful `LevLine Props live refresh` run triggers the archive job. Until the first persistent
+commit exists on `research-data/props-v2-market-archive`, the archive must be described as
+implementation-ready rather than as an active evidence stream.
+
