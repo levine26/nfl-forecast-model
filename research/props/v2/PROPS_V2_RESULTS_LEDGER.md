@@ -254,6 +254,34 @@ The challenger therefore collapses exactly to Poisson, zero seasons improve and 
 **Disposition:** REJECT `P2-TD-COUNT-V01`. Do not force a nonzero dispersion floor or retune the
 evaluated mechanism. Permanent record: `TEAM_TD_COUNT_DEVELOPMENT_RESULT.md`.
 
+## Signed rushing true-pregame ablation — rejected
+
+Primary artifacts: 2023 `10577330985`, 2024 `10577865798`, 2025 `10577735587`.
+
+All three primary jobs preserved V1's sampled carries exactly and used no target-game carries or
+target-game yards for fitting.
+
+2023–2025 aggregate, N **982**, 230 games, 114 players:
+- V1 CRPS **18.26669**;
+- signed-rushing CRPS **18.30423**;
+- challenger minus V1 **+0.03754**;
+- game-clustered 95% interval **+0.01576 to +0.06120**;
+- V1 Fair-Line MAE **24.91395**;
+- challenger Fair-Line MAE **24.93737**;
+- MAE difference **+0.02342**;
+- V1 80% coverage **62.32%**;
+- challenger coverage **63.14%**.
+
+Season CRPS differences:
+- 2023 **+0.08278**;
+- 2024 **+0.02573**;
+- 2025 **−0.03189** on only 75 rows.
+
+**Disposition:** REJECT `P2-DIST-RUSH-PREGAME-V01`. The positive conditional event-support result
+did not survive integration with the full pregame V1 opportunity distribution. Do not tune residual
+pools or variance against these evaluated outcomes. Permanent record:
+`SIGNED_RUSHING_PREGAME_DEVELOPMENT_RESULT.md`.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
