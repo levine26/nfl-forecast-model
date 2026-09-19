@@ -34,6 +34,13 @@ Receiving yards:
 
 Only games identified as finalized by the schedule source are graded.
 
+Outcome-feed completeness also fails closed:
+- the target game must be present in the postgame PBP source;
+- when the PBP schema exposes `game_seconds_remaining`, the grader additionally requires a
+  zero-second game row before treating missing player events as a valid zero-yard result;
+- if the finalized schedule is available but the PBP completion evidence is not, the receipt remains
+  ungraded rather than being scored as zero.
+
 Participation / void policy:
 - stable player identity must resolve in the canonical snap-count source;
 - offense snaps must be **> 0**;
