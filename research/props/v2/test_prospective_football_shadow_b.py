@@ -301,6 +301,8 @@ def test_shadow_b_receipt_uses_explicit_capture_timestamps():
         recorded_utc=recorded,
         source_workflow_run="1",
         source_head_sha="b"*40,
+        source_season=2026,
+        source_week=2,
         v1_samples=np.array([40,50,60,70],dtype=float),
         shadow_samples=np.array([42,52,62,72],dtype=float),
     )
@@ -308,4 +310,6 @@ def test_shadow_b_receipt_uses_explicit_capture_timestamps():
     assert receipt["capture_started_utc"]==started.isoformat()
     assert receipt["capture_completed_utc"]==recorded.isoformat()
     assert receipt["recorded_utc"]==recorded.isoformat()
+    assert receipt["source_season"]==2026
+    assert receipt["source_week"]==2
     assert receipt["governance"]["production_authorized"] is False
