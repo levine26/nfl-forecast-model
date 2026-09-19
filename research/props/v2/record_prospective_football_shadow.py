@@ -544,7 +544,8 @@ def build_receipt(
         "event_type":EVENT_TYPE,
         "shadow_id":_shadow_id(source_id),
         "shadow_version":SHADOW_VERSION,
-        "recorded_utc":recorded.isoformat(),
+        "capture_started_utc":capture_started.isoformat(),
+        "capture_completed_utc":capture_clock().isoformat(),
         "source_workflow_run":str(source_workflow_run),
         "source_head_sha":str(source_head_sha),
         "source_season":int(source_season),
@@ -625,8 +626,14 @@ def record_shadow_a(
     season=int(upstream.get("season"))
     week=int(upstream.get("week"))
     captured=_aware(upstream.get("captured_at_utc"),label="upstream captured_at_utc")
-    recorded=(recorded_utc or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    if recorded<captured:
+
+    def capture_clock()->datetime:
+        if recorded_utc is not None:
+            return recorded_utc.astimezone(timezone.utc)
+        return datetime.now(timezone.utc)
+
+    capture_started=capture_clock()
+    if capture_started<captured:
         raise FootballShadowError("shadow cannot be recorded before source upstream capture")
 
     slate,manifests=load_manifests(run_root)
@@ -659,7 +666,7 @@ def record_shadow_a(
     for manifest in manifests:
         verify_manifest_fingerprint(manifest)
         kickoff=_aware(manifest["kickoff_utc"],label="manifest kickoff_utc")
-        if recorded>=kickoff:
+        if capture_clock()>=kickoff:
             skipped_started+=1
             continue
 
@@ -690,6 +697,11 @@ def record_shadow_a(
         baseline_index=_forecast_index(baseline_artifact)
         shadow_index=_forecast_index(shadow_artifact)
 
+        receipt_recorded=capture_clock()
+        if receipt_recorded>=kickoff:
+            skipped_started+=1
+            continue
+
         game_id=str(manifest["game_id"])
         game_receipts=0
         for key,replay in baseline_index.items():
@@ -711,7 +723,7 @@ def record_shadow_a(
                 manifest=manifest,
                 player_audit=overlay_audit,
                 frozen=frozen,
-                recorded_utc=recorded,
+                recorded_utc=receipt_recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
                 source_season=season,
