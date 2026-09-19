@@ -460,6 +460,7 @@ def test_shadow_a_workflow_requires_live_generation_and_market_provenance():
     text=WORKFLOW.read_text(encoding="utf-8")
     assert "LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0" in text
     assert "source_provenance.json" in text
+    assert '--repo "${{ github.repository }}"' in text
     assert "Shadow A market snapshot SHA mismatch" in text
     assert "Shadow A market provider provenance mismatch" in text
     assert "--source-trigger-head-sha" in text
