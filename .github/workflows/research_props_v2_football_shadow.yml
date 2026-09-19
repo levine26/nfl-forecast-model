@@ -222,16 +222,31 @@ jobs:
               rows=[json.loads(line) for line in ledger.read_text().splitlines() if line.strip()]
           if d["new_receipts"]>0:
               assert rows, "capture reported new receipts but ledger is empty"
+          amendment_fields=(
+              "source_trigger_head_sha",
+              "source_market_provider",
+              "source_market_credential_mode",
+              "source_provenance_sha256",
+          )
+          current=[
+              row for row in rows
+              if str(row.get("source_workflow_run"))==str(d["source_workflow_run"])
+          ]
+          if d["new_receipts"]>0:
+              assert len(current)>=int(d["new_receipts"])
           for row in rows:
               assert row["contract_version"]=="levline-props-v2-football-shadow-a-v0.1.0"
               assert row["shadow_version"]=="P2-SHADOW-A-DEFENSE-v0.1.0"
               assert int(row["source_season"])>=2026
               assert 1<=int(row["source_week"])<=18
               assert len(str(row["source_head_sha"])) in {40,64}
-              assert len(str(row["source_trigger_head_sha"])) in {40,64}
-              assert row["source_market_provider"]
-              assert row["source_market_credential_mode"]
-              assert len(str(row["source_provenance_sha256"]))==64
+              present=[bool(str(row.get(field) or "").strip()) for field in amendment_fields]
+              if any(present):
+                  assert all(present), "partial live-source provenance is invalid"
+                  assert len(str(row["source_trigger_head_sha"])) in {40,64}
+                  assert row["source_market_provider"]
+                  assert row["source_market_credential_mode"]
+                  assert len(str(row["source_provenance_sha256"]))==64
               assert "actual_result" not in row
               assert "grading_result" not in row
               for model_key in ("v1","shadow_a"):
@@ -240,6 +255,13 @@ jobs:
                   assert sum(int(x) for x in dist["counts"])==int(dist["sample_count"])
                   assert len(dist["support"])==len(dist["counts"])
                   assert len(str(dist["sha256"]))==64
+          for row in current:
+              assert all(bool(str(row.get(field) or "").strip()) for field in amendment_fields)
+              assert row["source_head_sha"]==d["source_head_sha"]
+              assert row["source_trigger_head_sha"]==d["source_trigger_head_sha"]
+              assert row["source_market_provider"]==d["source_market_provider"]
+              assert row["source_market_credential_mode"]==d["source_market_credential_mode"]
+              assert row["source_provenance_sha256"]==d["source_provenance_sha256"]
           print(json.dumps({
               "source_workflow_run":d["source_workflow_run"],
               "source_season":d["source_season"],
