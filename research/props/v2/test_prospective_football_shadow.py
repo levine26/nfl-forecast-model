@@ -465,3 +465,10 @@ def test_shadow_a_workflow_requires_live_generation_and_market_provenance():
     assert "Shadow A market provider provenance mismatch" in text
     assert "--source-trigger-head-sha" in text
     assert "--source-provenance-sha256" in text
+
+
+def test_shadow_a_workflow_accepts_legacy_rows_but_rejects_partial_provenance():
+    text=WORKFLOW.read_text(encoding="utf-8")
+    assert 'partial live-source provenance is invalid' in text
+    assert '"legacy_pre_provenance_receipts":legacy' in text
+    assert 'if str(row.get("source_workflow_run"))==str(d["source_workflow_run"]):' in text
