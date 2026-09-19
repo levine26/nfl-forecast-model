@@ -114,3 +114,16 @@ def test_repository_frozen_priors_are_preregistered_and_valid():
         "alpha": 9.0,
         "beta": 1.0,
     }
+
+
+def test_live_coordinator_uses_sharded_permanent_history_append():
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert "append_jsonl_immutable_sharded" in text
+    assert (
+        'append_jsonl_immutable_sharded(permanent_ledger, receipts, identity_key="forecast_id")'
+        in text
+    )
+    assert (
+        'append_jsonl_immutable(permanent_ledger, receipts, identity_key="forecast_id")'
+        not in text
+    )
