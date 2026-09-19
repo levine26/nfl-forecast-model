@@ -81,6 +81,18 @@ jobs:
             echo "::error::source run must be successful on main; branch=$BRANCH conclusion=$CONCLUSION"
             exit 1
           fi
+          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/record_prospective_football_shadow_b.py?ref=$SHA" >/dev/null 2>&1; then
+            echo "::error::source run predates the prospective Shadow B listener; retrospective backfill is prohibited"
+            exit 1
+          fi
+          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/props_dynamic_role.py?ref=$SHA" >/dev/null 2>&1; then
+            echo "::error::source run lacks the frozen Dynamic Role V0.1 engine"
+            exit 1
+          fi
+          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json?ref=$SHA" >/dev/null 2>&1; then
+            echo "::error::source run lacks the frozen defensive-efficiency coefficient file"
+            exit 1
+          fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
           echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
 
