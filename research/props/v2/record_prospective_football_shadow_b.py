@@ -392,6 +392,10 @@ def build_receipt(
     recorded_utc: datetime,
     source_workflow_run: str,
     source_head_sha: str,
+    source_trigger_head_sha: str,
+    source_market_provider: str,
+    source_market_credential_mode: str,
+    source_provenance_sha256: str,
     source_season: int,
     source_week: int,
     v1_samples: Any,
@@ -440,6 +444,10 @@ def build_receipt(
         "recorded_utc":recorded.isoformat(),
         "source_workflow_run":str(source_workflow_run),
         "source_head_sha":str(source_head_sha),
+        "source_trigger_head_sha":str(source_trigger_head_sha),
+        "source_market_provider":str(source_market_provider),
+        "source_market_credential_mode":str(source_market_credential_mode),
+        "source_provenance_sha256":str(source_provenance_sha256),
         "source_season":int(source_season),
         "source_week":int(source_week),
         "source_forecast_id":source_id,
@@ -512,8 +520,35 @@ def record_shadow_b(
     *,
     source_workflow_run: str,
     source_head_sha: str,
+    source_trigger_head_sha: str,
+    source_market_provider: str,
+    source_market_credential_mode: str,
+    source_provenance_sha256: str,
     recorded_utc: datetime|None=None,
 )->dict[str,Any]:
+    source_workflow_run=str(source_workflow_run or "").strip()
+    source_head_sha=str(source_head_sha or "").strip().lower()
+    source_trigger_head_sha=str(source_trigger_head_sha or "").strip().lower()
+    source_market_provider=str(source_market_provider or "").strip()
+    source_market_credential_mode=str(source_market_credential_mode or "").strip()
+    source_provenance_sha256=str(source_provenance_sha256 or "").strip().lower()
+    if not source_workflow_run:
+        raise FootballShadowBError("source_workflow_run is required")
+    for label,value in (
+        ("source_head_sha",source_head_sha),
+        ("source_trigger_head_sha",source_trigger_head_sha),
+    ):
+        if len(value) not in {40,64} or any(ch not in "0123456789abcdef" for ch in value):
+            raise FootballShadowBError(f"{label} must be a git SHA")
+    if not source_market_provider:
+        raise FootballShadowBError("source_market_provider is required")
+    if not source_market_credential_mode:
+        raise FootballShadowBError("source_market_credential_mode is required")
+    if len(source_provenance_sha256)!=64 or any(
+        ch not in "0123456789abcdef" for ch in source_provenance_sha256
+    ):
+        raise FootballShadowBError("source_provenance_sha256 must be SHA-256")
+
     frozen=load_frozen_coefficients(frozen_path)
     run_root=locate_live_run_root(artifact_root)
     upstream=_load_object(run_root/"upstream"/"upstream_slate.json")
@@ -644,6 +679,10 @@ def record_shadow_b(
                 recorded_utc=receipt_recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
+                source_trigger_head_sha=source_trigger_head_sha,
+                source_market_provider=source_market_provider,
+                source_market_credential_mode=source_market_credential_mode,
+                source_provenance_sha256=source_provenance_sha256,
                 source_season=season,
                 source_week=week,
                 v1_samples=baseline.player_stats[str(source["player_id"])][str(source["prop_type"])],
@@ -673,6 +712,10 @@ def record_shadow_b(
         "recorded_utc":capture_completed.isoformat(),
         "source_workflow_run":str(source_workflow_run),
         "source_head_sha":str(source_head_sha),
+        "source_trigger_head_sha":str(source_trigger_head_sha),
+        "source_market_provider":str(source_market_provider),
+        "source_market_credential_mode":str(source_market_credential_mode),
+        "source_provenance_sha256":str(source_provenance_sha256),
         "source_season":season,
         "source_week":week,
         "source_game_count":len(manifests),
@@ -698,11 +741,19 @@ def main()->int:
     parser.add_argument("--ledger",type=Path,required=True)
     parser.add_argument("--source-workflow-run",required=True)
     parser.add_argument("--source-head-sha",required=True)
+    parser.add_argument("--source-trigger-head-sha",required=True)
+    parser.add_argument("--source-market-provider",required=True)
+    parser.add_argument("--source-market-credential-mode",required=True)
+    parser.add_argument("--source-provenance-sha256",required=True)
     args=parser.parse_args()
     result=record_shadow_b(
         args.artifact_root,args.frozen_coefficients,args.ledger,
         source_workflow_run=args.source_workflow_run,
         source_head_sha=args.source_head_sha,
+        source_trigger_head_sha=args.source_trigger_head_sha,
+        source_market_provider=args.source_market_provider,
+        source_market_credential_mode=args.source_market_credential_mode,
+        source_provenance_sha256=args.source_provenance_sha256,
     )
     print(json.dumps(result,indent=2,sort_keys=True))
     return 0
