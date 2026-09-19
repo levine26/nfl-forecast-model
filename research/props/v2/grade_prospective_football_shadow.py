@@ -10,13 +10,15 @@ from pathlib import Path
 import sys
 from typing import Any, Mapping
 
+import nflreadpy as nfl
 import numpy as np
 import pandas as pd
 
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/"src"))
 
-from nfl_forecast.data import load_core_data  # noqa:E402
+from nfl_forecast.data import load_advanced_data, load_core_data  # noqa:E402
+from nfl_forecast.props_player_sources import normalize_snap_counts_player_ids  # noqa:E402
 from nfl_forecast.props_upstream import normalize_nflverse_scramble_semantics  # noqa:E402
 
 CONTRACT_VERSION="levline-props-v2-football-shadow-grading-v0.1.0"
@@ -154,6 +156,35 @@ def _completed_games(schedule: pd.DataFrame)->set[str]:
     return set(work.loc[complete,"game_id"].astype(str))
 
 
+def offense_participation(snap_counts: pd.DataFrame)->tuple[dict[tuple[str,str],int],dict[str,Any]]:
+    snap_col=next(
+        (c for c in ("offense_snaps","offensive_snaps","off_snaps") if c in snap_counts.columns),
+        None,
+    )
+    if snap_col is None or "game_id" not in snap_counts.columns or "player_id" not in snap_counts.columns:
+        raise ShadowGradingError("snap-count source missing offense snaps/game_id/player_id")
+    work=snap_counts.copy()
+    work["player_id"]=work["player_id"].astype("string").fillna("").str.strip()
+    work["_snaps"]=pd.to_numeric(work[snap_col],errors="coerce")
+    work=work[
+        work["game_id"].notna()
+        & work["player_id"].ne("")
+        & work["_snaps"].notna()
+    ].copy()
+    grouped=(
+        work.groupby(["game_id","player_id"],as_index=False,sort=False)
+        .agg(offense_snaps=("_snaps","max"))
+    )
+    participation={
+        (str(row.game_id),str(row.player_id)):int(max(0.0,float(row.offense_snaps)))
+        for row in grouped.itertuples(index=False)
+    }
+    return participation,{
+        "participation_rows":int(len(participation)),
+        "positive_snap_rows":int(sum(value>0 for value in participation.values())),
+    }
+
+
 def actual_player_yards(pbp: pd.DataFrame)->dict[tuple[str,str,str],float]:
     required={"game_id"}
     if not required.issubset(pbp.columns):
@@ -193,13 +224,28 @@ def grade_receipts(
     *,
     completed_games:set[str],
     actuals:Mapping[tuple[str,str,str],float],
-)->pd.DataFrame:
+    participation:Mapping[tuple[str,str],int],
+)->tuple[pd.DataFrame,dict[str,int]]:
     rows=[]
+    audit={
+        "not_final":0,
+        "missing_participation":0,
+        "zero_offense_snaps_void":0,
+        "graded":0,
+    }
     for receipt in receipts:
         game_id=str(receipt["game_id"])
         if game_id not in completed_games:
+            audit["not_final"]+=1
             continue
         player_id=str(receipt["player_id"])
+        snaps=participation.get((game_id,player_id))
+        if snaps is None:
+            audit["missing_participation"]+=1
+            continue
+        if int(snaps)<=0:
+            audit["zero_offense_snaps_void"]+=1
+            continue
         prop=str(receipt["prop_type"])
         actual=float(actuals.get((game_id,player_id,prop),0.0))
         line=float(receipt["market"]["line"])
@@ -271,7 +317,8 @@ def grade_receipts(
                 else None
             ),
         })
-    return pd.DataFrame(rows)
+    audit["graded"]=len(rows)
+    return pd.DataFrame(rows),audit
 
 
 def cluster_ci(frame: pd.DataFrame,column:str,*,seed:int,replicates:int=BOOTSTRAP_REPLICATES)->list[float|None]:
@@ -388,12 +435,26 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
         raise ShadowGradingError("no prospective Shadow A receipts")
     seasons=sorted({int(row["source_season"]) for row in receipts})
     bundle=load_core_data(seasons)
+    bundle=load_advanced_data(bundle,seasons)
     schedules=bundle.schedules.to_pandas() if hasattr(bundle.schedules,"to_pandas") else bundle.schedules.copy()
     pbp=bundle.pbp.to_pandas() if hasattr(bundle.pbp,"to_pandas") else bundle.pbp.copy()
     pbp,scramble_audit=normalize_nflverse_scramble_semantics(pbp)
+    players=nfl.load_players()
+    players=players.to_pandas() if hasattr(players,"to_pandas") else players.copy()
+    normalized_snaps,snap_identity_audit=normalize_snap_counts_player_ids(
+        bundle.snap_counts,players
+    )
+    if normalized_snaps is None or normalized_snaps.empty:
+        raise ShadowGradingError(f"snap identity normalization failed: {snap_identity_audit}")
+    participation,participation_audit=offense_participation(normalized_snaps)
     completed=_completed_games(schedules)
     actuals=actual_player_yards(pbp)
-    graded=grade_receipts(receipts,completed_games=completed,actuals=actuals)
+    graded,eligibility_audit=grade_receipts(
+        receipts,
+        completed_games=completed,
+        actuals=actuals,
+        participation=participation,
+    )
 
     output_dir.mkdir(parents=True,exist_ok=True)
     if graded.empty:
@@ -423,7 +484,12 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
         "overall":summarize(graded,seed=BOOTSTRAP_SEED+50000),
         "by_prop":by_prop,
         "concentration":concentration_diagnostics(graded),
-        "outcome_source_audit":{"pbp_normalization":scramble_audit},
+        "eligibility_audit":eligibility_audit,
+        "outcome_source_audit":{
+            "pbp_normalization":scramble_audit,
+            "snap_identity":snap_identity_audit,
+            "participation":participation_audit,
+        },
         "grading_policy":{
             "push_policy":"exclude pushes from Brier/log loss/directional accuracy; retain for CRPS/MAE/interval metrics",
             "calibration_edges":[float(x) for x in CALIBRATION_EDGES.tolist()],
