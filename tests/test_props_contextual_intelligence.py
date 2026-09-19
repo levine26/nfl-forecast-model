@@ -222,10 +222,10 @@ def test_current_reporting_resolves_drew_lock_from_fresh_starter_headline():
         GAME_ID: {
             "current_reported_sources": [
                 {
-                    "source_name": "Seattle Seahawks",
-                    "source_url": "https://www.seahawks.com/news/drew-lock-starts-week-2",
-                    "title": "Drew Lock to start at quarterback with Sam Darnold out",
-                    "as_of": "2026-09-18T22:00:00Z",
+                    "source_name": "Yahoo Sports",
+                    "source_url": "https://sports.yahoo.com/articles/drew-lock-start-cardinals.html",
+                    "title": "Seahawks’ Drew Lock Auditioning for QB-Needy NFL Teams With Start at Cardinals",
+                    "as_of": "2026-09-18T17:00:00Z",
                 }
             ]
         }
