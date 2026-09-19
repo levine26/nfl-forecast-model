@@ -10,6 +10,8 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[3]
 SCRIPT = ROOT / "research" / "props" / "v2" / "archive_live_prop_market.py"
+WORKFLOW = ROOT / ".github" / "workflows" / "research_props_v2_market_archive.yml"
+SOURCE_SHA = "a" * 40
 
 
 def _module():
@@ -82,10 +84,12 @@ def test_archives_full_normalized_multi_book_state_and_pit_distance(tmp_path):
         output_dir=out,
         manifest_path=manifest,
         source_workflow_run="123",
+        source_head_sha=SOURCE_SHA,
     )
     assert result["status"] == "archived"
     assert result["artifact_count"] == 1
     assert result["raw_provider_payload_sha256"] == "abc123"
+    assert result["source_head_sha"] == SOURCE_SHA
 
     rows = [json.loads(line) for line in manifest.read_text().splitlines()]
     assert len(rows) == 1
@@ -93,6 +97,7 @@ def test_archives_full_normalized_multi_book_state_and_pit_distance(tmp_path):
     with gzip.open(capture, "rt", encoding="utf-8") as handle:
         record = json.loads(handle.readline())
     assert record["minutes_to_kickoff"] == pytest.approx(240.0)
+    assert record["source_head_sha"] == SOURCE_SHA
     assert record["market_artifact"]["sportsbook_count"] == 2
     assert len(record["market_artifact"]["individual_books"]) == 2
 
@@ -106,10 +111,10 @@ def test_duplicate_snapshot_is_idempotent(tmp_path):
     manifest = out / "manifest.jsonl"
 
     first = module.archive_snapshot(
-        market, output_dir=out, manifest_path=manifest, source_workflow_run="123"
+        market, output_dir=out, manifest_path=manifest, source_workflow_run="123", source_head_sha=SOURCE_SHA
     )
     second = module.archive_snapshot(
-        market, output_dir=out, manifest_path=manifest, source_workflow_run="123"
+        market, output_dir=out, manifest_path=manifest, source_workflow_run="123", source_head_sha=SOURCE_SHA
     )
     assert first["status"] == "archived"
     assert second["status"] == "existing"
@@ -144,3 +149,28 @@ def test_production_authorized_snapshot_is_rejected(tmp_path):
             manifest_path=tmp_path / "archive" / "manifest.jsonl",
             source_workflow_run="123",
         )
+
+
+def test_rejects_missing_or_invalid_source_head_sha(tmp_path):
+    module = _module()
+    captured = datetime(2026, 9, 18, 17, 0, tzinfo=timezone.utc)
+    kickoff = captured + timedelta(hours=2)
+    market = _write_capture(tmp_path / "download", _snapshot(captured, kickoff))
+    for value in ("", "not-a-sha"):
+        with pytest.raises(module.MarketArchiveError, match="source_head_sha"):
+            module.archive_snapshot(
+                market,
+                output_dir=tmp_path / "archive",
+                manifest_path=tmp_path / "archive" / "manifest.jsonl",
+                source_workflow_run="123",
+                source_head_sha=value,
+            )
+
+
+def test_market_archive_workflow_has_exact_source_no_backfill_gate():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    marker = "EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-archive-exact-source-v0.1.0"
+    assert marker in text
+    assert "source run predates the exact-source market archive listener" in text
+    assert "head_sha=$SHA" in text
+    assert "--source-head-sha" in text
