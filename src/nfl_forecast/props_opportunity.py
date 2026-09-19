@@ -1086,6 +1086,10 @@ def build_opportunity_projection(
             "position": str(row.position),
             "availability_probability": float(row.availability_probability),
             "availability_uncertainty": float(row.availability_uncertainty),
+            "role_multiplier": float(row.role_multiplier),
+            "carry_role_multiplier": float(row.carry_role_multiplier),
+            "target_role_multiplier": float(row.target_role_multiplier),
+            "route_role_multiplier": float(row.route_role_multiplier),
             "is_primary_qb": pid == primary_qb,
         }
         if pid in carry_index:

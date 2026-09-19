@@ -253,3 +253,30 @@ def test_generic_carries_are_rejected_to_prevent_qb_scramble_double_count():
     unsafe = _player_history().rename(columns={"designed_carries": "carries"})
     with pytest.raises(ValueError, match="designed_carries"):
         build_opportunity_projection(_team_history(), unsafe, _players(), _context())
+
+
+def test_projection_retains_applied_role_multipliers_for_exact_replay():
+    players = _players()
+    players["role_multiplier"] = 1.0
+    players["carry_role_multiplier"] = 1.0
+    players["target_role_multiplier"] = 1.0
+    players["route_role_multiplier"] = 1.0
+    players.loc[players["player_id"].eq("RB1"), "role_multiplier"] = 0.93
+    players.loc[players["player_id"].eq("RB1"), "carry_role_multiplier"] = 1.17
+    players.loc[players["player_id"].eq("RB1"), "target_role_multiplier"] = 1.08
+    players.loc[players["player_id"].eq("RB1"), "route_role_multiplier"] = 0.91
+
+    projection = build_opportunity_projection(
+        _team_history(), _player_history(), players, _context()
+    )
+    retained = {row["player_id"]: row for row in projection.players}
+    rb1 = retained["RB1"]
+    assert rb1["role_multiplier"] == pytest.approx(0.93)
+    assert rb1["carry_role_multiplier"] == pytest.approx(1.17)
+    assert rb1["target_role_multiplier"] == pytest.approx(1.08)
+    assert rb1["route_role_multiplier"] == pytest.approx(0.91)
+
+    # These fields are replay metadata only: they are the exact normalized values
+    # already consumed by the canonical opportunity calculation.
+    carry = projection.hierarchy["designed_carry_share_given_designed_rush"]
+    assert carry["concentration"]["RB1"] > 0.0
