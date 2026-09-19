@@ -30,7 +30,7 @@ test('Performance page is empirical-data gated and retains immutable receipts',a
   await page.goto('./#/props/history')
   const performance=page.locator('.lp-performance')
   await expect(performance).toBeVisible()
-  await expect(performance.locator('.lp-page-head h1')).toHaveCount(1)
+  await expect(performance.locator('.lp-performance-head h1')).toHaveCount(1)
   await expect(performance.locator('.lp-performance-concepts article')).toHaveCount(4)
   await expect(performance.locator('.lp-performance-concepts article b')).toHaveCount(4)
 
