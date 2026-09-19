@@ -64,7 +64,7 @@ Same-week and target-game outcomes are excluded by construction.
 4. Regenerate only:
    - rushing yards from the existing carry array and adjusted yards/carry mean;
    - receiving yards from the existing reception array and adjusted yards/reception mean.
-5. Use deterministic shadow-specific RNG seeds.
+5. Use the exact deterministic RNG namespace from the passed retrospective candidate `levline-props-v2-defensive-efficiency-pregame-v0.1.0`; changing the wrapper/shadow version may not change the candidate draws.
 6. Serialize only rushing-yard and receiving-yard shadow forecasts.
 
 A receipt is invalid if any paired opportunity array changes.
@@ -100,6 +100,16 @@ Fail closed unless:
 - no target-week outcome enters defensive state.
 
 Started games are skipped, never reconstructed later.
+
+
+## No retrospective backfill
+
+Prospective evidence begins only after this listener is merged to `main`.
+
+The capture job checks out the exact source live-refresh head SHA and executes the recorder from that
+source state. A live refresh whose source SHA predates the listener cannot be replayed later and
+labeled prospective evidence. Missing or delayed pregame receipts remain missing; they are never
+reconstructed after kickoff.
 
 ## Shadow B
 
