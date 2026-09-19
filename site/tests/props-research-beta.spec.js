@@ -92,11 +92,14 @@ test('Performance page is empirical-data gated and retains immutable receipts',a
   await expect(page.getByText('Betting Performance')).toBeVisible()
   await expect(page.getByText('INSUFFICIENT EVALUATION DATA').first()).toBeVisible()
 
-  const receiptDetails=page.locator('details.lp-receipt').first()
-  if (fixtureRequired || await receiptDetails.isVisible().catch(()=>false)) {
-    await expect(receiptDetails).toBeVisible()
+  const originalLineLabel=page.getByText('Original sportsbook line / price',{exact:true}).first()
+  if (fixtureRequired) {
+    await expect(originalLineLabel).toBeAttached()
+  }
+  if (fixtureRequired || await originalLineLabel.count()) {
+    const receiptDetails=originalLineLabel.locator('xpath=ancestor::details[1]')
     await receiptDetails.evaluate(element=>{ element.open=true })
-    await expect(receiptDetails.getByText('Original sportsbook line / price')).toBeVisible()
+    await expect(originalLineLabel).toBeVisible()
     await expect(receiptDetails.getByText('Forecast timestamp')).toBeVisible()
     await expect(receiptDetails.getByText('Model version')).toBeVisible()
   }
