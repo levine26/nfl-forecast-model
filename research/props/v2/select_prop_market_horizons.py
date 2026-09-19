@@ -35,6 +35,29 @@ class HorizonError(ValueError):
     pass
 
 
+def has_live_source_provenance(row: Mapping[str, Any]) -> bool:
+    run_id = str(row.get("source_workflow_run") or "").strip()
+    generation_sha = str(row.get("source_head_sha") or "").strip().lower()
+    trigger_sha = str(row.get("source_trigger_head_sha") or "").strip().lower()
+    provider = str(row.get("source_market_provider") or "").strip()
+    credential_mode = str(row.get("source_market_credential_mode") or "").strip()
+    provenance_sha = str(row.get("source_provenance_sha256") or "").strip().lower()
+    git_sha = lambda value: len(value) in {40, 64} and all(
+        char in "0123456789abcdef" for char in value
+    )
+    sha256 = len(provenance_sha) == 64 and all(
+        char in "0123456789abcdef" for char in provenance_sha
+    )
+    return bool(
+        run_id
+        and git_sha(generation_sha)
+        and git_sha(trigger_sha)
+        and provider
+        and credential_mode
+        and sha256
+    )
+
+
 def _canon(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
 
@@ -106,6 +129,11 @@ def _selected_record(
         ),
         "snapshot_id": row.get("snapshot_id"),
         "source_workflow_run": row.get("source_workflow_run"),
+        "source_head_sha": row.get("source_head_sha"),
+        "source_trigger_head_sha": row.get("source_trigger_head_sha"),
+        "source_market_provider": row.get("source_market_provider"),
+        "source_market_credential_mode": row.get("source_market_credential_mode"),
+        "source_provenance_sha256": row.get("source_provenance_sha256"),
         "captured_at_utc": row.get("captured_at_utc"),
         "kickoff_utc": row.get("kickoff_utc"),
         "game_id": row.get("game_id"),
@@ -133,6 +161,10 @@ def select_horizons(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
     for raw in rows:
         row = dict(raw)
+        if not has_live_source_provenance(row):
+            # Preserve legacy pre-amendment captures in the archive, but they are permanently
+            # ineligible for prospective horizon / CLV evidence.
+            continue
         if row.get("research_only") is not True or row.get("production_authorized") is not False:
             raise HorizonError("horizon selection accepts research-only rows")
         minutes = float(row.get("minutes_to_kickoff"))
@@ -193,13 +225,17 @@ def main() -> int:
     args = parser.parse_args()
 
     rows = _load_archive_rows(args.archive_root)
-    selected = select_horizons(rows)
+    eligible_rows = [row for row in rows if has_live_source_provenance(row)]
+    legacy_rows = len(rows) - len(eligible_rows)
+    selected = select_horizons(eligible_rows)
     _write_jsonl(args.output, selected)
     status = {
         "contract_version": CONTRACT_VERSION,
         "archive_rows": len(rows),
+        "provenance_eligible_rows": len(eligible_rows),
+        "legacy_pre_provenance_rows": legacy_rows,
         "selected_rows": len(selected),
-        "identities": len({_identity(row) for row in rows}) if rows else 0,
+        "identities": len({_identity(row) for row in eligible_rows}) if eligible_rows else 0,
         "horizon_counts": {
             name: sum(row["horizon"] == name for row in selected)
             for name in ["EARLIEST_OBSERVED", *(h.name for h in HORIZONS), "NEAR_CLOSE_OBSERVED"]
