@@ -269,3 +269,48 @@ def test_marketless_v1_row_is_ineligible_not_fatal():
         source_head_sha="b"*40,
     )
     assert receipt is None
+
+
+def test_shadow_overlay_normalizes_opponent_alias():
+    module=_module()
+    player=SimpleNamespace(
+        player_id="P1",
+        opponent="JAC",
+        rushing_yards_per_carry=4.3,
+        rushing_yards_shape_per_carry=2.0,
+        rushing_yards_per_carry_event_sd=3.0,
+        rushing_yards_per_carry_mean_se=0.1,
+        receiving_yards_per_reception=10.0,
+        receiving_yards_shape_per_reception=2.0,
+        receiving_yards_per_reception_event_sd=5.0,
+        receiving_yards_per_reception_mean_se=0.1,
+    )
+    n=20
+    stats={
+        "active":np.ones(n,dtype=int),
+        "pass_attempts":np.zeros(n,dtype=int),
+        "routes":np.arange(n)%10,
+        "targets":np.arange(n)%5,
+        "receptions":np.arange(n)%4,
+        "carries":np.arange(n)%6,
+        "rushing_yards":np.zeros(n,dtype=int),
+        "receiving_yards":np.zeros(n,dtype=int),
+    }
+    baseline=DummyResult(
+        game_id="G-JAX",
+        model_version="V1",
+        players=(player,),
+        player_stats={"P1":{k:v.copy() for k,v in stats.items()}},
+    )
+    frozen=module.load_frozen_coefficients(FROZEN)
+    defense={
+        "JAX":{
+            "rushing":{"opponent_defense_delta":0.1},
+            "receiving":{"opponent_defense_delta":0.2},
+        }
+    }
+    shadow,audit=module.apply_shadow_a(
+        baseline,defense_state=defense,frozen=frozen
+    )
+    assert shadow.model_version==module.SHADOW_VERSION
+    assert audit["P1"]["opponent"]=="JAX"
