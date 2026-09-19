@@ -17,6 +17,7 @@ ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/"src"))
 
 from nfl_forecast.data import load_core_data  # noqa:E402
+from nfl_forecast.props_upstream import normalize_nflverse_scramble_semantics  # noqa:E402
 
 CONTRACT_VERSION="levline-props-v2-football-shadow-grading-v0.1.0"
 RECEIPT_CONTRACT_VERSION="levline-props-v2-football-shadow-a-v0.1.0"
@@ -383,6 +384,7 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
     bundle=load_core_data(seasons)
     schedules=bundle.schedules.to_pandas() if hasattr(bundle.schedules,"to_pandas") else bundle.schedules.copy()
     pbp=bundle.pbp.to_pandas() if hasattr(bundle.pbp,"to_pandas") else bundle.pbp.copy()
+    pbp,scramble_audit=normalize_nflverse_scramble_semantics(pbp)
     completed=_completed_games(schedules)
     actuals=actual_player_yards(pbp)
     graded=grade_receipts(receipts,completed_games=completed,actuals=actuals)
@@ -415,6 +417,7 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
         "overall":summarize(graded,seed=BOOTSTRAP_SEED+50000),
         "by_prop":by_prop,
         "concentration":concentration_diagnostics(graded),
+        "outcome_source_audit":{"pbp_normalization":scramble_audit},
         "grading_policy":{
             "push_policy":"exclude pushes from Brier/log loss/directional accuracy; retain for CRPS/MAE/interval metrics",
             "calibration_edges":[float(x) for x in CALIBRATION_EDGES.tolist()],
