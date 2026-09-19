@@ -148,6 +148,8 @@ def verify_b_receipt(row: Mapping[str,Any])->None:
 
     if str(row.get("prop_type") or "") not in SUPPORTED_PROPS:
         raise ShadowBGradingError("unsupported Shadow B prop type")
+    if not str(row.get("team") or "").strip():
+        raise ShadowBGradingError("Shadow B receipt missing team identity")
     shadow_a_grader.validate_distribution(row["v1"]["empirical_distribution"])
     shadow_a_grader.validate_distribution(row["shadow_b"]["empirical_distribution"])
 
@@ -323,6 +325,7 @@ def grade_b_receipts(
             "source_week":int(b["source_week"]),
             "game_id":game_id,
             "player_id":player_id,
+            "team":str(b.get("team") or ""),
             "prop_type":prop,
             "actual_result":actual,
             "market_line":line,
@@ -473,11 +476,14 @@ def concentration(frame: pd.DataFrame)->dict[str,Any]:
         return {}
     total=len(work)
     by_week=work.groupby(["source_season","source_week"]).size().sort_values(ascending=False)
+    by_team=work.groupby("team").size().sort_values(ascending=False)
     by_player=work.groupby("player_id").size().sort_values(ascending=False)
     return {
         "largest_week_share":float(by_week.iloc[0]/total),
+        "largest_team_share":float(by_team.iloc[0]/total),
         "largest_player_share":float(by_player.iloc[0]/total),
         "largest_week":list(by_week.index[0]),
+        "largest_team":str(by_team.index[0]),
         "largest_player_id":str(by_player.index[0]),
         "prop_counts":work["prop_type"].value_counts().to_dict(),
     }
