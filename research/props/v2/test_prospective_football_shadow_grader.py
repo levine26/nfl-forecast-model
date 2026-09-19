@@ -181,3 +181,34 @@ def test_fixed_80_interval_is_derived_from_empirical_distribution():
     assert high==80.0
     assert covered is True
     assert score==pytest.approx(80.0)
+
+
+def test_receipt_integrity_hash_is_enforced(tmp_path):
+    module=_module()
+    row={
+        "contract_version":module.RECEIPT_CONTRACT_VERSION,
+        "shadow_version":module.SHADOW_VERSION,
+        "shadow_id":"shadow-1",
+        "source_forecast_sha256":"a"*64,
+        "source_manifest_sha256":"b"*64,
+        "source_season":2026,
+        "source_week":2,
+        "prop_type":"rushing_yards",
+        "governance":{
+            "production_authorized":False,
+            "target_week_outcomes_used":0,
+        },
+        "v1":{"empirical_distribution":_snapshot([1,2,3])},
+        "shadow_a":{"empirical_distribution":_snapshot([1,2,4])},
+    }
+    row["shadow_sha256"]=module._sha(row)
+    path=tmp_path/"ledger.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    receipts=module.read_receipts(path)
+    assert len(receipts)==1
+
+    corrupted=json.loads(json.dumps(row))
+    corrupted["source_week"]=3
+    path.write_text(json.dumps(corrupted)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowGradingError,match="receipt SHA-256 mismatch"):
+        module.read_receipts(path)
