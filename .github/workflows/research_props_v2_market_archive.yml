@@ -92,7 +92,7 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/props-live-artifacts
           mkdir -p /tmp/props-live-artifacts
-          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
+          gh run download "${{ steps.source.outputs.run_id }}" --repo "${{ github.repository }}" --dir /tmp/props-live-artifacts
           mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
           mapfile -t MARKETS < <(find /tmp/props-live-artifacts -name market.json -type f | sort)
           if [ "${#PROVENANCE[@]}" -ne 1 ] || [ "${#MARKETS[@]}" -ne 1 ]; then
