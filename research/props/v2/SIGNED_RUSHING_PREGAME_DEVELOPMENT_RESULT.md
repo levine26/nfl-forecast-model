@@ -1,77 +1,76 @@
 # LevLine Props 2.0 — Signed Rushing True-Pregame Development Result
 
-Status: **RETROSPECTIVE PAIRED PREGAME ABLATION — REJECTED**  
+Status: **RETROSPECTIVE DEVELOPMENT — REJECTED**  
 Primary workflow: `35420676818`  
 Contract: `levline-props-v2-signed-rushing-pregame-v0.1.0`  
 Production promotion authorized: **NO**
 
 ## Question
 
-The conditional event-level study showed that signed rushing-yard support improved CRPS when actual
-event count was held fixed. This follow-up tested whether that mechanism improves the **full pregame
-rushing-yard distribution** when V1's simulated carry counts are preserved exactly.
+The earlier component-isolation study showed that signed empirical rushing-event support improved
+conditional CRPS when actual event count was held fixed.
 
-For every paired forecast:
-- V1 pregame state is unchanged;
-- sampled carry arrays are byte-for-byte identical;
-- V1 rushing yards/carry mean and uncertainty are preserved;
-- only the conditional rushing-yard draw changes from the nonnegative Gamma aggregate to centered
-  signed empirical event residuals fitted through season S−1;
-- target-game carries and target-game yards are not used in the fit.
+This follow-up removed that postgame conditioning:
+- V1's full pregame opportunity simulation was retained;
+- the exact sampled carry array was preserved for every player;
+- V1's player rushing-yards/carry mean and uncertainty were retained;
+- only the conditional rushing-yard draw was replaced with signed empirical event residuals fitted
+  through season S−1.
 
-## Aggregate result
+Target-game carries and target-game yards were never used to fit or construct the forecast.
 
-2023–2025:
-- N: **982** rushing-yard props;
-- unique games: **230**;
-- unique players: **114**;
-- V1 CRPS: **18.26136**;
-- signed-rushing CRPS: **18.30030**;
-- challenger minus V1 CRPS: **+0.03894** (worse);
-- game-clustered 95% interval: **+0.01676 to +0.06300**;
-- V1 Fair-Line MAE: **24.90733**;
-- signed-rushing Fair-Line MAE: **24.93737**;
-- challenger minus V1 MAE: **+0.03004** (worse);
-- game-clustered MAE-difference interval: **−0.02264 to +0.08299**;
-- V1 80% coverage: **62.22%**;
-- challenger 80% coverage: **63.14%**.
+## Pooled 2023–2025 result
 
-Coverage improves by about **+0.92 pp**, but the primary CRPS criterion fails clearly and Fair-Line
-MAE also moves in the wrong direction.
+Paired rushing-yard props: **982**  
+Unique games: **230**  
+Unique players: **114**
+
+- V1 CRPS: **18.26136**
+- signed challenger CRPS: **18.30030**
+- challenger minus V1 CRPS: **+0.03894** (worse)
+- game-clustered 95% interval: **+0.01676 to +0.06300**
+
+- V1 Fair-Line MAE: **24.90733**
+- challenger Fair-Line MAE: **24.93737**
+- challenger minus V1 MAE: **+0.03004** (worse)
+- game-clustered 95% interval: **−0.02264 to +0.08299**
+
+- V1 80% coverage: **62.22%**
+- challenger 80% coverage: **63.14%**
+- coverage change: **+0.92 pp**
+
+The coverage safeguard passes, but both primary proper-score / Fair-Line criteria fail.
 
 ## By season
 
-| Season | N | Δ CRPS | Δ Fair-Line MAE | V1 80% cov. | Challenger 80% cov. |
+| Season | N | Δ CRPS | Δ Fair-Line MAE | V1 coverage | Challenger coverage |
 |---|---:|---:|---:|---:|---:|
 | 2023 | 279 | **+0.08908** | **+0.11470** | 56.27% | 58.06% |
 | 2024 | 628 | **+0.02573** | −0.00239 | 64.65% | 65.29% |
 | 2025* | 75 | −0.03703 | −0.01333 | 64.00% | 64.00% |
 
-Only 2025 improves CRPS, and that genuine-OPEN slice is very small. The preregistered requirement
-was improvement in at least two of three seasons.
+*2025 is the small genuine-OPEN slice and cannot rescue the pooled / multi-season failure.
 
-## Scientific interpretation
+CRPS improves in only **one of three** seasons. In 2023 the challenger is materially worse, with a
+season-level clustered CRPS interval entirely above zero.
 
-The earlier signed-event component result was real but **does not survive composition with the
-pregame carry-count distribution and V1 player mean**.
-
-This is an important negative result: structural realism at the event level is not sufficient by
-itself to improve the full player-prop distribution. The residual resampling broadens/reshapes the
-aggregate in a way that slightly improves coverage but worsens probabilistic accuracy.
-
-## Disposition
+## Scientific disposition
 
 **REJECT P2-DIST-RUSH-PREGAME-V01.**
 
+The signed-support mechanism was useful under actual-event-count component isolation but did not
+survive interaction with the full pregame opportunity distribution. That is exactly why the
+component-first firewall exists.
+
 Do not:
-- tune residual centering, pooling thresholds, tail clipping, or event sampling against these
-  evaluated outcomes;
-- rescue the candidate using the small 2025 slice;
-- promote signed event support into production merely because the conditional component test passed.
+- tune the residual pool by position using these prop outcomes;
+- reweight negative events;
+- alter the 250-event fallback threshold;
+- blend Gamma and empirical draws based on these results;
+- rescue the candidate using the small favorable 2025 slice.
 
-The conditional signed-rushing mechanism remains useful scientific evidence about support
-misspecification, but this specific pregame implementation fails its frozen gate.
+The earlier component result remains scientifically informative: negative rushing-event support is
+real, but this particular empirical-residual integration is not an improvement to the full pregame
+Props distribution.
 
-No F-ST, Props V1, Sunday Signal, threshold, or production change is authorized.
-
-*2025 genuine-OPEN evidence is a small sample.
+No production forecast, Props V1 output, F-ST model, or betting threshold changes from this result.
