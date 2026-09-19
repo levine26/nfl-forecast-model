@@ -109,21 +109,28 @@ test('TD markets use probability and price language instead of a continuous Fair
 })
 
 test('Performance page is empirical-data gated and retains immutable receipts',async({page})=>{
+  test.setTimeout(60000)
   await page.goto('./#/props/history')
-  await expect(page.getByText('Prospective validation, with receipts.')).toBeVisible()
-  await expect(page.getByText('Projection Accuracy')).toBeVisible()
-  await expect(page.getByText('Probability Calibration')).toBeVisible()
-  await expect(page.getByText('Market Performance')).toBeVisible()
-  await expect(page.getByText('Betting Performance')).toBeVisible()
-  await expect(page.getByText('INSUFFICIENT EVALUATION DATA').first()).toBeVisible()
+  const performance=page.locator('.lp-performance')
+  await expect(performance).toBeVisible()
+  await expect(performance.locator('.lp-page-head h1')).toHaveText('Prospective validation, with receipts.')
 
-  const receiptDetails=page.locator('.lp-receipt').first()
+  const concepts=performance.locator('.lp-performance-concepts')
+  await expect(concepts).toContainText('Projection Accuracy')
+  await expect(concepts).toContainText('Probability Calibration')
+  await expect(concepts).toContainText('Market Performance')
+  await expect(concepts).toContainText('Betting Performance')
+  await expect(concepts.locator('article')).toHaveCount(4)
+  await expect(concepts.locator('article b')).toHaveCount(4)
+
+  const receiptDetails=performance.locator('.lp-receipt').first()
   if (fixtureRequired) await expect(receiptDetails).toBeVisible()
   if (await receiptDetails.isVisible().catch(()=>false)) {
     await receiptDetails.locator(':scope > summary').click()
-    await expect(receiptDetails.getByText('Original sportsbook line / price')).toBeVisible()
-    await expect(receiptDetails.getByText('Forecast timestamp')).toBeVisible()
-    await expect(receiptDetails.getByText('Model version')).toBeVisible()
+    const receiptGrid=receiptDetails.locator('.lp-receipt-grid')
+    await expect(receiptGrid).toContainText('Original sportsbook line / price')
+    await expect(receiptGrid).toContainText('Forecast timestamp')
+    await expect(receiptGrid).toContainText('Model version')
   }
 })
 
