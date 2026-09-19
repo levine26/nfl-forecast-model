@@ -43,6 +43,10 @@ def _b_receipt():
         "recorded_utc":"2026-09-20T19:00:00+00:00",
         "source_workflow_run":"12345",
         "source_head_sha":"c"*40,
+        "source_trigger_head_sha":"e"*40,
+        "source_market_provider":"the_odds_api",
+        "source_market_credential_mode":"configured",
+        "source_provenance_sha256":"d"*64,
         "source_season":2026,
         "source_week":2,
         "source_forecast_id":"forecast-1",
@@ -94,6 +98,10 @@ def _a_pair_for(b):
         "source_forecast_id":b["source_forecast_id"],
         "source_workflow_run":b["source_workflow_run"],
         "source_head_sha":b["source_head_sha"],
+        "source_trigger_head_sha":b["source_trigger_head_sha"],
+        "source_market_provider":b["source_market_provider"],
+        "source_market_credential_mode":b["source_market_credential_mode"],
+        "source_provenance_sha256":b["source_provenance_sha256"],
         "source_forecast_sha256":b["source_forecast_sha256"],
         "source_manifest_sha256":b["source_manifest_sha256"],
         "source_season":b["source_season"],
@@ -153,6 +161,11 @@ def test_a_b_pair_requires_identical_source_and_v1_distribution():
     drift=json.loads(json.dumps(a))
     drift["source_workflow_run"]="other"
     with pytest.raises(module.ShadowBGradingError,match="source_workflow_run"):
+        module.verify_pair(drift,b)
+
+    drift=json.loads(json.dumps(a))
+    drift["source_market_provider"]="other_provider"
+    with pytest.raises(module.ShadowBGradingError,match="source_market_provider"):
         module.verify_pair(drift,b)
 
     drift=json.loads(json.dumps(a))
