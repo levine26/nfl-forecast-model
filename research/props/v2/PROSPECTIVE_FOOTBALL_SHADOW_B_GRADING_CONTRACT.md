@@ -105,7 +105,11 @@ Only the integrity-matched B-vs-A sample counts:
 - at least **100 unique games**;
 - at least **8 NFL weeks**;
 - no unresolved PIT/provenance/identity failures;
-- no material proper-score degradation versus Shadow A;
+- no material proper-score degradation versus Shadow A, operationalized before outcomes as:
+  - mean Shadow B minus Shadow A CRPS <= 0;
+  - mean Shadow B minus Shadow A Brier score <= 0 on decided props;
+  - mean Shadow B minus Shadow A log loss <= 0 on decided props;
+  - mean Shadow B minus Shadow A 80% interval score <= 0;
 - positive evidence not driven by one week, team, player or prop subtype.
 
 These are discussion thresholds, not automatic promotion rules.
