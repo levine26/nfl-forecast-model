@@ -44,12 +44,16 @@ the tested candidate.
 
 ## Defense mechanism
 
-Identical to Shadow A:
+Identical to canonical Shadow A / PR #394:
 - frozen coefficients fit through 2025;
 - opponent prior 8 defensive games;
 - 80-event shrinkage to the prior league mean;
 - strictly prior-week rushing and receiving events;
-- only yards/carry and yards/reception means are adjusted.
+- role-adjusted opportunities are simulated first;
+- the exact PR #394 post-simulation defense overlay then regenerates only rushing-yard and
+  receiving-yard arrays from those role-adjusted carry/reception samples;
+- the defense overlay uses the same retrospective mechanism version in its deterministic RNG
+  namespace as PR #394.
 
 ## Pairing and receipts
 
@@ -62,7 +66,8 @@ For each eligible market-backed rushing-yard or receiving-yard source forecast:
 6. record an immutable pre-kickoff receipt.
 
 Every receipt preserves source forecast and manifest hashes, V1 and Shadow B distribution summaries,
-market line/probability, role multiplier/estimate provenance, defense-state provenance, and explicit
+immutable empirical distribution snapshots sufficient for later proper-score grading, market
+line/probability, role multiplier/estimate provenance, defense-state provenance, and explicit
 research-only governance.
 
 ## Fail-closed rules
@@ -75,5 +80,8 @@ No receipt if:
 - stable snap identity is unavailable;
 - target-week history enters the role or defense state;
 - source V1 replay differs from the published source artifact.
+
+A source run is ineligible if its main-branch SHA predates the Shadow B listener itself; historical
+live runs may not be replayed later to manufacture prospective evidence.
 
 No production Props V1, Sunday Signal, F-ST model, calibration, or betting policy is modified.
