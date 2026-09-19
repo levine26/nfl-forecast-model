@@ -225,3 +225,38 @@ def test_ambiguous_rank_one_depth_chart_fails_closed_for_team():
     )
     assert "ARI" not in resolved
     assert audit["teams_ambiguous"][0]["team"] == "ARI"
+
+
+def test_out_rank_one_qb_does_not_block_next_available_depth_qb():
+    depth = pd.DataFrame(
+        [
+            {
+                "dt": "2026-09-18T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB1",
+                "pos_abb": "QB",
+                "pos_rank": 1,
+            },
+            {
+                "dt": "2026-09-18T18:00:00Z",
+                "team": "ARI",
+                "gsis_id": "A-QB2",
+                "pos_abb": "QB",
+                "pos_rank": 2,
+            },
+        ]
+    )
+    state = _depth_player_state().copy()
+    state["expected_active_state"] = "UNKNOWN"
+    state.loc[state["player_id"].eq("A-QB1"), "expected_active_state"] = "OUT"
+    state["roster_membership_state"] = "ACTIVE_ROSTER"
+
+    resolved, audit = resolve_primary_qbs_from_depth_charts(
+        depth,
+        state,
+        game_id="2026_03_LAR_ARI",
+        forecast_timestamp="2026-09-18T22:00:00Z",
+    )
+
+    assert resolved["ARI"]["player_id"] == "A-QB2"
+    assert audit["teams_resolved"] == 1
