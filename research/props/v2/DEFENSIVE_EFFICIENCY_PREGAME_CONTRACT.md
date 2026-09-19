@@ -32,6 +32,8 @@ outcomes.
 
 ## Defense state and coefficients
 
+The V1 forecast baseline retains its existing historical input window. The challenger defense-state/coefficient source separately uses **2019 through S** PBP so the PR #391 component specification is inherited rather than silently refit on a shorter history.
+
 The defense feature and fixed ridge specification are inherited unchanged from PR #391:
 - opponent prior 8 defensive games;
 - shrink toward prior league event mean with 80 pseudo-events;
