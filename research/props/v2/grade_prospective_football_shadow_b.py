@@ -79,7 +79,7 @@ def verify_b_receipt(row: Mapping[str,Any])->None:
     if len(supplied)!=64 or supplied!=_sha(material):
         raise ShadowBGradingError("Shadow B receipt SHA-256 mismatch")
 
-    for field in ("source_forecast_sha256","source_manifest_sha256"):
+    for field in ("source_forecast_sha256","source_manifest_sha256","source_provenance_sha256"):
         value=str(row.get(field) or "").lower()
         if len(value)!=64 or any(c not in "0123456789abcdef" for c in value):
             raise ShadowBGradingError(f"invalid Shadow B provenance hash: {field}")
@@ -91,10 +91,16 @@ def verify_b_receipt(row: Mapping[str,Any])->None:
 
     source_run=str(row.get("source_workflow_run") or "").strip()
     source_sha=str(row.get("source_head_sha") or "").strip().lower()
+    trigger_sha=str(row.get("source_trigger_head_sha") or "").strip().lower()
     if not source_run:
         raise ShadowBGradingError("Shadow B receipt missing source workflow run")
-    if len(source_sha) not in {40,64} or any(c not in "0123456789abcdef" for c in source_sha):
-        raise ShadowBGradingError("Shadow B receipt has invalid source head SHA")
+    for label,value in (("source head",source_sha),("source trigger head",trigger_sha)):
+        if len(value) not in {40,64} or any(c not in "0123456789abcdef" for c in value):
+            raise ShadowBGradingError(f"Shadow B receipt has invalid {label} SHA")
+    if not str(row.get("source_market_provider") or "").strip():
+        raise ShadowBGradingError("Shadow B receipt missing source market provider")
+    if not str(row.get("source_market_credential_mode") or "").strip():
+        raise ShadowBGradingError("Shadow B receipt missing source market credential mode")
 
     kickoff=_aware(row.get("kickoff_utc"),"kickoff_utc")
     forecast_at=_aware(row.get("source_forecast_timestamp_utc"),"source_forecast_timestamp_utc")
@@ -190,6 +196,10 @@ def verify_pair(a: Mapping[str,Any], b: Mapping[str,Any])->None:
         "source_forecast_id",
         "source_workflow_run",
         "source_head_sha",
+        "source_trigger_head_sha",
+        "source_market_provider",
+        "source_market_credential_mode",
+        "source_provenance_sha256",
         "source_forecast_sha256",
         "source_manifest_sha256",
         "source_season",
