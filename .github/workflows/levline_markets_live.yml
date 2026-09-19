@@ -161,11 +161,69 @@ jobs:
               python scripts/run_levline_markets_live.py \
                 --priors config/levline_markets_priors_v1.json \
                 --work-root .artifacts/props-live \
-                --source-workflow-run "${{ github.run_id }}" \
-                --trigger-head-sha "$TRIGGER_HEAD_SHA" \
-                --generation-base-sha "$GENERATION_BASE_SHA" \
                 "${EXTRA_ARGS[@]}" \
                 "${BOOK_ARGS[@]}"
+
+            mapfile -t RUN_ROOTS < <(find .artifacts/props-live -mindepth 1 -maxdepth 1 -type d | sort)
+            if [ "${#RUN_ROOTS[@]}" -ne 1 ]; then
+              echo "::error::expected exactly one surviving live Props audit run-root; found ${#RUN_ROOTS[@]}"
+              exit 1
+            fi
+            RUN_ROOT="${RUN_ROOTS[0]}"
+            MARKET="$RUN_ROOT/market.json"
+            RAW_MARKET="$RUN_ROOT/market.raw.json"
+            FORECASTS="$RUN_ROOT/forecasts.json"
+            MANIFEST_SLATE="$RUN_ROOT/manifests/manifest_slate.json"
+            for path in "$MARKET" "$RAW_MARKET" "$FORECASTS" "$MANIFEST_SLATE"; do
+              test -f "$path" || { echo "::error::missing live Props audit file: $path"; exit 1; }
+            done
+
+            MARKET_PROVIDER=$(jq -r '.provider // empty' "$MARKET")
+            CREDENTIAL_MODE=$(jq -r '.credential_mode // "configured"' "$RAW_MARKET")
+            CAPTURE_MODE=$(jq -r '.capture_mode // empty' "$RAW_MARKET")
+            PROVIDER_ATTEMPTS=$(jq -c '.provider_attempts // []' "$RAW_MARKET")
+            test -n "$MARKET_PROVIDER"
+            test -n "$CREDENTIAL_MODE"
+            LIVE_RUN_ID=$(basename "$RUN_ROOT")
+            CREATED_UTC=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            MARKET_SHA=$(sha256sum "$MARKET" | awk '{print $1}')
+            RAW_MARKET_SHA=$(sha256sum "$RAW_MARKET" | awk '{print $1}')
+            FORECASTS_SHA=$(sha256sum "$FORECASTS" | awk '{print $1}')
+            MANIFEST_SHA=$(sha256sum "$MANIFEST_SLATE" | awk '{print $1}')
+
+            jq -n \
+              --arg contract_version "levline-props-live-source-provenance-v0.1.0" \
+              --arg source_workflow_run "${{ github.run_id }}" \
+              --arg trigger_head_sha "$TRIGGER_HEAD_SHA" \
+              --arg generation_base_sha "$GENERATION_BASE_SHA" \
+              --arg live_run_id "$LIVE_RUN_ID" \
+              --arg created_utc "$CREATED_UTC" \
+              --arg market_provider "$MARKET_PROVIDER" \
+              --arg market_credential_mode "$CREDENTIAL_MODE" \
+              --arg market_capture_mode "$CAPTURE_MODE" \
+              --arg market_snapshot_sha256 "$MARKET_SHA" \
+              --arg raw_market_sha256 "$RAW_MARKET_SHA" \
+              --arg forecasts_sha256 "$FORECASTS_SHA" \
+              --arg manifest_slate_sha256 "$MANIFEST_SHA" \
+              --argjson provider_attempts "$PROVIDER_ATTEMPTS" \
+              '{
+                contract_version:$contract_version,
+                source_workflow_run:$source_workflow_run,
+                trigger_head_sha:$trigger_head_sha,
+                generation_base_sha:$generation_base_sha,
+                live_run_id:$live_run_id,
+                created_utc:$created_utc,
+                market_provider:$market_provider,
+                market_credential_mode:$market_credential_mode,
+                market_capture_mode:$market_capture_mode,
+                provider_attempts:$provider_attempts,
+                market_snapshot_sha256:$market_snapshot_sha256,
+                raw_market_sha256:$raw_market_sha256,
+                forecasts_sha256:$forecasts_sha256,
+                manifest_slate_sha256:$manifest_slate_sha256,
+                research_only:true,
+                production_authorized:false
+              }' > "$RUN_ROOT/source_provenance.json"
 
             git add \
               outputs/props/forecasts.json \
