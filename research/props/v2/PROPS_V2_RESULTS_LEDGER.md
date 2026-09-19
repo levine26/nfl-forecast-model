@@ -191,6 +191,24 @@ as prospective timestamped injury/practice/status plus workload collection. Perm
 
 This is a data-coverage result, not evidence for or against the workload-mixture hypothesis.
 
+## Game-environment residual — rejected
+
+Workflow `35417908900`, artifact `10576338704`.
+
+2023–2025, N **1,422** team-game rows / **711** games:
+- baseline team-play MAE **6.87917**;
+- challenger team-play MAE **6.91492**;
+- challenger minus baseline **+0.03574 plays**;
+- game-clustered 95% interval **+0.01396 to +0.05730**;
+- baseline dropback-rate MAE **0.082411**;
+- challenger dropback-rate MAE **0.082700**;
+- dropback delta **+0.000289**, interval **−0.000436 to +0.001018**.
+
+Team-play MAE worsened in **2023, 2024 and 2025**.
+
+**Disposition:** REJECT `P2-GAME-ENV-V01`. Do not retune the evaluated formulation. Permanent
+record: `GAME_ENVIRONMENT_DEVELOPMENT_RESULT.md`.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
