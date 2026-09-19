@@ -1,0 +1,89 @@
+name: LevLine Props 2.1 Sunday Challenger
+
+on:
+  push:
+    branches: [research/props-2-1-sunday]
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/props21_*.py'
+      - 'scripts/build_props21_challenger.py'
+      - 'tests/test_props21_*.py'
+      - 'site/src/Props21Challenger.jsx'
+      - 'site/src/props21-challenger.css'
+      - 'site/src/PropsResearchBeta.jsx'
+      - 'research/props/v21/**'
+      - '.github/workflows/research_props21_sunday.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install '.[dev]'
+      - name: Validate Props 2.1 contracts and frozen surfaces
+        run: |
+          python -m pytest -q \
+            tests/test_props21_personnel.py \
+            tests/test_props21_xtd.py \
+            tests/test_props21_market.py \
+            tests/test_props21_qa.py \
+            tests/test_props21_coordinator.py \
+            tests/test_props_integration.py \
+            tests/test_props_publication.py \
+            tests/test_fst_frozen_identity.py \
+            tests/test_research_firewall.py
+      - name: Verify protected winner-model files are byte-identical to main
+        run: |
+          test -z "$(git diff --name-only origin/main...HEAD -- \
+            src/nfl_forecast/pipeline.py \
+            src/nfl_forecast/models.py \
+            src/nfl_forecast/features.py \
+            src/nfl_forecast/fst_production.py \
+            src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json)"
+      - name: Rebuild and validate the real committed live slate
+        run: |
+          python scripts/build_props21_challenger.py \
+            --input outputs/props/forecasts.json \
+            --previews outputs/game_previews.json \
+            --credential-mode shared_public_demo \
+            --output /tmp/public_challenger.json \
+            --receipts /tmp/forecast_originals.jsonl \
+            --report /tmp/live_slate_audit.md
+          python - <<'PY'
+          import json
+          payload=json.load(open('/tmp/public_challenger.json'))
+          audit=payload['audit']
+          assert audit['game_count'] == 15
+          assert audit['market_backed_qb_team_count'] == 30
+          assert not audit['market_backed_qb_zero_output']
+          assert not audit['unresolved_canonical_identity']
+          assert not audit['out_player_normal_opportunity']
+          assert audit['all_quotes_pregame']
+          assert not audit['winner_model_mutated']
+          assert not audit['v1_mutated']
+          assert not audit['shadow_a_mutated']
+          assert not audit['shadow_b_mutated']
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build Sunday Signal UI
+        working-directory: site
+        run: |
+          npm install
+          npm run build
+      - name: Validate Challenger responsive UI and keyboard surface
+        working-directory: site
+        run: |
+          mkdir -p public/data/props21
+          cp /tmp/public_challenger.json public/data/props21/public_challenger.json
+          npx playwright install --with-deps chromium
+          npx playwright test tests/props21-challenger.spec.js

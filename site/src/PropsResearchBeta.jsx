@@ -19,6 +19,7 @@ import {
   unitFor,
 } from './propsPresentation.js'
 import './props-research-beta.css'
+import Props21Challenger from './Props21Challenger.jsx'
 
 const BASE = import.meta.env.BASE_URL
 const MARKET_OPTIONS = [['ALL','All markets'],['PASSING','Passing'],['RUSHING','Rushing'],['RECEIVING','Receiving'],['RECEPTIONS','Receptions'],['TDS','Touchdowns']]
@@ -48,7 +49,7 @@ function routeState() {
   }
   return {
     active:true,
-    view:['board','games','history','about'].includes(view) ? view : 'board',
+    view:['board','games','history','about','challenger'].includes(view) ? view : 'board',
     gameId:null,
   }
 }
@@ -569,7 +570,7 @@ function About() {
 }
 
 function ProductNav({ view }) {
-  const items=[['board','Board','props'],['games','Games','props/games'],['history','Performance','props/history'],['about','How It Works','props/about']]
+  const items=[['board','Board','props'],['games','Games','props/games'],['history','Performance','props/history'],['about','How It Works','props/about'],['challenger','2.1 Challenger','props/challenger']]
   return <nav className="lp-product-nav" aria-label="LevLine Props views">{items.map(([key,label,path])=><button key={key} className={view===key?'active':''} aria-current={view===key?'page':undefined} onClick={()=>navigate(path)}>{label}</button>)}</nav>
 }
 
@@ -634,7 +635,7 @@ export default function PropsResearchBeta() {
   return <div className="lp-app">
     <PropsHeader view={route.view}/>
     <main>
-      {loading ? <LoadingState/> : <>
+      {route.view==='challenger' ? <Props21Challenger/> : loading ? <LoadingState/> : <>
         {route.view==='board' && <PropsBoard rows={rows} payload={publicPayload} history={historyPayload}/>}
         {route.view==='games' && (!publicPayload ? <GamesIndex rows={[]}/> : (route.gameId ? <GameDetail rows={rows} gameId={route.gameId}/> : <GamesIndex rows={rows}/>))}
         {route.view==='history' && <History payload={historyPayload}/>}
