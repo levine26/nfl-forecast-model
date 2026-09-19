@@ -417,7 +417,7 @@ No completed 2026 outcome may change the candidate. Grading is evaluation-only.
 
 Primary candidate: **P2-SHADOW-A-DEFENSE**.
 
-Capture listener: **PR #402 — in validation, not yet merged**.
+Capture listener: **PR #402 — merged to `main` and active**.
 It replays the exact V1 live manifest, applies only the frozen rushing/receiving defensive-efficiency
 residuals, preserves every V1 opportunity array, uses the exact #394 mechanism RNG identity, and
 writes immutable pregame receipts off `main`.
@@ -435,13 +435,14 @@ Each receipt is designed to preserve:
 Prospective football Shadow A receipts accumulated so far: **0**.
 No pre-listener live run may be backfilled as prospective.
 
-Grading implementation: **PR #406 — frozen before first grade, dependent on #402**.
+Grading implementation: **PR #406 — merged to `main`, frozen before the first eligible receipt/outcome**.
 The grader uses finalized outcomes only, requires positive offensive snaps, preserves sportsbook void
 semantics, computes CRPS/MAE/Brier/log loss/fixed-80%-interval/directional metrics, and never
 auto-authorizes promotion.
 
-Secondary **Shadow B (defense + Dynamic Role V0.1 full)** remains **unimplemented with zero receipts**.
-No outcome before Shadow B's own first immutable receipt may count toward its prospective sample.
+Secondary **Shadow B (defense + Dynamic Role V0.1 full)** is now implemented by **PR #405**, merged to `main` with a separate immutable listener and separate evidence branch. Shadow B receipts accumulated so far: **0**. It replays V1, reconstructs the captured V1 opportunity distributions before applying the exact Dynamic Role V0.1 full transform, then applies the exact #394 defensive-efficiency overlay. No outcome before Shadow B's own first immutable receipt may count toward its prospective sample.
+
+Shadow B grading is frozen separately in **PR #409** before the first B receipt/outcome. Its primary comparison is B vs matched Shadow A; B vs V1 is supporting context only. Unmatched B receipts cannot enter the B-vs-A minimum-evidence threshold.
 
 ## Prospective market archive activation status
 
