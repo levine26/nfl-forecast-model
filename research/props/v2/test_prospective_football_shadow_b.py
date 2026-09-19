@@ -19,6 +19,7 @@ from nfl_forecast.props_opportunity import (
 ROOT=Path(__file__).resolve().parents[3]
 SCRIPT=ROOT/"research"/"props"/"v2"/"record_prospective_football_shadow_b.py"
 FROZEN=ROOT/"research"/"props"/"v2"/"DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json"
+WORKFLOW=ROOT/".github"/"workflows"/"research_props_v2_football_shadow_b.yml"
 
 
 def _module():
@@ -375,3 +376,13 @@ def test_shadow_b_fails_closed_when_strictly_lagged_snap_history_is_unavailable(
             manifest,
             pd.DataFrame([{"player_id":"RB1"}]),
         )
+
+
+def test_shadow_b_workflow_requires_live_generation_and_market_provenance():
+    text=WORKFLOW.read_text(encoding="utf-8")
+    assert "LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0" in text
+    assert "source_provenance.json" in text
+    assert "Shadow B market snapshot SHA mismatch" in text
+    assert "Shadow B market provider provenance mismatch" in text
+    assert "--source-trigger-head-sha" in text
+    assert "--source-provenance-sha256" in text
