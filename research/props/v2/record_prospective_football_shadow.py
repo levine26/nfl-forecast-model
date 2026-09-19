@@ -417,17 +417,58 @@ def _forecast_index(artifact: Mapping[str,Any])->dict[tuple[str,str,str],dict[st
 
 
 def _assert_replay_matches_source(replay: Mapping[str,Any], source: Mapping[str,Any])->None:
+    source_id=str(source.get("forecast_id") or "")
+    replay_id=str(replay.get("forecast_id") or "")
+    if not source_id or replay_id!=source_id:
+        raise FootballShadowError(
+            f"baseline replay forecast_id drift: {replay_id!r} != {source_id!r}"
+        )
+
     replay_model=replay.get("model") if isinstance(replay.get("model"),Mapping) else {}
     source_model=source.get("model") if isinstance(source.get("model"),Mapping) else {}
-    for field in ("fair_line","over_probability","under_probability"):
-        a=_finite(replay_model.get(field))
-        b=_finite(source_model.get(field))
+    if str(replay_model.get("version") or "")!=str(source_model.get("version") or ""):
+        raise FootballShadowError(
+            f"baseline replay model-version drift for {source_id}"
+        )
+
+    def assert_numeric(label: str, a_raw: Any, b_raw: Any)->None:
+        a=_finite(a_raw)
+        b=_finite(b_raw)
         if a is None and b is None:
-            continue
+            return
         if a is None or b is None or not math.isclose(a,b,rel_tol=0.0,abs_tol=1e-12):
             raise FootballShadowError(
-                f"baseline replay drift for {source.get('forecast_id')}/{field}: {a} != {b}"
+                f"baseline replay drift for {source_id}/{label}: {a} != {b}"
             )
+
+    for field in ("fair_line","over_probability","under_probability","standard_deviation"):
+        assert_numeric(field,replay_model.get(field),source_model.get(field))
+
+    replay_interval=(
+        replay_model.get("prediction_interval")
+        if isinstance(replay_model.get("prediction_interval"),Mapping)
+        else {}
+    )
+    source_interval=(
+        source_model.get("prediction_interval")
+        if isinstance(source_model.get("prediction_interval"),Mapping)
+        else {}
+    )
+    for field in ("low","high","coverage"):
+        assert_numeric(
+            f"prediction_interval.{field}",
+            replay_interval.get(field),
+            source_interval.get(field),
+        )
+
+    replay_market=replay.get("market") if isinstance(replay.get("market"),Mapping) else {}
+    source_market=source.get("market") if isinstance(source.get("market"),Mapping) else {}
+    for field in ("line","no_vig_over_probability"):
+        assert_numeric(
+            f"market.{field}",
+            replay_market.get(field),
+            source_market.get(field),
+        )
 
 
 def _shadow_id(source_forecast_id: str)->str:
