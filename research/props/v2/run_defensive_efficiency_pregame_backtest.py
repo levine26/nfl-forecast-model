@@ -129,6 +129,14 @@ def run_season(*,season:int,mode:str,simulations:int):
     bundle=load_core_data(seasons)
     bundle=load_advanced_data(bundle,seasons)
     pbp,pbp_audit=normalize_historical_pbp(bundle.pbp)
+
+    # Preserve the successful PR #391 component specification exactly: its
+    # defensive-efficiency state was trained from 2019+ PBP. Keep that source
+    # separate from the frozen V1 forecast-history bundle so the baseline is
+    # unchanged while the challenger coefficient/history contract is inherited.
+    component_bundle=load_core_data(range(2019,int(season)+1))
+    component_pbp,component_pbp_audit=normalize_historical_pbp(component_bundle.pbp)
+
     players=_pandas(nfl.load_players())
     snap_counts,snap_identity_audit=normalize_snap_counts_player_ids(bundle.snap_counts,players)
 
@@ -154,7 +162,7 @@ def run_season(*,season:int,mode:str,simulations:int):
     )
     position_priors=fitted_priors["efficiency_position_priors"]
 
-    event_rows=build_event_rows(pbp,_positions(players))
+    event_rows=build_event_rows(component_pbp,_positions(players))
     component_rows=build_component_rows(event_rows)
     fit=fit_residual(
         component_rows,event_type=mode,trained_through_season=trained_through
@@ -367,6 +375,7 @@ def run_season(*,season:int,mode:str,simulations:int):
         "fit":fit,
         "source_audit":{
             "pbp_normalization":pbp_audit,
+            "component_pbp_normalization":component_pbp_audit,
             "snap_identity":snap_identity_audit,
             "market_source":market_source_audit,
             "game_line_source":game_line_source_audit,
