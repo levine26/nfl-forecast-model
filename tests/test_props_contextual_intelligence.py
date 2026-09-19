@@ -355,3 +355,36 @@ def test_same_timestamp_conflicting_current_starter_claims_fail_closed():
 
     assert "SEA" not in resolved
     assert audit["teams_ambiguous"][0]["team"] == "SEA"
+
+
+def test_newer_current_starter_report_supersedes_older_conflicting_report():
+    state = _player_state()
+    state.loc[state["player_id"].eq("SEA-DARNOLD"), "expected_active_state"] = "AVAILABLE"
+    previews = {
+        GAME_ID: {
+            "current_reported_sources": [
+                {
+                    "source_name": "Earlier report",
+                    "source_url": "https://example.com/darnold-earlier",
+                    "title": "Sam Darnold will start at quarterback for Seattle",
+                    "as_of": "2026-09-18T19:00:00Z",
+                },
+                {
+                    "source_name": "Seattle Seahawks",
+                    "source_url": "https://www.seahawks.com/news/drew-lock-late-update",
+                    "title": "Drew Lock to start at quarterback for Seattle",
+                    "as_of": "2026-09-18T22:00:00Z",
+                },
+            ]
+        }
+    }
+
+    resolved, audit = resolve_primary_qbs_from_current_reporting(
+        previews,
+        state,
+        game_id=GAME_ID,
+        forecast_timestamp=FORECAST,
+    )
+
+    assert resolved["SEA"]["player_id"] == "SEA-LOCK"
+    assert audit["status"] == "qualified"
