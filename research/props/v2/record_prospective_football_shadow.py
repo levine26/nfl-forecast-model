@@ -79,6 +79,21 @@ def _stable_seed(*parts: Any)->int:
     return int.from_bytes(digest[:8],"big")%(2**32-1)
 
 
+def _empirical_distribution_snapshot(samples: Any)->dict[str,Any]:
+    values=np.asarray(samples,dtype=float)
+    values=values[np.isfinite(values)]
+    if values.size==0:
+        raise FootballShadowError("empirical distribution snapshot requires finite samples")
+    support,counts=np.unique(values,return_counts=True)
+    snapshot={
+        "sample_count":int(values.size),
+        "support":[float(value) for value in support.tolist()],
+        "counts":[int(count) for count in counts.tolist()],
+    }
+    snapshot["sha256"]=_sha(snapshot)
+    return snapshot
+
+
 def _aware(value: Any, *, label: str)->datetime:
     try:
         parsed=datetime.fromisoformat(str(value).replace("Z","+00:00"))
@@ -417,17 +432,58 @@ def _forecast_index(artifact: Mapping[str,Any])->dict[tuple[str,str,str],dict[st
 
 
 def _assert_replay_matches_source(replay: Mapping[str,Any], source: Mapping[str,Any])->None:
+    source_id=str(source.get("forecast_id") or "")
+    replay_id=str(replay.get("forecast_id") or "")
+    if not source_id or replay_id!=source_id:
+        raise FootballShadowError(
+            f"baseline replay forecast_id drift: {replay_id!r} != {source_id!r}"
+        )
+
     replay_model=replay.get("model") if isinstance(replay.get("model"),Mapping) else {}
     source_model=source.get("model") if isinstance(source.get("model"),Mapping) else {}
-    for field in ("fair_line","over_probability","under_probability"):
-        a=_finite(replay_model.get(field))
-        b=_finite(source_model.get(field))
+    if str(replay_model.get("version") or "")!=str(source_model.get("version") or ""):
+        raise FootballShadowError(
+            f"baseline replay model-version drift for {source_id}"
+        )
+
+    def assert_numeric(label: str, a_raw: Any, b_raw: Any)->None:
+        a=_finite(a_raw)
+        b=_finite(b_raw)
         if a is None and b is None:
-            continue
+            return
         if a is None or b is None or not math.isclose(a,b,rel_tol=0.0,abs_tol=1e-12):
             raise FootballShadowError(
-                f"baseline replay drift for {source.get('forecast_id')}/{field}: {a} != {b}"
+                f"baseline replay drift for {source_id}/{label}: {a} != {b}"
             )
+
+    for field in ("fair_line","over_probability","under_probability","standard_deviation"):
+        assert_numeric(field,replay_model.get(field),source_model.get(field))
+
+    replay_interval=(
+        replay_model.get("prediction_interval")
+        if isinstance(replay_model.get("prediction_interval"),Mapping)
+        else {}
+    )
+    source_interval=(
+        source_model.get("prediction_interval")
+        if isinstance(source_model.get("prediction_interval"),Mapping)
+        else {}
+    )
+    for field in ("low","high","coverage"):
+        assert_numeric(
+            f"prediction_interval.{field}",
+            replay_interval.get(field),
+            source_interval.get(field),
+        )
+
+    replay_market=replay.get("market") if isinstance(replay.get("market"),Mapping) else {}
+    source_market=source.get("market") if isinstance(source.get("market"),Mapping) else {}
+    for field in ("line","no_vig_over_probability"):
+        assert_numeric(
+            f"market.{field}",
+            replay_market.get(field),
+            source_market.get(field),
+        )
 
 
 def _shadow_id(source_forecast_id: str)->str:
@@ -448,6 +504,8 @@ def build_receipt(
     recorded_utc: datetime,
     source_workflow_run: str,
     source_head_sha: str,
+    v1_samples: Any,
+    shadow_samples: Any,
 )->dict[str,Any]|None:
     source_id=str(source.get("forecast_id") or "").strip()
     prop_type=str(source.get("prop_type") or "").strip()
@@ -491,7 +549,10 @@ def build_receipt(
         "source_forecast_sha256":_sha(dict(source)),
         "source_manifest_sha256":str(manifest.get("manifest_sha256") or ""),
         "source_forecast_timestamp_utc":forecast_at.isoformat(),
+        "source_data_horizon_utc":source.get("data_horizon_utc"),
         "source_market_captured_utc":market_at.isoformat(),
+        "source_signal_state":str(source.get("signal_state") or ""),
+        "source_data_quality":dict(source.get("data_quality")) if isinstance(source.get("data_quality"),Mapping) else {},
         "kickoff_utc":kickoff.isoformat(),
         "game_id":str(source.get("game_id") or ""),
         "player_id":pid,
@@ -513,6 +574,7 @@ def build_receipt(
             "under_probability":_finite(source_model.get("under_probability")),
             "standard_deviation":_finite(source_model.get("standard_deviation")),
             "prediction_interval":source_model.get("prediction_interval"),
+            "empirical_distribution":_empirical_distribution_snapshot(v1_samples),
         },
         "shadow_a":{
             "model_version":shadow_model.get("version"),
@@ -521,6 +583,7 @@ def build_receipt(
             "under_probability":_finite(shadow_model.get("under_probability")),
             "standard_deviation":_finite(shadow_model.get("standard_deviation")),
             "prediction_interval":shadow_model.get("prediction_interval"),
+            "empirical_distribution":_empirical_distribution_snapshot(shadow_samples),
         },
         "defensive_efficiency":{
             "event_type":event_type,
@@ -647,6 +710,8 @@ def record_shadow_a(
                 recorded_utc=recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
+                v1_samples=baseline.player_stats[str(source.get("player_id") or "")][key[2]],
+                shadow_samples=shadow.player_stats[str(source.get("player_id") or "")][key[2]],
             )
             if receipt is None:
                 continue
