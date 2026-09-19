@@ -193,6 +193,12 @@ def test_receipt_integrity_hash_is_enforced(tmp_path):
         "source_manifest_sha256":"b"*64,
         "source_season":2026,
         "source_week":2,
+        "source_workflow_run":"12345",
+        "source_head_sha":"c"*40,
+        "recorded_utc":"2026-09-20T19:00:00+00:00",
+        "source_forecast_timestamp_utc":"2026-09-20T18:00:00+00:00",
+        "source_market_captured_utc":"2026-09-20T18:05:00+00:00",
+        "kickoff_utc":"2026-09-20T20:00:00+00:00",
         "prop_type":"rushing_yards",
         "governance":{
             "production_authorized":False,
@@ -211,4 +217,35 @@ def test_receipt_integrity_hash_is_enforced(tmp_path):
     corrupted["source_week"]=3
     path.write_text(json.dumps(corrupted)+"\n",encoding="utf-8")
     with pytest.raises(module.ShadowGradingError,match="receipt SHA-256 mismatch"):
+        module.read_receipts(path)
+
+
+def test_receipt_integrity_rejects_post_kickoff_chronology(tmp_path):
+    module=_module()
+    row={
+        "contract_version":module.RECEIPT_CONTRACT_VERSION,
+        "shadow_version":module.SHADOW_VERSION,
+        "shadow_id":"shadow-late",
+        "source_forecast_sha256":"a"*64,
+        "source_manifest_sha256":"b"*64,
+        "source_season":2026,
+        "source_week":2,
+        "source_workflow_run":"12345",
+        "source_head_sha":"c"*40,
+        "recorded_utc":"2026-09-20T20:01:00+00:00",
+        "source_forecast_timestamp_utc":"2026-09-20T18:00:00+00:00",
+        "source_market_captured_utc":"2026-09-20T18:05:00+00:00",
+        "kickoff_utc":"2026-09-20T20:00:00+00:00",
+        "prop_type":"rushing_yards",
+        "governance":{
+            "production_authorized":False,
+            "target_week_outcomes_used":0,
+        },
+        "v1":{"empirical_distribution":_snapshot([1,2,3])},
+        "shadow_a":{"empirical_distribution":_snapshot([1,2,4])},
+    }
+    row["shadow_sha256"]=module._sha(row)
+    path=tmp_path/"ledger.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowGradingError,match="pre-kickoff"):
         module.read_receipts(path)
