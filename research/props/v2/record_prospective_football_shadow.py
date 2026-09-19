@@ -504,6 +504,8 @@ def build_receipt(
     recorded_utc: datetime,
     source_workflow_run: str,
     source_head_sha: str,
+    source_season: int,
+    source_week: int,
     v1_samples: Any,
     shadow_samples: Any,
 )->dict[str,Any]|None:
@@ -545,6 +547,8 @@ def build_receipt(
         "recorded_utc":recorded.isoformat(),
         "source_workflow_run":str(source_workflow_run),
         "source_head_sha":str(source_head_sha),
+        "source_season":int(source_season),
+        "source_week":int(source_week),
         "source_forecast_id":source_id,
         "source_forecast_sha256":_sha(dict(source)),
         "source_manifest_sha256":str(manifest.get("manifest_sha256") or ""),
@@ -710,6 +714,8 @@ def record_shadow_a(
                 recorded_utc=recorded,
                 source_workflow_run=source_workflow_run,
                 source_head_sha=source_head_sha,
+                source_season=season,
+                source_week=week,
                 v1_samples=baseline.player_stats[str(source.get("player_id") or "")][key[2]],
                 shadow_samples=shadow.player_stats[str(source.get("player_id") or "")][key[2]],
             )
