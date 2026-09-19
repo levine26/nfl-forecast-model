@@ -9,11 +9,19 @@ on:
       - 'research/props/v2/test_prospective_shadow.py'
       - '.github/workflows/research_props_v2_prospective_shadow.yml'
   workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful main-branch LevLine Props live refresh run ID
+        required: true
+        type: string
   workflow_run:
     workflows:
       - 'LevLine Props live refresh'
     types:
       - completed
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -38,29 +46,54 @@ jobs:
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     permissions:
+      actions: read
       contents: write
     concurrency:
       group: levline-props-v2-prospective-shadow
       cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Restore immutable research shadow ledger
+      - name: Resolve and validate exact source live workflow run
+        id: source
         run: |
           set -euo pipefail
-          DATA_DIR=research_outputs/props_v2/prospective_shadow
-          mkdir -p "$DATA_DIR"
-          git fetch origin research-data/props-v2-prospective-shadow:refs/remotes/origin/research-data/props-v2-prospective-shadow || true
-          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-prospective-shadow; then
-            for file in challenger_originals.jsonl last_record_status.json; do
-              git show "origin/research-data/props-v2-prospective-shadow:$DATA_DIR/$file" > "$DATA_DIR/$file" 2>/dev/null || true
-            done
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RUN_ID="${{ inputs.source_run_id }}"
+          else
+            RUN_ID="${{ github.event.workflow_run.id }}"
           fi
+          test -n "$RUN_ID"
+          META=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID")
+          NAME=$(printf '%s' "$META" | jq -r '.name')
+          BRANCH=$(printf '%s' "$META" | jq -r '.head_branch')
+          SHA=$(printf '%s' "$META" | jq -r '.head_sha')
+          CONCLUSION=$(printf '%s' "$META" | jq -r '.conclusion')
+          if [ "$NAME" != "LevLine Props live refresh" ]; then
+            echo "::error::source run is not LevLine Props live refresh: $NAME"
+            exit 1
+          fi
+          if [ "$BRANCH" != "main" ] || [ "$CONCLUSION" != "success" ]; then
+            echo "::error::source run must be successful on main; branch=$BRANCH conclusion=$CONCLUSION"
+            exit 1
+          fi
+          for path in \
+            research/props/v2/record_prospective_shadow.py \
+            research/props/v2/prospective_shadow_v0_1.json; do
+            if ! gh api "repos/${{ github.repository }}/contents/$path?ref=$SHA" >/dev/null 2>&1; then
+              echo "::error::source run predates the prospective market shadow listener: missing $path at $SHA"
+              exit 1
+            fi
+          done
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.head_sha }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -70,12 +103,75 @@ jobs:
       - name: Install project
         run: python -m pip install -e .
 
-      - name: Record all currently eligible pregame shadow receipts
+      - name: Download exact source live audit artifact
+        id: artifact
         run: |
           set -euo pipefail
-          test -s outputs/props/forecasts.json
-          mkdir -p research_outputs/props_v2/prospective_shadow
-          python research/props/v2/record_prospective_shadow.py             --forecasts outputs/props/forecasts.json             --config research/props/v2/prospective_shadow_v0_1.json             --ledger research_outputs/props_v2/prospective_shadow/challenger_originals.jsonl             | tee research_outputs/props_v2/prospective_shadow/last_record_status.json
+          rm -rf /tmp/props-live-artifacts
+          mkdir -p /tmp/props-live-artifacts
+          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
+          mapfile -t FORECASTS < <(find /tmp/props-live-artifacts -name forecasts.json -type f | sort)
+          if [ "${#FORECASTS[@]}" -ne 1 ]; then
+            echo "::error::expected exactly one forecasts.json in source artifacts; found ${#FORECASTS[@]}"
+            printf '%s\n' "${FORECASTS[@]:-}"
+            exit 1
+          fi
+          echo "forecasts=${FORECASTS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore immutable research shadow ledger
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/prospective_shadow
+          rm -rf "$DATA_DIR"
+          mkdir -p "$DATA_DIR"
+          git fetch origin research-data/props-v2-prospective-shadow:refs/remotes/origin/research-data/props-v2-prospective-shadow || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-prospective-shadow; then
+            git archive --format=tar origin/research-data/props-v2-prospective-shadow "$DATA_DIR" 2>/dev/null | tar -xf - || true
+          fi
+          mkdir -p "$DATA_DIR"
+
+      - name: Record exact-run pregame market shadow receipts
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/props_v2/prospective_shadow
+          python research/props/v2/record_prospective_shadow.py \
+            --forecasts "${{ steps.artifact.outputs.forecasts }}" \
+            --config research/props/v2/prospective_shadow_v0_1.json \
+            --ledger "$DATA_DIR/challenger_originals.jsonl" \
+            --source-workflow-run "${{ steps.source.outputs.run_id }}" \
+            --source-head-sha "${{ steps.source.outputs.head_sha }}" \
+            | tee "$DATA_DIR/last_record_status.json"
+
+      - name: Enforce research-only source provenance
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("research_outputs/props_v2/prospective_shadow")
+          status=json.loads((root/"last_record_status.json").read_text())
+          assert status["contract_version"]=="levline-props-v2-prospective-shadow-v0.1.0"
+          assert status["production_authorized"] is False
+          assert status["winner_model_mutated"] is False
+          assert status["published_v1_props_mutated"] is False
+          assert status["source_workflow_run"]
+          assert len(status["source_head_sha"]) in {40,64}
+          ledger=root/"challenger_originals.jsonl"
+          rows=[]
+          if ledger.exists():
+              rows=[json.loads(line) for line in ledger.read_text().splitlines() if line.strip()]
+          for row in rows:
+              assert row["source_workflow_run"]
+              assert row["source_head_sha"]==status["source_head_sha"]
+              assert row["governance"]["production_authorized"] is False
+              assert "actual_result" not in row
+              assert "grading_result" not in row
+          print(json.dumps({
+              "source_workflow_run":status["source_workflow_run"],
+              "source_head_sha":status["source_head_sha"],
+              "appended":status["appended"],
+              "ledger_receipts":len(rows),
+          },indent=2))
+          PY
 
       - name: Persist shadow evidence away from main
         run: |
