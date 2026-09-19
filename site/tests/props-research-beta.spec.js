@@ -13,6 +13,37 @@ function boardRow(scope,name) {
   return scope.locator('.lp-board-row').filter({hasText:name}).first()
 }
 
+test('Performance page is empirical-data gated and retains immutable receipts',async({page})=>{
+  test.setTimeout(60000)
+  for (const label of [
+    'Prospective validation, with receipts.',
+    'Projection Accuracy',
+    'Probability Calibration',
+    'Market Performance',
+    'Betting Performance',
+    'INSUFFICIENT EVALUATION DATA',
+    'Original sportsbook line / price',
+    'Forecast timestamp',
+    'Model version',
+  ]) expect(propsSource).toContain(label)
+
+  await page.goto('./#/props/history')
+  const performance=page.locator('.lp-performance')
+  await expect(performance).toBeVisible()
+  await expect(performance.locator('.lp-page-head h1')).toHaveCount(1)
+  await expect(performance.locator('.lp-performance-concepts article')).toHaveCount(4)
+  await expect(performance.locator('.lp-performance-concepts article b')).toHaveCount(4)
+
+  const receipts=performance.locator('.lp-receipt')
+  if (fixtureRequired) await expect(receipts).toHaveCount(4)
+  const receiptDetails=receipts.first()
+  if (await receiptDetails.isVisible().catch(()=>false)) {
+    await receiptDetails.locator(':scope > summary').click()
+    await expect(receiptDetails).toHaveJSProperty('open',true)
+    await expect(receiptDetails.locator('.lp-receipt-grid .lp-metric')).toHaveCount(8)
+  }
+})
+
 for (const width of [320,390,430,768,1440]) {
   test('Props board has no essential horizontal overflow at ' + width + 'px',async({page})=>{
     await page.setViewportSize({width,height:1000})
@@ -111,36 +142,6 @@ test('TD markets use probability and price language instead of a continuous Fair
   await expect(cmc.locator('.lp-fair-viz')).toHaveCount(0)
 })
 
-test('Performance page is empirical-data gated and retains immutable receipts',async({page})=>{
-  test.setTimeout(60000)
-  for (const label of [
-    'Prospective validation, with receipts.',
-    'Projection Accuracy',
-    'Probability Calibration',
-    'Market Performance',
-    'Betting Performance',
-    'INSUFFICIENT EVALUATION DATA',
-    'Original sportsbook line / price',
-    'Forecast timestamp',
-    'Model version',
-  ]) expect(propsSource).toContain(label)
-
-  await page.goto('./#/props/history')
-  const performance=page.locator('.lp-performance')
-  await expect(performance).toBeVisible()
-  await expect(performance.locator('.lp-page-head h1')).toHaveCount(1)
-  await expect(performance.locator('.lp-performance-concepts article')).toHaveCount(4)
-  await expect(performance.locator('.lp-performance-concepts article b')).toHaveCount(4)
-
-  const receipts=performance.locator('.lp-receipt')
-  if (fixtureRequired) await expect(receipts).toHaveCount(4)
-  const receiptDetails=receipts.first()
-  if (await receiptDetails.isVisible().catch(()=>false)) {
-    await receiptDetails.locator(':scope > summary').click()
-    await expect(receiptDetails).toHaveJSProperty('open',true)
-    await expect(receiptDetails.locator('.lp-receipt-grid .lp-metric')).toHaveCount(8)
-  }
-})
 test('Props navigation supports keyboard activation and returns to canonical Sunday Signal route',async({page})=>{
   await page.goto('./#/props')
   const games=page.getByRole('button',{name:'Games',exact:true}).first()
