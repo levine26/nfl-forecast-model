@@ -455,7 +455,15 @@ def build_receipt(
     kickoff=_aware(source.get("kickoff_utc"),label="kickoff_utc")
     forecast_at=_aware(source.get("forecast_timestamp_utc"),label="forecast_timestamp_utc")
     source_market=source.get("market") if isinstance(source.get("market"),Mapping) else {}
-    market_at=_aware(source_market.get("captured_utc"),label="market captured_utc")
+    market_captured=source_market.get("captured_utc")
+    market_line=_finite(source_market.get("line"))
+    market_no_vig=_finite(source_market.get("no_vig_over_probability"))
+    if market_captured is None or market_line is None or market_no_vig is None:
+        # V1 publishes research rows even when no complete sportsbook market is available.
+        # Those rows are valid source forecasts but are outside the paired market-backed
+        # prospective shadow population and must be skipped rather than aborting the slate.
+        return None
+    market_at=_aware(market_captured,label="market captured_utc")
     recorded=recorded_utc.astimezone(timezone.utc)
     if not (forecast_at<kickoff and market_at<kickoff and recorded<kickoff):
         return None
@@ -492,8 +500,8 @@ def build_receipt(
         "opponent":str(source.get("opponent") or ""),
         "prop_type":prop_type,
         "market":{
-            "line":_finite(source_market.get("line")),
-            "no_vig_over_probability":_finite(source_market.get("no_vig_over_probability")),
+            "line":market_line,
+            "no_vig_over_probability":market_no_vig,
             "over_price_american":_finite(source_market.get("over_price_american")),
             "under_price_american":_finite(source_market.get("under_price_american")),
         },
