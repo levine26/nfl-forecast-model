@@ -40,7 +40,7 @@ The defense shadow may regenerate only rushing-yard and receiving-yard arrays.
 
 The GitHub workflow-run trigger SHA is not assumed to be the generation SHA. The source live audit
 artifact must contain exactly one `source_provenance.json` under
-`levline-props-live-source-provenance-v0.1.0` and its forecast/manifest hashes must verify before
+`levline-props-live-source-provenance-v0.1.0` and its forecast/manifest/market hashes plus market-provider identity must verify before
 Shadow A executes.
 
 Every receipt preserves:
