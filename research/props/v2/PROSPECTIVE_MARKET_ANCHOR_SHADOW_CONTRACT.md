@@ -98,7 +98,7 @@ For every capture:
 1. resolve the successful main-branch `LevLine Props live refresh` run;
 2. download that exact run's audit artifact before checkout;
 3. verify the provenance-record run ID and trigger SHA against GitHub Actions metadata;
-4. verify the source forecast hash against the provenance record;
+4. verify the source forecast hash, normalized market-snapshot hash, and market provider against the provenance record;
 5. require both trigger SHA and generation-base SHA to contain this live-provenance listener;
 6. check out the **generation-base SHA**;
 7. record receipts only from that exact artifact.
