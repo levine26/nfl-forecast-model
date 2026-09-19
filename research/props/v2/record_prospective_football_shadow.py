@@ -18,6 +18,7 @@ from pathlib import Path
 import sys
 from typing import Any, Mapping
 
+import nflreadpy as nfl
 import numpy as np
 import pandas as pd
 
@@ -35,6 +36,7 @@ from nfl_forecast.props_manifest import (  # noqa:E402
     verify_manifest_fingerprint,
     verify_manifest_slate_index,
 )
+from nfl_forecast.props_player_state import normalize_team_code  # noqa:E402
 from nfl_forecast.props_publication import append_jsonl_immutable, read_jsonl  # noqa:E402
 from nfl_forecast.props_upstream import normalize_nflverse_scramble_semantics  # noqa:E402
 
@@ -188,27 +190,53 @@ def load_manifests(run_root: Path)->tuple[dict[str,Any],list[dict[str,Any]]]:
     return slate,manifests
 
 
-def _event_frame(pbp: pd.DataFrame, event_type: str)->pd.DataFrame:
+def _player_positions()->dict[str,str]:
+    players=nfl.load_players()
+    players=players.to_pandas() if hasattr(players,"to_pandas") else players.copy()
+    id_col=next((c for c in ("gsis_id","player_id") if c in players.columns),None)
+    pos_col=next((c for c in ("position","position_group") if c in players.columns),None)
+    if id_col is None or pos_col is None:
+        raise FootballShadowError("players source missing stable ID/position")
+    work=players[[id_col,pos_col]].copy()
+    work[id_col]=work[id_col].astype("string").fillna("").str.strip()
+    work[pos_col]=work[pos_col].astype("string").fillna("").str.upper().str.strip()
+    work=work[
+        work[id_col].ne("")
+        & work[pos_col].isin({"QB","RB","WR","TE"})
+    ].drop_duplicates(id_col,keep="last")
+    return dict(zip(work[id_col].astype(str),work[pos_col].astype(str)))
+
+
+def _event_frame(
+    pbp: pd.DataFrame,
+    event_type: str,
+    positions: Mapping[str,str],
+)->pd.DataFrame:
     if "defteam" not in pbp.columns:
         raise FootballShadowError("PBP missing defteam")
     if event_type=="rushing":
         mask=pd.to_numeric(pbp.get("rush_attempt",0),errors="coerce").fillna(0).eq(1)
         yards_col="rushing_yards" if "rushing_yards" in pbp.columns else "yards_gained"
+        id_col=next((c for c in ("rusher_player_id","rusher_id") if c in pbp.columns),None)
     elif event_type=="receiving":
         mask=pd.to_numeric(pbp.get("complete_pass",0),errors="coerce").fillna(0).eq(1)
         yards_col="receiving_yards" if "receiving_yards" in pbp.columns else "yards_gained"
+        id_col=next((c for c in ("receiver_player_id","receiver_id") if c in pbp.columns),None)
     else:
         raise FootballShadowError(f"unsupported event_type {event_type}")
-    if yards_col not in pbp.columns:
-        raise FootballShadowError(f"PBP missing {event_type} yardage")
+    if yards_col not in pbp.columns or id_col is None:
+        raise FootballShadowError(f"PBP missing {event_type} yardage or stable player identity")
     yards=pd.to_numeric(pbp[yards_col],errors="coerce")
+    player_id=pbp[id_col].astype("string").fillna("").str.strip()
+    position=player_id.map(positions).astype("string").fillna("").str.upper().str.strip()
+    eligible=position.isin({"QB","RB","WR","TE"})
     frame=pbp.loc[
-        mask & yards.notna(),
+        mask & yards.notna() & player_id.ne("") & eligible,
         [c for c in ("game_id","season","week","defteam") if c in pbp.columns],
     ].copy()
     frame["yards"]=yards.loc[frame.index].astype(float)
-    frame["defteam"]=frame["defteam"].astype("string").fillna("").str.upper().str.strip()
-    frame=frame[frame["defteam"].ne("")].copy()
+    frame["defteam"]=frame["defteam"].map(normalize_team_code)
+    frame=frame[frame["defteam"].astype(str).ne("")].copy()
     frame["season"]=pd.to_numeric(frame["season"],errors="coerce")
     frame["week"]=pd.to_numeric(frame["week"],errors="coerce")
     return frame[frame["season"].notna() & frame["week"].notna()].copy()
@@ -237,11 +265,12 @@ def build_defense_state(
     if work.empty:
         raise FootballShadowError("no strictly prior-week PBP available for defense state")
 
-    state={str(team).upper():{} for team in teams}
+    positions=_player_positions()
+    state={normalize_team_code(team):{} for team in teams}
     audit={"pbp_normalization":norm_audit,"target_season":int(target_season),"target_week":int(target_week),"events":{}}
 
     for event_type in ("rushing","receiving"):
-        events=_event_frame(work,event_type)
+        events=_event_frame(work,event_type,positions)
         if events.empty:
             raise FootballShadowError(f"no prior {event_type} events")
         league_mean=float(events["yards"].mean())
