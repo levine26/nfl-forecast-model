@@ -169,3 +169,15 @@ def test_zero_offense_snaps_are_void_but_positive_snaps_zero_events_grade_zero()
     assert len(frame)==1
     assert frame.iloc[0]["actual_result"]==0.0
     assert audit["graded"]==1
+
+
+def test_fixed_80_interval_is_derived_from_empirical_distribution():
+    module=_module()
+    snapshot=_snapshot([0,10,20,30,40,50,60,70,80,90])
+    score,covered,low,high=module.fixed_interval_score(
+        snapshot,50.0,level=0.80
+    )
+    assert low==0.0
+    assert high==80.0
+    assert covered is True
+    assert score==pytest.approx(80.0)
