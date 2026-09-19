@@ -159,9 +159,16 @@ jobs:
           rows=[]
           if ledger.exists():
               rows=[json.loads(line) for line in ledger.read_text().splitlines() if line.strip()]
+          current=[
+              row for row in rows
+              if str(row.get("source_workflow_run"))==str(status["source_workflow_run"])
+          ]
+          if int(status["appended"])>0:
+              assert len(current)>=int(status["appended"])
+              assert all(row["source_head_sha"]==status["source_head_sha"] for row in current)
           for row in rows:
               assert row["source_workflow_run"]
-              assert row["source_head_sha"]==status["source_head_sha"]
+              assert len(str(row["source_head_sha"])) in {40,64}
               assert row["governance"]["production_authorized"] is False
               assert "actual_result" not in row
               assert "grading_result" not in row
