@@ -20,6 +20,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from nfl_forecast.injuries import fetch_nfl_injuries  # noqa: E402
+from nfl_forecast.props_contextual_intelligence import (  # noqa: E402
+    load_levline_media_payload,
+    resolve_primary_qbs_from_levline_media,
+)
 from nfl_forecast.props_player_sources import (  # noqa: E402
     load_offensive_props_sources,
     normalize_snap_counts_player_ids,
@@ -218,6 +222,20 @@ def main() -> int:
         type=Path,
         help="Optional explicit scoring/residual context; otherwise derive strictly lagged context.",
     )
+    parser.add_argument(
+        "--levline-media",
+        type=Path,
+        default=ROOT / "outputs" / "copilot_media_reads.json",
+        help=(
+            "Validated Sunday Signal media artifact used for point-in-time starter-QB "
+            "intelligence. Stale/missing/ambiguous entries fail closed to the depth-chart layer."
+        ),
+    )
+    parser.add_argument(
+        "--skip-levline-media",
+        action="store_true",
+        help="Disable the shared LevLine media handoff for controlled/offline research.",
+    )
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--cache-dir", default=".cache/nflreadpy")
     parser.add_argument(
@@ -237,6 +255,11 @@ def main() -> int:
     seasons = list(range(int(args.history_start_season), int(args.season) + 1))
     priors = _load(args.priors)
     scoring = _load(args.scoring_context) if args.scoring_context is not None else {}
+    levline_media = (
+        None
+        if args.skip_levline_media
+        else load_levline_media_payload(args.levline_media)
+    )
 
     sources = load_offensive_props_sources(
         seasons=seasons,
@@ -420,6 +443,20 @@ def main() -> int:
             game_id=game_id,
             forecast_timestamp=forecast_timestamp,
         )
+        if args.skip_levline_media:
+            media_qbs = {}
+            media_qb_audit = {
+                "status": "skipped",
+                "game_id": game_id,
+                "teams_resolved": 0,
+            }
+        else:
+            media_qbs, media_qb_audit = resolve_primary_qbs_from_levline_media(
+                levline_media,
+                player_state,
+                game_id=game_id,
+                forecast_timestamp=forecast_timestamp,
+            )
 
         explicit_scoring = game_config.get("scoring_context_by_team")
         if explicit_scoring is not None:
@@ -459,6 +496,7 @@ def main() -> int:
         ):
             raise ValueError("primary_qb_by_team must be an object when supplied")
         qb_overrides = dict(depth_qbs)
+        qb_overrides.update(media_qbs)
         qb_overrides.update(explicit_qb_overrides or {})
 
         package = build_game_upstream_package(
@@ -491,6 +529,7 @@ def main() -> int:
                 "kickoff_utc": kickoff,
                 "package": package,
                 "depth_qb_audit": depth_qb_audit,
+                "media_qb_audit": media_qb_audit,
                 "empirical_scoring_audit": empirical_scoring_audit,
                 "scoring_context_source": scoring_source,
                 "residual_efficiency_source": residual_source,
@@ -577,6 +616,12 @@ def main() -> int:
                         "availability_prior_fit": availability_prior_fit_audit,
                         "availability_priors_applied": availability_priors,
                         "depth_chart_primary_qb": build["depth_qb_audit"],
+                        "levline_media_primary_qb": build["media_qb_audit"],
+                        "levline_media_source_file": (
+                            None
+                            if args.skip_levline_media
+                            else str(args.levline_media)
+                        ),
                         "player_state": state_build.audit,
                         "upstream": package.audit,
                         "empirical_prior_fit": fitted_empirical["audit"],
