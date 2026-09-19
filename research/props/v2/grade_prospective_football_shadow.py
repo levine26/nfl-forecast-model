@@ -59,6 +59,29 @@ def _aware_timestamp(value: Any, *, label: str)->pd.Timestamp:
     return ts.tz_convert("UTC")
 
 
+LIVE_SOURCE_PROVENANCE_FIELDS=(
+    "source_trigger_head_sha",
+    "source_market_provider",
+    "source_market_credential_mode",
+    "source_provenance_sha256",
+)
+
+
+def live_source_provenance_eligibility(row: Mapping[str,Any])->str:
+    present=[bool(str(row.get(field) or "").strip()) for field in LIVE_SOURCE_PROVENANCE_FIELDS]
+    if not any(present):
+        return "legacy_pre_provenance"
+    if not all(present):
+        missing=[
+            field for field,is_present in zip(LIVE_SOURCE_PROVENANCE_FIELDS,present)
+            if not is_present
+        ]
+        raise ShadowGradingError(
+            f"partial live-source provenance is invalid; missing {missing}"
+        )
+    return "eligible"
+
+
 def verify_receipt_integrity(row: Mapping[str,Any])->None:
     supplied=str(row.get("shadow_sha256") or "")
     if len(supplied)!=64:
@@ -105,11 +128,16 @@ def verify_receipt_integrity(row: Mapping[str,Any])->None:
         raise ShadowGradingError("prospective receipt missing source market credential mode")
 
 
-def read_receipts(path: Path)->list[dict[str,Any]]:
+def read_receipts_with_audit(path: Path)->tuple[list[dict[str,Any]],dict[str,int]]:
     if not path.is_file():
         raise ShadowGradingError(f"receipt ledger not found: {path}")
     rows=[]
     seen=set()
+    audit={
+        "ledger_rows":0,
+        "provenance_eligible_receipts":0,
+        "legacy_pre_provenance_receipts":0,
+    }
     for line_number,line in enumerate(path.read_text(encoding="utf-8").splitlines(),start=1):
         if not line.strip():
             continue
@@ -119,6 +147,11 @@ def read_receipts(path: Path)->list[dict[str,Any]]:
             raise ShadowGradingError(f"invalid JSONL at line {line_number}") from exc
         if not isinstance(row,dict):
             raise ShadowGradingError(f"receipt line {line_number} is not an object")
+        audit["ledger_rows"]+=1
+        provenance_state=live_source_provenance_eligibility(row)
+        if provenance_state=="legacy_pre_provenance":
+            audit["legacy_pre_provenance_receipts"]+=1
+            continue
         if row.get("contract_version")!=RECEIPT_CONTRACT_VERSION:
             raise ShadowGradingError("unexpected receipt contract version")
         if row.get("shadow_version")!=SHADOW_VERSION:
@@ -158,6 +191,12 @@ def read_receipts(path: Path)->list[dict[str,Any]]:
         validate_distribution(row["v1"]["empirical_distribution"])
         validate_distribution(row["shadow_a"]["empirical_distribution"])
         rows.append(row)
+        audit["provenance_eligible_receipts"]+=1
+    return rows,audit
+
+
+def read_receipts(path: Path)->list[dict[str,Any]]:
+    rows,_=read_receipts_with_audit(path)
     return rows
 
 
@@ -578,9 +617,25 @@ def concentration_diagnostics(frame:pd.DataFrame)->dict[str,Any]:
 
 
 def run(ledger:Path,output_dir:Path)->dict[str,Any]:
-    receipts=read_receipts(ledger)
+    receipts,provenance_audit=read_receipts_with_audit(ledger)
+    output_dir.mkdir(parents=True,exist_ok=True)
     if not receipts:
-        raise ShadowGradingError("no prospective Shadow A receipts")
+        result={
+            "contract_version":CONTRACT_VERSION,
+            "receipt_contract_version":RECEIPT_CONTRACT_VERSION,
+            "shadow_version":SHADOW_VERSION,
+            "receipt_count":0,
+            "graded_count":0,
+            "ungraded_count":0,
+            "status":"NO_PROVENANCE_ELIGIBLE_RECEIPTS_YET",
+            "provenance_eligibility_audit":provenance_audit,
+            "automatic_promotion_authorized":False,
+        }
+        (output_dir/"summary.json").write_text(
+            json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8"
+        )
+        print(json.dumps(result,indent=2,sort_keys=True))
+        return result
     seasons=sorted({int(row["source_season"]) for row in receipts})
     bundle=load_core_data(seasons)
     bundle=load_advanced_data(bundle,seasons)
@@ -606,7 +661,6 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
         participation=participation,
     )
 
-    output_dir.mkdir(parents=True,exist_ok=True)
     if graded.empty:
         result={
             "contract_version":CONTRACT_VERSION,
@@ -616,6 +670,7 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
             "graded_count":0,
             "ungraded_count":len(receipts),
             "status":"NO_GRADED_RECEIPTS_YET",
+            "provenance_eligibility_audit":provenance_audit,
             "eligibility_audit":eligibility_audit,
             "outcome_source_audit":{
                 "pbp_normalization":scramble_audit,
@@ -644,6 +699,7 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
         "overall":summarize(graded,seed=BOOTSTRAP_SEED+50000),
         "by_prop":by_prop,
         "concentration":concentration_diagnostics(graded),
+        "provenance_eligibility_audit":provenance_audit,
         "eligibility_audit":eligibility_audit,
         "outcome_source_audit":{
             "pbp_normalization":scramble_audit,
