@@ -48,6 +48,24 @@ def _sha(value: Any)->str:
     return hashlib.sha256(_canon(value).encode("utf-8")).hexdigest()
 
 
+def verify_receipt_integrity(row: Mapping[str,Any])->None:
+    supplied=str(row.get("shadow_sha256") or "")
+    if len(supplied)!=64:
+        raise ShadowGradingError("prospective receipt missing shadow_sha256")
+    material=dict(row)
+    material.pop("shadow_sha256",None)
+    if supplied!=_sha(material):
+        raise ShadowGradingError("prospective receipt SHA-256 mismatch")
+    for field in ("source_forecast_sha256","source_manifest_sha256"):
+        value=str(row.get(field) or "")
+        if len(value)!=64 or any(char not in "0123456789abcdef" for char in value.lower()):
+            raise ShadowGradingError(f"invalid receipt provenance hash: {field}")
+    season=int(row.get("source_season",-1))
+    week=int(row.get("source_week",-1))
+    if season<2026 or not 1<=week<=18:
+        raise ShadowGradingError("invalid prospective season/week provenance")
+
+
 def read_receipts(path: Path)->list[dict[str,Any]]:
     if not path.is_file():
         raise ShadowGradingError(f"receipt ledger not found: {path}")
@@ -66,6 +84,7 @@ def read_receipts(path: Path)->list[dict[str,Any]]:
             raise ShadowGradingError("unexpected receipt contract version")
         if row.get("shadow_version")!=SHADOW_VERSION:
             raise ShadowGradingError("unexpected shadow version")
+        verify_receipt_integrity(row)
         shadow_id=str(row.get("shadow_id") or "")
         if not shadow_id or shadow_id in seen:
             raise ShadowGradingError(f"invalid/duplicate shadow_id: {shadow_id!r}")
