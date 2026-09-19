@@ -318,7 +318,7 @@ def apply_shadow_a(
     player_audit={}
     for player in baseline.players:
         stats=challenger.player_stats[player.player_id]
-        opponent=str(player.opponent).upper()
+        opponent=normalize_team_code(str(player.opponent))
         if opponent not in defense_state:
             raise FootballShadowError(f"missing defense state for {opponent}")
 
