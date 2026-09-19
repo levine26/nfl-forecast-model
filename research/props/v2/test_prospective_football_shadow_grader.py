@@ -44,7 +44,8 @@ def test_empirical_crps_matches_raw_sample_formula():
 def test_distribution_hash_is_enforced():
     module=_module()
     snap=_snapshot([1,2,3])
-    snap["counts"][0]=2
+    # Preserve structural validity so the failure exercises the immutable hash guard.
+    snap["support"][0]=0.5
     with pytest.raises(module.ShadowGradingError,match="SHA-256"):
         module.validate_distribution(snap)
 
