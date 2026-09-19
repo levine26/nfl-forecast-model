@@ -210,13 +210,13 @@ def test_receipt_fails_closed_after_kickoff():
     }
     before=datetime(2026,9,20,19,0,tzinfo=timezone.utc)
     receipt=module.build_receipt(
-        source=source,shadow=shadow,manifest=manifest,player_audit=audit,
+        source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
         frozen=frozen,recorded_utc=before,source_workflow_run="1",source_head_sha="b"*40,
     )
     assert receipt is not None
     assert receipt["governance"]["production_authorized"] is False
     after=datetime(2026,9,20,21,0,tzinfo=timezone.utc)
     assert module.build_receipt(
-        source=source,shadow=shadow,manifest=manifest,player_audit=audit,
+        source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
         frozen=frozen,recorded_utc=after,source_workflow_run="1",source_head_sha="b"*40,
     ) is None
