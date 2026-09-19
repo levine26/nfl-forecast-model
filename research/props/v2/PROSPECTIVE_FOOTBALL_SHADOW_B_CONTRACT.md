@@ -56,9 +56,14 @@ The exact tested V0.1 engine is reused:
 The role transform is applied to V1's captured opportunity artifact.
 
 Before applying any non-unit multiplier the listener must reconstruct the captured V1 carry,
-target and route distributions from the evidence retained in that artifact. Any mismatch fails the
-slate closed. This proves the algebraic transformation remains the same opportunity engine used by
-the tested candidate.
+target and route distributions from the evidence retained in that artifact. Reconstruction uses the
+same full canonical carry/receiving eligibility sets that V1 used before availability filtering,
+including unavailable players whose uncertainty still contributes to concentration scaling. Applied
+V1 role/channel multipliers must be retained explicitly; older artifacts may use unit multipliers
+only when every player explicitly records `role_adjustment_source: none`. Ambiguous or partial
+multiplier provenance fails closed. Dynamic Role V0.1 channel multipliers layer multiplicatively on
+top of the captured V1 multipliers. Any mismatch fails the slate closed. This proves the algebraic
+transformation remains the same opportunity engine used by the tested candidate.
 
 ## Defense mechanism
 
