@@ -153,12 +153,26 @@ def _team_token(value: object) -> str:
 
 
 def provider_team_code(value: object) -> str | None:
-    token = _team_token(value)
-    if token in NFL_TEAM_ALIASES:
-        return NFL_TEAM_ALIASES[token]
-    code = normalize_team_code(str(value or "").strip())
-    if code and len(code) <= 4:
-        return code
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+
+    candidates = [raw]
+    # Several public odds feeds append a canonical abbreviation to the display
+    # name, e.g. "Arizona Cardinals (ARI)". Strip only a final parenthetical token.
+    if raw.endswith(")") and "(" in raw:
+        base, suffix = raw.rsplit("(", 1)
+        suffix = suffix[:-1].strip()
+        if 2 <= len(suffix) <= 4 and suffix.replace("-", "").isalnum():
+            candidates.extend((base.strip(), suffix))
+
+    for candidate in candidates:
+        token = _team_token(candidate)
+        if token in NFL_TEAM_ALIASES:
+            return NFL_TEAM_ALIASES[token]
+        code = normalize_team_code(candidate)
+        if code and len(code) <= 4:
+            return code
     return None
 
 
@@ -206,8 +220,12 @@ def _match_event(
     event: Mapping[str, Any],
     game_directory: Mapping[tuple[str, str], Mapping[str, Any]],
 ) -> tuple[Mapping[str, Any] | None, str | None]:
-    home = provider_team_code(event.get("home_team"))
-    away = provider_team_code(event.get("away_team"))
+    home = provider_team_code(event.get("home_team")) or provider_team_code(
+        event.get("home_team_key")
+    )
+    away = provider_team_code(event.get("away_team")) or provider_team_code(
+        event.get("away_team_key")
+    )
     if not home or not away:
         return None, "unresolved_provider_team"
     game = game_directory.get(tuple(sorted((home, away))))
@@ -806,6 +824,9 @@ def fetch_live_nfl_prop_events(
         "provider": provider,
         "sport_key": SPORT_KEY,
         "discovery_event_count": len(raw_events),
+        "discovery_events": [
+            dict(event) for event in raw_events if isinstance(event, Mapping)
+        ],
         "matched_discovery_events": matched_events,
         "discovery_unmatched": discovery_unmatched,
         "event_odds": event_odds,
