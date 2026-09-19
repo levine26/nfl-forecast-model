@@ -106,6 +106,131 @@ def _write_json(path: Path, payload: object) -> None:
     os.replace(tmp, path)
 
 
+
+def _team_code(value: object) -> str:
+    text = str(value or "").strip().upper()
+    return "JAX" if text == "JAC" else text
+
+
+def validate_qb_market_opportunity_consistency(
+    upstream_root: Path,
+    market_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Fail closed when the live QB prop board contradicts upstream starter identity.
+
+    Market *presence* is used only as a publication QA cross-check. Lines, prices,
+    probabilities and consensus values never alter the opportunity/efficiency forecast.
+    """
+
+    slate = _load_json(upstream_root / "upstream_slate.json")
+    games = slate.get("games")
+    if not isinstance(games, list):
+        raise RuntimeError("upstream slate missing games for QB market consistency")
+
+    primary_by_team: dict[tuple[str, str], dict[str, Any]] = {}
+    for game in games:
+        if not isinstance(game, dict):
+            continue
+        game_id = str(game.get("game_id") or "")
+        files = game.get("files") or {}
+        opportunity_rel = files.get("opportunity")
+        if not game_id or not opportunity_rel:
+            raise RuntimeError("upstream slate game missing opportunity file")
+        opportunity = _load_json(upstream_root / str(opportunity_rel))
+        projections = opportunity.get("opportunity_projections")
+        if not isinstance(projections, list):
+            raise RuntimeError(f"upstream opportunity missing projections for {game_id}")
+        for projection in projections:
+            if not isinstance(projection, dict):
+                continue
+            metadata = projection.get("metadata") or {}
+            marginals = projection.get("marginals") or {}
+            team = _team_code(metadata.get("team"))
+            primary = str(marginals.get("primary_qb_player_id") or "").strip()
+            pass_dist = marginals.get("qb_pass_attempts") or {}
+            try:
+                pass_attempts = float(pass_dist.get("mean") or 0.0)
+            except (TypeError, ValueError):
+                pass_attempts = 0.0
+            if not game_id or not team or not primary or pass_attempts <= 0.0:
+                raise RuntimeError(
+                    f"upstream primary-QB opportunity is unresolved for {game_id}/{team}"
+                )
+            primary_by_team[(game_id, team)] = {
+                "player_id": primary,
+                "expected_pass_attempts": pass_attempts,
+            }
+
+    market_qbs: dict[tuple[str, str], set[str]] = {}
+    considered = 0
+    for row in market_rows:
+        if not isinstance(row, dict):
+            continue
+        if str(row.get("prop_type") or "") != "passing_yards":
+            continue
+        if row.get("consensus_line") is None:
+            continue
+        try:
+            sportsbook_count = int(row.get("sportsbook_count") or 0)
+        except (TypeError, ValueError):
+            sportsbook_count = 0
+        if sportsbook_count < 2:
+            continue
+        game_id = str(row.get("game_id") or "").strip()
+        team = _team_code(row.get("team"))
+        player_id = str(row.get("player_id") or "").strip()
+        if not game_id or not team or not player_id:
+            continue
+        try:
+            line = float(row.get("consensus_line"))
+        except (TypeError, ValueError):
+            continue
+        if line <= 0.0:
+            continue
+        considered += 1
+        market_qbs.setdefault((game_id, team), set()).add(player_id)
+
+    conflicts: list[dict[str, Any]] = []
+    for key, player_ids in sorted(market_qbs.items()):
+        upstream = primary_by_team.get(key)
+        if upstream is None:
+            conflicts.append(
+                {
+                    "game_id": key[0],
+                    "team": key[1],
+                    "reason": "market_team_missing_upstream_primary_qb",
+                    "market_player_ids": sorted(player_ids),
+                }
+            )
+            continue
+        primary = upstream["player_id"]
+        if primary not in player_ids:
+            conflicts.append(
+                {
+                    "game_id": key[0],
+                    "team": key[1],
+                    "reason": "live_qb_passing_market_disagrees_with_upstream_primary",
+                    "upstream_primary_qb_player_id": primary,
+                    "market_player_ids": sorted(player_ids),
+                    "upstream_expected_pass_attempts": upstream["expected_pass_attempts"],
+                }
+            )
+
+    audit = {
+        "status": "qualified" if not conflicts else "conflict",
+        "passing_market_rows_considered": int(considered),
+        "team_markets_checked": int(len(market_qbs)),
+        "conflicts": conflicts,
+        "market_values_used_for_forecast": False,
+        "purpose": "publication consistency guard only",
+    }
+    if conflicts:
+        raise RuntimeError(
+            "live QB passing market contradicts upstream starter identity: "
+            + json.dumps(conflicts, sort_keys=True)
+        )
+    return audit
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run one governed live LevLine Props cycle.")
     parser.add_argument("--season", type=int)
@@ -197,6 +322,10 @@ def main() -> int:
             "live Props capture returned no normalized market artifacts; "
             "refusing to replace the current published slate"
         )
+    qb_market_consistency = validate_qb_market_opportunity_consistency(
+        upstream,
+        market_rows,
+    )
 
     _run(
         sys.executable,
@@ -244,6 +373,7 @@ def main() -> int:
         "completed_utc": datetime.now(timezone.utc).isoformat(),
         "forecast_count": len(forecasts),
         "market_artifact_count": len(market_rows),
+        "qb_market_opportunity_consistency": qb_market_consistency,
         "public_summary": summary,
         "current_forecasts": str(current_forecasts.relative_to(ROOT)),
         "current_public": str(current_public.relative_to(ROOT)),
