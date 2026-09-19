@@ -11,6 +11,7 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
 from availability_workload_mixture import (
+    AvailabilityMixtureError,
     build_workload_examples,
     evaluate_season_forward,
     fit_workload_mixtures,
@@ -126,3 +127,11 @@ def test_season_forward_evaluation_never_consumes_prop_outcomes():
     assert summary["prop_outcomes_used_for_fit_or_evaluation"]==0
     assert summary["completed_2026_outcomes_used"]==0
     assert summary["production_authorized"] is False
+
+
+def test_2026_fit_horizon_is_rejected():
+    snaps,_=normalize_snap_history(_snap_rows(),max_season=2023)
+    injuries,_=normalize_injury_designations(_injuries(),max_season=2023)
+    examples,_=build_workload_examples(injuries,snaps)
+    with pytest.raises(AvailabilityMixtureError,match="2026"):
+        fit_workload_mixtures(examples,trained_through_season=2026)
