@@ -350,12 +350,16 @@ def _role_player_audit(role_audit: Mapping[str,Any])->dict[str,Any]:
             str(row.get("player_id")):dict(row)
             for row in estimates if isinstance(row,Mapping) and row.get("player_id")
         }
-        ids=set(estimate_by_id)|set(map(str,adjustments))
+        fallback_ids={
+            str(pid) for pid in dynamic.get("fallback_player_ids",[])
+        } if isinstance(dynamic,Mapping) else set()
+        ids=set(estimate_by_id)|set(map(str,adjustments))|fallback_ids
         for pid in ids:
             out[pid]={
                 "team":team,
                 "adjustment":dict(adjustments.get(pid,{})),
                 "estimate":estimate_by_id.get(pid),
+                "fallback_to_unit_role":pid in fallback_ids,
                 "engine_version":dynamic.get("engine_version"),
                 "mode":dynamic.get("mode"),
                 "history":dynamic.get("history"),
