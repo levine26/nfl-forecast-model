@@ -3,7 +3,8 @@
 Status: **FROZEN BEFORE FIRST SHADOW B RECEIPT / OUTCOME**  
 Version: `levline-props-v2-football-shadow-b-grading-v0.1.0`  
 Candidate: `P2-SHADOW-B-DEFENSE-ROLE-v0.1.0`  
-Automatic production authorization: **NONE**
+Automatic production authorization: **NONE**  
+Live-generation provenance amendment: 2026-09-19, before first Shadow B receipt/outcome
 
 ## Scientific hierarchy
 
@@ -34,7 +35,10 @@ grading version.
 A Shadow B receipt is a valid B-vs-A pair only when the matching Shadow A receipt has the same:
 - source forecast ID;
 - source workflow run;
-- source head SHA;
+- actual generation-base SHA (`source_head_sha`);
+- workflow trigger SHA;
+- source market provider and credential mode;
+- live source-provenance SHA-256;
 - source forecast SHA-256;
 - source manifest SHA-256;
 - game/player/prop identity;
@@ -62,7 +66,8 @@ Before grading, B receipts must prove:
 - defensive-efficiency coefficients are from
   `levline-props-v2-defensive-efficiency-shadow-v0.1.0` and trained only through 2025.
 
-The B receipt, V1 PMF and Shadow B PMF hashes must verify.
+The B receipt, V1 PMF, Shadow B PMF and live source-provenance hash shapes must verify. Missing
+provider/mode or trigger/generation provenance fails closed.
 
 ## Outcome policy
 

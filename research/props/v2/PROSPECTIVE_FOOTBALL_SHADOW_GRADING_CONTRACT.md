@@ -3,7 +3,8 @@
 Status: **FROZEN BEFORE FIRST SHADOW A OUTCOME IS GRADED**  
 Version: `levline-props-v2-football-shadow-grading-v0.1.0`  
 Candidate: `P2-SHADOW-A-DEFENSE-v0.1.0`  
-Automatic production authorization: **NONE**
+Automatic production authorization: **NONE**  
+Live-generation provenance amendment: 2026-09-19, before first provenance-eligible Shadow A receipt/outcome
 
 ## Input boundary
 
@@ -16,9 +17,16 @@ The receipt must already contain lossless empirical V1 and Shadow A yardage dist
 source season/week, market line, Fair Lines, probabilities, intervals and point-in-time provenance.
 
 Before grading, the grader must verify the receipt's own `shadow_sha256`, the embedded distribution
-hashes, and the source forecast/manifest provenance-hash shapes. Corrupt or edited rows fail closed.
+hashes, source forecast/manifest hashes, live source-provenance SHA-256, actual generation SHA,
+workflow trigger SHA, market provider and credential mode. Corrupt, incomplete or edited rows fail closed.
 
 The grader may not recreate a missing pregame forecast after kickoff.
+
+Legacy pre-amendment rows are preserved in the append-only ledger but are not grading inputs. A row
+without the complete live-generation provenance amendment (trigger SHA, generation SHA, provider/mode,
+and provenance-record SHA-256) is counted in the provenance eligibility audit and excluded before any
+outcome lookup or score calculation. The initial 289 Shadow A receipts from source run `35428763144`
+are therefore audit-only legacy rows and contribute zero observations to promotion thresholds.
 
 ## Outcome definition
 

@@ -2,7 +2,8 @@
 
 Status: **FROZEN PROSPECTIVE DATA CAPTURE / RESEARCH ONLY**  
 Version: `levline-props-v2-market-archive-v0.1.0`  
-Exact-source provenance amendment: 2026-09-19, before first persistent archive capture
+Exact-source provenance amendment: 2026-09-19, before first persistent archive capture  
+Live-generation provenance amendment: 2026-09-19, before first provenance-eligible persistent archive capture
 
 ## Objective
 
@@ -25,7 +26,10 @@ For each player/game/prop market artifact the archive retains:
 - SHA-256 of the normalized market artifact;
 - SHA-256 provenance of the raw provider payload when available;
 - source live-workflow run ID;
-- exact source live-workflow head SHA.
+- actual generation-base SHA (`source_head_sha`);
+- workflow trigger SHA;
+- selected market provider and credential mode;
+- SHA-256 of the live source-provenance record.
 
 Raw provider payload bytes are **not** copied to the persistent research branch. Their digest is
 preserved for provenance while avoiding unnecessary data duplication.
@@ -41,19 +45,26 @@ A snapshot is eligible only if:
 
 Post-kickoff snapshots fail closed.
 
-## Exact source-run boundary
+## Exact source-run and generation boundary
 
-The workflow-run event is only a trigger. Every archive capture must:
-1. resolve the requested GitHub Actions run;
-2. require workflow name `LevLine Props live refresh`, branch `main`, and conclusion `success`;
-3. require that source head SHA to already contain the versioned exact-source archive listener;
-4. check out that exact source head SHA;
-5. download artifacts only from that exact workflow run;
-6. persist both the source workflow run ID and source head SHA into the archive rows, manifest, and status.
+The workflow-run event is only a trigger; its head SHA is not assumed to be the generation SHA.
+Every archive capture must:
+1. resolve the successful main-branch `LevLine Props live refresh` run;
+2. download that exact run before checkout;
+3. require exactly one `source_provenance.json` under
+   `levline-props-live-source-provenance-v0.1.0`;
+4. verify its workflow-run ID and trigger SHA against GitHub Actions metadata;
+5. verify the normalized `market.json` hash and provider against the provenance record;
+6. require both trigger SHA and actual generation-base SHA to contain this provenance-aware listener;
+7. check out the actual generation-base SHA;
+8. persist workflow run, generation SHA, trigger SHA, provider/mode and provenance SHA-256.
 
-A live run predating the exact-source listener is permanently ineligible for prospective archive evidence.
-Manual dispatch may not be used to backfill an older run after the listener is merged. Missing captures stay
-missing.
+A live run predating the live-generation provenance listener is permanently ineligible for
+provenance-eligible archive evidence. The first persistence event occurred before this amendment became
+active and archived one 1,033-row normalized snapshot from source run `35428763144`. That snapshot
+remains immutable for auditability but is excluded from preregistered horizon/CLV selection and all
+promotion thresholds. It may not be rewritten, deleted, or retroactively upgraded. Manual dispatch may
+not backfill it. Missing captures stay missing.
 
 ## Horizon policy
 

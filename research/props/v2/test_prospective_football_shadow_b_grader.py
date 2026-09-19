@@ -43,6 +43,10 @@ def _b_receipt():
         "recorded_utc":"2026-09-20T19:00:00+00:00",
         "source_workflow_run":"12345",
         "source_head_sha":"c"*40,
+        "source_trigger_head_sha":"e"*40,
+        "source_market_provider":"the_odds_api",
+        "source_market_credential_mode":"configured",
+        "source_provenance_sha256":"d"*64,
         "source_season":2026,
         "source_week":2,
         "source_forecast_id":"forecast-1",
@@ -94,6 +98,10 @@ def _a_pair_for(b):
         "source_forecast_id":b["source_forecast_id"],
         "source_workflow_run":b["source_workflow_run"],
         "source_head_sha":b["source_head_sha"],
+        "source_trigger_head_sha":b["source_trigger_head_sha"],
+        "source_market_provider":b["source_market_provider"],
+        "source_market_credential_mode":b["source_market_credential_mode"],
+        "source_provenance_sha256":b["source_provenance_sha256"],
         "source_forecast_sha256":b["source_forecast_sha256"],
         "source_manifest_sha256":b["source_manifest_sha256"],
         "source_season":b["source_season"],
@@ -153,6 +161,11 @@ def test_a_b_pair_requires_identical_source_and_v1_distribution():
     drift=json.loads(json.dumps(a))
     drift["source_workflow_run"]="other"
     with pytest.raises(module.ShadowBGradingError,match="source_workflow_run"):
+        module.verify_pair(drift,b)
+
+    drift=json.loads(json.dumps(a))
+    drift["source_market_provider"]="other_provider"
+    with pytest.raises(module.ShadowBGradingError,match="source_market_provider"):
         module.verify_pair(drift,b)
 
     drift=json.loads(json.dumps(a))
@@ -365,3 +378,36 @@ def test_b_receipt_integrity_requires_team_identity(tmp_path):
     path.write_text(json.dumps(row)+"\n",encoding="utf-8")
     with pytest.raises(module.ShadowBGradingError,match="team identity"):
         module.read_b_receipts(path)
+
+
+def test_legacy_shadow_b_receipt_is_preserved_but_excluded(tmp_path):
+    module=_module()
+    row=_b_receipt()
+    for key in (
+        "source_trigger_head_sha",
+        "source_market_provider",
+        "source_market_credential_mode",
+        "source_provenance_sha256",
+    ):
+        row.pop(key)
+    row["shadow_sha256"]=module._sha({k:v for k,v in row.items() if k!="shadow_sha256"})
+    path=tmp_path/"legacy-b.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    receipts,audit=module.read_b_receipts_with_audit(path)
+    assert receipts==[]
+    assert audit=={
+        "ledger_rows":1,
+        "provenance_eligible_receipts":0,
+        "legacy_pre_provenance_receipts":1,
+    }
+
+
+def test_partial_shadow_b_provenance_fails_closed(tmp_path):
+    module=_module()
+    row=_b_receipt()
+    row.pop("source_market_provider")
+    row["shadow_sha256"]=module._sha({k:v for k,v in row.items() if k!="shadow_sha256"})
+    path=tmp_path/"partial-b.jsonl"
+    path.write_text(json.dumps(row)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowBGradingError,match="partial Shadow B live-source provenance"):
+        module.read_b_receipts_with_audit(path)

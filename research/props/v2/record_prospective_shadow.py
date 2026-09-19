@@ -150,6 +150,10 @@ def build_shadow_receipt(
     recorded_utc: datetime,
     source_workflow_run: str,
     source_head_sha: str,
+    source_trigger_head_sha: str,
+    source_market_provider: str,
+    source_market_credential_mode: str,
+    source_provenance_sha256: str,
 ) -> dict[str, Any] | None:
     if recorded_utc.tzinfo is None:
         raise ShadowError("recorded_utc must be timezone-aware")
@@ -159,10 +163,22 @@ def build_shadow_receipt(
     prop_type = str(row.get("prop_type") or "").strip()
     source_run = str(source_workflow_run or "").strip()
     source_sha = str(source_head_sha or "").strip().lower()
+    trigger_sha = str(source_trigger_head_sha or "").strip().lower()
+    market_provider = str(source_market_provider or "").strip()
+    credential_mode = str(source_market_credential_mode or "").strip()
+    provenance_sha = str(source_provenance_sha256 or "").strip().lower()
     if not source_run:
         raise ShadowError("source_workflow_run is required")
     if len(source_sha) not in {40, 64} or any(c not in "0123456789abcdef" for c in source_sha):
         raise ShadowError("source_head_sha must be a git SHA")
+    if len(trigger_sha) not in {40, 64} or any(c not in "0123456789abcdef" for c in trigger_sha):
+        raise ShadowError("source_trigger_head_sha must be a git SHA")
+    if not market_provider:
+        raise ShadowError("source_market_provider is required")
+    if not credential_mode:
+        raise ShadowError("source_market_credential_mode is required")
+    if len(provenance_sha) != 64 or any(c not in "0123456789abcdef" for c in provenance_sha):
+        raise ShadowError("source_provenance_sha256 must be SHA-256")
     if not source_id or prop_type not in set(config["supported_prop_types"]):
         return None
 
@@ -202,6 +218,10 @@ def build_shadow_receipt(
         "recorded_utc": recorded.isoformat(),
         "source_workflow_run": source_run,
         "source_head_sha": source_sha,
+        "source_trigger_head_sha": trigger_sha,
+        "source_market_provider": market_provider,
+        "source_market_credential_mode": credential_mode,
+        "source_provenance_sha256": provenance_sha,
         "source_forecast_id": source_id,
         "source_forecast_sha256": _sha(source_copy),
         "source_forecast_timestamp_utc": forecast_at.isoformat(),
@@ -252,6 +272,10 @@ def record_shadow_receipts(
     *,
     source_workflow_run: str,
     source_head_sha: str,
+    source_trigger_head_sha: str,
+    source_market_provider: str,
+    source_market_credential_mode: str,
+    source_provenance_sha256: str,
     recorded_utc: datetime | None = None,
 ) -> dict[str, Any]:
     rows = artifact.get("forecasts")
@@ -286,6 +310,10 @@ def record_shadow_receipts(
             recorded_utc=recorded,
             source_workflow_run=source_workflow_run,
             source_head_sha=source_head_sha,
+            source_trigger_head_sha=source_trigger_head_sha,
+            source_market_provider=source_market_provider,
+            source_market_credential_mode=source_market_credential_mode,
+            source_provenance_sha256=source_provenance_sha256,
         )
         if receipt is None:
             ineligible += 1
@@ -299,6 +327,10 @@ def record_shadow_receipts(
         "recorded_utc": recorded.astimezone(timezone.utc).isoformat(),
         "source_workflow_run": str(source_workflow_run),
         "source_head_sha": str(source_head_sha).lower(),
+        "source_trigger_head_sha": str(source_trigger_head_sha).lower(),
+        "source_market_provider": str(source_market_provider),
+        "source_market_credential_mode": str(source_market_credential_mode),
+        "source_provenance_sha256": str(source_provenance_sha256).lower(),
         "forecast_rows_received": len(rows),
         "eligible_new_shadow_receipts": len(receipts),
         "appended": int(appended),
@@ -318,6 +350,10 @@ def main() -> int:
     parser.add_argument("--ledger", type=Path, required=True)
     parser.add_argument("--source-workflow-run", required=True)
     parser.add_argument("--source-head-sha", required=True)
+    parser.add_argument("--source-trigger-head-sha", required=True)
+    parser.add_argument("--source-market-provider", required=True)
+    parser.add_argument("--source-market-credential-mode", required=True)
+    parser.add_argument("--source-provenance-sha256", required=True)
     args = parser.parse_args()
 
     artifact = json.loads(args.forecasts.read_text(encoding="utf-8"))
@@ -330,6 +366,10 @@ def main() -> int:
         args.ledger,
         source_workflow_run=args.source_workflow_run,
         source_head_sha=args.source_head_sha,
+        source_trigger_head_sha=args.source_trigger_head_sha,
+        source_market_provider=args.source_market_provider,
+        source_market_credential_mode=args.source_market_credential_mode,
+        source_provenance_sha256=args.source_provenance_sha256,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0

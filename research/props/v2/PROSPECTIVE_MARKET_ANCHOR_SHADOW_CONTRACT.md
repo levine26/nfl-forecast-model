@@ -2,7 +2,8 @@
 
 Status: **FROZEN BEFORE PROSPECTIVE SHADOW GRADES**  
 Created: 2026-09-18  
-Exact-source provenance amendment: 2026-09-19, before first prospective receipt
+Exact-source provenance amendment: 2026-09-19, before first prospective receipt  
+Live-generation provenance amendment: 2026-09-19, before first provenance-eligible prospective receipt/outcome
 
 ## Purpose
 
@@ -77,30 +78,53 @@ A shadow receipt may be created only when:
 Started games fail closed. A candidate is never reconstructed after kickoff.
 
 
-## Exact source-run boundary
+## Exact source-run and generation boundary
 
-The workflow-run trigger is only a notification. It may **not** read whatever forecast happens to be
-on latest `main`.
+The workflow-run trigger is only a notification. It may **not** be treated as proof of the code SHA
+that generated the forecast, because the live publisher can regenerate from a newer `main` during a
+push-race retry.
+
+Every eligible live audit artifact must therefore contain exactly one immutable
+`source_provenance.json` under contract
+`levline-props-live-source-provenance-v0.1.0`. It records:
+- source workflow run ID;
+- workflow trigger head SHA;
+- actual generation-base SHA;
+- live run ID;
+- selected market provider and credential mode;
+- hashes of the normalized market snapshot, raw market capture, forecast artifact and manifest slate.
 
 For every capture:
-1. resolve the triggering live workflow run through the GitHub Actions API;
-2. require workflow name `LevLine Props live refresh`, branch `main`, and conclusion `success`;
-3. require the source head SHA to already contain this prospective listener and frozen config;
-4. check out that exact source head SHA;
-5. download that exact workflow run's full audit artifact;
-6. require exactly one source `forecasts.json`;
-7. record receipts only from that artifact.
+1. resolve the successful main-branch `LevLine Props live refresh` run;
+2. download that exact run's audit artifact before checkout;
+3. verify the provenance-record run ID and trigger SHA against GitHub Actions metadata;
+4. verify the source forecast hash, normalized market-snapshot hash, and market provider against the provenance record;
+5. require both trigger SHA and generation-base SHA to contain this live-provenance listener;
+6. check out the **generation-base SHA**;
+7. record receipts only from that exact artifact.
 
-This prevents an overlapping or later live refresh from being mislabeled under an earlier trigger.
+Within prospective receipts, `source_head_sha` means the actual generation-base SHA.
+`source_trigger_head_sha` separately preserves the workflow trigger SHA. The market provider,
+credential mode and SHA-256 of `source_provenance.json` are immutable receipt fields.
 
-A live run whose source commit predates this exact-run listener cannot be replayed later and called
-prospective evidence. Missing pregame receipts remain missing.
+Provider failover does not create permission to select providers after observing outcomes. Evaluation
+must report provider/mode composition and, when sample size permits, provider-stratified diagnostics.
+No provider may be retrospectively excluded because of performance.
+
+A live run predating this live-generation provenance amendment cannot be replayed later and called
+provenance-eligible prospective evidence. The first persistence event occurred before this amendment
+became active and wrote 545 legacy market-anchor receipts from source run `35428763144`. Those rows
+remain immutable for auditability but are permanently excluded from promotion/evaluation thresholds.
+They may not be rewritten, deleted, or retroactively upgraded. Missing pregame receipts remain missing.
 
 ## Immutable identity
 
 Every shadow receipt must preserve:
 - source workflow run ID;
-- source head SHA;
+- actual generation-base SHA (`source_head_sha`);
+- workflow trigger SHA (`source_trigger_head_sha`);
+- source market provider and credential mode;
+- SHA-256 of the live source-provenance record;
 - source `forecast_id`;
 - source forecast timestamp;
 - source market capture timestamp;

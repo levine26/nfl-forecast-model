@@ -2,7 +2,8 @@
 
 Status: **FROZEN BEFORE SHADOW A PROSPECTIVE GRADING**  
 Version: `levline-props-v2-football-shadow-a-v0.1.0`  
-Production authorization: **NONE**
+Production authorization: **NONE**  
+Live-generation provenance amendment: 2026-09-19, before first provenance-eligible Shadow A receipt/outcome
 
 ## Candidate
 
@@ -33,6 +34,29 @@ The runner must consume the frozen per-game integration manifests from that exac
 remain unchanged.
 
 The defense shadow may regenerate only rushing-yard and receiving-yard arrays.
+
+
+## Live-generation provenance freeze
+
+The GitHub workflow-run trigger SHA is not assumed to be the generation SHA. The source live audit
+artifact must contain exactly one `source_provenance.json` under
+`levline-props-live-source-provenance-v0.1.0` and its forecast/manifest/market hashes plus market-provider identity must verify before
+Shadow A executes.
+
+Every receipt preserves:
+- source workflow run ID;
+- actual generation-base SHA as `source_head_sha`;
+- workflow trigger SHA as `source_trigger_head_sha`;
+- source market provider and credential mode;
+- SHA-256 of the live source-provenance record.
+
+Both the trigger SHA and generation-base SHA must already contain this provenance-aware listener.
+Runs predating this amendment are permanently ineligible for provenance-eligible Shadow A evidence.
+The first persistence event occurred before this amendment became active and wrote 289 legacy Shadow A
+receipts from source run `35428763144`. Those rows remain immutable for auditability but are excluded
+from all grading, minimum-evidence and promotion thresholds. They may not be rewritten, deleted, or
+retroactively upgraded. Provider failover is metadata/provenance only and does not alter the frozen
+defensive-efficiency candidate.
 
 ## Frozen defense coefficients
 
@@ -113,8 +137,8 @@ If the job crosses kickoff while computing, no receipt may be written for that g
 
 Prospective evidence begins only after this listener is merged to `main`.
 
-The capture job checks out the exact source live-refresh head SHA and executes the recorder from that
-source state. A live refresh whose source SHA predates the listener cannot be replayed later and
+The capture job downloads and verifies the exact live artifact first, then checks out its recorded actual
+generation-base SHA and executes the recorder from that source state. A live refresh whose source SHA predates the listener cannot be replayed later and
 labeled prospective evidence. Missing or delayed pregame receipts remain missing; they are never
 reconstructed after kickoff.
 

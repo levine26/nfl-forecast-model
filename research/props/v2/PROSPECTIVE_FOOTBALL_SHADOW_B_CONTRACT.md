@@ -3,7 +3,8 @@
 Status: **FROZEN BEFORE SHADOW B PROSPECTIVE GRADING**  
 Version: `levline-props-v2-football-shadow-b-v0.1.0`  
 Candidate: `P2-SHADOW-B-DEFENSE-ROLE`  
-Production authorization: **NONE**
+Production authorization: **NONE**  
+Live-generation provenance amendment: 2026-09-19, before first Shadow B receipt
 
 ## Candidate identity
 
@@ -23,6 +24,23 @@ The listener may consume only:
 - NFL snap-count history strictly before the target week for Dynamic Role V0.1.
 
 Target-week and target-game results are excluded.
+
+
+## Live-generation provenance freeze
+
+The source workflow trigger SHA and the SHA that actually generated the live artifact are distinct
+provenance concepts. Shadow B requires exactly one `source_provenance.json` under
+`levline-props-live-source-provenance-v0.1.0` and verifies its forecast/manifest/market hashes plus market-provider identity before
+simulation.
+
+Every receipt preserves the source workflow run ID, actual generation-base SHA
+(`source_head_sha`), workflow trigger SHA (`source_trigger_head_sha`), market provider, market
+credential mode and source-provenance SHA-256. Both trigger and generation SHAs must already contain
+this provenance-aware listener and the frozen Dynamic Role/defense dependencies.
+
+Runs predating this amendment are permanently ineligible. Provider failover changes neither Dynamic
+Role V0.1 nor the defensive-efficiency candidate; it is immutable source metadata that must remain
+matched between Shadow A and Shadow B.
 
 ## Dynamic Role V0.1
 

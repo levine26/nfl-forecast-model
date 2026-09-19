@@ -23,6 +23,9 @@ on:
 permissions:
   contents: read
 
+env:
+  LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0
+
 jobs:
   test:
     if: github.event_name == 'pull_request'
@@ -57,7 +60,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Resolve and validate source live workflow run
+      - name: Resolve source live workflow run
         id: source
         run: |
           set -euo pipefail
@@ -70,7 +73,7 @@ jobs:
           META=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID")
           NAME=$(printf '%s' "$META" | jq -r '.name')
           BRANCH=$(printf '%s' "$META" | jq -r '.head_branch')
-          SHA=$(printf '%s' "$META" | jq -r '.head_sha')
+          TRIGGER_SHA=$(printf '%s' "$META" | jq -r '.head_sha')
           CONCLUSION=$(printf '%s' "$META" | jq -r '.conclusion')
           if [ "$NAME" != "LevLine Props live refresh" ]; then
             echo "::error::source run is not LevLine Props live refresh: $NAME"
@@ -80,20 +83,73 @@ jobs:
             echo "::error::source run must be successful on main; branch=$BRANCH conclusion=$CONCLUSION"
             exit 1
           fi
-          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/record_prospective_football_shadow.py?ref=$SHA" >/dev/null 2>&1; then
-            echo "::error::source run predates the prospective Shadow A listener; retrospective backfill is prohibited"
-            exit 1
-          fi
-          if ! gh api "repos/${{ github.repository }}/contents/research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json?ref=$SHA" >/dev/null 2>&1; then
-            echo "::error::source run lacks the frozen Shadow A coefficient file"
-            exit 1
-          fi
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
-          echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "trigger_head_sha=$TRIGGER_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Download and validate exact live source provenance
+        id: artifact
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/props-live-artifacts
+          mkdir -p /tmp/props-live-artifacts
+          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
+          mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
+          mapfile -t FORECASTS < <(find /tmp/props-live-artifacts -name forecasts.json -type f | sort)
+          mapfile -t MANIFESTS < <(find /tmp/props-live-artifacts -name manifest_slate.json -type f | sort)
+          mapfile -t MARKETS < <(find /tmp/props-live-artifacts -name market.json -type f | sort)
+          if [ "${#PROVENANCE[@]}" -ne 1 ] || [ "${#FORECASTS[@]}" -ne 1 ] || [ "${#MANIFESTS[@]}" -ne 1 ] || [ "${#MARKETS[@]}" -ne 1 ]; then
+            echo "::error::Shadow A source artifact must contain one provenance, forecast, manifest-slate, and market file"
+            exit 1
+          fi
+          test -n "$(find /tmp/props-live-artifacts -name upstream_slate.json -print -quit)"
+
+          PROV="${PROVENANCE[0]}"
+          CONTRACT=$(jq -r '.contract_version // empty' "$PROV")
+          PROV_RUN=$(jq -r '.source_workflow_run // empty' "$PROV")
+          PROV_TRIGGER=$(jq -r '.trigger_head_sha // empty' "$PROV")
+          GENERATION_SHA=$(jq -r '.generation_base_sha // empty' "$PROV")
+          PROVIDER=$(jq -r '.market_provider // empty' "$PROV")
+          CREDENTIAL_MODE=$(jq -r '.market_credential_mode // empty' "$PROV")
+          EXPECTED_FORECAST_SHA=$(jq -r '.forecasts_sha256 // empty' "$PROV")
+          EXPECTED_MANIFEST_SHA=$(jq -r '.manifest_slate_sha256 // empty' "$PROV")
+          EXPECTED_MARKET_SHA=$(jq -r '.market_snapshot_sha256 // empty' "$PROV")
+          ACTUAL_FORECAST_SHA=$(sha256sum "${FORECASTS[0]}" | awk '{print $1}')
+          ACTUAL_MANIFEST_SHA=$(sha256sum "${MANIFESTS[0]}" | awk '{print $1}')
+          ACTUAL_MARKET_SHA=$(sha256sum "${MARKETS[0]}" | awk '{print $1}')
+          SNAPSHOT_PROVIDER=$(jq -r '.provider // empty' "${MARKETS[0]}")
+          PROVENANCE_SHA=$(sha256sum "$PROV" | awk '{print $1}')
+
+          [ "$CONTRACT" = "$LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION" ] || { echo "::error::unexpected live source provenance contract"; exit 1; }
+          [ "$PROV_RUN" = "${{ steps.source.outputs.run_id }}" ] || { echo "::error::Shadow A source run provenance mismatch"; exit 1; }
+          [ "$PROV_TRIGGER" = "${{ steps.source.outputs.trigger_head_sha }}" ] || { echo "::error::Shadow A trigger SHA provenance mismatch"; exit 1; }
+          [[ "$GENERATION_SHA" =~ ^[0-9a-f]{40}$|^[0-9a-f]{64}$ ]] || { echo "::error::invalid Shadow A generation SHA"; exit 1; }
+          [ -n "$PROVIDER" ] && [ -n "$CREDENTIAL_MODE" ] || { echo "::error::Shadow A source missing market provider/mode"; exit 1; }
+          [ "$EXPECTED_FORECAST_SHA" = "$ACTUAL_FORECAST_SHA" ] || { echo "::error::Shadow A forecast artifact SHA mismatch"; exit 1; }
+          [ "$EXPECTED_MANIFEST_SHA" = "$ACTUAL_MANIFEST_SHA" ] || { echo "::error::Shadow A manifest-slate SHA mismatch"; exit 1; }
+          [ "$EXPECTED_MARKET_SHA" = "$ACTUAL_MARKET_SHA" ] || { echo "::error::Shadow A market snapshot SHA mismatch"; exit 1; }
+          [ "$SNAPSHOT_PROVIDER" = "$PROVIDER" ] || { echo "::error::Shadow A market provider provenance mismatch"; exit 1; }
+
+          for SHA in "${{ steps.source.outputs.trigger_head_sha }}" "$GENERATION_SHA"; do
+            WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_football_shadow.yml?ref=$SHA" | jq -r '.content // empty')
+            if [ -z "$WORKFLOW_B64" ] || ! printf '%s' "$WORKFLOW_B64" | base64 -d | grep -Fq 'LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0'; then
+              echo "::error::source SHA predates the live-source-provenance Shadow A listener: $SHA"
+              exit 1
+            fi
+          done
+          for required in \
+            research/props/v2/record_prospective_football_shadow.py \
+            research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json; do
+            gh api "repos/${{ github.repository }}/contents/$required?ref=$GENERATION_SHA" >/dev/null
+          done
+
+          echo "generation_sha=$GENERATION_SHA" >> "$GITHUB_OUTPUT"
+          echo "market_provider=$PROVIDER" >> "$GITHUB_OUTPUT"
+          echo "market_credential_mode=$CREDENTIAL_MODE" >> "$GITHUB_OUTPUT"
+          echo "provenance_sha256=$PROVENANCE_SHA" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.source.outputs.head_sha }}
+          ref: ${{ steps.artifact.outputs.generation_sha }}
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -113,16 +169,6 @@ jobs:
         run: |
           python -m pip install -e .
           python -m pip install pyarrow
-
-      - name: Download exact source live audit artifact
-        run: |
-          set -euo pipefail
-          rm -rf /tmp/props-live-artifacts
-          mkdir -p /tmp/props-live-artifacts
-          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
-          test -n "$(find /tmp/props-live-artifacts -name manifest_slate.json -print -quit)"
-          test -n "$(find /tmp/props-live-artifacts -name upstream_slate.json -print -quit)"
-          test -n "$(find /tmp/props-live-artifacts -name forecasts.json -print -quit)"
 
       - name: Restore immutable football shadow ledger
         run: |
@@ -145,7 +191,11 @@ jobs:
             --frozen-coefficients research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json \
             --ledger "$DATA_DIR/shadow_a_originals.jsonl" \
             --source-workflow-run "${{ steps.source.outputs.run_id }}" \
-            --source-head-sha "${{ steps.source.outputs.head_sha }}" \
+            --source-head-sha "${{ steps.artifact.outputs.generation_sha }}" \
+            --source-trigger-head-sha "${{ steps.source.outputs.trigger_head_sha }}" \
+            --source-market-provider "${{ steps.artifact.outputs.market_provider }}" \
+            --source-market-credential-mode "${{ steps.artifact.outputs.market_credential_mode }}" \
+            --source-provenance-sha256 "${{ steps.artifact.outputs.provenance_sha256 }}" \
             | tee "$DATA_DIR/last_record_status.json"
 
       - name: Enforce research-only capture status
@@ -161,6 +211,11 @@ jobs:
           assert d["winner_model_mutated"] is False
           assert d["published_v1_props_mutated"] is False
           assert d["outcomes_read"]==0
+          assert len(d["source_head_sha"]) in {40,64}
+          assert len(d["source_trigger_head_sha"]) in {40,64}
+          assert d["source_market_provider"]
+          assert d["source_market_credential_mode"]
+          assert len(d["source_provenance_sha256"])==64
           ledger=Path("research_outputs/props_v2/football_shadow/shadow_a_originals.jsonl")
           rows=[]
           if ledger.exists():
@@ -172,6 +227,11 @@ jobs:
               assert row["shadow_version"]=="P2-SHADOW-A-DEFENSE-v0.1.0"
               assert int(row["source_season"])>=2026
               assert 1<=int(row["source_week"])<=18
+              assert len(str(row["source_head_sha"])) in {40,64}
+              assert len(str(row["source_trigger_head_sha"])) in {40,64}
+              assert row["source_market_provider"]
+              assert row["source_market_credential_mode"]
+              assert len(str(row["source_provenance_sha256"]))==64
               assert "actual_result" not in row
               assert "grading_result" not in row
               for model_key in ("v1","shadow_a"):

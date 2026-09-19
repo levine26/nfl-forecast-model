@@ -19,6 +19,7 @@ from nfl_forecast.props_opportunity import (
 ROOT=Path(__file__).resolve().parents[3]
 SCRIPT=ROOT/"research"/"props"/"v2"/"record_prospective_football_shadow_b.py"
 FROZEN=ROOT/"research"/"props"/"v2"/"DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json"
+WORKFLOW=ROOT/".github"/"workflows"/"research_props_v2_football_shadow_b.yml"
 
 
 def _module():
@@ -300,7 +301,9 @@ def test_shadow_b_receipt_uses_explicit_capture_timestamps():
         capture_started_utc=started,
         recorded_utc=recorded,
         source_workflow_run="1",
-        source_head_sha="b"*40,
+        source_head_sha="b"*40,source_trigger_head_sha="c"*40,
+        source_market_provider="the_odds_api",source_market_credential_mode="configured",
+        source_provenance_sha256="d"*64,
         source_season=2026,
         source_week=2,
         v1_samples=np.array([40,50,60,70],dtype=float),
@@ -312,6 +315,11 @@ def test_shadow_b_receipt_uses_explicit_capture_timestamps():
     assert receipt["recorded_utc"]==recorded.isoformat()
     assert receipt["source_season"]==2026
     assert receipt["source_week"]==2
+    assert receipt["source_head_sha"]=="b"*40
+    assert receipt["source_trigger_head_sha"]=="c"*40
+    assert receipt["source_market_provider"]=="the_odds_api"
+    assert receipt["source_market_credential_mode"]=="configured"
+    assert receipt["source_provenance_sha256"]=="d"*64
     assert receipt["governance"]["production_authorized"] is False
 
 
@@ -368,3 +376,13 @@ def test_shadow_b_fails_closed_when_strictly_lagged_snap_history_is_unavailable(
             manifest,
             pd.DataFrame([{"player_id":"RB1"}]),
         )
+
+
+def test_shadow_b_workflow_requires_live_generation_and_market_provenance():
+    text=WORKFLOW.read_text(encoding="utf-8")
+    assert "LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0" in text
+    assert "source_provenance.json" in text
+    assert "Shadow B market snapshot SHA mismatch" in text
+    assert "Shadow B market provider provenance mismatch" in text
+    assert "--source-trigger-head-sha" in text
+    assert "--source-provenance-sha256" in text
