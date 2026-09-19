@@ -214,7 +214,9 @@ def test_receipt_fails_closed_after_kickoff():
     before=datetime(2026,9,20,19,0,tzinfo=timezone.utc)
     receipt=module.build_receipt(
         source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
-        frozen=frozen,recorded_utc=before,source_workflow_run="1",source_head_sha="b"*40,
+        frozen=frozen,recorded_utc=before,source_workflow_run="1",source_head_sha="b"*40,source_trigger_head_sha="c"*40,
+        source_market_provider="the_odds_api",source_market_credential_mode="configured",
+        source_provenance_sha256="d"*64,
         source_season=2026,source_week=2,
         v1_samples=np.array([40,50,60,70,80],dtype=float),
         shadow_samples=np.array([42,52,62,72,82],dtype=float),
@@ -227,6 +229,11 @@ def test_receipt_fails_closed_after_kickoff():
     assert receipt["source_data_horizon_utc"]=="2026-09-20T17:59:00+00:00"
     assert receipt["source_season"]==2026
     assert receipt["source_week"]==2
+    assert receipt["source_head_sha"]=="b"*40
+    assert receipt["source_trigger_head_sha"]=="c"*40
+    assert receipt["source_market_provider"]=="the_odds_api"
+    assert receipt["source_market_credential_mode"]=="configured"
+    assert receipt["source_provenance_sha256"]=="d"*64
     assert receipt["v1"]["empirical_distribution"]["sample_count"]==5
     assert sum(receipt["v1"]["empirical_distribution"]["counts"])==5
     assert receipt["shadow_a"]["empirical_distribution"]["sample_count"]==5
@@ -234,7 +241,9 @@ def test_receipt_fails_closed_after_kickoff():
     after=datetime(2026,9,20,21,0,tzinfo=timezone.utc)
     assert module.build_receipt(
         source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
-        frozen=frozen,recorded_utc=after,source_workflow_run="1",source_head_sha="b"*40,
+        frozen=frozen,recorded_utc=after,source_workflow_run="1",source_head_sha="b"*40,source_trigger_head_sha="c"*40,
+        source_market_provider="the_odds_api",source_market_credential_mode="configured",
+        source_provenance_sha256="d"*64,
         source_season=2026,source_week=2,
         v1_samples=np.array([40,50,60,70,80],dtype=float),
         shadow_samples=np.array([42,52,62,72,82],dtype=float),
@@ -285,7 +294,9 @@ def test_marketless_v1_row_is_ineligible_not_fatal():
         frozen=frozen,
         recorded_utc=datetime(2026,9,20,19,0,tzinfo=timezone.utc),
         source_workflow_run="1",
-        source_head_sha="b"*40,
+        source_head_sha="b"*40,source_trigger_head_sha="c"*40,
+        source_market_provider="the_odds_api",source_market_credential_mode="configured",
+        source_provenance_sha256="d"*64,
         source_season=2026,
         source_week=2,
         v1_samples=np.array([40,50,60,70,80],dtype=float),
