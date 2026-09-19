@@ -229,21 +229,38 @@ jobs:
           if int(status["appended"])>0:
               assert len(current)>=int(status["appended"])
               assert all(row["source_head_sha"]==status["source_head_sha"] for row in current)
+          provenance_fields=(
+              "source_trigger_head_sha",
+              "source_market_provider",
+              "source_market_credential_mode",
+              "source_provenance_sha256",
+          )
+          legacy=0
           for row in rows:
               assert row["source_workflow_run"]
               assert len(str(row["source_head_sha"])) in {40,64}
-              assert len(str(row["source_trigger_head_sha"])) in {40,64}
-              assert row["source_market_provider"]
-              assert row["source_market_credential_mode"]
-              assert len(str(row["source_provenance_sha256"]))==64
+              present=[bool(str(row.get(field) or "").strip()) for field in provenance_fields]
+              if any(present):
+                  assert all(present), "partial live-source provenance is invalid"
+                  assert len(str(row["source_trigger_head_sha"])) in {40,64}
+                  assert len(str(row["source_provenance_sha256"]))==64
+              else:
+                  legacy+=1
               assert row["governance"]["production_authorized"] is False
               assert "actual_result" not in row
               assert "grading_result" not in row
+          for row in current:
+              assert row["source_head_sha"]==status["source_head_sha"]
+              assert row["source_trigger_head_sha"]==status["source_trigger_head_sha"]
+              assert row["source_market_provider"]==status["source_market_provider"]
+              assert row["source_market_credential_mode"]==status["source_market_credential_mode"]
+              assert row["source_provenance_sha256"]==status["source_provenance_sha256"]
           print(json.dumps({
               "source_workflow_run":status["source_workflow_run"],
               "source_head_sha":status["source_head_sha"],
               "appended":status["appended"],
               "ledger_receipts":len(rows),
+              "legacy_pre_provenance_receipts":legacy,
           },indent=2))
           PY
 
