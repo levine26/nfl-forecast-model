@@ -25,6 +25,10 @@ SNAPSHOT_CONTRACT_VERSION = "levline-props-market-snapshot-v0.1"
 SPORT_KEY = "americanfootball_nfl"
 API_BASE = "https://api.the-odds-api.com/v4"
 PROPLINE_API_BASE = "https://api.prop-line.com/v1"
+# PropLine intentionally publishes this read-only, shared, rate-limited free-tier
+# credential in its MIT-licensed MCP server so zero-config clients can make their
+# first request. Keep it LAST in the fallback order; personal credentials always win.
+PROPLINE_PUBLIC_DEMO_KEY = "be2b8487fcfacb1fbc292a8aa925a84c"
 SPORTSGAMEODDS_API_BASE = "https://api.sportsgameodds.com/v2"
 DEFAULT_REGIONS = "us"
 DEFAULT_ODDS_FORMAT = "american"
@@ -785,19 +789,20 @@ def fetch_live_nfl_prop_events_with_fallback(
 
     attempts: list[dict[str, Any]] = []
     configured = [
-        ("the_odds_api", str(the_odds_api_key or "").strip()),
-        ("propline", str(propline_api_key or "").strip()),
-        ("sportsgameodds", str(sportsgameodds_api_key or "").strip()),
+        ("the_odds_api", "the_odds_api", str(the_odds_api_key or "").strip()),
+        ("propline", "propline", str(propline_api_key or "").strip()),
+        (
+            "sportsgameodds",
+            "sportsgameodds",
+            str(sportsgameodds_api_key or "").strip(),
+        ),
+        ("propline_demo", "propline", PROPLINE_PUBLIC_DEMO_KEY),
     ]
-    if not any(key for _, key in configured):
-        raise PropsMarketLiveError(
-            "live Props market capture requires The Odds API, PropLine, or SportsGameOdds credential"
-        )
 
     errors: list[str] = []
-    for provider, api_key in configured:
+    for attempt_name, provider, api_key in configured:
         if not api_key:
-            attempts.append({"provider": provider, "status": "not_configured"})
+            attempts.append({"provider": attempt_name, "status": "not_configured"})
             continue
         try:
             events, raw_bundle = fetch_live_nfl_prop_events(
@@ -810,12 +815,21 @@ def fetch_live_nfl_prop_events_with_fallback(
             )
         except PropsMarketLiveError as exc:
             detail = str(exc)
-            attempts.append({"provider": provider, "status": "failed", "detail": detail})
-            errors.append(f"{provider}: {detail}")
+            attempts.append(
+                {"provider": attempt_name, "status": "failed", "detail": detail}
+            )
+            errors.append(f"{attempt_name}: {detail}")
             continue
 
-        attempts.append({"provider": provider, "status": "selected"})
-        return events, {**raw_bundle, "provider_attempts": attempts}
+        attempts.append({"provider": attempt_name, "status": "selected"})
+        credential_mode = (
+            "shared_public_demo" if attempt_name == "propline_demo" else "configured"
+        )
+        return events, {
+            **raw_bundle,
+            "provider_attempts": attempts,
+            "credential_mode": credential_mode,
+        }
 
     raise PropsMarketLiveError(
         "all configured live Props market providers failed: " + "; ".join(errors)
