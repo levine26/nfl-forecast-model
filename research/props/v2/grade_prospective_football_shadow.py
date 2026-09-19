@@ -417,14 +417,21 @@ def grade_receipts(
             "shadow_minus_v1_log_loss":shadow_log-v1_log if outcome is not None else math.nan,
             "v1_interval_score_80":v1_interval,
             "shadow_interval_score_80":shadow_interval,
+            "shadow_minus_v1_interval_score_80":shadow_interval-v1_interval,
             "v1_interval_low_80":v1_low,
             "v1_interval_high_80":v1_high,
             "shadow_interval_low_80":shadow_low,
             "shadow_interval_high_80":shadow_high,
             "v1_covered_80":v1_covered,
             "shadow_covered_80":shadow_covered,
+            "shadow_minus_v1_coverage_80":float(shadow_covered)-float(v1_covered),
             "v1_direction_hit":v1_dir,
             "shadow_direction_hit":shadow_dir,
+            "shadow_minus_v1_direction_hit":(
+                shadow_dir-v1_dir
+                if outcome is not None and math.isfinite(v1_dir) and math.isfinite(shadow_dir)
+                else math.nan
+            ),
             "v1_over_probability":v1_p,
             "shadow_over_probability":shadow_p,
             "over_outcome":outcome,
@@ -503,8 +510,16 @@ def summarize(frame:pd.DataFrame,*,seed:int)->dict[str,Any]:
         "mae_difference_ci95":cluster_ci(frame,"shadow_minus_v1_abs_error",seed=seed+1000),
         "v1_interval_score_80":float(frame["v1_interval_score_80"].mean()),
         "shadow_interval_score_80":float(frame["shadow_interval_score_80"].mean()),
+        "shadow_minus_v1_interval_score_80":float(frame["shadow_minus_v1_interval_score_80"].mean()),
+        "interval_score_difference_ci95":cluster_ci(
+            frame,"shadow_minus_v1_interval_score_80",seed=seed+3000
+        ),
         "v1_coverage_80":float(frame["v1_covered_80"].astype(float).mean()),
         "shadow_coverage_80":float(frame["shadow_covered_80"].astype(float).mean()),
+        "shadow_minus_v1_coverage_80":float(frame["shadow_minus_v1_coverage_80"].mean()),
+        "coverage_difference_ci95":cluster_ci(
+            frame,"shadow_minus_v1_coverage_80",seed=seed+4000
+        ),
         "v1_brier":float(decided["v1_brier"].mean()) if len(decided) else None,
         "shadow_brier":float(decided["shadow_brier"].mean()) if len(decided) else None,
         "shadow_minus_v1_brier":float(decided["shadow_minus_v1_brier"].mean()) if len(decided) else None,
@@ -512,8 +527,17 @@ def summarize(frame:pd.DataFrame,*,seed:int)->dict[str,Any]:
         "v1_log_loss":float(decided["v1_log_loss"].mean()) if len(decided) else None,
         "shadow_log_loss":float(decided["shadow_log_loss"].mean()) if len(decided) else None,
         "shadow_minus_v1_log_loss":float(decided["shadow_minus_v1_log_loss"].mean()) if len(decided) else None,
+        "log_loss_difference_ci95":cluster_ci(
+            decided,"shadow_minus_v1_log_loss",seed=seed+5000
+        ) if len(decided) else [None,None],
         "v1_direction_accuracy":float(decided["v1_direction_hit"].mean()) if len(decided) else None,
         "shadow_direction_accuracy":float(decided["shadow_direction_hit"].mean()) if len(decided) else None,
+        "shadow_minus_v1_direction_accuracy":float(
+            decided["shadow_minus_v1_direction_hit"].mean()
+        ) if len(decided) else None,
+        "direction_accuracy_difference_ci95":cluster_ci(
+            decided,"shadow_minus_v1_direction_hit",seed=seed+6000
+        ) if len(decided) else [None,None],
         "v1_calibration":calibration_table(decided,"v1_over_probability"),
         "shadow_calibration":calibration_table(decided,"shadow_over_probability"),
     }
