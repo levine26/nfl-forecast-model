@@ -205,7 +205,15 @@ def test_receipt_integrity_hash_is_enforced(tmp_path):
         "prop_type":"rushing_yards",
         "governance":{
             "production_authorized":False,
+            "published_v1_props_mutated":False,
+            "winner_model_mutated":False,
+            "opportunity_arrays_preserved":True,
             "target_week_outcomes_used":0,
+            "completed_2026_outcomes_used_for_coefficient_fit":0,
+        },
+        "defensive_efficiency":{
+            "coefficient_contract_version":module.FROZEN_COEFFICIENT_VERSION,
+            "fit":{"trained_through_season":2025},
         },
         "v1":{"empirical_distribution":_snapshot([1,2,3])},
         "shadow_a":{"empirical_distribution":_snapshot([1,2,4])},
@@ -242,7 +250,15 @@ def test_receipt_integrity_rejects_post_kickoff_chronology(tmp_path):
         "prop_type":"rushing_yards",
         "governance":{
             "production_authorized":False,
+            "published_v1_props_mutated":False,
+            "winner_model_mutated":False,
+            "opportunity_arrays_preserved":True,
             "target_week_outcomes_used":0,
+            "completed_2026_outcomes_used_for_coefficient_fit":0,
+        },
+        "defensive_efficiency":{
+            "coefficient_contract_version":module.FROZEN_COEFFICIENT_VERSION,
+            "fit":{"trained_through_season":2025},
         },
         "v1":{"empirical_distribution":_snapshot([1,2,3])},
         "shadow_a":{"empirical_distribution":_snapshot([1,2,4])},
@@ -301,3 +317,52 @@ def test_complete_outcome_pbp_games_requires_zero_seconds_when_available():
     assert games=={"G1"}
     assert audit["mode"]=="game_seconds_remaining_zero"
     assert audit["game_count"]==1
+
+
+def test_receipt_integrity_rejects_governance_or_coefficient_drift(tmp_path):
+    module=_module()
+    base={
+        "contract_version":module.RECEIPT_CONTRACT_VERSION,
+        "shadow_version":module.SHADOW_VERSION,
+        "shadow_id":"shadow-governance",
+        "source_forecast_sha256":"a"*64,
+        "source_manifest_sha256":"b"*64,
+        "source_season":2026,
+        "source_week":2,
+        "source_workflow_run":"12345",
+        "source_head_sha":"c"*40,
+        "recorded_utc":"2026-09-20T19:00:00+00:00",
+        "source_forecast_timestamp_utc":"2026-09-20T18:00:00+00:00",
+        "source_market_captured_utc":"2026-09-20T18:05:00+00:00",
+        "kickoff_utc":"2026-09-20T20:00:00+00:00",
+        "prop_type":"rushing_yards",
+        "governance":{
+            "production_authorized":False,
+            "published_v1_props_mutated":False,
+            "winner_model_mutated":False,
+            "opportunity_arrays_preserved":True,
+            "target_week_outcomes_used":0,
+            "completed_2026_outcomes_used_for_coefficient_fit":0,
+        },
+        "defensive_efficiency":{
+            "coefficient_contract_version":module.FROZEN_COEFFICIENT_VERSION,
+            "fit":{"trained_through_season":2025},
+        },
+        "v1":{"empirical_distribution":_snapshot([1,2,3])},
+        "shadow_a":{"empirical_distribution":_snapshot([1,2,4])},
+    }
+
+    bad=json.loads(json.dumps(base))
+    bad["governance"]["opportunity_arrays_preserved"]=False
+    bad["shadow_sha256"]=module._sha(bad)
+    path=tmp_path/"ledger.jsonl"
+    path.write_text(json.dumps(bad)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowGradingError,match="opportunity arrays"):
+        module.read_receipts(path)
+
+    bad=json.loads(json.dumps(base))
+    bad["defensive_efficiency"]["fit"]["trained_through_season"]=2026
+    bad["shadow_sha256"]=module._sha(bad)
+    path.write_text(json.dumps(bad)+"\n",encoding="utf-8")
+    with pytest.raises(module.ShadowGradingError,match="frozen through 2025"):
+        module.read_receipts(path)
