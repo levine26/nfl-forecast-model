@@ -93,10 +93,38 @@ def _players_frame(projection: Mapping[str,Any])->pd.DataFrame:
         raise FootballShadowBError(f"projection players missing fields: {sorted(missing)}")
     frame["player_id"]=frame["player_id"].astype(str)
     frame["position"]=frame["position"].astype(str).str.upper()
-    frame["role_multiplier"]=1.0
-    frame["carry_role_multiplier"]=1.0
-    frame["target_role_multiplier"]=1.0
-    frame["route_role_multiplier"]=1.0
+
+    multiplier_columns=(
+        "role_multiplier",
+        "carry_role_multiplier",
+        "target_role_multiplier",
+        "route_role_multiplier",
+    )
+    present=[column in frame.columns for column in multiplier_columns]
+    if all(present):
+        for column in multiplier_columns:
+            frame[column]=pd.to_numeric(frame[column],errors="coerce")
+            if frame[column].isna().any() or (~np.isfinite(frame[column])).any() or (frame[column]<0).any():
+                raise FootballShadowBError(f"invalid captured V1 multiplier column: {column}")
+    elif any(present):
+        missing_multipliers=[
+            column for column,is_present in zip(multiplier_columns,present) if not is_present
+        ]
+        raise FootballShadowBError(
+            f"partial captured V1 multiplier provenance: missing {missing_multipliers}"
+        )
+    else:
+        if "role_adjustment_source" not in frame.columns:
+            raise FootballShadowBError(
+                "captured V1 opportunity artifact lacks applied role multipliers"
+            )
+        sources=frame["role_adjustment_source"].fillna("").astype(str).str.strip().str.lower()
+        if not sources.eq("none").all():
+            raise FootballShadowBError(
+                "captured V1 opportunity artifact omits non-unit role multiplier provenance"
+            )
+        for column in multiplier_columns:
+            frame[column]=1.0
     return frame
 
 
@@ -154,7 +182,10 @@ def _apply_adjustments(frame: pd.DataFrame, adjustments: Mapping[str,Mapping[str
         for field,value in values.items():
             if field not in {"carry_role_multiplier","target_role_multiplier","route_role_multiplier"}:
                 raise FootballShadowBError(f"unsupported Shadow B role field: {field}")
-            out.loc[mask,field]=float(value)
+            multiplier=float(value)
+            if not math.isfinite(multiplier) or multiplier<0:
+                raise FootballShadowBError(f"invalid Shadow B role multiplier for {pid}/{field}")
+            out.loc[mask,field]=out.loc[mask,field].astype(float)*multiplier
     return out
 
 
@@ -177,8 +208,14 @@ def transform_opportunity_projection(
     if not isinstance(captured_carry,Mapping):
         raise FootballShadowBError("missing designed carry distribution")
     carry_ids=[str(x) for x in captured_carry.get("player_ids",[])]
-    carry_base=_ordered(base_players,carry_ids)
-    carry_dynamic=_ordered(dynamic_players,carry_ids)
+    carry_base=base_players[
+        base_players["position"].isin(["QB","RB","FB","WR"])
+    ].copy().reset_index(drop=True)
+    carry_dynamic=dynamic_players[
+        dynamic_players["position"].isin(["QB","RB","FB","WR"])
+    ].copy().reset_index(drop=True)
+    if carry_base.empty:
+        raise FootballShadowBError("captured projection has no carry-eligible players")
     if "carry_history_effective_opportunities" not in carry_base.columns:
         raise FootballShadowBError("carry history evidence missing from captured projection")
     carry_alpha=(
@@ -203,8 +240,14 @@ def transform_opportunity_projection(
     if not isinstance(captured_target,Mapping):
         raise FootballShadowBError("missing target distribution")
     target_ids=[str(x) for x in captured_target.get("player_ids",[])]
-    target_base=_ordered(base_players,target_ids)
-    target_dynamic=_ordered(dynamic_players,target_ids)
+    target_base=base_players[
+        base_players["position"].isin(["RB","FB","WR","TE"])
+    ].copy().reset_index(drop=True)
+    target_dynamic=dynamic_players[
+        dynamic_players["position"].isin(["RB","FB","WR","TE"])
+    ].copy().reset_index(drop=True)
+    if target_base.empty:
+        raise FootballShadowBError("captured projection has no target-eligible players")
     if "target_history_effective_opportunities" not in target_base.columns:
         raise FootballShadowBError("target history evidence missing from captured projection")
     target_alpha=(
@@ -232,9 +275,9 @@ def transform_opportunity_projection(
     baseline_participation=route_info.get("baseline_participation")
     if not isinstance(baseline_participation,Mapping):
         raise FootballShadowBError("captured route baseline participation missing")
-    route_ids=target_ids
-    route_base=_ordered(base_players,route_ids)
-    route_dynamic=_ordered(dynamic_players,route_ids)
+    route_ids=target_base["player_id"].astype(str).tolist()
+    route_base=target_base.copy()
+    route_dynamic=target_dynamic.copy()
     if "route_history_effective_dropbacks" not in route_base.columns:
         raise FootballShadowBError("route history evidence missing from captured projection")
     try:
@@ -259,7 +302,9 @@ def transform_opportunity_projection(
     audit.update({
         "baseline_reconstruction_verified":True,
         "carry_player_count":len(carry_ids),
+        "carry_eligible_player_count":len(carry_base),
         "target_player_count":len(target_ids),
+        "target_eligible_player_count":len(target_base),
         "route_player_count":len(route_ids),
     })
     return out,audit
