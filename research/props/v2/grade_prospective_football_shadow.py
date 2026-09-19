@@ -460,9 +460,18 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
     if graded.empty:
         result={
             "contract_version":CONTRACT_VERSION,
+            "receipt_contract_version":RECEIPT_CONTRACT_VERSION,
+            "shadow_version":SHADOW_VERSION,
             "receipt_count":len(receipts),
             "graded_count":0,
-            "status":"NO_FINAL_GAMES_YET",
+            "ungraded_count":len(receipts),
+            "status":"NO_GRADED_RECEIPTS_YET",
+            "eligibility_audit":eligibility_audit,
+            "outcome_source_audit":{
+                "pbp_normalization":scramble_audit,
+                "snap_identity":snap_identity_audit,
+                "participation":participation_audit,
+            },
             "automatic_promotion_authorized":False,
         }
         (output_dir/"summary.json").write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
