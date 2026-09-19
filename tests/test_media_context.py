@@ -147,3 +147,5 @@ def test_media_led_read_is_matchup_preview_then_model_explanation():
     assert preview["editorial_voice"]["media_led"] is True
     assert preview["editorial_voice"]["two_paragraph_contract"] is True
     assert preview["reported_sources"][0]["source_name"] == "ESPN"
+    assert preview["current_reported_sources"][0]["source_name"] == "ESPN"
+    assert preview["current_reported_sources"][0]["title"].startswith("Chiefs expect Patrick Mahomes")
