@@ -139,3 +139,9 @@ Any later challenger must receive a new version and begin a new prospective ledg
 
 Neither candidate is production-authorized by this contract. Candidate A is explicitly a market
 baseline. Candidate B remains a research challenger until a separate promotion gate is satisfied.
+
+## Revalidation status
+
+This isolated architecture remains the canonical replacement for #377. It is being revalidated after
+the Props history/receipt QA harness was repaired on main; no shadow coefficient, eligibility rule,
+or research boundary changes in this revalidation.
