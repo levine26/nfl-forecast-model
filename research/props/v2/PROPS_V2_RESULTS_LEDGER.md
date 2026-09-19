@@ -218,6 +218,20 @@ Frozen candidates:
 
 No completed 2026 outcome may change the candidate. Grading is evaluation-only.
 
+## Prospective market archive activation status
+
+The capture implementation exists in **PR #381**, including frozen exact-timestamp archive and
+T48H/T24H/T12H/T6H/T90M/T30M/near-close horizon selection.
+
+As of this record, the persistent branch
+`research-data/props-v2-market-archive` does **not** exist and no manifest/horizon archive is
+available. The workflow's automatic `workflow_run` trigger operates only after the archive workflow
+is present on `main`.
+
+**Disposition:** prospective market evidence collection is implementation-ready but **not yet
+active**. Do not describe CLV/movement capture as started until #381 is merged and the first
+successful live refresh produces a persistent archive commit.
+
 ## Production conclusion
 
 No Props 2.0 architecture is scientifically authorized for production at this point. V1 remains the
