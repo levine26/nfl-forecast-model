@@ -1,0 +1,45 @@
+name: LevLine Props 2.0 route-target source audit
+
+on:
+  pull_request:
+    branches:
+      - research/props-v2-challenger
+    paths:
+      - 'research/props/v2/audit_route_participation_source.py'
+      - 'research/props/v2/test_route_participation_source_audit.py'
+      - 'research/props/v2/ROUTE_TARGET_SOURCE_AUDIT_CONTRACT.md'
+      - '.github/workflows/research_props_v2_route_source_audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q research/props/v2/test_route_participation_source_audit.py
+
+  inspect-real-source:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]' pyarrow
+      - run: |
+          python research/props/v2/audit_route_participation_source.py             --season 2022 --season 2023 --season 2024 --season 2025             --output research_outputs/props_v2/route_source_audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-route-source-audit
+          path: research_outputs/props_v2/route_source_audit.json
+          if-no-files-found: error
