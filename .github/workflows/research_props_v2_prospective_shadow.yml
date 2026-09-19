@@ -25,6 +25,7 @@ permissions:
 
 env:
   EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-shadow-exact-source-v0.1.0
+  LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0
 
 jobs:
   test:
@@ -59,7 +60,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Resolve and validate exact source live workflow run
+      - name: Resolve exact source live workflow run
         id: source
         run: |
           set -euo pipefail
@@ -72,7 +73,7 @@ jobs:
           META=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID")
           NAME=$(printf '%s' "$META" | jq -r '.name')
           BRANCH=$(printf '%s' "$META" | jq -r '.head_branch')
-          SHA=$(printf '%s' "$META" | jq -r '.head_sha')
+          TRIGGER_SHA=$(printf '%s' "$META" | jq -r '.head_sha')
           CONCLUSION=$(printf '%s' "$META" | jq -r '.conclusion')
           if [ "$NAME" != "LevLine Props live refresh" ]; then
             echo "::error::source run is not LevLine Props live refresh: $NAME"
@@ -82,25 +83,78 @@ jobs:
             echo "::error::source run must be successful on main; branch=$BRANCH conclusion=$CONCLUSION"
             exit 1
           fi
-          for path in \
-            research/props/v2/record_prospective_shadow.py \
-            research/props/v2/prospective_shadow_v0_1.json; do
-            if ! gh api "repos/${{ github.repository }}/contents/$path?ref=$SHA" >/dev/null 2>&1; then
-              echo "::error::source run predates the prospective market shadow listener: missing $path at $SHA"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "trigger_head_sha=$TRIGGER_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Download and validate exact live source provenance
+        id: artifact
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/props-live-artifacts
+          mkdir -p /tmp/props-live-artifacts
+          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
+
+          mapfile -t FORECASTS < <(find /tmp/props-live-artifacts -name forecasts.json -type f | sort)
+          mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
+          if [ "${#FORECASTS[@]}" -ne 1 ] || [ "${#PROVENANCE[@]}" -ne 1 ]; then
+            echo "::error::source artifact must contain exactly one forecasts.json and one source_provenance.json"
+            exit 1
+          fi
+
+          PROV="${PROVENANCE[0]}"
+          CONTRACT=$(jq -r '.contract_version // empty' "$PROV")
+          PROV_RUN=$(jq -r '.source_workflow_run // empty' "$PROV")
+          PROV_TRIGGER=$(jq -r '.trigger_head_sha // empty' "$PROV")
+          GENERATION_SHA=$(jq -r '.generation_base_sha // empty' "$PROV")
+          PROVIDER=$(jq -r '.market_provider // empty' "$PROV")
+          CREDENTIAL_MODE=$(jq -r '.market_credential_mode // empty' "$PROV")
+          EXPECTED_FORECAST_SHA=$(jq -r '.forecasts_sha256 // empty' "$PROV")
+          ACTUAL_FORECAST_SHA=$(sha256sum "${FORECASTS[0]}" | awk '{print $1}')
+          PROVENANCE_SHA=$(sha256sum "$PROV" | awk '{print $1}')
+
+          if [ "$CONTRACT" != "$LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION" ]; then
+            echo "::error::unexpected live source provenance contract: $CONTRACT"
+            exit 1
+          fi
+          if [ "$PROV_RUN" != "${{ steps.source.outputs.run_id }}" ]; then
+            echo "::error::live source provenance run ID mismatch"
+            exit 1
+          fi
+          if [ "$PROV_TRIGGER" != "${{ steps.source.outputs.trigger_head_sha }}" ]; then
+            echo "::error::live source provenance trigger SHA mismatch"
+            exit 1
+          fi
+          if ! [[ "$GENERATION_SHA" =~ ^[0-9a-f]{40}$|^[0-9a-f]{64}$ ]]; then
+            echo "::error::invalid generation SHA in live source provenance"
+            exit 1
+          fi
+          if [ -z "$PROVIDER" ] || [ -z "$CREDENTIAL_MODE" ]; then
+            echo "::error::live source provenance missing market provider/mode"
+            exit 1
+          fi
+          if [ "$EXPECTED_FORECAST_SHA" != "$ACTUAL_FORECAST_SHA" ]; then
+            echo "::error::live source forecast artifact SHA mismatch"
+            exit 1
+          fi
+
+          for SHA in "${{ steps.source.outputs.trigger_head_sha }}" "$GENERATION_SHA"; do
+            WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_prospective_shadow.yml?ref=$SHA" | jq -r '.content // empty')
+            if [ -z "$WORKFLOW_B64" ] || \
+               ! printf '%s' "$WORKFLOW_B64" | base64 -d | grep -Fq 'LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0'; then
+              echo "::error::source SHA predates the live-source-provenance market shadow listener: $SHA"
               exit 1
             fi
           done
-          WORKFLOW_B64=$(gh api "repos/${{ github.repository }}/contents/.github/workflows/research_props_v2_prospective_shadow.yml?ref=$SHA" | jq -r '.content // empty')
-          if [ -z "$WORKFLOW_B64" ] || ! printf '%s' "$WORKFLOW_B64" | base64 -d | grep -Fq 'EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-shadow-exact-source-v0.1.0'; then
-            echo "::error::source run predates the exact-source-run prospective market shadow listener; retrospective backfill is prohibited"
-            exit 1
-          fi
-          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
-          echo "head_sha=$SHA" >> "$GITHUB_OUTPUT"
+
+          echo "forecasts=${FORECASTS[0]}" >> "$GITHUB_OUTPUT"
+          echo "generation_sha=$GENERATION_SHA" >> "$GITHUB_OUTPUT"
+          echo "market_provider=$PROVIDER" >> "$GITHUB_OUTPUT"
+          echo "market_credential_mode=$CREDENTIAL_MODE" >> "$GITHUB_OUTPUT"
+          echo "provenance_sha256=$PROVENANCE_SHA" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
         with:
-          ref: ${{ steps.source.outputs.head_sha }}
+          ref: ${{ steps.artifact.outputs.generation_sha }}
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -110,21 +164,6 @@ jobs:
 
       - name: Install project
         run: python -m pip install -e .
-
-      - name: Download exact source live audit artifact
-        id: artifact
-        run: |
-          set -euo pipefail
-          rm -rf /tmp/props-live-artifacts
-          mkdir -p /tmp/props-live-artifacts
-          gh run download "${{ steps.source.outputs.run_id }}" --dir /tmp/props-live-artifacts
-          mapfile -t FORECASTS < <(find /tmp/props-live-artifacts -name forecasts.json -type f | sort)
-          if [ "${#FORECASTS[@]}" -ne 1 ]; then
-            echo "::error::expected exactly one forecasts.json in source artifacts; found ${#FORECASTS[@]}"
-            printf '%s\n' "${FORECASTS[@]:-}"
-            exit 1
-          fi
-          echo "forecasts=${FORECASTS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Restore immutable research shadow ledger
         run: |
@@ -147,7 +186,11 @@ jobs:
             --config research/props/v2/prospective_shadow_v0_1.json \
             --ledger "$DATA_DIR/challenger_originals.jsonl" \
             --source-workflow-run "${{ steps.source.outputs.run_id }}" \
-            --source-head-sha "${{ steps.source.outputs.head_sha }}" \
+            --source-head-sha "${{ steps.artifact.outputs.generation_sha }}" \
+            --source-trigger-head-sha "${{ steps.source.outputs.trigger_head_sha }}" \
+            --source-market-provider "${{ steps.artifact.outputs.market_provider }}" \
+            --source-market-credential-mode "${{ steps.artifact.outputs.market_credential_mode }}" \
+            --source-provenance-sha256 "${{ steps.artifact.outputs.provenance_sha256 }}" \
             | tee "$DATA_DIR/last_record_status.json"
 
       - name: Enforce research-only source provenance
@@ -163,6 +206,10 @@ jobs:
           assert status["published_v1_props_mutated"] is False
           assert status["source_workflow_run"]
           assert len(status["source_head_sha"]) in {40,64}
+          assert len(status["source_trigger_head_sha"]) in {40,64}
+          assert status["source_market_provider"]
+          assert status["source_market_credential_mode"]
+          assert len(status["source_provenance_sha256"])==64
           ledger=root/"challenger_originals.jsonl"
           rows=[]
           if ledger.exists():
@@ -177,6 +224,10 @@ jobs:
           for row in rows:
               assert row["source_workflow_run"]
               assert len(str(row["source_head_sha"])) in {40,64}
+              assert len(str(row["source_trigger_head_sha"])) in {40,64}
+              assert row["source_market_provider"]
+              assert row["source_market_credential_mode"]
+              assert len(str(row["source_provenance_sha256"]))==64
               assert row["governance"]["production_authorized"] is False
               assert "actual_result" not in row
               assert "grading_result" not in row
