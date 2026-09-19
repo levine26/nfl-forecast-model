@@ -38,6 +38,7 @@ def _projection():
             "carry_history_effective_opportunities":34.0,
             "target_history_effective_opportunities":8.0,
             "route_history_effective_dropbacks":16.0,
+            "role_adjustment_source":"none",
         },
         {
             "player_id":"RB2","player_name":"RB Two","position":"RB",
@@ -45,6 +46,7 @@ def _projection():
             "carry_history_effective_opportunities":20.0,
             "target_history_effective_opportunities":5.0,
             "route_history_effective_dropbacks":11.0,
+            "role_adjustment_source":"none",
         },
         {
             "player_id":"WR1","player_name":"WR One","position":"WR",
@@ -52,6 +54,7 @@ def _projection():
             "carry_history_effective_opportunities":2.0,
             "target_history_effective_opportunities":31.0,
             "route_history_effective_dropbacks":62.0,
+            "role_adjustment_source":"none",
         },
         {
             "player_id":"WR2","player_name":"WR Two","position":"WR",
@@ -59,6 +62,7 @@ def _projection():
             "carry_history_effective_opportunities":1.0,
             "target_history_effective_opportunities":24.0,
             "route_history_effective_dropbacks":55.0,
+            "role_adjustment_source":"none",
         },
     ]
     players=pd.DataFrame(rows)
@@ -195,6 +199,8 @@ def test_shadow_b_transform_matches_canonical_opportunity_engine():
     baseline=build_opportunity_projection(
         team_history,player_history,players,context
     ).to_dict()
+    for row in baseline["players"]:
+        row["role_adjustment_source"]="none"
     transformed,audit=module.transform_opportunity_projection(
         baseline,adjustments
     )
@@ -387,3 +393,143 @@ def test_shadow_b_workflow_requires_live_generation_and_market_provenance():
     assert "Shadow B market provider provenance mismatch" in text
     assert "--source-trigger-head-sha" in text
     assert "--source-provenance-sha256" in text
+
+
+def test_shadow_b_reconstructs_with_unavailable_player_in_canonical_eligibility_set():
+    module=_module()
+    projection=_projection()
+    unavailable={
+        "player_id":"RB_OUT",
+        "player_name":"Unavailable Back",
+        "position":"RB",
+        "availability_probability":0.0,
+        "availability_uncertainty":0.30,
+        "carry_history_effective_opportunities":12.0,
+        "target_history_effective_opportunities":4.0,
+        "route_history_effective_dropbacks":8.0,
+        "role_adjustment_source":"none",
+    }
+    projection["players"].append(unavailable)
+
+    players=pd.DataFrame(projection["players"])
+    for col in ("role_multiplier","carry_role_multiplier","target_role_multiplier","route_role_multiplier"):
+        players[col]=1.0
+
+    carry=players[players["position"].isin(["QB","RB","FB","WR"])].copy().reset_index(drop=True)
+    carry_alpha=(
+        carry["carry_history_effective_opportunities"].fillna(0.0).to_numpy(dtype=float)
+        + DEFAULT_ALLOCATION_PSEUDOCOUNT
+    )
+    carry_dist,carry_redist,_=_availability_adjusted_allocation(
+        carry,carry_alpha,label="designed_carry_share",multiplier_column="carry_role_multiplier"
+    )
+    projection["hierarchy"]["designed_carry_share_given_designed_rush"]=carry_dist
+    projection["redistribution"]["designed_carries"]=carry_redist
+
+    target=players[players["position"].isin(["RB","FB","WR","TE"])].copy().reset_index(drop=True)
+    target_alpha=(
+        target["target_history_effective_opportunities"].fillna(0.0).to_numpy(dtype=float)
+        + DEFAULT_ALLOCATION_PSEUDOCOUNT
+    )
+    target_dist,target_redist,_=_availability_adjusted_allocation(
+        target,target_alpha,label="target_share",multiplier_column="target_role_multiplier"
+    )
+    projection["hierarchy"]["target_share_given_team_target"]=target_dist
+    projection["redistribution"]["targets"]=target_redist
+
+    base_means=np.asarray([
+        float(projection["redistribution"]["routes"]["baseline_participation"].get(pid,0.20))
+        for pid in target["player_id"].astype(str)
+    ],dtype=float)
+    route_strength=(
+        target["route_history_effective_dropbacks"].fillna(0.0).to_numpy(dtype=float)
+        + module.ROUTE_PRIOR_STRENGTH
+    )
+    route_dists,route_redist,_=_route_redistribution(target,base_means,route_strength)
+    projection["hierarchy"]["route_participation_given_dropback"]={
+        pid:dist for pid,dist in zip(target["player_id"].astype(str),route_dists)
+    }
+    projection["redistribution"]["routes"]=route_redist
+
+    adjusted,audit=module.transform_opportunity_projection(projection,{})
+    assert audit["baseline_reconstruction_verified"] is True
+    assert audit["carry_eligible_player_count"]==len(carry)
+    assert "RB_OUT" not in adjusted["hierarchy"]["designed_carry_share_given_designed_rush"]["player_ids"]
+
+
+def test_shadow_b_layers_dynamic_role_on_retained_v1_multipliers():
+    module=_module()
+    team_rows=[]
+    player_rows=[]
+    for week in range(1,7):
+        gid=f"2025_{week:02d}_ARI_LAR"
+        team_rows.append({
+            "game_id":gid,"season":2025,"week":week,"team":"ARI",
+            "offensive_plays":64.0,"dropbacks":39.0,"pass_attempts":36.0,
+            "sacks":2.0,"qb_scrambles":1.0,"designed_rush_attempts":25.0,
+            "team_targets":34.0,
+        })
+        player_rows.extend([
+            {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"QB1","position":"QB","designed_carries":3.0,"routes":0.0,"targets":0.0,"receptions":0.0},
+            {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"RB1","position":"RB","designed_carries":16.0,"routes":21.0,"targets":5.0,"receptions":4.0},
+            {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"RB2","position":"RB","designed_carries":6.0,"routes":10.0,"targets":2.0,"receptions":1.0},
+            {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"WR1","position":"WR","designed_carries":0.0,"routes":36.0,"targets":11.0,"receptions":7.0},
+            {"game_id":gid,"season":2025,"week":week,"team":"ARI","player_id":"TE1","position":"TE","designed_carries":0.0,"routes":27.0,"targets":7.0,"receptions":5.0},
+        ])
+    team_history=pd.DataFrame(team_rows)
+    player_history=pd.DataFrame(player_rows)
+    players=pd.DataFrame([
+        {"player_id":"QB1","player_name":"QB","position":"QB","availability_probability":1.0,"availability_uncertainty":0.0,"is_primary_qb":True},
+        {"player_id":"RB1","player_name":"RB One","position":"RB","availability_probability":0.95,"availability_uncertainty":0.04,"is_primary_qb":False},
+        {"player_id":"RB2","player_name":"RB Two","position":"RB","availability_probability":0.0,"availability_uncertainty":0.20,"is_primary_qb":False},
+        {"player_id":"WR1","player_name":"WR One","position":"WR","availability_probability":0.98,"availability_uncertainty":0.02,"is_primary_qb":False},
+        {"player_id":"TE1","player_name":"TE One","position":"TE","availability_probability":0.97,"availability_uncertainty":0.03,"is_primary_qb":False},
+    ])
+    for col in ("role_multiplier","carry_role_multiplier","target_role_multiplier","route_role_multiplier"):
+        players[col]=1.0
+    players.loc[players["player_id"].eq("RB1"),"role_multiplier"]=0.94
+    players.loc[players["player_id"].eq("RB1"),"carry_role_multiplier"]=1.08
+    players.loc[players["player_id"].eq("WR1"),"target_role_multiplier"]=0.92
+    players.loc[players["player_id"].eq("WR1"),"route_role_multiplier"]=1.05
+
+    context=ForecastContext(
+        game_id="2026_03_LAR_ARI",season=2026,week=3,team="ARI",opponent="LAR",
+        forecast_timestamp="2026-09-19T18:00:00+00:00",
+        data_horizon="2026-09-19T18:00:00+00:00",
+    )
+    baseline=build_opportunity_projection(team_history,player_history,players,context).to_dict()
+    by_id=players.set_index("player_id")
+    for row in baseline["players"]:
+        pid=row["player_id"]
+        for col in ("role_multiplier","carry_role_multiplier","target_role_multiplier","route_role_multiplier"):
+            row[col]=float(by_id.loc[pid,col])
+
+    adjustments={
+        "RB1":{"carry_role_multiplier":1.20,"target_role_multiplier":1.10,"route_role_multiplier":1.15},
+        "WR1":{"target_role_multiplier":1.12,"route_role_multiplier":1.08},
+    }
+    transformed,audit=module.transform_opportunity_projection(baseline,adjustments)
+    assert audit["baseline_reconstruction_verified"] is True
+
+    dynamic=players.copy()
+    for pid,fields in adjustments.items():
+        for field,value in fields.items():
+            dynamic.loc[dynamic["player_id"].eq(pid),field] *= float(value)
+    canonical=build_opportunity_projection(team_history,player_history,dynamic,context).to_dict()
+
+    for channel in ("designed_carry_share_given_designed_rush","target_share_given_team_target"):
+        left=transformed["hierarchy"][channel]
+        right=canonical["hierarchy"][channel]
+        assert left["player_ids"]==right["player_ids"]
+        for field in ("concentration","mean_share","variance"):
+            for pid in left[field]:
+                assert left[field][pid]==pytest.approx(right[field][pid],abs=1e-12)
+
+
+def test_shadow_b_fails_closed_when_multiplier_provenance_is_ambiguous():
+    module=_module()
+    projection=_projection()
+    for row in projection["players"]:
+        row.pop("role_adjustment_source",None)
+    with pytest.raises(module.FootballShadowBError,match="lacks applied role multipliers"):
+        module.transform_opportunity_projection(projection,{})
