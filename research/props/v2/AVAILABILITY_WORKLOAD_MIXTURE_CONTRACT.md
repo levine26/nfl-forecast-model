@@ -77,6 +77,14 @@ Secondary:
 - sample sizes by designation and position;
 - season-forward stability.
 
-This component can advance to prospective shadow testing only if workload MAE improves without a
-material degradation in active/inactive probability quality. It cannot authorize production from
-retrospective evidence.
+The development gate is frozen before the real-data evaluation:
+1. pooled 2023–2025 workload-ratio MAE must improve versus the active-only comparator;
+2. mixture MAE must improve in at least two of the three evaluation seasons;
+3. mixture active/inactive Brier score may not be worse than the active-only comparator by more
+   than **0.005 absolute Brier**.
+
+RMSE is reported as a secondary workload metric. Subgroup results are diagnostic only and may not
+rescue a failed aggregate gate.
+
+This component can advance to prospective shadow testing only if the complete frozen gate passes.
+It cannot authorize production from retrospective evidence.
