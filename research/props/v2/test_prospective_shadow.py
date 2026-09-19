@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SCRIPT = ROOT / "research" / "props" / "v2" / "record_prospective_shadow.py"
 FIXTURE = ROOT / "research" / "props" / "fixtures" / "props_forecasts.json"
 CONFIG = ROOT / "research" / "props" / "v2" / "prospective_shadow_v0_1.json"
+WORKFLOW = ROOT / ".github" / "workflows" / "research_props_v2_prospective_shadow.yml"
 NOW = datetime(2026, 9, 18, 17, 30, tzinfo=timezone.utc)
 SOURCE_RUN = "12345"
 SOURCE_SHA = "a" * 40
@@ -137,3 +138,11 @@ def test_same_source_forecast_has_stable_shadow_identity():
     assert a is not None and b is not None
     assert a["shadow_id"] == b["shadow_id"]
     assert a["recorded_utc"] != b["recorded_utc"]
+
+
+def test_exact_source_listener_has_versioned_no_backfill_gate():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    marker = "EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-shadow-exact-source-v0.1.0"
+    assert marker in text
+    assert "source run predates the exact-source-run prospective market shadow listener" in text
+    assert "base64 -d | grep -Fq" in text
