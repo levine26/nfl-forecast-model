@@ -1,0 +1,29 @@
+name: LevLine Props 2.0 football shadow grader
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/grade_prospective_football_shadow.py'
+      - 'research/props/v2/test_prospective_football_shadow_grader.py'
+      - 'research/props/v2/PROSPECTIVE_FOOTBALL_SHADOW_GRADING_CONTRACT.md'
+      - '.github/workflows/research_props_v2_football_shadow_grader.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: python -m pip install -e '.[dev]'
+      - name: Compile and test frozen prospective grader
+        run: |
+          python -m py_compile research/props/v2/grade_prospective_football_shadow.py
+          python -m pytest -q research/props/v2/test_prospective_football_shadow_grader.py
