@@ -37,10 +37,17 @@ def _sha_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def _git_sha(value: Any) -> str:
+def _git_sha(value: Any, *, label: str = "source_head_sha") -> str:
     text = str(value or "").strip().lower()
     if len(text) not in {40, 64} or any(char not in "0123456789abcdef" for char in text):
-        raise MarketArchiveError("source_head_sha must be a git SHA")
+        raise MarketArchiveError(f"{label} must be a git SHA")
+    return text
+
+
+def _sha256(value: Any, *, label: str) -> str:
+    text = str(value or "").strip().lower()
+    if len(text) != 64 or any(char not in "0123456789abcdef" for char in text):
+        raise MarketArchiveError(f"{label} must be SHA-256")
     return text
 
 
@@ -142,12 +149,29 @@ def archive_snapshot(
     manifest_path: Path,
     source_workflow_run: str,
     source_head_sha: str,
+    source_trigger_head_sha: str,
+    source_market_provider: str,
+    source_market_credential_mode: str,
+    source_provenance_sha256: str,
 ) -> dict[str, Any]:
     source_run = str(source_workflow_run or "").strip()
     if not source_run:
         raise MarketArchiveError("source_workflow_run is required")
     source_sha = _git_sha(source_head_sha)
+    trigger_sha = _git_sha(source_trigger_head_sha, label="source_trigger_head_sha")
+    source_provider = str(source_market_provider or "").strip()
+    credential_mode = str(source_market_credential_mode or "").strip()
+    provenance_sha = _sha256(source_provenance_sha256, label="source_provenance_sha256")
+    if not source_provider:
+        raise MarketArchiveError("source_market_provider is required")
+    if not credential_mode:
+        raise MarketArchiveError("source_market_credential_mode is required")
     snapshot = _load_snapshot(market_path)
+    snapshot_provider = str(snapshot.get("provider") or "").strip()
+    if snapshot_provider != source_provider:
+        raise MarketArchiveError(
+            f"market provider provenance mismatch: {snapshot_provider!r} != {source_provider!r}"
+        )
     captured = _dt(snapshot.get("captured_at_utc"))
     kickoffs = _kickoffs(snapshot)
     canonical = _canon(snapshot)
@@ -184,6 +208,10 @@ def archive_snapshot(
                 "snapshot_id": snapshot_id,
                 "source_workflow_run": source_run,
                 "source_head_sha": source_sha,
+                "source_trigger_head_sha": trigger_sha,
+                "source_market_provider": source_provider,
+                "source_market_credential_mode": credential_mode,
+                "source_provenance_sha256": provenance_sha,
                 "captured_at_utc": captured.isoformat(),
                 "kickoff_utc": kickoff.isoformat(),
                 "minutes_to_kickoff": minutes_to_kickoff,
@@ -209,6 +237,10 @@ def archive_snapshot(
         "captured_at_utc": captured.isoformat(),
         "source_workflow_run": source_run,
         "source_head_sha": source_sha,
+        "source_trigger_head_sha": trigger_sha,
+        "source_market_provider": source_provider,
+        "source_market_credential_mode": credential_mode,
+        "source_provenance_sha256": provenance_sha,
         "normalized_snapshot_sha256": snapshot_sha,
         "raw_provider_payload_sha256": raw_sha,
         "artifact_count": len(rows),
@@ -230,11 +262,19 @@ def archive_artifact_root(
     manifest_path: Path,
     source_workflow_run: str,
     source_head_sha: str,
+    source_trigger_head_sha: str,
+    source_market_provider: str,
+    source_market_credential_mode: str,
+    source_provenance_sha256: str,
 ) -> dict[str, Any]:
     source_run = str(source_workflow_run or "").strip()
     if not source_run:
         raise MarketArchiveError("source_workflow_run is required")
     source_sha = _git_sha(source_head_sha)
+    trigger_sha = _git_sha(source_trigger_head_sha, label="source_trigger_head_sha")
+    source_provider = str(source_market_provider or "").strip()
+    credential_mode = str(source_market_credential_mode or "").strip()
+    provenance_sha = _sha256(source_provenance_sha256, label="source_provenance_sha256")
     market_paths = sorted(artifact_root.rglob("market.json"))
     if not market_paths:
         raise MarketArchiveError(f"no market.json found under {artifact_root}")
@@ -245,6 +285,10 @@ def archive_artifact_root(
             manifest_path=manifest_path,
             source_workflow_run=source_run,
             source_head_sha=source_sha,
+            source_trigger_head_sha=trigger_sha,
+            source_market_provider=source_provider,
+            source_market_credential_mode=credential_mode,
+            source_provenance_sha256=provenance_sha,
         )
         for path in market_paths
     ]
@@ -252,6 +296,10 @@ def archive_artifact_root(
         "contract_version": CONTRACT_VERSION,
         "source_workflow_run": source_run,
         "source_head_sha": source_sha,
+        "source_trigger_head_sha": trigger_sha,
+        "source_market_provider": source_provider,
+        "source_market_credential_mode": credential_mode,
+        "source_provenance_sha256": provenance_sha,
         "snapshot_files_found": len(market_paths),
         "archived": sum(row["status"] == "archived" for row in results),
         "existing": sum(row["status"] == "existing" for row in results),
@@ -268,6 +316,10 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--source-workflow-run", required=True)
     parser.add_argument("--source-head-sha", required=True)
+    parser.add_argument("--source-trigger-head-sha", required=True)
+    parser.add_argument("--source-market-provider", required=True)
+    parser.add_argument("--source-market-credential-mode", required=True)
+    parser.add_argument("--source-provenance-sha256", required=True)
     parser.add_argument("--status", type=Path)
     args = parser.parse_args()
 
@@ -277,6 +329,10 @@ def main() -> int:
         manifest_path=args.manifest,
         source_workflow_run=args.source_workflow_run,
         source_head_sha=args.source_head_sha,
+        source_trigger_head_sha=args.source_trigger_head_sha,
+        source_market_provider=args.source_market_provider,
+        source_market_credential_mode=args.source_market_credential_mode,
+        source_provenance_sha256=args.source_provenance_sha256,
     )
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.status is not None:
