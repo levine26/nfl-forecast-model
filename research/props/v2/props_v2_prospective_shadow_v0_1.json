@@ -1,0 +1,49 @@
+{
+  "contract_version": "levline-props-v2-prospective-shadow-v0.1.0",
+  "status": "FROZEN_PROSPECTIVE_RESEARCH_SHADOW",
+  "production_authorized": false,
+  "completed_2026_outcomes_used_for_selection_or_fit": false,
+  "supported_prop_types": [
+    "passing_yards",
+    "passing_tds",
+    "rushing_yards",
+    "receiving_yards",
+    "receptions"
+  ],
+  "market_only": {
+    "version": "props-v2-market-only-v0.1.0",
+    "rule": "original_market_no_vig_over_probability"
+  },
+  "market_v1_residual": {
+    "version": "props-v2-market-v1-residual-v0.1.0",
+    "formula": "logit(p_market) + intercept + residual_beta * (logit(p_v1) - logit(p_market))",
+    "intercept": -0.0718941364380648,
+    "residual_beta": 0.043750664468122,
+    "residual_l2": 10.0,
+    "intercept_l2": 1.0
+  },
+  "fit_provenance": {
+    "seasons": [2023, 2024, 2025],
+    "source_population": "genuine Action Network OPEN historical V1 reconstruction",
+    "source_workflow_run_id": 35363701921,
+    "decided_nonpush_fit_rows": 5670,
+    "forecast_csv_sha256": {
+      "2023": "b89835c777fbef531afbdbadda3e07c6ac4da72b6a22178aa8dbc4e9ef29d4bd",
+      "2024": "cf9e31d0e80cc141e47db3c4f6d167e52f66302e8e0085c16d8e9bfa0bb98e12",
+      "2025": "6d2d8aaf95a549b1cc6841f23d49b07c3d9f9d38c1e7ee1be6242cced34d085a"
+    }
+  },
+  "direction_rule": {
+    "over": "p_over > 0.5",
+    "under": "p_over < 0.5",
+    "no_call": "p_over == 0.5"
+  },
+  "governance": {
+    "retrospective_accuracy_is_not_prospective_validation": true,
+    "no_edge_threshold": true,
+    "no_family_selection": true,
+    "immutable_after_recording": true,
+    "winner_model_mutated": false,
+    "published_v1_props_mutated": false
+  }
+}
