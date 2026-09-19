@@ -86,7 +86,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     env:
-      THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY || secrets.PROPLINE_API_KEY || secrets.SPORTSGAMEODDS_API_KEY }}
+      THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
       PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}
       SPORTSGAMEODDS_API_KEY: ${{ secrets.SPORTSGAMEODDS_API_KEY }}
       PROPS_BOOKMAKERS: ${{ vars.PROPS_BOOKMAKERS }}
