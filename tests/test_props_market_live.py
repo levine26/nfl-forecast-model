@@ -736,3 +736,13 @@ def test_live_workflow_does_not_cross_wire_provider_credentials():
     assert "PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}" in text
     assert "SPORTSGAMEODDS_API_KEY: ${{ secrets.SPORTSGAMEODDS_API_KEY }}" in text
     assert "secrets.THE_ODDS_API_KEY || secrets.PROPLINE_API_KEY" not in text
+
+
+def test_live_workflow_rebases_only_across_safe_challenger_output_races():
+    text = LIVE_WORKFLOW.read_text(encoding="utf-8")
+    assert "for publish_attempt in 1 2 3 4 5" in text
+    assert "challenger_outputs/*) ;;" in text
+    assert "safe_output_race=false" in text
+    assert "git rebase origin/main" in text
+    assert "safe output-only rebase conflicted; falling back to full regeneration" in text
+    assert "Any other intervening path remains unsafe" in text
