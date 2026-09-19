@@ -15,6 +15,9 @@ The grader reads only:
 The receipt must already contain lossless empirical V1 and Shadow A yardage distributions,
 source season/week, market line, Fair Lines, probabilities, intervals and point-in-time provenance.
 
+Before grading, the grader must verify the receipt's own `shadow_sha256`, the embedded distribution
+hashes, and the source forecast/manifest provenance-hash shapes. Corrupt or edited rows fail closed.
+
 The grader may not recreate a missing pregame forecast after kickoff.
 
 ## Outcome definition
