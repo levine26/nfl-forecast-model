@@ -1,7 +1,7 @@
 # LevLine Props 2.0 — Dynamic Role V2 Development Result
 
 Status: **RETROSPECTIVE DEVELOPMENT — PREREGISTERED CANDIDATE REJECTED**  
-Source workflow: `35381482900`  
+Source workflow: `35417823424`  
 Frozen contract: `levline-props-v2-dynamic-role-development-v0.2.0`  
 Production promotion authorized: **NO**
 
@@ -29,13 +29,8 @@ per-artifact directories.
 
 Canonical aggregate workflow completed successfully after the artifact-layout fix. Canonical aggregate artifact: `10577640488`.
 
-Primary artifact IDs:
-- 2023 route_only: `10564975561`
-- 2023 full: `10564227643`
-- 2024 route_only: `10565126428`
-- 2024 full: `10564822140`
-- 2025 route_only: `10563674812`
-- 2025 full: `10563659680`
+Canonical aggregate workflow: `35417823424`  
+Canonical aggregate artifact: `10577640488`
 
 ## Route-only V2
 
