@@ -114,3 +114,88 @@ def test_repository_frozen_priors_are_preregistered_and_valid():
         "alpha": 9.0,
         "beta": 1.0,
     }
+
+
+def _write_upstream_qb_fixture(tmp_path, *, primary_player_id="ATL-TUA"):
+    upstream = tmp_path / "upstream"
+    upstream.mkdir()
+    opportunity = {
+        "opportunity_projections": [
+            {
+                "metadata": {
+                    "game_id": "2026_02_CAR_ATL",
+                    "team": "ATL",
+                    "opponent": "CAR",
+                },
+                "marginals": {
+                    "primary_qb_player_id": primary_player_id,
+                    "qb_pass_attempts": {"mean": 31.5},
+                },
+            },
+            {
+                "metadata": {
+                    "game_id": "2026_02_CAR_ATL",
+                    "team": "CAR",
+                    "opponent": "ATL",
+                },
+                "marginals": {
+                    "primary_qb_player_id": "CAR-YOUNG",
+                    "qb_pass_attempts": {"mean": 32.0},
+                },
+            },
+        ]
+    }
+    (upstream / "opp.json").write_text(json.dumps(opportunity), encoding="utf-8")
+    (upstream / "upstream_slate.json").write_text(
+        json.dumps(
+            {
+                "games": [
+                    {
+                        "game_id": "2026_02_CAR_ATL",
+                        "files": {"opportunity": "opp.json"},
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    return upstream
+
+
+def test_qb_market_consistency_rejects_cooper_rush_market_when_upstream_still_tua(tmp_path):
+    module = _module()
+    upstream = _write_upstream_qb_fixture(tmp_path, primary_player_id="ATL-TUA")
+    market_rows = [
+        {
+            "game_id": "2026_02_CAR_ATL",
+            "team": "ATL",
+            "player_id": "ATL-RUSH",
+            "prop_type": "passing_yards",
+            "consensus_line": 184.5,
+            "sportsbook_count": 4,
+        }
+    ]
+
+    with pytest.raises(RuntimeError, match="contradicts upstream starter identity"):
+        module.validate_qb_market_opportunity_consistency(upstream, market_rows)
+
+
+def test_qb_market_consistency_accepts_market_for_resolved_primary_qb(tmp_path):
+    module = _module()
+    upstream = _write_upstream_qb_fixture(tmp_path, primary_player_id="ATL-RUSH")
+    market_rows = [
+        {
+            "game_id": "2026_02_CAR_ATL",
+            "team": "ATL",
+            "player_id": "ATL-RUSH",
+            "prop_type": "passing_yards",
+            "consensus_line": 184.5,
+            "sportsbook_count": 4,
+        }
+    ]
+
+    audit = module.validate_qb_market_opportunity_consistency(upstream, market_rows)
+
+    assert audit["status"] == "qualified"
+    assert audit["market_values_used_for_forecast"] is False
+    assert audit["team_markets_checked"] == 1
