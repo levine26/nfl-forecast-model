@@ -282,6 +282,46 @@ did not survive integration with the full pregame V1 opportunity distribution. D
 pools or variance against these evaluated outcomes. Permanent record:
 `SIGNED_RUSHING_PREGAME_DEVELOPMENT_RESULT.md`.
 
+## Opponent defensive efficiency — true-pregame passes
+
+PR #394 preserves V1 opportunity-count arrays and changes only the strictly lagged opponent-defense
+efficiency adjustment to yards/event means.
+
+### Rushing
+
+- N **941**, 230 games, 112 players;
+- V1 CRPS **18.19360**;
+- challenger CRPS **17.93138**;
+- improvement **−0.26222**;
+- game-clustered 95% interval **−0.34455 to −0.17871**;
+- V1 Fair-Line MAE **24.85228**;
+- challenger MAE **24.56642**;
+- improvement **−0.28587**;
+- coverage **62.17% → 62.91%**;
+- CRPS improves in **3/3 seasons**.
+
+Directional accuracy is diagnostic only and slightly declines **48.51% → 48.09%**.
+
+### Receiving
+
+- N **1,864**, 230 games, 256 players;
+- V1 CRPS **19.18091**;
+- challenger CRPS **18.77232**;
+- improvement **−0.40859**;
+- game-clustered 95% interval **−0.50123 to −0.32632**;
+- V1 Fair-Line MAE **26.87741**;
+- challenger MAE **26.31626**;
+- improvement **−0.56116**;
+- coverage **71.51% → 71.78%**;
+- CRPS improves in **2/3 seasons**.
+
+Directional accuracy is diagnostic only and slightly declines **50.13% → 49.81%**.
+
+**Disposition:** BOTH event-type mechanisms pass the frozen true-pregame gate and become eligible for
+a future prospectively frozen shadow challenger. This is not evidence of improved hit rate or betting
+edge, and no production promotion is authorized. Permanent record:
+`DEFENSIVE_EFFICIENCY_PREGAME_RESULT.md`.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
