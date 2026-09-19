@@ -74,12 +74,14 @@ def test_pushes_are_excluded_only_from_threshold_binary_metrics():
         "source_signal_state":"WATCH",
         "source_data_quality":{"state":"HIGH"},
     }
-    frame=module.grade_receipts(
+    frame,audit=module.grade_receipts(
         [receipt],
         completed_games={"G1"},
         actuals={("G1","P1","rushing_yards"):50.0},
+        participation={("G1","P1"):25},
     )
     assert len(frame)==1
+    assert audit["graded"]==1
     assert bool(frame.iloc[0]["push"]) is True
     assert np.isfinite(frame.iloc[0]["v1_crps"])
     assert np.isnan(frame.iloc[0]["v1_brier"])
@@ -124,3 +126,46 @@ def test_minimum_discussion_threshold_is_not_automatic_promotion():
     summary=module.summarize(frame,seed=1)
     assert summary["minimum_discussion_threshold"]["sample_size_conditions_met"] is True
     assert summary["automatic_promotion_authorized"] is False
+
+
+def test_zero_offense_snaps_are_void_but_positive_snaps_zero_events_grade_zero():
+    module=_module()
+    base={
+        "shadow_id":"s",
+        "source_season":2026,
+        "source_week":2,
+        "game_id":"G1",
+        "player_id":"P1",
+        "prop_type":"receiving_yards",
+        "market":{"line":10.5},
+        "v1":{
+            "fair_line":12.0,
+            "over_probability":0.55,
+            "prediction_interval":{"low":0.0,"high":30.0,"coverage":0.8},
+            "empirical_distribution":_snapshot([0,5,10,15]),
+        },
+        "shadow_a":{
+            "fair_line":11.0,
+            "over_probability":0.52,
+            "prediction_interval":{"low":0.0,"high":28.0,"coverage":0.8},
+            "empirical_distribution":_snapshot([0,4,9,14]),
+        },
+    }
+    frame,audit=module.grade_receipts(
+        [base],
+        completed_games={"G1"},
+        actuals={},
+        participation={("G1","P1"):0},
+    )
+    assert frame.empty
+    assert audit["zero_offense_snaps_void"]==1
+
+    frame,audit=module.grade_receipts(
+        [base],
+        completed_games={"G1"},
+        actuals={},
+        participation={("G1","P1"):12},
+    )
+    assert len(frame)==1
+    assert frame.iloc[0]["actual_result"]==0.0
+    assert audit["graded"]==1
