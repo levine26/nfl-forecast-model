@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
@@ -10,6 +11,8 @@ from nfl_forecast import props_market_live as live
 UTC = timezone.utc
 CAPTURE = datetime(2026, 9, 20, 16, 0, tzinfo=UTC)
 KICKOFF = "2026-09-20T20:05:00+00:00"
+ROOT = Path(__file__).resolve().parents[1]
+LIVE_WORKFLOW = ROOT / ".github" / "workflows" / "levline_markets_live.yml"
 
 
 def _player_state():
@@ -715,3 +718,10 @@ def test_live_fetch_audits_unmatched_provider_event_identity(monkeypatch):
             "reason": "unresolved_provider_team",
         }
     ]
+
+
+def test_live_workflow_separates_direct_and_workflow_run_concurrency():
+    text = LIVE_WORKFLOW.read_text(encoding="utf-8")
+    assert "'levline-props-live-media-trigger'" in text
+    assert "'levline-props-live-direct'" in text
+    assert "cancel-in-progress: true" in text
