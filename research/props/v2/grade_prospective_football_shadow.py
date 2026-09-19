@@ -67,7 +67,7 @@ def verify_receipt_integrity(row: Mapping[str,Any])->None:
     material.pop("shadow_sha256",None)
     if supplied!=_sha(material):
         raise ShadowGradingError("prospective receipt SHA-256 mismatch")
-    for field in ("source_forecast_sha256","source_manifest_sha256"):
+    for field in ("source_forecast_sha256","source_manifest_sha256","source_provenance_sha256"):
         value=str(row.get(field) or "")
         if len(value)!=64 or any(char not in "0123456789abcdef" for char in value.lower()):
             raise ShadowGradingError(f"invalid receipt provenance hash: {field}")
@@ -93,10 +93,16 @@ def verify_receipt_integrity(row: Mapping[str,Any])->None:
 
     source_run=str(row.get("source_workflow_run") or "").strip()
     source_sha=str(row.get("source_head_sha") or "").strip().lower()
+    trigger_sha=str(row.get("source_trigger_head_sha") or "").strip().lower()
     if not source_run:
         raise ShadowGradingError("prospective receipt missing source workflow run")
-    if len(source_sha) not in {40,64} or any(c not in "0123456789abcdef" for c in source_sha):
-        raise ShadowGradingError("prospective receipt has invalid source head SHA")
+    for label,value in (("source head",source_sha),("source trigger head",trigger_sha)):
+        if len(value) not in {40,64} or any(c not in "0123456789abcdef" for c in value):
+            raise ShadowGradingError(f"prospective receipt has invalid {label} SHA")
+    if not str(row.get("source_market_provider") or "").strip():
+        raise ShadowGradingError("prospective receipt missing source market provider")
+    if not str(row.get("source_market_credential_mode") or "").strip():
+        raise ShadowGradingError("prospective receipt missing source market credential mode")
 
 
 def read_receipts(path: Path)->list[dict[str,Any]]:
