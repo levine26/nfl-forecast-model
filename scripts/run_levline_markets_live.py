@@ -21,7 +21,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from nfl_forecast.props_publication import append_jsonl_immutable, read_jsonl  # noqa: E402
+from nfl_forecast.props_publication import append_jsonl_immutable_sharded, read_jsonl  # noqa: E402
 
 RESEARCH_LABEL = "LEVLINE PROPS — RESEARCH BETA"
 
@@ -227,7 +227,7 @@ def main() -> int:
     if len(receipts) != len(forecasts):
         raise RuntimeError("live Props immutable receipt count does not reconcile")
     permanent_ledger = args.output_root / "history" / "forecast_originals.jsonl"
-    append_jsonl_immutable(permanent_ledger, receipts, identity_key="forecast_id")
+    append_jsonl_immutable_sharded(permanent_ledger, receipts, identity_key="forecast_id")
 
     current_forecasts = args.output_root / "forecasts.json"
     current_public = args.output_root / "public_props.json"
