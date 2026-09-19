@@ -21,8 +21,10 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from nfl_forecast.injuries import fetch_nfl_injuries  # noqa: E402
 from nfl_forecast.props_contextual_intelligence import (  # noqa: E402
+    fetch_live_qb_starter_reports,
     load_levline_media_payload,
     resolve_primary_qbs_from_levline_media,
+    resolve_primary_qbs_from_live_reports,
 )
 from nfl_forecast.props_player_sources import (  # noqa: E402
     load_offensive_props_sources,
@@ -234,7 +236,15 @@ def main() -> int:
     parser.add_argument(
         "--skip-levline-media",
         action="store_true",
-        help="Disable the shared LevLine media handoff for controlled/offline research.",
+        help="Disable the persisted shared LevLine media handoff for controlled/offline research.",
+    )
+    parser.add_argument(
+        "--skip-live-starter-reporting",
+        action="store_true",
+        help=(
+            "Disable fresh QB starter reporting through LevLine's Google/Bing media source stack "
+            "for controlled/offline research."
+        ),
     )
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--cache-dir", default=".cache/nflreadpy")
@@ -270,6 +280,28 @@ def main() -> int:
     props_pbp, pbp_normalization_audit = normalize_nflverse_scramble_semantics(
         sources.pbp
     )
+
+    live_starter_reports = None
+    live_starter_capture_audit = {
+        "status": "skipped" if args.skip_live_starter_reporting else "not_attempted",
+        "error": None,
+    }
+    if not args.skip_live_starter_reporting:
+        try:
+            live_starter_reports, reporting_audit = fetch_live_qb_starter_reports(
+                sources.schedules,
+                season=args.season,
+                week=args.week,
+            )
+            live_starter_capture_audit = {
+                **reporting_audit,
+                "error": None,
+            }
+        except Exception as exc:
+            live_starter_capture_audit = {
+                "status": "unavailable_fail_closed",
+                "error": f"{type(exc).__name__}: {str(exc)[:240]}",
+            }
 
     availability = None
     availability_audit = {
@@ -457,6 +489,20 @@ def main() -> int:
                 game_id=game_id,
                 forecast_timestamp=forecast_timestamp,
             )
+        if args.skip_live_starter_reporting:
+            live_report_qbs = {}
+            live_report_qb_audit = {
+                "status": "skipped",
+                "game_id": game_id,
+                "teams_resolved": 0,
+            }
+        else:
+            live_report_qbs, live_report_qb_audit = resolve_primary_qbs_from_live_reports(
+                live_starter_reports,
+                player_state,
+                game_id=game_id,
+                forecast_timestamp=forecast_timestamp,
+            )
 
         explicit_scoring = game_config.get("scoring_context_by_team")
         if explicit_scoring is not None:
@@ -497,6 +543,7 @@ def main() -> int:
             raise ValueError("primary_qb_by_team must be an object when supplied")
         qb_overrides = dict(depth_qbs)
         qb_overrides.update(media_qbs)
+        qb_overrides.update(live_report_qbs)
         qb_overrides.update(explicit_qb_overrides or {})
 
         package = build_game_upstream_package(
@@ -530,6 +577,7 @@ def main() -> int:
                 "package": package,
                 "depth_qb_audit": depth_qb_audit,
                 "media_qb_audit": media_qb_audit,
+                "live_report_qb_audit": live_report_qb_audit,
                 "empirical_scoring_audit": empirical_scoring_audit,
                 "scoring_context_source": scoring_source,
                 "residual_efficiency_source": residual_source,
@@ -622,6 +670,10 @@ def main() -> int:
                             if args.skip_levline_media
                             else str(args.levline_media)
                         ),
+                        "levline_live_starter_reporting_capture":
+                            live_starter_capture_audit,
+                        "levline_live_starter_primary_qb":
+                            build["live_report_qb_audit"],
                         "player_state": state_build.audit,
                         "upstream": package.audit,
                         "empirical_prior_fit": fitted_empirical["audit"],
