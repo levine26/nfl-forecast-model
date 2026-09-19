@@ -21,7 +21,9 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from nfl_forecast.injuries import fetch_nfl_injuries  # noqa: E402
 from nfl_forecast.props_contextual_intelligence import (  # noqa: E402
+    load_levline_game_previews,
     load_levline_media_payload,
+    resolve_primary_qbs_from_current_reporting,
     resolve_primary_qbs_from_levline_media,
 )
 from nfl_forecast.props_player_sources import (  # noqa: E402
@@ -223,18 +225,32 @@ def main() -> int:
         help="Optional explicit scoring/residual context; otherwise derive strictly lagged context.",
     )
     parser.add_argument(
+        "--levline-current-reporting",
+        type=Path,
+        default=ROOT / "outputs" / "game_previews.json",
+        help=(
+            "Sunday Signal game previews containing the persisted current_reported_sources "
+            "handoff from LevLine's ranked media pass."
+        ),
+    )
+    parser.add_argument(
         "--levline-media",
         type=Path,
         default=ROOT / "outputs" / "copilot_media_reads.json",
         help=(
-            "Validated Sunday Signal media artifact used for point-in-time starter-QB "
-            "intelligence. Stale/missing/ambiguous entries fail closed to the depth-chart layer."
+            "Validated provider/Copilot media artifact retained as a secondary starter-QB "
+            "fallback. Stale/missing/ambiguous entries fail closed."
         ),
+    )
+    parser.add_argument(
+        "--skip-levline-current-reporting",
+        action="store_true",
+        help="Disable LevLine current-reporting starter handoff for controlled/offline research.",
     )
     parser.add_argument(
         "--skip-levline-media",
         action="store_true",
-        help="Disable the shared LevLine media handoff for controlled/offline research.",
+        help="Disable the provider/Copilot media fallback for controlled/offline research.",
     )
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--cache-dir", default=".cache/nflreadpy")
@@ -255,6 +271,11 @@ def main() -> int:
     seasons = list(range(int(args.history_start_season), int(args.season) + 1))
     priors = _load(args.priors)
     scoring = _load(args.scoring_context) if args.scoring_context is not None else {}
+    levline_current_reporting = (
+        None
+        if args.skip_levline_current_reporting
+        else load_levline_game_previews(args.levline_current_reporting)
+    )
     levline_media = (
         None
         if args.skip_levline_media
@@ -443,6 +464,23 @@ def main() -> int:
             game_id=game_id,
             forecast_timestamp=forecast_timestamp,
         )
+        if args.skip_levline_current_reporting:
+            current_reporting_qbs = {}
+            current_reporting_qb_audit = {
+                "status": "skipped",
+                "game_id": game_id,
+                "teams_resolved": 0,
+            }
+        else:
+            current_reporting_qbs, current_reporting_qb_audit = (
+                resolve_primary_qbs_from_current_reporting(
+                    levline_current_reporting,
+                    player_state,
+                    game_id=game_id,
+                    forecast_timestamp=forecast_timestamp,
+                )
+            )
+
         if args.skip_levline_media:
             media_qbs = {}
             media_qb_audit = {
@@ -497,6 +535,8 @@ def main() -> int:
             raise ValueError("primary_qb_by_team must be an object when supplied")
         qb_overrides = dict(depth_qbs)
         qb_overrides.update(media_qbs)
+        # Fresh deterministic LevLine reporting outranks the optional provider overlay.
+        qb_overrides.update(current_reporting_qbs)
         qb_overrides.update(explicit_qb_overrides or {})
 
         package = build_game_upstream_package(
@@ -529,6 +569,7 @@ def main() -> int:
                 "kickoff_utc": kickoff,
                 "package": package,
                 "depth_qb_audit": depth_qb_audit,
+                "current_reporting_qb_audit": current_reporting_qb_audit,
                 "media_qb_audit": media_qb_audit,
                 "empirical_scoring_audit": empirical_scoring_audit,
                 "scoring_context_source": scoring_source,
@@ -616,6 +657,13 @@ def main() -> int:
                         "availability_prior_fit": availability_prior_fit_audit,
                         "availability_priors_applied": availability_priors,
                         "depth_chart_primary_qb": build["depth_qb_audit"],
+                        "levline_current_reporting_primary_qb":
+                            build["current_reporting_qb_audit"],
+                        "levline_current_reporting_source_file": (
+                            None
+                            if args.skip_levline_current_reporting
+                            else str(args.levline_current_reporting)
+                        ),
                         "levline_media_primary_qb": build["media_qb_audit"],
                         "levline_media_source_file": (
                             None

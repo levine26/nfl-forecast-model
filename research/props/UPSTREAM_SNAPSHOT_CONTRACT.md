@@ -62,9 +62,13 @@ An optional scoring-context file may override these quantities for a controlled 
 
 For current QB identity, the operator first consumes timestamped 2025+ nflverse depth charts at or before the forecast timestamp. The depth fallback is availability-aware: QBs already marked `OUT`, inactive, or reserve/unavailable are excluded before rank selection. `QUESTIONABLE` and `DOUBTFUL` remain probabilistic availability states; they are not converted into a replacement starter unless fresher qualified reporting explicitly identifies one.
 
-The builder then consumes the already-validated Sunday Signal / LevLine shared media artifact (`outputs/copilot_media_reads.json` by default). This is the same researched reporting surface used by LevLine editorial intelligence; Props does not run a second news crawler. A fresh, game-matched, explicit starter claim may override the depth-chart fallback only when the named quarterback resolves uniquely to the canonical game roster, is not `OUT`, and the reporting passes the contextual adapter's corroboration rules. Stale, future, ambiguous, conditional, or missing reporting does not override anything. The frozen upstream audit records both depth-chart and shared-media resolution.
+The builder then consumes two already-validated Sunday Signal / LevLine reporting surfaces; Props does not run a second news crawler.
 
-An explicit preregistered `primary_qb_by_team` entry with point-in-time provenance remains the final override for controlled research. The precedence is therefore: availability-aware depth chart → qualified shared LevLine media → explicit preregistered override.
+First, `outputs/game_previews.json` supplies `current_reported_sources`, the separately persisted result of LevLine's current ranked Google/Bing/team-source media pass before any provider overlay. A source-qualified, timestamped starter headline may override the depth-chart fallback only when the named quarterback resolves uniquely to the canonical game roster and is not `OUT`. Older conflicting starter claims yield to the newest qualified current report; an exact-time conflict fails closed.
+
+Second, `outputs/copilot_media_reads.json` remains a secondary provider/Copilot fallback. Its prose must itself be fresh and explicitly identify the starter. Stale, future, ambiguous, conditional, or missing reporting from either layer does not override anything. The frozen upstream audit records depth-chart, current-reporting, and provider-media resolution independently.
+
+An explicit preregistered `primary_qb_by_team` entry with point-in-time provenance remains the final override for controlled research. The automatic precedence is therefore: availability-aware depth chart → qualified provider fallback → qualified current LevLine reporting; the explicit preregistered override remains final.
 
 ## Operator flow
 
@@ -97,9 +101,9 @@ The script:
 1. loads nflverse schedule/PBP/snap/current-roster sources through the existing Props source adapter;
 2. loads the nflverse stable player identity table;
 3. attempts to capture the current NFL injury report unless `--skip-injury-fetch` is specified;
-4. loads the validated shared LevLine media artifact unless `--skip-levline-media` is specified;
+4. loads LevLine's persisted current-reporting snapshot unless `--skip-levline-current-reporting` is specified and loads the provider/Copilot fallback unless `--skip-levline-media` is specified;
 5. timestamps the forecast only after live source requests complete;
-6. builds canonical current player state, resolves an availability-aware QB depth fallback, and applies only qualified fresh shared-media starter evidence;
+6. builds canonical current player state, resolves an availability-aware QB depth fallback, and applies only qualified point-in-time starter evidence from the shared LevLine reporting layers;
 7. derives strictly lagged opportunity/efficiency history;
 8. fits efficiency priors only through 2025 and derives current scoring-volume state from strictly prior weeks unless explicit preregistered overrides are supplied;
 9. executes the actual opportunity and efficiency/TD lane interfaces;
