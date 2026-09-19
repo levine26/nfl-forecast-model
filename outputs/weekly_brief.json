@@ -1,10 +1,10 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_02_MIN_CHI",
+      "game_id": "2026_02_IND_KC",
       "largest_driver": "Market movement",
-      "pick": "CHI",
-      "pick_delta_pp": -1.5004666804369293
+      "pick": "KC",
+      "pick_delta_pp": 0.53428965575536
     },
     {
       "game_id": "2026_01_NE_SEA",
@@ -13,13 +13,13 @@
       "pick_delta_pp": -1.260265225511148e-08
     },
     {
-      "game_id": "2026_02_CAR_ATL",
+      "game_id": "2026_01_BAL_IND",
       "largest_driver": "No material input move",
-      "pick": "CAR",
-      "pick_delta_pp": -1.6115997425458772e-10
+      "pick": "BAL",
+      "pick_delta_pp": -0.0
     }
   ],
-  "generated_utc": "2026-09-19T16:31:04.535229+00:00",
+  "generated_utc": "2026-09-19T16:59:36.121185+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
@@ -28,7 +28,16 @@
       "pick": "CAR",
       "pick_prob": 0.6339604069576155,
       "projected_score": "ATL 24.2 \u2013 CAR 20.7",
-      "pure_market_gap_pp": 19.780110397043256
+      "pure_market_gap_pp": 19.780110397043266
+    },
+    {
+      "confidence": "Solid",
+      "game_id": "2026_02_MIN_CHI",
+      "matchup": "MIN @ CHI",
+      "pick": "CHI",
+      "pick_prob": 0.6759943365283947,
+      "projected_score": "CHI 23.1 \u2013 MIN 22.2",
+      "pure_market_gap_pp": 14.240797848516063
     },
     {
       "confidence": "Solid",
@@ -38,15 +47,6 @@
       "pick_prob": 0.6687813236929755,
       "projected_score": "DAL 22.5 \u2013 WAS 21.3",
       "pure_market_gap_pp": 12.45065107952673
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_02_MIN_CHI",
-      "matchup": "MIN @ CHI",
-      "pick": "CHI",
-      "pick_prob": 0.6537491302503929,
-      "projected_score": "CHI 23.1 \u2013 MIN 22.2",
-      "pure_market_gap_pp": 12.348903309393178
     }
   ],
   "most_uncertain": [
