@@ -442,7 +442,7 @@ auto-authorizes promotion.
 
 Secondary **Shadow B (defense + Dynamic Role V0.1 full)** is now implemented by **PR #405**, merged to `main` with a separate immutable listener and separate evidence branch. Shadow B receipts accumulated so far: **0**. It replays V1, reconstructs the captured V1 opportunity distributions before applying the exact Dynamic Role V0.1 full transform, then applies the exact #394 defensive-efficiency overlay. No outcome before Shadow B's own first immutable receipt may count toward its prospective sample.
 
-Shadow B grading is frozen separately in **PR #409** before the first B receipt/outcome. Its primary comparison is B vs matched Shadow A; B vs V1 is supporting context only. Unmatched B receipts cannot enter the B-vs-A minimum-evidence threshold.
+Shadow B grading is frozen separately in **PR #409** before the first B receipt/outcome. Its primary comparison is B vs matched Shadow A; B vs V1 is supporting context only. Unmatched B receipts cannot enter the B-vs-A minimum-evidence threshold. Before any promotion discussion, the matched B-vs-A sample must meet the frozen size thresholds and show no mean degradation versus Shadow A on CRPS, Brier score, log loss, or 80% interval score.
 
 ## Prospective market archive activation status
 
