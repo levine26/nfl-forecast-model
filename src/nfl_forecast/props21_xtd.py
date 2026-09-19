@@ -278,10 +278,12 @@ def build_xtd_from_manifest(manifest: Mapping[str, Any]) -> dict[str, Any]:
             raise ValueError("player has no team scoring environment")
         for item in (row, team_map[key[:2]]):
             _season(item.get("prior_model_trained_through_season"))
-            if _time(item.get("feature_data_horizon"), "feature_data_horizon") > forecast:
-                raise ValueError("feature horizon after forecast")
-            if _time(item.get("forecast_timestamp"), "row forecast") != forecast:
-                raise ValueError("row forecast must match manifest forecast")
+            row_forecast = _time(item.get("forecast_timestamp"), "row forecast")
+            feature_horizon = _time(item.get("feature_data_horizon"), "feature_data_horizon")
+            if feature_horizon > row_forecast:
+                raise ValueError("feature horizon after row forecast")
+            if row_forecast > forecast:
+                raise ValueError("row forecast after manifest forecast")
             if _time(item.get("kickoff_timestamp"), "row kickoff") != kickoff:
                 raise ValueError("row kickoff must match manifest kickoff")
         pos = str(row.get("position"))

@@ -1,7 +1,8 @@
 import pytest
 
 from nfl_forecast.props21_xtd import (
-    fit_xtd_context_model, project_context_xtd, td_debt_diagnostic,
+    build_xtd_from_manifest, fit_xtd_context_model, project_context_xtd,
+    td_debt_diagnostic,
 )
 
 
@@ -59,3 +60,49 @@ def test_current_game_outcomes_and_due_inputs_are_prohibited():
                               forecast_timestamp="2026-09-19T20:00:00+00:00")
     assert debt["td_debt_diagnostic"] == 3
     assert debt["used_in_prediction"] is False
+
+
+def _live_manifest(row_forecast="2026-09-19T19:00:00+00:00"):
+    kickoff = "2026-09-20T17:00:00+00:00"
+    common = {
+        "game_id": "g",
+        "team": "ATL",
+        "prior_model_trained_through_season": 2025,
+        "feature_data_horizon": "2026-09-19T18:00:00+00:00",
+        "forecast_timestamp": row_forecast,
+        "kickoff_timestamp": kickoff,
+    }
+    return {
+        "game_id": "g",
+        "forecast_timestamp_utc": "2026-09-19T20:00:00+00:00",
+        "kickoff_utc": kickoff,
+        "efficiency_player_parameters": [{
+            **common,
+            "player_id": "p",
+            "position": "RB",
+            "expected_passing_tds": 0.0,
+            "expected_receiving_tds": 0.1,
+            "expected_rushing_tds": 0.2,
+            "expected_pass_attempts": 0.0,
+            "expected_targets": 4.0,
+            "expected_carries": 10.0,
+            "expected_red_zone_targets": 1.0,
+            "expected_goal_line_carries": 2.0,
+        }],
+        "team_td_parameters": [{
+            **common,
+            "expected_passing_td_opportunities": 0.1,
+            "expected_rushing_td_opportunities": 0.2,
+        }],
+    }
+
+
+def test_manifest_adapter_accepts_point_in_time_rows_older_than_manifest_forecast():
+    result = build_xtd_from_manifest(_live_manifest())
+    assert result["audit"]["player_count"] == 1
+    assert result["players"][0]["player_id"] == "p"
+
+
+def test_manifest_adapter_rejects_rows_newer_than_manifest_forecast():
+    with pytest.raises(ValueError, match="row forecast after manifest forecast"):
+        build_xtd_from_manifest(_live_manifest("2026-09-19T20:01:00+00:00"))
