@@ -220,3 +220,52 @@ def test_receipt_fails_closed_after_kickoff():
         source=source,shadow=shadow,manifest=manifest,player_audit={"P1":audit},
         frozen=frozen,recorded_utc=after,source_workflow_run="1",source_head_sha="b"*40,
     ) is None
+
+
+def test_marketless_v1_row_is_ineligible_not_fatal():
+    module=_module()
+    frozen=module.load_frozen_coefficients(FROZEN)
+    source={
+        "forecast_id":"f-no-market",
+        "game_id":"G1",
+        "player_id":"P1",
+        "player":"Player",
+        "position":"RB",
+        "team":"ARI",
+        "opponent":"LAR",
+        "prop_type":"rushing_yards",
+        "kickoff_utc":"2026-09-20T20:00:00+00:00",
+        "forecast_timestamp_utc":"2026-09-20T18:00:00+00:00",
+        "market":{
+            "captured_utc":None,
+            "line":None,
+            "no_vig_over_probability":None,
+        },
+        "model":{
+            "version":"V1",
+            "fair_line":62.0,
+            "over_probability":None,
+            "under_probability":None,
+        },
+    }
+    shadow=json.loads(json.dumps(source))
+    shadow["model"]["version"]=module.SHADOW_VERSION
+    audit={
+        "base_rushing_yards_per_carry":4.2,
+        "shadow_rushing_yards_per_carry":4.4,
+        "rushing_defense_state":{"opponent_defense_delta":0.2},
+        "base_receiving_yards_per_reception":10.0,
+        "shadow_receiving_yards_per_reception":10.1,
+        "receiving_defense_state":{"opponent_defense_delta":0.1},
+    }
+    receipt=module.build_receipt(
+        source=source,
+        shadow=shadow,
+        manifest={"manifest_sha256":"a"*64},
+        player_audit={"P1":audit},
+        frozen=frozen,
+        recorded_utc=datetime(2026,9,20,19,0,tzinfo=timezone.utc),
+        source_workflow_run="1",
+        source_head_sha="b"*40,
+    )
+    assert receipt is None
