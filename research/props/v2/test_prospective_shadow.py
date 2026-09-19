@@ -184,6 +184,7 @@ def test_exact_source_listener_has_versioned_no_backfill_gate():
     assert provenance_marker in text
     assert "source_provenance.json" in text
     assert "live source provenance trigger SHA mismatch" in text
+    assert "live source market snapshot provenance mismatch" in text
     assert "source SHA predates the live-source-provenance market shadow listener" in text
 
 
