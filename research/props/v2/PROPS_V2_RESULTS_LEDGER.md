@@ -322,6 +322,36 @@ a future prospectively frozen shadow challenger. This is not evidence of improve
 edge, and no production promotion is authorized. Permanent record:
 `DEFENSIVE_EFFICIENCY_PREGAME_RESULT.md`.
 
+## Defensive-efficiency prospective coefficient freeze
+
+PR #396 completed the final pre-2026 coefficient freeze for the true-pregame defensive-efficiency
+candidate using football event data through **2025 only**.
+
+Frozen rushing fit:
+- standardized beta **0.10603753**;
+- intercept **−0.12662088**;
+- x mean **0.00796987**;
+- x sd **0.35506207**;
+- training rows **13,243**.
+
+Frozen receiving fit:
+- standardized beta **0.21008098**;
+- intercept **−0.33430875**;
+- x mean **−0.09374150**;
+- x sd **0.63468582**;
+- training rows **22,925**.
+
+Fit population: **180,791** event rows / **36,168** component rows.
+
+Firewall audit:
+- completed 2026 outcomes used: **0**;
+- prop outcomes used: **0**;
+- sportsbook results used: **0**;
+- production authorization: **false**.
+
+**Disposition:** coefficients are eligible only for untouched prospective shadow once the validated
+pregame mechanism PR is merged. They may not be changed because of 2026 performance.
+
 ## Prospective shadow
 
 Clean firewall-compliant implementation: **PR #379**.
