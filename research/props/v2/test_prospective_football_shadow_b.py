@@ -300,7 +300,9 @@ def test_shadow_b_receipt_uses_explicit_capture_timestamps():
         capture_started_utc=started,
         recorded_utc=recorded,
         source_workflow_run="1",
-        source_head_sha="b"*40,
+        source_head_sha="b"*40,source_trigger_head_sha="c"*40,
+        source_market_provider="the_odds_api",source_market_credential_mode="configured",
+        source_provenance_sha256="d"*64,
         source_season=2026,
         source_week=2,
         v1_samples=np.array([40,50,60,70],dtype=float),
@@ -312,6 +314,11 @@ def test_shadow_b_receipt_uses_explicit_capture_timestamps():
     assert receipt["recorded_utc"]==recorded.isoformat()
     assert receipt["source_season"]==2026
     assert receipt["source_week"]==2
+    assert receipt["source_head_sha"]=="b"*40
+    assert receipt["source_trigger_head_sha"]=="c"*40
+    assert receipt["source_market_provider"]=="the_odds_api"
+    assert receipt["source_market_credential_mode"]=="configured"
+    assert receipt["source_provenance_sha256"]=="d"*64
     assert receipt["governance"]["production_authorized"] is False
 
 
