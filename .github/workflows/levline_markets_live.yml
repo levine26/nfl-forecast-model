@@ -50,7 +50,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('levline-props-live-pr-{0}', github.event.pull_request.number) || 'levline-props-live' }}
+  group: ${{ github.event_name == 'pull_request' && format('levline-props-live-pr-{0}', github.event.pull_request.number) || github.event_name == 'workflow_run' && 'levline-props-live-media-trigger' || 'levline-props-live-direct' }}
   cancel-in-progress: true
 
 jobs:
