@@ -67,8 +67,6 @@ jobs:
           assert d["completed_2026_outcomes_used"] == 0
           eligible=d["source_qualified_evaluation_seasons"]
           excluded=d["source_excluded_seasons"]
-          assert len(eligible) >= 2
-          assert set(map(str,eligible)) == set(d["by_season"])
           assert set(eligible).issubset({2023,2024,2025})
           assert set(excluded).issubset({"2023","2024","2025"})
           for season,reason in excluded.items():
@@ -76,8 +74,17 @@ jobs:
                   "no_prior_training_examples",
                   "no_target_evaluation_examples",
               }
-          assert d["aggregate"]["n"] > 0
+          if d.get("status")=="BLOCKED_SOURCE_COVERAGE":
+              assert len(eligible) < 2
+              assert d["aggregate"] is None
+              assert d["development_gate"]["passed"] is False
+              assert d["development_gate"]["reason"]=="insufficient_source_qualified_seasons"
+          else:
+              assert len(eligible) >= 2
+              assert set(map(str,eligible)) == set(d["by_season"])
+              assert d["aggregate"]["n"] > 0
           print(json.dumps({
+              "status":d.get("status","EVALUATED"),
               "aggregate":d["aggregate"],
               "development_gate":d["development_gate"],
           },indent=2))
