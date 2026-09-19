@@ -278,16 +278,22 @@ def cluster_ci(frame: pd.DataFrame,column:str,*,seed:int,replicates:int=BOOTSTRA
     usable=frame[["game_id",column]].copy()
     usable[column]=pd.to_numeric(usable[column],errors="coerce")
     usable=usable[usable[column].notna()]
-    games=np.asarray(sorted(usable["game_id"].astype(str).unique()))
-    if len(games)<2:
+    grouped=(
+        usable.assign(game_id=usable["game_id"].astype(str))
+        .groupby("game_id",sort=True)[column]
+        .agg(["sum","count"])
+    )
+    if len(grouped)<2:
         return [None,None]
-    grouped={g:usable[usable["game_id"].astype(str).eq(g)] for g in games}
+    sums=grouped["sum"].to_numpy(dtype=float)
+    counts=grouped["count"].to_numpy(dtype=float)
     rng=np.random.default_rng(seed)
     values=np.empty(int(replicates),dtype=float)
+    n_games=len(grouped)
     for i in range(int(replicates)):
-        sampled=rng.choice(games,size=len(games),replace=True)
-        boot=pd.concat([grouped[g] for g in sampled],ignore_index=True)
-        values[i]=float(boot[column].mean())
+        sampled=rng.integers(0,n_games,size=n_games)
+        denominator=float(counts[sampled].sum())
+        values[i]=float(sums[sampled].sum()/denominator)
     return [float(np.quantile(values,.025)),float(np.quantile(values,.975))]
 
 
