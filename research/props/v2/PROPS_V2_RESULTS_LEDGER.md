@@ -403,14 +403,45 @@ This is a full pregame distribution/Fair-Line improvement, not a demonstrated di
 betting-edge improvement. No production promotion. Permanent record:
 `DEFENSIVE_EFFICIENCY_PREGAME_RESULT.md`.
 
-## Prospective shadow
+## Prospective market-anchor shadow
 
 Clean firewall-compliant implementation: **PR #379**.
 Frozen candidates:
 - market-only no-vig probability;
 - market + frozen pre-2026 V1 residual.
 
+This is a calibration/market-anchor experiment and is distinct from the football-mechanism shadow.
 No completed 2026 outcome may change the candidate. Grading is evaluation-only.
+
+## Prospective football Shadow A
+
+Primary candidate: **P2-SHADOW-A-DEFENSE**.
+
+Capture listener: **PR #402 — in validation, not yet merged**.
+It replays the exact V1 live manifest, applies only the frozen rushing/receiving defensive-efficiency
+residuals, preserves every V1 opportunity array, uses the exact #394 mechanism RNG identity, and
+writes immutable pregame receipts off `main`.
+
+Each receipt is designed to preserve:
+- season/week and kickoff/forecast/market timestamps;
+- source workflow/head/forecast/manifest hashes;
+- V1 signal + quality state;
+- market line and no-vig probability;
+- V1 and Shadow A Fair Lines/probabilities;
+- lossless empirical V1 and Shadow A yardage PMFs for future CRPS;
+- frozen defense state and coefficients;
+- explicit zero-outcome-read / no-production governance.
+
+Prospective football Shadow A receipts accumulated so far: **0**.
+No pre-listener live run may be backfilled as prospective.
+
+Grading implementation: **PR #406 — frozen before first grade, dependent on #402**.
+The grader uses finalized outcomes only, requires positive offensive snaps, preserves sportsbook void
+semantics, computes CRPS/MAE/Brier/log loss/fixed-80%-interval/directional metrics, and never
+auto-authorizes promotion.
+
+Secondary **Shadow B (defense + Dynamic Role V0.1 full)** remains **unimplemented with zero receipts**.
+No outcome before Shadow B's own first immutable receipt may count toward its prospective sample.
 
 ## Prospective market archive activation status
 
