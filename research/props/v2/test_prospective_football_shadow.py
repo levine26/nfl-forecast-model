@@ -220,6 +220,7 @@ def test_receipt_fails_closed_after_kickoff():
         shadow_samples=np.array([42,52,62,72,82],dtype=float),
     )
     assert receipt is not None
+    assert receipt["recorded_utc"]==before.isoformat()
     assert receipt["governance"]["production_authorized"] is False
     assert receipt["source_signal_state"]=="WATCH"
     assert receipt["source_data_quality"]["state"]=="HIGH"
