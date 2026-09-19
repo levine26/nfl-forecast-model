@@ -213,6 +213,35 @@ def _completed_games(schedule: pd.DataFrame)->set[str]:
     return set(work.loc[complete,"game_id"].astype(str))
 
 
+def complete_outcome_pbp_games(pbp: pd.DataFrame)->tuple[set[str],dict[str,Any]]:
+    if "game_id" not in pbp.columns:
+        raise ShadowGradingError("PBP missing game_id")
+    work=pbp[pbp["game_id"].notna()].copy()
+    work["game_id"]=work["game_id"].astype(str)
+    if work.empty:
+        return set(),{"mode":"empty","game_count":0}
+
+    if "game_seconds_remaining" in work.columns:
+        work["_seconds"]=pd.to_numeric(work["game_seconds_remaining"],errors="coerce")
+        complete=(
+            work.groupby("game_id",sort=False)["_seconds"]
+            .min()
+            .loc[lambda values: values.le(0.0)]
+            .index.astype(str)
+        )
+        games=set(complete)
+        return games,{
+            "mode":"game_seconds_remaining_zero",
+            "game_count":int(len(games)),
+        }
+
+    games=set(work["game_id"].astype(str))
+    return games,{
+        "mode":"game_presence_fallback",
+        "game_count":int(len(games)),
+    }
+
+
 def offense_participation(snap_counts: pd.DataFrame)->tuple[dict[tuple[str,str],int],dict[str,Any]]:
     snap_col=next(
         (c for c in ("offense_snaps","offensive_snaps","off_snaps") if c in snap_counts.columns),
@@ -518,9 +547,7 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
         raise ShadowGradingError(f"snap identity normalization failed: {snap_identity_audit}")
     participation,participation_audit=offense_participation(normalized_snaps)
     completed=_completed_games(schedules)
-    if "game_id" not in pbp.columns:
-        raise ShadowGradingError("PBP missing game_id")
-    outcome_pbp_games=set(pbp.loc[pbp["game_id"].notna(),"game_id"].astype(str))
+    outcome_pbp_games,outcome_pbp_audit=complete_outcome_pbp_games(pbp)
     actuals=actual_player_yards(pbp)
     graded,eligibility_audit=grade_receipts(
         receipts,
@@ -545,6 +572,7 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
                 "pbp_normalization":scramble_audit,
                 "snap_identity":snap_identity_audit,
                 "participation":participation_audit,
+                "outcome_pbp":outcome_pbp_audit,
             },
             "automatic_promotion_authorized":False,
         }
@@ -572,6 +600,7 @@ def run(ledger:Path,output_dir:Path)->dict[str,Any]:
             "pbp_normalization":scramble_audit,
             "snap_identity":snap_identity_audit,
             "participation":participation_audit,
+            "outcome_pbp":outcome_pbp_audit,
         },
         "grading_policy":{
             "push_policy":"exclude pushes from Brier/log loss/directional accuracy; retain for CRPS/MAE/interval metrics",
