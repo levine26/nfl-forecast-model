@@ -379,3 +379,31 @@ def test_shadow_overlay_uses_retrospective_candidate_rng_namespace():
     )
     assert module.RETROSPECTIVE_MECHANISM_VERSION=="levline-props-v2-defensive-efficiency-pregame-v0.1.0"
     assert np.array_equal(shadow.player_stats["P1"]["rushing_yards"],expected)
+
+
+def test_v1_replay_verification_is_strict():
+    module=_module()
+    source={
+        "forecast_id":"fid",
+        "market":{"line":60.5,"no_vig_over_probability":0.51},
+        "model":{
+            "version":"V1",
+            "fair_line":62.0,
+            "over_probability":0.54,
+            "under_probability":0.46,
+            "standard_deviation":20.0,
+            "prediction_interval":{"low":30.0,"high":90.0,"coverage":0.80},
+        },
+    }
+    replay=json.loads(json.dumps(source))
+    module._assert_replay_matches_source(replay,source)
+
+    drift=json.loads(json.dumps(source))
+    drift["model"]["prediction_interval"]["high"]=90.01
+    with pytest.raises(module.FootballShadowError,match="prediction_interval.high"):
+        module._assert_replay_matches_source(drift,source)
+
+    drift=json.loads(json.dumps(source))
+    drift["market"]["line"]=61.5
+    with pytest.raises(module.FootballShadowError,match="market.line"):
+        module._assert_replay_matches_source(drift,source)
