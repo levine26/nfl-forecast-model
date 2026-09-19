@@ -1,0 +1,278 @@
+name: LevLine 4 official club nflverse metadata consistency V1
+
+on:
+  pull_request:
+    paths:
+      - 'research/levline4_2026_official_club_nflverse_metadata_consistency_v1_contract.json'
+      - 'research/levline4_2026_official_club_nflverse_metadata_consistency_v1.py'
+      - 'research/test_levline4_2026_official_club_nflverse_metadata_consistency_v1.py'
+      - 'research/levline4_2026_official_club_nflverse_metadata_consistency_v1_first_result_manifest.json'
+      - '.github/workflows/research_levline4_2026_official_club_nflverse_metadata_consistency_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: levline4-official-club-nflverse-metadata-consistency-v1-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  unit-and-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deterministic test dependencies
+        run: python -m pip install pytest 'polars==1.33.1'
+      - name: Run frozen metadata-consistency unit tests
+        run: pytest -q research/test_levline4_2026_official_club_nflverse_metadata_consistency_v1.py
+      - name: Assert preregistered authority boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('research/levline4_2026_official_club_nflverse_metadata_consistency_v1_contract.json').read_text())
+          assert c['contract_id']=='LEVLINE-4-2026-OFFICIAL-CLUB-NFLVERSE-METADATA-CONSISTENCY-V1'
+          assert c['status']=='PREREGISTERED_CROSS_PUBLISHER_METADATA_CONSISTENCY_ONLY'
+          assert c['frozen_sources']['official_club']['roster_metadata_sha256']=='90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f'
+          assert c['frozen_sources']['nflverse_identity']['projection_sha256']=='fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f'
+          assert c['frozen_sources']['nflverse_identity']['position_field_present'] is False
+          assert c['frozen_resolution']['jersey_used_for_resolution'] is False
+          assert c['frozen_resolution']['position_used_for_resolution'] is False
+          assert c['frozen_resolution']['fuzzy_matching_allowed'] is False
+          assert c['frozen_resolution']['manual_override_allowed'] is False
+          assert c['qualification_gate']['exact_unique_resolution_rate_min']==0.995
+          assert c['qualification_gate']['ambiguities_allowed']==0
+          assert c['qualification_gate']['jersey_agreement_rate_required']==1.0
+          assert c['qualification_gate']['post_result_threshold_relaxation_allowed'] is False
+          assert c['qualification_gate']['later_same_version_execution_may_replace_first_result'] is False
+          assert c['authority_if_gate_passes']['underlying_source_independence_proven'] is False
+          assert c['authority_if_gate_passes']['player_identity_to_gsis_qualified'] is False
+          assert c['authority_if_gate_passes']['availability_state_authorized'] is False
+          assert c['authority_if_gate_passes']['forecast_probability_effect_authorized'] is False
+          assert c['authority_if_gate_passes']['production_authorized'] is False
+          assert c['governance']['target_inactive_rows_used_for_design_or_selection'] is False
+          assert c['governance']['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert c['governance']['postgame_participation_used'] is False
+          assert c['governance']['f_st_01_frozen_2026_unchanged'] is True
+          PY
+
+  canonical-first-consistency-evidence:
+    needs: unit-and-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect whether canonical first-result manifest is frozen
+        id: canonical
+        shell: bash
+        run: |
+          if [[ -f research/levline4_2026_official_club_nflverse_metadata_consistency_v1_first_result_manifest.json ]]; then
+            echo 'present=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'present=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.canonical.outputs.present != 'true'
+        with:
+          python-version: '3.11'
+      - name: Install execution dependency
+        if: steps.canonical.outputs.present != 'true'
+        run: python -m pip install 'polars==1.33.1'
+      - name: Prove frozen contract predates first empirical execution head
+        if: steps.canonical.outputs.present != 'true'
+        run: |
+          set -euo pipefail
+          contract_commit=$(git log -1 --format=%H -- research/levline4_2026_official_club_nflverse_metadata_consistency_v1_contract.json)
+          test -n "$contract_commit"
+          test "$contract_commit" != "$GITHUB_SHA"
+          echo "frozen_contract_commit=$contract_commit"
+      - name: Materialize exact durable frozen source projections
+        if: steps.canonical.outputs.present != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OFFICIAL_REF='refs/remotes/origin/levline4-official-club-v2-data'
+          IDENTITY_REF='refs/remotes/origin/levline4-identity-v1-data'
+          OFFICIAL_PATH='research_outputs/levline4_2026_official_club_roster_parser_v2/first_held_out_35130069924/roster_metadata.jsonl'
+          IDENTITY_PATH='research_outputs/levline4_2026_identity_source_v1/projections/2026-fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f.parquet'
+          git fetch origin 'research-data/levline4-official-club-roster-v2:refs/remotes/origin/levline4-official-club-v2-data'
+          git fetch origin 'research-data/levline4-identity-source-v1:refs/remotes/origin/levline4-identity-v1-data'
+          git show "${OFFICIAL_REF}:${OFFICIAL_PATH}" > /tmp/official_roster_metadata.jsonl
+          git show "${IDENTITY_REF}:${IDENTITY_PATH}" > /tmp/nflverse_identity.parquet
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          expected={
+              Path('/tmp/official_roster_metadata.jsonl'):'90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f',
+              Path('/tmp/nflverse_identity.parquet'):'fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f',
+          }
+          for path,digest in expected.items():
+              assert path.is_file() and path.stat().st_size > 0, path
+              observed=hashlib.sha256(path.read_bytes()).hexdigest()
+              assert observed==digest, (path,observed,digest)
+          PY
+      - name: Execute first frozen cross-publisher consistency audit
+        if: steps.canonical.outputs.present != 'true'
+        id: audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python -m research.levline4_2026_official_club_nflverse_metadata_consistency_v1 \
+            --official-roster-metadata /tmp/official_roster_metadata.jsonl \
+            --identity-projection /tmp/nflverse_identity.parquet
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Verify first receipt cannot broaden authority
+        if: steps.canonical.outputs.present != 'true' && always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('research_outputs/levline4_2026_official_club_nflverse_metadata_consistency_v1/receipt.json')
+          assert p.is_file(), 'consistency receipt missing'
+          r=json.loads(p.read_text())
+          assert r['contract_id']=='LEVLINE-4-2026-OFFICIAL-CLUB-NFLVERSE-METADATA-CONSISTENCY-V1'
+          assert r['official_roster_metadata_sha256']=='90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f'
+          assert r['nflverse_identity_projection_sha256']=='fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f'
+          assert r['underlying_source_independence_proven'] is False
+          for key in (
+              'official_stable_player_identifier_qualified',
+              'official_identifier_to_gsis_bridge_qualified',
+              'player_identity_to_gsis_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert r[key] is False, key
+          assert r['target_inactive_rows_used_for_design_or_selection'] is False
+          assert r['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert r['postgame_participation_used'] is False
+          assert r['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'status':r['status'],
+              'official_row_count':r['official_row_count'],
+              'resolved_exact_unique_count':r['resolved_exact_unique_count'],
+              'unresolved_count':r['unresolved_count'],
+              'ambiguous_count':r['ambiguous_count'],
+              'exact_unique_resolution_rate':r['exact_unique_resolution_rate'],
+              'jersey_comparable_count':r['jersey_comparable_count'],
+              'jersey_agreement_count':r['jersey_agreement_count'],
+              'jersey_disagreement_count':r['jersey_disagreement_count'],
+              'jersey_agreement_rate':r['jersey_agreement_rate'],
+              'gate_pass':r['gate_pass'],
+          },indent=2,sort_keys=True))
+          PY
+      - name: Upload immutable first consistency evidence
+        if: steps.canonical.outputs.present != 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline4-official-club-nflverse-metadata-consistency-v1-${{ github.run_id }}
+          path: research_outputs/levline4_2026_official_club_nflverse_metadata_consistency_v1/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Surface frozen scientific result after evidence upload
+        if: steps.canonical.outputs.present != 'true' && always()
+        run: test "${{ steps.audit.outputs.exit_code }}" = "0"
+
+      - name: Read canonical first-result manifest
+        if: steps.canonical.outputs.present == 'true'
+        id: manifest
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_official_club_nflverse_metadata_consistency_v1_first_result_manifest.json').read_text())
+          assert m['first_result_is_canonical'] is True
+          assert m['later_same_version_execution_may_replace_first_result'] is False
+          print(f"artifact_id={m['first_artifact_id']}")
+          print(f"artifact_digest={m['artifact_digest']}")
+          PY
+      - name: Download immutable canonical first artifact only
+        if: steps.canonical.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          observed_digest=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}" --jq '.digest')
+          test "$observed_digest" = "${{ steps.manifest.outputs.artifact_digest }}"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.manifest.outputs.artifact_id }}/zip" > /tmp/consistency_first.zip
+          rm -rf /tmp/consistency_first && mkdir -p /tmp/consistency_first
+          unzip -q /tmp/consistency_first.zip -d /tmp/consistency_first
+      - name: Verify canonical first evidence bytes and authority
+        if: steps.canonical.outputs.present == 'true'
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          m=json.loads(Path('research/levline4_2026_official_club_nflverse_metadata_consistency_v1_first_result_manifest.json').read_text())
+          root=Path('/tmp/consistency_first')
+          expected=m['file_sha256']
+          for name,digest in expected.items():
+              p=root/name
+              assert p.is_file(), name
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==digest, name
+          r=json.loads((root/'receipt.json').read_text())
+          assert r['status']==m['first_result_status']
+          assert r['underlying_source_independence_proven'] is False
+          for key in (
+              'official_stable_player_identifier_qualified',
+              'official_identifier_to_gsis_bridge_qualified',
+              'player_identity_to_gsis_qualified',
+              'week2_sunday_due_inactive_player_identity_to_gsis_qualified',
+              'general_2026_player_identity_to_gsis_qualified',
+              'game_day_membership_qualified',
+              'availability_state_authorized',
+              'player_value_join_authorized',
+              'forecast_probability_effect_authorized',
+              'model_fit_authorized',
+              'production_authorized',
+          ):
+              assert r[key] is False, key
+          assert r['target_inactive_rows_used_for_design_or_selection'] is False
+          assert r['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert r['postgame_participation_used'] is False
+          assert r['f_st_01_frozen_2026_unchanged'] is True
+          print(json.dumps({
+              'first_result_status':r['status'],
+              'exact_unique_resolution_rate':r['exact_unique_resolution_rate'],
+              'unresolved_count':r['unresolved_count'],
+              'ambiguous_count':r['ambiguous_count'],
+              'jersey_agreement_rate':r['jersey_agreement_rate'],
+              'metadata_consistency_validated':r['official_club_vs_nflverse_metadata_consistency_validated'],
+              'player_identity_to_gsis_qualified':r['player_identity_to_gsis_qualified'],
+          },indent=2,sort_keys=True))
+          PY
+
+  research-firewall:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Prove branch is research-only
+        run: |
+          git diff --name-only origin/${{ github.base_ref || 'main' }}...HEAD > /tmp/changed.txt
+          python - <<'PY'
+          from pathlib import Path
+          changed=[x.strip() for x in Path('/tmp/changed.txt').read_text().splitlines() if x.strip()]
+          bad=[x for x in changed if not (x.startswith('research/') or x.startswith('.github/workflows/research_'))]
+          assert not bad, f'non-research paths changed: {bad}'
+          PY
+          git diff --exit-code origin/${{ github.base_ref || 'main' }}...HEAD -- outputs/ site/ src/ scripts/ config/

@@ -1,0 +1,107 @@
+{
+  "contract_version": 1,
+  "contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-NFLVERSE-METADATA-CONSISTENCY-V1",
+  "status": "PREREGISTERED_CROSS_PUBLISHER_METADATA_CONSISTENCY_ONLY",
+  "purpose": "Measure whether the canonical official-club roster metadata rows agree mechanically with the frozen 2026 Week 2 status-free nflverse identity projection under exact team plus exact normalized name matching. This experiment does not qualify GSIS truth, roster membership, availability, player value, forecast effects, model fitting, or production use.",
+  "frozen_sources": {
+    "official_club": {
+      "contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-ROSTER-PARSER-V2",
+      "workflow_run_id": 35130069924,
+      "artifact_id": 10461126275,
+      "artifact_digest": "sha256:7ba9c87c8de3392505327e572cf6730d901113d2c22ca25daef3a3dc8a01fe3e",
+      "roster_metadata_sha256": "90c3974677862b8838acf2afaf6bec07087ce9784a7ab01491d8dcfd1f41489f",
+      "durable_branch": "research-data/levline4-official-club-roster-v2",
+      "durable_path": "research_outputs/levline4_2026_official_club_roster_parser_v2/first_held_out_35130069924/roster_metadata.jsonl",
+      "expected_row_count": 2463,
+      "expected_team_count": 32
+    },
+    "nflverse_identity": {
+      "workflow_run_id": 35113550399,
+      "artifact_id": 10452584328,
+      "artifact_digest": "sha256:489e3f407b5704b142e9244234d0193848e87a7a4fa00d051906ba41a9923318",
+      "projection_sha256": "fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f",
+      "durable_branch": "research-data/levline4-identity-source-v1",
+      "durable_path": "research_outputs/levline4_2026_identity_source_v1/projections/2026-fc993e0543950222cd20e0c29e457980da572d100bebff6a5d4bf5f7b72b051f.parquet",
+      "season": 2026,
+      "game_type": "REG",
+      "week": 2,
+      "status_fields_present": false,
+      "position_field_present": false
+    },
+    "separate_publishers": true,
+    "statistical_or_upstream_data_independence_proven": false
+  },
+  "frozen_resolution": {
+    "official_name_field": "visible_name",
+    "official_team_field": "team",
+    "name_normalizer": "research.levline4_prospective_inactive_gsis_resolver_v1.normalize_name",
+    "team_normalizer": "research.levline4_prospective_inactive_gsis_resolver_v1.normalize_team",
+    "nflverse_aliases": [
+      "first_name + last_name",
+      "football_name + last_name"
+    ],
+    "join_key": "week=2 + exact normalized team + exact normalized full-name alias",
+    "exactly_one_candidate_required_for_resolution": true,
+    "possible_states": [
+      "RESOLVED_EXACT_UNIQUE",
+      "UNRESOLVED",
+      "AMBIGUOUS"
+    ],
+    "position_used_for_resolution": false,
+    "jersey_used_for_resolution": false,
+    "canonical_data_name_used_for_resolution": false,
+    "profile_slug_used_for_resolution": false,
+    "status_used_for_resolution": false,
+    "fuzzy_matching_allowed": false,
+    "phonetic_matching_allowed": false,
+    "manual_override_allowed": false,
+    "adjacent_week_fallback_allowed": false
+  },
+  "post_resolution_metadata_audit": {
+    "jersey_compared_only_after_exact_unique_resolution": true,
+    "jersey_normalization": "missing remains missing; otherwise finite integral numeric value 0 through 99 becomes canonical decimal string; any other nonempty value is invalid",
+    "jersey_used_as_rescue": false,
+    "position_comparison_performed": false,
+    "position_comparison_reason": "the frozen status-free nflverse projection intentionally excludes position",
+    "missing_jersey_imputed": false
+  },
+  "qualification_gate": {
+    "official_row_count_must_equal": 2463,
+    "official_team_count_must_equal": 32,
+    "exact_unique_resolution_rate_min": 0.995,
+    "exact_unique_threshold_origin": "inherited unchanged from the preregistered Week 2 identity mechanics gate in PR 318; not selected from this comparison result",
+    "ambiguities_allowed": 0,
+    "duplicate_candidate_gsis_assignments_within_team_allowed": 0,
+    "nflverse_identity_metadata_conflicts_allowed": 0,
+    "invalid_nonempty_jersey_values_allowed": 0,
+    "jersey_comparable_fraction_of_exact_unique_min": 0.80,
+    "jersey_agreement_rate_required": 1.0,
+    "post_result_threshold_relaxation_allowed": false,
+    "later_same_version_execution_may_replace_first_result": false,
+    "unresolved_rows_may_be_repaired_after_observation": false
+  },
+  "authority_if_gate_passes": {
+    "official_club_vs_nflverse_metadata_consistency_validated": true,
+    "cross_publisher_metadata_agreement_observed": true,
+    "underlying_source_independence_proven": false,
+    "official_stable_player_identifier_qualified": false,
+    "official_identifier_to_gsis_bridge_qualified": false,
+    "player_identity_to_gsis_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "research_only": true,
+    "target_inactive_rows_used_for_design_or_selection": false,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "f_st_01_frozen_2026_unchanged": true,
+    "production_dependency_authorized": false
+  }
+}

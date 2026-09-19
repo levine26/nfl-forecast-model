@@ -1,0 +1,70 @@
+{
+  "schema_version": "levline4-2026-official-club-nflverse-metadata-consistency-v1-first-result-manifest",
+  "contract_id": "LEVLINE-4-2026-OFFICIAL-CLUB-NFLVERSE-METADATA-CONSISTENCY-V1",
+  "first_result_is_canonical": true,
+  "later_same_version_execution_may_replace_first_result": false,
+  "first_workflow_run_id": 35138408984,
+  "first_artifact_id": 10463384373,
+  "first_head_sha": "d063beeed1c40893b8999747c1ace28fcf5c32b7",
+  "artifact_digest": "sha256:0a996baf7dc90d5755c4726871ea3d3718a5337c57f3e53fa7f276b6e1991242",
+  "file_sha256": {
+    "duplicate_candidate_assignments.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "receipt.json": "61615d451b482f11d627c8de938470bdc6e8b12fee36c656cc96959f583e9ba8",
+    "row_results.jsonl": "c7fdc60589391297b9135e5faf9d687d0993bb2d9cf86c4553e8de331a77addd",
+    "summary.json": "6126f421aa518e1935996b854c1dc76789f52da2a97df6fab11dddcc2525eecb"
+  },
+  "first_result_status": "FAIL",
+  "frozen_metrics": {
+    "official_row_count": 2463,
+    "official_team_count": 32,
+    "resolved_exact_unique_count": 2286,
+    "unresolved_count": 177,
+    "ambiguous_count": 0,
+    "exact_unique_resolution_rate": 0.928136419001218,
+    "duplicate_candidate_gsis_assignment_count": 0,
+    "nflverse_identity_metadata_conflict_row_count": 0,
+    "invalid_nonempty_jersey_value_count": 11,
+    "jersey_comparable_count": 2272,
+    "jersey_comparable_fraction_of_exact_unique": 0.9938757655293088,
+    "jersey_agreement_count": 2228,
+    "jersey_disagreement_count": 44,
+    "jersey_agreement_rate": 0.9806338028169014,
+    "position_comparison_performed": false,
+    "gate_pass": false
+  },
+  "frozen_gate": {
+    "exact_unique_resolution_rate_min": 0.995,
+    "ambiguities_allowed": 0,
+    "duplicate_candidate_gsis_assignments_within_team_allowed": 0,
+    "nflverse_identity_metadata_conflicts_allowed": 0,
+    "invalid_nonempty_jersey_values_allowed": 0,
+    "jersey_comparable_fraction_of_exact_unique_min": 0.80,
+    "jersey_agreement_rate_required": 1.0,
+    "post_result_threshold_relaxation_allowed": false,
+    "unresolved_rows_may_be_repaired_after_observation": false
+  },
+  "authority": {
+    "official_club_vs_nflverse_metadata_consistency_validated": false,
+    "cross_publisher_metadata_agreement_observed": false,
+    "underlying_source_independence_proven": false,
+    "official_stable_player_identifier_qualified": false,
+    "official_identifier_to_gsis_bridge_qualified": false,
+    "player_identity_to_gsis_qualified": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "game_day_membership_qualified": false,
+    "availability_state_authorized": false,
+    "player_value_join_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "model_fit_authorized": false,
+    "production_authorized": false
+  },
+  "governance": {
+    "target_inactive_rows_used_for_design_or_selection": false,
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "postgame_participation_used": false,
+    "same_version_threshold_or_rule_change_after_first_result": false,
+    "same_version_manual_or_fuzzy_rescue_after_first_result": false,
+    "f_st_01_frozen_2026_unchanged": true
+  }
+}
