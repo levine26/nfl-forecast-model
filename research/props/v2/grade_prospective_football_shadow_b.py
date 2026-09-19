@@ -89,14 +89,25 @@ def verify_b_receipt(row: Mapping[str,Any])->None:
     if season<2026 or not 1<=week<=18:
         raise ShadowBGradingError("invalid Shadow B season/week")
 
+    source_run=str(row.get("source_workflow_run") or "").strip()
+    source_sha=str(row.get("source_head_sha") or "").strip().lower()
+    if not source_run:
+        raise ShadowBGradingError("Shadow B receipt missing source workflow run")
+    if len(source_sha) not in {40,64} or any(c not in "0123456789abcdef" for c in source_sha):
+        raise ShadowBGradingError("Shadow B receipt has invalid source head SHA")
+
     kickoff=_aware(row.get("kickoff_utc"),"kickoff_utc")
     forecast_at=_aware(row.get("source_forecast_timestamp_utc"),"source_forecast_timestamp_utc")
     market_at=_aware(row.get("source_market_captured_utc"),"source_market_captured_utc")
+    capture_started=_aware(row.get("capture_started_utc"),"capture_started_utc")
+    capture_completed=_aware(row.get("capture_completed_utc"),"capture_completed_utc")
     recorded_at=_aware(row.get("recorded_utc"),"recorded_utc")
-    if not (forecast_at<kickoff and market_at<kickoff and recorded_at<kickoff):
+    if not (forecast_at<kickoff and market_at<kickoff and capture_started<kickoff and capture_completed<kickoff and recorded_at<kickoff):
         raise ShadowBGradingError("Shadow B receipt is not strictly pre-kickoff")
-    if forecast_at>recorded_at or market_at>recorded_at:
-        raise ShadowBGradingError("Shadow B receipt chronology is inconsistent")
+    if forecast_at>capture_started or market_at>capture_started:
+        raise ShadowBGradingError("Shadow B capture began before source forecast/market existed")
+    if capture_started>capture_completed or capture_completed!=recorded_at:
+        raise ShadowBGradingError("Shadow B capture timestamps are inconsistent")
 
     governance=row.get("governance")
     if not isinstance(governance,Mapping):
@@ -132,7 +143,7 @@ def verify_b_receipt(row: Mapping[str,Any])->None:
         raise ShadowBGradingError("Shadow B missing Dynamic Role provenance")
     if str(role.get("engine_version") or "")!=DYNAMIC_ROLE_VERSION:
         raise ShadowBGradingError("unexpected Dynamic Role engine version")
-    if str(role.get("mode") or "full")!="full":
+    if str(role.get("mode") or "")!="full":
         raise ShadowBGradingError("unexpected Dynamic Role mode")
 
     if str(row.get("prop_type") or "") not in SUPPORTED_PROPS:
