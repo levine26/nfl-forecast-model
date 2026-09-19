@@ -1,7 +1,8 @@
 # Props 2.0 Market Archive Contract
 
 Status: **FROZEN PROSPECTIVE DATA CAPTURE / RESEARCH ONLY**  
-Version: `levline-props-v2-market-archive-v0.1.0`
+Version: `levline-props-v2-market-archive-v0.1.0`  
+Exact-source provenance amendment: 2026-09-19, before first persistent archive capture
 
 ## Objective
 
@@ -23,7 +24,8 @@ For each player/game/prop market artifact the archive retains:
 - dispersion, best-price and movement fields already computed by the frozen market engine;
 - SHA-256 of the normalized market artifact;
 - SHA-256 provenance of the raw provider payload when available;
-- source live-workflow run ID.
+- source live-workflow run ID;
+- exact source live-workflow head SHA.
 
 Raw provider payload bytes are **not** copied to the persistent research branch. Their digest is
 preserved for provenance while avoiding unnecessary data duplication.
@@ -38,6 +40,20 @@ A snapshot is eligible only if:
 - capture time is strictly before kickoff.
 
 Post-kickoff snapshots fail closed.
+
+## Exact source-run boundary
+
+The workflow-run event is only a trigger. Every archive capture must:
+1. resolve the requested GitHub Actions run;
+2. require workflow name `LevLine Props live refresh`, branch `main`, and conclusion `success`;
+3. require that source head SHA to already contain the versioned exact-source archive listener;
+4. check out that exact source head SHA;
+5. download artifacts only from that exact workflow run;
+6. persist both the source workflow run ID and source head SHA into the archive rows, manifest, and status.
+
+A live run predating the exact-source listener is permanently ineligible for prospective archive evidence.
+Manual dispatch may not be used to backfill an older run after the listener is merged. Missing captures stay
+missing.
 
 ## Horizon policy
 

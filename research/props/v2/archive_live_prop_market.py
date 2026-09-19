@@ -37,6 +37,13 @@ def _sha_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def _git_sha(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    if len(text) not in {40, 64} or any(char not in "0123456789abcdef" for char in text):
+        raise MarketArchiveError("source_head_sha must be a git SHA")
+    return text
+
+
 def _dt(value: Any) -> datetime:
     try:
         parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
@@ -134,7 +141,12 @@ def archive_snapshot(
     output_dir: Path,
     manifest_path: Path,
     source_workflow_run: str,
+    source_head_sha: str,
 ) -> dict[str, Any]:
+    source_run = str(source_workflow_run or "").strip()
+    if not source_run:
+        raise MarketArchiveError("source_workflow_run is required")
+    source_sha = _git_sha(source_head_sha)
     snapshot = _load_snapshot(market_path)
     captured = _dt(snapshot.get("captured_at_utc"))
     kickoffs = _kickoffs(snapshot)
@@ -170,7 +182,8 @@ def archive_snapshot(
             {
                 "contract_version": CONTRACT_VERSION,
                 "snapshot_id": snapshot_id,
-                "source_workflow_run": str(source_workflow_run),
+                "source_workflow_run": source_run,
+                "source_head_sha": source_sha,
                 "captured_at_utc": captured.isoformat(),
                 "kickoff_utc": kickoff.isoformat(),
                 "minutes_to_kickoff": minutes_to_kickoff,
@@ -194,7 +207,8 @@ def archive_snapshot(
         "contract_version": CONTRACT_VERSION,
         "snapshot_id": snapshot_id,
         "captured_at_utc": captured.isoformat(),
-        "source_workflow_run": str(source_workflow_run),
+        "source_workflow_run": source_run,
+        "source_head_sha": source_sha,
         "normalized_snapshot_sha256": snapshot_sha,
         "raw_provider_payload_sha256": raw_sha,
         "artifact_count": len(rows),
@@ -215,7 +229,12 @@ def archive_artifact_root(
     output_dir: Path,
     manifest_path: Path,
     source_workflow_run: str,
+    source_head_sha: str,
 ) -> dict[str, Any]:
+    source_run = str(source_workflow_run or "").strip()
+    if not source_run:
+        raise MarketArchiveError("source_workflow_run is required")
+    source_sha = _git_sha(source_head_sha)
     market_paths = sorted(artifact_root.rglob("market.json"))
     if not market_paths:
         raise MarketArchiveError(f"no market.json found under {artifact_root}")
@@ -224,13 +243,15 @@ def archive_artifact_root(
             path,
             output_dir=output_dir,
             manifest_path=manifest_path,
-            source_workflow_run=source_workflow_run,
+            source_workflow_run=source_run,
+            source_head_sha=source_sha,
         )
         for path in market_paths
     ]
     return {
         "contract_version": CONTRACT_VERSION,
-        "source_workflow_run": str(source_workflow_run),
+        "source_workflow_run": source_run,
+        "source_head_sha": source_sha,
         "snapshot_files_found": len(market_paths),
         "archived": sum(row["status"] == "archived" for row in results),
         "existing": sum(row["status"] == "existing" for row in results),
@@ -246,6 +267,7 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--source-workflow-run", required=True)
+    parser.add_argument("--source-head-sha", required=True)
     parser.add_argument("--status", type=Path)
     args = parser.parse_args()
 
@@ -254,6 +276,7 @@ def main() -> int:
         output_dir=args.output_dir,
         manifest_path=args.manifest,
         source_workflow_run=args.source_workflow_run,
+        source_head_sha=args.source_head_sha,
     )
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.status is not None:
