@@ -631,3 +631,34 @@ def test_nflverse_la_player_state_matches_rams_provider_event():
         row["game_id"] == "2026_03_ARI_LA"
         for row in snapshot["market_artifacts"]
     )
+
+
+def test_live_fetch_audits_unmatched_provider_event_identity(monkeypatch):
+    def fake_get(path, *, api_key, params=None, timeout_seconds=20.0):
+        if path.endswith("/events"):
+            return [
+                {
+                    "id": "evt-unmatched",
+                    "home_team": "Mystery Home",
+                    "away_team": "Mystery Away",
+                    "commence_time": KICKOFF,
+                }
+            ]
+        raise AssertionError("unmatched event must not fetch event odds")
+
+    monkeypatch.setattr(live, "_provider_get_json", fake_get)
+    events, raw = live.fetch_live_nfl_prop_events(
+        player_state_rows=_player_state(),
+        api_key="test-key",
+    )
+
+    assert events == []
+    assert raw["discovery_unmatched"] == [
+        {
+            "provider_event_id": "evt-unmatched",
+            "home_team": "Mystery Home",
+            "away_team": "Mystery Away",
+            "commence_time": KICKOFF,
+            "reason": "unresolved_provider_team",
+        }
+    ]
