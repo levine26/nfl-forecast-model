@@ -10,7 +10,7 @@ Status: **ACTIVE / APPEND-ONLY SCIENTIFIC RECORD**
 | P2-FTN-RESIDUAL | Generic FTN matchup residual adds signal beyond market + V1 residual | Retrospective | COMPLETE | REJECT incremental residual |
 | P2-MKT-FAMILY | Separate calibration by prop family beats pooled global residual | Retrospective | COMPLETE | REJECT; preregistered gate failed |
 | P2-SHADOW-MKT-V1-V01 | Frozen global residual improves market-only probability prospectively | Prospective untouched | PR #379 | Freeze/collect only; no 2026 fitting |
-| P2-MICRO-V2 | Player-prop multi-book state / movement adds value vs one OPEN quote | Prospective + historical where licensed | PR #381 — capture layer | Archive exact pregame multi-book states first; no outcome-tuned horizon selection |
+| P2-MICRO-V2 | Player-prop multi-book state / movement adds value vs one OPEN quote | Prospective + historical where licensed | PR #381 — implementation ready, capture not yet active | Merge capture workflow to main before evidence can accumulate; no outcome-tuned horizon selection |
 | P2-GAME-ENV-V2 | Pregame spread/total context improves top-level opportunity forecasts | Retrospective development | COMPLETE — PR #389 | REJECT V0.1: team-play MAE worsened in all three seasons; pooled clustered CI entirely above zero |
 | P2-ROLE-V2 | Latent dynamic role beats static/EWMA proxy | Retrospective | COMPLETE — PR #382 | REJECT V0.2: route-only slightly worsens MAE/CRPS; full materially worsens MAE/CRPS; no subgroup rescue |
 | P2-AVAIL-MIX | Q/D workload-state mixtures improve conditional workload vs P(active) × normal role | Historical source audit + prospective follow-up | RETROSPECTIVE BLOCKED — PR #388 | No pre-2025 training examples; stop retrospective test and collect timestamped workload evidence prospectively |
@@ -18,7 +18,7 @@ Status: **ACTIVE / APPEND-ONLY SCIENTIFIC RECORD**
 | P2-EFF-V2 | Strictly lagged opponent defensive efficiency improves conditional rushing/receiving yardage beyond player baseline | Retrospective component isolation | PR #391 — preregistered component study | Rushing and receiving have separate frozen gates; actual event count conditioning forbids pregame claim |
 | P2-DIST-V2 | Signed empirical event-yard distributions improve conditional yardage CRPS vs nonnegative Gamma | Retrospective component isolation | COMPLETE — PR #390 | ADVANCE mechanism only: aggregate CRPS improves; strongest for rushing; actual event count conditioning forbids pregame claim |
 | P2-TD-V2 | Overdispersed team offensive TD counts improve rare-event distribution quality vs Poisson at the same mean | Retrospective component isolation | PR #392 — preregistered component study | Gate on CRPS, clustered uncertainty and log loss before any player-TD integration |
-| P2-CLV-V1 | LevLine disagreement predicts subsequent market movement | Prospective | DATA CAPTURE STARTED via #381 | Freeze horizon/close selection before grading; no outcome-tuned horizon selection |
+| P2-CLV-V1 | LevLine disagreement predicts subsequent market movement | Prospective | BLOCKED UNTIL #381 MERGES / NO ARCHIVE BRANCH YET | Frozen horizon/close policy already defined; begin evidence collection only after main workflow activation |
 
 ## Experiment discipline
 
