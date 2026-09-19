@@ -188,6 +188,7 @@ def test_production_prediction_path_does_not_import_research_modules():
         "availability_2025_reconstruction",
         "props_player_state",
         "props_player_sources",
+        "props_contextual_intelligence",
         "props_efficiency_td",
         "props_opportunity",
         "props_opportunity_adapter",
