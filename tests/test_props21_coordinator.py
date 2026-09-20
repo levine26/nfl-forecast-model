@@ -33,3 +33,55 @@ def test_coordinator_keeps_v1_separate_and_receipts_are_idempotent(tmp_path):
     assert _append_receipts(receipt, payload) == 0
     saved = json.loads(receipt.read_text().strip())
     assert saved["immutable"] is True and saved["outcome"] is None
+
+
+
+def manifest():
+    common = {
+        "game_id": "g",
+        "team": "ATL",
+        "prior_model_trained_through_season": 2025,
+        "feature_data_horizon": "2026-09-19T18:00:00+00:00",
+        "forecast_timestamp": "2026-09-19T19:00:00+00:00",
+        "kickoff_timestamp": "2026-09-20T17:00:00+00:00",
+    }
+    return {
+        "game_id": "g",
+        "forecast_timestamp_utc": "2026-09-19T19:30:00+00:00",
+        "kickoff_utc": "2026-09-20T17:00:00+00:00",
+        "efficiency_player_parameters": [{
+            **common,
+            "player_id": "p",
+            "player_name": "Starter Player",
+            "position": "QB",
+            "expected_passing_tds": 1.4,
+            "expected_receiving_tds": 0.0,
+            "expected_rushing_tds": 0.2,
+            "expected_pass_attempts": 32.0,
+            "expected_qb_rush_attempts": 4.0,
+            "expected_carries": 0.0,
+            "expected_routes": 0.0,
+            "expected_targets": 0.0,
+            "expected_red_zone_targets": 0.0,
+            "expected_goal_line_carries": 1.0,
+        }],
+        "team_td_parameters": [{
+            **common,
+            "expected_passing_td_opportunities": 1.4,
+            "expected_rushing_td_opportunities": 0.2,
+        }],
+    }
+
+
+def test_coordinator_retains_manifest_opportunity_for_qa():
+    generated = datetime(2026, 9, 19, 20, tzinfo=timezone.utc)
+    payload = build(
+        source(),
+        {},
+        generated=generated,
+        manifests={"g": manifest()},
+    )
+    row = payload["forecasts"][0]
+    assert row["opportunity_state"]["pass_attempts"] == 32.0
+    assert row["opportunity_state"]["carries"] == 4.0
+    assert "OPPORTUNITY_UNVERIFIED" not in row["qa"]["flag_codes"]
