@@ -172,6 +172,36 @@ def _personnel_by_player(
     }
 
 
+def _opportunity_by_player(
+    manifests: Mapping[str, Mapping[str, Any]] | None,
+) -> dict[tuple[str, str], dict[str, float | None]]:
+    """Retain frozen opportunity expectations for QA without changing forecasts."""
+    result: dict[tuple[str, str], dict[str, float | None]] = {}
+    for game, manifest in (manifests or {}).items():
+        for row in manifest.get("efficiency_player_parameters", []):
+            if not isinstance(row, Mapping):
+                continue
+            player_id = str(row.get("player_id") or "").strip()
+            if not player_id:
+                continue
+            position = str(row.get("position") or "").upper()
+            pass_attempts = _number(row.get("expected_pass_attempts"))
+            qb_rushes = _number(row.get("expected_qb_rush_attempts"))
+            designed_carries = _number(row.get("expected_carries"))
+            carries = qb_rushes if position == "QB" else designed_carries
+            targets = _number(row.get("expected_targets"))
+            routes = _number(row.get("expected_routes"))
+            total_parts = [value for value in (carries, targets) if value is not None]
+            result[(str(game), player_id)] = {
+                "pass_attempts": pass_attempts,
+                "carries": carries,
+                "targets": targets,
+                "routes": routes,
+                "total_opportunities": sum(total_parts) if total_parts else None,
+            }
+    return result
+
+
 def _market_state(row: Mapping[str, Any], generated: datetime, credential_mode: str | None) -> dict[str, Any]:
     provenance = row.get("provenance") if isinstance(row.get("provenance"), Mapping) else {}
     market_provenance = provenance.get("market") if isinstance(provenance.get("market"), Mapping) else {}
@@ -229,10 +259,16 @@ def _xtd_diagnostic(row: Mapping[str, Any], manifest_xtd: Mapping[str, Any] | No
 def _public_row(
     source: Mapping[str, Any], role: Mapping[str, Any], market_state: Mapping[str, Any], generated: datetime,
     manifest_xtd: Mapping[str, Any] | None = None,
+    opportunity: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     model = source.get("model") if isinstance(source.get("model"), Mapping) else {}
     market = source.get("market") if isinstance(source.get("market"), Mapping) else {}
-    qa = evaluate_forecast_qa(source, role_state=role, market_state=market_state)
+    qa = evaluate_forecast_qa(
+        source,
+        role_state=role,
+        market_state=market_state,
+        opportunity=opportunity,
+    )
     publish_numbers = qa["publication_eligible"]
     prop = str(source.get("prop_type") or "")
     is_td = prop in TD_PROPS
@@ -275,6 +311,7 @@ def _public_row(
             "evidence_ids": role.get("evidence_ids", []),
         },
         "xtd": _xtd_diagnostic(source, manifest_xtd),
+        "opportunity_state": dict(opportunity or {}),
         "market_state": compact_market_state,
         "qa": qa,
         "provenance": {
@@ -309,6 +346,7 @@ def build(
     if any(generated >= kickoff for kickoff in kickoffs):
         raise ValueError("refusing partial/started slate: every source game must remain pregame")
     roles, personnel_audit = _personnel_by_player(rows, previews, generated, manifests)
+    opportunity_by_player = _opportunity_by_player(manifests)
     xtd_by_player: dict[tuple[str, str], Mapping[str, Any]] = {}
     manifest_xtd_audit: list[dict[str, Any]] = []
     for game, manifest in (manifests or {}).items():
@@ -335,7 +373,14 @@ def build(
             market_supported += 1
         else:
             market_insufficient += 1
-        public = _public_row(source_row, role, market_state, generated, xtd_by_player.get(key))
+        public = _public_row(
+            source_row,
+            role,
+            market_state,
+            generated,
+            xtd_by_player.get(key),
+            opportunity_by_player.get(key),
+        )
         signal = public["qa"]["signal_state"]
         qa_blocked += signal == "NO SIGNAL"
         qa_watch += signal == "WATCH"
