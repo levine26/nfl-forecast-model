@@ -1,7 +1,7 @@
 {
-  "appended": 274,
-  "capture_completed_utc": "2026-09-20T16:38:00.093347+00:00",
-  "capture_started_utc": "2026-09-20T16:37:16.729766+00:00",
+  "appended": 123,
+  "capture_completed_utc": "2026-09-20T19:32:34.395800+00:00",
+  "capture_started_utc": "2026-09-20T19:32:10.086379+00:00",
   "contract_version": "levline-props-v2-football-shadow-a-v0.1.0",
   "defense_state_audit": {
     "events": {
@@ -29,100 +29,60 @@
     "target_season": 2026,
     "target_week": 2
   },
-  "eligible_source_rows": 924,
+  "eligible_source_rows": 438,
   "game_audit": {
-    "2026_02_CAR_ATL": {
-      "new_receipts": 18,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "5deeb367e4cc57732b04b8ebfbc6fc5e4d8634714225ae5274c798584ae2e25f"
-    },
-    "2026_02_CIN_HOU": {
-      "new_receipts": 21,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "f56d43e676e5df23e74932a4e3bc4e13689ded489e1da08251ac08e9a790c3a8"
-    },
-    "2026_02_CLE_TB": {
-      "new_receipts": 17,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "d60ba8ec0d710a76502c432596106b714d6f9ab7fc2a8007c812f8df095a8d27"
-    },
-    "2026_02_GB_NYJ": {
-      "new_receipts": 21,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "19242f8444ab0854c4f913d047f0284758caa4e7cf3973532725c37cf57c8d69"
-    },
     "2026_02_IND_KC": {
-      "new_receipts": 18,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "f6c777e250147e8e52563b02a952bfcf5bbada9558daa27ede6eb1c8b243b2b2"
-    },
-    "2026_02_JAX_DEN": {
       "new_receipts": 19,
       "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "2858c4764e9d79387647df33b3f2a0e35b6cdd1bbf5756e6f7c4c7511b4aeb9c"
+      "source_manifest_sha256": "577e1d6abf93494ce00c6ac5a0017179d4a3dc5e362887c9858afe0b5cd98af9"
+    },
+    "2026_02_JAX_DEN": {
+      "new_receipts": 20,
+      "opportunity_arrays_preserved": true,
+      "source_manifest_sha256": "40619a5a76e704b25cf7389ece264030f279784266de143dd0bce9d7609bebb3"
     },
     "2026_02_LV_LAC": {
-      "new_receipts": 17,
+      "new_receipts": 18,
       "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "6978d116724279652216c24b11316d8b45a57cadc42de567d8b606b332fb1a7a"
+      "source_manifest_sha256": "ac029de020e3a9431405ba00532733659afbd112892b14ba266b784cb5fe349c"
     },
     "2026_02_MIA_SF": {
       "new_receipts": 15,
       "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "57f5bfff026629e5e70c9396694062de035fb1db795df2bea5543cbec63b8fdc"
-    },
-    "2026_02_MIN_CHI": {
-      "new_receipts": 19,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "0eb86b6482b1e584b7ab479ec9a3d0191ee0ba9e53f3d0f4dd836174d89c357f"
-    },
-    "2026_02_NO_BAL": {
-      "new_receipts": 21,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "e2a86a7fde3c1e6e1701bc4859f95a81729d006048c8a4f3e8595e35165ec0bd"
+      "source_manifest_sha256": "7602d03bb3110dd149dcbd47f3e494b24425c3a76efffbeecdd2272d8939379d"
     },
     "2026_02_NYG_LA": {
       "new_receipts": 15,
       "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "41c9782792c33f38059db3aab2fdda15807589213e7470cf5780f42c62c9db66"
-    },
-    "2026_02_PHI_TEN": {
-      "new_receipts": 18,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "26388b614d460a7cc32ec7b8ec0990108a6fc113d23a18138547fc6fb8b1d641"
-    },
-    "2026_02_PIT_NE": {
-      "new_receipts": 20,
-      "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "50ecba95dc8649a7401ed2c92362ef3f2bd3ae688a2addee2ae43de36ba3cb2e"
+      "source_manifest_sha256": "690ad7efcee6d71a5f8c76972fadbecf09d39041574419b34588c4b8a93cff5b"
     },
     "2026_02_SEA_ARI": {
       "new_receipts": 18,
       "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "58b6a94b7c1005846dabdbb03bda929dc8ceb992b43a256637b86f127fd3554a"
+      "source_manifest_sha256": "72edaefcb2b732cc3d5093940590e316646c224e5f60bad3b4ed7da3e2fe49e5"
     },
     "2026_02_WAS_DAL": {
-      "new_receipts": 17,
+      "new_receipts": 18,
       "opportunity_arrays_preserved": true,
-      "source_manifest_sha256": "5bee2dcf257fc33df7f23f8f581d57aececd8b23dcd89a75d717c6704d86b05f"
+      "source_manifest_sha256": "26eb7c086b997716f710a05e6d7d13aa01b9750fb4df00009a6db989f49a7648"
     }
   },
   "ledger": "research_outputs/props_v2/football_shadow/shadow_a_originals.jsonl",
-  "new_receipts": 274,
+  "new_receipts": 123,
   "outcomes_read": 0,
   "production_authorized": false,
   "published_v1_props_mutated": false,
   "shadow_version": "P2-SHADOW-A-DEFENSE-v0.1.0",
   "skipped_existing": 0,
   "skipped_started_games": 0,
-  "source_game_count": 15,
-  "source_head_sha": "74292b7cc00aafac107eeea33736aa9ae25ca43a",
+  "source_game_count": 7,
+  "source_head_sha": "5af2f39f66b81d984c096ff5f79eb1843956e9ef",
   "source_market_credential_mode": "configured",
   "source_market_provider": "propline",
-  "source_provenance_sha256": "ad0c3c11334875783ca145c8976834b58c3d5ee84d5dbbc1cb2804eb0afd7f5a",
+  "source_provenance_sha256": "c7366f646a72870fdd3d005db5d3fce57c6b9290be1ef0bb5ca735463d794fba",
   "source_season": 2026,
-  "source_trigger_head_sha": "74292b7cc00aafac107eeea33736aa9ae25ca43a",
+  "source_trigger_head_sha": "5af2f39f66b81d984c096ff5f79eb1843956e9ef",
   "source_week": 2,
-  "source_workflow_run": "35522828946",
+  "source_workflow_run": "35532281202",
   "winner_model_mutated": false
 }
