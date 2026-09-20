@@ -53,3 +53,21 @@ def test_accounting_checks_expectations_and_skips_medians():
     result = check_accounting(accounting)
     assert result["flags"][0]["code"] == "PLAYER_TEAM_ACCOUNTING_INCONSISTENCY"
     assert result["skipped"][0]["name"] == "market_medians"
+
+
+def test_depth_chart_expected_starter_cannot_be_radar_without_news_and_availability():
+    depth_role = role(
+        role_state="STARTER_EXPECTED",
+        availability_state="UNKNOWN",
+        current_news_coverage=False,
+    )
+    qa = evaluate_forecast_qa(
+        forecast(),
+        role_state=depth_role,
+        market_state={"status": "MARKET_DISTRIBUTION_SUPPORTED", "book_count": 3},
+        opportunity={"targets": 7},
+    )
+    assert qa["signal_state"] == "WATCH"
+    assert qa["betting_eligible"] is False
+    codes = {flag["code"] for flag in qa["flags"]}
+    assert {"UNKNOWN_AVAILABILITY", "ROLE_UNCERTAINTY", "MISSING_CURRENT_NEWS_COVERAGE"} <= codes
