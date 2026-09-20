@@ -163,6 +163,14 @@ def _snapshot_rank1_depth_charts(
         ),
         None,
     )
+    if position_col is None:
+        audit["status"] = "unusable_missing_position_column"
+        return {
+            "contract_version": DEPTH_CHART_SNAPSHOT_CONTRACT,
+            "captured_at_utc": captured.isoformat(),
+            "depth_charts": [],
+            "audit": audit,
+        }
     if position_col:
         work["_position"] = work[position_col].astype("string").fillna("").str.upper().str.strip()
         work["_position"] = work["_position"].replace({
