@@ -1,6 +1,6 @@
 # Props 2.1 live-slate acceptance report
 
-Generated: 2026-09-20T00:00:22.995616+00:00
+Generated: 2026-09-20T00:29:08.205182+00:00
 Games: 15
 Forecasts: 3439
 Market-backed QB team states: 30
@@ -9,8 +9,8 @@ Current-reporting evidence accepted: 7
 Players with qualified current news: 5
 xTD aggregate diagnostics: 1771
 Context-fitted xTD rows: 0
-Market distributions supported: 215
-Market distributions using explicit fallback: 3224
+Market distributions supported: 214
+Market distributions using explicit fallback: 3225
 Market providers: propline
 Credential mode: configured
 QA states: {"no_signal": 3060, "radar": 0, "watch": 379}
@@ -29,7 +29,7 @@ V1/Shadow A/Shadow B mutation: false
 6. Unresolved canonical identities: 0.
 7. Pregame chronology: PASS.
 8. Provider/credential provenance: propline / configured.
-9. Market distribution: 215 supported; 3224 explicit fallbacks.
+9. Market distribution: 214 supported; 3225 explicit fallbacks.
 10. Team/player accounting: source simulation accounting is checked per forecast; incomplete cross-market expectations remain unevaluable rather than summed from medians.
 11. Extreme Fair-Line gaps: automated QA active and confidence cannot increase because a gap is large.
 12. Suspicious forecasts: 3060 NO SIGNAL, 379 WATCH, 0 RADAR.
