@@ -169,6 +169,132 @@
     "status": "healthy"
   },
   "generated_utc": "2026-09-20T15:26:15.397367+00:00",
+  "groq_provider_fallback": {
+    "failed_games": [
+      "2026_02_CAR_ATL",
+      "2026_02_CLE_TB",
+      "2026_02_GB_NYJ",
+      "2026_02_IND_KC",
+      "2026_02_LV_LAC",
+      "2026_02_MIA_SF",
+      "2026_02_MIN_CHI",
+      "2026_02_NO_BAL",
+      "2026_02_NYG_LA",
+      "2026_02_PHI_TEN",
+      "2026_02_PIT_NE",
+      "2026_02_SEA_ARI",
+      "2026_02_WAS_DAL"
+    ],
+    "games": {
+      "2026_02_CAR_ATL": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=128, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-20T15:45:55.549773+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_02_CLE_TB": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=513, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-20T15:52:44.294309+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_02_GB_NYJ": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=601, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-20T15:51:37.940035+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_02_IND_KC": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=13, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
+        "recovered_at_utc": "2026-09-20T16:00:31.951750+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_02_LV_LAC": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=338, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-20T15:56:06.397365+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_02_MIA_SF": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=75, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
+        "recovered_at_utc": "2026-09-20T15:59:25.575619+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_02_MIN_CHI": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=37, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
+        "recovered_at_utc": "2026-09-20T15:48:08.681368+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_02_NO_BAL": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=55, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
+        "recovered_at_utc": "2026-09-20T15:47:01.911606+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_02_NYG_LA": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=87, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
+        "recovered_at_utc": "2026-09-20T16:01:38.301401+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_02_PHI_TEN": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=495, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-20T15:53:50.661272+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_02_PIT_NE": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=683, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=999, x-ratelimit-remaining-tokens=",
+        "recovered_at_utc": "2026-09-20T15:50:31.344179+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_02_SEA_ARI": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=252, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-20T15:57:12.820884+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_02_WAS_DAL": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=145, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-20T15:58:19.161845+00:00",
+        "requires_chatgpt_refresh": true
+      }
+    },
+    "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
+    "run_id": "35520527338",
+    "status": "degraded"
+  },
   "injuries": {
     "as_of": "2026-09-20T15:26:15.502596+00:00",
     "players": 251,
