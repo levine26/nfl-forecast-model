@@ -76,6 +76,151 @@ def _json_safe(value):
     return value
 
 
+DEPTH_CHART_SNAPSHOT_CONTRACT = "levline-props-depth-chart-snapshot-v0.1"
+
+
+def _snapshot_rank1_depth_charts(
+    depth_charts: pd.DataFrame | None,
+    *,
+    forecast_timestamp: datetime,
+) -> dict:
+    """Freeze the latest qualified pregame rank-1 depth-chart rows by team/position.
+
+    Source snapshot time and local capture time are distinct. Naive, future,
+    unidentifiable, unsupported-position, and non-rank-1 rows fail closed. The
+    snapshot is categorical personnel evidence only; it never asserts workload.
+    """
+    captured = forecast_timestamp.astimezone(timezone.utc)
+    audit = {
+        "status": "missing",
+        "rows_received": 0,
+        "invalid_timestamp_rows": 0,
+        "future_rows_discarded": 0,
+        "invalid_identity_rows": 0,
+        "unsupported_position_rows": 0,
+        "non_rank1_rows_discarded": 0,
+        "superseded_rows_discarded": 0,
+        "rows_frozen": 0,
+        "teams_frozen": 0,
+    }
+    if depth_charts is None or depth_charts.empty:
+        return {
+            "contract_version": DEPTH_CHART_SNAPSHOT_CONTRACT,
+            "captured_at_utc": captured.isoformat(),
+            "depth_charts": [],
+            "audit": audit,
+        }
+
+    work = depth_charts.copy()
+    audit["rows_received"] = int(len(work))
+    required = {"dt", "team", "gsis_id", "pos_rank"}
+    missing = sorted(required - set(work.columns))
+    if missing:
+        audit["status"] = "unusable_missing_required_columns"
+        audit["missing_columns"] = missing
+        return {
+            "contract_version": DEPTH_CHART_SNAPSHOT_CONTRACT,
+            "captured_at_utc": captured.isoformat(),
+            "depth_charts": [],
+            "audit": audit,
+        }
+
+    parsed = []
+    for value in work["dt"]:
+        try:
+            stamp = pd.Timestamp(value)
+        except Exception:
+            stamp = pd.NaT
+        if pd.isna(stamp) or stamp.tzinfo is None:
+            parsed.append(pd.NaT)
+        else:
+            parsed.append(stamp.tz_convert("UTC"))
+    work["_dt"] = pd.to_datetime(parsed, utc=True, errors="coerce")
+    audit["invalid_timestamp_rows"] = int(work["_dt"].isna().sum())
+
+    future = work["_dt"].gt(pd.Timestamp(captured))
+    audit["future_rows_discarded"] = int(future.fillna(False).sum())
+    work = work[work["_dt"].notna() & ~future].copy()
+
+    work["_team"] = work["team"].map(normalize_team_code)
+    work["_id"] = work["gsis_id"].astype("string").fillna("").str.strip()
+    invalid_identity = (
+        work["_team"].astype("string").fillna("").str.strip().eq("")
+        | work["_id"].eq("")
+        | work["_id"].eq("<NA>")
+        | work["_id"].str.lower().eq("nan")
+    )
+    audit["invalid_identity_rows"] = int(invalid_identity.sum())
+    work = work[~invalid_identity].copy()
+
+    position_col = next(
+        (column for column in ("pos_abb", "position", "pos_name") if column in work.columns),
+        None,
+    )
+    if position_col is None:
+        audit["status"] = "unusable_missing_position_column"
+        return {
+            "contract_version": DEPTH_CHART_SNAPSHOT_CONTRACT,
+            "captured_at_utc": captured.isoformat(),
+            "depth_charts": [],
+            "audit": audit,
+        }
+    work["_position"] = work[position_col].astype("string").fillna("").str.upper().str.strip()
+    work["_position"] = work["_position"].replace({
+        "QUARTERBACK": "QB",
+        "RUNNING BACK": "RB",
+        "HALFBACK": "RB",
+        "WIDE RECEIVER": "WR",
+        "TIGHT END": "TE",
+        "HB": "RB",
+    })
+    supported = work["_position"].isin({"QB", "RB", "WR", "TE"})
+    audit["unsupported_position_rows"] = int((~supported).sum())
+    work = work[supported].copy()
+
+    ranks = pd.to_numeric(work["pos_rank"], errors="coerce")
+    rank1 = ranks.eq(1)
+    audit["non_rank1_rows_discarded"] = int((~rank1).sum())
+    work = work[rank1].copy()
+    if work.empty:
+        audit["status"] = "qualified_empty"
+        return {
+            "contract_version": DEPTH_CHART_SNAPSHOT_CONTRACT,
+            "captured_at_utc": captured.isoformat(),
+            "depth_charts": [],
+            "audit": audit,
+        }
+
+    latest_by_group = work.groupby(["_team", "_position"])["_dt"].transform("max")
+    superseded = work["_dt"].ne(latest_by_group)
+    audit["superseded_rows_discarded"] = int(superseded.sum())
+    work = work[~superseded].copy()
+    work = work.sort_values(["_team", "_id", "_dt"]).drop_duplicates(
+        subset=["_team", "_id", "_dt"], keep="last"
+    )
+
+    rows = []
+    for _, row in work.iterrows():
+        rows.append({
+            "dt": row["_dt"].isoformat(),
+            "capture_timestamp": captured.isoformat(),
+            "team": row["_team"],
+            "gsis_id": row["_id"],
+            "player_id": row["_id"],
+            "pos_rank": 1,
+            "position": str(row["_position"]),
+        })
+    audit["status"] = "qualified"
+    audit["rows_frozen"] = len(rows)
+    audit["teams_frozen"] = len({row["team"] for row in rows})
+    return {
+        "contract_version": DEPTH_CHART_SNAPSHOT_CONTRACT,
+        "captured_at_utc": captured.isoformat(),
+        "depth_charts": rows,
+        "audit": audit,
+    }
+
+
 def _write_new(path: Path, payload: object) -> None:
     if path.exists():
         raise FileExistsError(f"refusing to overwrite frozen upstream artifact: {path}")
@@ -580,7 +725,12 @@ def main() -> int:
     root = args.output_dir
     multi = len(builds) > 1
     common_player_state = root / "player_state.json"
+    common_depth_charts = root / "depth_charts.json"
     slate_index = root / "upstream_slate.json"
+    depth_chart_snapshot = _snapshot_rank1_depth_charts(
+        sources.depth_charts,
+        forecast_timestamp=forecast_timestamp,
+    )
     planned: list[tuple[Path, object]] = [
         (
             common_player_state,
@@ -593,7 +743,8 @@ def main() -> int:
                     "pbp_source_normalization": pbp_normalization_audit,
                 },
             },
-        )
+        ),
+        (common_depth_charts, depth_chart_snapshot),
     ]
     index_games: list[dict] = []
 
@@ -711,6 +862,7 @@ def main() -> int:
         "week": int(args.week),
         "captured_at_utc": forecast_timestamp.isoformat(),
         "player_state_file": str(common_player_state.relative_to(root)),
+        "depth_charts_file": str(common_depth_charts.relative_to(root)),
         "game_count": len(index_games),
         "scheduled_pregame_game_count": len(schedule_pregame_ids),
         "excluded_started_game_ids": started_game_ids,
@@ -738,6 +890,8 @@ def main() -> int:
                 "game_count": len(builds),
                 "game_ids": [build["game_id"] for build in builds],
                 "player_state": str(common_player_state),
+                "depth_charts": str(common_depth_charts),
+                "depth_chart_rows": depth_chart_snapshot["audit"]["rows_frozen"],
                 "slate_index": str(slate_index),
             },
             indent=2,
