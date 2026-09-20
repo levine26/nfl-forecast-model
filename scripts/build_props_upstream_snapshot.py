@@ -153,16 +153,26 @@ def _snapshot_rank1_depth_charts(
     audit["invalid_identity_rows"] = int(invalid_identity.sum())
     work = work[~invalid_identity].copy()
 
+    # nflverse 2025+ uses pos_grp for formation group (offense/defense/special
+    # teams), not the player's football position. Prefer the explicit abbreviation.
     position_col = next(
         (
             column
-            for column in ("pos_grp", "pos_abb", "pos_name", "position")
+            for column in ("pos_abb", "position", "pos_name")
             if column in work.columns
         ),
         None,
     )
     if position_col:
         work["_position"] = work[position_col].astype("string").fillna("").str.upper().str.strip()
+        work["_position"] = work["_position"].replace({
+            "QUARTERBACK": "QB",
+            "RUNNING BACK": "RB",
+            "HALFBACK": "RB",
+            "WIDE RECEIVER": "WR",
+            "TIGHT END": "TE",
+            "HB": "RB",
+        })
         supported = work["_position"].isin({"QB", "RB", "WR", "TE"})
         audit["unsupported_position_rows"] = int((~supported).sum())
         work = work[supported].copy()
