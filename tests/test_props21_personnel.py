@@ -154,3 +154,34 @@ def test_structured_availability_fails_closed_without_timestamp_or_official_url(
         row for row in adapted["evidence"]
         if row.get("qualification_reference") == "sunday_signal:structured_official_availability"
     ]
+
+
+def test_rank1_depth_chart_is_categorical_starter_evidence_only():
+    manifest = {"game_id": "g", "kickoff_utc": KICKOFF}
+    runner = player("rb1", "Runner One", "RB")
+    adapted = adapt_personnel_evidence(
+        manifest,
+        [runner],
+        {},
+        depth_charts=[{
+            "dt": "2026-09-19T18:00:00+00:00",
+            "capture_timestamp": "2026-09-19T19:00:00+00:00",
+            "team": "ATL",
+            "gsis_id": "rb1",
+            "pos_rank": 1,
+            "position": "RB",
+        }],
+    )
+    result = build_personnel_intelligence(
+        adapted["player_state"],
+        adapted["evidence"],
+        forecast_timestamp=FORECAST,
+        kickoff_timestamp=KICKOFF,
+    )
+    state = result["states"][0]
+    assert state["role_state"] == "STARTER_EXPECTED"
+    assert state["workload_state"] == "UNKNOWN"
+    assert state["workload_multiplier"] is None
+    assert state["news_coverage"] is False
+    assert "ROLE_UNCERTAIN" in state["uncertainties"]
+    assert "MISSING_CURRENT_NEWS_COVERAGE" in state["uncertainties"]
