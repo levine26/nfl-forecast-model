@@ -84,4 +84,4 @@ def test_coordinator_retains_manifest_opportunity_for_qa():
     row = payload["forecasts"][0]
     assert row["opportunity_state"]["pass_attempts"] == 32.0
     assert row["opportunity_state"]["carries"] == 4.0
-    assert "OPPORTUNITY_UNVERIFIED" not in row["qa"]["flag_codes"]
+    assert "OPPORTUNITY_UNVERIFIED" not in {flag["code"] for flag in row["qa"]["flags"]}
