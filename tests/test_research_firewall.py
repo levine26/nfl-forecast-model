@@ -76,6 +76,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "tests/test_props_upstream.py",
         "tests/test_props_runner.py",
         "tests/test_props_integration.py",
+        "tests/test_levline_markets_live.py",
         "tests/test_props21_coordinator.py",
         "tests/test_props21_market.py",
         "tests/test_props21_personnel.py",
