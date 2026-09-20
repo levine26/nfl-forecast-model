@@ -1,19 +1,19 @@
 # Props 2.1 live-slate acceptance report
 
-Generated: 2026-09-20T00:29:08.205182+00:00
+Generated: 2026-09-20T00:48:19.773272+00:00
 Games: 15
 Forecasts: 3439
 Market-backed QB team states: 30
 Market-backed QBs with zero output: 0
-Current-reporting evidence accepted: 7
-Players with qualified current news: 5
+Current-reporting evidence accepted: 12
+Players with qualified current news: 3
 xTD aggregate diagnostics: 1771
 Context-fitted xTD rows: 0
-Market distributions supported: 214
-Market distributions using explicit fallback: 3225
+Market distributions supported: 213
+Market distributions using explicit fallback: 3226
 Market providers: propline
 Credential mode: configured
-QA states: {"no_signal": 3060, "radar": 0, "watch": 379}
+QA states: {"no_signal": 3064, "radar": 0, "watch": 375}
 Unresolved canonical identities: 0
 OUT players with normal opportunity: 0
 Winner/F-ST mutation: false
@@ -22,17 +22,17 @@ V1/Shadow A/Shadow B mutation: false
 ## Acceptance checklist
 
 1. Starting-QB identity: PASS — 30 market-backed team/QB states across 15 games.
-2. Qualified reported starters/replacements: Cooper Rush (192.2 vs 183.5), Drew Lock (199.6 vs 206.0).
+2. Qualified reported starters/replacements: Cooper Rush (192.2 vs 183.5).
 3. Market-backed QBs with approximately zero passing output: 0.
 4. OUT players retaining normal opportunity: 0.
-5. RB/WR/TE role intelligence: active; coverage {"QB": {"non_unknown_role": 3, "players": 103, "qualified_news": 3}, "RB": {"non_unknown_role": 0, "players": 180, "qualified_news": 0}, "TE": {"non_unknown_role": 0, "players": 173, "qualified_news": 0}, "WR": {"non_unknown_role": 1, "players": 288, "qualified_news": 2}}.
+5. RB/WR/TE role intelligence: active; coverage {"QB": {"non_unknown_role": 4, "players": 103, "qualified_news": 2}, "RB": {"non_unknown_role": 0, "players": 180, "qualified_news": 0}, "TE": {"non_unknown_role": 1, "players": 173, "qualified_news": 0}, "WR": {"non_unknown_role": 3, "players": 288, "qualified_news": 1}}.
 6. Unresolved canonical identities: 0.
 7. Pregame chronology: PASS.
 8. Provider/credential provenance: propline / configured.
-9. Market distribution: 214 supported; 3225 explicit fallbacks.
+9. Market distribution: 213 supported; 3226 explicit fallbacks.
 10. Team/player accounting: source simulation accounting is checked per forecast; incomplete cross-market expectations remain unevaluable rather than summed from medians.
 11. Extreme Fair-Line gaps: automated QA active and confidence cannot increase because a gap is large.
-12. Suspicious forecasts: 3060 NO SIGNAL, 379 WATCH, 0 RADAR.
+12. Suspicious forecasts: 3064 NO SIGNAL, 375 WATCH, 0 RADAR.
 13. V1 outputs unchanged: PASS.
 14. Shadow A/B receipts unchanged: PASS.
 15. Official F-ST/winner surfaces unchanged: PASS.
