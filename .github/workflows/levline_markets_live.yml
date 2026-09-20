@@ -193,7 +193,8 @@ jobs:
             RAW_MARKET="$RUN_ROOT/market.raw.json"
             FORECASTS="$RUN_ROOT/forecasts.json"
             MANIFEST_SLATE="$RUN_ROOT/manifests/manifest_slate.json"
-            for path in "$MARKET" "$RAW_MARKET" "$FORECASTS" "$MANIFEST_SLATE"; do
+            DEPTH_CHARTS="$RUN_ROOT/upstream/depth_charts.json"
+            for path in "$MARKET" "$RAW_MARKET" "$FORECASTS" "$MANIFEST_SLATE" "$DEPTH_CHARTS"; do
               test -f "$path" || { echo "::error::missing live Props audit file: $path"; exit 1; }
             done
 
@@ -209,6 +210,7 @@ jobs:
             RAW_MARKET_SHA=$(sha256sum "$RAW_MARKET" | awk '{print $1}')
             FORECASTS_SHA=$(sha256sum "$FORECASTS" | awk '{print $1}')
             MANIFEST_SHA=$(sha256sum "$MANIFEST_SLATE" | awk '{print $1}')
+            DEPTH_CHARTS_SHA=$(sha256sum "$DEPTH_CHARTS" | awk '{print $1}')
 
             jq -n \
               --arg contract_version "levline-props-live-source-provenance-v0.1.0" \
@@ -224,6 +226,7 @@ jobs:
               --arg raw_market_sha256 "$RAW_MARKET_SHA" \
               --arg forecasts_sha256 "$FORECASTS_SHA" \
               --arg manifest_slate_sha256 "$MANIFEST_SHA" \
+              --arg depth_charts_sha256 "$DEPTH_CHARTS_SHA" \
               --argjson provider_attempts "$PROVIDER_ATTEMPTS" \
               '{
                 contract_version:$contract_version,
@@ -240,6 +243,7 @@ jobs:
                 raw_market_sha256:$raw_market_sha256,
                 forecasts_sha256:$forecasts_sha256,
                 manifest_slate_sha256:$manifest_slate_sha256,
+                depth_charts_sha256:$depth_charts_sha256,
                 research_only:true,
                 production_authorized:false
               }' > "$RUN_ROOT/source_provenance.json"
@@ -250,6 +254,7 @@ jobs:
               --input outputs/props/forecasts.json \
               --previews outputs/game_previews.json \
               --manifest-slate "$MANIFEST_SLATE" \
+              --depth-charts "$DEPTH_CHARTS" \
               --credential-mode "$CREDENTIAL_MODE" \
               --output challenger_outputs/props21/public_challenger.json \
               --receipts challenger_outputs/props21/forecast_originals.jsonl \
