@@ -97,6 +97,7 @@ def _snapshot_rank1_depth_charts(
         "invalid_timestamp_rows": 0,
         "future_rows_discarded": 0,
         "invalid_identity_rows": 0,
+        "unsupported_position_rows": 0,
         "non_rank1_rows_discarded": 0,
         "superseded_rows_discarded": 0,
         "rows_frozen": 0,
@@ -152,6 +153,20 @@ def _snapshot_rank1_depth_charts(
     audit["invalid_identity_rows"] = int(invalid_identity.sum())
     work = work[~invalid_identity].copy()
 
+    position_col = next(
+        (
+            column
+            for column in ("pos_grp", "pos_abb", "pos_name", "position")
+            if column in work.columns
+        ),
+        None,
+    )
+    if position_col:
+        work["_position"] = work[position_col].astype("string").fillna("").str.upper().str.strip()
+        supported = work["_position"].isin({"QB", "RB", "WR", "TE"})
+        audit["unsupported_position_rows"] = int((~supported).sum())
+        work = work[supported].copy()
+
     ranks = pd.to_numeric(work["pos_rank"], errors="coerce")
     rank1 = ranks.eq(1)
     audit["non_rank1_rows_discarded"] = int((~rank1).sum())
@@ -165,21 +180,13 @@ def _snapshot_rank1_depth_charts(
             "audit": audit,
         }
 
-    latest_by_team = work.groupby("_team")["_dt"].transform("max")
-    superseded = work["_dt"].ne(latest_by_team)
+    snapshot_groups = ["_team", "_position"] if position_col else ["_team"]
+    latest_by_group = work.groupby(snapshot_groups)["_dt"].transform("max")
+    superseded = work["_dt"].ne(latest_by_group)
     audit["superseded_rows_discarded"] = int(superseded.sum())
     work = work[~superseded].copy()
     work = work.sort_values(["_team", "_id", "_dt"]).drop_duplicates(
         subset=["_team", "_id", "_dt"], keep="last"
-    )
-
-    position_col = next(
-        (
-            column
-            for column in ("pos_grp", "pos_abb", "pos_name", "position")
-            if column in work.columns
-        ),
-        None,
     )
     rows = []
     for _, row in work.iterrows():
@@ -192,7 +199,7 @@ def _snapshot_rank1_depth_charts(
             "pos_rank": 1,
         }
         if position_col:
-            output["position"] = _json_safe(row.get(position_col))
+            output["position"] = str(row["_position"])
         rows.append(output)
 
     audit["status"] = "qualified"
