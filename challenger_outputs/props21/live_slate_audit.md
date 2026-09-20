@@ -1,6 +1,6 @@
 # Props 2.1 live-slate acceptance report
 
-Generated: 2026-09-19T22:16:28.920790+00:00
+Generated: 2026-09-20T00:00:22.995616+00:00
 Games: 15
 Forecasts: 3439
 Market-backed QB team states: 30
@@ -9,10 +9,10 @@ Current-reporting evidence accepted: 7
 Players with qualified current news: 5
 xTD aggregate diagnostics: 1771
 Context-fitted xTD rows: 0
-Market distributions supported: 207
-Market distributions using explicit fallback: 3232
+Market distributions supported: 215
+Market distributions using explicit fallback: 3224
 Market providers: propline
-Credential mode: shared_public_demo
+Credential mode: configured
 QA states: {"no_signal": 3060, "radar": 0, "watch": 379}
 Unresolved canonical identities: 0
 OUT players with normal opportunity: 0
@@ -28,8 +28,8 @@ V1/Shadow A/Shadow B mutation: false
 5. RB/WR/TE role intelligence: active; coverage {"QB": {"non_unknown_role": 3, "players": 103, "qualified_news": 3}, "RB": {"non_unknown_role": 0, "players": 180, "qualified_news": 0}, "TE": {"non_unknown_role": 0, "players": 173, "qualified_news": 0}, "WR": {"non_unknown_role": 1, "players": 288, "qualified_news": 2}}.
 6. Unresolved canonical identities: 0.
 7. Pregame chronology: PASS.
-8. Provider/credential provenance: propline / shared_public_demo.
-9. Market distribution: 207 supported; 3232 explicit fallbacks.
+8. Provider/credential provenance: propline / configured.
+9. Market distribution: 215 supported; 3224 explicit fallbacks.
 10. Team/player accounting: source simulation accounting is checked per forecast; incomplete cross-market expectations remain unevaluable rather than summed from medians.
 11. Extreme Fair-Line gaps: automated QA active and confidence cannot increase because a gap is large.
 12. Suspicious forecasts: 3060 NO SIGNAL, 379 WATCH, 0 RADAR.
