@@ -1179,3 +1179,22 @@ def test_depth_chart_snapshot_freezes_latest_pregame_rank1_rows():
     assert audit["invalid_timestamp_rows"] == 1
     assert audit["non_rank1_rows_discarded"] == 1
     assert audit["superseded_rows_discarded"] == 1
+
+
+
+def test_depth_chart_snapshot_fails_closed_without_player_position_column():
+    module = _upstream_cli_module()
+    forecast = datetime(2026, 9, 19, 20, 0, tzinfo=timezone.utc)
+    frame = pd.DataFrame([{
+        "dt": "2026-09-19T19:00:00+00:00",
+        "team": "ATL",
+        "gsis_id": "ambiguous",
+        "pos_rank": 1,
+        "pos_grp": "Offense",
+    }])
+    snapshot = module._snapshot_rank1_depth_charts(
+        frame,
+        forecast_timestamp=forecast,
+    )
+    assert snapshot["depth_charts"] == []
+    assert snapshot["audit"]["status"] == "unusable_missing_position_column"
