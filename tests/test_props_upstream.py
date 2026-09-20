@@ -1155,13 +1155,13 @@ def test_depth_chart_snapshot_freezes_latest_pregame_rank1_rows():
     module = _upstream_cli_module()
     forecast = datetime(2026, 9, 19, 20, 0, tzinfo=timezone.utc)
     frame = pd.DataFrame([
-        {"dt": "2026-09-19T18:00:00+00:00", "team": "ATL", "gsis_id": "old-rb", "pos_rank": 1, "pos_grp": "RB"},
-        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "rb1", "pos_rank": 1, "pos_grp": "RB"},
-        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "wr1", "pos_rank": 1, "pos_grp": "WR"},
-        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "rb2", "pos_rank": 2, "pos_grp": "RB"},
-        {"dt": "2026-09-19T21:00:00+00:00", "team": "ATL", "gsis_id": "future", "pos_rank": 1, "pos_grp": "TE"},
-        {"dt": "2026-09-19T19:00:00", "team": "ATL", "gsis_id": "naive", "pos_rank": 1, "pos_grp": "TE"},
-        {"dt": "2026-09-19T18:30:00+00:00", "team": "JAC", "gsis_id": "jax-qb", "pos_rank": 1, "pos_grp": "QB"},
+        {"dt": "2026-09-19T18:00:00+00:00", "team": "ATL", "gsis_id": "old-rb", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "RB"},
+        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "rb1", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "RB"},
+        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "wr1", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "WR"},
+        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "rb2", "pos_rank": 2, "pos_grp": "Offense", "pos_abb": "RB"},
+        {"dt": "2026-09-19T21:00:00+00:00", "team": "ATL", "gsis_id": "future", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "TE"},
+        {"dt": "2026-09-19T19:00:00", "team": "ATL", "gsis_id": "naive", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "TE"},
+        {"dt": "2026-09-19T18:30:00+00:00", "team": "JAC", "gsis_id": "jax-qb", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "QB"},
     ])
     snapshot = module._snapshot_rank1_depth_charts(frame, forecast_timestamp=forecast)
     rows = snapshot["depth_charts"]
@@ -1171,6 +1171,7 @@ def test_depth_chart_snapshot_freezes_latest_pregame_rank1_rows():
         ("JAX", "jax-qb"),
     }
     assert all(row["pos_rank"] == 1 for row in rows)
+    assert {row["position"] for row in rows} == {"QB", "RB", "WR"}
     assert all(row["capture_timestamp"] == forecast.isoformat() for row in rows)
     audit = snapshot["audit"]
     assert audit["status"] == "qualified"
