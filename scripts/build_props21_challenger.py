@@ -62,6 +62,24 @@ def _load_manifest_slate(path: Path | None) -> dict[str, Mapping[str, Any]]:
     return result
 
 
+def _load_depth_charts(path: Path | None) -> list[dict[str, Any]]:
+    if path is None:
+        return []
+    payload = _load(path)
+    if isinstance(payload, Mapping):
+        version = payload.get("contract_version")
+        if version not in {None, "levline-props-depth-chart-snapshot-v0.1"}:
+            raise ValueError(f"unexpected depth-chart snapshot contract: {version!r}")
+        rows = payload.get("depth_charts")
+    else:
+        rows = payload
+    if not isinstance(rows, list):
+        raise ValueError("depth-chart snapshot must contain a depth_charts list")
+    if not all(isinstance(row, Mapping) for row in rows):
+        raise ValueError("depth-chart snapshot rows must be objects")
+    return [dict(row) for row in rows]
+
+
 def _aware(value: object, label: str) -> datetime:
     try:
         parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
@@ -123,6 +141,7 @@ def _canonical_players(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, A
 def _personnel_by_player(
     rows: list[dict[str, Any]], previews: Mapping[str, Any], generated: datetime,
     manifests: Mapping[str, Mapping[str, Any]] | None = None,
+    depth_charts: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[tuple[str, str], dict[str, Any]], dict[str, Any]]:
     players = _canonical_players(rows)
     states: dict[tuple[str, str], dict[str, Any]] = {}
@@ -144,6 +163,7 @@ def _personnel_by_player(
             manifest,
             player_state=player_rows,
             media_payload=payload,
+            depth_charts=depth_charts or [],
         )
         result = build_personnel_intelligence(
             adapted["player_state"],
@@ -168,6 +188,7 @@ def _personnel_by_player(
         "accepted_evidence": accepted,
         "rejected_evidence": rejected,
         "news_covered_players": news,
+        "depth_chart_rows_supplied": len(depth_charts or []),
         "rejection_counts": dict(sorted(rejection_counts.items())),
     }
 
@@ -298,6 +319,7 @@ def build(
     source: Mapping[str, Any], previews: Mapping[str, Any], *, generated: datetime,
     credential_mode: str | None = None,
     manifests: Mapping[str, Mapping[str, Any]] | None = None,
+    depth_charts: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     rows = source.get("forecasts")
     if not isinstance(rows, list) or not rows:
@@ -308,7 +330,7 @@ def build(
     kickoffs = {_aware(row.get("kickoff_utc"), "kickoff_utc") for row in rows}
     if any(generated >= kickoff for kickoff in kickoffs):
         raise ValueError("refusing partial/started slate: every source game must remain pregame")
-    roles, personnel_audit = _personnel_by_player(rows, previews, generated, manifests)
+    roles, personnel_audit = _personnel_by_player(rows, previews, generated, manifests, depth_charts)
     xtd_by_player: dict[tuple[str, str], Mapping[str, Any]] = {}
     manifest_xtd_audit: list[dict[str, Any]] = []
     for game, manifest in (manifests or {}).items():
@@ -526,6 +548,7 @@ def main() -> int:
     parser.add_argument("--input", type=Path, default=Path("outputs/props/forecasts.json"))
     parser.add_argument("--previews", type=Path, default=Path("outputs/game_previews.json"))
     parser.add_argument("--manifest-slate", type=Path)
+    parser.add_argument("--depth-charts", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--receipts", type=Path)
     parser.add_argument("--report", type=Path)
@@ -535,7 +558,8 @@ def main() -> int:
     generated = _aware(args.generated_at, "generated-at") if args.generated_at else datetime.now(timezone.utc)
     payload = build(_load(args.input), _load(args.previews) if args.previews.exists() else {},
                     generated=generated, credential_mode=args.credential_mode,
-                    manifests=_load_manifest_slate(args.manifest_slate))
+                    manifests=_load_manifest_slate(args.manifest_slate),
+                    depth_charts=_load_depth_charts(args.depth_charts))
     _write_json(args.output, payload)
     if args.receipts:
         payload["audit"]["new_receipt_count"] = _append_receipts(args.receipts, payload)
