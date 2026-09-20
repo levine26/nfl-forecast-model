@@ -37,6 +37,31 @@ TEAM_HOSTS = {"azcardinals.com", "atlantafalcons.com", "baltimoreravens.com", "b
                "commanders.com", "nfl.com"}
 QUALIFIED_REPORTING_REFERENCE = "levline_current_reported_sources:qualified"
 
+STRUCTURED_AVAILABILITY_STATUS = {
+    "OUT": "OUT",
+    "DOUBTFUL": "DOUBTFUL",
+    "QUESTIONABLE": "QUESTIONABLE",
+    "AVAILABLE": "AVAILABLE",
+    "ACTIVE": "AVAILABLE",
+}
+
+
+def _structured_availability_claim(title: Any) -> tuple[str, str, str] | None:
+    """Parse only exact team/player/status labels emitted by Sunday Signal evidence."""
+    match = re.fullmatch(
+        r"\s*([A-Z]{2,3})\s*:\s*(.+?)\s*[—-]\s*(Out|Doubtful|Questionable|Available|Active)\s*",
+        _text(title),
+        re.I,
+    )
+    if not match:
+        return None
+    team, player_name, raw_status = match.groups()
+    status = STRUCTURED_AVAILABILITY_STATUS.get(raw_status.upper())
+    if not status:
+        return None
+    return _team(team), _text(player_name), status
+
+
 
 def _text(value: Any) -> str:
     if value is None or (isinstance(value, float) and math.isnan(value)):
@@ -353,6 +378,69 @@ def adapt_personnel_evidence(
     entry = game_map.get(game, {}) if isinstance(game_map, Mapping) else {}
     if isinstance(entry, Mapping):
         capture = entry.get("captured_at_utc") or entry.get("generated_utc") or payload.get("captured_at_utc") or payload.get("generated_utc")
+
+        # Reuse Sunday Signal's structured official availability observations only
+        # when the timestamped matchup row joins exactly to a structured personnel
+        # record that carries an allowlisted official URL. This is intentionally
+        # narrower than free-text headline parsing and never infers workload.
+        structured_sources: dict[tuple[str, str], set[tuple[str, str]]] = {}
+        for collection in ("evidence_used", "key_factors"):
+            for source_row in entry.get(collection, []) or []:
+                if not isinstance(source_row, Mapping):
+                    continue
+                title = _text(source_row.get("title"))
+                source_name = _text(source_row.get("source_name"))
+                source_url = _text(source_row.get("source_url"))
+                category = _text(source_row.get("category") or source_row.get("family")).lower()
+                if not title or not source_url or category not in {"personnel", "availability"}:
+                    continue
+                structured_sources.setdefault((title, source_name), set()).add((source_name, source_url))
+        for observation in entry.get("matchup_meter", []) or []:
+            if not isinstance(observation, Mapping) or _text(observation.get("family")).lower() != "availability":
+                continue
+            claim = _structured_availability_claim(observation.get("title"))
+            if claim is None:
+                continue
+            claim_team, claim_name, kind = claim
+            matches = [
+                player for player in players
+                if _text(player.get("game_id")) == game
+                and _team(player.get("team")) == claim_team
+                and _name(player.get("player_name")) == _name(claim_name)
+            ]
+            if len(matches) != 1:
+                continue
+            source_name = _text(observation.get("source_name"))
+            source_candidates = structured_sources.get((_text(observation.get("title")), source_name), set())
+            if len(source_candidates) != 1:
+                continue
+            qualified_source_name, source_url = next(iter(source_candidates))
+            if not _host_allowed(source_url, TEAM_HOSTS):
+                continue
+            observed = observation.get("as_of") or observation.get("timestamp")
+            captured = observation.get("capture_timestamp") or observation.get("captured_at_utc") or capture
+            if _stamp(observed) is None or _stamp(captured) is None:
+                continue
+            player = matches[0]
+            evidence.append({
+                "game_id": game,
+                "team": player.get("team"),
+                "player_id": player.get("player_id"),
+                "player_name": player.get("player_name"),
+                "position": player.get("position"),
+                "evidence_type": kind,
+                "source": qualified_source_name,
+                "source_url": source_url,
+                "source_kind": "official",
+                "qualification_state": "QUALIFIED",
+                "qualification_reference": "sunday_signal:structured_official_availability",
+                "timestamp": observed,
+                "capture_timestamp": captured,
+                "timestamp_basis": "official_status_observation",
+                "title": observation.get("title"),
+                "channel": "availability",
+            })
+
         for source in entry.get("current_reported_sources", []) or []:
             if not isinstance(source, Mapping):
                 continue
