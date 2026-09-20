@@ -79,6 +79,7 @@ ALLOWED_EXACT = {
     "src/nfl_forecast/props_integration.py",
     "tests/test_props_efficiency_td.py",
     "tests/test_props_integration.py",
+    "tests/test_levline_markets_live.py",
     "tests/test_props_opportunity.py",
     "tests/test_props_opportunity_adapter.py",
     "tests/test_props_opportunity_handoff.py",
