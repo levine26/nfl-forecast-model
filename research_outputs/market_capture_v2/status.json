@@ -1,14 +1,16 @@
 {
-  "api_key_configured": false,
+  "api_key_configured": true,
   "api_key_value_recorded": false,
   "completed_2026_outcomes_used": 0,
-  "external_request_made": false,
+  "error": "401 Client Error: Unauthorized for url: https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?apiKey=3d96ef7ff946cf31d87083ef7786629b&regions=us&markets=h2h%2Cspreads%2Ctotals&oddsFormat=american&dateFormat=iso",
+  "error_type": "HTTPError",
+  "external_request_made": null,
   "observability_schema": "levline-market-capture-observability-v1",
-  "observed_at_utc": "2026-09-17T23:45:03.135290Z",
+  "observed_at_utc": "2026-09-20T14:54:06.284840Z",
   "official_forecast_mutation_authorized": false,
   "probability_feature_authorized": false,
   "production_authorized": false,
-  "reason": "missing_api_key",
+  "reason": "collector_exception",
   "research_only": true,
-  "status": "skipped"
+  "status": "error"
 }
