@@ -1012,6 +1012,8 @@ def test_all_games_cli_builds_one_atomic_upstream_slate(monkeypatch, tmp_path):
     assert index["game_count"] == 2
     assert [row["game_id"] for row in index["games"]] == ["g1", "g2"]
     assert (output / "player_state.json").exists()
+    assert (output / "depth_charts.json").exists()
+    assert index["depth_charts_file"] == "depth_charts.json"
     assert (output / "games" / "g1" / "g1.game_spec.json").exists()
     assert (output / "games" / "g2" / "g2.game_spec.json").exists()
 
