@@ -1,0 +1,58 @@
+{
+  "authority": {
+    "active_or_healthy_inference_from_absence_authorized": false,
+    "availability_probability_feature_authorized": false,
+    "forecast_probability_effect_authorized": false,
+    "game_day_membership_qualified": false,
+    "general_2026_player_identity_to_gsis_qualified": false,
+    "model_fit_authorized": false,
+    "player_value_join_authorized": false,
+    "production_authorized": false,
+    "source_independent_identity_validation_still_required": true,
+    "week2_sunday_due_inactive_identity_mechanics_validated": false,
+    "week2_sunday_due_inactive_player_identity_to_gsis_qualified": false
+  },
+  "completed_2026_outcomes_used": 0,
+  "contract_id": "LEVLINE-4-2026-PROSPECTIVE-INACTIVE-IDENTITY-QUALIFICATION-V1",
+  "evaluated_attempt_id": "8db40b4b76413dc1303e90ed9c138be95e69a0a797058253e41410f72daccdc9",
+  "evaluated_captured_at_utc": "2026-09-20T16:00:10.676846Z",
+  "evaluated_execution_id": "c5116067ddb4178e0e9e54cce30688a1f12cf0d0e3b0a9382be004bf4b94496c",
+  "f_st_01_frozen_2026_unchanged": true,
+  "first_identity_execution_only": true,
+  "gates": {
+    "ambiguities_zero": true,
+    "cross_artifact_agreement_eq_1": true,
+    "cross_artifact_agreement_wilson95_lower_gte_0_95": true,
+    "cross_artifact_auditable_fraction_gte_0_80": true,
+    "cross_artifact_auditable_rows_gte_73": true,
+    "cross_artifact_contradictions_zero": true,
+    "dependency_shas_match": true,
+    "exact_due_team_coverage": true,
+    "exact_unique_resolution_rate_gte_0_995": false,
+    "first_execution_status_pass": true,
+    "global_source_never_used_as_fallback": true,
+    "one_distinct_matching_article_body": true,
+    "research_authority_firewall_intact": true,
+    "row_and_observation_integrity": true,
+    "week_is_2": true
+  },
+  "metrics": {
+    "ambiguities": 0,
+    "cross_artifact_agreement": 1.0,
+    "cross_artifact_agreement_wilson95_lower_bound": 0.9541818704644728,
+    "cross_artifact_auditable_fraction_of_exact_unique": 0.8602150537634409,
+    "cross_artifact_auditable_rows": 80,
+    "cross_artifact_contradictions": 0,
+    "cross_artifact_corroborated": 80,
+    "exact_unique_resolution_rate": 0.9489795918367347,
+    "exact_unique_resolutions": 93,
+    "total_resolver_rows": 98
+  },
+  "schema_version": "levline4-2026-prospective-inactive-identity-qualification-v1",
+  "source_lineage": {
+    "cross_artifact_audit_is_source_independent": false,
+    "global_identity_provider": "nflverse",
+    "weekly_identity_provider": "nflverse"
+  },
+  "status": "FAIL_WEEK2_SUNDAY_DUE_INACTIVE_IDENTITY_MECHANICS"
+}
