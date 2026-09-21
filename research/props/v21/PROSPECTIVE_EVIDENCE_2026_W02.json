@@ -1,0 +1,68 @@
+{
+  "contract_version": "levline-props-2.1-prospective-evidence-manifest-v0.1.0",
+  "research_only": true,
+  "production_authorized": false,
+  "source_live_workflow_run": "35477049179",
+  "source_live_workflow_trigger_sha": "e851c4ae703bd7fd2d34c052190a6a546925f3a2",
+  "publication_commit": "ba723255982c79ffe6072c714dd0ee2c37e1fa34",
+  "generated_utc": "2026-09-20T00:00:22.995616+00:00",
+  "forecast_count": 3439,
+  "game_count": 15,
+  "games": [
+    "2026_02_CAR_ATL",
+    "2026_02_CIN_HOU",
+    "2026_02_CLE_TB",
+    "2026_02_GB_NYJ",
+    "2026_02_IND_KC",
+    "2026_02_JAX_DEN",
+    "2026_02_LV_LAC",
+    "2026_02_MIA_SF",
+    "2026_02_MIN_CHI",
+    "2026_02_NO_BAL",
+    "2026_02_NYG_LA",
+    "2026_02_PHI_TEN",
+    "2026_02_PIT_NE",
+    "2026_02_SEA_ARI",
+    "2026_02_WAS_DAL"
+  ],
+  "props21": {
+    "model_version": "levline-props-2.1-sunday-v0.1",
+    "receipt_version": "levline-props-2.1-prospective-receipt-v0.1",
+    "forecast_timestamp_utc": "2026-09-20T00:00:22.995616+00:00",
+    "source_data_horizon_utc": "2026-09-19T23:56:50.256554+00:00",
+    "receipt_path": "challenger_outputs/props21/forecast_originals.jsonl",
+    "receipt_blob_sha": "e89cdce268fb10c5107ba6db4087107fb213555f",
+    "receipt_blob_size_bytes": 12071470,
+    "public_path": "challenger_outputs/props21/public_challenger.json",
+    "public_blob_sha": "414ab291ac506369417740ec48cea5de42584448",
+    "audit_path": "challenger_outputs/props21/live_slate_audit.md",
+    "audit_blob_sha": "57442fef35111a73622f4927f2ab3f0e3cf74b7c"
+  },
+  "source_v1": {
+    "model_version": "levline-props-simulation-v0.1.0",
+    "forecast_timestamp_utc": "2026-09-19T23:59:43.732146+00:00",
+    "forecast_path": "outputs/props/forecasts.json",
+    "forecast_blob_sha": "ec61a5ae36f2e307b4bde1fc4c5a0fa6255923dc",
+    "forecast_blob_size_bytes": 24595586,
+    "forecast_count": 3439
+  },
+  "market": {
+    "provider": "propline",
+    "credential_mode": "configured",
+    "captured_artifact_count": 894,
+    "market_distributions_supported": 215,
+    "market_distribution_fallbacks": 3224
+  },
+  "qa": {
+    "no_signal": 3060,
+    "watch": 379,
+    "radar": 0,
+    "unresolved_canonical_identities": 0,
+    "out_players_with_normal_opportunity": 0,
+    "context_fitted_xtd_rows": 0,
+    "aggregate_xtd_diagnostics": 1771
+  },
+  "chronology": "source_data_horizon <= source_v1_forecast <= props21_forecast < kickoff",
+  "scoring_rule": "Only finalized games with complete outcome PBP and positive offensive-snap participation are graded. Unfinalized games remain ungraded.",
+  "immutable_originals_mutated": false
+}
