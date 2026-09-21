@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 
 from nfl_forecast.data import load_advanced_data, load_core_data
-from nfl_forecast.props_evaluation import evaluate_history, original_sha256
+from research.props.evaluation.props_evaluation import evaluate_history, original_sha256
 from nfl_forecast.props_player_sources import normalize_snap_counts_player_ids
 from nfl_forecast.props_upstream import normalize_nflverse_scramble_semantics
 from research.props.v2 import grade_prospective_football_shadow as shadow_grader
