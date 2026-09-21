@@ -48,12 +48,19 @@ jobs:
             src/nfl_forecast/features.py \
             src/nfl_forecast/fst_production.py \
             src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json)"
-      - name: Rebuild and validate the real committed live slate
+      - name: Rebuild and validate the frozen 15-game pregame slate
         run: |
+          set -euo pipefail
+          FROZEN_COMMIT=ba723255982c79ffe6072c714dd0ee2c37e1fa34
+          git cat-file -e "${FROZEN_COMMIT}:outputs/props/forecasts.json"
+          git cat-file -e "${FROZEN_COMMIT}:outputs/game_previews.json"
+          git show "${FROZEN_COMMIT}:outputs/props/forecasts.json" > /tmp/frozen_props_forecasts.json
+          git show "${FROZEN_COMMIT}:outputs/game_previews.json" > /tmp/frozen_game_previews.json
           python scripts/build_props21_challenger.py \
-            --input outputs/props/forecasts.json \
-            --previews outputs/game_previews.json \
-            --credential-mode shared_public_demo \
+            --input /tmp/frozen_props_forecasts.json \
+            --previews /tmp/frozen_game_previews.json \
+            --generated-at 2026-09-20T00:00:22.995616+00:00 \
+            --credential-mode configured \
             --output /tmp/public_challenger.json \
             --receipts /tmp/forecast_originals.jsonl \
             --report /tmp/live_slate_audit.md
