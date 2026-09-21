@@ -839,6 +839,13 @@ def _cli_package(game_id):
 
 
 def _patch_upstream_cli(monkeypatch, module, *, fail_game=None):
+    class FrozenDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            value = datetime(2026, 9, 19, 12, 0, tzinfo=timezone.utc)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(module, "datetime", FrozenDateTime)
     state = _cli_player_state()
     schedules = pd.DataFrame(
         [
