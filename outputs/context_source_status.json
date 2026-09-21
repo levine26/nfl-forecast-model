@@ -102,9 +102,7 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {
-      "2026_02_MIA_SF": "newer_reporting_available"
-    },
+    "advisories": {},
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 15,
@@ -146,7 +144,7 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 77,
+    "evidence_repairs": 0,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
@@ -189,20 +187,22 @@
     ],
     "games": {
       "2026_02_CAR_ATL": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-21T08:40:24.650440+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=226, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
         "recovered_at_utc": "2026-09-21T06:54:12.700946+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_02_CIN_HOU": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-21T08:40:24.650440+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=723, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=999, x-ratelimit-remaining-tokens=",
         "recovered_at_utc": "2026-09-21T06:57:40.635935+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_02_CLE_TB": {
         "fallback_source": "chatgpt",
@@ -221,20 +221,22 @@
         "requires_chatgpt_refresh": false
       },
       "2026_02_IND_KC": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-21T08:40:24.650440+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=74, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
         "recovered_at_utc": "2026-09-21T07:08:50.983326+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_02_JAX_DEN": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-21T08:40:24.650440+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=391, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
         "recovered_at_utc": "2026-09-21T07:03:14.684901+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_02_LV_LAC": {
         "fallback_source": "chatgpt",
@@ -253,20 +255,22 @@
         "requires_chatgpt_refresh": false
       },
       "2026_02_MIN_CHI": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-21T08:40:24.650440+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=82, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
         "recovered_at_utc": "2026-09-21T06:56:26.592557+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_02_NO_BAL": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-21T08:40:24.650440+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=154, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
         "recovered_at_utc": "2026-09-21T06:55:19.633266+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_02_NYG_LA": {
         "fallback_source": "chatgpt",
@@ -277,12 +281,13 @@
         "requires_chatgpt_refresh": false
       },
       "2026_02_PHI_TEN": {
-        "fallback_source": "last_validated_editorial",
+        "chatgpt_refreshed_at_utc": "2026-09-21T08:40:24.650440+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=468, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
         "recovered_at_utc": "2026-09-21T07:02:07.954944+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_02_PIT_NE": {
         "fallback_source": "chatgpt",
@@ -311,7 +316,7 @@
     },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
     "run_id": "35570348827",
-    "status": "degraded"
+    "status": "healthy"
   },
   "injuries": {
     "as_of": "2026-09-21T06:36:02.761871+00:00",
@@ -324,6 +329,8 @@
   "media_reporting": {
     "as_of": "2026-09-21T06:38:58.528553+00:00",
     "cross_game_titles_rejected": 0,
+    "fallback_snapshot_guardrail": "Failed-game recovery preserves the previously launch-grade media packet; a transient fallback-run media rediscovery cannot erase validated reporting authority.",
+    "fallback_snapshot_reused": true,
     "games": 15,
     "games_with_display_reporting": 15,
     "games_with_reporting": 15,
