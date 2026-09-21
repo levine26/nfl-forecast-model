@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import pytest
 
-from nfl_forecast.props_evaluation import (
+from research.props.evaluation.props_evaluation import (
     EVALUATION_CONTRACT_VERSION,
     american_to_decimal,
     evaluate_history,
