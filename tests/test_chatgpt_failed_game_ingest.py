@@ -110,6 +110,57 @@ def test_mixed_payload_replaces_only_target_game() -> None:
     assert mixed["games"]["g2"]["paragraph1"] == "successful Groq paragraph"
 
 
+
+def test_mixed_payload_recovers_missing_successful_game_from_validated_preview() -> None:
+    base = {
+        "games": {
+            "g1": {
+                "headline": "old failed game",
+                "paragraph1": "old paragraph one",
+                "paragraph2": "old paragraph two",
+                "sources": [{"name": "A", "title": "A", "url": "https://www.nfl.com/news/a"}],
+            }
+        }
+    }
+    chatgpt = {
+        "g1": {
+            "headline": "fresh ChatGPT failed-game replacement",
+            "paragraph1": "fresh replacement paragraph",
+            "model_rationale": "Fresh failed-game research supplies a new matchup mechanism without changing any numerical LevLine forecast input or output.",
+            "sources": [{"name": "C", "title": "C", "url": "https://www.cbssports.com/nfl/c"}],
+        }
+    }
+    previews = {
+        "g2": {
+            "headline": "last validated successful game",
+            "paragraphs": [
+                "The successful game keeps its previously validated human matchup read even when a later provider publication contracts to another game only.",
+                "LevLine numbers remain deterministic. The successful matchup keeps its protection and explosive-play mechanism because that prior editorial read already passed the publication validator. The pick: Team B moneyline.",
+            ],
+            "reported_sources": [
+                {
+                    "source_name": "ESPN",
+                    "title": "Validated source",
+                    "source_url": "https://www.espn.com/nfl/story/b",
+                }
+            ],
+        }
+    }
+
+    mixed = module.build_mixed_raw_payload(
+        canonical_game_ids=["g1", "g2"],
+        base_artifact=base,
+        chatgpt_entries=chatgpt,
+        preview_artifact=previews,
+    )
+
+    assert mixed["games"]["g1"]["headline"].startswith("fresh ChatGPT")
+    assert mixed["games"]["g2"]["headline"] == "last validated successful game"
+    assert mixed["games"]["g2"]["sources"][0]["name"] == "ESPN"
+    assert "protection and explosive-play mechanism" in mixed["games"]["g2"]["model_rationale"]
+
+
+
 def test_mark_recovered_clears_refresh_requirement_only_for_target() -> None:
     updated = module.mark_chatgpt_recovered(
         _status(),
