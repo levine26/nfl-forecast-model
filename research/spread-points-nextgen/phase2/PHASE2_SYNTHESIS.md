@@ -342,3 +342,23 @@ No Phase 3 challenger result existed when these constraints were frozen.
 ### DO NOT REPEAT
 
 Do not rerun Phase 1; do not redo the Phase 2 literature/external-model review; do not broaden the frozen A0/B0/C0 search after observing results; do not inspect 2025 challenger outcomes in Phase 3; do not use completed 2026 outcomes for candidate selection; do not relabel closing/late historical market data as T-120; do not use hindsight starter/injury/weather state; do not force D or player features; do not add paid data without escalation; do not revive retired Props orchestration; and do not weaken F-ST production safeguards.
+
+---
+
+# Final Phase 2 closeout receipt
+
+Phase 2 satisfied its exit criteria without starting Phase 3.
+
+- final validated head: `076dc9d6f6c052eec4744a155070c42c1b99ae82`;
+- exact-head research firewall run `35751402751`: **SUCCESS**;
+- exact-head full research validation run `35751402726`: **SUCCESS**, including foundation, v0.8 isolated regeneration, market-reliance/horizon, paired uncertainty, margin forensics, and the final validation gate;
+- PR #520: **MERGED**;
+- merge commit: `405906942013252c158244c9b033a3240baa37f8`;
+- merged artifacts were re-read and verified from `main`;
+- no production forecast behavior changed;
+- no Challenger A/B/C 2025 result was inspected;
+- no completed-2026 outcome selected architecture/features/hyperparameters/thresholds/weights;
+- no paid dependency was added;
+- Phase 3 remains **NOT STARTED**.
+
+The exact Phase 3 start state is therefore the frozen A0/B0/C0 implementation contract plus the strict target-specific D eligibility gate described above. Do not broaden that search after development results, do not score 2025 in Phase 3, and do not reopen Phase 2 merely because a reference candidate performs poorly.
