@@ -1,0 +1,142 @@
+{
+  "audit_id": "ADAPTIVE-C2-PIT-AUDIT-V1",
+  "candidate_id": "ADAPTIVE-REGIME-SHOCK-GATE-V1",
+  "preregistration_base_sha": "99b255aae7fc36ad367561f613e3fcb3752ef528",
+  "status": "PRE_RESULT_POINT_IN_TIME_FEATURE_AUDIT",
+  "target_horizon": "T-120",
+  "target_sample": {
+    "season": 2025,
+    "reason": "Equivalent qualified T-120 depth-chart and practice-state evidence exists for 2025; equivalent 2022-2024 personnel state and historical strict multi-horizon market paths are not qualified."
+  },
+  "classifications": [
+    {
+      "feature_family": "frozen_fst_probability",
+      "classification": "fully_PIT_valid",
+      "scope": "2022-2025 keyed chronology; Candidate 2 target 2025",
+      "source": "challenger_outputs/fst/provenance/training_frame_keyed.csv",
+      "candidate_v1_use": "allowed"
+    },
+    {
+      "feature_family": "component_resolved_base_probabilities",
+      "classification": "fully_PIT_valid",
+      "scope": "historical OOF; season-forward reconstruction",
+      "source": "challenger_outputs/fst/provenance/base_oof_keyed.csv",
+      "candidate_v1_use": "allowed"
+    },
+    {
+      "feature_family": "2025_t120_qb1_identity_change",
+      "classification": "fully_PIT_valid",
+      "scope": "2025 only",
+      "source": "DEPTH-STATE-01 / nflverse timestamped depth charts",
+      "candidate_v1_use": "primary shock channel"
+    },
+    {
+      "feature_family": "2025_t120_rank1_ol_turnover",
+      "classification": "fully_PIT_valid",
+      "scope": "2025 only",
+      "source": "DEPTH-STATE-01 / nflverse timestamped depth charts",
+      "candidate_v1_use": "primary shock channel"
+    },
+    {
+      "feature_family": "2025_qb_final_practice_dnp",
+      "classification": "fully_PIT_valid_with_stable_id_join",
+      "scope": "2025 only; practice state proven known by T-120 under conservative filing-time rule",
+      "source": "availability_2025_composite_reconstruction qualification",
+      "candidate_v1_use": "primary shock channel; fail closed on ambiguous/missing join"
+    },
+    {
+      "feature_family": "2025_other_high_impact_player_practice_state",
+      "classification": "partially_PIT_valid",
+      "scope": "2025 practice state is qualified but a frozen historical role/value mapping for all high-impact positions is not",
+      "source": "availability_2025_composite_reconstruction + depth state",
+      "candidate_v1_use": "excluded from V1"
+    },
+    {
+      "feature_family": "2022_2024_injury_availability",
+      "classification": "unavailable_historically",
+      "scope": "cross-season harmonization failed closed",
+      "source": "LEVLINE_4_CANONICAL_RESEARCH_LEDGER / availability harmonization receipts",
+      "candidate_v1_use": "prohibited"
+    },
+    {
+      "feature_family": "historical_t120_to_later_market_path",
+      "classification": "unavailable_historically",
+      "scope": "no equivalent strict request-level multi-book path for 2022-2025",
+      "source": "LevLine 4 market-path governance",
+      "candidate_v1_use": "prohibited"
+    },
+    {
+      "feature_family": "2026_market_path",
+      "classification": "prospective_only",
+      "scope": "T-120/T-60/T-45/T-30 strict captures",
+      "source": "LEVLINE market-state/path infrastructure",
+      "candidate_v1_use": "prohibited for historical Candidate 2"
+    },
+    {
+      "feature_family": "2026_expected_lineup_qb_probability",
+      "classification": "prospective_only",
+      "scope": "timestamped capture contract",
+      "source": "LEVLINE-4-EXPECTED-LINEUP-QB-CAPTURE-V1",
+      "candidate_v1_use": "prohibited"
+    },
+    {
+      "feature_family": "official_inactives",
+      "classification": "prospective_only_for_candidate2",
+      "scope": "2026 archive and later-than-T120 risk; 2025 final game designation not authorized",
+      "source": "NFL injury snapshot / 2025 reconstruction contracts",
+      "candidate_v1_use": "prohibited"
+    },
+    {
+      "feature_family": "coach_playcaller_scheme_change",
+      "classification": "partially_PIT_valid_but_not_equivalently_archived",
+      "scope": "no frozen complete historical event ledger",
+      "candidate_v1_use": "excluded from V1"
+    },
+    {
+      "feature_family": "transactions_roster_events",
+      "classification": "partially_PIT_valid_but_semantics_not_sufficient",
+      "scope": "existing archive work does not authorize complete active-membership labels",
+      "candidate_v1_use": "excluded from V1"
+    },
+    {
+      "feature_family": "rest_short_week_bye",
+      "classification": "fully_reconstructable_schedule_context",
+      "scope": "2025",
+      "candidate_v1_use": "excluded by preregistration; weak/modifier evidence"
+    },
+    {
+      "feature_family": "travel_timezone_international",
+      "classification": "partially_reconstructable",
+      "scope": "venue/schedule derivable but acclimation not consistently PIT archived",
+      "candidate_v1_use": "excluded by preregistration"
+    },
+    {
+      "feature_family": "weather",
+      "classification": "unavailable_as_equivalent_historical_PIT_snapshot",
+      "scope": "no frozen Candidate 2 historical weather snapshot contract",
+      "candidate_v1_use": "excluded"
+    },
+    {
+      "feature_family": "closing_line",
+      "classification": "post_target_horizon_or_leakage_risk",
+      "scope": "historical",
+      "candidate_v1_use": "prohibited"
+    }
+  ],
+  "chronology_rules": [
+    "No observation after T-120 may authorize a Candidate 2 switch.",
+    "Later depth-chart revisions may not rewrite an earlier game state.",
+    "Final practice status is used only under the separately qualified conservative known-by-T120 rule.",
+    "Missing/ambiguous personnel state never means healthy/stable; it prevents the shock channel from authorizing a switch.",
+    "No completed 2026 outcome is read for feature, threshold, parameter, candidate or subgroup selection.",
+    "Target outcomes are joined only after deterministic Candidate 2 probabilities are generated."
+  ],
+  "leakage_stop_conditions": [
+    "future depth snapshot detected",
+    "practice state cannot be proven known by T-120",
+    "ambiguous stable-ID QB practice join",
+    "component reconstruction fails registered audit reproduction",
+    "any 2026 completed outcome enters candidate construction"
+  ],
+  "production_changed": false
+}
