@@ -44,6 +44,8 @@ If multiple archive rows share the same latest timestamp, deterministic tie-brea
 
 A capture at or after kickoff is never eligible. A capture before the source forecast is not a valid close for that forecast.
 
+A closing event is not frozen until at least **60 minutes after kickoff**. This archive-settlement grace allows an on-time pre-kickoff snapshot to finish persisting before the immutable closing selection is made. The selected market timestamp itself must still be strictly pre-kickoff.
+
 ## 4. Identity gate
 
 Archive matching is exact on:
