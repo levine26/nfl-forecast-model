@@ -324,3 +324,37 @@ def test_all_provider_failures_expose_only_safe_metadata(monkeypatch) -> None:
         assert "apiKey=" not in text
     else:
         raise AssertionError("expected all-provider failure")
+
+
+def test_due_horizons_never_accept_post_cutoff_capture() -> None:
+    kickoff = datetime(2026, 9, 13, 17, 0, tzinfo=timezone.utc)
+    target = datetime(2026, 9, 13, 15, 0, tzinfo=timezone.utc)
+    early = due_horizons(kickoff, target - timedelta(minutes=5))
+    exact = due_horizons(kickoff, target)
+    late = due_horizons(kickoff, target + timedelta(minutes=1))
+    assert [row["horizon"] for row in early] == ["T-120m"]
+    assert [row["horizon"] for row in exact] == ["T-120m"]
+    assert late == []
+
+
+def test_late_consensus_never_closes_horizon(tmp_path) -> None:
+    ledger = tmp_path / "ledger.csv"
+    pd.DataFrame([
+        {
+            "game_id": "game-late",
+            "horizon": "T-60m",
+            "row_type": "consensus",
+            "sportsbook_key": "sportsbook_consensus",
+            "source_count": MIN_CONSENSUS_BOOKS,
+            "timing_error_minutes": 1.0,
+        },
+        {
+            "game_id": "game-early",
+            "horizon": "T-60m",
+            "row_type": "consensus",
+            "sportsbook_key": "sportsbook_consensus",
+            "source_count": MIN_CONSENSUS_BOOKS,
+            "timing_error_minutes": -1.0,
+        },
+    ]).to_csv(ledger, index=False)
+    assert _captured_pairs(ledger) == {("game-early", "T-60m")}
