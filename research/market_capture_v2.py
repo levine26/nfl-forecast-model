@@ -215,6 +215,7 @@ def consensus_row(book_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
 
     identity_fields = (
         "game_id",
+        "market_provider",
         "event_id",
         "provider_commence_time_utc",
         "home_team",
@@ -245,6 +246,7 @@ def consensus_row(book_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
     return {
         "row_type": "consensus",
         "game_id": template["game_id"],
+        "market_provider": template.get("market_provider"),
         "event_id": template.get("event_id"),
         "provider_commence_time_utc": template.get("provider_commence_time_utc"),
         "provider_kickoff_delta_minutes": template.get("provider_kickoff_delta_minutes"),
