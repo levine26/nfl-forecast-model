@@ -174,17 +174,16 @@ Use one simple, regularized and auditable reference:
 
 - **Ridge regression** under the fixed alpha grid in `BOUNDED_IMPLEMENTATION_SPEC.md`.
 
-Exactly one low-complexity GAM/spline sensitivity may be attempted if supported cleanly. ElasticNet and tree ensembles are not part of the initial C0 search.
+No GAM, spline, ElasticNet or tree residual sensitivity is part of the initial Phase 3 candidate.
 
 ## Predictors
 
 Football-only features available before the market horizon, such as:
 
-- dynamic team-strength deltas from Challenger A or an equivalent chronology-safe base;
+- A0 dynamic team-strength deltas and A0 football-only forecast outputs;
 - rest/home context;
-- limited lagged efficiency/process features;
 - model-market discrepancy only if constructed from a truly football-only forecast;
-- market level itself only when needed to model known nonlinear residual structure.
+- market level itself as the prespecified line-level calibration term.
 
 ## Market timing rule
 
@@ -294,3 +293,11 @@ Where earlier wording in this file is more permissive than the final Phase 2 har
 
 Those closeout restrictions were recorded before Phase 3 implementation/results and therefore narrow, rather than expand, researcher degrees of freedom.
 
+
+## 11. Confirmatory holdout rule
+
+A/B/C are the deliberately small preregistered set. All methodologically valid A/B/C candidate identities proceed to the one-time 2025 Phase 4 holdout even if their 2022–2024 development metrics are weak. Development may document failure, but it may not delete a valid preregistered family before the holdout.
+
+A candidate can be invalidated only for PIT/source failure, specification violation, irreproducibility, irreparable numerical failure, or inability to emit the preregistered target. Poor MAE is not an invalidation category.
+
+D remains the only development-gated component.

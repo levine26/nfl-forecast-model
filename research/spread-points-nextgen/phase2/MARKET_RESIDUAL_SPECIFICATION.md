@@ -84,9 +84,9 @@ No market favorite-size bands, total bands, arbitrary interactions, polynomial e
 
 Reference model:
 
-- Ridge or ElasticNet.
+- **Ridge regression only**, under the fixed alpha grid in `BOUNDED_IMPLEMENTATION_SPEC.md`.
 
-No nonlinear secondary learner is part of initial Phase 3. GAM/spline/tree residual models are deferred and require a preregistration amendment before any such result is inspected.
+No nonlinear secondary learner is part of initial Phase 3. GAM/spline/ElasticNet/tree residual models are deferred and require a preregistration amendment before any such result is inspected.
 
 ---
 
@@ -122,8 +122,8 @@ For every football predictor used in C, report its incremental contribution agai
 Required comparison ladder:
 
 1. **Market only:** predicted residual = 0.
-2. **Market + line-level calibration:** an ElasticNet residual model using only the market line level for that target; no football variables.
-3. **Market + football residual information:** an ElasticNet residual model using the frozen A0 football forecast/state variables but excluding the market-line calibration term beyond the residual anchor.
+2. **Market + line-level calibration:** a Ridge residual model using only the market line level for that target; no football variables.
+3. **Market + football residual information:** a Ridge residual model using the frozen A0 football forecast/state variables but excluding the market-line calibration term beyond the residual anchor.
 4. **Full C0:** the complete preregistered target-specific predictor set in `BOUNDED_IMPLEMENTATION_SPEC.md`.
 
 All four use the same paired games and nested chronology. The ladder distinguishes genuine football information from simple calibration of the market level itself.

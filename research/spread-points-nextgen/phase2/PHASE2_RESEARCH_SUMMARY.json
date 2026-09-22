@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 2,
-  "status": "CLOSEOUT_PENDING_EXACT_HEAD_CI",
+  "status": "ANALYTICALLY_COMPLETE_PENDING_SYNC_AND_FINAL_CI",
   "production_changed": false,
   "user_required_external_source": "davidsasser.com",
   "initial_challengers": [
@@ -82,12 +82,16 @@
       "B",
       "C"
     ],
-    "ensemble_D": "conditional_only",
+    "ensemble_D": "conditional_target_specific_numeric_gate",
     "A0_initial_identity": true,
     "A1_requires_new_preregistration": true,
     "B0_independent_of_A0": true,
+    "B0_drive_estimator": "poisson_l2",
+    "B0_drive_outcome_estimator": "multinomial_logistic_l2",
     "C0_estimator": "ridge",
-    "C1_sensitivity": "GAM_or_skip",
+    "C0_football_base": "A0",
+    "nonlinear_C_sensitivity": "deferred",
+    "valid_ABC_all_proceed_to_holdout": true,
     "deterministic_outer_development_seasons": [
       2022,
       2023,
