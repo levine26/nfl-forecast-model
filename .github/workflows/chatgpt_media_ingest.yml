@@ -6,7 +6,7 @@ on:
     paths:
       - "scripts/ingest_chatgpt_media_payloads.py"
       - "tests/test_chatgpt_media_ingest.py"
-      - "inputs/chatgpt_media/**"
+      - "inputs/chatgpt_media/current/**"
       - ".github/workflows/chatgpt_media_ingest.yml"
   push:
     branches: [main]
@@ -68,7 +68,10 @@ jobs:
           )
           for marker in forbidden:
               assert marker not in text, marker
-          print('ChatGPT ingestion is constrained to the existing editorial validation boundary.')
+          workflow = Path('.github/workflows/chatgpt_media_ingest.yml').read_text(encoding='utf-8')
+          assert 'inputs/chatgpt_media/current/**' in workflow
+          assert 'inputs/chatgpt_media/**' not in workflow
+          print('ChatGPT ingestion is constrained to the existing editorial validation boundary and current-bundle namespace.')
           PY
 
       - name: Require a complete bundle for production ingestion
