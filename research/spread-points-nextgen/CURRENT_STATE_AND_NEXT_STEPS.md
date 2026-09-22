@@ -13,7 +13,7 @@
 
 Phase 2 research/design is analytically complete and has passed hostile methodological review. No Phase 3 challenger has been implemented and no A/B/C 2025 challenger result has been inspected.
 
-The branch was synchronized with concurrent main through compatibility PR #521, then resynchronized through PR #528 after main advanced to `032289d5b62b226b242e4b4c202935f7fb0ef61a`. #521 preserved separate adaptive-weekly-learning research; #528 preserved a Sunday Signal contextual-output refresh. Neither concurrent workstream is used to select Spread & Points challengers.
+The branch was repeatedly synchronized with concurrent `main` as unrelated work advanced: PR #521 preserved adaptive-weekly-learning research, PR #528 preserved Sunday Signal contextual outputs, later compatibility merges preserved the adaptive Candidate 2 closeout/T-120 shadow state, and PR #536 preserved the generated market refresh through `3e859968a40b8250f85ed211e8b1e7593ea1bf47`. These concurrent surfaces are repository state only; none is used to select or redefine Spread & Points challengers.
 
 ## Frozen initial Phase 3 shortlist
 
