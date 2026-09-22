@@ -45,7 +45,7 @@ Completed 2026 outcomes:
 
 - **zero permitted for architecture, features, tuning, thresholds, stacking, survival, or candidate selection.**
 
-Phase 1 did inspect baseline 2025 failures, so 2025 is not philosophically pristine. No A/B/C output existed then. This caveat remains mandatory and Phase 5 prospective evidence is still required.
+Phase 1 did inspect baseline 2025 failures, so 2025 is not philosophically pristine. No A/B/C output existed then. This caveat remains mandatory. Phase 5 now performs Candidate 5 historical F-ST-anchored integration, and Phase 6 prospective evidence remains mandatory before any promotion claim.
 
 ## Data / PIT state
 
@@ -92,6 +92,38 @@ A/B/C are testable with free/open sources. Paid injury/OL/route/coverage/partici
 - production behavior: **unchanged**
 - Phase 3: **NOT STARTED**
 
+## Program amendment — future Candidate 5 integration
+
+A governance amendment adds a new downstream integration phase without changing the immediate execution path:
+
+- **Phase 5 — Historical F-ST-Anchored Winner Integration**
+- working candidate ID: `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`;
+- primary form: strongly regularized logistic residual/offset around frozen F-ST;
+- primary component inputs: chronology-clean OOF A0/B0 outputs and compact uncertainty/disagreement summaries;
+- market-aware C0 information remains a separately labeled historical diagnostic unless same-horizon market receipts exist;
+- all stack inputs must be genuine OOF predictions for their game;
+- 2025 is an underlying-component holdout and must not be misrepresented as a pristine Candidate 5 holdout;
+- honest Candidate 5 historical development evidence should come from nested chronology/OOF component surfaces, principally 2022-2024;
+- prospective Phase 6 evidence is mandatory for promotion;
+- expected +0.4 to +0.8 percentage-point uplift is a **pre-result research prior only**, never an optimization target or promise.
+
+The amendment reflects the Adaptive Weekly Learning evidence:
+
+- Candidate 1 generic residual learning was rejected (722/1,087; ~-1.75 pp vs F-ST; 42.15% switch accuracy; worse Brier/log loss);
+- naive weekly F-ST refitting was rejected (739/1,087; ~-0.184 pp);
+- calibration-only preserved all 741 winners and produced only tiny proper-score gains;
+- Candidate 2 was inconclusive/sparse;
+- Candidate 3 was inconclusive and did not establish market-path information beyond market level;
+- Candidate 4 remains a frozen, independent prospective experiment and does **not** block the Spread & Points program.
+
+Candidate 4 may continue collecting clean prospective PIT market/QB evidence. Its outcomes may not tune Candidate 5 V1; any later personnel/market extension requires a separately versioned Candidate 5.x contract.
+
+An earlier unmerged Phase 3 startup-only branch may exist, but canonical `main` remains authoritative: Phase 3 is **NOT STARTED** until substantive Phase 3 work is merged/recorded through the normal program controls. This governance amendment does not start or implement Phase 3.
+
+The roadmap is now:
+
+Phase 0 complete -> Phase 1 complete -> Phase 2 complete -> **Phase 3 controlled implementation -> Phase 4 historical validation/underlying 2025 holdout -> Phase 5 Candidate 5 historical integration -> Phase 6 prospective shadow/hardening -> Phase 7 final synthesis/promotion package**.
+
 ## Exact next action
 
 **STOP Phase 2.** In the next Phase 3 execution chat, read the merged control files and canonical Phase 2 artifacts from current `main`, then implement only the frozen Phase 3 program below. Do not reopen Phase 1/2 merely because the chat is new.
@@ -112,6 +144,12 @@ A/B/C are testable with free/open sources. Paid injury/OL/route/coverage/partici
 - Do not weaken F-ST production safeguards.
 - Do not treat David Sasser public record claims as validation without reconstructable methodology/chronology.
 - Do not convert failed A0/B0/C0 references into an unconstrained rescue search under the same candidate identity.
+- Do not start Candidate 5 before Phase 4 is complete.
+- Do not independently rebuild A0/B0/C0 inside Candidate 5; consume frozen OOF component surfaces.
+- Do not wait for Candidate 4 to mature before continuing Spread & Points Phases 3-5.
+- Do not use Candidate 4 outcomes to tune Candidate 5.
+- Do not use in-sample A0/B0/C0/D predictions as Candidate 5 stack inputs.
+- Do not call 2025 a pristine Candidate 5 holdout merely because it was the underlying-model holdout.
 
 ## Phase 3 handoff — prepare only, do not execute here
 
