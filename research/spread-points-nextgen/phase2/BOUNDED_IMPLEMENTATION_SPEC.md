@@ -66,15 +66,18 @@ A random-walk / AR(1) offense-defense state-space implementation is scientifical
 
 ### Component 1 — expected drives
 
-Use a simple count/continuous regression for expected team offensive drives.
+Model expected team offensive drives with one fixed design.
 
-Initial predictors:
+Initial predictors are exactly:
 
-- lagged team drive count;
-- lagged opponent drive count;
-- lagged plays/drive or offensive plays;
-- home/rest;
-- A0 dynamic strength outputs if generated strictly OOF.
+- offense prior-game drive-count state: exponentially weighted mean with half-life **8 team games**;
+- opponent prior-game drive-count-allowed state: exponentially weighted mean with half-life **8 team games**;
+- offense prior-game plays-per-drive state: exponentially weighted mean with half-life **8 team games**;
+- opponent prior-game plays-per-drive-allowed state: exponentially weighted mean with half-life **8 team games**;
+- home indicator;
+- rest differential.
+
+No A0 output enters B0. This keeps B structurally distinct rather than turning it into an A wrapper.
 
 Reference estimator:
 
@@ -90,6 +93,25 @@ Each prior offensive drive is classified into the compact scoring family:
 - FG;
 - EMPTY / other zero-point offensive outcome.
 
+B0 uses one fixed pregame feature design for every drive in the forecast game:
+
+- offense team indicator;
+- defense team indicator;
+- home indicator;
+- rest differential;
+- offense EPA/play state, EWMA half-life **8 team games**;
+- defense EPA/play-allowed state, EWMA half-life **8 team games**;
+- offense success-rate state, EWMA half-life **8 team games**;
+- defense success-rate-allowed state, EWMA half-life **8 team games**;
+- offense turnover-per-drive state, EWMA half-life **8 team games**;
+- defense takeaways-per-drive state, EWMA half-life **8 team games**;
+- offense explosive-play rate state, EWMA half-life **8 team games**;
+- defense explosive-play-allowed state, EWMA half-life **8 team games**;
+- offense red-zone TD conversion state, shrinkage-smoothed using prior drives only;
+- defense red-zone TD allowed state, shrinkage-smoothed using prior drives only.
+
+The red-zone definition and shrinkage formula must be fixed in code before the first development metric is emitted; changing them after observing results is a candidate-identity change requiring preregistration amendment.
+
 Rare safeties / defensive scores are not given unconstrained team-specific classifiers. They enter through a low-frequency empirical residual/tail component.
 
 Reference estimator:
@@ -99,6 +121,8 @@ Reference estimator:
 Prespecified inverse-regularization grid:
 
 - `C = [0.05, 0.2, 1.0, 5.0]`
+
+If fewer than two valid inner validation seasons exist, use fixed fallback `C=0.2`.
 
 ### Component 3 — score simulation
 
@@ -152,13 +176,27 @@ All selection is prior-time nested.
 
 ### Initial predictor set
 
-- market margin or total level;
-- football-only predicted margin/total from the frozen development football base;
-- football-model minus market difference;
-- dynamic offense-strength difference;
-- dynamic defense-strength difference;
-- rest differential;
-- home context where not already absorbed by orientation.
+C0 uses **A0 only** as its football base; it may not choose A versus B after seeing which looks better.
+
+For the margin residual model:
+
+- market home margin;
+- A0 football-only expected margin;
+- A0 minus market margin disagreement;
+- A0 offense-strength difference;
+- A0 defense-strength difference;
+- rest differential.
+
+For the total residual model:
+
+- market total;
+- A0 football-only expected total;
+- A0 minus market total disagreement;
+- A0 summed offense-strength state;
+- A0 summed defense-strength state;
+- rest differential.
+
+Home context is already encoded in the home-oriented market and A0 forecasts and is not duplicated as an extra C0 switch variable.
 
 No injury/weather/player state unless separately qualified.
 
