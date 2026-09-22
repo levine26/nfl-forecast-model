@@ -94,7 +94,9 @@ jobs:
       - name: Canonicalize current editorial forecast source
         if: github.event_name != 'pull_request'
         run: |
-          python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
+          python scripts/build_canonical_editorial_predictions.py \
+            --editorial-roster outputs/copilot_media_reads.json \
+            --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
       - name: Preserve validated media reporting snapshot
