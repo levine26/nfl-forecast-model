@@ -486,3 +486,222 @@ Any Candidate 2 must use a materially different pregame-observable information m
 - [x] Candidate 1 preregistered robustness analysis
 - [x] Candidate 1 rejected
 - [ ] Candidate 2 theory/design — intentionally paused pending user direction
+
+## 20. Candidate 2 Pre-Registration — frozen 2026-09-22
+
+Status: **PRE-RESULT / RESEARCH ONLY / NO PRODUCTION CHANGE**
+
+Candidate ID: `ADAPTIVE-REGIME-SHOCK-GATE-V1`
+
+This section was frozen before Candidate 2 target-period winner results were inspected or generated. It is a materially different hypothesis from rejected `ADAPTIVE-RESIDUAL-STATE-V1`: Candidate 2 does not learn persistence from prior forecast errors and does not weekly-refit F-ST.
+
+### 20.1 Hypothesis
+
+Frozen F-ST may become locally stale when the pregame personnel state changes abruptly. A component-resolved football challenger may contain useful directional information on a small subset of near-boundary games, but prior LevLine research shows component disagreement alone is insufficient for promotion. Candidate 2 therefore asks whether a separately observed, point-in-time personnel regime shock can identify the subset of F-ST/component disagreements where preserving the frozen incumbent is less reliable.
+
+The primary estimand remains paired straight-up winner accuracy versus frozen F-ST.
+
+### 20.2 Primary architecture
+
+Candidate 2 is an incumbent-preserving selective winner-switch gate.
+
+For every eligible 2025 game:
+
+1. reconstruct the chronology-clean frozen F-ST probability without changing F-ST coefficients or production code;
+2. reconstruct the already-established component-resolved L2 challenger from market logit plus the four base-model logits (`logistic`, `extra_trees`, `xgboost`, `catboost`) using only seasons strictly before the 2025 target season;
+3. preserve the F-ST winner unless all three conditions below are true:
+   - **boundary condition:** `abs(P_FST - 0.5) <= 0.075`;
+   - **directional disagreement:** the component-resolved challenger selects the opposite winner from F-ST;
+   - **orthogonal regime-shock condition:** a qualified T-120 personnel-state signal indicates a material state discontinuity.
+4. when all conditions are satisfied, use the component-resolved challenger probability/pick; otherwise retain the F-ST probability/pick.
+
+The regime signal determines whether a switch is permitted, not the direction of the switch. Direction comes only from the separately reconstructed component-resolved challenger. This prevents arbitrary injury-point assignment.
+
+### 20.3 Primary regime-shock definition
+
+A game satisfies the primary strong-shock gate when, using only state known at or before T-120, at least one team has any of:
+
+- `QB1 change == 1` relative to that team's prior game under the qualified 2025 depth-chart state contract;
+- at least **2** new rank-1 offensive-line identities relative to that team's prior game;
+- current rank-1 QB final-practice status equal to **DNP**, joined by stable GSIS identity to the qualified 2025 practice-state reconstruction.
+
+Unknown, ambiguous, missing, or non-qualified state never becomes a shock by imputation. It simply cannot authorize a switch. Week-1/no-prior-team-state rows therefore default to F-ST unless another independently observable primary shock is valid.
+
+The primary definition is intentionally sparse. Defensive churn, generic injury counts, RB/WR/TE injury counts, role-weighted player values, coaching/scheme labels, weather, rest, travel and reputation are not part of Candidate 2 V1.
+
+### 20.4 Allowable data/features
+
+Allowable V1 inputs are limited to:
+
+- chronology-clean F-ST probability/pick from the established keyed provenance frame;
+- historical base-model OOF probabilities from `challenger_outputs/fst/provenance/base_oof_keyed.csv`;
+- the four component probabilities listed above and their predeclared L2 season-forward stack;
+- 2025 T-120 depth-chart state under `DEPTH-STATE-01`: QB1 identity/change, rank-1 OL new-count/continuity, source timestamp, missingness and stable-ID coverage;
+- qualified 2025 practice state from `availability_2025_composite_reconstruction`, restricted to practice status and stable identity proven known by T-120;
+- game/season/week/team identity and kickoff clock needed for chronology;
+- target outcome only after the candidate prediction for that row has been deterministically generated and frozen inside the historical replay.
+
+### 20.5 Explicitly excluded from V1
+
+The following may be studied descriptively or prospectively but may not enter Candidate 2 V1:
+
+- completed 2026 outcomes of any kind;
+- T-60/T-45/T-30 or closing-market information in a T-120 historical candidate;
+- reconstructed historical market paths where exact PIT request state did not exist;
+- 2026 prospective component, injury, depth-chart or beat-state captures;
+- final game-day inactive status learned after T-120;
+- actual snaps, participation, final starter identity learned after the decision horizon, or postgame roster knowledge;
+- unqualified 2022-2024 injury/availability reconstructions;
+- numeric editorial injury points or hand-assigned player values;
+- generic PURE upset overrides or football unanimity overrides;
+- score/margin disagreement as an independent corroborating channel;
+- team identity, team reputation, prior Candidate 1 residual state, prior forecast errors, or weekly F-ST refit state;
+- coaching/scheme/news-text labels without an equivalent frozen PIT historical contract;
+- rest, travel, circadian and weather features in V1.
+
+### 20.6 Historical sample and missingness
+
+Primary target season: **2025 only**.
+
+Reason: the repository currently qualifies equivalent T-120 depth-chart and practice-state evidence for 2025, but does not authorize a unified 2022-2025 availability reconstruction or retrospective strict multi-horizon market path. Candidate 2 will not manufacture cross-season state merely to preserve the 1,087-game sample.
+
+The candidate is scored on every 2025 row for which the frozen F-ST and component-resolved probabilities can be reconstructed. Missing/ambiguous personnel evidence is fail-closed: Candidate 2 equals F-ST on that row. Reports must separately disclose:
+
+- exact total paired games;
+- games with both-team depth state;
+- games with evaluable QB-change state;
+- games with evaluable OL-change state;
+- games with qualified QB practice-state join;
+- games satisfying the strong-shock gate;
+- rows preserved solely because state was unknown.
+
+F-ST, market, Candidate 1, weekly-refit control, component-only control and Candidate 2 must be compared on the exact same Candidate 2 paired rows when a row-level comparator exists. No full-1,087 benchmark may be presented as the causal comparator to a smaller Candidate 2 sample.
+
+### 20.7 Frozen parameter / robustness grid
+
+**Primary V1**:
+- F-ST boundary distance: **0.075**;
+- OL new rank-1 threshold: **2**;
+- QB practice shock: **DNP only**;
+- component stack L2 logistic: `C=1.0`, `lbfgs`, same four component logits plus market logit, season-forward fit;
+- no learned cross-channel shock weight;
+- no tree search;
+- no target-period threshold optimization.
+
+**Preregistered robustness-only grid**:
+- boundary distance: `[0.05, 0.075, 0.10]`;
+- OL new rank-1 threshold: `[1, 2, 3]`;
+- QB practice definition: `[DNP_only, DNP_or_limited]`.
+
+The full grid is descriptive falsification evidence only. The primary V1 remains the primary candidate regardless of which retrospective cell is best. No best 2025 cell may be promoted or relabeled as V1.
+
+### 20.8 Controls / ablations
+
+Mandatory 2025 paired controls:
+
+- frozen F-ST;
+- raw market;
+- Candidate 1 `ADAPTIVE-RESIDUAL-STATE-V1` unchanged;
+- `NAIVE-WEEKLY-FST-REFIT-CONTROL-V1` unchanged;
+- component-resolved challenger without the regime gate;
+- boundary + component disagreement without a regime-shock requirement;
+- shock gate with QB-change channel removed;
+- shock gate with OL-churn channel removed;
+- shock gate with QB-practice channel removed, if the qualified join is available.
+
+Ablations diagnose mechanism. They may not be used to rewrite V1 after target outcomes are seen.
+
+### 20.9 Evaluation metrics
+
+Primary:
+- straight-up winner accuracy;
+- absolute correct winners;
+- accuracy delta versus F-ST on identical rows.
+
+Mandatory secondary:
+- Brier score and delta;
+- log loss and delta;
+- calibration/reliability summary;
+- disagreements and disagreement rate;
+- candidate-only correct;
+- incumbent-only correct;
+- net winners gained;
+- switch win rate;
+- exact paired McNemar diagnostic;
+- week-block bootstrap interval;
+- week-by-week results;
+- regular-season/postseason split if sample permits;
+- F-ST confidence/boundary buckets;
+- market-probability buckets;
+- shock-channel attribution.
+
+Because Candidate 2 V1 has one historical target season, "season stability" is structurally not estimable for the regime features. This limitation must be explicit and materially lowers evidentiary weight even if the point estimate is positive.
+
+### 20.10 Adversarial validation
+
+If V1 is positive, attempt to falsify it by checking:
+
+- source timestamp leakage and any post-T120 state;
+- dependence on one week;
+- dependence on one team;
+- dependence on one switch;
+- dependence on QB-only, OL-only or practice-only shocks;
+- boundary sensitivity across the preregistered grid;
+- OL-threshold sensitivity across the preregistered grid;
+- DNP-only versus DNP-or-limited sensitivity;
+- component-only versus shock-gated contribution;
+- early/mid/late 2025;
+- favorites versus underdogs;
+- F-ST confidence and market-probability buckets;
+- regular season versus postseason;
+- missingness/coverage topology.
+
+A positive result that vanishes under reasonable preregistered perturbation is not robust.
+
+### 20.11 Success and stop criteria
+
+Interpret the primary V1 accuracy delta using the project bands:
+- <= 0 pp: **REJECT**;
+- >0 to +0.25 pp: **INCONCLUSIVE**;
+- +0.25 to +0.75 pp: **PROMISING** only if switch mechanism is coherent;
+- +0.75 to +1.25 pp: **strong historical point signal**, still limited by one-season regime-data coverage;
+- > +1.25 pp: trigger aggressive leakage/selection audit before substantive belief.
+
+Regardless of point estimate, Candidate 2 cannot be called historically season-stable because its qualified regime-state sample is 2025-only. Prospective shadow testing may be recommended only if V1 is positive, PIT-clean, mechanism-coherent and not concentrated in a pathological subgroup.
+
+Stop immediately if source chronology cannot be proven, the component reconstruction fails to reproduce the registered historical component result within deterministic tolerance, stable-ID practice joins are ambiguous, or any 2026 completed outcome enters feature/threshold/candidate selection.
+
+### 20.12 Lane assignments
+
+- **Lane A — evidence/mechanism:** update literature/professional-practice synthesis for event-driven state change, market information incorporation, QB leverage, sparse dynamic models and David Sasser; distinguish conceptual support from implementation evidence.
+- **Lane B — PIT audit:** create a feature-availability matrix classifying every requested signal family as fully PIT valid, partially PIT valid, unavailable historically, or prospective-only; verify exact source hashes/timestamps and common-sample eligibility.
+- **Lane C — model:** implement `ADAPTIVE-REGIME-SHOCK-GATE-V1` and deterministic component reconstruction, with tests for fail-closed missingness and no target leakage.
+- **Lane D — evaluation:** reuse the established paired adaptive framework and add exact Candidate 2 controls/coverage/shock attribution.
+- **Lane E — adversarial:** execute the frozen robustness grid, concentration diagnostics, channel ablations and reproducibility receipt.
+
+### 20.13 Branch / production policy
+
+Candidate 2 implementation must live on a dedicated Candidate 2 research integration branch plus lane branches created from the synchronized Candidate 2 preregistration base. Production F-ST, production probabilities, site outputs and production workflows remain unchanged. Candidate 2 may not be prospectively deployed or merged into production without a separate user decision after the completed report.
+
+### 20.14 External-evidence rationale frozen with this preregistration
+
+External evidence is supportive but not outcome-selective:
+
+- dynamic sports models justify time-varying latent strength and stronger adaptation around real structural changes, but Candidate 1 directly rejects generic outcome-residual adaptation for LevLine;
+- recent sparse Bayesian dynamic Bradley-Terry work supports strong shrinkage in stable periods and diffuse innovation only around credible changes;
+- NFL player-value research using sportsbook point-spread values finds QB value dominates other player positions, supporting QB state as a high-leverage regime indicator rather than arbitrary injury points;
+- NFL betting-line research indicates information content generally increases during the week, supporting market movement as a plausible information channel, but the repository lacks an equivalent historical strict-PIT multi-book path for Candidate 2 V1;
+- David Sasser's public board exposes model projection beside open/current market state, supporting disciplined model-versus-market comparison, but does not disclose a weekly update algorithm and is not treated as evidence for one.
+
+### 20.15 Candidate 2 execution ledger
+
+- [x] Candidate 2 theory materially separated from Candidate 1
+- [x] Candidate 2 pre-registration frozen before target-result generation
+- [ ] Candidate 2 synchronized research integration base created
+- [ ] Lane A evidence complete
+- [ ] Lane B PIT audit complete
+- [ ] Lane C implementation complete
+- [ ] Lane D historical evaluation complete
+- [ ] Lane E adversarial validation complete
+- [ ] Candidate 2 final receipt and disposition recorded
+
