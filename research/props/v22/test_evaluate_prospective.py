@@ -96,6 +96,80 @@ def _grade(receipt, actual: float):
     return row
 
 
+
+def _closing_event(receipt, *, line_clv: float = 1.5, price_clv_pp: float = 2.0):
+    forecast = datetime.fromisoformat(
+        str(receipt["forecast_timestamp_utc"]).replace("Z", "+00:00")
+    )
+    kickoff = datetime.fromisoformat(
+        str(receipt["kickoff_utc"]).replace("Z", "+00:00")
+    )
+    row = {
+        "contract_version": MODULE.CLOSING_CONTRACT_VERSION,
+        "source_props21_forecast_sha256": receipt["source_props21_forecast_sha256"],
+        "source_props21_forecast_id": receipt["source_props21_forecast_id"],
+        "game_id": receipt["game_id"],
+        "player_id": receipt["player_id"],
+        "prop_type": receipt["prop_type"],
+        "forecast_timestamp_utc": receipt["forecast_timestamp_utc"],
+        "kickoff_utc": receipt["kickoff_utc"],
+        "frozen_model_side": "over",
+        "original_market": {
+            "line": (receipt.get("line") or {}).get("market_line"),
+            "event_probability": (receipt.get("probability") or {}).get(
+                "market_probability"
+            ),
+            "archive_price_basis": {"snapshot_id": "original"},
+        },
+        "closing_market": {
+            "line": (
+                ((receipt.get("line") or {}).get("market_line") or 0.0) + line_clv
+            ),
+            "event_probability": 0.56,
+            "frozen_side_probability": 0.56,
+            "archive": {
+                "snapshot_id": "close",
+                "captured_at_utc": (kickoff - timedelta(minutes=2)).isoformat(),
+                "kickoff_utc": kickoff.isoformat(),
+                "minutes_to_kickoff": 2.0,
+            },
+        },
+        "line_clv": {
+            "available": True,
+            "raw_closing_minus_original_line": line_clv,
+            "side_oriented_line_clv": line_clv,
+        },
+        "same_threshold_price_clv": {
+            "available": True,
+            "threshold": (receipt.get("line") or {}).get("market_line"),
+            "side": "over",
+            "original_best_price": {
+                "sportsbook": "a",
+                "american": -105,
+                "decimal": 1.9523809524,
+                "implied_probability": 0.512195122,
+            },
+            "closing_best_price": {
+                "sportsbook": "b",
+                "american": -115,
+                "decimal": 1.8695652174,
+                "implied_probability": 0.534883721,
+            },
+            "decimal_odds_clv_original_minus_close": 0.082815735,
+            "implied_probability_clv_pp_close_minus_original": price_clv_pp,
+        },
+        "selection": {
+            "latest_valid_capture_strictly_before_kickoff": True,
+            "capture_at_or_after_forecast": True,
+            "archive_settlement_grace_minutes": 60,
+            "outcome_consulted": False,
+        },
+        "research_only": True,
+        "production_authorized": False,
+    }
+    row["closing_event_sha256"] = MODULE._sha(row)
+    return row
+
 def test_evaluator_scores_frozen_line_challengers_against_original_market():
     receipts = _receipts()
     grades = [_grade(receipts[0], 108.0)]
@@ -212,3 +286,64 @@ def test_grade_hash_tampering_fails_closed():
     grade["actual_result"] = 999.0
     with pytest.raises(MODULE.Props22EvaluationError, match="grade hash mismatch"):
         MODULE.validate_grades([grade])
+
+
+def test_closing_market_evidence_is_secondary_and_keeps_readiness_unchanged():
+    receipts = _receipts()
+    grades = [_grade(receipts[0], 108.0)]
+    closing = [_closing_event(receipts[0])]
+
+    without, _ = MODULE.evaluate(receipts, grades, bootstrap_replicates=25)
+    with_close, detail = MODULE.evaluate(
+        receipts,
+        grades,
+        closing_events=closing,
+        bootstrap_replicates=25,
+    )
+
+    evidence = with_close["closing_market_evidence"]
+    assert evidence["status"] == "DESCRIPTIVE_SECONDARY"
+    assert evidence["promotion_effect"] == "NONE"
+    assert evidence["source_forecasts"] == 1
+    assert evidence["original_market_matched_observations"] == 1
+    assert evidence["closing_market_matched_observations"] == 1
+    assert evidence["line_clv"]["n"] == 1
+    assert evidence["line_clv"]["mean"] == pytest.approx(1.5)
+    assert evidence["line_clv"]["positive_share"] == pytest.approx(1.0)
+    assert evidence["same_threshold_price_clv_implied_probability_pp"]["n"] == 1
+    assert evidence["same_threshold_price_clv_implied_probability_pp"]["mean"] == pytest.approx(2.0)
+    assert with_close["terminal_readiness"] == without["terminal_readiness"]
+    assert with_close["promotion_decision"] == without["promotion_decision"]
+    assert detail["closing_market_matched"].all()
+    assert detail["side_oriented_line_clv"].dropna().eq(1.5).all()
+
+
+def test_closing_event_hash_tampering_fails_closed():
+    receipts = _receipts()
+    event = _closing_event(receipts[0])
+    event["line_clv"]["side_oriented_line_clv"] = 99.0
+
+    with pytest.raises(MODULE.Props22EvaluationError, match="closing-event hash mismatch"):
+        MODULE.validate_closing_events([event], receipts)
+
+
+def test_closing_event_wrong_source_identity_fails_closed():
+    receipts = _receipts()
+    event = _closing_event(receipts[0])
+    event["player_id"] = "wrong-player"
+    event.pop("closing_event_sha256")
+    event["closing_event_sha256"] = MODULE._sha(event)
+
+    with pytest.raises(MODULE.Props22EvaluationError, match="identity mismatch"):
+        MODULE.validate_closing_events([event], receipts)
+
+
+def test_closing_event_post_kickoff_timestamp_fails_closed():
+    receipts = _receipts()
+    event = _closing_event(receipts[0])
+    event["closing_market"]["archive"]["captured_at_utc"] = event["kickoff_utc"]
+    event.pop("closing_event_sha256")
+    event["closing_event_sha256"] = MODULE._sha(event)
+
+    with pytest.raises(MODULE.Props22EvaluationError, match="invalid forecast/close/kickoff chronology"):
+        MODULE.validate_closing_events([event], receipts)
