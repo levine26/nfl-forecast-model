@@ -26,7 +26,7 @@
         "process_variance_per_week": 0.03,
         "weekly_mean_reversion": 0.97,
         "offseason_mean_reversion": 0.5,
-        "max_abs_state_logit": 1.0
+        "max_abs_state_logit": 1
       },
       "promotion_eligible": false
     },
@@ -36,7 +36,7 @@
       "path": "research/adaptive_error_audit_calibration_v1.py",
       "mechanism": "prior-week-only L2-shrunk logit intercept",
       "parameters": {
-        "l2_penalty": 25.0,
+        "l2_penalty": 25,
         "pick_preserving_primary_variant": true
       },
       "promotion_eligible": false
@@ -57,6 +57,25 @@
       "path": "research/adaptive_sensitivity_v1.py",
       "promotion_eligible": false,
       "full_sample_best_may_be_promoted": false
+    },
+    {
+      "candidate_id": "ADAPTIVE-REGIME-SHOCK-GATE-V1",
+      "role": "candidate2_primary_regime_change_challenger",
+      "path": "research/adaptive_regime_shock_gate_v1.py",
+      "mechanism": "incumbent-preserving near-boundary component switch authorized only by qualified T-120 QB/OL/practice regime shock",
+      "historical_scope": {
+        "target_season": 2025,
+        "reason": "qualified equivalent T-120 depth/practice regime-state evidence is 2025-only"
+      },
+      "parameters": {
+        "incumbent_boundary_distance": 0.075,
+        "ol_new_rank1_threshold": 2,
+        "qb_practice_definition": "DNP_only",
+        "component_stack": "L2 logistic C=1.0 on market + logistic + extra_trees + xgboost + catboost logits, season-forward"
+      },
+      "promotion_eligible": false,
+      "completed_2026_outcomes_used_for_design": 0,
+      "production_authorized": false
     }
   ],
   "prospective_rule": "A later production-eligible challenger must receive a new frozen candidate ID, exact commit SHA, config digest, and prospective start week after historical/adversarial validation."
