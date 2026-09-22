@@ -235,7 +235,7 @@ This ordering is binding for the initial Phase 3 build.
 For avoidance of doubt, the initial implementation feature contract is:
 
 - **A0:** the exact compact offense/defense EPA, pass-EPA, success, home and rest set in `BOUNDED_IMPLEMENTATION_SPEC.md`;
-- **B0:** the exact drive-volume, scoring-per-drive, turnover/takeaway, explosive, A0-strength, home and rest set in that specification;
+- **B0:** the exact independent drive-volume, team/opponent indicator, EPA/success, red-zone, turnover/takeaway, explosive, home and rest set in that specification; no A0 output enters B0;
 - **C0:** the exact market/football residual feature set in that specification and `MARKET_RESIDUAL_SPECIFICATION.md`.
 
 The broader tables in this document are a mechanism/source research map, not permission for Phase 3 to add every listed feature.
