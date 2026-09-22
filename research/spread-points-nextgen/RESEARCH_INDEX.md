@@ -220,7 +220,7 @@ External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
 External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research. Final Sasser search found useful score/line/market product separation but no reproducible current methodology/archive sufficient for scientific validation.
 
-Compatibility sync #521 merged current `main` into the Phase 2 branch before final validation. The concurrent adaptive-weekly-learning research remained separate and was not used to select Spread & Points challengers.
+Compatibility sync #521 merged concurrent adaptive-weekly-learning main state into the Phase 2 branch. After main advanced again, compatibility sync #528 preserved Sunday Signal contextual output refresh commit `032289d5b62b226b242e4b4c202935f7fb0ef61a`. Neither concurrent workstream was used to select Spread & Points challengers.
 
 ### Phase 3 — planned
 
