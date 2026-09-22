@@ -111,4 +111,4 @@ def test_snapshot_rejects_source_state_not_observed_by_capture() -> None:
     )
     row = out.iloc[0]
     assert bool(row["qb1_snapshot_complete"]) is False
-    assert "home_depth_state_not_observed_by_capture" in row["incomplete_reasons"]
+    assert "home_missing_depth_state_by_t120" in row["incomplete_reasons"]
