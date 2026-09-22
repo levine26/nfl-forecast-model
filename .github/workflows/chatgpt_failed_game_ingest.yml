@@ -7,11 +7,13 @@ on:
       - "scripts/finalize_editorial.py"
       - "scripts/build_canonical_editorial_predictions.py"
       - "scripts/refresh_editorial_slate_roster.py"
+      - "scripts/restore_last_good_editorial_snapshot.py"
       - "tests/test_chatgpt_failed_game_ingest.py"
       - "tests/test_editorial_provider_fallback.py"
       - "tests/test_editorial_text_safety.py"
       - "tests/test_canonical_editorial_predictions.py"
       - "tests/test_editorial_slate_roster.py"
+      - "tests/test_restore_last_good_editorial_snapshot.py"
       - "src/nfl_forecast/editorial_provider_fallback.py"
       - "src/nfl_forecast/editorial_text_safety.py"
       - ".github/workflows/chatgpt_failed_game_ingest.yml"
@@ -26,7 +28,10 @@ permissions:
   actions: read
 
 concurrency:
-  group: sunday-signal-chatgpt-failed-game-fallback
+  group: >-
+    ${{ github.event_name == 'pull_request'
+        && format('sunday-signal-chatgpt-failed-game-fallback-pr-{0}', github.event.pull_request.number)
+        || 'sunday-signal-chatgpt-failed-game-fallback-production' }}
   cancel-in-progress: true
 
 jobs:
@@ -36,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 100
+          fetch-depth: 500
 
       - uses: actions/setup-python@v5
         with:
@@ -48,8 +53,8 @@ jobs:
 
       - name: Test game-scoped fallback boundary
         run: |
-          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
-          python -m py_compile scripts/ingest_chatgpt_failed_games.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          python -m py_compile scripts/ingest_chatgpt_failed_games.py scripts/restore_last_good_editorial_snapshot.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
 
       - name: Enforce editorial-only fallback wiring
         run: |
@@ -78,6 +83,9 @@ jobs:
           assert "git merge-base --is-ancestor \"$current_base\" origin/main" in workflow
           assert '--editorial-roster inputs/sunday_signal/editorial_slate_roster.json' in workflow
           assert 'scripts/refresh_editorial_slate_roster.py' in workflow
+          assert 'scripts/restore_last_good_editorial_snapshot.py' in workflow
+          assert "sunday-signal-chatgpt-failed-game-fallback-pr-{0}" in workflow
+          assert "sunday-signal-chatgpt-failed-game-fallback-production" in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
           assert 'Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
@@ -85,6 +93,39 @@ jobs:
           assert 'if git push origin HEAD:main; then' in workflow
           print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves launch-grade reporting, and safely retries research-only publication races.')
           PY
+
+      - name: Prove last-good full-slate recovery on repository history
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          cp outputs/context_source_status.json /tmp/current-fallback-status.json
+          python scripts/refresh_editorial_slate_roster.py \
+            --roster inputs/sunday_signal/editorial_slate_roster.json
+          python scripts/restore_last_good_editorial_snapshot.py \
+            --roster inputs/sunday_signal/editorial_slate_roster.json \
+            --status outputs/context_source_status.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          roster=json.loads(Path('inputs/sunday_signal/editorial_slate_roster.json').read_text())
+          media=json.loads(Path('outputs/copilot_media_reads.json').read_text())
+          previews=json.loads(Path('outputs/game_previews.json').read_text())
+          evidence=json.loads(Path('outputs/contextual_evidence.json').read_text())
+          status=json.loads(Path('outputs/context_source_status.json').read_text())
+          before=json.loads(Path('/tmp/current-fallback-status.json').read_text())
+          expected=set(roster['game_ids'])
+          assert len(expected)==15, len(expected)
+          assert set(media['games'])==expected
+          assert set(previews)==expected
+          assert set(evidence)==expected
+          assert status.get('groq_provider_fallback')==before.get('groq_provider_fallback')
+          assert int((status.get('editorial_finalizer') or {}).get('games') or 0)==15
+          assert int((status.get('copilot_media') or {}).get('games_applied') or 0)==15
+          assert (status.get('media_reporting') or {}).get('last_good_snapshot_source_commit')
+          print('historical full-slate recovery proof passed for 15 games')
+          PY
+          git restore --worktree -- outputs
+          rm -f inputs/sunday_signal/editorial_slate_roster.json
 
       - name: Stop after validation on pull request
         if: github.event_name == 'pull_request'
@@ -107,6 +148,13 @@ jobs:
             --editorial-roster inputs/sunday_signal/editorial_slate_roster.json \
             --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
+
+      - name: Restore last launch-grade full-slate editorial snapshot
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/restore_last_good_editorial_snapshot.py \
+            --roster inputs/sunday_signal/editorial_slate_roster.json \
+            --status outputs/context_source_status.json
 
       - name: Preserve validated media reporting snapshot
         if: github.event_name != 'pull_request'
