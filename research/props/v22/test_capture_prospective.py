@@ -98,5 +98,5 @@ def test_immutable_append_is_idempotent_and_conflicts_fail_closed(tmp_path: Path
         "\n".join(json.dumps(row, sort_keys=True) for row in existing) + "\n",
         encoding="utf-8",
     )
-    with pytest.raises(Props22CaptureError, match="conflicting duplicate identity"):
+    with pytest.raises(Props22CaptureError, match="immutable challenger receipt conflict"):
         append_immutable(ledger, rows)
