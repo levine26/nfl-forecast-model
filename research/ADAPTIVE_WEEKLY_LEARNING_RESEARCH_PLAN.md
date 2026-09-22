@@ -387,3 +387,23 @@ Again, the full-sample best combination is descriptive only.
 A separate diagnostic may select among the predeclared grid using only chronologically earlier seasons and then score a later season. It must label the training seasons and target season explicitly. No target season may influence its own parameter choice.
 
 This grid is a robustness / falsification device, not authorization for post-result parameter rescue.
+
+
+## 18. Pre-result adversarial validation rules — frozen 2026-09-22
+
+These checks were specified before the first integrated historical result was interpreted.
+
+For any candidate with a positive full-sample accuracy delta:
+
+1. **Season sign stability:** report the accuracy delta in every target season. A gain concentrated in one season is not sufficient evidence of a generally useful adaptive mechanism.
+2. **Week concentration:** report net correct switches by season-week. If one week accounts for more than 50% of the total positive net gain, label the result concentration-sensitive.
+3. **Team concentration:** attribute each switch to both participating teams. If a small set of teams dominates the gain, report that explicitly and do not generalize the mechanism without further validation.
+4. **Probability guardrail:** positive winner accuracy may not hide a material deterioration in both Brier and log loss. Any such tradeoff requires a separate candidate rationale.
+5. **Grid robustness:** report the complete preregistered residual-state and switch-gate grids. The primary V1 remains the primary candidate regardless of which retrospective cell is best.
+6. **Nested chronology diagnostic:** parameter selection for a target season may use only earlier target seasons. The target season's outcomes may not choose its own configuration.
+7. **Baseline reproduction:** the common frozen F-ST benchmark must reproduce 741/1,087 correct on the established 2022–2025 sample where applicable. Failure invalidates the comparison.
+8. **Leakage assertions:** same-week outcome-use flags must remain false for every scored game.
+9. **Large-gain skepticism:** any full-sample uplift above +1.25 percentage points receives an explicit leakage/selection audit before substantive interpretation.
+10. **No hindsight rescue:** a failed V1 may motivate a newly registered V2 theory, but V1 parameters may not be edited and re-described as if they were the original candidate.
+
+These are interpretation rules, not automatic production-promotion criteria.
