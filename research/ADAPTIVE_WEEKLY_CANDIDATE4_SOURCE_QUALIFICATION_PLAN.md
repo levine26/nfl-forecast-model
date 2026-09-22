@@ -31,8 +31,15 @@ A source attempt qualifies a Candidate 4 horizon only if:
 For the T-120 -> T-60 path:
 - >=5 identical sportsbooks must exist at both horizons;
 - only same-book pairs are used;
+- all counted books must satisfy the frozen <=30 minute freshness rule at their selected request;
+- T-120 and T-60 must come from the same provider identity;
 - later rows never backfill an earlier horizon;
 - T-45/T-30 cannot repair a missing T-60.
+
+The shared LevLine 4 market capture contract retains its pre-existing 2-book floor for unrelated research semantics. Candidate 4 does **not** rewrite that contract. Instead:
+- the scheduled collector is invoked with Candidate 4's `min_close_books=5`, so it continues retrying the horizon until a 5-book consensus exists or the one-sided window closes;
+- Candidate 4 then reconstructs its own horizon state from the underlying book rows and requires 5 fresh same-provider books before eligibility;
+- a legacy 2-book consensus may remain in the append-only ledger but cannot qualify Candidate 4.
 
 If PropLine is unavailable, Candidate 4 fails closed. No other provider is automatically substituted without an explicit source-contract amendment committed before the affected lock.
 
@@ -40,10 +47,13 @@ If PropLine is unavailable, Candidate 4 fails closed. No other provider is autom
 
 Primary V1 football event: **newly known QB unavailability / starter replacement**.
 
-Required pre-T-120 identity state:
+Required T-120 identity state:
 - nflverse 2025+ depth-chart row with `dt <= T-120`;
 - team, player_name, GSIS id, QB position and rank-1 state;
-- unambiguous QB1 only.
+- unambiguous QB1 only;
+- the repository must capture and content-hash both teams' selected QB1 identities during the one-sided window `T-120-7.5m <= capture <= T-120`;
+- rows whose upstream `dt` is later than the actual repository capture timestamp are excluded;
+- the T-60 job consumes only this immutable T-120 snapshot and may not re-query depth charts.
 
 Required T-60 shock evidence:
 - official NFL inactive article captured before/equal T-60;
