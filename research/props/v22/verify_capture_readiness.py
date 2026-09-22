@@ -236,10 +236,15 @@ def audit_readiness(
     }
 
     if not rows:
+        if ledger_path.exists():
+            raise Props22ReadinessError(
+                "Props 2.2 ledger exists but contains no receipts; "
+                "an empty first-capture artifact is not a valid armed state"
+            )
         return {
             **common,
             "state": "ARMED_AWAITING_FIRST_CAPTURE",
-            "ledger_exists": ledger_path.exists(),
+            "ledger_exists": False,
             "ledger_rows": 0,
             "source_forecasts": 0,
             "guardrail": (
