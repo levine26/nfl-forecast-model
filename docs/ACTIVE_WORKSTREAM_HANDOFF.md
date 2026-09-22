@@ -78,7 +78,9 @@ Do not redo:
 - #486 — immutable Props 2.2 prospective capture contract;
 - #487 — distribution-evidence evaluator;
 - #488 — personnel/opportunity evidence coverage audit;
-- #491 — live integration that captures Props 2.2 receipts after successful **pregame** Props 2.1 runs.
+- #491 — live integration that captures Props 2.2 receipts after successful **pregame** Props 2.1 runs;
+- #496 — frozen Props 2.2 prospective evaluator;
+- #497 — immutable postgame grader plus scheduled/off-main grading and evaluation workflow.
 
 ### Frozen Props 2.2 design
 
@@ -123,6 +125,17 @@ That run must:
 
 Do not manually backfill Week 2 into Props 2.2.
 
+### Postgame chain is already implemented
+
+After future receipts exist, the repository no longer needs a new scoring build:
+- `research/props/v22/grade_prospective.py` creates one immutable hashed grade per original Props 2.1 source forecast;
+- zero offensive snaps are voided, missing participation/PBP remains pending, and legitimate participated zero-stat outcomes are graded as `0.0`;
+- `research/props/v22/evaluate_prospective.py` scores the frozen grid vs the original point-in-time market with game-clustered uncertainty and Holm-Bonferroni reporting;
+- `.github/workflows/research_props22_postgame.yml` runs Tuesday/Wednesday, cleanly no-ops before receipts exist, and persists postgame evidence to `research-data/props22-evaluation` rather than `main`;
+- `research/props/v22/POSTGAME_GRADING_CONTRACT.md` freezes these eligibility rules before the first future holdout receipt.
+
+The evaluator never auto-selects a winner. Per-week reports remain descriptive until terminal preregistered evidence thresholds are satisfied.
+
 ## Completed workflow cleanup
 
 ### #492 — legacy Props 2.0 listeners honor live post-kickoff no-op
@@ -164,7 +177,7 @@ The old listeners failed because they demanded `source_provenance.json`, `foreca
 4. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green and the Props 2.2 capture hook is still wired.
 5. On the first future pregame live run, verify `challenger_outputs/props22/` is created with valid immutable receipts.
 6. Preserve forward personnel/opportunity and distribution evidence concurrently.
-7. Use the frozen Props 2.2 evaluator once future outcomes exist; do not change its definitions mid-holdout.
+7. After games finalize, verify the scheduled postgame workflow appends immutable grades and refreshes `research-data/props22-evaluation`; do not change grading/evaluation definitions mid-holdout.
 8. Do not select a Props 2.2 winner mid-holdout. Wait for the preregistered terminal evidence threshold.
 9. If a PR becomes stale after main advances, create one clean current-main replacement and close the stale predecessor explicitly.
 
