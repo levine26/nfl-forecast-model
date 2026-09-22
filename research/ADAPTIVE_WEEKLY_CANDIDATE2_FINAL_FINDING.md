@@ -2,10 +2,12 @@
 
 Status: **historical Candidate 2 complete / INCONCLUSIVE / no production change**  
 Candidate: `ADAPTIVE-REGIME-SHOCK-GATE-V1`  
-Validated candidate code SHA: `f4a5ea26bc999819d4c79179c20b8f33fd77401f`  
-Workflow run: `35747145825`  
-Artifact: `10703836596`  
-Artifact SHA256: `9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5`  
+Canonical validated execution SHA: `3d47141ed8584e989702d1982e4e1dc60d8248a2`  
+Workflow run: `35749549009`  
+Artifact: `10705320611`  
+Artifact SHA256: `fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771`  
+Config SHA256: `957dc2443685f1a90d8632ee1f6b7af78834d1e039ded9ee7432690237a96437`  
+Feature contract: `research/ADAPTIVE_WEEKLY_LEARNING_RESEARCH_PLAN.md`, Candidate 2 Pre-Registration §§20.2–20.7  
 Full receipt: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_RECEIPT.json`
 
 ## Executive conclusion
@@ -86,7 +88,7 @@ Validated 2025 coverage:
 - both-team T-120 depth state: **272/272 games**;
 - QB-change evaluable: **256 games**;
 - OL-change evaluable: **256 games**;
-- qualified QB practice join: **126 games**;
+- qualified QB practice join: **127 games**;
 - strong regime shock: **51 games**;
 - near-boundary component/F-ST disagreements: **4 games**;
 - authorized Candidate 2 switches: **1 game**;
@@ -136,7 +138,7 @@ The main actionable external implication is **prospective strict-PIT multi-book 
    Yes. QB identity change is a plausible structural break and external NFL player-value evidence supports QB state as unusually high leverage. Empirically, however, the evidence is one event.
 
 8. **Is the gain reproducible?**  
-   The exact historical computation is reproducible from the recorded code SHA/workflow/artifact. The *generalization* of the gain is not established.
+   The exact historical computation is reproducible from the canonical execution SHA, workflow artifact and frozen config digest. The *generalization* of the gain is not established.
 
 9. **Suitable for prospective shadow testing?**  
    **Not authorized from V1 evidence.** The preregistration required a positive, PIT-clean, coherent result that was not pathologically concentrated. V1 is positive and clean but entirely one-switch/one-week/QB-channel concentrated.
@@ -151,3 +153,8 @@ The main actionable external implication is **prospective strict-PIT multi-book 
 Candidate 2 is more encouraging than Candidate 1 because it changed only one winner, that switch was correct, and probability quality also improved. But the evidence is too sparse and concentrated to establish incremental winner-selection information beyond frozen F-ST.
 
 No production change is authorized. No prospective Candidate 2 shadow has been frozen. Candidate 3 has not been started.
+
+
+## Canonical provenance note
+
+The canonical hardened execution is commit `3d47141ed8584e989702d1982e4e1dc60d8248a2`, workflow run `35749549009`, artifact `10705320611`. A prior pre-hardening run produced the same winner result but is superseded for final receipt purposes. The later hardening changed evaluation runtime only: the Candidate 2 model, preregistered thresholds, feature contract and primary 10,000-draw Candidate-2-vs-F-ST bootstrap were unchanged.
