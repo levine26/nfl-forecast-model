@@ -109,6 +109,26 @@ def test_restores_locked_games_dropped_from_contracting_current_slate():
 
 
 
+def test_loads_persistent_game_id_roster(tmp_path):
+    roster = tmp_path / "editorial_slate_roster.json"
+    roster.write_text(
+        """{
+  "schema_version": 1,
+  "season": 2026,
+  "week": 2,
+  "frozen": true,
+  "game_ids": ["2026_02_CAR_ATL", "2026_02_NYG_LA"]
+}
+""",
+        encoding="utf-8",
+    )
+
+    assert MODULE._load_editorial_game_ids(roster) == {
+        "2026_02_CAR_ATL",
+        "2026_02_NYG_LA",
+    }
+
+
 def test_loads_top_level_game_preview_roster(tmp_path):
     roster = tmp_path / "game_previews.json"
     roster.write_text(
