@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "phase": 1,
+  "name": "Current LevLine Audit, Baseline Reproduction & Error Decomposition",
+  "status": "ANALYTICALLY_COMPLETE_PENDING_EXACT_HEAD_CI",
+  "production_changed": false,
+  "sample": {
+    "seasons": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "regular_season_games": 1087,
+    "ties": 3
+  },
+  "baseline": {
+    "home_points_mae": 7.42368116929241,
+    "away_points_mae": 7.485142354656214,
+    "margin_mae": 9.961987009785291,
+    "total_mae": 10.853913707422718,
+    "market_spread_mae": 9.494480220791168,
+    "market_total_mae": 10.189052437902484,
+    "fst_chronology_clean_winner_accuracy": 0.6816927322907084,
+    "market_winner_accuracy": 0.6761729530818767,
+    "fst_brier": 0.21065334840485694,
+    "market_brier": 0.2101992905677052,
+    "ats_accuracy": 0.4877126654064272
+  },
+  "paired_market_comparison": {
+    "margin_model_minus_market_mae": 0.46750678899412285,
+    "margin_block_bootstrap_ci95": [
+      0.29781927,
+      0.64387937
+    ],
+    "total_model_minus_market_mae": 0.6648612695202354,
+    "total_block_bootstrap_ci95": [
+      0.43698005,
+      0.89545928
+    ]
+  },
+  "failure_modes": [
+    "compressed extreme margins and blowouts",
+    "total regression toward middle",
+    "large model-market disagreement does not imply continuous-error edge",
+    "late-season total degradation",
+    "missing PIT-safe game-specific QB/personnel/weather state remains a research gap",
+    "current descriptive regression weighting does not beat best individual base regressor"
+  ],
+  "source_blockers": {
+    "prospective_multibook_market": "latest inspected The Odds API collector status HTTP 401; snapshot ledger empty",
+    "prospective_weather": "capture blocked on unresolved qualified game-specific venue receipts"
+  },
+  "external_research": [
+    "davidsasser.com"
+  ],
+  "artifacts": [
+    "research/spread-points-nextgen/phase1/EVALUATION_CONTRACT.md",
+    "research/spread-points-nextgen/phase1/CURRENT_ARCHITECTURE_AUDIT.md",
+    "research/spread-points-nextgen/phase1/BASELINE_REPRODUCTION_REPORT.md",
+    "research/spread-points-nextgen/phase1/ERROR_DECOMPOSITION_REPORT.md",
+    "research/spread-points-nextgen/phase1/DATA_API_INVENTORY.md",
+    "research/spread-points-nextgen/phase1/LEAKAGE_PIT_AUDIT.md",
+    "research/spread-points-nextgen/phase1/PHASE1_SYNTHESIS.md"
+  ]
+}
