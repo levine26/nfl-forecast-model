@@ -38,7 +38,14 @@ RESEARCH_SENSITIVE_OUTPUTS = frozenset(
 RESEARCH_ONLY_PREFIXES = (
     "research/",
     "docs/levline4/",
-    "challenger_outputs/",
+)
+
+RESEARCH_ONLY_EXACT = frozenset(
+    {
+        "challenger_outputs/prediction_history_shadow.csv",
+        "challenger_outputs/fst/prospective_evaluation.json",
+        "challenger_outputs/fst/prospective_weekly.csv",
+    }
 )
 
 FALLBACK_STATUS_SIDECAR = Path("/tmp/sunday-signal-groq-provider-fallback.json")
@@ -48,6 +55,8 @@ def is_research_only_path(path: str) -> bool:
     value = str(path or "").strip()
     if not value:
         return False
+    if value in RESEARCH_ONLY_EXACT:
+        return True
     if any(value.startswith(prefix) for prefix in RESEARCH_ONLY_PREFIXES):
         return True
 
