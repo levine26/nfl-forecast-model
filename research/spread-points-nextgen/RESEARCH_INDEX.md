@@ -198,7 +198,7 @@ Additional Phase 1 control/evidence:
 
 External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
-### Phase 2 — closeout candidate / exact-head CI pending
+### Phase 2 — COMPLETE
 
 - literature review — `research/spread-points-nextgen/phase2/LITERATURE_REVIEW.md`
 - external-model review — `research/spread-points-nextgen/phase2/EXTERNAL_MODEL_REVIEW.md`
@@ -220,7 +220,17 @@ External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
 External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research. Final Sasser search found useful score/line/market product separation but no reproducible current methodology/archive sufficient for scientific validation.
 
-Compatibility sync #521 preserved concurrent adaptive-weekly-learning state; #528 preserved Sunday Signal contextual outputs; later syncs preserved adaptive Candidate 2 closeout/T-120 shadow state; #536 preserved the generated market/status refresh through `3e859968a40b8250f85ed211e8b1e7593ea1bf47`. These are provenance-only repository syncs and were not used to select or redefine Spread & Points challengers.
+Compatibility sync #521 preserved concurrent adaptive-weekly-learning state; #528 preserved Sunday Signal contextual outputs; later syncs preserved adaptive Candidate 2 closeout/T-120 shadow state; #536 preserved generated market/status output state; and the final compatibility sync incorporated the adaptive Candidate 2 freeze through `e93127963c76cd309cdddf17d91291c04a60a659`. These were provenance-only repository syncs and were not used to select or redefine Spread & Points challengers.
+
+Final closeout:
+
+- final validated head — `076dc9d6f6c052eec4744a155070c42c1b99ae82`
+- research firewall — `35751402751` **SUCCESS**
+- full research validation — `35751402726` **SUCCESS**
+- PR #520 — **MERGED**
+- merge commit — `405906942013252c158244c9b033a3240baa37f8`
+- all eleven canonical Phase 2 artifacts and all four control files re-read from `main` after merge
+- Phase 3 — **NOT STARTED**
 
 ### Phase 3 — planned
 
