@@ -1,6 +1,6 @@
 # LevLine Adaptive Weekly Learning — Research Plan & Execution Ledger
 
-Status: CANDIDATE 4 ACTIVE — PROSPECTIVE PREPARATION / PIT REMEDIATION  
+Status: CANDIDATE 4 PREREGISTERED — CI / LIVE SOURCE QUALIFICATION  
 Repository: `levine26/nfl-forecast-model`  
 Authoritative branch for this plan: `main`  
 Primary objective: determine whether leakage-safe weekly learning can improve LevLine straight-up NFL winner accuracy beyond frozen `F-ST-01-FROZEN-2026` without degrading calibration, robustness, or scientific validity.
