@@ -1,6 +1,6 @@
 {
   "registry_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE-REGISTRY-V1",
-  "status": "CANDIDATE_4_PREREGISTERED_AWAITING_CI_AND_LIVE_SOURCE_QUALIFICATION",
+  "status": "CANDIDATE_4_PREREGISTERED_PROSPECTIVE_INFRASTRUCTURE_VALIDATION",
   "production_incumbent": "F-ST-01-FROZEN-2026",
   "frozen_benchmark": {
     "games": 1087,
@@ -59,7 +59,7 @@
     {
       "candidate_number": 4,
       "candidate_id": "ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1",
-      "disposition": "PREREGISTERED_PRE_PROSPECTIVE",
+      "disposition": "PREREGISTERED_AWAITING_PROSPECTIVE_EVIDENCE",
       "research_question": "After conditioning on contemporaneous market level, do strict-PIT market-path residuals and independently timestamped football-information shocks add incremental winner-selection value over frozen F-ST?",
       "primary_horizon": "T-60m",
       "incumbent_horizon": "T-120m",
@@ -67,17 +67,20 @@
       "completed_2026_outcomes_for_design_or_selection": 0,
       "production_authorized": false,
       "preregistration_sha": "74ecd303545c09f57593546472d27438e3d8a204",
-      "earliest_eligible_lock": "2026-09-24T22:15:00Z conditional on preregistration freeze and qualified market capture",
+      "earliest_eligible_lock": "2026-09-27T15:00:00Z (Week 3 Sunday 13:00 ET cohort T-120), conditional on qualified five-book market capture and Candidate 4 QB source execution",
       "integration_branch": "research/adaptive-weekly-learning-c4-integration",
-      "current_blocker": "CI must pass and a live zero-cost multi-book source must satisfy Candidate 4 quality gates; existing The Odds API credential failed with HTTP 401 and PropLine requires a configured repository secret before live qualification.",
-      "note": "Candidate 4 mathematical rule is frozen. Thursday Week 3 is diagnostic/source-only because primary QB inactive semantics are Sunday-qualified.",
+      "current_blocker": "No modeling blocker. Live PropLine source qualification remains pending first successful prospective capture; legacy The Odds API credential path previously returned 401 and is not relied upon.",
+      "note": "Frozen sparse T-60 market-path + newly-known T-120-QB1 inactive gate. Thursday Week 3 is diagnostics-only; first primary cohort is Sunday. No completed 2026 outcomes used.",
       "config_commit_sha": "af3c27ed742cf9c7f51b19f4e23d81bf379cafbd",
       "qb_source_contract_commit_sha": "4649e8b16e33e1bd2dae0a51ddf176c3f65bbd11",
       "earliest_primary_cohort": "2026 Week 3 Sunday (2026-09-27)",
       "earliest_primary_t120": "2026-09-27T15:00:00Z for 13:00 ET cohort",
       "earliest_primary_t60": "2026-09-27T16:00:00Z for 13:00 ET cohort",
       "prospective_predictions_locked": 0,
-      "games_graded": 0
+      "games_graded": 0,
+      "first_primary_decision_cutoff": "2026-09-27T16:00:00Z (T-60)",
+      "market_close_gate_books": 5,
+      "qb_source_contract": "ADAPTIVE-CANDIDATE4-QB-SHOCK-SOURCE-V1"
     }
   ],
   "controls": [
@@ -107,7 +110,7 @@
     ],
     "formal_confidence_interval": false
   },
-  "next_state": "CANDIDATE_4_PROSPECTIVE_SHADOW",
+  "next_state": "CANDIDATE_4_CI_AND_LIVE_SOURCE_QUALIFICATION",
   "candidate4_started": true,
   "production_changed": false
 }
