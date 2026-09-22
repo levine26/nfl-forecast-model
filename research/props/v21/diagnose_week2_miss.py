@@ -30,6 +30,7 @@ REQUIRED = {
     "graded",
     "actual_result",
     "model_mean",
+    "fair_line",
     "market_line",
     "model_p_over",
     "market_p_over",
@@ -56,10 +57,16 @@ def prepare_matched(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     projection["model_abs_error"] = (
         projection["actual_result"].astype(float) - projection["model_mean"].astype(float)
     ).abs()
+    projection["fair_abs_error"] = (
+        projection["actual_result"].astype(float) - projection["fair_line"].astype(float)
+    ).abs()
     projection["market_abs_error"] = (
         projection["actual_result"].astype(float) - projection["market_line"].astype(float)
     ).abs()
-    projection["mae_delta"] = projection["model_abs_error"] - projection["market_abs_error"]
+    projection["fair_mae_delta"] = projection["fair_abs_error"] - projection["market_abs_error"]
+    projection["model_mean_mae_delta"] = (
+        projection["model_abs_error"] - projection["market_abs_error"]
+    )
     projection["push"] = projection["actual_result"].astype(float).eq(
         projection["market_line"].astype(float)
     )
@@ -121,9 +128,11 @@ def summarize_group(
         if len(p1) >= min_n:
             row.update(
                 {
-                    "model_mae": float(p1["model_abs_error"].mean()),
+                    "model_mean_mae": float(p1["model_abs_error"].mean()),
+                    "fair_line_mae": float(p1["fair_abs_error"].mean()),
                     "market_mae": float(p1["market_abs_error"].mean()),
-                    "mae_delta": float(p1["mae_delta"].mean()),
+                    "fair_line_mae_delta": float(p1["fair_mae_delta"].mean()),
+                    "model_mean_mae_delta": float(p1["model_mean_mae_delta"].mean()),
                 }
             )
         if len(p2) >= min_n:
@@ -173,9 +182,11 @@ def run(input_csv: Path, output_dir: Path, *, min_n: int = 10) -> dict[str, Any]
         "projection_n": int(len(projection)),
         "probability_n": int(len(probability)),
         "overall": {
-            "model_mae": float(projection["model_abs_error"].mean()),
+            "model_mean_mae": float(projection["model_abs_error"].mean()),
+            "fair_line_mae": float(projection["fair_abs_error"].mean()),
             "market_mae": float(projection["market_abs_error"].mean()),
-            "mae_delta": float(projection["mae_delta"].mean()),
+            "fair_line_mae_delta": float(projection["fair_mae_delta"].mean()),
+            "model_mean_mae_delta": float(projection["model_mean_mae_delta"].mean()),
             "model_brier": float(probability["model_brier"].mean()),
             "market_brier": float(probability["market_brier"].mean()),
             "brier_delta": float(probability["brier_delta"].mean()),
