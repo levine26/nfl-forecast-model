@@ -697,11 +697,101 @@ External evidence is supportive but not outcome-selective:
 
 - [x] Candidate 2 theory materially separated from Candidate 1
 - [x] Candidate 2 pre-registration frozen before target-result generation
-- [ ] Candidate 2 synchronized research integration base created
-- [ ] Lane A evidence complete
-- [ ] Lane B PIT audit complete
-- [ ] Lane C implementation complete
-- [ ] Lane D historical evaluation complete
-- [ ] Lane E adversarial validation complete
-- [ ] Candidate 2 final receipt and disposition recorded
+- [x] Candidate 2 synchronized research integration base created
+- [x] Lane A evidence complete
+- [x] Lane B PIT audit complete
+- [x] Lane C implementation complete
+- [x] Lane D historical evaluation complete
+- [x] Lane E adversarial validation complete
+- [x] Candidate 2 final receipt and disposition recorded
+
+## 21. Candidate 2 checkpoint — completed 2026-09-22
+
+Candidate ID: `ADAPTIVE-REGIME-SHOCK-GATE-V1`  
+Preregistration main SHA: `fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da`  
+Synchronized Candidate 2 base: `99b255aae7fc36ad367561f613e3fcb3752ef528`  
+Validated candidate code SHA: `f4a5ea26bc999819d4c79179c20b8f33fd77401f`  
+Validated workflow run: `35747145825`  
+Evidence artifact: `10703836596`  
+Artifact SHA256: `9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5`  
+Final receipt: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_RECEIPT.json`  
+Final finding: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_FINDING.md`
+
+### Same-sample 2025 result
+
+Candidate 2 is evaluated on the exact qualified 2025 regime-state sample, not against the full 1,087-game F-ST benchmark as though the samples were identical.
+
+- paired games: **272**
+- frozen F-ST: **179 / 272 = 65.8088%**
+- Candidate 2: **180 / 272 = 66.1765%**
+- accuracy delta: **+1 winner / +0.3676 percentage points**
+- Candidate 2 Brier: **0.2114047** vs F-ST **0.2115784**; delta **-0.0001737**
+- Candidate 2 log loss: **0.6072719** vs F-ST **0.6076199**; delta **-0.0003480**
+- winner switches: **1 / 272**
+- Candidate-2-only correct: **1**
+- F-ST-only correct: **0**
+- switch win rate: **100% (1/1)**
+- exact McNemar diagnostic: **p = 1.0**
+- week-block bootstrap 95% accuracy-delta interval: **0.0000 to +1.1278 pp**
+
+The sole switch was `2025_12_ATL_NO`: a near-boundary F-ST/component disagreement authorized by the preregistered QB1-change shock. The switch was correct.
+
+### PIT coverage
+
+- both-team T-120 depth state: **272 / 272**
+- QB-change evaluable: **256 games**
+- OL-change evaluable: **256 games**
+- qualified QB-practice join: **126 games**
+- strong-shock games: **51**
+- near-boundary F-ST/component disagreements: **4**
+- authorized Candidate 2 switches: **1**
+- future-snapshot violations: **0**
+- ambiguous QB-practice joins: **0**
+
+No historical closing-line substitution, post-T-120 inactive state, unqualified 2022-2024 availability, actual snaps, or completed 2026 outcomes entered Candidate 2 construction or selection.
+
+### Adversarial result
+
+The preregistered grid contained 18 configurations.
+
+- **12 / 18** preserved the +1 winner result;
+- **6 / 18** were neutral;
+- **0 / 18** were negative;
+- lowering the OL threshold to 1 added a second switch and erased the net gain;
+- removing QB-change erased the gain;
+- QB-change-only reproduced the full gain;
+- removing Week 12 erased the gain;
+- the maximum single-week share of positive net gain was **100%**.
+
+Thus the sign is not a one-cell threshold artifact, but the evidence is entirely one-switch / one-week / QB-channel concentrated.
+
+### Scientific disposition
+
+**INCONCLUSIVE.**
+
+Candidate 2 is directionally more encouraging than Candidate 1 because it made only one winner change, that change was correct, and Brier/log loss also improved slightly. However, one successful switch is not statistically distinguishable from noise and does not establish a season-stable or reproducible winner-selection edge.
+
+Candidate 2 therefore does **not** satisfy its own preregistered standard for prospective-shadow authorization. It is not rejected as a mechanism, but it is not promoted.
+
+### Updated adaptive-learning accuracy view
+
+The original approximately 68.8% adaptive central prior is no longer supported after Candidate 1 and Candidate 2.
+
+Current governance estimate:
+- frozen established long-run benchmark remains approximately **68.17%** on the chronology-clean 2022-2025 benchmark;
+- current central estimate for LevLine long-run straight-up accuracy with mechanisms actually evidenced so far is approximately **68.3%**;
+- a defensible near-term range is approximately **68.2%-68.4%**, with high uncertainty;
+- materially larger gains remain possible only if genuinely orthogonal prospective information such as strict multi-book market-path and richer qualified player/QB state later validates.
+
+### Stop state
+
+- [x] Candidate 2 complete
+- [x] Candidate 2 final disposition recorded
+- [x] Production F-ST unchanged
+- [x] No Candidate 2 prospective shadow frozen
+- [x] No prospective start week assigned
+- [x] No production deployment authorized
+- [x] Candidate 3 **not started**
+
+This is the required Candidate 2 stop point pending user direction.
 
