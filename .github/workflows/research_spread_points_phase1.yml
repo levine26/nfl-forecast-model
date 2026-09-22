@@ -1,0 +1,62 @@
+name: Spread points Phase 1 audit
+
+on:
+  pull_request:
+    paths:
+      - 'research/spread-points-nextgen/phase1/**'
+      - '.github/workflows/research_spread_points_phase1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spread-points-phase1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: reproducible baseline and error audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: spread-points-phase1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            spread-points-phase1-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Run Phase 1 audit
+        run: |
+          rm -rf research_outputs/spread_points_phase1
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python research/spread-points-nextgen/phase1/run_baseline_audit.py \
+            --output-dir research_outputs/spread_points_phase1
+          test -s research_outputs/spread_points_phase1/baseline_metrics.json
+          test -s research_outputs/spread_points_phase1/phase1_machine_summary.json
+          test -s research_outputs/spread_points_phase1/baseline_predictions_2022_2025.csv
+          test -s research_outputs/spread_points_phase1/error_decomposition.csv
+      - name: Verify production surfaces unchanged
+        run: |
+          git diff --exit-code -- \
+            outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py \
+            src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py \
+            src/nfl_forecast/market.py src/nfl_forecast/market_t120.py \
+            src/nfl_forecast/fst_production.py scripts/run_week.py scripts/refresh_market.py
+      - name: Upload Phase 1 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: spread-points-phase1-${{ github.run_id }}
+          path: research_outputs/spread_points_phase1/
+          retention-days: 30
