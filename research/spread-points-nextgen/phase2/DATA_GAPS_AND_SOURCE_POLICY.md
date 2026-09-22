@@ -179,3 +179,33 @@ Escalate a paid source only if Phase 3/4 shows:
 - expected improvement is large enough to matter relative to uncertainty and operational cost.
 
 Any future memo must name the source, fields, price, test plan and no-cost alternatives before purchase.
+
+## 8. Phase 3 feature-source feasibility matrix
+
+This matrix is the implementation contract for the proposed feature families. "Publication rule" refers to when the information is eligible for a simulated forecast, not merely when the source ultimately contains it.
+
+| Feature family | Source | Stable key | Pregame / publication rule | Lag | Missingness | Historical coverage / status |
+|---|---|---|---|---|---|---|
+| opponent-adjusted EPA / success | nflverse PBP | game ID + team | only completed prior games; sequential opponent state | >=1 completed game | explicit; no same-game fill | strong multi-season; **initial A/B allowed** |
+| dynamic offense/defense state | derived from prior schedule/PBP | team + game order | update only after prior game completes | sequential | prior/shrinkage state, not future imputation | strong; **initial A allowed** |
+| drives / possessions | nflverse PBP drive fields / derived drive boundaries | game ID + drive + offense team | prior completed games only | >=1 game | malformed/unresolved drives excluded and counted | strong enough for B subject to construction QA |
+| red-zone opportunity/conversion | prior PBP | game + team/play | prior completed games only | >=1 game | shrink sparse rates; preserve missing | strong; **controlled B input** |
+| explosive-play rate | prior PBP | game + team/play | definition frozen before results; prior completed games only | >=1 game | explicit | strong; **controlled B input** |
+| sacks / turnovers | prior PBP | game + team/play | prior completed games only | >=1 game | explicit; regularize rare rates | strong; **controlled B input** |
+| field-goal / special-teams scoring | prior PBP | game + team/play | prior completed games only | >=1 game | rare defensive/ST scores handled as tail component | strong for basic scoring; richer player ST state not required |
+| home/rest | schedule | game ID | deterministic schedule known pregame | none | fail if game identity unresolved | strong; **initial A/B/C allowed** |
+| static stadium/roof | schedule + qualified venue map | game ID/venue | use only truly static value tied to correct venue | none | unknown != outdoor | conditional sensitivity; venue mapping must pass |
+| market spread/total | nflverse schedule for historical family | game ID | closing/late benchmark only; exact horizon opaque | none | exact paired rows only | strong benchmark; **C allowed with label** |
+| prospective T-120 market | timestamped collector | game ID + book + captured_at | latest valid snapshot at/before T-120; staleness rules | none | failure/stale != no movement | collector currently blocked by HTTP 401; **not historical C** |
+| QB starter / replacement | timestamped expected-lineup/depth evidence + lagged QB performance | GSIS/player ID + game ID | starter identity timestamp <= decision horizon | lag QB quality | unknown starter remains unknown | no uniform 2022–2025 fixed-horizon history; **conditional** |
+| injuries / availability | qualified reports/snapshots | player ID + team + game | report/snapshot available <= horizon | source-specific | missing != healthy | qualified 2025 slice + prospective 2026; **conditional only** |
+| OL/personnel continuity | depth/availability/roster history | stable player IDs | as-of lineup/role must be proven | source-specific | unresolved role fails closed | insufficient uniform 2022–2025 history; **conditional** |
+| NGS / FTN / PFR advanced | nflverse/public advanced feeds | player/team + week | source publication must precede next forecast horizon | >=1 published game/week | structural missingness explicit | optional controlled ablation, not prerequisite |
+| weather | NWS/Open-Meteo forecast-as-of + exact venue | game ID + forecast issue time | forecast issue/update <= decision horizon | none | missing forecast != normal | venue receipts incomplete; **blocked initially** |
+| news/coaching state | timestamped official/reputable publication | game/team + published_at | published <= simulated horizon | none | absence of article != no change | no uniform numeric historical pipeline; **not initial** |
+
+### Operational constraints retained
+
+- The Odds API HTTP 401 state blocks strong prospective multi-book same-horizon evidence until repaired; it does **not** block closing-like historical C.
+- Unresolved venue receipts block qualified prospective weather capture; they do **not** authorize realized historical weather.
+- Source existence never substitutes for as-of proof.
