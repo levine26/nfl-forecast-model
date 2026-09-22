@@ -104,6 +104,7 @@ jobs:
         run: >-
           python -m research.market_capture_observability_v1
           --quota-reserve 50
+          --min-close-books 5
 
       - name: Freeze eligible LevLine 4 horizon forecasts
         if: (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true') && steps.capture.outcome == 'success'
