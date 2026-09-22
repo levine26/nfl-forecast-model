@@ -64,7 +64,7 @@ jobs:
 
       - name: Audit current first-capture readiness
         run: |
-          python research/props/v22/verify_capture_readiness.py \
+          python -m research.props.v22.verify_capture_readiness \
             --workflow .github/workflows/levline_markets_live.yml \
             --ledger challenger_outputs/props22/forecast_originals.jsonl \
             --output /tmp/props22-first-capture-readiness.json
