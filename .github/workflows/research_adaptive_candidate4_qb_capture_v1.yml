@@ -1,0 +1,142 @@
+name: Adaptive Candidate 4 QB shock capture
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/ADAPTIVE_WEEKLY_CANDIDATE4_QB_SOURCE_CONTRACT.json'
+      - 'research/ADAPTIVE_WEEKLY_CANDIDATE4_QB_SOURCE_CONTRACT_ADDENDUM.md'
+      - 'research/adaptive_candidate4_qb_shock_v1.py'
+      - 'research/run_adaptive_candidate4_qb_shock_v1.py'
+      - 'research/test_adaptive_candidate4_qb_shock_v1.py'
+      - 'research/test_run_adaptive_candidate4_qb_shock_v1.py'
+      - '.github/workflows/research_adaptive_candidate4_qb_capture_v1.yml'
+  workflow_run:
+    workflows:
+      - 'LevLine research inactive article source archive v1'
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-research-inactive-snapshot-archive-v1
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install Candidate 4 QB test dependencies
+        run: >-
+          python -m pip install
+          pytest
+          'pandas==3.0.5'
+          'beautifulsoup4>=4.12'
+          'nflreadpy==0.1.5'
+      - name: Validate Candidate 4 QB source and runner
+        run: >-
+          python -m pytest -q
+          research/test_adaptive_candidate4_qb_shock_v1.py
+          research/test_run_adaptive_candidate4_qb_shock_v1.py
+      - name: Verify frozen source authority
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          contract=json.loads(Path('research/ADAPTIVE_WEEKLY_CANDIDATE4_QB_SOURCE_CONTRACT.json').read_text())
+          assert contract['contract_id']=='ADAPTIVE-CANDIDATE4-QB-SHOCK-SOURCE-V1'
+          assert contract['preregistration_sha']=='74ecd303545c09f57593546472d27438e3d8a204'
+          assert contract['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert contract['production_authorized'] is False
+          assert contract['shock']['player_value_magnitude_authorized'] is False
+          parser=json.loads(Path('research/inactive_article_cohort_parser_v2_receipt.json').read_text())
+          assert parser['status']=='PASS'
+          assert parser['qualification_passed'] is True
+          assert parser['authority']['player_level_parser_qualified_for_due_cohort_filtering'] is True
+          PY
+
+  capture:
+    if: >-
+      github.event_name != 'pull_request' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Restore official inactive archive and existing Candidate 4 QB ledger
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/inactive-snapshots-v1:refs/remotes/origin/research-data/inactive-snapshots-v1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
+            for DATA_DIR in               research_outputs/inactive_article_source_archive_v1               research_outputs/adaptive_candidate4
+            do
+              if git ls-tree -d --name-only origin/research-data/inactive-snapshots-v1 "$DATA_DIR" | grep -q "^${DATA_DIR}$"; then
+                git archive origin/research-data/inactive-snapshots-v1 "$DATA_DIR" | tar -xf -
+              fi
+            done
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install pinned Candidate 4 QB source dependencies
+        run: >-
+          python -m pip install
+          'pandas==3.0.5'
+          'beautifulsoup4>=4.12'
+          'nflreadpy==0.1.5'
+
+      - name: Build frozen Candidate 4 QB information state
+        run: >-
+          PYTHONPATH="$PWD/src:$PWD"
+          python -m research.run_adaptive_candidate4_qb_shock_v1
+
+      - name: Persist Candidate 4 QB evidence away from main
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/adaptive_candidate4
+          if [ ! -s "$DATA_DIR/qb_state.csv" ]; then
+            echo 'No Candidate 4 QB rows are ready.'
+            exit 0
+          fi
+
+          rm -rf /tmp/adaptive_candidate4
+          cp -R "$DATA_DIR" /tmp/adaptive_candidate4
+
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
+            git checkout -B candidate4-qb-data origin/research-data/inactive-snapshots-v1
+          else
+            git checkout -B candidate4-qb-data
+          fi
+
+          mkdir -p research_outputs
+          rm -rf research_outputs/adaptive_candidate4
+          cp -R /tmp/adaptive_candidate4 research_outputs/adaptive_candidate4
+          git add research_outputs/adaptive_candidate4/
+          if git diff --cached --quiet; then
+            echo 'Candidate 4 QB ledger unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture prospective Candidate 4 QB state'
+          git push origin HEAD:research-data/inactive-snapshots-v1
