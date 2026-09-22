@@ -89,6 +89,9 @@ def select_frozen_incumbents(production_history: pd.DataFrame) -> dict[str, dict
         return {}
     required = {
         "game_id",
+        "season",
+        "week",
+        "gameday",
         "home_team",
         "away_team",
         "final_home_prob",
@@ -105,6 +108,14 @@ def select_frozen_incumbents(production_history: pd.DataFrame) -> dict[str, dict
 
     rows: list[dict[str, Any]] = []
     for row in production_history.to_dict("records"):
+        try:
+            season = int(row.get("season"))
+            week = int(row.get("week"))
+            gameday = datetime.fromisoformat(str(row.get("gameday"))[:10])
+        except (TypeError, ValueError):
+            continue
+        if season != 2026 or week < 3 or gameday.weekday() != 6:
+            continue
         if str(row.get("lock_status") or "").upper() != "LOCKED":
             continue
         if str(row.get("fst_artifact_id") or "") != FST_ARTIFACT_ID:
@@ -281,6 +292,9 @@ def build_candidate4_decisions(
         )
         reasons.extend(qb_reasons)
 
+        if generated >= kickoff:
+            reasons.append("decision_recorded_postkickoff")
+
         eligible = not reasons
         market_pick = _pick(home, away, float(m60)) if m60 is not None else None
         market_home = market_pick == home if market_pick is not None else False
@@ -315,6 +329,9 @@ def build_candidate4_decisions(
             "candidate_version": CANDIDATE_VERSION,
             "preregistration_sha": PREREGISTRATION_SHA,
             "game_id": game_id,
+            "season": int(incumbent.get("season")),
+            "week": int(incumbent.get("week")),
+            "gameday": str(incumbent.get("gameday")),
             "home_team": home,
             "away_team": away,
             "kickoff_utc": _iso(kickoff),
