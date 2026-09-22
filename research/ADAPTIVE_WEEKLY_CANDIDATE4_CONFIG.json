@@ -1,0 +1,64 @@
+{
+  "candidate_id": "ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1",
+  "candidate_version": "1.0.0",
+  "preregistration_commit_sha": "74ecd303545c09f57593546472d27438e3d8a204",
+  "production_incumbent": "F-ST-01-FROZEN-2026",
+  "production_authorized": false,
+  "completed_2026_outcomes_used_for_design_or_selection": 0,
+  "primary_horizons": {
+    "incumbent": "T-120 production lock window",
+    "market_start": "T-120m",
+    "decision": "T-60m",
+    "diagnostic": [
+      "T-45m",
+      "T-30m"
+    ]
+  },
+  "market": {
+    "min_common_sportsbooks": 5,
+    "breadth_absolute_threshold": 0.5,
+    "capture_tolerance_minutes": 7.5,
+    "positive_timing_error_allowed": false,
+    "same_provider_across_primary_horizons": true,
+    "devig": "proportional_two_way",
+    "consensus": "median_logit"
+  },
+  "qb_shock": {
+    "allowed_values": [
+      -1,
+      0,
+      1
+    ],
+    "winner_authority_type": "newly_known_T120_QB1_inactive",
+    "magnitude_estimation_allowed": false,
+    "emergency_third_qb_alone_is_shock": false,
+    "exact_identity_required": true
+  },
+  "decision": {
+    "switch_requires": [
+      "T60_market_winner_disagrees_with_FST",
+      "path_median_logit_direction_points_to_T60_market_winner",
+      "absolute_movement_breadth_at_least_0.50",
+      "nonzero_qualified_QB_shock",
+      "QB_shock_direction_points_to_T60_market_winner"
+    ],
+    "retain_probability": "P_FST",
+    "switch_probability": "M60"
+  },
+  "inference": {
+    "bootstrap_draws": 10000,
+    "bootstrap_seed": 20260927,
+    "block": "NFL_week",
+    "primary_metric": "paired_straight_up_accuracy_delta_vs_FST",
+    "mandatory_comparator": "level_only_switch_control"
+  },
+  "earliest_primary_cohort": {
+    "season": 2026,
+    "week": 3,
+    "date": "2026-09-27",
+    "weekday": "Sunday",
+    "nominal_early_kickoff_utc": "2026-09-27T17:00:00Z",
+    "nominal_t120_utc": "2026-09-27T15:00:00Z",
+    "nominal_t60_utc": "2026-09-27T16:00:00Z"
+  }
+}
