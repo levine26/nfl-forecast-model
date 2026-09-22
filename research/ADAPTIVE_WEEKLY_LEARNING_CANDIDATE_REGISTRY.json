@@ -67,7 +67,7 @@
       "completed_2026_outcomes_for_design_or_selection": 0,
       "production_authorized": false,
       "preregistration_sha": "74ecd303545c09f57593546472d27438e3d8a204",
-      "earliest_eligible_lock": "2026-09-27T15:00:00Z (Week 3 Sunday 13:00 ET cohort T-120), conditional on qualified five-book market capture and Candidate 4 QB source execution",
+      "earliest_eligible_lock": "2026-09-27T16:00:00Z (Week 3 Sunday 13:00 ET cohort T-60 decision), conditional on qualified five-book T-120/T-60 market capture and Candidate 4 QB source execution",
       "integration_branch": "research/adaptive-weekly-learning-c4-integration",
       "current_blocker": "No modeling blocker. Live PropLine source qualification remains pending first successful prospective capture; legacy The Odds API credential path previously returned 401 and is not relied upon.",
       "note": "Frozen sparse T-60 market-path + newly-known T-120-QB1 inactive gate. Thursday Week 3 is diagnostics-only; first primary cohort is Sunday. No completed 2026 outcomes used.",
@@ -80,7 +80,8 @@
       "games_graded": 0,
       "first_primary_decision_cutoff": "2026-09-27T16:00:00Z (T-60)",
       "market_close_gate_books": 5,
-      "qb_source_contract": "ADAPTIVE-CANDIDATE4-QB-SHOCK-SOURCE-V1"
+      "qb_source_contract": "ADAPTIVE-CANDIDATE4-QB-SHOCK-SOURCE-V1",
+      "earliest_required_market_evidence": "2026-09-27T15:00:00Z (T-120)"
     }
   ],
   "controls": [
