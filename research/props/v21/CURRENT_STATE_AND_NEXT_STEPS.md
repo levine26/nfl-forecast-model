@@ -17,7 +17,7 @@ The first clean Props 2.1 prospective cohort is immutable:
 - forecast week: **2026 Week 2**
 - retrospective forecast mutation: **forbidden**
 
-PR #458 is the canonical current-main evaluation surface. PRs #447, #448 and #457 are superseded.
+PR #466 is the canonical current-main evaluation surface. PRs #447, #448, #457 and #458 are superseded.
 
 ## 2. First prospective result
 
@@ -87,7 +87,7 @@ Do not redo these unless broken:
 - depth-chart evidence remains categorical only; it does not assign workload or independently create a betting signal
 - PropLine support and the shared public-demo fallback exist on current main
 - the live Props publisher preserves immutable receipts/history and remains fail-closed on incomplete pregame state
-- post-kickoff lifecycle no-op is being fixed in PR #459 so code-only pushes after the target week starts do not report false production failures
+- post-kickoff lifecycle no-op is merged in PR #459, so code-only pushes after the target week starts preserve the last valid publication and exit cleanly
 
 ## 4. Scientific interpretation
 
@@ -178,11 +178,10 @@ Until that evidence exists, Props remains research/challenger status.
 
 ## 7. Repository hygiene
 
-At this handoff, the intended active Props PRs are:
+At this handoff:
 
-- **#458** — canonical current-main prospective evaluation / scientific record
-- **#459** — live post-kickoff clean no-op lifecycle fix
-
-Historical experimental PRs were intentionally closed or superseded so new chats should not revive them by default.
-
-Separate Sunday Signal editorial recovery work is tracked independently and must not be allowed to delay the Props research lanes.
+- **#466** is the canonical active Props prospective-evaluation / scientific-record PR.
+- **#459** is merged and complete (post-kickoff live no-op).
+- **#434** and **#446** are merged and complete.
+- Historical experimental/superseded PRs were intentionally closed; do not revive them by default.
+- **#465** is separate Sunday Signal editorial recovery work and must not delay Props research execution.
