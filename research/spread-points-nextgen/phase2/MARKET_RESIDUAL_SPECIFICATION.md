@@ -62,27 +62,21 @@ The historical closing-like candidate cannot be silently promoted into the T-120
 
 ---
 
-## 5. Initial predictors
+## 5. Initial C0 predictors
 
-Keep the initial residual model deliberately small.
+Keep the initial residual model deliberately small and fixed.
 
-Eligible:
+For both margin and total C0:
 
-- football-only expected margin / total from a frozen football base;
-- dynamic offense-strength difference;
-- dynamic defense-strength difference;
-- rest differential;
-- home context;
-- prior-game opponent-adjusted efficiency;
-- market line level itself for bounded nonlinear calibration if preregistered.
-
-Optional prespecified interactions:
-
+- market line level;
+- frozen football-only predicted margin or total from A0;
 - football-model minus market discrepancy;
-- market favorite-size band;
-- market-total band.
+- A0 dynamic offense-strength difference;
+- A0 dynamic defense-strength difference;
+- rest differential;
+- home indicator where not already absorbed by target orientation.
 
-No arbitrary high-order interaction search.
+No market favorite-size bands, total bands, arbitrary interactions, polynomial expansion, player state, weather or post-result feature additions are authorized in C0.
 
 ---
 
@@ -195,3 +189,16 @@ Interpretation:
 - If M2/M3 do not improve the relevant nulls, record **NO_INCREMENTAL_FOOTBALL_EDGE**.
 
 No arm may use future line movement, closing data for an earlier horizon, completed-2026 outcomes, or hindsight personnel/weather state.
+
+
+## 12. Same-horizon honesty
+
+Historical C0 uses only the closing/late nflverse market family and must be labeled that way.
+
+No Phase 3 or Phase 4 table may:
+
+- call those rows T-120;
+- mix timestamped prospective market receipts with closing-like historical rows in one headline metric;
+- use a later market update to backfill an earlier simulated horizon.
+
+Prospective T-120 is a separately versioned future candidate family.
