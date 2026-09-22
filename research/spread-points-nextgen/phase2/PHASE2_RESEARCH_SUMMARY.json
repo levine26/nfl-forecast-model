@@ -31,7 +31,7 @@
     {
       "id": "D",
       "name": "Nested Ensemble / Reconciliation",
-      "condition": "target-specific: residual abs correlation <=0.90; nested convex blend improves pooled target MAE vs best component; same-sign improvement in at least two of 2022/2023/2024; season+week block-bootstrap probability of lower MAE >=0.75"
+      "condition": "target-specific: absolute residual correlation <0.90; nested nonnegative convex blend improves pooled 2022-2024 target MAE by >=0.10 points versus the best constituent; lower target MAE than the best constituent in both 2023 and 2024; season+week block-bootstrap probability of lower pooled MAE >=0.75"
     },
     {
       "name": "QB/personnel overlay",
@@ -157,14 +157,13 @@
     "all_passed": false
   },
   "frozen_development_contract": {
-    "training_history_rule": "candidate-specific earliest complete required-feature coverage; expanding prior-only training",
+    "training_history_rule": "fixed 2016 training floor; expanding prior-only training",
     "outer_target_seasons": [
       2022,
       2023,
       2024
     ],
-    "inner_fold_rule": "expanding prior-only folds; at least two complete prior training seasons; use latest four valid inner validation seasons (or all available when fewer); fixed fallback when fewer than two valid folds",
-    "fixed_lagged_state_half_life_team_games": 8,
+    "inner_fold_rule": "one-season expanding prior-only validation targets beginning 2019; use latest four eligible inner validation seasons (or all when fewer); fixed fallback if fewer than two eligible folds",
     "initial_reference_models": [
       "A0",
       "B0",
@@ -185,7 +184,14 @@
       "M3_full_C0"
     ],
     "training_start_season": 2016,
-    "inner_target_start_season": 2019
+    "inner_target_start_season": 2019,
+    "B0_process_ewma_half_life_team_games": 8,
+    "A0_observation_half_life_grid_team_games": [
+      4,
+      8,
+      16,
+      32
+    ]
   },
   "red_team": {
     "shortlist_changed": false,

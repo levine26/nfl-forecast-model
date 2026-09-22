@@ -25,7 +25,7 @@ Phase 2 therefore tightened the design before any Phase 3 result exists:
 
 - initial implementation is **A0 + B0 + C0 only**;
 - explicit state-space A1 and nonlinear residual C1 are deferred rather than activated from qualitative development diagnostics;
-- lagged process summaries use a fixed 8-team-game EWMA;
+- B0 lagged process summaries use fixed 8-team-game EWMAs; A0 retains only its preregistered observation half-life grid `[4,8,16,32]`; C0 has no independent rolling-window search;
 - outer development targets are exactly 2022, 2023 and 2024;
 - inner folds are deterministic expanding prior-time folds using the latest four valid validation seasons, with fixed fallbacks when fewer than two valid folds exist;
 - candidate-specific tuning objectives and tie-breaks are frozen;
@@ -227,7 +227,7 @@ ATS/O-U remains secondary and cannot select a model.
 
 To avoid branch/model sprawl:
 
-1. implement shared chronology/data/evaluation scaffolding using the frozen candidate-specific earliest-qualified-history rule and deterministic nested folds;
+1. implement shared chronology/data/evaluation scaffolding using the frozen 2016 training floor, 2019+ inner validation targets and deterministic nested folds;
 2. implement **A0** only;
 3. implement **B0** only;
 4. implement **C0** only, including the four mandatory market-null comparisons;
