@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "phase": 2,
+  "status": "IN_PROGRESS_DESIGN_FROZEN",
+  "production_changed": false,
+  "user_required_external_source": "davidsasser.com",
+  "initial_challengers": [
+    {
+      "id": "A",
+      "name": "Dynamic Opponent-Adjusted Joint Score",
+      "market_aware": false,
+      "status": "preregistered"
+    },
+    {
+      "id": "B",
+      "name": "Possession / Drive Score Process",
+      "market_aware": false,
+      "status": "preregistered"
+    },
+    {
+      "id": "C",
+      "name": "Market Residual Margin and Total",
+      "market_aware": true,
+      "status": "preregistered"
+    }
+  ],
+  "conditional_components": [
+    {
+      "id": "D",
+      "name": "Nested Ensemble / Reconciliation",
+      "condition": "only if A/B/C show complementary OOS information"
+    },
+    {
+      "name": "QB/personnel overlay",
+      "condition": "qualified multi-season PIT input or prospective shadow only"
+    },
+    {
+      "name": "weather extension",
+      "condition": "qualified venue and forecast-as-of history"
+    }
+  ],
+  "frozen_final_historical_holdout": 2025,
+  "completed_2026_outcomes_for_selection": 0,
+  "paid_data_escalation": false,
+  "primary_research_principles": [
+    "rolling-origin nested validation",
+    "football-only and market-aware families evaluated separately",
+    "market residualization tested because market is stronger continuous baseline",
+    "proper scoring rules for predictive distributions",
+    "complexity must earn survival"
+  ]
+}
