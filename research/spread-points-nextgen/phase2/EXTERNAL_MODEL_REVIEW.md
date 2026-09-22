@@ -28,37 +28,50 @@ The current public college-football board exposes, game by game:
 - opening market line;
 - current market line;
 - ATS selection;
-- aggregate straight-up / ATS tracking.
+- aggregate straight-up / ATS tracking;
+- a page-level update timestamp for the current weekly board.
 
-### Transferable idea
+The graphic view separately publishes projected line and model pick.
 
-The strongest transferable idea is **surface separation**:
+### Four-way evidence classification
 
-`model score -> model line -> market comparison -> selection`
+#### 1. Reproducible methodological evidence
 
-That is exactly the semantic clarity LevLine needs because current Sunday Signal already contains separate independent margin, independent total, F-ST winner probability and probability-implied public spread objects.
+**None located in the public materials reviewed for Phase 2.**
 
-### Evidence limitations
+No public source located in the review supplied enough information to reconstruct the forecast from raw data or independently reproduce the reported historical record.
 
-Phase 2 search did not locate a sufficiently detailed public specification of:
+#### 2. Technical but incomplete information
+
+The public board proves that Sasser maintains distinct objects for model-projected team scores, model-implied line, opening line, current line and the final displayed market-side pick. That is technically informative about output semantics, but it does not reveal:
 
 - training data;
-- feature set;
-- model class;
-- time-series validation;
-- point-in-time market capture;
-- exact historical forecast archive;
-- tuning / selection policy.
+- feature construction;
+- estimator/model family;
+- parameter estimation;
+- chronology or revision policy;
+- whether market data enter the score projection itself;
+- point-in-time source capture;
+- walk-forward tuning;
+- frozen candidate identity.
 
-Therefore:
+A current-week update timestamp is useful product metadata but is not an immutable historical forecast archive.
 
-- Sasser's public forecasts may be used as a design comparator;
-- self-reported records are not LevLine validation evidence;
-- no weights, coefficients or claimed edge are copied into the preregistration.
+#### 3. Product-design observations
+
+The strongest transferable concept is **surface separation**:
+
+`model score -> model line -> market comparison -> displayed selection`
+
+That is directly relevant to LevLine because current Sunday Signal already contains separate independent score/margin/total objects, F-ST winner probability and a probability-implied public spread. Phase 2 adopts the semantic separation, not Sasser's unknown model.
+
+#### 4. Unsupported performance / marketing claims
+
+The board displays aggregate straight-up and ATS records. Phase 2 does **not** treat those records as scientific evidence because the public material reviewed does not establish an independently frozen forecast archive, denominator policy, point-in-time market source, model version history or selection/tuning protocol.
 
 ### LevLine use
 
-Adopt the **separation of raw score projection from market comparison** as a product/research principle. Require LevLine to be more explicit than the public Sasser page about as-of data and reproducibility.
+Adopt the score-versus-line-versus-market semantic separation. Require LevLine to exceed the public Sasser product in provenance, fixed candidate identity, same-horizon labeling and reproducibility. Do not copy coefficients, infer hidden methodology from outputs, or use the displayed public record as evidence that a challenger should survive.
 
 ---
 
