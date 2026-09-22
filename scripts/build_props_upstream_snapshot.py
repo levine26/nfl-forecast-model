@@ -515,7 +515,7 @@ def main() -> int:
                 "pregame_game_ids": [],
                 "reason": "target week has no scheduled pregame games remaining",
             }
-            _write(args.output_dir / "postkickoff_noop.json", marker)
+            _write_new(args.output_dir / "postkickoff_noop.json", marker)
             print(
                 "Props upstream no-op: all target-week games have started; "
                 f"season={args.season} week={args.week} started={len(started_game_ids)}"
