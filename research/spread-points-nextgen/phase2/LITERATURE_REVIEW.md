@@ -16,6 +16,22 @@ Phase 2 separates evidence into four classes:
 
 No external source is treated as proof that a LevLine implementation will improve accuracy. Transfer requires chronology-safe validation in this repository.
 
+### Source-quality register
+
+| Source / idea | Evidence class | What it can support here | What it cannot establish |
+|---|---|---|---|
+| Glickman & Stern (1998) NFL state-space scores | **peer reviewed** | dynamic latent team strength; time variation | that LevLine's specific implementation will improve |
+| Harville football rating work | **peer reviewed** | strong simple linear/mixed baselines | superiority of any modern feature set |
+| Baker & McHale (2013) exact NFL scores | **peer reviewed** | discrete score-process modeling; genuine OOS precedent | direct transfer of old-era coefficients |
+| Boulier/Stekler market studies | **peer reviewed** | market as a difficult benchmark | current-market efficiency at a specific 2026 horizon |
+| Gneiting & Raftery (2007) | **peer reviewed** | proper probabilistic scoring | which NFL distribution family is best |
+| Gama et al. (2014) concept drift survey | **peer reviewed review** | temporal drift requires chronology-aware evaluation | a specific NFL decay rate |
+| Bates & Granger (1969) forecast combination | **peer reviewed** | combinations can help when errors differ | that an ensemble should be forced |
+| Diebold & Mariano (1995) | **peer reviewed** | paired predictive-accuracy comparison principles | immunity from small-sample uncertainty |
+| nfelo | **reproducible open source / technical** | architecture, market-regression separation, implementation ideas | independent peer-reviewed accuracy claims |
+| Open Source Football / nflverse technical work | **reproducible open source / technical** | opponent adjustment, shrinkage, public-data implementation | automatic OOS improvement |
+| David Sasser public CFB board | **practitioner/product evidence; method opaque** | semantic separation of score, model line, market line and pick | scientific validation of the public record |
+
 ---
 
 ## 1. Dynamic team strength and score prediction
@@ -244,7 +260,35 @@ The central requirement is rolling-origin evaluation: each test forecast is gene
 
 ---
 
-## 10. Research conclusions carried into challenger design
+## 10. Concept drift, forecast combination, and paired comparison
+
+### Concept drift
+
+**Source:** João Gama, Indrė Žliobaitė, Albert Bifet, Mykola Pechenizkiy and Abdelhamid Bouchachia (2014), *A Survey on Concept Drift Adaptation*, ACM Computing Surveys 46(4), Article 44. DOI: https://doi.org/10.1145/2523813
+
+The general forecasting lesson is that the mapping from predictors to outcomes can change over time. In NFL terms, rules, pace, fourth-down strategy, roster construction and information markets can shift. This supports time-decay/dynamic-state hypotheses and chronological validation; it does **not** justify searching many decay rates until one fits the latest season.
+
+**LevLine implication:** candidate tuning stays inside prior-time folds. Recent seasons receive an explicit modern summary, while older data may stabilize parameters only through the frozen candidate rules.
+
+### Forecast combination
+
+**Source:** J. M. Bates and C. W. J. Granger (1969), *The Combination of Forecasts*, Operational Research Quarterly / Journal of the Operational Research Society 20(4), 451–468. DOI: https://doi.org/10.1057/jors.1969.103
+
+Forecast combinations can reduce error when component errors contain complementary information. The result does not imply that adding models is always beneficial; highly correlated errors add little.
+
+**LevLine implication:** Challenger D remains conditional. Complementarity and nested OOF blend improvement must pass an objective Phase 3 gate; no ensemble is built for symmetry.
+
+### Paired forecast comparison
+
+**Source:** Francis X. Diebold and Roberto S. Mariano (1995), *Comparing Predictive Accuracy*, Journal of Business & Economic Statistics 13(3), 253–263. DOI: https://doi.org/10.1080/07350015.1995.10524599
+
+Forecast comparisons should use paired loss differentials and account for dependence rather than comparing unrelated aggregate summaries.
+
+**LevLine implication:** exact-common-game comparisons and season+week block resampling remain the primary uncertainty mechanism. Formal asymptotic tests are supplementary rather than a substitute for the preregistered paired bootstrap.
+
+---
+
+## 11. Research conclusions carried into challenger design
 
 The strongest evidence supports:
 
