@@ -266,3 +266,31 @@ The literature does **not** justify:
 - using hindsight player/weather states.
 
 These conclusions define the Phase 2 preregistration.
+
+## 11. Evidence-classification audit and anti-overfit addendum
+
+The closeout red-team review rechecked the main sources and explicitly classifies what kind of evidence each can support.
+
+| Source / family | Evidence class | Reproducible enough to transfer method? | What it can support here | What it cannot prove |
+|---|---|---:|---|---|
+| Glickman & Stern (1998), NFL score state-space model | **peer reviewed** | yes, methodologically | dynamic latent team strength; evolving offense/defense state | that the same specification beats a modern market or LevLine |
+| Harville football/NFL linear mixed models | **peer reviewed** | yes, methodologically | strong simple team-effect baselines; partial pooling / temporal structure | that extra complexity is required |
+| Baker & McHale (2013), exact NFL scores | **peer reviewed** | yes, methodologically | discrete scoring-process motivation; genuine OOS exact-score evaluation | that a LevLine drive model will improve modern NFL forecasts |
+| Boulier/Stekler and related NFL market-efficiency work | **peer reviewed** | yes for historical samples | sportsbook market as a difficult baseline; separate forecast-vs-market question | present-day exploitable inefficiency |
+| Gneiting & Raftery (2007) | **peer reviewed** | yes | proper scoring, calibration plus sharpness | any football-specific architecture |
+| nflWAR / public expected-points work | **peer reviewed / reproducible research** | substantially | multilevel football-process modeling and uncertainty | direct next-game score lift |
+| Brill et al. expected-points critique | **strong technical research / preprint** | methodologically | regularization, dependence, selection-bias and uncertainty cautions | settled peer-reviewed NFL forecasting evidence |
+| Open Source Football opponent-adjusted / multilevel EPA | **reproducible open source / technical** | yes | implementable opponent-adjustment and shrinkage ideas | a guaranteed OOS score improvement |
+| nfelo | **reproducible open source / practitioner technical** | high for architecture/code | separation of football signal and market regression; dynamic ratings; public caution about overfit | independent scientific proof of reported edge |
+| davidsasser.com public board | **practitioner/product observation; methodology opaque** | no | semantic separation of projected scores, model line, and market line | model validity, PIT integrity, or claimed performance |
+
+### Model-selection and concept-drift caution
+
+The public nfelo WEPA methodology history is useful precisely because it documents a failure mode: a forward-looking feature-selection approach could look predictive while overfitting, motivating a backward-looking evaluation redesign. That is practitioner evidence, not a LevLine result, but it reinforces the Phase 1 leakage audit and supports a narrow preregistered search.
+
+Sources:
+- https://www.nfeloapp.com/analysis/weighted-EPA-methodology-and-performance
+- https://scikit-learn.org/stable/modules/cross_validation.html
+- https://otexts.com/fpp3/tscv.html
+
+**Phase 2 consequence:** no additional model family or broad window/feature search is authorized. Hyperparameters, preprocessing, residual-variance estimation, stacking and any conditional extension must remain inside prior-time folds.
