@@ -65,6 +65,7 @@ def run_observed_capture(
     *,
     status_path: str = "research_outputs/market_capture_v2/status.json",
     quota_reserve: int = 50,
+    min_close_books: int = 2,
     capture_fn: Callable[..., dict] = market_capture,
 ) -> tuple[dict, int]:
     status_file = Path(status_path)
@@ -72,7 +73,11 @@ def run_observed_capture(
     exit_code = 0
 
     try:
-        result = capture_fn(status_path=status_path, quota_reserve=quota_reserve)
+        result = capture_fn(
+            status_path=status_path,
+            quota_reserve=quota_reserve,
+            min_close_books=int(min_close_books),
+        )
     except Exception as exc:  # preserve evidence before surfacing the original failure
         result = {
             "status": "error",
@@ -96,11 +101,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--status", default="research_outputs/market_capture_v2/status.json")
     parser.add_argument("--quota-reserve", type=int, default=50)
+    parser.add_argument("--min-close-books", type=int, default=2)
     args = parser.parse_args()
 
     receipt, exit_code = run_observed_capture(
         status_path=args.status,
         quota_reserve=args.quota_reserve,
+        min_close_books=args.min_close_books,
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))
     raise SystemExit(exit_code)
