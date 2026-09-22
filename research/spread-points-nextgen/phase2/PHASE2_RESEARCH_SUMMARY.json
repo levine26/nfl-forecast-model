@@ -198,7 +198,8 @@
       "Lacey 1990",
       "Gray & Gray 1997",
       "Gneiting & Raftery 2007",
-      "Yurko, Ventura & Horowitz 2019"
+      "Yurko, Ventura & Horowitz 2019",
+      "Bock 2017 turnover prediction"
     ],
     "strong_technical_not_peer_reviewed": [
       "Brill et al. 2024 expected-points preprint"
@@ -218,5 +219,10 @@
     "immutable_pit_forecast_archive_found": false,
     "independent_validation_protocol_found": false,
     "scientific_use": "product architecture comparator only"
+  },
+  "process_feature_evidence": {
+    "turnovers": "peer-reviewed rare-event predictability; noisy/weak persistence implies shrinkage and no deterministic adjustment",
+    "red_zone": "football mechanism + technical/practitioner evidence; bounded shrinkage-smoothed B0 component, not separate search",
+    "explosive_plays": "technical/practitioner scoring-tail evidence; one fixed B0 definition, no threshold/window search"
   }
 }
