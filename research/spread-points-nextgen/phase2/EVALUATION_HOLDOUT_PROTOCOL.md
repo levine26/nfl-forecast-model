@@ -318,3 +318,82 @@ It must be reported even if unfavorable.
 No 2025-based rescue retuning is permitted under the same candidate identity.
 
 After Phase 4, any surviving candidate still requires prospective Phase 5 evidence before production consideration.
+
+## 16. Deterministic nested-selection contract
+
+The closeout red-team review identified that "tune only on earlier data" was scientifically correct but left too much implementation discretion. Phase 3 therefore uses the following deterministic rules.
+
+### 16.1 Outer development folds
+
+The mandatory modern development forecasts are exactly:
+
+- target season **2022** — all training rows strictly before 2022;
+- target season **2023** — all training rows strictly before 2023;
+- target season **2024** — all training rows strictly before 2024.
+
+No 2025 or completed-2026 outcome may enter any fit, transform, tuning decision, residual-variance estimate, or candidate-survival decision in Phase 3.
+
+### 16.2 Inner folds
+
+For an outer target season Y:
+
+1. construct expanding-origin, one-season validation folds using only qualified seasons strictly before Y;
+2. require every inner validation prediction to be generated from rows earlier than that validation season;
+3. where more than four eligible inner validation seasons exist, use the **four most recent** eligible seasons to reduce obsolete-era dominance;
+4. where fewer than two eligible inner validation seasons exist for a source-limited component, do not invent a later-data tuning set: use the preregistered default parameter for that component and mark the outer fold \`DEFAULT_INSUFFICIENT_INNER_HISTORY\`.
+
+The exact eligible inner seasons and train-through cutoff must be written to the candidate receipt.
+
+### 16.3 Preprocessing and derived-state nesting
+
+Inside every inner and outer fold:
+
+- scaling/centering parameters are fit on training rows only;
+- opponent-strength states are built sequentially from earlier games only;
+- any A-derived predictor used by another candidate must be generated OOF relative to the receiving row;
+- residual covariance/dispersion parameters come from training-only residuals or nested OOF training residuals;
+- no normalization, clipping threshold, missing-value statistic or category level may be learned from the outer target season.
+
+### 16.4 Hyperparameter selection
+
+Only the grids already frozen in \`BOUNDED_IMPLEMENTATION_SPEC.md\` may be evaluated.
+
+Within an outer fold, choose the parameter set with the best **mean inner-fold primary loss**, with each inner validation season receiving equal weight. Candidate-specific selection loss is:
+
+- A0: mean of home-score MAE and away-score MAE;
+- B0 drive-count model: drive-count deviance; B0 scoring model: multinomial log loss; the game simulator itself has no additional free tuning parameter;
+- C0 margin residual: margin MAE of \`market + predicted residual\`;
+- C0 total residual: total MAE of \`market + predicted residual\`.
+
+If two configurations are numerically tied within \(10^{-6}\) in selection loss, use this deterministic tie-break:
+
+1. stronger regularization;
+2. longer A0 half-life;
+3. lexicographically earlier grid value.
+
+No secondary football or betting metric may break a tuning tie.
+
+### 16.5 Candidate survival is separate from tuning
+
+Outer 2022–2024 development metrics decide whether a frozen candidate is eligible to proceed to Phase 4; they do **not** retune it.
+
+- A is judged on team-point and margin/total accuracy plus distribution diagnostics.
+- B is judged primarily on total/team-score distribution quality and whether compression is reduced without material global degradation.
+- C is judged against the market-only null on exact paired rows.
+- D is not presumed to exist; see Section 16.6.
+
+A candidate may be retired for clear development failure. It may not be rescued by a new feature/model search under the same identity.
+
+### 16.6 Conditional ensemble eligibility
+
+D may be attempted only if at least two frozen candidates survive their own development gates **and** their 2022–2024 OOS residuals are not identical/redundant in practice.
+
+The only authorized D reference is the already-preregistered nonnegative convex combination fit on nested OOF rows. D is eligible to survive only if its nested development predictions improve the relevant primary loss over the best constituent on the pooled 2022–2024 OOS rows **and** the improvement is not opposite-signed in two of the three outer seasons.
+
+If that condition is not met, record \`ENSEMBLE_NOT_ELIGIBLE\`. Do not search another stacker.
+
+## 17. Holdout red-team decision
+
+No more defensible pre-2026 historical holdout is available without either reusing seasons already central to architecture development or abandoning the historical holdout and waiting exclusively for future prospective evidence.
+
+Keeping 2025 is therefore the least-bad transparent design because no A/B/C challenger outputs have been inspected yet. The limitation that Phase 1 inspected baseline 2025 errors remains mandatory disclosure. This design is **not** equivalent to a philosophically pristine untouched season, and Phase 5 prospective evidence remains necessary before promotion.
