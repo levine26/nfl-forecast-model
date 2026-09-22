@@ -710,10 +710,10 @@ External evidence is supportive but not outcome-selective:
 Candidate ID: `ADAPTIVE-REGIME-SHOCK-GATE-V1`  
 Preregistration main SHA: `fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da`  
 Synchronized Candidate 2 base: `99b255aae7fc36ad367561f613e3fcb3752ef528`  
-Validated candidate code SHA: `f4a5ea26bc999819d4c79179c20b8f33fd77401f`  
-Validated workflow run: `35747145825`  
-Evidence artifact: `10703836596`  
-Artifact SHA256: `9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5`  
+Validated hardened integration SHA: `3d47141ed8584e989702d1982e4e1dc60d8248a2`  
+Validated workflow run: `35749549009`  
+Evidence artifact: `10705320611`  
+Artifact SHA256: `fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771`\nCandidate config SHA256: `8b08f2d37c7531783e8b1a2dd8ae8ab8e6fb95d48a680fe681479561c7d44969`  
 Final receipt: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_RECEIPT.json`  
 Final finding: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_FINDING.md`
 
@@ -741,7 +741,7 @@ The sole switch was `2025_12_ATL_NO`: a near-boundary F-ST/component disagreemen
 - both-team T-120 depth state: **272 / 272**
 - QB-change evaluable: **256 games**
 - OL-change evaluable: **256 games**
-- qualified QB-practice join: **126 games**
+- qualified QB-practice join: **127 games**
 - strong-shock games: **51**
 - near-boundary F-ST/component disagreements: **4**
 - authorized Candidate 2 switches: **1**
