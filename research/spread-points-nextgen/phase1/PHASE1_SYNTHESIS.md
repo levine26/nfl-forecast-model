@@ -176,12 +176,14 @@ Before seeing challenger results:
 | Concrete hypotheses | error report + this synthesis |
 | No major baseline uncertainty | definitions frozen in `EVALUATION_CONTRACT.md`; remaining unknowns are explicitly source/PIT research questions, not ambiguity about the current baseline |
 
-Final exact-head validation passed:
+Final post-sync exact-head validation passed on `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`:
 
-- research firewall run `35695606248`: **SUCCESS**;
-- research validation run `35695606246`: **SUCCESS**;
-- dedicated Phase 1 audit run `35695606219`: **SUCCESS**;
-- audit artifact `10680706168`.
+- research firewall run `35741337735`: **SUCCESS**;
+- research validation run `35741337942`: **SUCCESS**;
+- dedicated Phase 1 audit run `35741337832`: **SUCCESS**;
+- final audit artifact `10699778876`, digest `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`.
+
+PR #513 merged as `a4f7172c0c4ff82b1689411181e7a9042a1628a8`. The exact-head checks finished successfully after the merge and the merged Phase 1 package was re-verified from `main`.
 
 The structural diagnostics additionally found no strong monotonic recent-form or simple pace residual gradient, zero Core-feature missingness across the audited OOF sample, and only descriptive/non-PIT-safe weather associations. Phase 1 is therefore **COMPLETE**. Phase 2 remains **NOT STARTED** until the next substantive chat follows the canonical startup protocol.
 

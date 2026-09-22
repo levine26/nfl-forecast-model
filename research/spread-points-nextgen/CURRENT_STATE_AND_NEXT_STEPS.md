@@ -5,7 +5,7 @@
 **Phase 0:** **COMPLETE**  
 **Phase 1:** **COMPLETE**  
 **Phase 2:** **NOT STARTED**  
-**Active phase:** None. Stop after Phase 1 merge; the next substantive chat starts Phase 2 under the mandatory startup protocol.
+**Active phase:** None. Phase 1 is merged and complete; the next substantive chat starts Phase 2 under the mandatory startup protocol.
 
 ## Phase 1 completion state
 
@@ -18,14 +18,17 @@ Canonical Phase 1 directory:
 Primary Phase 1 branch / PR:
 
 - branch: `research/spread-points-nextgen-phase1`
-- PR: **#513**
+- PR: **#513 — MERGED**
+- merge commit: `a4f7172c0c4ff82b1689411181e7a9042a1628a8`
 
-Exact-head validation before closeout:
+Final post-sync validation:
 
-- research firewall `35695606248`: **SUCCESS**
-- research validation `35695606246`: **SUCCESS**
-- dedicated Phase 1 audit `35695606219`: **SUCCESS**
-- audit artifact `10680706168`
+- candidate head: `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`
+- research firewall `35741337735`: **SUCCESS**
+- research validation `35741337942`: **SUCCESS**
+- dedicated Phase 1 audit `35741337832`: **SUCCESS**
+- audit artifact `10699778876`
+- artifact digest: `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`
 
 ## Reproduced baseline
 
@@ -151,4 +154,4 @@ The next substantive chat must:
 
 ## Stop condition
 
-**Phase 1 is complete. Phase 2 remains NOT STARTED. Stop after merging the Phase 1 research package.**
+**Phase 1 is complete and merged. Phase 2 remains NOT STARTED. The next substantive chat begins Phase 2 from current `main`.**

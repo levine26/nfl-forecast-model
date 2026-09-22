@@ -192,8 +192,9 @@ Additional Phase 1 control/evidence:
 - reproducible runner — `research/spread-points-nextgen/phase1/run_baseline_audit.py`
 - structural diagnostic runner — `research/spread-points-nextgen/phase1/run_structural_slices.py`
 - helper tests — `research/spread-points-nextgen/phase1/test_run_baseline_audit.py`
-- exact-head validation runs — firewall `35695606248`; research validation `35695606246`; Phase 1 audit `35695606219`
-- dedicated audit artifact — `10680706168`
+- final post-sync validation runs — firewall `35741337735`; research validation `35741337942`; Phase 1 audit `35741337832`
+- final dedicated audit artifact — `10699778876`, digest `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`
+- Phase 1 PR / merge — `#513`, merge `a4f7172c0c4ff82b1689411181e7a9042a1628a8`
 
 External comparator explicitly carried into Phase 2: **davidsasser.com**.
 

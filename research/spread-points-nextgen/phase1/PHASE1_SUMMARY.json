@@ -64,12 +64,12 @@
     "research/spread-points-nextgen/phase1/PHASE1_SYNTHESIS.md"
   ],
   "exact_head_validation": {
-    "commit_sha": "a1a6212d5aeb17d8b0c5602ac5da21aac374d81f",
-    "research_firewall_run_id": 35695606248,
-    "research_validation_run_id": 35695606246,
-    "phase1_audit_run_id": 35695606219,
-    "audit_artifact_id": 10680706168,
-    "audit_artifact_sha256": "26a3499232db3ff63972c1fd4931810e798307d70bf6ce6d88bc1b27f64a269f",
+    "commit_sha": "b6b831fd1a77180e8dc97a0eb17495bbdee44ba5",
+    "research_firewall_run_id": 35741337735,
+    "research_validation_run_id": 35741337942,
+    "phase1_audit_run_id": 35741337832,
+    "audit_artifact_id": 10699778876,
+    "audit_artifact_sha256": "c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1",
     "all_passed": true
   },
   "structural_diagnostics": {
@@ -79,5 +79,12 @@
     "mean_core_feature_missing_count": 0,
     "max_core_feature_missing_count": 0,
     "weather_note": "schedule-recorded weather is descriptive only and is not a PIT-safe historical forecast source"
+  },
+  "integration": {
+    "pull_request": 513,
+    "merged": true,
+    "merge_commit_sha": "a4f7172c0c4ff82b1689411181e7a9042a1628a8",
+    "post_sync_checks_completed_after_merge": true,
+    "merged_package_verified_from_main": true
   }
 }
