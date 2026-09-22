@@ -42,6 +42,7 @@ PROPS_RETIREMENT_ALLOWED_PREFIXES = (
 PROPS_RETIREMENT_ALLOWED_EXACT = {
     ".github/workflows/dashboard.yml",
     ".github/workflows/levline_markets_live.yml",
+    ".github/workflows/responsive.yml",
     "config/levline_markets_priors_v1.json",
     "docs/ACTIVE_WORKSTREAM_HANDOFF.md",
     "scripts/check_research_firewall.py",
