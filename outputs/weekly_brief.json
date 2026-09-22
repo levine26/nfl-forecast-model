@@ -1,16 +1,16 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_03_KC_MIA",
+      "largest_driver": "Market movement",
+      "pick": "KC",
+      "pick_delta_pp": -0.47066107133704044
+    },
+    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material input move",
       "pick": "SEA",
       "pick_delta_pp": -1.260265225511148e-08
-    },
-    {
-      "game_id": "2026_01_ARI_LAC",
-      "largest_driver": "No material input move",
-      "pick": "LAC",
-      "pick_delta_pp": 0.0
     },
     {
       "game_id": "2026_01_BAL_IND",
@@ -19,7 +19,7 @@
       "pick_delta_pp": -0.0
     }
   ],
-  "generated_utc": "2026-09-22T05:13:57.861718+00:00",
+  "generated_utc": "2026-09-22T14:25:39.647198+00:00",
   "market_disagreements": [
     {
       "confidence": "High",
@@ -28,25 +28,25 @@
       "pick": "KC",
       "pick_prob": 0.8934262997448407,
       "projected_score": "MIA 21.3 \u2013 KC 25.0",
-      "pure_market_gap_pp": 24.469748338216426
+      "pure_market_gap_pp": 24.46974833801706
     },
     {
       "confidence": "Solid",
       "game_id": "2026_03_PHI_CHI",
       "matchup": "PHI @ CHI",
       "pick": "PHI",
-      "pick_prob": 0.647725828497953,
+      "pick_prob": 0.6559503061843629,
       "projected_score": "CHI 22.6 \u2013 PHI 22.5",
-      "pure_market_gap_pp": 12.316930852800567
+      "pure_market_gap_pp": 13.03714302430562
     },
     {
-      "confidence": "Solid",
-      "game_id": "2026_03_CIN_PIT",
-      "matchup": "CIN @ PIT",
-      "pick": "CIN",
-      "pick_prob": 0.6516812088947902,
-      "projected_score": "PIT 22.1 \u2013 CIN 23.6",
-      "pure_market_gap_pp": 7.8918199441007255
+      "confidence": "Lean",
+      "game_id": "2026_03_TEN_NYG",
+      "matchup": "TEN @ NYG",
+      "pick": "NYG",
+      "pick_prob": 0.5790440292219307,
+      "projected_score": "NYG 25.6 \u2013 TEN 18.7",
+      "pure_market_gap_pp": 7.99195541618375
     }
   ],
   "most_uncertain": [
@@ -55,7 +55,7 @@
       "game_id": "2026_03_MIN_TB",
       "matchup": "MIN @ TB",
       "pick": "MIN",
-      "pick_prob": 0.5266441243675886,
+      "pick_prob": 0.5214538099984851,
       "projected_score": "TB 22.0 \u2013 MIN 24.0"
     },
     {
@@ -63,7 +63,7 @@
       "game_id": "2026_03_LA_DEN",
       "matchup": "LA @ DEN",
       "pick": "LA",
-      "pick_prob": 0.5594396175438445,
+      "pick_prob": 0.5697417053047076,
       "projected_score": "DEN 23.1 \u2013 LA 22.9"
     },
     {
@@ -89,7 +89,7 @@
       "game_id": "2026_03_ARI_SF",
       "matchup": "ARI @ SF",
       "pick": "SF",
-      "pick_prob": 0.7816968030824343,
+      "pick_prob": 0.7926346707075079,
       "projected_score": "SF 30.0 \u2013 ARI 17.0"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_03_SEA_WAS",
       "matchup": "SEA @ WAS",
       "pick": "SEA",
-      "pick_prob": 0.7313635702721237,
+      "pick_prob": 0.7361175484980588,
       "projected_score": "WAS 19.1 \u2013 SEA 27.6"
     }
   ],
