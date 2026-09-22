@@ -200,3 +200,48 @@ No neural/meta-tree stack is authorized. No global all-target ensemble is inferr
 9. 2026 completed outcomes remain unavailable to all selection code paths.
 
 This bounded specification is intentionally conservative. If these models cannot improve the baseline, Phase 2 does not authorize an unlimited search for a more complicated rescue.
+
+## Closeout hardening — authoritative clarifications
+
+These clarifications supersede any more permissive wording above and were recorded before any Phase 3 challenger result existed.
+
+### A: A0 is the initial Challenger A identity
+
+A0 is the mandatory initial A reference. Its exponentially weighted, partially pooled offense/defense structure is the bounded dynamic approximation to be tested first.
+
+**A1 is not automatically executable in the initial Phase 3 build.** An explicit state-space A1 may be proposed only through a preregistration amendment recorded before A1 predictions are inspected. A weak A0 result is not, by itself, authorization to search state-transition specifications.
+
+### B: preserve structural independence from A
+
+The **B0 reference must run without A0 predictions as an input**. This keeps B scientifically distinct: it tests whether possession volume plus discrete drive scoring adds information rather than merely repackaging A.
+
+Exactly one prespecified sensitivity may add strictly OOF A0 strength outputs to B after the independent B0 reference exists. That sensitivity is reported as \`B0_PLUS_A0_STATE\`; it does not replace B0 retroactively.
+
+For expected drives:
+
+- reference family: Poisson regression;
+- Negative Binomial is permitted only when the training-fold Pearson dispersion statistic is **> 1.5** in every available qualifying inner fold (minimum two folds when two exist);
+- if that condition is not met, Negative Binomial is not tested.
+
+No Gaussian-vs-Poisson-vs-NB retrospective bake-off is authorized.
+
+### C: one linear reference, not a learner bake-off
+
+C0 is **Ridge regression only** for the initial reference.
+
+Prespecified ridge alpha grid:
+
+- \`[0.01, 0.1, 1, 10, 100]\`
+
+The earlier ElasticNet/l1-ratio option is withdrawn before implementation results. It may not be tested under the C0 identity.
+
+C1, if the implementation stack supports it cleanly, is one **GAM/spline sensitivity** on the preregistered market-level/disagreement terms. Shallow gradient boosting is no longer an alternative fallback. If the GAM cannot be implemented cleanly, C1 is skipped.
+
+### D: no stacker search
+
+D remains a single nonnegative convex combination. No second meta-learner, regime switcher, tree stacker, or learned gating model is authorized if the convex reference fails.
+
+### Search-space interpretation
+
+These restrictions are deliberately asymmetric: Phase 2 would rather miss a clever model than produce an optimistic result through researcher degrees of freedom. Any broader successor family must become a newly preregistered candidate, not a silent Phase 3 rescue.
+
