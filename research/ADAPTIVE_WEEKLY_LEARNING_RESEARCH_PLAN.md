@@ -317,3 +317,34 @@ If scope, metrics, candidate definitions, thresholds, or evidence rules change, 
 - whether any candidate's prospective clock must reset.
 
 This file is the authoritative anti-drift reference for the LevLine Adaptive Weekly Learning project.
+
+
+## 16. Execution log — 2026-09-22 initial build
+
+The following work was created from governance commit `aea40328a19a1be7b5bb43057dd182c5bab870b3` and integrated only into the research integration branch:
+
+- Integration branch: `research/adaptive-weekly-learning-integration`
+- Lane 1 PR #514 — chronology-safe weekly replay + leakage tests
+- Lane 2 PR #515 — Bayesian-shrinkage residual team-state challenger + chronology test
+- Lane 3 PR #516 — weekly error audit + L2-shrunk online intercept calibration + pick-preservation test
+- Lane 4 PR #517 — selective switch gate + chronology-safe naive weekly F-ST refit negative control
+- Lane 5 PR #518 — paired accuracy/Brier/log-loss evaluation + disagreement/McNemar accounting
+- Lane 6 PR #519 — professional/peer-reviewed literature synthesis
+- Dedicated integration workflow: `.github/workflows/research_adaptive_weekly_learning_v1.yml`
+- Integrated research head after initial six lanes: `8f409560a5c0e534a0371a355a46336e01620e29`
+
+All six lane PRs were merged into the research integration branch. None was merged into production `main`.
+
+Current validation state at this log entry:
+- repository research firewalls passed on the active code lanes checked so far;
+- combined adaptive integration workflow is executing against the integrated research head;
+- Phase 3 historical results are not yet recorded here and must be written back to this ledger after the workflow artifacts are verified.
+
+The first empirical comparisons are deliberately:
+1. frozen chronology-clean F-ST;
+2. naive weekly F-ST refit;
+3. Bayesian residual-state adaptation;
+4. pick-preserving online calibration;
+5. residual-state + conservative selective switch gate.
+
+No threshold or hyperparameter is to be changed in response to those first results without recording a new candidate/version and the evidence boundary here.
