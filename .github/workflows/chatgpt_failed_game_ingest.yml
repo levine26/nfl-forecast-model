@@ -7,11 +7,13 @@ on:
       - "scripts/finalize_editorial.py"
       - "scripts/build_canonical_editorial_predictions.py"
       - "scripts/refresh_editorial_slate_roster.py"
+      - "scripts/restore_last_good_editorial_snapshot.py"
       - "tests/test_chatgpt_failed_game_ingest.py"
       - "tests/test_editorial_provider_fallback.py"
       - "tests/test_editorial_text_safety.py"
       - "tests/test_canonical_editorial_predictions.py"
       - "tests/test_editorial_slate_roster.py"
+      - "tests/test_restore_last_good_editorial_snapshot.py"
       - "src/nfl_forecast/editorial_provider_fallback.py"
       - "src/nfl_forecast/editorial_text_safety.py"
       - ".github/workflows/chatgpt_failed_game_ingest.yml"
@@ -48,8 +50,8 @@ jobs:
 
       - name: Test game-scoped fallback boundary
         run: |
-          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
-          python -m py_compile scripts/ingest_chatgpt_failed_games.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          python -m py_compile scripts/ingest_chatgpt_failed_games.py scripts/restore_last_good_editorial_snapshot.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
 
       - name: Enforce editorial-only fallback wiring
         run: |
@@ -78,6 +80,7 @@ jobs:
           assert "git merge-base --is-ancestor \"$current_base\" origin/main" in workflow
           assert '--editorial-roster inputs/sunday_signal/editorial_slate_roster.json' in workflow
           assert 'scripts/refresh_editorial_slate_roster.py' in workflow
+          assert 'scripts/restore_last_good_editorial_snapshot.py' in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
           assert 'Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
@@ -107,6 +110,13 @@ jobs:
             --editorial-roster inputs/sunday_signal/editorial_slate_roster.json \
             --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
+
+      - name: Restore last launch-grade full-slate editorial snapshot
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/restore_last_good_editorial_snapshot.py \
+            --roster inputs/sunday_signal/editorial_slate_roster.json \
+            --status outputs/context_source_status.json
 
       - name: Preserve validated media reporting snapshot
         if: github.event_name != 'pull_request'
