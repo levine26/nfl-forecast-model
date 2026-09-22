@@ -1,0 +1,76 @@
+name: Adaptive Candidate 2 regime-shock research
+
+on:
+  push:
+    branches:
+      - research/adaptive-weekly-learning-c2-integration
+  pull_request:
+    branches:
+      - research/adaptive-weekly-learning-c2-integration
+    paths:
+      - 'research/adaptive_regime_shock_gate_v1.py'
+      - 'research/test_adaptive_regime_shock_gate_v1.py'
+      - 'research/adaptive_candidate2_*.py'
+      - 'research/ADAPTIVE_WEEKLY_CANDIDATE2_*.md'
+      - 'research/adaptive_candidate2_*.json'
+      - '.github/workflows/research_adaptive_candidate2_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adaptive-candidate2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+
+      - name: Run Candidate 2 unit tests
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" pytest -q             research/test_adaptive_regime_shock_gate_v1.py             research/test_adaptive_weekly_evaluation_v1.py
+
+      - name: Run Candidate 2 historical construction
+        if: github.event_name != 'pull_request'
+        run: |
+          rm -rf research_outputs/adaptive_candidate2_ci
+          mkdir -p research_outputs/adaptive_candidate2_ci
+          PYTHONPATH="$PWD/src:$PWD" python research/adaptive_regime_shock_gate_v1.py             --output-dir research_outputs/adaptive_candidate2_ci/candidate
+
+      - name: Run Candidate 2 evaluation if present
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -f research/adaptive_candidate2_evaluation_v1.py ]; then
+            PYTHONPATH="$PWD/src:$PWD" python research/adaptive_candidate2_evaluation_v1.py               --input research_outputs/adaptive_candidate2_ci/candidate/scored_games.csv               --output-dir research_outputs/adaptive_candidate2_ci/evaluation
+          fi
+
+      - name: Run Candidate 2 adversarial audit if present
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -f research/adaptive_candidate2_adversarial_v1.py ]; then
+            PYTHONPATH="$PWD/src:$PWD" python research/adaptive_candidate2_adversarial_v1.py               --input research_outputs/adaptive_candidate2_ci/candidate/scored_games.csv               --output-dir research_outputs/adaptive_candidate2_ci/adversarial
+          fi
+
+      - name: Prove production surfaces unchanged
+        run: |
+          git diff --exit-code --             outputs/ site/             src/nfl_forecast/pipeline.py             src/nfl_forecast/models.py             src/nfl_forecast/features.py             src/nfl_forecast/data.py             src/nfl_forecast/publish.py             scripts/run_week.py
+
+      - name: Upload Candidate 2 evidence
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: adaptive-candidate2-${{ github.run_id }}
+          path: research_outputs/adaptive_candidate2_ci/
+          if-no-files-found: error
+          retention-days: 60
