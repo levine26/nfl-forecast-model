@@ -784,6 +784,33 @@ The resulting research question is narrower than broad model replacement:
 
 > Can independent, historically trained football representations identify the subset of cases in which frozen F-ST is systematically wrong?
 
+### Scientific and external evidence mapping
+
+Candidate 5 does not reopen Phase 2 research. It inherits and cross-references the existing evidence base:
+
+- **Dynamic team strength:** Glickman & Stern and related dynamic-rating literature support time-varying team ability, partial pooling and shrinkage rather than arbitrary short rolling averages. Candidate 5 therefore consumes compact A0 strength/forecast outputs rather than rebuilding a second raw team-strength system.
+- **Structural scoring:** Baker & McHale and related NFL score-process work support discrete scoring structure, joint team-score distributions and explicit scoring processes. Candidate 5 therefore may consume compact B0 score-distribution/uncertainty outputs rather than replacing B0 with a mean-only classifier.
+- **nflverse / nflfastR / Open Source Football:** opponent-adjusted EPA, lagged football state, drive information and open reproducible infrastructure are useful inputs to the underlying A0/B0 layers. Data-field availability alone never proves point-in-time availability for a simulated forecast.
+- **nfelo:** the transferable architecture is football model -> explicit market regression/reconciliation, not copying parameters. Independent football signal must remain measurable; market information is a separate layer; historical closing/current market information may not masquerade as an earlier production horizon.
+- **Other transparent open-source NFL work:** simple EPA/Elo models commonly fail to beat the sportsbook market on their own. This is evidence against Candidate 5 becoming a fresh EPA logistic regression, basic Elo, generic gradient booster or football-only rebuild from scratch.
+- **Forecast-combination literature:** combination is useful only when component errors are meaningfully complementary; noisy estimated weights can worsen forecasts. Candidate 5 therefore requires shrinkage, OOF component forecasts, ablations and no forced ensemble.
+- **Proper scoring/calibration:** winner accuracy is the primary production-oriented question, but Brier, log loss and calibration are mandatory guardrails. A classification-rate gain accompanied by severe probability deterioration is not sufficient evidence for promotion.
+
+Primary Phase 2 source records remain:
+- `research/spread-points-nextgen/phase2/LITERATURE_REVIEW.md`;
+- `research/spread-points-nextgen/phase2/EXTERNAL_MODEL_REVIEW.md`;
+- `research/spread-points-nextgen/phase2/BOUNDED_IMPLEMENTATION_SPEC.md`;
+- `research/spread-points-nextgen/phase2/EVALUATION_HOLDOUT_PROTOCOL.md`;
+- `research/spread-points-nextgen/phase2/MARKET_RESIDUAL_SPECIFICATION.md`;
+- `research/spread-points-nextgen/phase2/FEATURE_HYPOTHESES_AND_PLAYER_POLICY.md`.
+
+Adaptive cross-program evidence that Phase 5 must read:
+- `research/ADAPTIVE_WEEKLY_LEARNING_RESEARCH_PLAN.md`;
+- `research/ADAPTIVE_WEEKLY_LEARNING_CANDIDATE_REGISTRY.json`;
+- `research/ADAPTIVE_WEEKLY_LEARNING_FIRST_RUN_RECEIPT.json`;
+- `research/ADAPTIVE_WEEKLY_CANDIDATE4_PREREGISTRATION.md`;
+- `research/ADAPTIVE_WEEKLY_CANDIDATE4_EVIDENCE_REVIEW.md`.
+
 ### Entry criteria
 
 Phase 5 may begin only when:
