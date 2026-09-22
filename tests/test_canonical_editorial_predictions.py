@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import importlib.util
 from pathlib import Path
+import json
 
 import pandas as pd
 import pytest
@@ -115,4 +116,36 @@ def test_refuses_post_kickoff_live_replacement_without_lock():
             current,
             official,
             now_utc=datetime(2026, 9, 13, 18, 0, tzinfo=timezone.utc),
+        )
+
+
+def test_editorial_roster_loader_accepts_top_level_game_preview_map(tmp_path):
+    roster = tmp_path / "game_previews.json"
+    roster.write_text(
+        json.dumps(
+            {
+                "2026_02_CAR_ATL": {"game_id": "2026_02_CAR_ATL"},
+                "2026_02_NYG_LA": {"game_id": "2026_02_NYG_LA"},
+                "generated_utc": "2026-09-21T23:00:00Z",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert MODULE._load_editorial_game_ids(roster) == {
+        "2026_02_CAR_ATL",
+        "2026_02_NYG_LA",
+    }
+
+
+def test_authorized_roster_fails_closed_when_locked_game_cannot_be_reconstructed():
+    live = _row("2026_02_NYG_LA", "NYG", "LA", 0.71, "LA")
+    live.update({"week": 2, "gameday": "2026-09-21", "gametime": "20:15"})
+
+    with pytest.raises(RuntimeError, match="cannot be reconstructed"):
+        MODULE.build_canonical_editorial_predictions(
+            pd.DataFrame([live]),
+            pd.DataFrame(columns=["game_id", "lock_status"]),
+            now_utc=datetime(2026, 9, 21, 23, 0, tzinfo=timezone.utc),
+            editorial_game_ids={"2026_02_NYG_LA", "2026_02_CAR_ATL"},
         )
