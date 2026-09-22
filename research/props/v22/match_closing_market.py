@@ -70,22 +70,35 @@ def _timestamp(value: Any, *, label: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def read_jsonl(path: Path) -> list[dict[str, Any]]:
+def _jsonl_paths(path: Path) -> list[Path]:
     if not path.exists():
         return []
+    if path.is_dir():
+        return sorted(item for item in path.glob("part-*.jsonl") if item.is_file())
+    if path.is_file():
+        return [path]
+    raise ClosingMarketError(f"{path}: unsupported JSONL store path")
+
+
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    with path.open(encoding="utf-8") as handle:
-        for line_no, line in enumerate(handle, start=1):
-            text = line.strip()
-            if not text:
-                continue
-            try:
-                value = json.loads(text)
-            except json.JSONDecodeError as exc:
-                raise ClosingMarketError(f"{path}:{line_no}: invalid JSON") from exc
-            if not isinstance(value, dict):
-                raise ClosingMarketError(f"{path}:{line_no}: row must be a JSON object")
-            rows.append(value)
+    for jsonl_path in _jsonl_paths(path):
+        with jsonl_path.open(encoding="utf-8") as handle:
+            for line_no, line in enumerate(handle, start=1):
+                text = line.strip()
+                if not text:
+                    continue
+                try:
+                    value = json.loads(text)
+                except json.JSONDecodeError as exc:
+                    raise ClosingMarketError(
+                        f"{jsonl_path}:{line_no}: invalid JSON"
+                    ) from exc
+                if not isinstance(value, dict):
+                    raise ClosingMarketError(
+                        f"{jsonl_path}:{line_no}: row must be a JSON object"
+                    )
+                rows.append(value)
     return rows
 
 
