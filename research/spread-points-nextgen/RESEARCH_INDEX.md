@@ -215,8 +215,10 @@ External comparator explicitly carried into Phase 2: **davidsasser.com**.
 - deterministic nested-fold contract is recorded in `phase2/EVALUATION_HOLDOUT_PROTOCOL.md`
 - feature/source/PIT feasibility matrix is recorded in `phase2/DATA_GAPS_AND_SOURCE_POLICY.md`
 - Challenger C M0/M1/M2/M3 null hierarchy is recorded in `phase2/MARKET_RESIDUAL_SPECIFICATION.md`
+- evidence-quality ledger and final publisher/technical-source verification are recorded in `phase2/LITERATURE_REVIEW.md`
+- normalized external-system audit and required four-way Sasser classification are recorded in `phase2/EXTERNAL_MODEL_REVIEW.md`
 
-External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research.
+External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research. Final Sasser search found useful score/line/market product separation but no reproducible current methodology/archive sufficient for scientific validation.
 
 Compatibility sync #521 merged current `main` into the Phase 2 branch before final validation. The concurrent adaptive-weekly-learning research remained separate and was not used to select Spread & Points challengers.
 
