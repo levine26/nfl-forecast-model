@@ -7,13 +7,22 @@
 
 Each external system is reviewed on:
 
-- target and outputs;
+- prediction target and outputs;
+- architecture;
 - data inputs;
-- football-vs-market separation;
+- team-strength methodology;
+- market use;
+- QB/player treatment;
+- scoring-process treatment;
+- calibration / uncertainty;
+- validation design;
+- prospective evidence;
 - chronology / point-in-time transparency;
 - reproducibility;
-- evaluation quality;
-- relevance to Phase 1 residual failures.
+- transferable concept;
+- limitations.
+
+Evidence is explicitly classified as peer reviewed, strong technical research, reproducible open source, practitioner/industry evidence, or speculative/opaque.
 
 ---
 
@@ -83,6 +92,8 @@ Adopt the score-versus-line-versus-market semantic separation. Require LevLine t
 nfelo is a particularly useful comparator because its code and design are publicly inspectable.
 
 ### Relevant architecture
+
+**Evidence class:** reproducible open source / practitioner technical evidence.
 
 The current open-source implementation includes:
 
@@ -305,3 +316,28 @@ It strengthens three constraints instead:
 - market-aware modeling must retain an explicit market-only null and must not hide market dependence.
 
 David Sasser remains useful as a product-semantic comparator, not a scientific benchmark.
+
+
+---
+
+## 8. Normalized external-system audit matrix
+
+| System / family | Target | Architecture | Inputs / team strength | Market use | QB/player | Scoring process | Calibration / distribution | Validation / prospective evidence | Reproducibility | Transferable concept | Main limitation |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| David Sasser CFB | projected team scores / line / picks | not publicly specified | not publicly specified | opening/current lines shown separately | unknown | score outputs visible; mechanism unknown | not documented | public record shown, but chronology/frozen archive/independent validation not established | low | keep model score, model line and market comparison as separate surfaces | methodology and PIT evidence opaque |
+| nfelo | team rating, win probability, spread/value | modified Elo + contextual layers + explicit market regression | nflverse + custom ratings; dynamic Elo | explicit open/close regression layer | explicit QB model/context | not a discrete drive simulator | line-to-probability translation; key-number work | public technical analyses and open code; not peer-reviewed validation | high | football base and market layer should remain separately measurable | some data/claims are practitioner evidence; architecture is not automatically transferable |
+| Open Source Football / nflverse | EPA/team ability examples | lagged EPA, opponent adjustment, multilevel shrinkage | public PBP | generally football-only | varies | play-level efficiency, not full game-score process | uncertainty in multilevel examples | reproducible examples, not formal prospective score model | high | regularize noisy EPA and adjust opponent strength under chronology | examples are methodological demonstrations |
+| Glickman/Stern family | NFL scores | dynamic state-space team strength | historical NFL scores/team effects | football-only | latent team effects, not player explicit | final-score model | probabilistic state-space | peer-reviewed predictive study | method reproducible | evolving partially pooled strength | historical era/data; not modern feature proof |
+| Baker/McHale family | exact NFL score | point-process scoring hazards | prior team statistics and/or market | optional market-conditioned variants | not core | explicit discrete scoring events | exact-score distribution | peer-reviewed genuine OOS evaluation | method reproducible | preserve football scoring discreteness | implementation complexity and historical era |
+| FiveThirtyEight-style Elo/QB concepts | win probability / rating | Elo + QB adjustment | results + QB performance | historically could be compared with market | explicit QB state | no drive simulator | probability output | historical public methodology; current product discontinued | medium | separate persistent team state from shorter-lived QB state | unified LevLine PIT starter history is absent |
+
+## 9. Sasser classification checklist
+
+The required four-way Sasser distinction is now explicit:
+
+1. **Reproducible methodological evidence:** none located for the current public model.
+2. **Technical but incomplete information:** projected scores and projected-line construction are visible as outputs, but internal mechanics are not documented enough to reproduce.
+3. **Product-design observations:** strong; score, model line, opening line, current line and pick are visibly separate.
+4. **Unsupported marketing/performance claims:** any aggregate record shown on the site remains descriptive only and is not imported into LevLine evidence.
+
+That classification is intentionally conservative and remains unchanged unless a reproducible technical source is later discovered.
