@@ -176,13 +176,26 @@ Phase 1 must identify exactly what these artifacts did, their data universe, whe
 
 As phases advance, add canonical links here rather than forcing future chats to search the entire repository.
 
-### Phase 1 — planned
+### Phase 1 — complete
 
-- current architecture report — TBD
-- reproducible baseline report — TBD
-- error-decomposition report — TBD
-- data/API inventory — TBD
-- leakage/PIT risk register — TBD
+- current architecture report — `research/spread-points-nextgen/phase1/CURRENT_ARCHITECTURE_AUDIT.md`
+- reproducible baseline report — `research/spread-points-nextgen/phase1/BASELINE_REPRODUCTION_REPORT.md`
+- error-decomposition report — `research/spread-points-nextgen/phase1/ERROR_DECOMPOSITION_REPORT.md`
+- data/API inventory — `research/spread-points-nextgen/phase1/DATA_API_INVENTORY.md`
+- leakage/PIT risk register — `research/spread-points-nextgen/phase1/LEAKAGE_PIT_AUDIT.md`
+
+Additional Phase 1 control/evidence:
+
+- evaluation contract — `research/spread-points-nextgen/phase1/EVALUATION_CONTRACT.md`
+- synthesis / Phase 2 hypotheses — `research/spread-points-nextgen/phase1/PHASE1_SYNTHESIS.md`
+- machine-readable summary — `research/spread-points-nextgen/phase1/PHASE1_SUMMARY.json`
+- reproducible runner — `research/spread-points-nextgen/phase1/run_baseline_audit.py`
+- structural diagnostic runner — `research/spread-points-nextgen/phase1/run_structural_slices.py`
+- helper tests — `research/spread-points-nextgen/phase1/test_run_baseline_audit.py`
+- exact-head validation runs — firewall `35695606248`; research validation `35695606246`; Phase 1 audit `35695606219`
+- dedicated audit artifact — `10680706168`
+
+External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
 ### Phase 2 — planned
 

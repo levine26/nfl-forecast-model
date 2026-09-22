@@ -1,196 +1,154 @@
 # Spread & Points Next-Generation — Current State & Next Steps
 
-**Last updated:** 2026-09-21 America/Los_Angeles  
+**Last updated:** 2026-09-22 America/Los_Angeles  
 **Program authority:** `research/spread-points-nextgen/MASTER_PLAN.md`  
-**Phase-0 base main:** `536d6ab712028e374b42815db106f9fcb5d28053`  
-**Phase-0 governance merge SHA:** `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25`  
-**Phase 0 status:** **COMPLETE**  
-**Phase 1 status:** **NOT STARTED**  
-**Active phase:** None. The next chat may begin Phase 1 only after following the mandatory startup protocol.
+**Phase 0:** **COMPLETE**  
+**Phase 1:** **COMPLETE**  
+**Phase 2:** **NOT STARTED**  
+**Active phase:** None. Stop after Phase 1 merge; the next substantive chat starts Phase 2 under the mandatory startup protocol.
 
-## Completed Phase 0 objective
+## Phase 1 completion state
 
-GitHub is now the authoritative institutional memory for the next-generation LevLine research program covering spread setting, scoring margin, team points, totals, and joint score distributions.
+Phase 1 audited the current LevLine score/spread system without changing production behavior.
 
-Phase 0 created, validated, merged, and verified the permanent governance/handoff layer without changing production forecast behavior and without beginning the Phase 1 baseline audit.
+Canonical Phase 1 directory:
 
-## Work completed
+`research/spread-points-nextgen/phase1/`
 
-- Resolved the repository default branch as `main`.
-- Recorded the Phase-0 base main SHA `536d6ab712028e374b42815db106f9fcb5d28053`.
-- Verified current production winner-probability strategy from direct production surfaces as `F-ST-01-FROZEN-2026`.
-- Verified the packaged production artifact is `production_frozen` and the active production strategy is pinned to F-ST.
-- Verified F-ST frozen identity, provenance, reconstruction-tolerance, and fail-closed test contracts.
-- Located the current score/margin/total implementation in `pipeline.py`, `models.py`, `features.py`, and `public_forecast.py`.
-- Verified current semantics distinguish:
-  - the independently fitted diagnostic margin/total regressions; and
-  - the probability-implied public fair margin/spread derived from the official F-ST winner probability.
-- Located and verified the existing research firewall workflow and protected production surfaces.
-- Verified the retired Props implementation is disabled in production.
-- Verified retired Props research is preserved in `docs/props/` and branch `archive/props-pre-revamp-2026-09-21`.
-- Located existing source/data governance in `research/LEVLINE_DATA_SOURCE_MATRIX.md`.
-- Inspected relevant branch/PR state and confirmed no pre-existing open PR blocked Phase 0.
-- Created the canonical directory `research/spread-points-nextgen/`.
-- Created all five permanent control documents:
-  - `MASTER_PLAN.md`
-  - `PHASE_STATUS.md`
-  - `CURRENT_STATE_AND_NEXT_STEPS.md`
-  - `DECISION_LOG.md`
-  - `RESEARCH_INDEX.md`
-- Recorded the exact Phase 0 -> Phase 6 sequence, entry/exit criteria, dependencies, outputs, branch discipline, artifact discipline, anti-leakage rules, free/open-data policy, paid-data escalation rule, and final human approval gate.
-- Recorded the mandatory future-chat startup and shutdown protocol.
-- Opened docs/research-governance PR **#512**.
-- Verified the PR diff contained exactly five files, all under `research/spread-points-nextgen/`.
-- Preserved the existing CI/firewall rules unchanged.
-- Passed the repository’s research firewall.
-- Passed the full existing research-validation workflow and final gate.
-- Merged PR #512.
-- Verified all five canonical files directly from `main` at merge SHA `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25`.
-- Updated `PHASE_STATUS.md` on `main` to mark **Phase 0 COMPLETE** and **Phase 1 NOT STARTED**.
+Primary Phase 1 branch / PR:
 
-## Important findings
+- branch: `research/spread-points-nextgen-phase1`
+- PR: **#513**
 
-1. **Production winner is verified, not assumed.** The active production strategy is `F-ST-01-FROZEN-2026`.
-2. **The current score/spread system has two distinct semantics.** The pipeline fits an independent margin model, but Sunday Signal’s official public fair line is derived from the official win probability and margin sigma.
-3. **Research is already strongly firewalled.** Existing CI protects production surfaces and fail-closes cross-boundary research changes.
-4. **Props retirement is authoritative.** The old player-prop product is intentionally removed from active production. Scientific concepts may be reused; the implementation must not be resurrected wholesale.
-5. **Branch/workflow proliferation is a known failure mode.** This program uses one active phase and one primary branch per phase/coherent block unless a specialist branch has a concrete justification.
-6. **The repository already contains substantial LevLine 4, market, player-state, availability, and score-distribution research.** Phase 1 should inventory and reuse valid evidence rather than rebuilding it by default.
-7. **Historical headline accuracy figures remain reference points until Phase 1 reproduces them under the exact current semantics and data universe.**
+Exact-head validation before closeout:
 
-## Phase 0 commits and PR
+- research firewall `35695606248`: **SUCCESS**
+- research validation `35695606246`: **SUCCESS**
+- dedicated Phase 1 audit `35695606219`: **SUCCESS**
+- audit artifact `10680706168`
 
-Phase-0 branch commits:
+## Reproduced baseline
 
-- `7a5e969933f2239469a89ddcf9f35d81c10d333c` — initialize master plan.
-- `ba360428a52705779a86a8265245d5ecc962a6b0` — add phase registry.
-- `43bb03e1c94f21723539b38d8a671916971000eb` — add current-state handoff.
-- `c0ff5370fd82a0c33b6ed8547ace09b812f59a2b` — add decision log.
-- `44c25c8500770e9cee716139252659455c4cb30d` — add research index.
+Primary universe: **1,087 regular-season games, 2022–2025**.
 
-Integration:
+Independent football score model:
 
-- PR **#512** — `docs: establish spread-points nextgen research program`
-- merge SHA: `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25`
-- post-merge Phase-0 status commit: `dd95dcacfb7e480e73d163fa4c3c9c5179845f9a`
+- home points MAE: **7.424**
+- away points MAE: **7.485**
+- margin MAE: **9.962**
+- total MAE: **10.854**
 
-## Validation
+Historical schedule market benchmark:
 
-### LevLine research firewall
+- spread/margin MAE: **9.494**
+- total MAE: **10.189**
 
-Workflow run `35691355664`: **SUCCESS**
+Paired season+week bootstrap supports a market advantage on both continuous targets.
 
-This validated the existing research path/import firewall without modifying or weakening it.
+Chronology-clean historical F-ST analogue:
 
-### LevLine research validation
+- winner accuracy: **68.17%**
+- Brier: **0.21065**
+- log loss: **0.60871**
 
-Workflow run `35691355478`: **SUCCESS**
+Raw market:
 
-Successful jobs:
+- winner accuracy: **67.62%**
+- Brier: **0.21020**
+- log loss: **0.60765**
 
-- foundation;
-- v0.8 isolated regeneration;
-- Phase 2 market reliance and horizon study;
-- paired statistical uncertainty audit;
-- margin disagreement forensics;
-- research validation gate.
+Independent-margin ATS diagnostic accuracy is **48.77%** after pushes are excluded.
 
-No production surface was intentionally changed by the Phase 0 PR.
+## Main empirical findings
 
-## Key artifacts inspected
+1. **Score/margin prediction is compressed.** Large realized margins and double-digit favorite environments are under-differentiated.
+2. **Totals regress strongly toward the middle.** Model total prediction SD is only 1.83 points versus 4.25 for the market total.
+3. **Large LevLine-market disagreement is not a validated edge.** In the >=6-point disagreement slice the model's continuous margin error is materially worse than the market.
+4. **The current inverse-MAE four-regressor blend does not beat the best individual ElasticNet OOF MAE** for either margin or total.
+5. **The market is the stronger continuous baseline** in every 2022–2025 target season for margin and total.
+6. **Recent-form and simple pace slices do not show a strong monotonic residual pattern.** They remain candidate ingredients only if Phase 2 research provides a better structural formulation.
+7. **Core OOF data completeness is not the observed problem.** All 44 Core fields are populated on the audited universe before model imputation.
+8. **Observed historical weather metadata cannot be treated as a PIT-safe forecast source.** Weather experiments still require archived or prospectively captured forecasts.
+9. **2025 availability evidence is suggestive, not decisive.** QB/OL practice-limitation slices have higher margin MAE but one-season uncertainty intervals cross zero.
+10. **Current architecture is intentionally split:** independent margin/total regressions, frozen market-conditioned F-ST winner probability, and a public probability-to-margin bridge are different forecast objects.
 
-Production/governance:
+## Important governance findings
 
-- `README.md`
-- `config/model.yaml`
-- `src/nfl_forecast/fst_production.py`
-- `src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json`
-- `research/fst/F-ST-01-FROZEN-2026.json`
-- `docs/FST_FREEZE_PROVENANCE.md`
-- `tests/test_fst_frozen_identity.py`
-- `tests/test_fst_production.py`
-- `tests/test_official_locking.py`
-- `.github/workflows/research_validation.yml`
+- Base score-regressor OOF predictions are season-held-out, but final inverse-MAE weights reuse the combined evaluation block.
+- The ordinary Core classifier meta-model is fit and scored on the same combined base-OOF matrix; its displayed stack OOF metric is not fully nested.
+- Frozen F-ST normal scoring remains capped at 2025.
+- Current ordinary live Core/margin/total fits may incorporate already-completed 2026 games for later 2026 forecasts; completed 2026 outcomes remain forbidden for research architecture/feature selection.
+- Historical nflverse market fields are an opaque closing/late benchmark, not a verified T-120 source.
+- Historical starter/injury/weather state must fail closed unless its as-of time is proven.
+- Research source qualification does not equal feature or production authorization.
 
-Current score/spread architecture:
+## Data/source state carried into Phase 2
 
-- `src/nfl_forecast/pipeline.py`
-- `src/nfl_forecast/models.py`
-- `src/nfl_forecast/features.py`
-- `src/nfl_forecast/public_forecast.py`
-- `src/nfl_forecast/market.py`
-- `src/nfl_forecast/market_t120.py`
+Strong/free foundations include nflverse schedule/PBP, sequential Elo, the qualified 2025 availability composite, 2025+ timestamped depth charts, 2026 prospective injury snapshots, lagged NGS/PFR/FTN research sources, and existing market/weather collection infrastructure.
 
-Prior research/data:
+Operational issues observed during Phase 1:
 
-- `research/LEVLINE_DATA_SOURCE_MATRIX.md`
-- existing LevLine 4 research indexed in `RESEARCH_INDEX.md`
-- existing player/personnel and availability research indexed in `RESEARCH_INDEX.md`
+- prospective multi-book The Odds API collector: latest inspected state reported HTTP 401 and no usable current ledger rows;
+- prospective weather capture: blocked on unresolved qualified game-specific venue receipts.
 
-Retired Props:
+Neither issue changes production, but both constrain same-horizon Phase 2 experiments until resolved.
 
-- `docs/props/PROPS_RESEARCH_ARCHIVE_2026-09.md`
-- `docs/props/README.md`
-- `docs/props/RESET_MANIFEST.md`
-- `archive/props-pre-revamp-2026-09-21`
+## David Sasser inclusion
 
-## Failed approaches / cautions worth remembering
+Per user instruction, **davidsasser.com is explicitly part of the external research set**.
 
-- Exact GitHub code search terms did not reliably surface several files that were present; directory/API inspection was more dependable during Phase 0.
-- Do not infer current production authorization solely from the historical research F-ST registry. The packaged production artifact, active production code, and current repository contract are the direct production boundary.
-- Do not equate `expected_margin` with the official public probability-implied fair spread.
-- Do not rebuild old Props orchestration merely because some player-state or simulation concepts are scientifically useful.
-- Do not run expensive experiments again solely because a new chat did not personally generate them.
+Phase 1 used it only as a comparator: its public CFB board separates projected team scores, projected line, opening/current market line, and ATS selection/tracking. The public material inspected does not expose enough reproducible model/data/chronology detail to use its reported record as scientific validation.
 
-## Unresolved questions for Phase 1
+**Phase 2 must include a deeper davidsasser.com review** alongside peer-reviewed literature, technical public models, and reproducible open-source systems.
 
-These are deliberate Phase 1 work, not Phase 0 blockers:
+## Canonical Phase 1 artifacts
 
-- exact reproducible home/away-point, margin, total, winner, ATS, and market baseline metrics under current semantics;
-- full decomposition of margin/score residuals;
-- exact treatment and predictive contribution of EPA, team form, QB/player state, injuries, weather, rest/travel, and market inputs;
-- concept-drift evidence and optimal modern-season boundary;
-- full current API/data inventory, rate limits, provenance, and point-in-time limitations;
-- exact failure modes that should generate Phase 2 research hypotheses.
+- `phase1/EVALUATION_CONTRACT.md`
+- `phase1/CURRENT_ARCHITECTURE_AUDIT.md`
+- `phase1/BASELINE_REPRODUCTION_REPORT.md`
+- `phase1/ERROR_DECOMPOSITION_REPORT.md`
+- `phase1/DATA_API_INVENTORY.md`
+- `phase1/LEAKAGE_PIT_AUDIT.md`
+- `phase1/PHASE1_SYNTHESIS.md`
+- `phase1/PHASE1_SUMMARY.json`
+- `phase1/run_baseline_audit.py`
+- `phase1/run_structural_slices.py`
+- `phase1/test_run_baseline_audit.py`
 
-## Blockers
+## EXACT NEXT ACTION — PHASE 2 CHAT
 
-None.
+Do **not** restart Phase 1 and do **not** implement challengers yet.
 
-# EXACT NEXT ACTION — PHASE 1 CHAT
-
-The next chat must **not** restart the project. It must:
+The next substantive chat must:
 
 1. Resolve current repository `main`.
-2. Read, in this order:
-   - `research/spread-points-nextgen/MASTER_PLAN.md`
-   - `research/spread-points-nextgen/PHASE_STATUS.md`
-   - `research/spread-points-nextgen/CURRENT_STATE_AND_NEXT_STEPS.md`
-   - `research/spread-points-nextgen/DECISION_LOG.md`
-   - relevant sections of `research/spread-points-nextgen/RESEARCH_INDEX.md`
-3. Inspect open PRs and active branches relevant to Phase 1.
-4. Confirm Phase 0 is `COMPLETE` and Phase 1 is `NOT STARTED`.
-5. Mark Phase 1 `IN PROGRESS` when substantive Phase 1 work actually begins.
-6. Create or use **one primary Phase 1 audit branch**.
-7. Begin by documenting the current architecture and reproducing the current baselines from repository evidence.
-8. Perform the required error decomposition and complete API/data inventory.
-9. Do **not** implement successor challengers or begin the Phase 2 literature/design program during Phase 1.
-10. Before that chat finishes, update all required control/handoff files and commit the handoff.
+2. Read the five canonical control files in the required order.
+3. Read Phase 1 `PHASE1_SYNTHESIS.md`, `ERROR_DECOMPOSITION_REPORT.md`, `DATA_API_INVENTORY.md`, and `LEAKAGE_PIT_AUDIT.md`.
+4. Inspect open PRs/branches and verify Phase 1 is merged/complete.
+5. Mark Phase 2 `IN PROGRESS` only when substantive Phase 2 work begins.
+6. Perform the Phase 2 **deep external research and challenger-design program**, including:
+   - peer-reviewed sports forecasting and statistical score modeling;
+   - NFL analytics and market-efficiency research;
+   - drive/possession, opponent-adjusted, dynamic/Bayesian/state-space, player/QB/availability, red-zone/explosive-play, uncertainty and ensemble methods;
+   - respected public/open-source forecasting systems;
+   - **davidsasser.com**, with clear separation between reproducible evidence and opaque claims.
+7. Convert Phase 1 residual findings into a deliberately limited challenger shortlist.
+8. Freeze a chronology-clean development/validation/untouched-holdout protocol **before challenger results exist**.
+9. Specify PIT contracts and data gaps for every proposed feature family.
+10. Do not implement Phase 3 challengers in the Phase 2 chat.
+11. Update all control/handoff files before Phase 2 stops.
 
-# DO NOT REPEAT
+## DO NOT REPEAT
 
-- Do not redo Phase 0 governance setup.
-- Do not recreate the canonical directory or duplicate the five control files.
-- Do not re-prove from scratch that `F-ST-01-FROZEN-2026` is the active production probability strategy unless repository state materially changes.
-- Do not rediscover the retired Props preservation branch; it is `archive/props-pre-revamp-2026-09-21`.
-- Do not reactivate or wholesale merge retired Props code.
-- Do not treat the research F-ST registry’s historical shadow status as the sole source of truth for current production.
-- Do not conflate independent `expected_margin` with the probability-implied public fair spread.
-- Do not rerun the Phase 0 CI merely to prove that the Phase 0 docs existed; PR #512 already passed the repository firewall and full research-validation gate.
-- Do not begin Phase 2 literature review or Phase 3 challenger implementation before Phase 1 exit criteria are satisfied.
-- Do not alter F-ST coefficients, official locks, historical grading, or production forecast behavior.
-- Do not weaken governance or CI to accelerate the program.
+- Do not rerun Phase 1 merely because a new chat did not personally generate it.
+- Do not conflate `expected_margin` with the public probability-implied fair spread.
+- Do not treat the historical closing/late market as T-120.
+- Do not use final historical starter/injury/weather state without PIT proof.
+- Do not use completed 2026 outcomes for feature, architecture, threshold or challenger selection.
+- Do not resurrect the retired Props orchestration.
+- Do not weaken the research firewall.
+- Do not make a paid source dependency without the required user escalation.
 
-## Phase 0 stop condition
+## Stop condition
 
-**Phase 0 is complete. Phase 1 remains not started. Stop this chat here.**
+**Phase 1 is complete. Phase 2 remains NOT STARTED. Stop after merging the Phase 1 research package.**
