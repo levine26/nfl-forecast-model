@@ -69,6 +69,17 @@ def test_readiness_is_armed_before_first_future_capture(tmp_path: Path):
     ]
 
 
+def test_readiness_fails_closed_on_existing_empty_ledger(tmp_path: Path):
+    ledger = tmp_path / "forecast_originals.jsonl"
+    ledger.write_text("", encoding="utf-8")
+
+    with pytest.raises(Props22ReadinessError, match="exists but contains no receipts"):
+        audit_readiness(
+            workflow_path=WORKFLOW,
+            ledger_path=ledger,
+        )
+
+
 def test_first_future_capture_is_verified_as_complete_immutable_grid(tmp_path: Path):
     ledger = tmp_path / "forecast_originals.jsonl"
     rows = build_capture([_source()])
