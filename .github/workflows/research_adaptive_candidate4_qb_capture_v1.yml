@@ -20,10 +20,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: levline-research-inactive-snapshot-archive-v1
-  cancel-in-progress: false
-
 jobs:
   test:
     if: github.event_name == 'pull_request'
@@ -67,6 +63,9 @@ jobs:
           PY
 
   capture:
+    concurrency:
+      group: levline-research-inactive-snapshot-archive-v1
+      cancel-in-progress: false
     if: >-
       github.event_name != 'pull_request' &&
       (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
