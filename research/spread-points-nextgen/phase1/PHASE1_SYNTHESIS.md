@@ -184,3 +184,7 @@ Final exact-head validation passed:
 - audit artifact `10680706168`.
 
 The structural diagnostics additionally found no strong monotonic recent-form or simple pace residual gradient, zero Core-feature missingness across the audited OOF sample, and only descriptive/non-PIT-safe weather associations. Phase 1 is therefore **COMPLETE**. Phase 2 remains **NOT STARTED** until the next substantive chat follows the canonical startup protocol.
+
+## Closeout compatibility sync
+
+Before merge, the Phase 1 branch was synchronized with current `main` at `df91b80403a7af3094a9a6a8915afd0a6dce2ad3`. The sync brought forward only concurrent repository state outside the Phase 1 research package; Phase 1 did not modify production forecast logic. Fresh pull-request checks on the post-sync head are required before merge.
