@@ -28,7 +28,10 @@ permissions:
   actions: read
 
 concurrency:
-  group: sunday-signal-chatgpt-failed-game-fallback
+  group: >-
+    ${{ github.event_name == 'pull_request'
+        && format('sunday-signal-chatgpt-failed-game-fallback-pr-{0}', github.event.pull_request.number)
+        || 'sunday-signal-chatgpt-failed-game-fallback-production' }}
   cancel-in-progress: true
 
 jobs:
@@ -81,6 +84,8 @@ jobs:
           assert '--editorial-roster inputs/sunday_signal/editorial_slate_roster.json' in workflow
           assert 'scripts/refresh_editorial_slate_roster.py' in workflow
           assert 'scripts/restore_last_good_editorial_snapshot.py' in workflow
+          assert "sunday-signal-chatgpt-failed-game-fallback-pr-{0}" in workflow
+          assert "sunday-signal-chatgpt-failed-game-fallback-production" in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
           assert 'Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
