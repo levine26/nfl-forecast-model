@@ -126,7 +126,7 @@ Phase 0 complete -> Phase 1 complete -> Phase 2 complete -> **Phase 3 controlled
 
 ## Exact next action
 
-**STOP Phase 2.** In the next Phase 3 execution chat, read the merged control files and canonical Phase 2 artifacts from current `main`, then implement only the frozen Phase 3 program below. Do not reopen Phase 1/2 merely because the chat is new.
+**Immediate next action remains Phase 3.** Read the merged control files and canonical Phase 2 artifacts from current `main`, then implement only the frozen Phase 3 A0/B0/C0 program (D only if its frozen gate passes). This amendment does not authorize Candidate 5 or Phase 4 work and does not reopen Phase 1/2.
 
 ## DO NOT REPEAT
 
