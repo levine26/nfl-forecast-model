@@ -407,3 +407,82 @@ For any candidate with a positive full-sample accuracy delta:
 10. **No hindsight rescue:** a failed V1 may motivate a newly registered V2 theory, but V1 parameters may not be edited and re-described as if they were the original candidate.
 
 These are interpretation rules, not automatic production-promotion criteria.
+
+
+## 19. Candidate 1 checkpoint — completed 2026-09-22
+
+Validated workflow run: `35742825363`  
+Validated integration SHA: `2bf1077a8adb5121aadf64b8f0bbfc7538fe00c4`  
+Evidence artifact: `10699993670`  
+Full receipt: `research/ADAPTIVE_WEEKLY_LEARNING_FIRST_RUN_RECEIPT.json`
+
+### Incumbent benchmark
+- Frozen F-ST: 741 / 1,087 correct
+- Accuracy: 68.1693%
+- Brier: 0.2106533
+- Log loss: 0.6087126
+
+### Candidate 1 — ADAPTIVE-RESIDUAL-STATE-V1
+- Correct: 722 / 1,087
+- Accuracy: 66.4213%
+- Delta vs F-ST: **-1.7479 percentage points**
+- Brier: 0.2163569 (worse)
+- Log loss: 0.6226563 (worse)
+- Winner switches vs F-ST: 121
+- Candidate-only correct: 51
+- F-ST-only correct: 70
+- Switch win rate: 42.15%
+- Exact paired McNemar diagnostic p: 0.1014
+
+By-season accuracy delta:
+- 2022: -1.8450 pp
+- 2023: -3.6765 pp
+- 2024: -2.5735 pp
+- 2025: +1.1029 pp
+
+**Disposition: REJECT Candidate 1.**
+
+### Negative control — weekly full F-ST refit
+- Correct: 739 / 1,087
+- Accuracy: 67.9853%
+- Delta vs frozen F-ST: **-0.1840 pp**
+- Only 6 winner switches; weekly refit won 2 and F-ST won 4.
+
+**Conclusion:** simple weekly retraining does not improve winner accuracy.
+
+### Calibration ablation
+The pick-preserving weekly calibration layer kept all 741 winners unchanged while slightly improving probability quality:
+- Accuracy delta: 0.0000 pp
+- Brier delta: -0.0000846
+- Log-loss delta: -0.0000847
+
+This is worth retaining as a probability-calibration research component, but it does not increase straight-up winner accuracy.
+
+### Selective gate on Candidate 1
+- Correct: 738 / 1,087
+- Accuracy: 67.8933%
+- Delta vs F-ST: -0.2760 pp
+- 79 authorized switches
+- Switch win rate: 48.10%
+
+**Disposition: REJECT Candidate 1 gate.**
+
+### Robustness result
+The preregistered nested chronology-safe parameter-selection diagnostic also failed:
+- F-ST: 559 / 816
+- Adaptive: 549 / 816
+- Delta: -1.2255 pp
+- Switch win rate: 36.84%
+
+This means the result is not credibly rescued by choosing different parameters from the preregistered residual-state grid.
+
+### Scientific checkpoint
+The initial research prior of approximately +0.6 pp for generic controlled weekly residual learning is **not supported by Candidate 1**. Candidate 1 is frozen as a failed experiment and must not be retuned and relabeled as the same candidate.
+
+Any Candidate 2 must use a materially different pregame-observable information mechanism rather than simply retuning the residual-state learner.
+
+### Ledger update
+- [x] Candidate 1 historical walk-forward experiment
+- [x] Candidate 1 preregistered robustness analysis
+- [x] Candidate 1 rejected
+- [ ] Candidate 2 theory/design — intentionally paused pending user direction
