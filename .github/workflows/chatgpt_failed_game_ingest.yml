@@ -25,7 +25,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: sunday-signal-chatgpt-failed-game-fallback
+  group: sunday-signal-chatgpt-failed-game-fallback-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
