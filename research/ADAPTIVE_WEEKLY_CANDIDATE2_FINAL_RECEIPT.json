@@ -8,16 +8,25 @@
     "target_results_seen_before_preregistration": false
   },
   "validated_execution": {
-    "candidate_code_sha": "f4a5ea26bc999819d4c79179c20b8f33fd77401f",
-    "workflow_run_id": 35747145825,
-    "artifact_id": 10703836596,
-    "artifact_sha256": "9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5",
+    "candidate_code_sha": "3d47141ed8584e989702d1982e4e1dc60d8248a2",
+    "workflow_run_id": 35749549009,
+    "artifact_id": 10705320611,
+    "artifact_sha256": "fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771",
     "evidence_attribution_correction_sha": "08585db62617523628e8c7951c336eedbc6b1efe",
     "unit_tests_passed": true,
     "construction_passed": true,
     "paired_evaluation_passed": true,
     "adversarial_validation_passed": true,
-    "production_surface_diff_check_passed": true
+    "production_surface_diff_check_passed": true,
+    "supersedes_preliminary_execution": {
+      "candidate_code_sha": "f4a5ea26bc999819d4c79179c20b8f33fd77401f",
+      "workflow_run_id": 35747145825,
+      "artifact_id": 10703836596,
+      "artifact_sha256": "9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5"
+    },
+    "candidate_model_blob_sha": "3a68a612d0239e2da5f48dcb088fcca9c39af74b",
+    "config_sha256": "8b08f2d37c7531783e8b1a2dd8ae8ab8e6fb95d48a680fe681479561c7d44969",
+    "runtime_hardening_note": "Final run removes redundant control bootstrap computation only; Candidate 2 features, thresholds, predictions, target sample, success criteria, and the 10,000-draw primary Candidate 2 vs F-ST inferential evaluation are unchanged."
   },
   "sample": {
     "season": 2025,
@@ -129,7 +138,7 @@
     "both_team_depth_state_games": 272,
     "qb_change_evaluable_games": 256,
     "ol_change_evaluable_games": 256,
-    "qb_practice_join_games": 126,
+    "qb_practice_join_games": 127,
     "strong_shock_games": 51,
     "boundary_component_disagreement_games": 4,
     "authorized_switches": 1,
@@ -159,7 +168,7 @@
     "probability_quality": "Both Brier and log loss improved slightly on the exact paired sample.",
     "statistical_distinguishability": "No. McNemar p=1.0; week-block accuracy interval includes zero.",
     "football_coherence": "Yes at the mechanism level because QB state is a high-leverage structural change, but empirical evidence is only one event.",
-    "reproducibility": "Yes for the recorded workflow/artifact/code SHA.",
+    "reproducibility": "Yes. The hardened final execution is pinned to integration SHA 3d47141ed8584e989702d1982e4e1dc60d8248a2, workflow run 35749549009, artifact 10705320611, and artifact SHA256 fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771.",
     "prospective_shadow_suitability": "Not authorized by V1 evidence because the entire gain is one-switch/one-week/QB-channel concentrated.",
     "revised_long_run_accuracy_estimate": "Central estimate approximately 68.3%; defensible near-term range approximately 68.2%-68.4% for currently evidenced adaptive mechanisms. A 68.8%-69% central estimate is no longer supported by the completed Candidate 1 and Candidate 2 evidence."
   },
@@ -176,4 +185,4 @@
     "production_merge_authorized": false,
     "candidate3_started": false
   }
-}
+}\n
