@@ -222,6 +222,7 @@ def test_only_qualified_multibook_consensus_closes_a_horizon(tmp_path) -> None:
             "row_type": "book",
             "sportsbook_key": "book-a",
             "source_count": None,
+            "timing_error_minutes": 0.0,
         },
         {
             "game_id": "game-a",
@@ -229,6 +230,7 @@ def test_only_qualified_multibook_consensus_closes_a_horizon(tmp_path) -> None:
             "row_type": "consensus",
             "sportsbook_key": "sportsbook_consensus",
             "source_count": 1,
+            "timing_error_minutes": 0.0,
         },
         {
             "game_id": "game-b",
@@ -236,6 +238,7 @@ def test_only_qualified_multibook_consensus_closes_a_horizon(tmp_path) -> None:
             "row_type": "consensus",
             "sportsbook_key": "sportsbook_consensus",
             "source_count": MIN_CONSENSUS_BOOKS,
+            "timing_error_minutes": 0.0,
         },
     ]).to_csv(ledger, index=False)
 
