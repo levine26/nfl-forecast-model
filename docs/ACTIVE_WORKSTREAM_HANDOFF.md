@@ -25,8 +25,7 @@ Key merged fixes include:
 - #476 docs-only recovery race allowance;
 - #480 full ChatGPT-ingestion / failed-game-fallback namespace isolation;
 - #483 isolated six-game fallback retry;
-- #485 code-only full-ingestion pushes validate without republishing stale bundles;
-- #503 recovered the later nine-game Groq failure set through validated ChatGPT fallback.
+- #485 code-only full-ingestion pushes validate without republishing stale bundles.
 
 Verified on current committed `main`:
 - frozen Week 2 weekend roster: **15 games**;
@@ -37,8 +36,8 @@ Verified on current committed `main`:
 - provider: **healthy, 15/15 applied**;
 - media reporting: **healthy, 15 trusted games**;
 - Groq fallback status: **healthy**;
-- every current Groq-failed weekend game has `requires_chatgpt_refresh=false`;
-- the latest nine-game unresolved set was recovered through validated ChatGPT fallback;
+- every previously failed Groq game has `requires_chatgpt_refresh=false`;
+- the six late unresolved games were recovered through validated ChatGPT fallback;
 - recovery reused a launch-grade historical editorial snapshot and never altered LevLine/F-ST probabilities, picks, grading, or locks.
 
 Do not reopen the one-game collapse investigation unless current committed artifacts regress.
@@ -81,8 +80,7 @@ Do not redo:
 - #488 — personnel/opportunity evidence coverage audit;
 - #491 — live integration that captures Props 2.2 receipts after successful **pregame** Props 2.1 runs;
 - #496 — frozen Props 2.2 prospective evaluator;
-- #497 — immutable postgame grader plus scheduled/off-main grading and evaluation workflow;
-- #500 — prospective closing-market / CLV evidence contract and matcher using only append-only pre-kickoff market archives.
+- #497 — immutable postgame grader plus scheduled/off-main grading and evaluation workflow.
 
 ### Frozen Props 2.2 design
 
@@ -126,23 +124,6 @@ That run must:
 7. leave production Props labels and the LevLine winner model untouched.
 
 Do not manually backfill Week 2 into Props 2.2.
-
-### Automated first-capture acceptance
-
-PR #504 adds the explicit first-capture readiness gate.
-
-Before the first future ledger, the expected state is `ARMED_AWAITING_FIRST_CAPTURE`. After the first successful future pregame live Props publication, the gate must become `FIRST_CAPTURE_VERIFIED`.
-
-The verified state requires:
-- all eight frozen challenger rows for every source forecast;
-- immutable receipt hashes that recompute exactly;
-- valid pre-kickoff chronology;
-- the frozen Props 2.1 baseline identity;
-- research-only / production-unauthorized flags;
-- no outcomes in prospective receipts;
-- no duplicate or incomplete challenger identities.
-
-The gate runs after successful live Props refreshes and on the main Thursday-Monday collection days. It must never manufacture or backfill receipts.
 
 ### Postgame chain is already implemented
 
@@ -193,8 +174,8 @@ The old listeners failed because they demanded `source_provenance.json`, `foreca
 1. Read this file and `research/props/v21/CURRENT_STATE_AND_NEXT_STEPS.md`.
 2. Verify Sunday Signal remains 15/15 healthy, but keep that lane monitoring-only unless it regresses.
 3. Do **not** run new Week 2 tuning or weight selection.
-4. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green, the Props 2.2 capture hook is still wired, and—once #504 is merged—the readiness state is `ARMED_AWAITING_FIRST_CAPTURE`.
-5. On the first future pregame live run, verify `challenger_outputs/props22/` is created and require the readiness gate to report `FIRST_CAPTURE_VERIFIED`.
+4. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green and the Props 2.2 capture hook is still wired.
+5. On the first future pregame live run, verify `challenger_outputs/props22/` is created with valid immutable receipts.
 6. Preserve forward personnel/opportunity and distribution evidence concurrently.
 7. After games finalize, verify the scheduled postgame workflow appends immutable grades and refreshes `research-data/props22-evaluation`; do not change grading/evaluation definitions mid-holdout.
 8. Do not select a Props 2.2 winner mid-holdout. Wait for the preregistered terminal evidence threshold.
