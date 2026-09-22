@@ -12,7 +12,6 @@ _SPEC.loader.exec_module(_FIREWALL)
 path_allowed = _FIREWALL.path_allowed
 research_scope_triggered = _FIREWALL.research_scope_triggered
 validate_changed_paths = _FIREWALL.validate_changed_paths
-validate_props_retirement_paths = _FIREWALL.validate_props_retirement_paths
 
 
 def test_research_allowlist_accepts_isolated_surfaces():
@@ -26,30 +25,11 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "src/nfl_forecast/player_impact_monitor.py",
         "src/nfl_forecast/availability_qualification.py",
         "src/nfl_forecast/availability_2025_reconstruction.py",
-        "src/nfl_forecast/props_player_state.py",
-        "src/nfl_forecast/props_player_sources.py",
-        "src/nfl_forecast/props_contextual_intelligence.py",
-        "src/nfl_forecast/props_efficiency_td.py",
-        "src/nfl_forecast/props_opportunity.py",
-        "src/nfl_forecast/props_opportunity_adapter.py",
-        "src/nfl_forecast/props_opportunity_handoff.py",
-        "src/nfl_forecast/props_market.py",
-        "src/nfl_forecast/props_market_odds_api.py",
-        "src/nfl_forecast/props_market_live.py",
-        "src/nfl_forecast/props_manifest.py",
-        "src/nfl_forecast/props_upstream.py",
-        "src/nfl_forecast/props_integration.py",
         "scripts/run_challenger_v09.py",
         "scripts/run_fst_reconstruction_probe.py",
         "scripts/verify_fst_reconstruction_evidence.py",
         "scripts/build_expected_lineup_impacts.py",
         "scripts/reconstruct_2025_availability.py",
-        "scripts/run_props_research_beta.py",
-        "scripts/run_levline_markets_live.py",
-        "scripts/build_props_market_snapshot.py",
-        "scripts/build_props_integration_manifest.py",
-        "scripts/build_props_upstream_snapshot.py",
-        "scripts/build_props21_challenger.py",
         "research/experiments.json",
         "research/fst/F-ST-01-FROZEN-2026.json",
         "research/player_impact/EXPECTED_LINEUP_CONTRACT.md",
@@ -64,38 +44,8 @@ def test_research_allowlist_accepts_isolated_surfaces():
         "tests/test_player_impact_monitor.py",
         "tests/test_availability_qualification.py",
         "tests/test_availability_2025_reconstruction.py",
-        "tests/test_props_player_state.py",
-        "tests/test_props_player_sources.py",
-        "tests/test_props_contextual_intelligence.py",
-        "tests/test_props_efficiency_td.py",
-        "tests/test_props_opportunity.py",
-        "tests/test_props_opportunity_adapter.py",
-        "tests/test_props_opportunity_handoff.py",
-        "tests/test_props_market.py",
-        "tests/test_props_market_odds_api.py",
-        "tests/test_props_market_live.py",
-        "tests/test_props_manifest.py",
-        "tests/test_props_upstream.py",
-        "tests/test_props_runner.py",
-        "tests/test_props_integration.py",
-        "tests/test_levline_markets_live.py",
-        "tests/test_props21_coordinator.py",
-        "tests/test_props21_market.py",
-        "tests/test_props21_personnel.py",
-        "tests/test_props21_qa.py",
-        "tests/test_props21_xtd.py",
-        "src/nfl_forecast/props21_market.py",
-        "src/nfl_forecast/props21_personnel.py",
-        "src/nfl_forecast/props21_qa.py",
-        "src/nfl_forecast/props21_xtd.py",
-        "site/src/Props21Challenger.jsx",
-        "site/src/props21-challenger.css",
-        "site/tests/props21-challenger.spec.js",
         ".github/workflows/research_firewall.yml",
         ".github/workflows/research_2025_availability_reconstruction.yml",
-        ".github/workflows/levline_markets_live.yml",
-        ".github/workflows/responsive.yml",
-        ".github/workflows/responsive.yml",
         "docs/LEVLINE_RESEARCH.md",
         "docs/IMPACT_MONITOR_GAP_ANALYSIS.md",
         "docs/FST_FREEZE_PROVENANCE.md",
@@ -180,43 +130,6 @@ def test_mixed_research_and_production_diff_fails_closed():
     ]
     assert research_scope_triggered(changed, "fix/fst-provenance")
     assert validate_changed_paths(changed) == ["src/nfl_forecast/pipeline.py"]
-
-
-def test_props_retirement_lane_allows_only_the_explicit_reset_surface():
-    allowed = [
-        ".github/workflows/dashboard.yml",
-        ".github/workflows/levline_markets_live.yml",
-        ".github/workflows/research_props22_postgame.yml",
-        "config/levline_markets_priors_v1.json",
-        "docs/ACTIVE_WORKSTREAM_HANDOFF.md",
-        "docs/props/PROPS_RESEARCH_ARCHIVE_2026-09.md",
-        "outputs/props/forecasts.json",
-        "challenger_outputs/props21/forecast_originals.jsonl",
-        "research/props/v22/PREREGISTRATION.md",
-        "scripts/build_props_publication.py",
-        "scripts/run_levline_markets_live.py",
-        "site/src/AppCoherent.jsx",
-        "site/src/PropsResearchBeta.jsx",
-        "src/nfl_forecast/props_market.py",
-        "src/nfl_forecast/challenger_props_simulation.py",
-        "tests/test_props_market.py",
-        "tests/test_challenger_props_simulation.py",
-        "tests/test_levline_markets_live.py",
-        "scripts/check_research_firewall.py",
-        "tests/test_research_firewall.py",
-    ]
-    assert validate_props_retirement_paths(allowed) == []
-
-
-def test_props_retirement_lane_still_blocks_winner_model_and_unrelated_production():
-    blocked = [
-        "src/nfl_forecast/fst_production.py",
-        "src/nfl_forecast/pipeline.py",
-        "scripts/run_week.py",
-        "outputs/this_week.csv",
-        "site/src/AppSignal.jsx",
-    ]
-    assert validate_props_retirement_paths(blocked) == sorted(blocked)
 
 
 def test_production_prediction_path_does_not_import_research_modules():
