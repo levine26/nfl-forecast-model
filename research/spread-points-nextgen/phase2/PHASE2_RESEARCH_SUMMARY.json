@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 2,
-  "status": "ANALYTICALLY_COMPLETE_PENDING_CI",
+  "status": "ANALYTICALLY_COMPLETE_PENDING_SYNC_AND_FINAL_CI",
   "production_changed": false,
   "user_required_external_source": "davidsasser.com",
   "initial_challengers": [
@@ -60,7 +60,11 @@
     "evaluation_preregistered": true,
     "final_historical_holdout": 2025,
     "data_gaps_documented": true,
-    "paid_data_escalation": false
+    "paid_data_escalation": false,
+    "bounded_search_space": true,
+    "deterministic_nested_selection": true,
+    "feature_source_pit_matrix": true,
+    "red_team_review": true
   },
   "external_evidence_highlights": [
     "Glickman & Stern 1998 dynamic NFL state-space scores",
@@ -71,5 +75,32 @@
     "nflWAR multilevel public-data player evaluation",
     "nfelo open-source dynamic/market-regression architecture",
     "davidsasser.com score-line-market product separation"
-  ]
+  ],
+  "red_team_closeout": {
+    "shortlist_retained": [
+      "A",
+      "B",
+      "C"
+    ],
+    "ensemble_D": "conditional_only",
+    "A0_initial_identity": true,
+    "A1_requires_new_preregistration": true,
+    "B0_independent_of_A0": true,
+    "C0_estimator": "ridge",
+    "C1_sensitivity": "GAM_or_skip",
+    "deterministic_outer_development_seasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "final_historical_holdout": 2025,
+    "completed_2026_selection_outcomes": 0,
+    "market_null_hierarchy": [
+      "M0_market_only",
+      "M1_line_calibration_only",
+      "M2_football_residual",
+      "M3_full_residual"
+    ],
+    "paid_data_escalation": false
+  }
 }
