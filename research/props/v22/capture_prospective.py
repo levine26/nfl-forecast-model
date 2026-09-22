@@ -9,6 +9,7 @@ identical; conflicting duplicates fail closed.
 """
 
 import argparse
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 from typing import Any, Iterable, Mapping
@@ -18,6 +19,21 @@ from research.props.v22.challengers import Props22Error, build_challenger_set, l
 
 class Props22CaptureError(RuntimeError):
     pass
+
+
+CAPTURE_NOT_BEFORE_UTC = datetime(2026, 9, 22, 2, 25, 8, tzinfo=timezone.utc)
+
+
+def _timestamp(value: Any) -> datetime | None:
+    if value in (None, ""):
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -70,6 +86,12 @@ def build_capture(
         if source.get("outcome") is not None:
             raise Props22CaptureError(
                 f"{forecast_id}: prospective capture refuses outcome-bearing source receipt"
+            )
+        forecast_time = _timestamp(source.get("forecast_timestamp_utc"))
+        if forecast_time is None or forecast_time < CAPTURE_NOT_BEFORE_UTC:
+            raise Props22CaptureError(
+                f"{forecast_id}: source forecast predates Props 2.2 prospective capture boundary "
+                f"{CAPTURE_NOT_BEFORE_UTC.isoformat()}"
             )
         model_version = str((source.get("provenance") or {}).get("challenger_model_version") or "")
         if model_version != baseline:
