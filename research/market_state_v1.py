@@ -292,6 +292,7 @@ def build_market_state(rows: Iterable[dict[str, Any]]) -> tuple[list[dict[str, A
         template = horizons[available[0]]
         record: dict[str, Any] = {
             "game_id": game_id,
+            "market_provider": template.get("market_provider"),
             "event_id": template.get("event_id"),
             "provider_commence_time_utc": template.get("provider_commence_time_utc"),
             "home_team": template.get("home_team"),
