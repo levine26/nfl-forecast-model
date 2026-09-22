@@ -1,0 +1,35 @@
+name: LevLine Props 2.2 prospective capture validation
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v22/capture_prospective.py'
+      - 'research/props/v22/test_capture_prospective.py'
+      - '.github/workflows/research_props22_capture.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate frozen transformations and immutable prospective capture
+        run: >-
+          python -m pytest -q
+          research/props/v22/test_preregistration.py
+          research/props/v22/test_challengers.py
+          research/props/v22/test_capture_prospective.py
+      - name: Enforce research firewall
+        run: |
+          git fetch origin main
+          python scripts/check_research_firewall.py --base origin/main --head-ref "${{ github.head_ref || github.ref_name }}"
