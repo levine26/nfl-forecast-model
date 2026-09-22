@@ -26,6 +26,8 @@ A1 explicit state-space expansion, player/QB/personnel overlays, and weather are
 
 ## Frozen chronology
 
+Historical training floor for A0/B0/C0: **2016 regular season**. Inner validation targets begin in **2019**.
+
 Development outer targets:
 
 - 2022 — prior seasons only;

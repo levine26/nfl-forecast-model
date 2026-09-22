@@ -64,14 +64,18 @@ For modern-feature families whose data begin in 2022:
 
 For Core/history-only structures with older coverage, earlier target seasons may be added to stabilize inner selection, but the modern 2022–2024 summary remains mandatory.
 
+### Frozen historical floor
+
+For the initial A0/B0/C0 references, eligible historical training begins with the **2016 regular season**. Inner validation target seasons begin with **2019**. This is a fixed design choice, not a tunable window: it keeps the initial program in the post-2015 scoring-rule environment while retaining multiple prior seasons for the first inner validation fold.
+
 ## Deterministic inner tuning
 
 Every hyperparameter, regularization strength, decay parameter and combination weight must be selected using data **strictly earlier than the outer test season**.
 
 For each outer target season `Y` in **2022, 2023, 2024**:
 
-1. determine the candidate's earliest season with complete required feature coverage;
-2. create expanding-window inner folds with validation season `V < Y` and training seasons strictly before `V`;
+1. restrict A0/B0/C0 eligible rows to seasons >= 2016;
+2. create expanding-window inner folds with validation season `2019 <= V < Y` and training seasons `2016..V-1` only;
 3. an inner fold is valid only when at least **two complete prior training seasons** exist;
 4. use the **latest four valid inner validation seasons**, or all valid seasons when fewer than three exist;
 5. if fewer than **two** valid inner validation seasons exist, do not tune from data; use the fixed candidate fallback in `BOUNDED_IMPLEMENTATION_SPEC.md`;

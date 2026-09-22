@@ -14,8 +14,8 @@ This table is the binding feasibility summary for the proposed feature families.
 | dynamic offense/defense state | derived from prior schedule/PBP | team + game order | state updated only after prior final game | sequential | initialize from league prior | multi-season | **A0 READY** |
 | drives / possession counts | nflverse PBP drive structure | game_id + drive + posteam | prior completed games only; drive extraction contract frozen before outputs | lagged prior-game state; exact transform frozen in B0 implementation contract | ambiguous drives fail closed / logged | multi-season, implementation contract required | **B0 READY WITH EXTRACTION TESTS** |
 | TD/FG/empty drive rates | nflverse PBP | game_id + drive + posteam | prior completed drives only | lagged / training-fold regularized | unknown outcome rows excluded with counts | multi-season | **B0 READY** |
-| red-zone rates | nflverse PBP | game_id + drive/play | prior completed games only | would be lagged | explicit | multi-season | **DEFERRED; NOT B0** |
-| explosive-play rates | nflverse PBP | game_id + team | prior completed games only; definition fixed before run | lagged prior-game state | explicit | multi-season | **CONTROLLED B SENSITIVITY** |
+| red-zone rates | nflverse PBP | game_id + drive/play | prior completed games only | would be lagged | explicit | multi-season | **B0 READY; SHRINKAGE-SMOOTHED** |
+| explosive-play rates | nflverse PBP | game_id + team | prior completed games only; definition fixed before run | lagged prior-game state | explicit | multi-season | **B0 READY / CONTROLLED INPUT** |
 | sacks | nflverse PBP | game_id + team | prior completed games only | lagged | explicit | multi-season | **DEFERRED AS STANDALONE B0 FEATURE** |
 | turnovers / takeaways | nflverse PBP | game_id + team | prior completed games only | lagged / regularized | explicit | multi-season | **CONTROLLED B INPUT** |
 | special teams / defensive scores | nflverse PBP | game_id + scoring event | prior completed games only | training-only empirical tail | explicit | multi-season but sparse | **TAIL ONLY / NO TEAM-SPECIFIC CLASSIFIER** |

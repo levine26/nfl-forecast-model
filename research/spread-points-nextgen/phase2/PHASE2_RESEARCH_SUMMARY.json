@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 2,
-  "status": "ANALYTICALLY_COMPLETE_HARDENED_PENDING_EXACT_HEAD_CI",
+  "status": "HARDENED_SYNCED_PENDING_EXACT_HEAD_CI",
   "production_changed": false,
   "user_required_external_source": "davidsasser.com",
   "initial_challengers": [
@@ -31,7 +31,7 @@
     {
       "id": "D",
       "name": "Nested Ensemble / Reconciliation",
-      "condition": "target-specific: abs residual correlation <=0.90; nested convex blend lowers pooled MAE; improvement same sign in >=2 of 3 development seasons; season+week bootstrap P(lower MAE) >=0.75"
+      "condition": "target-specific: residual abs correlation <=0.90; nested convex blend improves pooled target MAE vs best component; same-sign improvement in at least two of 2022/2023/2024; season+week block-bootstrap probability of lower MAE >=0.75"
     },
     {
       "name": "QB/personnel overlay",
@@ -154,7 +154,9 @@
       "M1_line_calibration_only",
       "M2_football_residual_information",
       "M3_full_C0"
-    ]
+    ],
+    "training_start_season": 2016,
+    "inner_target_start_season": 2019
   },
   "red_team": {
     "shortlist_changed": false,

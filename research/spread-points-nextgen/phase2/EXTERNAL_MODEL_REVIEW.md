@@ -280,7 +280,7 @@ The strongest external lesson is architectural restraint:
 
 ---
 
-## 8. Full external-system evidence matrix
+## 10. Full external-system evidence matrix
 
 | System | Prediction target | Architecture / team strength | Inputs | Market use | QB/player treatment | Scoring-process treatment | Calibration / uncertainty | Validation design | Prospective evidence visible? | Reproducibility | Transferable idea | Principal limitation |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -290,7 +290,7 @@ The strongest external lesson is architectural restraint:
 | Glickman/Stern family | NFL scores | latent time-varying team strength | historical NFL scores/context | none in base | player shocks absorbed into state movement | direct score model | state uncertainty | predictive historical study | no modern live archive | **method reproducible** | dynamic partial pooling | older era |
 | Baker/McHale family | exact NFL scores | score-event point process | prior-game team stats and/or market | optional spread/total inputs | indirect through team stats | **explicit scoring hazard/process** | full exact-score distribution | genuine OOS evaluation | historical paper only | **method reproducible** | discrete football scoring distribution | older data environment |
 
-## 9. Systems deliberately not promoted into the shortlist
+## 11. Systems deliberately not promoted into the shortlist
 
 Phase 2 located additional public repositories and hobby/technical NFL models. They were not added as design authorities merely because they use modern ML.
 
@@ -305,7 +305,7 @@ Common disqualifiers were:
 
 This is a deliberate negative finding. The review favors a small number of sources with either strong peer-reviewed methodology or unusually transparent reproducible architecture.
 
-## 10. External-review conclusion after red team
+## 12. External-review conclusion after red team
 
 The external review does **not** justify expanding beyond A0/B0/C0.
 
