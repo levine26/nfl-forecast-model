@@ -12,7 +12,7 @@ on:
       - 'research/test_adaptive_regime_shock_gate_v1.py'
       - 'research/adaptive_candidate2_*.py'
       - 'research/ADAPTIVE_WEEKLY_CANDIDATE2_*.md'
-      - 'research/adaptive_candidate2_*.json'
+      - 'research/adaptive_weekly_candidate_registry_v1.json'
       - '.github/workflows/research_adaptive_candidate2_v1.yml'
   workflow_dispatch:
 
@@ -26,45 +26,92 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 65
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
+
       - run: pip install '.[dev]'
 
-      - name: Run Candidate 2 unit tests
+      - name: Run Candidate 2 unit and reproduction tests
         run: |
-          PYTHONPATH="$PWD/src:$PWD" pytest -q             research/test_adaptive_regime_shock_gate_v1.py             research/test_adaptive_weekly_evaluation_v1.py
+          PYTHONPATH="$PWD/src:$PWD" pytest -q \
+            research/test_adaptive_regime_shock_gate_v1.py \
+            research/test_adaptive_weekly_evaluation_v1.py
 
-      - name: Run Candidate 2 historical construction
+      - name: Rebuild qualified 2025 T-120 depth state
         if: github.event_name != 'pull_request'
         run: |
           rm -rf research_outputs/adaptive_candidate2_ci
           mkdir -p research_outputs/adaptive_candidate2_ci
-          PYTHONPATH="$PWD/src:$PWD" python research/adaptive_regime_shock_gate_v1.py             --output-dir research_outputs/adaptive_candidate2_ci/candidate
+          PYTHONPATH="$PWD/src:$PWD" python research/run_depth_chart_state_v1.py \
+            --output-dir research_outputs/adaptive_candidate2_ci/depth
+          test -s research_outputs/adaptive_candidate2_ci/depth/team_game_depth_state.csv
+          test -s research_outputs/adaptive_candidate2_ci/depth/audit.json
+
+      - name: Rebuild qualified 2025 practice-state reconstruction
+        if: github.event_name != 'pull_request'
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" python scripts/reconstruct_2025_availability.py \
+            --output-dir research_outputs/adaptive_candidate2_ci/availability \
+            --require-qualified
+          test -s research_outputs/adaptive_candidate2_ci/availability/availability_2025_canonical.csv
+          test -s research_outputs/adaptive_candidate2_ci/availability/qualification.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path(
+              'research_outputs/adaptive_candidate2_ci/availability/qualification.json'
+          ).read_text())
+          assert result['qualified'] is True
+          assert result['completed_2026_outcomes_used'] == 0
+          assert result['known_by_t120_rate'] == 1.0
+          PY
+
+      - name: Run frozen Candidate 2 construction
+        if: github.event_name != 'pull_request'
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" python research/adaptive_regime_shock_gate_v1.py \
+            --depth-state research_outputs/adaptive_candidate2_ci/depth/team_game_depth_state.csv \
+            --availability research_outputs/adaptive_candidate2_ci/availability/availability_2025_canonical.csv \
+            --output-dir research_outputs/adaptive_candidate2_ci/candidate
+          test -s research_outputs/adaptive_candidate2_ci/candidate/scored_games.csv
+          test -s research_outputs/adaptive_candidate2_ci/candidate/model_audit.json
 
       - name: Run Candidate 2 evaluation if present
         if: github.event_name != 'pull_request'
         run: |
           if [ -f research/adaptive_candidate2_evaluation_v1.py ]; then
-            PYTHONPATH="$PWD/src:$PWD" python research/adaptive_candidate2_evaluation_v1.py               --input research_outputs/adaptive_candidate2_ci/candidate/scored_games.csv               --output-dir research_outputs/adaptive_candidate2_ci/evaluation
+            PYTHONPATH="$PWD/src:$PWD" python research/adaptive_candidate2_evaluation_v1.py \
+              --input research_outputs/adaptive_candidate2_ci/candidate/scored_games.csv \
+              --output-dir research_outputs/adaptive_candidate2_ci/evaluation
           fi
 
       - name: Run Candidate 2 adversarial audit if present
         if: github.event_name != 'pull_request'
         run: |
           if [ -f research/adaptive_candidate2_adversarial_v1.py ]; then
-            PYTHONPATH="$PWD/src:$PWD" python research/adaptive_candidate2_adversarial_v1.py               --input research_outputs/adaptive_candidate2_ci/candidate/scored_games.csv               --output-dir research_outputs/adaptive_candidate2_ci/adversarial
+            PYTHONPATH="$PWD/src:$PWD" python research/adaptive_candidate2_adversarial_v1.py \
+              --input research_outputs/adaptive_candidate2_ci/candidate/scored_games.csv \
+              --output-dir research_outputs/adaptive_candidate2_ci/adversarial
           fi
 
       - name: Prove production surfaces unchanged
         run: |
-          git diff --exit-code --             outputs/ site/             src/nfl_forecast/pipeline.py             src/nfl_forecast/models.py             src/nfl_forecast/features.py             src/nfl_forecast/data.py             src/nfl_forecast/publish.py             scripts/run_week.py
+          git diff --exit-code -- \
+            outputs/ site/ \
+            src/nfl_forecast/pipeline.py \
+            src/nfl_forecast/models.py \
+            src/nfl_forecast/features.py \
+            src/nfl_forecast/data.py \
+            src/nfl_forecast/publish.py \
+            scripts/run_week.py
 
       - name: Upload Candidate 2 evidence
         if: github.event_name != 'pull_request'
