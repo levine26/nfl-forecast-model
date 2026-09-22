@@ -84,7 +84,15 @@ def run(
     feature_cols = core_columns(games)
     feature_frame = games[["game_id", *feature_cols]].copy()
     feature_frame["core_feature_missing_count"] = feature_frame[feature_cols].isna().sum(axis=1)
-    merged = baseline.merge(feature_frame, on="game_id", how="left", validate="one_to_one")
+    # The baseline artifact already carries a selected set of Core form columns.
+    # Merge only the missingness count here so duplicate feature names do not get
+    # suffixed and accidentally hide the canonical baseline columns.
+    merged = baseline.merge(
+        feature_frame[["game_id", "core_feature_missing_count"]],
+        on="game_id",
+        how="left",
+        validate="one_to_one",
+    )
 
     report: dict = {
         "status": "research_only_descriptive",
@@ -174,17 +182,22 @@ def run(
         "max_missing_features": int(miss.max()) if miss.notna().any() else None,
         "buckets": dq_rows,
         "feature_missing_rates": {
-            col: float(pd.to_numeric(merged[col], errors="coerce").isna().mean())
+            col: float(pd.to_numeric(feature_frame[col], errors="coerce").isna().mean())
             for col in feature_cols
         },
     }
 
     # Schedule weather fields are observational metadata, not point-in-time forecast receipts.
     # They can diagnose association with errors but are not safe historical pregame features.
-    weather_cols = [c for c in ("game_id", "roof", "temp", "wind") if c in bundle.schedules.columns]
-    if len(weather_cols) > 1:
-        wx = bundle.schedules[weather_cols].drop_duplicates("game_id", keep="last")
-        wm = merged.merge(wx, on="game_id", how="left")
+    weather_cols = [c for c in ("roof", "temp", "wind") if c in bundle.schedules.columns]
+    if weather_cols:
+        # The baseline audit already carries roof when available. Add only
+        # weather fields not already present so diagnostics remain one-to-one.
+        extra_weather = [c for c in weather_cols if c not in merged.columns]
+        wm = merged.copy()
+        if extra_weather:
+            wx = bundle.schedules[["game_id", *extra_weather]].drop_duplicates("game_id", keep="last")
+            wm = wm.merge(wx, on="game_id", how="left", validate="one_to_one")
         report["weather"]["point_in_time_status"] = (
             "schedule-recorded observational metadata only; not equivalent to a forecast known at the decision horizon"
         )
