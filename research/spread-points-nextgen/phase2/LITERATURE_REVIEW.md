@@ -338,3 +338,62 @@ Sources:
 - https://otexts.com/fpp3/tscv.html
 
 **Phase 2 consequence:** no additional model family or broad window/feature search is authorized. Hyperparameters, preprocessing, residual-variance estimation, stacking and any conditional extension must remain inside prior-time folds.
+
+
+---
+
+## 11. Evidence-quality ledger and red-team additions
+
+The Phase 2 review uses the following explicit evidence classifications.
+
+| Source / idea | Evidence class | Direct NFL score relevance | Validation / chronology strength | Transferable conclusion | Limitation |
+|---|---|---:|---|---|---|
+| Glickman & Stern (1998), JASA | **peer reviewed** | high | predictive historical study; older era | time-varying latent team strength is statistically well motivated | 1988–1993 football/data environment |
+| Harville football rating work | **peer reviewed** | medium-high | classical predictive modeling | simple regularized team effects remain serious baselines | older era; not modern PBP |
+| Baker & McHale (2013), IJF | **peer reviewed** | **very high** | explicit out-of-sample exact-score evaluation | NFL scoring discreteness and score-process modeling deserve a bounded test | older features/market environment |
+| Cain, Law & Peel (2000), Journal of Forecasting | **peer reviewed** | high | market-efficiency study; score-distribution result | non-Gaussian/count-like score structure is plausible; market remains difficult to beat | older era; negative-binomial fit is not itself a modern challenger prescription |
+| Boulier / Stekler / Amundson market studies | **peer reviewed** | medium | historical OOS/efficiency tests | market must be treated as a strong baseline/prior | historical market microstructure differs from 2020s |
+| Gray & Gray (1997) and later Shank studies | **peer reviewed** | medium | some OOS strategy tests | apparent inefficiencies can be regime/subgroup dependent and may decay | not a license for LevLine subgroup mining |
+| Gneiting & Raftery (2007), JASA | **peer reviewed** | general methodology | strong | proper scores are required for predictive distributions | not football-specific |
+| Hyndman rolling-origin validation text | **strong technical/statistical reference** | general methodology | strong chronology guidance | train/tune only on earlier observations | textbook, not NFL-specific |
+| Brill et al. expected-points work (2024 preprint) | **strong technical research / preprint** | high process relevance | methodological critique; not Phase 2 peer-reviewed evidence | regularization, dependence and uncertainty matter; flexible ML can overfit football states | preprint status; not a pregame game-score model |
+| nflverse / Open Source Football opponent-adjustment work | **reproducible open source / technical** | high feature relevance | code/data inspectable | lagged opponent adjustment and multilevel shrinkage are implementable at $0 | technical posts, not peer-reviewed forecast superiority |
+| nfelo | **reproducible open source / practitioner** | high | architecture/code inspectable; data-source PIT varies | separate football base from market regression; market-aware models can collapse to market | not independent scientific validation |
+| davidsasser.com CFB board | **practitioner/product evidence; opaque methodology** | product-semantic relevance | public board timestamp and outputs visible; model internals/forecast archive not established | keep projected scores, model line and market comparison semantically separate | performance record is not reproducible scientific evidence |
+
+### Modern market-efficiency caution
+
+Later peer-reviewed NFL betting-market papers do report historical inefficiencies in selected regimes. Phase 2 does **not** convert those findings into LevLine rules. Their existence reinforces the need for:
+
+- fixed hypotheses before evaluation;
+- same-horizon lines;
+- paired OOS testing;
+- resistance to subgroup/threshold fishing;
+- willingness to conclude that a reported historical inefficiency has decayed.
+
+This is especially important because Phase 1 found that large LevLine-market disagreement was **worse**, not better, on continuous error.
+
+### Score-distribution implication
+
+Cain, Law & Peel's finding that NFL point scoring was well described by a negative-binomial framework is directionally consistent with Baker & McHale's broader point that NFL scores are not well represented by a featureless Gaussian story.
+
+Phase 2 therefore keeps:
+
+- A0's correlated-Gaussian residual distribution as a **reference**;
+- B0's discrete drive-scoring simulation as the structurally football-like challenger;
+- distributional scoring/coverage as a required evaluation layer.
+
+It does **not** add a third negative-binomial candidate simply because an older paper found a good marginal fit.
+
+## 12. Literature red-team conclusion
+
+After the deeper review, no additional initial challenger family is justified.
+
+The strongest correction to the earlier Phase 2 draft is methodological rather than architectural:
+
+- freeze A0/B0/C0;
+- defer A1/C1 instead of activating them from qualitative development diagnostics;
+- make inner tuning deterministic;
+- keep D behind an explicit complementarity/improvement gate.
+
+This reduces researcher degrees of freedom while preserving the three genuinely distinct scientific questions.
