@@ -17,6 +17,29 @@ The program can implement the initial three challengers without a new paid depen
 
 Therefore a paid source is **not necessary to begin Phase 3**.
 
+## 1A. Feature-family PIT feasibility matrix
+
+| Feature family | Source | Stable identity key | Pregame availability / publication rule | Missingness | Historical coverage | Initial Phase 3 status |
+|---|---|---|---|---|---|---|
+| dynamic offense/defense state | derived from nflverse PBP + schedule | `game_id`, team abbreviation / franchise mapping | only completed prior games; state updated after game completion | fail row/candidate build if core game/team identity is unresolved | multi-season | **core A/B** |
+| opponent-adjusted EPA / success | nflverse PBP | `game_id`, `posteam`, `defteam` | prior completed games only; adjustment fit only inside training chronology | no future/opponent backfill | multi-season | **core A/B** |
+| drives / possessions | nflverse PBP | `game_id`, drive id, possession team | prior completed games only | explicit malformed/missing drive handling | multi-season | **core B** |
+| red-zone rates | nflverse PBP | `game_id`, possession team, yardline/play | prior completed games only; fixed red-zone definition | explicit denominator=0 and missing play state | multi-season | **bounded B input** |
+| explosive-play rates | nflverse PBP | `game_id`, offense/defense team, play id | prior completed games only; threshold fixed before results | explicit no-qualified-play state | multi-season | **bounded B input** |
+| sacks / turnovers | nflverse PBP | `game_id`, team, play id | prior completed games only | explicit event/denominator handling | multi-season | **bounded B input** |
+| FG / special-teams scoring | nflverse PBP | `game_id`, team, play id | prior completed games only | rare-event pooling; no hindsight roster attribution | multi-season | **bounded B / tail** |
+| home/rest | nflverse schedule | `game_id`, team, game date | deterministic from schedule known before kickoff | fail if date/team identity missing | multi-season | **core A/B/C** |
+| static venue/roof | nflverse schedule + qualified venue map | `game_id`, venue/stadium identity | venue for that game must be resolved independently of outcome | unknown, never guessed | broad schedule; exact mapping variable | **optional static sensitivity** |
+| QB starter / replacement | timestamped depth/expected-lineup evidence + stable player IDs | GSIS/player id + `game_id` + snapshot time | expected starter must be timestamped <= simulated horizon | unknown != same starter | no unified fixed-horizon 2022–2025 history | **blocked/conditional** |
+| injury / availability | qualified practice/injury snapshots | GSIS/player id + team/week + report timestamp | report version must be known <= horizon | missing != healthy | qualified 2025 slice; prospective 2026+ | **blocked core; sensitivity only** |
+| OL continuity / personnel | depth charts + availability + roster identity | player ids + lineup snapshot time | expected role/lineup timestamp <= horizon | unresolved role explicit | incomplete multi-season PIT | **blocked/conditional** |
+| advanced player/charting | nflverse NGS / FTN / PFR advanced | player/team/week identifiers | prior completed game plus source-publication lag before forecast | structural missingness flag required | source-dependent | **not initial; later ablation only** |
+| weather | NWS / archived Open-Meteo + exact venue | `game_id` + venue coordinates + forecast issue/update timestamp | forecast issue/update available <= simulated horizon | missing forecast != benign weather | historical PIT incomplete; prospective collector exists | **blocked** |
+| historical market | nflverse schedule fields | `game_id` | exact historical horizon/book opaque | paired rows only; never impute line | multi-season | **C closing/late benchmark only** |
+| prospective market | timestamped multi-book collector | `game_id` + book/source + fetched/update timestamp | latest valid snapshot <= declared horizon | failed collector != no move | current collector issue; no usable ledger at Phase 1 audit | **blocked for T-120 claims** |
+
+The key distinction is **source qualification versus feature authorization**. A source can be technically accessible yet remain inadmissible for a fixed-horizon historical experiment.
+
 ---
 
 ## 2. Market data gap
