@@ -204,15 +204,11 @@ Phase 1 showed larger current LevLine-market disagreement has worse continuous m
 
 **Class:** conditional combination policy, not an initial standalone model
 
-Challenger D becomes eligible only if at least two of A/B/C show:
-
-- non-redundant OOS residuals;
-- meaningful complementary information;
-- stable improvement in distinct metrics or regimes.
+Challenger D becomes eligible only under the exact numeric development gate frozen in `EVALUATION_HOLDOUT_PROTOCOL.md`.
 
 Any combination weights must be produced from **nested OOF predictions only**.
 
-No full-block weight fitting is permitted.
+No full-block weight fitting is permitted, and no alternate stacker is tried if the gate fails.
 
 If complementarity is weak, no ensemble is built.
 
