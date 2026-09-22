@@ -137,3 +137,12 @@ def test_live_workflow_transports_frozen_depth_chart_personnel_snapshot():
     assert '--depth-charts "$DEPTH_CHARTS"' in workflow
     assert 'DEPTH_CHARTS_SHA=$(sha256sum "$DEPTH_CHARTS"' in workflow
     assert 'depth_charts_sha256:$depth_charts_sha256' in workflow
+
+
+def test_live_workflow_allows_clean_postkickoff_noop():
+    workflow = (ROOT / ".github" / "workflows" / "levline_markets_live.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "--allow-empty-postkickoff" in workflow
+    assert "postkickoff_noop.json" in workflow
+    assert "Props live refresh no-op: target week has no pregame games remaining." in workflow
