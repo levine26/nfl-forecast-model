@@ -243,3 +243,19 @@ def test_postkickoff_recording_cannot_become_eligible() -> None:
     assert bool(row["eligible"]) is False
     assert "decision_recorded_postkickoff" in row["ineligibility_reasons"]
     assert bool(row["candidate_switch"]) is False
+
+
+def test_incumbent_locked_after_t60_is_ineligible() -> None:
+    production = _production()
+    production.loc[0, "lock_timestamp_utc"] = "2026-09-27T16:01:00Z"
+    production.loc[0, "minutes_to_kickoff_at_lock"] = 59.0
+    out = build_candidate4_decisions(
+        production,
+        _market(),
+        _qb(direction=1),
+        generated_at_utc="2026-09-27T16:05:00Z",
+    )
+    row = out.iloc[0]
+    assert bool(row["eligible"]) is False
+    assert "incumbent_lock_after_t60" in row["ineligibility_reasons"]
+    assert bool(row["candidate_switch"]) is False
