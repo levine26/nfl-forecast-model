@@ -69,8 +69,15 @@ jobs:
         id: source
         run: |
           set -euo pipefail
-          RECEIPTS=challenger_outputs/props22/forecast_originals.jsonl
-          if [ -s "$RECEIPTS" ]; then
+          RECEIPTS=challenger_outputs/props22/forecast_originals
+          HAS_RECEIPTS=false
+          if [ -f "$RECEIPTS" ] && [ -s "$RECEIPTS" ]; then
+            HAS_RECEIPTS=true
+          elif [ -d "$RECEIPTS" ] && \
+               find "$RECEIPTS" -maxdepth 1 -type f -name 'part-*.jsonl' -size +0c -print -quit | grep -q .; then
+            HAS_RECEIPTS=true
+          fi
+          if [ "$HAS_RECEIPTS" = true ]; then
             echo "has_receipts=true" >> "$GITHUB_OUTPUT"
             echo "receipts=$RECEIPTS" >> "$GITHUB_OUTPUT"
           else
