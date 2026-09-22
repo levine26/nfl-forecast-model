@@ -2,18 +2,29 @@
   "receipt_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE2-FINAL-V1",
   "candidate_id": "ADAPTIVE-REGIME-SHOCK-GATE-V1",
   "status": "COMPLETE_HISTORICAL_EVALUATION_INCONCLUSIVE",
+  "completed_date": "2026-09-22",
+  "scientific_disposition": "INCONCLUSIVE",
   "preregistration": {
     "main_commit_sha": "fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da",
     "synchronized_candidate2_base_sha": "99b255aae7fc36ad367561f613e3fcb3752ef528",
     "target_results_seen_before_preregistration": false
   },
   "validated_execution": {
-    "candidate_code_sha": "f4a5ea26bc999819d4c79179c20b8f33fd77401f",
-    "workflow_run_id": 35747145825,
-    "artifact_id": 10703836596,
-    "artifact_sha256": "9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5",
-    "evidence_attribution_correction_sha": "08585db62617523628e8c7951c336eedbc6b1efe",
-    "unit_tests_passed": true,
+    "canonical_execution_sha": "3d47141ed8584e989702d1982e4e1dc60d8248a2",
+    "model_blob_sha": "3a68a612d0239e2da5f48dcb088fcca9c39af74b",
+    "evaluation_blob_sha": "8e94f13e5ac0409a5a5237833a5ad7c2975a9a8e",
+    "adversarial_blob_sha": "b4e2388768aaf62fd12a1bdffb25b0701cc4a604",
+    "workflow_run_id": 35749549009,
+    "artifact_id": 10705320611,
+    "artifact_sha256": "fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771",
+    "earlier_pre_hardening_execution_superseded": {
+      "execution_sha": "f4a5ea26bc999819d4c79179c20b8f33fd77401f",
+      "workflow_run_id": 35747145825,
+      "artifact_id": 10703836596
+    },
+    "unit_and_reproduction_tests_passed": true,
+    "qualified_depth_rebuild_passed": true,
+    "qualified_practice_rebuild_passed": true,
     "construction_passed": true,
     "paired_evaluation_passed": true,
     "adversarial_validation_passed": true,
@@ -35,8 +46,8 @@
     "games": 1087,
     "correct": 741,
     "accuracy": 0.6816927322907084,
-    "brier": 0.21065334840485694,
-    "log_loss": 0.6087126266444343,
+    "brier": 0.2106533,
+    "log_loss": 0.6087126,
     "note": "Context only. Candidate 2 causal comparison is the identical 2025 272-game sample."
   },
   "same_sample_results": {
@@ -58,12 +69,15 @@
       "disagreement_rate": 0.003676470588235294,
       "candidate_only_correct": 1,
       "fst_only_correct": 0,
+      "net_correct": 1,
       "switch_win_rate": 1,
       "mcnemar_exact_two_sided_p": 1,
+      "paired_error_loss_p": 0.317311,
       "week_block_accuracy_delta_95_ci": [
         0,
         0.011278195488721887
       ],
+      "week_block_accuracy_probability_better": 0.6521,
       "week_block_brier_delta_95_ci": [
         -0.0005329582726782689,
         0
@@ -116,52 +130,79 @@
   },
   "switch_mechanism": {
     "authorized_switch_game_id": "2025_12_ATL_NO",
-    "reason": "away_team_qb1_change",
+    "week": 12,
+    "away_team": "ATL",
+    "home_team": "NO",
+    "reason": "qb_change",
     "fst_home_probability": 0.509392,
     "component_home_probability": 0.460679,
+    "candidate_home_probability": 0.460679,
     "actual_home_win": 0,
     "switch_helped": true,
     "qb_change_channel_required_for_gain": true,
-    "ol_churn_channel_generated_primary_switches": false,
-    "qb_practice_channel_generated_primary_switches": false
+    "ol_churn_contributed": false,
+    "qb_practice_contributed": false
   },
   "coverage": {
     "both_team_depth_state_games": 272,
     "qb_change_evaluable_games": 256,
     "ol_change_evaluable_games": 256,
-    "qb_practice_join_games": 126,
+    "qualified_qb_practice_join_games": 127,
     "strong_shock_games": 51,
-    "boundary_component_disagreement_games": 4,
+    "boundary_games": 50,
+    "component_disagreement_games": 4,
     "authorized_switches": 1,
+    "rows_preserved_with_no_strong_shock": 221,
+    "depth_team_games": 544,
+    "depth_team_game_coverage": 1,
     "future_snapshot_violations": 0,
-    "ambiguous_qb_practice_joins": 0
+    "depth_postgame_snaps_used": 0,
+    "nflverse_practice_rows": 6068,
+    "independent_nfl_crosscheck_rows": 6068,
+    "identity_match_rate": 0.999340804218853,
+    "fully_qualified_practice_state_rate": 0.999340804218853,
+    "practice_status_agreement_rate": 1,
+    "known_by_t120_rate": 1,
+    "unresolved_player_week_rows": 4,
+    "actual_snaps_used": 0,
+    "postgame_participation_used": 0,
+    "completed_2026_outcomes_used": 0
   },
   "adversarial_validation": {
     "preregistered_grid_configurations": 18,
+    "positive_grid_cells": 12,
+    "neutral_grid_cells": 6,
+    "negative_grid_cells": 0,
     "positive_accuracy_fraction": 0.6666666666666666,
     "nonnegative_accuracy_fraction": 1,
     "best_accuracy_delta_pp": 0.3676470588235281,
     "worst_accuracy_delta_pp": 0,
     "primary_rank_by_accuracy_delta": 1,
-    "max_single_week_positive_gain_share": 1,
+    "lowering_ol_threshold_to_1_erased_gain": true,
     "remove_qb_change_delta_pp": 0,
     "qb_change_only_delta_pp": 0.3676470588235281,
-    "leave_out_week_12_delta_pp": 0,
+    "remove_ol_churn_changed_gain": false,
+    "remove_qb_practice_changed_gain": false,
+    "max_single_week_positive_gain_share": 1,
+    "weeks_with_nonpositive_delta_after_removal": 1,
+    "teams_with_nonpositive_delta_after_removal": 2,
     "threshold_fragility_flag": true,
     "one_season_regime_feature_limit": true,
-    "season_stability_estimable": false
+    "season_stability_estimable": false,
+    "historical_market_path_testable": false
   },
   "scientific_answers": {
     "exact_information_producing_gain": "T-120 QB1 identity change as an orthogonal regime-shock gate, with direction supplied by the frozen component-resolved challenger on a near-boundary F-ST disagreement.",
     "how_often_disagrees": "1 of 272 games (0.3676%).",
     "switch_correctness": "1 of 1 (100%), statistically uninformative.",
-    "season_stability": "Not estimable; qualified regime features support only 2025.",
-    "probability_quality": "Both Brier and log loss improved slightly on the exact paired sample.",
-    "statistical_distinguishability": "No. McNemar p=1.0; week-block accuracy interval includes zero.",
-    "football_coherence": "Yes at the mechanism level because QB state is a high-leverage structural change, but empirical evidence is only one event.",
-    "reproducibility": "Yes for the recorded workflow/artifact/code SHA.",
-    "prospective_shadow_suitability": "Not authorized by V1 evidence because the entire gain is one-switch/one-week/QB-channel concentrated.",
-    "revised_long_run_accuracy_estimate": "Central estimate approximately 68.3%; defensible near-term range approximately 68.2%-68.4% for currently evidenced adaptive mechanisms. A 68.8%-69% central estimate is no longer supported by the completed Candidate 1 and Candidate 2 evidence."
+    "season_stability": "Not estimable; qualified equivalent regime features support only 2025.",
+    "probability_quality": "Brier improved by 0.0001737 and log loss by 0.0003480 on the exact paired sample; week-block intervals reach zero.",
+    "statistical_distinguishability": "No. McNemar p=1.0; paired week-block error-loss p=0.3173; accuracy bootstrap interval includes zero.",
+    "football_coherence": "Yes at the mechanism level because QB state is a high-leverage structural change, but empirical evidence is one event.",
+    "historical_computation_reproducible": true,
+    "long_run_gain_reproducible": false,
+    "prospective_shadow_suitability": "Not authorized by V1 evidence because the entire gain is one-switch/one-week/QB-channel concentrated and the adversarial audit flags threshold fragility.",
+    "revised_long_run_accuracy_estimate": "Central estimate approximately 68.3%; defensible near-term research range approximately 68.2%-68.4% for currently evidenced adaptive mechanisms. This is a governance research judgment, not a formal confidence interval."
   },
   "disposition": "INCONCLUSIVE",
   "prospective": {
@@ -172,8 +213,10 @@
   },
   "governance": {
     "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "target_outcomes_used_to_change_v1_parameters": 0,
     "production_changed": false,
     "production_merge_authorized": false,
-    "candidate3_started": false
+    "candidate3_started": false,
+    "awaiting_user_direction": true
   }
 }
