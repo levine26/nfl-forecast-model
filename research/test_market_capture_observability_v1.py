@@ -6,11 +6,12 @@ from research.market_capture_observability_v1 import run_observed_capture
 
 
 def test_missing_api_key_is_persisted_without_key_value(tmp_path, monkeypatch) -> None:
+    monkeypatch.delenv("PROPLINE_API_KEY", raising=False)
     monkeypatch.delenv("THE_ODDS_API_KEY", raising=False)
     path = tmp_path / "status.json"
 
     def fake_capture(**kwargs):
-        return {"status": "skipped", "reason": "missing_api_key", "external_request_made": False}
+        return {"status": "skipped", "reason": "missing_market_api_key", "external_request_made": False}
 
     receipt, code = run_observed_capture(
         status_path=str(path), quota_reserve=50, capture_fn=fake_capture
@@ -18,7 +19,7 @@ def test_missing_api_key_is_persisted_without_key_value(tmp_path, monkeypatch) -
     persisted = json.loads(path.read_text(encoding="utf-8"))
     assert code == 2
     assert receipt == persisted
-    assert persisted["reason"] == "missing_api_key"
+    assert persisted["reason"] == "missing_market_api_key"
     assert persisted["api_key_configured"] is False
     assert persisted["api_key_value_recorded"] is False
     assert persisted["production_authorized"] is False
@@ -89,3 +90,42 @@ def test_quota_skip_is_observable_but_not_a_failure(tmp_path, monkeypatch) -> No
     assert code == 0
     assert receipt["reason"] == "free_quota_reserve_reached"
     assert receipt["api_key_configured"] is True
+
+
+
+def test_propline_key_alone_is_recorded_only_as_configured_source(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("PROPLINE_API_KEY", "prop-secret-value")
+    monkeypatch.delenv("THE_ODDS_API_KEY", raising=False)
+    path = tmp_path / "status.json"
+
+    def fake_capture(**kwargs):
+        return {"status": "captured", "market_provider": "propline", "external_request_made": True}
+
+    receipt, code = run_observed_capture(
+        status_path=str(path), quota_reserve=50, capture_fn=fake_capture
+    )
+    text = path.read_text(encoding="utf-8")
+    assert code == 0
+    assert receipt["configured_market_sources"] == ["propline"]
+    assert receipt["api_key_configured"] is True
+    assert "prop-secret-value" not in text
+
+
+def test_exception_redacts_configured_secret_values(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("PROPLINE_API_KEY", "prop-secret-value")
+    monkeypatch.setenv("THE_ODDS_API_KEY", "odds-secret-value")
+    path = tmp_path / "status.json"
+
+    def fake_capture(**kwargs):
+        raise RuntimeError(
+            "bad header prop-secret-value and URL ?apiKey=odds-secret-value"
+        )
+
+    receipt, code = run_observed_capture(
+        status_path=str(path), quota_reserve=50, capture_fn=fake_capture
+    )
+    text = path.read_text(encoding="utf-8")
+    assert code == 1
+    assert "[REDACTED]" in receipt["error"]
+    assert "prop-secret-value" not in text
+    assert "odds-secret-value" not in text
