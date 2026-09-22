@@ -71,7 +71,15 @@ def _direction_points_to_market(direction: float, market_home: bool) -> bool:
 
 
 def _content_hash(record: dict[str, Any]) -> str:
-    payload = json.dumps(record, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    # generated_at_utc is operational metadata, not part of the scientific decision.
+    # This makes an exact replay idempotent while any source/gate/probability change
+    # still changes the immutable decision digest.
+    basis = {
+        key: value
+        for key, value in record.items()
+        if key not in {"generated_at_utc", "decision_sha256"}
+    }
+    payload = json.dumps(basis, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
