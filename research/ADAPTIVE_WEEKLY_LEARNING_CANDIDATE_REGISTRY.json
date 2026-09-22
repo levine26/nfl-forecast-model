@@ -84,7 +84,10 @@
       "earliest_required_market_evidence": "2026-09-27T15:00:00Z (T-120)",
       "candidate4_retry_close_books": 5,
       "legacy_levline4_market_qualification_books": 2,
-      "shared_legacy_contract_rewritten": false
+      "shared_legacy_contract_rewritten": false,
+      "qb1_t120_capture_mode": "immutable_one_sided_T120_snapshot",
+      "qb1_t60_live_depth_requery": false,
+      "qb1_snapshot_missingness_policy": "fail_closed_no_later_repair"
     }
   ],
   "controls": [
