@@ -84,3 +84,56 @@ If the shock gate does not improve switch quality, or if any gain is driven by o
 ## Scientific boundary
 
 Even a positive 2025 point estimate is not multi-season confirmation. Qualified regime features exist for one historical target season, so a positive result can at most justify **prospective shadow consideration**, never production promotion.
+
+## Addendum — David Sasser GitHub audit
+
+The public GitHub account linked from David Sasser's site was inspected directly.
+
+Relevant repositories found:
+
+- `davidsasser/BettingModel`
+- `davidsasser/NFLTotalModel`
+
+### `BettingModel`
+
+The public NFL line scraper is old and should not be treated as the implementation behind the current 2026 college-football board. It is nevertheless informative about Sasser's market-data workflow.
+
+The code:
+
+- pulls NFL moneyline, spread and totals;
+- timestamps the collection;
+- preserves individual sportsbook observations rather than only one consensus number;
+- explicitly parses Pinnacle, 5Dimes, Heritage, Bovada and BetOnline;
+- stores book-specific prices/lines in separate fields.
+
+This is directly relevant to LevLine's existing strict-PIT multi-book architecture: professional modeling practice here treats market identity, line type, book identity and observation time as separate data, which is stronger evidence for **preserving market microstructure** than the public website alone.
+
+It does **not** establish:
+- a current Sasser model architecture;
+- a Bayesian/change-point updater;
+- injury or QB weighting;
+- weekly model retraining;
+- historical efficacy of following or fading line movement.
+
+Therefore no Candidate 2 V1 threshold or feature is changed from this audit.
+
+### `NFLTotalModel`
+
+The public README describes a historical-game training approach for NFL totals and an intended holdout test after Week 6. The repository is incomplete and does not provide evidence of a finished adaptive weekly winner model.
+
+### Current Sasser CFB board versus public GitHub
+
+The current `davidsasser.com/cfb` board displays model projected score, opening line and current line. The public repositories inspected do not expose a clearly corresponding 2026 CFB model implementation. The current site therefore remains useful as evidence of model-versus-market workflow, while the older `BettingModel` repository provides concrete code evidence that Sasser has historically preserved book-specific market observations and timestamps.
+
+### Candidate 2 implication
+
+This strengthens the **future prospective market-shock lane**, especially:
+- opener/current delta;
+- exact quote timestamp;
+- per-book movement;
+- movement breadth;
+- dispersion;
+- stale-versus-fresh book state.
+
+It does not alter `ADAPTIVE-REGIME-SHOCK-GATE-V1`, because the preregistered Candidate 2 historical V1 lacks an equivalent strict-PIT 2025 multi-book path and is already frozen.
+
