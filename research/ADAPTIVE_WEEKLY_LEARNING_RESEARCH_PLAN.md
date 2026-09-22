@@ -714,6 +714,10 @@ Canonical validated execution SHA: `3d47141ed8584e989702d1982e4e1dc60d8248a2`
 Canonical workflow run: `35749549009`  
 Canonical evidence artifact: `10705320611`  
 Artifact SHA256: `fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771`  
+Frozen config SHA256: `957dc2443685f1a90d8632ee1f6b7af78834d1e039ded9ee7432690237a96437`  
+Feature contract: Candidate 2 Pre-Registration §§20.2–20.7  
+Prospective start week: `null` (not authorized)  
+Prediction-lock rules assigned: `false`  
 Final receipt: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_RECEIPT.json`  
 Final finding: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_FINDING.md`
 
