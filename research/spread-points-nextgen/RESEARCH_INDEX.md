@@ -198,7 +198,7 @@ Additional Phase 1 control/evidence:
 
 External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
-### Phase 2 — closeout candidate / exact-head CI pending
+### Phase 2 — COMPLETE
 
 - literature review — `research/spread-points-nextgen/phase2/LITERATURE_REVIEW.md`
 - external-model review — `research/spread-points-nextgen/phase2/EXTERNAL_MODEL_REVIEW.md`
@@ -219,6 +219,18 @@ External comparator explicitly carried into Phase 2: **davidsasser.com**.
 - normalized external-system audit and required four-way Sasser classification are recorded in `phase2/EXTERNAL_MODEL_REVIEW.md`
 
 External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research. Final Sasser search found useful score/line/market product separation but no reproducible current methodology/archive sufficient for scientific validation.
+
+Final Phase 2 completion receipt:
+
+- final pre-merge head — `076dc9d6f6c052eec4744a155070c42c1b99ae82`
+- synchronized pre-merge `main` — `e93127963c76cd309cdddf17d91291c04a60a659`
+- exact-head research firewall — run `35751402751` **SUCCESS**
+- exact-head full research validation — run `35751402726` **SUCCESS**
+- PR #520 — **MERGED**
+- merge SHA — `405906942013252c158244c9b033a3240baa37f8`
+- merged artifacts verified from `main`
+- production changed — **NO**
+- Phase 3 — **NOT STARTED**
 
 Compatibility sync #521 preserved concurrent adaptive-weekly-learning state; #528 preserved Sunday Signal contextual outputs; later syncs preserved adaptive Candidate 2 closeout/T-120 shadow state; #536 preserved the generated market/status refresh through `3e859968a40b8250f85ed211e8b1e7593ea1bf47`. These are provenance-only repository syncs and were not used to select or redefine Spread & Points challengers.
 
