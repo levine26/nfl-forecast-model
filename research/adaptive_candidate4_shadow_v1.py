@@ -27,6 +27,7 @@ PREREGISTRATION_SHA = "74ecd303545c09f57593546472d27438e3d8a204"
 FST_ARTIFACT_ID = "F-ST-01-FROZEN-2026"
 MIN_COMMON_BOOKS = 5
 BREADTH_THRESHOLD = 0.50
+MAX_BOOK_FRESHNESS_MINUTES = 30.0
 DECISION_HORIZON_MINUTES = 60
 INCUMBENT_WINDOW_MINUTES = 120
 
@@ -68,6 +69,30 @@ def _pick(home_team: str, away_team: str, home_probability: float) -> str:
 
 def _direction_points_to_market(direction: float, market_home: bool) -> bool:
     return direction > 0 if market_home else direction < 0
+
+
+def _qualified_book_at_request(
+    row: dict[str, Any],
+    *,
+    request: datetime,
+    provider: str | None,
+) -> bool:
+    if provider and str(row.get("market_provider") or "") != provider:
+        return False
+    home_ml = _float(row.get("home_moneyline"))
+    away_ml = _float(row.get("away_moneyline"))
+    probability = _float(row.get("h2h_home_no_vig"))
+    freshness = _float(row.get("freshness_minutes"))
+    last_update = _utc(row.get("sportsbook_last_update_utc"))
+    if home_ml in {None, 0.0} or away_ml in {None, 0.0}:
+        return False
+    if probability is None or not 0.0 < probability < 1.0:
+        return False
+    if freshness is None or not 0.0 <= freshness <= MAX_BOOK_FRESHNESS_MINUTES:
+        return False
+    if last_update is None or last_update > request:
+        return False
+    return True
 
 
 def _content_hash(record: dict[str, Any]) -> str:
@@ -254,6 +279,7 @@ def build_candidate4_decisions(
         d = None
         breadth = None
         common_books: list[str] = []
+        qualified_common_books: list[str] = []
         provider = None
         t120_request = None
         t60_request = None
@@ -287,6 +313,20 @@ def build_candidate4_decisions(
                 reasons.append("invalid_t60_timing")
             if t120_request is not None and t60_request is not None and t120_request >= t60_request:
                 reasons.append("market_horizon_order_invalid")
+
+            if t120_request is not None and t60_request is not None and provider:
+                for book in common_books:
+                    left = books.get("T-120m", {}).get(book)
+                    right = books.get("T-60m", {}).get(book)
+                    if left is None or right is None:
+                        continue
+                    if (
+                        _qualified_book_at_request(left, request=t120_request, provider=provider)
+                        and _qualified_book_at_request(right, request=t60_request, provider=provider)
+                    ):
+                        qualified_common_books.append(book)
+            if len(qualified_common_books) < MIN_COMMON_BOOKS:
+                reasons.append("market_source_quality_gate_failed")
 
         qb_row = qb_by_game.get(game_id)
         qb_complete, qb_direction, qb_reasons = _qb_complete_for_decision(
@@ -351,6 +391,9 @@ def build_candidate4_decisions(
             "market_path_breadth": breadth,
             "common_sportsbook_count": len(common_books),
             "common_sportsbooks": "|".join(common_books),
+            "qualified_common_sportsbook_count": len(qualified_common_books),
+            "qualified_common_sportsbooks": "|".join(qualified_common_books),
+            "market_source_qualified": len(qualified_common_books) >= MIN_COMMON_BOOKS,
             "qb_state_complete": qb_complete,
             "qb_shock_direction": qb_direction,
             "qb_shock_known_by_utc": str((qb_row or {}).get("qb_shock_known_by_utc") or "") or None,
