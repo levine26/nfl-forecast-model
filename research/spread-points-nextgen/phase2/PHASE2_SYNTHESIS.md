@@ -1,6 +1,6 @@
 # Phase 2 Synthesis — Deep External Research & Challenger Design
 
-**Status:** analytically complete; pending exact-head CI/firewall verification  
+**Status:** analytically complete after red-team hardening; pending current-main synchronization and exact-head CI/firewall verification  
 **Production change:** none  
 **Primary branch:** `research/spread-points-nextgen-phase2`  
 **Draft PR:** #520
@@ -16,6 +16,24 @@ The external evidence supports three ideas strongly enough to implement:
 3. market-residual prediction around a strong sportsbook prior.
 
 Everything else is conditional.
+
+## Red-team hardening result
+
+The hostile methodology review did **not** invalidate A/B/C, but it did identify excess discretion in the earlier implementation wording.
+
+Phase 2 therefore tightened the design before any Phase 3 result exists:
+
+- initial implementation is **A0 + B0 + C0 only**;
+- explicit state-space A1 and nonlinear residual C1 are deferred rather than activated from qualitative development diagnostics;
+- lagged process summaries use a fixed 8-team-game EWMA;
+- training begins at 2016;
+- outer development targets are exactly 2022, 2023 and 2024;
+- inner tuning targets begin in 2019 and are strictly prior-time;
+- candidate-specific tuning objectives and tie-breaks are frozen;
+- A0/B0/C0 reference identities receive one Phase 4 2025 score if implementation/PIT-valid even when development is negative;
+- D has an explicit numeric eligibility gate and is not forced.
+
+This reduces researcher degrees of freedom and prevents Phase 3 from becoming a rescue search.
 
 ---
 
@@ -206,14 +224,15 @@ ATS/O-U remains secondary and cannot select a model.
 
 To avoid branch/model sprawl:
 
-1. implement shared chronology/data/evaluation scaffolding;
-2. implement Challenger A simple reference;
-3. implement Challenger B bounded drive model;
-4. implement Challenger C simple residual reference;
-5. run only development-period OOS evaluation through 2024;
-6. freeze surviving candidate identities;
-7. do not score the 2025 holdout until Phase 4;
-8. build D only if residual complementarity is demonstrated.
+1. implement shared chronology/data/evaluation scaffolding using the frozen 2016 training floor and deterministic nested folds;
+2. implement **A0** only;
+3. implement **B0** only;
+4. implement **C0** only, including the four mandatory market-null comparisons;
+5. run only 2022–2024 development OOS evaluation;
+6. freeze A0/B0/C0 candidate identities and preserve negative outputs;
+7. evaluate D eligibility using the exact numeric development gate; build it only if every gate is satisfied;
+8. do not score any 2025 challenger output until Phase 4;
+9. leave A1/C1/player/weather extensions unimplemented absent a new pre-result preregistration.
 
 ---
 
@@ -234,7 +253,9 @@ To avoid branch/model sprawl:
 | deliberately limited shortlist | A/B/C; D conditional |
 | davidsasser.com included | external review + literature/external inventory |
 
-Once exact-head PR checks pass, Phase 2 can be marked **COMPLETE** and Phase 3 can begin in a later substantive chat.
+Before Phase 2 can be marked **COMPLETE**, the branch must first be synchronized to the then-current `main`, fresh exact-head firewall and full research-validation checks must pass, PR #520 must be reviewable and merged, merged artifacts must be re-read from `main`, and the control files must record the exact Phase 3 start state.
+
+Phase 3 remains **NOT STARTED** in this chat.
 
 ## Red-team closeout findings
 
