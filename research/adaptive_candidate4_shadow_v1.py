@@ -183,7 +183,8 @@ def _qb_complete_for_decision(
 
     known_by = _utc(row.get("qb_shock_known_by_utc"))
     inactive_capture = _utc(row.get("inactive_capture_timestamp_utc"))
-    depth_time = _utc(row.get("t120_depth_timestamp_utc"))
+    home_depth_time = _utc(row.get("home_t120_depth_timestamp_utc"))
+    away_depth_time = _utc(row.get("away_t120_depth_timestamp_utc"))
     target_t60 = kickoff - timedelta(minutes=DECISION_HORIZON_MINUTES)
     target_t120 = kickoff - timedelta(minutes=120)
 
@@ -199,13 +200,16 @@ def _qb_complete_for_decision(
 
     if inactive_capture is None or inactive_capture > target_t60:
         reasons.append("inactive_capture_not_by_t60")
-    if depth_time is None or depth_time > target_t120:
-        reasons.append("depth_state_after_t120")
+    if home_depth_time is None or home_depth_time > target_t120:
+        reasons.append("home_depth_state_not_valid_by_t120")
+    if away_depth_time is None or away_depth_time > target_t120:
+        reasons.append("away_depth_state_not_valid_by_t120")
 
     required_text = (
-        "t120_qb1_team",
-        "t120_qb1_player_name",
-        "t120_qb1_gsis_id",
+        "home_t120_qb1_player_name",
+        "home_t120_qb1_gsis_id",
+        "away_t120_qb1_player_name",
+        "away_t120_qb1_gsis_id",
         "inactive_raw_sha256",
     )
     for field in required_text:
@@ -350,10 +354,12 @@ def build_candidate4_decisions(
             "qb_state_complete": qb_complete,
             "qb_shock_direction": qb_direction,
             "qb_shock_known_by_utc": str((qb_row or {}).get("qb_shock_known_by_utc") or "") or None,
-            "t120_qb1_team": str((qb_row or {}).get("t120_qb1_team") or "") or None,
-            "t120_qb1_player_name": str((qb_row or {}).get("t120_qb1_player_name") or "") or None,
-            "t120_qb1_gsis_id": str((qb_row or {}).get("t120_qb1_gsis_id") or "") or None,
-            "t120_depth_timestamp_utc": str((qb_row or {}).get("t120_depth_timestamp_utc") or "") or None,
+            "home_t120_qb1_player_name": str((qb_row or {}).get("home_t120_qb1_player_name") or "") or None,
+            "home_t120_qb1_gsis_id": str((qb_row or {}).get("home_t120_qb1_gsis_id") or "") or None,
+            "home_t120_depth_timestamp_utc": str((qb_row or {}).get("home_t120_depth_timestamp_utc") or "") or None,
+            "away_t120_qb1_player_name": str((qb_row or {}).get("away_t120_qb1_player_name") or "") or None,
+            "away_t120_qb1_gsis_id": str((qb_row or {}).get("away_t120_qb1_gsis_id") or "") or None,
+            "away_t120_depth_timestamp_utc": str((qb_row or {}).get("away_t120_depth_timestamp_utc") or "") or None,
             "inactive_raw_sha256": str((qb_row or {}).get("inactive_raw_sha256") or "") or None,
             "inactive_capture_timestamp_utc": str((qb_row or {}).get("inactive_capture_timestamp_utc") or "") or None,
             "eligible": eligible,
