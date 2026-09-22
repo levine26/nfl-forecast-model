@@ -80,6 +80,8 @@ LevLine does not copy nfelo's parameters, ATS objectives or current nonlinear ma
 
 **Open Source Football / nflverse** supports opponent-adjusted EPA and multilevel shrinkage using the same free ecosystem already available to LevLine.
 
+Process-feature evidence is deliberately weaker and narrower: peer-reviewed turnover research supports treating turnovers as rare but conditionally predictable events while also emphasizing noise/regression concerns; red-zone finishing and explosive-play evidence is primarily technical/practitioner and supports only bounded, shrinkage-aware B0 components rather than independent challenger families or threshold searches.
+
 **davidsasser.com**, included explicitly at the user's request, is useful as a product architecture comparator because the public board clearly separates projected team scores, model projected line, market opening/current line and selection. A final targeted site/web/GitHub search found no reproducible current model specification, source repository, immutable PIT forecast archive or independent validation protocol. Its current record therefore remains product-level/opaque evidence, not scientific validation.
 
 The final evidence hierarchy is explicit: peer-reviewed work supports general statistical/football methodology; reproducible open-source systems support implementation ideas; practitioner systems do not become peer-reviewed evidence; and opaque performance claims are not imported into LevLine validation. Brill et al. (2024) remains classified as a strong technical preprint rather than peer-reviewed literature.
