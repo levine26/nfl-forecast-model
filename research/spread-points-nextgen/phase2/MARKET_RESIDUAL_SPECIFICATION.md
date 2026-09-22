@@ -191,7 +191,7 @@ Interpretation:
 No arm may use future line movement, closing data for an earlier horizon, completed-2026 outcomes, or hindsight personnel/weather state.
 
 
-## 12. Same-horizon honesty
+## 13. Same-horizon honesty
 
 Historical C0 uses only the closing/late nflverse market family and must be labeled that way.
 
