@@ -1,0 +1,59 @@
+{
+  "contract_version": "levline-props-2.2-prereg-v0.1",
+  "status": "FROZEN_BEFORE_FUTURE_HOLDOUT",
+  "research_only": true,
+  "production_authorized": false,
+  "baseline_model": "levline-props-2.1-sunday-v0.1",
+  "outcome_fit_allowed": false,
+  "challengers": [
+    {
+      "id": "P21_BASE",
+      "line_market_weight": 0,
+      "line_model_weight": 1,
+      "probability_shrink_to_half": 0
+    },
+    {
+      "id": "P22_RESIDUAL_25",
+      "line_market_weight": 0.75,
+      "line_model_weight": 0.25,
+      "probability_shrink_to_half": 0
+    },
+    {
+      "id": "P22_RESIDUAL_50",
+      "line_market_weight": 0.5,
+      "line_model_weight": 0.5,
+      "probability_shrink_to_half": 0
+    },
+    {
+      "id": "P22_CAL_50",
+      "line_market_weight": 0,
+      "line_model_weight": 1,
+      "probability_shrink_to_half": 0.5
+    },
+    {
+      "id": "P22_RESIDUAL50_CAL50",
+      "line_market_weight": 0.5,
+      "line_model_weight": 0.5,
+      "probability_shrink_to_half": 0.5
+    }
+  ],
+  "minimum_promotion_evidence": {
+    "future_weeks": 3,
+    "finalized_games": 30,
+    "market_matched_observations": 1000,
+    "prop_family_observations": 250
+  },
+  "primary_metrics": [
+    "paired_absolute_error_vs_market",
+    "brier_vs_market",
+    "log_loss_vs_market",
+    "calibration",
+    "market_residual_slope"
+  ],
+  "forbidden": [
+    "week2_parameter_fit",
+    "retrospective_signal_relabel",
+    "postkickoff_market_use",
+    "production_winner_model_mutation"
+  ]
+}
