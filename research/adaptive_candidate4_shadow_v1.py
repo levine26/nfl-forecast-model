@@ -15,6 +15,7 @@ from typing import Any, Iterable
 
 import pandas as pd
 
+from research.market_capture_v2 import consensus_row
 from research.market_state_v1 import (
     build_market_state,
     select_book_horizons,
@@ -93,6 +94,48 @@ def _qualified_book_at_request(
     if last_update is None or last_update > request:
         return False
     return True
+
+
+
+
+def _candidate4_qualified_market_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Rebuild Candidate 4 horizons only from >=5 fresh same-request sportsbooks.
+
+    The shared research collector may retain looser legacy consensus attempts. Candidate 4
+    ignores those attempts entirely and recomputes its horizon consensus from book rows that
+    satisfy the frozen freshness/provider requirements.
+    """
+    groups: dict[tuple[str, str, str, str], list[dict[str, Any]]] = {}
+    for original in rows:
+        row = dict(original)
+        if str(row.get("row_type") or "") != "book":
+            continue
+        game_id = str(row.get("game_id") or "").strip()
+        horizon = str(row.get("horizon") or "").strip()
+        request_text = str(row.get("request_timestamp_utc") or "").strip()
+        provider = str(row.get("market_provider") or "").strip()
+        request = _utc(request_text)
+        if not game_id or not horizon or request is None or not provider:
+            continue
+        if not _qualified_book_at_request(row, request=request, provider=provider):
+            continue
+        groups.setdefault((game_id, horizon, request_text, provider), []).append(row)
+
+    qualified_rows: list[dict[str, Any]] = []
+    for key in sorted(groups):
+        books = groups[key]
+        book_keys = [str(row.get("sportsbook_key") or "").strip() for row in books]
+        if any(not value for value in book_keys) or len(set(book_keys)) < MIN_COMMON_BOOKS:
+            continue
+        # Duplicate sportsbook identities at one request are not allowed to create breadth.
+        if len(set(book_keys)) != len(book_keys):
+            continue
+        consensus = consensus_row(books)
+        if consensus is None or int(consensus.get("source_count") or 0) < MIN_COMMON_BOOKS:
+            continue
+        qualified_rows.extend(books)
+        qualified_rows.append(consensus)
+    return qualified_rows
 
 
 def _content_hash(record: dict[str, Any]) -> str:
@@ -257,7 +300,8 @@ def build_candidate4_decisions(
         raise ValueError("generated_at_utc must be timezone-aware")
 
     incumbents = select_frozen_incumbents(production_history)
-    market_rows = market_ledger.to_dict("records") if not market_ledger.empty else []
+    raw_market_rows = market_ledger.to_dict("records") if not market_ledger.empty else []
+    market_rows = _candidate4_qualified_market_rows(raw_market_rows)
     market_states, _ = build_market_state(market_rows)
     state_by_game = {str(row["game_id"]): row for row in market_states}
     selected_consensus = select_consensus_horizons(market_rows)
