@@ -183,7 +183,7 @@ def test_consensus_retains_source_count_market_dispersion_and_event_identity() -
     assert consensus["home_spread"] == -3.0
     assert consensus["total_points"] == 44.5
     assert QUALIFYING_CLOSE_ROW_TYPE == "consensus"
-    assert MIN_CONSENSUS_BOOKS == 5
+    assert MIN_CONSENSUS_BOOKS == 2
 
 
 def test_consensus_rejects_duplicate_books_or_mixed_event_identity() -> None:
@@ -361,3 +361,33 @@ def test_late_consensus_never_closes_horizon(tmp_path) -> None:
         },
     ]).to_csv(ledger, index=False)
     assert _captured_pairs(ledger) == {("game-early", "T-60m")}
+
+
+def test_candidate4_retry_threshold_does_not_rewrite_legacy_two_book_contract(tmp_path) -> None:
+    ledger = tmp_path / "ledger.csv"
+    pd.DataFrame([
+        {
+            "game_id": "game-a",
+            "horizon": "T-60m",
+            "row_type": "consensus",
+            "sportsbook_key": "sportsbook_consensus",
+            "source_count": 2,
+            "timing_error_minutes": -1.0,
+        },
+        {
+            "game_id": "game-b",
+            "horizon": "T-60m",
+            "row_type": "consensus",
+            "sportsbook_key": "sportsbook_consensus",
+            "source_count": 5,
+            "timing_error_minutes": -1.0,
+        },
+    ]).to_csv(ledger, index=False)
+
+    # Existing LevLine4 research semantics remain two-book qualified.
+    assert _captured_pairs(ledger) == {
+        ("game-a", "T-60m"),
+        ("game-b", "T-60m"),
+    }
+    # Candidate 4's workflow can independently keep retrying until five books.
+    assert _captured_pairs(ledger, min_close_books=5) == {("game-b", "T-60m")}
