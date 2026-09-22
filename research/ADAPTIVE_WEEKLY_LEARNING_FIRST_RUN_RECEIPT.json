@@ -1,0 +1,100 @@
+{
+  "receipt_id": "LEVLINE-ADAPTIVE-WEEKLY-FIRST-INTEGRATED-RUN-V1",
+  "workflow_run_id": 35742825363,
+  "artifact_id": 10699993670,
+  "artifact_sha256": "d7807d7c31d04f5afe4af912093f54b9b60ddaf7dae3446ad81035193bb6b01f",
+  "validated_head_sha": "2bf1077a8adb5121aadf64b8f0bbfc7538fe00c4",
+  "sample": {
+    "seasons": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "games": 1087
+  },
+  "incumbent": {
+    "candidate_id": "F-ST-01-FROZEN-2026",
+    "correct": 741,
+    "accuracy": 0.6816927322907084,
+    "brier": 0.21065334840485694,
+    "log_loss": 0.6087126266444343
+  },
+  "results": {
+    "naive_weekly_refit": {
+      "candidate_id": "NAIVE-WEEKLY-FST-REFIT-CONTROL-V1",
+      "correct": 739,
+      "accuracy": 0.6798528058877645,
+      "delta_accuracy_pp": -0.18399264029438367,
+      "switches": 6,
+      "switch_win_rate": 0.3333333333333333,
+      "disposition": "REJECT_AS_WINNER_ACCURACY_IMPROVEMENT"
+    },
+    "residual_state_v1": {
+      "candidate_id": "ADAPTIVE-RESIDUAL-STATE-V1",
+      "correct": 722,
+      "accuracy": 0.6642134314627415,
+      "delta_accuracy_pp": -1.7479300827966893,
+      "brier": 0.21635690859808834,
+      "log_loss": 0.6226562755261862,
+      "switches": 121,
+      "adaptive_only_correct": 51,
+      "incumbent_only_correct": 70,
+      "switch_win_rate": 0.4214876033057851,
+      "mcnemar_exact_two_sided_p": 0.10136765353309228,
+      "disposition": "REJECT_V1"
+    },
+    "calibration_intercept_v1": {
+      "candidate_id": "ADAPTIVE-CALIBRATION-INTERCEPT-V1",
+      "correct": 741,
+      "accuracy": 0.6816927322907084,
+      "delta_accuracy_pp": 0,
+      "brier": 0.21056871963662896,
+      "brier_delta": -0.00008462876822798449,
+      "log_loss": 0.6086278828508991,
+      "log_loss_delta": -0.00008474379353518025,
+      "switches": 0,
+      "disposition": "RETAIN_AS_PROBABILITY_QUALITY_RESEARCH_ONLY"
+    },
+    "residual_plus_switch_gate_v1": {
+      "candidate_id": "ADAPTIVE-SELECTIVE-SWITCH-GATE-V1",
+      "correct": 738,
+      "accuracy": 0.6789328426862925,
+      "delta_accuracy_pp": -0.2759889604415866,
+      "brier": 0.21149270533833173,
+      "log_loss": 0.6104886501047192,
+      "authorized_switches": 79,
+      "candidate_only_correct": 38,
+      "incumbent_only_correct": 41,
+      "switch_win_rate": 0.4810126582278481,
+      "mcnemar_exact_two_sided_p": 0.8221442424521855,
+      "disposition": "REJECT_V1"
+    },
+    "preregistered_nested_parameter_selection": {
+      "games": 816,
+      "seasons": [
+        2023,
+        2024,
+        2025
+      ],
+      "incumbent_correct": 559,
+      "adaptive_correct": 549,
+      "incumbent_accuracy": 0.6850490196078431,
+      "adaptive_accuracy": 0.6727941176470589,
+      "delta_accuracy_pp": -1.225490196078427,
+      "switches": 38,
+      "switch_win_rate": 0.3684210526315789,
+      "disposition": "FAILS_TO_RESCUE_RESIDUAL_MECHANISM"
+    }
+  },
+  "scientific_conclusion": "Simple weekly refitting and generic team-level residual learning do not improve the established frozen F-ST winner benchmark on the chronology-clean 2022-2025 sample. Pick-preserving online intercept calibration slightly improves probability scoring without changing winners. Further winner-accuracy research must use a materially different, pregame-observable mechanism rather than retuning the failed residual state.",
+  "governance": {
+    "completed_2026_outcomes_used": 0,
+    "production_changed": false,
+    "unit_tests_passed": true,
+    "production_surface_diff_check_passed": true,
+    "sensitivity_grid_preregistered_before_result": true,
+    "failed_v1_may_be_retuned_and_called_same_candidate": false,
+    "promotion_authorized": false
+  }
+}
