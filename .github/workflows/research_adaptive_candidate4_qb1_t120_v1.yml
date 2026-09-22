@@ -15,10 +15,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: levline-research-inactive-snapshot-archive-v1
-  cancel-in-progress: false
-
 jobs:
   test:
     if: github.event_name == 'pull_request'
@@ -45,6 +41,9 @@ jobs:
           research/test_adaptive_candidate4_qb1_snapshot_v1.py
 
   capture:
+    concurrency:
+      group: levline-research-inactive-snapshot-archive-v1
+      cancel-in-progress: false
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
