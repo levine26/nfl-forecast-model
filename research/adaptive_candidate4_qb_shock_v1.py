@@ -167,6 +167,7 @@ def select_inactive_evidence(
     archive_dir: Path,
     games: list[dict[str, Any]],
     t60_target_utc: datetime,
+    t120_target_utc: datetime,
 ) -> dict[str, Any] | None:
     """Select the latest qualifying archived article state no later than T-60."""
     due_game_ids = {str(game.get("game_id") or "") for game in games}
@@ -177,10 +178,10 @@ def select_inactive_evidence(
         if observation.get("archive_id") != SOURCE_ARCHIVE_ID:
             continue
         captured = _utc(observation.get("captured_at_utc"))
-        if captured is None or captured > t60_target_utc:
+        if captured is None or captured <= t120_target_utc or captured > t60_target_utc:
             continue
         observed_ids = {str(game.get("game_id") or "") for game in observation.get("due_games") or []}
-        if observed_ids != due_game_ids:
+        if not due_game_ids.issubset(observed_ids):
             continue
         copy = dict(observation)
         copy["_captured_dt"] = captured
@@ -237,11 +238,13 @@ def build_qb_shock_rows(
 ) -> pd.DataFrame:
     """Build one Candidate 4 QB-state row per game in one kickoff cohort."""
     kickoff = _kickoff(games)
+    t120 = kickoff - timedelta(minutes=120)
     t60 = kickoff - timedelta(minutes=60)
     evidence = select_inactive_evidence(
         archive_dir=archive_dir,
         games=games,
         t60_target_utc=t60,
+        t120_target_utc=t120,
     )
     snapshots: dict[str, tuple[dict[str, Any] | None, list[str]]] = {}
     for team in sorted(_due_teams(games)):
@@ -307,7 +310,7 @@ def build_qb_shock_rows(
             "inactive_source_url": evidence["source_url"] if evidence else None,
             "inactive_raw_sha256": evidence["raw_sha256"] if evidence else None,
             "qb_state_complete": complete,
-            "source_qualified": complete,
+            "source_qualified": evidence is not None,
             "incomplete_reasons": "|".join(sorted(set(reasons))),
             "research_only": True,
             "production_authorized": False,
