@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 100
+          fetch-depth: 500
 
       - uses: actions/setup-python@v5
         with:
@@ -88,6 +88,37 @@ jobs:
           assert 'if git push origin HEAD:main; then' in workflow
           print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves launch-grade reporting, and safely retries research-only publication races.')
           PY
+
+      - name: Prove last-good full-slate recovery on repository history
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          cp outputs/context_source_status.json /tmp/current-fallback-status.json
+          python scripts/refresh_editorial_slate_roster.py \
+            --roster inputs/sunday_signal/editorial_slate_roster.json
+          python scripts/restore_last_good_editorial_snapshot.py \
+            --roster inputs/sunday_signal/editorial_slate_roster.json \
+            --status outputs/context_source_status.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          roster=json.loads(Path('inputs/sunday_signal/editorial_slate_roster.json').read_text())
+          media=json.loads(Path('outputs/copilot_media_reads.json').read_text())
+          previews=json.loads(Path('outputs/game_previews.json').read_text())
+          evidence=json.loads(Path('outputs/contextual_evidence.json').read_text())
+          status=json.loads(Path('outputs/context_source_status.json').read_text())
+          before=json.loads(Path('/tmp/current-fallback-status.json').read_text())
+          expected=set(roster['game_ids'])
+          assert len(expected)==15, len(expected)
+          assert set(media['games'])==expected
+          assert set(previews)==expected
+          assert set(evidence)==expected
+          assert status.get('groq_provider_fallback')==before.get('groq_provider_fallback')
+          assert int((status.get('editorial_finalizer') or {}).get('games') or 0)==15
+          assert int((status.get('copilot_media') or {}).get('games_applied') or 0)==15
+          print('historical full-slate recovery proof passed for 15 games')
+          PY
+          git restore --worktree -- outputs inputs/sunday_signal/editorial_slate_roster.json
 
       - name: Stop after validation on pull request
         if: github.event_name == 'pull_request'
