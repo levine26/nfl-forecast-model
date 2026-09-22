@@ -265,3 +265,43 @@ The strongest external lesson is architectural restraint:
 - a drive model deserves one structurally separate reference;
 - market regression deserves an explicit market-null hierarchy;
 - public model records without reconstructable chronology do not justify model expansion.
+
+
+---
+
+## 8. Full external-system evidence matrix
+
+| System | Prediction target | Architecture / team strength | Inputs | Market use | QB/player treatment | Scoring-process treatment | Calibration / uncertainty | Validation design | Prospective evidence visible? | Reproducibility | Transferable idea | Principal limitation |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| David Sasser CFB | team scores, projected line, ATS pick | not publicly specified | not publicly specified | opening/current lines displayed separately | not publicly specified | score projections visible; internal process opaque | not disclosed | aggregate record shown; independent chronology not reconstructable | current board is timestamped, but full immutable archive not established | **low for methodology** | score -> model line -> market comparison separation | opaque model/data/tuning |
+| nfelo | team rating / line / win probability | dynamic Elo-style rating with efficiency/context adjustments | public results/efficiency plus configured context | explicit opening/closing regression layer | QB adjustment present | not a full drive simulator | probability translation; market regression code visible | code inspectable; external data PIT varies | public weekly outputs exist, but this review does not treat them as an independent prospective trial | **high architecture/code** | football base separate from market regression | practitioner system; some data/parameters not independently validated |
+| Open Source Football / nflverse examples | team ability / EPA-derived ratings | multilevel / opponent-adjusted EPA examples | nflverse/nflfastR PBP | generally football-only | varies by post | play/EPA process | uncertainty in multilevel examples | technical demonstrations; chronology inspectable when lagged | not generally a frozen forecasting product | **high code/data reproducibility** | lagged opponent adjustment + shrinkage | posts are not proof of score-forecast superiority |
+| Glickman/Stern family | NFL scores | latent time-varying team strength | historical NFL scores/context | none in base | player shocks absorbed into state movement | direct score model | state uncertainty | predictive historical study | no modern live archive | **method reproducible** | dynamic partial pooling | older era |
+| Baker/McHale family | exact NFL scores | score-event point process | prior-game team stats and/or market | optional spread/total inputs | indirect through team stats | **explicit scoring hazard/process** | full exact-score distribution | genuine OOS evaluation | historical paper only | **method reproducible** | discrete football scoring distribution | older data environment |
+
+## 9. Systems deliberately not promoted into the shortlist
+
+Phase 2 located additional public repositories and hobby/technical NFL models. They were not added as design authorities merely because they use modern ML.
+
+Common disqualifiers were:
+
+- hyperparameter search without a clearly protected temporal holdout;
+- winner-only targets rather than team points/margin/total;
+- unclear or hindsight feature construction;
+- no prospective record;
+- opaque data licensing;
+- no evidence that complexity beats a simpler baseline.
+
+This is a deliberate negative finding. The review favors a small number of sources with either strong peer-reviewed methodology or unusually transparent reproducible architecture.
+
+## 10. External-review conclusion after red team
+
+The external review does **not** justify expanding beyond A0/B0/C0.
+
+It strengthens three constraints instead:
+
+- dynamic/partial-pooling structure should be tested simply first;
+- football scoring discreteness deserves one bounded process model, not a simulator zoo;
+- market-aware modeling must retain an explicit market-only null and must not hide market dependence.
+
+David Sasser remains useful as a product-semantic comparator, not a scientific benchmark.
