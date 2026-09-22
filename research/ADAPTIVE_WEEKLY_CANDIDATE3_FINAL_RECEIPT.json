@@ -1,0 +1,211 @@
+{
+  "receipt_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE3-FINAL-V1",
+  "candidate_id": "ADAPTIVE-MARKET-PATH-INNOVATION-V1",
+  "status": "COMPLETE_HISTORICAL_EVALUATION_INCONCLUSIVE",
+  "completed_date": "2026-09-22",
+  "scientific_disposition": "INCONCLUSIVE",
+  "authoritative_preregistration": {
+    "path": "research/ADAPTIVE_WEEKLY_CANDIDATE3_PREREGISTRATION.md",
+    "commit_sha": "52cf402cd33da0e535ef963c7d98f9b4304ea208",
+    "primary_lambda": 0.5,
+    "target_results_seen_before_preregistration": false
+  },
+  "preregistration_reconciliation": {
+    "later_conflicting_json_commit": "97a974228f202b6dcfb1ec4f72267d6e7216774b",
+    "status": "NON_AUTHORITATIVE",
+    "reason": "It was committed after the authoritative 52cf402 freeze and was never used by the canonical evaluator.",
+    "canonical_evaluator_preregistration_sha": "52cf402cd33da0e535ef963c7d98f9b4304ea208"
+  },
+  "validated_execution": {
+    "pull_request": 542,
+    "integration_branch": "research/adaptive-weekly-learning-c3-integration",
+    "pr_head_sha": "56de02d2e2d20ca39d567c03fc6bbe887c69b71a",
+    "pr_merge_execution_sha": "fb6040bfae5380213c8deca13036e8754d358ec1",
+    "workflow_run_id": 35757935130,
+    "artifact_id": 10708209825,
+    "artifact_sha256": "ce64bc2d011acb894e65a7a05273ce897bec76dc14cb9b95b64b3b2dd7d636a8",
+    "config_digest_sha256": "de577832d944868c65d3ab562f094bc6c71cee3eff8aee5c91957f6399f686d6",
+    "market_archive_sha256": "b03c4e7f1cf885e9f20ea808ee538c26c21df4065b342fe04c50d09b808c344c",
+    "source_audit_passed": true,
+    "production_firewall_passed": true,
+    "evidence_schema_passed": true,
+    "canonical_evaluation_passed": true
+  },
+  "candidate_definition": {
+    "structural_prior": "chronology-clean F-ST probability",
+    "early_band_minutes_before_kickoff": [1440, 2160],
+    "lock_band_minutes_before_kickoff": [120, 360],
+    "minimum_common_sportsbooks": 5,
+    "path_feature": "median same-book logit(home no-vig probability) change from EARLY to LOCK",
+    "formula": "logit(P_C3)=logit(P_FST)+0.50*D",
+    "missingness": "fail closed to exact F-ST probability",
+    "fitted_candidate3_parameters": 0
+  },
+  "pit_qualification": {
+    "historical_scope": "2025 only",
+    "archive_games": 285,
+    "archive_sportsbooks": 38,
+    "post_or_at_kickoff_rows": 0,
+    "exact_T120_T60_T45_T30_qualified": false,
+    "coarse_band_history_qualified": true
+  },
+  "sample": {
+    "season": 2025,
+    "paired_games": 272,
+    "path_qualified_games": 264,
+    "fail_closed_games": 8,
+    "path_coverage": 0.9705882352941176,
+    "prediction_horizon": "EARLY T-2160..T-1440 to LOCK T-360..T-120; not exact T-120"
+  },
+  "same_sample_results": {
+    "frozen_fst": {
+      "correct": 179,
+      "accuracy": 0.6580882352941176,
+      "brier": 0.21157841309047173,
+      "log_loss": 0.6076199189347058
+    },
+    "candidate3": {
+      "correct": 180,
+      "accuracy": 0.6617647058823529,
+      "accuracy_delta_pp": 0.3676470588235294,
+      "brier": 0.21213037693099118,
+      "brier_delta": 0.000551963840519447,
+      "log_loss": 0.6086655020798805,
+      "log_loss_delta": 0.0010455831451747,
+      "switches": 3,
+      "candidate_only_correct": 2,
+      "fst_only_correct": 1,
+      "net_correct": 1,
+      "switch_win_rate": 0.6666666666666666,
+      "mcnemar_exact_two_sided_p": 1.0,
+      "week_block_accuracy_delta_95_ci": [-0.007575757575757576, 0.0149812734082397],
+      "week_block_accuracy_delta_95_ci_pp": [-0.7575757575757576, 1.49812734082397],
+      "week_block_accuracy_probability_better": 0.6152
+    }
+  },
+  "switches": [
+    {
+      "game_id": "2025_08_CHI_BAL",
+      "fst_home_probability": 0.5533370117889708,
+      "candidate3_home_probability": 0.4612411682055893,
+      "actual_home_win": 1,
+      "candidate3_correct": false,
+      "fst_correct": true
+    },
+    {
+      "game_id": "2025_12_ATL_NO",
+      "fst_home_probability": 0.5093924971572674,
+      "candidate3_home_probability": 0.49941113897729406,
+      "actual_home_win": 0,
+      "candidate3_correct": true,
+      "fst_correct": false
+    },
+    {
+      "game_id": "2025_17_BAL_GB",
+      "fst_home_probability": 0.5345412906774374,
+      "candidate3_home_probability": 0.49807445409856016,
+      "actual_home_win": 0,
+      "candidate3_correct": true,
+      "fst_correct": false
+    }
+  ],
+  "market_controls": {
+    "path_eligible_games": 264,
+    "fst_on_path_eligible": {
+      "correct": 172,
+      "accuracy": 0.6515151515151515
+    },
+    "early_market": {
+      "correct": 172,
+      "accuracy": 0.6515151515151515
+    },
+    "lock_market": {
+      "correct": 175,
+      "accuracy": 0.6628787878787878
+    },
+    "latest_prekickoff_market": {
+      "correct": 175,
+      "accuracy": 0.6628787878787878
+    },
+    "market_trend_control": {
+      "correct": 173,
+      "accuracy": 0.6553030303030303
+    },
+    "level_only_all_rows": {
+      "correct": 180,
+      "accuracy": 0.6617647058823529,
+      "net_correct_vs_fst": 1,
+      "switches": 3,
+      "switch_win_rate": 0.6666666666666666
+    }
+  },
+  "previous_candidates_same_2025_slice": {
+    "candidate1_residual_unchanged": {
+      "correct": 182,
+      "accuracy": 0.6691176470588235,
+      "interpretation": "Does not alter Candidate 1 multi-season rejection."
+    },
+    "naive_weekly_refit_unchanged": {
+      "correct": 179,
+      "accuracy": 0.6580882352941176
+    },
+    "component_resolved": {
+      "correct": 179,
+      "accuracy": 0.6580882352941176
+    },
+    "candidate2_unchanged": {
+      "correct": 180,
+      "accuracy": 0.6617647058823529,
+      "interpretation": "Candidate 2 remains inconclusive and one-switch concentrated."
+    }
+  },
+  "incremental_information": {
+    "path_independent_incremental_winner_information_demonstrated": false,
+    "reason": "The preregistered level-only control reproduced the same +1 net winner gain, so Candidate 3 did not exceed a market-level update."
+  },
+  "adversarial_validation": {
+    "robustness_grid_cells": 12,
+    "positive_cells": 3,
+    "neutral_cells": 7,
+    "negative_cells": 2,
+    "primary_lambda_0_50_positive_in_all_three_lock_windows": true,
+    "lambda_0_25_net_gain": 0,
+    "lambda_0_75_net_gain": 0,
+    "lambda_1_00_negative_in_two_broader_lock_windows": true,
+    "single_game_deletion_can_erase_entire_gain": true,
+    "weeks_whose_deletion_erases_gain": [12, 17],
+    "teams_whose_deletion_erases_gain": ["ATL", "GB", "NO"],
+    "max_positive_team_contribution_share_of_net_gain": 1.0,
+    "leave_one_book_out_tests": 37,
+    "leave_one_book_out_tests_preserving_net_plus_one": 37,
+    "post_lock_timestamp_leakage_detected": false
+  },
+  "leakage_assessment": {
+    "market_rows_post_kickoff_used": 0,
+    "lock_rows_later_than_T120_used": 0,
+    "completed_2026_season_outcomes_loaded": 0,
+    "post_prereg_candidate_retuning": false,
+    "production_changed": false
+  },
+  "scientific_answers": {
+    "effect_magnitude": "+1 winner / +0.367647 pp on 272 games",
+    "statistical_distinguishability": "No; McNemar p=1.0 and week-block 95% accuracy interval spans harm and no gain.",
+    "probability_quality": "Worse than F-ST on both Brier and log loss.",
+    "independent_market_path_information": "Not demonstrated; level-only control reproduced the net winner gain.",
+    "robustness": "Weak; only 3/12 grid cells were positive and single game/week/team deletions can erase the gain.",
+    "book_dependence": "No single sportsbook drives the result; all 37 leave-one-book-out checks preserve +1.",
+    "revised_long_run_accuracy_estimate": "Central estimate remains approximately 68.3%; practical near-term research range remains approximately 68.2%-68.4%. This is a research judgment, not a formal confidence interval."
+  },
+  "disposition": "INCONCLUSIVE",
+  "prospective": {
+    "automatic_live_shadow_authorized": false,
+    "production_deployment_authorized": false,
+    "recommended_next_step": "If research continues, freeze a prospective design that separates market-level update from market-path residual conditional on level, optionally joined to qualified QB/player-news timing, before any future outcomes are scored."
+  },
+  "governance": {
+    "candidate4_started": false,
+    "production_changed": false,
+    "production_merge_authorized": false,
+    "stop_after_candidate3": true
+  }
+}
