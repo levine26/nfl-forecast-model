@@ -262,3 +262,41 @@ def test_incumbent_locked_after_t60_is_ineligible() -> None:
     assert bool(row["eligible"]) is False
     assert "incumbent_lock_after_t60" in row["ineligibility_reasons"]
     assert bool(row["candidate_switch"]) is False
+
+
+def test_one_market_identity_failure_does_not_poison_other_games() -> None:
+    prod_a = _production()
+    prod_b = _production().copy()
+    prod_b["game_id"] = "2026_03_C_D"
+    prod_b["home_team"] = "D"
+    prod_b["away_team"] = "C"
+    production = pd.concat([prod_a, prod_b], ignore_index=True)
+
+    bad = _market(provider_t120="propline", provider_t60="other-provider")
+    good = _market().copy()
+    good["game_id"] = "2026_03_C_D"
+    good["home_team"] = "D"
+    good["away_team"] = "C"
+    good["event_id"] = "evt-c-d"
+    market = pd.concat([bad, good], ignore_index=True)
+
+    qb_a = _qb(direction=1)
+    qb_b = _qb(direction=1).copy()
+    qb_b["game_id"] = "2026_03_C_D"
+    qb_b["home_t120_qb1_player_name"] = "Home QB D"
+    qb_b["home_t120_qb1_gsis_id"] = "00-0000004"
+    qb_b["away_t120_qb1_player_name"] = "Away QB C"
+    qb_b["away_t120_qb1_gsis_id"] = "00-0000003"
+    qb = pd.concat([qb_a, qb_b], ignore_index=True)
+
+    out = build_candidate4_decisions(
+        production,
+        market,
+        qb,
+        generated_at_utc="2026-09-27T16:01:00Z",
+    ).set_index("game_id")
+
+    assert bool(out.loc["2026_03_A_B", "eligible"]) is False
+    assert "market_horizon_identity_mismatch" in out.loc["2026_03_A_B", "ineligibility_reasons"]
+    assert bool(out.loc["2026_03_C_D", "eligible"]) is True
+    assert bool(out.loc["2026_03_C_D", "candidate_switch"]) is True
