@@ -1,0 +1,78 @@
+name: LevLine Props 2.2 first-capture readiness
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v22/CHALLENGER_GRID.json'
+      - 'research/props/v22/challengers.py'
+      - 'research/props/v22/capture_prospective.py'
+      - 'research/props/v22/verify_capture_readiness.py'
+      - 'research/props/v22/test_verify_capture_readiness.py'
+      - '.github/workflows/levline_markets_live.yml'
+      - '.github/workflows/research_props22_readiness.yml'
+  workflow_dispatch:
+  schedule:
+    # Pregame collection readiness Thursday-Monday.
+    - cron: '10 14 * * 4,5,6,0,1'
+  workflow_run:
+    workflows: ['LevLine Props live refresh']
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: >-
+    ${{ github.event_name == 'pull_request'
+        && format('props22-readiness-pr-{0}', github.event.pull_request.number)
+        || github.event_name == 'workflow_run'
+           && format('props22-readiness-live-{0}', github.event.workflow_run.id)
+        || 'props22-readiness-main' }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+          cache: pip
+
+      - run: pip install '.[dev]'
+
+      - name: Validate frozen capture contract and readiness audit
+        run: |
+          python -m pytest -q \
+            research/props/v22/test_preregistration.py \
+            research/props/v22/test_challengers.py \
+            research/props/v22/test_capture_prospective.py \
+            research/props/v22/test_verify_capture_readiness.py
+          python -m py_compile \
+            research/props/v22/capture_prospective.py \
+            research/props/v22/verify_capture_readiness.py
+
+      - name: Audit current first-capture readiness
+        run: |
+          python research/props/v22/verify_capture_readiness.py \
+            --workflow .github/workflows/levline_markets_live.yml \
+            --ledger challenger_outputs/props22/forecast_originals.jsonl \
+            --output /tmp/props22-first-capture-readiness.json
+
+      - name: Upload readiness evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: props22-first-capture-readiness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/props22-first-capture-readiness.json
+          if-no-files-found: error
+          retention-days: 30
