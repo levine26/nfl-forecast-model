@@ -161,6 +161,8 @@ def collapse_source_forecasts(
 ) -> list[dict[str, Any]]:
     grouped: dict[str, list[Mapping[str, Any]]] = {}
     for row in receipts:
+        if row.get("outcome") is not None:
+            raise ClosingMarketError("closing matcher refuses outcome-bearing forecast receipts")
         if row.get("research_only") is not True or row.get("production_authorized") is not False:
             raise ClosingMarketError("Props 2.2 closing matcher accepts research-only receipts")
         source_sha = str(row.get("source_props21_forecast_sha256") or "").strip()
