@@ -123,11 +123,11 @@ That run must:
 
 Do not manually backfill Week 2 into Props 2.2.
 
-## Active engineering cleanup
+## Completed workflow cleanup
 
-### #492 — legacy Props 2.0 listeners must honor live post-kickoff no-op
+### #492 — legacy Props 2.0 listeners honor live post-kickoff no-op
 
-This is the only active workflow-noise fix at this handoff.
+This cleanup is merged and complete.
 
 Problem:
 - #459 made a fully-started target week a successful live no-op;
@@ -139,7 +139,7 @@ Problem:
 - normal full pregame artifact -> existing provenance/SHA validation and capture behavior unchanged;
 - mixed/malformed/unexpected artifact -> fail closed.
 
-Merge #492 only after all four focused workflow PR checks pass.
+PR #492 merged after its four focused workflow tests and research firewall passed.
 
 ## Why the latest legacy shadow failures are not model failures
 
@@ -159,12 +159,12 @@ The old listeners failed because they demanded `source_provenance.json`, `foreca
 ## Next-chat first actions
 
 1. Read this file and `research/props/v21/CURRENT_STATE_AND_NEXT_STEPS.md`.
-2. Check #492. If its four listener tests are green and it remains current-main/mergeable, merge it.
-3. Verify Sunday Signal remains 15/15 healthy, but keep that lane monitoring-only unless it regresses.
-4. Do **not** run new Week 2 tuning or weight selection.
-5. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green and the Props 2.2 capture hook is still wired.
-6. On the first future pregame live run, verify `challenger_outputs/props22/` is created with valid immutable receipts.
-7. Preserve forward personnel/opportunity and distribution evidence concurrently.
+2. Verify Sunday Signal remains 15/15 healthy, but keep that lane monitoring-only unless it regresses.
+3. Do **not** run new Week 2 tuning or weight selection.
+4. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green and the Props 2.2 capture hook is still wired.
+5. On the first future pregame live run, verify `challenger_outputs/props22/` is created with valid immutable receipts.
+6. Preserve forward personnel/opportunity and distribution evidence concurrently.
+7. Use the frozen Props 2.2 evaluator once future outcomes exist; do not change its definitions mid-holdout.
 8. Do not select a Props 2.2 winner mid-holdout. Wait for the preregistered terminal evidence threshold.
 9. If a PR becomes stale after main advances, create one clean current-main replacement and close the stale predecessor explicitly.
 
