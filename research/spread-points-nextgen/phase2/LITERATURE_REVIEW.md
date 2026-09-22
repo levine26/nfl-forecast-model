@@ -140,6 +140,17 @@ Its optimizer documentation also warns that a pure forecast-accuracy objective c
 
 ## 5. Score-process / drive decomposition
 
+### Baker & McHale (2013) — exact NFL scores
+
+**Source:** Rose D. Baker and Ian G. McHale, *Forecasting exact scores in National Football League games*, International Journal of Forecasting 29(1), 122–130.  
+DOI: https://doi.org/10.1016/j.ijforecast.2012.07.002
+
+This is the most directly relevant exact-score paper located in Phase 2. It builds a point-process model for NFL scoring, allows scoring hazards to vary using prior-game team statistics and/or sportsbook spread/total information, and evaluates genuine out-of-sample forecasts. The paper explicitly notes that NFL score distributions are unusual because touchdowns, field goals and other scoring events create repeated combinations of 3 and 7 rather than a smooth continuous score distribution.
+
+The authors report that the betting market remains extremely strong for game outcomes, while their exact-score forecasts are competitive with the market.
+
+**LevLine implication:** a joint-score challenger should model football scoring as discrete events or drives rather than rely only on a Normal margin/total error layer. It also reinforces the need to keep football-only and market-conditioned variants separately labeled.
+
 ### nflWAR / reproducible expected-points modeling
 
 **Source:** Ronald Yurko, Samuel Ventura and Maksim Horowitz, *nflWAR: a reproducible method for offensive player evaluation in football*, Journal of Quantitative Analysis in Sports 15(3), 163–183 (2019).  
