@@ -153,9 +153,9 @@ The merged audit measures future coverage of:
 
 This is descriptive instrumentation. Do not use current coverage rates to retrospectively choose exclusions or fit forecast weights.
 
-## 7. Active cleanup: PR #492
+## 7. Completed lifecycle cleanup: PR #492
 
-The only active Props engineering cleanup at this handoff is #492.
+PR #492 is merged and complete.
 
 Why it exists:
 - the live Props workflow now correctly emits a successful post-kickoff no-op when no pregame games remain;
@@ -185,13 +185,12 @@ The forward questions are:
 
 ## 9. Execution order
 
-1. Merge #492 only after all four legacy listener PR checks pass.
-2. Before the next untouched pregame slate, verify the live Props workflow and #491 capture hook remain intact.
-3. On the next successful pregame live run, verify the first immutable Props 2.2 ledger is created.
-4. Run forward distribution and personnel/opportunity audits concurrently.
-5. Do not select a Props 2.2 winner mid-holdout.
-6. After future games finalize, run the frozen evaluator without changing candidate definitions.
-7. Keep weekly findings descriptive until terminal evidence thresholds are met.
+1. Before the next untouched pregame slate, verify the live Props workflow and #491 capture hook remain intact.
+2. On the next successful pregame live run, verify the first immutable Props 2.2 ledger is created.
+3. Run forward distribution and personnel/opportunity audits concurrently.
+4. Do not select a Props 2.2 winner mid-holdout.
+5. After future games finalize, run the frozen evaluator without changing candidate definitions.
+6. Keep weekly findings descriptive until terminal evidence thresholds are met.
 
 ## 10. Repository hygiene
 
