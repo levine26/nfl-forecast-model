@@ -83,12 +83,15 @@ def test_restores_locked_games_dropped_from_contracting_current_slate():
     locked_b = _locked(_row("2026_02_IND_KC", "IND", "KC", 0.66, "KC"))
     locked_b.update({"week": 2, "gameday": "2026-09-20", "gametime": "16:25"})
 
+    excluded_same_week = _locked(_row("2026_02_DET_BUF", "DET", "BUF", 0.61, "BUF"))
+    excluded_same_week.update({"week": 2, "gameday": "2026-09-17", "gametime": "20:15"})
     prior_week = _locked(_row("2026_01_AAA_BBB", "AAA", "BBB", 0.61, "BBB"))
 
     selected = MODULE.build_canonical_editorial_predictions(
         pd.DataFrame([live]),
-        pd.DataFrame([locked_a, locked_b, prior_week]),
+        pd.DataFrame([locked_a, locked_b, excluded_same_week, prior_week]),
         now_utc=datetime(2026, 9, 21, 23, 0, tzinfo=timezone.utc),
+        editorial_game_ids={"2026_02_NYG_LA", "2026_02_CAR_ATL", "2026_02_IND_KC"},
     )
 
     assert selected["game_id"].tolist() == [
@@ -99,6 +102,7 @@ def test_restores_locked_games_dropped_from_contracting_current_slate():
     restored = selected.set_index("game_id")
     assert restored.loc["2026_02_CAR_ATL", "lock_status"] == "LOCKED"
     assert restored.loc["2026_02_IND_KC", "lock_status"] == "LOCKED"
+    assert "2026_02_DET_BUF" not in restored.index
     assert "2026_01_AAA_BBB" not in restored.index
 
 
