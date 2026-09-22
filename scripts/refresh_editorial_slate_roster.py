@@ -86,10 +86,16 @@ def build_roster(
     elif existing_identity is not None:
         season, week = existing_identity
     else:
-        official_identity = _frame_identity(official)
-        if official_identity is None:
+        if official.empty or "season" not in official.columns or "week" not in official.columns:
             raise RuntimeError("cannot identify active season/week")
-        season, week = official_identity
+        identities = {
+            (int(season), int(week))
+            for season, week in zip(official["season"], official["week"])
+            if not pd.isna(season) and not pd.isna(week)
+        }
+        if not identities:
+            raise RuntimeError("cannot identify active season/week")
+        season, week = max(identities)
 
     if existing_identity == (season, week) and bool(existing.get("frozen")):
         game_ids = [str(gid) for gid in existing.get("game_ids") or []]
