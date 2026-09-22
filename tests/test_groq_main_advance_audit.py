@@ -44,6 +44,8 @@ def test_isolated_research_namespaces_are_reconcilable() -> None:
         "docs/levline4/modern-gamebook-structure.md",
         "research/availability/v09b_modern_gamebook_structure_probe_contract_v1.json",
         "research/availability/v09b_modern_gamebook_structure_probe_v1_receipt.json",
+        "challenger_outputs/fst/prospective_evaluation.json",
+        "challenger_outputs/fst/prospective_weekly.csv",
         "research/test_v09b_modern_gamebook_structure_probe_v1.py",
         "research/v09b_modern_gamebook_structure_probe_v1.py",
         "scripts/run_research_v09b_modern_gamebook_structure_probe_v1.py",
@@ -55,7 +57,7 @@ def test_isolated_research_namespaces_are_reconcilable() -> None:
     assert audit.safe_to_reconcile
     assert audit.research_sensitive == ()
     assert audit.non_output == ()
-    assert audit.research_only == tuple(sorted(paths[:8]))
+    assert audit.research_only == tuple(sorted(paths[:10]))
 
 
 def test_research_prefix_does_not_whitelist_production_paths() -> None:
