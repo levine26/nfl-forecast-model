@@ -3,7 +3,7 @@
 ## Canonical state
 
 - Repository: `levine26/nfl-forecast-model`.
-- Canonical current evaluation PR: **#458 — Consolidate Props 2.1 prospective evaluation on current main**.
+- Canonical current evaluation PR: **#466 — Consolidate Props 2.1 prospective evaluation on current main**.
 - Frozen prospective cohort provenance is unchanged:
   - live run: `35477049179`
   - publication commit: `ba723255982c79ffe6072c714dd0ee2c37e1fa34`
@@ -77,8 +77,8 @@ Keep Sunday Signal Props labeled research/challenger until the empirical promoti
 
 ## What the next chat should do first
 
-1. inspect PR #458 checks and merge only if the current-main evaluation surface remains green;
-2. inspect/finish PR #459 so postgame code merges stop generating false live-Props failures;
+1. inspect PR #466 checks and merge only if the current-main evaluation surface remains green;
+2. #459 is merged; only revisit it if post-kickoff live refresh stops no-oping cleanly;
 3. use the Week 2 artifact as diagnosis only;
 4. open a **new preregistered Props 2.2/next-challenger research lane** focused on calibration, market-residual signal, and opportunity-vs-efficiency attribution;
-5. do not restart Props from scratch and do not reopen superseded historical PRs unless they contain a uniquely useful component not already merged or represented in #458.
+5. do not restart Props from scratch and do not reopen superseded historical PRs unless they contain a uniquely useful component not already merged or represented in #466.
