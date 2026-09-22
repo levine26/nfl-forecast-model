@@ -652,13 +652,18 @@ def main() -> int:
     parser.add_argument("--credential-mode")
     args = parser.parse_args()
     generated = _aware(args.generated_at, "generated-at") if args.generated_at else datetime.now(timezone.utc)
-    payload = build(_load(args.input), _load(args.previews) if args.previews.exists() else {},
+    source_payload = _load(args.input)
+    payload = build(source_payload, _load(args.previews) if args.previews.exists() else {},
                     generated=generated, credential_mode=args.credential_mode,
                     manifests=_load_manifest_slate(args.manifest_slate),
                     depth_charts=_load_depth_charts(args.depth_charts))
     _write_json(args.output, payload)
     if args.receipts:
-        payload["audit"]["new_receipt_count"] = _append_receipts(args.receipts, payload)
+        payload["audit"]["new_receipt_count"] = _append_receipts(
+            args.receipts,
+            payload,
+            source_payload=source_payload,
+        )
         _write_json(args.output, payload)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
