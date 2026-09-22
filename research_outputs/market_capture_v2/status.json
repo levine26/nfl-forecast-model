@@ -2,7 +2,7 @@
   "api_key_configured": true,
   "api_key_value_recorded": false,
   "completed_2026_outcomes_used": 0,
-  "error": "401 Client Error: Unauthorized for url: https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?apiKey=3d96ef7ff946cf31d87083ef7786629b&regions=us&markets=h2h%2Cspreads%2Ctotals&oddsFormat=american&dateFormat=iso",
+  "error": "[REDACTED_LEGACY_CREDENTIAL_BEARING_HTTP_ERROR]",
   "error_type": "HTTPError",
   "external_request_made": null,
   "observability_schema": "levline-market-capture-observability-v1",
@@ -12,5 +12,6 @@
   "production_authorized": false,
   "reason": "collector_exception",
   "research_only": true,
-  "status": "error"
+  "status": "error",
+  "security_note": "Credential-bearing provider exception text was redacted at branch head on 2026-09-22. Rotate the legacy provider key because prior Git history may retain it."
 }
