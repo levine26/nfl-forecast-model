@@ -1,9 +1,9 @@
 # Phase 2 Synthesis — Deep External Research & Challenger Design
 
-**Status:** analytically complete after red-team hardening and current-main synchronization; pending exact-head CI/firewall verification  
+**Status:** **COMPLETE** — red-team hardened, exact-head validated, merged, and verified from `main`  
 **Production change:** none  
 **Primary branch:** `research/spread-points-nextgen-phase2`  
-**Draft PR:** #520
+**PR:** #520 — **MERGED** at `405906942013252c158244c9b033a3240baa37f8`
 
 ## What Phase 2 answered
 
@@ -256,9 +256,9 @@ To avoid branch/model sprawl:
 | deliberately limited shortlist | A/B/C; D conditional |
 | davidsasser.com included | external review + literature/external inventory |
 
-Before Phase 2 can be marked **COMPLETE**, fresh exact-head firewall and full research-validation checks must pass on the final synchronized branch head, PR #520 must be reviewable and merged, merged artifacts must be re-read from `main`, and the control files must record the exact Phase 3 start state.
+Phase 2 exit criteria are **SATISFIED**. Final synchronized head `076dc9d6f6c052eec4744a155070c42c1b99ae82` passed research firewall `35751402751` and full research validation `35751402726`; PR #520 merged at `405906942013252c158244c9b033a3240baa37f8`; every canonical Phase 2 artifact and control file was re-read from `main` after merge. Production remained unchanged, no 2025 challenger result was inspected, and completed 2026 outcomes were not used for selection.
 
-Phase 3 remains **NOT STARTED** in this chat.
+Phase 3 remains **NOT STARTED**. **STOP Phase 2.**
 
 ## Red-team closeout findings
 
@@ -319,3 +319,26 @@ The closeout contract is fully deterministic:
 - D is built for a target only if residual correlation is <0.90, pooled MAE improves by >=0.10 points, both 2023 and 2024 improve, and paired block-bootstrap P(improvement) is >=0.75.
 
 No Phase 3 challenger result existed when these constraints were frozen.
+
+
+---
+
+## Final completion receipt
+
+- final synchronized pre-merge main: `e93127963c76cd309cdddf17d91291c04a60a659`
+- final validated Phase 2 head: `076dc9d6f6c052eec4744a155070c42c1b99ae82`
+- compatibility sync PR #541: merged into the Phase 2 branch; adaptive Candidate 2 state preserved but not used as challenger evidence
+- exact-head research firewall `35751402751`: **SUCCESS**
+- exact-head full research validation `35751402726`: **SUCCESS**
+- primary PR #520: **MERGED**
+- primary merge commit: `405906942013252c158244c9b033a3240baa37f8`
+- merged canonical artifacts verified directly from `main`: **YES**
+- production change: **NONE**
+- paid-data dependency: **NONE**
+- 2025 challenger inspection during Phase 2: **NONE**
+- completed-2026 selection contamination: **NONE**
+- Phase 3 implementation: **NOT STARTED**
+
+### DO NOT REPEAT
+
+Do not rerun Phase 1; do not redo the Phase 2 literature/external-model review; do not broaden the frozen A0/B0/C0 search after observing results; do not inspect 2025 challenger outcomes in Phase 3; do not use completed 2026 outcomes for candidate selection; do not relabel closing/late historical market data as T-120; do not use hindsight starter/injury/weather state; do not force D or player features; do not add paid data without escalation; do not revive retired Props orchestration; and do not weaken F-ST production safeguards.
