@@ -1,10 +1,12 @@
 import math
 
+import numpy as np
 import pandas as pd
 import pytest
 
 from nfl_forecast.props_opportunity import (
     ForecastContext,
+    _availability_adjusted_allocation,
     build_opportunity_projection,
     diagnostics_summary,
     rolling_origin_team_diagnostics,
@@ -280,3 +282,35 @@ def test_projection_retains_applied_role_multipliers_for_exact_replay():
     # already consumed by the canonical opportunity calculation.
     carry = projection.hierarchy["designed_carry_share_given_designed_rush"]
     assert carry["concentration"]["RB1"] > 0.0
+
+
+def test_allocation_concentration_scale_includes_unavailable_eligible_players():
+    players = pd.DataFrame(
+        [
+            {
+                "player_id": "ACTIVE",
+                "availability_probability": 1.0,
+                "availability_uncertainty": 0.10,
+                "role_multiplier": 1.0,
+                "carry_role_multiplier": 1.0,
+            },
+            {
+                "player_id": "OUT",
+                "availability_probability": 0.0,
+                "availability_uncertainty": 0.0,
+                "role_multiplier": 1.0,
+                "carry_role_multiplier": 1.0,
+            },
+        ]
+    )
+    dist, audit, _ = _availability_adjusted_allocation(
+        players,
+        np.array([10.0, 10.0], dtype=float),
+        label="designed_carry_share",
+        multiplier_column="carry_role_multiplier",
+    )
+    assert dist["player_ids"] == ["ACTIVE"]
+    assert audit["baseline_share"] == pytest.approx({"ACTIVE": 0.5, "OUT": 0.5})
+    assert audit["availability_uncertainty_index"] == pytest.approx(0.05)
+    assert audit["concentration_scale"] == pytest.approx(1.0 / 1.2)
+    assert dist["concentration"]["ACTIVE"] == pytest.approx(10.0 / 1.2)
