@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-"""Candidate 2 paired evaluation on the exact historical Candidate 2 sample."""
+"""Paired evaluation for ADAPTIVE-REGIME-SHOCK-GATE-V1.
+
+All comparisons use the exact Candidate 2 paired sample. The primary estimand is
+straight-up winner accuracy versus frozen F-ST. Probability metrics are mandatory
+secondary diagnostics. This module never fits or retunes Candidate 2.
+"""
 
 import argparse
 import json
@@ -9,268 +14,215 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from nfl_forecast.challenger_evaluation import forecast_metrics
-from research.adaptive_naive_weekly_refit_control_v1 import (
-    attach_frozen_fst,
-    load_frame as load_weekly_frame,
-    weekly_refit_predictions,
-)
-from research.adaptive_residual_state_v1 import load_fst_replay, run_state_filter
 from research.adaptive_weekly_evaluation_v1 import evaluate as paired_evaluate
-from research.adaptive_weekly_evaluation_v1 import switch_accounting
 
+EPS = 1e-6
 CANDIDATE_ID = "ADAPTIVE-REGIME-SHOCK-GATE-V1"
-TARGET_SEASON = 2025
+
+COMPARATORS = {
+    "frozen_fst": "fst_prob",
+    "market": "market_prob",
+    "candidate1_residual_state": "candidate1_prob",
+    "weekly_refit_control": "weekly_refit_prob",
+    "component_resolved": "component_only_prob",
+    "boundary_component_no_shock": "boundary_component_prob",
+    "candidate2_regime_shock": "candidate_prob",
+}
 
 
-def attach_controls(frame: pd.DataFrame) -> pd.DataFrame:
-    work = frame.copy()
-
-    residual = run_state_filter(load_fst_replay())
-    residual = residual[residual["season"].eq(TARGET_SEASON)][
-        ["game_id", "adaptive_prob"]
-    ].rename(columns={"adaptive_prob": "candidate1_prob"})
-    work = work.merge(residual, on="game_id", how="left", validate="one_to_one")
-
-    weekly = weekly_refit_predictions(load_weekly_frame())
-    weekly = attach_frozen_fst(weekly)
-    weekly = weekly[weekly["season"].eq(TARGET_SEASON)][
-        ["game_id", "weekly_refit_prob"]
-    ]
-    work = work.merge(weekly, on="game_id", how="left", validate="one_to_one")
-
-    fst_side = work["fst_prob"].ge(0.5)
-    component_side = work["component_prob"].ge(0.5)
-    boundary_disagree = (
-        work["fst_prob"].sub(0.5).abs().le(0.075)
-        & fst_side.ne(component_side)
-    )
-    work["boundary_component_prob"] = np.where(
-        boundary_disagree, work["component_prob"], work["fst_prob"]
-    )
-    work["boundary_component_switch"] = boundary_disagree
-    return work
+def _log_loss(p: pd.Series, y: pd.Series) -> float:
+    prob = np.clip(pd.to_numeric(p, errors="raise").to_numpy(float), EPS, 1.0 - EPS)
+    target = pd.to_numeric(y, errors="raise").to_numpy(float)
+    return float(np.mean(-(target * np.log(prob) + (1 - target) * np.log(1 - prob))))
 
 
-def _comparison(frame: pd.DataFrame, col: str) -> dict:
-    metrics = forecast_metrics(frame, col)
-    fst = forecast_metrics(frame, "fst_prob")
-    switch = switch_accounting(frame, col, "fst_prob")
+def _score(frame: pd.DataFrame, probability_col: str) -> dict:
+    y = pd.to_numeric(frame["home_win"], errors="raise").astype(int)
+    p = pd.to_numeric(frame[probability_col], errors="raise")
+    pick = p.ge(0.5).astype(int)
+    correct = pick.eq(y)
     return {
-        "probability_column": col,
-        "correct": int(round(metrics["winner_pct"] * metrics["games"])),
-        "accuracy": metrics["winner_pct"],
-        "accuracy_delta_pp": 100.0 * (metrics["winner_pct"] - fst["winner_pct"]),
-        "brier": metrics["brier"],
-        "brier_delta": metrics["brier"] - fst["brier"],
-        "log_loss": metrics["log_loss"],
-        "log_loss_delta": metrics["log_loss"] - fst["log_loss"],
-        **switch,
+        "games": int(len(frame)),
+        "correct": int(correct.sum()),
+        "accuracy": float(correct.mean()),
+        "brier": float(np.mean((p - y) ** 2)),
+        "log_loss": _log_loss(p, y),
     }
 
 
-def _slice_metrics(part: pd.DataFrame) -> dict:
-    c = forecast_metrics(part, "candidate_prob")
-    f = forecast_metrics(part, "fst_prob")
-    s = switch_accounting(part, "candidate_prob", "fst_prob")
-    return {
-        "games": int(len(part)),
-        "candidate_correct": int(round(c["winner_pct"] * len(part))),
-        "fst_correct": int(round(f["winner_pct"] * len(part))),
-        "candidate_accuracy": c["winner_pct"],
-        "fst_accuracy": f["winner_pct"],
-        "accuracy_delta_pp": 100.0 * (c["winner_pct"] - f["winner_pct"]),
-        "candidate_brier": c["brier"],
-        "fst_brier": f["brier"],
-        "brier_delta": c["brier"] - f["brier"],
-        "candidate_log_loss": c["log_loss"],
-        "fst_log_loss": f["log_loss"],
-        "log_loss_delta": c["log_loss"] - f["log_loss"],
-        "switches": s["disagreements"],
-        "candidate_only_correct": s["candidate_only_correct"],
-        "fst_only_correct": s["reference_only_correct"],
-        "switch_win_rate": s["switch_win_rate"],
-        "net_correct_from_switches": s["net_correct_from_switches"],
-    }
-
-
-def _group_records(frame: pd.DataFrame, family: str, values: pd.Series) -> list[dict]:
-    rows = []
-    for value in pd.Series(values, index=frame.index).dropna().unique().tolist():
-        part = frame.loc[pd.Series(values, index=frame.index).eq(value)]
-        if part.empty:
-            continue
-        rows.append({"slice_family": family, "slice_value": str(value), **_slice_metrics(part)})
-    return rows
-
-
-def mechanism_slices(frame: pd.DataFrame) -> list[dict]:
+def _week_table(frame: pd.DataFrame) -> list[dict]:
     rows: list[dict] = []
-    rows.extend(_group_records(frame, "week", frame["week"].astype(int)))
-
-    week = pd.to_numeric(frame["week"], errors="coerce")
-    phase = np.select([week <= 6, week <= 12], ["early", "mid"], default="late")
-    rows.extend(_group_records(frame, "season_phase", pd.Series(phase, index=frame.index)))
-
-    fst_strength = frame["fst_prob"].sub(0.5).abs()
-    fst_bucket = pd.cut(
-        fst_strength,
-        [-np.inf, 0.025, 0.05, 0.075, 0.10, np.inf],
-        labels=["0-2.5pp", "2.5-5pp", "5-7.5pp", "7.5-10pp", ">10pp"],
-    )
-    rows.extend(_group_records(frame, "fst_boundary_distance", fst_bucket.astype("string")))
-
-    market_strength = frame["market_prob"].sub(0.5).abs()
-    market_bucket = pd.cut(
-        market_strength,
-        [-np.inf, 0.025, 0.05, 0.10, 0.15, np.inf],
-        labels=["0-2.5pp", "2.5-5pp", "5-10pp", "10-15pp", ">15pp"],
-    )
-    rows.extend(_group_records(frame, "market_boundary_distance", market_bucket.astype("string")))
-
-    market_side = np.where(frame["market_prob"].ge(0.5), "home_market_favorite", "away_market_favorite")
-    rows.extend(_group_records(frame, "market_side", pd.Series(market_side, index=frame.index)))
-
-    shock_flags = {
-        "qb_change": frame["shock_qb_change"].astype(bool),
-        "ol_churn": frame["shock_ol_churn"].astype(bool),
-        "qb_practice": frame["shock_qb_practice"].astype(bool),
-        "any_strong_shock": frame["strong_regime_shock"].astype(bool),
-    }
-    for name, flag in shock_flags.items():
-        for state in (True, False):
-            part = frame.loc[flag.eq(state)]
-            if not part.empty:
-                rows.append({
-                    "slice_family": f"shock_{name}",
-                    "slice_value": str(state).lower(),
-                    **_slice_metrics(part),
-                })
-
-    switch_reason = frame["switch_reason"].astype("string").fillna("unknown")
-    rows.extend(_group_records(frame, "switch_reason", switch_reason))
+    for week, part in frame.groupby("week", sort=True):
+        fst = _score(part, "fst_prob")
+        candidate = _score(part, "candidate_prob")
+        switches = part["candidate_switch"].fillna(False).astype(bool)
+        y = part["home_win"].astype(int)
+        c_ok = part["candidate_prob"].ge(0.5).astype(int).eq(y)
+        f_ok = part["fst_prob"].ge(0.5).astype(int).eq(y)
+        rows.append({
+            "week": int(week),
+            "games": int(len(part)),
+            "fst_correct": fst["correct"],
+            "candidate_correct": candidate["correct"],
+            "net_correct": int(candidate["correct"] - fst["correct"]),
+            "switches": int(switches.sum()),
+            "candidate_only_correct": int((switches & c_ok & ~f_ok).sum()),
+            "fst_only_correct": int((switches & f_ok & ~c_ok).sum()),
+        })
     return rows
 
 
-def evaluate(input_path: str | Path, bootstrap_samples: int = 10000) -> tuple[dict, dict[str, pd.DataFrame]]:
-    frame = pd.read_csv(input_path)
-    if not pd.to_numeric(frame["season"], errors="raise").astype(int).eq(TARGET_SEASON).all():
-        raise RuntimeError("Candidate 2 evaluation is frozen to the 2025 target sample")
-    frame = attach_controls(frame)
+def _shock_attribution(frame: pd.DataFrame) -> list[dict]:
+    switched = frame[frame["candidate_switch"].fillna(False).astype(bool)].copy()
+    if switched.empty:
+        return []
+    y = switched["home_win"].astype(int)
+    switched["candidate_correct"] = switched["candidate_prob"].ge(0.5).astype(int).eq(y)
+    switched["fst_correct"] = switched["fst_prob"].ge(0.5).astype(int).eq(y)
+    rows = []
+    for reason, part in switched.groupby("shock_reason", sort=True):
+        candidate_only = int((part["candidate_correct"] & ~part["fst_correct"]).sum())
+        fst_only = int((part["fst_correct"] & ~part["candidate_correct"]).sum())
+        rows.append({
+            "shock_reason": str(reason),
+            "switches": int(len(part)),
+            "candidate_only_correct": candidate_only,
+            "fst_only_correct": fst_only,
+            "net_correct": int(candidate_only - fst_only),
+            "switch_win_rate": float(candidate_only / len(part)) if len(part) else None,
+        })
+    return rows
 
-    required_controls = {
-        "fst_prob",
-        "market_prob",
-        "candidate1_prob",
-        "weekly_refit_prob",
-        "component_prob",
-        "boundary_component_prob",
-        "candidate_prob",
+
+def _coverage(frame: pd.DataFrame) -> dict:
+    return {
+        "paired_games": int(len(frame)),
+        "seasons": sorted(pd.to_numeric(frame["season"], errors="raise").astype(int).unique().tolist()),
+        "weeks": int(frame[["season", "week"]].drop_duplicates().shape[0]),
+        "strong_shock_games": int(frame["strong_regime_shock"].fillna(False).astype(bool).sum()),
+        "boundary_games": int(frame["boundary_eligible"].fillna(False).astype(bool).sum()),
+        "component_disagreement_games": int(frame["component_disagrees"].fillna(False).astype(bool).sum()),
+        "candidate2_switches": int(frame["candidate_switch"].fillna(False).astype(bool).sum()),
+        "qualified_qb_practice_join_games": int(
+            (
+                frame["home_qb_practice_qualified"].fillna(False).astype(bool)
+                | frame["away_qb_practice_qualified"].fillna(False).astype(bool)
+            ).sum()
+        ),
     }
-    missing = required_controls - set(frame.columns)
-    if missing:
-        raise RuntimeError(f"Candidate 2 controls missing: {sorted(missing)}")
-    if frame[list(required_controls)].isna().any().any():
-        bad = frame.loc[frame[list(required_controls)].isna().any(axis=1), "game_id"].tolist()
-        raise RuntimeError(f"Candidate 2 exact paired control sample incomplete: {bad[:5]}")
 
-    primary_report, primary_tables = paired_evaluate(
+
+def run(
+    input_path: str,
+    output_dir: str = "research_outputs/adaptive_candidate2_v1/evaluation",
+) -> dict:
+    frame = pd.read_csv(input_path)
+    required = {
+        "game_id", "season", "week", "home_win", "fst_prob", "market_prob",
+        "candidate1_prob", "weekly_refit_prob", "component_only_prob",
+        "boundary_component_prob", "candidate_prob", "candidate_switch",
+        "strong_regime_shock", "boundary_eligible", "component_disagrees",
+        "shock_reason", "home_qb_practice_qualified", "away_qb_practice_qualified",
+    }
+    missing = required - set(frame.columns)
+    if missing:
+        raise ValueError(f"Candidate 2 evaluation missing fields: {sorted(missing)}")
+    if sorted(frame["season"].astype(int).unique().tolist()) != [2025]:
+        raise RuntimeError("Candidate 2 V1 evaluation must remain on the preregistered 2025 target sample")
+    if frame["game_id"].astype(str).duplicated().any():
+        raise ValueError("Candidate 2 evaluation contains duplicate game IDs")
+    if frame[list(COMPARATORS.values())].isna().any().any():
+        raise RuntimeError("Candidate 2 exact paired comparator sample is incomplete")
+
+    scoreboard = {name: _score(frame, col) for name, col in COMPARATORS.items()}
+    fst = scoreboard["frozen_fst"]
+    candidate = scoreboard["candidate2_regime_shock"]
+
+    paired_report, paired_tables = paired_evaluate(
         frame,
         "candidate_prob",
         "fst_prob",
-        bootstrap_samples=bootstrap_samples,
+        target_col="home_win",
+        bootstrap_samples=10000,
     )
 
-    comparisons = {}
-    for name, col in [
-        ("frozen_fst", "fst_prob"),
-        ("market", "market_prob"),
-        ("candidate1_residual", "candidate1_prob"),
-        ("weekly_refit_control", "weekly_refit_prob"),
-        ("component_resolved", "component_prob"),
-        ("boundary_component_no_shock", "boundary_component_prob"),
-        ("candidate2", "candidate_prob"),
-    ]:
-        comparisons[name] = _comparison(frame, col)
+    controls_vs_fst = {}
+    for name, col in COMPARATORS.items():
+        if name == "frozen_fst":
+            continue
+        report, _ = paired_evaluate(
+            frame,
+            col,
+            "fst_prob",
+            target_col="home_win",
+            bootstrap_samples=10000,
+        )
+        controls_vs_fst[name] = {
+            "switch_accounting": report["switch_accounting"],
+            "metric_deltas": report["metric_deltas"],
+        }
 
-    switches = frame[frame["candidate_switch"].astype(bool)].copy()
-    switch_rows = []
-    for reason, part in switches.groupby("switch_reason", sort=True):
-        y = part["home_win"].astype(int)
-        candidate_correct = part["candidate_prob"].ge(0.5).astype(int).eq(y)
-        fst_correct = part["fst_prob"].ge(0.5).astype(int).eq(y)
-        switch_rows.append({
-            "switch_reason": str(reason),
-            "switches": int(len(part)),
-            "candidate_only_correct": int((candidate_correct & ~fst_correct).sum()),
-            "fst_only_correct": int((fst_correct & ~candidate_correct).sum()),
-            "switch_win_rate": float(candidate_correct.mean()) if len(part) else None,
-            "net_correct": int(candidate_correct.sum() - fst_correct.sum()),
-        })
-
-    report = {
-        "evaluation_id": "ADAPTIVE-CANDIDATE2-EVALUATION-V1",
+    result = {
+        "evaluation_id": "LEVLINE-ADAPTIVE-CANDIDATE2-EVALUATION-V1",
         "candidate_id": CANDIDATE_ID,
-        "status": "historical_2025_paired_evaluation",
+        "status": "historical_preregistered_2025_paired_evaluation",
+        "primary_metric": "straight_up_winner_accuracy",
         "sample": {
-            "season": TARGET_SEASON,
-            "games": int(len(frame)),
-            "one_season_regime_feature_limit": True,
-        },
-        "primary_vs_fst": primary_report,
-        "comparisons_same_rows": comparisons,
-        "coverage": {
-            "strong_shock_games": int(frame["strong_regime_shock"].astype(bool).sum()),
-            "boundary_component_disagreement_games": int(
-                (
-                    frame["boundary_eligible"].astype(bool)
-                    & frame["component_disagrees"].astype(bool)
-                ).sum()
+            **_coverage(frame),
+            "historical_scope_limitation": (
+                "Qualified equivalent personnel-regime state exists only for 2025; "
+                "season stability is therefore not estimable for Candidate 2 V1."
             ),
-            "candidate2_switches": int(frame["candidate_switch"].astype(bool).sum()),
-            "qb_change_shock_games": int(frame["shock_qb_change"].astype(bool).sum()),
-            "ol_churn_shock_games": int(frame["shock_ol_churn"].astype(bool).sum()),
-            "qb_practice_shock_games": int(frame["shock_qb_practice"].astype(bool).sum()),
         },
-        "switch_reason_summary": switch_rows,
+        "scoreboard_same_rows": scoreboard,
+        "primary_vs_fst": paired_report,
+        "controls_vs_fst": controls_vs_fst,
+        "week_results": _week_table(frame),
+        "shock_attribution": _shock_attribution(frame),
+        "summary": {
+            "fst_correct": fst["correct"],
+            "fst_accuracy": fst["accuracy"],
+            "candidate_correct": candidate["correct"],
+            "candidate_accuracy": candidate["accuracy"],
+            "accuracy_delta_pp": float(100.0 * (candidate["accuracy"] - fst["accuracy"])),
+            "brier_delta": float(candidate["brier"] - fst["brier"]),
+            "log_loss_delta": float(candidate["log_loss"] - fst["log_loss"]),
+            "switches": int(paired_report["switch_accounting"]["disagreements"]),
+            "switch_win_rate": paired_report["switch_accounting"]["switch_win_rate"],
+            "candidate_only_correct": paired_report["switch_accounting"]["candidate_only_correct"],
+            "fst_only_correct": paired_report["switch_accounting"]["reference_only_correct"],
+            "net_correct": paired_report["switch_accounting"]["net_correct_from_switches"],
+            "mcnemar_exact_two_sided_p": paired_report["switch_accounting"]["mcnemar_exact_two_sided_p"],
+        },
         "governance": {
-            "completed_2026_outcomes_used_for_candidate_design": 0,
-            "target_outcomes_used_to_change_candidate": 0,
-            "same_row_comparison_required": True,
+            "same_sample_comparison_required": True,
+            "completed_2026_outcomes_used": 0,
+            "candidate_parameters_changed_after_results": False,
             "production_changed": False,
             "promotion_authorized": False,
         },
     }
 
-    tables = {
-        "scored_with_controls": frame,
-        "bootstrap": primary_tables["bootstrap"],
-        "paired_tests": primary_tables["paired_tests"],
-        "calibration_bins": primary_tables["calibration_bins"],
-        "standard_slices": primary_tables["slices"],
-        "mechanism_slices": pd.DataFrame(mechanism_slices(frame)),
-        "switch_reason_summary": pd.DataFrame(switch_rows),
-    }
-    return report, tables
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "evaluation.json").write_text(
+        json.dumps(result, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    for name, table in paired_tables.items():
+        table.to_csv(out / f"primary_{name}.csv", index=False)
+    pd.DataFrame(result["week_results"]).to_csv(out / "week_results.csv", index=False)
+    pd.DataFrame(result["shock_attribution"]).to_csv(out / "shock_attribution.csv", index=False)
+    print(json.dumps(result, indent=2, sort_keys=True, default=str))
+    return result
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
-    parser.add_argument("--output-dir", default="research_outputs/adaptive_candidate2_evaluation_v1")
-    parser.add_argument("--bootstrap-samples", type=int, default=10000)
+    parser.add_argument("--output-dir", default="research_outputs/adaptive_candidate2_v1/evaluation")
     args = parser.parse_args()
-
-    report, tables = evaluate(args.input, bootstrap_samples=args.bootstrap_samples)
-    out = Path(args.output_dir)
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "evaluation.json").write_text(
-        json.dumps(report, indent=2, sort_keys=True, default=str) + "\n",
-        encoding="utf-8",
-    )
-    for name, table in tables.items():
-        table.to_csv(out / f"{name}.csv", index=False)
-    print(json.dumps(report, indent=2, sort_keys=True, default=str))
+    run(args.input, args.output_dir)
 
 
 if __name__ == "__main__":
