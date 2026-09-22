@@ -66,7 +66,9 @@ def due_horizons(kickoff_utc: datetime, now_utc: datetime) -> list[dict[str, Any
     for label, minutes in HORIZONS.items():
         target = kickoff - timedelta(minutes=minutes)
         error = (now - target).total_seconds() / 60.0
-        if abs(error) <= CAPTURE_TOLERANCE_MINUTES:
+        # Strict PIT rule: a nominal T-minus capture may be early but never late.
+        # Positive error means information observed after the declared cutoff.
+        if -CAPTURE_TOLERANCE_MINUTES <= error <= 0.0:
             out.append({"horizon": label, "target_timestamp_utc": target, "timing_error_minutes": error})
     return out
 
