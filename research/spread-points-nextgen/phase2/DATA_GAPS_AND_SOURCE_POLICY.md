@@ -184,3 +184,43 @@ Escalate a paid source only if Phase 3/4 shows:
 - expected improvement is large enough to matter relative to uncertainty and operational cost.
 
 Any future memo must name the source, fields, price, test plan and no-cost alternatives before purchase.
+
+
+---
+
+## 8. Canonical Phase 3 feature/source feasibility matrix
+
+This table is the authoritative source/PIT gate for the initial implementation. A Phase 3 feature may not be added merely because a dataframe column exists.
+
+| Feature family | Source | Stable identity key | Pregame availability rule | Publication-time / lag rule | Missingness | Historical coverage used | Status |
+|---|---|---|---|---|---|---|---|
+| game identity / schedule / home-away | nflverse games | `game_id`, team abbreviations mapped by repository crosswalk | schedule row known before game; final scores excluded from features | static schedule metadata only | fail if game/team identity unresolved | 2016–2024 dev; 2025 holdout later | **AUTHORIZED A0/B0/C0** |
+| rest differential | nflverse schedule dates | `game_id`, team | deterministically calculable from prior scheduled/completed games | prior schedule only | explicit unknown only if schedule history missing | 2016–2024 | **AUTHORIZED A0/B0/C0** |
+| prior PBP EPA/success | nflverse PBP | `game_id`, `posteam`/`defteam` | only completed games strictly before forecast game | fixed 8-team-game EW state; no current-game plays | no future fill; team-state minimum support enforced | 2016–2024 | **AUTHORIZED A0/B0** |
+| opponent-adjusted offense/defense state | derived inside training fold from prior PBP | team + season/week | state for game built from prior games only | opponent adjustment fitted/recomputed inside prior-time fold; never full-sample normalization | fail/league-prior shrinkage per frozen A0 spec | 2016–2024 | **AUTHORIZED A0; OOF output to B0/C0** |
+| drives / possessions | nflverse PBP drive identifiers/outcome reconstruction | `game_id`, possession team, drive index | only drives from completed prior games | fixed 8-team-game lagged state | malformed drives excluded with count reported | 2016–2024 where reconstruction passes | **AUTHORIZED B0** |
+| plays per drive | derived prior PBP | team/game | prior games only | fixed 8-team-game lagged state | explicit support threshold | 2016–2024 | **AUTHORIZED B0** |
+| TD / FG per drive | derived prior PBP scoring outcomes | team/game/drive | prior games only | fixed 8-team-game lagged state | rare/ambiguous scoring handled by frozen tail rule | 2016–2024 | **AUTHORIZED B0** |
+| turnover/takeaway per drive | prior PBP | team/game/drive | prior games only | fixed 8-team-game lagged state | explicit unknown/excluded malformed drive | 2016–2024 | **AUTHORIZED B0** |
+| explosive-play rate | prior PBP | team/game/play | prior games only; explosive definition frozen in Phase 3 contract before outputs | fixed 8-team-game lagged state | denominator/support recorded | 2016–2024 | **AUTHORIZED B0 after definition is coded once, not tuned** |
+| red-zone rates | prior PBP | team/game/drive | prior games only | would use fixed lag if activated | not encoded as zero when unavailable | multi-season possible | **DEFERRED; not B0** |
+| sacks / pressure | nflverse PBP / advanced sources | team/game/play/player IDs where needed | prior games only | source publication must precede next forecast | explicit | PBP sacks broad; pressure advanced varies | **DEFERRED; not B0** |
+| special teams | prior PBP | team/game/play | prior games only | prior-completed game | explicit | broad | **DEFERRED; rare tail only in B0** |
+| market spread / total | nflverse games historical fields | `game_id` | historical field treated only as closing/late family | exact capture horizon opaque; never called T-120 | paired rows only; never imputed | 2016–2025 where present | **AUTHORIZED C0 as historical closing-like benchmark** |
+| prospective T-120 market | repository market collector / The Odds API when healthy | game + book + snapshot timestamp | latest qualified snapshot at/before kickoff-120 | retrieval and provider timestamps required | failed auth/stale/sparse = unavailable | prospective only | **BLOCKED currently; required for same-horizon future work** |
+| QB expected starter | timestamped depth/expected-lineup sources | GSIS/player ID + game/team | identity must be explicitly known by simulated horizon | snapshot timestamp <= decision time | missing = unknown, never continuity | unified 2022–2025 fixed-horizon history absent | **BLOCKED/CONDITIONAL** |
+| QB prior quality | prior completed-game PBP/NGS after starter identity qualifies | stable player ID | only for qualified expected starter | observed prior data published before forecast | shrinkage + unknown flag | data broad, identity/PIT start-state gap remains | **CONDITIONAL** |
+| injury/practice state | 2025 composite; prospective NFL snapshots | stable player ID + team/week | report/practice state known by horizon | source timestamp <= horizon | missing = unknown | qualified 2025 only historically | **SENSITIVITY ONLY / CONDITIONAL** |
+| OL continuity/personnel | depth/roster/participation sources | player ID + position/team | expected role must be known pregame | participation cannot use same-game realized snaps | missing = unknown | incomplete unified PIT history | **BLOCKED/CONDITIONAL** |
+| NGS/PFR/FTN advanced | nflverse-distributed advanced feeds | player/team/game IDs | prior completed game only | must satisfy observed publication lag before next forecast | structural missingness explicit | varies by family | **DEFERRED** |
+| static roof/venue | schedule + verified venue mapping | game/venue ID | venue assignment known pregame | static metadata only | unresolved venue = unknown | broad but venue mapping must pass | **OPTIONAL FUTURE; not initial A0/B0/C0** |
+| weather forecast | NWS / archived Open-Meteo contract | game + venue + forecast issue time | forecast available by simulated horizon | issue/init availability <= horizon | missing = unavailable | historical reconstruction not yet qualified; prospective collector incomplete | **BLOCKED** |
+| travel/time zone | deterministic schedule + exact venue | team/game/venue | calculable pregame | static calculation | unresolved venue = unknown | potentially broad | **DEFERRED** |
+| news/text | official/team/media sources | URL/article ID + publication timestamp + entity mapping | published by horizon | timestamp must be preserved | missing is not negative evidence | no uniform historical archive | **BLOCKED from numerical initial model** |
+
+### Source-policy consequences
+
+1. **Initial A0/B0/C0 is fully feasible at $0** without QB, injury, weather, paid charting or repaired prospective market collection.
+2. The Odds API HTTP 401 affects prospective multi-book/T-120 research, not the historical closing-like C0 experiment.
+3. Unresolved venue receipts block qualified weather and precise travel extensions, not A0/B0/C0.
+4. No Phase 3 implementation may reinterpret a blocked/conditional row as authorized without a logged source-contract amendment written before results from that feature are inspected.
