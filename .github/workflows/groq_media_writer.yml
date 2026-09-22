@@ -14,6 +14,7 @@ on:
       - "src/nfl_forecast/source_policy.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_canonical_editorial_predictions.py"
+      - "scripts/maintain_editorial_slate_roster.py"
       - "scripts/build_copilot_media_prompt.py"
       - "scripts/build_single_game_copilot_prompt.py"
       - "scripts/run_groq_media_prompt.py"
@@ -25,6 +26,7 @@ on:
       - "scripts/validate_copilot_media_reads.py"
       - "scripts/audit_groq_main_advance.py"
       - "tests/test_canonical_editorial_predictions.py"
+      - "tests/test_editorial_slate_roster.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
       - "tests/test_copilot_composition.py"
@@ -51,6 +53,7 @@ on:
       - "src/nfl_forecast/source_policy.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_canonical_editorial_predictions.py"
+      - "scripts/maintain_editorial_slate_roster.py"
       - "scripts/build_copilot_media_prompt.py"
       - "scripts/build_single_game_copilot_prompt.py"
       - "scripts/run_groq_media_prompt.py"
@@ -62,6 +65,7 @@ on:
       - "scripts/validate_copilot_media_reads.py"
       - "scripts/audit_groq_main_advance.py"
       - "tests/test_canonical_editorial_predictions.py"
+      - "tests/test_editorial_slate_roster.py"
       - "tests/test_media_context.py"
       - "tests/test_copilot_media.py"
       - "tests/test_copilot_composition.py"
@@ -186,13 +190,16 @@ jobs:
 
       - name: Test media editorial guardrails
         run: |
-          pytest -q tests/test_canonical_editorial_predictions.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_editorial_provider_fallback.py tests/test_recover_groq_focused_game.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_groq_main_advance_audit.py
-          python -m py_compile scripts/recover_groq_focused_game.py src/nfl_forecast/editorial_provider_fallback.py
+          pytest -q tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_editorial_provider_fallback.py tests/test_recover_groq_focused_game.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_groq_main_advance_audit.py
+          python -m py_compile scripts/recover_groq_focused_game.py scripts/maintain_editorial_slate_roster.py src/nfl_forecast/editorial_provider_fallback.py
+
+      - name: Maintain durable editorial slate roster
+        run: python scripts/maintain_editorial_slate_roster.py
 
       - name: Canonicalize editorial forecast source
         run: |
           set -euo pipefail
-          python scripts/build_canonical_editorial_predictions.py --editorial-roster outputs/game_previews.json --output /tmp/editorial_predictions.csv
+          python scripts/build_canonical_editorial_predictions.py --editorial-roster outputs/editorial_slate_roster.json --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
       - name: Refresh deterministic reporting packet
@@ -536,7 +543,8 @@ jobs:
           assert 'recording it and continuing so every canonical game receives an independent provider attempt' in text
           assert 'Persist exact unresolved Groq failure state' in text
           assert 'refusing partial publication' in text
-          assert text.count('--editorial-roster outputs/game_previews.json') >= 2
+          assert text.count('--editorial-roster outputs/editorial_slate_roster.json') >= 2
+          assert 'python scripts/maintain_editorial_slate_roster.py' in text
           sync_block = text.split('      - name: Synchronize with contextual intelligence', 1)[1].split('      - name: Refresh latest main for scheduled/manual run', 1)[0]
           assert sync_block.count('git fetch origin main') >= 2
           assert sync_block.rfind('git fetch origin main') < sync_block.rfind('git reset --hard origin/main')
@@ -547,6 +555,7 @@ jobs:
           assert 'cancel-in-progress: true' in concurrency_block
           publish_block = text.rsplit('\n      - name: Publish editorial-only outputs', 1)[1]
           assert 'outputs/contextual_evidence.json' in publish_block
+          assert 'outputs/editorial_slate_roster.json' in publish_block
           assert 'validated_base=$(git rev-parse HEAD^)' in publish_block
           assert 'git pull --rebase origin main' not in publish_block
           print('Groq remains primary; validated Groq games checkpoint across retries, every unresolved game is isolated and recorded, and partial slates cannot publish.')
@@ -566,7 +575,8 @@ jobs:
             fi
             echo "Only reconcilable deterministic outputs advanced; rebuilding deterministic editorial facts on latest main."
             git reset --hard origin/main
-            python scripts/build_canonical_editorial_predictions.py --editorial-roster outputs/game_previews.json --output /tmp/editorial_predictions.csv
+            python scripts/maintain_editorial_slate_roster.py
+            python scripts/build_canonical_editorial_predictions.py --editorial-roster outputs/editorial_slate_roster.json --output /tmp/editorial_predictions.csv
             cp /tmp/editorial_predictions.csv outputs/this_week.csv
             python scripts/compose_copilot_media_reads.py --input /tmp/groq-media-raw.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --evidence outputs/contextual_evidence.json --output /tmp/groq-media-composed.json
             python scripts/render_levline_paragraphs.py --input /tmp/groq-media-composed.json --predictions outputs/this_week.csv --previews outputs/game_previews.json --output /tmp/groq-media-rendered.json
@@ -588,8 +598,8 @@ jobs:
           finalizer = status.get('editorial_finalizer', {})
           fallback = status.get('groq_provider_fallback', {})
           games = int(finalizer.get('games', 0))
-          roster = json.loads(Path('outputs/game_previews.json').read_text())
-          expected_games = len(roster)
+          roster = json.loads(Path('outputs/editorial_slate_roster.json').read_text())
+          expected_games = len(roster.get('game_ids') or [])
           if games != expected_games:
               raise SystemExit(f'editorial slate contracted: finalized={games} roster={expected_games}')
 
@@ -629,7 +639,7 @@ jobs:
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
+          git add outputs/editorial_slate_roster.json outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
           if git diff --cached --quiet; then echo "No media editorial changes to publish."; exit 0; fi
           git commit -m "Refresh Groq/ChatGPT Sunday Signal Reads"
           git fetch origin main
