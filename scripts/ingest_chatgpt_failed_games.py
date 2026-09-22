@@ -5,7 +5,7 @@ from __future__ import annotations
 The normal full-slate ChatGPT ingestion remains available for a deliberate complete
 handoff. This recovery path is narrower: the manifest may name only games that the
 latest Groq run explicitly marked as needing ChatGPT refresh. Successful Groq games are
-preserved from the already-validated provider artifact. The merged slate is then run
+preserved from the already-validated provider artifact, with the validated preview artifact used only if a prior provider publication itself contracted. The merged slate is then run
 through the same deterministic composition, rendering, source, uniqueness, and
 full-slate validators before it can be published.
 """
@@ -116,26 +116,56 @@ def _base_raw_entry(entry: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _preview_raw_entry(entry: dict[str, Any]) -> dict[str, Any]:
+    paragraphs = entry.get("paragraphs") or []
+    paragraph1 = str(paragraphs[0] if len(paragraphs) > 0 else entry.get("paragraph1") or "").strip()
+    paragraph2 = str(paragraphs[1] if len(paragraphs) > 1 else entry.get("paragraph2") or "").strip()
+    normalized_sources: list[dict[str, str]] = []
+    for source in entry.get("reported_sources") or entry.get("sources") or []:
+        if not isinstance(source, dict):
+            continue
+        name = str(source.get("source_name") or source.get("name") or "").strip()
+        title = str(source.get("title") or "").strip()
+        url = str(source.get("source_url") or source.get("url") or "").strip()
+        if name and title and url:
+            normalized_sources.append({"name": name, "title": title, "url": url})
+    return _base_raw_entry({
+        "headline": entry.get("headline"),
+        "paragraph1": paragraph1,
+        "paragraph2": paragraph2,
+        "sources": normalized_sources,
+    })
+
+
 def build_mixed_raw_payload(
     *,
     canonical_game_ids: list[str],
     base_artifact: dict[str, Any],
     chatgpt_entries: dict[str, dict[str, Any]],
+    preview_artifact: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     games = base_artifact.get("games") if isinstance(base_artifact, dict) else None
     if not isinstance(games, dict):
         raise ValueError("base validated provider artifact is missing games")
+    preview_games = preview_artifact if isinstance(preview_artifact, dict) else {}
     output: dict[str, dict[str, Any]] = {}
     for gid in canonical_game_ids:
         if gid in chatgpt_entries:
             output[gid] = chatgpt_entries[gid]
             continue
         entry = games.get(gid)
-        if not isinstance(entry, dict):
-            raise ValueError(f"base validated provider artifact missing successful game {gid}")
-        raw = _base_raw_entry(entry)
-        if not raw["headline"] or not raw["paragraph1"] or not raw["sources"]:
-            raise ValueError(f"base validated provider artifact has unusable game {gid}")
+        if isinstance(entry, dict):
+            raw = _base_raw_entry(entry)
+        else:
+            preview_entry = preview_games.get(gid)
+            if not isinstance(preview_entry, dict):
+                raise ValueError(
+                    f"base validated provider artifact missing successful game {gid} "
+                    "and no validated preview fallback is available"
+                )
+            raw = _preview_raw_entry(preview_entry)
+        if not raw["headline"] or not raw["paragraph1"] or not raw["model_rationale"] or not raw["sources"]:
+            raise ValueError(f"validated editorial base has unusable game {gid}")
         output[gid] = raw
     return {"games": output}
 
@@ -195,6 +225,7 @@ def ingest(
     status = json.loads(context_status_path.read_text(encoding="utf-8"))
     targets = validate_fallback_manifest(input_root, game_ids, status)
     base = json.loads(provider_path.read_text(encoding="utf-8"))
+    previews_payload = json.loads(preview_path.read_text(encoding="utf-8"))
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(prefix="chatgpt-failed-game-ingest-") as tmp:
@@ -227,6 +258,7 @@ def ingest(
                 canonical_game_ids=game_ids,
                 base_artifact=base,
                 chatgpt_entries=chatgpt_entries,
+                preview_artifact=previews_payload,
             ), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
