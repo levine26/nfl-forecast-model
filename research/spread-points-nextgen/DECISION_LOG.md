@@ -1,0 +1,40 @@
+# Spread & Points Next-Generation — Decision Log
+
+**Authority:** `MASTER_PLAN.md`  
+**Purpose:** Record durable program decisions, their rationale, and whether they may be revisited.  
+**Initialized:** 2026-09-21 America/Los_Angeles
+
+A decision may be revisited only through explicit new evidence and a new dated entry. Do not silently overwrite prior decisions.
+
+| Date | Decision | Rationale | Revisit policy |
+|---|---|---|---|
+| 2026-09-21 | Keep the current official production winner-probability model frozen throughout this research program. | Repository evidence verifies `F-ST-01-FROZEN-2026` as the active production strategy, with immutable identity/provenance controls. Research must not contaminate the live accountability record. | Revisit only in Phase 6 after all historical/prospective gates are complete and the user explicitly approves promotion. |
+| 2026-09-21 | The user must personally approve any final production promotion. | Human production control is a mandatory program requirement. No model result, PR merge, CI result, or research status may imply automatic authorization. | Not delegable. A future explicit user instruction may authorize a specific promotion after the final package exists. |
+| 2026-09-21 | Emphasize recent NFL seasons, approximately 2023-2026, for the primary modern research environment. | Current league behavior and information environments can drift. Older seasons may still help estimate stable structure or rare events. | May be refined if Phase 1/2 concept-drift evidence supports a different boundary; material changes must be logged. |
+| 2026-09-21 | Football-prediction metrics are primary; ATS is secondary. | The research target is accurate team points, margin, total, and distributions—not an attractive betting backtest. | Core principle. Metric details may be refined by preregistration, but ATS cannot become the sole selector. |
+| 2026-09-21 | Study both football-only and market-aware challengers. | These answer different scientific questions: intrinsic football prediction vs incremental information beyond a strong sportsbook prior. | Core principle. Specific architectures may change based on evidence. |
+| 2026-09-21 | Investigate player/personnel-to-team scoring as a hypothesis. | QB, availability, offensive line, workload, and personnel state may improve team scoring/margin prediction. | Revisit based on Phase 1 residuals and Phase 2 evidence. It must earn OOS value. |
+| 2026-09-21 | Do not resurrect the retired Props implementation wholesale. | The old system was intentionally removed because operational/workflow/branch/artifact complexity became excessive. Its scientific concepts remain reusable. | Core architectural boundary. A future clean-sheet player-to-team layer is allowed if justified. |
+| 2026-09-21 | Strongly prefer free/open/current data and existing configured APIs. | Reproducibility, cost control, and operational simplicity are priorities; the repository already contains useful source-governance infrastructure. | A paid source may be proposed only with a documented case for unique, material predictive value that cannot reasonably be replicated for free. |
+| 2026-09-21 | Paid-data dependencies require user escalation before adoption. | The user strongly prefers free/open sources and has not authorized automatic subscriptions or dependencies. | A specific source can be reconsidered with unique information, gap analysis, affected model component, plausible value, test plan, and cost. |
+| 2026-09-21 | Model complexity must earn its place empirically. | Sophistication without robust OOS improvement adds overfitting and operational risk. | Core principle. Complexity survives only when validation or necessary reliability justifies it. |
+| 2026-09-21 | No predetermined conclusion or mandatory challenger winner. | Scientific validity requires accepting negative findings. | Core principle. |
+| 2026-09-21 | The sportsbook market may prove superior and that result must be accepted if supported by evidence. | Market efficiency is itself a valid empirical outcome; LevLine must not manufacture incremental value. | Core principle. |
+| 2026-09-21 | Treat current public fair-spread semantics separately from the independent margin model. | Repository inspection shows the current pipeline fits an independent margin regressor, while Sunday Signal derives its public fair margin/spread from the official winner probability and margin sigma. | Revisit only if a later production architecture is explicitly approved; Phase 1 must audit both paths separately. |
+| 2026-09-21 | Use one active program phase at a time, while allowing justified parallel lanes within that phase. | Prevents redundant work, phase drift, and contradictory evidence. | Material phase-sequencing changes require documented empirical necessity and user approval where they alter the program. |
+| 2026-09-21 | Use one primary research branch per active phase/coherent implementation block, with very few specialist branches. | Prior Props development demonstrated branch explosion and handoff cost. | Revisit only if a concrete technical dependency clearly benefits from parallel branches. |
+| 2026-09-21 | GitHub control files, not chat memory, are authoritative institutional memory. | Long chats previously lost state and repeated work. Durable repository state is inspectable, reviewable, and handoff-safe. | Core governance principle. |
+| 2026-09-21 | Preserve chronology, point-in-time semantics, holdout separation, and immutable prospective evidence. | Prevents leakage, fake backtests, post-hoc rescue, and retrospective contamination. | Core scientific principle; may only be strengthened. |
+| 2026-09-21 | Preserve failed challengers and negative findings. | Avoids repeated dead ends and publication-selection bias. | Core research practice. |
+| 2026-09-21 | Avoid raw-data/artifact bloat in GitHub; prefer normalized, compact, sharded evidence with reproducible transformations. | Prior Props prospective ledgers demonstrated how quickly duplicated artifacts can become operationally costly. | Format may evolve, but compactness/reproducibility requirements remain. |
+
+## How to add a decision
+
+Append a dated row containing:
+
+1. the exact decision;
+2. the evidence or rationale;
+3. whether it is permanent, conditional, or revisitable;
+4. links/paths to supporting artifacts where relevant.
+
+Never delete an old decision merely because a later decision supersedes it. Add a new row that explicitly supersedes the prior entry.
