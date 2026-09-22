@@ -13,7 +13,7 @@
 
 Phase 2 research/design is analytically complete and has passed hostile methodological review. No Phase 3 challenger has been implemented and no A/B/C 2025 challenger result has been inspected.
 
-The branch was synchronized with current main through compatibility PR #521. The synced main-only work belongs to the separate adaptive-weekly-learning research program and is preserved without making Spread & Points Phase 2 dependent on it.
+The branch was synchronized with concurrent main through compatibility PR #521, then resynchronized through PR #528 after main advanced to `032289d5b62b226b242e4b4c202935f7fb0ef61a`. #521 preserved separate adaptive-weekly-learning research; #528 preserved a Sunday Signal contextual-output refresh. Neither concurrent workstream is used to select Spread & Points challengers.
 
 ## Frozen initial Phase 3 shortlist
 
