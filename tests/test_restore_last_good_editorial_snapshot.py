@@ -76,6 +76,7 @@ def test_trim_snapshot_preserves_current_failure_targets() -> None:
         evidence={"g0": {}, "g1": {"e": 1}, "g2": {"e": 2}},
         historical_status=historical_status,
         current_status=current_status,
+        source_commit="abc123",
     )
 
     assert set(previews) == {"g1", "g2"}
@@ -85,4 +86,5 @@ def test_trim_snapshot_preserves_current_failure_targets() -> None:
     assert status["editorial_finalizer"]["games"] == 2
     assert status["media_reporting"]["games_with_trusted_reporting"] == 2
     assert status["media_reporting"]["last_good_snapshot_reused"] is True
+    assert status["media_reporting"]["last_good_snapshot_source_commit"] == "abc123"
     assert status["groq_provider_fallback"]["games"]["g2"]["requires_chatgpt_refresh"] is True
