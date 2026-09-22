@@ -60,7 +60,7 @@ def _validate_live_hook(workflow_text: str) -> dict[str, Any]:
         "postkickoff_noop.json",
         "python -m research.props.v22.capture_prospective",
         "--source-json challenger_outputs/props21/public_challenger.json",
-        "--output challenger_outputs/props22/forecast_originals.jsonl",
+        "--output challenger_outputs/props22/forecast_originals",
         "challenger_outputs/props22",
     )
     missing = [marker for marker in required if marker not in workflow_text]
@@ -275,7 +275,7 @@ def main() -> int:
     parser.add_argument(
         "--ledger",
         type=Path,
-        default=Path("challenger_outputs/props22/forecast_originals.jsonl"),
+        default=Path("challenger_outputs/props22/forecast_originals"),
     )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
