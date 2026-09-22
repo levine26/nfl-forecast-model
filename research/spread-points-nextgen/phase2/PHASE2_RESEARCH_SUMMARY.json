@@ -155,18 +155,27 @@
         "merge_sha": "2a355952643d5527bad08a931bc790098f405c5c",
         "main_sha": "3e859968a40b8250f85ed211e8b1e7593ea1bf47",
         "scope": "generated market/status refresh"
+      },
+      {
+        "pr_number": 541,
+        "merge_sha": "076dc9d6f6c052eec4744a155070c42c1b99ae82",
+        "main_sha": "e93127963c76cd309cdddf17d91291c04a60a659",
+        "scope": "adaptive Candidate 2 final freeze/closeout state"
       }
     ],
-    "latest_synchronized_main_sha": "3e859968a40b8250f85ed211e8b1e7593ea1bf47",
+    "latest_synchronized_main_sha": "e93127963c76cd309cdddf17d91291c04a60a659",
     "concurrent_research_preserved": true,
-    "concurrent_research_used_for_challenger_selection": false
+    "concurrent_research_used_for_challenger_selection": false,
+    "final_phase2_head_sha": "076dc9d6f6c052eec4744a155070c42c1b99ae82"
   },
   "phase3_started": false,
-  "phase2_merge_sha": null,
+  "phase2_merge_sha": "405906942013252c158244c9b033a3240baa37f8",
   "final_exact_head_ci": {
-    "research_firewall_run_id": null,
-    "research_validation_run_id": null,
-    "all_passed": false
+    "research_firewall_run_id": 35751402751,
+    "research_firewall_conclusion": "success",
+    "research_validation_run_id": 35751402726,
+    "research_validation_conclusion": "success",
+    "all_passed": true
   },
   "frozen_development_contract": {
     "training_history_rule": "fixed 2016 training floor; expanding prior-only training",
@@ -253,5 +262,11 @@
     "turnovers": "peer-reviewed rare-event predictability; noisy/weak persistence implies shrinkage and no deterministic adjustment",
     "red_zone": "football mechanism + technical/practitioner evidence; bounded shrinkage-smoothed B0 component, not separate search",
     "explosive_plays": "technical/practitioner scoring-tail evidence; one fixed B0 definition, no threshold/window search"
-  }
+  },
+  "phase2_status": "complete",
+  "phase2_pr": 520,
+  "phase2_validated_head": "076dc9d6f6c052eec4744a155070c42c1b99ae82",
+  "merged_artifacts_verified_from_main": true,
+  "holdout_2025_challenger_results_inspected": false,
+  "completed_2026_used_for_selection": false
 }
