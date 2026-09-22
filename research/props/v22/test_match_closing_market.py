@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "match_closing_market.py"
+SCRIPT = Path(__file__).with_name("match_closing_market.py")
 SPEC = importlib.util.spec_from_file_location("match_closing_market", SCRIPT)
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
