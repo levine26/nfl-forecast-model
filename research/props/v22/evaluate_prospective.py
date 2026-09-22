@@ -141,11 +141,6 @@ def validate_receipts(
         if str(row.get("source_props21_model_version") or "") != baseline:
             raise Props22EvaluationError("Props 2.2 receipt baseline model identity mismatch")
 
-        grade_sha = str(row.get("grade_sha256") or "")
-        unhashed = dict(row)
-        unhashed.pop("grade_sha256", None)
-        if len(grade_sha) != 64 or _sha(unhashed) != grade_sha:
-            raise Props22EvaluationError("Props 2.2 grade hash mismatch")
         source_sha = str(row.get("source_props21_forecast_sha256") or "")
         source_id = str(row.get("source_props21_forecast_id") or "")
         receipt_sha = str(row.get("receipt_sha256") or "")
@@ -195,6 +190,11 @@ def validate_grades(rows: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, An
         row = dict(raw)
         if row.get("contract_version") != GRADE_CONTRACT_VERSION:
             raise Props22EvaluationError("unexpected Props 2.2 grade contract")
+        grade_sha = str(row.get("grade_sha256") or "")
+        unhashed = dict(row)
+        unhashed.pop("grade_sha256", None)
+        if len(grade_sha) != 64 or _sha(unhashed) != grade_sha:
+            raise Props22EvaluationError("Props 2.2 grade hash mismatch")
         source_sha = str(row.get("source_props21_forecast_sha256") or "")
         source_id = str(row.get("source_props21_forecast_id") or "")
         game_id = str(row.get("game_id") or "")
