@@ -71,7 +71,7 @@ A/B/C are testable with free/open sources. Paid injury/OL/route/coverage/partici
 
 - explicit evidence-quality classification for peer-reviewed, technical/open-source, practitioner and opaque sources;
 - deeper David Sasser review with product observations separated from reproducible evidence;
-- deterministic candidate-specific nested chronology/tie-breaking;
+- deterministic fixed-2016 nested chronology/tie-breaking;
 - A0/A1 boundary tightened;
 - independent B0 reference required;
 - C0 reduced to Ridge-only; no tree fallback;
