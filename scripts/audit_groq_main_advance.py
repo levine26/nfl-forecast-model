@@ -38,6 +38,7 @@ RESEARCH_SENSITIVE_OUTPUTS = frozenset(
 RESEARCH_ONLY_PREFIXES = (
     "research/",
     "docs/levline4/",
+    "challenger_outputs/",
 )
 
 FALLBACK_STATUS_SIDECAR = Path("/tmp/sunday-signal-groq-provider-fallback.json")
