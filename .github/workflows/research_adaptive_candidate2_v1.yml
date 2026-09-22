@@ -41,9 +41,17 @@ jobs:
 
       - name: Run Candidate 2 unit and reproduction tests
         run: |
-          PYTHONPATH="$PWD/src:$PWD" pytest -q \
+          tests=( \
             research/test_adaptive_regime_shock_gate_v1.py \
-            research/test_adaptive_weekly_evaluation_v1.py
+            research/test_adaptive_weekly_evaluation_v1.py \
+          )
+          for optional in \
+            research/test_adaptive_candidate2_evaluation_v1.py \
+            research/test_adaptive_candidate2_adversarial_v1.py
+          do
+            if [ -f "$optional" ]; then tests+=("$optional"); fi
+          done
+          PYTHONPATH="$PWD/src:$PWD" pytest -q "${tests[@]}"
 
       - name: Rebuild qualified 2025 T-120 depth state
         if: github.event_name != 'pull_request'
