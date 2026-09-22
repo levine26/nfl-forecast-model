@@ -4,8 +4,8 @@
 **Program authority:** `research/spread-points-nextgen/MASTER_PLAN.md`  
 **Phase 0:** **COMPLETE**  
 **Phase 1:** **COMPLETE**  
-**Phase 2:** **NOT STARTED**  
-**Active phase:** None. Stop after Phase 1 merge; the next substantive chat starts Phase 2 under the mandatory startup protocol.
+**Phase 2:** **IN PROGRESS**  
+**Active phase:** **Phase 2 — Deep External Research & Challenger Design** on `research/spread-points-nextgen-phase2`.
 
 ## Phase 1 completion state
 
@@ -152,3 +152,20 @@ The next substantive chat must:
 ## Stop condition
 
 **Phase 1 is complete. Phase 2 remains NOT STARTED. Stop after merging the Phase 1 research package.**
+
+
+## Phase 2 start record
+
+Phase 2 began on 2026-09-22 from merged Phase 1 main `a4f7172c0c4ff82b1689411181e7a9042a1628a8`.
+
+Scope is research/design only:
+
+- deep peer-reviewed and technical literature review;
+- external-model review, including davidsasser.com;
+- limited challenger shortlist;
+- feature and player/personnel hypotheses;
+- market-residual specification;
+- point-in-time/data-gap specification;
+- chronology-clean preregistered evaluation and untouched-holdout rules.
+
+**Do not implement Phase 3 challengers during Phase 2.**
