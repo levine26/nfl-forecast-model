@@ -317,3 +317,93 @@ If scope, metrics, candidate definitions, thresholds, or evidence rules change, 
 - whether any candidate's prospective clock must reset.
 
 This file is the authoritative anti-drift reference for the LevLine Adaptive Weekly Learning project.
+
+
+## 16. Execution log — 2026-09-22 initial build
+
+The following work was created from governance commit `aea40328a19a1be7b5bb43057dd182c5bab870b3` and integrated only into the research integration branch:
+
+- Integration branch: `research/adaptive-weekly-learning-integration`
+- Lane 1 PR #514 — chronology-safe weekly replay + leakage tests
+- Lane 2 PR #515 — Bayesian-shrinkage residual team-state challenger + chronology test
+- Lane 3 PR #516 — weekly error audit + L2-shrunk online intercept calibration + pick-preservation test
+- Lane 4 PR #517 — selective switch gate + chronology-safe naive weekly F-ST refit negative control
+- Lane 5 PR #518 — paired accuracy/Brier/log-loss evaluation + disagreement/McNemar accounting
+- Lane 6 PR #519 — professional/peer-reviewed literature synthesis
+- Dedicated integration workflow: `.github/workflows/research_adaptive_weekly_learning_v1.yml`
+- Integrated research head after initial six lanes: `8f409560a5c0e534a0371a355a46336e01620e29`
+
+All six lane PRs were merged into the research integration branch. None was merged into production `main`.
+
+Current validation state at this log entry:
+- repository research firewalls passed on the active code lanes checked so far;
+- combined adaptive integration workflow is executing against the integrated research head;
+- Phase 3 historical results are not yet recorded here and must be written back to this ledger after the workflow artifacts are verified.
+
+The first empirical comparisons are deliberately:
+1. frozen chronology-clean F-ST;
+2. naive weekly F-ST refit;
+3. Bayesian residual-state adaptation;
+4. pick-preserving online calibration;
+5. residual-state + conservative selective switch gate.
+
+No threshold or hyperparameter is to be changed in response to those first results without recording a new candidate/version and the evidence boundary here.
+
+
+## 17. Pre-result robustness grid — frozen 2026-09-22
+
+This grid was recorded before the first integrated historical adaptive workflow produced results.
+
+### Residual-state sensitivity grid
+
+The fixed V1 candidate remains the primary first candidate:
+- initial variance: 0.20
+- process variance/week: 0.03
+- weekly mean reversion: 0.97
+- offseason mean reversion: 0.50
+- max absolute residual state: 1.00 logit
+
+Robustness-only grid:
+- process variance/week: [0.01, 0.03, 0.06]
+- weekly mean reversion: [0.90, 0.97, 1.00]
+- offseason mean reversion: [0.25, 0.50, 0.75]
+
+The 27 combinations must be reported as sensitivity evidence. The best full-sample 2022–2025 combination may **not** be promoted as a new candidate merely because it wins retrospectively.
+
+### Selective-gate sensitivity grid
+
+Primary V1 gate remains:
+- incumbent boundary distance: 0.075 probability
+- minimum adaptive shift: 0.035 probability
+
+Robustness-only grid:
+- boundary distance: [0.05, 0.075, 0.10]
+- minimum adaptive shift: [0.02, 0.035, 0.05]
+
+Again, the full-sample best combination is descriptive only.
+
+### Permitted nested selection diagnostic
+
+A separate diagnostic may select among the predeclared grid using only chronologically earlier seasons and then score a later season. It must label the training seasons and target season explicitly. No target season may influence its own parameter choice.
+
+This grid is a robustness / falsification device, not authorization for post-result parameter rescue.
+
+
+## 18. Pre-result adversarial validation rules — frozen 2026-09-22
+
+These checks were specified before the first integrated historical result was interpreted.
+
+For any candidate with a positive full-sample accuracy delta:
+
+1. **Season sign stability:** report the accuracy delta in every target season. A gain concentrated in one season is not sufficient evidence of a generally useful adaptive mechanism.
+2. **Week concentration:** report net correct switches by season-week. If one week accounts for more than 50% of the total positive net gain, label the result concentration-sensitive.
+3. **Team concentration:** attribute each switch to both participating teams. If a small set of teams dominates the gain, report that explicitly and do not generalize the mechanism without further validation.
+4. **Probability guardrail:** positive winner accuracy may not hide a material deterioration in both Brier and log loss. Any such tradeoff requires a separate candidate rationale.
+5. **Grid robustness:** report the complete preregistered residual-state and switch-gate grids. The primary V1 remains the primary candidate regardless of which retrospective cell is best.
+6. **Nested chronology diagnostic:** parameter selection for a target season may use only earlier target seasons. The target season's outcomes may not choose its own configuration.
+7. **Baseline reproduction:** the common frozen F-ST benchmark must reproduce 741/1,087 correct on the established 2022–2025 sample where applicable. Failure invalidates the comparison.
+8. **Leakage assertions:** same-week outcome-use flags must remain false for every scored game.
+9. **Large-gain skepticism:** any full-sample uplift above +1.25 percentage points receives an explicit leakage/selection audit before substantive interpretation.
+10. **No hindsight rescue:** a failed V1 may motivate a newly registered V2 theory, but V1 parameters may not be edited and re-described as if they were the original candidate.
+
+These are interpretation rules, not automatic production-promotion criteria.

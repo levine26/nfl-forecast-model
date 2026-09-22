@@ -3,7 +3,7 @@
 **Phase status in this document:** **COMPLETE** — exact-head CI/firewall verification passed  
 **Production change:** none  
 **Primary branch:** `research/spread-points-nextgen-phase1`  
-**Draft PR:** #513
+**Merged PR:** #513 (`a4f7172c0c4ff82b1689411181e7a9042a1628a8`)
 
 ## What Phase 1 established
 
@@ -176,15 +176,17 @@ Before seeing challenger results:
 | Concrete hypotheses | error report + this synthesis |
 | No major baseline uncertainty | definitions frozen in `EVALUATION_CONTRACT.md`; remaining unknowns are explicitly source/PIT research questions, not ambiguity about the current baseline |
 
-Final exact-head validation passed:
+Final post-sync exact-head validation passed on `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`:
 
-- research firewall run `35695606248`: **SUCCESS**;
-- research validation run `35695606246`: **SUCCESS**;
-- dedicated Phase 1 audit run `35695606219`: **SUCCESS**;
-- audit artifact `10680706168`.
+- research firewall run `35741337735`: **SUCCESS**;
+- research validation run `35741337942`: **SUCCESS**;
+- dedicated Phase 1 audit run `35741337832`: **SUCCESS**;
+- final audit artifact `10699778876`, digest `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`.
+
+PR #513 merged as `a4f7172c0c4ff82b1689411181e7a9042a1628a8`. The exact-head checks finished successfully after the merge and the merged Phase 1 package was re-verified from `main`.
 
 The structural diagnostics additionally found no strong monotonic recent-form or simple pace residual gradient, zero Core-feature missingness across the audited OOF sample, and only descriptive/non-PIT-safe weather associations. Phase 1 is therefore **COMPLETE**. Phase 2 remains **NOT STARTED** until the next substantive chat follows the canonical startup protocol.
 
 ## Closeout compatibility sync
 
-Before merge, the Phase 1 branch was synchronized with current `main` at `df91b80403a7af3094a9a6a8915afd0a6dce2ad3`. The sync brought forward only concurrent repository state outside the Phase 1 research package; Phase 1 did not modify production forecast logic. Fresh pull-request checks on the post-sync head are required before merge.
+Before merge, the Phase 1 branch was synchronized with `main` at `df91b80403a7af3094a9a6a8915afd0a6dce2ad3`. The sync brought forward concurrent repository state outside the Phase 1 research package; Phase 1 did not modify production forecast logic. Fresh pull-request checks then passed on `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`, and PR #513 merged at `a4f7172c0c4ff82b1689411181e7a9042a1628a8`.
