@@ -21,21 +21,19 @@ from nfl_forecast.editorial_provider_fallback import recover_focused_payload
 from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
 
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
-# Compound Mini remains the primary provider because it gives Sunday Signal one
-# bounded web-search tool call per matchup. If Compound's hidden underlying model
-# exhausts a long-window quota, the runner can fail over to Groq's directly hosted
-# GPT-OSS model with its required browser-search tool without changing any LevLine
-# model or publication semantics.
-DEFAULT_MODEL = "groq/compound-mini"
-FALLBACK_MODEL = "openai/gpt-oss-120b"
+# Groq decommissioned Compound/Compound Mini on 2026-09-21. Sunday Signal now uses
+# directly hosted GPT-OSS with the documented built-in browser_search tool. The
+# smaller GPT-OSS model is a quota fallback only; deterministic publication validators
+# remain authoritative and no LevLine model semantics change.
+DEFAULT_MODEL = "openai/gpt-oss-120b"
+FALLBACK_MODEL = "openai/gpt-oss-20b"
 # Groq documents 2025-07-23 as the basic-search Compound version. Advanced search
 # retrieves more context; basic search is intentionally used here to stay inside the
 # tighter Free-tier limits inherited from Compound Mini's underlying models.
 DEFAULT_COMPOUND_VERSION = "2025-07-23"
-# Compound Mini needs a tight budget to stay within the routed Free-tier model's
-# minute window. Groq's browser-search quick start reserves 2K output tokens for
-# GPT-OSS; the fallback gets that larger budget because tool reasoning consumes part
-# of the completion allowance before the final compact JSON is emitted.
+# Direct GPT-OSS browser search uses the larger bounded budget because tool reasoning
+# consumes part of the completion allowance before the final compact JSON is emitted.
+# The legacy Compound budget is retained only for explicit historical overrides.
 MAX_COMPLETION_TOKENS = 600
 FALLBACK_MAX_COMPLETION_TOKENS = 2048
 FALLBACK_TOOL_TEMPERATURES = (0.6, 0.2)
