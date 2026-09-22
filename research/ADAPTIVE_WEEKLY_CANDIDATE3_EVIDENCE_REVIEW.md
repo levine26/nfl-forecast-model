@@ -55,3 +55,25 @@ Candidate 3 should use:
 7. one-season historical evidence treated as discovery/qualification, not production proof.
 
 No completed 2026-season result is authorized for feature, threshold, coefficient, or architecture selection.
+
+
+## Paid exact-horizon option (documentation only; not purchased)
+
+The free public archive is sufficient for the frozen one-season coarse-band Candidate 3 test, but it cannot establish exact historical T-120/T-60/T-45/T-30 states or multi-season path stability.
+
+A paid source that would materially change what is scientifically possible is **The Odds API historical featured-market feed**:
+
+- provider: The Odds API;
+- historical featured-market coverage: from June 6, 2020;
+- historical snapshot resolution: 10-minute snapshots initially, 5-minute snapshots from September 2022;
+- relevant NFL markets: moneyline, spread and total;
+- current paid access: historical data is paid-only; published plans currently begin at **$30/month for 20,000 credits**, with larger plans available;
+- why it matters: exact or near-exact T-minus reconstruction over multiple seasons becomes feasible without pretending that a closing line or a four-daily archive was known at the earlier lock;
+- why the free substitute is insufficient for that purpose: the qualified free archive covers only 2025 and captures four times per day, so exact canonical horizons and multi-season path stability cannot be established from it.
+
+No subscription was purchased or authorized. Candidate 3 does not depend on this paid option. If the adaptive-learning program is resumed, this source can be reconsidered only under a new research decision, with cost/quota planning performed before access.
+
+Public documentation consulted on 2026-09-22:
+- https://the-odds-api.com/historical-odds-data/
+- https://the-odds-api.com/liveapi/guides/v4/
+- https://the-odds-api.com/
