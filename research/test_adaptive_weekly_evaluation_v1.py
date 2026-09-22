@@ -13,9 +13,9 @@ def test_switch_accounting_counts_only_disagreements():
     })
     result = switch_accounting(frame, "candidate", "reference")
     assert result["disagreements"] == 3
-    assert result["candidate_only_correct"] == 2
-    assert result["reference_only_correct"] == 1
-    assert result["net_correct_from_switches"] == 1
+    assert result["candidate_only_correct"] == 1
+    assert result["reference_only_correct"] == 2
+    assert result["net_correct_from_switches"] == -1
 
 
 def test_exact_mcnemar_is_bounded():
