@@ -196,9 +196,19 @@ def test_terminal_readiness_reports_without_auto_selecting_winner():
     )
 
 
-def test_conflicting_or_nonfinal_grade_fails_closed():
+def test_nonfinal_grade_fails_closed_after_hash_validation():
     receipt = _receipts()[0]
     grade = _grade(receipt, 108.0)
     grade["finalized"] = False
+    grade.pop("grade_sha256")
+    grade["grade_sha256"] = MODULE._sha(grade)
     with pytest.raises(MODULE.Props22EvaluationError, match="finalized grades only"):
+        MODULE.validate_grades([grade])
+
+
+def test_grade_hash_tampering_fails_closed():
+    receipt = _receipts()[0]
+    grade = _grade(receipt, 108.0)
+    grade["actual_result"] = 999.0
+    with pytest.raises(MODULE.Props22EvaluationError, match="grade hash mismatch"):
         MODULE.validate_grades([grade])
