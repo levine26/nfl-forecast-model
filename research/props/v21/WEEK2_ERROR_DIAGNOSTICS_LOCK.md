@@ -23,6 +23,7 @@ For line/probability diagnostics, require all of:
 - `graded == True`
 - non-null `actual_result`
 - non-null `model_mean`
+- non-null `fair_line`
 - non-null `market_line`
 - non-null `model_p_over`
 - non-null `market_p_over`
@@ -34,9 +35,11 @@ Pushes are included in projection MAE but excluded from binary probability score
 For each eligible grouping, report:
 
 - N
-- model projection MAE
+- model-mean projection MAE
+- LevLine Fair Line MAE
 - original market line MAE
-- paired MAE delta = model MAE minus market MAE
+- primary paired MAE delta = Fair Line MAE minus market MAE
+- secondary model-mean MAE delta = model-mean MAE minus market MAE
 - non-push N
 - model Brier
 - market Brier
@@ -49,7 +52,7 @@ For each eligible grouping, report:
 - model confidence gap = confidence minus accuracy
 - market selected-direction confidence / accuracy / confidence gap
 
-Positive paired deltas mean the model was worse than the market. Positive confidence gap means overconfidence.
+Positive paired deltas mean the corresponding LevLine central estimate was worse than the market. The Fair-Line paired delta is the preregistered primary market-relative projection diagnostic. Positive confidence gap means overconfidence.
 
 ## Locked groupings
 
