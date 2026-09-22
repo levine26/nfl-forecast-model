@@ -57,7 +57,7 @@ jobs:
 
       - name: Run frozen Candidate 3 canonical evaluation
         run: |
-          PYTHONPATH=. python research/adaptive_candidate3_evaluation_v1.py             --db candidate3_inputs/nfl_odds.duckdb             --training-frame challenger_outputs/fst/provenance/training_frame_keyed.csv             --candidate2-scored candidate3_inputs/candidate2/candidate/scored_games.csv             --output-dir candidate3_evidence
+          PYTHONPATH=src:. python research/adaptive_candidate3_evaluation_v1.py             --db candidate3_inputs/nfl_odds.duckdb             --training-frame challenger_outputs/fst/provenance/training_frame_keyed.csv             --candidate2-scored candidate3_inputs/candidate2/candidate/scored_games.csv             --output-dir candidate3_evidence
 
       - name: Validate evidence schema and scientific firewall
         run: |
