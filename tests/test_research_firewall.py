@@ -95,6 +95,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         ".github/workflows/research_2025_availability_reconstruction.yml",
         ".github/workflows/levline_markets_live.yml",
         ".github/workflows/responsive.yml",
+        ".github/workflows/responsive.yml",
         "docs/LEVLINE_RESEARCH.md",
         "docs/IMPACT_MONITOR_GAP_ANALYSIS.md",
         "docs/FST_FREEZE_PROVENANCE.md",
