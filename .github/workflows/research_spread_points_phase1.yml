@@ -37,6 +37,8 @@ jobs:
             nfl-research-${{ runner.os }}-
             nfl-challenger-${{ runner.os }}-
             nflreadpy-${{ runner.os }}-
+      - name: Test Phase 1 audit helpers
+        run: python -m pytest -q research/spread-points-nextgen/phase1/test_run_baseline_audit.py
       - name: Run Phase 1 audit
         run: |
           rm -rf research_outputs/spread_points_phase1
@@ -47,6 +49,7 @@ jobs:
           test -s research_outputs/spread_points_phase1/phase1_machine_summary.json
           test -s research_outputs/spread_points_phase1/baseline_predictions_2022_2025.csv
           test -s research_outputs/spread_points_phase1/error_decomposition.csv
+          test -s research_outputs/spread_points_phase1/team_points_decomposition.csv
       - name: Verify production surfaces unchanged
         run: |
           git diff --exit-code -- \
