@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# Revalidation marker: depth-chart transport is intentionally retested against current main.
+
 import importlib.util
 import json
 from pathlib import Path
