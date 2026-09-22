@@ -80,7 +80,9 @@ Do not redo:
 - #488 — personnel/opportunity evidence coverage audit;
 - #491 — live integration that captures Props 2.2 receipts after successful **pregame** Props 2.1 runs;
 - #496 — frozen Props 2.2 prospective evaluator;
-- #497 — immutable postgame grader plus scheduled/off-main grading and evaluation workflow.
+- #497 — immutable postgame grader plus scheduled/off-main grading and evaluation workflow;
+- #500 — prospective closing-market / CLV evidence contract and immutable matcher;
+- #504 — fail-closed Props 2.2 first-capture readiness and acceptance gate.
 
 ### Frozen Props 2.2 design
 
@@ -105,14 +107,22 @@ No promotion/model-selection claim before at least:
 
 ## Props 2.2 prospective capture — current state
 
-The capture machinery is live, but **no Props 2.2 prospective ledger exists yet on main**. That is expected.
+The capture machinery is live, and **no Props 2.2 prospective ledger exists yet on main**. That is expected.
 
-Reason:
+PR #504 is merged. Its canonical readiness gate has only two valid states:
+- `ARMED_AWAITING_FIRST_CAPTURE` when the ledger file does not exist and the frozen grid / live capture hook are intact;
+- `FIRST_CAPTURE_VERIFIED` once a non-empty ledger exists and every source forecast has the complete frozen eight-challenger grid with valid hashes, chronology, frozen baseline identity, research-only governance, and no outcome contamination.
+
+The merge-head audit reported **`ARMED_AWAITING_FIRST_CAPTURE`** with the ledger absent, eight frozen challengers, the live hook present, the post-kickoff no-op guard before capture, and promotion candidates limited to `P22_COMBINED_25` and `P22_COMBINED_50`.
+
+Reason no ledger exists yet:
 - #491 merged after Week 2 was already fully started;
 - every subsequent live Props source run has therefore taken the valid post-kickoff no-op path;
 - the no-op path exits before creating 2.2 receipts, which preserves chronology and prevents retrospective Week 2 backfill.
 
-The first future successful **pregame** live Props run is the real acceptance test.
+An existing-but-empty ledger is a hard failure, not an ARMED state.
+
+The first future successful **pregame** live Props run is the real acceptance event. The readiness workflow runs after successful main `LevLine Props live refresh` executions and should then transition to `FIRST_CAPTURE_VERIFIED`.
 
 That run must:
 1. build a valid current-run Props 2.1 challenger artifact;
@@ -135,6 +145,17 @@ After future receipts exist, the repository no longer needs a new scoring build:
 - `research/props/v22/POSTGAME_GRADING_CONTRACT.md` freezes these eligibility rules before the first future holdout receipt.
 
 The evaluator never auto-selects a winner. Per-week reports remain descriptive until terminal preregistered evidence thresholds are satisfied.
+
+### Closing-market / CLV evidence is already frozen
+
+PR #500 is merged. Closing-market evidence is secondary/descriptive and cannot alter challenger coefficients or promotion thresholds.
+
+- closing evidence comes only from the append-only prospective market archive;
+- the selected close is the latest eligible capture strictly before kickoff;
+- same-threshold price CLV is reported only when the exact original threshold remains available;
+- missing closing evidence stays unmatched rather than being imputed;
+- the original point-in-time market remains the primary promotion comparator;
+- Week 2 closing evidence must not be backfilled into Props 2.2.
 
 ## Completed workflow cleanup
 
@@ -174,8 +195,8 @@ The old listeners failed because they demanded `source_provenance.json`, `foreca
 1. Read this file and `research/props/v21/CURRENT_STATE_AND_NEXT_STEPS.md`.
 2. Verify Sunday Signal remains 15/15 healthy, but keep that lane monitoring-only unless it regresses.
 3. Do **not** run new Week 2 tuning or weight selection.
-4. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green and the Props 2.2 capture hook is still wired.
-5. On the first future pregame live run, verify `challenger_outputs/props22/` is created with valid immutable receipts.
+4. Before the next untouched pregame slate, require the Props 2.2 readiness workflow to report `ARMED_AWAITING_FIRST_CAPTURE`.
+5. On the first future pregame live run, require `challenger_outputs/props22/forecast_originals.jsonl` to be created and the readiness workflow to transition to `FIRST_CAPTURE_VERIFIED`.
 6. Preserve forward personnel/opportunity and distribution evidence concurrently.
 7. After games finalize, verify the scheduled postgame workflow appends immutable grades and refreshes `research-data/props22-evaluation`; do not change grading/evaluation definitions mid-holdout.
 8. Do not select a Props 2.2 winner mid-holdout. Wait for the preregistered terminal evidence threshold.
