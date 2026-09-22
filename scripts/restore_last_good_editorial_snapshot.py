@@ -100,6 +100,7 @@ def trim_snapshot(
     evidence: dict[str, Any],
     historical_status: dict[str, Any],
     current_status: dict[str, Any],
+    source_commit: str = "",
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
     expected = len(roster_ids)
     trimmed_previews = _trim_game_map(previews, roster_ids)
@@ -147,6 +148,8 @@ def trim_snapshot(
             int(reporting.get("games_with_substantive_reporting") or 0),
         )
     reporting["last_good_snapshot_reused"] = True
+    if source_commit:
+        reporting["last_good_snapshot_source_commit"] = source_commit
     reporting["last_good_snapshot_guardrail"] = (
         "Post-kickoff recovery restored only previously launch-grade editorial artifacts "
         "for the frozen roster; current Groq failure targets remain authoritative."
@@ -233,6 +236,7 @@ def main() -> int:
         evidence=evidence,
         historical_status=historical_status,
         current_status=current_status,
+        source_commit=sha,
     )
     for (name, path), payload in zip(ARTIFACTS.items(), trimmed):
         target = repo_root / path
