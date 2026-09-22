@@ -22,7 +22,15 @@
     "decision_rule": "for each due team choose the latest snapshot timestamp dt <= nominal T-120; within that snapshot require exactly one QB row with pos_rank == 1 and non-empty gsis_id/player_name",
     "source_semantics": "2025+ depth-chart records carry ISO8601 load timestamp dt suitable for point-in-time assignment",
     "future_snapshot_use_prohibited": true,
-    "fuzzy_identity_prohibited": true
+    "fuzzy_identity_prohibited": true,
+    "capture_policy": {
+      "nominal_horizon": "T-120",
+      "one_sided_tolerance_minutes": 7.5,
+      "capture_must_be_no_later_than_target": true,
+      "source_row_timestamp_must_be_no_later_than_capture": true,
+      "immutable_snapshot_ledger": "research_outputs/adaptive_candidate4/qb1_t120_snapshots.csv",
+      "later_depth_requery_for_t60_shock": false
+    }
   },
   "inactive_source": {
     "archive_id": "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
@@ -60,10 +68,14 @@
     "kickoff_utc",
     "t120_target_utc",
     "t60_target_utc",
-    "t120_depth_timestamp_utc",
-    "t120_qb1_team",
-    "t120_qb1_player_name",
-    "t120_qb1_gsis_id",
+    "home_t120_qb1_player_name",
+    "home_t120_qb1_gsis_id",
+    "home_t120_depth_timestamp_utc",
+    "away_t120_qb1_player_name",
+    "away_t120_qb1_gsis_id",
+    "away_t120_depth_timestamp_utc",
+    "qb1_snapshot_sha256",
+    "qb1_snapshot_captured_at_utc",
     "inactive_capture_timestamp_utc",
     "inactive_source_url",
     "inactive_raw_sha256",
@@ -78,5 +90,6 @@
     "inactive_capture_after_t60": "INCOMPLETE",
     "unresolved_exact_name_identity": "INCOMPLETE",
     "later_capture_may_repair_prior_game": false
-  }
+  },
+  "schema_clarification": "Bilateral QB1 evidence fields and immutable T-120 capture policy; scientific shock rule unchanged."
 }
