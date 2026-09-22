@@ -1,6 +1,6 @@
 # Phase 2 Synthesis — Deep External Research & Challenger Design
 
-**Status:** analytically complete after red-team hardening; pending current-main synchronization and exact-head CI/firewall verification  
+**Status:** analytically complete after red-team hardening and current-main synchronization; pending exact-head CI/firewall verification  
 **Production change:** none  
 **Primary branch:** `research/spread-points-nextgen-phase2`  
 **Draft PR:** #520
@@ -26,9 +26,8 @@ Phase 2 therefore tightened the design before any Phase 3 result exists:
 - initial implementation is **A0 + B0 + C0 only**;
 - explicit state-space A1 and nonlinear residual C1 are deferred rather than activated from qualitative development diagnostics;
 - lagged process summaries use a fixed 8-team-game EWMA;
-- training begins at 2016;
 - outer development targets are exactly 2022, 2023 and 2024;
-- inner tuning targets begin in 2019 and are strictly prior-time;
+- inner folds are deterministic expanding prior-time folds using the latest four valid validation seasons, with fixed fallbacks when fewer than two valid folds exist;
 - candidate-specific tuning objectives and tie-breaks are frozen;
 - A0/B0/C0 reference identities receive one Phase 4 2025 score if implementation/PIT-valid even when development is negative;
 - D has an explicit numeric eligibility gate and is not forced.
@@ -99,7 +98,7 @@ Purpose:
 - adjust for opponent quality;
 - generate coherent home/away score expectations.
 
-Start simple. Nonlinear expansion, pass/rush substates and advanced charting are ablations, not defaults.
+A0 is the only initial A implementation. Explicit state-space A1, pass/rush substates, nonlinear expansion and advanced-charting variants are deferred behind a new preregistration.
 
 ## Challenger B — Possession / Drive Score Process
 
@@ -123,7 +122,7 @@ Purpose:
 - test whether football information adds incremental information beyond the market;
 - predict actual-minus-market residual rather than reconstruct the entire line.
 
-Reference learner is regularized and simple.
+Reference learner is Ridge-only under the frozen alpha grid.
 
 Historical nflverse market results remain closing/late benchmark research, never T-120.
 
@@ -224,7 +223,7 @@ ATS/O-U remains secondary and cannot select a model.
 
 To avoid branch/model sprawl:
 
-1. implement shared chronology/data/evaluation scaffolding using the frozen 2016 training floor and deterministic nested folds;
+1. implement shared chronology/data/evaluation scaffolding using the frozen candidate-specific earliest-qualified-history rule and deterministic nested folds;
 2. implement **A0** only;
 3. implement **B0** only;
 4. implement **C0** only, including the four mandatory market-null comparisons;
@@ -265,7 +264,7 @@ The final Phase 2 hostile review attempted to invalidate the shortlist and produ
 
 A forecasts team scoring from dynamic, partially pooled offense/defense strength.
 
-B forecasts scoring through **possession count plus discrete drive outcomes**. To prevent hidden convergence, the independent B0 reference is now required to run without A0 predictions. Only one labeled OOF A-state sensitivity is permitted afterward.
+B forecasts scoring through **possession count plus discrete drive outcomes**. To prevent hidden convergence, B0 is required to run without A0 predictions. No B+A sensitivity is part of the initial Phase 3 search.
 
 ### A is not allowed to become an open-ended state-space search
 
