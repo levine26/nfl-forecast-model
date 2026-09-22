@@ -1,6 +1,6 @@
 {
   "registry_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE-REGISTRY-V1",
-  "status": "CANDIDATE_3_COMPLETE_AWAITING_USER_DIRECTION",
+  "status": "CANDIDATE_4_ACTIVE_PROSPECTIVE_PREPARATION",
   "production_incumbent": "F-ST-01-FROZEN-2026",
   "frozen_benchmark": {
     "games": 1087,
@@ -55,6 +55,22 @@
       "independent_incremental_market_path_information_demonstrated": false,
       "production_authorized": false,
       "automatic_live_shadow_authorized": false
+    },
+    {
+      "candidate_number": 4,
+      "candidate_id": "ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1",
+      "disposition": "ACTIVE_PRE_REGISTRATION",
+      "research_question": "After conditioning on contemporaneous market level, do strict-PIT market-path residuals and independently timestamped football-information shocks add incremental winner-selection value over frozen F-ST?",
+      "primary_horizon": "T-60m",
+      "incumbent_horizon": "T-120m",
+      "prospective_only": true,
+      "completed_2026_outcomes_for_design_or_selection": 0,
+      "production_authorized": false,
+      "preregistration_sha": null,
+      "earliest_eligible_lock": "2026-09-24T22:15:00Z conditional on preregistration freeze and qualified market capture",
+      "integration_branch": "research/adaptive-weekly-learning-c4-integration",
+      "current_blocker": "research-data/market-capture-v2 last status is HTTP 401 Unauthorized; strict multi-book market path cannot be claimed until a qualified current source is restored",
+      "note": "Candidate 4 is a new prospective clock. Candidate 1-3 target results may motivate the question but may not tune Candidate 4."
     }
   ],
   "controls": [
@@ -84,7 +100,7 @@
     ],
     "formal_confidence_interval": false
   },
-  "next_state": "STOP_AFTER_CANDIDATE_3_UNTIL_USER_DIRECTION",
-  "candidate4_started": false,
+  "next_state": "CANDIDATE_4_RESEARCH_PIT_REMEDIATION_PREREGISTRATION",
+  "candidate4_started": true,
   "production_changed": false
 }
