@@ -1,5 +1,5 @@
 {
-  "contract_version": "levline-props-2.2-prereg-v0.1",
+  "contract_version": "levline-props-2.2-prereg-v0.2",
   "status": "FROZEN_BEFORE_FUTURE_HOLDOUT",
   "research_only": true,
   "production_authorized": false,
@@ -8,33 +8,83 @@
   "challengers": [
     {
       "id": "P21_BASE",
+      "role": "control",
+      "promotion_eligible": false,
       "line_market_weight": 0,
       "line_model_weight": 1,
+      "probability_market_weight": 0,
+      "probability_model_weight": 1,
       "probability_shrink_to_half": 0
     },
     {
-      "id": "P22_RESIDUAL_25",
+      "id": "P22_LINE_RESIDUAL_25",
+      "role": "mechanism_ablation",
+      "promotion_eligible": false,
       "line_market_weight": 0.75,
       "line_model_weight": 0.25,
+      "probability_market_weight": 0,
+      "probability_model_weight": 1,
       "probability_shrink_to_half": 0
     },
     {
-      "id": "P22_RESIDUAL_50",
+      "id": "P22_LINE_RESIDUAL_50",
+      "role": "mechanism_ablation",
+      "promotion_eligible": false,
       "line_market_weight": 0.5,
       "line_model_weight": 0.5,
+      "probability_market_weight": 0,
+      "probability_model_weight": 1,
+      "probability_shrink_to_half": 0
+    },
+    {
+      "id": "P22_PROB_RESIDUAL_25",
+      "role": "mechanism_ablation",
+      "promotion_eligible": false,
+      "line_market_weight": 0,
+      "line_model_weight": 1,
+      "probability_market_weight": 0.75,
+      "probability_model_weight": 0.25,
+      "probability_shrink_to_half": 0
+    },
+    {
+      "id": "P22_PROB_RESIDUAL_50",
+      "role": "mechanism_ablation",
+      "promotion_eligible": false,
+      "line_market_weight": 0,
+      "line_model_weight": 1,
+      "probability_market_weight": 0.5,
+      "probability_model_weight": 0.5,
       "probability_shrink_to_half": 0
     },
     {
       "id": "P22_CAL_50",
+      "role": "mechanism_ablation",
+      "promotion_eligible": false,
       "line_market_weight": 0,
       "line_model_weight": 1,
+      "probability_market_weight": 0,
+      "probability_model_weight": 1,
       "probability_shrink_to_half": 0.5
     },
     {
-      "id": "P22_RESIDUAL50_CAL50",
+      "id": "P22_COMBINED_25",
+      "role": "primary_challenger",
+      "promotion_eligible": true,
+      "line_market_weight": 0.75,
+      "line_model_weight": 0.25,
+      "probability_market_weight": 0.75,
+      "probability_model_weight": 0.25,
+      "probability_shrink_to_half": 0
+    },
+    {
+      "id": "P22_COMBINED_50",
+      "role": "primary_challenger",
+      "promotion_eligible": true,
       "line_market_weight": 0.5,
       "line_model_weight": 0.5,
-      "probability_shrink_to_half": 0.5
+      "probability_market_weight": 0.5,
+      "probability_model_weight": 0.5,
+      "probability_shrink_to_half": 0
     }
   ],
   "minimum_promotion_evidence": {
@@ -50,10 +100,23 @@
     "calibration",
     "market_residual_slope"
   ],
+  "selection_control": {
+    "promotion_candidate_ids": [
+      "P22_COMBINED_25",
+      "P22_COMBINED_50"
+    ],
+    "multiplicity_method": "holm_bonferroni",
+    "family_alpha": 0.05,
+    "comparator": "original_point_in_time_market",
+    "require_brier_and_log_loss_non_degradation": true,
+    "require_clean_chronology": true
+  },
   "forbidden": [
     "week2_parameter_fit",
+    "week2_counterfactual_candidate_selection",
     "retrospective_signal_relabel",
     "postkickoff_market_use",
+    "mid_holdout_grid_change",
     "production_winner_model_mutation"
   ]
 }
