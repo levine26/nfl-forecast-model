@@ -20,13 +20,13 @@ The branch was synchronized with current main through compatibility PR #521. The
 - **A — Dynamic Opponent-Adjusted Joint Score:** football-only. Initial identity is bounded A0: time-decayed, partially pooled offense/defense score model.
 - **B — Possession / Drive Score Process:** football-only. Independent B0 must model possessions plus TD/FG/empty drive outcomes without consuming A0 predictions. No B+A sensitivity is part of the initial Phase 3 search.
 - **C — Market Residual Margin / Total:** market-aware. Initial C0 is Ridge-only and must report M0 market-only, M1 line-calibration-only, M2 football-residual, and M3 full residual arms.
-- **D — Ensemble / reconciliation:** conditional only. Do not build unless at least two frozen candidates survive development and nested OOF combination adds information beyond the best constituent.
+- **D — Ensemble / reconciliation:** conditional only. For a target, do not build unless abs error correlation is <0.90, pooled 2022–2024 convex-blend MAE improves by >=0.10 points, both 2023 and 2024 improve, and season+week block-bootstrap P(improvement) is >=0.75.
 
 A1 explicit state-space expansion, player/QB/personnel overlays, and weather are **not** automatically authorized initial extensions.
 
 ## Frozen chronology
 
-Initial training history is **candidate-specific earliest complete required-feature coverage**; Phase 3 may not search alternate training-start years for better performance.
+Historical training floor for A0/B0/C0 is **2016 regular season**. Inner validation targets begin in **2019**. Phase 3 may not search alternate training-start years for better performance.
 
 Development outer targets are exactly:
 
@@ -34,7 +34,7 @@ Development outer targets are exactly:
 - 2023 — prior seasons only;
 - 2024 — prior seasons only.
 
-For each outer target, use expanding prior-only inner folds; a fold requires at least two complete prior training seasons. Use the **latest four valid inner validation seasons**, or all valid folds when fewer are available. If fewer than two valid inner validation seasons exist, use the candidate's frozen fallback rather than borrowing later data. All preprocessing, latent-state construction, residual variance/covariance estimation and tuning are training-only.
+For each outer target, use expanding prior-only inner folds with training history beginning in **2016** and validation season **V >= 2019**. Use the **latest four eligible inner validation seasons**, or all eligible folds when fewer are available. If fewer than two eligible folds exist because a required source lacks coverage, use the candidate's frozen fallback rather than borrowing later data. All preprocessing, latent-state construction, residual variance/covariance estimation and tuning are training-only.
 
 Final historical challenger holdout:
 
