@@ -73,15 +73,16 @@ jobs:
           assert '      - "inputs/chatgpt_media/current/**"' in workflow_lines
           assert '      - "inputs/chatgpt_media/**"' not in workflow_lines
           assert "steps.current_bundle_diff.outputs.changed == 'true'" in workflow
-          print('ChatGPT ingestion is constrained to the existing editorial validation boundary and current-bundle namespace.')
+          assert "github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'" in workflow
+          print('ChatGPT ingestion is constrained to the current-bundle namespace; code-only pushes validate without publishing.')
           PY
 
       - name: Require a complete bundle for production ingestion
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: test -f inputs/chatgpt_media/current/manifest.json
 
       - name: Validate contextual packet freshness
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: |
           python - <<'PY'
           from datetime import datetime, timezone
@@ -103,26 +104,42 @@ jobs:
           print(f'context packet is fresh and healthy: age_hours={age_hours:.2f}')
           PY
 
-      - name: Detect current-bundle changes on pull request
+      - name: Detect whether this event carries a current ChatGPT bundle
         id: current_bundle_diff
-        if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
-          git fetch origin "${{ github.base_ref }}" --depth=100
-          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -q '^inputs/chatgpt_media/current/'; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          fi
+          case "${{ github.event_name }}" in
+            workflow_dispatch)
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              ;;
+            pull_request)
+              git fetch origin "${{ github.base_ref }}" --depth=100
+              if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -q '^inputs/chatgpt_media/current/'; then
+                echo "changed=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "changed=false" >> "$GITHUB_OUTPUT"
+              fi
+              ;;
+            push)
+              if git diff --name-only "${GITHUB_SHA}^" "${GITHUB_SHA}" | grep -q '^inputs/chatgpt_media/current/'; then
+                echo "changed=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "changed=false" >> "$GITHUB_OUTPUT"
+              fi
+              ;;
+            *)
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
 
       - name: Canonicalize editorial forecast source
-        if: github.event_name != 'pull_request' || steps.current_bundle_diff.outputs.changed == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: |
           python scripts/build_canonical_editorial_predictions.py --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
       - name: Refresh deterministic reporting packet
-        if: github.event_name != 'pull_request' || steps.current_bundle_diff.outputs.changed == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: python scripts/finalize_editorial.py --skip-copilot
 
       - name: Validate complete ChatGPT bundle on pull request
@@ -132,14 +149,14 @@ jobs:
           echo "Complete ChatGPT bundle passed focused, merge, composition, rationale, source, uniqueness, and full-slate gates."
 
       - name: Ingest complete ChatGPT bundle
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: |
           rm -f outputs/copilot_media_reads.json
           python scripts/ingest_chatgpt_media_payloads.py --input-dir inputs/chatgpt_media/current --output outputs/copilot_media_reads.json
           echo "All ChatGPT-ingested responses passed the LevLine 3.0 full-slate publication validator."
 
       - name: Reconcile candidate with latest main snapshot
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: |
           set -euo pipefail
           git fetch origin main
@@ -162,7 +179,7 @@ jobs:
           fi
 
       - name: Finalize and enforce full-slate launch gate
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: |
           python scripts/finalize_editorial.py
           python - <<'PY'
@@ -183,7 +200,7 @@ jobs:
           PY
 
       - name: Publish editorial-only outputs
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: |
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
