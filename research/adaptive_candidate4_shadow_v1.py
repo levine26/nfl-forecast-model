@@ -318,6 +318,9 @@ def build_candidate4_decisions(
         w_fst = _pick(home, away, p_fst)
 
         reasons: list[str] = []
+        target_t60 = kickoff - timedelta(minutes=DECISION_HORIZON_MINUTES)
+        if lock_time > target_t60:
+            reasons.append("incumbent_lock_after_t60")
         state = state_by_game.get(game_id)
         m60 = None
         d = None
