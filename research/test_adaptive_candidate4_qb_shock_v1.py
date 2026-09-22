@@ -9,6 +9,7 @@ import pandas as pd
 
 from research.adaptive_candidate4_qb_shock_v1 import (
     build_qb_shock_rows,
+    build_qb_shock_rows_from_snapshots,
     normalize_name,
 )
 
@@ -29,6 +30,37 @@ def _depth(*, buf_dt: str = "2026-09-27T14:00:00Z", lac_dt: str = "2026-09-27T14
         {"dt": buf_dt, "team": "BUF", "player_name": "Backup Buffalo", "gsis_id": "00-0099998", "pos_abb": "QB", "pos_rank": 2},
         {"dt": lac_dt, "team": "LAC", "player_name": "Justin Herbert", "gsis_id": "00-0036355", "pos_abb": "QB", "pos_rank": 1},
         {"dt": lac_dt, "team": "LAC", "player_name": "Backup Charger", "gsis_id": "00-0099999", "pos_abb": "QB", "pos_rank": 2},
+    ])
+
+
+def _qb1_snapshots(*, captured: str = "2026-09-27T14:59:00Z") -> pd.DataFrame:
+    return pd.DataFrame([
+        {
+            "schema_version": "adaptive-candidate4-qb1-t120-snapshot-v1",
+            "candidate_id": "ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1",
+            "preregistration_sha": "74ecd303545c09f57593546472d27438e3d8a204",
+            "game_id": "2026_03_LAC_BUF",
+            "season": 2026,
+            "week": 3,
+            "gameday": "2026-09-27",
+            "home_team": "BUF",
+            "away_team": "LAC",
+            "kickoff_utc": "2026-09-27T17:00:00Z",
+            "t120_target_utc": "2026-09-27T15:00:00Z",
+            "captured_at_utc": captured,
+            "capture_timing_error_minutes": -1.0,
+            "home_t120_qb1_player_name": "Josh Allen",
+            "home_t120_qb1_gsis_id": "00-0034857",
+            "home_t120_depth_timestamp_utc": "2026-09-27T14:00:00Z",
+            "away_t120_qb1_player_name": "Justin Herbert",
+            "away_t120_qb1_gsis_id": "00-0036355",
+            "away_t120_depth_timestamp_utc": "2026-09-27T14:00:00Z",
+            "qb1_snapshot_complete": True,
+            "research_only": True,
+            "production_authorized": False,
+            "completed_2026_outcomes_used": 0,
+            "qb1_snapshot_sha256": "c" * 64,
+        }
     ])
 
 
@@ -144,3 +176,48 @@ def test_both_t120_qbs_inactive_is_ambiguous_not_zero(tmp_path) -> None:
     assert bool(row["qb_state_complete"]) is False
     assert "both_t120_qbs_inactive_direction_ambiguous" in row["incomplete_reasons"]
     assert pd.isna(row["qb_shock_direction"])
+
+
+def test_live_snapshot_path_uses_frozen_t120_identity(tmp_path) -> None:
+    _write_archive(
+        tmp_path,
+        bills_entries=["WR Example Receiver"],
+        chargers_entries=["QB Justin Herbert"],
+    )
+    out = build_qb_shock_rows_from_snapshots(
+        _qb1_snapshots(),
+        archive_dir=tmp_path,
+        games=GAMES,
+    )
+    row = out.iloc[0]
+    assert bool(row["qb_state_complete"]) is True
+    assert bool(row["source_qualified"]) is True
+    assert row["depth_source"] == "immutable_candidate4_t120_qb1_snapshot"
+    assert row["qb1_snapshot_sha256"] == "c" * 64
+    assert row["qb_shock_direction"] == 1
+    assert row["away_t120_qb1_player_name"] == "Justin Herbert"
+
+
+def test_live_snapshot_path_fails_closed_when_snapshot_missing(tmp_path) -> None:
+    _write_archive(tmp_path)
+    out = build_qb_shock_rows_from_snapshots(
+        pd.DataFrame(),
+        archive_dir=tmp_path,
+        games=GAMES,
+    )
+    row = out.iloc[0]
+    assert bool(row["qb_state_complete"]) is False
+    assert "missing_t120_qb1_snapshot" in row["incomplete_reasons"]
+    assert pd.isna(row["qb_shock_direction"])
+
+
+def test_live_snapshot_path_rejects_post_t120_capture(tmp_path) -> None:
+    _write_archive(tmp_path)
+    out = build_qb_shock_rows_from_snapshots(
+        _qb1_snapshots(captured="2026-09-27T15:00:01Z"),
+        archive_dir=tmp_path,
+        games=GAMES,
+    )
+    row = out.iloc[0]
+    assert bool(row["qb_state_complete"]) is False
+    assert "qb1_snapshot_capture_outside_t120_window" in row["incomplete_reasons"]
