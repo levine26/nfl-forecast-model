@@ -35,7 +35,7 @@ This does **not** authorize hand-coded QB point values. It supports the preregis
 
 ### Betting markets aggregate information during the week
 
-An NFL intra-week market-efficiency study reports increasing information content from early-week to game-time lines while still finding some inefficiencies and evidence consistent with superior analysts: Gandar et al.-style NFL intra-week analysis, *International Review of Financial Analysis* / ScienceDirect PII S0927539813000509.
+Miller & Rapach (2013, *Journal of Empirical Finance*, DOI 10.1016/j.jempfin.2013.07.002) analyze three sequential NFL betting lines within a week and find that information content increases as the week progresses, while also documenting some pricing inefficiencies and evidence consistent with superior analysts.
 
 Krieger & Davis (2024, *Journal of Economics and Finance*, DOI 10.1007/s12197-023-09656-5) study NFL line movement and market visibility across 2007–2021, supporting the premise that market movement is an information-aggregation process.
 
