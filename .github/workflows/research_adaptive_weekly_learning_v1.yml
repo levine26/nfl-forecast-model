@@ -1,0 +1,101 @@
+name: Adaptive weekly learning research
+
+on:
+  push:
+    branches:
+      - research/adaptive-weekly-learning-integration
+  pull_request:
+    branches:
+      - research/adaptive-weekly-learning-integration
+    paths:
+      - 'research/adaptive_*.py'
+      - 'research/test_adaptive_*.py'
+      - 'research/ADAPTIVE_WEEKLY_LEARNING_*.md'
+      - '.github/workflows/research_adaptive_weekly_learning_v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adaptive-weekly-learning-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+
+      - name: Run adaptive unit tests present on this branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          tests=()
+          for f in             research/test_adaptive_weekly_replay_v1.py             research/test_adaptive_residual_state_v1.py             research/test_adaptive_error_audit_calibration_v1.py             research/test_adaptive_selective_switch_gate_v1.py             research/test_adaptive_weekly_evaluation_v1.py
+          do
+            if [ -f "$f" ]; then tests+=("$f"); fi
+          done
+          if [ "${#tests[@]}" -gt 0 ]; then
+            PYTHONPATH="$PWD/src:$PWD" pytest -q "${tests[@]}"
+          else
+            echo "No adaptive tests present yet."
+          fi
+
+      - name: Run historical adaptive experiments present on this branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONPATH="$PWD/src:$PWD"
+          rm -rf research_outputs/adaptive_weekly_ci
+          mkdir -p research_outputs/adaptive_weekly_ci
+
+          if [ -f research/adaptive_weekly_replay_v1.py ]; then
+            python research/adaptive_weekly_replay_v1.py               --output research_outputs/adaptive_weekly_ci/replay_manifest.json
+          fi
+
+          if [ -f research/adaptive_residual_state_v1.py ]; then
+            python research/adaptive_residual_state_v1.py               --output-dir research_outputs/adaptive_weekly_ci/residual
+          fi
+
+          if [ -f research/adaptive_error_audit_calibration_v1.py ]; then
+            python research/adaptive_error_audit_calibration_v1.py               --output-dir research_outputs/adaptive_weekly_ci/calibration
+          fi
+
+          if [ -f research/adaptive_naive_weekly_refit_control_v1.py ]; then
+            python research/adaptive_naive_weekly_refit_control_v1.py               --output-dir research_outputs/adaptive_weekly_ci/weekly_refit
+          fi
+
+          if [ -f research/adaptive_selective_switch_gate_v1.py ] &&              [ -s research_outputs/adaptive_weekly_ci/residual/scored_games.csv ]; then
+            python research/adaptive_selective_switch_gate_v1.py               --input research_outputs/adaptive_weekly_ci/residual/scored_games.csv               --output-dir research_outputs/adaptive_weekly_ci/gate
+          fi
+
+          if [ -f research/adaptive_weekly_evaluation_v1.py ] &&              [ -s research_outputs/adaptive_weekly_ci/residual/scored_games.csv ]; then
+            python research/adaptive_weekly_evaluation_v1.py               --input research_outputs/adaptive_weekly_ci/residual/scored_games.csv               --candidate-col adaptive_prob               --reference-col fst_prob               --output-dir research_outputs/adaptive_weekly_ci/eval_residual
+          fi
+
+          if [ -f research/adaptive_weekly_evaluation_v1.py ] &&              [ -s research_outputs/adaptive_weekly_ci/gate/scored_games.csv ]; then
+            python research/adaptive_weekly_evaluation_v1.py               --input research_outputs/adaptive_weekly_ci/gate/scored_games.csv               --candidate-col gate_prob               --reference-col fst_prob               --output-dir research_outputs/adaptive_weekly_ci/eval_gate
+          fi
+
+      - name: Prove production surfaces unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code --             outputs/ site/             src/nfl_forecast/pipeline.py             src/nfl_forecast/models.py             src/nfl_forecast/features.py             src/nfl_forecast/data.py             src/nfl_forecast/publish.py             scripts/run_week.py
+
+      - name: Upload adaptive research evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: adaptive-weekly-learning-${{ github.run_id }}
+          path: research_outputs/adaptive_weekly_ci/
+          if-no-files-found: warn
+          retention-days: 30
