@@ -1,157 +1,124 @@
 # Spread & Points Next-Generation — Current State & Next Steps
 
 **Last updated:** 2026-09-22 America/Los_Angeles  
-**Program authority:** `research/spread-points-nextgen/MASTER_PLAN.md`  
+**Program authority:** \`research/spread-points-nextgen/MASTER_PLAN.md\`  
 **Phase 0:** **COMPLETE**  
 **Phase 1:** **COMPLETE**  
-**Phase 2:** **NOT STARTED**  
-**Active phase:** None. Phase 1 is merged and complete; the next substantive chat starts Phase 2 under the mandatory startup protocol.
+**Phase 2:** **IN PROGRESS — CLOSEOUT / EXACT-HEAD VALIDATION**  
+**Phase 3:** **NOT STARTED**  
+**Active branch:** \`research/spread-points-nextgen-phase2\`  
+**Primary PR:** #520
 
-## Phase 1 completion state
+## Phase 2 state
 
-Phase 1 audited the current LevLine score/spread system without changing production behavior.
+Phase 2 research/design is analytically complete and has passed hostile methodological review. No Phase 3 challenger has been implemented and no A/B/C 2025 challenger result has been inspected.
 
-Canonical Phase 1 directory:
+The branch was repeatedly synchronized with concurrent `main` as unrelated work advanced: PR #521 preserved adaptive-weekly-learning research, PR #528 preserved Sunday Signal contextual outputs, later compatibility merges preserved the adaptive Candidate 2 closeout/T-120 shadow state, and PR #536 preserved the generated market refresh through `3e859968a40b8250f85ed211e8b1e7593ea1bf47`. These concurrent surfaces are repository state only; none is used to select or redefine Spread & Points challengers.
 
-`research/spread-points-nextgen/phase1/`
+## Frozen initial Phase 3 shortlist
 
-Primary Phase 1 branch / PR:
+- **A — Dynamic Opponent-Adjusted Joint Score:** football-only. Initial identity is bounded A0: time-decayed, partially pooled offense/defense score model.
+- **B — Possession / Drive Score Process:** football-only. Independent B0 must model possessions plus TD/FG/empty drive outcomes without consuming A0 predictions. No B+A sensitivity is part of the initial Phase 3 search.
+- **C — Market Residual Margin / Total:** market-aware. Initial C0 is Ridge-only and must report M0 market-only, M1 line-calibration-only, M2 football-residual, and M3 full residual arms.
+- **D — Ensemble / reconciliation:** conditional only. For a target, do not build unless abs error correlation is <0.90, pooled 2022–2024 convex-blend MAE improves by >=0.10 points, both 2023 and 2024 improve, and season+week block-bootstrap P(improvement) is >=0.75.
 
-- branch: `research/spread-points-nextgen-phase1`
-- PR: **#513 — MERGED**
-- merge commit: `a4f7172c0c4ff82b1689411181e7a9042a1628a8`
+A1 explicit state-space expansion, player/QB/personnel overlays, and weather are **not** automatically authorized initial extensions.
 
-Final post-sync validation:
+## Frozen chronology
 
-- candidate head: `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`
-- research firewall `35741337735`: **SUCCESS**
-- research validation `35741337942`: **SUCCESS**
-- dedicated Phase 1 audit `35741337832`: **SUCCESS**
-- audit artifact `10699778876`
-- artifact digest: `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`
+Historical training floor for A0/B0/C0 is **2016 regular season**. Inner validation targets begin in **2019**. Phase 3 may not search alternate training-start years for better performance.
 
-## Reproduced baseline
+Development outer targets are exactly:
 
-Primary universe: **1,087 regular-season games, 2022–2025**.
+- 2022 — prior seasons only;
+- 2023 — prior seasons only;
+- 2024 — prior seasons only.
 
-Independent football score model:
+For each outer target, use expanding prior-only inner folds with training history beginning in **2016** and validation season **V >= 2019**. Use the **latest four eligible inner validation seasons**, or all eligible folds when fewer are available. If fewer than two eligible folds exist because a required source lacks coverage, use the candidate's frozen fallback rather than borrowing later data. All preprocessing, latent-state construction, residual variance/covariance estimation and tuning are training-only.
 
-- home points MAE: **7.424**
-- away points MAE: **7.485**
-- margin MAE: **9.962**
-- total MAE: **10.854**
+Final historical challenger holdout:
 
-Historical schedule market benchmark:
+- **2025** — open once in Phase 4 only after candidate identities freeze.
 
-- spread/margin MAE: **9.494**
-- total MAE: **10.189**
+Completed 2026 outcomes:
 
-Paired season+week bootstrap supports a market advantage on both continuous targets.
+- **zero permitted for architecture, features, tuning, thresholds, stacking, survival, or candidate selection.**
 
-Chronology-clean historical F-ST analogue:
+Phase 1 did inspect baseline 2025 failures, so 2025 is not philosophically pristine. No A/B/C output existed then. This caveat remains mandatory and Phase 5 prospective evidence is still required.
 
-- winner accuracy: **68.17%**
-- Brier: **0.21065**
-- log loss: **0.60871**
+## Data / PIT state
 
-Raw market:
+Initial A/B/C can be built from free/open data.
 
-- winner accuracy: **67.62%**
-- Brier: **0.21020**
-- log loss: **0.60765**
+Allowed foundations include chronology-safe prior-game nflverse PBP, derived dynamic states, schedule/home/rest, and historical schedule market lines labeled only as closing/late benchmark.
 
-Independent-margin ATS diagnostic accuracy is **48.77%** after pushes are excluded.
+Conditional or blocked:
 
-## Main empirical findings
+- QB/personnel: no uniform fixed-horizon 2022–2025 starter/availability history;
+- injuries/OL: qualified 2025 slice and prospective evidence only unless older PIT history is proven;
+- weather: blocked from initial historical selection until exact venue plus forecast-as-of history is qualified;
+- prospective multi-book T-120 market: current research collector issue remains HTTP 401 / no qualified current ledger at the Phase 1 audit;
+- historical market rows may **not** be relabeled T-120.
 
-1. **Score/margin prediction is compressed.** Large realized margins and double-digit favorite environments are under-differentiated.
-2. **Totals regress strongly toward the middle.** Model total prediction SD is only 1.83 points versus 4.25 for the market total.
-3. **Large LevLine-market disagreement is not a validated edge.** In the >=6-point disagreement slice the model's continuous margin error is materially worse than the market.
-4. **The current inverse-MAE four-regressor blend does not beat the best individual ElasticNet OOF MAE** for either margin or total.
-5. **The market is the stronger continuous baseline** in every 2022–2025 target season for margin and total.
-6. **Recent-form and simple pace slices do not show a strong monotonic residual pattern.** They remain candidate ingredients only if Phase 2 research provides a better structural formulation.
-7. **Core OOF data completeness is not the observed problem.** All 44 Core fields are populated on the audited universe before model imputation.
-8. **Observed historical weather metadata cannot be treated as a PIT-safe forecast source.** Weather experiments still require archived or prospectively captured forecasts.
-9. **2025 availability evidence is suggestive, not decisive.** QB/OL practice-limitation slices have higher margin MAE but one-season uncertainty intervals cross zero.
-10. **Current architecture is intentionally split:** independent margin/total regressions, frozen market-conditioned F-ST winner probability, and a public probability-to-margin bridge are different forecast objects.
+## Paid-data decision
 
-## Important governance findings
+**NO PAID DATA DEPENDENCY REQUESTED.**
 
-- Base score-regressor OOF predictions are season-held-out, but final inverse-MAE weights reuse the combined evaluation block.
-- The ordinary Core classifier meta-model is fit and scored on the same combined base-OOF matrix; its displayed stack OOF metric is not fully nested.
-- Frozen F-ST normal scoring remains capped at 2025.
-- Current ordinary live Core/margin/total fits may incorporate already-completed 2026 games for later 2026 forecasts; completed 2026 outcomes remain forbidden for research architecture/feature selection.
-- Historical nflverse market fields are an opaque closing/late benchmark, not a verified T-120 source.
-- Historical starter/injury/weather state must fail closed unless its as-of time is proven.
-- Research source qualification does not equal feature or production authorization.
+A/B/C are testable with free/open sources. Paid injury/OL/route/coverage/participation data may be reconsidered only after a specific residual failure is isolated and a bounded incremental-value test justifies cost.
 
-## Data/source state carried into Phase 2
+## Research hardening completed in closeout
 
-Strong/free foundations include nflverse schedule/PBP, sequential Elo, the qualified 2025 availability composite, 2025+ timestamped depth charts, 2026 prospective injury snapshots, lagged NGS/PFR/FTN research sources, and existing market/weather collection infrastructure.
+- explicit evidence-quality classification for peer-reviewed, technical/open-source, practitioner and opaque sources;
+- deeper David Sasser review with product observations separated from reproducible evidence;
+- deterministic candidate-specific nested chronology/tie-breaking;
+- A0/A1 boundary tightened;
+- independent B0 reference required;
+- C0 reduced to Ridge-only; no tree fallback;
+- four-arm market-null hierarchy frozen;
+- feature-source/PIT feasibility matrix frozen;
+- D ensemble gate tightened;
+- 2025 holdout caveat red-teamed and retained.
 
-Operational issues observed during Phase 1:
+## Exact next action before Phase 2 can become COMPLETE
 
-- prospective multi-book The Odds API collector: latest inspected state reported HTTP 401 and no usable current ledger rows;
-- prospective weather capture: blocked on unresolved qualified game-specific venue receipts.
-
-Neither issue changes production, but both constrain same-horizon Phase 2 experiments until resolved.
-
-## David Sasser inclusion
-
-Per user instruction, **davidsasser.com is explicitly part of the external research set**.
-
-Phase 1 used it only as a comparator: its public CFB board separates projected team scores, projected line, opening/current market line, and ATS selection/tracking. The public material inspected does not expose enough reproducible model/data/chronology detail to use its reported record as scientific validation.
-
-**Phase 2 must include a deeper davidsasser.com review** alongside peer-reviewed literature, technical public models, and reproducible open-source systems.
-
-## Canonical Phase 1 artifacts
-
-- `phase1/EVALUATION_CONTRACT.md`
-- `phase1/CURRENT_ARCHITECTURE_AUDIT.md`
-- `phase1/BASELINE_REPRODUCTION_REPORT.md`
-- `phase1/ERROR_DECOMPOSITION_REPORT.md`
-- `phase1/DATA_API_INVENTORY.md`
-- `phase1/LEAKAGE_PIT_AUDIT.md`
-- `phase1/PHASE1_SYNTHESIS.md`
-- `phase1/PHASE1_SUMMARY.json`
-- `phase1/run_baseline_audit.py`
-- `phase1/run_structural_slices.py`
-- `phase1/test_run_baseline_audit.py`
-
-## EXACT NEXT ACTION — PHASE 2 CHAT
-
-Do **not** restart Phase 1 and do **not** implement challengers yet.
-
-The next substantive chat must:
-
-1. Resolve current repository `main`.
-2. Read the five canonical control files in the required order.
-3. Read Phase 1 `PHASE1_SYNTHESIS.md`, `ERROR_DECOMPOSITION_REPORT.md`, `DATA_API_INVENTORY.md`, and `LEAKAGE_PIT_AUDIT.md`.
-4. Inspect open PRs/branches and verify Phase 1 is merged/complete.
-5. Mark Phase 2 `IN PROGRESS` only when substantive Phase 2 work begins.
-6. Perform the Phase 2 **deep external research and challenger-design program**, including:
-   - peer-reviewed sports forecasting and statistical score modeling;
-   - NFL analytics and market-efficiency research;
-   - drive/possession, opponent-adjusted, dynamic/Bayesian/state-space, player/QB/availability, red-zone/explosive-play, uncertainty and ensemble methods;
-   - respected public/open-source forecasting systems;
-   - **davidsasser.com**, with clear separation between reproducible evidence and opaque claims.
-7. Convert Phase 1 residual findings into a deliberately limited challenger shortlist.
-8. Freeze a chronology-clean development/validation/untouched-holdout protocol **before challenger results exist**.
-9. Specify PIT contracts and data gaps for every proposed feature family.
-10. Do not implement Phase 3 challengers in the Phase 2 chat.
-11. Update all control/handoff files before Phase 2 stops.
+1. Run/observe **fresh exact-head** \`LevLine research firewall\` and full \`LevLine research validation\` on PR #520 after the final control-file commit.
+2. Fix only genuine defects; never weaken the firewall.
+3. If both exact-head checks pass, mark PR #520 ready for review and merge it.
+4. Verify the merged Phase 2 artifacts directly from \`main\`.
+5. Record the merge SHA and exact CI run IDs in these control files on \`main\`.
+6. Leave Phase 3 **NOT STARTED** and stop.
 
 ## DO NOT REPEAT
 
-- Do not rerun Phase 1 merely because a new chat did not personally generate it.
-- Do not conflate `expected_margin` with the public probability-implied fair spread.
-- Do not treat the historical closing/late market as T-120.
-- Do not use final historical starter/injury/weather state without PIT proof.
-- Do not use completed 2026 outcomes for feature, architecture, threshold or challenger selection.
-- Do not resurrect the retired Props orchestration.
-- Do not weaken the research firewall.
-- Do not make a paid source dependency without the required user escalation.
+- Do not rerun Phase 1.
+- Do not redo the entire Phase 2 literature/external-model review.
+- Do not broaden the model search after seeing results.
+- Do not inspect 2025 challenger outcomes during Phase 3.
+- Do not use completed 2026 outcomes for candidate selection.
+- Do not call historical closing/late market data T-120.
+- Do not use final starter/injury/weather state without PIT proof.
+- Do not force an ensemble.
+- Do not force player features.
+- Do not add paid data without the documented escalation gate.
+- Do not revive retired Props orchestration.
+- Do not weaken F-ST production safeguards.
+- Do not treat David Sasser public record claims as validation without reconstructable methodology/chronology.
+- Do not convert failed A0/B0/C0 references into an unconstrained rescue search under the same candidate identity.
 
-## Stop condition
+## Phase 3 handoff — prepare only, do not execute here
 
-**Phase 1 is complete and merged. Phase 2 remains NOT STARTED. The next substantive chat begins Phase 2 from current `main`.**
+Once Phase 2 is formally complete, the next chat should:
+
+1. read the canonical control files and Phase 2 artifacts from current main;
+2. build shared chronology-safe data/evaluation scaffolding;
+3. implement A0 reference;
+4. implement independent B0 bounded drive model;
+5. implement C0 Ridge residual reference and M0/M1/M2/M3 null hierarchy;
+6. run development OOS evaluation through 2024 only;
+7. run only the frozen A0/B0/C0 reference implementations and required null/diagnostic comparisons; do not open deferred A1/B-alternative/C-nonlinear searches;
+8. determine D eligibility only from the frozen strict target-specific gate (correlation <0.90, pooled gain >=0.10 MAE, improvement in both 2023 and 2024, bootstrap probability >=0.75);
+9. freeze candidate identities;
+10. **do not score 2025**;
+11. stop for Phase 4.
+
+No Phase 3 code or challenger output belongs in Phase 2.

@@ -192,19 +192,35 @@ Additional Phase 1 control/evidence:
 - reproducible runner — `research/spread-points-nextgen/phase1/run_baseline_audit.py`
 - structural diagnostic runner — `research/spread-points-nextgen/phase1/run_structural_slices.py`
 - helper tests — `research/spread-points-nextgen/phase1/test_run_baseline_audit.py`
-- final post-sync validation runs — firewall `35741337735`; research validation `35741337942`; Phase 1 audit `35741337832`
+- final post-sync exact-head validation — firewall `35741337735`; research validation `35741337942`; Phase 1 audit `35741337832`
 - final dedicated audit artifact — `10699778876`, digest `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`
-- Phase 1 PR / merge — `#513`, merge `a4f7172c0c4ff82b1689411181e7a9042a1628a8`
+- PR #513 — merged at `a4f7172c0c4ff82b1689411181e7a9042a1628a8`
 
 External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
-### Phase 2 — planned
+### Phase 2 — closeout candidate / exact-head CI pending
 
-- literature review — TBD
-- external-model review — TBD
-- challenger design/preregistration — TBD
-- frozen holdout protocol — TBD
-- paid-data memo, if any — TBD
+- literature review — `research/spread-points-nextgen/phase2/LITERATURE_REVIEW.md`
+- external-model review — `research/spread-points-nextgen/phase2/EXTERNAL_MODEL_REVIEW.md`
+- challenger design/preregistration — `research/spread-points-nextgen/phase2/CHALLENGER_PREREGISTRATION.md`
+- feature/player policy — `research/spread-points-nextgen/phase2/FEATURE_HYPOTHESES_AND_PLAYER_POLICY.md`
+- market-residual specification — `research/spread-points-nextgen/phase2/MARKET_RESIDUAL_SPECIFICATION.md`
+- frozen evaluation/holdout protocol — `research/spread-points-nextgen/phase2/EVALUATION_HOLDOUT_PROTOCOL.md`
+- data/source-gap report — `research/spread-points-nextgen/phase2/DATA_GAPS_AND_SOURCE_POLICY.md`
+- paid-data decision — `research/spread-points-nextgen/phase2/PAID_DATA_DECISION.md`
+- synthesis / Phase 3 handoff — `research/spread-points-nextgen/phase2/PHASE2_SYNTHESIS.md`
+- machine-readable design summary — `research/spread-points-nextgen/phase2/PHASE2_RESEARCH_SUMMARY.json`
+- bounded implementation/search-space contract — `research/spread-points-nextgen/phase2/BOUNDED_IMPLEMENTATION_SPEC.md`
+- red-team closeout is recorded in `phase2/PHASE2_SYNTHESIS.md`
+- deterministic nested-fold contract is recorded in `phase2/EVALUATION_HOLDOUT_PROTOCOL.md`
+- feature/source/PIT feasibility matrix is recorded in `phase2/DATA_GAPS_AND_SOURCE_POLICY.md`
+- Challenger C M0/M1/M2/M3 null hierarchy is recorded in `phase2/MARKET_RESIDUAL_SPECIFICATION.md`
+- evidence-quality ledger and final publisher/technical-source verification are recorded in `phase2/LITERATURE_REVIEW.md`
+- normalized external-system audit and required four-way Sasser classification are recorded in `phase2/EXTERNAL_MODEL_REVIEW.md`
+
+External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research. Final Sasser search found useful score/line/market product separation but no reproducible current methodology/archive sufficient for scientific validation.
+
+Compatibility sync #521 preserved concurrent adaptive-weekly-learning state; #528 preserved Sunday Signal contextual outputs; later syncs preserved adaptive Candidate 2 closeout/T-120 shadow state; #536 preserved the generated market/status refresh through `3e859968a40b8250f85ed211e8b1e7593ea1bf47`. These are provenance-only repository syncs and were not used to select or redefine Spread & Points challengers.
 
 ### Phase 3 — planned
 

@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "phase": 2,
+  "status": "ANALYTICALLY_COMPLETE_PENDING_FINAL_CI_AND_MERGE",
+  "production_changed": false,
+  "user_required_external_source": "davidsasser.com",
+  "initial_challengers": [
+    {
+      "id": "A",
+      "name": "Dynamic Opponent-Adjusted Joint Score",
+      "market_aware": false,
+      "status": "preregistered",
+      "reference_id": "A0"
+    },
+    {
+      "id": "B",
+      "name": "Possession / Drive Score Process",
+      "market_aware": false,
+      "status": "preregistered",
+      "reference_id": "B0"
+    },
+    {
+      "id": "C",
+      "name": "Market Residual Margin and Total",
+      "market_aware": true,
+      "status": "preregistered",
+      "reference_id": "C0"
+    }
+  ],
+  "conditional_components": [
+    {
+      "id": "D",
+      "name": "Nested Ensemble / Reconciliation",
+      "condition": "target-specific: absolute residual correlation <0.90; nested nonnegative convex blend improves pooled 2022-2024 target MAE by >=0.10 points versus the best constituent; lower target MAE than the best constituent in both 2023 and 2024; season+week block-bootstrap probability of lower pooled MAE >=0.75"
+    },
+    {
+      "name": "QB/personnel overlay",
+      "condition": "qualified multi-season PIT input or prospective shadow only"
+    },
+    {
+      "name": "weather extension",
+      "condition": "qualified venue and forecast-as-of history"
+    }
+  ],
+  "frozen_final_historical_holdout": 2025,
+  "completed_2026_outcomes_for_selection": 0,
+  "paid_data_escalation": false,
+  "primary_research_principles": [
+    "rolling-origin nested validation",
+    "football-only and market-aware families evaluated separately",
+    "market residualization tested because market is stronger continuous baseline",
+    "proper scoring rules for predictive distributions",
+    "complexity must earn survival"
+  ],
+  "phase2_exit_criteria": {
+    "literature_review": true,
+    "external_model_review": true,
+    "davidsasser_review": true,
+    "candidate_architectures": true,
+    "feature_hypotheses": true,
+    "player_policy": true,
+    "market_residual_spec": true,
+    "evaluation_preregistered": true,
+    "final_historical_holdout": 2025,
+    "data_gaps_documented": true,
+    "paid_data_escalation": false,
+    "bounded_search_space": true,
+    "deterministic_nested_selection": true,
+    "feature_source_pit_matrix": true,
+    "red_team_review": true,
+    "deterministic_nested_tuning": true,
+    "pit_feature_matrix": true
+  },
+  "external_evidence_highlights": [
+    "Glickman & Stern 1998 dynamic NFL state-space scores",
+    "Harville linear/mixed football ratings and NFL forecasts",
+    "Baker & McHale 2013 exact NFL score point-process forecasts",
+    "Boulier & Stekler NFL market/forecast research",
+    "Gneiting & Raftery proper scoring rules",
+    "nflWAR multilevel public-data player evaluation",
+    "nfelo open-source dynamic/market-regression architecture",
+    "davidsasser.com score-line-market product separation"
+  ],
+  "red_team_closeout": {
+    "shortlist_retained": [
+      "A",
+      "B",
+      "C"
+    ],
+    "ensemble_D": "conditional_target_specific_numeric_gate",
+    "A0_initial_identity": true,
+    "A1_requires_new_preregistration": true,
+    "B0_independent_of_A0": true,
+    "B0_drive_estimator": "poisson_l2",
+    "B0_drive_outcome_estimator": "multinomial_logistic_l2",
+    "C0_estimator": "ridge",
+    "C0_football_base": "A0",
+    "nonlinear_C_sensitivity": "deferred",
+    "valid_ABC_all_proceed_to_holdout": true,
+    "deterministic_outer_development_seasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "final_historical_holdout": 2025,
+    "completed_2026_selection_outcomes": 0,
+    "market_null_hierarchy": [
+      "M0_market_only",
+      "M1_line_calibration_only",
+      "M2_football_residual",
+      "M3_full_residual"
+    ],
+    "paid_data_escalation": false,
+    "training_floor_season": 2016,
+    "inner_validation_start_season": 2019,
+    "A0_half_life_grid_team_games": [
+      4,
+      8,
+      16,
+      32
+    ],
+    "B0_process_ewma_half_life_team_games": 8,
+    "D_gate": {
+      "absolute_error_correlation_lt": 0.9,
+      "pooled_mae_improvement_min_points": 0.1,
+      "must_improve_seasons": [
+        2023,
+        2024
+      ],
+      "block_bootstrap_probability_improvement_gte": 0.75
+    }
+  },
+  "compatibility_sync": {
+    "sync_prs": [
+      {
+        "pr_number": 521,
+        "merge_sha": "23a01f6ccc81874b26f74aa58a5e5ee8151d1866",
+        "main_sha": "fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da",
+        "scope": "adaptive weekly learning research"
+      },
+      {
+        "pr_number": 528,
+        "merge_sha": "3f1de4749519e1b5ffe0b50d2faf6cd02323039d",
+        "main_sha": "032289d5b62b226b242e4b4c202935f7fb0ef61a",
+        "scope": "Sunday Signal contextual output refresh"
+      },
+      {
+        "pr_number": 532,
+        "merge_sha": "6fc7a2c94332aefe1c5f922acf2327b44e70a0b7",
+        "main_sha": "f19de1c0ce47347fd0a52ef00815a93cdc721364",
+        "scope": "adaptive Candidate 2 ledger closeout"
+      },
+      {
+        "pr_number": 536,
+        "merge_sha": "2a355952643d5527bad08a931bc790098f405c5c",
+        "main_sha": "3e859968a40b8250f85ed211e8b1e7593ea1bf47",
+        "scope": "generated market/status refresh"
+      }
+    ],
+    "latest_synchronized_main_sha": "3e859968a40b8250f85ed211e8b1e7593ea1bf47",
+    "concurrent_research_preserved": true,
+    "concurrent_research_used_for_challenger_selection": false
+  },
+  "phase3_started": false,
+  "phase2_merge_sha": null,
+  "final_exact_head_ci": {
+    "research_firewall_run_id": null,
+    "research_validation_run_id": null,
+    "all_passed": false
+  },
+  "frozen_development_contract": {
+    "training_history_rule": "fixed 2016 training floor; expanding prior-only training",
+    "outer_target_seasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "inner_fold_rule": "one-season expanding prior-only validation targets beginning 2019; use latest four eligible inner validation seasons (or all when fewer); fixed fallback if fewer than two eligible folds",
+    "initial_reference_models": [
+      "A0",
+      "B0",
+      "C0"
+    ],
+    "B0_independent_of_A0": true,
+    "C0_estimator": "ridge_only",
+    "deferred_initial_extensions": [
+      "A1",
+      "nonlinear_C",
+      "B_plus_A_sensitivity",
+      "negative_binomial_B_rescue"
+    ],
+    "market_residual_nulls": [
+      "M0_market_only",
+      "M1_line_calibration_only",
+      "M2_football_residual_information",
+      "M3_full_C0"
+    ],
+    "training_start_season": 2016,
+    "inner_target_start_season": 2019,
+    "B0_process_ewma_half_life_team_games": 8,
+    "A0_observation_half_life_grid_team_games": [
+      4,
+      8,
+      16,
+      32
+    ]
+  },
+  "red_team": {
+    "shortlist_changed": false,
+    "findings": [
+      "A/B/C remain materially distinct and implementable with free/PIT-safe core data",
+      "A0 is the only initial A implementation; explicit state-space A1 is deferred",
+      "B0 is independent of A0 and uses the fixed Poisson plus multinomial process design",
+      "C0 is Ridge-only on A0; nonlinear residual rescue is deferred",
+      "nested tuning objectives, fold construction and simplicity tie-breaks are deterministic",
+      "PIT feasibility is documented feature-family by feature-family",
+      "David Sasser remains product/architecture evidence rather than reproducible validation"
+    ]
+  },
+  "external_evidence_classification": {
+    "peer_reviewed": [
+      "Glickman & Stern 1998",
+      "Harville football-rating work",
+      "Baker & McHale 2013",
+      "Boulier & Stekler 2003",
+      "Boulier, Stekler & Amundson 2006",
+      "Lacey 1990",
+      "Gray & Gray 1997",
+      "Gneiting & Raftery 2007",
+      "Yurko, Ventura & Horowitz 2019",
+      "Bock 2017 turnover prediction"
+    ],
+    "strong_technical_not_peer_reviewed": [
+      "Brill et al. 2024 expected-points preprint"
+    ],
+    "reproducible_open_source": [
+      "nfelo",
+      "Open Source Football / nflverse technical implementations"
+    ],
+    "opaque_product_comparator": [
+      "davidsasser.com"
+    ]
+  },
+  "sasser_closeout": {
+    "public_score_line_market_separation_verified": true,
+    "current_model_specification_found": false,
+    "reproducible_source_repository_found": false,
+    "immutable_pit_forecast_archive_found": false,
+    "independent_validation_protocol_found": false,
+    "scientific_use": "product architecture comparator only"
+  },
+  "process_feature_evidence": {
+    "turnovers": "peer-reviewed rare-event predictability; noisy/weak persistence implies shrinkage and no deterministic adjustment",
+    "red_zone": "football mechanism + technical/practitioner evidence; bounded shrinkage-smoothed B0 component, not separate search",
+    "explosive_plays": "technical/practitioner scoring-tail evidence; one fixed B0 definition, no threshold/window search"
+  }
+}

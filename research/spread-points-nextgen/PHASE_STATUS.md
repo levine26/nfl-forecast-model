@@ -6,13 +6,13 @@
 **Phase-0 base main:** `536d6ab712028e374b42815db106f9fcb5d28053`  
 **Phase-0 governance merge:** `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25` via PR #512
 
-Only one phase should normally be `IN PROGRESS`. Parallel lanes are permitted only within the active phase. Phase 1 is complete. No phase is active until a Phase 2 chat follows the recorded startup protocol and marks Phase 2 `IN PROGRESS`.
+Only one phase should normally be `IN PROGRESS`. Phase 2 remains the single active phase only for closeout and exact-head validation. Phase 3 is NOT STARTED.
 
 | Phase | Name | Status | Primary branch | Supporting PR(s) | Key evidence / artifacts | Entry criteria | Exit criteria | Last updated | Exact next action |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | Master Program Initialization | **COMPLETE** | `docs/spread-points-nextgen-phase0` — merged | **#512 — MERGED** | Five canonical control files under `research/spread-points-nextgen/`; research firewall run `35691355664` **SUCCESS**; research validation run `35691355478` **SUCCESS**; merge `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25` verified from `main` | Existing repo accessible; current main and production boundary inspectable | **SATISFIED:** canonical plan/status/handoff/log/index merged to `main`; production firewall documented; future-chat protocol documented; docs-only diff verified; existing research firewall and validation gate passed; merged files re-read from `main` | 2026-09-21 | **STOP in the Phase 0 chat. Do not begin Phase 1 here.** |
-| 1 | Current LevLine Audit, Baseline Reproduction & Error Decomposition | **COMPLETE** | `research/spread-points-nextgen-phase1` — merged | **#513 — MERGED** | `phase1/EVALUATION_CONTRACT.md`; architecture, baseline, error, data/API, PIT and synthesis reports; final audit artifact `10699778876`; merge `a4f7172c0c4ff82b1689411181e7a9042a1628a8` | Phase 0 COMPLETE | **SATISFIED:** architecture documented; reproducible 2022–2025 baseline; market baselines and paired uncertainty; residual decomposition; data/API inventory; leakage/PIT register; Phase 2 hypotheses; final post-sync firewall/validation/audit all green | 2026-09-22 | **STOP Phase 1.** Next substantive chat begins Phase 2 only from current `main` and the canonical control files; include davidsasser.com in the external-model review. |
-| 2 | Deep External Research & Challenger Design | **NOT STARTED** | TBD | None | Future literature/external-model reviews and preregistration | Phase 1 COMPLETE | Literature/external-model review; limited challenger shortlist; feature hypotheses; player/market-residual specs; preregistered evaluation and frozen holdout rules; data gaps identified | 2026-09-22 | Read Phase 1 synthesis/error/data/PIT artifacts; inspect current main/PR state; mark Phase 2 `IN PROGRESS`; perform deep external research and preregistration only. Include davidsasser.com in the external-model review. |
+| 1 | Current LevLine Audit, Baseline Reproduction & Error Decomposition | **COMPLETE** | `research/spread-points-nextgen-phase1` — merged | **#513 — MERGED** | `phase1/EVALUATION_CONTRACT.md`; architecture, baseline, error, data/API, PIT and synthesis reports; final audit artifact `10699778876`; merge `a4f7172c0c4ff82b1689411181e7a9042a1628a8` | Phase 0 COMPLETE | **SATISFIED:** architecture documented; reproducible 2022–2025 baseline; market baselines and paired uncertainty; residual decomposition; data/API inventory; leakage/PIT register; Phase 2 hypotheses; final post-sync firewall/validation/audit all green | 2026-09-22 | **STOP Phase 1.** Phase 2 must continue from merged Phase 1 evidence; do not rerun the audit. |
+| 2 | Deep External Research & Challenger Design | **IN PROGRESS — CLOSEOUT / EXACT-HEAD CI** | `research/spread-points-nextgen-phase2` | **#520 — DRAFT until final checks pass**; sync #521 merged | Phase 2 canonical package; bounded A/B/C preregistration; deterministic nested protocol; PIT source matrix; red-team closeout | Phase 1 COMPLETE | Research/design analytically complete; still requires exact-head firewall + full validation, PR merge, merged-main verification, and final receipt | 2026-09-22 | Run fresh exact-head checks on the final branch head; if green, ready+merge #520; verify main; record merge/CI receipt; leave Phase 3 NOT STARTED. |
 | 3 | Controlled Challenger Implementation | **NOT STARTED** | TBD | None | Future candidate implementations/tests/contracts | Phase 2 COMPLETE | Selected challengers implemented; tests pass; provenance/as-of semantics intact; explicit versions; reproducible research outputs; production unchanged | 2026-09-21 | Await Phase 2 completion |
 | 4 | Historical Validation, Ablation & Model Selection | **NOT STARTED** | TBD | None | Future holdout/ablation/uncertainty reports | Phase 3 COMPLETE | All preregistered challengers evaluated; holdout clean; ablations/uncertainty/robustness/market comparison complete; finalist or no-finalist determination documented | 2026-09-21 | Await Phase 3 completion |
 | 5 | Prospective Shadow Validation & Operational Hardening | **NOT STARTED** | TBD | None | Future immutable receipts, grading, operational evidence | Phase 4 COMPLETE and credible finalist exists | Preregistered prospective evidence threshold satisfied; operational reliability demonstrated | 2026-09-21 | Await Phase 4 completion |
@@ -58,25 +58,29 @@ The merged canonical files were then verified directly from `main` at merge SHA 
 
 ## Phase 1 validation record
 
-Final exact-head commit: `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`.
+Final post-sync Phase 1 candidate head: `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`.
 
 - `LevLine research firewall` run `35741337735`: **SUCCESS**
 - `LevLine research validation` run `35741337942`: **SUCCESS**
 - `Spread points Phase 1 audit` run `35741337832`: **SUCCESS**
-- Dedicated Phase 1 evidence artifact: `10699778876`, digest `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`.
-- PR `#513`: **MERGED** at `a4f7172c0c4ff82b1689411181e7a9042a1628a8`.
-
-The final exact-head audit regenerated the canonical 1,087-game 2022–2025 baseline, passed helper tests, generated error/structural/team-points evidence, and verified protected production surfaces were unchanged. The merged control files were then re-read from `main`.
-
-### Final post-sync / merged Phase 1 receipt
-
-Final Phase 1 candidate head: `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`, synchronized with then-current `main` before merge.
-
-- research firewall run `35741337735`: **SUCCESS**
-- full research validation run `35741337942`: **SUCCESS**, including final research validation gate
-- dedicated Phase 1 audit run `35741337832`: **SUCCESS**
-- final audit artifact `10699778876`
+- Dedicated Phase 1 evidence artifact: `10699778876`
 - artifact digest: `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`
 - PR #513 merge commit: `a4f7172c0c4ff82b1689411181e7a9042a1628a8`
 
-PR #513 merged while the fresh post-sync checks were still executing; all of those exact-head checks subsequently completed successfully. The merged package was then re-read from `main`.
+The final exact-head audit regenerated the canonical 1,087-game 2022–2025 baseline, passed helper tests, generated error/structural/team-points evidence, and verified protected production surfaces were unchanged. The merged package was then re-read from `main`.
+
+## Phase 2 closeout candidate record
+
+- primary branch: \`research/spread-points-nextgen-phase2\`
+- primary PR: #520
+- compatibility sync PR: #521 — merged into the Phase 2 branch
+- synchronized main baseline at sync: \`fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da\`
+- initial pre-hardening Phase 2 checks:
+  - research firewall \`35743780159\`: **SUCCESS**
+  - research validation \`35743780066\`: **SUCCESS**
+- those earlier checks are preserved as evidence but are **not** final closeout checks because research/control files changed afterward.
+- final design/control reconciliation: **FROZEN FOR EXACT-HEAD CI**; no further Phase 2 branch content changes are planned before the merge gate.
+- final exact-head check IDs: **PENDING**
+- Phase 2 merge SHA: **PENDING**
+- Phase 3: **NOT STARTED**
+
