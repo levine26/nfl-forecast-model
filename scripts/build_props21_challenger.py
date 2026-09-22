@@ -549,6 +549,7 @@ def _append_receipts(path: Path, payload: Mapping[str, Any], *, source_payload: 
             if not isinstance(td_distribution, Mapping):
                 td_distribution = {}
             raw_seed = _number(source_provenance.get("pure_simulation_seed"))
+            raw_simulation_count = _number(source_model.get("simulation_count"))
             receipt_forecast["source_v1_distribution_evidence"] = {
                 "contract_version": "levline-props21-source-distribution-evidence-v0.1",
                 "source_model_version": source_model.get("version"),
@@ -558,7 +559,9 @@ def _append_receipts(path: Path, payload: Mapping[str, Any], *, source_payload: 
                     "high": _number(interval.get("high")),
                     "coverage": _number(interval.get("coverage")),
                 },
-                "simulation_count": int(_number(source_model.get("simulation_count")) or 0),
+                "simulation_count": (
+                    int(raw_simulation_count) if raw_simulation_count is not None else None
+                ),
                 "td_count_distribution": {
                     str(key): _number(value)
                     for key, value in td_distribution.items()
