@@ -31,6 +31,7 @@ PAIR_DEFINITIONS = (
     ("t30_minus_t45", "T-30m", "T-45m"),
 )
 IDENTITY_FIELDS = (
+    "market_provider",
     "event_id",
     "provider_commence_time_utc",
     "home_team",
