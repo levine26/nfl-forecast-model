@@ -710,12 +710,18 @@ External evidence is supportive but not outcome-selective:
 Candidate ID: `ADAPTIVE-REGIME-SHOCK-GATE-V1`  
 Preregistration main SHA: `fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da`  
 Synchronized Candidate 2 base: `99b255aae7fc36ad367561f613e3fcb3752ef528`  
-Validated candidate code SHA: `f4a5ea26bc999819d4c79179c20b8f33fd77401f`  
-Validated workflow run: `35747145825`  
-Evidence artifact: `10703836596`  
-Artifact SHA256: `9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5`  
+Canonical validated execution SHA: `3d47141ed8584e989702d1982e4e1dc60d8248a2`  
+Canonical workflow run: `35749549009`  
+Canonical evidence artifact: `10705320611`  
+Artifact SHA256: `fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771`  
+Frozen config SHA256: `957dc2443685f1a90d8632ee1f6b7af78834d1e039ded9ee7432690237a96437`  
+Feature contract: Candidate 2 Pre-Registration §§20.2–20.7  
+Prospective start week: `null` (not authorized)  
+Prediction-lock rules assigned: `false`  
 Final receipt: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_RECEIPT.json`  
 Final finding: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_FINDING.md`
+
+The earlier pre-hardening execution (`f4a5ea26...`, run `35747145825`, artifact `10703836596`) is superseded for final receipt purposes. Its winner result happened to match, but the canonical run above consumes the qualified 2025 practice-state reconstruction and final Lane D/E validation code.
 
 ### Same-sample 2025 result
 
@@ -732,61 +738,100 @@ Candidate 2 is evaluated on the exact qualified 2025 regime-state sample, not ag
 - F-ST-only correct: **0**
 - switch win rate: **100% (1/1)**
 - exact McNemar diagnostic: **p = 1.0**
+- paired week-block error-loss diagnostic: **p = 0.3173**
 - week-block bootstrap 95% accuracy-delta interval: **0.0000 to +1.1278 pp**
+- week-block bootstrap probability of positive accuracy delta: **0.6521**
 
-The sole switch was `2025_12_ATL_NO`: a near-boundary F-ST/component disagreement authorized by the preregistered QB1-change shock. The switch was correct.
+The sole switch was `2025_12_ATL_NO`: frozen F-ST home probability **0.509392**, component-resolved home probability **0.460679**. The preregistered QB1-change shock authorized the switch to Atlanta; Atlanta won. OL churn and QB-practice state did not contribute to this switch.
 
-### PIT coverage
+### PIT coverage and reconstruction integrity
 
-- both-team T-120 depth state: **272 / 272**
+- both-team T-120 depth state: **272 / 272 games**
 - QB-change evaluable: **256 games**
 - OL-change evaluable: **256 games**
-- qualified QB-practice join: **126 games**
+- qualified QB-practice join: **127 games**
 - strong-shock games: **51**
-- near-boundary F-ST/component disagreements: **4**
+- boundary games: **50**
+- F-ST/component pick disagreements: **4**
 - authorized Candidate 2 switches: **1**
+- rows preserved with no strong shock: **221**
+- depth team-games: **544 / 544**
 - future-snapshot violations: **0**
-- ambiguous QB-practice joins: **0**
+- depth postgame snaps used: **0**
+- final-practice reconstruction qualified: **true**
+- nflverse practice rows: **6,068**
+- independent NFL historical cross-check rows: **6,068**
+- identity-match / fully-qualified practice-state rate: **99.9341%**
+- practice-status agreement: **100%**
+- known-by-T120 rate among matched rows: **100%**
+- unresolved player-week practice rows: **4**, failed closed
+- actual snaps used: **0**
+- postgame participation used: **0**
+- completed 2026 outcomes used: **0**
 
 No historical closing-line substitution, post-T-120 inactive state, unqualified 2022-2024 availability, actual snaps, or completed 2026 outcomes entered Candidate 2 construction or selection.
 
+### Mandatory same-row controls
+
+On the same 272 games:
+
+- raw market: **178 / 272 = 65.4412%** (**-1** vs F-ST)
+- Candidate 1 residual state: **182 / 272 = 66.9118%** (**+3** vs F-ST on 2025 alone; Candidate 1 remains rejected on the full 2022-2025 experiment)
+- weekly F-ST refit control: **179 / 272 = 65.8088%** (**0**)
+- component-resolved challenger: **179 / 272 = 65.8088%** (**0**)
+- boundary + component disagreement without regime shock: **179 / 272 = 65.8088%** (**0**)
+- Candidate 2 regime-shock gate: **180 / 272 = 66.1765%** (**+1**)
+
+Thus the observed Candidate 2 gain did not come from the component challenger globally; it came from selectively allowing one QB-change disagreement that happened to be correct.
+
 ### Adversarial result
 
-The preregistered grid contained 18 configurations.
+The preregistered grid contained **18** configurations.
 
 - **12 / 18** preserved the +1 winner result;
 - **6 / 18** were neutral;
 - **0 / 18** were negative;
-- lowering the OL threshold to 1 added a second switch and erased the net gain;
+- primary V1 ranked tied-best by accuracy delta;
+- lowering the OL-new threshold to **1** added a second switch and erased the net gain;
 - removing QB-change erased the gain;
 - QB-change-only reproduced the full gain;
+- removing OL churn did not change the gain;
+- removing QB-practice did not change the gain;
 - removing Week 12 erased the gain;
-- the maximum single-week share of positive net gain was **100%**.
+- removing either team in the sole switched game erased the gain;
+- maximum single-week share of positive net gain: **100%**;
+- adversarial audit flag: **threshold fragility = true**;
+- season stability: **not estimable** because qualified equivalent regime-state data are 2025-only.
 
-Thus the sign is not a one-cell threshold artifact, but the evidence is entirely one-switch / one-week / QB-channel concentrated.
+The result is therefore coherent but entirely one-switch / one-week / QB-channel concentrated.
 
 ### Scientific disposition
 
 **INCONCLUSIVE.**
 
-Candidate 2 is directionally more encouraging than Candidate 1 because it made only one winner change, that change was correct, and Brier/log loss also improved slightly. However, one successful switch is not statistically distinguishable from noise and does not establish a season-stable or reproducible winner-selection edge.
+Candidate 2 is directionally more encouraging than Candidate 1 because it made only one winner change, that change was correct, and Brier/log loss also improved slightly. The mechanism is football-logically coherent: a QB1 state change can make an incumbent estimate stale, and the switch direction came from the separately reconstructed component stack rather than hand-coded injury points.
 
-Candidate 2 therefore does **not** satisfy its own preregistered standard for prospective-shadow authorization. It is not rejected as a mechanism, but it is not promoted.
+However, one successful switch is not statistically distinguishable from noise, is not season-stable, and fails the preregistered concentration/fragility standard for prospective-shadow authorization. The positive point estimate (**+0.3676 pp**) therefore cannot be treated as a demonstrated long-run uplift.
+
+Candidate 2 is **not rejected as a mechanism**, but V1 is **not promoted** and is **not authorized for prospective shadow testing** under this preregistration.
 
 ### Updated adaptive-learning accuracy view
 
-The original approximately 68.8% adaptive central prior is no longer supported after Candidate 1 and Candidate 2.
+The original approximately 68.8% adaptive central prior is no longer supported after Candidate 1, the weekly-refit negative control, and Candidate 2.
 
-Current governance estimate:
-- frozen established long-run benchmark remains approximately **68.17%** on the chronology-clean 2022-2025 benchmark;
-- current central estimate for LevLine long-run straight-up accuracy with mechanisms actually evidenced so far is approximately **68.3%**;
-- a defensible near-term range is approximately **68.2%-68.4%**, with high uncertainty;
-- materially larger gains remain possible only if genuinely orthogonal prospective information such as strict multi-book market-path and richer qualified player/QB state later validates.
+Current governance estimate (research judgment, **not** a formal confidence interval):
+
+- frozen established benchmark remains **68.1693%** on the chronology-clean 2022-2025 sample;
+- current central estimate for sustainable LevLine straight-up accuracy using mechanisms actually evidenced so far is approximately **68.3%**;
+- a defensible near-term research range is approximately **68.2%-68.4%**;
+- current evidence does **not** support treating ~69% as an achieved or expected adaptive accuracy level;
+- larger gains remain scientifically possible only if genuinely orthogonal prospective information (especially strict market-path information and richer qualified player/QB state) later validates under a newly preregistered candidate.
 
 ### Stop state
 
 - [x] Candidate 2 complete
 - [x] Candidate 2 final disposition recorded
+- [x] Canonical hardened execution run successful
 - [x] Production F-ST unchanged
 - [x] No Candidate 2 prospective shadow frozen
 - [x] No prospective start week assigned
