@@ -302,10 +302,26 @@ def build_candidate4_decisions(
     incumbents = select_frozen_incumbents(production_history)
     raw_market_rows = market_ledger.to_dict("records") if not market_ledger.empty else []
     market_rows = _candidate4_qualified_market_rows(raw_market_rows)
-    market_states, _ = build_market_state(market_rows)
-    state_by_game = {str(row["game_id"]): row for row in market_states}
-    selected_consensus = select_consensus_horizons(market_rows)
-    selected_books = select_book_horizons(market_rows, selected_consensus)
+    state_by_game: dict[str, dict[str, Any]] = {}
+    selected_books: dict[str, dict[str, dict[str, dict[str, Any]]]] = {}
+    market_errors: dict[str, str] = {}
+
+    rows_by_game: dict[str, list[dict[str, Any]]] = {}
+    for row in market_rows:
+        game_id = str(row.get("game_id") or "").strip()
+        if game_id:
+            rows_by_game.setdefault(game_id, []).append(row)
+
+    for game_id, game_rows in rows_by_game.items():
+        try:
+            market_states, _ = build_market_state(game_rows)
+            if market_states:
+                state_by_game[game_id] = market_states[0]
+            selected_consensus = select_consensus_horizons(game_rows)
+            selected_books.update(select_book_horizons(game_rows, selected_consensus))
+        except ValueError as exc:
+            market_errors[game_id] = type(exc).__name__ + ":" + str(exc)
+
     qb_by_game = _qb_state_by_game(qb_state)
 
     output: list[dict[str, Any]] = []
@@ -322,6 +338,8 @@ def build_candidate4_decisions(
         if lock_time > target_t60:
             reasons.append("incumbent_lock_after_t60")
         state = state_by_game.get(game_id)
+        if game_id in market_errors:
+            reasons.append("market_horizon_identity_mismatch")
         m60 = None
         d = None
         breadth = None
