@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import AppSignal from './AppSignal.jsx'
 import SignalEnhancements from './SignalEnhancements.jsx'
 import ForecastClarity from './ForecastClarity.jsx'
@@ -8,7 +7,6 @@ import ExperienceDomFixes from './ExperienceDomFixes.jsx'
 import HistoryReceiptDetails from './HistoryReceiptDetails.jsx'
 import HistoryEditorialGuard from './HistoryEditorialGuard.jsx'
 import BetTracker from './BetTracker.jsx'
-import PropsResearchBeta from './PropsResearchBeta.jsx'
 import './signal-polish.css'
 
 /**
@@ -16,10 +14,12 @@ import './signal-polish.css'
  *
  * AppCoherent remains the production entrypoint intentionally. The premium
  * Sunday Signal presentation lives in AppSignal, while the adjacent helpers add
- * presentation-only affordances around the same canonical game data. The Props
- * Research Beta is isolated behind its own hash namespace and consumes only the
- * separate Props public contract; it does not recompute or mutate winner-model
- * forecasts, picks, locks, grading, governance, or probabilities.
+ * presentation-only affordances around the same canonical game data.
+ *
+ * Props was intentionally removed from the production surface in the September
+ * 2026 reset. Any future player-prop product must re-enter through a separately
+ * validated research program rather than being mounted into Sunday Signal by
+ * default.
  *
  * public_forecasts.json
  * LEVLINE FORECAST
@@ -53,19 +53,7 @@ import './signal-polish.css'
  * Component diagnostics are supporting views, not competing official forecasts.
  * <details><summary>Model Consensus
  */
-function onPropsRoute() {
-  const raw = window.location.hash.replace(/^#\/?/, '')
-  return raw === 'props' || raw.startsWith('props/')
-}
-
 export default function AppCoherent() {
-  const [propsRoute, setPropsRoute] = useState(onPropsRoute)
-  useEffect(() => {
-    const update = () => setPropsRoute(onPropsRoute())
-    window.addEventListener('hashchange', update)
-    return () => window.removeEventListener('hashchange', update)
-  }, [])
-  if (propsRoute) return <PropsResearchBeta/>
   return <>
     <AppSignal/>
     <SignalEnhancements/>
@@ -76,6 +64,5 @@ export default function AppCoherent() {
     <HistoryReceiptDetails/>
     <HistoryEditorialGuard/>
     <BetTracker/>
-    <PropsResearchBeta/>
   </>
 }
