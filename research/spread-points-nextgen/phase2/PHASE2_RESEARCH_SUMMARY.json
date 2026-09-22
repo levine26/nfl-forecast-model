@@ -131,10 +131,21 @@
     }
   },
   "compatibility_sync": {
-    "pr_number": 521,
-    "merged": true,
-    "sync_merge_sha": "23a01f6ccc81874b26f74aa58a5e5ee8151d1866",
-    "synchronized_main_sha": "fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da",
+    "sync_prs": [
+      {
+        "pr_number": 521,
+        "merge_sha": "23a01f6ccc81874b26f74aa58a5e5ee8151d1866",
+        "main_sha": "fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da",
+        "scope": "adaptive weekly learning research"
+      },
+      {
+        "pr_number": 528,
+        "merge_sha": "3f1de4749519e1b5ffe0b50d2faf6cd02323039d",
+        "main_sha": "032289d5b62b226b242e4b4c202935f7fb0ef61a",
+        "scope": "Sunday Signal contextual output refresh"
+      }
+    ],
+    "latest_synchronized_main_sha": "032289d5b62b226b242e4b4c202935f7fb0ef61a",
     "concurrent_research_preserved": true,
     "concurrent_research_used_for_challenger_selection": false
   },
