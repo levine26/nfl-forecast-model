@@ -6,8 +6,9 @@
 **Phase 1:** **COMPLETE**  
 **Phase 2:** **COMPLETE**  
 **Phase 3:** **NOT STARTED**  
-**Active branch:** \`research/spread-points-nextgen-phase2\`  
-**Primary PR:** #520 — merged at `405906942013252c158244c9b033a3240baa37f8`
+**Completed branch:** \`research/spread-points-nextgen-phase2\`  
+**Merged PR:** #520  
+**Merge SHA:** \`405906942013252c158244c9b033a3240baa37f8\` — merged at `405906942013252c158244c9b033a3240baa37f8`
 
 ## Phase 2 state
 
