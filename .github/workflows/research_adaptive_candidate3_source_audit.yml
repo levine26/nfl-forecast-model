@@ -1,0 +1,42 @@
+name: Candidate 3 market-path source audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "research/adaptive_candidate3_market_path_source_audit_v1.py"
+      - ".github/workflows/research_adaptive_candidate3_source_audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install audit dependency
+        run: python -m pip install --disable-pip-version-check "duckdb>=1.1,<2"
+      - name: Download immutable public market archive
+        run: |
+          mkdir -p candidate3_source
+          curl -L --fail --retry 3 \
+            "https://github.com/bobby-king3/nfl-market-movement-tracker/releases/download/v1.1.1/nfl_odds.duckdb" \
+            -o candidate3_source/nfl_odds.duckdb
+          echo "b03c4e7f1cf885e9f20ea808ee538c26c21df4065b342fe04c50d09b808c344c  candidate3_source/nfl_odds.duckdb" | sha256sum -c -
+      - name: Run outcome-blind PIT qualification audit
+        run: |
+          python research/adaptive_candidate3_market_path_source_audit_v1.py \
+            --db candidate3_source/nfl_odds.duckdb \
+            --output candidate3_source/source_audit.json
+      - name: Upload qualification receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: adaptive-candidate3-source-audit
+          path: candidate3_source/source_audit.json
+          if-no-files-found: error
