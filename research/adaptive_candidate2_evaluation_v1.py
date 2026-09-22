@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from research.adaptive_weekly_evaluation_v1 import evaluate as paired_evaluate
+from research.adaptive_weekly_evaluation_v1 import evaluate as paired_evaluate, switch_accounting
 
 EPS = 1e-6
 CANDIDATE_ID = "ADAPTIVE-REGIME-SHOCK-GATE-V1"
@@ -146,20 +146,31 @@ def run(
         bootstrap_samples=10000,
     )
 
+    # Controls are mandatory paired comparators, but only Candidate 2 vs F-ST is the
+    # primary inferential contrast requiring the full 10,000-draw bootstrap suite.
+    # Avoid repeating that expensive bootstrap for every unchanged control.
     controls_vs_fst = {}
     for name, col in COMPARATORS.items():
         if name == "frozen_fst":
             continue
-        report, _ = paired_evaluate(
-            frame,
-            col,
-            "fst_prob",
-            target_col="home_win",
-            bootstrap_samples=10000,
-        )
+        score = scoreboard[name]
         controls_vs_fst[name] = {
-            "switch_accounting": report["switch_accounting"],
-            "metric_deltas": report["metric_deltas"],
+            "switch_accounting": switch_accounting(
+                frame,
+                col,
+                "fst_prob",
+                target_col="home_win",
+            ),
+            "metric_deltas": {
+                "winner_pct": float(score["accuracy"] - fst["accuracy"]),
+                "brier": float(score["brier"] - fst["brier"]),
+                "log_loss": float(score["log_loss"] - fst["log_loss"]),
+            },
+            "bootstrap_role": (
+                "primary_candidate_bootstrap_reported_in_primary_vs_fst"
+                if name == "candidate2_regime_shock"
+                else "descriptive_control_no_redundant_bootstrap"
+            ),
         }
 
     result = {
