@@ -170,3 +170,48 @@ def test_positive_snap_player_with_no_event_grades_zero():
     assert len(forecasts) == 1
     assert grades[0]["actual_result"] == 0.0
     assert audit["graded"] == 1
+
+
+def test_grade_eligibility_status_records_missing_participation_reason():
+    row = _receipt()
+    game = row["forecast"]["game_id"]
+    forecasts, grades, audit, metadata = build_evaluation_events(
+        [row],
+        completed_games={game},
+        outcome_pbp_games={game},
+        actuals={},
+        participation={},
+        graded_utc=pd.Timestamp("2026-09-21T12:00:00Z").to_pydatetime(),
+    )
+    assert len(forecasts) == 1
+    assert grades == []
+    assert audit["missing_participation"] == 1
+    assert metadata[row["forecast"]["forecast_id"]]["grade_eligibility_status"] == "MISSING_PARTICIPATION"
+
+
+def test_grade_eligibility_status_records_graded_and_zero_snap_rows():
+    graded_row = _receipt()
+    zero_row = _receipt()
+    zero_row["forecast"] = dict(zero_row["forecast"])
+    zero_row["forecast"]["forecast_id"] = "p21_zero"
+    zero_row["forecast"]["player_id"] = "00-0000003"
+    game = graded_row["forecast"]["game_id"]
+
+    forecasts, grades, audit, metadata = build_evaluation_events(
+        [graded_row, zero_row],
+        completed_games={game},
+        outcome_pbp_games={game},
+        actuals={},
+        participation={
+            (game, graded_row["forecast"]["player_id"]): 9,
+            (game, zero_row["forecast"]["player_id"]): 0,
+        },
+        graded_utc=pd.Timestamp("2026-09-21T12:00:00Z").to_pydatetime(),
+    )
+
+    assert len(forecasts) == 2
+    assert len(grades) == 1
+    assert audit["graded"] == 1
+    assert audit["zero_offense_snaps_void"] == 1
+    assert metadata[graded_row["forecast"]["forecast_id"]]["grade_eligibility_status"] == "GRADED"
+    assert metadata["p21_zero"]["grade_eligibility_status"] == "ZERO_OFFENSE_SNAPS_VOID"
