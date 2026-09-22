@@ -116,7 +116,7 @@ Once Phase 2 is formally complete, the next chat should:
 5. implement C0 Ridge residual reference and M0/M1/M2/M3 null hierarchy;
 6. run development OOS evaluation through 2024 only;
 7. run only the frozen A0/B0/C0 reference implementations and required null/diagnostic comparisons; do not open deferred A1/B-alternative/C-nonlinear searches;
-8. determine D eligibility only from the frozen numeric gate;
+8. determine D eligibility only from the frozen strict target-specific gate (correlation <0.90, pooled gain >=0.10 MAE, improvement in both 2023 and 2024, bootstrap probability >=0.75);
 9. freeze candidate identities;
 10. **do not score 2025**;
 11. stop for Phase 4.
