@@ -1065,6 +1065,58 @@ def test_all_games_cli_failure_writes_no_partial_slate(monkeypatch, tmp_path):
 
 
 
+def test_all_games_cli_can_noop_after_target_week_fully_started(monkeypatch, tmp_path):
+    module = _upstream_cli_module()
+    calls = _patch_upstream_cli(monkeypatch, module)
+
+    class PostKickoffDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            value = datetime(2026, 9, 21, 1, 0, tzinfo=timezone.utc)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(module, "datetime", PostKickoffDateTime)
+    priors_path = tmp_path / "priors.json"
+    priors_path.write_text(
+        json.dumps(
+            {
+                "route_prior_means": {"RB": 0.5, "WR": 0.9, "TE": 0.7},
+                "availability_beta_priors": {
+                    "UNKNOWN": {"alpha": 1.0, "beta": 1.0}
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "upstream"
+    monkeypatch.setattr(
+        __import__("sys"),
+        "argv",
+        [
+            str(UPSTREAM_SCRIPT),
+            "--season",
+            "2026",
+            "--week",
+            "3",
+            "--all-games",
+            "--allow-empty-postkickoff",
+            "--priors",
+            str(priors_path),
+            "--output-dir",
+            str(output),
+            "--skip-injury-fetch",
+        ],
+    )
+
+    assert module.main() == 0
+    assert calls == []
+    marker_payload = json.loads((output / "postkickoff_noop.json").read_text(encoding="utf-8"))
+    assert marker_payload["season"] == 2026
+    assert marker_payload["week"] == 3
+    assert marker_payload["pregame_game_ids"] == []
+    assert marker_payload["started_game_ids"] == ["g1", "g2"]
+
+
 def test_scheduled_pregame_game_ids_exclude_already_started_games():
     module = _upstream_cli_module()
     schedules = pd.DataFrame(
