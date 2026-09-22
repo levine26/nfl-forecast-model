@@ -144,7 +144,7 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 5,
+    "evidence_repairs": 0,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
@@ -167,6 +167,13 @@
     "status": "healthy"
   },
   "generated_utc": "2026-09-22T00:34:01.206344+00:00",
+  "groq_provider_fallback": {
+    "failed_games": [],
+    "games": {},
+    "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
+    "run_id": "35672526347",
+    "status": "healthy"
+  },
   "injuries": {
     "as_of": "2026-09-22T00:34:01.367418+00:00",
     "players": 251,
@@ -176,7 +183,7 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-22T00:34:21.006385+00:00",
+    "as_of": "2026-09-22T00:35:58.107964+00:00",
     "cross_game_titles_rejected": 0,
     "games": 1,
     "games_with_display_reporting": 1,
