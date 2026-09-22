@@ -181,6 +181,8 @@ def _load_editorial_game_ids(path: Path) -> set[str]:
         raise RuntimeError("Editorial roster must be a JSON object")
 
     games = payload.get("games")
+    if games is None and isinstance(payload.get("game_ids"), list):
+        games = [{"game_id": game_id} for game_id in payload["game_ids"]]
     if games is None:
         top_level_ids = {
             str(game_id)
@@ -191,7 +193,7 @@ def _load_editorial_game_ids(path: Path) -> set[str]:
             games = payload
         else:
             raise RuntimeError(
-                "Editorial roster must contain a 'games' object/list or be a top-level game-id map"
+                "Editorial roster must contain 'game_ids', a 'games' object/list, or be a top-level game-id map"
             )
 
     if isinstance(games, dict):

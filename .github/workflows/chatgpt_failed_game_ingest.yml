@@ -6,10 +6,12 @@ on:
       - "scripts/ingest_chatgpt_failed_games.py"
       - "scripts/finalize_editorial.py"
       - "scripts/build_canonical_editorial_predictions.py"
+      - "scripts/refresh_editorial_slate_roster.py"
       - "tests/test_chatgpt_failed_game_ingest.py"
       - "tests/test_editorial_provider_fallback.py"
       - "tests/test_editorial_text_safety.py"
       - "tests/test_canonical_editorial_predictions.py"
+      - "tests/test_editorial_slate_roster.py"
       - "src/nfl_forecast/editorial_provider_fallback.py"
       - "src/nfl_forecast/editorial_text_safety.py"
       - ".github/workflows/chatgpt_failed_game_ingest.yml"
@@ -46,7 +48,7 @@ jobs:
 
       - name: Test game-scoped fallback boundary
         run: |
-          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
           python -m py_compile scripts/ingest_chatgpt_failed_games.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
 
       - name: Enforce editorial-only fallback wiring
@@ -74,7 +76,8 @@ jobs:
           assert 'fallback_snapshot_reused' in workflow
           assert 'games_with_trusted_reporting' in workflow
           assert "git merge-base --is-ancestor \"$current_base\" origin/main" in workflow
-          assert '--editorial-roster outputs/game_previews.json' in workflow
+          assert '--editorial-roster inputs/sunday_signal/editorial_slate_roster.json' in workflow
+          assert 'scripts/refresh_editorial_slate_roster.py' in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
           assert 'Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
@@ -91,11 +94,17 @@ jobs:
         if: github.event_name != 'pull_request'
         run: test -f inputs/chatgpt_media/fallback/manifest.json
 
+      - name: Refresh and freeze editorial weekend roster
+        if: github.event_name != 'pull_request'
+        run: |
+          python scripts/refresh_editorial_slate_roster.py \
+            --roster inputs/sunday_signal/editorial_slate_roster.json
+
       - name: Canonicalize current editorial forecast source
         if: github.event_name != 'pull_request'
         run: |
           python scripts/build_canonical_editorial_predictions.py \
-            --editorial-roster outputs/game_previews.json \
+            --editorial-roster inputs/sunday_signal/editorial_slate_roster.json \
             --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
@@ -154,8 +163,8 @@ jobs:
           finalizer = status.get('editorial_finalizer', {})
           fallback = status.get('groq_provider_fallback', {})
           games = int(finalizer.get('games', 0))
-          roster = json.loads(Path('outputs/game_previews.json').read_text())
-          expected_games = len(roster)
+          roster = json.loads(Path('inputs/sunday_signal/editorial_slate_roster.json').read_text())
+          expected_games = len(roster.get('game_ids') or [])
           if games != expected_games:
               raise SystemExit(f'editorial slate contracted: finalized={games} roster={expected_games}')
           if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
@@ -176,7 +185,7 @@ jobs:
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
+          git add inputs/sunday_signal/editorial_slate_roster.json outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
           if git diff --cached --quiet; then
             echo "No failed-game editorial changes to publish."
             exit 0
