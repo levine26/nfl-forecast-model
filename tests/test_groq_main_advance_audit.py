@@ -60,6 +60,16 @@ def test_isolated_research_namespaces_are_reconcilable() -> None:
     assert audit.research_only == tuple(sorted(paths[:10]))
 
 
+def test_unknown_challenger_output_remains_fail_closed() -> None:
+    audit = MODULE.audit_main_advance([
+        "challenger_outputs/props21/publication.json",
+    ])
+
+    assert not audit.safe_to_reconcile
+    assert audit.research_only == ()
+    assert audit.non_output == ("challenger_outputs/props21/publication.json",)
+
+
 def test_research_prefix_does_not_whitelist_production_paths() -> None:
     audit = module.audit_main_advance(
         [
