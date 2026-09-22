@@ -30,3 +30,17 @@ Unchanged:
 - completed 2026 outcomes used for design/selection = 0.
 
 This is an evidence-schema clarification only. It does not create a new candidate clock.
+
+
+## Immutable T-120 execution clarification
+
+Before the first Candidate 4 primary game, the operational source path is further hardened:
+
+- QB1 identity is now **captured and content-hashed during the one-sided T-120 window itself**;
+- the T-120 capture accepts only source records already observed by the capture timestamp;
+- the T-60 inactive comparison consumes that immutable QB1 snapshot file;
+- the T-60 runner does **not** re-query nflverse/nflreadpy depth charts and does not retrospectively derive a T-120 identity from a later data pull;
+- if the T-120 snapshot is missing, incomplete, late, ambiguous, or has an identity mismatch, that game fails closed;
+- a later depth-chart pull may not repair a missed T-120 snapshot.
+
+This strengthens point-in-time evidence preservation without changing the frozen QB-shock definition, horizons, switch gate, threshold, or player-value authority.
