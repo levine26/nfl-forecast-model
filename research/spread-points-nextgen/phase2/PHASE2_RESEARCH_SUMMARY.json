@@ -152,7 +152,7 @@
       2023,
       2024
     ],
-    "inner_fold_rule": "expanding prior-only folds; at least two prior complete training seasons; latest four valid inner validation seasons, or all valid when fewer than three; fixed fallback when fewer than two valid folds",
+    "inner_fold_rule": "expanding prior-only folds; at least two complete prior training seasons; use latest four valid inner validation seasons (or all available when fewer); fixed fallback when fewer than two valid folds",
     "fixed_lagged_state_half_life_team_games": 8,
     "initial_reference_models": [
       "A0",
@@ -187,5 +187,36 @@
       "PIT feasibility is documented feature-family by feature-family",
       "David Sasser remains product/architecture evidence rather than reproducible validation"
     ]
+  },
+  "external_evidence_classification": {
+    "peer_reviewed": [
+      "Glickman & Stern 1998",
+      "Harville football-rating work",
+      "Baker & McHale 2013",
+      "Boulier & Stekler 2003",
+      "Boulier, Stekler & Amundson 2006",
+      "Lacey 1990",
+      "Gray & Gray 1997",
+      "Gneiting & Raftery 2007",
+      "Yurko, Ventura & Horowitz 2019"
+    ],
+    "strong_technical_not_peer_reviewed": [
+      "Brill et al. 2024 expected-points preprint"
+    ],
+    "reproducible_open_source": [
+      "nfelo",
+      "Open Source Football / nflverse technical implementations"
+    ],
+    "opaque_product_comparator": [
+      "davidsasser.com"
+    ]
+  },
+  "sasser_closeout": {
+    "public_score_line_market_separation_verified": true,
+    "current_model_specification_found": false,
+    "reproducible_source_repository_found": false,
+    "immutable_pit_forecast_archive_found": false,
+    "independent_validation_protocol_found": false,
+    "scientific_use": "product architecture comparator only"
   }
 }
