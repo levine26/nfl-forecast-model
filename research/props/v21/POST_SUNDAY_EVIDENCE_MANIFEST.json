@@ -1,0 +1,139 @@
+{
+  "contract_version": "levline-props-2.1-post-sunday-evidence-v0.1",
+  "evidence_status": "FROZEN_PROSPECTIVE_COHORT",
+  "source_workflow": {
+    "name": "LevLine Props live refresh",
+    "run_id": "35477049179",
+    "trigger_head_sha": "e851c4ae703bd7fd2d34c052190a6a546925f3a2",
+    "generation_base_sha": "f409616b5583c7d1338cb5d3cdfaf0a95021ef7e",
+    "live_run_id": "20260919T235645607854Z",
+    "created_utc": "2026-09-20T00:00:22Z"
+  },
+  "source_artifact_hashes": {
+    "market_snapshot_sha256": "340e9058fd535b2faccea40d5262250e845925907b33ec79773caa04850c7b05",
+    "raw_market_sha256": "efccac7423b168770dd3f49082dddd449e7e2f178ce76db2d38b3c80b0b22b00",
+    "v1_forecasts_sha256": "2d8b599ba973ccb9407469cdfb0a9de928a88945a1c8523f454273395568086d",
+    "manifest_slate_sha256": "aa9fdcaca121d8ea0dff55a3266043ef5fd6b67e922c608b8b35fd89295ca73e"
+  },
+  "props21_publication": {
+    "commit": "ba723255982c79ffe6072c714dd0ee2c37e1fa34",
+    "receipts_path": "challenger_outputs/props21/forecast_originals.jsonl",
+    "receipts_git_blob_sha": "e89cdce268fb10c5107ba6db4087107fb213555f",
+    "public_challenger_path": "challenger_outputs/props21/public_challenger.json",
+    "public_challenger_git_blob_sha": "414ab291ac506369417740ec48cea5de42584448",
+    "audit_path": "challenger_outputs/props21/live_slate_audit.md",
+    "audit_git_blob_sha": "57442fef35111a73622f4927f2ab3f0e3cf74b7c",
+    "model_version": "levline-props-2.1-sunday-v0.1",
+    "receipt_version": "levline-props-2.1-prospective-receipt-v0.1",
+    "generated_utc": "2026-09-20T00:00:22.995616+00:00",
+    "receipt_count": 3439,
+    "unique_players": 744,
+    "game_count": 15,
+    "market_provider": "propline",
+    "market_credential_mode": "configured",
+    "qa_states": {
+      "no_signal": 3060,
+      "watch": 379,
+      "radar": 0
+    },
+    "market_distribution": {
+      "supported": 215,
+      "explicit_fallback": 3224
+    },
+    "xtd": {
+      "aggregate_diagnostics": 1771,
+      "context_fitted_rows": 0
+    }
+  },
+  "deployment": {
+    "workflow_name": "NFL dashboard",
+    "run_id": "35477618922",
+    "head_sha": "ba723255982c79ffe6072c714dd0ee2c37e1fa34",
+    "build_conclusion": "success",
+    "deploy_conclusion": "success",
+    "props21_copy_step": "success",
+    "route": "#/props/challenger"
+  },
+  "games": [
+    [
+      "2026_02_CAR_ATL",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_CIN_HOU",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_CLE_TB",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_GB_NYJ",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_IND_KC",
+      "2026-09-21T00:20:00+00:00"
+    ],
+    [
+      "2026_02_JAX_DEN",
+      "2026-09-20T20:05:00+00:00"
+    ],
+    [
+      "2026_02_LV_LAC",
+      "2026-09-20T20:05:00+00:00"
+    ],
+    [
+      "2026_02_MIA_SF",
+      "2026-09-20T20:25:00+00:00"
+    ],
+    [
+      "2026_02_MIN_CHI",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_NO_BAL",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_NYG_LA",
+      "2026-09-22T00:15:00+00:00"
+    ],
+    [
+      "2026_02_PHI_TEN",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_PIT_NE",
+      "2026-09-20T17:00:00+00:00"
+    ],
+    [
+      "2026_02_SEA_ARI",
+      "2026-09-20T20:25:00+00:00"
+    ],
+    [
+      "2026_02_WAS_DAL",
+      "2026-09-20T20:25:00+00:00"
+    ]
+  ],
+  "prop_counts": {
+    "passing_yards": 103,
+    "rushing_yards": 283,
+    "passing_tds": 103,
+    "rushing_td": 283,
+    "anytime_td": 744,
+    "receiving_yards": 641,
+    "receptions": 641,
+    "receiving_td": 641
+  },
+  "governance": {
+    "original_receipts_mutable": false,
+    "postgame_outcomes_joined_separately": true,
+    "production_authorized": false,
+    "f_st_mutation": false,
+    "props_v1_mutation": false,
+    "shadow_a_mutation": false,
+    "shadow_b_mutation": false,
+    "contextual_xtd_activation": false
+  }
+}
