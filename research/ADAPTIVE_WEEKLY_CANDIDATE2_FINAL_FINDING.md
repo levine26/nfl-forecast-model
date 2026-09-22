@@ -2,10 +2,10 @@
 
 Status: **historical Candidate 2 complete / INCONCLUSIVE / no production change**  
 Candidate: `ADAPTIVE-REGIME-SHOCK-GATE-V1`  
-Validated candidate code SHA: `f4a5ea26bc999819d4c79179c20b8f33fd77401f`  
-Workflow run: `35747145825`  
-Artifact: `10703836596`  
-Artifact SHA256: `9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5`  
+Validated hardened integration SHA: `3d47141ed8584e989702d1982e4e1dc60d8248a2`  
+Workflow run: `35749549009`  
+Artifact: `10705320611`  
+Artifact SHA256: `fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771`  \nCandidate config SHA256: `8b08f2d37c7531783e8b1a2dd8ae8ab8e6fb95d48a680fe681479561c7d44969`  
 Full receipt: `research/ADAPTIVE_WEEKLY_CANDIDATE2_FINAL_RECEIPT.json`
 
 ## Executive conclusion
@@ -86,7 +86,7 @@ Validated 2025 coverage:
 - both-team T-120 depth state: **272/272 games**;
 - QB-change evaluable: **256 games**;
 - OL-change evaluable: **256 games**;
-- qualified QB practice join: **126 games**;
+- qualified QB practice join: **127 games**;
 - strong regime shock: **51 games**;
 - near-boundary component/F-ST disagreements: **4 games**;
 - authorized Candidate 2 switches: **1 game**;
@@ -99,7 +99,7 @@ Historical T-60/T-45/T-30 market paths, final inactives learned after T-120, ric
 
 David Sasser's public 2026 CFB board exposes model projection alongside **Open** and **Current** market lines. His older public GitHub `davidsasser/BettingModel` code also explicitly collected timestamped, book-specific NFL moneyline/spread/total observations across multiple books. That is useful professional-practice evidence for preserving market identity and path rather than reducing "market" to one scalar.
 
-The public GitHub code inspected is historical (2019/2020) and is **not** treated as the current 2026 Sasser model implementation. It does not reveal a current weekly retraining, injury-weighting or change-point algorithm.
+The public GitHub code inspected is historical (initial commit 2019-12-01) and is **not** treated as the current 2026 Sasser model implementation. It does not reveal a current weekly retraining, injury-weighting or change-point algorithm.
 
 External literature remains consistent with the mechanism, but does not prove it:
 
