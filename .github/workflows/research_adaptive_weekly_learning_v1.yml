@@ -86,6 +86,10 @@ jobs:
             python research/adaptive_weekly_evaluation_v1.py               --input research_outputs/adaptive_weekly_ci/gate/scored_games.csv               --candidate-col gate_prob               --reference-col fst_prob               --output-dir research_outputs/adaptive_weekly_ci/eval_gate
           fi
 
+          if [ -f research/adaptive_sensitivity_v1.py ]; then
+            python research/adaptive_sensitivity_v1.py --output-dir research_outputs/adaptive_weekly_ci/sensitivity
+          fi
+
       - name: Prove production surfaces unchanged
         shell: bash
         run: |
