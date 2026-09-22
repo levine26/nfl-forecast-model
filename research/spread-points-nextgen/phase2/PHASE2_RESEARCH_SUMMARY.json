@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 2,
-  "status": "ANALYTICALLY_COMPLETE_PENDING_FINAL_CI_AND_MERGE",
+  "status": "COMPLETE",
   "production_changed": false,
   "user_required_external_source": "davidsasser.com",
   "initial_challengers": [
@@ -69,7 +69,13 @@
     "feature_source_pit_matrix": true,
     "red_team_review": true,
     "deterministic_nested_tuning": true,
-    "pit_feature_matrix": true
+    "pit_feature_matrix": true,
+    "final_main_sync": true,
+    "exact_head_firewall": true,
+    "exact_head_full_validation": true,
+    "pr_520_merged": true,
+    "merged_main_verified": true,
+    "phase3_not_started": true
   },
   "external_evidence_highlights": [
     "Glickman & Stern 1998 dynamic NFL state-space scores",
@@ -157,16 +163,21 @@
         "scope": "generated market/status refresh"
       }
     ],
-    "latest_synchronized_main_sha": "3e859968a40b8250f85ed211e8b1e7593ea1bf47",
+    "latest_synchronized_main_sha": "e93127963c76cd309cdddf17d91291c04a60a659",
     "concurrent_research_preserved": true,
-    "concurrent_research_used_for_challenger_selection": false
+    "concurrent_research_used_for_challenger_selection": false,
+    "final_sync_head_sha": "076dc9d6f6c052eec4744a155070c42c1b99ae82",
+    "final_sync_scope": "adaptive Candidate 2 closeout files only; preserved as unrelated concurrent research"
   },
   "phase3_started": false,
-  "phase2_merge_sha": null,
+  "phase2_merge_sha": "405906942013252c158244c9b033a3240baa37f8",
   "final_exact_head_ci": {
-    "research_firewall_run_id": null,
-    "research_validation_run_id": null,
-    "all_passed": false
+    "research_firewall_run_id": 35751402751,
+    "research_firewall_conclusion": "success",
+    "research_validation_run_id": 35751402726,
+    "research_validation_conclusion": "success",
+    "validated_head_sha": "076dc9d6f6c052eec4744a155070c42c1b99ae82",
+    "all_passed": true
   },
   "frozen_development_contract": {
     "training_history_rule": "fixed 2016 training floor; expanding prior-only training",
@@ -253,5 +264,8 @@
     "turnovers": "peer-reviewed rare-event predictability; noisy/weak persistence implies shrinkage and no deterministic adjustment",
     "red_zone": "football mechanism + technical/practitioner evidence; bounded shrinkage-smoothed B0 component, not separate search",
     "explosive_plays": "technical/practitioner scoring-tail evidence; one fixed B0 definition, no threshold/window search"
-  }
+  },
+  "final_premerge_head_sha": "076dc9d6f6c052eec4744a155070c42c1b99ae82",
+  "final_synchronized_main_sha": "e93127963c76cd309cdddf17d91291c04a60a659",
+  "merged_artifacts_verified_from_main": true
 }
