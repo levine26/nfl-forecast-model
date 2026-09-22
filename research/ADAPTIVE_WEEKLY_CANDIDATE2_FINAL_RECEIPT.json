@@ -1,0 +1,179 @@
+{
+  "receipt_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE2-FINAL-V1",
+  "candidate_id": "ADAPTIVE-REGIME-SHOCK-GATE-V1",
+  "status": "COMPLETE_HISTORICAL_EVALUATION_INCONCLUSIVE",
+  "preregistration": {
+    "main_commit_sha": "fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da",
+    "synchronized_candidate2_base_sha": "99b255aae7fc36ad367561f613e3fcb3752ef528",
+    "target_results_seen_before_preregistration": false
+  },
+  "validated_execution": {
+    "candidate_code_sha": "f4a5ea26bc999819d4c79179c20b8f33fd77401f",
+    "workflow_run_id": 35747145825,
+    "artifact_id": 10703836596,
+    "artifact_sha256": "9039919437fc5b3fb48989e31b07fa592379d5fdc509e2cdabd3d9c3142654e5",
+    "evidence_attribution_correction_sha": "08585db62617523628e8c7951c336eedbc6b1efe",
+    "unit_tests_passed": true,
+    "construction_passed": true,
+    "paired_evaluation_passed": true,
+    "adversarial_validation_passed": true,
+    "production_surface_diff_check_passed": true
+  },
+  "sample": {
+    "season": 2025,
+    "paired_games": 272,
+    "reason_for_one_season_scope": "Equivalent qualified T-120 depth-chart/personnel and practice-state evidence exists for 2025; unified 2022-2024 availability and strict historical market-path state are not qualified.",
+    "full_benchmark_comparison_causal": false
+  },
+  "full_established_fst_benchmark": {
+    "seasons": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "games": 1087,
+    "correct": 741,
+    "accuracy": 0.6816927322907084,
+    "brier": 0.21065334840485694,
+    "log_loss": 0.6087126266444343,
+    "note": "Context only. Candidate 2 causal comparison is the identical 2025 272-game sample."
+  },
+  "same_sample_results": {
+    "frozen_fst": {
+      "correct": 179,
+      "accuracy": 0.6580882352941176,
+      "brier": 0.21157841309047173,
+      "log_loss": 0.6076199189347058
+    },
+    "candidate2": {
+      "correct": 180,
+      "accuracy": 0.6617647058823529,
+      "accuracy_delta_pp": 0.3676470588235281,
+      "brier": 0.21140467914374084,
+      "brier_delta": -0.00017373394673089737,
+      "log_loss": 0.6072718798407498,
+      "log_loss_delta": -0.0003480390939559763,
+      "switches": 1,
+      "disagreement_rate": 0.003676470588235294,
+      "candidate_only_correct": 1,
+      "fst_only_correct": 0,
+      "switch_win_rate": 1,
+      "mcnemar_exact_two_sided_p": 1,
+      "week_block_accuracy_delta_95_ci": [
+        0,
+        0.011278195488721887
+      ],
+      "week_block_brier_delta_95_ci": [
+        -0.0005329582726782689,
+        0
+      ],
+      "week_block_log_loss_delta_95_ci": [
+        -0.001067668799503932,
+        0
+      ]
+    },
+    "controls": {
+      "market": {
+        "correct": 178,
+        "accuracy": 0.6544117647058824,
+        "delta_pp_vs_fst": -0.3676470588235281,
+        "switches": 9,
+        "switch_win_rate": 0.4444444444444444
+      },
+      "candidate1_residual_unchanged": {
+        "correct": 182,
+        "accuracy": 0.6691176470588235,
+        "delta_pp_vs_fst": 1.1029411764705843,
+        "switches": 27,
+        "switch_win_rate": 0.5555555555555556,
+        "note": "2025-only positive slice does not alter Candidate 1 multi-season rejection."
+      },
+      "naive_weekly_refit_unchanged": {
+        "correct": 179,
+        "accuracy": 0.6580882352941176,
+        "delta_pp_vs_fst": 0,
+        "switches": 2,
+        "switch_win_rate": 0.5
+      },
+      "component_resolved": {
+        "correct": 179,
+        "accuracy": 0.6580882352941176,
+        "delta_pp_vs_fst": 0,
+        "switches": 4,
+        "switch_win_rate": 0.5,
+        "brier": 0.21044519816183715,
+        "log_loss": 0.6048230040940721
+      },
+      "boundary_component_without_shock": {
+        "correct": 179,
+        "accuracy": 0.6580882352941176,
+        "delta_pp_vs_fst": 0,
+        "switches": 4,
+        "switch_win_rate": 0.5
+      }
+    }
+  },
+  "switch_mechanism": {
+    "authorized_switch_game_id": "2025_12_ATL_NO",
+    "reason": "away_team_qb1_change",
+    "fst_home_probability": 0.509392,
+    "component_home_probability": 0.460679,
+    "actual_home_win": 0,
+    "switch_helped": true,
+    "qb_change_channel_required_for_gain": true,
+    "ol_churn_channel_generated_primary_switches": false,
+    "qb_practice_channel_generated_primary_switches": false
+  },
+  "coverage": {
+    "both_team_depth_state_games": 272,
+    "qb_change_evaluable_games": 256,
+    "ol_change_evaluable_games": 256,
+    "qb_practice_join_games": 126,
+    "strong_shock_games": 51,
+    "boundary_component_disagreement_games": 4,
+    "authorized_switches": 1,
+    "future_snapshot_violations": 0,
+    "ambiguous_qb_practice_joins": 0
+  },
+  "adversarial_validation": {
+    "preregistered_grid_configurations": 18,
+    "positive_accuracy_fraction": 0.6666666666666666,
+    "nonnegative_accuracy_fraction": 1,
+    "best_accuracy_delta_pp": 0.3676470588235281,
+    "worst_accuracy_delta_pp": 0,
+    "primary_rank_by_accuracy_delta": 1,
+    "max_single_week_positive_gain_share": 1,
+    "remove_qb_change_delta_pp": 0,
+    "qb_change_only_delta_pp": 0.3676470588235281,
+    "leave_out_week_12_delta_pp": 0,
+    "threshold_fragility_flag": true,
+    "one_season_regime_feature_limit": true,
+    "season_stability_estimable": false
+  },
+  "scientific_answers": {
+    "exact_information_producing_gain": "T-120 QB1 identity change as an orthogonal regime-shock gate, with direction supplied by the frozen component-resolved challenger on a near-boundary F-ST disagreement.",
+    "how_often_disagrees": "1 of 272 games (0.3676%).",
+    "switch_correctness": "1 of 1 (100%), statistically uninformative.",
+    "season_stability": "Not estimable; qualified regime features support only 2025.",
+    "probability_quality": "Both Brier and log loss improved slightly on the exact paired sample.",
+    "statistical_distinguishability": "No. McNemar p=1.0; week-block accuracy interval includes zero.",
+    "football_coherence": "Yes at the mechanism level because QB state is a high-leverage structural change, but empirical evidence is only one event.",
+    "reproducibility": "Yes for the recorded workflow/artifact/code SHA.",
+    "prospective_shadow_suitability": "Not authorized by V1 evidence because the entire gain is one-switch/one-week/QB-channel concentrated.",
+    "revised_long_run_accuracy_estimate": "Central estimate approximately 68.3%; defensible near-term range approximately 68.2%-68.4% for currently evidenced adaptive mechanisms. A 68.8%-69% central estimate is no longer supported by the completed Candidate 1 and Candidate 2 evidence."
+  },
+  "disposition": "INCONCLUSIVE",
+  "prospective": {
+    "candidate_frozen_for_live_shadow": false,
+    "prospective_start_week": null,
+    "prediction_lock_rules_assigned": false,
+    "deployment_authorized": false
+  },
+  "governance": {
+    "completed_2026_outcomes_used_for_design_or_selection": 0,
+    "production_changed": false,
+    "production_merge_authorized": false,
+    "candidate3_started": false
+  }
+}
