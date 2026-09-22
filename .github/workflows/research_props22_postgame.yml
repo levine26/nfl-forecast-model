@@ -1,0 +1,175 @@
+name: LevLine Props 2.2 postgame evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v22/grade_prospective.py'
+      - 'research/props/v22/POSTGAME_GRADING_CONTRACT.md'
+      - 'research/props/v22/evaluate_prospective.py'
+      - 'research/props/v22/test_grade_prospective.py'
+      - 'research/props/v22/test_evaluate_prospective.py'
+      - '.github/workflows/research_props22_postgame.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '15 15 * * 2,3'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-props22-postgame-evaluation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate postgame grading and evaluation contracts
+        run: |
+          python -m pytest -q \
+            research/props/v22/test_grade_prospective.py \
+            research/props/v22/test_evaluate_prospective.py
+          python -m py_compile \
+            research/props/v22/grade_prospective.py \
+            research/props/v22/evaluate_prospective.py
+
+  evaluate:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+          cache: pip
+
+      - run: pip install '.[dev]'
+
+      - name: Check for prospective Props 2.2 receipts
+        id: source
+        run: |
+          set -euo pipefail
+          RECEIPTS=challenger_outputs/props22/forecast_originals.jsonl
+          if [ -s "$RECEIPTS" ]; then
+            echo "has_receipts=true" >> "$GITHUB_OUTPUT"
+            echo "receipts=$RECEIPTS" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_receipts=false" >> "$GITHUB_OUTPUT"
+            echo "No Props 2.2 prospective receipts exist yet; clean postgame no-op."
+          fi
+
+      - name: Restore prior immutable postgame state
+        if: steps.source.outputs.has_receipts == 'true'
+        run: |
+          set -euo pipefail
+          STATE=/tmp/props22-evaluation-state
+          rm -rf "$STATE"
+          mkdir -p "$STATE/research_outputs/props22"
+          git fetch origin research-data/props22-evaluation:refs/remotes/origin/research-data/props22-evaluation || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props22-evaluation; then
+            mkdir -p /tmp/props22-archive
+            (
+              cd /tmp/props22-archive
+              git --git-dir="$GITHUB_WORKSPACE/.git" archive \
+                origin/research-data/props22-evaluation \
+                research_outputs/props22 2>/dev/null | tar -xf - || true
+            )
+            if [ -d /tmp/props22-archive/research_outputs/props22 ]; then
+              cp -R /tmp/props22-archive/research_outputs/props22/. \
+                "$STATE/research_outputs/props22/"
+            fi
+          fi
+
+      - name: Grade newly finalized source forecasts
+        if: steps.source.outputs.has_receipts == 'true'
+        run: |
+          set -euo pipefail
+          STATE=/tmp/props22-evaluation-state/research_outputs/props22
+          mkdir -p "$STATE"
+          python research/props/v22/grade_prospective.py \
+            --receipts "${{ steps.source.outputs.receipts }}" \
+            --grades "$STATE/grades.jsonl" \
+            --status "$STATE/grade_status.json" \
+            --allow-empty
+
+      - name: Evaluate frozen Props 2.2 challenger grid
+        if: steps.source.outputs.has_receipts == 'true'
+        run: |
+          set -euo pipefail
+          STATE=/tmp/props22-evaluation-state/research_outputs/props22
+          python research/props/v22/evaluate_prospective.py \
+            --receipts "${{ steps.source.outputs.receipts }}" \
+            --grades "$STATE/grades.jsonl" \
+            --output "$STATE/evaluation.json" \
+            --detail "$STATE/evaluation_detail.csv"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('/tmp/props22-evaluation-state/research_outputs/props22')
+          summary = json.loads((root / 'evaluation.json').read_text())
+          assert summary['research_only'] is True
+          assert summary['production_authorized'] is False
+          assert summary['promotion_decision'] in {
+              'NOT_READY_CONTINUE_FROZEN_HOLDOUT',
+              'TERMINAL_EVALUATION_PERMITTED_BUT_NO_AUTOMATIC_WINNER_SELECTION',
+          }
+          print(json.dumps({
+              'graded_source_forecasts': summary['graded_source_forecasts'],
+              'terminal_readiness': summary['terminal_readiness'],
+              'promotion_decision': summary['promotion_decision'],
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload postgame evaluation evidence
+        if: steps.source.outputs.has_receipts == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: levline-props22-postgame-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/props22-evaluation-state/research_outputs/props22
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Persist immutable postgame evidence off main
+        if: steps.source.outputs.has_receipts == 'true'
+        run: |
+          set -euo pipefail
+          STATE=/tmp/props22-evaluation-state/research_outputs/props22
+          rm -rf /tmp/props22-state-new
+          mkdir -p /tmp/props22-state-new
+          cp -R "$STATE"/. /tmp/props22-state-new/
+
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props22-evaluation; then
+            git checkout -B props22-evaluation-data origin/research-data/props22-evaluation
+          else
+            git checkout -B props22-evaluation-data
+          fi
+
+          rm -rf research_outputs/props22
+          mkdir -p research_outputs/props22
+          cp -R /tmp/props22-state-new/. research_outputs/props22/
+          git add research_outputs/props22/
+
+          if git diff --cached --quiet; then
+            echo "Props 2.2 postgame evidence unchanged."
+            exit 0
+          fi
+
+          git commit -m 'Update immutable Props 2.2 postgame evidence'
+          git push origin HEAD:research-data/props22-evaluation

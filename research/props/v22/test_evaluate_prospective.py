@@ -81,7 +81,7 @@ def _receipts(source=None):
 
 def _grade(receipt, actual: float):
     kickoff = datetime.fromisoformat(str(receipt["kickoff_utc"]).replace("Z", "+00:00"))
-    return {
+    row = {
         "contract_version": MODULE.GRADE_CONTRACT_VERSION,
         "source_props21_forecast_sha256": receipt["source_props21_forecast_sha256"],
         "source_props21_forecast_id": receipt["source_props21_forecast_id"],
@@ -92,6 +92,8 @@ def _grade(receipt, actual: float):
         "graded_utc": (kickoff + timedelta(hours=4)).isoformat(),
         "result_source": "synthetic_test",
     }
+    row["grade_sha256"] = MODULE._sha(row)
+    return row
 
 
 def test_evaluator_scores_frozen_line_challengers_against_original_market():
@@ -194,9 +196,19 @@ def test_terminal_readiness_reports_without_auto_selecting_winner():
     )
 
 
-def test_conflicting_or_nonfinal_grade_fails_closed():
+def test_nonfinal_grade_fails_closed_after_hash_validation():
     receipt = _receipts()[0]
     grade = _grade(receipt, 108.0)
     grade["finalized"] = False
+    grade.pop("grade_sha256")
+    grade["grade_sha256"] = MODULE._sha(grade)
     with pytest.raises(MODULE.Props22EvaluationError, match="finalized grades only"):
+        MODULE.validate_grades([grade])
+
+
+def test_grade_hash_tampering_fails_closed():
+    receipt = _receipts()[0]
+    grade = _grade(receipt, 108.0)
+    grade["actual_result"] = 999.0
+    with pytest.raises(MODULE.Props22EvaluationError, match="grade hash mismatch"):
         MODULE.validate_grades([grade])
