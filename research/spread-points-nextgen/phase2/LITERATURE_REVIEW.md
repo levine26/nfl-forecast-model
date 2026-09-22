@@ -210,6 +210,40 @@ Open implementations such as drive-outcome or drive-score frameworks provide use
 
 ---
 
+## 5A. Red-zone finishing, explosive plays, and turnover variance
+
+These process variables are mechanistically relevant to team scoring, but their **predictive persistence is not equally established**. Phase 2 therefore separates "important when realized" from "stable enough to forecast."
+
+### Turnovers — peer-reviewed evidence, high impact but rare/noisy
+
+Joel R. Bock, *Empirical Prediction of Turnovers in NFL Football*, Sports 5(1), 2017, DOI 10.3390/sports5010001, uses seven NFL seasons of play-by-play and reports that interceptions/fumbles can be predicted under some play-level conditions. The same paper emphasizes that turnovers are rare events, cites weak within-season persistence, and discusses regression-to-the-mean/chance components in turnover differential.
+
+**LevLine implication:** turnovers belong, if used, as heavily regularized prior-game process rates inside B0 rather than as deterministic "turnover luck" adjustments. Realized same-game turnovers are never pregame features. A rare-event tail can materially affect score variance even when the conditional mean is hard to forecast.
+
+**Evidence class:** peer-reviewed domain evidence for rare-event predictability; not direct evidence that a pregame team turnover-rate feature improves next-game margin/total forecasts.
+
+### Red-zone finishing — strong mechanism, weaker forecast-persistence evidence
+
+Public nflverse-based technical work consistently shows the scoring arithmetic: a red-zone trip ending in a touchdown produces materially more points than a field goal, while team red-zone TD rates are based on relatively small samples and regress substantially.
+
+**LevLine implication:** B0 may use a shrinkage-smoothed prior-drive red-zone TD conversion state because it maps directly to TD-vs-FG drive outcomes, but raw recent red-zone percentage is not treated as a stable team "skill" or an independent candidate-selection signal. The shrinkage formula must be fixed before development metrics.
+
+**Evidence class:** reproducible/practitioner technical evidence and football mechanism; insufficient peer-reviewed next-game forecast evidence to justify a broad red-zone feature search.
+
+### Explosive plays — high scoring leverage, limited independent forecast evidence
+
+Public play-by-play technical analyses show that drives containing large gains score at much higher rates and that explosive plays create score-distribution tails. However, a high realized explosive-play rate is partly a noisy efficiency outcome and is not by itself evidence of stable next-game predictability.
+
+**LevLine implication:** B0 may include one fixed lagged explosive-play rate for offense and defense as a bounded drive-process state. Phase 3 may not search multiple yardage thresholds or rolling windows after seeing results; the definition must be frozen in code before the first output.
+
+**Evidence class:** reproducible/practitioner technical evidence; not sufficient to create a separate challenger or unconstrained feature family.
+
+### Combined decision
+
+Red-zone, explosive-play, and turnover variables are **component-level hypotheses inside the bounded B0 process model**, not reasons to add candidates. Their forecast contribution must be assessed through the preregistered B0 identity and future ablation governance, with shrinkage appropriate to their variance.
+
+---
+
 ## 6. Player, QB and personnel effects
 
 ### nflWAR
