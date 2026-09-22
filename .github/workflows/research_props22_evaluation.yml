@@ -8,10 +8,12 @@ on:
       - 'research/props/v22/challengers.py'
       - 'research/props/v22/capture_prospective.py'
       - 'research/props/v22/evaluate_prospective.py'
+      - 'research/props/v22/grade_prospective.py'
       - 'research/props/v22/test_preregistration.py'
       - 'research/props/v22/test_challengers.py'
       - 'research/props/v22/test_capture_prospective.py'
       - 'research/props/v22/test_evaluate_prospective.py'
+      - 'research/props/v22/test_grade_prospective.py'
       - '.github/workflows/research_props22_evaluation.yml'
 
 permissions:
@@ -37,12 +39,15 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           evaluator = Path('research/props/v22/evaluate_prospective.py').read_text()
+          grader = Path('research/props/v22/grade_prospective.py').read_text()
           prereg = Path('research/props/v22/PREREGISTRATION.md').read_text()
           assert 'P22_COMBINED_25' in prereg
           assert 'P22_COMBINED_50' in prereg
           assert 'holm_bonferroni' in evaluator
           assert 'NOT_READY_CONTINUE_FROZEN_HOLDOUT' in evaluator
           assert 'TERMINAL_EVALUATION_PERMITTED_BUT_NO_AUTOMATIC_WINNER_SELECTION' in evaluator
+          assert 'ZERO_OFFENSE_SNAPS' in grader
+          assert 'missing_participation' in grader
           for forbidden in (
               'src/nfl_forecast/fst_production.py',
               'scripts/run_week.py',
