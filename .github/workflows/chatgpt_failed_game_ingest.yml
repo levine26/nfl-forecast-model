@@ -121,6 +121,7 @@ jobs:
           assert status.get('groq_provider_fallback')==before.get('groq_provider_fallback')
           assert int((status.get('editorial_finalizer') or {}).get('games') or 0)==15
           assert int((status.get('copilot_media') or {}).get('games_applied') or 0)==15
+          assert (status.get('media_reporting') or {}).get('last_good_snapshot_source_commit')
           print('historical full-slate recovery proof passed for 15 games')
           PY
           git restore --worktree -- outputs inputs/sunday_signal/editorial_slate_roster.json
