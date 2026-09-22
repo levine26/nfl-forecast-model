@@ -186,13 +186,16 @@ def test_opposite_qb_direction_preserves_incumbent() -> None:
 
 
 def test_market_provider_change_between_primary_horizons_fails_closed() -> None:
-    with pytest.raises(ValueError, match="market horizons disagree on event identity"):
-        build_candidate4_decisions(
-            _production(),
-            _market(provider_t120="propline", provider_t60="other-provider"),
-            _qb(direction=1),
-            generated_at_utc="2026-09-27T16:01:00Z",
-        )
+    out = build_candidate4_decisions(
+        _production(),
+        _market(provider_t120="propline", provider_t60="other-provider"),
+        _qb(direction=1),
+        generated_at_utc="2026-09-27T16:01:00Z",
+    )
+    row = out.iloc[0]
+    assert bool(row["eligible"]) is False
+    assert "market_horizon_identity_mismatch" in row["ineligibility_reasons"]
+    assert bool(row["candidate_switch"]) is False
 
 
 def test_decision_hash_is_replay_stable_and_append_is_idempotent() -> None:
