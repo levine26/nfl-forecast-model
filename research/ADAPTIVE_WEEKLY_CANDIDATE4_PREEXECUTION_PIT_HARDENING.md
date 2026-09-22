@@ -32,3 +32,15 @@ Unchanged:
 - production firewall.
 
 No completed 2026 Candidate 4 result informed this correction. No prospective Candidate 4 decision had been locked before it was made.
+
+
+## Shared-market contract preservation
+
+A second pre-execution correction preserves the previously frozen LevLine 4 market semantics while satisfying Candidate 4's stricter source rule:
+
+- the shared legacy market qualification constant remains **2 books**, exactly as frozen for existing LevLine 4 horizon research;
+- Candidate 4's scheduled collector retry threshold is separately set to **5 books**;
+- therefore a two-book consensus remains valid for the older LevLine 4 research candidate, but it does **not** stop Candidate 4 collection retries;
+- Candidate 4 itself reconstructs its horizon state only from at least five fresh, same-provider book rows and still requires at least five common books across T-120 and T-60.
+
+This avoids retroactively changing another research program merely to satisfy Candidate 4. It changes no Candidate 4 threshold and uses no completed Candidate 4 outcome.
