@@ -55,6 +55,18 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def read_source_json(path: Path) -> list[dict[str, Any]]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, Mapping):
+        raise Props22CaptureError(f"{path}: source artifact must be a JSON object")
+    rows = value.get("forecasts")
+    if not isinstance(rows, list) or not rows:
+        raise Props22CaptureError(f"{path}: source artifact requires a non-empty forecasts list")
+    if not all(isinstance(row, dict) for row in rows):
+        raise Props22CaptureError(f"{path}: every source forecast must be a JSON object")
+    return [dict(row) for row in rows]
+
+
 def _identity(row: Mapping[str, Any]) -> tuple[str, str]:
     source_sha = str(row.get("source_props21_forecast_sha256") or "").strip()
     challenger_id = str(row.get("challenger_id") or "").strip()
@@ -157,13 +169,19 @@ def append_immutable(path: Path, rows: Iterable[Mapping[str, Any]]) -> dict[str,
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--source-receipts", type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--source-receipts", type=Path)
+    source.add_argument("--source-json", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    sources = read_jsonl(args.source_receipts)
+    sources = (
+        read_jsonl(args.source_receipts)
+        if args.source_receipts is not None
+        else read_source_json(args.source_json)
+    )
     if not sources:
-        raise SystemExit("source receipt file is empty")
+        raise SystemExit("source forecast input is empty")
     rows = build_capture(sources)
     result = append_immutable(args.output, rows)
     print(json.dumps(result, sort_keys=True))
