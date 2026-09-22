@@ -129,7 +129,7 @@ No play-by-play sequence simulator is authorized.
 - red-zone opportunity and conversion measures if derivable from prior completed games;
 - explosive-play rates;
 - sack/turnover rates;
-- opponent-adjusted team strength from a chronology-safe training fold only in the separately labeled `B0_PLUS_A0_STATE` sensitivity; the independent B0 reference excludes A0 outputs;
+- opponent context only through B0's own training-fold team indicators and lagged offense/defense process states; **no A0 output enters B0**;
 - home/rest context.
 
 ## Failure test
