@@ -15,6 +15,7 @@ contract.
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -27,6 +28,9 @@ sys.path.insert(0, str(ROOT / "src"))
 from nfl_forecast.public_forecast import build_public_forecasts  # noqa: E402
 
 
+_GAME_ID_RE = re.compile(r"^\d{4}_\d{2}_[A-Z0-9]{2,4}_[A-Z0-9]{2,4}$")
+
+
 def _now_utc(value: str | None) -> datetime:
     if not value:
         return datetime.now(timezone.utc)
@@ -36,17 +40,40 @@ def _now_utc(value: str | None) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def _active_slate_identity(current_records: list[dict]) -> tuple[int, int]:
-    identities: set[tuple[int, int]] = set()
+def _active_slate_identity(
+    current_records: list[dict],
+    editorial_game_ids: set[str] | None = None,
+) -> tuple[int, int]:
+    current_identities: set[tuple[int, int]] = set()
     for row in current_records:
         season = row.get("season")
         week = row.get("week")
         if pd.isna(season) or pd.isna(week):
             raise RuntimeError("Current editorial forecast row is missing season/week")
-        identities.add((int(season), int(week)))
+        current_identities.add((int(season), int(week)))
+    if len(current_identities) > 1:
+        raise RuntimeError(
+            "Current editorial forecast source must identify at most one season/week; "
+            f"found {sorted(current_identities)}"
+        )
+
+    roster_identities: set[tuple[int, int]] = set()
+    for game_id in editorial_game_ids or set():
+        match = _GAME_ID_RE.fullmatch(str(game_id))
+        if match is None:
+            continue
+        season_text, week_text, *_ = str(game_id).split("_", 3)
+        roster_identities.add((int(season_text), int(week_text)))
+    if len(roster_identities) > 1:
+        raise RuntimeError(
+            "Editorial roster must identify exactly one season/week; "
+            f"found {sorted(roster_identities)}"
+        )
+
+    identities = current_identities | roster_identities
     if len(identities) != 1:
         raise RuntimeError(
-            "Current editorial forecast source must identify exactly one season/week; "
+            "Canonical editorial inputs must identify exactly one season/week; "
             f"found {sorted(identities)}"
         )
     return next(iter(identities))
@@ -62,7 +89,7 @@ def build_canonical_editorial_predictions(
     """Select locked-first rows, restoring only explicitly authorized editorial games."""
     current_records = current.to_dict(orient="records")
     official_records = official.to_dict(orient="records")
-    season, week = _active_slate_identity(current_records)
+    season, week = _active_slate_identity(current_records, editorial_game_ids)
 
     current_by_game = {
         str(row.get("game_id")): row
@@ -76,9 +103,15 @@ def build_canonical_editorial_predictions(
         and str(row.get("lock_status") or "").strip().upper() == "LOCKED"
     }
 
-    # outputs/this_week.csv can contract after kickoff. For recovery, restore only
-    # immutable games already present in the validated Sunday Signal media roster.
-    bridge_records = list(current_records)
+    # outputs/this_week.csv can contract after kickoff. When a stable editorial
+    # roster is supplied, it is authoritative for the publication slate: current rows
+    # outside that roster are excluded, and missing authorized games may be restored
+    # only from immutable LOCKED history for the same season/week.
+    bridge_records = [
+        row
+        for row in current_records
+        if editorial_game_ids is None or str(row.get("game_id")) in editorial_game_ids
+    ]
     locked_only = [
         row
         for game_id, row in locked_by_game.items()
@@ -98,6 +131,20 @@ def build_canonical_editorial_predictions(
         )
     )
     bridge_records.extend(locked_only)
+
+    if editorial_game_ids is not None:
+        bridge_ids = {
+            str(row.get("game_id"))
+            for row in bridge_records
+            if str(row.get("game_id") or "").strip()
+        }
+        missing = sorted(editorial_game_ids - bridge_ids)
+        extra = sorted(bridge_ids - editorial_game_ids)
+        if missing or extra:
+            raise RuntimeError(
+                "Canonical editorial bridge does not exactly match the authorized roster; "
+                f"missing={missing} extra={extra}"
+            )
 
     public = build_public_forecasts(bridge_records, official_records, now_utc=now_utc)
 
@@ -130,19 +177,41 @@ def build_canonical_editorial_predictions(
 
 def _load_editorial_game_ids(path: Path) -> set[str]:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    games = payload.get("games") or {}
+    if not isinstance(payload, dict):
+        raise RuntimeError("Editorial roster must be a JSON object")
+
+    games = payload.get("games")
+    if games is None:
+        top_level_ids = {
+            str(game_id)
+            for game_id in payload
+            if _GAME_ID_RE.fullmatch(str(game_id))
+        }
+        if top_level_ids and len(top_level_ids) == len(payload):
+            games = payload
+        else:
+            raise RuntimeError(
+                "Editorial roster must contain a 'games' object/list or be a top-level game-id map"
+            )
+
     if isinstance(games, dict):
-        game_ids = {str(game_id) for game_id in games if str(game_id).strip()}
+        game_ids = {
+            str(game_id)
+            for game_id in games
+            if _GAME_ID_RE.fullmatch(str(game_id))
+        }
     elif isinstance(games, list):
         game_ids = {
             str(game.get("game_id"))
             for game in games
-            if isinstance(game, dict) and str(game.get("game_id") or "").strip()
+            if isinstance(game, dict)
+            and _GAME_ID_RE.fullmatch(str(game.get("game_id") or ""))
         }
     else:
         raise RuntimeError("Editorial roster games must be an object or list")
+
     if not game_ids:
-        raise RuntimeError("Editorial roster contains no game IDs")
+        raise RuntimeError("Editorial roster contains no valid game IDs")
     return game_ids
 
 
@@ -156,7 +225,7 @@ def main() -> int:
     parser.add_argument(
         "--editorial-roster",
         type=Path,
-        help="Optional validated media packet whose game IDs authorize locked-game restoration.",
+        help="Optional stable editorial roster whose game IDs define the exact publication slate and authorize locked-game restoration.",
     )
     parser.add_argument("--now", help="Optional ISO-8601 UTC override for deterministic validation/tests.")
     args = parser.parse_args()
