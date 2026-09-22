@@ -1,0 +1,240 @@
+name: Adaptive Weekly Candidate 4 prospective shadow
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/ADAPTIVE_WEEKLY_CANDIDATE4_*'
+      - 'research/adaptive_candidate4_*'
+      - 'research/run_adaptive_candidate4_*'
+      - 'research/market_capture_v2.py'
+      - 'research/market_state_v1.py'
+      - 'research/run_market_capture_v2.py'
+      - 'research/market_capture_observability_v1.py'
+      - 'research/test_market_capture_*'
+      - 'research/test_levline4_horizon_shadow_v1.py'
+      - '.github/workflows/research_adaptive_candidate4_v1.yml'
+      - '.github/workflows/research_market_capture_v2.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: adaptive-candidate4-v1
+  cancel-in-progress: false
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install research test dependencies
+        run: >-
+          python -m pip install
+          pytest
+          'pandas>=2.2,<3.1'
+          'numpy>=1.26,<3'
+          'beautifulsoup4>=4.12'
+          'requests>=2.32'
+          nflreadpy
+      - name: Verify frozen Candidate 4 identities
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          config=json.loads(Path('research/ADAPTIVE_WEEKLY_CANDIDATE4_CONFIG.json').read_text())
+          qb=json.loads(Path('research/ADAPTIVE_WEEKLY_CANDIDATE4_QB_SOURCE_CONTRACT.json').read_text())
+          assert config['candidate_id']=='ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1'
+          assert config['preregistration_commit_sha']=='74ecd303545c09f57593546472d27438e3d8a204'
+          assert config['market']['min_common_sportsbooks']==5
+          assert config['market']['breadth_absolute_threshold']==0.5
+          assert config['market']['positive_timing_error_allowed'] is False
+          assert config['production_authorized'] is False
+          assert config['completed_2026_outcomes_used_for_design_or_selection']==0
+          assert qb['contract_id']=='ADAPTIVE-CANDIDATE4-QB-SHOCK-SOURCE-V1'
+          assert qb['production_authorized'] is False
+          assert qb['completed_2026_outcomes_used_for_design_or_selection']==0
+          PY
+          grep -F '74ecd303545c09f57593546472d27438e3d8a204' research/adaptive_candidate4_shadow_v1.py
+          python -m py_compile \
+            research/adaptive_candidate4_shadow_v1.py \
+            research/adaptive_candidate4_qb_shock_v1.py \
+            research/run_adaptive_candidate4_shadow_v1.py
+      - name: Run Candidate 4 and hardened market tests
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" pytest -q \
+            research/test_adaptive_candidate4_shadow_v1.py \
+            research/test_adaptive_candidate4_qb_shock_v1.py \
+            research/test_run_adaptive_candidate4_shadow_v1.py \
+            research/test_market_capture_v2.py \
+            research/test_market_capture_t45.py \
+            research/test_market_capture_observability_v1.py \
+            research/test_levline4_horizon_shadow_v1.py
+      - name: Verify production firewall
+        run: |
+          git fetch origin main
+          changed="$(git diff --name-only origin/main...HEAD)"
+          printf '%s\n' "$changed"
+          bad="$(printf '%s\n' "$changed" | grep -Ev '^(research/|\.github/workflows/research_)' || true)"
+          if [ -n "$bad" ]; then
+            echo "Candidate 4 PR touched non-research paths:"
+            echo "$bad"
+            exit 1
+          fi
+
+  shadow:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Cheap Candidate 4 retry-window gate
+        id: gate
+        run: |
+          python - <<'PY' > /tmp/c4_gate.txt
+          import csv
+          from datetime import datetime, timezone
+          from zoneinfo import ZoneInfo
+          now=datetime.now(timezone.utc)
+          eastern=ZoneInfo('America/New_York')
+          due=False
+          with open('outputs/this_week.csv', newline='', encoding='utf-8') as f:
+              for row in csv.DictReader(f):
+                  try:
+                      if int(row.get('season') or 0)!=2026 or int(row.get('week') or 0)<3:
+                          continue
+                      date=datetime.fromisoformat(str(row.get('gameday'))[:10])
+                      if date.weekday()!=6:
+                          continue
+                      local=datetime.strptime(
+                          f"{str(row.get('gameday'))[:10]} {str(row.get('gametime'))[:5]}",
+                          '%Y-%m-%d %H:%M'
+                      ).replace(tzinfo=eastern)
+                      kickoff=local.astimezone(timezone.utc)
+                      minutes=(kickoff-now).total_seconds()/60
+                      if 20 <= minutes <= 55:
+                          due=True
+                          break
+                  except Exception:
+                      continue
+          print('due=true' if due else 'due=false')
+          PY
+          cat /tmp/c4_gate.txt
+          if grep -q '^due=true' /tmp/c4_gate.txt; then
+            echo 'due=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'due=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore strict-PIT research inputs and prior Candidate 4 ledger
+        if: steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p research_outputs/market_capture_v2
+          git fetch origin research-data/market-capture-v2:refs/remotes/origin/research-data/market-capture-v2 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/market-capture-v2; then
+            git show "origin/research-data/market-capture-v2:research_outputs/market_capture_v2/market_snapshots.csv" \
+              > research_outputs/market_capture_v2/market_snapshots.csv 2>/dev/null || true
+          fi
+
+          git fetch origin research-data/inactive-snapshots-v1:refs/remotes/origin/research-data/inactive-snapshots-v1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
+            if git ls-tree -d --name-only origin/research-data/inactive-snapshots-v1 \
+              research_outputs/inactive_article_source_archive_v1 | \
+              grep -q '^research_outputs/inactive_article_source_archive_v1$'; then
+              git archive origin/research-data/inactive-snapshots-v1 \
+                research_outputs/inactive_article_source_archive_v1 | tar -xf -
+            fi
+          fi
+
+          git fetch origin research-data/adaptive-candidate4-v1:refs/remotes/origin/research-data/adaptive-candidate4-v1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/adaptive-candidate4-v1; then
+            if git ls-tree -d --name-only origin/research-data/adaptive-candidate4-v1 \
+              research_outputs/adaptive_candidate4_v1 | \
+              grep -q '^research_outputs/adaptive_candidate4_v1$'; then
+              git archive origin/research-data/adaptive-candidate4-v1 \
+                research_outputs/adaptive_candidate4_v1 | tar -xf -
+            fi
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.due == 'true'
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install prospective research dependencies
+        if: steps.gate.outputs.due == 'true'
+        run: >-
+          python -m pip install
+          'pandas>=2.2,<3.1'
+          'numpy>=1.26,<3'
+          'beautifulsoup4>=4.12'
+          nflreadpy
+
+      - name: Build immutable Candidate 4 pregame decisions
+        id: candidate4
+        if: steps.gate.outputs.due == 'true'
+        continue-on-error: true
+        env:
+          NFLREADPY_CACHE: 'off'
+          NFLREADPY_VERBOSE: 'False'
+        run: PYTHONPATH="$PWD/src:$PWD" python -m research.run_adaptive_candidate4_shadow_v1
+
+      - name: Persist Candidate 4 evidence away from main
+        if: always() && steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/adaptive_candidate4_v1
+          if [ ! -d "$DATA_DIR" ]; then
+            echo 'No Candidate 4 evidence directory produced.'
+            exit 0
+          fi
+          rm -rf /tmp/adaptive_candidate4_v1
+          cp -R "$DATA_DIR" /tmp/adaptive_candidate4_v1
+          rm -rf "$DATA_DIR"
+
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/adaptive-candidate4-v1; then
+            git checkout -B adaptive-candidate4-v1-data origin/research-data/adaptive-candidate4-v1
+          else
+            git checkout -B adaptive-candidate4-v1-data
+          fi
+          mkdir -p research_outputs
+          rm -rf research_outputs/adaptive_candidate4_v1
+          cp -R /tmp/adaptive_candidate4_v1 research_outputs/adaptive_candidate4_v1
+          git add research_outputs/adaptive_candidate4_v1/
+          if git diff --cached --quiet; then
+            echo 'Candidate 4 evidence unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture Adaptive Candidate 4 prospective evidence'
+          git push origin HEAD:research-data/adaptive-candidate4-v1
+
+      - name: Surface Candidate 4 execution failure after evidence preservation
+        if: always() && steps.gate.outputs.due == 'true'
+        run: |
+          if [ "${{ steps.candidate4.outcome }}" != 'success' ]; then
+            echo 'Candidate 4 prospective execution failed; any evidence produced was preserved.' >&2
+            exit 1
+          fi
