@@ -205,17 +205,26 @@ def _captured_pairs(path: Path) -> set[tuple[str, str]]:
     try:
         frame = pd.read_csv(
             path,
-            usecols=lambda c: c in {"game_id", "horizon", "row_type", "source_count"},
+            usecols=lambda c: c in {
+                "game_id",
+                "horizon",
+                "row_type",
+                "source_count",
+                "timing_error_minutes",
+            },
         )
     except Exception:
         return set()
-    required = {"game_id", "horizon", "row_type", "source_count"}
+    required = {"game_id", "horizon", "row_type", "source_count", "timing_error_minutes"}
     if not required.issubset(frame.columns):
         return set()
     source_count = pd.to_numeric(frame["source_count"], errors="coerce")
+    timing_error = pd.to_numeric(frame["timing_error_minutes"], errors="coerce")
     frame = frame[
         frame["row_type"].eq(QUALIFYING_CLOSE_ROW_TYPE)
         & source_count.ge(MIN_CONSENSUS_BOOKS)
+        & timing_error.ge(-7.5)
+        & timing_error.le(0.0)
     ]
     return set(zip(frame["game_id"].astype(str), frame["horizon"].astype(str)))
 
