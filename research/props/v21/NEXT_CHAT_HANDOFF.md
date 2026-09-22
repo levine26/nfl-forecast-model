@@ -15,8 +15,8 @@ Already merged into `main`:
 - PR #449 — post-kickoff CI lifecycle hardening.
 
 Active canonical PRs:
-- **#458** — current-main frozen Props 2.1 prospective evaluation. This is the canonical evaluation PR and replaces #447/#448/#457.
-- **#459** — post-kickoff live-refresh lifecycle fix. When the target week is proven fully started, live Props refresh becomes an audited successful no-op and preserves the last valid pregame publication. Missing state for any upcoming game still fails closed.
+- **#466** — canonical current-main frozen Props 2.1 prospective evaluation. It replaces #447/#448/#457/#458.
+- **#459** — MERGED. Post-kickoff live refresh is now an audited successful no-op that preserves the last valid pregame publication; missing state for any upcoming game still fails closed.
 
 Do not recreate or compete with these PRs. Inspect their latest head/checks and continue them.
 
@@ -101,8 +101,8 @@ Do not soften, hide, or reverse these findings. Scientific validity is more impo
 
 ### P0 — finish lifecycle/reproducibility cleanup
 
-1. Get #459 green and merge it so post-kickoff live refreshes stop producing false red production failures.
-2. Get #458 green and merge it so the prospective evaluator and evidence contract live on current main.
+1. #459 is merged; verify future post-kickoff live refreshes continue to no-op cleanly.
+2. Get #466 green and merge it so the prospective evaluator and evidence contract live on current main.
 3. Re-run/verify the post-Sunday evaluation from current main and compare its summary fingerprint/metrics to run `35662662103`. Any material delta requires investigation before further model work.
 
 ### P1 — strengthen future evidence collection before changing the model
@@ -161,8 +161,8 @@ The separate Sunday Signal editorial repair is addressing post-kickoff contracti
 
 A next chat should prefer completing one of these concrete outcomes over producing another roadmap:
 
-- merge #459 after green lifecycle tests;
-- merge #458 after reproducible evaluation succeeds;
+- keep #459 lifecycle behavior green on future post-kickoff runs;
+- merge #466 after reproducible evaluation succeeds;
 - produce and freeze a closing-market capture contract;
 - resolve the missing-participation audit with quantified causes;
 - preregister one successor calibration/market-assist challenger without using Week 2 outcomes for parameter selection;
