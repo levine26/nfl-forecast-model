@@ -71,7 +71,8 @@ Merged and complete:
 - #488 — future personnel/opportunity evidence coverage audit;
 - #491 — live pregame integration for Props 2.2 receipt capture;
 - #496 — frozen Props 2.2 prospective evaluator;
-- #497 — immutable Props 2.2 postgame grading contract, grader, and scheduled evaluation workflow.
+- #497 — immutable Props 2.2 postgame grading contract, grader, and scheduled evaluation workflow;
+- #500 — prospective closing-market/CLV evidence contract and matcher, using only append-only pre-kickoff archive evidence.
 
 Do not redo these unless repository evidence shows they are broken.
 
@@ -129,6 +130,22 @@ Required acceptance evidence:
 
 Do not manually create or backfill a Props 2.2 ledger from Week 2.
 
+### First-capture acceptance gate
+
+PR #504 adds an automated readiness/acceptance audit. Treat it as the canonical first-capture check once merged.
+
+Before a future ledger exists, the only valid state is:
+
+- `ARMED_AWAITING_FIRST_CAPTURE`
+
+After the first future successful pregame live Props publication creates a ledger, the gate must change to:
+
+- `FIRST_CAPTURE_VERIFIED`
+
+The verified state requires the complete frozen eight-challenger grid for every source forecast, valid receipt hashes, pre-kickoff chronology, the frozen Props 2.1 baseline identity, research-only / production-unauthorized flags, and no outcome contamination. Tampered hashes, incomplete grids, duplicate identities, post-kickoff forecasts, and live-hook regressions fail closed.
+
+The readiness workflow is designed to run after every successful `LevLine Props live refresh` and on the main Thursday-Monday collection days. It does not create or backfill receipts.
+
 ### Postgame evidence path
 
 The outcome side is already implemented before the first future holdout receipt:
@@ -152,6 +169,17 @@ Future receipts now preserve forward uncertainty evidence sufficient for:
 - supported discrete TD distribution scoring.
 
 Do not fabricate exact CRPS or PIT when a lossless continuous simulation distribution was not preserved.
+
+### Closing-market / CLV evidence
+
+PR #500 froze a secondary, descriptive closing-market evidence path before the first future Props 2.2 receipt.
+
+- closes come only from the append-only prospective market archive;
+- the selected close is the latest eligible archived capture strictly before kickoff;
+- same-threshold price CLV is reported only when the exact original threshold remains available;
+- missing closing evidence stays unmatched rather than being imputed;
+- CLV never changes challenger coefficients, promotion thresholds, or the primary original-market comparator;
+- no Week 2 closing evidence may be backfilled.
 
 ### Personnel/opportunity evidence
 
@@ -198,8 +226,8 @@ The forward questions are:
 
 ## 9. Execution order
 
-1. Before the next untouched pregame slate, verify the live Props workflow and #491 capture hook remain intact.
-2. On the next successful pregame live run, verify the first immutable Props 2.2 ledger is created.
+1. Before the next untouched pregame slate, verify the live Props workflow and #491 capture hook remain intact; once #504 is merged, the readiness state should be `ARMED_AWAITING_FIRST_CAPTURE`.
+2. On the next successful pregame live run, require the first immutable Props 2.2 ledger to be created and the readiness state to become `FIRST_CAPTURE_VERIFIED`.
 3. Run forward distribution and personnel/opportunity audits concurrently.
 4. After future games finalize, verify immutable grade append and the scheduled off-main evaluation refresh.
 5. Do not select a Props 2.2 winner mid-holdout or change candidate/grading/evaluation definitions.
