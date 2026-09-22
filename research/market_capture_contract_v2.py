@@ -10,7 +10,7 @@ LEDGER_IDENTITY_COLUMNS = (
 )
 
 QUALIFYING_CLOSE_ROW_TYPE = "consensus"
-MIN_CONSENSUS_BOOKS = 5
+MIN_CONSENSUS_BOOKS = 2
 
 
 def attempt_identity(row: dict) -> tuple:
