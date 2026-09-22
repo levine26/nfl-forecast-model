@@ -92,11 +92,7 @@ Reference model:
 
 - Ridge or ElasticNet.
 
-Secondary controlled ablation:
-
-- low-complexity GAM/spline or shallow tree model.
-
-A flexible tree ensemble must beat the simple reference in prior-time folds and survive complexity penalties before it becomes the candidate identity.
+No nonlinear secondary learner is part of initial Phase 3. GAM/spline/tree residual models are deferred and require a preregistration amendment before any such result is inspected.
 
 ---
 
@@ -129,14 +125,14 @@ Therefore:
 
 For every football predictor used in C, report its incremental contribution against the market-only null.
 
-At minimum compare:
+Required comparison ladder:
 
-1. market-only zero residual;
-2. market + football residual features;
-3. market + line-level calibration only;
-4. market + full preregistered residual candidate.
+1. **Market only:** predicted residual = 0.
+2. **Market + line-level calibration:** an ElasticNet residual model using only the market line level for that target; no football variables.
+3. **Market + football residual information:** an ElasticNet residual model using the frozen A0 football forecast/state variables but excluding the market-line calibration term beyond the residual anchor.
+4. **Full C0:** the complete preregistered target-specific predictor set in `BOUNDED_IMPLEMENTATION_SPEC.md`.
 
-This distinguishes genuine football information from simple market calibration.
+All four use the same paired games and nested chronology. The ladder distinguishes genuine football information from simple calibration of the market level itself.
 
 ---
 
