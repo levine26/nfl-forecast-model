@@ -15,6 +15,7 @@ contract.
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -99,7 +100,29 @@ def build_canonical_editorial_predictions(
     )
     bridge_records.extend(locked_only)
 
+    if editorial_game_ids is not None:
+        bridge_ids = {
+            str(row.get("game_id"))
+            for row in bridge_records
+            if str(row.get("game_id") or "").strip()
+        }
+        missing_authorized = sorted(editorial_game_ids - bridge_ids)
+        if missing_authorized:
+            raise RuntimeError(
+                "Authorized editorial roster cannot be reconstructed from current/locked rows: "
+                f"{missing_authorized}"
+            )
+
     public = build_public_forecasts(bridge_records, official_records, now_utc=now_utc)
+
+    if editorial_game_ids is not None:
+        public_ids = {str(game["game_id"]) for game in public["games"]}
+        if public_ids != editorial_game_ids:
+            raise RuntimeError(
+                "Canonical editorial slate does not exactly match the authorized roster: "
+                f"missing={sorted(editorial_game_ids - public_ids)} "
+                f"extra={sorted(public_ids - editorial_game_ids)}"
+            )
 
     bridge_by_game = {
         str(row.get("game_id")): row
@@ -128,21 +151,32 @@ def build_canonical_editorial_predictions(
     return result
 
 
+GAME_ID_PATTERN = re.compile(r"^\\d{4}_\\d{2}_[A-Z]{2,3}_[A-Z]{2,3}$")
+
+
 def _load_editorial_game_ids(path: Path) -> set[str]:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    games = payload.get("games") or {}
+    if not isinstance(payload, dict):
+        raise RuntimeError("Editorial roster must be a JSON object")
+
+    games = payload["games"] if "games" in payload else payload
     if isinstance(games, dict):
-        game_ids = {str(game_id) for game_id in games if str(game_id).strip()}
+        game_ids = {
+            str(game_id)
+            for game_id in games
+            if GAME_ID_PATTERN.fullmatch(str(game_id).strip())
+        }
     elif isinstance(games, list):
         game_ids = {
             str(game.get("game_id"))
             for game in games
-            if isinstance(game, dict) and str(game.get("game_id") or "").strip()
+            if isinstance(game, dict)
+            and GAME_ID_PATTERN.fullmatch(str(game.get("game_id") or "").strip())
         }
     else:
         raise RuntimeError("Editorial roster games must be an object or list")
     if not game_ids:
-        raise RuntimeError("Editorial roster contains no game IDs")
+        raise RuntimeError("Editorial roster contains no valid game IDs")
     return game_ids
 
 
