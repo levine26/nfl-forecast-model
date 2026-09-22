@@ -79,6 +79,7 @@ The final exact-head audit regenerated the canonical 1,087-game 2022–2025 base
   - research firewall \`35743780159\`: **SUCCESS**
   - research validation \`35743780066\`: **SUCCESS**
 - those earlier checks are preserved as evidence but are **not** final closeout checks because research/control files changed afterward.
+- final design/control reconciliation: **FROZEN FOR EXACT-HEAD CI**; no further Phase 2 branch content changes are planned before the merge gate.
 - final exact-head check IDs: **PENDING**
 - Phase 2 merge SHA: **PENDING**
 - Phase 3: **NOT STARTED**
