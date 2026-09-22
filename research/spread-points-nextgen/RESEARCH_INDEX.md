@@ -197,7 +197,7 @@ Additional Phase 1 control/evidence:
 
 External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
-### Phase 2 — in progress / analytically complete pending CI
+### Phase 2 — closeout candidate / exact-head CI pending
 
 - literature review — `research/spread-points-nextgen/phase2/LITERATURE_REVIEW.md`
 - external-model review — `research/spread-points-nextgen/phase2/EXTERNAL_MODEL_REVIEW.md`
@@ -209,8 +209,15 @@ External comparator explicitly carried into Phase 2: **davidsasser.com**.
 - paid-data decision — `research/spread-points-nextgen/phase2/PAID_DATA_DECISION.md`
 - synthesis / Phase 3 handoff — `research/spread-points-nextgen/phase2/PHASE2_SYNTHESIS.md`
 - machine-readable design summary — `research/spread-points-nextgen/phase2/PHASE2_RESEARCH_SUMMARY.json`
+- bounded implementation/search-space contract — `research/spread-points-nextgen/phase2/BOUNDED_IMPLEMENTATION_SPEC.md`
+- red-team closeout is recorded in `phase2/PHASE2_SYNTHESIS.md`
+- deterministic nested-fold contract is recorded in `phase2/EVALUATION_HOLDOUT_PROTOCOL.md`
+- feature/source/PIT feasibility matrix is recorded in `phase2/DATA_GAPS_AND_SOURCE_POLICY.md`
+- Challenger C M0/M1/M2/M3 null hierarchy is recorded in `phase2/MARKET_RESIDUAL_SPECIFICATION.md`
 
 External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research.
+
+Compatibility sync #521 merged current `main` into the Phase 2 branch before final validation. The concurrent adaptive-weekly-learning research remained separate and was not used to select Spread & Points challengers.
 
 ### Phase 3 — planned
 
