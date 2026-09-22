@@ -237,3 +237,19 @@ def test_duplicate_existing_identity_is_rejected() -> None:
             existing_ledger=duplicated,
             generated_at_utc="2026-09-13T16:20:00Z",
         )
+
+
+def test_post_cutoff_consensus_is_never_eligible_even_within_nominal_tolerance() -> None:
+    market = pd.DataFrame([
+        _consensus(
+            request="2026-09-13T16:16:00Z",
+            target="2026-09-13T16:15:00Z",
+            timing_error=1.0,
+        )
+    ])
+    ledger = build_shadow_ledger(
+        market,
+        pd.DataFrame([_lock()]),
+        generated_at_utc="2026-09-13T16:17:00Z",
+    )
+    assert ledger.empty
