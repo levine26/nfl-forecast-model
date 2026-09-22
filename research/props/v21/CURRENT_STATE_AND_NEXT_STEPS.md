@@ -69,7 +69,9 @@ Merged and complete:
 - #486 — immutable Props 2.2 prospective capture contract;
 - #487 — forward distribution-evidence scoring;
 - #488 — future personnel/opportunity evidence coverage audit;
-- #491 — live pregame integration for Props 2.2 receipt capture.
+- #491 — live pregame integration for Props 2.2 receipt capture;
+- #496 — frozen Props 2.2 prospective evaluator;
+- #497 — immutable Props 2.2 postgame grading contract, grader, and scheduled evaluation workflow.
 
 Do not redo these unless repository evidence shows they are broken.
 
@@ -126,6 +128,17 @@ Required acceptance evidence:
 8. the LevLine/F-ST winner model remains untouched.
 
 Do not manually create or backfill a Props 2.2 ledger from Week 2.
+
+### Postgame evidence path
+
+The outcome side is already implemented before the first future holdout receipt:
+- `POSTGAME_GRADING_CONTRACT.md` freezes finalization/participation/void semantics;
+- `grade_prospective.py` requires finalized games, final PBP and snap participation, produces one immutable hashed grade per original source forecast, voids zero-snap players, and leaves missing participation pending;
+- `evaluate_prospective.py` joins those separate grades to immutable challenger receipts, scores line MAE, Brier/log loss, calibration, market-residual diagnostics, clustered uncertainty and Holm-Bonferroni reporting;
+- the evaluator reports terminal readiness but never auto-promotes a challenger;
+- `research_props22_postgame.yml` runs Tuesday/Wednesday and persists grade/evaluation state off main on `research-data/props22-evaluation`.
+
+Before the first ledger exists, the postgame workflow cleanly no-ops.
 
 ## 6. Forward evidence lanes already available
 
@@ -188,8 +201,8 @@ The forward questions are:
 1. Before the next untouched pregame slate, verify the live Props workflow and #491 capture hook remain intact.
 2. On the next successful pregame live run, verify the first immutable Props 2.2 ledger is created.
 3. Run forward distribution and personnel/opportunity audits concurrently.
-4. Do not select a Props 2.2 winner mid-holdout.
-5. After future games finalize, run the frozen evaluator without changing candidate definitions.
+4. After future games finalize, verify immutable grade append and the scheduled off-main evaluation refresh.
+5. Do not select a Props 2.2 winner mid-holdout or change candidate/grading/evaluation definitions.
 6. Keep weekly findings descriptive until terminal evidence thresholds are met.
 
 ## 10. Repository hygiene
