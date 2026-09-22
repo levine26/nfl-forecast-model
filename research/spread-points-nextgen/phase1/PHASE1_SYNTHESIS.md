@@ -3,7 +3,7 @@
 **Phase status in this document:** **COMPLETE** — exact-head CI/firewall verification passed  
 **Production change:** none  
 **Primary branch:** `research/spread-points-nextgen-phase1`  
-**Draft PR:** #513
+**Merged PR:** #513 (`a4f7172c0c4ff82b1689411181e7a9042a1628a8`)
 
 ## What Phase 1 established
 
@@ -189,4 +189,4 @@ The structural diagnostics additionally found no strong monotonic recent-form or
 
 ## Closeout compatibility sync
 
-Before merge, the Phase 1 branch was synchronized with current `main` at `df91b80403a7af3094a9a6a8915afd0a6dce2ad3`. The sync brought forward only concurrent repository state outside the Phase 1 research package; Phase 1 did not modify production forecast logic. Fresh pull-request checks on the post-sync head are required before merge.
+Before merge, the Phase 1 branch was synchronized with `main` at `df91b80403a7af3094a9a6a8915afd0a6dce2ad3`. The sync brought forward concurrent repository state outside the Phase 1 research package; Phase 1 did not modify production forecast logic. Fresh pull-request checks then passed on `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`, and PR #513 merged at `a4f7172c0c4ff82b1689411181e7a9042a1628a8`.

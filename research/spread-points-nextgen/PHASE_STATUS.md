@@ -58,14 +58,15 @@ The merged canonical files were then verified directly from `main` at merge SHA 
 
 ## Phase 1 validation record
 
-Exact-head commit before closeout: `a1a6212d5aeb17d8b0c5602ac5da21aac374d81f`.
+Final exact-head commit: `b6b831fd1a77180e8dc97a0eb17495bbdee44ba5`.
 
-- `LevLine research firewall` run `35695606248`: **SUCCESS**
-- `LevLine research validation` run `35695606246`: **SUCCESS**
-- `Spread points Phase 1 audit` run `35695606219`: **SUCCESS**
-- Dedicated Phase 1 evidence artifact: `10680706168`, digest `sha256:26a3499232db3ff63972c1fd4931810e798307d70bf6ce6d88bc1b27f64a269f`.
+- `LevLine research firewall` run `35741337735`: **SUCCESS**
+- `LevLine research validation` run `35741337942`: **SUCCESS**
+- `Spread points Phase 1 audit` run `35741337832`: **SUCCESS**
+- Dedicated Phase 1 evidence artifact: `10699778876`, digest `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`.
+- PR `#513`: **MERGED** at `a4f7172c0c4ff82b1689411181e7a9042a1628a8`.
 
-The exact-head Phase 1 audit generated the canonical 1,087-game 2022–2025 baseline plus error, structural-slice, team-points and machine-summary artifacts while verifying protected production surfaces were unchanged.
+The final exact-head audit regenerated the canonical 1,087-game 2022–2025 baseline, passed helper tests, generated error/structural/team-points evidence, and verified protected production surfaces were unchanged. The merged control files were then re-read from `main`.
 
 ### Final post-sync / merged Phase 1 receipt
 
