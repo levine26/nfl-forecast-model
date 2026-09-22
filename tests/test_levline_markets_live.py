@@ -148,6 +148,17 @@ def test_live_workflow_allows_clean_postkickoff_noop():
     assert "Props live refresh no-op: target week has no pregame games remaining." in workflow
 
 
+def test_live_workflow_captures_props22_from_current_run_props21_json():
+    workflow = (ROOT / ".github" / "workflows" / "levline_markets_live.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "research/props/v22/capture_prospective.py" in workflow
+    assert "--source-json challenger_outputs/props21/public_challenger.json" in workflow
+    assert "--output challenger_outputs/props22/forecast_originals.jsonl" in workflow
+    assert "challenger_outputs/props22" in workflow
+    assert "research/props/v22/test_capture_prospective.py" in workflow
+
+
 def test_live_coordinator_postkickoff_noop_preserves_existing_publication(monkeypatch, tmp_path):
     module = _module()
     priors = tmp_path / "priors.json"
