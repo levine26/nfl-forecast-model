@@ -16,6 +16,25 @@ Phase 2 separates evidence into four classes:
 
 No external source is treated as proof that a LevLine implementation will improve accuracy. Transfer requires chronology-safe validation in this repository.
 
+## Verified evidence ledger
+
+The following classifications are frozen from the Phase 2 source audit:
+
+| Source | Evidence class | What is actually supported | What is not supported |
+|---|---|---|---|
+| Glickman & Stern (1998), JASA | **peer reviewed** | NFL score forecasting with time-varying team strength under a first-order autoregressive state process | direct evidence that LevLine's exact A0 implementation will improve modern NFL forecasts |
+| Harville football-rating work | **peer reviewed** | linear/mixed team-rating methodology and home-field/team-effect forecasting | a mandate to prefer a specific coefficient set or era-specific model |
+| Baker & McHale (2013), IJF | **peer reviewed** | genuine OOS NFL exact-score point-process forecasts; discrete football scoring mechanism; market remained a very strong outcome benchmark | proof that a LevLine drive simulator will beat the market |
+| Boulier & Stekler (2003); Boulier, Stekler & Amundson (2006); Lacey (1990); Gray & Gray (1997) | **peer reviewed** | NFL betting markets are difficult benchmarks; some historical inefficiencies exist but are unstable/era-sensitive | a durable modern betting rule or guaranteed market inefficiency |
+| Gneiting & Raftery (2007), JASA | **peer reviewed** | proper scoring rules for honest distributional forecast evaluation | a particular NFL distribution |
+| Yurko, Ventura & Horowitz (2019), JQAS | **peer reviewed** | reproducible public-PBP expected-points/player evaluation and multilevel shrinkage | proof that player variables improve next-game team score forecasts |
+| Brill et al. (2024) expected-points paper | **strong technical preprint, not peer reviewed at Phase 2 audit** | concrete warnings about selection bias, overfit artifacts, dependence and uncertainty in flexible football EP models | peer-reviewed validation or direct score-forecast uplift |
+| nfelo | **reproducible open source / practitioner technical evidence** | inspectable dynamic rating, QB/context and explicit market-regression architecture | peer-reviewed proof of its claimed accuracy or transferability to LevLine |
+| Open Source Football / nflverse examples | **reproducible open source / technical evidence** | opponent adjustment, multilevel EPA shrinkage and lagged public-data implementations | guaranteed OOS benefit in LevLine |
+| davidsasser.com | **product-design observation / opaque methodology** | current public board separates projected scores, projected line, opening/current market line and picks | reproducible model specification, PIT archive, independent validation, or scientific proof of self-reported records |
+
+This hierarchy controls the language used elsewhere in Phase 2.
+
 ### Source-quality register
 
 | Source / idea | Evidence class | What it can support here | What it cannot establish |
@@ -174,7 +193,7 @@ DOI: https://doi.org/10.1515/jqas-2018-0010
 
 The framework uses public play-by-play, expected-points modeling, win probability and multilevel player evaluation. It demonstrates that football value can be modeled through coherent play-level outcomes and partial pooling rather than only box-score aggregates.
 
-### Brill, Yee, Deshpande & Wyner (2024 preprint)
+### Brill, Yee, Deshpande & Wyner (2024 preprint — not peer reviewed at Phase 2 audit)
 
 **Source:** *Moving from Machine Learning to Statistics: the case of Expected Points in American football*  
 arXiv: https://arxiv.org/abs/2409.04889
@@ -397,3 +416,22 @@ The strongest correction to the earlier Phase 2 draft is methodological rather t
 - keep D behind an explicit complementarity/improvement gate.
 
 This reduces researcher degrees of freedom while preserving the three genuinely distinct scientific questions.
+
+
+---
+
+## 11. Phase 2 source-verification note — 2026-09-22
+
+The closeout audit re-verified the core sources against publisher, author, or current technical pages:
+
+- Glickman & Stern: JASA state-space NFL score article and first-order autoregressive team-strength formulation.
+- Baker & McHale: International Journal of Forecasting exact-score point-process paper with genuine out-of-sample forecasts; the betting market marginally outperformed the model on game-result forecasting.
+- Boulier & Stekler: International Journal of Forecasting comparison in which the betting market was the strongest predictor in their 1994–2000 sample.
+- Boulier, Stekler & Amundson; Lacey; Gray & Gray: peer-reviewed market-efficiency studies with mixed historical anomalies but no basis for assuming a persistent modern edge.
+- Gneiting & Raftery: JASA proper-scoring-rule foundation.
+- Yurko, Ventura & Horowitz: peer-reviewed JQAS reproducible public-data football evaluation.
+- Brill et al.: current source remains a preprint; it is intentionally not labeled peer reviewed.
+- nfelo: current public documentation and open-source MarketRegression code explicitly separate raw football rating from market regression and document the risk that accuracy optimization can collapse toward the market.
+- David Sasser: targeted searches of the current site and broader web located the public projection/graphic boards but **no sufficiently detailed technical methodology page, interview, source repository, archived PIT forecast ledger, or independent validation protocol**. The evidence classification therefore remains opaque/product-level.
+
+No source discovered in this verification justifies expanding the A0/B0/C0 shortlist.
