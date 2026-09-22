@@ -75,8 +75,9 @@ jobs:
           assert 'fallback_snapshot_reused' in workflow
           assert 'games_with_trusted_reporting' in workflow
           assert "git merge-base --is-ancestor \"$current_base\" origin/main" in workflow
-          assert "grep -Ev '^(research/|research_outputs/|\\.github/workflows/research_[^/]+\\.ya?ml$)'" in workflow
-          assert 'Only research-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
+          assert '--editorial-roster outputs/game_previews.json' in workflow
+          assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
+          assert 'Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
           assert 'for publish_attempt in 1 2 3; do' in workflow
           assert 'if git push origin HEAD:main; then' in workflow
@@ -95,7 +96,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           python scripts/build_canonical_editorial_predictions.py \
-            --editorial-roster outputs/copilot_media_reads.json \
+            --editorial-roster outputs/game_previews.json \
             --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
@@ -154,6 +155,10 @@ jobs:
           finalizer = status.get('editorial_finalizer', {})
           fallback = status.get('groq_provider_fallback', {})
           games = int(finalizer.get('games', 0))
+          roster = json.loads(Path('outputs/game_previews.json').read_text())
+          expected_games = len(roster)
+          if games != expected_games:
+              raise SystemExit(f'editorial slate contracted: finalized={games} roster={expected_games}')
           if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
               raise SystemExit(f'media reporting not launch-grade: {media}')
           if provider.get('status') != 'healthy' or int(provider.get('games_applied', 0)) != games:
@@ -191,13 +196,13 @@ jobs:
               fi
               changed_main_files=$(git diff --name-only "$current_base"..origin/main)
               printf 'main advance files:\n%s\n' "$changed_main_files"
-              unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
+              unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|challenger_outputs/prediction_history_shadow\.csv$|challenger_outputs/fst/(prospective_evaluation\.json|prospective_weekly\.csv)$|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
               if [ -n "$unsafe_main_files" ]; then
-                echo "Main changed outside the research-isolated namespace; refusing an unvalidated rebase."
+                echo "Main changed outside the approved research/challenger-isolated namespace; refusing an unvalidated rebase."
                 printf '%s\n' "$unsafe_main_files"
                 exit 1
               fi
-              echo "Only research-isolated files advanced; rebasing the already validated editorial output commit."
+              echo "Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit."
               git restore --worktree -- .
               git rebase origin/main
             fi
