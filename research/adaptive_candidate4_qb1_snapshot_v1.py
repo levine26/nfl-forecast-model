@@ -126,13 +126,20 @@ def build_t120_qb1_snapshots(
         if error < -CAPTURE_TOLERANCE_MINUTES or error > 0:
             raise ValueError("T-120 QB1 snapshot capture outside one-sided tolerance")
 
+        observed_depth = depth.copy()
+        if "dt" in observed_depth.columns:
+            observed_times = pd.to_datetime(observed_depth["dt"], errors="coerce", utc=True)
+            observed_depth = observed_depth[
+                observed_times.notna() & observed_times.le(pd.Timestamp(captured))
+            ].copy()
+
         home, home_reasons = select_t120_qb1(
-            depth,
+            observed_depth,
             team=str(game.get("home_team") or ""),
             kickoff_utc=kickoff,
         )
         away, away_reasons = select_t120_qb1(
-            depth,
+            observed_depth,
             team=str(game.get("away_team") or ""),
             kickoff_utc=kickoff,
         )
