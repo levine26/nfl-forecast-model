@@ -12,6 +12,7 @@ import hashlib
 import json
 import math
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
@@ -21,6 +22,26 @@ SCHEMA_VERSION = "adaptive-candidate4-qb1-t120-snapshot-v1"
 CANDIDATE_ID = "ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1"
 PREREGISTRATION_SHA = "74ecd303545c09f57593546472d27438e3d8a204"
 CAPTURE_TOLERANCE_MINUTES = 7.5
+
+
+EASTERN = ZoneInfo("America/New_York")
+
+
+def _kickoff_from_feed(raw: dict[str, Any]) -> datetime | None:
+    explicit = _utc(raw.get("kickoff_utc"))
+    if explicit is not None:
+        return explicit
+    gameday = str(raw.get("gameday") or "")[:10]
+    gametime = str(raw.get("gametime") or "")[:5]
+    if not gameday or not gametime:
+        return None
+    try:
+        local = datetime.strptime(f"{gameday} {gametime}", "%Y-%m-%d %H:%M").replace(
+            tzinfo=EASTERN
+        )
+    except ValueError:
+        return None
+    return local.astimezone(timezone.utc)
 
 
 def _utc(value: Any) -> datetime | None:
@@ -61,7 +82,7 @@ def due_t120_games(
         game_id = str(raw.get("game_id") or "").strip()
         if not game_id or game_id in existing:
             continue
-        kickoff = _utc(raw.get("kickoff_utc"))
+        kickoff = _kickoff_from_feed(raw)
         if kickoff is None:
             continue
         target = kickoff - timedelta(minutes=120)
