@@ -42,7 +42,8 @@ jobs:
 
   capture:
     concurrency:
-      group: levline-research-inactive-snapshot-archive-v1
+      # T-120 has a narrow one-sided window and occurs before inactive capture starts.
+      group: adaptive-candidate4-qb1-t120-v1
       cancel-in-progress: false
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
