@@ -17,6 +17,9 @@ def _production() -> pd.DataFrame:
     return pd.DataFrame([
         {
             "game_id": "2026_03_A_B",
+            "season": 2026,
+            "week": 3,
+            "gameday": "2026-09-27",
             "home_team": "B",
             "away_team": "A",
             "final_home_prob": 0.46,
@@ -218,3 +221,16 @@ def test_changed_scientific_evidence_cannot_rewrite_existing_decision() -> None:
     assert first.iloc[0]["decision_sha256"] != changed.iloc[0]["decision_sha256"]
     with pytest.raises(ValueError, match="rewrite attempted"):
         append_immutable(first, changed)
+
+
+def test_postkickoff_recording_cannot_become_eligible() -> None:
+    out = build_candidate4_decisions(
+        _production(),
+        _market(),
+        _qb(direction=1),
+        generated_at_utc="2026-09-27T17:01:00Z",
+    )
+    row = out.iloc[0]
+    assert bool(row["eligible"]) is False
+    assert "decision_recorded_postkickoff" in row["ineligibility_reasons"]
+    assert bool(row["candidate_switch"]) is False
