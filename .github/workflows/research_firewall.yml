@@ -21,7 +21,9 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
-      - run: pip install '.[dev]'
+      # This gate exercises path/static-import governance only. Keep its
+      # environment intentionally smaller than the production forecasting stack.
+      - run: python -m pip install "pytest>=8.0" "numpy==2.4.6" "pandas==3.0.5" "scikit-learn==1.9.0"
       - name: Enforce research path firewall
         run: python scripts/check_research_firewall.py --base origin/${{ github.base_ref }} --head-ref '${{ github.head_ref }}'
       - name: Verify static production import firewall
