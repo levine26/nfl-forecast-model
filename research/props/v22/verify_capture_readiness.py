@@ -58,7 +58,7 @@ def _validate_live_hook(workflow_text: str) -> dict[str, Any]:
     required = (
         "--allow-empty-postkickoff",
         "postkickoff_noop.json",
-        "python research/props/v22/capture_prospective.py",
+        "python -m research.props.v22.capture_prospective",
         "--source-json challenger_outputs/props21/public_challenger.json",
         "--output challenger_outputs/props22/forecast_originals.jsonl",
         "challenger_outputs/props22",
@@ -68,7 +68,7 @@ def _validate_live_hook(workflow_text: str) -> dict[str, Any]:
         raise Props22ReadinessError(f"live Props workflow is missing capture markers: {missing}")
 
     noop_index = workflow_text.find("postkickoff_noop.json")
-    capture_index = workflow_text.find("python research/props/v22/capture_prospective.py")
+    capture_index = workflow_text.find("python -m research.props.v22.capture_prospective")
     if noop_index < 0 or capture_index < 0 or capture_index <= noop_index:
         raise Props22ReadinessError(
             "Props 2.2 capture must occur only after the post-kickoff no-op guard"
