@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 2,
-  "status": "ANALYTICALLY_COMPLETE_PENDING_SYNC_AND_FINAL_CI",
+  "status": "ANALYTICALLY_COMPLETE_HARDENED_PENDING_SYNC_AND_CI",
   "production_changed": false,
   "user_required_external_source": "davidsasser.com",
   "initial_challengers": [
@@ -9,26 +9,29 @@
       "id": "A",
       "name": "Dynamic Opponent-Adjusted Joint Score",
       "market_aware": false,
-      "status": "preregistered"
+      "status": "preregistered",
+      "reference_id": "A0"
     },
     {
       "id": "B",
       "name": "Possession / Drive Score Process",
       "market_aware": false,
-      "status": "preregistered"
+      "status": "preregistered",
+      "reference_id": "B0"
     },
     {
       "id": "C",
       "name": "Market Residual Margin and Total",
       "market_aware": true,
-      "status": "preregistered"
+      "status": "preregistered",
+      "reference_id": "C0"
     }
   ],
   "conditional_components": [
     {
       "id": "D",
       "name": "Nested Ensemble / Reconciliation",
-      "condition": "only if A/B/C show complementary OOS information"
+      "condition": "residual abs correlation <0.90; nested convex combination improves both 2023 and 2024; pooled 2022-2024 MAE improvement >=0.10; prior-time weights only"
     },
     {
       "name": "QB/personnel overlay",
@@ -64,7 +67,9 @@
     "bounded_search_space": true,
     "deterministic_nested_selection": true,
     "feature_source_pit_matrix": true,
-    "red_team_review": true
+    "red_team_review": true,
+    "deterministic_nested_tuning": true,
+    "pit_feature_matrix": true
   },
   "external_evidence_highlights": [
     "Glickman & Stern 1998 dynamic NFL state-space scores",
@@ -121,5 +126,40 @@
     "research_firewall_run_id": null,
     "research_validation_run_id": null,
     "all_passed": false
+  },
+  "frozen_development_contract": {
+    "training_start_season": 2016,
+    "outer_target_seasons": [
+      2022,
+      2023,
+      2024
+    ],
+    "inner_target_start_season": 2019,
+    "fixed_lagged_state_half_life_team_games": 8,
+    "initial_reference_models": [
+      "A0",
+      "B0",
+      "C0"
+    ],
+    "deferred_initial_extensions": [
+      "A1",
+      "C1"
+    ],
+    "market_residual_nulls": [
+      "market_only",
+      "market_plus_line_level_calibration",
+      "market_plus_football_residual_information",
+      "full_C0"
+    ]
+  },
+  "red_team": {
+    "shortlist_changed": false,
+    "findings": [
+      "A/B/C remain materially distinct and implementable with free/PIT-safe core data",
+      "qualitative A1/C1 activation language was too permissive and has been removed",
+      "nested tuning objectives and tie-breaks are now deterministic",
+      "PIT feasibility is now documented feature-family by feature-family",
+      "David Sasser remains product/architecture evidence rather than reproducible validation"
+    ]
   }
 }
