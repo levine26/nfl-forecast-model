@@ -193,7 +193,7 @@ def _header_int_any(response: requests.Response, names: tuple[str, ...]) -> int 
     return None
 
 
-def _captured_pairs(path: Path) -> set[tuple[str, str]]:
+def _captured_pairs(path: Path, *, min_close_books: int = MIN_CONSENSUS_BOOKS) -> set[tuple[str, str]]:
     """Return only horizons closed by a qualifying multi-book consensus row.
 
     Book rows, one-book consensus rows, and legacy ledgers without a source_count
@@ -222,7 +222,7 @@ def _captured_pairs(path: Path) -> set[tuple[str, str]]:
     timing_error = pd.to_numeric(frame["timing_error_minutes"], errors="coerce")
     frame = frame[
         frame["row_type"].eq(QUALIFYING_CLOSE_ROW_TYPE)
-        & source_count.ge(MIN_CONSENSUS_BOOKS)
+        & source_count.ge(int(min_close_books))
         & timing_error.ge(-7.5)
         & timing_error.le(0.0)
     ]
@@ -258,6 +258,7 @@ def capture(
     ledger_path: str = "research_outputs/market_capture_v2/market_snapshots.csv",
     status_path: str = "research_outputs/market_capture_v2/status.json",
     quota_reserve: int = 50,
+    min_close_books: int = MIN_CONSENSUS_BOOKS,
     now_utc: datetime | None = None,
 ) -> dict:
     now = now_utc or datetime.now(timezone.utc)
@@ -270,7 +271,11 @@ def capture(
         return {"status": "skipped", "reason": "missing_slate", "external_request_made": False}
 
     slate = pd.read_csv(slate_file)
-    due = due_pairs(slate, now, _captured_pairs(ledger_file))
+    due = due_pairs(
+        slate,
+        now,
+        _captured_pairs(ledger_file, min_close_books=int(min_close_books)),
+    )
     if not due:
         return {"status": "skipped", "reason": "no_uncaptured_horizon_due", "external_request_made": False}
 
@@ -369,6 +374,7 @@ def capture(
         "quota_last_request_cost": _header_int_any(response, ("x-requests-last",)),
         "expected_request_cost": request_cost,
         "quota_reserve": int(quota_reserve),
+        "min_close_books": int(min_close_books),
         "free_tier_only": True,
         "historical_endpoint_used": False,
         "research_only": True,
@@ -384,12 +390,14 @@ def main() -> None:
     parser.add_argument("--ledger", default="research_outputs/market_capture_v2/market_snapshots.csv")
     parser.add_argument("--status", default="research_outputs/market_capture_v2/status.json")
     parser.add_argument("--quota-reserve", type=int, default=50)
+    parser.add_argument("--min-close-books", type=int, default=MIN_CONSENSUS_BOOKS)
     args = parser.parse_args()
     print(json.dumps(capture(
         slate_path=args.slate,
         ledger_path=args.ledger,
         status_path=args.status,
         quota_reserve=args.quota_reserve,
+        min_close_books=args.min_close_books,
     ), indent=2))
 
 
