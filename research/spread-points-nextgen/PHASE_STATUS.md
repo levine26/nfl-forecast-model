@@ -2,17 +2,17 @@
 
 **Program:** LevLine spread setting, team-point, margin, total, and joint-score research  
 **Authority:** `MASTER_PLAN.md`  
-**Last updated:** 2026-09-21 America/Los_Angeles  
+**Last updated:** 2026-09-22 America/Los_Angeles  
 **Phase-0 base main:** `536d6ab712028e374b42815db106f9fcb5d28053`  
 **Phase-0 governance merge:** `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25` via PR #512
 
-Only one phase should normally be `IN PROGRESS`. Parallel lanes are permitted only within the active phase. Phase 1 is now the single active program phase. Parallel analytical lanes are permitted within Phase 1 under the shared evaluation contract.
+Only one phase should normally be `IN PROGRESS`. Parallel lanes are permitted only within the active phase. Phase 1 is complete. No phase is active until a Phase 2 chat follows the recorded startup protocol and marks Phase 2 `IN PROGRESS`.
 
 | Phase | Name | Status | Primary branch | Supporting PR(s) | Key evidence / artifacts | Entry criteria | Exit criteria | Last updated | Exact next action |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | Master Program Initialization | **COMPLETE** | `docs/spread-points-nextgen-phase0` — merged | **#512 — MERGED** | Five canonical control files under `research/spread-points-nextgen/`; research firewall run `35691355664` **SUCCESS**; research validation run `35691355478` **SUCCESS**; merge `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25` verified from `main` | Existing repo accessible; current main and production boundary inspectable | **SATISFIED:** canonical plan/status/handoff/log/index merged to `main`; production firewall documented; future-chat protocol documented; docs-only diff verified; existing research firewall and validation gate passed; merged files re-read from `main` | 2026-09-21 | **STOP in the Phase 0 chat. Do not begin Phase 1 here.** |
-| 1 | Current LevLine Audit, Baseline Reproduction & Error Decomposition | **IN PROGRESS** | `research/spread-points-nextgen-phase1` | None | Phase 1 audit artifacts under `research/spread-points-nextgen/phase1/` | Phase 0 COMPLETE | Architecture documented; reproducible baseline; market baselines; residual decomposition; full data/API inventory; leakage/PIT risks; concrete hypotheses; no major baseline uncertainty | 2026-09-21 | Establish the canonical evaluation contract, audit architecture/data/PIT in parallel, reproduce baselines, and decompose errors. Do not implement challengers. |
-| 2 | Deep External Research & Challenger Design | **NOT STARTED** | TBD | None | Future literature/external-model reviews and preregistration | Phase 1 COMPLETE | Literature/external-model review; limited challenger shortlist; feature hypotheses; player/market-residual specs; preregistered evaluation and frozen holdout rules; data gaps identified | 2026-09-21 | Await Phase 1 completion |
+| 1 | Current LevLine Audit, Baseline Reproduction & Error Decomposition | **COMPLETE** | `research/spread-points-nextgen-phase1` | **#513** | `phase1/EVALUATION_CONTRACT.md`; architecture, baseline, error, data/API, PIT and synthesis reports; exact-head workflow artifact `10680706168` | Phase 0 COMPLETE | **SATISFIED:** architecture documented; reproducible 2022–2025 baseline; market baselines and paired uncertainty; residual decomposition; data/API inventory; leakage/PIT register; Phase 2 hypotheses; exact-head firewall/validation/audit all green | 2026-09-22 | **STOP Phase 1.** Merge #513 after closeout checks; next substantive chat begins Phase 2 only from current `main` and the canonical control files. |
+| 2 | Deep External Research & Challenger Design | **NOT STARTED** | TBD | None | Future literature/external-model reviews and preregistration | Phase 1 COMPLETE | Literature/external-model review; limited challenger shortlist; feature hypotheses; player/market-residual specs; preregistered evaluation and frozen holdout rules; data gaps identified | 2026-09-22 | Read Phase 1 synthesis/error/data/PIT artifacts; inspect current main/PR state; mark Phase 2 `IN PROGRESS`; perform deep external research and preregistration only. Include davidsasser.com in the external-model review. |
 | 3 | Controlled Challenger Implementation | **NOT STARTED** | TBD | None | Future candidate implementations/tests/contracts | Phase 2 COMPLETE | Selected challengers implemented; tests pass; provenance/as-of semantics intact; explicit versions; reproducible research outputs; production unchanged | 2026-09-21 | Await Phase 2 completion |
 | 4 | Historical Validation, Ablation & Model Selection | **NOT STARTED** | TBD | None | Future holdout/ablation/uncertainty reports | Phase 3 COMPLETE | All preregistered challengers evaluated; holdout clean; ablations/uncertainty/robustness/market comparison complete; finalist or no-finalist determination documented | 2026-09-21 | Await Phase 3 completion |
 | 5 | Prospective Shadow Validation & Operational Hardening | **NOT STARTED** | TBD | None | Future immutable receipts, grading, operational evidence | Phase 4 COMPLETE and credible finalist exists | Preregistered prospective evidence threshold satisfied; operational reliability demonstrated | 2026-09-21 | Await Phase 4 completion |
@@ -55,3 +55,14 @@ Validation:
   - research validation gate: success
 
 The merged canonical files were then verified directly from `main` at merge SHA `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25`.
+
+## Phase 1 validation record
+
+Exact-head commit before closeout: `a1a6212d5aeb17d8b0c5602ac5da21aac374d81f`.
+
+- `LevLine research firewall` run `35695606248`: **SUCCESS**
+- `LevLine research validation` run `35695606246`: **SUCCESS**
+- `Spread points Phase 1 audit` run `35695606219`: **SUCCESS**
+- Dedicated Phase 1 evidence artifact: `10680706168`, digest `sha256:26a3499232db3ff63972c1fd4931810e798307d70bf6ce6d88bc1b27f64a269f`.
+
+The exact-head Phase 1 audit generated the canonical 1,087-game 2022–2025 baseline plus error, structural-slice, team-points and machine-summary artifacts while verifying protected production surfaces were unchanged.

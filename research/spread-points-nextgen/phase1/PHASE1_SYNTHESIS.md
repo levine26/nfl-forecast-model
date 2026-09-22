@@ -1,6 +1,6 @@
 # Phase 1 Synthesis — Current LevLine Audit, Baseline Reproduction & Error Decomposition
 
-**Phase status in this document:** analytically complete, pending exact-head CI verification  
+**Phase status in this document:** **COMPLETE** — exact-head CI/firewall verification passed  
 **Production change:** none  
 **Primary branch:** `research/spread-points-nextgen-phase1`  
 **Draft PR:** #513
@@ -176,4 +176,11 @@ Before seeing challenger results:
 | Concrete hypotheses | error report + this synthesis |
 | No major baseline uncertainty | definitions frozen in `EVALUATION_CONTRACT.md`; remaining unknowns are explicitly source/PIT research questions, not ambiguity about the current baseline |
 
-Once the final exact-head CI/firewall runs pass, Phase 1 can be marked **COMPLETE** and Phase 2 can begin.
+Final exact-head validation passed:
+
+- research firewall run `35695606248`: **SUCCESS**;
+- research validation run `35695606246`: **SUCCESS**;
+- dedicated Phase 1 audit run `35695606219`: **SUCCESS**;
+- audit artifact `10680706168`.
+
+The structural diagnostics additionally found no strong monotonic recent-form or simple pace residual gradient, zero Core-feature missingness across the audited OOF sample, and only descriptive/non-PIT-safe weather associations. Phase 1 is therefore **COMPLETE**. Phase 2 remains **NOT STARTED** until the next substantive chat follows the canonical startup protocol.
