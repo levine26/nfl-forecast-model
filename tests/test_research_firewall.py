@@ -12,6 +12,7 @@ _SPEC.loader.exec_module(_FIREWALL)
 path_allowed = _FIREWALL.path_allowed
 research_scope_triggered = _FIREWALL.research_scope_triggered
 validate_changed_paths = _FIREWALL.validate_changed_paths
+validate_props_retirement_paths = _FIREWALL.validate_props_retirement_paths
 
 
 def test_research_allowlist_accepts_isolated_surfaces():
@@ -93,6 +94,7 @@ def test_research_allowlist_accepts_isolated_surfaces():
         ".github/workflows/research_firewall.yml",
         ".github/workflows/research_2025_availability_reconstruction.yml",
         ".github/workflows/levline_markets_live.yml",
+        ".github/workflows/responsive.yml",
         ".github/workflows/responsive.yml",
         "docs/LEVLINE_RESEARCH.md",
         "docs/IMPACT_MONITOR_GAP_ANALYSIS.md",
@@ -178,6 +180,43 @@ def test_mixed_research_and_production_diff_fails_closed():
     ]
     assert research_scope_triggered(changed, "fix/fst-provenance")
     assert validate_changed_paths(changed) == ["src/nfl_forecast/pipeline.py"]
+
+
+def test_props_retirement_lane_allows_only_the_explicit_reset_surface():
+    allowed = [
+        ".github/workflows/dashboard.yml",
+        ".github/workflows/levline_markets_live.yml",
+        ".github/workflows/research_props22_postgame.yml",
+        "config/levline_markets_priors_v1.json",
+        "docs/ACTIVE_WORKSTREAM_HANDOFF.md",
+        "docs/props/PROPS_RESEARCH_ARCHIVE_2026-09.md",
+        "outputs/props/forecasts.json",
+        "challenger_outputs/props21/forecast_originals.jsonl",
+        "research/props/v22/PREREGISTRATION.md",
+        "scripts/build_props_publication.py",
+        "scripts/run_levline_markets_live.py",
+        "site/src/AppCoherent.jsx",
+        "site/src/PropsResearchBeta.jsx",
+        "src/nfl_forecast/props_market.py",
+        "src/nfl_forecast/challenger_props_simulation.py",
+        "tests/test_props_market.py",
+        "tests/test_challenger_props_simulation.py",
+        "tests/test_levline_markets_live.py",
+        "scripts/check_research_firewall.py",
+        "tests/test_research_firewall.py",
+    ]
+    assert validate_props_retirement_paths(allowed) == []
+
+
+def test_props_retirement_lane_still_blocks_winner_model_and_unrelated_production():
+    blocked = [
+        "src/nfl_forecast/fst_production.py",
+        "src/nfl_forecast/pipeline.py",
+        "scripts/run_week.py",
+        "outputs/this_week.csv",
+        "site/src/AppSignal.jsx",
+    ]
+    assert validate_props_retirement_paths(blocked) == sorted(blocked)
 
 
 def test_production_prediction_path_does_not_import_research_modules():
