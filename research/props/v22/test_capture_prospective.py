@@ -77,6 +77,23 @@ def test_capture_rejects_outcome_bearing_or_wrong_baseline_source():
         build_capture([bad])
 
 
+def test_capture_rejects_pre_preregistration_or_preimplementation_forecasts():
+    stale = _source(
+        forecast_timestamp_utc="2026-09-22T02:20:00+00:00",
+        kickoff_utc="2026-09-27T20:25:00+00:00",
+        provenance={
+            "challenger_model_version": "levline-props-2.1-sunday-v0.1",
+            "source_data_horizon_utc": "2026-09-22T02:19:00+00:00",
+        },
+        market_state={
+            "book_count": 6,
+            "quote_as_of": "2026-09-22T02:19:30+00:00",
+        },
+    )
+    with pytest.raises(Props22CaptureError, match="predates Props 2.2 prospective capture boundary"):
+        build_capture([stale])
+
+
 def test_capture_rejects_duplicate_source_forecast_ids():
     with pytest.raises(Props22CaptureError, match="duplicate source forecast_id"):
         build_capture([_source(), _source()])
