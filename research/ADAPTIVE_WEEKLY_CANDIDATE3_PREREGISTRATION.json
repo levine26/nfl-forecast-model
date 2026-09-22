@@ -50,7 +50,12 @@
       "label": "T-360_to_T-120"
     },
     "selection_within_band": "for each sportsbook, select the latest qualifying captured_at inside the band",
-    "exact_horizon_claims_prohibited": ["T-120", "T-60", "T-45", "T-30"]
+    "exact_horizon_claims_prohibited": [
+      "T-120",
+      "T-60",
+      "T-45",
+      "T-30"
+    ]
   },
   "market_transform": {
     "american_odds_implied_probability": "odds>0: 100/(odds+100); odds<0: -odds/(-odds+100)",
@@ -65,7 +70,10 @@
     "formula": "logit(P_C3) = logit(P_FST) + lambda * path_innovation",
     "primary_lambda": 0.25,
     "lambda_rationale": "Conservative shrinkage: F-ST already contains a market component and the historical path archive is coarse. Candidate 3 therefore incorporates only one quarter of the observed same-book log-odds innovation rather than treating the full movement as independent information.",
-    "probability_clip": [0.000001, 0.999999],
+    "probability_clip": [
+      0.000001,
+      0.999999
+    ],
     "winner_threshold": 0.5,
     "fitted_parameters": 0,
     "outcome_trained_candidate3_thresholds": 0,
@@ -93,18 +101,35 @@
     "naive_weekly_refit_unchanged": "NAIVE-WEEKLY-FST-REFIT-CONTROL-V1, unchanged",
     "candidate2_unchanged": "ADAPTIVE-REGIME-SHOCK-GATE-V1, unchanged",
     "equivalent_no_path_ablation": "lambda=0, exactly F-ST",
-    "probability_only_update": "the primary Candidate 3 itself is a continuous probability update; winner changes are emergent at 0.5, not separately gated"
+    "probability_only_update": "the primary Candidate 3 itself is a continuous probability update; winner changes are emergent at 0.5, not separately gated",
+    "final_pre_kickoff_market": "same archive, latest qualifying pre-kickoff consensus per sportsbook; reporting-only control, never an input to Candidate 3"
   },
   "robustness_grid": {
     "rule": "Every cell is reported; no best-cell promotion.",
-    "lambdas": [0.125, 0.25, 0.5],
+    "lambdas": [
+      0.125,
+      0.25,
+      0.5
+    ],
     "early_bands": [
-      {"min_minutes_before_kickoff": 1440, "max_minutes_before_kickoff": 1800},
-      {"min_minutes_before_kickoff": 1440, "max_minutes_before_kickoff": 2160}
+      {
+        "min_minutes_before_kickoff": 1440,
+        "max_minutes_before_kickoff": 1800
+      },
+      {
+        "min_minutes_before_kickoff": 1440,
+        "max_minutes_before_kickoff": 2160
+      }
     ],
     "lock_bands": [
-      {"min_minutes_before_kickoff": 120, "max_minutes_before_kickoff": 240},
-      {"min_minutes_before_kickoff": 120, "max_minutes_before_kickoff": 360}
+      {
+        "min_minutes_before_kickoff": 120,
+        "max_minutes_before_kickoff": 240
+      },
+      {
+        "min_minutes_before_kickoff": 120,
+        "max_minutes_before_kickoff": 360
+      }
     ],
     "total_cells": 12
   },
@@ -171,5 +196,10 @@
     "live_shadow_automatic": false,
     "if_promising": "prospective preregistered shadow validation is required before any promotion consideration",
     "if_inconclusive_or_rejected": "close Candidate 3 and stop; do not begin Candidate 4"
+  },
+  "preregistration_addendum": {
+    "status": "PRE_RESULT_REPORTING_CONTROL_CORRECTION",
+    "reason": "The mandatory final-market-only control was omitted from the reporting controls in the initial preregistration. Candidate architecture, target sample, features, lambda, timestamp bands, robustness grid, inference, and success bands are unchanged.",
+    "target_results_seen_before_addendum": false
   }
 }
