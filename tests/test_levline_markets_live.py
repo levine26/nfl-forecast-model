@@ -127,3 +127,13 @@ def test_live_coordinator_uses_sharded_permanent_history_append():
         'append_jsonl_immutable(permanent_ledger, receipts, identity_key="forecast_id")'
         not in text
     )
+
+
+def test_live_workflow_transports_frozen_depth_chart_personnel_snapshot():
+    workflow = (ROOT / ".github" / "workflows" / "levline_markets_live.yml").read_text(
+        encoding="utf-8"
+    )
+    assert 'DEPTH_CHARTS="$RUN_ROOT/upstream/depth_charts.json"' in workflow
+    assert '--depth-charts "$DEPTH_CHARTS"' in workflow
+    assert 'DEPTH_CHARTS_SHA=$(sha256sum "$DEPTH_CHARTS"' in workflow
+    assert 'depth_charts_sha256:$depth_charts_sha256' in workflow

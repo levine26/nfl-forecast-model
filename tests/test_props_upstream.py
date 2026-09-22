@@ -1019,6 +1019,8 @@ def test_all_games_cli_builds_one_atomic_upstream_slate(monkeypatch, tmp_path):
     assert index["game_count"] == 2
     assert [row["game_id"] for row in index["games"]] == ["g1", "g2"]
     assert (output / "player_state.json").exists()
+    assert (output / "depth_charts.json").exists()
+    assert index["depth_charts_file"] == "depth_charts.json"
     assert (output / "games" / "g1" / "g1.game_spec.json").exists()
     assert (output / "games" / "g2" / "g2.game_spec.json").exists()
 
@@ -1154,3 +1156,51 @@ def test_all_games_cli_fails_if_upcoming_schedule_game_has_no_player_state(
     with pytest.raises(PropsUpstreamError, match="missing canonical player state"):
         module.main()
     assert not output.exists()
+
+
+def test_depth_chart_snapshot_freezes_latest_pregame_rank1_rows():
+    module = _upstream_cli_module()
+    forecast = datetime(2026, 9, 19, 20, 0, tzinfo=timezone.utc)
+    frame = pd.DataFrame([
+        {"dt": "2026-09-19T18:00:00+00:00", "team": "ATL", "gsis_id": "old-rb", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "RB"},
+        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "rb1", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "RB"},
+        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "wr1", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "WR"},
+        {"dt": "2026-09-19T19:00:00+00:00", "team": "ATL", "gsis_id": "rb2", "pos_rank": 2, "pos_grp": "Offense", "pos_abb": "RB"},
+        {"dt": "2026-09-19T21:00:00+00:00", "team": "ATL", "gsis_id": "future", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "TE"},
+        {"dt": "2026-09-19T19:00:00", "team": "ATL", "gsis_id": "naive", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "TE"},
+        {"dt": "2026-09-19T18:30:00+00:00", "team": "JAC", "gsis_id": "jax-qb", "pos_rank": 1, "pos_grp": "Offense", "pos_abb": "QB"},
+    ])
+    snapshot = module._snapshot_rank1_depth_charts(frame, forecast_timestamp=forecast)
+    rows = snapshot["depth_charts"]
+    assert {(row["team"], row["gsis_id"]) for row in rows} == {
+        ("ATL", "rb1"),
+        ("ATL", "wr1"),
+        ("JAX", "jax-qb"),
+    }
+    assert all(row["pos_rank"] == 1 for row in rows)
+    assert {row["position"] for row in rows} == {"QB", "RB", "WR"}
+    assert all(row["capture_timestamp"] == forecast.isoformat() for row in rows)
+    audit = snapshot["audit"]
+    assert audit["status"] == "qualified"
+    assert audit["future_rows_discarded"] == 1
+    assert audit["invalid_timestamp_rows"] == 1
+    assert audit["non_rank1_rows_discarded"] == 1
+    assert audit["superseded_rows_discarded"] == 1
+
+
+def test_depth_chart_snapshot_fails_closed_without_player_position_column():
+    module = _upstream_cli_module()
+    forecast = datetime(2026, 9, 19, 20, 0, tzinfo=timezone.utc)
+    frame = pd.DataFrame([{
+        "dt": "2026-09-19T19:00:00+00:00",
+        "team": "ATL",
+        "gsis_id": "ambiguous",
+        "pos_rank": 1,
+        "pos_grp": "Offense",
+    }])
+    snapshot = module._snapshot_rank1_depth_charts(
+        frame,
+        forecast_timestamp=forecast,
+    )
+    assert snapshot["depth_charts"] == []
+    assert snapshot["audit"]["status"] == "unusable_missing_position_column"
