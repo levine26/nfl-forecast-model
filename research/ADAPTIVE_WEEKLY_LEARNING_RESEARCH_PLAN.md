@@ -966,18 +966,16 @@ After conditioning on the market level actually known at the prediction horizon,
 
 Candidate 4 uses a new prospective clock. No game may enter its target sample unless the complete candidate specification and immutable lock contract were committed before that game's relevant lock. Completed 2026 games may be inspected only for schema, capture reliability, timestamps, missingness, and source integrity.
 
-The first currently scheduled possible lock is `2026_03_ATL_GB` at nominal T-120 = **2026-09-24T22:15:00Z**, conditional on:
-1. Candidate 4 preregistration being frozen before that instant; and
-2. a qualified strict-PIT market source being operational.
+The first possible **primary** Candidate 4 cohort is Week 3 Sunday, September 27, 2026. For the 13:00 ET cohort, nominal T-120 is **2026-09-27T15:00:00Z** and nominal T-60 is **2026-09-27T16:00:00Z**. Thursday ATL–GB remains market/source diagnostic only because the frozen primary QB inactive-source semantics are Sunday-specific.
 
 ### Parallel lane state
 
-- Lane A — external research: **ACTIVE; evidence supports sparse/selective information updates, not automatic path following**.
-- Lane B — PIT/source audit: **BLOCKED ON MULTI-BOOK MARKET SOURCE**. The latest `research-data/market-capture-v2` status records HTTP 401 Unauthorized and an empty market snapshot ledger.
-- Lane C — architecture: **SELECTED FOR IMPLEMENTATION** as a conservative T-60 selective information-arrival gate anchored to the frozen T-120 F-ST prior, with market-level, path-residual, and football-shock ablations.
-- Lane D — power/sample plan: **ACTIVE**.
-- Lane E — immutable shadow/CI: **PENDING IMPLEMENTATION**.
-- Preregistration: **NOT YET FROZEN**.
+- Lane A — external research: **COMPLETE FOR V1 FREEZE**. User-supplied Samford, nfl-data-py/nflverse, Congelio, and Quinnipiac sources were reviewed and mapped to Candidate 4 versus future challenger families.
+- Lane B — PIT/source audit: **INFRASTRUCTURE HARDENED; LIVE QUALIFICATION PENDING**. One-sided horizon timing is enforced end-to-end; the legacy credential-bearing error receipt was redacted at branch head; PropLine failover is wired but requires a configured secret/live qualifying capture. The current market ledger still has no qualified primary rows.
+- Lane C — architecture: **FROZEN** at preregistration commit `74ecd303545c09f57593546472d27438e3d8a204`: a conservative T-60 selective information-arrival gate anchored to the frozen production F-ST lock, with explicit level-only, path-only, QB-only, and combined controls.
+- Lane D — power/sample plan: **FROZEN**. Candidate 4 is switch-count limited; one remaining season is treated primarily as prospective falsification/mechanism evidence, not sufficient proof of a small long-run uplift.
+- Lane E — immutable shadow/CI: **IMPLEMENTED ON INTEGRATION BRANCH; CI PENDING**. Content-hashed T-60 decision rows, bilateral QB1 evidence, strict market freshness/provider gates, immutable rewrite rejection, retry workflow, and dedicated research-data persistence are implemented.
+- Preregistration: **FROZEN** at `74ecd303545c09f57593546472d27438e3d8a204`.
 - Prospective predictions locked: **0**.
 - Games graded: **0**.
 
@@ -987,4 +985,4 @@ Existing repository infrastructure already enforces one-sided strict T-120/T-60/
 
 ### Immediate next action
 
-Repair or replace the current zero-cost multi-book market capture without using completed 2026 outcomes; finish the frozen Candidate 4 mathematical contract, power plan, immutable receipt schema, tests, CI, and preregistration; then begin Week 3 shadow collection only if all PIT gates pass before the first eligible lock.
+Open and validate the Candidate 4 research PR. If CI passes, integrate the research-only infrastructure before Week 3 Sunday. Live shadow collection begins only when a zero-cost multi-book market source passes the frozen quality gates and official inactive/depth evidence satisfies the frozen QB source contract. Missing evidence fails closed; production F-ST remains unchanged.
