@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 2,
-  "status": "ANALYTICALLY_COMPLETE_PENDING_SYNC_AND_FINAL_CI",
+  "status": "CLOSEOUT_PENDING_EXACT_HEAD_CI",
   "production_changed": false,
   "user_required_external_source": "davidsasser.com",
   "initial_challengers": [
@@ -102,5 +102,20 @@
       "M3_full_residual"
     ],
     "paid_data_escalation": false
+  },
+  "compatibility_sync": {
+    "pr_number": 521,
+    "merged": true,
+    "sync_merge_sha": "23a01f6ccc81874b26f74aa58a5e5ee8151d1866",
+    "synchronized_main_sha": "fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da",
+    "concurrent_research_preserved": true,
+    "concurrent_research_used_for_challenger_selection": false
+  },
+  "phase3_started": false,
+  "phase2_merge_sha": null,
+  "final_exact_head_ci": {
+    "research_firewall_run_id": null,
+    "research_validation_run_id": null,
+    "all_passed": false
   }
 }
