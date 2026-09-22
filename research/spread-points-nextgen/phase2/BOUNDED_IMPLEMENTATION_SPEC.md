@@ -28,7 +28,9 @@ Selected only inside prior-time folds:
 - ridge alpha: `[0.1, 1, 10, 100]`
 - observation half-life in team games: `[4, 8, 16, 32]`
 
-No finer grid is permitted until the above is evaluated.
+If the frozen inner-fold rule in `EVALUATION_HOLDOUT_PROTOCOL.md` yields fewer than two valid inner validation seasons, no data-driven tuning occurs. Use the fixed fallback `alpha=10`, `half_life=16`.
+
+No finer grid is permitted in the initial Phase 3 candidate.
 
 ### Numeric process covariates
 
@@ -47,22 +49,14 @@ Opponent-team effects already supply opponent adjustment; no duplicate 3/5/8/EWM
 
 - generate home and away conditional means from the shared team-score model;
 - estimate home/away residual covariance from training-only OOF/residual data;
-- reference distribution: correlated Gaussian residual simulation;
-- preserve a discrete-score sensitivity through training-residual bootstrap if stable.
+- **primary reference distribution:** correlated Gaussian residual simulation;
+- training-residual bootstrap may be reported only as a non-selective distributional sensitivity. It cannot replace A0 because its score looks better.
 
-A0 exists to test whether a simple dynamically weighted, opponent-adjusted structure beats the current four-regressor feature ensemble.
+A0 is the complete initial Challenger A identity. It tests whether a simple dynamically weighted, opponent-adjusted structure beats the current four-regressor feature ensemble.
 
-## A1 optional state-space refinement
+## Explicit state-space refinement — deferred
 
-A1 becomes eligible only if A0 is reproducible and Phase 3 development evidence shows meaningful remaining temporal lag.
-
-Permitted change:
-
-- replace the time-decay approximation with explicit offense/defense random-walk or AR(1) latent states.
-
-State persistence / innovation parameters must use a small prior-time grid or likelihood fit inside the training fold. No 2025 result is available during this choice.
-
-A1 does not gain new feature families merely because the estimator changes.
+A random-walk / AR(1) offense-defense state-space implementation is scientifically motivated by Glickman & Stern, but it is **not an additional initial Phase 3 search branch**. It may be proposed later only through a preregistration amendment made before any new state-space result is inspected. Weak A0 performance alone is not sufficient reason to open that search.
 
 ---
 
@@ -84,9 +78,9 @@ Initial predictors:
 
 Reference estimator:
 
-- regularized linear or Poisson regression.
+- **Poisson regression with L2 regularization.**
 
-If training-fold dispersion materially violates Poisson assumptions, a Negative Binomial alternative is permitted and the dispersion diagnostic must be recorded.
+Training-fold overdispersion must be recorded as a diagnostic, but it does not authorize switching B0 to linear or Negative Binomial after seeing development performance. A different count family requires a preregistration amendment before its result is inspected.
 
 ### Component 2 — drive scoring outcome
 
@@ -142,15 +136,17 @@ Two separate regularized residual regressions:
 
 Estimator:
 
-- Ridge or ElasticNet.
+- **ElasticNet only.** `l1_ratio=0.0` is the ridge endpoint inside the same fixed family.
 
 Prespecified alpha grid:
 
 - `[0.01, 0.1, 1, 10, 100]`
 
-For ElasticNet, prespecified l1 ratio:
+Prespecified l1 ratio:
 
 - `[0.0, 0.2, 0.5]`
+
+If fewer than two valid inner validation seasons exist, use fixed fallback `alpha=1.0`, `l1_ratio=0.0`.
 
 All selection is prior-time nested.
 
@@ -166,30 +162,28 @@ All selection is prior-time nested.
 
 No injury/weather/player state unless separately qualified.
 
-## C1 controlled nonlinear sensitivity
+## Nonlinear residual sensitivity — deferred
 
-One low-complexity nonlinear model may be tested:
+No GAM, spline, tree or boosting residual model is authorized in the initial Phase 3 implementation. Challenger C is C0.
 
-- GAM/spline on market level + football-market disagreement; **or**
-- shallow gradient boosting with depth <=2 and a fixed small estimator grid.
-
-Only one C1 family may be chosen before results; do not test both and select the winner.
-
-Default Phase 3 choice: GAM/spline if the implementation stack supports it cleanly; otherwise skip C1 rather than substitute an unconstrained learner.
+A nonlinear residual model requires a preregistration amendment before its result is inspected; poor C0 development performance is not, by itself, authorization to search for a rescue model.
 
 ---
 
 # D — Conditional ensemble
 
-If activated, the first and only reference is a linear convex combination of frozen candidate OOF means/distributions.
+D is **target-specific** (margin and total are gated separately).
 
-Weights:
+Eligibility requires all of the following on common 2022–2024 outer-OOF rows:
 
-- nonnegative;
-- sum to one;
-- fitted only on inner/nested OOF rows.
+1. at least two eligible component error series have absolute Pearson correlation <= 0.90;
+2. a nonnegative, sum-to-one convex blend fitted only inside the nested training history improves the target MAE versus the best single component on the combined development OOF rows;
+3. the blend improvement has the same sign in at least two of the three outer target seasons (2022, 2023, 2024);
+4. season+week block bootstrap probability that the blend has lower MAE than the best component is >= 0.75.
 
-No neural/meta-tree stack is authorized.
+If any condition fails for a target, D does not exist for that target.
+
+No neural/meta-tree stack is authorized. No global all-target ensemble is inferred from a one-target gate.
 
 ---
 
@@ -198,10 +192,11 @@ No neural/meta-tree stack is authorized.
 1. Same team/game identity contract across A/B/C.
 2. No result-season feature normalization using future rows.
 3. Standardization parameters fit on training only.
-4. Hyperparameter grid evaluation occurs within prior-time folds only.
-5. Every emitted prediction stores candidate ID, train-through season/week, feature contract version and source-code SHA.
-6. Development outputs stop at 2024.
-7. Phase 3 runner must fail if asked to emit 2025 holdout metrics before Phase 4 authorization.
-8. 2026 completed outcomes remain unavailable to all selection code paths.
+4. Hyperparameter grid evaluation occurs within the deterministic prior-time folds in `EVALUATION_HOLDOUT_PROTOCOL.md` only.
+5. Candidate-specific tuning loss is fixed there before implementation; no metric switching is allowed.
+6. Every emitted prediction stores candidate ID, train-through season/week, feature contract version and source-code SHA.
+7. Development outputs stop at 2024.
+8. Phase 3 runner must fail if asked to emit 2025 holdout metrics before Phase 4 authorization.
+9. 2026 completed outcomes remain unavailable to all selection code paths.
 
 This bounded specification is intentionally conservative. If these models cannot improve the baseline, Phase 2 does not authorize an unlimited search for a more complicated rescue.
