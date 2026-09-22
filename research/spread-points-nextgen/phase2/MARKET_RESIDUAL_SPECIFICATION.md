@@ -169,3 +169,33 @@ Candidate C is scientifically interesting only if it:
 - remains transparent about market dependence.
 
 The program accepts “market-only wins” as a valid outcome.
+
+## 12. Mandatory four-arm null hierarchy
+
+Every Phase 3 development table for C must report the same exact paired rows for these four arms, in this order:
+
+1. **M0 — market only**
+   - predicted residual = 0;
+   - forecast = market.
+
+2. **M1 — market + line-level calibration only**
+   - residual model uses the market line level only;
+   - no football-state predictor;
+   - same Ridge family and nested chronology as C0.
+
+3. **M2 — market + football residual information**
+   - residual model uses the frozen football-only forecast/state terms plus prespecified home/rest context;
+   - no extra line-level calibration term beyond the market already present in the base forecast.
+
+4. **M3 — full preregistered residual model**
+   - combines the eligible M1 line-level calibration term and M2 football terms;
+   - this is the full C0 reference.
+
+Interpretation:
+
+- M1 improving M0 means calibration structure exists, not that football adds information.
+- M2 improving M0 is the direct test that football information explains sportsbook residual error.
+- M3 improving M1 shows whether football adds information beyond simple market recalibration.
+- If M2/M3 do not improve the relevant nulls, record **NO_INCREMENTAL_FOOTBALL_EDGE**.
+
+No arm may use future line movement, closing data for an earlier horizon, completed-2026 outcomes, or hindsight personnel/weather state.
