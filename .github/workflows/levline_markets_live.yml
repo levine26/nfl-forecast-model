@@ -279,7 +279,7 @@ jobs:
 
             # Props 2.2 remains research-only. Capture every preregistered challenger
             # mechanically from this just-generated, outcome-free Props 2.1 slate.
-            python research/props/v22/capture_prospective.py \
+            python -m research.props.v22.capture_prospective \
               --source-json challenger_outputs/props21/public_challenger.json \
               --output challenger_outputs/props22/forecast_originals.jsonl
 
