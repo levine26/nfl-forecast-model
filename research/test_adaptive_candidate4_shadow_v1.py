@@ -64,6 +64,13 @@ def _market(*, provider_t120: str = "propline", provider_t60: str = "propline") 
                     "row_type": "book",
                     "sportsbook_key": book,
                     "h2h_home_no_vig": p,
+                    "home_moneyline": -110 if p >= 0.5 else 120,
+                    "away_moneyline": 100 if p >= 0.5 else -130,
+                    "sportsbook_last_update_utc": (
+                        "2026-09-27T14:57:00Z" if horizon == "T-120m"
+                        else "2026-09-27T15:57:00Z"
+                    ),
+                    "freshness_minutes": 2.0,
                 }
             )
         rows.append(
