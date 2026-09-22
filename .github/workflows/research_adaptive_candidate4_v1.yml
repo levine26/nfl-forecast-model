@@ -16,6 +16,7 @@ on:
       - 'research/test_levline4_horizon_shadow_v1.py'
       - '.github/workflows/research_adaptive_candidate4_v1.yml'
       - '.github/workflows/research_adaptive_candidate4_qb_capture_v1.yml'
+      - '.github/workflows/research_adaptive_candidate4_qb1_t120_v1.yml'
       - '.github/workflows/research_market_capture_v2.yml'
   workflow_run:
     workflows:
@@ -74,10 +75,10 @@ jobs:
           assert qb['completed_2026_outcomes_used_for_design_or_selection']==0
           PY
           grep -F '74ecd303545c09f57593546472d27438e3d8a204' research/adaptive_candidate4_shadow_v1.py
-          python -m py_compile             research/adaptive_candidate4_shadow_v1.py             research/adaptive_candidate4_qb_shock_v1.py             research/run_adaptive_candidate4_qb_shock_v1.py             research/run_adaptive_candidate4_shadow_v1.py
+          python -m py_compile             research/adaptive_candidate4_shadow_v1.py             research/adaptive_candidate4_qb_shock_v1.py             research/adaptive_candidate4_qb1_snapshot_v1.py             research/run_adaptive_candidate4_qb1_snapshot_v1.py             research/run_adaptive_candidate4_qb_shock_v1.py             research/run_adaptive_candidate4_shadow_v1.py
       - name: Run Candidate 4 and hardened market tests
         run: |
-          PYTHONPATH="$PWD/src:$PWD" pytest -q             research/test_adaptive_candidate4_shadow_v1.py             research/test_adaptive_candidate4_qb_shock_v1.py             research/test_run_adaptive_candidate4_qb_shock_v1.py             research/test_run_adaptive_candidate4_shadow_v1.py             research/test_market_capture_v2.py             research/test_market_capture_t45.py             research/test_market_capture_observability_v1.py             research/test_levline4_horizon_shadow_v1.py
+          PYTHONPATH="$PWD/src:$PWD" pytest -q             research/test_adaptive_candidate4_shadow_v1.py             research/test_adaptive_candidate4_qb1_snapshot_v1.py             research/test_adaptive_candidate4_qb_shock_v1.py             research/test_run_adaptive_candidate4_qb_shock_v1.py             research/test_run_adaptive_candidate4_shadow_v1.py             research/test_market_capture_v2.py             research/test_market_capture_t45.py             research/test_market_capture_observability_v1.py             research/test_levline4_horizon_shadow_v1.py
       - name: Verify production firewall
         run: |
           git fetch origin main
