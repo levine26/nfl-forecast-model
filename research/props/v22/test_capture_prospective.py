@@ -10,6 +10,7 @@ from research.props.v22.capture_prospective import (
     append_immutable,
     build_capture,
     read_jsonl,
+    read_source_json,
 )
 
 
@@ -50,6 +51,17 @@ def _source(**overrides):
     }
     row.update(overrides)
     return row
+
+
+def test_read_source_json_uses_only_current_run_forecasts(tmp_path: Path):
+    source = tmp_path / "public_challenger.json"
+    source.write_text(
+        json.dumps({"forecasts": [_source()]}),
+        encoding="utf-8",
+    )
+    rows = read_source_json(source)
+    assert len(rows) == 1
+    assert rows[0]["forecast_id"] == "p21_capture_test"
 
 
 def test_build_capture_emits_complete_frozen_grid_without_outcomes():
