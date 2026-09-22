@@ -124,6 +124,18 @@ The roadmap is now:
 
 Phase 0 complete -> Phase 1 complete -> Phase 2 complete -> **Phase 3 controlled implementation -> Phase 4 historical validation/underlying 2025 holdout -> Phase 5 Candidate 5 historical integration -> Phase 6 prospective shadow/hardening -> Phase 7 final synthesis/promotion package**.
 
+## Candidate 5 governance-amendment receipt
+
+- amendment branch: `docs/spread-points-candidate5-program-amendment`
+- PR: **#545**
+- branch base at creation: `2fe2723b13c7e794bee4fe5cb6695b5eedc00e37`
+- changed surface: the five canonical `research/spread-points-nextgen/` control files only
+- production/model implementation changes: **NONE**
+- Phase 3 implementation changes: **NONE**
+- Candidate 5 implementation/training: **NONE**
+- prohibited holdout inspection: **NONE**
+- CI/merge receipt: to be finalized from the exact PR head before merge
+
 ## Exact next action
 
 **Immediate next action remains Phase 3.** Read the merged control files and canonical Phase 2 artifacts from current `main`, then implement only the frozen Phase 3 A0/B0/C0 program (D only if its frozen gate passes). This amendment does not authorize Candidate 5 or Phase 4 work and does not reopen Phase 1/2.
