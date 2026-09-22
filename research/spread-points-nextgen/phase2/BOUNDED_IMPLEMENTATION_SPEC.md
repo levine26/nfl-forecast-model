@@ -5,6 +5,21 @@
 
 This document refines the model families in `CHALLENGER_PREREGISTRATION.md`. Phase 3 may simplify an implementation for numerical/stability reasons, but expanding these search spaces requires a logged preregistration amendment before the new result is inspected.
 
+## Frozen search-space rule
+
+The initial Phase 3 implementation is exactly **A0 + B0 + C0**.
+
+- A1 and C1 are **deferred research ideas**, not development-period escape hatches.
+- No alternate learner family may be substituted because A0/B0/C0 underperform.
+- Any material extension requires a new candidate/version and a preregistration amendment written **before** that extension's outputs are inspected.
+- The mandatory A0/B0/C0 development outputs are preserved even when negative.
+
+## Fixed lagged-state construction
+
+To prevent rolling-window fishing, all compact lagged process summaries used by A0/B0/C0 are computed from prior completed regular-season team games with an exponentially weighted mean using a **fixed 8-team-game half-life**. No 3/5/8/16-window sweep is permitted.
+
+The A0 observation-weight half-life remains a model hyperparameter because it controls training-row influence, not feature-window construction. These are separate mechanisms.
+
 ---
 
 # A — Dynamic Opponent-Adjusted Joint Score
@@ -34,14 +49,18 @@ No finer grid is permitted in the initial Phase 3 candidate.
 
 ### Numeric process covariates
 
-Initial compact set:
+Initial compact set, all using the fixed 8-team-game lagged-state rule above:
 
-- lagged offense EPA/play;
-- lagged defense EPA/play allowed;
-- lagged pass EPA difference;
-- lagged success-rate difference;
+- offense EPA/play;
+- opponent defense EPA/play allowed;
+- offense pass EPA/play;
+- opponent defense pass EPA/play allowed;
+- offense success rate;
+- opponent defense success rate allowed;
 - rest differential;
 - home indicator.
+
+No rush/pass interaction search, arbitrary rolling-window duplication, or team-name correction is authorized.
 
 Opponent-team effects already supply opponent adjustment; no duplicate 3/5/8/EWMA copies of every variable are included.
 
@@ -117,6 +136,21 @@ Rare safeties / defensive scores are not given unconstrained team-specific class
 Reference estimator:
 
 - L2-regularized multinomial logistic regression.
+
+Pregame covariates are fixed to:
+
+- A0 OOF offense strength;
+- A0 OOF opponent-defense strength;
+- offense TD-per-drive and FG-per-drive rates;
+- opponent TD-per-drive and FG-per-drive allowed rates;
+- offense turnover-per-drive rate;
+- opponent takeaway-per-drive rate;
+- offense explosive-play rate;
+- opponent explosive-play rate allowed;
+- home indicator;
+- rest differential.
+
+All rate covariates use the fixed 8-team-game lagged-state rule. Red-zone, sack, special-teams, field-position, personnel and weather variables are **not** added to B0.
 
 Prespecified inverse-regularization grid:
 
