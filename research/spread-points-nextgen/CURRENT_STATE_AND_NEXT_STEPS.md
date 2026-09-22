@@ -18,7 +18,7 @@ The branch was synchronized with current main through compatibility PR #521. The
 ## Frozen initial Phase 3 shortlist
 
 - **A — Dynamic Opponent-Adjusted Joint Score:** football-only. Initial identity is bounded A0: time-decayed, partially pooled offense/defense score model.
-- **B — Possession / Drive Score Process:** football-only. Independent B0 must model possessions plus TD/FG/empty drive outcomes without consuming A0 predictions. One separately labeled OOF A-state sensitivity is allowed.
+- **B — Possession / Drive Score Process:** football-only. Independent B0 must model possessions plus TD/FG/empty drive outcomes without consuming A0 predictions. No B+A sensitivity is part of the initial Phase 3 search.
 - **C — Market Residual Margin / Total:** market-aware. Initial C0 is Ridge-only and must report M0 market-only, M1 line-calibration-only, M2 football-residual, and M3 full residual arms.
 - **D — Ensemble / reconciliation:** conditional only. Do not build unless at least two frozen candidates survive development and nested OOF combination adds information beyond the best constituent.
 
@@ -26,15 +26,15 @@ A1 explicit state-space expansion, player/QB/personnel overlays, and weather are
 
 ## Frozen chronology
 
-Historical training floor for A0/B0/C0: **2016 regular season**. Inner validation targets begin in **2019**.
+Initial training history is **candidate-specific earliest complete required-feature coverage**; Phase 3 may not search alternate training-start years for better performance.
 
-Development outer targets:
+Development outer targets are exactly:
 
 - 2022 — prior seasons only;
 - 2023 — prior seasons only;
 - 2024 — prior seasons only.
 
-All tuning/preprocessing is nested inside earlier-time inner folds. When more than four eligible inner validation seasons exist, use the four most recent. When fewer than two exist for a source-limited component, use the preregistered default rather than later data.
+For each outer target, use expanding prior-only inner folds; a fold requires at least two complete prior training seasons. Use the **latest four valid inner validation seasons**, or all valid folds when fewer are available. If fewer than two valid inner validation seasons exist, use the candidate's frozen fallback rather than borrowing later data. All preprocessing, latent-state construction, residual variance/covariance estimation and tuning are training-only.
 
 Final historical challenger holdout:
 
@@ -70,7 +70,7 @@ A/B/C are testable with free/open sources. Paid injury/OL/route/coverage/partici
 
 - explicit evidence-quality classification for peer-reviewed, technical/open-source, practitioner and opaque sources;
 - deeper David Sasser review with product observations separated from reproducible evidence;
-- deterministic nested chronology/tie-breaking;
+- deterministic candidate-specific nested chronology/tie-breaking;
 - A0/A1 boundary tightened;
 - independent B0 reference required;
 - C0 reduced to Ridge-only; no tree fallback;
