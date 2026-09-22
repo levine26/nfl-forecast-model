@@ -183,7 +183,7 @@ def test_consensus_retains_source_count_market_dispersion_and_event_identity() -
     assert consensus["home_spread"] == -3.0
     assert consensus["total_points"] == 44.5
     assert QUALIFYING_CLOSE_ROW_TYPE == "consensus"
-    assert MIN_CONSENSUS_BOOKS == 2
+    assert MIN_CONSENSUS_BOOKS == 5
 
 
 def test_consensus_rejects_duplicate_books_or_mixed_event_identity() -> None:
