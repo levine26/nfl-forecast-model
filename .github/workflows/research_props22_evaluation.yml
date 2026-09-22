@@ -1,0 +1,53 @@
+name: LevLine Props 2.2 evaluation contract
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v22/CHALLENGER_GRID.json'
+      - 'research/props/v22/PREREGISTRATION.md'
+      - 'research/props/v22/challengers.py'
+      - 'research/props/v22/capture_prospective.py'
+      - 'research/props/v22/evaluate_prospective.py'
+      - 'research/props/v22/test_preregistration.py'
+      - 'research/props/v22/test_challengers.py'
+      - 'research/props/v22/test_capture_prospective.py'
+      - 'research/props/v22/test_evaluate_prospective.py'
+      - '.github/workflows/research_props22_evaluation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate frozen Props 2.2 capture and evaluation contracts
+        run: |
+          python -m pytest -q             research/props/v22/test_preregistration.py             research/props/v22/test_challengers.py             research/props/v22/test_capture_prospective.py             research/props/v22/test_evaluate_prospective.py
+          python -m py_compile             research/props/v22/challengers.py             research/props/v22/capture_prospective.py             research/props/v22/evaluate_prospective.py
+      - name: Enforce evaluation-only boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          evaluator = Path('research/props/v22/evaluate_prospective.py').read_text()
+          prereg = Path('research/props/v22/PREREGISTRATION.md').read_text()
+          assert 'P22_COMBINED_25' in prereg
+          assert 'P22_COMBINED_50' in prereg
+          assert 'holm_bonferroni' in evaluator
+          assert 'NOT_READY_CONTINUE_FROZEN_HOLDOUT' in evaluator
+          assert 'TERMINAL_EVALUATION_PERMITTED_BUT_NO_AUTOMATIC_WINNER_SELECTION' in evaluator
+          for forbidden in (
+              'src/nfl_forecast/fst_production.py',
+              'scripts/run_week.py',
+              'outputs/this_week.csv',
+          ):
+              assert forbidden not in evaluator
+          print('Props 2.2 evaluator remains research-only and does not auto-select a winner.')
+          PY
