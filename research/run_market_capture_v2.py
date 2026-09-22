@@ -18,8 +18,10 @@ from research.market_capture_contract_v2 import (
 from research.market_capture_v2 import consensus_row, due_horizons, normalize_bookmaker
 
 
-API_URL = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
-EXPECTED_REQUEST_COST = 3  # h2h + spreads + totals in one region
+THE_ODDS_API_URL = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
+PROPLINE_API_URL = "https://api.prop-line.com/v1/sports/football_nfl/odds"
+EXPECTED_REQUEST_COST = 3  # The Odds API: h2h + spreads + totals in one region
+PROPLINE_EXPECTED_REQUEST_COST = 1  # one bulk game-lines request
 MAX_EVENT_KICKOFF_DELTA_MINUTES = 30.0
 TEAM_ABBR = {
     "Arizona Cardinals": "ARI", "Atlanta Falcons": "ATL", "Baltimore Ravens": "BAL",
@@ -104,6 +106,93 @@ def _header_int(response: requests.Response, name: str) -> int | None:
         return None
 
 
+
+def _provider_configs() -> list[dict]:
+    """Return configured zero-cost market providers in deterministic preference order.
+
+    PropLine is attempted first because it exposes a The-Odds-API-compatible multi-book
+    NFL surface and uses header auth, which avoids placing credentials in request URLs.
+    The existing The Odds API path remains a fallback.
+    """
+    providers: list[dict] = []
+    propline_key = os.getenv("PROPLINE_API_KEY", "").strip()
+    if propline_key:
+        providers.append(
+            {
+                "name": "propline",
+                "url": PROPLINE_API_URL,
+                "params": {"markets": "h2h,spreads,totals"},
+                "headers": {"X-API-Key": propline_key},
+                "expected_cost": PROPLINE_EXPECTED_REQUEST_COST,
+            }
+        )
+
+    odds_key = os.getenv("THE_ODDS_API_KEY", "").strip()
+    if odds_key:
+        providers.append(
+            {
+                "name": "the_odds_api",
+                "url": THE_ODDS_API_URL,
+                "params": {
+                    "apiKey": odds_key,
+                    "regions": "us",
+                    "markets": "h2h,spreads,totals",
+                    "oddsFormat": "american",
+                    "dateFormat": "iso",
+                },
+                "headers": {},
+                "expected_cost": EXPECTED_REQUEST_COST,
+            }
+        )
+    return providers
+
+
+def _request_market_events(providers: list[dict]) -> tuple[str, requests.Response, list[dict], list[dict], int]:
+    """Fetch one valid bulk NFL board, failing over without logging credential-bearing URLs."""
+    failures: list[dict] = []
+    for provider in providers:
+        try:
+            response = requests.get(
+                provider["url"],
+                params=provider["params"],
+                headers=provider["headers"] or None,
+                timeout=20,
+            )
+            response.raise_for_status()
+            events = response.json()
+            if not isinstance(events, list):
+                raise RuntimeError(f"{provider['name']} response must be a list of events")
+            return (
+                str(provider["name"]),
+                response,
+                events,
+                failures,
+                int(provider["expected_cost"]),
+            )
+        except Exception as exc:
+            status_code = getattr(getattr(exc, "response", None), "status_code", None)
+            failures.append(
+                {
+                    "provider": str(provider["name"]),
+                    "error_type": type(exc).__name__,
+                    "http_status": int(status_code) if status_code is not None else None,
+                }
+            )
+    summary = ", ".join(
+        f"{row['provider']}:{row['error_type']}:{row['http_status']}"
+        for row in failures
+    )
+    raise RuntimeError(f"all configured market providers failed ({summary})")
+
+
+def _header_int_any(response: requests.Response, names: tuple[str, ...]) -> int | None:
+    for name in names:
+        value = _header_int(response, name)
+        if value is not None:
+            return value
+    return None
+
+
 def _captured_pairs(path: Path) -> set[tuple[str, str]]:
     """Return only horizons closed by a qualifying multi-book consensus row.
 
@@ -176,36 +265,34 @@ def capture(
     if not due:
         return {"status": "skipped", "reason": "no_uncaptured_horizon_due", "external_request_made": False}
 
-    previous = _status(status_file)
-    remaining = previous.get("quota_remaining")
-    if remaining is not None and int(remaining) < int(quota_reserve) + EXPECTED_REQUEST_COST:
+    providers = _provider_configs()
+    if not providers:
         return {
             "status": "skipped",
-            "reason": "free_quota_reserve_reached",
-            "quota_remaining": int(remaining),
-            "required_credits": EXPECTED_REQUEST_COST,
+            "reason": "missing_market_api_key",
+            "configured_market_sources": [],
             "external_request_made": False,
         }
 
-    api_key = os.getenv("THE_ODDS_API_KEY", "").strip()
-    if not api_key:
-        return {"status": "skipped", "reason": "missing_api_key", "external_request_made": False}
+    previous = _status(status_file)
+    remaining = previous.get("quota_remaining")
+    previous_provider = previous.get("market_provider")
+    primary = providers[0]
+    if (
+        remaining is not None
+        and previous_provider == primary["name"]
+        and int(remaining) < int(quota_reserve) + int(primary["expected_cost"])
+    ):
+        return {
+            "status": "skipped",
+            "reason": "free_quota_reserve_reached",
+            "market_provider": primary["name"],
+            "quota_remaining": int(remaining),
+            "required_credits": int(primary["expected_cost"]),
+            "external_request_made": False,
+        }
 
-    response = requests.get(
-        API_URL,
-        params={
-            "apiKey": api_key,
-            "regions": "us",
-            "markets": "h2h,spreads,totals",
-            "oddsFormat": "american",
-            "dateFormat": "iso",
-        },
-        timeout=20,
-    )
-    response.raise_for_status()
-    events = response.json()
-    if not isinstance(events, list):
-        raise RuntimeError("The Odds API response must be a list of events")
+    provider_name, response, events, provider_failures, request_cost = _request_market_events(providers)
 
     rows: list[dict] = []
     missed: list[str] = []
@@ -233,6 +320,7 @@ def capture(
                 kickoff_timestamp_utc=item["kickoff_timestamp_utc"],
             )
             if row:
+                row["market_provider"] = provider_name
                 book_rows.append(row)
         rows.extend(book_rows)
         consensus = consensus_row(book_rows)
@@ -264,10 +352,13 @@ def capture(
         "rows_added_this_request": len(rows),
         "missed": missed,
         "external_request_made": True,
-        "quota_used": _header_int(response, "x-requests-used"),
-        "quota_remaining": _header_int(response, "x-requests-remaining"),
-        "quota_last_request_cost": _header_int(response, "x-requests-last"),
-        "expected_request_cost": EXPECTED_REQUEST_COST,
+        "market_provider": provider_name,
+        "configured_market_sources": [str(provider["name"]) for provider in providers],
+        "provider_failures_before_success": provider_failures,
+        "quota_used": _header_int_any(response, ("x-daily-used", "x-requests-used")),
+        "quota_remaining": _header_int_any(response, ("x-daily-remaining", "x-requests-remaining")),
+        "quota_last_request_cost": _header_int_any(response, ("x-requests-last",)),
+        "expected_request_cost": request_cost,
         "quota_reserve": int(quota_reserve),
         "free_tier_only": True,
         "historical_endpoint_used": False,
