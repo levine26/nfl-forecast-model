@@ -37,6 +37,19 @@ def _row(game_id: str, away: str, home: str, probability: float, pick: str) -> d
     }
 
 
+def _locked(row: dict, *, kickoff: str = "2026-09-13T17:00:00+00:00") -> dict:
+    locked = dict(row)
+    locked.update(
+        {
+            "lock_status": "LOCKED",
+            "lock_timestamp_utc": "2026-09-13T15:05:00+00:00",
+            "kickoff_utc": kickoff,
+            "minutes_to_kickoff_at_lock": 115.0,
+        }
+    )
+    return locked
+
+
 def test_locked_row_overrides_later_mutable_forecast():
     gid = "2026_01_AAA_BBB"
     current = pd.DataFrame(
@@ -45,16 +58,7 @@ def test_locked_row_overrides_later_mutable_forecast():
             _row("2026_01_CCC_DDD", "CCC", "DDD", 0.62, "DDD"),
         ]
     )
-    locked = _row(gid, "AAA", "BBB", 0.64, "BBB")
-    locked.update(
-        {
-            "lock_status": "LOCKED",
-            "lock_timestamp_utc": "2026-09-13T15:05:00+00:00",
-            "kickoff_utc": "2026-09-13T17:00:00+00:00",
-            "minutes_to_kickoff_at_lock": 115.0,
-        }
-    )
-    official = pd.DataFrame([locked])
+    official = pd.DataFrame([_locked(_row(gid, "AAA", "BBB", 0.64, "BBB"))])
 
     selected = MODULE.build_canonical_editorial_predictions(
         current,
@@ -67,6 +71,35 @@ def test_locked_row_overrides_later_mutable_forecast():
     assert selected.loc[gid, "lock_status"] == "LOCKED"
     assert float(selected.loc["2026_01_CCC_DDD", "final_home_prob"]) == pytest.approx(0.62)
     assert selected.loc["2026_01_CCC_DDD", "pick"] == "DDD"
+
+
+def test_restores_locked_games_dropped_from_contracting_current_slate():
+    live = _row("2026_02_NYG_LA", "NYG", "LA", 0.71, "LA")
+    live.update({"week": 2, "gameday": "2026-09-21", "gametime": "20:15"})
+
+    locked_a = _locked(_row("2026_02_CAR_ATL", "CAR", "ATL", 0.63, "ATL"))
+    locked_a.update({"week": 2, "gameday": "2026-09-20", "gametime": "13:00"})
+
+    locked_b = _locked(_row("2026_02_IND_KC", "IND", "KC", 0.66, "KC"))
+    locked_b.update({"week": 2, "gameday": "2026-09-20", "gametime": "16:25"})
+
+    prior_week = _locked(_row("2026_01_AAA_BBB", "AAA", "BBB", 0.61, "BBB"))
+
+    selected = MODULE.build_canonical_editorial_predictions(
+        pd.DataFrame([live]),
+        pd.DataFrame([locked_a, locked_b, prior_week]),
+        now_utc=datetime(2026, 9, 21, 23, 0, tzinfo=timezone.utc),
+    )
+
+    assert selected["game_id"].tolist() == [
+        "2026_02_NYG_LA",
+        "2026_02_CAR_ATL",
+        "2026_02_IND_KC",
+    ]
+    restored = selected.set_index("game_id")
+    assert restored.loc["2026_02_CAR_ATL", "lock_status"] == "LOCKED"
+    assert restored.loc["2026_02_IND_KC", "lock_status"] == "LOCKED"
+    assert "2026_01_AAA_BBB" not in restored.index
 
 
 def test_refuses_post_kickoff_live_replacement_without_lock():
