@@ -91,3 +91,20 @@ The final exact-head audit regenerated the canonical 1,087-game 2022–2025 base
 - completed-2026 outcomes used for candidate selection: **NO**
 - paid-data dependency requested: **NO**
 - Phase 3: **NOT STARTED**
+
+## Candidate 5 roadmap amendment record
+
+Governance-only amendment:
+
+- amendment branch: `docs/spread-points-candidate5-program-amendment`
+- PR: **#545 — MERGED**
+- validated head: `86bc790a47573833b3ede934784d5997c26f571d`
+- research firewall run `35795292921`: **SUCCESS**
+- full research validation run `35795292923`: **SUCCESS**
+- merge commit: `e51a066edfb17b292e4823a8f4696470b2da7703`
+- changed surface: five canonical `research/spread-points-nextgen/` control files only
+- Phase 3 implementation: **NOT STARTED**
+- Candidate 5 implementation/training: **NOT STARTED**
+- production F-ST / Sunday Signal behavior: **UNCHANGED**
+
+This amendment inserts Phase 5 Candidate 5 historical F-ST-anchored integration, renumbers prospective shadow validation to Phase 6, and renumbers final synthesis/promotion to Phase 7. It does not alter the immediate Phase 3 next action.

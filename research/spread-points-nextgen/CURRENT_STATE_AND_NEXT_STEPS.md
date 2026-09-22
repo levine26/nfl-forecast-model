@@ -134,7 +134,14 @@ Phase 0 complete -> Phase 1 complete -> Phase 2 complete -> **Phase 3 controlled
 - Phase 3 implementation changes: **NONE**
 - Candidate 5 implementation/training: **NONE**
 - prohibited holdout inspection: **NONE**
-- CI/merge receipt: to be finalized from the exact PR head before merge
+- validated amendment head: `86bc790a47573833b3ede934784d5997c26f571d`
+- research firewall `35795292921`: **SUCCESS**
+- full research validation `35795292923`: **SUCCESS**
+- PR #545: **MERGED**
+- amendment merge SHA: `e51a066edfb17b292e4823a8f4696470b2da7703`
+- merged control files verified directly from `main`
+- production behavior: **UNCHANGED**
+- Phase 3: **NOT STARTED**
 
 ## Exact next action
 

@@ -256,6 +256,17 @@ Final closeout:
 - ablation report — TBD
 - statistical uncertainty report — TBD
 
+### Candidate 5 roadmap governance amendment
+
+- governance branch — `docs/spread-points-candidate5-program-amendment`
+- PR #545 — **MERGED**
+- validated head — `86bc790a47573833b3ede934784d5997c26f571d`
+- research firewall — `35795292921` **SUCCESS**
+- full research validation — `35795292923` **SUCCESS**
+- merge commit — `e51a066edfb17b292e4823a8f4696470b2da7703`
+- production change — none
+- Phase 3 / Candidate 5 implementation — none
+
 ### Phase 5 — planned: Candidate 5 historical F-ST-anchored winner integration
 
 Working candidate: `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`.
