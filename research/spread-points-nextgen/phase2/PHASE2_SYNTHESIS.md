@@ -300,3 +300,18 @@ No challenger is removed.
 - **D — CONDITIONAL; do not force**
 
 The shortlist remains three initial challengers because they answer genuinely different scientific questions with data that can be constructed under legal chronology.
+
+## Final pre-result chronology and D gate
+
+The closeout contract is fully deterministic:
+
+- reference training begins in **2016**;
+- inner validation targets begin in **2019** and use expanding prior-only history;
+- outer development targets are exactly **2022, 2023, 2024**;
+- A0 retains only the bounded half-life grid `[4,8,16,32]`;
+- B0 process states use fixed **8-team-game** EWMAs and remain independent of A0;
+- C0 is Ridge-only on frozen A0 plus the fixed M0/M1/M2/M3 market-null hierarchy;
+- every methodologically valid A0/B0/C0 reference receives the one-time Phase 4 2025 evaluation;
+- D is built for a target only if residual correlation is <0.90, pooled MAE improves by >=0.10 points, both 2023 and 2024 improve, and paired block-bootstrap P(improvement) is >=0.75.
+
+No Phase 3 challenger result existed when these constraints were frozen.

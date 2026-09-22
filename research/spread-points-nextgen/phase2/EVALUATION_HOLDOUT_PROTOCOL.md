@@ -54,33 +54,29 @@ The distinction must be disclosed in every final report.
 
 ## Core development target seasons
 
-Phase 3 development comparisons should use rolling-origin outer forecasts ending no later than 2024.
+The initial A0/B0/C0 training floor is **2016**. No pre-2016 game enters these reference candidates.
 
-For modern-feature families whose data begin in 2022:
+Mandatory rolling-origin outer development targets are exactly:
 
-- outer target 2022: train only on earlier qualified seasons;
-- outer target 2023: train through 2022;
-- outer target 2024: train through 2023.
+- outer target **2022**: refit on qualified 2016–2021 history after nested tuning;
+- outer target **2023**: refit on qualified 2016–2022 history after nested tuning;
+- outer target **2024**: refit on qualified 2016–2023 history after nested tuning.
 
-For Core/history-only structures with older coverage, earlier target seasons may be added to stabilize inner selection, but the modern 2022–2024 summary remains mandatory.
-
-### Frozen historical floor
-
-For the initial A0/B0/C0 references, eligible historical training begins with the **2016 regular season**. Inner validation target seasons begin with **2019**. This is a fixed design choice, not a tunable window: it keeps the initial program in the post-2015 scoring-rule environment while retaining multiple prior seasons for the first inner validation fold.
+No 2025 or completed-2026 outcome may enter Phase 3 fitting, transformation, tuning, residual-variance estimation, candidate identity, or D eligibility.
 
 ## Deterministic inner tuning
 
-Every hyperparameter, regularization strength, decay parameter and combination weight must be selected using data **strictly earlier than the outer test season**.
+Every hyperparameter, regularization strength and A0 decay parameter must be selected using data **strictly earlier than the outer test season**.
 
 For each outer target season `Y` in **2022, 2023, 2024**:
 
-1. restrict A0/B0/C0 eligible rows to seasons >= 2016;
-2. create expanding-window inner folds with validation season `2019 <= V < Y` and training seasons `2016..V-1` only;
-3. an inner fold is valid only when at least **two complete prior training seasons** exist;
-4. use the **latest four valid inner validation seasons**, or all valid seasons when fewer than three exist;
-5. if fewer than **two** valid inner validation seasons exist, do not tune from data; use the fixed candidate fallback in `BOUNDED_IMPLEMENTATION_SPEC.md`;
-6. fit every scaler, imputer, latent-state initialization, residual variance/covariance estimate and other learned preprocessing object on the inner training portion only;
-7. after choosing the hyperparameter setting, refit on all eligible data strictly before `Y` and emit the outer `Y` predictions.
+1. candidate training history begins in **2016**;
+2. construct expanding-window one-season inner validation folds with `V < Y` and **`V >= 2019`**;
+3. each inner training block is exactly qualified seasons `2016 ... V-1`;
+4. use the **latest four eligible inner validation seasons**, or all eligible seasons when fewer than four exist;
+5. every scaler, imputer, state initialization, residual variance/covariance estimate, clipping rule and other learned preprocessing object is fit on the inner training portion only;
+6. if fewer than **two** eligible inner validation seasons exist because a required source family lacks coverage, do not borrow later data; use the fixed fallback in `BOUNDED_IMPLEMENTATION_SPEC.md` and record `DEFAULT_INSUFFICIENT_INNER_HISTORY`;
+7. after choosing the hyperparameter setting, refit on all eligible 2016-through-`Y-1` history and emit the outer-`Y` prediction.
 
 No meta-model may be trained on the same OOF rows on which it is reported. No later season may be borrowed to make an early-season tuning problem easier.
 
@@ -324,12 +320,12 @@ D is target-specific. Margin and total are evaluated independently.
 
 D exists for a target only if all four conditions hold on common 2022–2024 outer-OOF rows:
 
-1. at least two eligible component error series have **absolute Pearson correlation <= 0.90**;
-2. the nested nonnegative convex blend has lower pooled target MAE than the best single component;
-3. the blend's MAE improvement has the same sign in at least **two of the three** outer seasons;
-4. season+week block-bootstrap probability that the blend has lower MAE than the best component is **>= 0.75**.
+1. at least two eligible component error series have **absolute Pearson correlation < 0.90**;
+2. the nested nonnegative convex blend improves pooled 2022–2024 target MAE by **at least 0.10 points** versus the best constituent;
+3. the blend has lower target MAE than the best constituent in **both 2023 and 2024**;
+4. season+week block-bootstrap probability that the blend has lower pooled MAE than the best constituent is **>= 0.75**.
 
-If any condition fails, record `ENSEMBLE_NOT_ELIGIBLE` for that target. No alternate stacker or gate may be searched.
+If any condition fails, record `ENSEMBLE_NOT_ELIGIBLE` for that target. No alternate stacker or eligibility gate may be searched.
 
 
 # 16. Phase 4 final-holdout interpretation

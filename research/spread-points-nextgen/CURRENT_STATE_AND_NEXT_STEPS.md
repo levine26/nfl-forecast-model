@@ -115,8 +115,8 @@ Once Phase 2 is formally complete, the next chat should:
 4. implement independent B0 bounded drive model;
 5. implement C0 Ridge residual reference and M0/M1/M2/M3 null hierarchy;
 6. run development OOS evaluation through 2024 only;
-7. run only preregistered sensitivities/ablations;
-8. determine D eligibility from development residual complementarity;
+7. run only the frozen A0/B0/C0 reference implementations and required null/diagnostic comparisons; do not open deferred A1/B-alternative/C-nonlinear searches;
+8. determine D eligibility only from the frozen numeric gate;
 9. freeze candidate identities;
 10. **do not score 2025**;
 11. stop for Phase 4.

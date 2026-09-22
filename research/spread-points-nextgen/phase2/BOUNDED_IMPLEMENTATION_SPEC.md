@@ -235,18 +235,20 @@ D is **target-specific** (margin and total are gated separately).
 
 Eligibility requires all of the following on common 2022–2024 outer-OOF rows:
 
-1. at least two eligible component error series have absolute Pearson correlation <= 0.90;
-2. a nonnegative, sum-to-one convex blend fitted only inside the nested training history improves the target MAE versus the best single component on the combined development OOF rows;
-3. the blend improvement has the same sign in at least two of the three outer target seasons (2022, 2023, 2024);
-4. season+week block bootstrap probability that the blend has lower MAE than the best component is >= 0.75.
+1. at least two eligible component error series have **absolute Pearson correlation < 0.90**;
+2. a nonnegative, sum-to-one convex blend fitted only inside nested prior-time history improves pooled 2022–2024 target MAE by **at least 0.10 points** versus the best single constituent;
+3. the blend has lower target MAE than the best constituent in **both 2023 and 2024**;
+4. season+week block-bootstrap probability that the blend has lower pooled MAE than the best constituent is **>= 0.75**.
 
-If any condition fails for a target, D does not exist for that target.
+If any condition fails for a target, record `ENSEMBLE_NOT_ELIGIBLE`; D does not exist for that target.
 
-No neural/meta-tree stack is authorized. No global all-target ensemble is inferred from a one-target gate.
+No neural/meta-tree stack, alternate gate, or global all-target ensemble is authorized.
 
 ---
 
 # Shared implementation rules
+
+Training data floor: **2016 season**. Mandatory outer development targets are **2022, 2023, 2024**. Inner validation targets begin in **2019** under the deterministic evaluation protocol.
 
 1. Same team/game identity contract across A/B/C.
 2. No result-season feature normalization using future rows.
@@ -266,6 +268,7 @@ This section records the final pre-result reconciliation after concurrent Phase 
 
 - **A:** A0 is the only initial Challenger A implementation. Explicit state-space A1 is deferred.
 - **B:** B0 is independent of A0; no A-derived predictor enters B0. Expected drives use the fixed Poisson design above. Negative Binomial, Gaussian alternatives, and `B0_PLUS_A0_STATE` are not initial Phase 3 candidates.
+- The fixed **8-team-game EWMA** applies to B0 process covariates only. A0 retains its preregistered observation half-life grid `[4, 8, 16, 32]`; C0 consumes frozen A0 outputs and does not create a separate EWMA-window search.
 - **C:** C0 is Ridge-only on the fixed A0 football base. GAM, spline, ElasticNet and tree residual variants are deferred.
 - **D:** D is target-specific and exists only if the objective complementarity gate in this document passes.
 - No weak development result authorizes opening a broader learner/feature search under the same candidate identity.
