@@ -763,14 +763,265 @@ Preserve failed challengers and negative findings.
 
 ---
 
-## PHASE 5 — PROSPECTIVE SHADOW VALIDATION & OPERATIONAL HARDENING
+## PHASE 5 — HISTORICAL F-ST-ANCHORED WINNER INTEGRATION
+
+**Working candidate ID:** `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`
+
+**Purpose:** Determine whether chronology-clean, out-of-fold Next-Gen football representations can identify systematic residual errors in the already strong frozen F-ST winner model and improve straight-up winner accuracy without materially degrading probability quality or merely copying a later sportsbook market.
+
+This phase is the planned convergence point between the Spread & Points program and the lessons from the separate Adaptive Weekly Learning program. It is a major learned challenger, not another hand-written adaptive gate, naive weekly refit, or replacement model trained from scratch.
+
+**Scientific rationale carried from Adaptive Weekly Learning**
+
+- `ADAPTIVE-RESIDUAL-STATE-V1` was rejected: 722/1,087 correct (66.4213%), approximately -1.7479 percentage points versus frozen F-ST, with 121 winner switches and only 42.15% accuracy on those switches; Brier and log loss were also worse.
+- `NAIVE-WEEKLY-FST-REFIT-CONTROL-V1` was rejected: 739/1,087 (67.9853%), approximately -0.184 pp versus F-ST, with 2/6 changed winners correct.
+- pick-preserving calibration retained all 741 F-ST winners and produced only very small Brier/log-loss improvements; calibration can improve proper scoring without creating winner-selection information.
+- Adaptive Candidate 2 was inconclusive because its mechanism was extremely sparse.
+- Adaptive Candidate 3 was inconclusive; its tiny apparent winner gain did not establish independent market-path information beyond contemporaneous market level.
+- Adaptive Candidate 4, `ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1`, remains a separate frozen prospective experiment. Its outcomes may not tune Candidate 5. Candidate 4 need not mature before Phases 3-5 of this program proceed.
+
+The resulting research question is narrower than broad model replacement:
+
+> Can independent, historically trained football representations identify the subset of cases in which frozen F-ST is systematically wrong?
+
+### Entry criteria
+
+Phase 5 may begin only when:
+
+- Phase 4 is `COMPLETE`;
+- A0, B0 and C0 implementation/evaluation are complete and frozen;
+- D disposition is known under its preregistered gate;
+- all underlying PIT/provenance checks are complete;
+- chronology-clean 2022-2024 OOF component predictions are preserved;
+- the one-time 2025 **underlying-model** holdout has been completed and documented;
+- negative Next-Gen results are preserved;
+- no completed-2026 result has been used to design Candidate 5;
+- a Candidate 5 evidence-boundary analysis is written;
+- Candidate 5 architecture, feature/component inclusion policy, tuning grid and evaluation protocol are frozen before Candidate 5 development outputs are inspected.
+
+Poor score MAE alone does not automatically exclude a methodologically valid component from Candidate 5 research because a component may contain complementary winner information. Conversely, no component is forced into the primary stack merely because it exists. The inclusion policy must be frozen in advance and justified without Candidate 5 outcome fishing.
+
+### Primary architecture
+
+The primary Candidate 5 model is an **F-ST-anchored residual probability model**:
+
+`logit(P_C5) = logit(P_FST) + learned_residual_correction`
+
+The F-ST logit is the incumbent anchor/offset. The residual correction must be strongly regularized toward zero so that unsupported additional signal collapses toward F-ST rather than creating broad speculative winner changes.
+
+The primary learner is a strongly regularized logistic residual/offset model. The compact feature contract should preferentially consume component-level OOF forecasts and uncertainty summaries rather than reconstructing a raw kitchen-sink football model.
+
+Subject to the final pre-result contract, candidate inputs may include:
+
+- incumbent channel: F-ST probability/logit and prespecified confidence/distance-from-0.5 summary;
+- A0 channel: OOF home-win probability, expected margin, compact latent offense/defense strength differences, forecast uncertainty;
+- B0 channel: OOF home-win probability, expected margin, expected total, score-distribution variance/tail summaries and compact scoring-process uncertainty;
+- disagreement channel: A0-vs-F-ST, B0-vs-F-ST, A0-vs-B0 and overall component dispersion;
+- low-dimensional context only when legal at the forecast horizon and preregistered.
+
+Do not explode A0/B0 back into dozens of redundant rolling features.
+
+A single shallow, strongly regularized nonlinear challenger may be preregistered **before any Candidate 5 results** only if scientifically justified. There is no open-ended XGBoost/CatBoost/neural/model-zoo search and no post-result rescue tournament.
+
+### Football-only primary versus market-aware diagnostic
+
+Candidate 5 must keep two families distinct.
+
+**Primary horizon-compatible football arm**
+
+- F-ST + eligible A0/B0 outputs + legal same-horizon context.
+- This is the primary architecture for testing whether independent football information improves the incumbent without relying on a later sportsbook state.
+
+**Historical market-aware diagnostic arm**
+
+- F-ST + A0/B0 + eligible C0/market information.
+- Historical nflverse market fields remain truthfully labeled **historical closing/late benchmark with opaque exact horizon**.
+- This arm may not be called T-120 and may not be deployed as though closing-like information existed at the F-ST production horizon.
+- A future same-horizon market-aware Candidate 5 requires enough genuinely timestamped same-horizon receipts and, when necessary, a separate candidate/version identity.
+
+### OOF stacking and chronology
+
+Every A0/B0/C0/D prediction used as a Candidate 5 training feature for a game must itself be a legitimate out-of-fold prediction for that game. In-sample base predictions are prohibited.
+
+Preserve the existing Next-Gen chronology unless a separately documented pre-result amendment is scientifically necessary:
+
+- initial training floor: 2016;
+- deterministic inner validation targets beginning 2019;
+- outer development targets: 2022, 2023, 2024;
+- final underlying-model historical holdout: 2025.
+
+Candidate 5 historical development evidence should use chronology-clean nested/OOF component surfaces, principally 2022-2024. No completed-2026 outcome may participate in architecture, feature selection, interactions, hyperparameters, thresholds, stack weights, calibration or candidate survival.
+
+### Candidate 5 evidence boundary and 2025
+
+Phase 4's 2025 result is an underlying-component holdout, **not automatically a pristine Candidate 5 holdout**. Candidate 5 is conceived after the program has already planned to inspect the underlying 2025 component results.
+
+Before Candidate 5 training begins, create an explicit evidence-boundary document stating what 2025 information has already been observed and what claims remain legitimate.
+
+Rules:
+
+- Candidate 5 architecture and tuning rules must be frozen without inspecting Candidate-5-specific 2025 outcome performance.
+- Do not select the best Candidate 5 version on 2025 and call 2025 untouched.
+- If frozen 2025 component predictions are later used as training inputs for the final prospective refit, disclose that 2025 no longer serves as a Candidate 5 holdout.
+- Honest historical Candidate 5 OOS estimates may be produced through nested chronology over 2022-2024.
+- Prospective Phase 6 evidence is mandatory for any promotion claim. Do not manufacture historical independence that does not exist.
+
+### Mandatory ablations
+
+On exact paired rows, report at minimum:
+
+1. frozen F-ST;
+2. F-ST + A0;
+3. F-ST + B0;
+4. F-ST + A0 + B0;
+5. Candidate 5 primary compact football model;
+6. eligible historical market-aware Candidate 5 diagnostic arm;
+7. raw A0 winner probability;
+8. raw B0 winner probability;
+9. market benchmark on compatible rows;
+10. any D-based version only if D exists legitimately.
+
+If a nonlinear Candidate 5 learner was preregistered before results, compare it directly with the regularized logistic residual reference. Preserve every mandatory ablation, not only the best result.
+
+### Evaluation
+
+Primary production-oriented estimand:
+
+`accuracy(Candidate5) - accuracy(F-ST)`
+
+on exact paired games.
+
+Mandatory reporting:
+
+- games;
+- F-ST correct;
+- Candidate 5 correct;
+- Candidate-5-only correct;
+- F-ST-only correct;
+- accuracy delta;
+- winner-change/switch rate;
+- accuracy on changed winners;
+- exact McNemar test where appropriate;
+- week/season-block bootstrap uncertainty;
+- Brier;
+- log loss;
+- calibration intercept/slope and reliability where supported;
+- season-by-season delta;
+- week/team concentration;
+- favorite-strength slices;
+- F-ST-confidence slices;
+- component-disagreement slices.
+
+Mechanism identity:
+
+`DeltaAccuracy = winner_change_rate * (2 * changed_winner_accuracy - 1)`
+
+Candidate 1 is the negative reference case: roughly 11.1% winner changes at ~42.15% changed-winner accuracy generated about -1.75 pp versus F-ST. Candidate 5 can improve winner accuracy only by making sufficiently selective, better-than-50% corrections.
+
+Winner accuracy is the primary production question, but a superficially higher classification rate cannot justify severe deterioration in Brier, log loss or calibration.
+
+### Pre-result research prior
+
+For planning only, not optimization:
+
+- current frozen F-ST historical benchmark: ~68.17%;
+- plausible sustainable Candidate 5 uplift hypothesis: approximately +0.4 to +0.8 percentage points;
+- rough corresponding range: approximately 68.6% to 69.0%.
+
+Interpretation is descriptive only:
+
+- ~0.0 to +0.25 pp: likely unresolved/noise;
+- +0.25 to +0.75 pp: potentially promising;
+- +0.75 to +1.25 pp: strong if robust;
+- >+1.25 pp: trigger an adversarial leakage/selection audit before believing it.
+
+Do not tune toward these numbers. Null and negative results are valid.
+
+### PIT/player/weather rules
+
+Candidate 5 V1 must remain viable without historically ambiguous QB, injury, OL, non-QB availability, weather, coaching or late-market information.
+
+No:
+
+- final starter state masquerading as earlier knowledge;
+- missing injury treated as healthy;
+- missing starter treated as stable;
+- realized weather treated as forecast weather;
+- closing market treated as an earlier line.
+
+Candidate 4's prospective market/QB infrastructure may later motivate a separately versioned Candidate 5.x extension, but Candidate 4 outcomes and accumulated evidence may not be used to tune Candidate 5 V1.
+
+### Candidate 5 must not become
+
+- another hand-written adaptive gate;
+- naive weekly F-ST retraining;
+- an unconstrained state-space search;
+- a high-dimensional kitchen-sink learner;
+- random K-fold cross-validation;
+- same-row base-model leakage;
+- dozens of rolling-window variants;
+- unrestricted hyperparameter searches;
+- XGBoost/CatBoost merely because they are powerful;
+- injury/starter hindsight;
+- realized-weather leakage;
+- closing-line-as-T-120 leakage;
+- 2025 model selection mislabeled as untouched;
+- completed-2026 architecture tuning;
+- winner-accuracy optimization that ignores probability-quality guardrails;
+- deletion of negative results;
+- production modification.
+
+### Required Phase 5 outputs
+
+Create durable artifacts substantially equivalent to:
+
+- `phase5/CANDIDATE5_RESEARCH_CHARTER.md`
+- `phase5/CANDIDATE5_EVIDENCE_BOUNDARY.md`
+- `phase5/CANDIDATE5_FEATURE_AND_COMPONENT_CONTRACT.md`
+- `phase5/CANDIDATE5_OOF_STACKING_PROTOCOL.md`
+- `phase5/CANDIDATE5_MODEL_SPECIFICATION.md`
+- `phase5/CANDIDATE5_ABLATION_PLAN.md`
+- `phase5/CANDIDATE5_EVALUATION_PROTOCOL.md`
+- `phase5/CANDIDATE5_HISTORICAL_RESULTS.md`
+- `phase5/CANDIDATE5_FREEZE_RECEIPT.json`
+- candidate registry/config/code/tests as appropriate.
+
+Names may follow repository conventions, but the scientific content must exist.
+
+### Exit criteria
+
+Phase 5 is complete only when:
+
+1. Candidate 5 architecture is frozen.
+2. OOF stacking provenance is proven.
+3. No base-prediction leakage exists.
+4. Candidate 5 chronology/evidence boundaries are explicit.
+5. Mandatory ablations are complete.
+6. Historical Candidate 5 performance is reported honestly.
+7. Brier/log loss/calibration guardrails are reported.
+8. Market-aware results use truthful horizon labels.
+9. Negative results are preserved.
+10. model/version/code SHA/configuration are immutable.
+11. Candidate 5 is explicitly classified as rejected, inconclusive-but-coherent, or eligible for prospective shadow validation.
+12. production remains unchanged.
+13. completed-2026 outcomes were not used for design/selection.
+14. program-control files are updated.
+15. research firewall and full research validation pass.
+
+A positive historical result does not authorize production.
+
+**Dependency:** Phase 4.
+
+---
+
+## PHASE 6 — PROSPECTIVE SHADOW VALIDATION & OPERATIONAL HARDENING
 
 **Purpose:** Determine whether historical improvement survives real future forecasts.
 
 **Entry criteria**
 
-- Phase 4 is `COMPLETE`.
-- At least one credible finalist exists.
+- Phase 5 is `COMPLETE`.
+- At least one credible finalist from the Next-Gen scoring program and/or Candidate 5 is eligible for prospective shadowing.
 - Prospective protocol and evidence threshold are frozen before evaluation begins.
 
 **Required prospective receipts**
@@ -797,7 +1048,23 @@ Freeze before kickoff immutable records containing, as appropriate:
 - data-quality flags;
 - source provenance.
 
-Append outcomes later. Grade separately. Never overwrite original predictions.
+For any eligible Candidate 5 finalist, receipts must additionally preserve:
+
+- Candidate 5 candidate ID/version;
+- code/config SHA;
+- frozen F-ST probability;
+- exact A0/B0/D or other component inputs actually used;
+- market-aware inputs only when valid at the declared horizon;
+- resulting Candidate 5 probability;
+- resulting winner;
+- source timestamps;
+- horizon identity;
+- missingness/data-quality status;
+- immutable content hash.
+
+Append outcomes later through a separate grader. Never overwrite original predictions.
+
+Candidate 4 remains an independent Adaptive-program prospective experiment. Its mature evidence may be summarized in the final synthesis, but its accumulating outcomes do not retroactively tune Candidate 5.
 
 Avoid Props-style monolithic evidence files. Prefer compact/sharded evidence.
 
@@ -825,37 +1092,43 @@ Also harden:
 
 **Exit criteria**
 
-Phase 5 is complete only when the preregistered prospective evidence requirement is satisfied and operational reliability is demonstrated.
+Phase 6 is complete only when the preregistered prospective evidence requirement is satisfied and operational reliability is demonstrated.
 
 Do not weaken this standard because historical results look strong.
 
-**Dependency:** Phase 4.
+**Dependency:** Phase 5.
 
 ---
 
-## PHASE 6 — FINAL SYNTHESIS & PROMOTION PACKAGE
+## PHASE 7 — FINAL SYNTHESIS & PROMOTION PACKAGE
 
 **Purpose:** Present the evidence needed for a human production decision.
 
 **Entry criteria**
 
-- Phase 5 is `COMPLETE`.
+- Phase 6 is `COMPLETE`.
 - Historical and prospective evidence is complete enough for a production decision.
 
 **Required final report**
 
-Explain:
+Explain and compare:
 
-- current model;
+- current frozen F-ST;
+- final Spread & Points football/score models;
+- sportsbook/market baselines;
+- Candidate 5 primary football-only model;
+- any legitimate same-horizon market-aware Candidate 5 variant;
+- Candidate 4 prospective evidence when mature enough to report;
+- failed Adaptive challengers;
+- failed Next-Gen challengers;
 - proposed architecture;
 - research performed;
 - external evidence;
 - data used;
-- features used;
+- features/components used;
 - player-model contribution;
 - market-residual contribution;
-- baseline performance;
-- challenger performance;
+- baseline/challenger performance;
 - historical holdout performance;
 - prospective performance;
 - calibration;
@@ -863,7 +1136,6 @@ Explain:
 - spread/points/total accuracy;
 - market-relative performance;
 - statistical uncertainty;
-- failed models;
 - ablations;
 - operational complexity;
 - data/API dependencies;
@@ -893,7 +1165,7 @@ Then **STOP**.
 
 The user must personally give the final green light. Do not merge or deploy a successor as official LevLine before that approval.
 
-**Dependency:** Phase 5.
+**Dependency:** Phase 6.
 
 ---
 
@@ -954,7 +1226,7 @@ No research result, however favorable, automatically changes production.
 
 Promotion requires all of the following:
 
-- Phase 0 through Phase 6 complete;
+- Phase 0 through Phase 7 complete;
 - historical chronology/holdout integrity preserved;
 - prospective evidence requirement satisfied;
 - operational reliability demonstrated;
