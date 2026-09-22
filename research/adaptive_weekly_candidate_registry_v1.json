@@ -1,0 +1,63 @@
+{
+  "registry_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE-REGISTRY-V1",
+  "governance_source": "research/ADAPTIVE_WEEKLY_LEARNING_RESEARCH_PLAN.md",
+  "production_candidate_frozen": false,
+  "candidates": [
+    {
+      "candidate_id": "F-ST-01-FROZEN-2026",
+      "role": "incumbent_control",
+      "mutable": false,
+      "2026_outcomes_used_for_fitting": 0
+    },
+    {
+      "candidate_id": "NAIVE-WEEKLY-FST-REFIT-CONTROL-V1",
+      "role": "negative_control",
+      "path": "research/adaptive_naive_weekly_refit_control_v1.py",
+      "mechanism": "refit market+PURE logistic stack after every completed week",
+      "promotion_eligible": false
+    },
+    {
+      "candidate_id": "ADAPTIVE-RESIDUAL-STATE-V1",
+      "role": "primary_adaptive_v1",
+      "path": "research/adaptive_residual_state_v1.py",
+      "mechanism": "Bayesian-shrinkage team residual state around F-ST",
+      "parameters": {
+        "initial_variance": 0.2,
+        "process_variance_per_week": 0.03,
+        "weekly_mean_reversion": 0.97,
+        "offseason_mean_reversion": 0.5,
+        "max_abs_state_logit": 1.0
+      },
+      "promotion_eligible": false
+    },
+    {
+      "candidate_id": "ADAPTIVE-CALIBRATION-INTERCEPT-V1",
+      "role": "probability_calibration_ablation",
+      "path": "research/adaptive_error_audit_calibration_v1.py",
+      "mechanism": "prior-week-only L2-shrunk logit intercept",
+      "parameters": {
+        "l2_penalty": 25.0,
+        "pick_preserving_primary_variant": true
+      },
+      "promotion_eligible": false
+    },
+    {
+      "candidate_id": "ADAPTIVE-SELECTIVE-SWITCH-GATE-V1",
+      "role": "decision_replacement_ablation",
+      "path": "research/adaptive_selective_switch_gate_v1.py",
+      "parameters": {
+        "incumbent_boundary_distance": 0.075,
+        "minimum_adaptive_shift": 0.035
+      },
+      "promotion_eligible": false
+    },
+    {
+      "candidate_id": "LEVLINE-ADAPTIVE-SENSITIVITY-V1",
+      "role": "robustness_diagnostic",
+      "path": "research/adaptive_sensitivity_v1.py",
+      "promotion_eligible": false,
+      "full_sample_best_may_be_promoted": false
+    }
+  ],
+  "prospective_rule": "A later production-eligible challenger must receive a new frozen candidate ID, exact commit SHA, config digest, and prospective start week after historical/adversarial validation."
+}
