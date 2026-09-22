@@ -1,88 +1,180 @@
-# LevLine Props 2.2 — Market-Residual & Calibration Challenger Preregistration
+# LevLine Props 2.2 — Market-Residual Future-Holdout Preregistration
 
-Status: FROZEN DESIGN BEFORE FUTURE-HOLDOUT FORECAST CAPTURE
-Research-only: yes
-Production authorization: no
-Baseline: frozen Props 2.1 (levline-props-2.1-sunday-v0.1)
-Motivation source: Week 2 prospective evaluation diagnosis only. Week 2 outcomes may not be used to fit, select, or validate a Props 2.2 winner.
+Status: **FROZEN DESIGN BEFORE FUTURE-HOLDOUT FORECAST CAPTURE**  
+Research-only: yes  
+Production authorization: no  
+Baseline: `levline-props-2.1-sunday-v0.1`
+
+Week 2 is diagnosis-only. Its outcomes may motivate the scientific question, but they may not fit coefficients, select a candidate, determine a prop-family exclusion, or validate a Props 2.2 winner.
 
 ## 1. Scientific objective
 
-Determine whether LevLine contains incremental player-prop information beyond the sportsbook market after correcting two prospectively observed failure modes: overconfident probabilities and raw Fair Lines that underperformed the contemporaneous market on the matched Week 2 cohort.
+Determine whether LevLine contains incremental player-prop information beyond the sportsbook market after the frozen Props 2.1 Week 2 cohort showed two prospective failure modes: raw Fair Lines underperformed contemporaneous market lines and model probabilities were overconfident / inferior on Brier and log loss.
 
-The forward-looking question is whether the residual disagreement between LevLine and the sportsbook contains predictive information when the market is treated as a strong prior rather than something to replace.
+The market is therefore treated as a strong point-in-time prior. The forward question is whether the residual disagreement between LevLine and the market contains predictive information.
 
 ## 2. Contamination boundary
 
-Prohibited: fitting coefficients to Week 2 outcomes; choosing a challenger after looking at Week 2 counterfactual performance; changing candidate weights after any future-holdout outcome is observed; rewriting frozen Props 2.1 receipts; changing official LevLine/F-ST winner-model code; using post-kickoff market data; or selecting only favorable prop families after outcome inspection.
+Before any future-holdout outcome is observed, the candidate grid, weights, eligibility rules, metrics, multiplicity rule and minimum evidence are frozen.
 
-## 3. Frozen challenger grid
+Prohibited:
+- fitting any coefficient to Week 2 outcomes;
+- testing counterfactual Week 2 candidate performance to choose weights;
+- changing the grid after any future-holdout outcome is known;
+- rewriting frozen Props 2.1 receipts;
+- post-kickoff market use;
+- retrospective signal relabeling or threshold search;
+- selecting favorable prop families after outcome inspection;
+- changing official LevLine/F-ST winner-model code.
 
-Let M be Props 2.1 Fair Line, L the contemporaneous sportsbook consensus line, p the Props 2.1 model probability for the evaluated side, and q the sportsbook no-vig probability when available.
+## 3. Definitions
 
-### P21_BASE
-Line = M. Probability = p. This is the unchanged prospective control.
+For an eligible point-in-time market observation:
 
-### P22_RESIDUAL_25
-Line = L + 0.25 × (M − L). Probability = p.
+- `M` = Props 2.1 Fair Line.
+- `L` = contemporaneous sportsbook consensus line captured before forecast/kickoff.
+- `p` = Props 2.1 probability for the evaluated side.
+- `q` = sportsbook no-vig probability for the same side, when available.
 
-### P22_RESIDUAL_50
-Line = L + 0.50 × (M − L). Probability = p.
+A residual line blend is `L + w(M-L)`.  
+A residual probability blend is `q + w(p-q)`.
 
-### P22_CAL_50
-Line = M. Probability = 0.5 + 0.50 × (p − 0.5).
+If the required market quantity is missing at the allowed horizon, the corresponding market-anchored challenger is unavailable for that observation. It may not be backfilled.
 
-### P22_RESIDUAL50_CAL50
-Line = L + 0.50 × (M − L). Probability = 0.5 + 0.50 × (p − 0.5).
+## 4. Frozen candidate grid
 
-Where q exists, also preserve p − q and M − L as diagnostic residuals. These residuals are not separately promoted models.
+### Control
 
-## 4. Why these weights are admissible
+**P21_BASE**  
+Line = `M`. Probability = `p`.
 
-The coefficients are simple prespecified fractions (0.25 and 0.50), not fitted to Week 2 errors. No coefficient is selected because it would have performed best retrospectively on Week 2. All candidates stay active through the required future holdout.
+### Mechanism ablations — descriptive only, not promotion eligible
+
+**P22_LINE_RESIDUAL_25**  
+Line = `L + 0.25(M-L)`. Probability = `p`.
+
+**P22_LINE_RESIDUAL_50**  
+Line = `L + 0.50(M-L)`. Probability = `p`.
+
+**P22_PROB_RESIDUAL_25**  
+Line = `M`. Probability = `q + 0.25(p-q)`.
+
+**P22_PROB_RESIDUAL_50**  
+Line = `M`. Probability = `q + 0.50(p-q)`.
+
+**P22_CAL_50**  
+Line = `M`. Probability = `0.5 + 0.50(p-0.5)`.
+
+These ablations diagnose whether any improvement comes from line anchoring, probability anchoring, or generic de-overconfidence. They cannot be promoted as a selected winner from this grid.
+
+### Primary promotion-eligible challengers
+
+**P22_COMBINED_25**  
+Line = `L + 0.25(M-L)`. Probability = `q + 0.25(p-q)`.
+
+**P22_COMBINED_50**  
+Line = `L + 0.50(M-L)`. Probability = `q + 0.50(p-q)`.
+
+The fractions 0.25 and 0.50 are simple prespecified shrinkage strengths, not fitted to Week 2 outcomes. Both remain active through the entire required future holdout.
 
 ## 5. Prospective capture requirements
 
-Every challenger receipt must preserve challenger ID, frozen coefficients, source Props 2.1 forecast ID, player/game/prop identity, model Fair Line/probability, sportsbook line/no-vig probability when available, provider/book count, market capture time, forecast time, data horizon, kickoff, role/availability/depth-chart state, research-only flags, and immutable receipt hash.
+Each challenger receipt must preserve:
 
-Chronology must prove market/data horizon <= forecast time < kickoff. Missing required market information makes the market-anchored challenger unavailable for that observation; it must not be backfilled.
+- challenger ID and frozen coefficient contract;
+- source Props 2.1 forecast ID and immutable source hash;
+- game/player/prop identity;
+- source model Fair Line and probability;
+- sportsbook line and no-vig probability used by the challenger;
+- provider/book count and dispersion when available;
+- market capture timestamp, forecast timestamp, data horizon and kickoff;
+- role/availability/depth-chart state;
+- research-only / production-ineligible flags;
+- immutable challenger receipt hash.
+
+Chronology must prove market/data horizon <= forecast time < kickoff.
 
 ## 6. Primary future-holdout metrics
 
-Projection accuracy: MAE, paired absolute-error difference versus the original sportsbook line, and game-clustered bootstrap confidence interval.
+For line markets:
 
-Probability accuracy: Brier score, log loss, paired difference versus sportsbook no-vig probability, and game-clustered confidence interval.
+- MAE;
+- paired absolute-error difference vs the original point-in-time sportsbook line;
+- game-clustered confidence interval.
 
-Calibration: fixed probability bins, expected calibration error, and calibration intercept/slope when sample size permits.
+For probability markets:
 
-Incremental residual signal: for continuous markets, regress outcome residual (actual − L) on model residual (M − L), with game-clustered uncertainty. Also report residual sign agreement and descriptive Pearson/Spearman association.
+- Brier score;
+- log loss;
+- paired differences vs sportsbook no-vig probability;
+- game-clustered confidence intervals.
 
-## 7. Secondary decompositions
+Calibration:
 
-Predeclared prop-family strata: QB passing yards, QB rushing yards, RB rushing yards, RB receiving yards, receptions, WR/TE receiving yards, passing TDs, and rushing/receiving/anytime TDs where probability semantics are compatible.
+- fixed probability bins;
+- ECE;
+- calibration intercept/slope when sample size permits.
 
-Also report book-count, stable-versus-uncertain role state, player availability state, and market-capture-horizon strata. These remain diagnostic unless minimum sample rules are met.
+Incremental residual signal:
 
-## 8. Minimum evidence thresholds
+- regress `actual - L` on `M - L` with game-clustered uncertainty;
+- residual sign agreement;
+- descriptive Pearson and Spearman association.
 
-Per-week reports are descriptive only. No promotion/model-selection claim before at least 3 future weeks, 30 finalized games, 1,000 market-matched observations, 250 observations for any prop-family superiority claim, game-clustered uncertainty, and no unresolved chronology/receipt-integrity violations.
+The original point-in-time sportsbook market remains the required comparator. Beating P21_BASE alone is insufficient.
 
-If thresholds are not met, continue prospective accumulation without changing the grid.
+## 7. Multiplicity and selection control
 
-## 9. Selection rule
+Only `P22_COMBINED_25` and `P22_COMBINED_50` are promotion-eligible.
 
-After minimum future-holdout evidence is reached, compare every challenger against both the original sportsbook market and P21_BASE. Require supported projection or probability improvement, non-degraded calibration, and clean chronology/governance. Document losing candidates as well as winners.
+At the prespecified terminal evaluation, primary market-relative comparisons across these two candidates use **Holm-Bonferroni control at family alpha 0.05**. Losing candidates remain reported.
 
-If no candidate shows credible incremental value, keep Props in research status and do not promote.
+A promotion claim additionally requires:
+- no degradation on both Brier and log loss for the probability component;
+- clean chronology and receipt integrity;
+- no material calibration deterioration;
+- minimum sample thresholds below.
+
+Mechanism ablations are explanatory only and cannot become the promoted winner based on this holdout.
+
+If neither primary challenger shows credible incremental value beyond the market, Props remains research-only.
+
+## 8. Minimum evidence
+
+No promotion/model-selection claim before all of:
+
+- at least 3 future weeks;
+- at least 30 finalized games;
+- at least 1,000 market-matched observations;
+- at least 250 observations for any prop-family superiority claim;
+- game-clustered uncertainty;
+- no unresolved chronology or receipt-integrity violation.
+
+Per-week reports are descriptive only.
+
+## 9. Predeclared decompositions
+
+Report, without post-hoc selection:
+
+- QB passing yards;
+- QB rushing yards;
+- RB rushing yards;
+- RB receiving yards;
+- receptions;
+- WR/TE receiving yards;
+- passing TDs;
+- rushing/receiving/anytime TDs where probability semantics are compatible;
+- book-count/liquidity;
+- stable vs uncertain role state;
+- availability state;
+- market-capture horizon.
+
+A subgroup result does not authorize a subgroup-specific production rule unless it meets the minimum sample requirement and is separately prospectively validated.
 
 ## 10. ROI boundary
 
-ROI is secondary and valid only for prospectively frozen signal decisions with captured executable prices. No retrospective threshold selection, no backfilled prices, and no using later market movement as if known at forecast time.
+ROI is secondary and valid only for prospectively frozen signal decisions with captured executable prices. No retrospective threshold selection, no backfilled prices, and no treating later market movement as available at forecast time.
 
-## 11. Opportunity vs efficiency attribution
-
-Preserve enough future-holdout decomposition to attribute central-estimate error to opportunity/volume, efficiency per opportunity, availability/role misses, and market disagreement. This is diagnostic and may not mutate the grid mid-holdout.
-
-## 12. Promotion firewall
+## 11. Promotion firewall
 
 Props 2.2 remains isolated research. It may not modify official LevLine/F-ST probabilities, winner-model features/weights, official pick locks, grading, existing frozen Props 2.1 receipts, or production labels implying verified market superiority.
