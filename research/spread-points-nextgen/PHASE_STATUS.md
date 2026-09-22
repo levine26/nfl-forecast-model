@@ -3,14 +3,15 @@
 **Program:** LevLine spread setting, team-point, margin, total, and joint-score research  
 **Authority:** `MASTER_PLAN.md`  
 **Last updated:** 2026-09-21 America/Los_Angeles  
-**Phase-0 base main:** `536d6ab712028e374b42815db106f9fcb5d28053`
+**Phase-0 base main:** `536d6ab712028e374b42815db106f9fcb5d28053`  
+**Phase-0 governance merge:** `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25` via PR #512
 
-Only one phase should normally be `IN PROGRESS`. Parallel lanes are permitted only within the active phase.
+Only one phase should normally be `IN PROGRESS`. Parallel lanes are permitted only within the active phase. After Phase 0 completion, no phase is active until the next Phase 1 chat begins work and marks Phase 1 `IN PROGRESS`.
 
 | Phase | Name | Status | Primary branch | Supporting PR(s) | Key evidence / artifacts | Entry criteria | Exit criteria | Last updated | Exact next action |
 |---|---|---|---|---|---|---|---|---|---|
-| 0 | Master Program Initialization | **IN PROGRESS** | `docs/spread-points-nextgen-phase0` | Pending docs/governance PR | `MASTER_PLAN.md`; this registry; current-state handoff; decision log; research index; verified F-ST/Props/firewall evidence | Existing repo accessible; current main and production boundary inspectable | Canonical files merged to `main`; docs-only checks pass; production unchanged; final handoff marks Phase 0 complete | 2026-09-21 | Finish remaining control files, open/validate/merge docs-governance PR, verify from `main`, then mark Phase 0 COMPLETE and Phase 1 NOT STARTED |
-| 1 | Current LevLine Audit, Baseline Reproduction & Error Decomposition | **NOT STARTED** | TBD | None | Future architecture/baseline/error/API reports | Phase 0 COMPLETE | Architecture documented; reproducible baseline; market baselines; residual decomposition; full data/API inventory; leakage/PIT risks; concrete hypotheses; no major baseline uncertainty | 2026-09-21 | Do not start until Phase 0 exit criteria are satisfied |
+| 0 | Master Program Initialization | **COMPLETE** | `docs/spread-points-nextgen-phase0` — merged | **#512 — MERGED** | Five canonical control files under `research/spread-points-nextgen/`; research firewall run `35691355664` **SUCCESS**; research validation run `35691355478` **SUCCESS**; merge `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25` verified from `main` | Existing repo accessible; current main and production boundary inspectable | **SATISFIED:** canonical plan/status/handoff/log/index merged to `main`; production firewall documented; future-chat protocol documented; docs-only diff verified; existing research firewall and validation gate passed; merged files re-read from `main` | 2026-09-21 | **STOP in the Phase 0 chat. Do not begin Phase 1 here.** |
+| 1 | Current LevLine Audit, Baseline Reproduction & Error Decomposition | **NOT STARTED** | TBD — use one primary Phase 1 audit branch | None | Future architecture/baseline/error/API reports | Phase 0 COMPLETE | Architecture documented; reproducible baseline; market baselines; residual decomposition; full data/API inventory; leakage/PIT risks; concrete hypotheses; no major baseline uncertainty | 2026-09-21 | **Next chat:** resolve current `main`; read all five canonical control files; inspect open PRs/active branches relevant to Phase 1; mark Phase 1 `IN PROGRESS`; create/use one primary Phase 1 audit branch; begin the current-architecture and baseline-reproduction audit. Do not implement challengers. |
 | 2 | Deep External Research & Challenger Design | **NOT STARTED** | TBD | None | Future literature/external-model reviews and preregistration | Phase 1 COMPLETE | Literature/external-model review; limited challenger shortlist; feature hypotheses; player/market-residual specs; preregistered evaluation and frozen holdout rules; data gaps identified | 2026-09-21 | Await Phase 1 completion |
 | 3 | Controlled Challenger Implementation | **NOT STARTED** | TBD | None | Future candidate implementations/tests/contracts | Phase 2 COMPLETE | Selected challengers implemented; tests pass; provenance/as-of semantics intact; explicit versions; reproducible research outputs; production unchanged | 2026-09-21 | Await Phase 2 completion |
 | 4 | Historical Validation, Ablation & Model Selection | **NOT STARTED** | TBD | None | Future holdout/ablation/uncertainty reports | Phase 3 COMPLETE | All preregistered challengers evaluated; holdout clean; ablations/uncertainty/robustness/market comparison complete; finalist or no-finalist determination documented | 2026-09-21 | Await Phase 3 completion |
@@ -29,3 +30,28 @@ Only one phase should normally be `IN PROGRESS`. Parallel lanes are permitted on
 A phase transition is not justified by code existing. The phase’s stated exit criteria must be satisfied and recorded in this file plus `CURRENT_STATE_AND_NEXT_STEPS.md`.
 
 Material reordering, collapsing, skipping, or redefining phases requires documented empirical necessity in `DECISION_LOG.md` and explicit user approval when it materially changes the program.
+
+## Phase 0 validation record
+
+PR #512 changed exactly five files, all under `research/spread-points-nextgen/`:
+
+- `MASTER_PLAN.md`
+- `PHASE_STATUS.md`
+- `CURRENT_STATE_AND_NEXT_STEPS.md`
+- `DECISION_LOG.md`
+- `RESEARCH_INDEX.md`
+
+No production code, outputs, workflows, site files, or frozen-model artifacts were changed.
+
+Validation:
+
+- `LevLine research firewall` run `35691355664`: **SUCCESS**
+- `LevLine research validation` run `35691355478`: **SUCCESS**
+  - foundation: success
+  - v0.8 isolated regeneration: success
+  - Phase 2 market reliance and horizon study: success
+  - paired statistical uncertainty audit: success
+  - margin disagreement forensics: success
+  - research validation gate: success
+
+The merged canonical files were then verified directly from `main` at merge SHA `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25`.
