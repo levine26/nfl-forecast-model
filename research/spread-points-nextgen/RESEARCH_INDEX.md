@@ -256,15 +256,46 @@ Final closeout:
 - ablation report — TBD
 - statistical uncertainty report — TBD
 
-### Phase 5 — planned
+### Phase 5 — planned: Candidate 5 historical F-ST-anchored winner integration
 
-- prospective receipt index — TBD
+Working candidate: `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`.
+
+Required future artifacts substantially equivalent to:
+
+- `phase5/CANDIDATE5_RESEARCH_CHARTER.md`
+- `phase5/CANDIDATE5_EVIDENCE_BOUNDARY.md`
+- `phase5/CANDIDATE5_FEATURE_AND_COMPONENT_CONTRACT.md`
+- `phase5/CANDIDATE5_OOF_STACKING_PROTOCOL.md`
+- `phase5/CANDIDATE5_MODEL_SPECIFICATION.md`
+- `phase5/CANDIDATE5_ABLATION_PLAN.md`
+- `phase5/CANDIDATE5_EVALUATION_PROTOCOL.md`
+- `phase5/CANDIDATE5_HISTORICAL_RESULTS.md`
+- `phase5/CANDIDATE5_FREEZE_RECEIPT.json`
+
+Cross-program evidence that Phase 5 must read rather than rediscover:
+
+- `research/ADAPTIVE_WEEKLY_LEARNING_RESEARCH_PLAN.md`
+- `research/ADAPTIVE_WEEKLY_LEARNING_CANDIDATE_REGISTRY.json`
+- `research/ADAPTIVE_WEEKLY_LEARNING_FIRST_RUN_RECEIPT.json`
+- `research/ADAPTIVE_WEEKLY_CANDIDATE4_PREREGISTRATION.md`
+- `research/ADAPTIVE_WEEKLY_CANDIDATE4_EVIDENCE_REVIEW.md`
+- Phase 2 A0/B0/C0 design and holdout contracts indexed above;
+- future Phase 3 OOF component surfaces and Phase 4 underlying-model holdout evidence.
+
+Candidate 4 continues prospectively and independently; its outcomes do not tune Candidate 5 V1.
+
+### Phase 6 — planned: prospective shadow validation / operational hardening
+
+- immutable prospective receipt index for eligible Next-Gen and Candidate 5 finalists — TBD
 - prospective grading report — TBD
 - operational-hardening report — TBD
+- Candidate 5 receipt fields must preserve F-ST anchor, exact component inputs, resulting probability/winner, horizon/source timestamps, data-quality state and immutable hash.
 
-### Phase 6 — planned
+### Phase 7 — planned: final synthesis / promotion package
 
 - final synthesis — TBD
+- explicit F-ST / Next-Gen / market / Candidate 5 comparison — TBD
+- Candidate 4 prospective evidence summary when mature enough — TBD
 - promotion package — TBD
 - migration/rollback plan — TBD
 - monitoring plan — TBD
