@@ -475,16 +475,42 @@ def build(
     }
 
 
-def _append_receipts(path: Path, payload: Mapping[str, Any]) -> int:
+def _append_receipts(
+    path: Path,
+    payload: Mapping[str, Any],
+    *,
+    source_payload: Mapping[str, Any] | None = None,
+) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: set[str] = set()
     if path.exists():
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 existing.add(str(json.loads(line).get("receipt_id")))
+    source_by_id: dict[str, Mapping[str, Any]] = {}
+    if isinstance(source_payload, Mapping):
+        source_rows = source_payload.get("forecasts")
+        if isinstance(source_rows, list):
+            source_by_id = {
+                str(item.get("forecast_id")): item
+                for item in source_rows
+                if isinstance(item, Mapping) and item.get("forecast_id")
+            }
+
     new = []
     for row in payload["forecasts"]:
         qa = row["qa"]
+        source_row = source_by_id.get(str(row.get("source_v1_forecast_id") or ""))
+        source_model = (
+            source_row.get("model")
+            if isinstance(source_row, Mapping) and isinstance(source_row.get("model"), Mapping)
+            else {}
+        )
+        source_provenance = (
+            source_row.get("provenance")
+            if isinstance(source_row, Mapping) and isinstance(source_row.get("provenance"), Mapping)
+            else {}
+        )
         receipt_forecast = {
             key: row.get(key) for key in (
                 "forecast_id", "source_v1_forecast_id", "player_id", "player_name", "team",
@@ -520,6 +546,34 @@ def _append_receipts(path: Path, payload: Mapping[str, Any]) -> int:
             )
         }
         receipt_forecast["market_state_sha256"] = _sha(row["market_state"])
+        if source_model:
+            interval = source_model.get("prediction_interval")
+            if not isinstance(interval, Mapping):
+                interval = {}
+            td_distribution = source_model.get("td_count_distribution")
+            if not isinstance(td_distribution, Mapping):
+                td_distribution = {}
+            raw_seed = _number(source_provenance.get("pure_simulation_seed"))
+            receipt_forecast["source_v1_distribution_evidence"] = {
+                "contract_version": "levline-props21-source-distribution-evidence-v0.1",
+                "source_model_version": source_model.get("version"),
+                "standard_deviation": _number(source_model.get("standard_deviation")),
+                "prediction_interval": {
+                    "low": _number(interval.get("low")),
+                    "high": _number(interval.get("high")),
+                    "coverage": _number(interval.get("coverage")),
+                },
+                "simulation_count": int(_number(source_model.get("simulation_count")) or 0),
+                "td_count_distribution": {
+                    str(key): _number(value)
+                    for key, value in td_distribution.items()
+                    if _number(value) is not None
+                },
+                "expected_tds": _number(source_model.get("expected_tds")),
+                "pure_simulation_seed": int(raw_seed) if raw_seed is not None else None,
+                "source_model_sha256": _sha(source_model),
+                "lossless_continuous_distribution_preserved": False,
+            }
         receipt = {
             "receipt_version": RECEIPT_VERSION,
             "receipt_id": row["forecast_id"],
@@ -603,13 +657,18 @@ def main() -> int:
     parser.add_argument("--credential-mode")
     args = parser.parse_args()
     generated = _aware(args.generated_at, "generated-at") if args.generated_at else datetime.now(timezone.utc)
-    payload = build(_load(args.input), _load(args.previews) if args.previews.exists() else {},
+    source_payload = _load(args.input)
+    payload = build(source_payload, _load(args.previews) if args.previews.exists() else {},
                     generated=generated, credential_mode=args.credential_mode,
                     manifests=_load_manifest_slate(args.manifest_slate),
                     depth_charts=_load_depth_charts(args.depth_charts))
     _write_json(args.output, payload)
     if args.receipts:
-        payload["audit"]["new_receipt_count"] = _append_receipts(args.receipts, payload)
+        payload["audit"]["new_receipt_count"] = _append_receipts(
+            args.receipts,
+            payload,
+            source_payload=source_payload,
+        )
         _write_json(args.output, payload)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
