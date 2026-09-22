@@ -277,14 +277,9 @@ A tiny average improvement driven by one season is not robust evidence. Energy s
 
 # 13. Complexity gate
 
-A more complex candidate survives only if it provides at least one of:
+The mandatory reference identities are A0, B0 and C0 only. A1/C1 are deferred and cannot be activated as outcome-dependent rescues.
 
-- robust primary-metric improvement;
-- materially better distribution calibration/sharpness;
-- unique complementary OOS information needed for an ensemble;
-- operational capability that a simpler candidate cannot provide.
-
-If a simple regularized model ties a complex model within uncertainty, prefer the simpler model.
+For any future preregistered extension, if a simple regularized model ties a complex model within uncertainty, prefer the simpler model.
 
 ---
 
@@ -309,7 +304,16 @@ D is the only component whose existence is development-gated; its objective gate
 
 ---
 
-# 15. Phase 4 final-holdout interpretation
+# 15. Paired-comparison discipline
+
+All development and holdout comparisons use exact common games for the models being compared.
+
+- A football-only candidate versus the current football-only baseline uses the common score-model game set.
+- C0 versus market uses only rows with the same historical market field present.
+- Missing external state is never imputed to enlarge a paired benchmark.
+- The game inclusion ledger is frozen before metrics are summarized.
+
+# 16. Phase 4 final-holdout interpretation
 
 The 2025 result is the final historical challenger holdout under this program.
 
