@@ -95,3 +95,26 @@ def test_frozen_roster_survives_complete_current_contraction() -> None:
     )
 
     assert roster == existing
+
+
+def test_bootstraps_latest_locked_week_when_current_is_empty() -> None:
+    official = pd.DataFrame([
+        {
+            **_row("2026_01_OLD_GAME", "2026-09-13", locked=True),
+            "week": 1,
+        },
+        _row("2026_02_DET_BUF", "2026-09-17", "20:15", locked=True),
+        _row("2026_02_CAR_ATL", "2026-09-20", "13:00", locked=True),
+        _row("2026_02_NYG_LA", "2026-09-21", "20:15", locked=True),
+    ])
+
+    roster = MODULE.build_roster(
+        pd.DataFrame(),
+        official,
+        {},
+        now_utc=datetime(2026, 9, 22, 4, 0, tzinfo=timezone.utc),
+    )
+
+    assert roster["season"] == 2026
+    assert roster["week"] == 2
+    assert roster["game_ids"] == ["2026_02_CAR_ATL", "2026_02_NYG_LA"]
