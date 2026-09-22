@@ -290,6 +290,7 @@ def build_qb_shock_rows(
         row = {
             "schema_version": "adaptive-candidate4-qb-shock-v1",
             "contract_id": CONTRACT_ID,
+            "depth_source": "nflverse_depth_charts_via_nflreadpy",
             "game_id": str(game["game_id"]),
             "home_team": home,
             "away_team": away,
@@ -327,3 +328,39 @@ def build_qb_shock_rows(
         ).hexdigest()
         output.append(row)
     return pd.DataFrame(output)
+
+
+
+def append_immutable_qb_state(
+    existing: pd.DataFrame | None,
+    new_rows: pd.DataFrame,
+) -> pd.DataFrame:
+    """Append first-seen QB states; any scientific rewrite fails closed."""
+    if existing is None or existing.empty:
+        return new_rows.copy().reset_index(drop=True)
+    required = {"game_id", "qb_state_sha256"}
+    if not required.issubset(existing.columns):
+        raise ValueError("existing Candidate 4 QB ledger lacks immutable identity fields")
+    if existing["game_id"].astype(str).duplicated().any():
+        raise ValueError("existing Candidate 4 QB ledger has duplicate game_id")
+
+    out = existing.copy()
+    known = {
+        str(row["game_id"]): str(row["qb_state_sha256"])
+        for row in out.to_dict("records")
+    }
+    additions: list[dict[str, Any]] = []
+    for row in new_rows.to_dict("records"):
+        game_id = str(row["game_id"])
+        digest = str(row["qb_state_sha256"])
+        if game_id in known:
+            if known[game_id] != digest:
+                raise ValueError(
+                    f"immutable Candidate 4 QB-state rewrite attempted for {game_id}"
+                )
+            continue
+        additions.append(row)
+        known[game_id] = digest
+    if additions:
+        out = pd.concat([out, pd.DataFrame(additions)], ignore_index=True, sort=False)
+    return out.reset_index(drop=True)
