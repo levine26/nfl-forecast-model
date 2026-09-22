@@ -80,7 +80,9 @@ LevLine does not copy nfelo's parameters, ATS objectives or current nonlinear ma
 
 **Open Source Football / nflverse** supports opponent-adjusted EPA and multilevel shrinkage using the same free ecosystem already available to LevLine.
 
-**davidsasser.com**, included explicitly at the user's request, is useful as a product architecture comparator because the public board clearly separates projected team scores, model projected line, market opening/current line and selection. The public material inspected does not disclose enough methodology, data chronology or frozen historical forecasts to treat its record as reproducible validation evidence.
+**davidsasser.com**, included explicitly at the user's request, is useful as a product architecture comparator because the public board clearly separates projected team scores, model projected line, market opening/current line and selection. A final targeted site/web/GitHub search found no reproducible current model specification, source repository, immutable PIT forecast archive or independent validation protocol. Its current record therefore remains product-level/opaque evidence, not scientific validation.
+
+The final evidence hierarchy is explicit: peer-reviewed work supports general statistical/football methodology; reproducible open-source systems support implementation ideas; practitioner systems do not become peer-reviewed evidence; and opaque performance claims are not imported into LevLine validation. Brill et al. (2024) remains classified as a strong technical preprint rather than peer-reviewed literature.
 
 ---
 
@@ -252,7 +254,7 @@ To avoid branch/model sprawl:
 | deliberately limited shortlist | A/B/C; D conditional |
 | davidsasser.com included | external review + literature/external inventory |
 
-Before Phase 2 can be marked **COMPLETE**, the branch must first be synchronized to the then-current `main`, fresh exact-head firewall and full research-validation checks must pass, PR #520 must be reviewable and merged, merged artifacts must be re-read from `main`, and the control files must record the exact Phase 3 start state.
+Before Phase 2 can be marked **COMPLETE**, fresh exact-head firewall and full research-validation checks must pass on the final synchronized branch head, PR #520 must be reviewable and merged, merged artifacts must be re-read from `main`, and the control files must record the exact Phase 3 start state.
 
 Phase 3 remains **NOT STARTED** in this chat.
 
