@@ -197,13 +197,20 @@ Additional Phase 1 control/evidence:
 
 External comparator explicitly carried into Phase 2: **davidsasser.com**.
 
-### Phase 2 — planned
+### Phase 2 — in progress / analytically complete pending CI
 
-- literature review — TBD
-- external-model review — TBD
-- challenger design/preregistration — TBD
-- frozen holdout protocol — TBD
-- paid-data memo, if any — TBD
+- literature review — `research/spread-points-nextgen/phase2/LITERATURE_REVIEW.md`
+- external-model review — `research/spread-points-nextgen/phase2/EXTERNAL_MODEL_REVIEW.md`
+- challenger design/preregistration — `research/spread-points-nextgen/phase2/CHALLENGER_PREREGISTRATION.md`
+- feature/player policy — `research/spread-points-nextgen/phase2/FEATURE_HYPOTHESES_AND_PLAYER_POLICY.md`
+- market-residual specification — `research/spread-points-nextgen/phase2/MARKET_RESIDUAL_SPECIFICATION.md`
+- frozen evaluation/holdout protocol — `research/spread-points-nextgen/phase2/EVALUATION_HOLDOUT_PROTOCOL.md`
+- data/source-gap report — `research/spread-points-nextgen/phase2/DATA_GAPS_AND_SOURCE_POLICY.md`
+- paid-data decision — `research/spread-points-nextgen/phase2/PAID_DATA_DECISION.md`
+- synthesis / Phase 3 handoff — `research/spread-points-nextgen/phase2/PHASE2_SYNTHESIS.md`
+- machine-readable design summary — `research/spread-points-nextgen/phase2/PHASE2_RESEARCH_SUMMARY.json`
+
+External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research.
 
 ### Phase 3 — planned
 

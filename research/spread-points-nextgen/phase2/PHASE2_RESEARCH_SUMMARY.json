@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": 2,
-  "status": "IN_PROGRESS_DESIGN_FROZEN",
+  "status": "ANALYTICALLY_COMPLETE_PENDING_CI",
   "production_changed": false,
   "user_required_external_source": "davidsasser.com",
   "initial_challengers": [
@@ -48,5 +48,28 @@
     "market residualization tested because market is stronger continuous baseline",
     "proper scoring rules for predictive distributions",
     "complexity must earn survival"
+  ],
+  "phase2_exit_criteria": {
+    "literature_review": true,
+    "external_model_review": true,
+    "davidsasser_review": true,
+    "candidate_architectures": true,
+    "feature_hypotheses": true,
+    "player_policy": true,
+    "market_residual_spec": true,
+    "evaluation_preregistered": true,
+    "final_historical_holdout": 2025,
+    "data_gaps_documented": true,
+    "paid_data_escalation": false
+  },
+  "external_evidence_highlights": [
+    "Glickman & Stern 1998 dynamic NFL state-space scores",
+    "Harville linear/mixed football ratings and NFL forecasts",
+    "Baker & McHale 2013 exact NFL score point-process forecasts",
+    "Boulier & Stekler NFL market/forecast research",
+    "Gneiting & Raftery proper scoring rules",
+    "nflWAR multilevel public-data player evaluation",
+    "nfelo open-source dynamic/market-regression architecture",
+    "davidsasser.com score-line-market product separation"
   ]
 }
