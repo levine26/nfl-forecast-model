@@ -40,17 +40,40 @@ def _now_utc(value: str | None) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def _active_slate_identity(current_records: list[dict]) -> tuple[int, int]:
-    identities: set[tuple[int, int]] = set()
+def _active_slate_identity(
+    current_records: list[dict],
+    editorial_game_ids: set[str] | None = None,
+) -> tuple[int, int]:
+    current_identities: set[tuple[int, int]] = set()
     for row in current_records:
         season = row.get("season")
         week = row.get("week")
         if pd.isna(season) or pd.isna(week):
             raise RuntimeError("Current editorial forecast row is missing season/week")
-        identities.add((int(season), int(week)))
+        current_identities.add((int(season), int(week)))
+    if len(current_identities) > 1:
+        raise RuntimeError(
+            "Current editorial forecast source must identify at most one season/week; "
+            f"found {sorted(current_identities)}"
+        )
+
+    roster_identities: set[tuple[int, int]] = set()
+    for game_id in editorial_game_ids or set():
+        match = _GAME_ID_RE.fullmatch(str(game_id))
+        if match is None:
+            continue
+        season_text, week_text, *_ = str(game_id).split("_", 3)
+        roster_identities.add((int(season_text), int(week_text)))
+    if len(roster_identities) > 1:
+        raise RuntimeError(
+            "Editorial roster must identify exactly one season/week; "
+            f"found {sorted(roster_identities)}"
+        )
+
+    identities = current_identities | roster_identities
     if len(identities) != 1:
         raise RuntimeError(
-            "Current editorial forecast source must identify exactly one season/week; "
+            "Canonical editorial inputs must identify exactly one season/week; "
             f"found {sorted(identities)}"
         )
     return next(iter(identities))
@@ -66,7 +89,7 @@ def build_canonical_editorial_predictions(
     """Select locked-first rows, restoring only explicitly authorized editorial games."""
     current_records = current.to_dict(orient="records")
     official_records = official.to_dict(orient="records")
-    season, week = _active_slate_identity(current_records)
+    season, week = _active_slate_identity(current_records, editorial_game_ids)
 
     current_by_game = {
         str(row.get("game_id")): row
