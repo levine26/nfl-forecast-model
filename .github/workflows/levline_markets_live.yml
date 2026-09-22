@@ -281,7 +281,7 @@ jobs:
             # mechanically from this just-generated, outcome-free Props 2.1 slate.
             python -m research.props.v22.capture_prospective \
               --source-json challenger_outputs/props21/public_challenger.json \
-              --output challenger_outputs/props22/forecast_originals.jsonl
+              --output challenger_outputs/props22/forecast_originals
 
             # History originals may rotate into immutable sub-100 MiB shards.
             # Stage the complete history tree so rotations preserve every row and stage the
