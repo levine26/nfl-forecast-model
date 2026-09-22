@@ -348,3 +348,42 @@ The first empirical comparisons are deliberately:
 5. residual-state + conservative selective switch gate.
 
 No threshold or hyperparameter is to be changed in response to those first results without recording a new candidate/version and the evidence boundary here.
+
+
+## 17. Pre-result robustness grid — frozen 2026-09-22
+
+This grid was recorded before the first integrated historical adaptive workflow produced results.
+
+### Residual-state sensitivity grid
+
+The fixed V1 candidate remains the primary first candidate:
+- initial variance: 0.20
+- process variance/week: 0.03
+- weekly mean reversion: 0.97
+- offseason mean reversion: 0.50
+- max absolute residual state: 1.00 logit
+
+Robustness-only grid:
+- process variance/week: [0.01, 0.03, 0.06]
+- weekly mean reversion: [0.90, 0.97, 1.00]
+- offseason mean reversion: [0.25, 0.50, 0.75]
+
+The 27 combinations must be reported as sensitivity evidence. The best full-sample 2022–2025 combination may **not** be promoted as a new candidate merely because it wins retrospectively.
+
+### Selective-gate sensitivity grid
+
+Primary V1 gate remains:
+- incumbent boundary distance: 0.075 probability
+- minimum adaptive shift: 0.035 probability
+
+Robustness-only grid:
+- boundary distance: [0.05, 0.075, 0.10]
+- minimum adaptive shift: [0.02, 0.035, 0.05]
+
+Again, the full-sample best combination is descriptive only.
+
+### Permitted nested selection diagnostic
+
+A separate diagnostic may select among the predeclared grid using only chronologically earlier seasons and then score a later season. It must label the training seasons and target season explicitly. No target season may influence its own parameter choice.
+
+This grid is a robustness / falsification device, not authorization for post-result parameter rescue.
