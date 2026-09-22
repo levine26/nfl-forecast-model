@@ -235,3 +235,48 @@ To avoid branch/model sprawl:
 | davidsasser.com included | external review + literature/external inventory |
 
 Once exact-head PR checks pass, Phase 2 can be marked **COMPLETE** and Phase 3 can begin in a later substantive chat.
+
+## Red-team closeout findings
+
+The final Phase 2 hostile review attempted to invalidate the shortlist and produced the following conclusions.
+
+### A and B are sufficiently distinct — after hardening
+
+A forecasts team scoring from dynamic, partially pooled offense/defense strength.
+
+B forecasts scoring through **possession count plus discrete drive outcomes**. To prevent hidden convergence, the independent B0 reference is now required to run without A0 predictions. Only one labeled OOF A-state sensitivity is permitted afterward.
+
+### A is not allowed to become an open-ended state-space search
+
+A0 is the initial A identity. Explicit A1 state-space variants are deferred behind a new preregistration amendment. This avoids using a weak A0 result as permission to search transition equations.
+
+### B is identifiable with current free data
+
+nflverse PBP provides enough historical game/drive structure to construct the bounded drive process, subject to drive-taxonomy QA. B does not require proprietary tracking data or a play-sequence simulator.
+
+### C may simply learn zero — and that is acceptable
+
+Residual sportsbook error is noisy and plausibly close to unpredictable. C therefore retains the exact market-only null and now has a fixed M0/M1/M2/M3 hierarchy separating market calibration from football information. C0 is Ridge-only.
+
+### Development sample size argues for less complexity, not more
+
+The mandatory modern OOS target seasons are only 2022–2024 before the 2025 holdout. That sample does not justify a large learner/feature tournament. The closeout specification removes the ElasticNet bake-off, tree fallback, automatic A1 search, and B estimator bake-off.
+
+### 2025 remains a transparent imperfect holdout
+
+Phase 1 inspected baseline 2025 failures, so 2025 is not philosophically pristine. No A/B/C output existed at that time. Phase 2 found no superior historical alternative that would both remain recent and avoid prior architecture exposure. The protection is therefore candidate freeze now, zero Phase 3 2025 challenger inspection, one Phase 4 opening, and required Phase 5 prospective evidence.
+
+### Player/weather deferral is methodological, not convenience
+
+The reason QB/personnel/weather are conditional is source chronology: the repository lacks a uniform 2022–2025 fixed-horizon starter/availability history and qualified historical forecast-weather archive. Hindsight states are not permitted to rescue a challenger.
+
+### Final shortlist
+
+No challenger is removed.
+
+- **A — IMPLEMENT reference only**
+- **B — IMPLEMENT independent bounded reference**
+- **C — IMPLEMENT Ridge residual reference with mandatory market nulls**
+- **D — CONDITIONAL; do not force**
+
+The shortlist remains three initial challengers because they answer genuinely different scientific questions with data that can be constructed under legal chronology.
