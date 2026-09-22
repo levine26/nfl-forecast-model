@@ -9,7 +9,6 @@ Scientific evidence remains capped at T-60; the grace period never expands the s
 
 import argparse
 from datetime import datetime, timedelta, timezone
-import importlib.metadata
 import json
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -18,7 +17,7 @@ import pandas as pd
 
 from research.adaptive_candidate4_qb_shock_v1 import (
     append_immutable_qb_state,
-    build_qb_shock_rows,
+    build_qb_shock_rows_from_snapshots,
 )
 
 PROCESSING_GRACE_MINUTES = 10
@@ -113,20 +112,6 @@ def candidate_cohorts(
     return [by_key[key] for key in sorted(by_key)]
 
 
-def _load_depth_2026() -> tuple[pd.DataFrame, str]:
-    import nflreadpy as nfl
-
-    frame = nfl.load_depth_charts([2026])
-    if hasattr(frame, "to_dicts"):
-        depth = pd.DataFrame(frame.to_dicts())
-    elif isinstance(frame, pd.DataFrame):
-        depth = frame.copy()
-    else:
-        depth = pd.DataFrame(frame)
-    version = importlib.metadata.version("nflreadpy")
-    return depth, version
-
-
 def _verify_parser_authority(path: Path) -> dict:
     receipt = json.loads(path.read_text(encoding="utf-8"))
     if receipt.get("status") != "PASS" or receipt.get("qualification_passed") is not True:
@@ -144,6 +129,7 @@ def run(
     archive_dir: Path,
     output_csv: Path,
     parser_receipt_path: Path,
+    qb1_snapshot_path: Path,
     now_utc: datetime | None = None,
 ) -> dict:
     now = now_utc or datetime.now(timezone.utc)
@@ -171,16 +157,19 @@ def run(
             "completed_2026_outcomes_used": 0,
         }
 
-    depth, version = _load_depth_2026()
+    qb1_snapshots = (
+        pd.read_csv(qb1_snapshot_path)
+        if qb1_snapshot_path.exists() and qb1_snapshot_path.stat().st_size
+        else pd.DataFrame()
+    )
     additions: list[pd.DataFrame] = []
     for games in cohorts:
-        rows = build_qb_shock_rows(
-            depth,
+        rows = build_qb_shock_rows_from_snapshots(
+            qb1_snapshots,
             archive_dir=archive_dir,
             games=games,
         )
         if not rows.empty:
-            rows["nflreadpy_version"] = version
             additions.append(rows)
 
     new_rows = pd.concat(additions, ignore_index=True, sort=False) if additions else pd.DataFrame()
@@ -194,7 +183,7 @@ def run(
         "rows_added": int(added),
         "ledger_rows": int(len(combined)),
         "cohorts_processed": int(len(cohorts)),
-        "nflreadpy_version": version,
+        "qb1_snapshot_source": str(qb1_snapshot_path),
         "processing_grace_minutes": PROCESSING_GRACE_MINUTES,
         "research_only": True,
         "production_authorized": False,
@@ -219,11 +208,17 @@ def main() -> None:
         type=Path,
         default=Path("research/inactive_article_cohort_parser_v2_receipt.json"),
     )
+    parser.add_argument(
+        "--qb1-snapshots",
+        type=Path,
+        default=Path("research_outputs/adaptive_candidate4/qb1_t120_snapshots.csv"),
+    )
     args = parser.parse_args()
     result = run(
         archive_dir=args.archive_dir,
         output_csv=args.output_csv,
         parser_receipt_path=args.parser_receipt,
+        qb1_snapshot_path=args.qb1_snapshots,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
 
