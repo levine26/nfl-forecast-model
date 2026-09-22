@@ -17,20 +17,39 @@ from typing import Callable
 
 from research.run_market_capture_v2 import capture as market_capture
 
-OBSERVABILITY_SCHEMA = "levline-market-capture-observability-v1"
+OBSERVABILITY_SCHEMA = "levline-market-capture-observability-v2"
+
+
+def _configured_sources() -> list[str]:
+    sources: list[str] = []
+    if os.getenv("PROPLINE_API_KEY", "").strip():
+        sources.append("propline")
+    if os.getenv("THE_ODDS_API_KEY", "").strip():
+        sources.append("the_odds_api")
+    return sources
+
+
+def _redact_secrets(text: str) -> str:
+    safe = str(text)
+    for name in ("PROPLINE_API_KEY", "THE_ODDS_API_KEY"):
+        value = os.getenv(name, "").strip()
+        if value:
+            safe = safe.replace(value, "[REDACTED]")
+    return safe
 
 
 def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def _safe_receipt(result: dict, *, api_key_configured: bool) -> dict:
+def _safe_receipt(result: dict, *, configured_sources: list[str]) -> dict:
     receipt = dict(result)
     receipt.update(
         {
             "observability_schema": OBSERVABILITY_SCHEMA,
             "observed_at_utc": _iso_now(),
-            "api_key_configured": bool(api_key_configured),
+            "api_key_configured": bool(configured_sources),
+            "configured_market_sources": list(configured_sources),
             "api_key_value_recorded": False,
             "research_only": True,
             "production_authorized": False,
@@ -46,28 +65,33 @@ def run_observed_capture(
     *,
     status_path: str = "research_outputs/market_capture_v2/status.json",
     quota_reserve: int = 50,
+    min_close_books: int = 2,
     capture_fn: Callable[..., dict] = market_capture,
 ) -> tuple[dict, int]:
     status_file = Path(status_path)
-    api_key_configured = bool(os.getenv("THE_ODDS_API_KEY", "").strip())
+    configured_sources = _configured_sources()
     exit_code = 0
 
     try:
-        result = capture_fn(status_path=status_path, quota_reserve=quota_reserve)
+        result = capture_fn(
+            status_path=status_path,
+            quota_reserve=quota_reserve,
+            min_close_books=int(min_close_books),
+        )
     except Exception as exc:  # preserve evidence before surfacing the original failure
         result = {
             "status": "error",
             "reason": "collector_exception",
             "error_type": type(exc).__name__,
-            "error": str(exc)[:500],
+            "error": _redact_secrets(str(exc))[:500],
             "external_request_made": None,
         }
         exit_code = 1
 
-    if result.get("reason") == "missing_api_key":
+    if result.get("reason") in {"missing_api_key", "missing_market_api_key"}:
         exit_code = max(exit_code, 2)
 
-    receipt = _safe_receipt(result, api_key_configured=api_key_configured)
+    receipt = _safe_receipt(result, configured_sources=configured_sources)
     status_file.parent.mkdir(parents=True, exist_ok=True)
     status_file.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return receipt, exit_code
@@ -77,11 +101,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--status", default="research_outputs/market_capture_v2/status.json")
     parser.add_argument("--quota-reserve", type=int, default=50)
+    parser.add_argument("--min-close-books", type=int, default=2)
     args = parser.parse_args()
 
     receipt, exit_code = run_observed_capture(
         status_path=args.status,
         quota_reserve=args.quota_reserve,
+        min_close_books=args.min_close_books,
     )
     print(json.dumps(receipt, indent=2, sort_keys=True))
     raise SystemExit(exit_code)

@@ -1,6 +1,6 @@
 # LevLine Adaptive Weekly Learning — Research Plan & Execution Ledger
 
-Status: CANDIDATE 3 COMPLETE — INCONCLUSIVE — AWAITING USER DIRECTION  
+Status: CANDIDATE 4 PREREGISTERED — CI / LIVE SOURCE QUALIFICATION  
 Repository: `levine26/nfl-forecast-model`  
 Authoritative branch for this plan: `main`  
 Primary objective: determine whether leakage-safe weekly learning can improve LevLine straight-up NFL winner accuracy beyond frozen `F-ST-01-FROZEN-2026` without degrading calibration, robustness, or scientific validity.
@@ -948,3 +948,41 @@ If the program later continues, the next defensible design should be prospective
 3. qualified QB/player-news timing where available.
 
 No production promotion is authorized by Candidate 3.
+
+
+## 24. Candidate 4 execution state — started 2026-09-22
+
+Candidate ID: `ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1`  
+Integration branch: `research/adaptive-weekly-learning-c4-integration`  
+Base main SHA: `d448f618c8427ed96e1fa1f3d5d76749504bebfb`  
+Production authorization: **false**  
+Completed 2026 outcomes permitted for Candidate 4 design/selection: **0**
+
+### Scientific question
+
+After conditioning on the market level actually known at the prediction horizon, do strict point-in-time market-path residuals and independently timestamped football-information shocks add incremental winner-selection information beyond frozen `F-ST-01-FROZEN-2026`?
+
+### Prospective boundary
+
+Candidate 4 uses a new prospective clock. No game may enter its target sample unless the complete candidate specification and immutable lock contract were committed before that game's relevant lock. Completed 2026 games may be inspected only for schema, capture reliability, timestamps, missingness, and source integrity.
+
+The first possible **primary** Candidate 4 cohort is Week 3 Sunday, September 27, 2026. For the 13:00 ET cohort, nominal T-120 is **2026-09-27T15:00:00Z** and nominal T-60 is **2026-09-27T16:00:00Z**. Thursday ATL–GB remains market/source diagnostic only because the frozen primary QB inactive-source semantics are Sunday-specific.
+
+### Parallel lane state
+
+- Lane A — external research: **COMPLETE FOR V1 FREEZE**. User-supplied Samford, nfl-data-py/nflverse, Congelio, and Quinnipiac sources were reviewed and mapped to Candidate 4 versus future challenger families.
+- Lane B — PIT/source audit: **INFRASTRUCTURE HARDENED; LIVE QUALIFICATION PENDING**. One-sided horizon timing is enforced end-to-end; the legacy credential-bearing error receipt was redacted at branch head; PropLine failover is wired but requires a configured secret/live qualifying capture. Candidate 4's scheduler retries until a five-book capture is present, while the pre-existing LevLine 4 market contract remains unchanged at its original two-book qualification floor. The current market ledger still has no qualified Candidate 4 primary rows.
+- Lane C — architecture: **FROZEN** at preregistration commit `74ecd303545c09f57593546472d27438e3d8a204`: a conservative T-60 selective information-arrival gate anchored to the frozen production F-ST lock, with explicit level-only, path-only, QB-only, and combined controls.
+- Lane D — power/sample plan: **FROZEN**. Candidate 4 is switch-count limited; one remaining season is treated primarily as prospective falsification/mechanism evidence, not sufficient proof of a small long-run uplift.
+- Lane E — immutable shadow/CI: **IMPLEMENTED ON INTEGRATION BRANCH; CI PENDING**. Content-hashed one-sided T-120 QB1 snapshots, T-60 inactive comparisons that consume only those frozen snapshots, content-hashed T-60 decision rows, strict market freshness/provider gates, immutable rewrite rejection, and dedicated research-data persistence are implemented.
+- Preregistration: **FROZEN** at `74ecd303545c09f57593546472d27438e3d8a204`.
+- Prospective predictions locked: **0**.
+- Games graded: **0**.
+
+### Current source judgment
+
+Existing repository infrastructure already enforces one-sided strict T-120/T-60/T-45/T-30 market cutoffs and preserves official NFL injury/inactive evidence prospectively. Candidate 4 additionally freezes each due game's bilateral QB1 identity in a content-hashed T-120 snapshot; the T-60 QB-shock job may consume only that frozen snapshot and may not re-query depth charts. Missing T-120 identity evidence fails closed. Live Candidate 4 market-path evidence still requires the first successful five-book qualified capture.
+
+### Immediate next action
+
+Open and validate the Candidate 4 research PR. If CI passes, integrate the research-only infrastructure before Week 3 Sunday. Live shadow collection begins only when a zero-cost multi-book market source passes the frozen quality gates and official inactive/depth evidence satisfies the frozen QB source contract. Missing evidence fails closed; production F-ST remains unchanged.

@@ -66,7 +66,9 @@ def due_horizons(kickoff_utc: datetime, now_utc: datetime) -> list[dict[str, Any
     for label, minutes in HORIZONS.items():
         target = kickoff - timedelta(minutes=minutes)
         error = (now - target).total_seconds() / 60.0
-        if abs(error) <= CAPTURE_TOLERANCE_MINUTES:
+        # Strict PIT rule: a nominal T-minus capture may be early but never late.
+        # Positive error means information observed after the declared cutoff.
+        if -CAPTURE_TOLERANCE_MINUTES <= error <= 0.0:
             out.append({"horizon": label, "target_timestamp_utc": target, "timing_error_minutes": error})
     return out
 
@@ -213,6 +215,7 @@ def consensus_row(book_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
 
     identity_fields = (
         "game_id",
+        "market_provider",
         "event_id",
         "provider_commence_time_utc",
         "home_team",
@@ -230,6 +233,11 @@ def consensus_row(book_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
     if any(not key for key in sportsbook_keys) or len(set(sportsbook_keys)) != len(sportsbook_keys):
         return None
 
+    provider_names = {str(row.get("market_provider") or "").strip() for row in valid}
+    if len(provider_names) > 1:
+        return None
+    market_provider = next(iter(provider_names)) if provider_names else ""
+
     spread_values = [float(row["home_spread"]) for row in valid if row.get("home_spread") is not None]
     total_values = [float(row["total_points"]) for row in valid if row.get("total_points") is not None]
     freshness = [float(row["freshness_minutes"]) for row in valid if row.get("freshness_minutes") is not None]
@@ -238,6 +246,7 @@ def consensus_row(book_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
     return {
         "row_type": "consensus",
         "game_id": template["game_id"],
+        "market_provider": template.get("market_provider"),
         "event_id": template.get("event_id"),
         "provider_commence_time_utc": template.get("provider_commence_time_utc"),
         "provider_kickoff_delta_minutes": template.get("provider_kickoff_delta_minutes"),
@@ -250,6 +259,7 @@ def consensus_row(book_rows: list[dict[str, Any]]) -> dict[str, Any] | None:
         "timing_error_minutes": template["timing_error_minutes"],
         "sportsbook_key": "sportsbook_consensus",
         "sportsbook_title": "Robust sportsbook consensus",
+        "market_provider": market_provider or None,
         "h2h_home_no_vig": median_logit(probs),
         "home_spread": median(spread_values) if spread_values else None,
         "total_points": median(total_values) if total_values else None,

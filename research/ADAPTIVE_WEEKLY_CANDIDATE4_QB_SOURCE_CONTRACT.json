@@ -1,0 +1,95 @@
+{
+  "contract_id": "ADAPTIVE-CANDIDATE4-QB-SHOCK-SOURCE-V1",
+  "status": "PREREGISTERED_BEFORE_FIRST_WEEK3_PRIMARY_EXECUTION",
+  "candidate_id": "ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1",
+  "preregistration_sha": "74ecd303545c09f57593546472d27438e3d8a204",
+  "season": 2026,
+  "supported_scope": "Sunday due-game cohorts beginning Week 3",
+  "production_authorized": false,
+  "completed_2026_outcomes_used_for_design_or_selection": 0,
+  "t120_qb1_source": {
+    "provider": "nflverse depth charts via nflreadpy",
+    "loader": "nflreadpy.load_depth_charts([2026])",
+    "source_time_field": "dt",
+    "required_fields": [
+      "dt",
+      "team",
+      "player_name",
+      "gsis_id",
+      "pos_abb",
+      "pos_rank"
+    ],
+    "decision_rule": "for each due team choose the latest snapshot timestamp dt <= nominal T-120; within that snapshot require exactly one QB row with pos_rank == 1 and non-empty gsis_id/player_name",
+    "source_semantics": "2025+ depth-chart records carry ISO8601 load timestamp dt suitable for point-in-time assignment",
+    "future_snapshot_use_prohibited": true,
+    "fuzzy_identity_prohibited": true,
+    "capture_policy": {
+      "nominal_horizon": "T-120",
+      "one_sided_tolerance_minutes": 7.5,
+      "capture_must_be_no_later_than_target": true,
+      "source_row_timestamp_must_be_no_later_than_capture": true,
+      "immutable_snapshot_ledger": "research_outputs/adaptive_candidate4/qb1_t120_snapshots.csv",
+      "later_depth_requery_for_t60_shock": false
+    }
+  },
+  "inactive_source": {
+    "archive_id": "NFL-INACTIVE-ARTICLE-SOURCE-2026-V1",
+    "parser_contract": "NFL-INACTIVE-ARTICLE-COHORT-PARSER-2026-V2",
+    "parser_receipt_status_required": "PASS",
+    "known_by_time": "archive captured_at_utc",
+    "eligible_known_by_rule": "after incumbent production lock and <= nominal T-60",
+    "due_game_cohort_required": true,
+    "exact_due_team_coverage_required": true,
+    "emergency_third_qb_alone_is_starter_loss": false
+  },
+  "name_identity": {
+    "method": "exact normalized team plus player name",
+    "normalization": [
+      "Unicode NFKC",
+      "casefold",
+      "strip punctuation/non-alphanumeric",
+      "collapse whitespace",
+      "strip common suffixes jr/sr/ii/iii/iv"
+    ],
+    "fuzzy_matching": false,
+    "one_to_many_guessing": false,
+    "mismatch_policy": "unresolved_fail_closed"
+  },
+  "shock": {
+    "home_qb1_newly_inactive": -1,
+    "away_qb1_newly_inactive": 1,
+    "complete_evidence_no_t120_qb1_inactive": 0,
+    "player_value_magnitude_authorized": false,
+    "manual_override_authorized": false,
+    "llm_probability_judgment_authorized": false
+  },
+  "evidence_required": [
+    "game_id",
+    "kickoff_utc",
+    "t120_target_utc",
+    "t60_target_utc",
+    "home_t120_qb1_player_name",
+    "home_t120_qb1_gsis_id",
+    "home_t120_depth_timestamp_utc",
+    "away_t120_qb1_player_name",
+    "away_t120_qb1_gsis_id",
+    "away_t120_depth_timestamp_utc",
+    "qb1_snapshot_sha256",
+    "qb1_snapshot_captured_at_utc",
+    "inactive_capture_timestamp_utc",
+    "inactive_source_url",
+    "inactive_raw_sha256",
+    "qb_shock_direction",
+    "source_qualified",
+    "qb_state_complete"
+  ],
+  "failure_policy": {
+    "missing_depth_state": "INCOMPLETE",
+    "ambiguous_qb1": "INCOMPLETE",
+    "inactive_article_missing_due_team": "INCOMPLETE",
+    "inactive_capture_after_t60": "INCOMPLETE",
+    "unresolved_exact_name_identity": "INCOMPLETE",
+    "later_capture_may_repair_prior_game": false
+  },
+  "schema_clarification": "Bilateral QB1 evidence fields and immutable T-120 capture policy; scientific shock rule unchanged."
+}

@@ -1,0 +1,127 @@
+name: Adaptive Candidate 4 T-120 QB1 snapshot
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/adaptive_candidate4_qb1_snapshot_v1.py'
+      - 'research/run_adaptive_candidate4_qb1_snapshot_v1.py'
+      - 'research/test_adaptive_candidate4_qb1_snapshot_v1.py'
+      - '.github/workflows/research_adaptive_candidate4_qb1_t120_v1.yml'
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install T-120 snapshot test dependencies
+        run: >-
+          python -m pip install
+          pytest
+          'pandas==3.0.5'
+          'beautifulsoup4>=4.12'
+      - name: Validate immutable T-120 QB1 capture
+        run: >-
+          PYTHONPATH="$PWD/src:$PWD"
+          python -m pytest -q
+          research/test_adaptive_candidate4_qb1_snapshot_v1.py
+
+  capture:
+    concurrency:
+      # T-120 has a narrow one-sided window and occurs before inactive capture starts.
+      group: adaptive-candidate4-qb1-t120-v1
+      cancel-in-progress: false
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Restore existing Candidate 4 source ledger
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/inactive-snapshots-v1:refs/remotes/origin/research-data/inactive-snapshots-v1 || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
+            mkdir -p research_outputs
+            if git ls-tree -d --name-only origin/research-data/inactive-snapshots-v1               research_outputs/adaptive_candidate4 |               grep -q '^research_outputs/adaptive_candidate4$'; then
+              git archive origin/research-data/inactive-snapshots-v1                 research_outputs/adaptive_candidate4 | tar -xf -
+            fi
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install pinned T-120 source dependency
+        run: >-
+          python -m pip install
+          'pandas==3.0.5'
+          'nflreadpy==0.1.5'
+          'beautifulsoup4>=4.12'
+
+      - name: Capture immutable T-120 QB1 identities
+        id: snapshot
+        continue-on-error: true
+        run: >-
+          PYTHONPATH="$PWD/src:$PWD"
+          python -m research.run_adaptive_candidate4_qb1_snapshot_v1
+
+      - name: Persist T-120 QB1 evidence away from main
+        if: always()
+        run: |
+          set -euo pipefail
+          DATA_DIR=research_outputs/adaptive_candidate4
+          if [ ! -s "$DATA_DIR/qb1_t120_snapshots.csv" ]; then
+            echo 'No Candidate 4 T-120 QB1 snapshot rows are ready.'
+            exit 0
+          fi
+
+          rm -rf /tmp/adaptive_candidate4
+          cp -R "$DATA_DIR" /tmp/adaptive_candidate4
+
+          git config user.name 'levline-research-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/inactive-snapshots-v1; then
+            git checkout -B candidate4-qb1-data origin/research-data/inactive-snapshots-v1
+          else
+            git checkout -B candidate4-qb1-data
+          fi
+
+          mkdir -p research_outputs
+          rm -rf research_outputs/adaptive_candidate4
+          cp -R /tmp/adaptive_candidate4 research_outputs/adaptive_candidate4
+          git add research_outputs/adaptive_candidate4/
+          if git diff --cached --quiet; then
+            echo 'Candidate 4 T-120 QB1 ledger unchanged.'
+            exit 0
+          fi
+          git commit -m 'Capture prospective Candidate 4 T-120 QB1 state'
+          git push origin HEAD:research-data/inactive-snapshots-v1
+
+      - name: Surface snapshot failure after evidence preservation
+        if: always()
+        run: |
+          if [ "${{ steps.snapshot.outcome }}" != 'success' ]; then
+            echo 'Candidate 4 T-120 QB1 capture failed; any evidence produced was preserved.' >&2
+            exit 1
+          fi

@@ -121,12 +121,22 @@ def _qualified_consensus_rows(market: pd.DataFrame) -> pd.DataFrame:
 
     valid_horizon = work["horizon"].astype(str).isin(HORIZONS)
     valid_prob = work["prob_num"].gt(0.0) & work["prob_num"].lt(1.0)
-    valid_timing = work["timing_error_num"].abs().le(float(CAPTURE_TOLERANCE_MINUTES))
+    valid_timing = (
+        work["timing_error_num"].ge(-float(CAPTURE_TOLERANCE_MINUTES))
+        & work["timing_error_num"].le(0.0)
+    )
     valid_time = work[["request_dt", "target_dt", "kickoff_dt"]].notna().all(axis=1)
+    no_later_than_cutoff = work["request_dt"].le(work["target_dt"])
     pregame = work["request_dt"].lt(work["kickoff_dt"])
     enough_books = work["source_count_num"].ge(int(MIN_CONSENSUS_BOOKS))
     work = work[
-        valid_horizon & valid_prob & valid_timing & valid_time & pregame & enough_books
+        valid_horizon
+        & valid_prob
+        & valid_timing
+        & valid_time
+        & no_later_than_cutoff
+        & pregame
+        & enough_books
     ].copy()
     if work.empty:
         return work
