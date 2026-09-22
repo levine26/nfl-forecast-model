@@ -21,7 +21,7 @@ def _consensus(
     target: str = "2026-09-13T16:15:00Z",
     kickoff: str = "2026-09-13T17:00:00Z",
     probability: float = 0.62,
-    source_count: int = 5,
+    source_count: int = 4,
     timing_error: float = 0.0,
 ) -> dict:
     return {
@@ -38,7 +38,7 @@ def _consensus(
         "sportsbook_key": "sportsbook_consensus",
         "h2h_home_no_vig": probability,
         "source_count": source_count,
-        "source_names": "book1|book2|book3|book4|book5",
+        "source_names": "book1|book2|book3|book4",
         "max_freshness_minutes": 3.0,
         "probability_range": 0.025,
         "research_only": True,
