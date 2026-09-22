@@ -330,25 +330,31 @@ def build_evaluation_events(
             "market_book_count": market_state.get("book_count"),
             "market_line_dispersion": market_state.get("line_dispersion"),
             "qa_flag_count": len((forecast.get("qa") or {}).get("flag_codes") or []),
+            "grade_eligibility_status": "PENDING",
         }
 
         game_id = str(forecast["game_id"])
         if game_id not in completed_games:
             audit["not_final"] += 1
+            metadata[fid]["grade_eligibility_status"] = "NOT_FINAL"
             continue
         if game_id not in outcome_pbp_games:
             audit["missing_final_pbp"] += 1
+            metadata[fid]["grade_eligibility_status"] = "MISSING_FINAL_PBP"
             continue
         player_id = str(forecast["player_id"])
         snaps = participation.get((game_id, player_id))
         if snaps is None:
             audit["missing_participation"] += 1
+            metadata[fid]["grade_eligibility_status"] = "MISSING_PARTICIPATION"
             continue
         if int(snaps) <= 0:
             audit["zero_offense_snaps_void"] += 1
+            metadata[fid]["grade_eligibility_status"] = "ZERO_OFFENSE_SNAPS_VOID"
             continue
         prop = str(forecast["prop_type"])
         actual = float(actuals.get((game_id, player_id, prop), 0.0))
+        metadata[fid]["grade_eligibility_status"] = "GRADED"
         grades.append(
             {
                 "history_contract_version": "levline-props-history-v0.1",
@@ -402,6 +408,7 @@ def enrich_detail(detail: pd.DataFrame, metadata: Mapping[str, Mapping[str, Any]
         "market_book_count",
         "market_line_dispersion",
         "qa_flag_count",
+        "grade_eligibility_status",
     ):
         out[field] = out["forecast_id"].map(
             lambda fid: metadata.get(str(fid), {}).get(field)
