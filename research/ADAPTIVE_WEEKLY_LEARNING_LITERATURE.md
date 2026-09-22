@@ -278,11 +278,16 @@ Status: pre-result support for `ADAPTIVE-REGIME-SHOCK-GATE-V1`. This section doc
 
 ### David Sasser — current public implementation evidence
 
-Source: https://www.davidsasser.com/cfb
+Sources:
+- https://www.davidsasser.com/cfb
+- https://github.com/davidsasser
+- https://github.com/davidsasser/NFL-BIG-DATA-BOWL-2026
 
-The current public board exposes projected scores / projected lines together with opening and current market lines and a running performance record. That is useful professional-practice evidence for retaining an independent model view and market-state comparison rather than collapsing them into one opaque number. The public surface still does not disclose a weekly retraining or regime-switch algorithm, so it is **not** evidence for a particular adaptive implementation.
+The current public CFB board exposes projected scores / projected lines together with opening and current market lines and a running performance record. That is useful professional-practice evidence for retaining an independent model view and market-state comparison rather than collapsing them into one opaque number.
 
-Candidate 2 implication: preserve component/model direction and contemporaneous state as separate channels; do not infer undisclosed update mechanics.
+Sasser's public GitHub profile was also inspected. The visible football-specific NFL repository, `NFL-BIG-DATA-BOWL-2026`, is a player-tracking / trajectory modeling project rather than the public CFB winner/spread engine. Its visible `Pranav Predictions/prediction.py` combines weekly 2023 tracking files, engineers player-role/position features, and compares regression models; the shown script uses a random `train_test_split(..., random_state=42)`, not a chronology-safe weekly winner replay. The repository therefore provides useful evidence of his broader modeling practice but **does not expose a weekly retraining, market-integration, or regime-switch algorithm that can be copied into LevLine**.
+
+Candidate 2 implication: preserve component/model direction and contemporaneous market/state as separate channels; do not infer undisclosed update mechanics from Sasser's public site. His GitHub is informative context, not validation of Candidate 2's architecture or thresholds.
 
 ### Macrì-Demartino, Egidi & Torelli (2026) — sparse dynamic regime adaptation
 
