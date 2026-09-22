@@ -56,7 +56,12 @@ def _regression_oof(
             "game_id", "season", "week", "gameday", "away_team", "home_team",
             "home_score", "away_score", "margin", "game_total", "spread_line",
             "total_line", "home_moneyline", "away_moneyline", "market_home_prob",
-            "rest_diff",
+            "rest_diff", "home_elo", "away_elo", "elo_home_prob",
+            "diff_win_ewma", "diff_off_epa_ewma", "diff_def_epa_allowed_ewma",
+            "diff_pass_epa_ewma", "diff_rush_epa_ewma", "diff_success_rate_ewma",
+            "diff_off_epa_l3", "diff_off_epa_l8", "diff_pass_epa_l3", "diff_pass_epa_l8",
+            "diff_rush_epa_l3", "diff_rush_epa_l8", "diff_success_rate_l3",
+            "diff_success_rate_l8", "diff_win_l3", "diff_win_l8",
         ) if c in work.columns
     ]
 
@@ -155,6 +160,38 @@ def _bucket(value: float, defs) -> str | None:
     return None
 
 
+def _block_bootstrap_error_delta(
+    frame: pd.DataFrame,
+    model_error: pd.Series,
+    market_error: pd.Series,
+    *,
+    samples: int = 5000,
+    seed: int = 26,
+) -> dict:
+    work = pd.DataFrame({
+        "season": pd.to_numeric(frame["season"], errors="coerce"),
+        "week": pd.to_numeric(frame["week"], errors="coerce"),
+        "delta": pd.to_numeric(model_error, errors="coerce") - pd.to_numeric(market_error, errors="coerce"),
+    }).dropna()
+    work["_block"] = work["season"].astype(int).astype(str) + "_" + work["week"].astype(int).astype(str)
+    blocks = sorted(work["_block"].unique())
+    values = {block: work.loc[work["_block"].eq(block), "delta"].to_numpy(dtype=float) for block in blocks}
+    rng = np.random.default_rng(seed)
+    draws = np.empty(int(samples), dtype=float)
+    for i in range(int(samples)):
+        chosen = rng.choice(blocks, size=len(blocks), replace=True)
+        draws[i] = float(np.concatenate([values[block] for block in chosen]).mean())
+    return {
+        "games": int(len(work)),
+        "blocks": int(len(blocks)),
+        "model_minus_market_mae": float(work["delta"].mean()),
+        "ci95": [float(np.quantile(draws, 0.025)), float(np.quantile(draws, 0.975))],
+        "bootstrap_probability_model_better": float(np.mean(draws < 0.0)),
+        "samples": int(samples),
+        "block": "season+week",
+    }
+
+
 def _error_rows(frame: pd.DataFrame) -> pd.DataFrame:
     rows: list[dict] = []
 
@@ -219,6 +256,37 @@ def _error_rows(frame: pd.DataFrame) -> pd.DataFrame:
         for label, part in frame.groupby("rest_bucket"):
             add("rest_differential", label, part)
 
+    frame["market_favorite_side"] = np.select(
+        [frame["market_margin"] > 0, frame["market_margin"] < 0],
+        ["home_favorite", "away_favorite"],
+        default="pickem",
+    )
+    for label, part in frame.groupby("market_favorite_side"):
+        add("market_favorite_side", label, part)
+
+    if "div_game" in frame.columns:
+        div = pd.to_numeric(frame["div_game"], errors="coerce")
+        for label, part in frame.groupby(np.where(div.eq(1), "division", "non_division")):
+            add("division_game", label, part)
+
+    if "roof" in frame.columns:
+        roof = frame["roof"].fillna("unknown").astype(str).str.lower()
+        frame["roof_bucket"] = np.where(
+            roof.str.contains("dome|closed", regex=True),
+            "enclosed",
+            np.where(roof.str.contains("outdoor|open", regex=True), "open_air_or_open_roof", "other_or_unknown"),
+        )
+        for label, part in frame.groupby("roof_bucket"):
+            add("roof_state", label, part)
+
+    if {"home_elo", "away_elo"}.issubset(frame.columns):
+        elo_gap = (pd.to_numeric(frame["home_elo"], errors="coerce") - pd.to_numeric(frame["away_elo"], errors="coerce")).abs()
+        frame["elo_strength_gap"] = pd.cut(
+            elo_gap, bins=[-np.inf, 50, 100, np.inf], labels=["<50", "50-100", "100+"], right=False
+        )
+        for label, part in frame.groupby("elo_strength_gap", observed=True):
+            add("pregame_elo_gap", str(label), part)
+
     for side in ("home_team", "away_team"):
         if side in frame.columns:
             for team, part in frame.groupby(side):
@@ -252,12 +320,37 @@ def _process_diagnostics(pbp: pd.DataFrame) -> pd.DataFrame:
         sacks = pd.to_numeric(valid.get("sack", 0), errors="coerce").fillna(0)
         qb_hits = pd.to_numeric(valid.get("qb_hit", 0), errors="coerce").fillna(0)
         possessions = np.nan
+        red_zone_opportunities = np.nan
+        red_zone_td_rate = np.nan
         if "drive" in valid.columns and "posteam" in valid.columns:
-            possessions = float(valid[["posteam", "drive"]].dropna().drop_duplicates().shape[0])
+            drive_keys = valid[["posteam", "drive"]].dropna().drop_duplicates()
+            possessions = float(drive_keys.shape[0])
+            if "yardline_100" in valid.columns and "touchdown" in valid.columns:
+                drive = valid[["posteam", "drive", "yardline_100", "touchdown"]].dropna(subset=["posteam", "drive"]).copy()
+                drive["yardline_100"] = pd.to_numeric(drive["yardline_100"], errors="coerce")
+                drive["touchdown"] = pd.to_numeric(drive["touchdown"], errors="coerce").fillna(0)
+                drive_summary = drive.groupby(["posteam", "drive"], observed=True).agg(
+                    reached_red_zone=("yardline_100", lambda s: bool((s <= 20).any())),
+                    touchdown=("touchdown", "max"),
+                )
+                rz = drive_summary[drive_summary["reached_red_zone"]]
+                red_zone_opportunities = float(len(rz))
+                red_zone_td_rate = float(rz["touchdown"].mean()) if len(rz) else np.nan
+        fg_result = valid.get("field_goal_result", pd.Series(index=valid.index, dtype=object)).astype(str).str.lower()
+        made_field_goals = float(fg_result.eq("made").sum())
+        special = pd.to_numeric(valid.get("special_teams_play", 0), errors="coerce")
+        if not isinstance(special, pd.Series):
+            special = pd.Series(float(special), index=valid.index)
+        special = special.fillna(0).eq(1)
+        touchdowns = pd.to_numeric(valid.get("touchdown", 0), errors="coerce")
+        if not isinstance(touchdowns, pd.Series):
+            touchdowns = pd.Series(float(touchdowns), index=valid.index)
+        special_teams_tds = float((special & touchdowns.fillna(0).eq(1)).sum())
         rows.append({
             "game_id": game_id,
             "realized_offensive_plays": int(len(valid)),
             "realized_pass_rate": float(pass_attempts / denom) if denom else np.nan,
+            "realized_rush_rate": float(rush_attempts / denom) if denom else np.nan,
             "realized_mean_epa": float(epa.mean()) if epa.notna().any() else np.nan,
             "realized_success_rate": float(success.mean()) if success.notna().any() else np.nan,
             "realized_explosive_20plus_rate": float((yards >= 20).mean()) if yards.notna().any() else np.nan,
@@ -265,6 +358,10 @@ def _process_diagnostics(pbp: pd.DataFrame) -> pd.DataFrame:
             "realized_sacks": float(sacks.sum()),
             "realized_qb_hits": float(qb_hits.sum()),
             "realized_possessions_proxy": possessions,
+            "realized_red_zone_opportunities": red_zone_opportunities,
+            "realized_red_zone_td_rate": red_zone_td_rate,
+            "realized_made_field_goals": made_field_goals,
+            "realized_special_teams_tds": special_teams_tds,
         })
     return pd.DataFrame(rows)
 
@@ -277,7 +374,9 @@ def _correlations(frame: pd.DataFrame) -> dict:
         "realized_offensive_plays", "realized_pass_rate", "realized_mean_epa",
         "realized_success_rate", "realized_explosive_20plus_rate",
         "realized_turnovers", "realized_sacks", "realized_qb_hits",
-        "realized_possessions_proxy",
+        "realized_possessions_proxy", "realized_rush_rate",
+        "realized_red_zone_opportunities", "realized_red_zone_td_rate",
+        "realized_made_field_goals", "realized_special_teams_tds",
     ):
         if col not in frame.columns:
             continue
@@ -339,6 +438,14 @@ def run(output_dir: str = "research_outputs/spread_points_phase1", config_path: 
     merged["market_margin_error_abs"] = (merged["actual_margin"] - merged["market_margin"]).abs()
     merged["market_total_error_abs"] = (merged["actual_total"] - pd.to_numeric(merged["total_line"], errors="coerce")).abs()
     merged["model_market_gap"] = merged["model_margin"] - merged["market_margin"]
+
+    diagnostic_schedule_cols = [
+        c for c in ["game_id", "div_game", "roof", "location", "stadium"]
+        if c in bundle.schedules.columns
+    ]
+    if len(diagnostic_schedule_cols) > 1:
+        schedule_diag = bundle.schedules[diagnostic_schedule_cols].drop_duplicates("game_id", keep="last")
+        merged = merged.merge(schedule_diag, on="game_id", how="left", validate="one_to_one")
 
     margin_sigma = float(margin_fit["residual_std"])
     total_sigma = float(total_fit["residual_std"])
@@ -428,6 +535,33 @@ def run(output_dir: str = "research_outputs/spread_points_phase1", config_path: 
         },
     }
 
+    modern = merged[pd.to_numeric(merged["season"], errors="coerce").ge(2023)].copy()
+    baseline["modern_2023_2025"] = {
+        "games": int(len(modern)),
+        "home_points": _numeric_metrics(modern["actual_home_score"], modern["model_home_score"]),
+        "away_points": _numeric_metrics(modern["actual_away_score"], modern["model_away_score"]),
+        "margin": _numeric_metrics(modern["actual_margin"], modern["model_margin"]),
+        "market_spread": _numeric_metrics(modern["actual_margin"], modern["market_margin"]),
+        "total": _numeric_metrics(modern["actual_total"], modern["model_total"]),
+        "market_total": _numeric_metrics(modern["actual_total"], pd.to_numeric(modern["total_line"], errors="coerce")),
+    }
+    baseline["paired_model_vs_market_uncertainty"] = {
+        "margin_mae": _block_bootstrap_error_delta(
+            merged,
+            (merged["actual_margin"] - merged["model_margin"]).abs(),
+            (merged["actual_margin"] - merged["market_margin"]).abs(),
+            samples=5000,
+            seed=426,
+        ),
+        "total_mae": _block_bootstrap_error_delta(
+            merged,
+            (merged["actual_total"] - merged["model_total"]).abs(),
+            (merged["actual_total"] - pd.to_numeric(merged["total_line"], errors="coerce")).abs(),
+            samples=5000,
+            seed=427,
+        ),
+    }
+
     non_ties = ~np.isclose(merged["actual_margin"], 0.0)
     baseline["winner"]["tie_excluded_sensitivity"] = {
         "games": int(non_ties.sum()),
@@ -513,8 +647,66 @@ def run(output_dir: str = "research_outputs/spread_points_phase1", config_path: 
         "note": "uses chronology-clean historical F-ST analogue; public production bridge uses official frozen probability plus margin sigma",
     }
 
+    window_pairs = [
+        ("diff_off_epa_l3", "diff_off_epa_l8"),
+        ("diff_pass_epa_l3", "diff_pass_epa_l8"),
+        ("diff_rush_epa_l3", "diff_rush_epa_l8"),
+        ("diff_success_rate_l3", "diff_success_rate_l8"),
+        ("diff_win_l3", "diff_win_l8"),
+    ]
+    standardized_parts = []
+    for short_col, long_col in window_pairs:
+        if short_col not in merged.columns or long_col not in merged.columns:
+            continue
+        diff = (pd.to_numeric(merged[short_col], errors="coerce") - pd.to_numeric(merged[long_col], errors="coerce")).abs()
+        scale = float(pd.to_numeric(merged[long_col], errors="coerce").std(ddof=1))
+        if np.isfinite(scale) and scale > 0:
+            standardized_parts.append(diff / scale)
+    if standardized_parts:
+        merged["recent_form_window_disagreement"] = pd.concat(standardized_parts, axis=1).mean(axis=1)
+        q25, q75 = merged["recent_form_window_disagreement"].quantile([0.25, 0.75])
+        low = merged[merged["recent_form_window_disagreement"] <= q25]
+        high = merged[merged["recent_form_window_disagreement"] >= q75]
+        recent_form_instability = {
+            "definition": "mean standardized absolute L3-vs-L8 disagreement across offense/pass/rush/success/win pregame features",
+            "corr_with_abs_margin_error": float(merged["recent_form_window_disagreement"].corr((merged["actual_margin"] - merged["model_margin"]).abs())),
+            "corr_with_abs_total_error": float(merged["recent_form_window_disagreement"].corr((merged["actual_total"] - merged["model_total"]).abs())),
+            "bottom_quartile_games": int(len(low)),
+            "bottom_quartile_margin_mae": float((low["actual_margin"] - low["model_margin"]).abs().mean()),
+            "top_quartile_games": int(len(high)),
+            "top_quartile_margin_mae": float((high["actual_margin"] - high["model_margin"]).abs().mean()),
+            "diagnostic_only": True,
+        }
+    else:
+        recent_form_instability = {"status": "unavailable"}
+
+    market_signal_overlap = {
+        "independent_margin_vs_market_margin_correlation": float(merged["model_margin"].corr(merged["market_margin"])),
+        "independent_total_vs_market_total_correlation": float(merged["model_total"].corr(pd.to_numeric(merged["total_line"], errors="coerce"))),
+        "football_probability_vs_market_probability_correlation": float(merged["pure_prob"].corr(merged["market_prob"])),
+        "direct_market_feature_in_independent_margin_total_models": False,
+    }
+
     decomposition = _error_rows(merged)
     process_corr = _correlations(merged)
+
+    team_point_rows = []
+    for team in sorted(set(merged["home_team"].astype(str)) | set(merged["away_team"].astype(str))):
+        home = merged[merged["home_team"].astype(str).eq(team)]
+        away = merged[merged["away_team"].astype(str).eq(team)]
+        actual_for = pd.concat([home["actual_home_score"], away["actual_away_score"]], ignore_index=True)
+        pred_for = pd.concat([home["model_home_score"], away["model_away_score"]], ignore_index=True)
+        actual_against = pd.concat([home["actual_away_score"], away["actual_home_score"]], ignore_index=True)
+        pred_against = pd.concat([home["model_away_score"], away["model_home_score"]], ignore_index=True)
+        team_point_rows.append({
+            "team": team,
+            "games": int(len(actual_for)),
+            "offense_points_mae": float((actual_for - pred_for).abs().mean()),
+            "offense_points_bias_actual_minus_pred": float((actual_for - pred_for).mean()),
+            "defense_points_allowed_mae": float((actual_against - pred_against).abs().mean()),
+            "defense_points_allowed_bias_actual_minus_pred": float((actual_against - pred_against).mean()),
+        })
+    team_points = pd.DataFrame(team_point_rows)
 
     summary = {
         "status": "research_only",
@@ -524,6 +716,8 @@ def run(output_dir: str = "research_outputs/spread_points_phase1", config_path: 
         "baseline": baseline,
         "compression": compression,
         "coherence": coherence,
+        "market_signal_overlap": market_signal_overlap,
+        "recent_form_instability": recent_form_instability,
         "realized_process_diagnostics": {
             "warning": "postgame diagnostic associations only; never pregame features in this audit",
             "correlations": process_corr,
@@ -537,6 +731,7 @@ def run(output_dir: str = "research_outputs/spread_points_phase1", config_path: 
 
     merged.to_csv(out / "baseline_predictions_2022_2025.csv", index=False)
     decomposition.to_csv(out / "error_decomposition.csv", index=False)
+    team_points.to_csv(out / "team_points_decomposition.csv", index=False)
     winner_coeff.to_csv(out / "chronology_clean_winner_coefficients.csv", index=False)
     (out / "baseline_metrics.json").write_text(json.dumps(baseline, indent=2, allow_nan=True), encoding="utf-8")
     (out / "phase1_machine_summary.json").write_text(json.dumps(summary, indent=2, allow_nan=True), encoding="utf-8")
