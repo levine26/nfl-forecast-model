@@ -25,7 +25,8 @@ Key merged fixes include:
 - #476 docs-only recovery race allowance;
 - #480 full ChatGPT-ingestion / failed-game-fallback namespace isolation;
 - #483 isolated six-game fallback retry;
-- #485 code-only full-ingestion pushes validate without republishing stale bundles.
+- #485 code-only full-ingestion pushes validate without republishing stale bundles;
+- #503 recovered the later nine-game Groq failure set through validated ChatGPT fallback.
 
 Verified on current committed `main`:
 - frozen Week 2 weekend roster: **15 games**;
@@ -36,8 +37,8 @@ Verified on current committed `main`:
 - provider: **healthy, 15/15 applied**;
 - media reporting: **healthy, 15 trusted games**;
 - Groq fallback status: **healthy**;
-- every previously failed Groq game has `requires_chatgpt_refresh=false`;
-- the six late unresolved games were recovered through validated ChatGPT fallback;
+- every current Groq-failed weekend game has `requires_chatgpt_refresh=false`;
+- the latest nine-game unresolved set was recovered through validated ChatGPT fallback;
 - recovery reused a launch-grade historical editorial snapshot and never altered LevLine/F-ST probabilities, picks, grading, or locks.
 
 Do not reopen the one-game collapse investigation unless current committed artifacts regress.
@@ -80,7 +81,9 @@ Do not redo:
 - #488 — personnel/opportunity evidence coverage audit;
 - #491 — live integration that captures Props 2.2 receipts after successful **pregame** Props 2.1 runs;
 - #496 — frozen Props 2.2 prospective evaluator;
-- #497 — immutable postgame grader plus scheduled/off-main grading and evaluation workflow.
+- #497 — immutable postgame grader plus scheduled/off-main grading and evaluation workflow;
+- #500 — prospective closing-market / CLV evidence contract and matcher using only append-only pre-kickoff market archives;
+- #504 — first-capture readiness/acceptance gate plus the module-safe live Props 2.2 capture hook.
 
 ### Frozen Props 2.2 design
 
@@ -124,6 +127,35 @@ That run must:
 7. leave production Props labels and the LevLine winner model untouched.
 
 Do not manually backfill Week 2 into Props 2.2.
+
+### First-capture readiness is now armed on main
+
+PR #504 is merged.
+
+The post-merge main validation chain proved:
+- `LevLine Props live refresh` succeeded on main and took the governed Week 2 post-kickoff no-op path;
+- the no-op artifact contained zero pregame games and all 16 Week 2 games as started;
+- no Props 2.2 receipts were manufactured from Week 2;
+- the successful live run triggered `LevLine Props 2.2 first-capture readiness`;
+- the readiness workflow completed successfully on main with state **`ARMED_AWAITING_FIRST_CAPTURE`**;
+- the frozen challenger count is **8**;
+- the live capture hook is present and occurs only after the post-kickoff no-op guard;
+- the expected promotion candidates remain `P22_COMBINED_25` and `P22_COMBINED_50`.
+
+The next untouched successful pregame live run must flip the readiness state to **`FIRST_CAPTURE_VERIFIED`**. That state requires the complete frozen eight-challenger grid for every source forecast, valid immutable receipt hashes, pre-kickoff chronology, frozen Props 2.1 baseline identity, research-only / production-unauthorized flags, and no outcome contamination. An existing but empty ledger is explicitly invalid.
+
+#504 also fixed a latent first-use bug: the live workflow now invokes Props 2.2 prospective capture as the package module `python -m research.props.v22.capture_prospective`, so its `research.*` imports resolve correctly when the first future pregame capture actually runs.
+
+### Closing-market / CLV path
+
+PR #500 is merged and frozen before the first future Props 2.2 receipt.
+
+- closing observations come only from the append-only prospective market archive;
+- the selected close is the latest eligible archived capture strictly before kickoff;
+- same-threshold price CLV is reported only when the exact original threshold remains available;
+- missing closing evidence stays unmatched rather than being imputed;
+- CLV is secondary descriptive evidence and cannot change challenger coefficients, promotion thresholds, or the original point-in-time market comparator;
+- Week 2 closing evidence may not be backfilled.
 
 ### Postgame chain is already implemented
 
@@ -174,12 +206,13 @@ The old listeners failed because they demanded `source_provenance.json`, `foreca
 1. Read this file and `research/props/v21/CURRENT_STATE_AND_NEXT_STEPS.md`.
 2. Verify Sunday Signal remains 15/15 healthy, but keep that lane monitoring-only unless it regresses.
 3. Do **not** run new Week 2 tuning or weight selection.
-4. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green and the Props 2.2 capture hook is still wired.
-5. On the first future pregame live run, verify `challenger_outputs/props22/` is created with valid immutable receipts.
+4. Before the next untouched pregame slate, verify `LevLine Props live refresh` remains green and the first-capture readiness state remains `ARMED_AWAITING_FIRST_CAPTURE`.
+5. On the first future pregame live run, verify `challenger_outputs/props22/forecast_originals.jsonl` is created and require the readiness gate to report `FIRST_CAPTURE_VERIFIED`.
 6. Preserve forward personnel/opportunity and distribution evidence concurrently.
 7. After games finalize, verify the scheduled postgame workflow appends immutable grades and refreshes `research-data/props22-evaluation`; do not change grading/evaluation definitions mid-holdout.
 8. Do not select a Props 2.2 winner mid-holdout. Wait for the preregistered terminal evidence threshold.
 9. If a PR becomes stale after main advances, create one clean current-main replacement and close the stale predecessor explicitly.
+10. Do not reopen the three standing long-horizon issues (#182 historical F-ST metric reconciliation, #104 legacy freeze-provenance exception, #4 conditional scenario engine) as Props/Sunday launch blockers unless new evidence makes them directly relevant.
 
 ## Repo hygiene
 
