@@ -25,6 +25,7 @@ from research.props.v22.challengers import load_grid
 EVALUATION_CONTRACT_VERSION = "levline-props-2.2-eval-v0.1"
 GRADE_CONTRACT_VERSION = "levline-props-2.2-grade-v0.1"
 RECEIPT_CONTRACT_VERSION = "levline-props-2.2-prereg-v0.2"
+CLOSING_CONTRACT_VERSION = "levline-props-2.2-closing-market-v0.1"
 BOOTSTRAP_SEED = 20260922
 BOOTSTRAP_REPLICATES = 5000
 PROB_EPS = 1e-12
@@ -218,6 +219,218 @@ def validate_grades(rows: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, An
             raise Props22EvaluationError(f"conflicting duplicate grade for {source_sha}")
         grades[source_sha] = row
     return grades
+
+
+def _source_receipt_map(
+    receipts: Iterable[Mapping[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    sources: dict[str, dict[str, Any]] = {}
+    for receipt in receipts:
+        source_sha = str(receipt.get("source_props21_forecast_sha256") or "")
+        if not source_sha:
+            continue
+        identity = {
+            "source_props21_forecast_id": str(receipt.get("source_props21_forecast_id") or ""),
+            "game_id": str(receipt.get("game_id") or ""),
+            "player_id": str(receipt.get("player_id") or ""),
+            "prop_type": str(receipt.get("prop_type") or ""),
+            "kickoff_utc": str(receipt.get("kickoff_utc") or ""),
+            "forecast_timestamp_utc": str(receipt.get("forecast_timestamp_utc") or ""),
+            "market_line": _num((receipt.get("line") or {}).get("market_line")),
+            "market_probability": _prob((receipt.get("probability") or {}).get("market_probability")),
+        }
+        prior = sources.get(source_sha)
+        if prior is not None and _canonical(prior) != _canonical(identity):
+            raise Props22EvaluationError(
+                f"conflicting source identity across challenger receipts: {source_sha}"
+            )
+        sources[source_sha] = identity
+    return sources
+
+
+def validate_closing_events(
+    rows: Iterable[Mapping[str, Any]],
+    receipts: Iterable[Mapping[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    sources = _source_receipt_map(receipts)
+    events: dict[str, dict[str, Any]] = {}
+    for raw in rows:
+        row = dict(raw)
+        if row.get("contract_version") != CLOSING_CONTRACT_VERSION:
+            raise Props22EvaluationError("unexpected Props 2.2 closing-market contract")
+        if row.get("research_only") is not True or row.get("production_authorized") is not False:
+            raise Props22EvaluationError("closing-market evidence violates research-only governance")
+        event_sha = str(row.get("closing_event_sha256") or "")
+        unhashed = dict(row)
+        unhashed.pop("closing_event_sha256", None)
+        if len(event_sha) != 64 or _sha(unhashed) != event_sha:
+            raise Props22EvaluationError("Props 2.2 closing-event hash mismatch")
+
+        source_sha = str(row.get("source_props21_forecast_sha256") or "")
+        source = sources.get(source_sha)
+        if source is None:
+            raise Props22EvaluationError(
+                f"closing event does not match a frozen Props 2.2 source forecast: {source_sha}"
+            )
+        for field in (
+            "source_props21_forecast_id",
+            "game_id",
+            "player_id",
+            "prop_type",
+            "kickoff_utc",
+            "forecast_timestamp_utc",
+        ):
+            if str(row.get(field) or "") != str(source.get(field) or ""):
+                raise Props22EvaluationError(
+                    f"closing event/source identity mismatch for {field}: {source_sha}"
+                )
+
+        forecast_at = _timestamp(row.get("forecast_timestamp_utc"))
+        kickoff_at = _timestamp(row.get("kickoff_utc"))
+        closing_market = (
+            row.get("closing_market")
+            if isinstance(row.get("closing_market"), Mapping)
+            else {}
+        )
+        archive = (
+            closing_market.get("archive")
+            if isinstance(closing_market.get("archive"), Mapping)
+            else {}
+        )
+        close_at = _timestamp(archive.get("captured_at_utc"))
+        if (
+            forecast_at is None
+            or close_at is None
+            or kickoff_at is None
+            or not (forecast_at <= close_at < kickoff_at)
+        ):
+            raise Props22EvaluationError("closing event has invalid forecast/close/kickoff chronology")
+
+        selection = row.get("selection")
+        if not isinstance(selection, Mapping):
+            raise Props22EvaluationError("closing event is missing selection provenance")
+        if selection.get("outcome_consulted") is not False:
+            raise Props22EvaluationError("closing-event selection may not consult outcomes")
+        if selection.get("latest_valid_capture_strictly_before_kickoff") is not True:
+            raise Props22EvaluationError("closing event does not prove latest-valid-capture policy")
+        if selection.get("capture_at_or_after_forecast") is not True:
+            raise Props22EvaluationError("closing event does not prove post-forecast capture policy")
+
+        prior = events.get(source_sha)
+        if prior is not None and str(prior.get("closing_event_sha256")) != event_sha:
+            raise Props22EvaluationError(f"conflicting duplicate closing event for {source_sha}")
+        events[source_sha] = row
+    return events
+
+
+def _closing_market_summary(
+    receipts: Iterable[Mapping[str, Any]],
+    events: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    sources = _source_receipt_map(receipts)
+    original_market_matched = sum(
+        1
+        for source in sources.values()
+        if source.get("market_line") is not None
+        or source.get("market_probability") is not None
+    )
+
+    line_values: list[float] = []
+    price_decimal_values: list[float] = []
+    price_probability_values: list[float] = []
+    by_prop: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"closing_matched": 0, "line_clv_available": 0, "price_clv_available": 0}
+    )
+    for source_sha, event in events.items():
+        source = sources[source_sha]
+        prop_type = str(source.get("prop_type") or "")
+        by_prop[prop_type]["closing_matched"] += 1
+
+        line_clv = event.get("line_clv")
+        if isinstance(line_clv, Mapping) and line_clv.get("available") is True:
+            value = _num(line_clv.get("side_oriented_line_clv"))
+            if value is not None:
+                line_values.append(value)
+                by_prop[prop_type]["line_clv_available"] += 1
+
+        price_clv = event.get("same_threshold_price_clv")
+        if isinstance(price_clv, Mapping) and price_clv.get("available") is True:
+            decimal_value = _num(price_clv.get("decimal_odds_clv_original_minus_close"))
+            probability_value = _num(
+                price_clv.get("implied_probability_clv_pp_close_minus_original")
+            )
+            if decimal_value is not None and probability_value is not None:
+                price_decimal_values.append(decimal_value)
+                price_probability_values.append(probability_value)
+                by_prop[prop_type]["price_clv_available"] += 1
+
+    def _stats(values: list[float]) -> dict[str, Any]:
+        if not values:
+            return {
+                "n": 0,
+                "mean": None,
+                "median": None,
+                "positive_share": None,
+                "zero_share": None,
+                "negative_share": None,
+            }
+        arr = np.asarray(values, dtype=float)
+        return {
+            "n": int(len(arr)),
+            "mean": float(arr.mean()),
+            "median": float(np.median(arr)),
+            "positive_share": float(np.mean(arr > 0)),
+            "zero_share": float(np.mean(arr == 0)),
+            "negative_share": float(np.mean(arr < 0)),
+        }
+
+    return {
+        "contract_version": CLOSING_CONTRACT_VERSION,
+        "status": "DESCRIPTIVE_SECONDARY",
+        "source_forecasts": len(sources),
+        "original_market_matched_observations": int(original_market_matched),
+        "closing_market_matched_observations": int(len(events)),
+        "line_clv": _stats(line_values),
+        "same_threshold_price_clv_decimal_odds": _stats(price_decimal_values),
+        "same_threshold_price_clv_implied_probability_pp": _stats(
+            price_probability_values
+        ),
+        "by_prop_type": {key: dict(value) for key, value in sorted(by_prop.items())},
+        "promotion_effect": "NONE",
+        "guardrail": (
+            "Closing-market evidence is secondary descriptive evidence only. It does not "
+            "change frozen challenger definitions, terminal readiness, multiplicity, or "
+            "promotion selection."
+        ),
+    }
+
+
+def _attach_closing_detail(
+    detail: pd.DataFrame,
+    events: Mapping[str, Mapping[str, Any]],
+) -> pd.DataFrame:
+    if detail.empty:
+        return detail
+    out = detail.copy()
+    out["closing_market_matched"] = out["source_sha"].map(
+        lambda source_sha: str(source_sha) in events
+    )
+    out["side_oriented_line_clv"] = out["source_sha"].map(
+        lambda source_sha: _num(
+            ((events.get(str(source_sha)) or {}).get("line_clv") or {}).get(
+                "side_oriented_line_clv"
+            )
+        )
+    )
+    out["same_threshold_price_clv_pp"] = out["source_sha"].map(
+        lambda source_sha: _num(
+            (
+                (events.get(str(source_sha)) or {}).get("same_threshold_price_clv")
+                or {}
+            ).get("implied_probability_clv_pp_close_minus_original")
+        )
+    )
+    return out
 
 
 def join_receipts_and_grades(
@@ -644,13 +857,16 @@ def evaluate(
     receipts: Iterable[Mapping[str, Any]],
     grades: Iterable[Mapping[str, Any]],
     *,
+    closing_events: Iterable[Mapping[str, Any]] = (),
     grid: Mapping[str, Any] | None = None,
     bootstrap_replicates: int = BOOTSTRAP_REPLICATES,
 ) -> tuple[dict[str, Any], pd.DataFrame]:
     frozen = dict(grid or load_grid())
     valid_receipts = validate_receipts(receipts, grid=frozen)
     grade_map = validate_grades(grades)
+    closing_map = validate_closing_events(closing_events, valid_receipts)
     detail = join_receipts_and_grades(valid_receipts, grade_map)
+    detail = _attach_closing_detail(detail, closing_map)
 
     candidate_metrics: dict[str, Any] = {}
     line_pvalues: dict[str, float | None] = {}
@@ -717,6 +933,9 @@ def evaluate(
         "candidate_metrics": candidate_metrics,
         "terminal_readiness": readiness,
         "multiplicity": multiplicity,
+        "closing_market_evidence": _closing_market_summary(
+            valid_receipts, closing_map
+        ),
         "promotion_decision": (
             "TERMINAL_EVALUATION_PERMITTED_BUT_NO_AUTOMATIC_WINNER_SELECTION"
             if readiness["terminal_evaluation_ready"]
@@ -736,14 +955,17 @@ def main() -> int:
     parser.add_argument("--grades", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--detail", type=Path)
+    parser.add_argument("--closing-events", type=Path)
     parser.add_argument("--bootstrap-replicates", type=int, default=BOOTSTRAP_REPLICATES)
     args = parser.parse_args()
 
     receipts = read_jsonl(args.receipts)
     grades = read_jsonl(args.grades)
+    closing_events = read_jsonl(args.closing_events) if args.closing_events else []
     summary, detail = evaluate(
         receipts,
         grades,
+        closing_events=closing_events,
         bootstrap_replicates=args.bootstrap_replicates,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)

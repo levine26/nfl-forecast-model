@@ -6,8 +6,11 @@ on:
       - 'research/props/v22/grade_prospective.py'
       - 'research/props/v22/POSTGAME_GRADING_CONTRACT.md'
       - 'research/props/v22/evaluate_prospective.py'
+      - 'research/props/v22/match_closing_market.py'
+      - 'research/props/v22/CLOSING_MARKET_CONTRACT.md'
       - 'research/props/v22/test_grade_prospective.py'
       - 'research/props/v22/test_evaluate_prospective.py'
+      - 'research/props/v22/test_match_closing_market.py'
       - '.github/workflows/research_props22_postgame.yml'
   workflow_dispatch:
   schedule:
@@ -35,10 +38,12 @@ jobs:
         run: |
           python -m pytest -q \
             research/props/v22/test_grade_prospective.py \
-            research/props/v22/test_evaluate_prospective.py
+            research/props/v22/test_evaluate_prospective.py \
+            research/props/v22/test_match_closing_market.py
           python -m py_compile \
             research/props/v22/grade_prospective.py \
-            research/props/v22/evaluate_prospective.py
+            research/props/v22/evaluate_prospective.py \
+            research/props/v22/match_closing_market.py
 
   evaluate:
     if: github.event_name != 'pull_request'
@@ -95,6 +100,29 @@ jobs:
             fi
           fi
 
+      - name: Restore append-only prospective Props market archive
+        if: steps.source.outputs.has_receipts == 'true'
+        run: |
+          set -euo pipefail
+          ARCHIVE_ROOT=/tmp/props-v2-market-archive/research_outputs/props_v2/market_archive
+          rm -rf /tmp/props-v2-market-archive
+          mkdir -p "$ARCHIVE_ROOT"
+          git fetch origin research-data/props-v2-market-archive:refs/remotes/origin/research-data/props-v2-market-archive || true
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/props-v2-market-archive; then
+            rm -rf /tmp/props-v2-market-archive-extract
+            mkdir -p /tmp/props-v2-market-archive-extract
+            (
+              cd /tmp/props-v2-market-archive-extract
+              git --git-dir="$GITHUB_WORKSPACE/.git" archive \
+                origin/research-data/props-v2-market-archive \
+                research_outputs/props_v2/market_archive 2>/dev/null | tar -xf - || true
+            )
+            if [ -d /tmp/props-v2-market-archive-extract/research_outputs/props_v2/market_archive ]; then
+              cp -R /tmp/props-v2-market-archive-extract/research_outputs/props_v2/market_archive/. "$ARCHIVE_ROOT/"
+            fi
+          fi
+          echo "restored prospective market archive files: $(find "$ARCHIVE_ROOT" -type f | wc -l)"
+
       - name: Grade newly finalized source forecasts
         if: steps.source.outputs.has_receipts == 'true'
         run: |
@@ -107,6 +135,19 @@ jobs:
             --status "$STATE/grade_status.json" \
             --allow-empty
 
+      - name: Match immutable pre-kickoff closing-market evidence
+        if: steps.source.outputs.has_receipts == 'true'
+        run: |
+          set -euo pipefail
+          STATE=/tmp/props22-evaluation-state/research_outputs/props22
+          ARCHIVE_ROOT=/tmp/props-v2-market-archive/research_outputs/props_v2/market_archive
+          python research/props/v22/match_closing_market.py \
+            --receipts "${{ steps.source.outputs.receipts }}" \
+            --archive-root "$ARCHIVE_ROOT" \
+            --output "$STATE/closing_events.jsonl" \
+            --status "$STATE/closing_status.json" \
+            --allow-empty
+
       - name: Evaluate frozen Props 2.2 challenger grid
         if: steps.source.outputs.has_receipts == 'true'
         run: |
@@ -115,6 +156,7 @@ jobs:
           python research/props/v22/evaluate_prospective.py \
             --receipts "${{ steps.source.outputs.receipts }}" \
             --grades "$STATE/grades.jsonl" \
+            --closing-events "$STATE/closing_events.jsonl" \
             --output "$STATE/evaluation.json" \
             --detail "$STATE/evaluation_detail.csv"
           python - <<'PY'
@@ -124,6 +166,10 @@ jobs:
           summary = json.loads((root / 'evaluation.json').read_text())
           assert summary['research_only'] is True
           assert summary['production_authorized'] is False
+          closing = summary['closing_market_evidence']
+          assert closing['status'] == 'DESCRIPTIVE_SECONDARY'
+          assert closing['promotion_effect'] == 'NONE'
+          assert closing['closing_market_matched_observations'] <= closing['source_forecasts']
           assert summary['promotion_decision'] in {
               'NOT_READY_CONTINUE_FROZEN_HOLDOUT',
               'TERMINAL_EVALUATION_PERMITTED_BUT_NO_AUTOMATIC_WINNER_SELECTION',
@@ -131,6 +177,7 @@ jobs:
           print(json.dumps({
               'graded_source_forecasts': summary['graded_source_forecasts'],
               'terminal_readiness': summary['terminal_readiness'],
+              'closing_market_evidence': summary['closing_market_evidence'],
               'promotion_decision': summary['promotion_decision'],
           }, indent=2, sort_keys=True))
           PY
