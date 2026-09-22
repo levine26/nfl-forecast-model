@@ -90,6 +90,33 @@ jobs:
           print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves launch-grade reporting, and safely retries research-only publication races.')
           PY
 
+      - name: Prove last-good full-slate ancestor recovery on pull request
+        if: github.event_name == 'pull_request'
+        run: |
+          python scripts/refresh_editorial_slate_roster.py --roster /tmp/editorial_slate_roster.json
+          rm -rf /tmp/last-good-editorial
+          python scripts/restore_last_good_editorial_base.py \
+            --roster /tmp/editorial_slate_roster.json \
+            --output-dir /tmp/last-good-editorial \
+            --reporting-snapshot /tmp/last-good-reporting.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          roster = json.loads(Path('/tmp/editorial_slate_roster.json').read_text())
+          media = json.loads(Path('/tmp/last-good-editorial/copilot_media_reads.json').read_text())
+          previews = json.loads(Path('/tmp/last-good-editorial/game_previews.json').read_text())
+          evidence = json.loads(Path('/tmp/last-good-editorial/contextual_evidence.json').read_text())
+          snapshot = json.loads(Path('/tmp/last-good-reporting.json').read_text())
+          expected = set(roster['game_ids'])
+          assert len(expected) == 15, len(expected)
+          assert set(media['games']) == expected
+          assert set(previews) == expected
+          assert set(evidence) == expected
+          assert int(snapshot['games']) == 15
+          assert snapshot.get('source_commit')
+          print('last-good ancestor recovery proof passed:', snapshot['source_commit'])
+          PY
+
       - name: Stop after validation on pull request
         if: github.event_name == 'pull_request'
         run: echo "Fallback code and tests validated; no publication on PR."
