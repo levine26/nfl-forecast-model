@@ -358,6 +358,15 @@ def main() -> int:
         help="Build every canonical pregame player-state game in the target week.",
     )
     parser.add_argument(
+        "--allow-empty-postkickoff",
+        action="store_true",
+        help=(
+            "Return a deliberate no-op marker when the target week's schedule is fully "
+            "started and no pregame games remain. Missing state for any upcoming game "
+            "still fails closed."
+        ),
+    )
+    parser.add_argument(
         "--history-start-season",
         type=int,
         default=2024,
@@ -495,6 +504,23 @@ def main() -> int:
         )
     available_game_ids = sorted(set(schedule_pregame_ids) & state_game_ids)
     if not available_game_ids:
+        if args.allow_empty_postkickoff and not schedule_pregame_ids and started_game_ids:
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            marker = {
+                "contract_version": "levline-props-postkickoff-noop-v0.1",
+                "season": int(args.season),
+                "week": int(args.week),
+                "forecast_timestamp_utc": forecast_timestamp.isoformat(),
+                "started_game_ids": sorted(started_game_ids),
+                "pregame_game_ids": [],
+                "reason": "target week has no scheduled pregame games remaining",
+            }
+            _write_new(args.output_dir / "postkickoff_noop.json", marker)
+            print(
+                "Props upstream no-op: all target-week games have started; "
+                f"season={args.season} week={args.week} started={len(started_game_ids)}"
+            )
+            return 0
         raise PropsUpstreamError("canonical player state contains no scheduled pregame games")
 
     if args.all_games:

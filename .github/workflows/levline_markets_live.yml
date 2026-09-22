@@ -180,8 +180,16 @@ jobs:
               python scripts/run_levline_markets_live.py \
                 --priors config/levline_markets_priors_v1.json \
                 --work-root .artifacts/props-live \
+                --allow-empty-postkickoff \
                 "${EXTRA_ARGS[@]}" \
                 "${BOOK_ARGS[@]}"
+
+            NOOP_MARKER=$(find .artifacts/props-live -type f -name postkickoff_noop.json -print -quit || true)
+            if [ -n "$NOOP_MARKER" ]; then
+              echo "Props live refresh no-op: target week has no pregame games remaining."
+              cat "$NOOP_MARKER"
+              exit 0
+            fi
 
             mapfile -t RUN_ROOTS < <(find .artifacts/props-live -mindepth 1 -maxdepth 1 -type d | sort)
             if [ "${#RUN_ROOTS[@]}" -ne 1 ]; then

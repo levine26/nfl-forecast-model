@@ -37,6 +37,7 @@ ALLOWED_PREFIXES = (
     "scripts/build_expected_lineup_impacts.py",
     "scripts/reconstruct_2025_availability.py",
     "scripts/run_props_research_beta.py",
+    "scripts/run_levline_markets_live.py",
     "scripts/build_props_market_snapshot.py",
     "scripts/build_props_integration_manifest.py",
     "scripts/build_props_upstream_snapshot.py",

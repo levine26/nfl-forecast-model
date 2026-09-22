@@ -137,3 +137,81 @@ def test_live_workflow_transports_frozen_depth_chart_personnel_snapshot():
     assert '--depth-charts "$DEPTH_CHARTS"' in workflow
     assert 'DEPTH_CHARTS_SHA=$(sha256sum "$DEPTH_CHARTS"' in workflow
     assert 'depth_charts_sha256:$depth_charts_sha256' in workflow
+
+
+def test_live_workflow_allows_clean_postkickoff_noop():
+    workflow = (ROOT / ".github" / "workflows" / "levline_markets_live.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "--allow-empty-postkickoff" in workflow
+    assert "postkickoff_noop.json" in workflow
+    assert "Props live refresh no-op: target week has no pregame games remaining." in workflow
+
+
+def test_live_coordinator_postkickoff_noop_preserves_existing_publication(monkeypatch, tmp_path):
+    module = _module()
+    priors = tmp_path / "priors.json"
+    priors.write_text(
+        json.dumps(
+            {
+                "route_prior_means": {"RB": 0.55, "WR": 0.90, "TE": 0.75},
+                "availability_beta_priors": {
+                    "UNKNOWN": {"alpha": 9.0, "beta": 1.0}
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    output_root = tmp_path / "published"
+    output_root.mkdir()
+    sentinel = output_root / "forecasts.json"
+    sentinel.write_text('{"sentinel":"prior-valid-publication"}\n', encoding="utf-8")
+    work_root = tmp_path / "work"
+
+    calls = []
+
+    def fake_run(*args):
+        calls.append([str(value) for value in args])
+        command = calls[-1]
+        assert "build_props_upstream_snapshot.py" in " ".join(command)
+        output_dir = Path(command[command.index("--output-dir") + 1])
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "postkickoff_noop.json").write_text(
+            json.dumps(
+                {
+                    "contract_version": "levline-props-postkickoff-noop-v0.1",
+                    "season": 2026,
+                    "week": 2,
+                    "pregame_game_ids": [],
+                    "started_game_ids": ["g1", "g2"],
+                    "reason": "target week has no scheduled pregame games remaining",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    monkeypatch.setattr(module, "_run", fake_run)
+    monkeypatch.setenv("THE_ODDS_API_KEY", "test-key")
+    monkeypatch.setattr(
+        __import__("sys"),
+        "argv",
+        [
+            str(SCRIPT),
+            "--season",
+            "2026",
+            "--week",
+            "2",
+            "--priors",
+            str(priors),
+            "--work-root",
+            str(work_root),
+            "--output-root",
+            str(output_root),
+            "--allow-empty-postkickoff",
+        ],
+    )
+
+    assert module.main() == 0
+    assert len(calls) == 1
+    assert "--allow-empty-postkickoff" in calls[0]
+    assert sentinel.read_text(encoding="utf-8") == '{"sentinel":"prior-valid-publication"}\n'
