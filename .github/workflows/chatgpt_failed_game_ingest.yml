@@ -87,7 +87,7 @@ jobs:
           assert "sunday-signal-chatgpt-failed-game-fallback-pr-{0}" in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-production" in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
-          assert 'Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
+          assert 'Only research/challenger/docs-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
           assert 'for publish_attempt in 1 2 3; do' in workflow
           assert 'if git push origin HEAD:main; then' in workflow
@@ -252,13 +252,13 @@ jobs:
               fi
               changed_main_files=$(git diff --name-only "$current_base"..origin/main)
               printf 'main advance files:\n%s\n' "$changed_main_files"
-              unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|challenger_outputs/prediction_history_shadow\.csv$|challenger_outputs/fst/(prospective_evaluation\.json|prospective_weekly\.csv)$|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
+              unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|docs/|challenger_outputs/prediction_history_shadow\.csv$|challenger_outputs/fst/(prospective_evaluation\.json|prospective_weekly\.csv)$|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
               if [ -n "$unsafe_main_files" ]; then
-                echo "Main changed outside the approved research/challenger-isolated namespace; refusing an unvalidated rebase."
+                echo "Main changed outside the approved research/challenger/docs-isolated namespace; refusing an unvalidated rebase."
                 printf '%s\n' "$unsafe_main_files"
                 exit 1
               fi
-              echo "Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit."
+              echo "Only research/challenger/docs-isolated files advanced; rebasing the already validated editorial output commit."
               git restore --worktree -- .
               git rebase origin/main
             fi
