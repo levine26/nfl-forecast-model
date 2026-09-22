@@ -217,3 +217,51 @@ The strongest transferable combination is:
 6. transparent score-versus-market product semantics similar to the useful part of davidsasser.com.
 
 The shortlist remains intentionally smaller than the universe of interesting public ideas.
+
+## 8. David Sasser deep-search closeout
+
+A second targeted public-web review was performed for \`davidsasser.com\` using methodology/model/source-code/archive/interview/validation terms in addition to the live CFB board and its graphic view.
+
+### What was actually located
+
+1. **Product-design observation — directly inspectable**
+   - the public CFB board displays model-projected team scores;
+   - a model projected line is shown separately from opening/current market lines;
+   - a model pick and tracking surface are displayed separately.
+   - public pages inspected: https://www.davidsasser.com/cfb and https://www.davidsasser.com/cfb/graphic
+
+2. **Technical but incomplete information**
+   - the visible forecasts imply a score-to-line comparison workflow;
+   - the public surface is not sufficient to identify the statistical estimator, priors, features, training window, market ingestion rule, or recalibration procedure.
+
+3. **Reproducible methodological evidence**
+   - **none located in the public material found during Phase 2**.
+   - targeted searches did not surface public source code, a complete technical specification, an independently reproducible fixed-horizon forecast archive, or a documented rolling-origin validation protocol.
+
+4. **Unsupported / non-transferable performance claims**
+   - any displayed or self-reported records are treated as product metadata only unless the underlying forecast timestamps, selection rule, denominator, and frozen history can be independently reconstructed.
+
+This is an evidence-of-search statement, not proof that no private or unindexed methodology exists.
+
+### Transfer rule
+
+The only concept imported from Sasser is the **semantic decomposition**:
+
+\`football score projection -> model line -> market line comparison -> downstream selection/tracking\`
+
+No coefficient, record, claimed advantage, feature, or tuning policy is imported.
+
+### Comparison with transparent systems
+
+This is why nfelo and Open Source Football carry more methodological weight in Phase 2: code/method details are publicly inspectable. Sasser remains useful, but in a different evidence category.
+
+## 9. External-model red-team conclusion
+
+The review does **not** justify adding another challenger.
+
+The strongest external lesson is architectural restraint:
+
+- dynamic team strength deserves one bounded football-only reference;
+- a drive model deserves one structurally separate reference;
+- market regression deserves an explicit market-null hierarchy;
+- public model records without reconstructable chronology do not justify model expansion.
