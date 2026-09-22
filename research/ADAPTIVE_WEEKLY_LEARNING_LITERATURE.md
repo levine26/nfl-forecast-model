@@ -271,3 +271,77 @@ Therefore the research prior remains:
 - **naive weekly full retraining: expected negative value**.
 
 The sprint must now replace this prior with measured chronology-safe evidence.
+
+## Candidate 2 addendum — Regime-change / information-shock mechanism (2026-09-22)
+
+Status: pre-result support for `ADAPTIVE-REGIME-SHOCK-GATE-V1`. This section documents mechanisms and source constraints; it does not select thresholds from Candidate 2 outcomes.
+
+### David Sasser — current public implementation evidence
+
+Sources:
+- https://www.davidsasser.com/cfb
+- https://github.com/davidsasser
+- https://github.com/davidsasser/NFL-BIG-DATA-BOWL-2026
+
+The current public CFB board exposes projected scores / projected lines together with opening and current market lines and a running performance record. That is useful professional-practice evidence for retaining an independent model view and market-state comparison rather than collapsing them into one opaque number.
+
+Sasser's public GitHub profile was also inspected. The visible football-specific NFL repository, `NFL-BIG-DATA-BOWL-2026`, is a player-tracking / trajectory modeling project rather than the public CFB winner/spread engine. Its visible `Pranav Predictions/prediction.py` combines weekly 2023 tracking files, engineers player-role/position features, and compares regression models; the shown script uses a random `train_test_split(..., random_state=42)`, not a chronology-safe weekly winner replay. The repository therefore provides useful evidence of his broader modeling practice but **does not expose a weekly retraining, market-integration, or regime-switch algorithm that can be copied into LevLine**.
+
+Candidate 2 implication: preserve component/model direction and contemporaneous market/state as separate channels; do not infer undisclosed update mechanics from Sasser's public site. His GitHub is informative context, not validation of Candidate 2's architecture or thresholds.
+
+### Macrì-Demartino, Egidi & Torelli (2026) — sparse dynamic regime adaptation
+
+Roberto Macrì-Demartino, Leonardo Egidi & Nicola Torelli, “Bayesian dynamic Bradley-Terry model with commensurate spike-and-slab priors,” Journal of Big Data (2026). DOI: 10.1186/s40537-026-01486-6.
+https://link.springer.com/article/10.1186/s40537-026-01486-6
+
+The model strongly borrows from prior team state when performance is stable and allows a more diffuse innovation regime when evidence supports a sudden change. Reported latent-strength changes line up with major roster/injury events, and out-of-sample Brier performance improves versus simpler dynamic comparators in the NBA application.
+
+Candidate 2 implication: the relevant theoretical distinction is **stable-state shrinkage versus event-driven innovation**, not faster generic recency weighting. LevLine Candidate 1 already falsified generic residual adaptation; Candidate 2 therefore uses an independently observed personnel discontinuity only as a gate on a separately directional challenger.
+
+### Hoffer & Pincin (2019) — NFL player point-spread value
+
+Adam Hoffer & Jared A. Pincin, “Quantifying NFL Players’ Value With the Help of Vegas Point Spreads Values,” Journal of Sports Economics 20(7), 2019. DOI: 10.1177/1527002519832060.
+https://journals.sagepub.com/doi/10.1177/1527002519832060
+
+Using sportsbook individual point-spread values, the study finds that quarterbacks dominate player value; passing yards per game, passing touchdowns and rushing touchdowns are the performance measures consistently related to point-spread values.
+
+Candidate 2 implication: QB starter continuity is a defensible high-leverage structural state variable. The paper does **not** justify assigning arbitrary fixed injury points inside LevLine, so V1 uses QB state only to authorize or deny a switch whose direction comes from the existing component-resolved challenger.
+
+### Professional oddsmaker practice — QB changes and market reaction
+
+Current and historical sportsbook-oriented reporting consistently treats starter-to-backup QB changes as one of the largest personnel inputs to an NFL point spread. This is professional-practice corroboration, not a replacement for a chronology-safe historical feature contract.
+
+Candidate 2 implication: QB change is prioritized over broad injury-count features; replacement-specific numerical deltas remain excluded from V1.
+
+### Betting-market information aggregation
+
+NFL market-efficiency research generally finds that simple historical or objective-information trading rules do not reliably defeat the line. Separately, sports betting-line research has found that unexplained opening-to-closing movement can contain information, consistent with informed trading.
+
+Candidate 2 implication: market-path information is scientifically plausible as an information-shock channel, but LevLine does not possess an equivalent strict-PIT historical multi-book path for 2022–2025. Therefore opener-to-current / T-60 / T-45 / T-30 movement is **excluded from historical Candidate 2 V1** and remains prospective-only.
+
+### Hidden-state / change-point methods
+
+Hidden Markov and state-switching sports models are useful evidence that observed competitive processes can occupy qualitatively different latent regimes. Their main relevance here is conceptual: an event may alter the state-generating process, making a static relationship locally stale.
+
+Candidate 2 implication: V1 uses the smallest falsifiable approximation to a state switch — a deterministic, PIT personnel-shock gate — rather than fitting a high-capacity hidden-state model on one NFL season.
+
+### Evidence synthesis for Candidate 2 V1
+
+Supported:
+1. incumbent preservation as the default;
+2. near-boundary switching only;
+3. independent personnel discontinuity as a *gate*, not a hand-scored direction;
+4. QB continuity as the highest-priority personnel shock;
+5. offensive-line discontinuity as a secondary structural shock;
+6. strong fail-closed missingness;
+7. market-path research prospectively once exact PIT paths exist.
+
+Not supported for V1:
+1. generic weekly residual learning;
+2. arbitrary injury points;
+3. generic football unanimity overrides;
+4. closing-line substitution for missing PIT paths;
+5. large contextual feature sets;
+6. post-hoc threshold mining;
+7. treating one positive 2025 subgroup as season-stable proof.
+
