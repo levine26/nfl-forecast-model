@@ -27,6 +27,7 @@ env:
   EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-shadow-exact-source-v0.1.0
   LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0
 
+  POSTKICKOFF_NOOP_REQUIRED_VERSION: levline-props-postkickoff-noop-v0.1
 jobs:
   test:
     if: github.event_name == 'pull_request'
@@ -93,6 +94,27 @@ jobs:
           rm -rf /tmp/props-live-artifacts
           mkdir -p /tmp/props-live-artifacts
           gh run download "${{ steps.source.outputs.run_id }}" --repo "${{ github.repository }}" --dir /tmp/props-live-artifacts
+          mapfile -t NOOPS < <(find /tmp/props-live-artifacts -name postkickoff_noop.json -type f | sort)
+          if [ "${#NOOPS[@]}" -gt 0 ]; then
+            mapfile -t NON_NOOP_FILES < <(find /tmp/props-live-artifacts -type f ! -name postkickoff_noop.json | sort)
+            if [ "${#NOOPS[@]}" -ne 1 ] || [ "${#NON_NOOP_FILES[@]}" -ne 0 ]; then
+              echo "::error::post-kickoff no-op artifact must be the only file in the exact source capture"
+              exit 1
+            fi
+            NOOP="${NOOPS[0]}"
+            NOOP_CONTRACT=$(jq -r '.contract_version // empty' "$NOOP")
+            PREGAME_COUNT=$(jq '.pregame_game_ids | length' "$NOOP")
+            STARTED_COUNT=$(jq '.started_game_ids | length' "$NOOP")
+            NOOP_SEASON=$(jq -r '.season // empty' "$NOOP")
+            NOOP_WEEK=$(jq -r '.week // empty' "$NOOP")
+            [ "$NOOP_CONTRACT" = "$POSTKICKOFF_NOOP_REQUIRED_VERSION" ] || { echo "::error::unexpected post-kickoff no-op contract"; exit 1; }
+            [ "$PREGAME_COUNT" -eq 0 ] && [ "$STARTED_COUNT" -gt 0 ] || { echo "::error::invalid post-kickoff no-op game counts"; exit 1; }
+            [[ "$NOOP_SEASON" =~ ^[0-9]{4}$ ]] && [[ "$NOOP_WEEK" =~ ^[0-9]{1,2}$ ]] || { echo "::error::invalid post-kickoff no-op season/week"; exit 1; }
+            echo "noop=true" >> "$GITHUB_OUTPUT"
+            echo "governed post-kickoff no-op; no research capture required"
+            exit 0
+          fi
+          echo "noop=false" >> "$GITHUB_OUTPUT"
 
           mapfile -t FORECASTS < <(find /tmp/props-live-artifacts -name forecasts.json -type f | sort)
           mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
@@ -161,19 +183,23 @@ jobs:
           echo "provenance_sha256=$PROVENANCE_SHA" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
+        if: steps.artifact.outputs.noop != 'true'
         with:
           ref: ${{ steps.artifact.outputs.generation_sha }}
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
+        if: steps.artifact.outputs.noop != 'true'
         with:
           python-version: '3.11'
           cache: pip
 
       - name: Install project
+        if: steps.artifact.outputs.noop != 'true'
         run: python -m pip install -e .
 
       - name: Restore immutable research shadow ledger
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/prospective_shadow
@@ -186,6 +212,7 @@ jobs:
           mkdir -p "$DATA_DIR"
 
       - name: Record exact-run pregame market shadow receipts
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/prospective_shadow
@@ -202,6 +229,7 @@ jobs:
             | tee "$DATA_DIR/last_record_status.json"
 
       - name: Enforce research-only source provenance
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           python - <<'PY'
           import json
@@ -264,6 +292,7 @@ jobs:
           PY
 
       - name: Persist shadow evidence away from main
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/prospective_shadow

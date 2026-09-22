@@ -26,6 +26,7 @@ env:
   EXACT_SOURCE_RUN_LISTENER_VERSION: levline-props-v2-market-archive-exact-source-v0.1.0
   LIVE_SOURCE_PROVENANCE_REQUIRED_VERSION: levline-props-live-source-provenance-v0.1.0
 
+  POSTKICKOFF_NOOP_REQUIRED_VERSION: levline-props-postkickoff-noop-v0.1
 jobs:
   test:
     if: github.event_name == 'pull_request'
@@ -93,6 +94,27 @@ jobs:
           rm -rf /tmp/props-live-artifacts
           mkdir -p /tmp/props-live-artifacts
           gh run download "${{ steps.source.outputs.run_id }}" --repo "${{ github.repository }}" --dir /tmp/props-live-artifacts
+          mapfile -t NOOPS < <(find /tmp/props-live-artifacts -name postkickoff_noop.json -type f | sort)
+          if [ "${#NOOPS[@]}" -gt 0 ]; then
+            mapfile -t NON_NOOP_FILES < <(find /tmp/props-live-artifacts -type f ! -name postkickoff_noop.json | sort)
+            if [ "${#NOOPS[@]}" -ne 1 ] || [ "${#NON_NOOP_FILES[@]}" -ne 0 ]; then
+              echo "::error::post-kickoff no-op artifact must be the only file in the exact source capture"
+              exit 1
+            fi
+            NOOP="${NOOPS[0]}"
+            NOOP_CONTRACT=$(jq -r '.contract_version // empty' "$NOOP")
+            PREGAME_COUNT=$(jq '.pregame_game_ids | length' "$NOOP")
+            STARTED_COUNT=$(jq '.started_game_ids | length' "$NOOP")
+            NOOP_SEASON=$(jq -r '.season // empty' "$NOOP")
+            NOOP_WEEK=$(jq -r '.week // empty' "$NOOP")
+            [ "$NOOP_CONTRACT" = "$POSTKICKOFF_NOOP_REQUIRED_VERSION" ] || { echo "::error::unexpected post-kickoff no-op contract"; exit 1; }
+            [ "$PREGAME_COUNT" -eq 0 ] && [ "$STARTED_COUNT" -gt 0 ] || { echo "::error::invalid post-kickoff no-op game counts"; exit 1; }
+            [[ "$NOOP_SEASON" =~ ^[0-9]{4}$ ]] && [[ "$NOOP_WEEK" =~ ^[0-9]{1,2}$ ]] || { echo "::error::invalid post-kickoff no-op season/week"; exit 1; }
+            echo "noop=true" >> "$GITHUB_OUTPUT"
+            echo "governed post-kickoff no-op; no research capture required"
+            exit 0
+          fi
+          echo "noop=false" >> "$GITHUB_OUTPUT"
           mapfile -t PROVENANCE < <(find /tmp/props-live-artifacts -name source_provenance.json -type f | sort)
           mapfile -t MARKETS < <(find /tmp/props-live-artifacts -name market.json -type f | sort)
           if [ "${#PROVENANCE[@]}" -ne 1 ] || [ "${#MARKETS[@]}" -ne 1 ]; then
@@ -132,15 +154,18 @@ jobs:
           echo "provenance_sha256=$PROVENANCE_SHA" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
+        if: steps.artifact.outputs.noop != 'true'
         with:
           ref: ${{ steps.artifact.outputs.generation_sha }}
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
+        if: steps.artifact.outputs.noop != 'true'
         with:
           python-version: '3.11'
 
       - name: Restore full append-only market archive
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
@@ -153,12 +178,14 @@ jobs:
           mkdir -p "$DATA_DIR"
 
       - name: Archive normalized multi-book player-prop state
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
           python research/props/v2/archive_live_prop_market.py             --artifact-root /tmp/props-live-artifacts             --output-dir "$DATA_DIR"             --manifest "$DATA_DIR/manifest.jsonl"             --source-workflow-run "${{ steps.source.outputs.run_id }}"             --source-head-sha "${{ steps.artifact.outputs.generation_sha }}"             --source-trigger-head-sha "${{ steps.source.outputs.trigger_head_sha }}"             --source-market-provider "${{ steps.artifact.outputs.market_provider }}"             --source-market-credential-mode "${{ steps.artifact.outputs.market_credential_mode }}"             --source-provenance-sha256 "${{ steps.artifact.outputs.provenance_sha256 }}"             --status "$DATA_DIR/last_archive_status.json"
 
       - name: Derive preregistered PIT horizons from accumulated captures
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
@@ -168,6 +195,7 @@ jobs:
             --status "$DATA_DIR/horizon_status.json"
 
       - name: Persist evidence off main
+        if: steps.artifact.outputs.noop != 'true'
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/props_v2/market_archive
