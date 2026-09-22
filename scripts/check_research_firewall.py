@@ -19,6 +19,40 @@ import sys
 
 RESEARCH_HEAD_PREFIXES = ("research/", "challenger/")
 
+# One-time retirement lane used only for the September 2026 Props reset. The branch
+# is allowed to delete the enumerated retired Props surfaces and detach their two
+# shared integration points. It still fails closed on every winner-model/F-ST path.
+PROPS_RETIREMENT_HEAD_PREFIX = "cleanup/props-reset"
+PROPS_RETIREMENT_ALLOWED_PREFIXES = (
+    ".github/workflows/props",
+    ".github/workflows/research_props",
+    "challenger_outputs/props",
+    "docs/props/",
+    "outputs/props/",
+    "research/props/",
+    "scripts/build_props",
+    "scripts/run_props",
+    "scripts/update_props",
+    "site/src/Props",
+    "site/src/props",
+    "site/tests/props",
+    "src/nfl_forecast/props",
+    "tests/test_props",
+)
+PROPS_RETIREMENT_ALLOWED_EXACT = {
+    ".github/workflows/dashboard.yml",
+    ".github/workflows/levline_markets_live.yml",
+    "config/levline_markets_priors_v1.json",
+    "docs/ACTIVE_WORKSTREAM_HANDOFF.md",
+    "scripts/check_research_firewall.py",
+    "scripts/run_levline_markets_live.py",
+    "site/src/AppCoherent.jsx",
+    "src/nfl_forecast/challenger_props_simulation.py",
+    "tests/test_challenger_props_simulation.py",
+    "tests/test_levline_markets_live.py",
+    "tests/test_research_firewall.py",
+}
+
 ALLOWED_PREFIXES = (
     ".github/workflows/challenger",
     ".github/workflows/research_",
@@ -197,6 +231,20 @@ def validate_changed_paths(paths: list[str]) -> list[str]:
     return sorted({path for path in paths if path and not path_allowed(path)})
 
 
+def props_retirement_path_allowed(path: str) -> bool:
+    normalized = _normalize(path)
+    return (
+        normalized in PROPS_RETIREMENT_ALLOWED_EXACT
+        or normalized.startswith(PROPS_RETIREMENT_ALLOWED_PREFIXES)
+    )
+
+
+def validate_props_retirement_paths(paths: list[str]) -> list[str]:
+    return sorted(
+        {path for path in paths if path and not props_retirement_path_allowed(path)}
+    )
+
+
 def changed_paths(base: str) -> list[str]:
     command = ["git", "diff", "--name-only", f"{base}...HEAD"]
     output = subprocess.check_output(command, text=True)
@@ -210,6 +258,22 @@ def main() -> int:
     parser.add_argument("paths", nargs="*")
     args = parser.parse_args()
     paths = args.paths or changed_paths(args.base)
+    if args.head_ref.startswith(PROPS_RETIREMENT_HEAD_PREFIX):
+        violations = validate_props_retirement_paths(paths)
+        print("Props retirement changed paths:")
+        for path in paths:
+            print(f"  {path}")
+        if violations:
+            print("\nPROPS RETIREMENT FIREWALL VIOLATION", file=sys.stderr)
+            print(
+                "The reset branch may touch only explicitly enumerated retired Props surfaces.",
+                file=sys.stderr,
+            )
+            for path in violations:
+                print(f"  blocked: {path}", file=sys.stderr)
+            return 1
+        print("Props retirement firewall: PASS")
+        return 0
     if not research_scope_triggered(paths, args.head_ref):
         print(f"research firewall skipped for production-only diff: {args.head_ref or '<unnamed>'}")
         return 0
