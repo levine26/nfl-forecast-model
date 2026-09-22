@@ -19,8 +19,12 @@ from research.market_capture_v2 import (
 )
 from research.run_market_capture_v2 import (
     MAX_EVENT_KICKOFF_DELTA_MINUTES,
+    PROPLINE_API_URL,
+    THE_ODDS_API_URL,
     _captured_pairs,
     _match_event,
+    _provider_configs,
+    _request_market_events,
 )
 
 
@@ -246,3 +250,77 @@ def test_only_qualified_multibook_consensus_closes_a_horizon(tmp_path) -> None:
         }
     ]).to_csv(legacy, index=False)
     assert _captured_pairs(legacy) == set()
+
+
+
+class _FakeResponse:
+    def __init__(self, *, payload=None, status_code=200, headers=None):
+        self._payload = [] if payload is None else payload
+        self.status_code = status_code
+        self.headers = headers or {}
+        self.url = "https://provider.invalid/?apiKey=should-never-be-surfaced"
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            exc = RuntimeError(f"http status {self.status_code}")
+            exc.response = self
+            raise exc
+
+    def json(self):
+        return self._payload
+
+
+def test_provider_config_prefers_propline_and_uses_header_auth(monkeypatch) -> None:
+    monkeypatch.setenv("PROPLINE_API_KEY", "prop-secret")
+    monkeypatch.setenv("THE_ODDS_API_KEY", "odds-secret")
+    providers = _provider_configs()
+    assert [row["name"] for row in providers] == ["propline", "the_odds_api"]
+    assert providers[0]["url"] == PROPLINE_API_URL
+    assert providers[0]["headers"] == {"X-API-Key": "prop-secret"}
+    assert "apiKey" not in providers[0]["params"]
+    assert providers[1]["url"] == THE_ODDS_API_URL
+    assert providers[1]["params"]["apiKey"] == "odds-secret"
+
+
+def test_provider_failover_does_not_surface_credentials(monkeypatch) -> None:
+    monkeypatch.setenv("PROPLINE_API_KEY", "prop-secret")
+    monkeypatch.setenv("THE_ODDS_API_KEY", "odds-secret")
+    calls = []
+
+    def fake_get(url, *, params=None, headers=None, timeout=None):
+        calls.append((url, params, headers))
+        if url == PROPLINE_API_URL:
+            return _FakeResponse(status_code=503)
+        return _FakeResponse(payload=[{"id": "evt"}], status_code=200)
+
+    monkeypatch.setattr("research.run_market_capture_v2.requests.get", fake_get)
+    provider, response, events, failures, cost = _request_market_events(_provider_configs())
+    assert provider == "the_odds_api"
+    assert response.status_code == 200
+    assert events == [{"id": "evt"}]
+    assert failures == [{"provider": "propline", "error_type": "RuntimeError", "http_status": 503}]
+    assert cost == 3
+    rendered = repr(failures)
+    assert "prop-secret" not in rendered
+    assert "odds-secret" not in rendered
+
+
+def test_all_provider_failures_expose_only_safe_metadata(monkeypatch) -> None:
+    monkeypatch.setenv("PROPLINE_API_KEY", "prop-secret")
+    monkeypatch.setenv("THE_ODDS_API_KEY", "odds-secret")
+
+    def fake_get(url, *, params=None, headers=None, timeout=None):
+        return _FakeResponse(status_code=401)
+
+    monkeypatch.setattr("research.run_market_capture_v2.requests.get", fake_get)
+    try:
+        _request_market_events(_provider_configs())
+    except RuntimeError as exc:
+        text = str(exc)
+        assert "propline:RuntimeError:401" in text
+        assert "the_odds_api:RuntimeError:401" in text
+        assert "prop-secret" not in text
+        assert "odds-secret" not in text
+        assert "apiKey=" not in text
+    else:
+        raise AssertionError("expected all-provider failure")
