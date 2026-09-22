@@ -475,16 +475,37 @@ def build(
     }
 
 
-def _append_receipts(path: Path, payload: Mapping[str, Any]) -> int:
+def _append_receipts(path: Path, payload: Mapping[str, Any], *, source_payload: Mapping[str, Any] | None = None) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     existing: set[str] = set()
     if path.exists():
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 existing.add(str(json.loads(line).get("receipt_id")))
+    source_by_id: dict[str, Mapping[str, Any]] = {}
+    if isinstance(source_payload, Mapping):
+        source_rows = source_payload.get("forecasts")
+        if isinstance(source_rows, list):
+            source_by_id = {
+                str(item.get("forecast_id")): item
+                for item in source_rows
+                if isinstance(item, Mapping) and item.get("forecast_id")
+            }
+
     new = []
     for row in payload["forecasts"]:
         qa = row["qa"]
+        source_row = source_by_id.get(str(row.get("source_v1_forecast_id") or ""))
+        source_model = (
+            source_row.get("model")
+            if isinstance(source_row, Mapping) and isinstance(source_row.get("model"), Mapping)
+            else {}
+        )
+        source_provenance = (
+            source_row.get("provenance")
+            if isinstance(source_row, Mapping) and isinstance(source_row.get("provenance"), Mapping)
+            else {}
+        )
         receipt_forecast = {
             key: row.get(key) for key in (
                 "forecast_id", "source_v1_forecast_id", "player_id", "player_name", "team",
