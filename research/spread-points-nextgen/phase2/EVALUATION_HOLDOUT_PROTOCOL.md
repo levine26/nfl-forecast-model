@@ -64,18 +64,33 @@ For modern-feature families whose data begin in 2022:
 
 For Core/history-only structures with older coverage, earlier target seasons may be added to stabilize inner selection, but the modern 2022–2024 summary remains mandatory.
 
-## Inner tuning
+## Deterministic inner tuning
 
-Every hyperparameter, regularization strength, state-decay parameter, feature choice and combination weight must be selected using data **strictly earlier than the outer test season**.
+Every hyperparameter, regularization strength, decay parameter and combination weight must be selected using data **strictly earlier than the outer test season**.
 
-No meta-model may be trained on the same OOF rows on which it is reported.
+For each outer target season `Y` in **2022, 2023, 2024**:
 
-When early target seasons provide too little prior OOF history for data-driven tuning, use:
+1. determine the candidate's earliest season with complete required feature coverage;
+2. create expanding-window inner folds with validation season `V < Y` and training seasons strictly before `V`;
+3. an inner fold is valid only when at least **two complete prior training seasons** exist;
+4. use the **latest three valid inner validation seasons**, or all valid seasons when fewer than three exist;
+5. if fewer than **two** valid inner validation seasons exist, do not tune from data; use the fixed candidate fallback in `BOUNDED_IMPLEMENTATION_SPEC.md`;
+6. fit every scaler, imputer, latent-state initialization, residual variance/covariance estimate and other learned preprocessing object on the inner training portion only;
+7. after choosing the hyperparameter setting, refit on all eligible data strictly before `Y` and emit the outer `Y` predictions.
 
-- a fixed literature-derived/default parameter; or
-- older pre-target rolling folds.
+No meta-model may be trained on the same OOF rows on which it is reported. No later season may be borrowed to make an early-season tuning problem easier.
 
-Do not borrow later seasons.
+### Frozen tuning objectives
+
+Hyperparameter choice is lexicographic and candidate-specific:
+
+- **A:** minimize average team-points MAE, `(home_MAE + away_MAE)/2`; tie-break by margin MAE, then total MAE.
+- **B:** minimize total MAE; tie-break by average team-points MAE, then margin MAE. Distribution scores are reported but do not change B's initial tuning objective.
+- **C-margin:** minimize hybrid margin MAE.
+- **C-total:** minimize hybrid total MAE.
+- **D:** no free hyperparameter search beyond the convex weights and the explicit eligibility gate.
+
+For an exact tie at displayed precision, select the more regularized/simpler setting. Metric switching after seeing results is prohibited.
 
 ---
 
@@ -256,7 +271,7 @@ Primary paired comparisons use:
 
 Report seasonal signs separately.
 
-A tiny average improvement driven by one season is not robust evidence.
+A tiny average improvement driven by one season is not robust evidence. Energy score is supplementary for the joint distribution and is not a sole selector because multivariate proper scores can have limited finite-sample discrimination for some dependency errors.
 
 ---
 
@@ -275,16 +290,22 @@ If a simple regularized model ties a complex model within uncertainty, prefer th
 
 # 14. Phase 3 -> Phase 4 gate
 
-Before final 2025 scoring, a candidate must:
+A/B/C are a small preregistered confirmatory set. **Weak 2022–2024 development performance alone does not authorize deleting a valid A/B/C candidate before the holdout.** This prevents a second layer of candidate shopping after the shortlist is already frozen.
+
+Before final 2025 scoring, each A/B/C candidate must:
 
 1. be reproducible;
 2. pass PIT/source checks;
-3. have a frozen identity;
-4. show no catastrophic development-season degradation;
-5. show improvement or defensible non-inferiority on its stated primary purpose;
-6. preserve the 2026 selection firewall.
+3. conform to the bounded implementation specification;
+4. have a frozen identity;
+5. preserve the 2026 selection firewall;
+6. emit finite, valid predictions on its required development universe.
 
-No candidate is required to survive.
+A candidate may be declared **invalid** before Phase 4 only for a methodological/engineering defect such as PIT failure, unreproducible identity, specification violation, irreparable numerical failure, or inability to produce the preregistered target. Invalidity must be logged with the defect; it may not be a euphemism for poor MAE.
+
+All valid A/B/C candidates proceed to the one-time 2025 Phase 4 evaluation.
+
+D is the only component whose existence is development-gated; its objective gate is frozen in `BOUNDED_IMPLEMENTATION_SPEC.md`.
 
 ---
 
