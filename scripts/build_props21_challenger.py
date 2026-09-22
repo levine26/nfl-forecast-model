@@ -541,6 +541,34 @@ def _append_receipts(path: Path, payload: Mapping[str, Any], *, source_payload: 
             )
         }
         receipt_forecast["market_state_sha256"] = _sha(row["market_state"])
+        if source_model:
+            interval = source_model.get("prediction_interval")
+            if not isinstance(interval, Mapping):
+                interval = {}
+            td_distribution = source_model.get("td_count_distribution")
+            if not isinstance(td_distribution, Mapping):
+                td_distribution = {}
+            raw_seed = _number(source_provenance.get("pure_simulation_seed"))
+            receipt_forecast["source_v1_distribution_evidence"] = {
+                "contract_version": "levline-props21-source-distribution-evidence-v0.1",
+                "source_model_version": source_model.get("version"),
+                "standard_deviation": _number(source_model.get("standard_deviation")),
+                "prediction_interval": {
+                    "low": _number(interval.get("low")),
+                    "high": _number(interval.get("high")),
+                    "coverage": _number(interval.get("coverage")),
+                },
+                "simulation_count": int(_number(source_model.get("simulation_count")) or 0),
+                "td_count_distribution": {
+                    str(key): _number(value)
+                    for key, value in td_distribution.items()
+                    if _number(value) is not None
+                },
+                "expected_tds": _number(source_model.get("expected_tds")),
+                "pure_simulation_seed": int(raw_seed) if raw_seed is not None else None,
+                "source_model_sha256": _sha(source_model),
+                "lossless_continuous_distribution_preserved": False,
+            }
         receipt = {
             "receipt_version": RECEIPT_VERSION,
             "receipt_id": row["forecast_id"],
