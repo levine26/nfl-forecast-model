@@ -1,0 +1,54 @@
+name: LevLine Props 2.0 defensive efficiency shadow freeze
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v2/freeze_defensive_efficiency_shadow.py'
+      - 'research/props/v2/test_defensive_efficiency_shadow_freeze.py'
+      - 'research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_CONTRACT.md'
+      - '.github/workflows/research_props_v2_defensive_efficiency_shadow.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install -e '.[dev]'
+          python -m pip install pyarrow
+      - run: python -m pytest -q research/props/v2/test_defensive_efficiency_shadow_freeze.py
+      - name: Freeze final pre-2026 coefficients
+        run: |
+          python research/props/v2/freeze_defensive_efficiency_shadow.py \
+            --output research_outputs/props_v2/defensive_efficiency_shadow/frozen_coefficients.json
+      - name: Enforce prospective firewall and immutable coefficient lock
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          generated=json.loads(Path("research_outputs/props_v2/defensive_efficiency_shadow/frozen_coefficients.json").read_text())
+          frozen=json.loads(Path("research/props/v2/DEFENSIVE_EFFICIENCY_SHADOW_FROZEN.json").read_text())
+          assert generated["contract_version"]=="levline-props-v2-defensive-efficiency-shadow-v0.1.0"
+          assert generated["trained_through_season"]==2025
+          assert generated["completed_2026_outcomes_used"]==0
+          assert generated["prop_outcomes_used"]==0
+          assert generated["sportsbook_results_used"]==0
+          assert generated["production_authorized"] is False
+          assert set(generated["fits"])=={"rushing","receiving"}
+          for key in ("contract_version","component_contract_version","trained_through_season","history_start_season","fit_population","fits","completed_2026_outcomes_used","prop_outcomes_used","sportsbook_results_used","production_authorized"):
+              assert generated[key]==frozen[key], f"frozen coefficient drift in {key}"
+          print(json.dumps(frozen,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levline-props-v2-defensive-efficiency-shadow-coefficients
+          path: research_outputs/props_v2/defensive_efficiency_shadow/
+          if-no-files-found: error
