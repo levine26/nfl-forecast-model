@@ -4,16 +4,16 @@
 **Program authority:** \`research/spread-points-nextgen/MASTER_PLAN.md\`  
 **Phase 0:** **COMPLETE**  
 **Phase 1:** **COMPLETE**  
-**Phase 2:** **IN PROGRESS — CLOSEOUT / EXACT-HEAD VALIDATION**  
+**Phase 2:** **COMPLETE**  
 **Phase 3:** **NOT STARTED**  
 **Active branch:** \`research/spread-points-nextgen-phase2\`  
-**Primary PR:** #520
+**Primary PR:** #520 — merged at `405906942013252c158244c9b033a3240baa37f8`
 
 ## Phase 2 state
 
-Phase 2 research/design is analytically complete and has passed hostile methodological review. No Phase 3 challenger has been implemented and no A/B/C 2025 challenger result has been inspected.
+Phase 2 research/design is **COMPLETE**. It passed hostile methodological review, exact-head firewall/validation, merge verification, and post-merge artifact verification. No Phase 3 challenger has been implemented and no A/B/C 2025 challenger result has been inspected.
 
-The branch was repeatedly synchronized with concurrent `main` as unrelated work advanced: PR #521 preserved adaptive-weekly-learning research, PR #528 preserved Sunday Signal contextual outputs, later compatibility merges preserved the adaptive Candidate 2 closeout/T-120 shadow state, and PR #536 preserved the generated market refresh through `3e859968a40b8250f85ed211e8b1e7593ea1bf47`. These concurrent surfaces are repository state only; none is used to select or redefine Spread & Points challengers.
+The branch was repeatedly synchronized with concurrent `main` as unrelated work advanced. The final pre-merge synchronization preserved adaptive Candidate 2 closeout state through `e93127963c76cd309cdddf17d91291c04a60a659`; the final Phase 2 head was `076dc9d6f6c052eec4744a155070c42c1b99ae82`. Concurrent adaptive, Sunday Signal, T-120 shadow, and generated-output work remained provenance-only and was not used to select or redefine Spread & Points challengers.
 
 ## Frozen initial Phase 3 shortlist
 
@@ -79,14 +79,21 @@ A/B/C are testable with free/open sources. Paid injury/OL/route/coverage/partici
 - D ensemble gate tightened;
 - 2025 holdout caveat red-teamed and retained.
 
-## Exact next action before Phase 2 can become COMPLETE
+## Phase 2 completion receipt
 
-1. Run/observe **fresh exact-head** \`LevLine research firewall\` and full \`LevLine research validation\` on PR #520 after the final control-file commit.
-2. Fix only genuine defects; never weaken the firewall.
-3. If both exact-head checks pass, mark PR #520 ready for review and merge it.
-4. Verify the merged Phase 2 artifacts directly from \`main\`.
-5. Record the merge SHA and exact CI run IDs in these control files on \`main\`.
-6. Leave Phase 3 **NOT STARTED** and stop.
+- exact-head research firewall `35751402751`: **SUCCESS**
+- exact-head full research validation `35751402726`: **SUCCESS**
+- validated head: `076dc9d6f6c052eec4744a155070c42c1b99ae82`
+- synchronized pre-merge main: `e93127963c76cd309cdddf17d91291c04a60a659`
+- PR #520: **MERGED**
+- merge commit: `405906942013252c158244c9b033a3240baa37f8`
+- canonical Phase 2 artifacts and control files: **verified directly from main after merge**
+- production behavior: **unchanged**
+- Phase 3: **NOT STARTED**
+
+## Exact next action
+
+**STOP Phase 2.** In the next Phase 3 execution chat, read the merged control files and canonical Phase 2 artifacts from current `main`, then implement only the frozen Phase 3 program below. Do not reopen Phase 1/2 merely because the chat is new.
 
 ## DO NOT REPEAT
 
