@@ -17,7 +17,13 @@ No feature is admitted solely because it correlates with historical outcomes.
 
 ---
 
-## 2. Team strength / efficiency
+## 2. Fixed lagged-state rule
+
+Unless a feature is explicitly defined otherwise in `BOUNDED_IMPLEMENTATION_SPEC.md`, initial A0/B0/C0 team-process summaries use only prior completed regular-season team games and an exponentially weighted mean with a **fixed 8-team-game half-life**.
+
+This removes rolling-window selection from Phase 3.
+
+## 3. Team strength / efficiency
 
 | Feature family | Mechanism | Source | PIT rule | Initial role |
 |---|---|---|---|---|
@@ -33,7 +39,7 @@ No feature is admitted solely because it correlates with historical outcomes.
 
 ---
 
-## 3. Pace / possession
+## 4. Pace / possession
 
 | Feature family | Mechanism | Source | PIT rule | Role |
 |---|---|---|---|---|
@@ -45,7 +51,7 @@ Phase 1 found that a crude prior-five play-count proxy alone has almost zero sim
 
 ---
 
-## 4. Scoring-process variables
+## 5. Scoring-process variables
 
 | Feature family | Mechanism | PIT | Role |
 |---|---|---|---|
@@ -61,7 +67,7 @@ Do not model rare events with unconstrained team-specific parameters unless samp
 
 ---
 
-## 5. Home field / rest / travel
+## 6. Home field / rest / travel
 
 ### Initially allowed
 
@@ -78,7 +84,7 @@ Do not launch a large interaction search across stadium/context fields.
 
 ---
 
-## 6. QB policy
+## 7. QB policy
 
 ### Football mechanism
 
@@ -114,7 +120,7 @@ No missing starter is encoded as “same starter.”
 
 ---
 
-## 7. Injury / offensive-line / personnel policy
+## 8. Injury / offensive-line / personnel policy
 
 The 2025 qualified practice-state composite is one-season evidence only.
 
@@ -143,7 +149,7 @@ Timestamped 2026+ snapshots may be graded prospectively but completed 2026 outco
 
 ---
 
-## 8. Advanced player / charting inputs
+## 9. Advanced player / charting inputs
 
 Potential free sources:
 
@@ -161,7 +167,7 @@ They are optional ablations, not core prerequisites.
 
 ---
 
-## 9. Weather
+## 10. Weather
 
 Potential mechanisms:
 
@@ -182,7 +188,7 @@ Until then: blocked.
 
 ---
 
-## 10. Market inputs
+## 11. Market inputs
 
 Challenger A/B: no market input.
 
@@ -196,7 +202,7 @@ Do not include bookmaker outcome labels, future line moves, or closing data in a
 
 ---
 
-## 11. Feature-family priorities
+## 12. Feature-family priorities
 
 ### Tier 1 — required initial implementation
 - dynamic offense/defense strength;
@@ -222,3 +228,14 @@ The initial B0 red-zone, explosive and turnover states are fixed by `BOUNDED_IMP
 - coaching/scheme changes.
 
 This ordering is binding for the initial Phase 3 build.
+
+
+## 13. Initial Phase 3 feature freeze
+
+For avoidance of doubt, the initial implementation feature contract is:
+
+- **A0:** the exact compact offense/defense EPA, pass-EPA, success, home and rest set in `BOUNDED_IMPLEMENTATION_SPEC.md`;
+- **B0:** the exact drive-volume, scoring-per-drive, turnover/takeaway, explosive, A0-strength, home and rest set in that specification;
+- **C0:** the exact market/football residual feature set in that specification and `MARKET_RESIDUAL_SPECIFICATION.md`.
+
+The broader tables in this document are a mechanism/source research map, not permission for Phase 3 to add every listed feature.
