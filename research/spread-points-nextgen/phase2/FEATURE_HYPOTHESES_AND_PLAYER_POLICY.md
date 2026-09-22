@@ -206,12 +206,13 @@ Do not include bookmaker outcome labels, future line moves, or closing data in a
 - drive scoring-process rates for B;
 - market residual target for C.
 
-### Tier 2 — controlled ablations
+### Tier 2 — prespecified diagnostics / amendment candidates
 - pass/rush decomposition;
-- red zone;
-- explosives;
-- sacks/turnovers;
-- simple static venue context.
+- sacks beyond the fixed B0 process state;
+- simple static venue context;
+- alternative red-zone/explosive formulations beyond the fixed B0 definitions.
+
+The initial B0 red-zone, explosive and turnover states are fixed by `BOUNDED_IMPLEMENTATION_SPEC.md`; Tier 2 is **not** permission for Phase 3 to search alternate definitions after seeing development metrics.
 
 ### Tier 3 — conditional on data qualification
 - QB starter/replacement;
