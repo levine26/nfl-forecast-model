@@ -75,8 +75,8 @@ jobs:
           assert 'fallback_snapshot_reused' in workflow
           assert 'games_with_trusted_reporting' in workflow
           assert "git merge-base --is-ancestor \"$current_base\" origin/main" in workflow
-          assert "grep -Ev '^(research/|research_outputs/|\\.github/workflows/research_[^/]+\\.ya?ml$)'" in workflow
-          assert 'Only research-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
+          assert "grep -Ev '^(research/|research_outputs/|challenger_outputs/prediction_history_shadow\\.csv$|challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)$|\\.github/workflows/research_[^/]+\\.ya?ml$)'" in workflow
+          assert 'Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
           assert 'for publish_attempt in 1 2 3; do' in workflow
           assert 'if git push origin HEAD:main; then' in workflow
@@ -87,20 +87,39 @@ jobs:
         if: github.event_name == 'pull_request'
         run: echo "Fallback code and tests validated; no publication on PR."
 
-      - name: Require failed-game bundle
+      - name: Detect unresolved failed-game recovery
         if: github.event_name != 'pull_request'
+        id: fallback-needed
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          unresolved = sorted(
+              gid for gid, item in ((status.get('groq_provider_fallback') or {}).get('games') or {}).items()
+              if isinstance(item, dict) and bool(item.get('requires_chatgpt_refresh'))
+          )
+          needed = 'true' if unresolved else 'false'
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as fh:
+              fh.write(f'needed={needed}\n')
+          print('unresolved ChatGPT fallback targets:', unresolved)
+          PY
+
+      - name: Require failed-game bundle
+        if: github.event_name != 'pull_request' && steps.fallback-needed.outputs.needed == 'true'
         run: test -f inputs/chatgpt_media/fallback/manifest.json
 
       - name: Canonicalize current editorial forecast source
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback-needed.outputs.needed == 'true'
         run: |
           python scripts/build_canonical_editorial_predictions.py \
-            --editorial-roster outputs/copilot_media_reads.json \
+            --editorial-roster outputs/game_previews.json \
             --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
       - name: Preserve validated media reporting snapshot
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback-needed.outputs.needed == 'true'
         run: |
           python - <<'PY'
           import json
@@ -124,14 +143,14 @@ jobs:
           PY
 
       - name: Overlay ChatGPT only onto Groq-failed games and full-slate validate
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback-needed.outputs.needed == 'true'
         run: |
           python scripts/ingest_chatgpt_failed_games.py \
             --input-dir inputs/chatgpt_media/fallback \
             --output outputs/copilot_media_reads.json
 
       - name: Finalize and enforce publication gate
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback-needed.outputs.needed == 'true'
         run: |
           python scripts/finalize_editorial.py
           python - <<'PY'
@@ -167,7 +186,7 @@ jobs:
           PY
 
       - name: Publish editorial-only recovery
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback-needed.outputs.needed == 'true'
         run: |
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
@@ -191,13 +210,13 @@ jobs:
               fi
               changed_main_files=$(git diff --name-only "$current_base"..origin/main)
               printf 'main advance files:\n%s\n' "$changed_main_files"
-              unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
+              unsafe_main_files=$(printf '%s\n' "$changed_main_files" | grep -Ev '^(research/|research_outputs/|challenger_outputs/prediction_history_shadow\.csv$|challenger_outputs/fst/(prospective_evaluation\.json|prospective_weekly\.csv)$|\.github/workflows/research_[^/]+\.ya?ml$)' || true)
               if [ -n "$unsafe_main_files" ]; then
-                echo "Main changed outside the research-isolated namespace; refusing an unvalidated rebase."
+                echo "Main changed outside the approved research/challenger-isolated namespace; refusing an unvalidated rebase."
                 printf '%s\n' "$unsafe_main_files"
                 exit 1
               fi
-              echo "Only research-isolated files advanced; rebasing the already validated editorial output commit."
+              echo "Only research/challenger-isolated files advanced; rebasing the already validated editorial output commit."
               git restore --worktree -- .
               git rebase origin/main
             fi
