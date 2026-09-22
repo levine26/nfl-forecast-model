@@ -1,0 +1,22 @@
+{
+  "document_status": "NON_AUTHORITATIVE_CONFLICTING_DRAFT_TOMBSTONE",
+  "candidate_id": "ADAPTIVE-MARKET-PATH-INNOVATION-V1",
+  "original_conflicting_commit_sha": "97a974228f202b6dcfb1ec4f72267d6e7216774b",
+  "authoritative_preregistration": {
+    "path": "research/ADAPTIVE_WEEKLY_CANDIDATE3_PREREGISTRATION.md",
+    "commit_sha": "52cf402cd33da0e535ef963c7d98f9b4304ea208",
+    "primary_lambda": 0.5,
+    "primary_early_band_minutes_before_kickoff": [1440, 2160],
+    "primary_lock_band_minutes_before_kickoff": [120, 360]
+  },
+  "reason": "This JSON was committed after the already-frozen markdown preregistration and contained conflicting lambda/grid definitions. Git commit chronology establishes the markdown preregistration at 52cf402 as authoritative. The canonical evaluator was already bound to 52cf402 and did not use this JSON.",
+  "target_result_influence_on_reconciliation": false,
+  "canonical_evaluation": {
+    "workflow_run_id": 35757935130,
+    "artifact_id": 10708209825,
+    "artifact_sha256": "ce64bc2d011acb894e65a7a05273ce897bec76dc14cb9b95b64b3b2dd7d636a8",
+    "preregistration_sha_recorded_by_evaluator": "52cf402cd33da0e535ef963c7d98f9b4304ea208"
+  },
+  "preservation": "The original conflicting JSON remains permanently recoverable from commit 97a974228f202b6dcfb1ec4f72267d6e7216774b.",
+  "production_changed": false
+}

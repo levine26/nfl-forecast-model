@@ -1,6 +1,6 @@
 # LevLine Adaptive Weekly Learning — Research Plan & Execution Ledger
 
-Status: ACTIVE RESEARCH GOVERNANCE  
+Status: CANDIDATE 3 COMPLETE — INCONCLUSIVE — AWAITING USER DIRECTION  
 Repository: `levine26/nfl-forecast-model`  
 Authoritative branch for this plan: `main`  
 Primary objective: determine whether leakage-safe weekly learning can improve LevLine straight-up NFL winner accuracy beyond frozen `F-ST-01-FROZEN-2026` without degrading calibration, robustness, or scientific validity.
@@ -840,3 +840,111 @@ Current governance estimate (research judgment, **not** a formal confidence inte
 
 This is the required Candidate 2 stop point pending user direction.
 
+
+
+## Candidate 3 final closeout — 2026-09-22
+
+Status: **COMPLETE — INCONCLUSIVE**
+
+Candidate ID: `ADAPTIVE-MARKET-PATH-INNOVATION-V1`
+
+### Authoritative control state
+
+- Integration branch: `research/adaptive-weekly-learning-c3-integration`
+- Pull request: #542
+- Authoritative preregistration: `52cf402cd33da0e535ef963c7d98f9b4304ea208`
+- Canonical workflow run: `35757935130`
+- Canonical artifact: `10708209825`
+- Artifact SHA256: `ce64bc2d011acb894e65a7a05273ce897bec76dc14cb9b95b64b3b2dd7d636a8`
+- PR-head SHA evaluated: `56de02d2e2d20ca39d567c03fc6bbe887c69b71a`
+- PR-merge execution SHA recorded by Actions: `fb6040bfae5380213c8deca13036e8754d358ec1`
+- Config digest: `de577832d944868c65d3ab562f094bc6c71cee3eff8aee5c91957f6399f686d6`
+- Final finding: `research/ADAPTIVE_WEEKLY_CANDIDATE3_FINAL_FINDING.md`
+- Final receipt: `research/ADAPTIVE_WEEKLY_CANDIDATE3_FINAL_RECEIPT.json`
+
+A later conflicting JSON preregistration committed at `97a974228f202b6dcfb1ec4f72267d6e7216774b` is non-authoritative because the Candidate 3 markdown preregistration had already been frozen at `52cf402...`. The canonical evaluator was bound to `52cf402...`; the conflicting JSON has been tombstoned for future readers.
+
+### Completed lanes
+
+- **Lane A — external research / professional modeling:** complete. Market information arrival, change-point/state-space logic, bookmaker information aggregation, line movement, sparse intervention design, and David Sasser's public work were reviewed. No public Sasser source was found that exposes a chronology-safe adaptive NFL winner model.
+- **Lane B — PIT data audit:** complete. Public v1.1.1 market archive qualified for coarse 2025 historical bands only; exact historical T-120/T-60/T-45/T-30 claims remain prohibited.
+- **Lane C — Candidate 3 model design:** complete and frozen before target evaluation. F-ST remained the structural prior; the only primary new feature was median same-book log-odds movement from T-2160..T-1440 to T-360..T-120; lambda 0.50.
+- **Lane D — evaluation framework:** complete. Paired accuracy, Brier, log loss, calibration, switch accounting, McNemar, 10,000-draw week-block bootstrap, controls, and robustness grid were executed.
+- **Lane E — adversarial validation / governance:** complete. Single-game/week/team/book concentration, window/lambda robustness, level-only control, market-only explanation, PIT leakage checks, and production firewall were executed.
+
+### Canonical result
+
+Frozen F-ST on 2025:
+- 179/272
+- 65.8088%
+- Brier 0.2115784131
+- log loss 0.6076199189
+
+Candidate 3:
+- 180/272
+- 66.1765%
+- +0.367647 percentage points
+- Brier 0.2121303769 (**worse by 0.0005519638**)
+- log loss 0.6086655021 (**worse by 0.0010455831**)
+- 3 switches
+- Candidate-3-only correct: 2
+- F-ST-only correct: 1
+- switch win rate: 66.67%
+- exact McNemar p=1.0
+- 10,000-draw week-block 95% accuracy-delta interval: **-0.7576 to +1.4981 pp**
+
+### Incremental-information finding
+
+The preregistered all-row **level-only** control also scored 180/272 and produced the same +1 net winner gain versus F-ST.
+
+Therefore Candidate 3 did **not** demonstrate that market **path** adds independent winner-selection information beyond a later market **level** update.
+
+On 264 path-qualified rows:
+- F-ST: 172/264
+- EARLY market: 172/264
+- LOCK market: 175/264
+- latest pre-kickoff market: 175/264
+- market-trend control: 173/264
+
+### Adversarial result
+
+- 12 preregistered robustness cells: 3 positive, 7 neutral, 2 negative.
+- lambda 0.25: no gain.
+- lambda 0.50: +1 winner.
+- lambda 0.75: no gain.
+- lambda 1.00: negative in the two broader lock windows.
+- deleting Week 12 or Week 17 erases the gain.
+- deleting ATL, GB, or NO erases the gain.
+- a single-game deletion can erase the entire gain.
+- all 37 leave-one-book-out checks retain +1, so the result is not driven by one sportsbook.
+- no post-kickoff or post-T-120 lock leakage detected.
+- completed 2026 outcomes used by Candidate 3 evaluation: 0.
+- production changed: false.
+
+### Scientific disposition
+
+**INCONCLUSIVE**
+
+Candidate 3 is not promoted and is not automatically authorized as a live shadow model.
+
+The sustainable-accuracy research judgment remains:
+- central estimate: approximately **68.3%**
+- practical near-term range: approximately **68.2%-68.4%**
+
+### Blockers / limitations
+
+- Qualified historical market-path evidence exists for only one season.
+- Historical archive cadence is four snapshots/day, not exact canonical T-minus history.
+- Target-season outcomes were known from earlier LevLine work before Candidate 3 began, so positive historical evidence cannot count as prospective validation.
+- Winner gain is sparse, concentrated, statistically unresolved, and not independent of the level-only market update.
+
+### Next step
+
+**STOP after Candidate 3. Do not begin Candidate 4 automatically.**
+
+If the program later continues, the next defensible design should be prospectively frozen before future outcomes and should explicitly decompose:
+1. market level update;
+2. market-path residual conditional on level;
+3. qualified QB/player-news timing where available.
+
+No production promotion is authorized by Candidate 3.

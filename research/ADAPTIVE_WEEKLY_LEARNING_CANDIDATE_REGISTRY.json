@@ -1,0 +1,90 @@
+{
+  "registry_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE-REGISTRY-V1",
+  "status": "CANDIDATE_3_COMPLETE_AWAITING_USER_DIRECTION",
+  "production_incumbent": "F-ST-01-FROZEN-2026",
+  "frozen_benchmark": {
+    "games": 1087,
+    "correct": 741,
+    "accuracy": 0.6816927322907084,
+    "brier": 0.21065334840485694,
+    "log_loss": 0.6087126266444343
+  },
+  "candidates": [
+    {
+      "candidate_number": 1,
+      "candidate_id": "ADAPTIVE-RESIDUAL-STATE-V1",
+      "disposition": "REJECTED",
+      "sample_games": 1087,
+      "correct": 722,
+      "accuracy": 0.664213,
+      "delta_pp_vs_fst": -1.7479,
+      "switches": 121,
+      "canonical_artifact_id": 10699993670,
+      "note": "Generic residual learning rejected; 2025-positive slice does not rescue the multi-season failure."
+    },
+    {
+      "candidate_number": 2,
+      "candidate_id": "ADAPTIVE-REGIME-SHOCK-GATE-V1",
+      "disposition": "INCONCLUSIVE",
+      "sample_games": 272,
+      "correct": 180,
+      "accuracy": 0.6617647058823529,
+      "delta_pp_vs_fst": 0.3676470588235294,
+      "switches": 1,
+      "authoritative_preregistration_sha": "fd1b1bd5eeb1ce9e0ddfecd700a487d6265665da",
+      "canonical_execution_sha": "3d47141ed8584e989702d1982e4e1dc60d8248a2",
+      "canonical_workflow_run_id": 35749549009,
+      "canonical_artifact_id": 10705320611,
+      "canonical_artifact_sha256": "fc647c321190cebcda814a88a8159b7342894951aa7e80e07585928a5b4cb771",
+      "production_authorized": false
+    },
+    {
+      "candidate_number": 3,
+      "candidate_id": "ADAPTIVE-MARKET-PATH-INNOVATION-V1",
+      "disposition": "INCONCLUSIVE",
+      "sample_games": 272,
+      "correct": 180,
+      "accuracy": 0.6617647058823529,
+      "delta_pp_vs_fst": 0.3676470588235294,
+      "switches": 3,
+      "authoritative_preregistration_sha": "52cf402cd33da0e535ef963c7d98f9b4304ea208",
+      "canonical_execution_sha": "fb6040bfae5380213c8deca13036e8754d358ec1",
+      "canonical_workflow_run_id": 35757935130,
+      "canonical_artifact_id": 10708209825,
+      "canonical_artifact_sha256": "ce64bc2d011acb894e65a7a05273ce897bec76dc14cb9b95b64b3b2dd7d636a8",
+      "independent_incremental_market_path_information_demonstrated": false,
+      "production_authorized": false,
+      "automatic_live_shadow_authorized": false
+    }
+  ],
+  "controls": [
+    {
+      "candidate_id": "NAIVE-WEEKLY-FST-REFIT-CONTROL-V1",
+      "disposition": "REJECTED",
+      "sample_games": 1087,
+      "correct": 739,
+      "accuracy": 0.679853,
+      "delta_pp_vs_fst": -0.184
+    },
+    {
+      "candidate_id": "ADAPTIVE-CALIBRATION-INTERCEPT-V1",
+      "disposition": "PROBABILITY_ONLY_FINDING",
+      "sample_games": 1087,
+      "correct": 741,
+      "accuracy": 0.6816927322907084,
+      "winner_switches": 0,
+      "interpretation": "Slight Brier/log-loss improvement without winner-selection change."
+    }
+  ],
+  "sustainable_accuracy_research_judgment": {
+    "central": 0.683,
+    "practical_near_term_range": [
+      0.682,
+      0.684
+    ],
+    "formal_confidence_interval": false
+  },
+  "next_state": "STOP_AFTER_CANDIDATE_3_UNTIL_USER_DIRECTION",
+  "candidate4_started": false,
+  "production_changed": false
+}

@@ -1,0 +1,48 @@
+{
+  "audit_id": "LEVLINE-ADAPTIVE-C3-HISTORICAL-MARKET-PATH-SOURCE-AUDIT-V1",
+  "status": "QUALIFIED_FOR_COARSE_HORIZON_2025_HISTORICAL_RESEARCH",
+  "canonical_ci_run_id": 35756509795,
+  "canonical_artifact_id": 10708651734,
+  "canonical_artifact_sha256": "11e920ec0e6d3cd62f236dc84ac766b47156362849e08f7ff0387214f9469e1c",
+  "execution_sha": "f16605587ac4255946e084988411732daaf5e3ea",
+  "source": {
+    "provider_repo": "bobby-king3/nfl-market-movement-tracker",
+    "release": "v1.1.1",
+    "asset": "nfl_odds.duckdb",
+    "asset_sha256": "b03c4e7f1cf885e9f20ea808ee538c26c21df4065b342fe04c50d09b808c344c",
+    "capture_schedule": "four historical API snapshots per day; 02:00,14:00,18:00,22:00 UTC",
+    "archive_scope": "2025-09-04 through 2026-02-09"
+  },
+  "qualified_relation": "main.stg_odds",
+  "counts": {
+    "prematch_h2h_or_spread_rows": 1220820,
+    "h2h_rows": 628310,
+    "distinct_games": 285,
+    "distinct_books": 38,
+    "post_or_at_kickoff_rows": 0
+  },
+  "coverage": {
+    "early_T2160_to_T1440_games": 284,
+    "lock_T360_to_T120_games": 279,
+    "same_book_early_to_lock_games_ge_5_books": 278,
+    "median_common_books": 34
+  },
+  "qualification": {
+    "exact_T120": false,
+    "exact_T60": false,
+    "exact_T45": false,
+    "exact_T30": false,
+    "coarse_early_band_T2160_to_T1440": true,
+    "coarse_lock_band_T360_to_T120": true,
+    "reason": "The four-per-day archive provides genuine timestamped pre-kickoff observations but not sufficiently dense captures to claim exact canonical T-minus horizons. Candidate 3 may use only the preregistered coarse bands and must label them as such.",
+    "no_closing_backfill": true,
+    "no_post_kickoff_rows": true
+  },
+  "scientific_firewall": {
+    "source_audit_loaded_outcomes": false,
+    "source_audit_loaded_fst_predictions": false,
+    "completed_2026_season_outcomes_used": 0,
+    "source_selection_used_target_results": false
+  },
+  "production_changed": false
+}
