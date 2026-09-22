@@ -143,21 +143,6 @@ Reference estimator:
 
 - L2-regularized multinomial logistic regression.
 
-Pregame covariates are fixed to:
-
-- A0 OOF offense strength;
-- A0 OOF opponent-defense strength;
-- offense TD-per-drive and FG-per-drive rates;
-- opponent TD-per-drive and FG-per-drive allowed rates;
-- offense turnover-per-drive rate;
-- opponent takeaway-per-drive rate;
-- offense explosive-play rate;
-- opponent explosive-play rate allowed;
-- home indicator;
-- rest differential.
-
-All rate covariates use the fixed 8-team-game lagged-state rule. Red-zone, sack, special-teams, field-position, personnel and weather variables are **not** added to B0.
-
 Prespecified inverse-regularization grid:
 
 - `C = [0.05, 0.2, 1.0, 5.0]`
