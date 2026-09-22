@@ -1,0 +1,175 @@
+{
+  "preregistration_id": "LEVLINE-ADAPTIVE-WEEKLY-CANDIDATE3-PREREG-V1",
+  "candidate_id": "ADAPTIVE-MARKET-PATH-INNOVATION-V1",
+  "status": "FROZEN_BEFORE_CANDIDATE3_TARGET_EVALUATION",
+  "research_only": true,
+  "production_authorized": false,
+  "hypothesis": "A conservative fraction of genuine same-book pregame market log-odds movement contains incremental information about the 2025 winner decision beyond the governed frozen F-ST benchmark, while most games remain effectively unchanged.",
+  "target_sample": {
+    "season": 2025,
+    "universe": "the exact 272 regular-season game_ids in the chronology-clean F-ST 2025 benchmark",
+    "incumbent_expected": {
+      "correct": 179,
+      "accuracy": 0.6580882352941176
+    },
+    "reason_for_scope": "The newly qualified public historical market archive covers 2025 with genuine timestamped snapshots. Equivalent multi-season book-level path history is not qualified.",
+    "missing_candidate3_market_path_rows": "retain row and set Candidate 3 probability equal to F-ST probability"
+  },
+  "historical_blinding_limitation": {
+    "fully_blinded_target_outcomes": false,
+    "reason": "2025 NFL outcomes and some game identities were already known from prior Candidate 1/Candidate 2 and LevLine research before this Candidate 3 program began.",
+    "candidate3_path_outcome_join_seen_before_freeze": false,
+    "candidate3_path_features_scored_before_freeze": false,
+    "interpretation": "The architecture was selected from prior negative adaptive evidence, PIT source qualification, and external literature, not from Candidate 3 path/outcome results. Any favorable historical result can be at most promising and requires prospective validation."
+  },
+  "source_contract": {
+    "repo": "bobby-king3/nfl-market-movement-tracker",
+    "release": "v1.1.1",
+    "asset": "nfl_odds.duckdb",
+    "asset_sha256": "b03c4e7f1cf885e9f20ea808ee538c26c21df4065b342fe04c50d09b808c344c",
+    "qualified_relation": "main.stg_odds",
+    "market_type": "h2h",
+    "required_pit": [
+      "captured_at < game_start_time",
+      "sportsbook_updated_at <= captured_at when sportsbook_updated_at is present",
+      "no closing-price reconstruction",
+      "no post-kickoff rows",
+      "no later state backfill into an earlier band"
+    ],
+    "source_audit": "research/ADAPTIVE_WEEKLY_CANDIDATE3_PIT_AUDIT.json"
+  },
+  "timestamp_bands": {
+    "primary_early": {
+      "min_minutes_before_kickoff": 1440,
+      "max_minutes_before_kickoff": 2160,
+      "label": "T-2160_to_T-1440"
+    },
+    "primary_lock": {
+      "min_minutes_before_kickoff": 120,
+      "max_minutes_before_kickoff": 360,
+      "label": "T-360_to_T-120"
+    },
+    "selection_within_band": "for each sportsbook, select the latest qualifying captured_at inside the band",
+    "exact_horizon_claims_prohibited": ["T-120", "T-60", "T-45", "T-30"]
+  },
+  "market_transform": {
+    "american_odds_implied_probability": "odds>0: 100/(odds+100); odds<0: -odds/(-odds+100)",
+    "devig": "two-outcome proportional normalization",
+    "book_state": "home no-vig probability paired from home and away h2h outcomes at the same sportsbook and captured_at",
+    "minimum_common_books": 5,
+    "consensus_level": "logistic(median(logit(book_home_no_vig_probability)))",
+    "path_innovation": "median over common sportsbooks of [logit(lock_home_no_vig_probability)-logit(early_home_no_vig_probability)]"
+  },
+  "mathematical_architecture": {
+    "structural_prior": "chronology-clean season-forward F-ST probability for the identical 2025 game_id",
+    "formula": "logit(P_C3) = logit(P_FST) + lambda * path_innovation",
+    "primary_lambda": 0.25,
+    "lambda_rationale": "Conservative shrinkage: F-ST already contains a market component and the historical path archive is coarse. Candidate 3 therefore incorporates only one quarter of the observed same-book log-odds innovation rather than treating the full movement as independent information.",
+    "probability_clip": [0.000001, 0.999999],
+    "winner_threshold": 0.5,
+    "fitted_parameters": 0,
+    "outcome_trained_candidate3_thresholds": 0,
+    "missingness": "fail closed to exact F-ST probability"
+  },
+  "primary_feature_family": [
+    "signed same-book log-odds innovation from early band to lock band"
+  ],
+  "descriptive_only_not_primary_features": [
+    "absolute movement",
+    "movement breadth",
+    "cross-book dispersion",
+    "reversal count",
+    "acceleration",
+    "sportsbook identity",
+    "QB/player/news interaction",
+    "spread movement"
+  ],
+  "controls": {
+    "frozen_fst": "chronology-clean season-forward F-ST 2025 vector",
+    "raw_lock_market": "same archive, primary lock band, consensus level only",
+    "market_path_without_fst": "logit(P)=logit(P_lock_market)+0.25*path_innovation",
+    "component_resolved": "unchanged season-forward L2 market+four-component stack from existing LevLine 4 evidence",
+    "candidate1_unchanged": "ADAPTIVE-RESIDUAL-STATE-V1, unchanged",
+    "naive_weekly_refit_unchanged": "NAIVE-WEEKLY-FST-REFIT-CONTROL-V1, unchanged",
+    "candidate2_unchanged": "ADAPTIVE-REGIME-SHOCK-GATE-V1, unchanged",
+    "equivalent_no_path_ablation": "lambda=0, exactly F-ST",
+    "probability_only_update": "the primary Candidate 3 itself is a continuous probability update; winner changes are emergent at 0.5, not separately gated"
+  },
+  "robustness_grid": {
+    "rule": "Every cell is reported; no best-cell promotion.",
+    "lambdas": [0.125, 0.25, 0.5],
+    "early_bands": [
+      {"min_minutes_before_kickoff": 1440, "max_minutes_before_kickoff": 1800},
+      {"min_minutes_before_kickoff": 1440, "max_minutes_before_kickoff": 2160}
+    ],
+    "lock_bands": [
+      {"min_minutes_before_kickoff": 120, "max_minutes_before_kickoff": 240},
+      {"min_minutes_before_kickoff": 120, "max_minutes_before_kickoff": 360}
+    ],
+    "total_cells": 12
+  },
+  "primary_metric": "paired straight-up accuracy difference versus F-ST on all 272 identical rows",
+  "secondary_metrics": [
+    "Brier score",
+    "log loss",
+    "calibration intercept",
+    "calibration slope",
+    "winner switches",
+    "candidate-only correct",
+    "F-ST-only correct",
+    "switch win rate",
+    "qualified path coverage",
+    "fail-closed count"
+  ],
+  "paired_inference": {
+    "mcnemar": "exact two-sided on discordant winner correctness",
+    "week_block_bootstrap": {
+      "draws": 10000,
+      "seed": 20260922,
+      "unit": "NFL week"
+    },
+    "concentration": [
+      "leave-one-week-out",
+      "leave-one-team-out",
+      "single-game gain share"
+    ]
+  },
+  "adversarial_tests": [
+    "single-game dependence",
+    "single-week dependence",
+    "single-team dependence",
+    "single-book dependence by leave-one-book-out path recomputation",
+    "primary-lambda sensitivity",
+    "timestamp-window sensitivity across all 12 preregistered cells",
+    "minimum-book coverage sensitivity as descriptive only; no alternate minimum is promotable",
+    "market-only explanation",
+    "F-ST-boundary concentration",
+    "feature ablation lambda=0",
+    "PIT violations",
+    "sportsbook_updated_at future-state violations",
+    "sample-mapping failures",
+    "multiple-testing warning"
+  ],
+  "success_bands": {
+    "REJECTED": "Primary Candidate 3 does not exceed F-ST winner accuracy, or PIT/source integrity fails.",
+    "INCONCLUSIVE": "Primary accuracy is positive but evidence is too sparse, concentrated, fragile, or uncertain to satisfy the promising band.",
+    "PROMISING_REQUIRES_PROSPECTIVE_VALIDATION": "Primary gains at least 3 net winners over F-ST; has at least 7 winner switches and switch win rate >=0.60; no single week supplies >50% of net gain; no single team deletion makes the net gain negative; at least 9/12 preregistered grid cells are nonnegative and at least 6/12 are positive; probability quality does not trigger a +0.0025 Brier deterioration alert; PIT integrity passes. This still cannot constitute production validation from one known-outcome historical season.",
+    "PROSPECTIVELY_VALIDATED": "Not attainable in Candidate 3 historical evaluation."
+  },
+  "stopping_rule": "Run the frozen primary candidate, all frozen controls, all 12 robustness cells, and the preregistered adversarial suite exactly once in canonical CI. Do not add features or retune lambda/window choices after target results.",
+  "prohibited_data": [
+    "post-kickoff market rows",
+    "closing lines used to reconstruct missing earlier states",
+    "completed 2026 outcomes for candidate design or evaluation",
+    "later injury/player/QB state",
+    "actual snaps or participation",
+    "target-result-driven feature selection",
+    "target-result-driven threshold or lambda search"
+  ],
+  "advancement": {
+    "production_promotion": false,
+    "live_shadow_automatic": false,
+    "if_promising": "prospective preregistered shadow validation is required before any promotion consideration",
+    "if_inconclusive_or_rejected": "close Candidate 3 and stop; do not begin Candidate 4"
+  }
+}
