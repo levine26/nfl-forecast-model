@@ -180,6 +180,17 @@ def _load_editorial_game_ids(path: Path) -> set[str]:
     if not isinstance(payload, dict):
         raise RuntimeError("Editorial roster must be a JSON object")
 
+    game_ids_list = payload.get("game_ids")
+    if isinstance(game_ids_list, list):
+        game_ids = {
+            str(game_id)
+            for game_id in game_ids_list
+            if _GAME_ID_RE.fullmatch(str(game_id))
+        }
+        if not game_ids:
+            raise RuntimeError("Editorial roster contains no valid game IDs")
+        return game_ids
+
     games = payload.get("games")
     if games is None:
         top_level_ids = {
