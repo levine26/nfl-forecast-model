@@ -81,7 +81,7 @@ def _receipts(source=None):
 
 def _grade(receipt, actual: float):
     kickoff = datetime.fromisoformat(str(receipt["kickoff_utc"]).replace("Z", "+00:00"))
-    return {
+    row = {
         "contract_version": MODULE.GRADE_CONTRACT_VERSION,
         "source_props21_forecast_sha256": receipt["source_props21_forecast_sha256"],
         "source_props21_forecast_id": receipt["source_props21_forecast_id"],
@@ -92,6 +92,8 @@ def _grade(receipt, actual: float):
         "graded_utc": (kickoff + timedelta(hours=4)).isoformat(),
         "result_source": "synthetic_test",
     }
+    row["grade_sha256"] = MODULE._sha(row)
+    return row
 
 
 def test_evaluator_scores_frozen_line_challengers_against_original_market():
