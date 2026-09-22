@@ -1,169 +1,176 @@
 # Active LevLine / Sunday Signal Workstream Handoff
 
-**Point-in-time:** 2026-09-21 ~18:36 America/Los_Angeles  
+**Point-in-time:** 2026-09-21 evening America/Los_Angeles  
 **Repository:** `levine26/nfl-forecast-model`
 
-This file is a continuity aid, not a substitute for checking current GitHub state. Before acting, re-read current `main`, open PRs, and relevant workflow runs. Do not restart completed work.
+This is the cross-chat continuity source. Always re-check current `main`, open PRs, and current workflow runs before acting. Do not restart completed work or revive superseded PRs by default.
 
 ## Non-negotiable governance
 
-- Do not modify the official LevLine/F-ST winner model while working these lanes.
-- Do not weaken research firewalls, chronology, locking, or publication gates to make CI pass.
-- Week 2 Props outcomes are **evaluation/diagnostic evidence only**. They may motivate future hypotheses but may not be used to fit coefficients, choose among challenger weights retrospectively, tune thresholds, recalibrate probabilities, or construct retrospective betting signals.
-- Props 2.2 promotion is future-holdout only.
+- Do not modify the official LevLine/F-ST winner model while working Props/editorial research lanes.
+- Do not weaken chronology, locking, research firewalls, immutable receipt rules, or launch gates to make CI pass.
+- Frozen Props 2.1 Week 2 outcomes are evaluation/diagnostic evidence only. They may motivate hypotheses but may not fit coefficients, choose weights retrospectively, tune thresholds, or construct retrospective betting signals.
+- Props 2.2 is future-holdout only. Week 2 receipts must never be backfilled into its prospective ledger.
+- A post-kickoff live Props no-op is a valid lifecycle state. It must preserve the last valid publication and must not create fake prospective receipts.
 
-## Sunday Signal checker / editorial recovery
+## Sunday Signal — verified healthy
 
-### What is already fixed
+The post-kickoff editorial collapse is repaired on committed `main`.
 
-- Post-kickoff slate contraction was identified as the main editorial failure mode.
-- PR #455 added a persisted weekend editorial-roster concept.
-- PR #456 hardened Groq publication against isolated challenger-output races.
-- PR #465 added recovery from the newest **launch-grade historical full-slate editorial snapshot**. The recovery restores only editorial artifacts, trims them to the authorized 15-game Week 2 weekend roster, preserves current Groq failure targets, and never changes LevLine/F-ST forecasts.
-- The fallback manifest was retriggered on current main for the exact unresolved set.
+Key merged fixes include:
+- #450 canonical locked-slate bridge;
+- #455 persisted weekend editorial roster;
+- #456 challenger-output race isolation;
+- #465 last launch-grade full-slate recovery;
+- #476 docs-only recovery race allowance;
+- #480 full ChatGPT-ingestion / failed-game-fallback namespace isolation;
+- #483 isolated six-game fallback retry;
+- #485 code-only full-ingestion pushes validate without republishing stale bundles.
 
-### Current recovery run at this handoff
+Verified on current committed `main`:
+- frozen Week 2 weekend roster: **15 games**;
+- `outputs/copilot_media_reads.json`: **15 games**;
+- `outputs/game_previews.json`: **15 games**;
+- `outputs/contextual_evidence.json`: **15 games**;
+- editorial finalizer: **healthy, 15 games, 15 unique headlines**;
+- provider: **healthy, 15/15 applied**;
+- media reporting: **healthy, 15 trusted games**;
+- Groq fallback status: **healthy**;
+- every previously failed Groq game has `requires_chatgpt_refresh=false`;
+- the six late unresolved games were recovered through validated ChatGPT fallback;
+- recovery reused a launch-grade historical editorial snapshot and never altered LevLine/F-ST probabilities, picks, grading, or locks.
 
-- Fallback workflow: **Sunday Signal ChatGPT failed-game fallback**
-- Run: **35675981382**
-- Trigger commit: `cf2c8cbe11b2492188ce1674a04c4c981ef0d2be`
-- Target: six unresolved games.
-- At handoff the run was queued because GitHub Actions was saturated by parallel research CI.
+Do not reopen the one-game collapse investigation unless current committed artifacts regress.
 
-### Do not call Sunday Signal fixed until all of these are verified on committed main
+## Props 2.1 — frozen evidence
 
-1. `inputs/sunday_signal/editorial_slate_roster.json` exists and represents the frozen 15-game weekend roster.
-2. `outputs/copilot_media_reads.json` contains exactly those 15 games.
-3. `outputs/game_previews.json` contains exactly those 15 games.
-4. `outputs/contextual_evidence.json` contains exactly those 15 games.
-5. `outputs/context_source_status.json` reports healthy full-slate editorial/media counts (15), with no stale partial-slate health claim.
-6. Current failed-game targets are either resolved by validated ChatGPT payloads or remain explicitly degraded; never hide unresolved games.
-7. The dashboard deployment consuming the repaired artifacts succeeds.
-8. No winner probabilities, F-ST calculations, locks, grading, or betting-model outputs changed as part of editorial recovery.
+Canonical prospective cohort:
+- live workflow: `35477049179`;
+- publication commit: `ba723255982c79ffe6072c714dd0ee2c37e1fa34`;
+- receipt blob: `e89cdce268fb10c5107ba6db4087107fb213555f`;
+- **3,439** frozen forecasts across **15 games**;
+- retrospective forecast mutation: forbidden.
 
-If the fallback run is cancelled by unrelated main churn, re-check the current unresolved game IDs before retriggering. Do not blindly reuse a stale manifest.
+Canonical evaluation was merged in #466.
 
-## Props 2.1 — current scientific state
+Observed Week 2 evaluation:
+- **1,606** forecasts graded across 14 finalized games;
+- **359** like-for-like market-matched forecasts;
+- Fair-Line minus original-market MAE delta: about **+1.375**, game-clustered 95% CI roughly **[+0.828, +2.001]**;
+- model-minus-market Brier delta: about **+0.0243**, CI roughly **[+0.0066, +0.0414]**;
+- model-minus-market log-loss delta: about **+0.1035**, CI roughly **[+0.0432, +0.1729]**;
+- preregistered probability bins showed systematic model overconfidence;
+- zero original `MODEL EDGE` observations, therefore betting ROI is not measurable.
 
-### Engineering fixes already merged
+Interpretation: Week 2 did not show incremental accuracy beyond the point-in-time market. This is a diagnosis/development cohort, not a valid tuning/validation loop.
 
-- **PR #446** — point-in-time depth-chart transport into live Props 2.1. Depth-chart evidence is categorical role context only; it does not create workload certainty or betting eligibility.
-- **PR #459** — fully started target week becomes a clean live no-op instead of a false production failure.
-  - Verified production run: **35675291033**
-  - It detected all 16 Week 2 games as started, wrote `levline-props-postkickoff-noop-v0.1`, preserved the last valid Props publication, and exited successfully.
-- **PR #466** — canonical current-main prospective evaluation surface for the frozen Week 2 cohort.
+## Props work already merged
 
-### Frozen Week 2 evidence
+Do not redo:
+- #434 — full eligible-roster concentration semantics;
+- #446 — point-in-time depth-chart transport;
+- #459 — fully-started target week becomes a clean live no-op;
+- #466 — canonical Props 2.1 prospective evaluation;
+- #478 — Props 2.2 future-holdout preregistration;
+- #479 — locked Week 2 descriptive miss diagnostics;
+- #481 — forward distribution-evidence preservation in new 2.1 receipts;
+- #482 — deterministic Props 2.2 market-residual transformations;
+- #486 — immutable Props 2.2 prospective capture contract;
+- #487 — distribution-evidence evaluator;
+- #488 — personnel/opportunity evidence coverage audit;
+- #491 — live integration that captures Props 2.2 receipts after successful **pregame** Props 2.1 runs.
 
-Frozen cohort:
-- source live run: `35477049179`
-- publication commit: `ba723255982c79ffe6072c714dd0ee2c37e1fa34`
-- receipt blob: `e89cdce268fb10c5107ba6db4087107fb213555f`
-- 3,439 frozen Props 2.1 receipts / 15 games.
+### Frozen Props 2.2 design
 
-Successful prospective evaluation found:
-- 1,606 forecasts graded across 14 finalized games at the evaluation point.
-- 359 like-for-like market-matched forecasts.
-- On that matched one-week cohort, Props 2.1 was worse than the contemporaneous sportsbook market:
-  - model/fair-line projection MAE delta vs market: about **+1.375** units, game-clustered 95% CI roughly **[+0.828, +2.001]**;
-  - Brier delta vs market: about **+0.0243**, CI roughly **[+0.0066, +0.0414]**;
-  - log-loss delta vs market: about **+0.1035**, CI roughly **[+0.0432, +0.1729]**.
-- Preregistered probability bins showed systematic overconfidence.
-- There were zero original `MODEL EDGE` observations, so betting ROI is not measurable.
-- This is **not** enough evidence to declare permanent model failure or market superiority across future weeks, but it is enough to reject any claim that Week 2 demonstrated market-beating Props accuracy.
+The preregistered grid includes:
+- `P21_BASE` control;
+- line-residual 25% / 50%;
+- probability-residual 25% / 50%;
+- fixed probability shrink-to-half diagnostic;
+- combined 25% / 50% primary challengers.
 
-Do not tune against these results.
+Only the two combined challengers are promotion eligible.
 
-## Active Props PRs and intended order
+No promotion/model-selection claim before at least:
+- 3 future weeks;
+- 30 finalized games;
+- 1,000 market-matched observations;
+- 250 observations for a prop-family superiority claim;
+- clean chronology and receipt integrity;
+- game-clustered uncertainty;
+- multiplicity control across promotion candidates;
+- no material Brier/log-loss degradation.
 
-### #468 — Preregister Props 2.2 market-residual future-holdout challengers
+## Props 2.2 prospective capture — current state
 
-Purpose: freeze a small outcome-free grid before future-holdout capture.
+The capture machinery is live, but **no Props 2.2 prospective ledger exists yet on main**. That is expected.
 
-Frozen candidates:
-- unchanged Props 2.1 control;
-- market-residual line blend with 25% model residual;
-- market-residual line blend with 50% model residual;
-- 50% shrinkage of model probability toward 0.5;
-- combined 50% residual blend + 50% probability shrinkage.
+Reason:
+- #491 merged after Week 2 was already fully started;
+- every subsequent live Props source run has therefore taken the valid post-kickoff no-op path;
+- the no-op path exits before creating 2.2 receipts, which preserves chronology and prevents retrospective Week 2 backfill.
 
-These weights are simple prespecified fractions and are **not fitted to Week 2**.
+The first future successful **pregame** live Props run is the real acceptance test.
 
-Promotion threshold is at least:
-- 3 future weeks,
-- 30 finalized games,
-- 1,000 market-matched observations,
-- 250 observations for a prop-family superiority claim,
-- clean chronology/receipt integrity,
-- game-clustered uncertainty.
+That run must:
+1. build a valid current-run Props 2.1 challenger artifact;
+2. preserve source live-run ID, generation SHA, trigger SHA, timestamps, market provenance, and source forecast hashes;
+3. apply the entire frozen Props 2.2 challenger grid mechanically;
+4. append immutable/idempotent records under `challenger_outputs/props22/`;
+5. reject any source receipt earlier than the frozen Props 2.2 prospective start boundary;
+6. contain no outcomes or grading fields;
+7. leave production Props labels and the LevLine winner model untouched.
 
-**Merge #468 first after its preregistration/firewall checks pass.**
+Do not manually backfill Week 2 into Props 2.2.
 
-### #471 — Implement preregistered Props 2.2 transformations
+## Active engineering cleanup
 
-Stacked on #468. It implements only the frozen deterministic transformations and explicitly rejects outcome-contaminated inputs.
+### #492 — legacy Props 2.0 listeners must honor live post-kickoff no-op
 
-At this handoff it is based on an older prereg branch/main state and is not mergeable. **Do not merge the stale branch.** After #468 lands, rebuild/rebase #471 on current main while preserving only the preregistered transformation code/tests.
+This is the only active workflow-noise fix at this handoff.
 
-### #474 — Preserve source distribution evidence in future Props 2.1 receipts
+Problem:
+- #459 made a fully-started target week a successful live no-op;
+- four legacy Props 2.0 listeners still assumed every successful live refresh contains a full pregame artifact;
+- they therefore produced false-red workflow failures after valid no-op runs.
 
-Current-main replacement for stale #469.
+#492 changes the four listeners to classify the exact source artifact:
+- exactly one `levline-props-postkickoff-noop-v0.1` marker, zero other files, zero pregame game IDs, at least one started game -> clean success and skip capture;
+- normal full pregame artifact -> existing provenance/SHA validation and capture behavior unchanged;
+- mixed/malformed/unexpected artifact -> fail closed.
 
-Forward-only evidence preservation:
-- SD,
-- prediction interval and coverage,
-- simulation count,
-- TD count distribution,
-- expected TDs,
-- pure simulation seed,
-- source-model hash.
+Merge #492 only after all four focused workflow PR checks pass.
 
-This is stored only in future immutable research receipts. Public challenger output stays unchanged. Frozen Week 2 receipts are not rewritten. The receipt explicitly says a lossless continuous distribution is not preserved, so CRPS/PIT remain unavailable unless a separate prospective archive contract is added.
+## Why the latest legacy shadow failures are not model failures
 
-This lane is independent of Props 2.2 and may merge after its checks pass.
+The red runs from the latest successful live Props refresh did **not** fail due to forecasting, market, depth-chart, or 2.2 logic.
 
-### #473 — Diagnose frozen Props 2.1 Week 2 miss without tuning
+The exact live artifact contained only:
 
-Descriptive-only error decomposition by preregistered subgroup:
-- prop type,
-- position,
-- role state,
-- availability,
-- workload,
-- market liquidity,
-- forecast horizon.
+`postkickoff_noop.json`
 
-It may report MAE/Brier/log-loss gaps and confidence gaps. It may **not** fit calibration, search thresholds, select favorable subgroups, construct retrospective ROI, or change production.
+with:
+- contract `levline-props-postkickoff-noop-v0.1`;
+- zero pregame games;
+- all 16 Week 2 games already started.
 
-This lane is hypothesis-generating only.
+The old listeners failed because they demanded `source_provenance.json`, `forecasts.json`, `manifest_slate.json`, and `market.json` even when no pregame capture should exist.
 
-## Immediate Props 2.2 next lane after #468/#471
+## Next-chat first actions
 
-Build a **prospective capture lane before Week 3 outcomes**.
+1. Read this file and `research/props/v21/CURRENT_STATE_AND_NEXT_STEPS.md`.
+2. Check #492. If its four listener tests are green and it remains current-main/mergeable, merge it.
+3. Verify Sunday Signal remains 15/15 healthy, but keep that lane monitoring-only unless it regresses.
+4. Do **not** run new Week 2 tuning or weight selection.
+5. Before the next untouched pregame slate, verify `LevLine Props live refresh` is green and the Props 2.2 capture hook is still wired.
+6. On the first future pregame live run, verify `challenger_outputs/props22/` is created with valid immutable receipts.
+7. Preserve forward personnel/opportunity and distribution evidence concurrently.
+8. Do not select a Props 2.2 winner mid-holdout. Wait for the preregistered terminal evidence threshold.
+9. If a PR becomes stale after main advances, create one clean current-main replacement and close the stale predecessor explicitly.
 
-Recommended architecture:
-1. Run inside or immediately after a successful `LevLine Props live refresh`, after the Props 2.1 challenger has been built.
-2. Consume the exact Props 2.1 challenger records generated by that live run.
-3. Apply all preregistered Props 2.2 candidates mechanically; do not select one.
-4. Preserve source live-run ID, generation SHA, trigger SHA, source forecast ID/hash, forecast/data-horizon/market timestamps, kickoff, market provider/book count, role/availability state, challenger coefficients, and immutable receipt hash.
-5. Preserve explicit missing-market semantics. Never backfill a market line or probability.
-6. Store `outcome: null` / no grading information in the prospective receipt.
-7. Keep the capture research-only and production-unauthed.
-8. Evaluate only after games finalize, with the frozen grid unchanged.
+## Repo hygiene
 
-Do not wire this capture against the stale #471 branch because that branch predates later live-workflow changes such as depth-chart transport. First get #468 onto main, rebuild #471 on current main, then stack capture on that current state.
+Historical Props 2.0 / 2.1 experimental PRs were intentionally consolidated and closed. Do not reopen them merely because they contain interesting experiments.
 
-## Repo cleanup policy
-
-The earlier Props 2.0 experiment backlog was intentionally reduced. Do not reopen superseded branches merely because they contain interesting experiments. Preserve unique evidence, but use the current Props 2.1/2.2 path as the active program.
-
-When a replacement PR is created on current main, close the stale predecessor and say which PR supersedes it.
-
-## First actions for the next chat
-
-1. Check run **35675981382** and verify Sunday Signal artifacts on committed main.
-2. Check #468 targeted preregistration + firewall checks; merge when clean.
-3. Rebuild #471 on the newly merged current main if still stale/nonmergeable.
-4. Check #474 and merge if its forward-only receipt tests/firewall are clean.
-5. Check #473; preserve it as diagnostic-only.
-6. Stack the Props 2.2 prospective-capture lane on the current-main implementation before the next pregame capture window.
+Current scientific path:
+**Props 2.1 frozen baseline -> Props 2.2 preregistered challengers -> future untouched prospective receipts -> terminal paired evaluation vs original market.**
