@@ -562,3 +562,137 @@ def build_qb_shock_rows_from_snapshots(
         ).hexdigest()
         output.append(row)
     return pd.DataFrame(output)
+
+
+def build_qb_shock_rows_from_snapshot(
+    qb1_snapshots: pd.DataFrame,
+    *,
+    archive_dir: Path,
+    games: list[dict[str, Any]],
+) -> pd.DataFrame:
+    """Build Candidate 4 QB shock rows only from frozen T-120 QB1 snapshots."""
+    kickoff = _kickoff(games)
+    t120 = kickoff - timedelta(minutes=120)
+    t60 = kickoff - timedelta(minutes=60)
+    evidence = select_inactive_evidence(
+        archive_dir=archive_dir,
+        games=games,
+        t60_target_utc=t60,
+        t120_target_utc=t120,
+    )
+
+    if qb1_snapshots.empty or "game_id" not in qb1_snapshots.columns:
+        snapshot_by_game: dict[str, dict[str, Any]] = {}
+    else:
+        if qb1_snapshots["game_id"].astype(str).duplicated().any():
+            raise ValueError("QB1 snapshot ledger contains duplicate game_id")
+        snapshot_by_game = {
+            str(row["game_id"]): dict(row)
+            for row in qb1_snapshots.to_dict("records")
+        }
+
+    inactive_by_team: dict[str, set[str]] = {}
+    if evidence is not None:
+        for row in evidence["cohort_rows"]:
+            team = str(row["team"])
+            inactive_by_team.setdefault(team, set()).add(normalize_name(row["player_name_rendered"]))
+
+    output: list[dict[str, Any]] = []
+    for game in games:
+        game_id = str(game["game_id"])
+        home = TEAM_NORMALIZATION.get(str(game["home_team"]).upper(), str(game["home_team"]).upper())
+        away = TEAM_NORMALIZATION.get(str(game["away_team"]).upper(), str(game["away_team"]).upper())
+        snapshot = snapshot_by_game.get(game_id)
+        reasons: list[str] = []
+
+        if snapshot is None:
+            reasons.append("missing_frozen_t120_qb1_snapshot")
+        else:
+            if str(snapshot.get("home_team") or "").upper() != home:
+                reasons.append("home_team_snapshot_identity_mismatch")
+            if str(snapshot.get("away_team") or "").upper() != away:
+                reasons.append("away_team_snapshot_identity_mismatch")
+            if not bool(snapshot.get("qb1_snapshot_complete")):
+                reasons.append("frozen_t120_qb1_snapshot_incomplete")
+            if str(snapshot.get("research_only") or "").lower() not in {"true", "1"}:
+                reasons.append("qb1_snapshot_not_research_only")
+            if str(snapshot.get("production_authorized") or "").lower() in {"true", "1"}:
+                reasons.append("qb1_snapshot_production_authorized")
+            captured = _utc(snapshot.get("captured_at_utc"))
+            target = _utc(snapshot.get("t120_target_utc"))
+            if captured is None or target is None or captured > target:
+                reasons.append("qb1_snapshot_not_captured_by_t120")
+            elif (captured - target).total_seconds() / 60.0 < -7.5:
+                reasons.append("qb1_snapshot_outside_frozen_t120_window")
+
+        if evidence is None:
+            reasons.append("no_qualified_inactive_article_by_t60")
+
+        home_name = str((snapshot or {}).get("home_t120_qb1_player_name") or "").strip()
+        away_name = str((snapshot or {}).get("away_t120_qb1_player_name") or "").strip()
+        home_gsis = str((snapshot or {}).get("home_t120_qb1_gsis_id") or "").strip()
+        away_gsis = str((snapshot or {}).get("away_t120_qb1_gsis_id") or "").strip()
+        if not home_name or not home_gsis:
+            reasons.append("missing_home_frozen_qb1_identity")
+        if not away_name or not away_gsis:
+            reasons.append("missing_away_frozen_qb1_identity")
+
+        home_inactive = bool(
+            home_name and evidence is not None
+            and normalize_name(home_name) in inactive_by_team.get(home, set())
+        )
+        away_inactive = bool(
+            away_name and evidence is not None
+            and normalize_name(away_name) in inactive_by_team.get(away, set())
+        )
+        if home_inactive and away_inactive:
+            reasons.append("both_t120_qbs_inactive_direction_ambiguous")
+
+        if reasons:
+            direction: int | None = None
+        elif home_inactive:
+            direction = -1
+        elif away_inactive:
+            direction = 1
+        else:
+            direction = 0
+
+        complete = not reasons
+        row = {
+            "schema_version": "adaptive-candidate4-qb-shock-v1",
+            "contract_id": CONTRACT_ID,
+            "game_id": game_id,
+            "home_team": home,
+            "away_team": away,
+            "kickoff_utc": _iso(kickoff),
+            "t120_target_utc": _iso(t120),
+            "t60_target_utc": _iso(t60),
+            "home_t120_qb1_player_name": home_name or None,
+            "home_t120_qb1_gsis_id": home_gsis or None,
+            "home_t120_depth_timestamp_utc": (snapshot or {}).get("home_t120_depth_timestamp_utc"),
+            "away_t120_qb1_player_name": away_name or None,
+            "away_t120_qb1_gsis_id": away_gsis or None,
+            "away_t120_depth_timestamp_utc": (snapshot or {}).get("away_t120_depth_timestamp_utc"),
+            "home_t120_qb1_inactive": home_inactive if complete else None,
+            "away_t120_qb1_inactive": away_inactive if complete else None,
+            "qb_shock_direction": direction,
+            "qb_shock_known_by_utc": evidence["captured_at_utc"] if evidence else None,
+            "inactive_capture_timestamp_utc": evidence["captured_at_utc"] if evidence else None,
+            "inactive_source_url": evidence["source_url"] if evidence else None,
+            "inactive_raw_sha256": evidence["raw_sha256"] if evidence else None,
+            "qb1_snapshot_sha256": (snapshot or {}).get("qb1_snapshot_sha256"),
+            "qb1_snapshot_captured_at_utc": (snapshot or {}).get("captured_at_utc"),
+            "qb_state_complete": complete,
+            "source_qualified": evidence is not None and snapshot is not None and not reasons,
+            "incomplete_reasons": "|".join(sorted(set(reasons))),
+            "research_only": True,
+            "production_authorized": False,
+            "player_value_magnitude_authorized": False,
+            "completed_2026_outcomes_used": 0,
+        }
+        digest_basis = {key: value for key, value in row.items() if key != "qb_state_sha256"}
+        row["qb_state_sha256"] = hashlib.sha256(
+            json.dumps(digest_basis, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        output.append(row)
+    return pd.DataFrame(output)
