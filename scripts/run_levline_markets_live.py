@@ -132,6 +132,11 @@ def main() -> int:
     parser.add_argument("--api-key-env", default="THE_ODDS_API_KEY")
     parser.add_argument("--regions", default="us")
     parser.add_argument("--bookmakers")
+    parser.add_argument(
+        "--allow-empty-postkickoff",
+        action="store_true",
+        help="Treat a fully started target week as a successful no-op instead of a live publication failure.",
+    )
     args = parser.parse_args()
 
     if (args.season is None) != (args.week is None):
@@ -167,7 +172,7 @@ def main() -> int:
     staged_public = run_root / "public_props.json"
     staged_ledger = run_root / "forecast_originals.jsonl"
 
-    _run(
+    upstream_command: list[object] = [
         sys.executable,
         ROOT / "scripts" / "build_props_upstream_snapshot.py",
         "--season", season,
@@ -175,7 +180,17 @@ def main() -> int:
         "--all-games",
         "--priors", args.priors,
         "--output-dir", upstream,
-    )
+    ]
+    if args.allow_empty_postkickoff:
+        upstream_command.append("--allow-empty-postkickoff")
+    _run(*upstream_command)
+
+    noop_marker = upstream / "postkickoff_noop.json"
+    if noop_marker.exists():
+        marker = _load_json(noop_marker)
+        print(json.dumps(marker, indent=2, sort_keys=True))
+        print("LevLine Props live cycle no-op: target week has no pregame games remaining.")
+        return 0
 
     market_command: list[object] = [
         sys.executable,
