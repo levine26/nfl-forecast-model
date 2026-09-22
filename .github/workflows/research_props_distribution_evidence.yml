@@ -1,0 +1,31 @@
+name: LevLine Props distribution evidence evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'research/props/v21/evaluate_distribution_evidence.py'
+      - 'research/props/v21/test_evaluate_distribution_evidence.py'
+      - '.github/workflows/research_props_distribution_evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-distribution-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Validate exact evidence-supported distribution metrics
+        run: python -m pytest -q research/props/v21/test_evaluate_distribution_evidence.py
+      - name: Enforce research firewall
+        run: |
+          git fetch origin main
+          python scripts/check_research_firewall.py --base origin/main --head-ref "${{ github.head_ref || github.ref_name }}"
