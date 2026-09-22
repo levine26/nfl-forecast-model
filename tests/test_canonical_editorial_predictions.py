@@ -126,6 +126,25 @@ def test_loads_top_level_game_preview_roster(tmp_path):
     }
 
 
+
+def test_restores_full_roster_after_current_slate_is_empty():
+    locked_a = _locked(_row("2026_02_CAR_ATL", "CAR", "ATL", 0.63, "ATL"))
+    locked_a.update({"week": 2, "gameday": "2026-09-20", "gametime": "13:00"})
+    locked_b = _locked(_row("2026_02_NYG_LA", "NYG", "LA", 0.71, "LA"))
+    locked_b.update({"week": 2, "gameday": "2026-09-21", "gametime": "20:15"})
+
+    selected = MODULE.build_canonical_editorial_predictions(
+        pd.DataFrame(),
+        pd.DataFrame([locked_a, locked_b]),
+        now_utc=datetime(2026, 9, 22, 2, 0, tzinfo=timezone.utc),
+        editorial_game_ids={"2026_02_CAR_ATL", "2026_02_NYG_LA"},
+    )
+
+    assert set(selected["game_id"]) == {"2026_02_CAR_ATL", "2026_02_NYG_LA"}
+    assert selected["lock_status"].str.upper().eq("LOCKED").all()
+
+
+
 def test_refuses_authorized_roster_game_without_live_or_locked_source():
     live = _row("2026_02_NYG_LA", "NYG", "LA", 0.71, "LA")
     live.update({"week": 2, "gameday": "2026-09-21", "gametime": "20:15"})
