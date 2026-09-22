@@ -151,7 +151,7 @@ def build_canonical_editorial_predictions(
     return result
 
 
-GAME_ID_PATTERN = re.compile(r"^\\d{4}_\\d{2}_[A-Z]{2,3}_[A-Z]{2,3}$")
+GAME_ID_PATTERN = re.compile(r"^\d{4}_\d{2}_[A-Z]{2,3}_[A-Z]{2,3}$")
 
 
 def _load_editorial_game_ids(path: Path) -> set[str]:
