@@ -1,6 +1,6 @@
 # LevLine Adaptive Weekly Learning — Research Plan & Execution Ledger
 
-Status: CANDIDATE 3 COMPLETE — INCONCLUSIVE — AWAITING USER DIRECTION  
+Status: CANDIDATE 4 ACTIVE — PROSPECTIVE PREPARATION / PIT REMEDIATION  
 Repository: `levine26/nfl-forecast-model`  
 Authoritative branch for this plan: `main`  
 Primary objective: determine whether leakage-safe weekly learning can improve LevLine straight-up NFL winner accuracy beyond frozen `F-ST-01-FROZEN-2026` without degrading calibration, robustness, or scientific validity.
@@ -948,3 +948,43 @@ If the program later continues, the next defensible design should be prospective
 3. qualified QB/player-news timing where available.
 
 No production promotion is authorized by Candidate 3.
+
+
+## 24. Candidate 4 execution state — started 2026-09-22
+
+Candidate ID: `ADAPTIVE-CONDITIONAL-INFORMATION-ARRIVAL-V1`  
+Integration branch: `research/adaptive-weekly-learning-c4-integration`  
+Base main SHA: `d448f618c8427ed96e1fa1f3d5d76749504bebfb`  
+Production authorization: **false**  
+Completed 2026 outcomes permitted for Candidate 4 design/selection: **0**
+
+### Scientific question
+
+After conditioning on the market level actually known at the prediction horizon, do strict point-in-time market-path residuals and independently timestamped football-information shocks add incremental winner-selection information beyond frozen `F-ST-01-FROZEN-2026`?
+
+### Prospective boundary
+
+Candidate 4 uses a new prospective clock. No game may enter its target sample unless the complete candidate specification and immutable lock contract were committed before that game's relevant lock. Completed 2026 games may be inspected only for schema, capture reliability, timestamps, missingness, and source integrity.
+
+The first currently scheduled possible lock is `2026_03_ATL_GB` at nominal T-120 = **2026-09-24T22:15:00Z**, conditional on:
+1. Candidate 4 preregistration being frozen before that instant; and
+2. a qualified strict-PIT market source being operational.
+
+### Parallel lane state
+
+- Lane A — external research: **ACTIVE; evidence supports sparse/selective information updates, not automatic path following**.
+- Lane B — PIT/source audit: **BLOCKED ON MULTI-BOOK MARKET SOURCE**. The latest `research-data/market-capture-v2` status records HTTP 401 Unauthorized and an empty market snapshot ledger.
+- Lane C — architecture: **SELECTED FOR IMPLEMENTATION** as a conservative T-60 selective information-arrival gate anchored to the frozen T-120 F-ST prior, with market-level, path-residual, and football-shock ablations.
+- Lane D — power/sample plan: **ACTIVE**.
+- Lane E — immutable shadow/CI: **PENDING IMPLEMENTATION**.
+- Preregistration: **NOT YET FROZEN**.
+- Prospective predictions locked: **0**.
+- Games graded: **0**.
+
+### Current source judgment
+
+Existing repository infrastructure already enforces one-sided strict T-120/T-60/T-45/T-30 cutoffs and preserves official NFL injury snapshots prospectively. Those contracts are reusable. However, Candidate 4 may not claim market-path evidence while the multi-book collector is unauthorized, and raw inactive/news captures remain non-quantitative until their player-level parser and timing semantics are qualified for this candidate.
+
+### Immediate next action
+
+Repair or replace the current zero-cost multi-book market capture without using completed 2026 outcomes; finish the frozen Candidate 4 mathematical contract, power plan, immutable receipt schema, tests, CI, and preregistration; then begin Week 3 shadow collection only if all PIT gates pass before the first eligible lock.
