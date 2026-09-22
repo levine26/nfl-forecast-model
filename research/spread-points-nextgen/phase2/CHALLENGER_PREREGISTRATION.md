@@ -89,7 +89,7 @@ Preferred implementation emits a joint predictive score distribution using resid
 
 ## Complexity rule
 
-Start with the smallest dynamic offense/defense specification. Passing/rushing sub-states or nonlinear learners are added only through a preregistered Phase 3 ablation path and must improve prior-time validation.
+Start with the smallest dynamic offense/defense specification, A0. Explicit state-space A1, passing/rushing sub-states, or nonlinear learners are **not automatic Phase 3 extensions**; any such expansion requires a preregistration amendment before its predictions are inspected.
 
 ---
 
@@ -129,7 +129,7 @@ No play-by-play sequence simulator is authorized.
 - red-zone opportunity and conversion measures if derivable from prior completed games;
 - explosive-play rates;
 - sack/turnover rates;
-- opponent-adjusted team strength from a chronology-safe training fold;
+- opponent-adjusted team strength from a chronology-safe training fold only in the separately labeled `B0_PLUS_A0_STATE` sensitivity; the independent B0 reference excludes A0 outputs;
 - home/rest context.
 
 ## Failure test
@@ -170,11 +170,11 @@ Prediction:
 
 ## Initial model class
 
-Use a simple, regularized and auditable model first:
+Use one simple, regularized and auditable reference:
 
-- Ridge / ElasticNet or similarly constrained generalized additive structure.
+- **Ridge regression** under the fixed alpha grid in `BOUNDED_IMPLEMENTATION_SPEC.md`.
 
-A tree ensemble may be a secondary preregistered ablation, but it cannot replace the simple reference without prior-time improvement.
+Exactly one low-complexity GAM/spline sensitivity may be attempted if supported cleanly. ElasticNet and tree ensembles are not part of the initial C0 search.
 
 ## Predictors
 
@@ -287,3 +287,14 @@ Correlated variants of the same quantity are not all admitted merely because the
 | Weather extension | yes | no | **BLOCKED/CONDITIONAL ON PIT WEATHER** |
 
 This is the deliberately limited Phase 2 challenger set.
+
+## 10. Closeout authority
+
+Where earlier wording in this file is more permissive than the final Phase 2 hardening, the following documents control:
+
+1. \`BOUNDED_IMPLEMENTATION_SPEC.md\`;
+2. \`EVALUATION_HOLDOUT_PROTOCOL.md\`;
+3. \`MARKET_RESIDUAL_SPECIFICATION.md\`.
+
+Those closeout restrictions were recorded before Phase 3 implementation/results and therefore narrow, rather than expand, researcher degrees of freedom.
+
