@@ -25,7 +25,8 @@ Key merged fixes include:
 - #476 docs-only recovery race allowance;
 - #480 full ChatGPT-ingestion / failed-game-fallback namespace isolation;
 - #483 isolated six-game fallback retry;
-- #485 code-only full-ingestion pushes validate without republishing stale bundles.
+- #485 code-only full-ingestion pushes validate without republishing stale bundles;
+- #503 recovered the later nine-game Groq failure set through validated ChatGPT fallback.
 
 Verified on current committed `main`:
 - frozen Week 2 weekend roster: **15 games**;
@@ -36,8 +37,8 @@ Verified on current committed `main`:
 - provider: **healthy, 15/15 applied**;
 - media reporting: **healthy, 15 trusted games**;
 - Groq fallback status: **healthy**;
-- every previously failed Groq game has `requires_chatgpt_refresh=false`;
-- the six late unresolved games were recovered through validated ChatGPT fallback;
+- every current Groq-failed weekend game has `requires_chatgpt_refresh=false`;
+- the latest nine-game unresolved set was recovered through validated ChatGPT fallback;
 - recovery reused a launch-grade historical editorial snapshot and never altered LevLine/F-ST probabilities, picks, grading, or locks.
 
 Do not reopen the one-game collapse investigation unless current committed artifacts regress.
@@ -114,6 +115,16 @@ PR #504 is merged. Its canonical readiness gate has only two valid states:
 - `FIRST_CAPTURE_VERIFIED` once a non-empty ledger exists and every source forecast has the complete frozen eight-challenger grid with valid hashes, chronology, frozen baseline identity, research-only governance, and no outcome contamination.
 
 The merge-head audit reported **`ARMED_AWAITING_FIRST_CAPTURE`** with the ledger absent, eight frozen challengers, the live hook present, the post-kickoff no-op guard before capture, and promotion candidates limited to `P22_COMBINED_25` and `P22_COMBINED_50`.
+
+
+Post-merge main verification also passed:
+- main `LevLine Props live refresh` run `35686820129` completed successfully;
+- it took the governed `levline-props-postkickoff-noop-v0.1` path with zero pregame games and all 16 Week 2 games started;
+- it created no Props 2.2 receipts;
+- that successful main run triggered readiness run `35686980974`;
+- the triggered readiness run completed successfully on main and again reported **`ARMED_AWAITING_FIRST_CAPTURE`**.
+
+#504 also fixed a latent first-use execution bug: the live workflow now invokes prospective capture as `python -m research.props.v22.capture_prospective`, which is required for the module's `research.*` imports to resolve when the first future pregame capture actually runs.
 
 Reason no ledger exists yet:
 - #491 merged after Week 2 was already fully started;
@@ -201,6 +212,7 @@ The old listeners failed because they demanded `source_provenance.json`, `foreca
 7. After games finalize, verify the scheduled postgame workflow appends immutable grades and refreshes `research-data/props22-evaluation`; do not change grading/evaluation definitions mid-holdout.
 8. Do not select a Props 2.2 winner mid-holdout. Wait for the preregistered terminal evidence threshold.
 9. If a PR becomes stale after main advances, create one clean current-main replacement and close the stale predecessor explicitly.
+10. Treat the three standing open issues as long-horizon research/governance work, not current Props/Sunday launch blockers unless new evidence makes them directly relevant: #182 F-ST historical probability-metric reconciliation; #104 legacy F-ST-01 freeze-provenance exception; #4 validated conditional scenario engine.
 
 ## Repo hygiene
 
