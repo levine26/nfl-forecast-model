@@ -1,0 +1,200 @@
+{
+  "margin": {
+    "abs_error_correlations": {
+      "A0_B0": 0.9429255374827542,
+      "A0_C0": 0.9042062689474891,
+      "B0_C0": 0.8612959636232322
+    },
+    "best_constituent": "C0",
+    "best_constituent_mae": 9.43895668195999,
+    "bootstrap": {
+      "block": "season+week",
+      "blocks": 54,
+      "candidate_minus_reference_mean": 0.018647167525403793,
+      "ci95": [
+        -0.015068015198842261,
+        0.05422996532608206
+      ],
+      "games": 815,
+      "probability_candidate_lower": 0.1364,
+      "samples": 10000,
+      "seed": 26040
+    },
+    "component_pooled_mae": {
+      "A0": 9.882508546957865,
+      "B0": 10.21317018404908,
+      "C0": 9.43895668195999
+    },
+    "contract": {
+      "abs_error_correlation_lt": 0.9,
+      "bootstrap_probability_gte": 0.75,
+      "must_improve_seasons": [
+        2023,
+        2024
+      ],
+      "pooled_mae_gain_gte": 0.1,
+      "weights": "nonnegative_sum_to_one_prior_time_nested"
+    },
+    "correlation_gate_pass": true,
+    "disposition": "ENSEMBLE_NOT_ELIGIBLE",
+    "nested_blend_mae": 9.457603849485395,
+    "pooled_mae_gain": -0.01864716752540474,
+    "season_comparison": {
+      "2023": {
+        "best_constituent_mae": 9.943609921951056,
+        "blend_mae": 9.975123119568071,
+        "improvement": -0.031513197617014654
+      },
+      "2024": {
+        "best_constituent_mae": 9.59693466269437,
+        "blend_mae": 9.614040646108252,
+        "improvement": -0.017105983413882697
+      }
+    },
+    "season_gate_pass": false,
+    "target": "margin",
+    "weight_receipts": [
+      {
+        "target_season": 2022,
+        "training_seasons": [
+          2019,
+          2020,
+          2021
+        ],
+        "weights": {
+          "A0": 6.602347096504358e-05,
+          "B0": 0.12369897961324192,
+          "C0": 0.8762349969157931
+        }
+      },
+      {
+        "target_season": 2023,
+        "training_seasons": [
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "weights": {
+          "A0": 0.16506412194040154,
+          "B0": 7.040919065916813e-07,
+          "C0": 0.8349351739676919
+        }
+      },
+      {
+        "target_season": 2024,
+        "training_seasons": [
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ],
+        "weights": {
+          "A0": 0.11307707845754973,
+          "B0": 2.4033779399469216e-07,
+          "C0": 0.8869226812046563
+        }
+      }
+    ]
+  },
+  "total": {
+    "abs_error_correlations": {
+      "A0_B0": 0.8544098311051708,
+      "A0_C0": 0.9021062531579085,
+      "B0_C0": 0.7972147211300721
+    },
+    "best_constituent": "C0",
+    "best_constituent_mae": 10.13763752934022,
+    "bootstrap": {
+      "block": "season+week",
+      "blocks": 54,
+      "candidate_minus_reference_mean": 0.0217140516551319,
+      "ci95": [
+        0.0018180071461181304,
+        0.0463509266586854
+      ],
+      "games": 815,
+      "probability_candidate_lower": 0.0139,
+      "samples": 10000,
+      "seed": 26041
+    },
+    "component_pooled_mae": {
+      "A0": 10.386912200041253,
+      "B0": 11.30440920245399,
+      "C0": 10.13763752934022
+    },
+    "contract": {
+      "abs_error_correlation_lt": 0.9,
+      "bootstrap_probability_gte": 0.75,
+      "must_improve_seasons": [
+        2023,
+        2024
+      ],
+      "pooled_mae_gain_gte": 0.1,
+      "weights": "nonnegative_sum_to_one_prior_time_nested"
+    },
+    "correlation_gate_pass": true,
+    "disposition": "ENSEMBLE_NOT_ELIGIBLE",
+    "nested_blend_mae": 10.159351580995352,
+    "pooled_mae_gain": -0.02171405165513285,
+    "season_comparison": {
+      "2023": {
+        "best_constituent_mae": 10.242470322166586,
+        "blend_mae": 10.242470318203596,
+        "improvement": 3.96298993621258e-09
+      },
+      "2024": {
+        "best_constituent_mae": 9.75084046151282,
+        "blend_mae": 9.749778591830104,
+        "improvement": 0.0010618696827151552
+      }
+    },
+    "season_gate_pass": true,
+    "target": "total",
+    "weight_receipts": [
+      {
+        "target_season": 2022,
+        "training_seasons": [
+          2019,
+          2020,
+          2021
+        ],
+        "weights": {
+          "A0": 0.0034700784775219934,
+          "B0": 0.10395856614695616,
+          "C0": 0.8925713553755219
+        }
+      },
+      {
+        "target_season": 2023,
+        "training_seasons": [
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "weights": {
+          "A0": 3.330754296006108e-08,
+          "B0": 1.570786708066671e-10,
+          "C0": 0.9999999665353783
+        }
+      },
+      {
+        "target_season": 2024,
+        "training_seasons": [
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ],
+        "weights": {
+          "A0": 0.0035464169788943477,
+          "B0": 0.00018647637845302484,
+          "C0": 0.9962671066426525
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,115 @@
+name: Spread & Points Phase 3 validation
+
+on:
+  push:
+    branches: [research/spread-points-nextgen-phase3]
+    paths:
+      - 'research/spread-points-nextgen/phase3/**'
+      - '.github/workflows/research_spread_points_phase3.yml'
+  pull_request:
+    paths:
+      - 'research/spread-points-nextgen/phase3/**'
+      - '.github/workflows/research_spread_points_phase3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spread-points-phase3-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py
+    scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  contract-tests:
+    name: Phase 3 contract and firewall tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - name: Compile Phase 3 implementation
+        run: python -m compileall -q research/spread-points-nextgen/phase3
+      - name: Run Phase 3 contract tests
+        run: pytest -q research/spread-points-nextgen/phase3/test_phase3.py
+      - name: Prove production surfaces unchanged
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+
+  development-regeneration:
+    name: 2022-2024 chronology-safe regeneration
+    needs: contract-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: phase3-spread-points-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            phase3-spread-points-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Generate frozen Phase 3 development evidence
+        run: |
+          rm -rf /tmp/levline-phase3
+          python -m research.spread-points-nextgen.phase3.run_phase3 --output-dir /tmp/levline-phase3 --simulations 10000
+      - name: Verify required evidence package
+        run: |
+          test -s /tmp/levline-phase3/A0_OOF_2022_2024.csv
+          test -s /tmp/levline-phase3/B0_OOF_2022_2024.csv
+          test -s /tmp/levline-phase3/C0_OOF_2022_2024.csv
+          test -s /tmp/levline-phase3/FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv
+          test -s /tmp/levline-phase3/DEVELOPMENT_SUMMARY.json
+          test -s /tmp/levline-phase3/CANDIDATE_RUN_RECEIPTS.json
+          test -s /tmp/levline-phase3/D_ELIGIBILITY_RECEIPT.json
+          test -s /tmp/levline-phase3/RUN_MANIFEST.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import pandas as pd
+          root=Path('/tmp/levline-phase3'); manifest=json.loads((root/'RUN_MANIFEST.json').read_text())
+          assert manifest['loaded_seasons']==list(range(2016,2025)); assert manifest['development_seasons']==[2022,2023,2024]
+          assert manifest['2025_loaded'] is False and manifest['2025_challenger_scored'] is False and manifest['completed_2026_outcomes_used'] is False and manifest['candidate5_trained'] is False
+          for name in ('A0_OOF_2022_2024.csv','B0_OOF_2022_2024.csv','C0_OOF_2022_2024.csv'):
+              frame=pd.read_csv(root/name); assert len(frame)==815; assert sorted(frame['season'].astype(int).unique().tolist())==[2022,2023,2024]; assert (frame['train_through_season'].astype(int)<frame['season'].astype(int)).all()
+          future=pd.read_csv(root/'FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv'); assert len(future)==815; assert future['oof_provenance_assertion'].astype(bool).all()
+          for prefix in ('a0','b0','c0'): assert (future[f'{prefix}_train_through_season'].astype(int)<future['season'].astype(int)).all()
+          PY
+      - name: Verify regenerated evidence matches frozen committed evidence
+        run: |
+          set -euo pipefail
+          frozen='research/spread-points-nextgen/phase3/evidence'
+          for file in A0_OOF_2022_2024.csv B0_OOF_2022_2024.csv C0_OOF_2022_2024.csv BASELINES_2022_2024.csv DIAGNOSTIC_SLICES.csv FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv DEVELOPMENT_SUMMARY.json CANDIDATE_RUN_RECEIPTS.json D_ELIGIBILITY_RECEIPT.json; do cmp "$frozen/$file" "/tmp/levline-phase3/$file"; done
+      - name: Prove production surfaces unchanged
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+      - uses: actions/upload-artifact@v4
+        with: {name: 'spread-points-phase3-${{ github.run_id }}', path: /tmp/levline-phase3/, retention-days: 30}
+
+  gate:
+    name: Phase 3 exact-run gate
+    if: always()
+    needs: [contract-tests, development-regeneration]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require both lanes
+        env: {CONTRACT: '${{ needs.contract-tests.result }}', DEVELOPMENT: '${{ needs.development-regeneration.result }}'}
+        run: |
+          set -euo pipefail
+          echo "contract=$CONTRACT"
+          echo "development=$DEVELOPMENT"
+          test "$CONTRACT" = success
+          test "$DEVELOPMENT" = success

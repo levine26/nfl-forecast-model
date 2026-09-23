@@ -243,11 +243,39 @@ Final closeout:
 - all eleven canonical Phase 2 artifacts and all four control files re-read from `main` after merge
 - Phase 3 — **NOT STARTED**
 
-### Phase 3 — planned
+### Phase 3 — COMPLETE (scientific package; final PR/merge receipt pending)
 
-- challenger registry — TBD
-- feature/provenance contracts — TBD
-- implementation/test index — TBD
+- preimplementation research delta — `research/spread-points-nextgen/phase3/PREIMPLEMENTATION_RESEARCH_REVIEW.md`
+- frozen pre-result gate — `research/spread-points-nextgen/phase3/PRE_RESULT_GATE.json`
+- candidate registry — `research/spread-points-nextgen/phase3/CANDIDATE_REGISTRY.md` and `CANDIDATE_REGISTRY.json`
+- feature/provenance contract — `research/spread-points-nextgen/phase3/FEATURE_PROVENANCE_CONTRACT.md`
+- implementation/test index — `research/spread-points-nextgen/phase3/IMPLEMENTATION_INDEX.md`
+- development evaluation — `research/spread-points-nextgen/phase3/DEVELOPMENT_EVALUATION.md`
+- D eligibility receipt — `research/spread-points-nextgen/phase3/D_ELIGIBILITY_RECEIPT.md`
+- future Candidate 5 OOF contract — `research/spread-points-nextgen/phase3/FUTURE_CANDIDATE5_OOF_SURFACE_CONTRACT.md`
+- adversarial red team — `research/spread-points-nextgen/phase3/RED_TEAM_AUDIT.md`
+- synthesis — `research/spread-points-nextgen/phase3/PHASE3_SYNTHESIS.md`
+- Phase 4 handoff — `research/spread-points-nextgen/phase3/PHASE4_HANDOFF.md`
+- reproducible runner — `research/spread-points-nextgen/phase3/run_phase3.py`
+- dedicated tests — `tests/test_spread_points_phase3.py`
+- dedicated CI — `.github/workflows/research_spread_points_phase3.yml`
+- durable 2022-2024 OOF/evidence package — `research/spread-points-nextgen/phase3/evidence/`
+
+Phase 3 development receipt:
+
+- exact successful development run — `35810171571`
+- exact development head — `3d893ec8e26824f7e6c1883f4d0d09c19160c712`
+- artifact digest before repository preservation — `sha256:516496990fec29e17479e0f55b7e21f82381f510f394a631df6bf4dea3475b41`
+- A0 margin/total MAE — 9.8825 / 10.3869
+- B0 margin/total MAE — 10.2132 / 11.3044
+- market M0 margin/total MAE — 9.4184 / 10.1209
+- C0 M3 margin/total MAE — 9.4390 / 10.1376
+- C0 — `NO_INCREMENTAL_FOOTBALL_EDGE` for margin and total
+- D — `ENSEMBLE_NOT_ELIGIBLE` for margin and total
+- 2025 underlying challenger holdout — **UNOPENED**
+- completed-2026 outcomes used for selection — **NO**
+- Candidate 5 trained — **NO**
+- production change — none
 
 ### Phase 4 — planned
 
