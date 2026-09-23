@@ -137,17 +137,36 @@ def _preview_raw_entry(entry: dict[str, Any]) -> dict[str, Any]:
     })
 
 
+def _checkpoint_entries(checkpoint_dir: Path | None) -> dict[str, dict[str, Any]]:
+    if checkpoint_dir is None or not checkpoint_dir.is_dir():
+        return {}
+    entries: dict[str, dict[str, Any]] = {}
+    for path in checkpoint_dir.glob("*.txt"):
+        gid = path.stem
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        games = payload.get("games") if isinstance(payload, dict) else None
+        entry = games.get(gid) if isinstance(games, dict) else None
+        if isinstance(entry, dict) and set(map(str, games)) == {gid}:
+            entries[gid] = entry
+    return entries
+
+
 def build_mixed_raw_payload(
     *,
     canonical_game_ids: list[str],
     base_artifact: dict[str, Any],
     chatgpt_entries: dict[str, dict[str, Any]],
     preview_artifact: dict[str, Any] | None = None,
+    checkpoint_entries: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     games = base_artifact.get("games") if isinstance(base_artifact, dict) else None
     if not isinstance(games, dict):
         raise ValueError("base validated provider artifact is missing games")
     preview_games = preview_artifact if isinstance(preview_artifact, dict) else {}
+    checkpoints = checkpoint_entries if isinstance(checkpoint_entries, dict) else {}
     output: dict[str, dict[str, Any]] = {}
     for gid in canonical_game_ids:
         if gid in chatgpt_entries:
@@ -156,14 +175,22 @@ def build_mixed_raw_payload(
         entry = games.get(gid)
         if isinstance(entry, dict):
             raw = _base_raw_entry(entry)
+        elif isinstance(checkpoints.get(gid), dict):
+            raw = _base_raw_entry(checkpoints[gid])
         else:
             preview_entry = preview_games.get(gid)
             if not isinstance(preview_entry, dict):
                 raise ValueError(
                     f"base validated provider artifact missing successful game {gid} "
-                    "and no validated preview fallback is available"
+                    "and no validated provider checkpoint or preview fallback is available"
                 )
-            raw = _preview_raw_entry(preview_entry)
+            # Preview continuity is allowed only for a game explicitly recorded as a
+            # provider failure. A successful provider game may never be silently
+            # downgraded to deterministic preview prose.
+            raise ValueError(
+                f"successful provider game {gid} is missing both published HUMAN prose "
+                "and a validated Groq checkpoint"
+            )
         if not raw["headline"] or not raw["paragraph1"] or not raw["model_rationale"] or not raw["sources"]:
             raise ValueError(f"validated editorial base has unusable game {gid}")
         output[gid] = raw
@@ -207,6 +234,7 @@ def ingest(
     provider_artifact: Path,
     status_path: Path,
     output: Path,
+    provider_checkpoint_dir: Path | None = None,
 ) -> list[str]:
     repo_root = Path(__file__).resolve().parents[1]
     resolve = lambda path: path if path.is_absolute() else repo_root / path
@@ -217,6 +245,7 @@ def ingest(
     provider_path = resolve(provider_artifact)
     context_status_path = resolve(status_path)
     output_path = resolve(output)
+    checkpoint_path = resolve(provider_checkpoint_dir) if provider_checkpoint_dir is not None else None
 
     frame = pd.read_csv(prediction_path)
     if "game_id" not in frame.columns:
@@ -259,6 +288,7 @@ def ingest(
                 base_artifact=base,
                 chatgpt_entries=chatgpt_entries,
                 preview_artifact=previews_payload,
+                checkpoint_entries=_checkpoint_entries(checkpoint_path),
             ), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
@@ -300,6 +330,7 @@ def main() -> None:
     parser.add_argument("--provider-artifact", default="outputs/copilot_media_reads.json")
     parser.add_argument("--status", default="outputs/context_source_status.json")
     parser.add_argument("--output", default="outputs/copilot_media_reads.json")
+    parser.add_argument("--provider-checkpoint-dir", default="")
     args = parser.parse_args()
     ingest(
         input_dir=Path(args.input_dir),
@@ -309,6 +340,7 @@ def main() -> None:
         provider_artifact=Path(args.provider_artifact),
         status_path=Path(args.status),
         output=Path(args.output),
+        provider_checkpoint_dir=Path(args.provider_checkpoint_dir) if args.provider_checkpoint_dir else None,
     )
 
 
