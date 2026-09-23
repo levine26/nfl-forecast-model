@@ -21,7 +21,7 @@ from nfl_forecast.challenger_ats_nextgen_gate import (
     write_phase2_gate_artifacts,
 )
 from nfl_forecast.config import load_config
-from nfl_forecast.data import load_advanced_data, load_core_data
+from nfl_forecast.data import load_core_data
 from nfl_forecast.elo import build_pregame_elo
 from nfl_forecast.features import add_game_results, aggregate_team_games, build_matchup_features
 
@@ -39,8 +39,6 @@ def run(
     # floor and historical outcome ceiling. Never request 2026 in this runner.
     seasons = list(range(TRAINING_FLOOR, HISTORICAL_END + 1))
     bundle = load_core_data(seasons, cfg["data"]["cache_dir"])
-    advanced_start = max(TRAINING_FLOOR, int(cfg["data"]["advanced_start_season"]))
-    bundle = load_advanced_data(bundle, range(advanced_start, HISTORICAL_END + 1))
 
     schedules = bundle.schedules.copy()
     schedule_season = pd.to_numeric(schedules["season"], errors="coerce")
@@ -75,7 +73,7 @@ def run(
         gate,
         out,
         source_description=(
-            "2015-2025 nflverse core/advanced data loaded through repository data functions; "
+            "2015-2025 nflverse core schedule/PBP data loaded through repository data functions; "
             "pregame Elo and shifted alpha-0.15 matchup features built through existing "
             "chronology-safe feature pipeline; historical schedule market fields retain "
             "exact-horizon-opaque evidence semantics"
