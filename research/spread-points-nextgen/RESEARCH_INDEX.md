@@ -2,7 +2,7 @@
 
 **Authority:** `MASTER_PLAN.md`  
 **Purpose:** Canonical map of the Spread & Points research program.  
-**Last reconciled:** 2026-09-22 America/Los_Angeles
+**Last reconciled:** 2026-09-23 America/Los_Angeles
 
 This index is a map, not an authorization mechanism. Candidate identity and evidence boundaries are controlled by frozen contracts and phase receipts.
 
@@ -15,7 +15,7 @@ This index is a map, not an authorization mechanism. Candidate identity and evid
 - `research/spread-points-nextgen/RESEARCH_INDEX.md`
 - `research/spread-points-nextgen/FINAL_PHASE3_RECEIPT.md`
 - `research/spread-points-nextgen/FINAL_PHASE4_RECEIPT.md`
-- future merged closeout: `research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
+- `research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
 
 ## Production firewall
 
@@ -54,7 +54,7 @@ Final integration:
 
 Authoritative closeout: `research/spread-points-nextgen/FINAL_PHASE4_RECEIPT.md`.
 
-Canonical evidence is under `research/spread-points-nextgen/phase4/`, including the opening receipt, frozen A0/B0/C0 2025 outputs, baselines, diagnostics, historical-validation/ablation/uncertainty/robustness/red-team reports, synthesis and Phase 5 handoff.
+Canonical evidence is under `research/spread-points-nextgen/phase4/`, including the opening receipt, frozen A0/B0/C0 2025 outputs, baselines, diagnostics, historical-validation/ablation/uncertainty/robustness/red-team reports, synthesis, and Phase 5 handoff.
 
 Key receipts:
 
@@ -70,7 +70,11 @@ Key receipts:
 
 2025 is **OPENED / SPENT** for the underlying A0/B0/C0 evaluation.
 
-## Phase 5 — SCIENTIFICALLY COMPLETE; CANDIDATE 5 REJECTED
+## Phase 5 — COMPLETE; CANDIDATE 5 REJECTED
+
+Authoritative closeout:
+
+`research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
 
 Primary branch:
 
@@ -84,7 +88,12 @@ Scientific freeze:
 
 `df14e51d73aad96899d3ba4364cbb76989f0d2bf`
 
-The Phase 5 contract was committed before Candidate-5-specific performance. It freezes the evidence boundary, component policy, F-ST provenance, feature sets, chronology-clean meta-stacking, L2 offset-logistic model, lambda selection, threshold, ablations, metrics, uncertainty, 2025 diagnostic rule and scientific disposition rule.
+Merged implementation identities:
+
+- code SHA-256 `55f62f9de44e853f820016c893c6d94a9a2226f7c08e412260a7cf5d10c9b4c2`
+- config SHA-256 `5762ac921519e594412d0dbcc6ced49d8fb332672e83bb0c5e54cd53d04299ce`
+
+The Phase 5 contract was committed before Candidate-5-specific performance. It freezes the evidence boundary, component policy, F-ST provenance, feature sets, chronology-clean meta-stacking, L2 offset-logistic model, lambda selection, threshold, ablations, metrics, uncertainty, 2025 diagnostic rule, and scientific disposition rule.
 
 Canonical Phase 5 package under `research/spread-points-nextgen/phase5/`:
 
@@ -129,7 +138,7 @@ Execution provenance:
 
 - first workflow attempt `35827845845` — pre-result unit-test failure only; no Candidate-5-specific metrics generated
 - engineering-only fixture correction `b86b7c98b40a3b68e6fb4e42f9aeb6592554065a`
-- first successful frozen historical workflow `35828122187` — contract gate, historical package and exact-run gate SUCCESS
+- first successful frozen historical workflow `35828122187` — contract gate, historical package, and exact-run gate SUCCESS
 - evidence preservation commit `8fce0be359d93d68bc2c4bba852ede4181a38368`
 
 Primary 2022–2024 result:
@@ -147,7 +156,17 @@ Primary 2022–2024 result:
 
 2025 was executed only after the complete freeze and is labeled `POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC`. On 272 games, both F-ST and Candidate 5 were 179/272 with zero winner switches. It did not select or rescue the candidate.
 
-No Phase 6 handoff is created because the preregistered eligibility rule is not satisfied.
+Final integration:
+
+- PR #552 — **MERGED**
+- exact validated head `a4f892d64ab163a421eed203d9b50983e5bbd04b`
+- Phase 5 validation `35875417408` — SUCCESS
+- research firewall `35875417416` — SUCCESS
+- full research validation `35875417452` — SUCCESS
+- Phase 4 reproducibility regression `35875417543` — SUCCESS
+- merge `a68afb1e1cf9675a7ff9e0e0af1f52343546f029`
+
+No Phase 6 handoff exists because the preregistered eligibility rule was not satisfied.
 
 ## Validation workflows
 
@@ -159,6 +178,6 @@ No Phase 6 handoff is created because the preregistered eligibility rule is not 
 
 ## Current program state
 
-Phase 5 scientific work is closed with Candidate 5 V1 `REJECTED`; only PR/merge/final-receipt integration work remains. Completed 2026 outcomes remain outside Candidate 5 historical selection. Production remains `F-ST-01-FROZEN-2026`.
+Phase 5 is fully closed with Candidate 5 V1 `REJECTED`. Completed 2026 outcomes remained outside Candidate 5 historical selection. Production remains `F-ST-01-FROZEN-2026`.
 
-**Do not start Phase 6 for Candidate 5 V1. Do not rescue the rejected historical identity.**
+**STOP this candidate program. Do not start Phase 6 for Candidate 5 V1. Do not rescue the rejected identity. Any future challenger requires separate authorization, a new preregistration, and a new candidate identity.**
