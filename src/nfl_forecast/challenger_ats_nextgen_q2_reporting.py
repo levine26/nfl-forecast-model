@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from scipy import optimize
 
 from nfl_forecast.challenger_ats_nextgen_q1_reporting import fixed_slice_masks
 from nfl_forecast.challenger_ats_nextgen_q2 import (
@@ -17,6 +18,8 @@ from nfl_forecast.challenger_ats_nextgen_q2 import (
 
 RELIABILITY_EDGES = np.linspace(0.0, 1.0, 11)
 KEY_MARGINS = (3, 6, 7, 10, 14)
+INTERVAL_LEVELS = (0.50, 0.80, 0.90)
+CALIBRATION_DEGENERACY_TOL = 1e-12
 
 
 def _binary_cover_probability(cpl: np.ndarray) -> np.ndarray:
@@ -42,6 +45,58 @@ def _margin_summaries(pmf: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return expected, median
 
 
+def _pmf_quantile(pmf: np.ndarray, probability: float) -> np.ndarray:
+    if not 0.0 < float(probability) < 1.0:
+        raise ValueError("Q2 reporting quantile probability must be inside (0,1)")
+    cdf = np.cumsum(np.asarray(pmf, dtype=float), axis=1)
+    index = np.argmax(cdf >= float(probability), axis=1)
+    return SUPPORT[index].astype(float)
+
+
+def _interval_metrics(pmf: np.ndarray, margin: np.ndarray) -> dict[str, float]:
+    out: dict[str, float] = {}
+    for level in INTERVAL_LEVELS:
+        tail = (1.0 - float(level)) / 2.0
+        lower = _pmf_quantile(pmf, tail)
+        upper = _pmf_quantile(pmf, 1.0 - tail)
+        covered = (margin >= lower) & (margin <= upper)
+        label = str(int(round(level * 100)))
+        out[f"interval_{label}_coverage"] = float(np.mean(covered))
+        out[f"interval_{label}_mean_width"] = float(np.mean(upper - lower))
+    return out
+
+
+def _cover_calibration_intercept_slope(
+    probability: np.ndarray,
+    actual: np.ndarray,
+) -> tuple[float, float]:
+    """Unpenalized logistic calibration; NaN when mechanically non-estimable."""
+    p = np.asarray(probability, dtype=float)
+    y = np.asarray(actual, dtype=float)
+    if len(p) != len(y) or len(p) == 0 or not np.isfinite(p).all() or not np.isfinite(y).all():
+        return float("nan"), float("nan")
+    if np.unique(y).size < 2:
+        return float("nan"), float("nan")
+    clipped = np.clip(p, LOGLOSS_FLOOR, 1.0 - LOGLOSS_FLOOR)
+    logit = np.log(clipped) - np.log1p(-clipped)
+    if float(np.std(logit)) <= CALIBRATION_DEGENERACY_TOL:
+        return float("nan"), float("nan")
+
+    def objective(beta: np.ndarray) -> float:
+        eta = float(beta[0]) + float(beta[1]) * logit
+        return float(np.sum(np.logaddexp(0.0, eta) - y * eta))
+
+    result = optimize.minimize(
+        objective,
+        np.asarray([0.0, 1.0], dtype=float),
+        method="BFGS",
+        options={"gtol": 1e-10, "maxiter": 1000},
+    )
+    if not result.success or not np.isfinite(result.x).all():
+        return float("nan"), float("nan")
+    return float(result.x[0]), float(result.x[1])
+
+
 def _metrics_for_rows(meta: pd.DataFrame, pmf: np.ndarray) -> dict:
     validate_pmf(pmf)
     margin = pd.to_numeric(meta["margin"], errors="raise").to_numpy(dtype=float)
@@ -63,9 +118,14 @@ def _metrics_for_rows(meta: pd.DataFrame, pmf: np.ndarray) -> dict:
         brier = np.square(binary[nonpush] - cover_actual[nonpush])
         mean_brier = float(np.mean(brier))
         mean_binary_logloss = float(np.mean(binary_logloss))
+        calibration_intercept, calibration_slope = _cover_calibration_intercept_slope(
+            binary[nonpush], cover_actual[nonpush]
+        )
     else:
         mean_brier = float("nan")
         mean_binary_logloss = float("nan")
+        calibration_intercept = float("nan")
+        calibration_slope = float("nan")
     expected, median = _margin_summaries(pmf)
     return {
         "n": int(len(meta)),
@@ -74,6 +134,8 @@ def _metrics_for_rows(meta: pd.DataFrame, pmf: np.ndarray) -> dict:
         "multinomial_cpl_logloss": float(np.mean(cpl_logloss)),
         "cover_brier_nonpush": mean_brier,
         "cover_logloss_nonpush": mean_binary_logloss,
+        "cover_calibration_intercept": calibration_intercept,
+        "cover_calibration_slope": calibration_slope,
         "mean_predicted_push": float(np.mean(cpl[:, 1])),
         "empirical_push_rate": float(np.mean(push_actual)),
         "push_calibration_error": float(np.mean(cpl[:, 1]) - np.mean(push_actual)),
@@ -83,6 +145,7 @@ def _metrics_for_rows(meta: pd.DataFrame, pmf: np.ndarray) -> dict:
         "median_margin_rmse": float(np.sqrt(np.mean(np.square(margin - median)))),
         "mean_endpoint_mass": float(np.mean(endpoint_mass(pmf))),
         "max_endpoint_mass": float(np.max(endpoint_mass(pmf))),
+        **_interval_metrics(pmf, margin),
     }
 
 
@@ -151,13 +214,7 @@ def q2_cover_reliability(metadata: pd.DataFrame, arms: dict[str, np.ndarray]) ->
 
 
 def q2_key_mass_calibration(metadata: pd.DataFrame, arms: dict[str, np.ndarray]) -> pd.DataFrame:
-    """Report predicted versus observed mass at the five frozen absolute key margins.
-
-    This is a diagnostic required by the Phase-1 Q2 preregistration.  It is not a
-    selection objective and cannot rescue or redefine the primary Q2 candidate.
-    Positive and negative margins are aggregated because V1 shares their key-
-    excess coefficients by absolute key.
-    """
+    """Report predicted versus observed mass at the five frozen absolute key margins."""
     margin = pd.to_numeric(metadata["margin"], errors="raise").to_numpy(dtype=float)
     groups: list[tuple[str, np.ndarray]] = [("ALL", np.arange(len(metadata), dtype=int))]
     for season, part in metadata.groupby("season", sort=True):
