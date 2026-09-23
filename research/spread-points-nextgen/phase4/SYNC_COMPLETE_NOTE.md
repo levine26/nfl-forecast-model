@@ -1,1 +1,0 @@
-This note is finalized by the subsequent two-parent synchronization merge with live main `6a2160c6f8d5a0b598da892707b0471f50bc30a8`.
