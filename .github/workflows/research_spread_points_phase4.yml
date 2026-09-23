@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: spread-points-phase4-${{ github.event.pull_request.number || github.ref }}
@@ -143,6 +143,28 @@ jobs:
           git fetch origin main --quiet
           base=$(git merge-base origin/main HEAD)
           git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
+      - name: Preserve complete holdout evidence on Phase 4 branch
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest='research/spread-points-nextgen/phase4'
+          cp /tmp/levline-phase4/A0_HOLDOUT_2025.csv "$dest/"
+          cp /tmp/levline-phase4/B0_HOLDOUT_2025.csv "$dest/"
+          cp /tmp/levline-phase4/C0_HOLDOUT_2025.csv "$dest/"
+          cp /tmp/levline-phase4/BASELINES_HOLDOUT_2025.csv "$dest/"
+          cp /tmp/levline-phase4/DIAGNOSTIC_SLICES_2025.csv "$dest/"
+          cp /tmp/levline-phase4/HOLDOUT_SUMMARY.json "$dest/"
+          cp /tmp/levline-phase4/HOLDOUT_RUN_MANIFEST.json "$dest/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dest/A0_HOLDOUT_2025.csv" "$dest/B0_HOLDOUT_2025.csv" "$dest/C0_HOLDOUT_2025.csv" \
+                  "$dest/BASELINES_HOLDOUT_2025.csv" "$dest/DIAGNOSTIC_SLICES_2025.csv" \
+                  "$dest/HOLDOUT_SUMMARY.json" "$dest/HOLDOUT_RUN_MANIFEST.json"
+          if ! git diff --cached --quiet; then
+            git commit -m 'research: preserve one-time Phase 4 2025 holdout evidence [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
