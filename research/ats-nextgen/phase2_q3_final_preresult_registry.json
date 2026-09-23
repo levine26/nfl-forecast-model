@@ -1,0 +1,33 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "C_Q3_FINAL_PRE_RESULT",
+  "candidate_id": "ATS-Q3-DIRECT-CPL-HURDLE-V1",
+  "status": "IMPLEMENTATION_FROZEN_NO_ACCEPTED_Q3_RESULT",
+  "stage_c_base_sha": "16859845573c3344ed82ae0b9bd27fa8b891eee4",
+  "validated_contract_head": "d9dbfe24af7fd19f5b22e76fd5f57dd83c606a60",
+  "scientific_blobs": {
+    "core": "c707ec8994fa27038ec9e14c757f5a67e99b6e86",
+    "reporting": "89660aaefeb14624bc16434cf91dd2f08feef067",
+    "runner": "733a5cac7cbcc9efa6d378fb92edc4eea1585893",
+    "core_tests": "2456c5a70c4a74c5672d38e5adcd74f8b954e519",
+    "reporting_tests": "0d914311f7572f7e7a3e1964900fb24759014f69",
+    "opening_receipt": "7c1000402134b399a2052fde86aff83e7bd7cb12",
+    "scoring_receipt": "98c6e2fb56f6fa886bc9d53f237b9589b6014800",
+    "opening_registry": "8897016dc576660ff95f72bcc0e2de97c00905e3"
+  },
+  "contract_workflow_blob": "4ba0358df0f7970f15ec8111850a11f336b43706",
+  "candidate_fitting_performed": false,
+  "candidate_performance_generated": false,
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "q2_valid_oof_available": false,
+  "q2_complementarity_available": false,
+  "q2_q3_blend_available": false,
+  "primary_comparison": "Q3_vs_Q3_M2_multinomial_cpl_logloss_exact_common_rows",
+  "historical_execution_requires_contract_success": true,
+  "scientific_blob_drift_invalidates_authorization": true,
+  "posthoc_calibration_allowed": false,
+  "class_weighting_allowed": false,
+  "stage_d_opened": false
+}
