@@ -31,6 +31,11 @@ BANNED = (
     "according to cbs sports", "live stream", "tv map",
     "75% pure / 25% market", "75% pure and 25% market",
     "weighting is 75% pure", "production blend weights",
+    "stay on schedule", "staying on schedule", "obvious passing downs",
+    "predictable passing situations", "predictable dropback game",
+    "clean early downs", "keep the full playbook available",
+    "field position loom", "third-down efficiency should carry",
+    "the deciding issue is likely to be", "turn manageable series into",
 )
 
 # Official availability/status language is inherently standardized and may repeat across
@@ -159,6 +164,34 @@ def _team_aliases(code: str) -> set[str]:
 def _mentions_any(text: str, aliases: set[str]) -> bool:
     lowered = text.lower()
     return any(re.search(rf"\b{re.escape(alias)}\b", lowered) for alias in aliases)
+
+
+def _named_people(text: str, away: str, home: str) -> set[str]:
+    excluded_first = {
+        "The", "Both", "When", "While", "With", "For", "If", "On", "At", "In",
+        "Green", "San", "New", "Los", "Las", "Kansas", "Tampa",
+    }
+    team_phrases = {_team_name(away).lower(), _team_name(home).lower()}
+    people: set[str] = set()
+    for match in re.finditer(r"\b([A-Z][a-zA-Z'’.-]+)\s+([A-Z][a-zA-Z'’.-]+)\b", str(text or "")):
+        first, second = match.groups()
+        phrase = f"{first} {second}"
+        if first in excluded_first or phrase.lower() in team_phrases:
+            continue
+        people.add(phrase)
+    return people
+
+
+def _source_titles_cover_matchup(sources: list[dict], away: str, home: str) -> bool:
+    away_aliases = _team_aliases(away)
+    home_aliases = _team_aliases(home)
+    away_seen = False
+    home_seen = False
+    for source in sources:
+        title = str(source.get("title") or "").lower()
+        away_seen = away_seen or _mentions_any(title, away_aliases)
+        home_seen = home_seen or _mentions_any(title, home_aliases)
+    return away_seen and home_seen
 
 
 def _contains_pct(text: str, value: float | None) -> bool:
@@ -293,6 +326,11 @@ def main() -> None:
 
         if not _mentions_any(paragraph1, away_aliases) or not _mentions_any(paragraph1, home_aliases):
             failures.append(f"{gid}: paragraph1 must explain both teams")
+        named_people = _named_people(paragraph1, away, home)
+        if len(named_people) < 2:
+            failures.append(
+                f"{gid}: paragraph1 must name at least two concrete players/coaches; found {sorted(named_people)}"
+            )
         if "levline" not in paragraph2.lower():
             failures.append(f"{gid}: paragraph2 must explicitly explain LevLine")
         if "f-st" not in paragraph2.lower():
@@ -353,6 +391,10 @@ def main() -> None:
             domain_families.add(_domain_family(url))
         if len(valid_sources) < 2 or len(domain_families) < 2:
             failures.append(f"{gid}: requires at least two independent approved-domain sources")
+        elif not _source_titles_cover_matchup(valid_sources, away, home):
+            failures.append(
+                f"{gid}: source titles must visibly cover both matchup teams; generic league-wide roundups are insufficient"
+            )
 
         cleaned[gid] = {
             "headline": headline,

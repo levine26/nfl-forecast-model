@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-"""Create and preserve the Sunday Signal weekend editorial roster.
+"""Create and preserve the complete Sunday Signal editorial roster for the active NFL week.
 
 Production forecast outputs legitimately contract as games kick off. Editorial publication
-must not use those contracting files as its roster authority. This helper defines the
-weekend slate as the active NFL week's Saturday/Sunday/Monday games, using the union of
-current live rows and immutable same-week locks. Once the weekend boundary is reached,
-the roster is frozen for that season/week and survives later output contraction.
+must not use those contracting files as its roster authority. This helper defines the full
+active NFL week across every scheduled gameday (including Thursday/Friday/Saturday games),
+using the union of current live rows and immutable same-week locks. Once the first game-day
+boundary is reached, the roster is frozen for that season/week and survives later output
+contraction.
 """
 
 import argparse
@@ -51,23 +52,13 @@ def _existing_identity(payload: dict) -> tuple[int, int] | None:
     return int(season), int(week)
 
 
-def _weekend_start(rows: pd.DataFrame, tz: ZoneInfo) -> datetime:
+def _slate_start(rows: pd.DataFrame, tz: ZoneInfo) -> datetime:
     if rows.empty or "gameday" not in rows.columns:
-        raise RuntimeError("cannot determine weekend boundary without gameday rows")
+        raise RuntimeError("cannot determine slate boundary without gameday rows")
     parsed_dates = [date.fromisoformat(str(value)) for value in rows["gameday"] if str(value)]
     if not parsed_dates:
-        raise RuntimeError("cannot determine weekend boundary from empty gameday values")
-
-    sunday_counts = Counter(d for d in parsed_dates if d.weekday() == 6)
-    if sunday_counts:
-        sunday = max(sunday_counts, key=lambda d: (sunday_counts[d], d))
-    else:
-        counts = Counter(parsed_dates)
-        primary = max(counts, key=lambda d: (counts[d], d))
-        sunday = primary + timedelta(days=(6 - primary.weekday()) % 7)
-
-    saturday = sunday - timedelta(days=1)
-    return datetime.combine(saturday, time.min, tzinfo=tz)
+        raise RuntimeError("cannot determine slate boundary from empty gameday values")
+    return datetime.combine(min(parsed_dates), time.min, tzinfo=tz)
 
 
 def build_roster(
@@ -129,37 +120,34 @@ def build_roster(
 
     candidates = candidates.drop_duplicates(subset=["game_id"], keep="first")
     tz = ZoneInfo(timezone_name)
-    weekend_start_local = _weekend_start(candidates, tz)
-    weekend_start_date = weekend_start_local.date()
+    slate_start_local = _slate_start(candidates, tz)
 
-    weekend = candidates[
-        candidates["gameday"].astype(str).map(lambda value: date.fromisoformat(value) >= weekend_start_date)
-    ].copy()
-    if weekend.empty:
-        raise RuntimeError("derived weekend editorial roster is empty")
+    slate = candidates.copy()
+    if slate.empty:
+        raise RuntimeError("derived active-week editorial roster is empty")
 
-    weekend["_gameday"] = weekend["gameday"].astype(str)
-    weekend["_gametime"] = weekend.get("gametime", pd.Series("", index=weekend.index)).fillna("").astype(str)
-    weekend["_game_id"] = weekend["game_id"].astype(str)
-    weekend = weekend.sort_values(["_gameday", "_gametime", "_game_id"])
-    game_ids = weekend["_game_id"].tolist()
+    slate["_gameday"] = slate["gameday"].astype(str)
+    slate["_gametime"] = slate.get("gametime", pd.Series("", index=slate.index)).fillna("").astype(str)
+    slate["_game_id"] = slate["game_id"].astype(str)
+    slate = slate.sort_values(["_gameday", "_gametime", "_game_id"])
+    game_ids = slate["_game_id"].tolist()
     if len(game_ids) != len(set(game_ids)):
         raise RuntimeError("derived weekend editorial roster contains duplicate game IDs")
 
-    frozen = now_utc.astimezone(tz) >= weekend_start_local
+    frozen = now_utc.astimezone(tz) >= slate_start_local
     return {
         "schema_version": 1,
         "season": season,
         "week": week,
         "timezone": timezone_name,
-        "weekend_start_local": weekend_start_local.isoformat(),
+        "slate_start_local": slate_start_local.isoformat(),
         "frozen": frozen,
         "generated_utc": now_utc.astimezone(timezone.utc).isoformat(),
         "game_ids": game_ids,
         "policy": (
-            "Weekend editorial roster is Saturday/Sunday/Monday for the active NFL week, "
-            "derived from current rows plus immutable same-week locks and frozen once the "
-            "weekend boundary is reached."
+            "Editorial roster covers the complete active NFL week, including standalone "
+            "Thursday/Friday/Saturday games, derived from current rows plus immutable same-week "
+            "locks and frozen once the first scheduled gameday boundary is reached."
         ),
     }
 
@@ -191,7 +179,7 @@ def main() -> int:
     args.roster.parent.mkdir(parents=True, exist_ok=True)
     args.roster.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(
-        f"editorial weekend roster OK: season={payload['season']} week={payload['week']} "
+        f"editorial full-week roster OK: season={payload['season']} week={payload['week']} "
         f"games={len(payload['game_ids'])} frozen={payload['frozen']} -> {args.roster}"
     )
     return 0

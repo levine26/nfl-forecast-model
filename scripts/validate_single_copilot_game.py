@@ -22,6 +22,28 @@ RATIONALE_PROHIBITED = re.compile(
     flags=re.I,
 )
 
+
+GENERIC_HUMAN_PHRASES = (
+    "stay on schedule",
+    "staying on schedule",
+    "obvious passing downs",
+    "predictable passing situations",
+    "predictable dropback game",
+    "clean early downs",
+    "keep the full playbook available",
+    "field position loom",
+    "field position should carry",
+    "third-down efficiency should carry",
+    "the deciding issue is likely to be",
+    "turn manageable series into",
+    "pressure remains central",
+    "explosive plays loom",
+)
+
+NAME_PAIR_RE = re.compile(
+    r"\b([A-Z][a-zA-Z'’.-]+)\s+([A-Z][a-zA-Z'’.-]+)\b"
+)
+
 # Groq occasionally compresses model_rationale to only a few words even when its
 # researched paragraph is publication-grade. In that case the rationale field is not
 # padded: it is discarded and deterministically reconstructed from a football mechanism
@@ -77,6 +99,46 @@ def _clean(value: object) -> str:
 
 def _words(value: object) -> list[str]:
     return re.findall(r"\b[\w'-]+\b", _clean(value))
+
+
+def _named_people(text: str, away: str, home: str) -> set[str]:
+    """Heuristic human-specificity check: require real-looking two-token names.
+
+    Team/city phrases and common sentence-openers are excluded. This is deliberately
+    conservative: the editorial prompt should name actual players/coaches rather than
+    passing generic football language through a word-count gate.
+    """
+    excluded_first = {
+        "The", "Both", "When", "While", "With", "For", "If", "On", "At", "In",
+        "Green", "San", "New", "Los", "Las", "Kansas", "Tampa",
+    }
+    team_phrases = {
+        _team_name(away).lower(),
+        _team_name(home).lower(),
+    }
+    people: set[str] = set()
+    for match in NAME_PAIR_RE.finditer(_clean(text)):
+        first, second = match.groups()
+        phrase = f"{first} {second}"
+        if first in excluded_first:
+            continue
+        if phrase.lower() in team_phrases:
+            continue
+        people.add(phrase)
+    return people
+
+
+def _source_titles_cover_matchup(sources: list[dict], away: str, home: str) -> bool:
+    """Require the citation set to visibly concern both teams, not generic NFL roundups."""
+    away_aliases = _team_aliases(away)
+    home_aliases = _team_aliases(home)
+    away_seen = False
+    home_seen = False
+    for source in sources:
+        title = _clean(source.get("title")).lower()
+        away_seen = away_seen or _mentions_any(title, away_aliases)
+        home_seen = home_seen or _mentions_any(title, home_aliases)
+    return away_seen and home_seen
 
 
 def _rationale_has_prohibited(value: object) -> bool:
@@ -236,6 +298,15 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
         failures.append(f"{gid}: paragraph1 length {len(p1_words)} outside 55-100")
     if not _mentions_any(paragraph1, _team_aliases(away)) or not _mentions_any(paragraph1, _team_aliases(home)):
         failures.append(f"{gid}: paragraph1 must discuss both teams")
+    named_people = _named_people(paragraph1, away, home)
+    if len(named_people) < 2:
+        failures.append(
+            f"{gid}: paragraph1 must name at least two concrete players/coaches; found {sorted(named_people)}"
+        )
+    paragraph1_lower = paragraph1.lower()
+    for phrase in GENERIC_HUMAN_PHRASES:
+        if phrase in paragraph1_lower:
+            failures.append(f"{gid}: paragraph1 contains generic editorial filler '{phrase}'")
     if not 18 <= len(rationale_words) <= 40:
         failures.append(f"{gid}: model_rationale length {len(rationale_words)} outside 18-40")
     if _rationale_has_prohibited(rationale):
@@ -243,6 +314,10 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
 
     valid_sources, _, source_failures = _valid_sources_with_backfill(row, entry.get("sources"))
     failures.extend(f"{gid}: {failure}" for failure in source_failures)
+    if not source_failures and not _source_titles_cover_matchup(valid_sources, away, home):
+        failures.append(
+            f"{gid}: source titles must visibly cover both matchup teams; generic league-wide roundups are insufficient"
+        )
     if not source_failures:
         entry["sources"] = valid_sources
 

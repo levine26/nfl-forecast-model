@@ -153,9 +153,9 @@ def test_every_reconstruction_template_is_contract_safe_and_cross_game_unique():
 def test_validate_persists_reconstructed_rationale_and_exact_passing_sources(tmp_path):
     gid = "2026_01_TB_CIN"
     paragraph1 = (
-        "Buccaneers protection has to handle Cincinnati pressure without forcing rushed throws, while Tampa Bay can help with motion and quick-game answers. "
-        "The Bengals need their front to win enough early downs to avoid obvious passing situations, and Cincinnati's secondary must tackle cleanly after the catch. "
-        "That protection-versus-pressure exchange should shape both teams' third-down options and determine which offense can stay on schedule."
+        "Baker Mayfield has to identify Cincinnati's pressure packages early enough to keep Tampa Bay's route concepts intact, especially when the Bengals crowd the line of scrimmage. "
+        "Joe Burrow gives Cincinnati a different kind of leverage: he can punish Tampa Bay if its secondary has to overcommit to the rush. "
+        "The matchup turns on whether Mayfield gets clean answers before pressure arrives and whether Burrow can force the Buccaneers to defend the full width of the field."
     )
     payload = {
         "games": {
