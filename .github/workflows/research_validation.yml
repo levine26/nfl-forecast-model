@@ -59,6 +59,7 @@ jobs:
             tests/test_challenger_market_reliance.py \
             tests/test_challenger_margin_forensics.py \
             tests/test_challenger_ats_nextgen_phase1.py \
+            tests/test_challenger_ats_nextgen_phase2_gate.py \
             tests/test_experiment_registry.py \
             tests/test_research_firewall.py
       - name: Prove foundation tests did not modify production surfaces
