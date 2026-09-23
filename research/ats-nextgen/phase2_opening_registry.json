@@ -1,0 +1,116 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "OPENING_GATE",
+  "status": "OPENING_GATE_COMPLETE_RECEIPT_PENDING_VALIDATION",
+  "created_date": "2026-09-23",
+  "production_model": "F-ST-01-FROZEN-2026",
+  "production_changed": false,
+  "completed_2026_outcomes_authorized": false,
+  "completed_2026_outcomes_used": 0,
+  "candidate_fitting_performed": false,
+  "candidate_performance_generated": false,
+  "q1_fit_authorized": false,
+  "q1_fit_authorization_condition": "Merge and exact-head validation of the Phase-2 opening receipt/registry package; then Stage A may execute ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1 exactly as preregistered.",
+  "integration": {
+    "branch": "research/ats-nextgen-phase2",
+    "pr_number": 559,
+    "base_main_sha": "ccccf37a74263a0a71cf3fecc198a61b163033bd",
+    "pre_receipt_implementation_head": "961e486ee9747c69a4420373153adac5caa6d437"
+  },
+  "canonical_sign": {
+    "margin": "home_score-away_score",
+    "source_spread_line": "nflverse spread_line; positive means home favored",
+    "home_spread": "-spread_line; sportsbook convention with home favorite negative",
+    "market_home_margin_center": "spread_line",
+    "ats_residual": "margin+home_spread",
+    "cover": "ats_residual>0",
+    "push": "ats_residual==0",
+    "loss": "ats_residual<0"
+  },
+  "chronology": {
+    "training_floor": 2015,
+    "historical_outcome_cutoff": 2025,
+    "outer_target_seasons": [2022, 2023, 2024, 2025],
+    "inner_target_floor": 2019,
+    "random_kfold_allowed": false
+  },
+  "market_evidence_class": "historical_closing_late_benchmark_exact_horizon_opaque",
+  "opening_artifact": {
+    "workflow_run": 35916159139,
+    "workflow_run_number": 4,
+    "workflow_conclusion": "success",
+    "artifact_id": 10774524253,
+    "artifact_name": "ats-nextgen-phase2-opening-7d5865e0a20aaeac579adf4db201054d0d7236a7",
+    "artifact_digest": "sha256:71ffe60cb0e472bd311ead8eabb961afbca75a41f9f7eb04fb310a78800f4511",
+    "artifact_head_sha": "961e486ee9747c69a4420373153adac5caa6d437",
+    "rows": 2895,
+    "eligible_rows": 2895,
+    "push_rows": 73,
+    "gate_raw_sha256": "0fabdc442e914ee9dc5cd501a728f1c1d69e11e01e44dd16ff800f46231fa20e",
+    "gate_canonical_game_keyed_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d"
+  },
+  "validated_pre_receipt_checks": {
+    "opening_gate_run": 35916159139,
+    "opening_gate_conclusion": "success",
+    "research_firewall_run": 35916158882,
+    "research_firewall_conclusion": "success",
+    "research_validation_run": 35916158869,
+    "research_validation_foundation_job": 107368347650,
+    "research_validation_foundation_conclusion": "success"
+  },
+  "frozen_blobs": {
+    "gate_module": {
+      "path": "src/nfl_forecast/challenger_ats_nextgen_gate.py",
+      "sha": "5be2162fbddf492b87b839b55397ca8cbb596b8a"
+    },
+    "gate_runner": {
+      "path": "scripts/run_challenger_ats_nextgen_phase2_gate.py",
+      "sha": "aca7fefe5abc12b91f64934c1f2c7e7b1f8689eb"
+    },
+    "gate_tests": {
+      "path": "tests/test_challenger_ats_nextgen_phase2_gate.py",
+      "sha": "10d741b14b869a87ff4bad572601524c645ff879"
+    },
+    "opening_workflow": {
+      "path": ".github/workflows/research_ats_nextgen_phase2_gate.yml",
+      "sha": "8ea611cd7867b7dc707bdaf3517161cb3ca28819"
+    },
+    "research_validation_workflow": {
+      "path": ".github/workflows/research_validation.yml",
+      "sha": "847b012a2b9779b88d37af9bb3e16bece51b99eb"
+    },
+    "model_config": {
+      "path": "config/model.yaml",
+      "sha": "c8db03a11c66254dc4ea897495c76b4152802bea"
+    },
+    "data_loader": {
+      "path": "src/nfl_forecast/data.py",
+      "sha": "2fb21dd6b7254d4b1e7921ae33f77d4dd2578640"
+    },
+    "feature_builder": {
+      "path": "src/nfl_forecast/features.py",
+      "sha": "76c42479cb72ab38509e0b4bcee723eb638789d1"
+    },
+    "elo_builder": {
+      "path": "src/nfl_forecast/elo.py",
+      "sha": "a7e7ae9e312e188a8d8c751c8a65addaa19cfcfe"
+    },
+    "phase1_registry": {
+      "path": "research/ats-nextgen/phase1_registry.json",
+      "sha": "7e47a10e27f278327e058ba4a64eb9c5310c4049"
+    }
+  },
+  "candidate_ids": {
+    "q1": "ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1",
+    "q2": "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1",
+    "q3": "ATS-Q3-DIRECT-CPL-HURDLE-V1"
+  },
+  "pre_result_engineering_corrections": [
+    {
+      "issue": "Initial draft treated nflverse spread_line as sportsbook-sign home spread L.",
+      "resolution": "Verified nflverse source semantics and fixed mapping before any candidate fitting or performance generation: canonical home_spread=-spread_line and market_home_margin_center=spread_line.",
+      "candidate_version_impact": "none; correction implements the already-frozen Phase-1 sign contract rather than changing it"
+    }
+  ]
+}

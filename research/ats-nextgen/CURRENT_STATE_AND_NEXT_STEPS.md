@@ -2,18 +2,30 @@
 
 ## Current state
 
-Phase 1 is **COMPLETE**. PR #556 merged the exact-head validated ATS research/preregistration package at `80f84dc8282205c48dbfd8ca7e9e31c4be663bb6`. Q1/Q2/Q3 remain untrained. No candidate-specific ATS historical performance was generated in Phase 1. Production remains `F-ST-01-FROZEN-2026` and Sunday Signal numerical forecasting is unchanged.
+Phase 1 is **COMPLETE**. PR #556 merged the exact-head validated ATS research/preregistration package at `80f84dc8282205c48dbfd8ca7e9e31c4be663bb6`.
 
-The prior Spread & Points negative evidence remains closed. The new ATS family is scientifically distinct and frozen around:
+Phase 2 is now **IN PROGRESS — OPENING GATE COMPLETE** on `research/ats-nextgen-phase2` / PR #559. The pre-fit opening gate has been implemented and exercised against the real 2015–2025 historical data path. Q1/Q2/Q3 remain untrained and no candidate-specific historical performance has been generated. Production remains `F-ST-01-FROZEN-2026` and Sunday Signal numerical forecasting is unchanged.
 
-- market-relative conditional quantiles;
-- discrete NFL margin probability mass;
-- key-number and push modeling;
-- conditional margin dispersion;
-- direct cover/push/loss probability estimation;
-- exact side-price economics only when quoted price is genuinely available.
+The dedicated opening workflow passed on exact pre-receipt implementation head `961e486ee9747c69a4420373153adac5caa6d437`:
 
-Historical 2022–2025 evidence is development/non-pristine. Completed 2026 outcomes remain prohibited from candidate design, fitting, tuning, selection, rescue, and historical survival decisions.
+- workflow run `35916159139` (#4): SUCCESS;
+- 2,895 historical gate rows, all ATS eligible;
+- 73 whole-line pushes;
+- 0 completed-2026 outcomes;
+- canonical game-keyed gate SHA-256 `bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d`;
+- artifact ID `10774524253`, SHA-256 `71ffe60cb0e472bd311ead8eabb961afbca75a41f9f7eb04fb310a78800f4511`.
+
+The opening boundary is frozen in `PHASE2_OPENING_RECEIPT.md` and `phase2_opening_registry.json`. The receipt/status package must pass exact-head CI and merge before Q1 fitting is authorized.
+
+## Source-sign contract resolved before results
+
+The Phase-2 audit verified that nflverse `spread_line` is positive when the home team is favored, while the frozen sportsbook home-spread notation uses a negative value for a home favorite. Therefore:
+
+- `market_home_margin_center = spread_line`;
+- `home_spread = -spread_line`;
+- `R = (home_score-away_score) + home_spread`.
+
+This was corrected before any candidate fitting or performance generation and conforms the implementation to the Phase-1 scientific contract.
 
 ## Frozen design summary
 
@@ -25,17 +37,26 @@ Historical 2022–2025 evidence is development/non-pristine. Completed 2026 outc
 
 A Q2/Q3 blend is authorized only on `w_Q2={0,.25,.50,.75,1}` selected by inner chronology-clean multinomial log loss.
 
-## Exact Phase-2 starting action
+Historical 2022–2025 evidence is development/non-pristine. Completed 2026 outcomes remain prohibited from candidate design, fitting, tuning, selection, rescue, and historical survival decisions.
 
-Phase 2 is **NOT STARTED**. When it is explicitly continued:
+## Exact next actions
 
-1. create a dedicated Phase-2 research branch from then-current `main`;
-2. read the complete Phase-1 package and final receipt;
-3. implement canonical sign/ATS grading helpers and the preregistered synthetic grading tests;
-4. assert whole-/half-line push logic;
-5. build row-level provenance for spread/total/moneyline and compact football state;
-6. assert outer/inner rolling chronology and completed-2026 exclusion;
-7. freeze implementation/config hashes in a pre-result Phase-2 opening receipt;
-8. only then fit Q1; implement Q2 and Q3 later in the frozen sequence.
+1. validate the complete opening receipt/registry/status package on its exact PR head;
+2. merge PR #559 only if the opening gate, research firewall, research validation, and full repository checks are green;
+3. verify merged `main` and record the opening merge identity;
+4. only then open Stage A and implement/execute Q1 exactly from `Q1_QUANTILE_PREREGISTRATION.md`;
+5. generate chronology-clean 2022–2025 Q1 outer OOF only after all Q1 implementation tests pass;
+6. do not redesign Q1 after viewing its outer results;
+7. do not begin Q2 until the frozen Q1 OOF interface is complete.
 
-Phase 2 remains research-only and is not authorized to change production.
+## Active firewalls
+
+- no completed-2026 outcome use;
+- no random K-fold;
+- no historical market-horizon relabeling;
+- no global/full-sample preprocessing that leaks target information;
+- no player-state/weather/news/juice/book-dispersion expansion in V1;
+- no post-result rescue learner, quantile, key number, threshold, calibration, or blend grid;
+- no production F-ST/Sunday Signal forecasting changes.
+
+> 2022–2025 is chronology-clean development evidence for this candidate execution but is not pristine independent confirmation because those seasons have informed prior LevLine research.
