@@ -134,3 +134,24 @@ Working Candidate 5 identity remains `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`. Pha
 - `.github/workflows/research_validation.yml`
 - `.github/workflows/research_spread_points_phase3.yml`
 - Phase 4 dedicated holdout workflow will be indexed here after it is committed.
+
+### Phase 4 — scientific package complete; merge closeout pending
+
+- pre-result opening receipt — `research/spread-points-nextgen/phase4/HOLDOUT_OPENING_RECEIPT.json` (commit `362af7af7db43a715b9ab9537a52d2749c37e7a6`)
+- exact first completed holdout run — `35818332253`, generator head `f0b92217488a1a000bee74a903a9437931a53230`
+- exact first-run artifact — `10732945725`, metadata digest `sha256:7e231406237dc0f27681cc974d07ba34a6fe3bb976bea42531bedc8166557671`
+- exact artifact preservation workflow — `35819413238` SUCCESS; verified provenance and all evidence SHA-256 values before commit
+- raw holdout predictions — `phase4/A0_HOLDOUT_2025.csv`, `B0_HOLDOUT_2025.csv`, `C0_HOLDOUT_2025.csv`
+- reference baselines — `phase4/BASELINES_HOLDOUT_2025.csv`
+- fixed diagnostic slices — `phase4/DIAGNOSTIC_SLICES_2025.csv`
+- machine summary / run manifest — `phase4/HOLDOUT_SUMMARY.json`, `phase4/HOLDOUT_RUN_MANIFEST.json`
+- execution failure/boundary log — `phase4/HOLDOUT_FAILURE_LOG.md`
+- historical validation — `phase4/HISTORICAL_VALIDATION_REPORT.md`
+- preregistered ablation analysis — `phase4/ABLATION_REPORT.md`
+- uncertainty — `phase4/STATISTICAL_UNCERTAINTY_REPORT.md`
+- robustness / fixed slices — `phase4/ROBUSTNESS_REPORT.md`
+- red-team audit — `phase4/RED_TEAM_AUDIT.md`
+- synthesis — `phase4/PHASE4_SYNTHESIS.md`
+- Phase 5 handoff — `phase4/PHASE5_HANDOFF.md`
+- scientific disposition — `NO_HISTORICAL_STANDALONE_FINALIST`; A0/B0 valid underlying representations but not standalone finalists; C0 market-aware diagnostic only; D remains ineligible
+- Candidate 5 — NOT STARTED / untrained; completed 2026 outcomes unused; production `F-ST-01-FROZEN-2026` unchanged
