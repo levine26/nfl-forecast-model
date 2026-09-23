@@ -91,6 +91,8 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+          import pandas as pd
+
           root = Path('/tmp/levline-phase3')
           manifest = json.loads((root / 'RUN_MANIFEST.json').read_text())
           assert manifest['loaded_seasons'] == list(range(2016, 2025))
@@ -99,7 +101,35 @@ jobs:
           assert manifest['2025_challenger_scored'] is False
           assert manifest['completed_2026_outcomes_used'] is False
           assert manifest['candidate5_trained'] is False
+
+          for name in ('A0_OOF_2022_2024.csv', 'B0_OOF_2022_2024.csv', 'C0_OOF_2022_2024.csv'):
+              frame = pd.read_csv(root / name)
+              assert len(frame) == 815
+              assert sorted(frame['season'].astype(int).unique().tolist()) == [2022, 2023, 2024]
+              assert (frame['train_through_season'].astype(int) < frame['season'].astype(int)).all()
+
+          future = pd.read_csv(root / 'FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv')
+          assert len(future) == 815
+          assert future['oof_provenance_assertion'].astype(bool).all()
+          for prefix in ('a0', 'b0', 'c0'):
+              assert (future[f'{prefix}_train_through_season'].astype(int) < future['season'].astype(int)).all()
           PY
+      - name: Verify regenerated evidence matches frozen committed evidence
+        run: |
+          set -euo pipefail
+          frozen='research/spread-points-nextgen/phase3/evidence'
+          for file in \
+            A0_OOF_2022_2024.csv \
+            B0_OOF_2022_2024.csv \
+            C0_OOF_2022_2024.csv \
+            BASELINES_2022_2024.csv \
+            DIAGNOSTIC_SLICES.csv \
+            FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv \
+            DEVELOPMENT_SUMMARY.json \
+            CANDIDATE_RUN_RECEIPTS.json \
+            D_ELIGIBILITY_RECEIPT.json; do
+            cmp "$frozen/$file" "/tmp/levline-phase3/$file"
+          done
       - name: Prove production surfaces unchanged
         run: git diff --exit-code -- $PROTECTED_SURFACES
       - uses: actions/upload-artifact@v4
