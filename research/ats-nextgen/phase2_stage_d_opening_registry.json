@@ -1,0 +1,54 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "D_FINAL_EVIDENCE_SYNTHESIS_AND_UNCERTAINTY",
+  "status": "FROZEN_PRE_EXECUTION",
+  "stage_c_merge_base": "539081c59e62a5d4dbc0a8f849d8a332424ea06e",
+  "candidate_fitting_authorized": false,
+  "candidate_retuning_authorized": false,
+  "candidate_rescue_authorized": false,
+  "completed_2026_outcomes_authorized": false,
+  "production_changes_authorized": false,
+  "accepted_inputs": {
+    "gate_canonical_game_keyed_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d",
+    "q1": {
+      "candidate_id": "ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1",
+      "classification": "VALID_NEGATIVE_INCREMENTAL_RESULT",
+      "oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
+      "rows": 1087
+    },
+    "q2": {
+      "candidate_id": "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1",
+      "classification": "STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT",
+      "accepted_oof_available": false,
+      "accepted_primary_performance_available": false,
+      "complementarity_available": false,
+      "q2_q3_blend_available": false
+    },
+    "q3": {
+      "candidate_id": "ATS-Q3-DIRECT-CPL-HURDLE-V1",
+      "classification": "NOT_INCREMENTAL_VS_Q3_M2",
+      "oof_sha256": "18610dfcfa9ffe71ed30259f9fef85a5655cefa68301f46fa1bb1950593dee04",
+      "rows": 1087
+    }
+  },
+  "uncertainty": {
+    "bootstrap_samples": 10000,
+    "seed": 26,
+    "alpha": 0.05,
+    "block_columns": ["season", "week"],
+    "interval": "percentile",
+    "delta_orientation": "candidate_minus_matching_market_null",
+    "probability_better_rule": "bootstrap_delta_lt_zero",
+    "q1_primary": "mean_row_pinball_across_tau_10_21_1_2_11_21__Q1_minus_M2",
+    "q3_primary": "multinomial_CPL_logloss__Q3_minus_Q3_M2",
+    "q3_secondary": "nonpush_conditional_cover_Brier__Q3_minus_Q3_M2",
+    "simple_hit_rate_interval": "two_sided_95pct_Clopper_Pearson"
+  },
+  "new_slices_authorized": false,
+  "synthetic_historical_juice_authorized": false,
+  "roi_or_ats_rescue_authorized": false,
+  "stage_d_execution_performed": false,
+  "stage_d_results_generated": false,
+  "next_stage_after_valid_closeout": "PHASE_3_SCIENTIFIC_SYNTHESIS_CANDIDATE_SELECTION_AND_FREEZE"
+}
