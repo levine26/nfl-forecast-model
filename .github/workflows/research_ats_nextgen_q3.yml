@@ -53,6 +53,7 @@ jobs:
           from pathlib import Path
           result = json.loads(Path('research/ats-nextgen/phase2_q2_result_registry.json').read_text())
           opening = json.loads(Path('research/ats-nextgen/phase2_q3_opening_registry.json').read_text())
+          final = json.loads(Path('research/ats-nextgen/phase2_q3_final_preresult_registry.json').read_text())
           assert result['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
           assert result['accepted_q2_outer_oof_artifact'] is None
           assert result['accepted_q2_primary_performance'] is None
@@ -62,6 +63,61 @@ jobs:
           assert opening['candidate_fitting_performed'] is False
           assert opening['candidate_performance_generated'] is False
           assert opening['completed_2026_outcomes_used'] == 0
+          assert final['candidate_fitting_performed'] is False
+          assert final['candidate_performance_generated'] is False
           PY
       - name: Prove contract tests did not modify production surfaces
         run: git diff --exit-code -- $PROTECTED_SURFACES
+
+  historical:
+    name: Q3 chronology-clean 2022-2025 OOF
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Verify frozen scientific blobs before first Q3 fit
+        run: |
+          test "$(git rev-parse HEAD:src/nfl_forecast/challenger_ats_nextgen_q3.py)" = "c707ec8994fa27038ec9e14c757f5a67e99b6e86"
+          test "$(git rev-parse HEAD:src/nfl_forecast/challenger_ats_nextgen_q3_reporting.py)" = "89660aaefeb14624bc16434cf91dd2f08feef067"
+          test "$(git rev-parse HEAD:scripts/run_challenger_ats_nextgen_q3.py)" = "733a5cac7cbcc9efa6d378fb92edc4eea1585893"
+          test "$(git rev-parse HEAD:tests/test_challenger_ats_nextgen_q3.py)" = "2456c5a70c4a74c5672d38e5adcd74f8b954e519"
+          test "$(git rev-parse HEAD:tests/test_challenger_ats_nextgen_q3_reporting.py)" = "0d914311f7572f7e7a3e1964900fb24759014f69"
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: ats-nextgen-q3-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ats-nextgen-q3-${{ runner.os }}-
+            ats-nextgen-q2-${{ runner.os }}-
+            ats-nextgen-q1-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Execute frozen Q3 only after exact-head contract success
+        run: |
+          rm -rf research_outputs/ats_nextgen/q3
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/run_challenger_ats_nextgen_q3.py
+          test -s research_outputs/ats_nextgen/q3/q3_outer_oof_2022_2025.csv
+          test -s research_outputs/ats_nextgen/q3/q3_inner_c_pair_selections.csv
+          test -s research_outputs/ats_nextgen/q3/q3_probability_metrics.csv
+          test -s research_outputs/ats_nextgen/q3/q3_cover_reliability.csv
+          test -s research_outputs/ats_nextgen/q3/q3_push_calibration.csv
+          test -s research_outputs/ats_nextgen/q3/q3_fixed_slice_metrics.csv
+          test -s research_outputs/ats_nextgen/q3/q3_summary.json
+      - name: Prove Q3 execution did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+      - name: Upload immutable Q3 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-nextgen-q3-${{ github.run_id }}
+          path: research_outputs/ats_nextgen/q3/
+          retention-days: 90
