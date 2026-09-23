@@ -13,7 +13,7 @@ Phase 2 is **COMPLETE**. Phase 3 is **NOT STARTED**. The next chat must begin fr
 | 0 | Master Program Initialization | **COMPLETE** | `docs/spread-points-nextgen-phase0` — merged | **#512 — MERGED** | Five canonical control files under `research/spread-points-nextgen/`; research firewall run `35691355664` **SUCCESS**; research validation run `35691355478` **SUCCESS**; merge `7a1dc92d7b79eba9e6e77edf097ff05e3de15c25` verified from `main` | Existing repo accessible; current main and production boundary inspectable | **SATISFIED:** canonical plan/status/handoff/log/index merged to `main`; production firewall documented; future-chat protocol documented; docs-only diff verified; existing research firewall and validation gate passed; merged files re-read from `main` | 2026-09-21 | **STOP in the Phase 0 chat. Do not begin Phase 1 here.** |
 | 1 | Current LevLine Audit, Baseline Reproduction & Error Decomposition | **COMPLETE** | `research/spread-points-nextgen-phase1` — merged | **#513 — MERGED** | `phase1/EVALUATION_CONTRACT.md`; architecture, baseline, error, data/API, PIT and synthesis reports; final audit artifact `10699778876`; merge `a4f7172c0c4ff82b1689411181e7a9042a1628a8` | Phase 0 COMPLETE | **SATISFIED:** architecture documented; reproducible 2022–2025 baseline; market baselines and paired uncertainty; residual decomposition; data/API inventory; leakage/PIT register; Phase 2 hypotheses; final post-sync firewall/validation/audit all green | 2026-09-22 | **STOP Phase 1.** Phase 2 must continue from merged Phase 1 evidence; do not rerun the audit. |
 | 2 | Deep External Research & Challenger Design | **COMPLETE** | `research/spread-points-nextgen-phase2` — merged | **#520 — MERGED** | Phase 2 canonical package; bounded A0/B0/C0 preregistration; deterministic nested protocol; PIT source matrix; red-team closeout; exact-head firewall `35751402751`; exact-head validation `35751402726`; merge `405906942013252c158244c9b033a3240baa37f8` | Phase 1 COMPLETE | **SATISFIED:** research questions translated; literature/external-model/Sasser review complete; evidence quality classified; A0/B0/C0 bounded; D conditional; 2025 holdout and 2026 firewall frozen; data/PIT/paid-data policies recorded; production unchanged; synchronized head `076dc9d6f6c052eec4744a155070c42c1b99ae82`; exact-head CI green; PR merged; all canonical artifacts re-read from `main` | 2026-09-22 | **STOP Phase 2. Phase 3 remains NOT STARTED.** Next chat must read the merged control files and execute the frozen Phase 3 handoff without reopening Phase 1/2. |
-| 3 | Controlled Challenger Implementation | **NOT STARTED** | TBD | None | Future candidate implementations/tests/contracts | **Phase 2 COMPLETE** | Selected challengers implemented; tests pass; provenance/as-of semantics intact; explicit versions; reproducible research outputs; production unchanged | 2026-09-22 | Begin only in the next Phase 3 execution chat from the frozen A0/B0/C0 contract; do not score 2025. |
+| 3 | Controlled Challenger Implementation | **COMPLETE — merge pending** | `research/spread-points-nextgen-phase3` | Phase 3 PR pending | Frozen A0/B0/C0 implementation; 815-game 2022–2024 OOF package; `phase3/evidence/`; development run `35810171571` SUCCESS; D ineligible for margin and total | **Phase 2 COMPLETE** | **SCIENTIFIC EXIT SATISFIED:** research delta + frozen gate; shared chronology scaffold; A0/B0/C0 implemented; M0/M1/M2/M3 evaluated; D gate applied; negative results preserved; OOF surfaces durable; 2025 unopened; Candidate 5 untrained; production unchanged. Final PR/exact-head/merge receipt still to be recorded. | 2026-09-22 | Merge validated Phase 3 exact head, verify from main, then STOP. Phase 4 remains NOT STARTED. |
 | 4 | Historical Validation, Ablation & Model Selection | **NOT STARTED** | TBD | None | Future holdout/ablation/uncertainty reports | Phase 3 COMPLETE | All preregistered challengers evaluated; holdout clean; ablations/uncertainty/robustness/market comparison complete; finalist or no-finalist determination documented | 2026-09-21 | Await Phase 3 completion |
 | 5 | Historical F-ST-Anchored Winner Integration (Candidate 5) | **NOT STARTED** | TBD | None | Future `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1` charter, OOF stacking/evidence-boundary contracts, ablations, historical results and freeze receipt | Phase 4 COMPLETE; underlying A0/B0/C0/D dispositions frozen; 2022-2024 OOF component surfaces preserved; Candidate 5 evidence boundary and preregistration frozen | OOF provenance proven; mandatory ablations/guardrails complete; truthful evidence boundary; Candidate 5 rejected/inconclusive/eligible for prospective shadow; production unchanged | 2026-09-22 | Await Phase 4 completion; do not start Candidate 5 early. |
 | 6 | Prospective Shadow Validation & Operational Hardening | **NOT STARTED** | TBD | None | Future immutable receipts, Candidate 5/Next-Gen shadow evidence, grading and operational evidence | Phase 5 COMPLETE and at least one credible finalist is eligible | Preregistered prospective evidence threshold satisfied; operational reliability demonstrated | 2026-09-22 | Await Phase 5 completion. Candidate 4 continues independently in the Adaptive program. |
@@ -108,3 +108,33 @@ Governance-only amendment:
 - production F-ST / Sunday Signal behavior: **UNCHANGED**
 
 This amendment inserts Phase 5 Candidate 5 historical F-ST-anchored integration, renumbers prospective shadow validation to Phase 6, and renumbers final synthesis/promotion to Phase 7. It does not alter the immediate Phase 3 next action.
+
+
+## Phase 3 scientific closeout record
+
+- primary branch: `research/spread-points-nextgen-phase3`
+- stale startup branch treatment: branch name reused, stale administrative-only state discarded in favor of canonical current-main controls before substantive work
+- pre-result decision: `KEEP_FROZEN_PHASE3_CONTRACT`
+- preregistration amendment: none
+- A0: `A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1`
+- B0: `B0-POSSESSION-DRIVE-SCORE-PROCESS-V1`
+- C0: `C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1`
+- D margin: `ENSEMBLE_NOT_ELIGIBLE`
+- D total: `ENSEMBLE_NOT_ELIGIBLE`
+- development universe: 815 regular-season games, 2022-2024 only
+- A0 margin/total MAE: 9.8825 / 10.3869
+- B0 margin/total MAE: 10.2132 / 11.3044
+- market M0 margin/total MAE: 9.4184 / 10.1209
+- C0 M3 margin/total MAE: 9.4390 / 10.1376
+- C0 incremental-football disposition: `NO_INCREMENTAL_FOOTBALL_EDGE` for margin and total
+- implementation SHA-256: `5f148219527b07d85261d3f196ace97a5eb5646271d43596032a692389abc579`
+- config SHA-256: `2c5cc1af74fc5f3955e44361b82b791710e4b63bbc69b0c15570617e2d86e543`
+- exact validated development run: `35810171571` — SUCCESS
+- exact validated development head: `3d893ec8e26824f7e6c1883f4d0d09c19160c712`
+- durable OOF/evidence location: `research/spread-points-nextgen/phase3/evidence/`
+- 2025 loaded/scored: **NO / NO**
+- completed-2026 outcomes used for selection: **NO**
+- Candidate 5 trained: **NO**
+- production: `F-ST-01-FROZEN-2026`, unchanged
+- Phase 4: **NOT STARTED**
+- final PR / exact-head post-sync CI / merge SHA: pending GitHub closeout
