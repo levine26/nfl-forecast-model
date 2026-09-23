@@ -1,0 +1,82 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "C_Q3_PRE_RESULT",
+  "candidate_id": "ATS-Q3-DIRECT-CPL-HURDLE-V1",
+  "status": "AUTHORIZED_TO_IMPLEMENT_UNTRAINED_NO_RESULT",
+  "created_date": "2026-09-23",
+  "branch": "research/ats-nextgen-phase2-q3",
+  "opening_main_sha": "16859845573c3344ed82ae0b9bd27fa8b891eee4",
+  "upstream": {
+    "phase2_gate_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d",
+    "q1_classification": "VALID_NEGATIVE_INCREMENTAL_RESULT",
+    "q1_outer_oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
+    "q2_classification": "STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT",
+    "q2_valid_oof_available": false,
+    "q2_complementarity_available": false,
+    "q2_q3_blend_available": false
+  },
+  "candidate_fitting_performed": false,
+  "candidate_performance_generated": false,
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "architecture": {
+    "push_head": "L2 logistic on whole-number lines only",
+    "cover_head": "L2 logistic on non-push rows",
+    "half_point_push_probability": 0.0,
+    "combine": {
+      "push": "p_push",
+      "cover": "(1-p_push)*q",
+      "loss": "(1-p_push)*(1-q)"
+    }
+  },
+  "spread_lattice": {
+    "whole_tolerance": 1e-9,
+    "half_tolerance": 1e-9,
+    "off_lattice_policy": "fail_closed"
+  },
+  "features": {
+    "q3_m2_cover": "frozen_market_design",
+    "q3_cover": "frozen_market_plus_compact_football_design",
+    "push": "frozen_market_design_plus_abs_spread_key_indicators",
+    "push_key_numbers": [3, 6, 7, 10, 14],
+    "push_football_features": false
+  },
+  "preprocessing": {
+    "training_fold_medians_only": true,
+    "training_fold_scaling_only": true,
+    "optional_missing_indicators": true,
+    "push_key_indicator_scaling_scope": "training_whole_line_rows_only"
+  },
+  "logistic": {
+    "learner": "sklearn.linear_model.LogisticRegression",
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "fit_intercept": true,
+    "class_weight": null,
+    "max_iter": 2000,
+    "C_grid": [0.01, 0.1, 1.0, 10.0],
+    "minimum_training_rows_per_head": 100,
+    "both_binary_classes_required": true
+  },
+  "tuning": {
+    "pair_grid_size": 16,
+    "metric": "pooled_prior_time_multinomial_log_loss",
+    "log_floor_evaluation_only": 1e-15,
+    "tie_tolerance": 1e-12,
+    "tie_break": ["smaller_C_push", "smaller_C_cover"],
+    "ats_or_roi_selecting": false
+  },
+  "chronology": {
+    "training_floor": 2015,
+    "inner_target_floor": 2019,
+    "outer_targets": [2022, 2023, 2024, 2025],
+    "random_kfold_allowed": false
+  },
+  "primary_comparison": "Q3_vs_Q3_M2_exact_common_rows",
+  "q2_comparison_policy": "unavailable_due_upstream_structural_invalidation",
+  "blend_policy": "unavailable_due_no_valid_q2_oof",
+  "posthoc_calibration_allowed": false,
+  "historical_execution_allowed_before_contract_tests": false,
+  "stage_d_opened": false
+}
