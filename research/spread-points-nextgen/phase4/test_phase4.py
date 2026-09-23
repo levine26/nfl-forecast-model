@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import importlib
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from ..phase3 import phase3_scaffold as scaffold
-from . import phase4_holdout as p4
+scaffold = importlib.import_module("research.spread-points-nextgen.phase3.phase3_scaffold")
+p4 = importlib.import_module("research.spread-points-nextgen.phase4.phase4_holdout")
 
 
 def test_frozen_contracts_pass_without_loading_holdout():
