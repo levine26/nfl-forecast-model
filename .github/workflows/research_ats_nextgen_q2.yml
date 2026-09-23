@@ -87,6 +87,7 @@ jobs:
           test -s research_outputs/ats_nextgen/q2/q2_distribution_metrics.csv
           test -s research_outputs/ats_nextgen/q2/q2_fixed_slice_metrics.csv
           test -s research_outputs/ats_nextgen/q2/q2_cover_reliability.csv
+          test -s research_outputs/ats_nextgen/q2/q2_key_mass_calibration.csv
           test -s research_outputs/ats_nextgen/q2/q2_summary.json
       - name: Prove Q2 execution did not modify production surfaces
         run: git diff --exit-code -- $PROTECTED_SURFACES
