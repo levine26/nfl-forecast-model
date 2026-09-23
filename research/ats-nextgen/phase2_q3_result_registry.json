@@ -1,0 +1,87 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "C_Q3",
+  "candidate_id": "ATS-Q3-DIRECT-CPL-HURDLE-V1",
+  "classification": "NOT_INCREMENTAL_VS_Q3_M2",
+  "branch": "research/ats-nextgen-phase2-q3",
+  "pr": 562,
+  "stage_b_merge_base": "16859845573c3344ed82ae0b9bd27fa8b891eee4",
+  "frozen_scientific_surface_head": "d9dbfe24af7fd19f5b22e76fd5f57dd83c606a60",
+  "accepted_result_head": "891d921c24bc045dd58de3b2dd05871f12d09183",
+  "workflow": {
+    "run_id": 35931071604,
+    "contract_job_id": 107417650978,
+    "historical_job_id": 107418004469,
+    "contract_conclusion": "success",
+    "historical_conclusion": "success"
+  },
+  "artifact": {
+    "id": 10781521222,
+    "name": "ats-nextgen-q3-35931071604",
+    "digest": "sha256:6062472dce30fddfcc6ad16d1d5c29203491f6e77d893aa673cc20bbb29a1bfa",
+    "outer_oof_rows": 1087,
+    "outer_target_seasons": [2022, 2023, 2024, 2025],
+    "files_sha256": {
+      "q3_outer_oof_2022_2025.csv": "18610dfcfa9ffe71ed30259f9fef85a5655cefa68301f46fa1bb1950593dee04",
+      "q3_inner_c_pair_selections.csv": "7164f804d3f0b2d240f538ef056c7e3c503a2994e092b14dbbe2db8f518b6e36",
+      "q3_probability_metrics.csv": "722833d2f9bd3a972f755964aa6c9b5ce8ed05b62c3d280383974f434001ba92",
+      "q3_cover_reliability.csv": "c32845d02c0e37724ca33a971a77748d60190c03124b55b89a6b3c3cf4c01993",
+      "q3_push_calibration.csv": "375d2b2251c945d1582032d1ca9a0ef8fda2f1578b2d41ec68ad93668c6c9636",
+      "q3_fixed_slice_metrics.csv": "518a3d9d7b575ce48151509e3e53c4e4790c3eb35fa09842a36ecac155870e99",
+      "q3_summary.json": "ed9b30b9174bec553a599e099f938f90eadf6748b9818f69fae97889c7e64072"
+    }
+  },
+  "gate_canonical_game_keyed_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d",
+  "primary_metric": {
+    "name": "multinomial_cover_push_loss_log_loss",
+    "direction": "lower_is_better",
+    "q3_m2": 0.7716887205239867,
+    "q3": 0.7730044623812287,
+    "q3_minus_q3_m2": 0.0013157418572419255
+  },
+  "secondary_metrics": {
+    "q3_m2_cover_brier_nonpush": 0.24979992069239074,
+    "q3_cover_brier_nonpush": 0.2504715666095457,
+    "q3_m2_cover_logloss_nonpush": 0.692751807769559,
+    "q3_cover_logloss_nonpush": 0.6941036143847026,
+    "q3_m2_cover_calibration_intercept": 0.034453703165041635,
+    "q3_m2_cover_calibration_slope": 0.8130523437112027,
+    "q3_cover_calibration_intercept": 0.010352055248903256,
+    "q3_cover_calibration_slope": 0.27094382668690847,
+    "shared_mean_predicted_push": 0.023992664002116082,
+    "empirical_push_rate": 0.02667893284268629,
+    "shared_push_calibration_error": -0.0026862688405702093
+  },
+  "season_q3_minus_q3_m2_logloss": {
+    "2022": 0.00011298354392952,
+    "2023": 0.00334784143158218,
+    "2024": -0.00130926027708478,
+    "2025": 0.00310698082497762
+  },
+  "fixed_slice_primary_metric_counts": {
+    "q3_better": 4,
+    "equal": 0,
+    "q3_worse": 10,
+    "total": 14
+  },
+  "selected_c_pairs": {
+    "2022": {"C_push": 0.01, "C_cover": 0.01},
+    "2023": {"C_push": 0.01, "C_cover": 0.01},
+    "2024": {"C_push": 0.1, "C_cover": 0.01},
+    "2025": {"C_push": 0.1, "C_cover": 0.01}
+  },
+  "q2_complementarity_available": false,
+  "q2_q3_blend_available": false,
+  "q2_unavailability_reason": "Q2 V1 structurally invalid under frozen support contract; no valid Q2 OOF distribution exists",
+  "candidate_repair_or_rescue_performed": false,
+  "posthoc_calibration_applied": false,
+  "class_weighting_used": false,
+  "ats_hit_rate_used_for_selection": false,
+  "roi_used_for_selection": false,
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "historical_evidence_class": "development_non_pristine",
+  "next_stage": "D_FINAL_EVIDENCE_SYNTHESIS_AND_UNCERTAINTY",
+  "repeated_use_disclosure": "2022-2025 is chronology-clean development evidence for this candidate execution but is not pristine independent confirmation because those seasons have informed prior LevLine research."
+}
