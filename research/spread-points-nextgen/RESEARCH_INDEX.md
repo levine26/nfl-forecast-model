@@ -2,7 +2,7 @@
 
 **Authority:** `MASTER_PLAN.md`  
 **Purpose:** Canonical map of the Spread & Points research program.  
-**Last reconciled:** 2026-09-22 America/Los_Angeles
+**Last reconciled:** 2026-09-23 America/Los_Angeles
 
 This index is a map, not an authorization mechanism. Candidate identity and evidence boundaries are controlled by frozen contracts and phase receipts.
 
@@ -15,7 +15,7 @@ This index is a map, not an authorization mechanism. Candidate identity and evid
 - `research/spread-points-nextgen/RESEARCH_INDEX.md`
 - `research/spread-points-nextgen/FINAL_PHASE3_RECEIPT.md`
 - `research/spread-points-nextgen/FINAL_PHASE4_RECEIPT.md`
-- future merged closeout: `research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
+- `research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
 
 ## Production firewall
 
@@ -70,7 +70,11 @@ Key receipts:
 
 2025 is **OPENED / SPENT** for the underlying A0/B0/C0 evaluation.
 
-## Phase 5 — SCIENTIFICALLY COMPLETE; CANDIDATE 5 REJECTED
+## Phase 5 — COMPLETE; CANDIDATE 5 REJECTED
+
+Authoritative closeout:
+
+`research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
 
 Primary branch:
 
@@ -125,12 +129,19 @@ Canonical Phase 5 package under `research/spread-points-nextgen/phase5/`:
 - `CANDIDATE5_RED_TEAM_AUDIT.md`
 - `PHASE5_SYNTHESIS.md`
 
-Execution provenance:
+Execution and integration provenance:
 
 - first workflow attempt `35827845845` — pre-result unit-test failure only; no Candidate-5-specific metrics generated
 - engineering-only fixture correction `b86b7c98b40a3b68e6fb4e42f9aeb6592554065a`
 - first successful frozen historical workflow `35828122187` — contract gate, historical package and exact-run gate SUCCESS
 - evidence preservation commit `8fce0be359d93d68bc2c4bba852ede4181a38368`
+- final integration PR #552 — **MERGED**
+- exact validated head `a4f892d64ab163a421eed203d9b50983e5bbd04b`
+- Phase 5 validation `35875417408` — **SUCCESS**
+- research firewall `35875417416` — **SUCCESS**
+- full research validation `35875417452` — **SUCCESS**
+- Phase 4 frozen-evidence regression `35875417543` — **SUCCESS**
+- merge commit `a68afb1e1cf9675a7ff9e0e0af1f52343546f029`
 
 Primary 2022–2024 result:
 
@@ -147,6 +158,8 @@ Primary 2022–2024 result:
 
 2025 was executed only after the complete freeze and is labeled `POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC`. On 272 games, both F-ST and Candidate 5 were 179/272 with zero winner switches. It did not select or rescue the candidate.
 
+During final integration, the inherited Phase 4 reproducibility workflow exposed a byte-level floating-point serialization false positive. The comparator was hardened without changing science to require exact structure/nonnumeric values and numeric equality within `1e-12`; exact-head run `35875417543` then regenerated the full Phase 4 evidence as semantically identical and passed the production-surface firewall.
+
 No Phase 6 handoff is created because the preregistered eligibility rule is not satisfied.
 
 ## Validation workflows
@@ -159,6 +172,6 @@ No Phase 6 handoff is created because the preregistered eligibility rule is not 
 
 ## Current program state
 
-Phase 5 scientific work is closed with Candidate 5 V1 `REJECTED`; only PR/merge/final-receipt integration work remains. Completed 2026 outcomes remain outside Candidate 5 historical selection. Production remains `F-ST-01-FROZEN-2026`.
+Phase 5 is fully closed with Candidate 5 V1 `REJECTED`. Completed 2026 outcomes remain outside Candidate 5 historical selection. Production remains `F-ST-01-FROZEN-2026`.
 
-**Do not start Phase 6 for Candidate 5 V1. Do not rescue the rejected historical identity.**
+**STOP. Do not start Phase 6 for Candidate 5 V1. Do not rescue the rejected historical identity.**
