@@ -105,13 +105,14 @@ The CLI rejects a final run with fewer than 10,000 B0 simulations per game.
   3. only after that gate succeeds, regenerates 2022–2024 evidence;
   4. validates output manifest firewalls;
   5. proves the run did not mutate protected production surfaces;
-  6. uploads the exact development package.
+  6. uploads the exact development package;
+  7. on the final head, verifies OOF provenance and byte-compares regenerated evidence against the committed frozen package.
 
 ## Generated evidence location
 
 After the exact regeneration is validated, durable generated artifacts are stored under:
 
-`research/spread-points-nextgen/phase3/generated/`
+`research/spread-points-nextgen/phase3/evidence/`
 
 The expected package is:
 
@@ -121,8 +122,7 @@ The expected package is:
 - `BASELINES_2022_2024.csv`
 - `DIAGNOSTIC_SLICES.csv`
 - `FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv`
-- optional `D_MARGIN_OOF_2022_2024.csv` only if eligible
-- optional `D_TOTAL_OOF_2022_2024.csv` only if eligible
+- D margin/total CSVs are absent because both targets are `ENSEMBLE_NOT_ELIGIBLE`.
 - `DEVELOPMENT_SUMMARY.json`
 - `CANDIDATE_RUN_RECEIPTS.json`
 - `D_ELIGIBILITY_RECEIPT.json`
@@ -142,3 +142,12 @@ The implementation is research-local. It does not modify or import into:
 - official history.
 
 Production remains `F-ST-01-FROZEN-2026`.
+
+## Evaluation / closeout artifacts
+
+- `DEVELOPMENT_EVALUATION.md` — human-readable 2022-2024 development results and market-relative interpretation.
+- `D_ELIGIBILITY_RECEIPT.md` — frozen target-specific D disposition.
+- `FUTURE_CANDIDATE5_OOF_SURFACE_CONTRACT.md` — compact downstream OOF contract; Candidate 5 remains untrained.
+- `RED_TEAM_AUDIT.md` — adversarial leakage/reproducibility/production audit.
+- `PHASE3_SYNTHESIS.md` — Phase 3 scientific synthesis.
+- `PHASE4_HANDOFF.md` — exact next-phase starting state; Phase 4 remains not started.
