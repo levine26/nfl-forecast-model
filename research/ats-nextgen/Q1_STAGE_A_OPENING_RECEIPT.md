@@ -4,7 +4,7 @@
 **Phase:** 2 — Controlled Implementation & Historical Development  
 **Stage:** A — Q1 only  
 **Candidate:** `ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1`  
-**Status at receipt:** **AUTHORIZED TO IMPLEMENT; UNTRAINED; NO Q1 PERFORMANCE GENERATED**  
+**Status at receipt:** **AUTHORIZED TO IMPLEMENT; UNTRAINED; NO COMPLETED Q1 PERFORMANCE ARTIFACT**  
 **Stage branch:** `research/ats-nextgen-phase2-q1`  
 **Opening base:** merged `main` at `f43e17ba783e3e389969cd1649889b37bd91afe9`
 
@@ -48,15 +48,21 @@ This stage implements exactly `Q1_QUANTILE_PREREGISTRATION.md`:
 - no player-state/weather/news/juice/book-dispersion expansion;
 - no completed-2026 outcomes.
 
-## Pre-result implementation decisions required by software, not target results
+## Earliest pre-result implementation decisions
 
-The frozen scientific documents do not specify a numerical tie-break for numerically equal inner mean pinball losses. Before any Q1 output exists, Stage A fixes the deterministic tie-break to the **larger alpha (stronger regularization)** within numerical tolerance `1e-12`. This is encoded in the implementation and contract test before historical execution.
+The frozen scientific documents do not specify a numerical tie-break for exactly equal inner mean pinball losses. The **earliest Stage-A receipt, before any completed Q1 historical artifact existed, fixed ties to the smaller alpha** after numerical equality within tolerance `1e-12`. That earliest decision controls this candidate version and is encoded in the implementation/tests.
 
-The fixed feature implementation creates missingness indicators for every optional numeric V1 feature. This is a stable schema choice; indicators may be all-zero in a particular training fold. Missing numeric values are imputed only from that training fold. Market total is centered on the training-fold median before the two frozen spread-total interactions are constructed.
+The same earliest receipt fixed a mechanical minimum of **100 eligible prior training rows** for an inner rolling-origin fold. A fold with fewer than 100 eligible prior training rows or no eligible target rows is omitted, never replaced by random CV, and the implementation records both `inner_targets_used` and `inner_targets_omitted` in tuning evidence.
 
-The Phase-1 contract did not preregister an arbitrary numeric minimum row count for an inner fold, so Stage A does not introduce one. An inner fold is usable only when both its prior-time training frame and its target frame contain eligible rows. A missing fold is omitted rather than replaced by random CV; the frozen expected inner target seasons and the actual `inner_targets_used` are preserved in the tuning evidence so any omission is auditable.
+The fixed feature implementation creates missingness indicators for every optional numeric V1 feature. Indicators may be all-zero in a particular fold. Missing numeric values are imputed only from that training fold. Market total is centered on the training-fold median before the two frozen spread-total interactions are constructed.
 
 Quantile crossings are reported as diagnostics only. No sorting, clipping, isotonic repair or other post-hoc monotonicity correction is authorized for Q1 V1.
+
+## Governance reconciliation before results
+
+A later pre-result edit briefly proposed the opposite tie-break (larger alpha) and removal of the 100-row guard. No completed Q1 evidence artifact was produced under that conflicting state: the corresponding first historical job was cancelled when the branch moved and uploaded no Q1 evidence. To avoid choosing between implementation rules after seeing target-period evidence, Stage A therefore reverts to and preserves the **earliest documented pre-result receipt**: smaller-alpha tie-break plus the 100-row inner-training minimum.
+
+This reconciliation is governance-only; it is not motivated by candidate performance and does not authorize any new feature, learner, quantile, threshold, calibration or rescue mechanism.
 
 ## Execution boundary
 
@@ -64,7 +70,7 @@ Q1 historical outer OOF generation is permitted only after the Phase-2 gate test
 
 The historical runner must first regenerate the 2015–2025 gate and match the frozen canonical game-keyed SHA-256 `bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d`; a mismatch fails closed before any Q1 fit.
 
-After the first valid Q1 outer OOF result exists, the Q1 learner, quantiles, alpha grid, feature family, chronology, preprocessing semantics, tie-break, comparators and fixed reporting slices may not be redesigned in response to those results.
+After the first valid completed Q1 outer OOF artifact exists, the learner, quantiles, alpha grid, feature family, chronology, preprocessing semantics, tie-break, 100-row fold guard, comparators and fixed reporting slices may not be redesigned in response to those results.
 
 Q2 and Q3 remain unopened.
 
