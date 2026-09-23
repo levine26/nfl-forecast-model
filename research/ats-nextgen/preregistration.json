@@ -1,0 +1,101 @@
+{
+  "program": "LEVLINE_ATS_NEXT_GENERATION_RESEARCH_PROGRAM",
+  "phase": 1,
+  "status": "FROZEN_BEFORE_RESULTS",
+  "frozen_date": "2026-09-23",
+  "production_authority": false,
+  "sign_convention": {
+    "M": "home_score-away_score",
+    "L": "sportsbook_home_spread_favorite_negative",
+    "S": "-L",
+    "R": "M+L",
+    "home_cover": "R>0",
+    "push": "R==0",
+    "home_loss": "R<0"
+  },
+  "evidence_boundary": {
+    "data_floor_season": 2015,
+    "outer_development_seasons": [2022, 2023, 2024, 2025],
+    "inner_validation_start_season": 2019,
+    "historical_status": "development_non_pristine",
+    "completed_2026_outcomes_allowed": false,
+    "positive_historical_result_can_authorize_production": false
+  },
+  "market_nulls": ["M0_QUOTED_SPREAD", "M1_MARKET_DISTRIBUTION", "M2_MARKET_ONLY_CALIBRATION"],
+  "q1": {
+    "id": "Q1-QR-MARKET-RESIDUAL-V1",
+    "target": "R",
+    "quantiles": [0.47619047619047616, 0.5, 0.5238095238095238],
+    "learner": "L1_regularized_linear_quantile_regression",
+    "alpha_grid": [0.001, 0.01, 0.1],
+    "shared_alpha_across_quantiles": true,
+    "selection_score": "season_equal_inner_oof_mean_pinball_loss",
+    "tie_rule": "larger_alpha",
+    "monotone_rearrangement": "rowwise_sort_three_quantiles",
+    "nonlinear_challenger_allowed": false
+  },
+  "q2": {
+    "id": "Q2-DISCRETE-KEY-PMF-V1",
+    "support": [-75, 75],
+    "base_specs": [
+      {"family": "gaussian"},
+      {"family": "student_t", "nu": 8},
+      {"family": "student_t", "nu": 4},
+      {"family": "generalized_normal", "beta": 2.5},
+      {"family": "generalized_normal", "beta": 1.5}
+    ],
+    "conditional_scale": "log_sigma=gamma0+gamma1*absS+gamma2*(total-45)+gamma3*absS*(total-45)",
+    "key_margins": [0, -3, 3, -6, 6, -7, 7, -10, 10, -14, 14],
+    "key_lambda_grid": [1, 10],
+    "scale_l2_nonintercept": 0.1,
+    "selection_score": "season_equal_inner_oof_discrete_margin_nll",
+    "mixtures_allowed": false,
+    "quarter_lines_eligible": false
+  },
+  "q3": {
+    "id": "Q3-DIRECT-CPL-V1",
+    "target_classes": ["COVER", "PUSH", "LOSS"],
+    "learners": [
+      {"family": "multinomial_logistic_l2", "C": 0.1},
+      {"family": "multinomial_logistic_l2", "C": 1.0},
+      {"family": "xgboost", "max_depth": 1, "n_estimators": 150, "learning_rate": 0.03, "subsample": 0.8, "colsample_bytree": 0.8, "min_child_weight": 20, "reg_lambda": 10, "gamma": 0, "random_state": 20260923},
+      {"family": "xgboost", "max_depth": 2, "n_estimators": 150, "learning_rate": 0.03, "subsample": 0.8, "colsample_bytree": 0.8, "min_child_weight": 20, "reg_lambda": 10, "gamma": 0, "random_state": 20260923}
+    ],
+    "selection_score": "season_equal_inner_oof_multinomial_log_loss",
+    "temperature_bounds": [0.5, 3.0],
+    "half_point_push_mask": true
+  },
+  "blend": {
+    "authorized": true,
+    "formula": "w*P_Q2+(1-w)*P_Q3",
+    "weights": [0, 0.25, 0.5, 0.75, 1.0],
+    "selection_score": "season_equal_prior_inner_oof_multinomial_log_loss",
+    "ats_or_roi_selection_allowed": false
+  },
+  "market_features": ["S", "abs_S", "total_line", "paired_moneyline_no_vig_home_prob"],
+  "football_features": [
+    "elo_diff",
+    "rest_diff",
+    "diff_off_epa_ewma",
+    "diff_pass_epa_ewma",
+    "diff_rush_epa_ewma",
+    "diff_success_rate_ewma",
+    "diff_def_epa_allowed_ewma",
+    "diff_def_pass_epa_allowed_ewma",
+    "diff_def_rush_epa_allowed_ewma",
+    "diff_def_success_allowed_ewma",
+    "diff_win_ewma"
+  ],
+  "selective_subsets": ["ALL", "POSITIVE_EV_QUOTED_PRICE_IF_AVAILABLE", "TOP_20_PERCENT_WITHIN_SEASON", "TOP_10_PERCENT_WITHIN_SEASON"],
+  "key_buckets": [[2.5, 3.0, 3.5], [5.5, 6.0, 6.5], [6.5, 7.0, 7.5], [9.5, 10.0, 10.5], [13.5, 14.0, 14.5]],
+  "uncertainty": {
+    "ats_interval": "clopper_pearson_95",
+    "block_bootstrap_unit": "season_week",
+    "bootstrap_replicates": 5000,
+    "seed": 20260923
+  },
+  "historical_spread_price_policy": "do_not_fabricate_missing_juice",
+  "random_kfold_allowed": false,
+  "roi_model_selection_allowed": false,
+  "phase2_started": false
+}
