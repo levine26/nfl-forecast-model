@@ -1,0 +1,89 @@
+name: ATS NextGen Q1 Stage A
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_ats_nextgen_q1.py'
+      - 'scripts/run_challenger_ats_nextgen_q1.py'
+      - 'tests/test_challenger_ats_nextgen_q1.py'
+      - 'research/ats-nextgen/**'
+      - '.github/workflows/research_ats_nextgen_q1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ats-nextgen-q1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py
+    scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  contract:
+    name: Q1 pre-result contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Prove opening gate and Q1 contract
+        run: |
+          pytest -q \
+            tests/test_challenger_ats_nextgen_phase2_gate.py \
+            tests/test_challenger_ats_nextgen_q1.py
+      - name: Prove contract tests did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+
+  historical:
+    name: Q1 chronology-clean 2022-2025 OOF
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: ats-nextgen-q1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ats-nextgen-q1-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Execute frozen Q1 only after contract success
+        run: |
+          rm -rf research_outputs/ats_nextgen/q1
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/run_challenger_ats_nextgen_q1.py
+          test -s research_outputs/ats_nextgen/q1/q1_outer_oof_2022_2025.csv
+          test -s research_outputs/ats_nextgen/q1/q1_inner_alpha_selections.csv
+          test -s research_outputs/ats_nextgen/q1/q1_quantile_metrics.csv
+          test -s research_outputs/ats_nextgen/q1/q1_quantile_crossings.csv
+          test -s research_outputs/ats_nextgen/q1/q1_summary.json
+      - name: Prove Q1 execution did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+      - name: Upload immutable Q1 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-nextgen-q1-${{ github.run_id }}
+          path: research_outputs/ats_nextgen/q1/
+          retention-days: 90
