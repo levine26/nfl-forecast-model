@@ -187,3 +187,53 @@ Once Phase 2 is formally complete, the next chat should:
 11. stop for Phase 4.
 
 No Phase 3 code or challenger output belongs in Phase 2.
+
+
+## Phase 3 controlled implementation — scientific closeout
+
+Phase 3 has completed its scientific implementation/evaluation work on `research/spread-points-nextgen-phase3`; final PR/exact-head/merge receipt is pending.
+
+Frozen pre-result decision: **KEEP_FROZEN_PHASE3_CONTRACT**. No preregistration amendment was made.
+
+Development evidence is 815 regular-season games from 2022-2024 only:
+
+- A0 margin/total MAE: 9.8825 / 10.3869;
+- B0 margin/total MAE: 10.2132 / 11.3044;
+- market M0 margin/total MAE: 9.4184 / 10.1209;
+- C0 M3 margin/total MAE: 9.4390 / 10.1376;
+- C0: **NO_INCREMENTAL_FOOTBALL_EDGE** for margin and total;
+- D margin: **ENSEMBLE_NOT_ELIGIBLE**;
+- D total: **ENSEMBLE_NOT_ELIGIBLE**.
+
+A0/B0/C0 remain valid Phase 4 references despite weak/negative development performance. They were not pruned or rescued.
+
+The exact validated 2022-2024 development run is GitHub Actions run `35810171571` at head `3d893ec8e26824f7e6c1883f4d0d09c19160c712`. The full OOF/evidence package is durable under `research/spread-points-nextgen/phase3/evidence/`.
+
+The initial full regeneration failure was an engineering schema-merge defect (overlapping PBP/schedule identity columns causing suffixed `home_team`/ `away_team`). It was fixed without changing the frozen candidate contract and a regression test was added before the successful regeneration.
+
+Evidence firewalls:
+
+- 2025 loaded: **NO**;
+- 2025 challenger scored: **NO**;
+- completed-2026 outcomes used for selection: **NO**;
+- Candidate 5 trained: **NO**;
+- production remains `F-ST-01-FROZEN-2026`, unchanged.
+
+Implementation SHA-256: `5f148219527b07d85261d3f196ace97a5eb5646271d43596032a692389abc579`.
+
+Config SHA-256: `2c5cc1af74fc5f3955e44361b82b791710e4b63bbc69b0c15570617e2d86e543`.
+
+See:
+
+- `phase3/DEVELOPMENT_EVALUATION.md`
+- `phase3/D_ELIGIBILITY_RECEIPT.md`
+- `phase3/RED_TEAM_AUDIT.md`
+- `phase3/PHASE3_SYNTHESIS.md`
+- `phase3/PHASE4_HANDOFF.md`
+- `phase3/FUTURE_CANDIDATE5_OOF_SURFACE_CONTRACT.md`
+
+## Phase 3 exact next action
+
+Finish GitHub closeout only: open the single Phase 3 PR, require the Phase 3 exact-run gate plus repository research firewall/full research validation on the synchronized head, fix only genuine defects, merge the exact validated head, verify merged artifacts from `main`, record the final receipt, and STOP.
+
+After that, Phase 4 becomes the next action but remains **NOT STARTED** in this Phase 3 task. Phase 4 opens the frozen underlying-model 2025 holdout once. Candidate 5 remains **NOT STARTED**.
