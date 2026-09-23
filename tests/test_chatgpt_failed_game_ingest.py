@@ -228,6 +228,7 @@ def test_mixed_payload_fails_closed_when_successful_game_has_no_provider_authori
                     ],
                 }
             },
+            checkpoint_entries={},
         )
     except ValueError as exc:
         assert "missing both published HUMAN prose and a validated Groq checkpoint" in str(exc)
