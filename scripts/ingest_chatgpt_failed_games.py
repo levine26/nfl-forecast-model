@@ -179,18 +179,22 @@ def build_mixed_raw_payload(
             raw = _base_raw_entry(checkpoints[gid])
         else:
             preview_entry = preview_games.get(gid)
+            if checkpoint_entries is not None:
+                # New-week bootstrap mode is stricter: a successful Groq game must
+                # come from published HUMAN prose or the validated Groq checkpoint
+                # cache. Never synthesize over a provider success at rollover.
+                raise ValueError(
+                    f"successful provider game {gid} is missing both published HUMAN prose "
+                    "and a validated Groq checkpoint"
+                )
             if not isinstance(preview_entry, dict):
                 raise ValueError(
                     f"base validated provider artifact missing successful game {gid} "
-                    "and no validated provider checkpoint or preview fallback is available"
+                    "and no validated preview fallback is available"
                 )
-            # Preview continuity is allowed only for a game explicitly recorded as a
-            # provider failure. A successful provider game may never be silently
-            # downgraded to deterministic preview prose.
-            raise ValueError(
-                f"successful provider game {gid} is missing both published HUMAN prose "
-                "and a validated Groq checkpoint"
-            )
+            # Legacy same-week continuity bridge: this preview was already part of a
+            # previously validated provider publication and may fill a contracted base.
+            raw = _preview_raw_entry(preview_entry)
         if not raw["headline"] or not raw["paragraph1"] or not raw["model_rationale"] or not raw["sources"]:
             raise ValueError(f"validated editorial base has unusable game {gid}")
         output[gid] = raw
