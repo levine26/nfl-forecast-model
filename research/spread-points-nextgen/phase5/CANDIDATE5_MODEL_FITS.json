@@ -1,0 +1,2081 @@
+{
+  "fits": [
+    {
+      "arm": "FST_PLUS_A0",
+      "fallback": true,
+      "reason": "NO_PRIOR_CANDIDATE5_META_TRAINING_SURFACE",
+      "selected_lambda": null,
+      "target_season": 2022,
+      "training_seasons": [],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "FST_PLUS_A0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00011399641879762643,
+          0.00016704525683182547,
+          0.0,
+          0.0003151483445851512,
+          -0.00021394965350948406
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.1841737257694117,
+          2.1756820971387394,
+          13.760447360492721,
+          0.002241917709998919,
+          -0.003376514385242256
+        ],
+        "optimizer_message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "std": [
+          0.4978742194622014,
+          4.36957999629728,
+          1.0,
+          0.28165067578447306,
+          0.20890772308292185
+        ],
+        "training_games": 271,
+        "training_seasons": [
+          2022
+        ],
+        "zero_variance": [
+          false,
+          false,
+          true,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2023,
+      "training_seasons": [
+        2022
+      ],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "FST_PLUS_A0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -6.623456780564403e-05,
+          -3.170555269504591e-05,
+          7.414202164708097e-05,
+          2.5668080996915062e-05,
+          -0.0001458964271437164
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13131907840731813,
+          2.0008893360774604,
+          13.71439573931478,
+          -0.000681215427186612,
+          0.00013283772674600391
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.5187801977185418,
+          4.026870423821122,
+          0.04596688951246442,
+          0.2669556650357565,
+          0.24465581530902716
+        ],
+        "training_games": 543,
+        "training_seasons": [
+          2022,
+          2023
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "training_seasons": [
+        2022,
+        2023
+      ],
+      "tuning_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "FST_PLUS_A0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00014599342853041015,
+          0.00010117931840194018,
+          0.0001423388254558153,
+          3.205664487245853e-05,
+          -0.000165502992442277
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13899427367341638,
+          2.12151340197865,
+          13.664375346568114,
+          0.0008368849236679873,
+          -0.0024559896818168105
+        ],
+        "optimizer_message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "std": [
+          0.5480659977436594,
+          3.8527370952479125,
+          0.08001658035963355,
+          0.30232373119779254,
+          0.28917483754118967
+        ],
+        "training_games": 815,
+        "training_seasons": [
+          2022,
+          2023,
+          2024
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "training_seasons": [
+        2022,
+        2023,
+        2024
+      ],
+      "tuning_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "FST_PLUS_B0",
+      "fallback": true,
+      "reason": "NO_PRIOR_CANDIDATE5_META_TRAINING_SURFACE",
+      "selected_lambda": null,
+      "target_season": 2022,
+      "training_seasons": [],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "FST_PLUS_B0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00021072476567470327,
+          3.2540543698371715e-05,
+          0.0002817475791733449,
+          0.00023307516042914703,
+          0.00018392681137639898
+        ],
+        "features": [
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.04802921982095641,
+          1.3529070110701107,
+          48.68136309963099,
+          17.322882115670666,
+          18.622546418628065
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.6287040075901162,
+          5.037515971072145,
+          3.803442642812213,
+          0.760503846769382,
+          0.9462488416805066
+        ],
+        "training_games": 271,
+        "training_seasons": [
+          2022
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2023,
+      "training_seasons": [
+        2022
+      ],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "FST_PLUS_B0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00012533301063288185,
+          -0.00011436192038796219,
+          0.00014552735927243925,
+          0.00013172042041928404,
+          0.00011305607019804044
+        ],
+        "features": [
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.017380201767727695,
+          1.3611941068139963,
+          48.171475138121544,
+          17.20954017902114,
+          18.46943807300173
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.6245943422189842,
+          4.8262592108042845,
+          3.805123592776768,
+          0.7710376943902214,
+          0.9499750937443032
+        ],
+        "training_games": 543,
+        "training_seasons": [
+          2022,
+          2023
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "training_seasons": [
+        2022,
+        2023
+      ],
+      "tuning_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "FST_PLUS_B0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -9.485433986907301e-05,
+          0.00015586159734892117,
+          4.6787423478446386e-06,
+          1.5312617580660946e-05,
+          -8.350032205133857e-06
+        ],
+        "features": [
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.019880662682992503,
+          1.475426134969325,
+          48.575312024539876,
+          17.27535197960037,
+          18.548450326052766
+        ],
+        "optimizer_message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "std": [
+          0.6434138567255662,
+          4.766471581023374,
+          4.006137745880935,
+          0.8136661237328919,
+          1.0043930132264998
+        ],
+        "training_games": 815,
+        "training_seasons": [
+          2022,
+          2023,
+          2024
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "training_seasons": [
+        2022,
+        2023,
+        2024
+      ],
+      "tuning_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "FST_PLUS_A0_PLUS_B0",
+      "fallback": true,
+      "reason": "NO_PRIOR_CANDIDATE5_META_TRAINING_SURFACE",
+      "selected_lambda": null,
+      "target_season": 2022,
+      "training_seasons": [],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "FST_PLUS_A0_PLUS_B0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00011368951829991975,
+          0.00016692206105854625,
+          0.0,
+          0.0003150964045487034,
+          -0.00021400088202680874,
+          -0.00021047510534924732,
+          3.210548830300072e-05,
+          0.0002817633452912076,
+          0.00023307849694920662,
+          0.00018392882892680478
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.1841737257694117,
+          2.1756820971387394,
+          13.760447360492721,
+          0.002241917709998919,
+          -0.003376514385242256,
+          0.04802921982095641,
+          1.3529070110701107,
+          48.68136309963099,
+          17.322882115670666,
+          18.622546418628065
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.4978742194622014,
+          4.36957999629728,
+          1.0,
+          0.28165067578447306,
+          0.20890772308292185,
+          0.6287040075901162,
+          5.037515971072145,
+          3.803442642812213,
+          0.760503846769382,
+          0.9462488416805066
+        ],
+        "training_games": 271,
+        "training_seasons": [
+          2022
+        ],
+        "zero_variance": [
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2023,
+      "training_seasons": [
+        2022
+      ],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "FST_PLUS_A0_PLUS_B0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -6.608489165970801e-05,
+          -3.163275368462212e-05,
+          7.402663343442564e-05,
+          2.572776074109934e-05,
+          -0.00014588588972711642,
+          -0.0001252775438074114,
+          -0.00011426309091393593,
+          0.00014552342493240285,
+          0.0001317152404556677,
+          0.00011304514783991164
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13131907840731813,
+          2.0008893360774604,
+          13.71439573931478,
+          -0.000681215427186612,
+          0.00013283772674600391,
+          0.017380201767727695,
+          1.3611941068139963,
+          48.171475138121544,
+          17.20954017902114,
+          18.46943807300173
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.5187801977185418,
+          4.026870423821122,
+          0.04596688951246442,
+          0.2669556650357565,
+          0.24465581530902716,
+          0.6245943422189842,
+          4.8262592108042845,
+          3.805123592776768,
+          0.7710376943902214,
+          0.9499750937443032
+        ],
+        "training_games": 543,
+        "training_seasons": [
+          2022,
+          2023
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "training_seasons": [
+        2022,
+        2023
+      ],
+      "tuning_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "FST_PLUS_A0_PLUS_B0",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00014580177910261888,
+          0.00010088746920683996,
+          0.0001423484822457752,
+          3.192326424869899e-05,
+          -0.00016560951771106536,
+          -9.454351636435265e-05,
+          0.0001557739687149064,
+          4.714495474184029e-06,
+          1.533583429857693e-05,
+          -8.334136892628655e-06
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13899427367341638,
+          2.12151340197865,
+          13.664375346568114,
+          0.0008368849236679873,
+          -0.0024559896818168105,
+          0.019880662682992503,
+          1.475426134969325,
+          48.575312024539876,
+          17.27535197960037,
+          18.548450326052766
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.5480659977436594,
+          3.8527370952479125,
+          0.08001658035963355,
+          0.30232373119779254,
+          0.28917483754118967,
+          0.6434138567255662,
+          4.766471581023374,
+          4.006137745880935,
+          0.8136661237328919,
+          1.0043930132264998
+        ],
+        "training_games": 815,
+        "training_seasons": [
+          2022,
+          2023,
+          2024
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "training_seasons": [
+        2022,
+        2023,
+        2024
+      ],
+      "tuning_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "PRIMARY_COMPACT_FOOTBALL",
+      "fallback": true,
+      "reason": "NO_PRIOR_CANDIDATE5_META_TRAINING_SURFACE",
+      "selected_lambda": null,
+      "target_season": 2022,
+      "training_seasons": [],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "PRIMARY_COMPACT_FOOTBALL",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00011370598836616064,
+          0.00016668499024626116,
+          0.0,
+          0.0003150409652659824,
+          -0.00021405538013635205,
+          -0.00021018741869356037,
+          3.224125398372182e-05,
+          0.0002816915085309493,
+          0.00023301040166379613,
+          0.00018385776243977361,
+          0.000324565406727512,
+          0.0002534115953268473,
+          0.00017415123464673614
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd",
+          "fst_confidence",
+          "a0_b0_logit_gap",
+          "component_prob_dispersion"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.1841737257694117,
+          2.1756820971387394,
+          13.760447360492721,
+          0.002241917709998919,
+          -0.003376514385242256,
+          0.04802921982095641,
+          1.3529070110701107,
+          48.68136309963099,
+          17.322882115670666,
+          18.622546418628065,
+          0.1462951613576017,
+          0.13614450594845529,
+          0.05750372961032488
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.4978742194622014,
+          4.36957999629728,
+          1.0,
+          0.28165067578447306,
+          0.20890772308292185,
+          0.6287040075901162,
+          5.037515971072145,
+          3.803442642812213,
+          0.760503846769382,
+          0.9462488416805066,
+          0.09593320469369088,
+          0.2980699923153057,
+          0.0328134972131821
+        ],
+        "training_games": 271,
+        "training_seasons": [
+          2022
+        ],
+        "zero_variance": [
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2023,
+      "training_seasons": [
+        2022
+      ],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "PRIMARY_COMPACT_FOOTBALL",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -6.60490686159253e-05,
+          -3.176646291428259e-05,
+          7.400780246616204e-05,
+          2.564174351180871e-05,
+          -0.0001459267416600485,
+          -0.00012509279229233093,
+          -0.00011419205483209143,
+          0.00014552227660891276,
+          0.00013171653483050796,
+          0.00011304472969540037,
+          6.403513565063723e-05,
+          0.00014773901525381907,
+          -2.051011390886706e-05
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd",
+          "fst_confidence",
+          "a0_b0_logit_gap",
+          "component_prob_dispersion"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13131907840731813,
+          2.0008893360774604,
+          13.71439573931478,
+          -0.000681215427186612,
+          0.00013283772674600391,
+          0.017380201767727695,
+          1.3611941068139963,
+          48.171475138121544,
+          17.20954017902114,
+          18.46943807300173,
+          0.14963126683637235,
+          0.11393887663959042,
+          0.05672411249085372
+        ],
+        "optimizer_message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "std": [
+          0.5187801977185418,
+          4.026870423821122,
+          0.04596688951246442,
+          0.2669556650357565,
+          0.24465581530902716,
+          0.6245943422189842,
+          4.8262592108042845,
+          3.805123592776768,
+          0.7710376943902214,
+          0.9499750937443032,
+          0.0990838194319232,
+          0.29692428480793776,
+          0.030745395764047334
+        ],
+        "training_games": 543,
+        "training_seasons": [
+          2022,
+          2023
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "training_seasons": [
+        2022,
+        2023
+      ],
+      "tuning_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "PRIMARY_COMPACT_FOOTBALL",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00014571855975101602,
+          0.00010092346353089034,
+          0.000142336000477369,
+          3.196829109155208e-05,
+          -0.00016558931638154274,
+          -9.454810177210297e-05,
+          0.00015570262205435968,
+          4.703984073856817e-06,
+          1.5318388394452225e-05,
+          -8.34819386797381e-06,
+          -9.177954211643603e-06,
+          -6.745595571002412e-05,
+          -0.00016676882987156933
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd",
+          "fst_confidence",
+          "a0_b0_logit_gap",
+          "component_prob_dispersion"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13899427367341638,
+          2.12151340197865,
+          13.664375346568114,
+          0.0008368849236679873,
+          -0.0024559896818168105,
+          0.019880662682992503,
+          1.475426134969325,
+          48.575312024539876,
+          17.27535197960037,
+          18.548450326052766,
+          0.15142182911215932,
+          0.11911361099042388,
+          0.05816816719843066
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.5480659977436594,
+          3.8527370952479125,
+          0.08001658035963355,
+          0.30232373119779254,
+          0.28917483754118967,
+          0.6434138567255662,
+          4.766471581023374,
+          4.006137745880935,
+          0.8136661237328919,
+          1.0043930132264998,
+          0.09747691568368017,
+          0.28210747045440976,
+          0.033201848450359
+        ],
+        "training_games": 815,
+        "training_seasons": [
+          2022,
+          2023,
+          2024
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "training_seasons": [
+        2022,
+        2023,
+        2024
+      ],
+      "tuning_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "MARKET_AWARE_DIAGNOSTIC",
+      "fallback": true,
+      "reason": "NO_PRIOR_CANDIDATE5_META_TRAINING_SURFACE",
+      "selected_lambda": null,
+      "target_season": 2022,
+      "training_seasons": [],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "MARKET_AWARE_DIAGNOSTIC",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00011371857622930533,
+          0.00016617339064486935,
+          0.0,
+          0.0003145690710795869,
+          -0.000214221673760093,
+          -0.00021014202064425995,
+          3.174447181795645e-05,
+          0.0002812990675000908,
+          0.0002325973950607672,
+          0.00018345939590128676,
+          0.00032446570026186484,
+          0.00025329481366828633,
+          0.00017432785460387627,
+          0.00012774156041331347,
+          0.00020428672532404069,
+          0.00022956462079417488,
+          0.0003462406492136264,
+          6.90463699432967e-05
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd",
+          "fst_confidence",
+          "a0_b0_logit_gap",
+          "component_prob_dispersion",
+          "market_logit_delta",
+          "c0_market_margin",
+          "c0_predicted_margin_residual",
+          "c0_market_total",
+          "c0_predicted_total_residual"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.1841737257694117,
+          2.1756820971387394,
+          13.760447360492721,
+          0.002241917709998919,
+          -0.003376514385242256,
+          0.04802921982095641,
+          1.3529070110701107,
+          48.68136309963099,
+          17.322882115670666,
+          18.622546418628065,
+          0.1462951613576017,
+          0.13614450594845529,
+          0.05750372961032488,
+          0.15020600354888652,
+          1.6568265682656826,
+          -0.5107472392848998,
+          44.103321033210335,
+          0.18670451342731884
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.4978742194622014,
+          4.36957999629728,
+          1.0,
+          0.28165067578447306,
+          0.20890772308292185,
+          0.6287040075901162,
+          5.037515971072145,
+          3.803442642812213,
+          0.760503846769382,
+          0.9462488416805066,
+          0.09593320469369088,
+          0.2980699923153057,
+          0.0328134972131821,
+          0.04961053864620816,
+          5.866153108379856,
+          0.35328293044418685,
+          4.1848906800475385,
+          0.3920246174199205
+        ],
+        "training_games": 271,
+        "training_seasons": [
+          2022
+        ],
+        "zero_variance": [
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2023,
+      "training_seasons": [
+        2022
+      ],
+      "tuning_seasons": []
+    },
+    {
+      "arm": "MARKET_AWARE_DIAGNOSTIC",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -6.593185052066325e-05,
+          -3.179321434834518e-05,
+          7.387382988865221e-05,
+          2.5727714198858924e-05,
+          -0.00014592042949667188,
+          -0.00012495351504000868,
+          -0.00011416322307364782,
+          0.0001455439905815509,
+          0.00013173794826040454,
+          0.00011305615208580238,
+          6.40088709237477e-05,
+          0.00014765084005730067,
+          -2.048872911948375e-05,
+          2.2574271509664138e-05,
+          6.708607353856477e-05,
+          -0.0002410157907150658,
+          8.349051760449695e-06,
+          0.0001361383745211519
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd",
+          "fst_confidence",
+          "a0_b0_logit_gap",
+          "component_prob_dispersion",
+          "market_logit_delta",
+          "c0_market_margin",
+          "c0_predicted_margin_residual",
+          "c0_market_total",
+          "c0_predicted_total_residual"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13131907840731813,
+          2.0008893360774604,
+          13.71439573931478,
+          -0.000681215427186612,
+          0.00013283772674600391,
+          0.017380201767727695,
+          1.3611941068139963,
+          48.171475138121544,
+          17.20954017902114,
+          18.46943807300173,
+          0.14963126683637235,
+          0.11393887663959042,
+          0.05672411249085372,
+          0.12093436693082255,
+          1.6574585635359116,
+          -0.4309431742476284,
+          43.52486187845304,
+          0.20287600034954664
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.5187801977185418,
+          4.026870423821122,
+          0.04596688951246442,
+          0.2669556650357565,
+          0.24465581530902716,
+          0.6245943422189842,
+          4.8262592108042845,
+          3.805123592776768,
+          0.7710376943902214,
+          0.9499750937443032,
+          0.0990838194319232,
+          0.29692428480793776,
+          0.030745395764047334,
+          0.05905710639668011,
+          5.814550759883267,
+          0.37425529798306517,
+          4.326119728511451,
+          0.3564344377254836
+        ],
+        "training_games": 543,
+        "training_seasons": [
+          2022,
+          2023
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "training_seasons": [
+        2022,
+        2023
+      ],
+      "tuning_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "MARKET_AWARE_DIAGNOSTIC",
+      "fallback": false,
+      "model": {
+        "beta": [
+          -0.00014553453612681637,
+          0.00010065077639045772,
+          0.00014199254548213173,
+          3.191202674900681e-05,
+          -0.00016568101696760515,
+          -9.433241255255389e-05,
+          0.0001555036576731428,
+          4.7739855232124745e-06,
+          1.537733357343803e-05,
+          -8.293432116383779e-06,
+          -9.215588407484096e-06,
+          -6.759037377891728e-05,
+          -0.00016670836004555875,
+          0.0001347330507240734,
+          0.00020026999974739575,
+          -0.0001997077777690496,
+          -2.128022869579578e-05,
+          2.761075256197934e-05
+        ],
+        "features": [
+          "a0_logit_delta",
+          "a0_expected_margin",
+          "a0_score_uncertainty",
+          "a0_offense_strength_diff",
+          "a0_defense_strength_diff",
+          "b0_logit_delta",
+          "b0_expected_margin",
+          "b0_expected_total",
+          "b0_margin_sd",
+          "b0_total_sd",
+          "fst_confidence",
+          "a0_b0_logit_gap",
+          "component_prob_dispersion",
+          "market_logit_delta",
+          "c0_market_margin",
+          "c0_predicted_margin_residual",
+          "c0_market_total",
+          "c0_predicted_total_residual"
+        ],
+        "lambda": 100.0,
+        "mean": [
+          0.13899427367341638,
+          2.12151340197865,
+          13.664375346568114,
+          0.0008368849236679873,
+          -0.0024559896818168105,
+          0.019880662682992503,
+          1.475426134969325,
+          48.575312024539876,
+          17.27535197960037,
+          18.548450326052766,
+          0.15142182911215932,
+          0.11911361099042388,
+          0.05816816719843066,
+          0.10412092278096188,
+          1.6024539877300614,
+          -0.32272506307949983,
+          43.79938650306748,
+          0.18147316823322104
+        ],
+        "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "std": [
+          0.5480659977436594,
+          3.8527370952479125,
+          0.08001658035963355,
+          0.30232373119779254,
+          0.28917483754118967,
+          0.6434138567255662,
+          4.766471581023374,
+          4.006137745880935,
+          0.8136661237328919,
+          1.0043930132264998,
+          0.09747691568368017,
+          0.28210747045440976,
+          0.033201848450359,
+          0.07108327230905359,
+          5.731753668199075,
+          0.36615551728738904,
+          4.242416502788324,
+          0.398907129945792
+        ],
+        "training_games": 815,
+        "training_seasons": [
+          2022,
+          2023,
+          2024
+        ],
+        "zero_variance": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "training_seasons": [
+        2022,
+        2023,
+        2024
+      ],
+      "tuning_seasons": [
+        2023,
+        2024
+      ]
+    }
+  ],
+  "tuning": [
+    {
+      "arm": "FST_PLUS_A0",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6323346303559
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6284598643469818
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6276921124961445
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6276094570074144
+        }
+      ],
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "validation_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "FST_PLUS_A0",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6101920283256607
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6082278453271989
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6079670233938275
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6079444107913171
+        }
+      ],
+      "label": "POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC",
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "validation_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "FST_PLUS_B0",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6298135275584947
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6280806037030102
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6276435002841396
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6276042848834618
+        }
+      ],
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "validation_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "FST_PLUS_B0",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6113039808893912
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.608782555721968
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6080364731955974
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6079514368703217
+        }
+      ],
+      "label": "POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC",
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "validation_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "FST_PLUS_A0_PLUS_B0",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6339368079852428
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6289052364398614
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6277349050885772
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6276135288941137
+        }
+      ],
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "validation_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "FST_PLUS_A0_PLUS_B0",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6130054543405893
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6090321586247983
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6080609751946559
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.607953880415211
+        }
+      ],
+      "label": "POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC",
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "validation_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "PRIMARY_COMPACT_FOOTBALL",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6384147971785201
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6298602868475494
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6278325528072561
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.627623205714474
+        }
+      ],
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "validation_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "PRIMARY_COMPACT_FOOTBALL",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6158043976032773
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6097759945286374
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6081439192156536
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6079622167909065
+        }
+      ],
+      "label": "POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC",
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "validation_seasons": [
+        2023,
+        2024
+      ]
+    },
+    {
+      "arm": "MARKET_AWARE_DIAGNOSTIC",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6468246849159435
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.632321297224631
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6281609572621122
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6276571854751469
+        }
+      ],
+      "selected_lambda": 100.0,
+      "target_season": 2024,
+      "validation_seasons": [
+        2023
+      ]
+    },
+    {
+      "arm": "MARKET_AWARE_DIAGNOSTIC",
+      "grid": [
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 0.1,
+          "log_loss": 0.6199357609547717
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 1.0,
+          "log_loss": 0.6110849525515457
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 10.0,
+          "log_loss": 0.6083169995685855
+        },
+        {
+          "folds": [
+            {
+              "training_games": 271,
+              "training_seasons": [
+                2022
+              ],
+              "validation_season": 2023
+            },
+            {
+              "training_games": 543,
+              "training_seasons": [
+                2022,
+                2023
+              ],
+              "validation_season": 2024
+            }
+          ],
+          "lambda": 100.0,
+          "log_loss": 0.6079800793990336
+        }
+      ],
+      "label": "POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC",
+      "selected_lambda": 100.0,
+      "target_season": 2025,
+      "validation_seasons": [
+        2023,
+        2024
+      ]
+    }
+  ]
+}
