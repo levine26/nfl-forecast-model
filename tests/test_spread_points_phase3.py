@@ -127,6 +127,49 @@ def test_b0_drive_taxonomy_is_fixed():
     assert D._drive_outcome("Interception") == "EMPTY"
 
 
+def test_drive_schedule_join_canonicalizes_overlapping_pbp_identity_columns():
+    pbp = pd.DataFrame(
+        {
+            "game_id": ["g1"],
+            "posteam": ["H"],
+            "defteam": ["A"],
+            "fixed_drive": [1],
+            "fixed_drive_result": ["Touchdown"],
+            "season": [2022],
+            "week": [1],
+            "gameday": ["1900-01-01"],
+            "home_team": ["STALE_H"],
+            "away_team": ["STALE_A"],
+            "home_rest": [0],
+            "away_rest": [0],
+            "epa": [1.0],
+            "success": [1.0],
+            "interception": [0],
+            "fumble_lost": [0],
+            "yards_gained": [20],
+            "yardline_100": [10],
+            "posteam_score": [0],
+            "posteam_score_post": [7],
+        }
+    )
+    schedules = pd.DataFrame(
+        {
+            "game_id": ["g1"],
+            "season": [2022],
+            "week": [1],
+            "gameday": [pd.Timestamp("2022-09-01")],
+            "home_team": ["H"],
+            "away_team": ["A"],
+            "home_rest": [7],
+            "away_rest": [7],
+        }
+    )
+    drives = D.build_drive_table(pbp, schedules)
+    assert drives.loc[0, "home_team"] == "H"
+    assert drives.loc[0, "away_team"] == "A"
+    assert not any(c.endswith("_x") or c.endswith("_y") for c in drives.columns)
+
+
 def test_b0_red_zone_formula_constants_are_frozen():
     assert S.RZ_PRIOR_STRENGTH == 20.0
     assert S.EWMA_HALF_LIFE == 8.0
