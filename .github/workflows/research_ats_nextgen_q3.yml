@@ -4,8 +4,10 @@ on:
   pull_request:
     paths:
       - 'src/nfl_forecast/challenger_ats_nextgen_q3.py'
+      - 'src/nfl_forecast/challenger_ats_nextgen_q3_reporting.py'
       - 'scripts/run_challenger_ats_nextgen_q3.py'
       - 'tests/test_challenger_ats_nextgen_q3.py'
+      - 'tests/test_challenger_ats_nextgen_q3_reporting.py'
       - 'research/ats-nextgen/**'
       - '.github/workflows/research_ats_nextgen_q3.yml'
   workflow_dispatch:
@@ -38,11 +40,12 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - name: Prove frozen gate and Q3 hurdle contract
+      - name: Prove frozen gate, Q3 hurdle, and reporting contracts
         run: |
           pytest -q \
             tests/test_challenger_ats_nextgen_phase2_gate.py \
-            tests/test_challenger_ats_nextgen_q3.py
+            tests/test_challenger_ats_nextgen_q3.py \
+            tests/test_challenger_ats_nextgen_q3_reporting.py
       - name: Verify Q2 invalidation remains closed
         run: |
           python - <<'PY'
@@ -52,7 +55,9 @@ jobs:
           opening = json.loads(Path('research/ats-nextgen/phase2_q3_opening_registry.json').read_text())
           assert result['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
           assert result['accepted_q2_outer_oof_artifact'] is None
+          assert result['accepted_q2_primary_performance'] is None
           assert opening['upstream']['q2_valid_oof_available'] is False
+          assert opening['upstream']['q2_complementarity_available'] is False
           assert opening['upstream']['q2_q3_blend_available'] is False
           assert opening['candidate_fitting_performed'] is False
           assert opening['candidate_performance_generated'] is False
