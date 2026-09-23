@@ -26,6 +26,7 @@ from nfl_forecast.challenger_ats_nextgen_q1 import (
     q1_metric_table,
     quantile_crossing_table,
 )
+from nfl_forecast.challenger_ats_nextgen_q1_reporting import q1_fixed_slice_metrics
 from nfl_forecast.config import load_config
 from nfl_forecast.data import load_core_data
 from nfl_forecast.elo import build_pregame_elo
@@ -105,15 +106,18 @@ def run(
     oof, tuning = generate_q1_outer_oof(gate)
     metrics = q1_metric_table(oof)
     crossings = quantile_crossing_table(oof)
+    fixed_slices = q1_fixed_slice_metrics(oof)
 
     oof_path = out / "q1_outer_oof_2022_2025.csv"
     tuning_path = out / "q1_inner_alpha_selections.csv"
     metric_path = out / "q1_quantile_metrics.csv"
     crossing_path = out / "q1_quantile_crossings.csv"
+    slice_path = out / "q1_fixed_slice_metrics.csv"
     oof.to_csv(oof_path, index=False, float_format="%.17g")
     tuning.to_csv(tuning_path, index=False, float_format="%.17g")
     metrics.to_csv(metric_path, index=False, float_format="%.17g")
     crossings.to_csv(crossing_path, index=False, float_format="%.17g")
+    fixed_slices.to_csv(slice_path, index=False, float_format="%.17g")
 
     seasons = sorted(pd.to_numeric(oof["season"], errors="raise").astype(int).unique().tolist())
     summary = {
@@ -132,11 +136,13 @@ def run(
         "q1_repair_or_rescue_performed": False,
         "ats_hit_rate_used_for_selection": False,
         "roi_used_for_selection": False,
+        "fixed_slice_definitions_frozen_pre_result": True,
         "outputs": {
             "outer_oof": str(oof_path),
             "inner_alpha_selections": str(tuning_path),
             "quantile_metrics": str(metric_path),
             "quantile_crossings": str(crossing_path),
+            "fixed_slice_metrics": str(slice_path),
         },
     }
     summary_path = out / "q1_summary.json"
