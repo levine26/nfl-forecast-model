@@ -69,8 +69,9 @@ def test_winner_change_identity():
     candidate = np.array([0.6, 0.4, 0.6, 0.4])
     result = c5.evaluate_probs(frame, candidate)
     assert result["changed_winners"] == 2
-    assert result["candidate_only_correct"] == 1
-    assert result["fst_only_correct"] == 1
+    assert result["candidate_only_correct"] == 2
+    assert result["fst_only_correct"] == 0
+    assert result["changed_winner_accuracy"] == pytest.approx(1.0)
     assert result["accuracy_delta"] == pytest.approx(result["mechanism_identity_delta"])
 
 
