@@ -29,7 +29,8 @@ def _source(rows: list[dict] | None = None) -> pd.DataFrame:
         "home_team": "B",
         "home_score": 24,
         "away_score": 21,
-        "spread_line": -3.0,
+        # nflverse convention: +3 means the home team is favored by three.
+        "spread_line": 3.0,
         "total_line": 44.5,
         "home_moneyline": -150,
         "away_moneyline": 130,
@@ -85,6 +86,20 @@ def test_whole_line_push_and_half_line_no_push_contract():
     assert grade_home_ats(24, 21, -2.5).outcome == "HOME_COVER"
 
 
+def test_nflverse_source_sign_is_converted_to_frozen_sportsbook_sign():
+    favorite = build_historical_ats_gate(_source())
+    row = favorite.iloc[0]
+    assert row["spread_line"] == 3.0
+    assert row["home_spread"] == -3.0
+    assert row["market_home_margin_center"] == 3.0
+
+    away_favorite = build_historical_ats_gate(_source([{"spread_line": -3.0}]))
+    row = away_favorite.iloc[0]
+    assert row["spread_line"] == -3.0
+    assert row["home_spread"] == 3.0
+    assert row["market_home_margin_center"] == -3.0
+
+
 def test_historical_gate_preserves_frozen_market_semantics_and_push_null_target():
     result = build_historical_ats_gate(_source())
     validate_gate_frame(result)
@@ -138,7 +153,7 @@ def test_nested_chronology_is_expanding_and_never_uses_target_or_future_season()
 def test_pre_fit_manifest_records_lineage_and_is_canonically_game_keyed(tmp_path):
     source = _source([
         {"game_id": "2022_02_A_B", "week": 2, "home_score": 27, "away_score": 20},
-        {"game_id": "2022_01_A_B", "week": 1, "home_score": 20, "away_score": 20, "spread_line": 1.0},
+        {"game_id": "2022_01_A_B", "week": 1, "home_score": 20, "away_score": 20, "spread_line": -1.0},
     ])
     frame = build_historical_ats_gate(source)
     manifest = write_phase2_gate_artifacts(
@@ -158,7 +173,8 @@ def test_pre_fit_manifest_records_lineage_and_is_canonically_game_keyed(tmp_path
     assert manifest["candidate_performance_generated"] is False
     assert manifest["completed_2026_outcomes_authorized"] is False
     assert manifest["random_kfold_allowed"] is False
-    assert manifest["market_lineage"]["home_spread"] == "spread_line"
+    assert manifest["market_lineage"]["home_spread"] == "-spread_line"
+    assert manifest["market_lineage"]["market_home_margin_center"] == "spread_line"
     assert manifest["football_feature_lineage"]["off_epa_diff"] == "diff_off_epa_ewma"
     assert persisted["artifact"]["raw_sha256"] == manifest["artifact"]["raw_sha256"]
     assert (
