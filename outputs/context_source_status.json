@@ -105,29 +105,12 @@
     "advisories": {},
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
-    "games_applied": 0,
-    "games_expected": 16,
+    "games_applied": 15,
+    "games_expected": 15,
     "max_age_hours": 6.0,
     "new_report_grace_minutes": 5.0,
-    "skipped": {
-      "2026_03_ARI_SF": "missing_entry",
-      "2026_03_ATL_GB": "missing_entry",
-      "2026_03_BAL_DAL": "missing_entry",
-      "2026_03_CAR_CLE": "missing_entry",
-      "2026_03_CIN_PIT": "missing_entry",
-      "2026_03_HOU_IND": "missing_entry",
-      "2026_03_KC_MIA": "missing_entry",
-      "2026_03_LAC_BUF": "missing_entry",
-      "2026_03_LA_DEN": "missing_entry",
-      "2026_03_LV_NO": "missing_entry",
-      "2026_03_MIN_TB": "missing_entry",
-      "2026_03_NE_JAX": "missing_entry",
-      "2026_03_NYJ_DET": "missing_entry",
-      "2026_03_PHI_CHI": "missing_entry",
-      "2026_03_SEA_WAS": "missing_entry",
-      "2026_03_TEN_NYG": "missing_entry"
-    },
-    "status": "unavailable"
+    "skipped": {},
+    "status": "healthy"
   },
   "depth_charts": {
     "season": 2026,
@@ -135,10 +118,10 @@
   },
   "editorial_finalizer": {
     "editorial_version": "story-desk-v3",
-    "games": 16,
+    "games": 15,
     "guardrail": "Final editorial pass changes only public explanation and story hierarchy, never LevLine probabilities.",
     "status": "healthy",
-    "unique_headlines": 16
+    "unique_headlines": 15
   },
   "editorial_intelligence": {
     "as_of": "2026-09-23T12:35:53.841788+00:00",
@@ -161,7 +144,7 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 1,
+    "evidence_repairs": 0,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
@@ -204,129 +187,144 @@
     ],
     "games": {
       "2026_03_ARI_SF": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:03:01.555376+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_BAL_DAL": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:05:13.119467+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_CAR_CLE": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T12:54:15.584448+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_CIN_PIT": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:00:50.086007+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_HOU_IND": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T12:56:27.060281+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_KC_MIA": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T12:58:38.583513+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_LAC_BUF": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T12:53:09.848337+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_LA_DEN": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:07:24.663103+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_LV_NO": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:06:18.868781+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_MIN_TB": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:04:07.360847+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_NE_JAX": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T12:57:32.797071+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_NYJ_DET": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T12:55:21.324538+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_PHI_CHI": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:08:30.433462+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_SEA_WAS": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T13:01:55.824340+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       },
       "2026_03_TEN_NYG": {
-        "fallback_source": "missing",
+        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
         "recovered_at_utc": "2026-09-23T12:59:44.331423+00:00",
-        "requires_chatgpt_refresh": true
+        "requires_chatgpt_refresh": false
       }
     },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
     "run_id": "35863102225",
-    "status": "degraded"
+    "status": "healthy"
   },
   "injuries": {
     "as_of": "2026-09-23T12:33:21.398942+00:00",
@@ -337,14 +335,16 @@
     "teams_with_reported_players": 2
   },
   "media_reporting": {
-    "as_of": "2026-09-23T12:36:17.652010+00:00",
+    "as_of": "2026-09-23T14:25:53.882441+00:00",
     "cross_game_titles_rejected": 0,
-    "games": 16,
-    "games_with_display_reporting": 16,
-    "games_with_reporting": 16,
+    "fallback_checkpoint_bootstrap": true,
+    "fallback_checkpoint_guardrail": "Week-rollover recovery rebuilt the current slate from validated Groq checkpoints for successful games plus exact authorized ChatGPT failed-game inputs.",
+    "games": 15,
+    "games_with_display_reporting": 15,
+    "games_with_reporting": 15,
     "games_with_substantive_reporting": 13,
     "games_with_trusted_reporting": 15,
-    "generic_titles_rejected": 4,
+    "generic_titles_rejected": 6,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -356,7 +356,7 @@
         "status": "unavailable"
       }
     },
-    "signals": 60,
+    "signals": 56,
     "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     "status": "healthy"
   },
