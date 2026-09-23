@@ -1,0 +1,62 @@
+name: ATS NextGen Q3 Stage C
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_ats_nextgen_q3.py'
+      - 'scripts/run_challenger_ats_nextgen_q3.py'
+      - 'tests/test_challenger_ats_nextgen_q3.py'
+      - 'research/ats-nextgen/**'
+      - '.github/workflows/research_ats_nextgen_q3.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ats-nextgen-q3-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py
+    scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  contract:
+    name: Q3 pre-result contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Prove frozen gate and Q3 hurdle contract
+        run: |
+          pytest -q \
+            tests/test_challenger_ats_nextgen_phase2_gate.py \
+            tests/test_challenger_ats_nextgen_q3.py
+      - name: Verify Q2 invalidation remains closed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('research/ats-nextgen/phase2_q2_result_registry.json').read_text())
+          opening = json.loads(Path('research/ats-nextgen/phase2_q3_opening_registry.json').read_text())
+          assert result['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
+          assert result['accepted_q2_outer_oof_artifact'] is None
+          assert opening['upstream']['q2_valid_oof_available'] is False
+          assert opening['upstream']['q2_q3_blend_available'] is False
+          assert opening['candidate_fitting_performed'] is False
+          assert opening['candidate_performance_generated'] is False
+          assert opening['completed_2026_outcomes_used'] == 0
+          PY
+      - name: Prove contract tests did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
