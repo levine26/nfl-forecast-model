@@ -258,8 +258,13 @@ def build_drive_table(pbp: pd.DataFrame, schedules: pd.DataFrame) -> pd.DataFram
         if c in schedules.columns
     ]
     sched = schedules[sched_cols].drop_duplicates("game_id")
-    if "season" in plays.columns:
-        plays = plays.drop(columns=[c for c in ("season", "week") if c in plays.columns])
+    # PBP releases may already carry schedule identity/context columns. Drop any
+    # overlapping schedule-owned fields before the canonical join so pandas does
+    # not suffix home_team/away_team/gameday/rest columns into _x/_y variants.
+    # This is an engineering normalization only; schedule remains authoritative.
+    schedule_owned = [c for c in sched_cols if c != "game_id" and c in plays.columns]
+    if schedule_owned:
+        plays = plays.drop(columns=schedule_owned)
     plays = plays.merge(sched, on="game_id", how="inner", validate="many_to_one")
 
     if "epa" in plays.columns:
