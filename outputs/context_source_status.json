@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-23T00:34:05.661076+00:00",
+    "as_of": "2026-09-23T03:30:22.039361+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-23T00:34:09.355102+00:00",
+    "as_of": "2026-09-23T03:30:25.580390+00:00",
     "conflicts": 0,
     "evidence_items_added": 20,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 20
   },
   "coaching": {
-    "as_of": "2026-09-23T00:32:48.473817+00:00",
+    "as_of": "2026-09-23T03:28:25.866737+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -141,7 +141,7 @@
     "unique_headlines": 16
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-23T00:33:55.391192+00:00",
+    "as_of": "2026-09-23T03:30:12.066416+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -168,9 +168,9 @@
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-23T00:32:47.209814+00:00",
+    "generated_utc": "2026-09-23T03:28:25.476622+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 230,
+    "signals": 229,
     "status": "healthy"
   },
   "ftn": {
@@ -183,153 +183,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-23T00:32:47.209814+00:00",
-  "groq_provider_fallback": {
-    "failed_games": [
-      "2026_03_ARI_SF",
-      "2026_03_BAL_DAL",
-      "2026_03_CAR_CLE",
-      "2026_03_CIN_PIT",
-      "2026_03_HOU_IND",
-      "2026_03_KC_MIA",
-      "2026_03_LAC_BUF",
-      "2026_03_LA_DEN",
-      "2026_03_LV_NO",
-      "2026_03_MIN_TB",
-      "2026_03_NE_JAX",
-      "2026_03_NYJ_DET",
-      "2026_03_PHI_CHI",
-      "2026_03_SEA_WAS",
-      "2026_03_TEN_NYG"
-    ],
-    "games": {
-      "2026_03_ARI_SF": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T01:01:49.929554+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_BAL_DAL": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T01:04:01.692383+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_CAR_CLE": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:53:03.052388+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_CIN_PIT": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:59:38.218959+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_HOU_IND": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:55:14.773008+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_KC_MIA": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:57:26.513257+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_LAC_BUF": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:51:57.198532+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_LA_DEN": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T01:06:13.389942+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_LV_NO": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T01:05:07.541961+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_MIN_TB": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T01:02:55.833137+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_NE_JAX": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:56:20.639292+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_NYJ_DET": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:54:08.911960+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_PHI_CHI": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T01:07:19.252211+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_SEA_WAS": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T01:00:44.077454+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_03_TEN_NYG": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T00:58:32.360432+00:00",
-        "requires_chatgpt_refresh": true
-      }
-    },
-    "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "35803721211",
-    "status": "degraded"
-  },
+  "generated_utc": "2026-09-23T03:28:25.476622+00:00",
   "injuries": {
-    "as_of": "2026-09-23T00:32:47.349178+00:00",
+    "as_of": "2026-09-23T03:28:25.621818+00:00",
     "players": 251,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg3",
@@ -337,13 +193,13 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-23T00:34:15.557765+00:00",
+    "as_of": "2026-09-23T03:30:31.588640+00:00",
     "cross_game_titles_rejected": 0,
     "games": 16,
     "games_with_display_reporting": 16,
     "games_with_reporting": 16,
-    "games_with_substantive_reporting": 13,
-    "games_with_trusted_reporting": 15,
+    "games_with_substantive_reporting": 15,
+    "games_with_trusted_reporting": 14,
     "generic_titles_rejected": 2,
     "providers": {
       "bing_news_rss": {
@@ -361,7 +217,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-23T00:34:08.505678+00:00",
+    "as_of": "2026-09-23T03:30:24.782982+00:00",
     "evidence_items_added": 20,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 20,
@@ -434,8 +290,8 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-23T00:32:51.593676+00:00",
-    "charted_plays": 5174,
+    "as_of": "2026-09-23T03:28:28.394191+00:00",
+    "charted_plays": 5324,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
     "status": "healthy"
@@ -467,7 +323,7 @@
     "story_items_added": 16
   },
   "weather": {
-    "as_of": "2026-09-23T00:33:40.314298+00:00",
+    "as_of": "2026-09-23T03:29:57.558539+00:00",
     "games_checked": 14,
     "status": "degraded"
   }
