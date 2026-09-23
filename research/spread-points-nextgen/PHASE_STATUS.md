@@ -2,11 +2,10 @@
 
 **Program:** LevLine spread setting, team-point, margin, total, and joint-score research  
 **Authority:** `MASTER_PLAN.md`  
-**Last updated:** 2026-09-22 America/Los_Angeles  
-**Active closeout branch:** `research/spread-points-nextgen-phase5`  
+**Last updated:** 2026-09-23 America/Los_Angeles  
 **Production model:** `F-ST-01-FROZEN-2026` — unchanged
 
-The authoritative Phase 3 completion receipt is `FINAL_PHASE3_RECEIPT.md`. The authoritative Phase 4 completion receipt is `FINAL_PHASE4_RECEIPT.md`. Phase 5 scientific work is complete on its research branch with Candidate 5 classified `REJECTED`; integration/merge closeout remains before the phase is marked fully merged.
+The authoritative Phase 3 completion receipt is `FINAL_PHASE3_RECEIPT.md`. The authoritative Phase 4 completion receipt is `FINAL_PHASE4_RECEIPT.md`. The authoritative Phase 5 completion receipt is `FINAL_PHASE5_RECEIPT.md`. Phase 5 is fully merged and closed with Candidate 5 classified `REJECTED`.
 
 | Phase | Name | Status | Primary branch | Supporting PR(s) | Key evidence / artifacts | Exact next action |
 |---|---|---|---|---|---|---|
@@ -15,7 +14,7 @@ The authoritative Phase 3 completion receipt is `FINAL_PHASE3_RECEIPT.md`. The a
 | 2 | Deep External Research & Challenger Design | **COMPLETE** | `research/spread-points-nextgen-phase2` — merged | #520 — MERGED | merge `405906942013252c158244c9b033a3240baa37f8`; frozen holdout protocol | Closed |
 | 3 | Controlled Challenger Implementation | **COMPLETE** | `research/spread-points-nextgen-phase3` — merged | #547 — MERGED; final receipt #549 — MERGED | final synchronized head `8c061cd400a6bb52a037d5e98880efd19a451fcb`; merge `d4d29d8c2340864e2d9e4bcd793852e8643be80c`; exact-head CI `35813365004`, `35813364985`, `35813364975` SUCCESS; 815-game 2022–2024 OOF package; D ineligible | Closed; do not rerun |
 | 4 | Historical Validation, Ablation & Model Selection | **COMPLETE** | `research/spread-points-nextgen-phase4` — merged | #550 — MERGED; receipt #551 — MERGED | 272 exact common 2025 games; exact validated head `c314dece97e5048f95ec5bb021d3fb7eb9f5dd33`; exact-head CI `35820561374`, `35820561354`, `35820561327` SUCCESS; merge `733f6d6a0497e996358282f38c61ea5fdd827040`; disposition `NO_HISTORICAL_STANDALONE_FINALIST` | Closed; 2025 underlying holdout spent |
-| 5 | Historical F-ST-Anchored Winner Integration (Candidate 5) | **SCIENTIFICALLY COMPLETE — REJECTED; MERGE CLOSEOUT IN PROGRESS** | `research/spread-points-nextgen-phase5` | pending | preregistration `df14e51d73aad96899d3ba4364cbb76989f0d2bf`; first successful frozen execution `35828122187`; evidence preservation `8fce0be359d93d68bc2c4bba852ede4181a38368`; 815-game primary result 562/815 for both F-ST and Candidate 5; zero switches; proper scores microscopically worse | Validate exact PR head, merge if operational checks pass, verify merged main, write immutable final receipt; no Phase 6 handoff |
+| 5 | Historical F-ST-Anchored Winner Integration (Candidate 5) | **COMPLETE — REJECTED** | `research/spread-points-nextgen-phase5` — merged | #552 — MERGED | preregistration `df14e51d73aad96899d3ba4364cbb76989f0d2bf`; exact validated head `a4f892d64ab163a421eed203d9b50983e5bbd04b`; exact-head CI `35875417408`, `35875417416`, `35875417452`, `35875417543` SUCCESS; merge `a68afb1e1cf9675a7ff9e0e0af1f52343546f029`; 815-game primary result 562/815 for both F-ST and Candidate 5; zero switches | Closed; no Phase 6 handoff for Candidate 5 V1 |
 | 6 | Prospective Shadow Validation & Operational Hardening | **NOT JUSTIFIED FOR CANDIDATE 5 V1** | none | None | Candidate 5 V1 failed the preregistered Phase 6 eligibility rule | Do not start for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1` |
 | 7 | Final Synthesis & Promotion Package | **NOT STARTED / NO PROMOTION CANDIDATE FROM PHASE 5** | TBD | None | future only if a separately authorized candidate completes prospective evidence | No production promotion |
 
@@ -29,6 +28,9 @@ The authoritative Phase 3 completion receipt is `FINAL_PHASE3_RECEIPT.md`. The a
 - correction commit: `b86b7c98b40a3b68e6fb4e42f9aeb6592554065a` — test expectation only; scientific contract unchanged
 - first successful historical execution: `35828122187` — dedicated contract gate, historical package and exact-run gate all SUCCESS
 - evidence preservation commit: `8fce0be359d93d68bc2c4bba852ede4181a38368`
+- exact validated PR head: `a4f892d64ab163a421eed203d9b50983e5bbd04b`
+- primary merge: `a68afb1e1cf9675a7ff9e0e0af1f52343546f029`
+- final receipt: `research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
 - development surface: 815 exact paired 2022–2024 games
 - 2025 diagnostic surface: 272 games, explicitly `POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC`
 - historical F-ST provenance: chronology-clean reproduction, 741/1,087 correct across 2022–2025; not original prospective locks
@@ -55,6 +57,6 @@ The 2025 non-pristine diagnostic also produced zero winner changes: F-ST and the
 
 ## Phase transition rule
 
-Candidate 5 V1 is closed scientifically. Do not rescue it by loosening regularization, changing features/interactions, adding a nonlinear learner, recalibrating, changing the 0.5 winner threshold, mining 2025, or using completed-2026 outcomes.
+Candidate 5 V1 is fully closed. Do not rescue it by loosening regularization, changing features/interactions, adding a nonlinear learner, recalibrating, changing the 0.5 winner threshold, mining 2025, or using completed-2026 outcomes.
 
-No Phase 6 handoff is authorized for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`. The remaining Phase 5 work is repository integration only: exact-head PR validation, merge, merged-main verification, and immutable final receipt. Production remains `F-ST-01-FROZEN-2026`.
+No Phase 6 handoff is authorized for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`. A future materially different research hypothesis requires a separately authorized and preregistered identity with a new evidence clock. Production remains `F-ST-01-FROZEN-2026`.
