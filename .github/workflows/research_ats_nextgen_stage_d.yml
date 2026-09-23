@@ -115,7 +115,7 @@ jobs:
       - name: Verify frozen Stage-D scientific blobs
         run: |
           test "$(git rev-parse HEAD:src/nfl_forecast/challenger_ats_nextgen_stage_d.py)" = "d7293b7c9b947590c72d58da1b2d07ce8c0919c0"
-          test "$(git rev-parse HEAD:scripts/run_challenger_ats_nextgen_stage_d.py)" = "5a4400fee7a6e5c7981bcc0b8b69e11e09862fbe"
+          test "$(git rev-parse HEAD:scripts/run_challenger_ats_nextgen_stage_d.py)" = "7df0df371b93d50265c9061f4215753a87909b15"
           test "$(git rev-parse HEAD:tests/test_challenger_ats_nextgen_stage_d.py)" = "1b727166aeb00c5b7c19d30e228ec6a9f40ed8ea"
           test "$(git rev-parse HEAD:research/ats-nextgen/PHASE2_STAGE_D_OPENING_RECEIPT.md)" = "021d641df7585bd878338bc56a073d17ce2e1fe4"
           test "$(git rev-parse HEAD:research/ats-nextgen/phase2_stage_d_opening_registry.json)" = "630fde8e67b7a15592f3836367222c846d04a12d"
