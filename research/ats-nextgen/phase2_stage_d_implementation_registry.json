@@ -2,25 +2,33 @@
   "program": "LEVLINE_ATS_NEXTGEN",
   "phase": 2,
   "stage": "D_FINAL_EVIDENCE_SYNTHESIS_AND_UNCERTAINTY",
-  "status": "IMPLEMENTATION_FROZEN_EXECUTION_AUTHORIZED",
+  "status": "PRE_EXECUTION_CORRECTED_REVALIDATION_REQUIRED",
   "stage_c_merge_base": "539081c59e62a5d4dbc0a8f849d8a332424ea06e",
   "scientific_blobs": {
     "src/nfl_forecast/challenger_ats_nextgen_stage_d.py": "d7293b7c9b947590c72d58da1b2d07ce8c0919c0",
-    "scripts/run_challenger_ats_nextgen_stage_d.py": "5a4400fee7a6e5c7981bcc0b8b69e11e09862fbe",
+    "scripts/run_challenger_ats_nextgen_stage_d.py": "7df0df371b93d50265c9061f4215753a87909b15",
     "tests/test_challenger_ats_nextgen_stage_d.py": "1b727166aeb00c5b7c19d30e228ec6a9f40ed8ea",
     "research/ats-nextgen/PHASE2_STAGE_D_OPENING_RECEIPT.md": "021d641df7585bd878338bc56a073d17ce2e1fe4",
     "research/ats-nextgen/phase2_stage_d_opening_registry.json": "630fde8e67b7a15592f3836367222c846d04a12d"
   },
   "workflow_blobs": {
     "contract_only_validated": "a51448d7fa8acd9d7c5a51064798cfdef9c55a21",
-    "execution_authorization": "5311d5f3ca60d07325db3525444c5245652975f2"
+    "superseded_execution_authorization": "5311d5f3ca60d07325db3525444c5245652975f2",
+    "corrected_execution_authorization": "010fa1073740d14ff338d82520b77693a48811ec"
   },
-  "contract_validation": {
+  "prior_contract_validation": {
     "head": "67fcd04688dea3d5ec9400d4590dd8c7da5dad23",
     "run_id": 35935482365,
     "job_id": 107431443312,
     "conclusion": "success",
     "historical_synthesis_reachable_on_validated_head": false
+  },
+  "pre_execution_correction": {
+    "reason": "Accepted Q1/Q3 summary JSON hashes include canonical output paths; nested Stage-D reproduction directories would create pathname-only hash drift.",
+    "scientific_design_changed": false,
+    "candidate_predictions_inspected": false,
+    "stage_d_result_existed_before_correction": false,
+    "correction": "Regenerate Q1/Q3 at their original canonical research_outputs/ats_nextgen/q1 and q3 paths before exact accepted-file hash checks."
   },
   "accepted_evidence": {
     "q1_oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
@@ -34,7 +42,6 @@
     "alpha": 0.05,
     "block_columns": ["season", "week"]
   },
-  "contract_only_workflow": false,
   "historical_synthesis_reachable": true,
   "historical_synthesis_requires_contract_success_on_same_head": true,
   "stage_d_execution_performed": false,
