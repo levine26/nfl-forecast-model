@@ -15,7 +15,7 @@
 - frozen full scientific-surface head: `d9dbfe24af7fd19f5b22e76fd5f57dd83c606a60`;
 - historical authorization / accepted result head: `891d921c24bc045dd58de3b2dd05871f12d09183`;
 - workflow: `35931071604`;
-- contract job: `107417390267` — **SUCCESS**;
+- contract job: `107417650978` — **SUCCESS**;
 - chronology-clean historical job: `107418004469` — **SUCCESS**;
 - completed-2026 outcomes used: **0**;
 - production forecasting changed: **no**.
