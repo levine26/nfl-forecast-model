@@ -31,7 +31,7 @@ Candidate Q2 location is:
 
 where `q1_mid_i` is Q1's chronology-clean official median residual prediction for that row.
 
-Market-only M1/M2 variants use no football-derived Q1 residual. The market-only calibrated Q2 null may use the chronology-clean Q1-M2 median residual.
+M1 uses `mu_i=S_i` exactly. M2 uses `mu_i=S_i+q1_m2_mid_i`, where `q1_m2_mid_i` is the chronology-clean market-only Q1-M2 median residual. Q2 full uses the chronology-clean full-Q1 median residual.
 
 Q2 may not refit a new outcome-dependent mean model.
 
@@ -127,23 +127,47 @@ For a half-point `S`:
 
 Quarter-point or other non-integer/non-half-point spreads are ineligible in V1; they are never rounded.
 
-## Market nulls
+## Exact market nulls
 
-### M1
+### M1 — raw market distribution
 
-A discrete market-derived PMF centered directly at `S`, using spread, total and paired-moneyline information where available, but no football features/Q1 football residual.
+Use the same selected Q2 base-family/key-mass/conditional-scale machinery, estimated with prior history only, but set location to `mu_i=S_i` exactly.
 
-### M2
+M1 inputs that can vary by row are therefore only:
 
-Same discrete Q2 architecture, but location uses the chronology-clean market-only Q1-M2 median residual and no football state. M2 is the direct null for incremental football-distribution claims.
+- `S_i` through location and `abs(S_i)` through scale;
+- `total_line` through scale;
+- the fixed `abs(S)*(total-45)` scale interaction.
+
+Key-mass parameters are prior-history calibration parameters. M1 contains no football variables, no Q1 residual, and no paired-moneyline input. Paired moneyline is reported as a market-shape diagnostic only for M1.
+
+### M2 — market-only calibrated distribution
+
+Use the same Q2 distribution machinery, but set location to:
+
+`mu_i = S_i + q1_m2_mid_i`,
+
+where `q1_m2_mid_i` comes from the chronology-clean **market-only** Q1 model using `S`, `abs(S)`, total, and paired-moneyline no-vig home probability where available.
+
+M2 contains no football variables. It is the direct null for any claim that Q2 full adds football information rather than merely calibrating market shape.
 
 ### Q2 full
 
-Uses chronology-clean full-Q1 median residual for location, while conditional scale and key mass remain governed by the frozen Q2 contract.
+Use:
+
+`mu_i = S_i + q1_full_mid_i`,
+
+where `q1_full_mid_i` is the chronology-clean full-Q1 median residual using the frozen market + football feature contract. Conditional scale and key-mass machinery are otherwise the same frozen Q2 architecture.
 
 ## Moneyline constraint
 
-When both historical moneylines exist, M1/M2 may include the paired no-vig home win probability as a market-only diagnostic/feature. Q2 V1 does not introduce a separate free parameter search to force exact moneyline matching; any moneyline calibration gain must emerge from the frozen market-only fitting framework.
+Paired home/away moneyline may enter Q2 only indirectly through Q1-M2/Q1-full location calibration, according to Q1's frozen feature contract. Q2 adds no separate moneyline coefficient, matching constraint, family search or outcome-tuned transformation.
+
+This resolves the market-null hierarchy exactly:
+
+- M1 = quoted spread/total distribution shape;
+- M2 = M1 + market-only Q1 location calibration (which may use paired-moneyline no-vig probability);
+- Q2 full = M1 distribution machinery + full-Q1 location calibration.
 
 ## Chronology
 
@@ -171,7 +195,7 @@ Same outer/inner structure as the master plan. Critically:
 
 Q2 can establish:
 
-- **distribution calibration value** if it improves M1;
+- **distribution calibration value** if M1/M2 improve raw market probability representation under proper scoring;
 - **incremental football-distribution information** only if full Q2 improves M2 under proper scoring with stable season evidence.
 
 Realized ATS/ROI cannot rescue a proper-score failure.
