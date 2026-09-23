@@ -80,7 +80,7 @@ jobs:
           assert q3['classification'] == 'NOT_INCREMENTAL_VS_Q3_M2'
           assert q3['accepted_result_head'] == '891d921c24bc045dd58de3b2dd05871f12d09183'
           assert q3['workflow']['run_id'] == 35931071604
-          assert q3['workflow']['contract_job_id'] == 107417390267
+          assert q3['workflow']['contract_job_id'] == 107417650978
           assert q3['workflow']['historical_job_id'] == 107418004469
           assert q3['artifact']['id'] == 10781521222
           assert q3['artifact']['digest'] == 'sha256:6062472dce30fddfcc6ad16d1d5c29203491f6e77d893aa673cc20bbb29a1bfa'
