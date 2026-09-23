@@ -1,0 +1,19 @@
+{
+  "schema_version": "phase3-pre-result-gate-v1",
+  "decision": "KEEP_FROZEN_PHASE3_CONTRACT",
+  "decision_date": "2026-09-22",
+  "timezone": "America/Los_Angeles",
+  "development_outputs_existed_before_decision": false,
+  "development_metrics_inspected_before_decision": false,
+  "challenger_2025_outputs_inspected": false,
+  "completed_2026_outcomes_used_for_selection": false,
+  "phase4_started": false,
+  "candidate5_started": false,
+  "production_model": "F-ST-01-FROZEN-2026",
+  "production_change": false,
+  "authorized_candidates": ["A0", "B0", "C0"],
+  "conditional_candidate": "D",
+  "preregistration_amendment": null,
+  "research_review": "research/spread-points-nextgen/phase3/PREIMPLEMENTATION_RESEARCH_REVIEW.md",
+  "notes": "The external research delta strengthened the rationale for the existing bounded chronology-safe contract and did not justify a pre-result amendment."
+}
