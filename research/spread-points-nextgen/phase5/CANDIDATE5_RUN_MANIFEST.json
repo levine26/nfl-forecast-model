@@ -1,0 +1,100 @@
+{
+  "D_disposition": "ENSEMBLE_NOT_ELIGIBLE",
+  "bootstrap": {
+    "blocks": 54,
+    "intervals": {
+      "accuracy_delta": {
+        "median": 0.0,
+        "p2_5": 0.0,
+        "p97_5": 0.0
+      },
+      "brier_delta": {
+        "median": 5.680058980153043e-06,
+        "p2_5": -4.274278953342824e-06,
+        "p97_5": 1.591625321179855e-05
+      },
+      "candidate_accuracy": {
+        "median": 0.6894484412470024,
+        "p2_5": 0.65700395256917,
+        "p97_5": 0.7200488997555012
+      },
+      "log_loss_delta": {
+        "median": 1.3401891975752553e-05,
+        "p2_5": -1.0772580953324667e-05,
+        "p97_5": 3.892963716294832e-05
+      }
+    },
+    "samples": 10000,
+    "seed": 20260922
+  },
+  "branch_base_main_sha": "d9302207c3dd0a82c89fadd2cd5adc52f6541bd0",
+  "candidate_id": "LEVLINE-HISTORICAL-RESIDUAL-STACK-V1",
+  "code_sha256": "55f62f9de44e853f820016c893c6d94a9a2226f7c08e412260a7cf5d10c9b4c2",
+  "completed_2026_outcomes_used": false,
+  "config_sha256": "5762ac921519e594412d0dbcc6ced49d8fb332672e83bb0c5e54cd53d04299ce",
+  "development": {
+    "2022_meta_fallback": "FST_ZERO_RESIDUAL_CORRECTION",
+    "games": 815,
+    "oof_component_surface": "research/spread-points-nextgen/phase3/evidence/FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv",
+    "seasons": [
+      2022,
+      2023,
+      2024
+    ]
+  },
+  "diagnostic_2025": {
+    "games": 272,
+    "label": "POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC",
+    "may_trigger_rescue": false,
+    "used_for_architecture_or_selection": false
+  },
+  "fst_historical_provenance": {
+    "interpretation": "chronology-clean historical reproduction, not original prospective locks",
+    "reproduced_2022_2025_games": 1087,
+    "reproduced_correct": 741,
+    "source": "challenger_outputs/fst/provenance/training_frame_keyed.csv",
+    "stack_code": "src/nfl_forecast/challenger_stacking.py"
+  },
+  "fst_identity": "F-ST-01-FROZEN-2026",
+  "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+  "nonlinear_learner_used": false,
+  "phase6_eligible": false,
+  "posthoc_calibration_applied": false,
+  "preregistration_commit_sha": "df14e51d73aad96899d3ba4364cbb76989f0d2bf",
+  "primary_metrics": {
+    "accuracy": 0.6895705521472393,
+    "accuracy_delta": 0.0,
+    "accuracy_delta_pp": 0.0,
+    "brier": 0.21035034140022688,
+    "brier_delta": 5.726240139475314e-06,
+    "calibration": {
+      "converged": false,
+      "intercept": 0.09794191203795367,
+      "slope": 1.1258145760960958
+    },
+    "candidate_correct": 562,
+    "candidate_only_correct": 0,
+    "changed_winner_accuracy": null,
+    "changed_winner_rate": 0.0,
+    "changed_winners": 0,
+    "fst_accuracy": 0.6895705521472393,
+    "fst_brier": 0.2103446151600874,
+    "fst_calibration": {
+      "converged": false,
+      "intercept": 0.09772300313056409,
+      "slope": 1.1262586986315575
+    },
+    "fst_correct": 562,
+    "fst_log_loss": 0.6090773094628958,
+    "fst_only_correct": 0,
+    "games": 815,
+    "log_loss": 0.6090908296692031,
+    "log_loss_delta": 1.352020630729367e-05,
+    "mcnemar_exact_two_sided_p": null,
+    "mechanism_identity_delta": 0.0
+  },
+  "production_changed": false,
+  "run_id": "LEVLINE-SPREAD-POINTS-PHASE5-CANDIDATE5-V1",
+  "scientific_disposition": "REJECTED",
+  "winner_threshold_tuned": false
+}

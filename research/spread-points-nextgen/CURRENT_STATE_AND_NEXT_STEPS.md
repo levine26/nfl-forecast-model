@@ -7,106 +7,130 @@
 **Phase 2:** **COMPLETE**  
 **Phase 3:** **COMPLETE**  
 **Phase 4:** **COMPLETE**  
-**Phase 5 Candidate 5:** **NOT STARTED**  
+**Phase 5 Candidate 5:** **SCIENTIFICALLY COMPLETE — `REJECTED`; repository merge closeout in progress**  
+**Phase 6 for Candidate 5 V1:** **NOT JUSTIFIED**  
 **Production:** `F-ST-01-FROZEN-2026` — unchanged
 
-Authoritative Phase 4 closeout receipt:
+Authoritative prior closeout receipts:
 
-`research/spread-points-nextgen/FINAL_PHASE4_RECEIPT.md`
+- `research/spread-points-nextgen/FINAL_PHASE3_RECEIPT.md`
+- `research/spread-points-nextgen/FINAL_PHASE4_RECEIPT.md`
 
-## Phase 4 one-time holdout state
+## Phase 5 frozen identity and evidence boundary
 
-2025 is **OPENED / SPENT** for the frozen underlying A0/B0/C0 evaluation.
-
-Correct description: **final historical challenger holdout, with the disclosed limitation that broad baseline 2025 errors informed earlier research questions**.
-
-Pre-result receipt:
-
-`362af7af7db43a715b9ab9537a52d2749c37e7a6`
-
-First complete scientific holdout run:
-
-- workflow: `35818332253`
-- generator head: `f0b92217488a1a000bee74a903a9437931a53230`
-- exact first-run artifact: `10732945725`
-- artifact metadata digest: `sha256:7e231406237dc0f27681cc974d07ba34a6fe3bb976bea42531bedc8166557671`
-- exact first-run evidence preservation workflow: `35819413238` — **SUCCESS**
-
-The initial push failure after the scientific run was an operational non-fast-forward caused by concurrent branch advancement. The scientific package had already completed and was preserved; the dedicated preservation workflow subsequently verified provenance and every evidence SHA before committing the exact package.
-
-## Frozen identities and contracts
-
-- A0: `A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1`
-- B0: `B0-POSSESSION-DRIVE-SCORE-PROCESS-V1`
-- C0: `C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1`
-- D margin/total: `ENSEMBLE_NOT_ELIGIBLE`
-- implementation SHA-256: `5f148219527b07d85261d3f196ace97a5eb5646271d43596032a692389abc579`
-- config SHA-256: `2c5cc1af74fc5f3955e44361b82b791710e4b63bbc69b0c15570617e2d86e543`
-- market label: `historical_closing_late_benchmark_exact_horizon_opaque`
-- 2025 exact common rows: 272
-- model fitting boundary: through 2024
-- B0 simulations/game: 10,000
-- paired bootstrap resamples: 10,000; week is the operative block in the single 2025 season
-- Candidate 5 trained: **NO**
-- completed 2026 outcomes used: **NO**
-- production changed: **NO**
-
-Frozen shifted pregame states may update from prior completed 2025 games because that behavior was already part of the candidate identity; no current-game or future 2025 outcome enters its own forecast and estimator fitting/tuning remained through 2024.
-
-## Phase 4 headline results
-
-| Model | Margin MAE | Total MAE | Market-relative interpretation |
-|---|---:|---:|---|
-| A0 | 10.495 | 10.689 | margin +0.772 vs market; 95% week-block interval +0.367 to +1.254; total nominally worse |
-| B0 | 10.305 | 11.810 | margin +0.582 and total +1.417 vs market; both materially unfavorable |
-| Market M0 | **9.722** | 10.393 | frozen market benchmark |
-| C0 M3 | 9.747 | **10.376** | M3-M0 margin +0.0246 and total -0.0179; both intervals cross zero |
-
-A0 home/away score MAE: **7.488 / 7.724**.  
-B0 home/away score MAE: **7.654 / 7.942**.  
-B0 2025 total signed error (`actual - prediction`): **-5.493**.
-
-## Final scientific dispositions
-
-- A0: `VALID_UNDERLYING_REPRESENTATION_NOT_STANDALONE_FINALIST`
-- B0: `VALID_UNDERLYING_REPRESENTATION_NOT_STANDALONE_FINALIST`
-- C0: `MARKET_AWARE_DIAGNOSTIC_ONLY_NO_INCREMENTAL_FOOTBALL_EDGE`
-- D: remains `ENSEMBLE_NOT_ELIGIBLE`
-- Phase 4 program-level result: **`NO_HISTORICAL_STANDALONE_FINALIST`**
-
-No new family, feature search, threshold, ensemble, A1/B1/C1, nonlinear rescue or 2025 retuning was opened. ATS/O-U diagnostics remained secondary and did not select or rescue a candidate.
-
-## Final integration receipt
-
-Primary Phase 4 PR:
-
-- PR #550 — **MERGED**
-- exact validated head: `c314dece97e5048f95ec5bb021d3fb7eb9f5dd33`
-- dedicated Phase 4 validation: `35820561374` — **SUCCESS**, including complete regeneration and byte comparison to the committed frozen holdout package
-- research firewall: `35820561354` — **SUCCESS**
-- full research validation: `35820561327` — **SUCCESS**
-- primary merge: `733f6d6a0497e996358282f38c61ea5fdd827040`
-
-Merged `main` was re-read after PR #550 and confirmed to contain the exact holdout manifest/evidence, fixed slices, validation/ablation/uncertainty/robustness/red-team/synthesis reports and Phase 5 handoff with unchanged frozen identities and evidence boundaries.
-
-## Phase 5 starting state
-
-Candidate 5 remains **NOT STARTED / NOT TRAINED**.
-
-Approved working identity:
+Candidate:
 
 `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`
 
-Preserved chronology-clean historical component surface:
+Scientific freeze commit:
+
+`df14e51d73aad96899d3ba4364cbb76989f0d2bf`
+
+The freeze predates every Candidate-5-specific performance result and fixes the evidence boundary, component policy, features, F-ST provenance, OOF meta-chronology, L2 residual-logistic learner, lambda grid, proper-score tuning, threshold, ablations, uncertainty procedure, 2025 policy and final classification rule.
+
+Primary historical surface:
 
 `research/spread-points-nextgen/phase3/evidence/FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv`
 
-Because the 2025 A0/B0/C0 component outputs and performance are now observed, Phase 5 may **not** call 2025 a pristine Candidate 5 holdout. A future Phase 5 task must first freeze the Candidate 5 evidence-boundary, component-inclusion, OOF stacking, model/tuning, ablation and evaluation contracts before inspecting any Candidate-5-specific output.
+- exact rows: **815**
+- seasons: **2022–2024**
+- all A0/B0/C0 component inputs retain their frozen OOF provenance
+- D remains `ENSEMBLE_NOT_ELIGIBLE`
+
+Historical F-ST baseline is the accepted chronology-clean annual reproduction from `challenger_outputs/fst/provenance/training_frame_keyed.csv` via `build_chronological_logit_stack`. It reproduces **741/1,087** correct across 2022–2025 and is explicitly a historical reproduction rather than an assertion of original prospective forecast locks.
+
+2025 is not pristine for Candidate 5. The only Candidate-5-specific 2025 use is the frozen, post-conception diagnostic labeled:
+
+`POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC`
+
+Completed-2026 outcomes did not participate in Candidate 5 design, fitting, tuning, historical evaluation, rescue or survival.
+
+## Phase 5 execution provenance
+
+First Phase 5 workflow attempt:
+
+- workflow `35827845845`
+- stopped in the pre-result unit-test gate
+- cause: incorrect expected discordant-count split in a synthetic test fixture
+- Candidate-5-specific historical metrics generated: **NO**
+
+Engineering-only correction:
+
+`b86b7c98b40a3b68e6fb4e42f9aeb6592554065a`
+
+The correction changed only the synthetic test expectation. It did not alter any scientific term.
+
+First successful frozen historical execution:
+
+- workflow `35828122187`
+- contract gate: **SUCCESS**
+- frozen historical package: **SUCCESS**
+- exact-run gate: **SUCCESS**
+- evidence preservation commit: `8fce0be359d93d68bc2c4bba852ede4181a38368`
+
+## Primary scientific result
+
+Exact paired 2022–2024 primary football arm:
+
+| Metric | F-ST | Candidate 5 primary | Delta |
+|---|---:|---:|---:|
+| Games | 815 | 815 | — |
+| Correct | 562 | 562 | 0 |
+| Accuracy | 68.9571% | 68.9571% | **0.0000 pp** |
+| Brier | 0.21034462 | 0.21035034 | **+0.00000573** |
+| Log loss | 0.60907731 | 0.60909083 | **+0.00001352** |
+| Calibration intercept | 0.09772 | 0.09794 | +0.00022 |
+| Calibration slope | 1.12626 | 1.12581 | -0.00044 |
+
+Winner-change mechanism:
+
+- changed winners: **0 / 815 = 0.0000%**
+- Candidate-5-only correct: **0**
+- F-ST-only correct: **0**
+- changed-winner accuracy: **not defined because no winner changed**
+- mechanism identity: exactly zero accuracy delta from zero switch rate
+- 10,000-resample season+week block-bootstrap accuracy-delta interval: **0.0000 to 0.0000**
+
+Every preregistered residual ablation also made zero winner changes. Raw A0 and raw B0 were materially lower in straight-up accuracy than F-ST. The separately labeled market-aware diagnostic also made zero switches and did not rescue the football-only conclusion.
+
+## 2025 fixed-model diagnostic
+
+On 272 games:
+
+- F-ST: **179/272 = 65.8088%**
+- primary Candidate 5: **179/272 = 65.8088%**
+- winner changes: **0**
+- primary Brier delta: approximately **+0.000003**
+- primary log-loss delta: approximately **+0.000006**
+
+This evidence is non-pristine, post-conception and non-selective. It caused no architecture, feature, lambda, calibration, threshold, learner or classification change.
+
+## Final scientific disposition
+
+**`REJECTED`**
+
+The preregistered Phase 6 eligibility rule required a positive paired accuracy delta, selective winner changes with changed-winner accuracy above 0.50, and no point-estimate degradation in Brier or log loss. Candidate 5 produced zero winner changes, zero accuracy gain, and microscopically worse proper-score point estimates.
+
+This is an accepted negative result. There is no model rescue.
+
+## Production and Phase 6 state
+
+Production `F-ST-01-FROZEN-2026` is unchanged. Sunday Signal forecasting behavior is unchanged. No official forecast output was replaced by Candidate 5.
+
+Phase 6 prospective shadow validation is **not justified for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`**, so no Phase 6 handoff is created.
+
+A future materially different research hypothesis would require a separately preregistered new candidate identity and a new evidence clock. It may not reinterpret the spent 2022–2025 evidence as untouched confirmation.
 
 ## Exact next action
 
-**STOP.**
+Complete repository closeout only:
 
-Do not start Phase 5 in Phase 4 closeout. Do not rerun Phase 3, change A0/B0/C0, resurrect D, tune on 2025, use completed 2026 outcomes for historical selection, modify F-ST, modify Sunday Signal forecasting behavior, or promote any model.
+1. reconcile the Phase 5 branch with current `main` while preserving unrelated production/automation commits;
+2. open the Phase 5 PR;
+3. require exact-head dedicated Phase 5 validation, LevLine research firewall and full research validation;
+4. merge only the exact validated head if repository state permits;
+5. re-read the merged Phase 5 package from `main`;
+6. record the immutable final Phase 5 receipt with PR, validated head, CI run IDs, merge SHA, code/config/evidence identities, `REJECTED` disposition, Phase 6 ineligibility, completed-2026 firewall and production-unchanged confirmation;
+7. STOP.
 
-When the user separately starts Phase 5, begin from `FINAL_PHASE4_RECEIPT.md` and `phase4/PHASE5_HANDOFF.md` and freeze the Phase 5 contract before training `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`.
+Do not start Phase 6 for Candidate 5 V1. Do not modify production.

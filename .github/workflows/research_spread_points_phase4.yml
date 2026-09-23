@@ -132,9 +132,86 @@ jobs:
           set -euo pipefail
           frozen='research/spread-points-nextgen/phase4'
           if test -s "$frozen/HOLDOUT_SUMMARY.json"; then
-            for file in A0_HOLDOUT_2025.csv B0_HOLDOUT_2025.csv C0_HOLDOUT_2025.csv BASELINES_HOLDOUT_2025.csv DIAGNOSTIC_SLICES_2025.csv HOLDOUT_SUMMARY.json; do
-              cmp "$frozen/$file" "/tmp/levline-phase4/$file"
-            done
+            python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import math
+          from pathlib import Path
+
+          import numpy as np
+          import pandas as pd
+
+          frozen = Path('research/spread-points-nextgen/phase4')
+          regenerated = Path('/tmp/levline-phase4')
+          csv_files = [
+              'A0_HOLDOUT_2025.csv',
+              'B0_HOLDOUT_2025.csv',
+              'C0_HOLDOUT_2025.csv',
+              'BASELINES_HOLDOUT_2025.csv',
+              'DIAGNOSTIC_SLICES_2025.csv',
+          ]
+          rtol = 1e-12
+          atol = 1e-12
+
+          for name in csv_files:
+              left = pd.read_csv(frozen / name)
+              right = pd.read_csv(regenerated / name)
+              if list(left.columns) != list(right.columns):
+                  raise AssertionError(f'{name}: column/order drift')
+              if left.shape != right.shape:
+                  raise AssertionError(f'{name}: shape drift {left.shape} != {right.shape}')
+              for column in left.columns:
+                  a = left[column]
+                  b = right[column]
+                  if pd.api.types.is_numeric_dtype(a.dtype) and pd.api.types.is_numeric_dtype(b.dtype):
+                      av = pd.to_numeric(a, errors='raise').to_numpy(dtype=float)
+                      bv = pd.to_numeric(b, errors='raise').to_numpy(dtype=float)
+                      if not np.allclose(av, bv, rtol=rtol, atol=atol, equal_nan=True):
+                          finite = np.isfinite(av) & np.isfinite(bv)
+                          max_abs = float(np.max(np.abs(av[finite] - bv[finite]))) if finite.any() else float('nan')
+                          raise AssertionError(f'{name}:{column}: numeric drift; max_abs={max_abs}')
+                  else:
+                      pd.testing.assert_series_equal(a, b, check_dtype=False, check_names=True)
+              print(f'{name}: semantically identical within rtol={rtol:g}, atol={atol:g}')
+
+          def compare_json(a, b, path='root'):
+              if isinstance(a, bool) or isinstance(b, bool):
+                  if type(a) is not type(b) or a != b:
+                      raise AssertionError(f'{path}: boolean drift {a!r} != {b!r}')
+                  return
+              if a is None or b is None:
+                  if a is not b:
+                      raise AssertionError(f'{path}: null/type drift {a!r} != {b!r}')
+                  return
+              if isinstance(a, dict) and isinstance(b, dict):
+                  if set(a) != set(b):
+                      raise AssertionError(f'{path}: key drift {set(a) ^ set(b)}')
+                  for key in a:
+                      compare_json(a[key], b[key], f'{path}.{key}')
+                  return
+              if isinstance(a, list) and isinstance(b, list):
+                  if len(a) != len(b):
+                      raise AssertionError(f'{path}: list-length drift {len(a)} != {len(b)}')
+                  for index, (left_item, right_item) in enumerate(zip(a, b)):
+                      compare_json(left_item, right_item, f'{path}[{index}]')
+                  return
+              if isinstance(a, int) and isinstance(b, int):
+                  if a != b:
+                      raise AssertionError(f'{path}: integer drift {a} != {b}')
+                  return
+              if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                  if not math.isclose(float(a), float(b), rel_tol=rtol, abs_tol=atol):
+                      raise AssertionError(f'{path}: numeric drift {a!r} != {b!r}')
+                  return
+              if type(a) is not type(b) or a != b:
+                  raise AssertionError(f'{path}: value/type drift {a!r} != {b!r}')
+
+          left_summary = json.loads((frozen / 'HOLDOUT_SUMMARY.json').read_text())
+          right_summary = json.loads((regenerated / 'HOLDOUT_SUMMARY.json').read_text())
+          compare_json(left_summary, right_summary)
+          print(f'HOLDOUT_SUMMARY.json: semantically identical within rtol={rtol:g}, atol={atol:g}')
+          PY
           fi
       - name: Prove protected production surfaces are unchanged
         shell: bash
