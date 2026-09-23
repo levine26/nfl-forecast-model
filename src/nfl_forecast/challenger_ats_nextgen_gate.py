@@ -8,6 +8,11 @@ forecasts. Historical schedule market fields retain their preregistered
 ``historical_closing_late_benchmark_exact_horizon_opaque`` evidence label;
 only timestamped run-history rows selected by :mod:`nfl_forecast.market_t120`
 may be described as T-120 evidence.
+
+Important source-sign boundary: nflverse ``spread_line`` is the home-margin
+market center (positive when the home team is favored). The ATS preregistration
+uses sportsbook home-spread notation ``L`` (negative when the home team is
+favored), so ``L = -spread_line`` and ``C = spread_line``.
 """
 
 from dataclasses import asdict, dataclass
@@ -26,6 +31,9 @@ OUTER_TARGET_SEASONS = (2022, 2023, 2024, 2025)
 INNER_TARGET_FLOOR = 2019
 HISTORICAL_MARKET_EVIDENCE_CLASS = (
     "historical_closing_late_benchmark_exact_horizon_opaque"
+)
+NFLVERSE_SPREAD_SOURCE_CONVENTION = (
+    "spread_line is positive when home is favored; canonical sportsbook home_spread=-spread_line"
 )
 FLOAT_FORMAT = "%.17g"
 LINE_TERMINATOR = "\n"
@@ -245,9 +253,13 @@ def build_historical_ats_gate(frame: pd.DataFrame) -> pd.DataFrame:
             continue
         out[semantic] = pd.to_numeric(work[source], errors="coerce")
 
-    out["home_spread"] = pd.to_numeric(work["spread_line"], errors="coerce")
-    out["market_home_margin_center"] = -out["home_spread"]
-    out["favorite_size"] = out["home_spread"].abs()
+    # nflverse spread_line is a home-margin market center: +3 means home favored
+    # by three. Convert it once, explicitly, to the frozen sportsbook notation
+    # where a home favorite is -3. Preserve the raw source field alongside it.
+    source_center = pd.to_numeric(work["spread_line"], errors="coerce")
+    out["home_spread"] = -source_center
+    out["market_home_margin_center"] = source_center
+    out["favorite_size"] = source_center.abs()
     out["market_total"] = pd.to_numeric(work["total_line"], errors="coerce")
     out["no_vig_home_moneyline_prob"] = no_vig_home_moneyline_probability(
         work["home_moneyline"], work["away_moneyline"]
@@ -293,9 +305,9 @@ def validate_gate_frame(frame: pd.DataFrame) -> None:
     """Validate a built Phase-2 gate frame before any candidate fitting."""
     _require_unique_game_ids(frame)
     required = {
-        "season", "market_evidence_class", "home_spread", "ats_eligible",
-        "margin", "ats_residual", "ats_outcome", "ats_home_cover", "ats_push",
-        *FOOTBALL_FEATURE_LINEAGE.keys(),
+        "season", "spread_line", "market_evidence_class", "home_spread",
+        "market_home_margin_center", "ats_eligible", "margin", "ats_residual",
+        "ats_outcome", "ats_home_cover", "ats_push", *FOOTBALL_FEATURE_LINEAGE.keys(),
     }
     missing = required - set(frame.columns)
     if missing:
@@ -305,6 +317,25 @@ def validate_gate_frame(frame: pd.DataFrame) -> None:
         raise ValueError("ATS Phase-2 gate frame season boundary violation")
     if not frame["market_evidence_class"].eq(HISTORICAL_MARKET_EVIDENCE_CLASS).all():
         raise ValueError("historical market horizon was relabeled")
+
+    source_center = pd.to_numeric(frame["spread_line"], errors="coerce")
+    canonical_spread = pd.to_numeric(frame["home_spread"], errors="coerce")
+    market_center = pd.to_numeric(frame["market_home_margin_center"], errors="coerce")
+    finite = source_center.notna()
+    if not np.allclose(
+        canonical_spread.loc[finite].to_numpy(),
+        -source_center.loc[finite].to_numpy(),
+        atol=1e-9,
+        rtol=0.0,
+    ):
+        raise ValueError("nflverse spread_line was not converted to sportsbook home-spread sign")
+    if not np.allclose(
+        market_center.loc[finite].to_numpy(),
+        source_center.loc[finite].to_numpy(),
+        atol=1e-9,
+        rtol=0.0,
+    ):
+        raise ValueError("market home-margin center does not preserve nflverse spread_line")
 
     eligible = frame["ats_eligible"].astype(bool)
     expected = pd.to_numeric(frame.loc[eligible, "margin"], errors="raise") + pd.to_numeric(
@@ -376,13 +407,19 @@ def write_phase2_gate_artifacts(
             "loss": "ats_residual<0",
         },
         "market_evidence_class": HISTORICAL_MARKET_EVIDENCE_CLASS,
+        "source_spread_convention": NFLVERSE_SPREAD_SOURCE_CONVENTION,
         "source_description": str(source_description),
         "market_lineage": {
-            "home_spread": "spread_line",
-            "market_home_margin_center": "-spread_line",
+            "source_spread_line": "nflverse spread_line; positive when home favored",
+            "home_spread": "-spread_line",
+            "market_home_margin_center": "spread_line",
             "favorite_size": "abs(spread_line)",
             "market_total": "total_line",
             "no_vig_home_moneyline_prob": "two_way_no_vig(home_moneyline,away_moneyline)",
+            "q1_fixed_interactions": (
+                "derived inside each training fold after training-fold total centering; "
+                "no full-sample centering in this gate"
+            ),
         },
         "football_feature_lineage": FOOTBALL_FEATURE_LINEAGE,
         "artifact": {
