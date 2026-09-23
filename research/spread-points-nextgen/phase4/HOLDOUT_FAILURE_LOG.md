@@ -44,3 +44,30 @@ Corrected head entering the first successful pre-holdout gate:
 `f0b92217488a1a000bee74a903a9437931a53230`
 
 The one-time 2025 holdout is considered opened only after that corrected head passes the complete pre-holdout gate and begins the `Frozen one-time 2025 A0/B0/C0 package` job.
+
+### Attempt 3 — run 35818332253 — first completed 2025 holdout computation
+
+- generator head: `f0b92217488a1a000bee74a903a9437931a53230`
+- pre-holdout gate: **SUCCESS**
+- complete frozen A0/B0/C0 computation: **SUCCESS**
+- required evidence/firewall verification: **SUCCESS**
+- protected production-surface check: **SUCCESS**
+- eligible 2025 rows: A0 = 272, B0 = 272, C0 = 272; all exact common rows = 272
+- A0/B0/C0 training boundary: through 2024; sequential shifted 2025 pregame state may use only prior completed 2025 games under the frozen state contract
+- B0 simulations/game: 10,000
+- bootstrap resamples: 10,000
+- Candidate 5 trained: **NO**
+- completed 2026 outcomes used: **NO**
+- production changed: **NO**
+- holdout status after this run: **OPENED / SPENT for A0/B0/C0 underlying-model evaluation**
+
+The scientific package completed before the only failure. The persistence step created a local evidence commit but its push was rejected because the remote Phase 4 branch had advanced by two cleanup-only commits while the run was executing. No result-driven model/code change occurred.
+
+The complete first-result package was preserved as GitHub Actions artifact:
+
+- artifact ID: `10732945725`
+- artifact name: `spread-points-phase4-35818332253`
+- artifact ZIP SHA-256: `7e231406237dc0f27681cc974d07ba34a6fe3bb976bea42531bedc8166557671`
+- retention: 90 days
+
+Any subsequent execution of the same frozen package is a **reproducibility / exact-head persistence run**, not a second pristine holdout opening. It may not modify candidate identity or rescue the observed result.
