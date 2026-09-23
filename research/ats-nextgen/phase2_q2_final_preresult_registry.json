@@ -1,0 +1,58 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "B_Q2_FINAL_PRE_RESULT",
+  "candidate_id": "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1",
+  "status": "FROZEN_UNTRAINED_NO_ACCEPTED_Q2_RESULT",
+  "branch": "research/ats-nextgen-phase2-q2",
+  "stage_b_base_sha": "a2581a62e3797a6ac466d614326bc72b7d5a1c57",
+  "final_preresult_parent_sha": "71aeb5734ceaf2b6c384f88f68314442b205272e",
+  "accepted_q2_result": null,
+  "candidate_fitting_performed_for_accepted_result": false,
+  "candidate_performance_accepted": false,
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "q3_opened": false,
+  "supersede_all_q2_runs_before_final_receipt": true,
+  "upstream": {
+    "phase2_gate_canonical_game_keyed_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d",
+    "stage_a_q1_outer_oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
+    "stage_a_q1_outer_oof_rows": 1087,
+    "q1_result_classification": "VALID_NEGATIVE_INCREMENTAL_RESULT"
+  },
+  "scientific_blobs": {
+    "distribution_core": "d551c4d3dbaa808556e3183fd65d6d20e8e92212",
+    "experiment_driver": "9249b39ebc2c42e4013a13b763d010c75939bd74",
+    "reporting": "596b9ede2c5c1f15bcac440d07dd8cb80e03339e",
+    "historical_runner": "af73910ce78c51e18b879d6175a8873f11bae40e",
+    "core_tests": "4a691a354b1e577fb64ae66767bee6eb2e985fc2",
+    "experiment_reporting_tests": "339fc5d8d315767d860f4d079a9c43a0304ba6d0",
+    "stage_b_workflow": "1c5c000ada73cfe458c69a1e440bafbbb1a2ca75",
+    "opening_receipt": "548c60fbaf44cb10fb47bfed3255ed30feb1cbae",
+    "scoring_receipt": "23a595ed7bbab8ff7eabd59225bc533d2230b85f"
+  },
+  "frozen_arm_count": 12,
+  "primary_comparison": "Q2_GN_FULL_vs_M1_GN_FULL",
+  "selection_metric": "pooled_prior_time_row_level_discrete_CRPS_RPS",
+  "reporting": {
+    "multinomial_cover_push_loss_logloss": true,
+    "binary_cover_brier_logloss_nonpush": true,
+    "cover_calibration_intercept_slope": true,
+    "cover_reliability_fixed_deciles": true,
+    "push_calibration": true,
+    "expected_and_median_margin_error": true,
+    "central_interval_levels": [0.5, 0.8, 0.9],
+    "fixed_slices": true,
+    "direct_key_margin_mass_calibration": [3, 6, 7, 10, 14]
+  },
+  "execution_requirements": {
+    "q2_contract_must_succeed_first": true,
+    "phase2_gate_hash_must_reproduce_before_q2_fit": true,
+    "q1_oof_hash_must_reproduce_before_q2_fit": true,
+    "q1_median_predictions_2022_2025_must_reproduce_by_game_id": true,
+    "endpoint_mass_threshold": 0.001,
+    "protected_production_diff_must_be_clean": true,
+    "immutable_artifact_required_before_interpretation": true
+  },
+  "historical_evidence_class": "development_non_pristine"
+}
