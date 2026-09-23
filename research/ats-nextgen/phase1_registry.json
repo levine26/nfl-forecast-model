@@ -1,7 +1,7 @@
 {
   "program": "LEVLINE_ATS_NEXTGEN",
   "phase": 1,
-  "status": "PREREGISTERED_PENDING_MERGE_CLOSEOUT",
+  "status": "PHASE1_COMPLETE",
   "created_date": "2026-09-23",
   "phase1_base_main": "21f153d69ad579f6bd67250d75330b2c77ea1228",
   "production_model": "F-ST-01-FROZEN-2026",
@@ -70,5 +70,22 @@
   },
   "multi_book_latent_fair_line": "PROSPECTIVE_EXTENSION_ONLY",
   "player_state_v1": "RESERVED_FOR_LATER_EXTENSION",
-  "phase2_started": false
+  "phase1_complete": true,
+  "phase2_started": false,
+  "closeout": {
+    "primary_branch": "research/ats-nextgen-phase1",
+    "pull_request": 556,
+    "validated_head": "c1397729b7f973169ef6fda700f481a91ad25538",
+    "research_validation_run_id": 35902704158,
+    "research_validation_run_number": 1535,
+    "research_validation_conclusion": "success",
+    "research_firewall_run_id": 35902704358,
+    "research_firewall_run_number": 1952,
+    "research_firewall_conclusion": "success",
+    "pull_request_full_test_run_id": 35902704146,
+    "pull_request_full_test_run_number": 1086,
+    "pull_request_full_test_conclusion": "success",
+    "primary_merge_sha": "80f84dc8282205c48dbfd8ca7e9e31c4be663bb6",
+    "merged_main_verified_sha": "80f84dc8282205c48dbfd8ca7e9e31c4be663bb6"
+  }
 }
