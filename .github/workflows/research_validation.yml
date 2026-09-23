@@ -64,6 +64,8 @@ jobs:
             tests/test_challenger_ats_nextgen_q1_reporting.py \
             tests/test_challenger_ats_nextgen_q2.py \
             tests/test_challenger_ats_nextgen_q2_experiment.py \
+            tests/test_challenger_ats_nextgen_q3.py \
+            tests/test_challenger_ats_nextgen_q3_reporting.py \
             tests/test_experiment_registry.py \
             tests/test_research_firewall.py
       - name: Prove foundation tests did not modify production surfaces
