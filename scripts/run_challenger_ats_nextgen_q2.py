@@ -28,6 +28,7 @@ from nfl_forecast.challenger_ats_nextgen_q2_experiment import generate_q2_outer_
 from nfl_forecast.challenger_ats_nextgen_q2_reporting import (
     q2_cover_reliability,
     q2_fixed_slice_metrics,
+    q2_key_mass_calibration,
     q2_metric_table,
 )
 from nfl_forecast.config import load_config
@@ -181,12 +182,14 @@ def run(
     metrics = q2_metric_table(metadata, arms)
     fixed_slices = q2_fixed_slice_metrics(metadata, arms)
     reliability = q2_cover_reliability(metadata, arms)
+    key_calibration = q2_key_mass_calibration(metadata, arms)
 
     metadata_path = out / "q2_outer_oof_metadata_2022_2025.csv"
     tuning_path = out / "q2_inner_selections.csv"
     metrics_path = out / "q2_distribution_metrics.csv"
     slices_path = out / "q2_fixed_slice_metrics.csv"
     reliability_path = out / "q2_cover_reliability.csv"
+    key_calibration_path = out / "q2_key_mass_calibration.csv"
     pmf_path = out / "q2_outer_oof_pmfs.npz"
 
     metadata.to_csv(metadata_path, index=False, float_format="%.17g")
@@ -194,6 +197,7 @@ def run(
     metrics.to_csv(metrics_path, index=False, float_format="%.17g")
     fixed_slices.to_csv(slices_path, index=False, float_format="%.17g")
     reliability.to_csv(reliability_path, index=False, float_format="%.17g")
+    key_calibration.to_csv(key_calibration_path, index=False, float_format="%.17g")
     np.savez_compressed(
         pmf_path,
         support=np.arange(-75, 76, dtype=int),
@@ -228,6 +232,7 @@ def run(
         "q2_repair_or_rescue_performed": False,
         "ats_hit_rate_used_for_selection": False,
         "roi_used_for_selection": False,
+        "key_mass_calibration_reported": True,
         "primary_paired_snapshot": {
             "M1_GN_FULL_mean_discrete_crps": float(m1["mean_discrete_crps"]),
             "Q2_GN_FULL_mean_discrete_crps": float(q2["mean_discrete_crps"]),
@@ -246,6 +251,7 @@ def run(
             "distribution_metrics": str(metrics_path),
             "fixed_slice_metrics": str(slices_path),
             "cover_reliability": str(reliability_path),
+            "key_mass_calibration": str(key_calibration_path),
         },
     }
     summary_path = out / "q2_summary.json"
