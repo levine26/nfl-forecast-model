@@ -41,7 +41,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 500
+          # Full history is required because recovery scans ancestor editorial snapshots.
+          # A shallow checkout can age out the last launch-grade full-slate snapshot in this high-churn repo.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -84,6 +86,7 @@ jobs:
           assert '--editorial-roster inputs/sunday_signal/editorial_slate_roster.json' in workflow
           assert 'scripts/refresh_editorial_slate_roster.py' in workflow
           assert 'scripts/restore_last_good_editorial_snapshot.py' in workflow
+          assert 'fetch-depth: 0' in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-pr-{0}" in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-production" in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
