@@ -16,6 +16,7 @@ from nfl_forecast.challenger_ats_nextgen_q2 import (
 )
 
 RELIABILITY_EDGES = np.linspace(0.0, 1.0, 11)
+KEY_MARGINS = (3, 6, 7, 10, 14)
 
 
 def _binary_cover_probability(cpl: np.ndarray) -> np.ndarray:
@@ -147,3 +148,57 @@ def q2_cover_reliability(metadata: pd.DataFrame, arms: dict[str, np.ndarray]) ->
                 }
             )
     return pd.DataFrame(rows)
+
+
+def q2_key_mass_calibration(metadata: pd.DataFrame, arms: dict[str, np.ndarray]) -> pd.DataFrame:
+    """Report predicted versus observed mass at the five frozen absolute key margins.
+
+    This is a diagnostic required by the Phase-1 Q2 preregistration.  It is not a
+    selection objective and cannot rescue or redefine the primary Q2 candidate.
+    Positive and negative margins are aggregated because V1 shares their key-
+    excess coefficients by absolute key.
+    """
+    margin = pd.to_numeric(metadata["margin"], errors="raise").to_numpy(dtype=float)
+    groups: list[tuple[str, np.ndarray]] = [("ALL", np.arange(len(metadata), dtype=int))]
+    for season, part in metadata.groupby("season", sort=True):
+        groups.append((str(int(season)), part.index.to_numpy(dtype=int)))
+
+    rows: list[dict] = []
+    support_start = int(SUPPORT[0])
+    for arm in sorted(arms):
+        pmf = np.asarray(arms[arm], dtype=float)
+        validate_pmf(pmf)
+        if len(pmf) != len(metadata):
+            raise ValueError(f"Q2 key calibration PMF rows do not align for {arm}")
+        for season_label, idx in groups:
+            y = margin[idx]
+            p = pmf[idx]
+            for key in KEY_MARGINS:
+                neg_idx = int(-key - support_start)
+                pos_idx = int(key - support_start)
+                predicted_negative = float(np.mean(p[:, neg_idx]))
+                predicted_positive = float(np.mean(p[:, pos_idx]))
+                predicted_absolute = predicted_negative + predicted_positive
+                observed_negative = float(np.mean(y == -float(key)))
+                observed_positive = float(np.mean(y == float(key)))
+                observed_absolute = observed_negative + observed_positive
+                rows.append(
+                    {
+                        "season": season_label,
+                        "arm": arm,
+                        "absolute_key": int(key),
+                        "n": int(len(idx)),
+                        "predicted_negative_rate": predicted_negative,
+                        "observed_negative_rate": observed_negative,
+                        "predicted_positive_rate": predicted_positive,
+                        "observed_positive_rate": observed_positive,
+                        "predicted_absolute_rate": predicted_absolute,
+                        "observed_absolute_rate": observed_absolute,
+                        "absolute_key_calibration_error": float(
+                            predicted_absolute - observed_absolute
+                        ),
+                    }
+                )
+    return pd.DataFrame(rows).sort_values(
+        ["season", "arm", "absolute_key"], kind="mergesort"
+    ).reset_index(drop=True)
