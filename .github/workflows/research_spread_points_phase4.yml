@@ -1,0 +1,169 @@
+name: Spread & Points Phase 4 holdout validation
+
+on:
+  push:
+    branches: [research/spread-points-nextgen-phase4]
+    paths:
+      - 'research/spread-points-nextgen/phase4/phase4_holdout.py'
+      - 'research/spread-points-nextgen/phase4/test_phase4.py'
+      - 'research/spread-points-nextgen/phase4/HOLDOUT_OPENING_RECEIPT.json'
+      - '.github/workflows/research_spread_points_phase4.yml'
+  pull_request:
+    paths:
+      - 'research/spread-points-nextgen/phase4/**'
+      - 'research/spread-points-nextgen/PHASE_STATUS.md'
+      - 'research/spread-points-nextgen/CURRENT_STATE_AND_NEXT_STEPS.md'
+      - 'research/spread-points-nextgen/DECISION_LOG.md'
+      - 'research/spread-points-nextgen/RESEARCH_INDEX.md'
+      - '.github/workflows/research_spread_points_phase4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spread-points-phase4-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/fst_production.py src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json
+    src/nfl_forecast/public_forecast.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py
+    src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py
+    scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  preholdout-gate:
+    name: Phase 4 pre-holdout contract gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - name: Compile frozen Phase 3 and Phase 4 adapter
+        run: python -m compileall -q research/spread-points-nextgen/phase3 research/spread-points-nextgen/phase4
+      - name: Re-run frozen Phase 3 contract tests
+        run: pytest -q research/spread-points-nextgen/phase3/test_phase3.py
+      - name: Run Phase 4 pre-holdout tests
+        run: pytest -q research/spread-points-nextgen/phase4/test_phase4.py
+      - name: Verify frozen identities and hashes without loading 2025
+        run: python -m research.spread-points-nextgen.phase4.phase4_holdout --preflight-only
+      - name: Prove protected production surfaces are unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
+
+  holdout-package:
+    name: Frozen one-time 2025 A0/B0/C0 package
+    needs: preholdout-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: phase4-spread-points-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            phase4-spread-points-${{ runner.os }}-
+            phase3-spread-points-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Execute complete frozen Phase 4 holdout package
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/levline-phase4
+          python -m research.spread-points-nextgen.phase4.phase4_holdout \
+            --output-dir /tmp/levline-phase4 \
+            --simulations 10000
+      - name: Verify required holdout evidence and firewalls
+        run: |
+          set -euo pipefail
+          for file in A0_HOLDOUT_2025.csv B0_HOLDOUT_2025.csv C0_HOLDOUT_2025.csv BASELINES_HOLDOUT_2025.csv DIAGNOSTIC_SLICES_2025.csv HOLDOUT_SUMMARY.json HOLDOUT_RUN_MANIFEST.json; do
+            test -s "/tmp/levline-phase4/$file"
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import pandas as pd
+          root=Path('/tmp/levline-phase4')
+          manifest=json.loads((root/'HOLDOUT_RUN_MANIFEST.json').read_text())
+          assert manifest['loaded_seasons']==list(range(2016,2026))
+          assert manifest['model_fit_training_seasons']==list(range(2016,2025))
+          assert manifest['target_season']==2025
+          assert manifest['2025_opened'] is True
+          assert manifest['candidate5_trained'] is False
+          assert manifest['completed_2026_outcomes_used'] is False
+          assert manifest['production_changed'] is False
+          assert manifest['D_margin']=='ENSEMBLE_NOT_ELIGIBLE'
+          assert manifest['D_total']=='ENSEMBLE_NOT_ELIGIBLE'
+          assert manifest['B0_simulations_per_game']>=10000
+          assert manifest['bootstrap_resamples']>=10000
+          assert manifest['market_horizon_label']=='historical_closing_late_benchmark_exact_horizon_opaque'
+          for name, cid in (
+              ('A0_HOLDOUT_2025.csv','A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1'),
+              ('B0_HOLDOUT_2025.csv','B0-POSSESSION-DRIVE-SCORE-PROCESS-V1'),
+              ('C0_HOLDOUT_2025.csv','C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1')):
+              f=pd.read_csv(root/name)
+              assert len(f)>0
+              assert f['season'].astype(int).eq(2025).all()
+              assert f['train_through_season'].astype(int).eq(2024).all()
+              assert f['candidate_id'].astype(str).eq(cid).all()
+              assert f['code_sha'].astype(str).eq('5f148219527b07d85261d3f196ace97a5eb5646271d43596032a692389abc579').all()
+              assert f['config_sha'].astype(str).eq('2c5cc1af74fc5f3955e44361b82b791710e4b63bbc69b0c15570617e2d86e543').all()
+          c=pd.read_csv(root/'C0_HOLDOUT_2025.csv')
+          assert c['market_horizon_label'].astype(str).eq('historical_closing_late_benchmark_exact_horizon_opaque').all()
+          PY
+      - name: Compare regenerated evidence with committed frozen holdout package when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          frozen='research/spread-points-nextgen/phase4'
+          if test -s "$frozen/HOLDOUT_SUMMARY.json"; then
+            for file in A0_HOLDOUT_2025.csv B0_HOLDOUT_2025.csv C0_HOLDOUT_2025.csv BASELINES_HOLDOUT_2025.csv DIAGNOSTIC_SLICES_2025.csv HOLDOUT_SUMMARY.json; do
+              cmp "$frozen/$file" "/tmp/levline-phase4/$file"
+            done
+          fi
+      - name: Prove protected production surfaces are unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: spread-points-phase4-${{ github.run_id }}
+          path: /tmp/levline-phase4/
+          if-no-files-found: warn
+          retention-days: 90
+
+  gate:
+    name: Phase 4 exact-run gate
+    if: always()
+    needs: [preholdout-gate, holdout-package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require preflight and complete package
+        env:
+          PREFLIGHT: '${{ needs.preholdout-gate.result }}'
+          HOLDOUT: '${{ needs.holdout-package.result }}'
+        run: |
+          set -euo pipefail
+          echo "preflight=$PREFLIGHT"
+          echo "holdout=$HOLDOUT"
+          test "$PREFLIGHT" = success
+          test "$HOLDOUT" = success
