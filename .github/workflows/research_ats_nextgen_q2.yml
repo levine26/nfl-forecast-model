@@ -1,0 +1,49 @@
+name: ATS NextGen Q2 Stage B
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_ats_nextgen_q2.py'
+      - 'scripts/run_challenger_ats_nextgen_q2.py'
+      - 'tests/test_challenger_ats_nextgen_q2.py'
+      - 'research/ats-nextgen/**'
+      - '.github/workflows/research_ats_nextgen_q2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ats-nextgen-q2-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py
+    scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  contract:
+    name: Q2 pre-result contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Prove opening gate, frozen Q1, and Q2 distribution contract
+        run: |
+          pytest -q \
+            tests/test_challenger_ats_nextgen_phase2_gate.py \
+            tests/test_challenger_ats_nextgen_q1.py \
+            tests/test_challenger_ats_nextgen_q1_reporting.py \
+            tests/test_challenger_ats_nextgen_q2.py
+      - name: Prove contract tests did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
