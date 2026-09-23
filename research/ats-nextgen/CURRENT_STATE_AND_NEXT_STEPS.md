@@ -42,7 +42,7 @@ Accepted execution:
 - branch `research/ats-nextgen-phase2-q3`;
 - PR #562;
 - workflow `35931071604`: **SUCCESS**;
-- contract job `107417390267`: **SUCCESS**;
+- contract job `107417650978`: **SUCCESS**;
 - historical job `107418004469`: **SUCCESS**;
 - artifact ID `10781521222`;
 - artifact digest `sha256:6062472dce30fddfcc6ad16d1d5c29203491f6e77d893aa673cc20bbb29a1bfa`;
@@ -75,16 +75,14 @@ The immutable result is recorded in:
 
 ## Exact next actions
 
-1. switch the Stage-C Q3 workflow to closeout-only mode so the accepted historical experiment is not rerun after interpretation;
-2. require the closeout workflow to re-run frozen Q3 contract tests and verify the immutable Q3 result registry/artifact identities;
-3. include Q3 model/reporting contract tests in the repository-wide research-validation foundation;
-4. validate the exact final Stage-C head with the research firewall, Phase-2 opening gate, frozen Q1 reproducibility, Q2 closeout, Q3 closeout, research validation, and full repository validation;
-5. update PR #562 to the preserved negative result and merge only after those exact-head gates are green;
-6. verify the resulting Stage-C merge is current `main`;
-7. create Stage D from that exact merge;
-8. in Stage D, use accepted evidence only and run the final paired season+week block-bootstrap uncertainty analysis with at least 10,000 resamples where defined;
-9. preserve Q2 complementarity/Q2-Q3 blend as **unavailable** because no valid Q2 OOF exists—do not reconstruct or substitute Q2;
-10. produce the final Phase-2 evidence synthesis and Phase-3 handoff without opening any new candidate family.
+1. validate the exact final Stage-C closeout head with the research firewall, Phase-2 opening gate, frozen Q1 reproducibility, Q2 closeout, Q3 closeout, research validation, and full repository validation;
+2. update PR #562 to preserve the verified negative result and exact accepted evidence identities;
+3. merge PR #562 only after those exact-head gates are green;
+4. verify the resulting Stage-C merge is current `main`;
+5. create Stage D from that exact merge;
+6. in Stage D, use accepted evidence only and run the final paired season+week block-bootstrap uncertainty analysis with at least 10,000 resamples where defined;
+7. preserve Q2 complementarity/Q2-Q3 blend as **unavailable** because no valid Q2 OOF exists—do not reconstruct or substitute Q2;
+8. produce the final Phase-2 evidence synthesis and Phase-3 handoff without opening any new candidate family.
 
 ## Active firewalls
 
