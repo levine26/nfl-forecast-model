@@ -148,6 +148,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # The holdout itself is already complete before this persistence step.
+          # Fast-forward/rebase onto any documentation-only branch advance so an
+          # operational push race cannot discard the already-verified evidence.
+          git fetch origin "${GITHUB_REF_NAME}" --quiet
+          git rebase "origin/${GITHUB_REF_NAME}"
           dest='research/spread-points-nextgen/phase4'
           cp /tmp/levline-phase4/A0_HOLDOUT_2025.csv "$dest/"
           cp /tmp/levline-phase4/B0_HOLDOUT_2025.csv "$dest/"
