@@ -71,3 +71,6 @@ def test_runner_does_not_build_d_or_candidate5():
 def test_final_simulation_floor_fails_closed(tmp_path):
     with pytest.raises(p4.Phase4HoldoutError, match="10,000"):
         p4.run_holdout(tmp_path, simulations=9_999)
+
+
+# Reproducibility trigger after the first completed 2025 holdout artifact; no scientific contract change.
