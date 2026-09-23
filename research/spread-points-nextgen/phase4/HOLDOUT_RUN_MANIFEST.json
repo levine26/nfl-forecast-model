@@ -1,0 +1,177 @@
+{
+  "2025_opened": true,
+  "B0_simulations_per_game": 10000,
+  "D_margin": "ENSEMBLE_NOT_ELIGIBLE",
+  "D_total": "ENSEMBLE_NOT_ELIGIBLE",
+  "bootstrap_block": "season+week; target season 2025 means week is operative resampling block",
+  "bootstrap_resamples": 10000,
+  "candidate5_trained": false,
+  "candidate_ids": {
+    "A0": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+    "B0": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+    "C0": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1"
+  },
+  "candidate_run_receipts": {
+    "A0_2025": {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          93.7646269673896,
+          2.476332829212024
+        ],
+        [
+          2.476332829212024,
+          89.55663756413684
+        ]
+      ],
+      "fallback_state": "NONE",
+      "inner_score": {
+        "margin_mae": 10.181274853962499,
+        "team_points_mae": 7.527633515414878,
+        "total_mae": 10.646786087400338
+      },
+      "selected_alpha": 100.0,
+      "selected_half_life": 8,
+      "target_games": 272,
+      "target_season": 2025,
+      "training_games_team_rows": 4734
+    },
+    "B0_2025": {
+      "candidate_id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "drive_fallback": "NONE",
+      "drive_inner_poisson_deviance": 0.24267220175563964,
+      "drive_overdispersion_diagnostic": 0.24731566775799607,
+      "outcome_fallback": "NONE",
+      "outcome_inner_log_loss": 0.9248497539939126,
+      "rare_fallback": "NONE",
+      "selected_drive_alpha": 0.0,
+      "selected_outcome_c": 0.05,
+      "simulations_per_game": 10000,
+      "target_games": 272,
+      "target_season": 2025,
+      "td_point_probabilities_6_7_8": [
+        0.0922992900054615,
+        0.8689240851993446,
+        0.038776624795193886
+      ],
+      "training_drive_rows": 52501,
+      "training_team_rows": 4654
+    },
+    "C0_2025": {
+      "candidate_id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "margin": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.767268683689698
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.76630792900534
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.76636420879938
+        }
+      },
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "paired_games": 272,
+      "target_season": 2025,
+      "total": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.301023862453302
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.313797598689609
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.315092102481245
+        }
+      }
+    }
+  },
+  "completed_2026_outcomes_used": false,
+  "config_sha256": "2c5cc1af74fc5f3955e44361b82b791710e4b63bbc69b0c15570617e2d86e543",
+  "eligible_game_counts": {
+    "A0": 272,
+    "A0_B0_C0_common": 272,
+    "A0_market_common": 272,
+    "B0": 272,
+    "B0_market_common": 272,
+    "C0": 272,
+    "C0_market_common": 272,
+    "baselines": 272
+  },
+  "evidence_sha256": {
+    "A0_HOLDOUT_2025.csv": "c5c151cf4415aed0d56825898c9ab1c0c381e44307b60bcb8c1398c45c95dd8f",
+    "B0_HOLDOUT_2025.csv": "afb9a17bfc385b4c876c0d127f2faf9f8efb274b4638db4c441787e8d309ae41",
+    "BASELINES_HOLDOUT_2025.csv": "e2c8fd11040a90a150b7dc3fea2353bf4950a1bd5f47e92a540477b07e81240b",
+    "C0_HOLDOUT_2025.csv": "fab2050544a230602aecf19d4b45fd8721a2bd1246c4423a67ab28317f6c5c38",
+    "DIAGNOSTIC_SLICES_2025.csv": "4700134ecde76cb4b72b0f2da34e61038d0766ef6d79c425880f6244f4516bb1",
+    "HOLDOUT_SUMMARY.json": "8336c6c8fc5350d465821ce592080b34d9c24ee1d9366d34053eb33c7ecd2e99"
+  },
+  "generator_git_head": "f0b92217488a1a000bee74a903a9437931a53230",
+  "holdout_description": "final historical challenger holdout, with the disclosed limitation that broad baseline 2025 errors informed earlier research questions",
+  "implementation_sha256": "5f148219527b07d85261d3f196ace97a5eb5646271d43596032a692389abc579",
+  "loaded_seasons": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+  "model_fit_training_seasons": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "opening_receipt_commit": "362af7af7db43a715b9ab9537a52d2749c37e7a6",
+  "preflight": {
+    "B0_simulations": 10000,
+    "D_margin": "ENSEMBLE_NOT_ELIGIBLE",
+    "D_total": "ENSEMBLE_NOT_ELIGIBLE",
+    "candidate5_trained": false,
+    "candidate_ids": {
+      "A0": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "B0": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "C0": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1"
+    },
+    "completed_2026_used": false,
+    "config_sha256": "2c5cc1af74fc5f3955e44361b82b791710e4b63bbc69b0c15570617e2d86e543",
+    "implementation_sha256": "5f148219527b07d85261d3f196ace97a5eb5646271d43596032a692389abc579",
+    "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+    "phase3_2025_firewall_intact": true,
+    "source_contract": "phase3-feature-provenance-v1",
+    "status": "PASS"
+  },
+  "production_changed": false,
+  "random_seeds": {
+    "base": 2603,
+    "market_margin": 26031,
+    "market_total": 26032
+  },
+  "schema_version": "spread-points-phase4-run-manifest-v1",
+  "source_contract": "phase3-feature-provenance-v1",
+  "target_feature_state_note": "Frozen shifted pregame states may update sequentially from prior completed 2025 games; no current-game or future 2025 outcome enters its own forecast, and estimator fitting remains through 2024 only.",
+  "target_season": 2025
+}

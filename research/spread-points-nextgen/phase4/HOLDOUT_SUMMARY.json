@@ -1,0 +1,676 @@
+{
+  "A0": {
+    "ATS_OU": {
+      "ATS": {
+        "graded_games": 271,
+        "hit_rate": 0.4907749077490775,
+        "no_edge_excluded": 0,
+        "pushes_excluded": 1,
+        "role": "secondary_diagnostic_only"
+      },
+      "OU": {
+        "graded_games": 272,
+        "hit_rate": 0.5220588235294118,
+        "no_edge_excluded": 0,
+        "pushes_excluded": 0,
+        "role": "secondary_diagnostic_only"
+      }
+    },
+    "away_points": {
+      "bias_actual_minus_pred": -1.114887073170881,
+      "games": 272,
+      "mae": 7.7244024695567175,
+      "residual_sd": 9.603948773496544,
+      "rmse": 9.650891301127494
+    },
+    "distribution": {
+      "joint_energy_draws_per_game": 10000,
+      "joint_energy_score": null,
+      "joint_energy_score_monte_carlo": 8.455279032045453,
+      "joint_energy_score_note": "A0 retained Gaussian covariance parameters rather than raw Monte Carlo draws; univariate proper scores and coverage are primary in Phase 3.",
+      "joint_energy_seed_policy": "stable_seed(A0_ID, game_id, base_seed=2603)",
+      "joint_gaussian_log_score_negative_log_density": 7.346875376165121,
+      "margin_50": {
+        "coverage": 0.5367647058823529,
+        "games": 272,
+        "mean_width": 18.016256255746256
+      },
+      "margin_80": {
+        "coverage": 0.7647058823529411,
+        "games": 272,
+        "mean_width": 34.23144888872242
+      },
+      "margin_crps": 7.558135903122056,
+      "margin_log_score_negative_log_density": 4.016836811278745,
+      "total_50": {
+        "coverage": 0.5,
+        "games": 272,
+        "mean_width": 18.509745364783413
+      },
+      "total_80": {
+        "coverage": 0.7904411764705882,
+        "games": 272,
+        "mean_width": 35.169093589893805
+      },
+      "total_crps": 7.6308909296220175,
+      "total_log_score_negative_log_density": 4.0223222429144885
+    },
+    "home_points": {
+      "bias_actual_minus_pred": -1.024595390384997,
+      "games": 272,
+      "mae": 7.4881088891273695,
+      "residual_sd": 9.358872588979013,
+      "rmse": 9.39767393139528
+    },
+    "margin": {
+      "bias_actual_minus_pred": 0.09029168278588393,
+      "games": 272,
+      "mae": 10.494625151284229,
+      "residual_sd": 13.459456322747887,
+      "rmse": 13.434995304803259
+    },
+    "market_relative": {
+      "margin": {
+        "candidate_mae": 10.494625151284229,
+        "candidate_minus_market_mae": 0.7721986806959931,
+        "candidate_residual_mean": 0.09029168278588393,
+        "candidate_residual_variance": 181.15696450395808,
+        "closer_rate_candidate": 0.43014705882352944,
+        "games": 272,
+        "market_mae": 9.722426470588236,
+        "market_residual_mean": 0.5716911764705882,
+        "market_residual_variance": 150.80941705556762,
+        "tie_rate": 0.0
+      },
+      "margin_bootstrap": {
+        "block": "season+week",
+        "blocks": 18,
+        "candidate_minus_reference_mean": 0.7721986806959931,
+        "ci95": [
+          0.3669816582207946,
+          1.2540898169844144
+        ],
+        "games": 272,
+        "probability_candidate_lower": 0.0,
+        "samples": 10000,
+        "seed": 26031
+      },
+      "total": {
+        "candidate_mae": 10.689184517665115,
+        "candidate_minus_market_mae": 0.29580216472394005,
+        "candidate_residual_mean": -2.1394824635558782,
+        "candidate_residual_variance": 178.49169185741897,
+        "closer_rate_candidate": 0.4632352941176471,
+        "games": 272,
+        "market_mae": 10.393382352941176,
+        "market_residual_mean": 1.150735294117647,
+        "market_residual_variance": 173.194907206425,
+        "tie_rate": 0.0
+      },
+      "total_bootstrap": {
+        "block": "season+week",
+        "blocks": 18,
+        "candidate_minus_reference_mean": 0.29580216472394005,
+        "ci95": [
+          -0.10164574850667082,
+          0.700709466154152
+        ],
+        "games": 272,
+        "probability_candidate_lower": 0.0759,
+        "samples": 10000,
+        "seed": 26032
+      }
+    },
+    "probability": {
+      "brier": 0.2343977138960662,
+      "games": 272,
+      "log_loss": 0.6602501001280308,
+      "winner_accuracy": 0.5698529411764706
+    },
+    "probability_tie_excluded": {
+      "brier": 0.23458429903179484,
+      "excluded_ties": 1,
+      "games": 271,
+      "log_loss": 0.6606202415723257,
+      "winner_accuracy": 0.5682656826568265
+    },
+    "total": {
+      "bias_actual_minus_pred": -2.1394824635558782,
+      "games": 272,
+      "mae": 10.689184517665115,
+      "residual_sd": 13.36007828784768,
+      "rmse": 13.50603041659258
+    }
+  },
+  "B0": {
+    "ATS_OU": {
+      "ATS": {
+        "graded_games": 271,
+        "hit_rate": 0.4870848708487085,
+        "no_edge_excluded": 0,
+        "pushes_excluded": 1,
+        "role": "secondary_diagnostic_only"
+      },
+      "OU": {
+        "graded_games": 272,
+        "hit_rate": 0.5183823529411765,
+        "no_edge_excluded": 0,
+        "pushes_excluded": 0,
+        "role": "secondary_diagnostic_only"
+      }
+    },
+    "away_points": {
+      "bias_actual_minus_pred": -3.00701875,
+      "games": 272,
+      "mae": 7.941660661764706,
+      "residual_sd": 9.562093453114997,
+      "rmse": 10.006979559939724
+    },
+    "distribution": {
+      "away_50": {
+        "coverage": 0.6470588235294118,
+        "games": 272,
+        "mean_width": 17.303308823529413
+      },
+      "away_80": {
+        "coverage": 0.8897058823529411,
+        "games": 272,
+        "mean_width": 32.8389705882353
+      },
+      "away_crps": 5.663003680404412,
+      "home_50": {
+        "coverage": 0.6727941176470589,
+        "games": 272,
+        "mean_width": 17.90073529411765
+      },
+      "home_80": {
+        "coverage": 0.9227941176470589,
+        "games": 272,
+        "mean_width": 33.94669117647059
+      },
+      "home_crps": 5.514997712757353,
+      "joint_energy_score": 8.796519077049277,
+      "log_score": null,
+      "log_score_note": "Not reported: finite empirical score-mass log scores from 10k draws are too sensitive to zero-cell smoothing for this reference simulator.",
+      "margin_50": {
+        "coverage": 0.6764705882352942,
+        "games": 272,
+        "mean_width": 23.516544117647058
+      },
+      "margin_80": {
+        "coverage": 0.9227941176470589,
+        "games": 272,
+        "mean_width": 45.148529411764706
+      },
+      "margin_crps": 7.615862658088235,
+      "total_50": {
+        "coverage": 0.6470588235294118,
+        "games": 272,
+        "mean_width": 25.840992647058822
+      },
+      "total_80": {
+        "coverage": 0.9117647058823529,
+        "games": 272,
+        "mean_width": 49.07095588235294
+      },
+      "total_crps": 8.230001925220588
+    },
+    "home_points": {
+      "bias_actual_minus_pred": -2.486033455882353,
+      "games": 272,
+      "mae": 7.6537893382352955,
+      "residual_sd": 9.322818300952058,
+      "rmse": 9.63201760753174
+    },
+    "margin": {
+      "bias_actual_minus_pred": 0.5209852941176469,
+      "games": 272,
+      "mae": 10.304718382352942,
+      "residual_sd": 13.245102940000958,
+      "rmse": 13.230994075101373
+    },
+    "market_relative": {
+      "margin": {
+        "candidate_mae": 10.304718382352942,
+        "candidate_minus_market_mae": 0.5822919117647058,
+        "candidate_residual_mean": 0.5209852941176469,
+        "candidate_residual_variance": 175.43275189122204,
+        "closer_rate_candidate": 0.4227941176470588,
+        "games": 272,
+        "market_mae": 9.722426470588236,
+        "market_residual_mean": 0.5716911764705882,
+        "market_residual_variance": 150.80941705556762,
+        "tie_rate": 0.0
+      },
+      "margin_bootstrap": {
+        "block": "season+week",
+        "blocks": 18,
+        "candidate_minus_reference_mean": 0.5822919117647058,
+        "ci95": [
+          0.18481140759271822,
+          1.0495029666666662
+        ],
+        "games": 272,
+        "probability_candidate_lower": 0.0006,
+        "samples": 10000,
+        "seed": 26031
+      },
+      "total": {
+        "candidate_mae": 11.810169852941176,
+        "candidate_minus_market_mae": 1.4167874999999999,
+        "candidate_residual_mean": -5.493052205882353,
+        "candidate_residual_variance": 181.26439266612059,
+        "closer_rate_candidate": 0.3897058823529412,
+        "games": 272,
+        "market_mae": 10.393382352941176,
+        "market_residual_mean": 1.150735294117647,
+        "market_residual_variance": 173.194907206425,
+        "tie_rate": 0.0
+      },
+      "total_bootstrap": {
+        "block": "season+week",
+        "blocks": 18,
+        "candidate_minus_reference_mean": 1.4167874999999999,
+        "ci95": [
+          0.6722778149710068,
+          2.154261915512024
+        ],
+        "games": 272,
+        "probability_candidate_lower": 0.0,
+        "samples": 10000,
+        "seed": 26032
+      }
+    },
+    "probability": {
+      "brier": 0.2299698148345588,
+      "games": 272,
+      "log_loss": 0.6514868778524453,
+      "winner_accuracy": 0.625
+    },
+    "probability_tie_excluded": {
+      "brier": 0.23002652794280445,
+      "excluded_ties": 1,
+      "games": 271,
+      "log_loss": 0.6515948632237708,
+      "winner_accuracy": 0.6236162361623616
+    },
+    "total": {
+      "bias_actual_minus_pred": -5.493052205882353,
+      "games": 272,
+      "mae": 11.810169852941176,
+      "residual_sd": 13.46344653742572,
+      "rmse": 14.517975134099736
+    }
+  },
+  "C0": {
+    "ATS_OU_M3": {
+      "ATS": {
+        "graded_games": 271,
+        "hit_rate": 0.5129151291512916,
+        "no_edge_excluded": 0,
+        "pushes_excluded": 1,
+        "role": "secondary_diagnostic_only"
+      },
+      "OU": {
+        "graded_games": 272,
+        "hit_rate": 0.5698529411764706,
+        "no_edge_excluded": 0,
+        "pushes_excluded": 0,
+        "role": "secondary_diagnostic_only"
+      }
+    },
+    "arms": {
+      "M0": {
+        "margin": {
+          "bias_actual_minus_pred": 0.5716911764705882,
+          "games": 272,
+          "mae": 9.722426470588236,
+          "residual_sd": 12.280448568988334,
+          "rmse": 12.271177672521421
+        },
+        "total": {
+          "bias_actual_minus_pred": 1.150735294117647,
+          "games": 272,
+          "mae": 10.393382352941176,
+          "residual_sd": 13.160353612514559,
+          "rmse": 13.18644580397525
+        }
+      },
+      "M1": {
+        "margin": {
+          "bias_actual_minus_pred": 0.6546715046197744,
+          "games": 272,
+          "mae": 9.723501022927737,
+          "residual_sd": 12.269846824300357,
+          "rmse": 12.264756270772224
+        },
+        "total": {
+          "bias_actual_minus_pred": 0.7988698854583433,
+          "games": 272,
+          "mae": 10.38120337670976,
+          "residual_sd": 13.16152889007576,
+          "rmse": 13.16157954435154
+        }
+      },
+      "M2": {
+        "margin": {
+          "bias_actual_minus_pred": 0.6406008802810265,
+          "games": 272,
+          "mae": 9.746786526410787,
+          "residual_sd": 12.306128227016435,
+          "rmse": 12.300178608872388
+        },
+        "total": {
+          "bias_actual_minus_pred": 1.0739459119630932,
+          "games": 272,
+          "mae": 10.375440070219303,
+          "residual_sd": 13.150399191404704,
+          "rmse": 13.170063615296367
+        }
+      },
+      "M3": {
+        "margin": {
+          "bias_actual_minus_pred": 0.6406052440051543,
+          "games": 272,
+          "mae": 9.746999225356452,
+          "residual_sd": 12.305983672351696,
+          "rmse": 12.30003474326551
+        },
+        "total": {
+          "bias_actual_minus_pred": 1.0740913944466308,
+          "games": 272,
+          "mae": 10.37552213841023,
+          "residual_sd": 13.150449675303426,
+          "rmse": 13.170125702537566
+        }
+      }
+    },
+    "incremental_M3_vs_M0": {
+      "interpretation_policy": "No post-hoc threshold. Nominal direction, uncertainty, development consistency and complexity are interpreted together after the complete holdout package exists.",
+      "margin": {
+        "M3_minus_M0_MAE": 0.024572754768218765,
+        "blocks": 18,
+        "ci95": [
+          -0.024193150241745186,
+          0.06746340693366715
+        ],
+        "games": 272,
+        "probability_M3_lower_absolute_error": 0.1488,
+        "samples": 10000
+      },
+      "question": "Does frozen C0 M3 add incremental information beyond raw market M0 on exact 2025 holdout rows?",
+      "total": {
+        "M3_minus_M0_MAE": -0.017860214530948246,
+        "blocks": 18,
+        "ci95": [
+          -0.059318269627625625,
+          0.022765324035677433
+        ],
+        "games": 272,
+        "probability_M3_lower_absolute_error": 0.7963,
+        "samples": 10000
+      }
+    },
+    "margin_football_incremental_disposition": "NO_INCREMENTAL_FOOTBALL_EDGE",
+    "market_relative_M3": {
+      "margin": {
+        "candidate_mae": 9.746999225356452,
+        "candidate_minus_market_mae": 0.024572754768218765,
+        "candidate_residual_mean": 0.6406052440051543,
+        "candidate_residual_variance": 151.43723414418653,
+        "closer_rate_candidate": 0.5110294117647058,
+        "games": 272,
+        "market_mae": 9.722426470588236,
+        "market_residual_mean": 0.5716911764705882,
+        "market_residual_variance": 150.80941705556762,
+        "tie_rate": 0.0
+      },
+      "margin_bootstrap": {
+        "block": "season+week",
+        "blocks": 18,
+        "candidate_minus_reference_mean": 0.024572754768218765,
+        "ci95": [
+          -0.024193150241745186,
+          0.06746340693366715
+        ],
+        "games": 272,
+        "probability_candidate_lower": 0.1488,
+        "samples": 10000,
+        "seed": 26031
+      },
+      "total": {
+        "candidate_mae": 10.37552213841023,
+        "candidate_minus_market_mae": -0.017860214530948246,
+        "candidate_residual_mean": 1.0740913944466308,
+        "candidate_residual_variance": 172.93432666268797,
+        "closer_rate_candidate": 0.5698529411764706,
+        "games": 272,
+        "market_mae": 10.393382352941176,
+        "market_residual_mean": 1.150735294117647,
+        "market_residual_variance": 173.194907206425,
+        "tie_rate": 0.0
+      },
+      "total_bootstrap": {
+        "block": "season+week",
+        "blocks": 18,
+        "candidate_minus_reference_mean": -0.017860214530948246,
+        "ci95": [
+          -0.059318269627625625,
+          0.022765324035677433
+        ],
+        "games": 272,
+        "probability_candidate_lower": 0.7963,
+        "samples": 10000,
+        "seed": 26032
+      }
+    },
+    "total_football_incremental_disposition": "DEVELOPMENT_INCREMENTAL_FOOTBALL_SIGNAL"
+  },
+  "Candidate5": "NOT_STARTED",
+  "D": {
+    "margin": "ENSEMBLE_NOT_ELIGIBLE",
+    "total": "ENSEMBLE_NOT_ELIGIBLE"
+  },
+  "FST_2025_OOS_comparator": "NOT_INCLUDED_UNLESS_EXISTING_CHRONOLOGY_CLEAN_REPRESENTATION_IS_ESTABLISHED; production F-ST is not re-fit or backcast in Phase 4",
+  "baselines": {
+    "historical_scoring_average": {
+      "margin": {
+        "bias_actual_minus_pred": 2.123042922154419,
+        "games": 272,
+        "mae": 10.387368037635364,
+        "residual_sd": 13.160589891325978,
+        "rmse": 13.306827897374175
+      },
+      "season_by_season": {
+        "2025": {
+          "games": 272,
+          "margin": {
+            "bias_actual_minus_pred": 2.123042922154419,
+            "games": 272,
+            "mae": 10.387368037635364,
+            "residual_sd": 13.160589891325978,
+            "rmse": 13.306827897374175
+          },
+          "total": {
+            "bias_actual_minus_pred": 0.06633492995396896,
+            "games": 272,
+            "mae": 10.634989549917828,
+            "residual_sd": 13.424645490610601,
+            "rmse": 13.4001093008191
+          }
+        }
+      },
+      "total": {
+        "bias_actual_minus_pred": 0.06633492995396896,
+        "games": 272,
+        "mae": 10.634989549917828,
+        "residual_sd": 13.424645490610601,
+        "rmse": 13.4001093008191
+      }
+    },
+    "market": {
+      "margin": {
+        "bias_actual_minus_pred": 0.5716911764705882,
+        "games": 272,
+        "mae": 9.722426470588236,
+        "residual_sd": 12.280448568988334,
+        "rmse": 12.271177672521421
+      },
+      "season_by_season": {
+        "2025": {
+          "games": 272,
+          "margin": {
+            "bias_actual_minus_pred": 0.5716911764705882,
+            "games": 272,
+            "mae": 9.722426470588236,
+            "residual_sd": 12.280448568988334,
+            "rmse": 12.271177672521421
+          },
+          "total": {
+            "bias_actual_minus_pred": 1.150735294117647,
+            "games": 272,
+            "mae": 10.393382352941176,
+            "residual_sd": 13.160353612514559,
+            "rmse": 13.18644580397525
+          }
+        }
+      },
+      "total": {
+        "bias_actual_minus_pred": 1.150735294117647,
+        "games": 272,
+        "mae": 10.393382352941176,
+        "residual_sd": 13.160353612514559,
+        "rmse": 13.18644580397525
+      }
+    },
+    "naive_hfa_league_total": {
+      "margin": {
+        "bias_actual_minus_pred": 0.34826443251571904,
+        "games": 272,
+        "mae": 11.055982690921743,
+        "residual_sd": 14.177274158360618,
+        "rmse": 14.155473785547738
+      },
+      "season_by_season": {
+        "2025": {
+          "games": 272,
+          "margin": {
+            "bias_actual_minus_pred": 0.34826443251571904,
+            "games": 272,
+            "mae": 11.055982690921743,
+            "residual_sd": 14.177274158360618,
+            "rmse": 14.155473785547738
+          },
+          "total": {
+            "bias_actual_minus_pred": 0.4942608538979578,
+            "games": 272,
+            "mae": 10.970819665001617,
+            "residual_sd": 13.814108496507782,
+            "rmse": 13.79754717175922
+          }
+        }
+      },
+      "total": {
+        "bias_actual_minus_pred": 0.4942608538979578,
+        "games": 272,
+        "mae": 10.970819665001617,
+        "residual_sd": 13.814108496507782,
+        "rmse": 13.79754717175922
+      }
+    },
+    "simple_epa_team_strength": {
+      "margin": {
+        "bias_actual_minus_pred": 0.4337687632822389,
+        "games": 272,
+        "mae": 10.34177398731148,
+        "residual_sd": 13.240800181163067,
+        "rmse": 13.223554378628892
+      },
+      "season_by_season": {
+        "2025": {
+          "games": 272,
+          "margin": {
+            "bias_actual_minus_pred": 0.4337687632822389,
+            "games": 272,
+            "mae": 10.34177398731148,
+            "residual_sd": 13.240800181163067,
+            "rmse": 13.223554378628892
+          },
+          "total": {
+            "bias_actual_minus_pred": -1.1147559591720284,
+            "games": 272,
+            "mae": 10.678492871837976,
+            "residual_sd": 13.418063575331939,
+            "rmse": 13.439686860499327
+          }
+        }
+      },
+      "total": {
+        "bias_actual_minus_pred": -1.1147559591720284,
+        "games": 272,
+        "mae": 10.678492871837976,
+        "residual_sd": 13.418063575331939,
+        "rmse": 13.439686860499327
+      }
+    }
+  },
+  "candidate5_trained": false,
+  "candidate_ids": {
+    "A0": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+    "B0": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+    "C0": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1"
+  },
+  "completed_2026_outcomes_used": false,
+  "development_reference": {
+    "A0_margin_mae": 9.882508546957865,
+    "A0_total_mae": 10.386912200041253,
+    "B0_margin_mae": 10.21317018404908,
+    "B0_total_mae": 11.30440920245399,
+    "C0_M3_margin_mae": 9.43895668195999,
+    "C0_M3_total_mae": 10.13763752934022,
+    "C0_margin_disposition": "NO_INCREMENTAL_FOOTBALL_EDGE",
+    "C0_total_disposition": "NO_INCREMENTAL_FOOTBALL_EDGE",
+    "D_margin": "ENSEMBLE_NOT_ELIGIBLE",
+    "D_total": "ENSEMBLE_NOT_ELIGIBLE",
+    "games": 815,
+    "market_M0_margin_mae": 9.4184,
+    "market_M0_total_mae": 10.1209,
+    "seasons": [
+      2022,
+      2023,
+      2024
+    ]
+  },
+  "evidence_scope": "2025 final historical challenger holdout; broad baseline 2025 errors had informed earlier research questions, but no A0/B0/C0 challenger output was inspected before Phase 4",
+  "finalist_disposition": "PENDING_POST_PACKAGE_INTERPRETATION",
+  "holdout_opened": true,
+  "phase": 4,
+  "phase1_context_note": "Phase 1 LevLine baseline context is not substituted for a chronology-clean exact-row 2025 F-ST comparator. No 2025 F-ST artifact trained with 2025 outcomes is scored as out-of-sample here.",
+  "phase1_current_levline_context": {
+    "ats_accuracy": 0.4877126654064272,
+    "away_points_mae": 7.485142354656214,
+    "fst_brier": 0.21065334840485694,
+    "fst_chronology_clean_winner_accuracy": 0.6816927322907084,
+    "home_points_mae": 7.42368116929241,
+    "margin_mae": 9.961987009785291,
+    "market_brier": 0.2101992905677052,
+    "market_spread_mae": 9.494480220791168,
+    "market_total_mae": 10.189052437902484,
+    "market_winner_accuracy": 0.6761729530818767,
+    "total_mae": 10.853913707422718
+  },
+  "production_changed": false,
+  "production_model": "F-ST-01-FROZEN-2026",
+  "row_counts": {
+    "A0": 272,
+    "A0_B0_C0_common": 272,
+    "A0_market_common": 272,
+    "B0": 272,
+    "B0_market_common": 272,
+    "C0": 272,
+    "C0_market_common": 272,
+    "baselines": 272
+  },
+  "schema_version": "spread-points-phase4-holdout-summary-v1",
+  "target_season": 2025
+}
