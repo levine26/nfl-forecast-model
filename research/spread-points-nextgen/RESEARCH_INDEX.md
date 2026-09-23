@@ -1,346 +1,136 @@
 # Spread & Points Next-Generation — Research Index
 
 **Authority:** `MASTER_PLAN.md`  
-**Purpose:** Make prior and future research discoverable without branch archaeology.  
-**Initialized:** 2026-09-21 America/Los_Angeles
-
-This index is a map, not an authorization mechanism. A file appearing here does not make it production-ready or scientifically authoritative beyond its stated scope.
-
-## 1. Current production and score/spread implementation
-
-| Area | Canonical path(s) | Why it matters |
-|---|---|---|
-| Main forecasting pipeline | `src/nfl_forecast/pipeline.py` | Builds historical/current games; fits winner, margin, and total models; applies frozen F-ST; emits expected margin/total and score diagnostics. |
-| Regression/classification models | `src/nfl_forecast/models.py` | Contains stacked classifiers and weighted regression used by the current pipeline. |
-| Matchup/team features | `src/nfl_forecast/features.py` | Builds historical matchup features, score targets, margin, total, rest, Elo, and team-form inputs. |
-| Official frozen F-ST production scoring | `src/nfl_forecast/fst_production.py` | Active winner-probability production boundary and exact frozen-identity validation. |
-| Packaged production artifact | `src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json` | Direct production artifact; status `production_frozen`. |
-| Public forecast semantics | `src/nfl_forecast/public_forecast.py` | Converts official probability to coherent probability-implied public fair margin/spread; preserves independent margin as diagnostic. |
-| Market ingestion/diagnostics | `src/nfl_forecast/market.py`, `src/nfl_forecast/market_t120.py`, `src/nfl_forecast/market_diagnostics.py` | Current market probability, point-in-time market, and diagnostic support. |
-| Weekly/publication flow | `scripts/run_week.py`, `scripts/refresh_market.py`, `scripts/pregame_due.py`, `scripts/verify_pregame_lock.py` | Production orchestration surfaces protected by the research firewall. |
-| Repository overview | `README.md`, `IMPLEMENTATION_STATUS.md` | Current product state and implementation ledger. |
-
-## 2. Official F-ST governance and production firewall
-
-| Artifact | Path | Scope |
-|---|---|---|
-| Frozen research identity registry | `research/fst/F-ST-01-FROZEN-2026.json` | Frozen candidate identity/history. Its historical research status must not be mistaken for the current packaged production artifact. |
-| Production artifact | `src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json` | Current production authorization and frozen constants. |
-| Freeze provenance contract | `docs/FST_FREEZE_PROVENANCE.md` | Required persistence, reconstruction, tolerance, provenance, and future candidate freeze rules. |
-| Frozen identity tests | `tests/test_fst_frozen_identity.py` | Fail-closed frozen identity/reconstruction checks. |
-| Production tests | `tests/test_fst_production.py` | Production F-ST behavior. |
-| Official lock tests | `tests/test_official_locking.py` | Pregame immutable lock behavior. |
-| Research validation/firewall workflow | `.github/workflows/research_validation.yml` | Research CI and explicit protected production surfaces. |
-| Research firewall tests | `tests/test_research_firewall.py` | Research-to-production isolation contract. |
-
-## 3. Historical accuracy and prior LevLine research
-
-Phase 1 must verify which prior figures are directly reproducible and which are historical references.
-
-Important existing research starting points include:
-
-- `research/LEVLINE_4_ACCURACY_FIRST_THESIS.md`
-- `research/LEVLINE_4_ACCURACY_TIEBREAKER_FINDING.md`
-- `research/LEVLINE_4_CANONICAL_RESEARCH_LEDGER.md`
-- `research/LEVLINE_4_CONDITIONAL_MARKET_RELIANCE_THESIS.md`
-- `research/LEVLINE_4_DECISION_MEMO_2026-09-15.md`
-- `research/LEVLINE_4_EVALUATION_GOVERNANCE_V2.md`
-- `research/LEVLINE_4_FINAL_RESEARCH_RECOMMENDATION.md`
-- `research/LEVLINE_4_LITERATURE_REVIEW.md`
-- `research/LEVLINE_4_RESEARCH_SPEC.md`
-- `research/LEVLINE_4_SELECTIVE_UPSET_GATE_THESIS.md`
-- `research/levline3_boundary_accuracy_audit_v1.json`
-- `research/levline3_chronological_accuracy_audit_v1.json`
-- `research/levline3_fst_market_accuracy_audit_v1.json`
-
-Relevant current scripts/tests include:
-
-- `scripts/run_challenger_margin_forensics.py`
-- `scripts/run_challenger_market_reliance.py`
-- `scripts/run_challenger_probability_margin_bridge.py`
-- `tests/test_challenger_margin_forensics.py`
-- `tests/test_challenger_market_reliance.py`
-- `tests/test_challenger_probability_margin_bridge.py`
-
-**Phase 1 rule:** reuse valid prior evidence where its data universe, chronology, target, and semantics match the new question; verify rather than blindly rebuild.
-
-## 4. Existing market research
-
-Key surfaces:
-
-- `src/nfl_forecast/challenger_market_incremental.py`
-- `src/nfl_forecast/challenger_market_reliance.py`
-- `src/nfl_forecast/challenger_market_sources.py`
-- `src/nfl_forecast/challenger_probability_margin_bridge.py`
-- `scripts/run_challenger_market_capture.py`
-- `scripts/run_market_audit.py`
-- `research/LEVLINE_4_CONDITIONAL_MARKET_RELIANCE_THESIS.md`
-- `research/LEVLINE_4_EVALUATION_GOVERNANCE_V2.md`
-- `research/LEVLINE_DATA_SOURCE_MATRIX.md`
-- `.github/workflows/research_market_capture_v2.yml`
-- `.github/workflows/research_market_horizons.yml`
-- `.github/workflows/research_market_state_v1.yml`
-
-Existing governance already distinguishes same-horizon market comparisons, prospective timestamps, market construction candidates, and market-vs-model incremental value.
-
-## 5. Existing player/personnel state infrastructure
-
-Potentially reusable scientific/infrastructure surfaces include:
-
-- `src/nfl_forecast/advanced_player_context.py`
-- `src/nfl_forecast/injuries.py`
-- `src/nfl_forecast/personnel_impact.py`
-- `src/nfl_forecast/player_impact_engine.py`
-- `src/nfl_forecast/player_impact_cards.py`
-- `src/nfl_forecast/player_impact_monitor.py`
-- `src/nfl_forecast/player_state_research.py`
-- `src/nfl_forecast/career_qb_context.py`
-- `src/nfl_forecast/qb_history.py`
-- `research/availability/`
-- `research/depth_chart_state_contract_v1.json`
-- `research/depth_chart_state_v1.py`
-- `research/expected_lineup_qb_capture_v1_contract.json`
-- `research/expected_lineup_state_v1.py`
-- `research/injury_snapshot_archive_contract_v1.json`
-- `research/injury_snapshot_archive_v1.py`
+**Purpose:** Canonical map of the active Spread & Points research program.  
+**Last reconciled:** 2026-09-22 America/Los_Angeles
 
-These are inputs for Phase 1 inventory and possible Phase 2 hypotheses. Their existence does **not** authorize them as successor-model features.
+This index is a map, not an authorization mechanism. Candidate identity and evidence boundaries are controlled by the frozen contracts and phase receipts.
 
-## 6. Data/API/source governance
+## Program controls
 
-Canonical current source inventory starting point:
+- `research/spread-points-nextgen/MASTER_PLAN.md`
+- `research/spread-points-nextgen/PHASE_STATUS.md`
+- `research/spread-points-nextgen/CURRENT_STATE_AND_NEXT_STEPS.md`
+- `research/spread-points-nextgen/DECISION_LOG.md`
+- `research/spread-points-nextgen/RESEARCH_INDEX.md`
+- `research/spread-points-nextgen/FINAL_PHASE3_RECEIPT.md`
 
-- `research/LEVLINE_DATA_SOURCE_MATRIX.md`
-- `research/data_source_governance.json`
-- `research/advanced_player_source_governance.json`
-- `research/free_only_policy.json`
-- `config/model.yaml`
-- `src/nfl_forecast/data.py`
-- `src/nfl_forecast/source_policy.py`
+## Production firewall
 
-The existing matrix currently discusses, among others:
+Production remains `F-ST-01-FROZEN-2026`. Key protected surfaces include:
 
-- nflverse game/schedule data;
-- The Odds API prospective multi-book research data;
-- constituent sportsbook feeds through aggregators;
-- prediction-exchange candidates;
-- historical/prospective injury and availability sources;
-- the verified 2026-only Sleeper archive;
-- official NFL availability sources;
-- paid candidates held inactive under the $0 policy;
-- advanced-player sources such as FTN/nflverse-derived data where technically qualified.
+- `src/nfl_forecast/fst_production.py`
+- `src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json`
+- `research/fst/F-ST-01-FROZEN-2026.json`
+- `src/nfl_forecast/pipeline.py`
+- `src/nfl_forecast/public_forecast.py`
+- `outputs/`
+- `site/`
+- weekly publication/lock scripts
 
-Phase 1 must create a complete, current API/data inventory rather than assuming this matrix is exhaustive or current enough for the new program.
+Research may not alter production F-ST coefficients, winner selection, public fair-spread semantics, official history, forecast locks, grading, or Sunday Signal forecasting behavior.
 
-## 7. Retired Props research archive
+## Phase 1 — COMPLETE
 
-**Do not reactivate wholesale.**
+Canonical evidence is under `research/spread-points-nextgen/phase1/`, including:
 
-Canonical active-repository references:
+- `CURRENT_ARCHITECTURE_AUDIT.md`
+- `BASELINE_REPRODUCTION_REPORT.md`
+- `ERROR_DECOMPOSITION_REPORT.md`
+- `DATA_API_INVENTORY.md`
+- `LEAKAGE_PIT_AUDIT.md`
+- `PHASE1_SYNTHESIS.md`
+- `PHASE1_SUMMARY.json`
 
-- `docs/props/PROPS_RESEARCH_ARCHIVE_2026-09.md`
-- `docs/props/README.md`
-- `docs/props/RESET_MANIFEST.md`
+PR #513 merged at `a4f7172c0c4ff82b1689411181e7a9042a1628a8`.
 
-Full preservation branch:
+## Phase 2 — COMPLETE
 
-- `archive/props-pre-revamp-2026-09-21`
+Canonical frozen design is under `research/spread-points-nextgen/phase2/`, especially:
 
-Reusable ideas include:
+- `EVALUATION_HOLDOUT_PROTOCOL.md`
+- `BOUNDED_IMPLEMENTATION_SPEC.md`
+- `CHALLENGER_PREREGISTRATION.md`
+- `MARKET_RESIDUAL_SPECIFICATION.md`
+- `DATA_GAPS_AND_SOURCE_POLICY.md`
+- `PHASE2_SYNTHESIS.md`
 
-- point-in-time player availability;
-- QB starter/replacement state;
-- role/workload modeling;
-- opportunity decomposition;
-- player uncertainty;
-- market benchmarking;
-- coherent simulation;
-- timestamped source provenance;
-- immutable forecast receipts;
-- append-outcomes-later grading.
-
-The old production/live orchestration, Props-specific workflow sprawl, and monolithic evidence patterns are explicitly non-targets.
-
-## 8. Existing joint-distribution / score-related research
-
-Potentially relevant starting points:
-
-- `src/nfl_forecast/challenger_joint_distribution.py`
-- `.github/workflows/research_phase3_joint_distribution.yml`
-- `.github/workflows/research_phase3b_probability_margin_bridge.yml`
-- `src/nfl_forecast/challenger_probability_margin_bridge.py`
-
-Phase 1 must identify exactly what these artifacts did, their data universe, whether they remain reproducible, and whether they answer the new scoring/margin question.
-
-## 9. Future program artifacts
-
-As phases advance, add canonical links here rather than forcing future chats to search the entire repository.
-
-### Phase 1 — complete
-
-- current architecture report — `research/spread-points-nextgen/phase1/CURRENT_ARCHITECTURE_AUDIT.md`
-- reproducible baseline report — `research/spread-points-nextgen/phase1/BASELINE_REPRODUCTION_REPORT.md`
-- error-decomposition report — `research/spread-points-nextgen/phase1/ERROR_DECOMPOSITION_REPORT.md`
-- data/API inventory — `research/spread-points-nextgen/phase1/DATA_API_INVENTORY.md`
-- leakage/PIT risk register — `research/spread-points-nextgen/phase1/LEAKAGE_PIT_AUDIT.md`
-
-Additional Phase 1 control/evidence:
-
-- evaluation contract — `research/spread-points-nextgen/phase1/EVALUATION_CONTRACT.md`
-- synthesis / Phase 2 hypotheses — `research/spread-points-nextgen/phase1/PHASE1_SYNTHESIS.md`
-- machine-readable summary — `research/spread-points-nextgen/phase1/PHASE1_SUMMARY.json`
-- reproducible runner — `research/spread-points-nextgen/phase1/run_baseline_audit.py`
-- structural diagnostic runner — `research/spread-points-nextgen/phase1/run_structural_slices.py`
-- helper tests — `research/spread-points-nextgen/phase1/test_run_baseline_audit.py`
-- final post-sync exact-head validation — firewall `35741337735`; research validation `35741337942`; Phase 1 audit `35741337832`
-- final dedicated audit artifact — `10699778876`, digest `sha256:c85bc49458631c6f9b9a14e0a21f1eb213b527017e20ddcc125e9e23b484e0e1`
-- PR #513 — merged at `a4f7172c0c4ff82b1689411181e7a9042a1628a8`
-
-External comparator explicitly carried into Phase 2: **davidsasser.com**.
-
-### Phase 2 — COMPLETE
-
-- literature review — `research/spread-points-nextgen/phase2/LITERATURE_REVIEW.md`
-- external-model review — `research/spread-points-nextgen/phase2/EXTERNAL_MODEL_REVIEW.md`
-- challenger design/preregistration — `research/spread-points-nextgen/phase2/CHALLENGER_PREREGISTRATION.md`
-- feature/player policy — `research/spread-points-nextgen/phase2/FEATURE_HYPOTHESES_AND_PLAYER_POLICY.md`
-- market-residual specification — `research/spread-points-nextgen/phase2/MARKET_RESIDUAL_SPECIFICATION.md`
-- frozen evaluation/holdout protocol — `research/spread-points-nextgen/phase2/EVALUATION_HOLDOUT_PROTOCOL.md`
-- data/source-gap report — `research/spread-points-nextgen/phase2/DATA_GAPS_AND_SOURCE_POLICY.md`
-- paid-data decision — `research/spread-points-nextgen/phase2/PAID_DATA_DECISION.md`
-- synthesis / Phase 3 handoff — `research/spread-points-nextgen/phase2/PHASE2_SYNTHESIS.md`
-- machine-readable design summary — `research/spread-points-nextgen/phase2/PHASE2_RESEARCH_SUMMARY.json`
-- bounded implementation/search-space contract — `research/spread-points-nextgen/phase2/BOUNDED_IMPLEMENTATION_SPEC.md`
-- red-team closeout is recorded in `phase2/PHASE2_SYNTHESIS.md`
-- deterministic nested-fold contract is recorded in `phase2/EVALUATION_HOLDOUT_PROTOCOL.md`
-- feature/source/PIT feasibility matrix is recorded in `phase2/DATA_GAPS_AND_SOURCE_POLICY.md`
-- Challenger C M0/M1/M2/M3 null hierarchy is recorded in `phase2/MARKET_RESIDUAL_SPECIFICATION.md`
-- evidence-quality ledger and final publisher/technical-source verification are recorded in `phase2/LITERATURE_REVIEW.md`
-- normalized external-system audit and required four-way Sasser classification are recorded in `phase2/EXTERNAL_MODEL_REVIEW.md`
-
-External systems explicitly reviewed include davidsasser.com, nfelo, Open Source Football/nflverse and score/drive-process research. Final Sasser search found useful score/line/market product separation but no reproducible current methodology/archive sufficient for scientific validation.
-
-Phase 2 final receipt:
-
-- validated head — `076dc9d6f6c052eec4744a155070c42c1b99ae82`
-- exact-head firewall — run `35751402751`, **SUCCESS**
-- exact-head full validation — run `35751402726`, **SUCCESS**
-- PR #520 — **MERGED**
-- merge commit — `405906942013252c158244c9b033a3240baa37f8`
-- merged artifacts — verified directly from `main`
-- production change — none
-- Phase 3 — **NOT STARTED**
-
-Concurrent-main synchronization preserved separate adaptive-weekly-learning, Sunday Signal contextual, T-120 shadow, and generated market/status state through the final validated Phase 2 head. Those workstreams were provenance-only and were not used to select Spread & Points challengers.
-
-Final closeout:
-
-- final validated head — `076dc9d6f6c052eec4744a155070c42c1b99ae82`
-- research firewall — `35751402751` **SUCCESS**
-- full research validation — `35751402726` **SUCCESS**
-- PR #520 — **MERGED**
-- merge commit — `405906942013252c158244c9b033a3240baa37f8`
-- all eleven canonical Phase 2 artifacts and all four control files re-read from `main` after merge
-- Phase 3 — **NOT STARTED**
-
-### Phase 3 — COMPLETE (scientific package; final PR/merge receipt pending)
-
-- preimplementation research delta — `research/spread-points-nextgen/phase3/PREIMPLEMENTATION_RESEARCH_REVIEW.md`
-- frozen pre-result gate — `research/spread-points-nextgen/phase3/PRE_RESULT_GATE.json`
-- candidate registry — `research/spread-points-nextgen/phase3/CANDIDATE_REGISTRY.md` and `CANDIDATE_REGISTRY.json`
-- feature/provenance contract — `research/spread-points-nextgen/phase3/FEATURE_PROVENANCE_CONTRACT.md`
-- implementation/test index — `research/spread-points-nextgen/phase3/IMPLEMENTATION_INDEX.md`
-- development evaluation — `research/spread-points-nextgen/phase3/DEVELOPMENT_EVALUATION.md`
-- D eligibility receipt — `research/spread-points-nextgen/phase3/D_ELIGIBILITY_RECEIPT.md`
-- future Candidate 5 OOF contract — `research/spread-points-nextgen/phase3/FUTURE_CANDIDATE5_OOF_SURFACE_CONTRACT.md`
-- adversarial red team — `research/spread-points-nextgen/phase3/RED_TEAM_AUDIT.md`
-- synthesis — `research/spread-points-nextgen/phase3/PHASE3_SYNTHESIS.md`
-- Phase 4 handoff — `research/spread-points-nextgen/phase3/PHASE4_HANDOFF.md`
-- reproducible runner — `research/spread-points-nextgen/phase3/run_phase3.py`
-- dedicated tests — `tests/test_spread_points_phase3.py`
-- dedicated CI — `.github/workflows/research_spread_points_phase3.yml`
-- durable 2022-2024 OOF/evidence package — `research/spread-points-nextgen/phase3/evidence/`
-
-Phase 3 development receipt:
-
-- exact successful development run — `35810171571`
-- exact development head — `3d893ec8e26824f7e6c1883f4d0d09c19160c712`
-- artifact digest before repository preservation — `sha256:516496990fec29e17479e0f55b7e21f82381f510f394a631df6bf4dea3475b41`
-- A0 margin/total MAE — 9.8825 / 10.3869
-- B0 margin/total MAE — 10.2132 / 11.3044
-- market M0 margin/total MAE — 9.4184 / 10.1209
-- C0 M3 margin/total MAE — 9.4390 / 10.1376
-- C0 — `NO_INCREMENTAL_FOOTBALL_EDGE` for margin and total
-- D — `ENSEMBLE_NOT_ELIGIBLE` for margin and total
-- 2025 underlying challenger holdout — **UNOPENED**
-- completed-2026 outcomes used for selection — **NO**
-- Candidate 5 trained — **NO**
-- production change — none
-
-### Phase 4 — planned
-
-- frozen historical validation report — TBD
-- holdout report — TBD
-- ablation report — TBD
-- statistical uncertainty report — TBD
-
-### Candidate 5 roadmap governance amendment
-
-- governance branch — `docs/spread-points-candidate5-program-amendment`
-- PR #545 — **MERGED**
-- validated head — `86bc790a47573833b3ede934784d5997c26f571d`
-- research firewall — `35795292921` **SUCCESS**
-- full research validation — `35795292923` **SUCCESS**
-- merge commit — `e51a066edfb17b292e4823a8f4696470b2da7703`
-- production change — none
-- Phase 3 / Candidate 5 implementation — none
-
-### Phase 5 — planned: Candidate 5 historical F-ST-anchored winner integration
-
-Working candidate: `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`.
-
-Required future artifacts substantially equivalent to:
-
-- `phase5/CANDIDATE5_RESEARCH_CHARTER.md`
-- `phase5/CANDIDATE5_EVIDENCE_BOUNDARY.md`
-- `phase5/CANDIDATE5_FEATURE_AND_COMPONENT_CONTRACT.md`
-- `phase5/CANDIDATE5_OOF_STACKING_PROTOCOL.md`
-- `phase5/CANDIDATE5_MODEL_SPECIFICATION.md`
-- `phase5/CANDIDATE5_ABLATION_PLAN.md`
-- `phase5/CANDIDATE5_EVALUATION_PROTOCOL.md`
-- `phase5/CANDIDATE5_HISTORICAL_RESULTS.md`
-- `phase5/CANDIDATE5_FREEZE_RECEIPT.json`
-
-Cross-program evidence that Phase 5 must read rather than rediscover:
-
-- `research/ADAPTIVE_WEEKLY_LEARNING_RESEARCH_PLAN.md`
-- `research/ADAPTIVE_WEEKLY_LEARNING_CANDIDATE_REGISTRY.json`
-- `research/ADAPTIVE_WEEKLY_LEARNING_FIRST_RUN_RECEIPT.json`
-- `research/ADAPTIVE_WEEKLY_CANDIDATE4_PREREGISTRATION.md`
-- `research/ADAPTIVE_WEEKLY_CANDIDATE4_EVIDENCE_REVIEW.md`
-- Phase 2 A0/B0/C0 design and holdout contracts indexed above;
-- future Phase 3 OOF component surfaces and Phase 4 underlying-model holdout evidence.
-
-Candidate 4 continues prospectively and independently; its outcomes do not tune Candidate 5 V1.
-
-### Phase 6 — planned: prospective shadow validation / operational hardening
-
-- immutable prospective receipt index for eligible Next-Gen and Candidate 5 finalists — TBD
-- prospective grading report — TBD
-- operational-hardening report — TBD
-- Candidate 5 receipt fields must preserve F-ST anchor, exact component inputs, resulting probability/winner, horizon/source timestamps, data-quality state and immutable hash.
-
-### Phase 7 — planned: final synthesis / promotion package
-
-- final synthesis — TBD
-- explicit F-ST / Next-Gen / market / Candidate 5 comparison — TBD
-- Candidate 4 prospective evidence summary when mature enough — TBD
-- promotion package — TBD
-- migration/rollback plan — TBD
-- monitoring plan — TBD
-
-## 10. Index maintenance rule
-
-Every substantive future chat must update this file when it creates a durable artifact that another chat should be able to find without broad repository search.
-
-Do not add every temporary output. Index the smallest set of artifacts needed to reconstruct decisions, reproduce evidence, and continue the program safely.
+PR #520 merged at `405906942013252c158244c9b033a3240baa37f8`.
+
+## Phase 3 — COMPLETE
+
+Authoritative closeout: `FINAL_PHASE3_RECEIPT.md`.
+
+Frozen implementation/evidence lives under `research/spread-points-nextgen/phase3/`:
+
+- `CANDIDATE_REGISTRY.json`
+- `FEATURE_PROVENANCE_CONTRACT.md`
+- `IMPLEMENTATION_INDEX.md`
+- `DEVELOPMENT_EVALUATION.md`
+- `D_ELIGIBILITY_RECEIPT.md`
+- `PHASE3_SYNTHESIS.md`
+- `PHASE4_HANDOFF.md`
+- `RED_TEAM_AUDIT.md`
+- `run_phase3.py`
+- `phase3_a0.py`
+- `phase3_b0.py`
+- `phase3_c0.py`
+- `phase3_data.py`
+- `phase3_evaluation.py`
+- `phase3_scaffold.py`
+- durable evidence directory `phase3/evidence/`
+
+Preserved downstream component surface:
+
+`research/spread-points-nextgen/phase3/evidence/FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv`
+
+Final integration:
+
+- Phase 3 PR #547 — MERGED
+- final synchronized head `8c061cd400a6bb52a037d5e98880efd19a451fcb`
+- merge `d4d29d8c2340864e2d9e4bcd793852e8643be80c`
+- exact-head Phase 3 validation `35813365004` SUCCESS
+- exact-head research firewall `35813364985` SUCCESS
+- exact-head research validation `35813364975` SUCCESS
+- implementation SHA-256 `5f148219527b07d85261d3f196ace97a5eb5646271d43596032a692389abc579`
+- config SHA-256 `2c5cc1af74fc5f3955e44361b82b791710e4b63bbc69b0c15570617e2d86e543`
+
+## Phase 4 — IN PROGRESS
+
+Primary branch:
+
+`research/spread-points-nextgen-phase4`
+
+Phase 4 owns the one-time 2025 underlying-model holdout for frozen A0/B0/C0 only. Required canonical output directory:
+
+`research/spread-points-nextgen/phase4/`
+
+Expected durable package includes:
+
+- `HOLDOUT_OPENING_RECEIPT.json`
+- `HOLDOUT_RUN_MANIFEST.json`
+- `A0_HOLDOUT_2025.csv`
+- `B0_HOLDOUT_2025.csv`
+- `C0_HOLDOUT_2025.csv`
+- `BASELINES_HOLDOUT_2025.csv`
+- `DIAGNOSTIC_SLICES_2025.csv`
+- `HOLDOUT_SUMMARY.json`
+- `HISTORICAL_VALIDATION_REPORT.md`
+- `ABLATION_REPORT.md`
+- `STATISTICAL_UNCERTAINTY_REPORT.md`
+- `ROBUSTNESS_REPORT.md`
+- `RED_TEAM_AUDIT.md`
+- `PHASE4_SYNTHESIS.md`
+- `PHASE5_HANDOFF.md`
+
+2025 is described consistently as the **final historical challenger holdout, with the disclosed limitation that broad baseline 2025 errors informed earlier research questions**.
+
+## Phase 5 — NOT STARTED
+
+Working Candidate 5 identity remains `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`. Phase 5 must consume the preserved chronology-clean 2022–2024 OOF component surface and obey its separate evidence-boundary rules. Phase 4 must not train it.
+
+## Validation workflows
+
+- `.github/workflows/research_validation.yml`
+- `.github/workflows/research_spread_points_phase3.yml`
+- Phase 4 dedicated holdout workflow will be indexed here after it is committed.
