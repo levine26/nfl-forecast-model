@@ -1,0 +1,550 @@
+{
+  "A0": [
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          62.604835171964524,
+          4.087754001475066
+        ],
+        [
+          4.087754001475066,
+          67.54484050784464
+        ]
+      ],
+      "fallback_state": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "inner_score": {},
+      "selected_alpha": 10.0,
+      "selected_half_life": 16,
+      "target_games": 256,
+      "target_season": 2017,
+      "training_games_team_rows": 512
+    },
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          86.52298183327592,
+          5.404021806386433
+        ],
+        [
+          5.404021806386433,
+          78.14809922916447
+        ]
+      ],
+      "fallback_state": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "inner_score": {},
+      "selected_alpha": 10.0,
+      "selected_half_life": 16,
+      "target_games": 256,
+      "target_season": 2018,
+      "training_games_team_rows": 1024
+    },
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          91.54179754253333,
+          5.57775364241901
+        ],
+        [
+          5.57775364241901,
+          82.40250232185598
+        ]
+      ],
+      "fallback_state": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "inner_score": {},
+      "selected_alpha": 10.0,
+      "selected_half_life": 16,
+      "target_games": 256,
+      "target_season": 2019,
+      "training_games_team_rows": 1536
+    },
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          93.16629991892967,
+          3.890708940420773
+        ],
+        [
+          3.890708940420773,
+          84.41208615637265
+        ]
+      ],
+      "fallback_state": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "inner_score": {},
+      "selected_alpha": 10.0,
+      "selected_half_life": 16,
+      "target_games": 256,
+      "target_season": 2020,
+      "training_games_team_rows": 2048
+    },
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          96.07688345376809,
+          5.346538932211936
+        ],
+        [
+          5.346538932211936,
+          93.72892396325331
+        ]
+      ],
+      "fallback_state": "NONE",
+      "inner_score": {
+        "margin_mae": 10.456080685377746,
+        "team_points_mae": 7.602524253777574,
+        "total_mae": 10.7379942234762
+      },
+      "selected_alpha": 100.0,
+      "selected_half_life": 4,
+      "target_games": 272,
+      "target_season": 2021,
+      "training_games_team_rows": 2560
+    },
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          95.64081495004962,
+          2.9146961430293654
+        ],
+        [
+          2.9146961430293654,
+          93.70909661084158
+        ]
+      ],
+      "fallback_state": "NONE",
+      "inner_score": {
+        "margin_mae": 10.680153482979122,
+        "team_points_mae": 7.742737523889724,
+        "total_mae": 10.975371588620476
+      },
+      "selected_alpha": 100.0,
+      "selected_half_life": 4,
+      "target_games": 271,
+      "target_season": 2022,
+      "training_games_team_rows": 3104
+    },
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          93.9438752361566,
+          3.0676405491641043
+        ],
+        [
+          3.0676405491641043,
+          92.88438402876609
+        ]
+      ],
+      "fallback_state": "NONE",
+      "inner_score": {
+        "margin_mae": 10.225159312782615,
+        "team_points_mae": 7.6042334781725565,
+        "total_mae": 10.93512810517241
+      },
+      "selected_alpha": 100.0,
+      "selected_half_life": 4,
+      "target_games": 272,
+      "target_season": 2023,
+      "training_games_team_rows": 3646
+    },
+    {
+      "candidate_id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "covariance": [
+        [
+          93.61217824257209,
+          2.4705792746798014
+        ],
+        [
+          2.4705792746798014,
+          90.38398279764756
+        ]
+      ],
+      "fallback_state": "NONE",
+      "inner_score": {
+        "margin_mae": 10.150057324106552,
+        "team_points_mae": 7.589831073387774,
+        "total_mae": 10.839215492712706
+      },
+      "selected_alpha": 100.0,
+      "selected_half_life": 8,
+      "target_games": 272,
+      "target_season": 2024,
+      "training_games_team_rows": 4190
+    }
+  ],
+  "B0": [
+    {
+      "candidate_id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "drive_fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "drive_inner_poisson_deviance": null,
+      "drive_overdispersion_diagnostic": 0.24632462041364234,
+      "outcome_fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "outcome_inner_log_loss": null,
+      "rare_fallback": "NONE",
+      "selected_drive_alpha": 1.0,
+      "selected_outcome_c": 0.2,
+      "simulations_per_game": 10000,
+      "target_games": 240,
+      "target_season": 2019,
+      "td_point_probabilities_6_7_8": [
+        0.08881421027364378,
+        0.8773403744599136,
+        0.03384541526644263
+      ],
+      "training_drive_rows": 17110,
+      "training_team_rows": 1472
+    },
+    {
+      "candidate_id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "drive_fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "drive_inner_poisson_deviance": null,
+      "drive_overdispersion_diagnostic": 0.24580697239699043,
+      "outcome_fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+      "outcome_inner_log_loss": null,
+      "rare_fallback": "NONE",
+      "selected_drive_alpha": 1.0,
+      "selected_outcome_c": 0.2,
+      "simulations_per_game": 10000,
+      "target_games": 256,
+      "target_season": 2020,
+      "td_point_probabilities_6_7_8": [
+        0.08978494623655914,
+        0.8758064516129033,
+        0.034408602150537634
+      ],
+      "training_drive_rows": 22797,
+      "training_team_rows": 1968
+    },
+    {
+      "candidate_id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "drive_fallback": "NONE",
+      "drive_inner_poisson_deviance": 0.25728763488572304,
+      "drive_overdispersion_diagnostic": 0.250458645072625,
+      "outcome_fallback": "NONE",
+      "outcome_inner_log_loss": 0.9309102884100907,
+      "rare_fallback": "NONE",
+      "selected_drive_alpha": 0.0,
+      "selected_outcome_c": 0.05,
+      "simulations_per_game": 10000,
+      "target_games": 272,
+      "target_season": 2021,
+      "td_point_probabilities_6_7_8": [
+        0.09273570324574962,
+        0.8714345932274835,
+        0.0358297035267669
+      ],
+      "training_drive_rows": 28466,
+      "training_team_rows": 2480
+    },
+    {
+      "candidate_id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "drive_fallback": "NONE",
+      "drive_inner_poisson_deviance": 0.24903398843134625,
+      "drive_overdispersion_diagnostic": 0.2472311099963821,
+      "outcome_fallback": "NONE",
+      "outcome_inner_log_loss": 0.9300178720382267,
+      "rare_fallback": "NONE",
+      "selected_drive_alpha": 0.0,
+      "selected_outcome_c": 0.05,
+      "simulations_per_game": 10000,
+      "target_games": 271,
+      "target_season": 2022,
+      "td_point_probabilities_6_7_8": [
+        0.09569155731041691,
+        0.8663337591452793,
+        0.0379746835443038
+      ],
+      "training_drive_rows": 34455,
+      "training_team_rows": 3024
+    },
+    {
+      "candidate_id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "drive_fallback": "NONE",
+      "drive_inner_poisson_deviance": 0.24224226648988756,
+      "drive_overdispersion_diagnostic": 0.24388705754657808,
+      "outcome_fallback": "NONE",
+      "outcome_inner_log_loss": 0.927081807682409,
+      "rare_fallback": "NONE",
+      "selected_drive_alpha": 0.0,
+      "selected_outcome_c": 0.05,
+      "simulations_per_game": 10000,
+      "target_games": 272,
+      "target_season": 2023,
+      "td_point_probabilities_6_7_8": [
+        0.09478530677609849,
+        0.8670803723351016,
+        0.03813432088879992
+      ],
+      "training_drive_rows": 40463,
+      "training_team_rows": 3566
+    },
+    {
+      "candidate_id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "drive_fallback": "NONE",
+      "drive_inner_poisson_deviance": 0.2463638167115883,
+      "drive_overdispersion_diagnostic": 0.24628357507847634,
+      "outcome_fallback": "NONE",
+      "outcome_inner_log_loss": 0.9265443625238529,
+      "rare_fallback": "NONE",
+      "selected_drive_alpha": 0.0,
+      "selected_outcome_c": 0.05,
+      "simulations_per_game": 10000,
+      "target_games": 272,
+      "target_season": 2024,
+      "td_point_probabilities_6_7_8": [
+        0.092108735814199,
+        0.8685669041963578,
+        0.03932435998944313
+      ],
+      "training_drive_rows": 46579,
+      "training_team_rows": 4110
+    }
+  ],
+  "C0": [
+    {
+      "candidate_id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "margin": {
+        "M1": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M2": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M3": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        }
+      },
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "paired_games": 256,
+      "target_season": 2019,
+      "total": {
+        "M1": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M2": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M3": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        }
+      }
+    },
+    {
+      "candidate_id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "margin": {
+        "M1": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M2": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M3": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        }
+      },
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "paired_games": 256,
+      "target_season": 2020,
+      "total": {
+        "M1": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M2": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        },
+        "M3": {
+          "alpha": 1.0,
+          "fallback": "DEFAULT_INSUFFICIENT_INNER_HISTORY",
+          "inner_mae": null
+        }
+      }
+    },
+    {
+      "candidate_id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "margin": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.042941553691135
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.062047947392385
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.063807440112036
+        }
+      },
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "paired_games": 272,
+      "target_season": 2021,
+      "total": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.494946559903916
+        },
+        "M2": {
+          "alpha": 0.01,
+          "fallback": "NONE",
+          "inner_mae": 10.511421298767212
+        },
+        "M3": {
+          "alpha": 0.01,
+          "fallback": "NONE",
+          "inner_mae": 10.511421072455954
+        }
+      }
+    },
+    {
+      "candidate_id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "margin": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.284625378798346
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.29200685884195
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.292882267732482
+        }
+      },
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "paired_games": 271,
+      "target_season": 2022,
+      "total": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.604261733586162
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.62573095446254
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.627745125022003
+        }
+      }
+    },
+    {
+      "candidate_id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "margin": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.905456578277898
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.912253676070424
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.913131782694043
+        }
+      },
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "paired_games": 272,
+      "target_season": 2023,
+      "total": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.55844677490743
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.574602802928958
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.57596940949665
+        }
+      }
+    },
+    {
+      "candidate_id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "margin": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.823531284546135
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.831391181955532
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 9.832326506442744
+        }
+      },
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "paired_games": 272,
+      "target_season": 2024,
+      "total": {
+        "M1": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.415442125172957
+        },
+        "M2": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.428020131065807
+        },
+        "M3": {
+          "alpha": 100.0,
+          "fallback": "NONE",
+          "inner_mae": 10.429307366841876
+        }
+      }
+    }
+  ]
+}
