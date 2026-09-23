@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-23T03:30:22.039361+00:00",
+    "as_of": "2026-09-23T06:34:59.787475+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-23T03:30:25.580390+00:00",
+    "as_of": "2026-09-23T06:35:03.669792+00:00",
     "conflicts": 0,
     "evidence_items_added": 20,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 20
   },
   "coaching": {
-    "as_of": "2026-09-23T03:28:25.866737+00:00",
+    "as_of": "2026-09-23T06:34:13.633232+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -96,7 +96,7 @@
     "pages_missing": 0,
     "parser_version": 2,
     "parser_version_refreshes": 0,
-    "refresh_attempts": 0,
+    "refresh_attempts": 32,
     "requested_teams": 32,
     "source": "Wikipedia season-page rendered infoboxes + explicit staff tables",
     "status": "healthy"
@@ -141,7 +141,7 @@
     "unique_headlines": 16
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-23T03:30:12.066416+00:00",
+    "as_of": "2026-09-23T06:34:52.733081+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -161,16 +161,16 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 82,
+    "evidence_repairs": 1,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-23T03:28:25.476622+00:00",
+    "generated_utc": "2026-09-23T06:33:59.697757+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 229,
+    "signals": 130,
     "status": "healthy"
   },
   "ftn": {
@@ -183,23 +183,23 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-23T03:28:25.476622+00:00",
+  "generated_utc": "2026-09-23T06:33:59.697757+00:00",
   "injuries": {
-    "as_of": "2026-09-23T03:28:25.621818+00:00",
-    "players": 251,
+    "as_of": "2026-09-23T06:33:59.814124+00:00",
+    "players": 22,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg3",
     "status": "healthy",
-    "teams_with_reported_players": 32
+    "teams_with_reported_players": 2
   },
   "media_reporting": {
-    "as_of": "2026-09-23T03:30:31.588640+00:00",
+    "as_of": "2026-09-23T06:35:09.799671+00:00",
     "cross_game_titles_rejected": 0,
     "games": 16,
     "games_with_display_reporting": 16,
     "games_with_reporting": 16,
     "games_with_substantive_reporting": 15,
-    "games_with_trusted_reporting": 14,
+    "games_with_trusted_reporting": 15,
     "generic_titles_rejected": 2,
     "providers": {
       "bing_news_rss": {
@@ -212,12 +212,12 @@
         "status": "unavailable"
       }
     },
-    "signals": 57,
+    "signals": 59,
     "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-23T03:30:24.782982+00:00",
+    "as_of": "2026-09-23T06:35:02.860243+00:00",
     "evidence_items_added": 20,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 20,
@@ -239,10 +239,10 @@
   },
   "personnel_usage": {
     "ambiguous_player_keys_discarded": 2,
-    "eligible_skill_injuries": 65,
-    "evidence_items_enriched": 15,
+    "eligible_skill_injuries": 6,
+    "evidence_items_enriched": 0,
     "guardrail": "Prior usage clarifies role importance but is not converted into an unvalidated point-value injury adjustment; ambiguous abbreviated-name matches are discarded.",
-    "matched_injured_players": 34,
+    "matched_injured_players": 2,
     "season": 2025,
     "source": "NFL.com official injury report + nflverse PBP usage",
     "source_url": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
@@ -290,7 +290,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-23T03:28:28.394191+00:00",
+    "as_of": "2026-09-23T06:34:15.948061+00:00",
     "charted_plays": 5324,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -323,7 +323,7 @@
     "story_items_added": 16
   },
   "weather": {
-    "as_of": "2026-09-23T03:29:57.558539+00:00",
+    "as_of": "2026-09-23T06:34:42.146774+00:00",
     "games_checked": 14,
     "status": "degraded"
   }
