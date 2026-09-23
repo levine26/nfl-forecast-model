@@ -1,0 +1,132 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "A_Q1_IMPLEMENTATION",
+  "candidate_id": "ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1",
+  "status": "IMPLEMENTATION_FROZEN_HISTORICAL_EXECUTION_PENDING_CONTRACT_CI",
+  "created_date": "2026-09-23",
+  "production_model": "F-ST-01-FROZEN-2026",
+  "production_changed": false,
+  "completed_2026_outcomes_authorized": false,
+  "completed_2026_outcomes_used": 0,
+  "candidate_fitting_performed": false,
+  "candidate_performance_generated": false,
+  "opening_integration": {
+    "opening_pr": 559,
+    "validated_opening_head": "446b8f963c4125bad972f79a793035d0a9a777e0",
+    "opening_merge_sha": "f43e17ba783e3e389969cd1649889b37bd91afe9",
+    "verified_main_sha_at_stage_a_open": "f43e17ba783e3e389969cd1649889b37bd91afe9",
+    "opening_firewall_run": 35917266533,
+    "opening_gate_run": 35917266606,
+    "opening_research_validation_run": 35917266598,
+    "opening_full_repository_run": 35917266639
+  },
+  "stage_a": {
+    "branch": "research/ats-nextgen-phase2-q1",
+    "base_sha": "f43e17ba783e3e389969cd1649889b37bd91afe9",
+    "pre_receipt_implementation_head": "6e9ad2eec0f4bc121f12a2133a85088df4a00d97",
+    "historical_execution_authorized_only_after_contract_ci": true,
+    "manual_adhoc_fit_counts_as_program_evidence": false
+  },
+  "frozen_gate": {
+    "rows": 2895,
+    "eligible_rows": 2895,
+    "push_rows": 73,
+    "completed_2026_outcomes": 0,
+    "market_evidence_class": "historical_closing_late_benchmark_exact_horizon_opaque",
+    "canonical_game_keyed_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d",
+    "runner_must_fail_closed_on_hash_mismatch": true
+  },
+  "q1_contract": {
+    "quantiles": [0.47619047619047616, 0.5, 0.5238095238095238],
+    "alpha_grid": [0.001, 0.01, 0.1, 1.0],
+    "learner": "sklearn.linear_model.QuantileRegressor",
+    "scikit_learn_version": "1.9.0",
+    "solver": "highs",
+    "fit_intercept": true,
+    "penalty": "L1 via QuantileRegressor alpha",
+    "inner_selection_metric": "pooled rolling-origin mean pinball loss per quantile",
+    "alpha_tie_tolerance": 1e-12,
+    "alpha_tie_break": "largest alpha / strongest regularization",
+    "random_kfold_allowed": false,
+    "posthoc_quantile_crossing_repair_allowed": false,
+    "ats_hit_rate_used_for_selection": false,
+    "roi_used_for_selection": false
+  },
+  "preprocessing": {
+    "imputation": "training-fold median only",
+    "fixed_missing_indicators_for_optional_numeric_features": true,
+    "scaling": "training-fold StandardScaler only",
+    "centered_total_reference": "training-fold market_total median",
+    "same_target_season_preprocessing_allowed": false
+  },
+  "chronology": {
+    "training_floor": 2015,
+    "outer_target_seasons": [2022, 2023, 2024, 2025],
+    "inner_target_floor": 2019,
+    "outer_train_rule": "2015 through outer_target-1",
+    "inner_train_rule": "2015 through inner_target-1"
+  },
+  "comparators": {
+    "M0": "raw quoted line / residual quantile zero",
+    "M2": "same quantile learner with market features only",
+    "Q1": "market plus compact PIT-safe football state"
+  },
+  "fixed_slices": {
+    "key_numbers": {
+      "K3": [2.5, 3.0, 3.5],
+      "K6": [5.5, 6.0, 6.5],
+      "K7": [6.5, 7.0, 7.5],
+      "K10": [9.5, 10.0, 10.5],
+      "K14": [13.5, 14.0, 14.5]
+    },
+    "favorite_size": ["<3", "3-<7", "7-<10", "10-<14", ">=14"],
+    "market_total": ["<42", "42-<45", "45-<48", ">=48"],
+    "new_post_result_buckets_allowed": false
+  },
+  "frozen_blobs": {
+    "q1_model": {
+      "path": "src/nfl_forecast/challenger_ats_nextgen_q1.py",
+      "sha": "bec3da17d91e01cc14a5752d57e605c80af9a991"
+    },
+    "q1_reporting": {
+      "path": "src/nfl_forecast/challenger_ats_nextgen_q1_reporting.py",
+      "sha": "b05c536fae784872666e29dbca3a3e7568e679af"
+    },
+    "q1_tests": {
+      "path": "tests/test_challenger_ats_nextgen_q1.py",
+      "sha": "1d0013d345d8cf63abcfec9f0af65d7b9a908e0e"
+    },
+    "q1_reporting_tests": {
+      "path": "tests/test_challenger_ats_nextgen_q1_reporting.py",
+      "sha": "17f2dde853bfc32eb35bb0b6a8affef6590f11fa"
+    },
+    "q1_runner": {
+      "path": "scripts/run_challenger_ats_nextgen_q1.py",
+      "sha": "e63f046ed5d7ae87645c5c8561e23a31719b3f0e"
+    },
+    "q1_workflow": {
+      "path": ".github/workflows/research_ats_nextgen_q1.yml",
+      "sha": "92a45f8a3aab852affdacbe6b1f2eb934c4b38c8"
+    },
+    "research_validation_workflow": {
+      "path": ".github/workflows/research_validation.yml",
+      "sha": "731c91e2265a89009d16690a167dcbb3c34422c3"
+    },
+    "opening_registry": {
+      "path": "research/ats-nextgen/phase2_opening_registry.json",
+      "sha": "ef64d745cffe7b2e876618e86a4cf8a57e58d875"
+    },
+    "q1_preregistration": {
+      "path": "research/ats-nextgen/Q1_QUANTILE_PREREGISTRATION.md",
+      "sha": "aea060d340ba272a46e244ab4cf621f32f9f04f4"
+    }
+  },
+  "execution_dependency": {
+    "workflow": ".github/workflows/research_ats_nextgen_q1.yml",
+    "contract_job": "Q1 pre-result contract",
+    "historical_job": "Q1 chronology-clean 2022-2025 OOF",
+    "historical_needs_contract": true
+  },
+  "repeated_use_disclosure": "2022-2025 is chronology-clean development evidence for this candidate execution but is not pristine independent confirmation because those seasons have informed prior LevLine research."
+}
