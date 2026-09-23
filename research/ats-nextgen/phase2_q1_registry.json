@@ -24,7 +24,7 @@
   "stage_a": {
     "branch": "research/ats-nextgen-phase2-q1",
     "base_sha": "f43e17ba783e3e389969cd1649889b37bd91afe9",
-    "pre_receipt_implementation_head": "6e9ad2eec0f4bc121f12a2133a85088df4a00d97",
+    "pre_receipt_implementation_head": "0a1184ac8da924701bb84e90f3d249d8239436e5",
     "historical_execution_authorized_only_after_contract_ci": true,
     "manual_adhoc_fit_counts_as_program_evidence": false
   },
@@ -46,8 +46,10 @@
     "fit_intercept": true,
     "penalty": "L1 via QuantileRegressor alpha",
     "inner_selection_metric": "pooled rolling-origin mean pinball loss per quantile",
+    "minimum_inner_training_rows": 100,
     "alpha_tie_tolerance": 1e-12,
-    "alpha_tie_break": "largest alpha / strongest regularization",
+    "alpha_tie_break": "smaller alpha, as frozen by Q1_STAGE_A_OPENING_RECEIPT.md before implementation",
+    "omitted_inner_targets_recorded": true,
     "random_kfold_allowed": false,
     "posthoc_quantile_crossing_repair_allowed": false,
     "ats_hit_rate_used_for_selection": false,
@@ -65,7 +67,8 @@
     "outer_target_seasons": [2022, 2023, 2024, 2025],
     "inner_target_floor": 2019,
     "outer_train_rule": "2015 through outer_target-1",
-    "inner_train_rule": "2015 through inner_target-1"
+    "inner_train_rule": "2015 through inner_target-1",
+    "oof_sort": ["season", "game_id"]
   },
   "comparators": {
     "M0": "raw quoted line / residual quantile zero",
@@ -84,10 +87,15 @@
     "market_total": ["<42", "42-<45", "45-<48", ">=48"],
     "new_post_result_buckets_allowed": false
   },
+  "pre_result_reconciliation": {
+    "performance_existed_when_reconciled": false,
+    "issue": "A later draft implementation receipt temporarily disagreed with the earlier Q1 Stage-A opening receipt on alpha tie-break and inner-fold minimum.",
+    "resolution": "Earliest pre-result receipt governs: 100 eligible prior-training rows minimum and smaller alpha on numerical pinball ties. Code and tests were conformed before historical execution."
+  },
   "frozen_blobs": {
     "q1_model": {
       "path": "src/nfl_forecast/challenger_ats_nextgen_q1.py",
-      "sha": "bec3da17d91e01cc14a5752d57e605c80af9a991"
+      "sha": "adee4d024bc7dd824d6702749f7b7ce8dae0d8e7"
     },
     "q1_reporting": {
       "path": "src/nfl_forecast/challenger_ats_nextgen_q1_reporting.py",
@@ -95,7 +103,7 @@
     },
     "q1_tests": {
       "path": "tests/test_challenger_ats_nextgen_q1.py",
-      "sha": "1d0013d345d8cf63abcfec9f0af65d7b9a908e0e"
+      "sha": "f36a887fe0db353f7543dcaf8a515966f151ef90"
     },
     "q1_reporting_tests": {
       "path": "tests/test_challenger_ats_nextgen_q1_reporting.py",
