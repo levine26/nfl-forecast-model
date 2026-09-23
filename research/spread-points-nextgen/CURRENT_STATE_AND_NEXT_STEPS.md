@@ -1,20 +1,21 @@
 # Spread & Points Next-Generation — Current State & Next Steps
 
-**Last updated:** 2026-09-22 America/Los_Angeles  
+**Last updated:** 2026-09-23 America/Los_Angeles  
 **Program authority:** `research/spread-points-nextgen/MASTER_PLAN.md`  
 **Phase 0:** **COMPLETE**  
 **Phase 1:** **COMPLETE**  
 **Phase 2:** **COMPLETE**  
 **Phase 3:** **COMPLETE**  
 **Phase 4:** **COMPLETE**  
-**Phase 5 Candidate 5:** **SCIENTIFICALLY COMPLETE — `REJECTED`; repository merge closeout in progress**  
-**Phase 6 for Candidate 5 V1:** **NOT JUSTIFIED**  
+**Phase 5 Candidate 5:** **COMPLETE — `REJECTED`**  
+**Phase 6 for Candidate 5 V1:** **NOT JUSTIFIED / DO NOT START**  
 **Production:** `F-ST-01-FROZEN-2026` — unchanged
 
-Authoritative prior closeout receipts:
+Authoritative closeout receipts:
 
 - `research/spread-points-nextgen/FINAL_PHASE3_RECEIPT.md`
 - `research/spread-points-nextgen/FINAL_PHASE4_RECEIPT.md`
+- `research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
 
 ## Phase 5 frozen identity and evidence boundary
 
@@ -26,7 +27,15 @@ Scientific freeze commit:
 
 `df14e51d73aad96899d3ba4364cbb76989f0d2bf`
 
-The freeze predates every Candidate-5-specific performance result and fixes the evidence boundary, component policy, features, F-ST provenance, OOF meta-chronology, L2 residual-logistic learner, lambda grid, proper-score tuning, threshold, ablations, uncertainty procedure, 2025 policy and final classification rule.
+Merged Candidate 5 identities:
+
+- code SHA-256: `55f62f9de44e853f820016c893c6d94a9a2226f7c08e412260a7cf5d10c9b4c2`
+- config SHA-256: `5762ac921519e594412d0dbcc6ced49d8fb332672e83bb0c5e54cd53d04299ce`
+- exact validated head: `a4f892d64ab163a421eed203d9b50983e5bbd04b`
+- merge SHA: `a68afb1e1cf9675a7ff9e0e0af1f52343546f029`
+- PR: #552 — MERGED
+
+The freeze predates every Candidate-5-specific performance result and fixes the evidence boundary, component policy, features, F-ST provenance, OOF meta-chronology, L2 residual-logistic learner, lambda grid, proper-score tuning, threshold, ablations, uncertainty procedure, 2025 policy, and final classification rule.
 
 Primary historical surface:
 
@@ -43,7 +52,7 @@ Historical F-ST baseline is the accepted chronology-clean annual reproduction fr
 
 `POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC`
 
-Completed-2026 outcomes did not participate in Candidate 5 design, fitting, tuning, historical evaluation, rescue or survival.
+Completed-2026 outcomes did not participate in Candidate 5 design, fitting, tuning, historical evaluation, rescue, or survival.
 
 ## Phase 5 execution provenance
 
@@ -103,7 +112,7 @@ On 272 games:
 - primary Brier delta: approximately **+0.000003**
 - primary log-loss delta: approximately **+0.000006**
 
-This evidence is non-pristine, post-conception and non-selective. It caused no architecture, feature, lambda, calibration, threshold, learner or classification change.
+This evidence is non-pristine, post-conception, and non-selective. It caused no architecture, feature, lambda, calibration, threshold, learner, or classification change.
 
 ## Final scientific disposition
 
@@ -113,24 +122,35 @@ The preregistered Phase 6 eligibility rule required a positive paired accuracy d
 
 This is an accepted negative result. There is no model rescue.
 
+## Exact-head merge validation and closeout
+
+Exact validated Phase 5 PR head:
+
+`a4f892d64ab163a421eed203d9b50983e5bbd04b`
+
+Exact-head checks:
+
+- Spread & Points Phase 5 Candidate 5 validation `35875417408` — **SUCCESS**
+- LevLine research firewall `35875417416` — **SUCCESS**
+- LevLine research validation `35875417452` — **SUCCESS**
+- Spread & Points Phase 4 reproducibility regression `35875417543` — **SUCCESS**
+
+PR #552 merged that exact head into `main` at:
+
+`a68afb1e1cf9675a7ff9e0e0af1f52343546f029`
+
+Merged `main` was re-read and verified to contain the complete Phase 5 preregistration, implementation, evidence, diagnostics, uncertainty, red-team, synthesis, failure-log, and run-manifest package.
+
 ## Production and Phase 6 state
 
 Production `F-ST-01-FROZEN-2026` is unchanged. Sunday Signal forecasting behavior is unchanged. No official forecast output was replaced by Candidate 5.
 
-Phase 6 prospective shadow validation is **not justified for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`**, so no Phase 6 handoff is created.
+Phase 6 prospective shadow validation is **not justified for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`**, so no Phase 6 handoff exists.
 
-A future materially different research hypothesis would require a separately preregistered new candidate identity and a new evidence clock. It may not reinterpret the spent 2022–2025 evidence as untouched confirmation.
+A future materially different research hypothesis would require a separately authorized and separately preregistered new candidate identity and a new evidence clock. It may not reinterpret the spent 2022–2025 evidence as untouched confirmation.
 
 ## Exact next action
 
-Complete repository closeout only:
+**STOP this candidate program.**
 
-1. reconcile the Phase 5 branch with current `main` while preserving unrelated production/automation commits;
-2. open the Phase 5 PR;
-3. require exact-head dedicated Phase 5 validation, LevLine research firewall and full research validation;
-4. merge only the exact validated head if repository state permits;
-5. re-read the merged Phase 5 package from `main`;
-6. record the immutable final Phase 5 receipt with PR, validated head, CI run IDs, merge SHA, code/config/evidence identities, `REJECTED` disposition, Phase 6 ineligibility, completed-2026 firewall and production-unchanged confirmation;
-7. STOP.
-
-Do not start Phase 6 for Candidate 5 V1. Do not modify production.
+Do not start Phase 6 for Candidate 5 V1. Do not rescue the rejected historical identity. Do not modify production. Any future challenger requires a new authorization, new preregistration, and new candidate identity.
