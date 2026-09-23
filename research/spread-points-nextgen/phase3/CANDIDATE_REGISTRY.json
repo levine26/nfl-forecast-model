@@ -1,0 +1,50 @@
+{
+  "schema_version": "phase3-candidate-registry-v1",
+  "gate": "KEEP_FROZEN_PHASE3_CONTRACT",
+  "production_model": "F-ST-01-FROZEN-2026",
+  "development_seasons": [2022, 2023, 2024],
+  "holdout_2025": "BLOCKED_UNTIL_PHASE4",
+  "completed_2026_selection": "BLOCKED",
+  "candidates": {
+    "A0": {
+      "id": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1",
+      "class": "football_only",
+      "estimator": "ridge_gaussian_team_score",
+      "alpha_grid": [0.1, 1.0, 10.0, 100.0],
+      "half_life_grid_team_games": [4, 8, 16, 32],
+      "fallback": {"alpha": 10.0, "half_life": 16}
+    },
+    "B0": {
+      "id": "B0-POSSESSION-DRIVE-SCORE-PROCESS-V1",
+      "class": "football_only",
+      "expected_drives_estimator": "poisson_l2",
+      "drive_alpha_grid": [0.0, 0.1, 1.0, 10.0],
+      "drive_alpha_fallback": 1.0,
+      "outcome_estimator": "multinomial_logistic_l2",
+      "outcome_c_grid": [0.05, 0.2, 1.0, 5.0],
+      "outcome_c_fallback": 0.2,
+      "simulation_draws": 10000,
+      "consumes_a0": false
+    },
+    "C0": {
+      "id": "C0-MARKET-RESIDUAL-MARGIN-TOTAL-V1",
+      "class": "market_aware",
+      "estimator": "ridge_residual",
+      "alpha_grid": [0.01, 0.1, 1.0, 10.0, 100.0],
+      "fallback": 1.0,
+      "football_base": "A0",
+      "market_horizon_label": "historical_closing_late_benchmark_exact_horizon_opaque",
+      "null_hierarchy": ["M0", "M1", "M2", "M3"]
+    },
+    "D_margin": {
+      "id": "D-CONVEX-MARGIN-V1",
+      "class": "conditional",
+      "gate": {"abs_error_corr_lt": 0.90, "pooled_mae_gain_gte": 0.10, "must_improve_seasons": [2023, 2024], "bootstrap_probability_gte": 0.75}
+    },
+    "D_total": {
+      "id": "D-CONVEX-TOTAL-V1",
+      "class": "conditional",
+      "gate": {"abs_error_corr_lt": 0.90, "pooled_mae_gain_gte": 0.10, "must_improve_seasons": [2023, 2024], "bootstrap_probability_gte": 0.75}
+    }
+  }
+}
