@@ -4,8 +4,10 @@ on:
   pull_request:
     paths:
       - 'src/nfl_forecast/challenger_ats_nextgen_q1.py'
+      - 'src/nfl_forecast/challenger_ats_nextgen_q1_reporting.py'
       - 'scripts/run_challenger_ats_nextgen_q1.py'
       - 'tests/test_challenger_ats_nextgen_q1.py'
+      - 'tests/test_challenger_ats_nextgen_q1_reporting.py'
       - 'research/ats-nextgen/**'
       - '.github/workflows/research_ats_nextgen_q1.yml'
   workflow_dispatch:
@@ -42,7 +44,8 @@ jobs:
         run: |
           pytest -q \
             tests/test_challenger_ats_nextgen_phase2_gate.py \
-            tests/test_challenger_ats_nextgen_q1.py
+            tests/test_challenger_ats_nextgen_q1.py \
+            tests/test_challenger_ats_nextgen_q1_reporting.py
       - name: Prove contract tests did not modify production surfaces
         run: git diff --exit-code -- $PROTECTED_SURFACES
 
@@ -78,6 +81,7 @@ jobs:
           test -s research_outputs/ats_nextgen/q1/q1_inner_alpha_selections.csv
           test -s research_outputs/ats_nextgen/q1/q1_quantile_metrics.csv
           test -s research_outputs/ats_nextgen/q1/q1_quantile_crossings.csv
+          test -s research_outputs/ats_nextgen/q1/q1_fixed_slice_metrics.csv
           test -s research_outputs/ats_nextgen/q1/q1_summary.json
       - name: Prove Q1 execution did not modify production surfaces
         run: git diff --exit-code -- $PROTECTED_SURFACES
