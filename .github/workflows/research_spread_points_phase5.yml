@@ -1,0 +1,229 @@
+name: Spread & Points Phase 5 Candidate 5 validation
+
+on:
+  push:
+    branches: [research/spread-points-nextgen-phase5]
+    paths:
+      - 'research/spread-points-nextgen/phase5/**'
+      - '.github/workflows/research_spread_points_phase5.yml'
+  pull_request:
+    paths:
+      - 'research/spread-points-nextgen/phase5/**'
+      - 'research/spread-points-nextgen/PHASE_STATUS.md'
+      - 'research/spread-points-nextgen/CURRENT_STATE_AND_NEXT_STEPS.md'
+      - 'research/spread-points-nextgen/DECISION_LOG.md'
+      - 'research/spread-points-nextgen/RESEARCH_INDEX.md'
+      - '.github/workflows/research_spread_points_phase5.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: spread-points-phase5-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/fst_production.py src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json
+    src/nfl_forecast/public_forecast.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py
+    src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py
+    scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  contract-gate:
+    name: Phase 5 frozen-contract gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - name: Compile Candidate 5 implementation
+        run: python -m compileall -q research/spread-points-nextgen/phase5
+      - name: Run Candidate 5 contract tests
+        run: pytest -q research/spread-points-nextgen/phase5/test_candidate5_residual_stack_v1.py
+      - name: Verify preregistration and schemas without Candidate 5 metrics
+        run: python research/spread-points-nextgen/phase5/candidate5_residual_stack_v1.py --preflight-only
+      - name: Verify immutable preregistration ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor df14e51d73aad96899d3ba4364cbb76989f0d2bf HEAD
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          receipt=json.loads(Path('research/spread-points-nextgen/phase5/CANDIDATE5_FREEZE_RECEIPT.json').read_text())
+          assert receipt['preregistration_commit_sha']=='df14e51d73aad96899d3ba4364cbb76989f0d2bf'
+          assert receipt['candidate5_specific_results_inspected_before_freeze'] is False
+          assert receipt['completed_2026_outcomes_used_for_design_selection_or_evaluation'] is False
+          assert receipt['production_changed'] is False
+          PY
+      - name: Prove protected production surfaces are unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
+
+  historical-package:
+    name: Frozen Candidate 5 historical package
+    needs: contract-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - name: Execute frozen Candidate 5 package
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/levline-phase5
+          python research/spread-points-nextgen/phase5/candidate5_residual_stack_v1.py --output-dir /tmp/levline-phase5
+      - name: Verify complete evidence package and firewalls
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            CANDIDATE5_DEVELOPMENT_PREDICTIONS_2022_2024.csv \
+            CANDIDATE5_2025_DIAGNOSTIC.csv \
+            CANDIDATE5_ABLATION_METRICS.csv \
+            CANDIDATE5_CALIBRATION.csv \
+            CANDIDATE5_RELIABILITY.csv \
+            CANDIDATE5_SLICES.csv \
+            CANDIDATE5_MODEL_FITS.json \
+            CANDIDATE5_RUN_MANIFEST.json \
+            CANDIDATE5_RESULTS.json \
+            CANDIDATE5_BOOTSTRAP_SUMMARY.json \
+            CANDIDATE5_HISTORICAL_RESULTS.md \
+            CANDIDATE5_UNCERTAINTY_REPORT.md \
+            CANDIDATE5_CALIBRATION_REPORT.md \
+            CANDIDATE5_RED_TEAM_AUDIT.md; do
+            test -s "/tmp/levline-phase5/$file"
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import pandas as pd
+          root=Path('/tmp/levline-phase5')
+          manifest=json.loads((root/'CANDIDATE5_RUN_MANIFEST.json').read_text())
+          assert manifest['candidate_id']=='LEVLINE-HISTORICAL-RESIDUAL-STACK-V1'
+          assert manifest['preregistration_commit_sha']=='df14e51d73aad96899d3ba4364cbb76989f0d2bf'
+          assert manifest['development']['seasons']==[2022,2023,2024]
+          assert manifest['development']['games']==815
+          assert manifest['diagnostic_2025']['games']==272
+          assert manifest['diagnostic_2025']['label']=='POST_CONCEPTION_NON_PRISTINE_2025_DIAGNOSTIC'
+          assert manifest['diagnostic_2025']['used_for_architecture_or_selection'] is False
+          assert manifest['market_horizon_label']=='historical_closing_late_benchmark_exact_horizon_opaque'
+          assert manifest['D_disposition']=='ENSEMBLE_NOT_ELIGIBLE'
+          assert manifest['fst_historical_provenance']['reproduced_2022_2025_games']==1087
+          assert manifest['fst_historical_provenance']['reproduced_correct']==741
+          assert manifest['completed_2026_outcomes_used'] is False
+          assert manifest['production_changed'] is False
+          assert manifest['winner_threshold_tuned'] is False
+          assert manifest['posthoc_calibration_applied'] is False
+          assert manifest['nonlinear_learner_used'] is False
+          assert manifest['scientific_disposition'] in {
+              'REJECTED','INCONCLUSIVE_BUT_COHERENT','ELIGIBLE_FOR_PROSPECTIVE_PHASE6_SHADOW_VALIDATION'
+          }
+          dev=pd.read_csv(root/'CANDIDATE5_DEVELOPMENT_PREDICTIONS_2022_2024.csv')
+          diag=pd.read_csv(root/'CANDIDATE5_2025_DIAGNOSTIC.csv')
+          assert len(dev)==815 and set(dev.season.astype(int))=={2022,2023,2024}
+          assert len(diag)==272 and set(diag.season.astype(int))=={2025}
+          assert not dev.game_id.astype(str).duplicated().any()
+          assert not diag.game_id.astype(str).duplicated().any()
+          PY
+      - name: Compare regeneration with committed immutable evidence when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest='research/spread-points-nextgen/phase5'
+          if test -s "$dest/CANDIDATE5_RUN_MANIFEST.json"; then
+            for file in \
+              CANDIDATE5_DEVELOPMENT_PREDICTIONS_2022_2024.csv \
+              CANDIDATE5_2025_DIAGNOSTIC.csv \
+              CANDIDATE5_ABLATION_METRICS.csv \
+              CANDIDATE5_CALIBRATION.csv \
+              CANDIDATE5_RELIABILITY.csv \
+              CANDIDATE5_SLICES.csv \
+              CANDIDATE5_MODEL_FITS.json \
+              CANDIDATE5_RUN_MANIFEST.json \
+              CANDIDATE5_RESULTS.json \
+              CANDIDATE5_BOOTSTRAP_SUMMARY.json \
+              CANDIDATE5_HISTORICAL_RESULTS.md \
+              CANDIDATE5_UNCERTAINTY_REPORT.md \
+              CANDIDATE5_CALIBRATION_REPORT.md \
+              CANDIDATE5_RED_TEAM_AUDIT.md; do
+              cmp "$dest/$file" "/tmp/levline-phase5/$file"
+            done
+          fi
+      - name: Prove protected production surfaces are unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
+      - name: Preserve exact Candidate 5 evidence on Phase 5 branch
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}" --quiet
+          git rebase "origin/${GITHUB_REF_NAME}"
+          dest='research/spread-points-nextgen/phase5'
+          for file in \
+            CANDIDATE5_DEVELOPMENT_PREDICTIONS_2022_2024.csv \
+            CANDIDATE5_2025_DIAGNOSTIC.csv \
+            CANDIDATE5_ABLATION_METRICS.csv \
+            CANDIDATE5_CALIBRATION.csv \
+            CANDIDATE5_RELIABILITY.csv \
+            CANDIDATE5_SLICES.csv \
+            CANDIDATE5_MODEL_FITS.json \
+            CANDIDATE5_RUN_MANIFEST.json \
+            CANDIDATE5_RESULTS.json \
+            CANDIDATE5_BOOTSTRAP_SUMMARY.json \
+            CANDIDATE5_HISTORICAL_RESULTS.md \
+            CANDIDATE5_UNCERTAINTY_REPORT.md \
+            CANDIDATE5_CALIBRATION_REPORT.md \
+            CANDIDATE5_RED_TEAM_AUDIT.md; do
+            cp "/tmp/levline-phase5/$file" "$dest/$file"
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dest"
+          if ! git diff --cached --quiet; then
+            git commit -m 'research: preserve Phase 5 Candidate 5 evidence [skip ci]'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: spread-points-phase5-${{ github.run_id }}
+          path: /tmp/levline-phase5/
+          if-no-files-found: warn
+          retention-days: 90
+
+  gate:
+    name: Phase 5 exact-run gate
+    if: always()
+    needs: [contract-gate, historical-package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require frozen contract and complete historical package
+        env:
+          CONTRACT: '${{ needs.contract-gate.result }}'
+          HISTORICAL: '${{ needs.historical-package.result }}'
+        run: |
+          set -euo pipefail
+          echo "contract=$CONTRACT"
+          echo "historical=$HISTORICAL"
+          test "$CONTRACT" = success
+          test "$HISTORICAL" = success
