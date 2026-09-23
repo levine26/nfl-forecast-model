@@ -172,3 +172,65 @@ def test_mark_recovered_clears_refresh_requirement_only_for_target() -> None:
     assert section["games"]["g1"]["requires_chatgpt_refresh"] is False
     assert section["games"]["g2"]["requires_chatgpt_refresh"] is False
     assert section["status"] == "healthy"
+
+
+
+def test_mixed_payload_bootstraps_successful_game_from_validated_groq_checkpoint() -> None:
+    base = {"games": {}}
+    chatgpt = {
+        "g1": {
+            "headline": "fresh failed-game replacement",
+            "paragraph1": "fresh replacement paragraph",
+            "model_rationale": "Fresh failed-game research supplies a matchup mechanism while leaving the successful provider game untouched and preserving its human editorial authority.",
+            "sources": [{"name": "CBS", "title": "Report", "url": "https://www.cbssports.com/nfl/report"}],
+        }
+    }
+    checkpoints = {
+        "g2": {
+            "headline": "validated Groq success",
+            "paragraph1": "The successful Groq game keeps its validated matchup reporting and human prose across the weekly rollover recovery path.",
+            "model_rationale": "Protection and coverage interactions remain the central football mechanism for this successful provider game, so its validated human read stays authoritative.",
+            "sources": [{"name": "ESPN", "title": "Report", "url": "https://www.espn.com/nfl/story/report"}],
+        }
+    }
+
+    mixed = module.build_mixed_raw_payload(
+        canonical_game_ids=["g1", "g2"],
+        base_artifact=base,
+        chatgpt_entries=chatgpt,
+        checkpoint_entries=checkpoints,
+    )
+
+    assert mixed["games"]["g1"]["headline"] == "fresh failed-game replacement"
+    assert mixed["games"]["g2"]["headline"] == "validated Groq success"
+    assert mixed["games"]["g2"]["paragraph1"].startswith("The successful Groq game")
+
+
+def test_mixed_payload_fails_closed_when_successful_game_has_no_provider_authority() -> None:
+    try:
+        module.build_mixed_raw_payload(
+            canonical_game_ids=["g1", "g2"],
+            base_artifact={"games": {}},
+            chatgpt_entries={
+                "g1": {
+                    "headline": "failed-game replacement",
+                    "paragraph1": "replacement",
+                    "model_rationale": "The failed game has a qualitative football rationale that is long enough for the strict publication contract to accept.",
+                    "sources": [{"name": "NFL", "title": "Report", "url": "https://www.nfl.com/news/report"}],
+                }
+            },
+            preview_artifact={
+                "g2": {
+                    "headline": "deterministic preview",
+                    "paragraphs": ["preview one", "preview two"],
+                    "reported_sources": [
+                        {"source_name": "ESPN", "title": "Report", "source_url": "https://www.espn.com/nfl/story/report"}
+                    ],
+                }
+            },
+            checkpoint_entries={},
+        )
+    except ValueError as exc:
+        assert "missing both published HUMAN prose and a validated Groq checkpoint" in str(exc)
+    else:
+        raise AssertionError("successful Groq games must fail closed rather than downgrade to preview prose")

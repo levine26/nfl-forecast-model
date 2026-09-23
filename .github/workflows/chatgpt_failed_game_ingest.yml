@@ -84,6 +84,10 @@ jobs:
           assert '--editorial-roster inputs/sunday_signal/editorial_slate_roster.json' in workflow
           assert 'scripts/refresh_editorial_slate_roster.py' in workflow
           assert 'scripts/restore_last_good_editorial_snapshot.py' in workflow
+          assert 'actions/cache/restore@v4' in workflow
+          assert '--provider-checkpoint-dir /tmp/groq-validated-checkpoint' in workflow
+          assert 'No same-roster launch-grade snapshot exists' in workflow
+          assert 'fallback_checkpoint_bootstrap' in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-pr-{0}" in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-production" in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
@@ -94,37 +98,29 @@ jobs:
           print('Failed-game ChatGPT fallback is constrained to editorial artifacts, preserves launch-grade reporting, and safely retries research-only publication races.')
           PY
 
-      - name: Prove last-good full-slate recovery on repository history
+      - name: Prove rollover-aware recovery boundary
         if: github.event_name == 'pull_request'
         run: |
           set -euo pipefail
-          cp outputs/context_source_status.json /tmp/current-fallback-status.json
           python scripts/refresh_editorial_slate_roster.py \
             --roster inputs/sunday_signal/editorial_slate_roster.json
-          python scripts/restore_last_good_editorial_snapshot.py \
-            --roster inputs/sunday_signal/editorial_slate_roster.json \
-            --status outputs/context_source_status.json
           python - <<'PY'
           import json
           from pathlib import Path
-          roster=json.loads(Path('inputs/sunday_signal/editorial_slate_roster.json').read_text())
-          media=json.loads(Path('outputs/copilot_media_reads.json').read_text())
-          previews=json.loads(Path('outputs/game_previews.json').read_text())
-          evidence=json.loads(Path('outputs/contextual_evidence.json').read_text())
-          status=json.loads(Path('outputs/context_source_status.json').read_text())
-          before=json.loads(Path('/tmp/current-fallback-status.json').read_text())
-          expected=set(roster['game_ids'])
-          assert len(expected)==15, len(expected)
-          assert set(media['games'])==expected
-          assert set(previews)==expected
-          assert set(evidence)==expected
-          assert status.get('groq_provider_fallback')==before.get('groq_provider_fallback')
-          assert int((status.get('editorial_finalizer') or {}).get('games') or 0)==15
-          assert int((status.get('copilot_media') or {}).get('games_applied') or 0)==15
-          assert (status.get('media_reporting') or {}).get('last_good_snapshot_source_commit')
-          print('historical full-slate recovery proof passed for 15 games')
+
+          roster = json.loads(Path('inputs/sunday_signal/editorial_slate_roster.json').read_text())
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
+          expected = set(map(str, roster.get('game_ids') or []))
+          failures = {
+              str(gid)
+              for gid, item in ((status.get('groq_provider_fallback') or {}).get('games') or {}).items()
+              if isinstance(item, dict) and item.get('provider_result') == 'failed' and item.get('requires_chatgpt_refresh')
+          }
+          assert expected, 'current editorial roster is empty'
+          assert failures.issubset(expected)
+          print('rollover-aware recovery boundary:', len(expected), 'games;', len(failures), 'authorized failed-game targets')
           PY
-          git restore --worktree -- outputs
+          pytest -q tests/test_chatgpt_failed_game_ingest.py tests/test_restore_last_good_editorial_snapshot.py
           rm -f inputs/sunday_signal/editorial_slate_roster.json
 
       - name: Stop after validation on pull request
@@ -149,12 +145,26 @@ jobs:
             --output /tmp/editorial_predictions.csv
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
-      - name: Restore last launch-grade full-slate editorial snapshot
+      - name: Restore validated Groq game checkpoints
+        if: github.event_name != 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/groq-validated-checkpoint
+          key: groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-${{ github.run_id }}
+          restore-keys: |
+            groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-
+
+      - name: Restore same-week launch-grade editorial snapshot when available
         if: github.event_name != 'pull_request'
         run: |
-          python scripts/restore_last_good_editorial_snapshot.py \
+          set -euo pipefail
+          if python scripts/restore_last_good_editorial_snapshot.py \
             --roster inputs/sunday_signal/editorial_slate_roster.json \
-            --status outputs/context_source_status.json
+            --status outputs/context_source_status.json; then
+            echo "Recovered same-roster launch-grade editorial snapshot."
+          else
+            echo "No same-roster launch-grade snapshot exists; continuing with validated Groq checkpoints plus exact failed-game ChatGPT inputs."
+          fi
 
       - name: Preserve validated media reporting snapshot
         if: github.event_name != 'pull_request'
@@ -168,16 +178,15 @@ jobs:
           finalizer = status.get('editorial_finalizer') or {}
           games = int(finalizer.get('games', 0))
           trusted = int(media.get('games_with_trusted_reporting', 0))
-          if games <= 0:
-              raise SystemExit(f'cannot preserve reporting without a validated slate size: {finalizer}')
-          if media.get('status') != 'healthy' or trusted != games:
-              raise SystemExit(f'pre-fallback media reporting is not launch-grade: {media}')
-          snapshot = {'games': games, 'media_reporting': media}
-          Path('/tmp/chatgpt-preserved-media-reporting.json').write_text(
-              json.dumps(snapshot, indent=2, sort_keys=True) + '\n',
-              encoding='utf-8',
-          )
-          print('preserved launch-grade media reporting snapshot:', games, 'games')
+          if games > 0 and media.get('status') == 'healthy' and trusted == games:
+              snapshot = {'games': games, 'media_reporting': media}
+              Path('/tmp/chatgpt-preserved-media-reporting.json').write_text(
+                  json.dumps(snapshot, indent=2, sort_keys=True) + '\n',
+                  encoding='utf-8',
+              )
+              print('preserved launch-grade media reporting snapshot:', games, 'games')
+          else:
+              print('No same-roster launch-grade reporting snapshot to preserve; week-rollover bootstrap will validate the rebuilt full slate.')
           PY
 
       - name: Overlay ChatGPT only onto Groq-failed games and full-slate validate
@@ -185,6 +194,7 @@ jobs:
         run: |
           python scripts/ingest_chatgpt_failed_games.py \
             --input-dir inputs/chatgpt_media/fallback \
+            --provider-checkpoint-dir /tmp/groq-validated-checkpoint \
             --output outputs/copilot_media_reads.json
 
       - name: Finalize and enforce publication gate
@@ -197,15 +207,26 @@ jobs:
 
           status_path = Path('outputs/context_source_status.json')
           status = json.loads(status_path.read_text())
-          snapshot = json.loads(Path('/tmp/chatgpt-preserved-media-reporting.json').read_text())
-          media = dict(snapshot.get('media_reporting') or {})
-          media['fallback_snapshot_reused'] = True
-          media['fallback_snapshot_guardrail'] = (
-              'Failed-game recovery preserves the previously launch-grade media packet; '
-              'a transient fallback-run media rediscovery cannot erase validated reporting authority.'
-          )
-          status['media_reporting'] = media
-          status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n')
+          snapshot_path = Path('/tmp/chatgpt-preserved-media-reporting.json')
+          if snapshot_path.is_file():
+              snapshot = json.loads(snapshot_path.read_text())
+              media = dict(snapshot.get('media_reporting') or {})
+              media['fallback_snapshot_reused'] = True
+              media['fallback_snapshot_guardrail'] = (
+                  'Failed-game recovery preserves the previously launch-grade media packet; '
+                  'a transient fallback-run media rediscovery cannot erase validated reporting authority.'
+              )
+              status['media_reporting'] = media
+              status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n')
+          else:
+              media = dict(status.get('media_reporting') or {})
+              media['fallback_checkpoint_bootstrap'] = True
+              media['fallback_checkpoint_guardrail'] = (
+                  'Week-rollover recovery rebuilt the current slate from validated Groq checkpoints '
+                  'for successful games plus exact authorized ChatGPT failed-game inputs.'
+              )
+              status['media_reporting'] = media
+              status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + '\n')
 
           provider = status.get('copilot_media', {})
           finalizer = status.get('editorial_finalizer', {})
