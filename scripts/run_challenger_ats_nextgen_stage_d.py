@@ -2,10 +2,10 @@ from __future__ import annotations
 
 """Run frozen ATS NextGen Phase-2 Stage-D evidence synthesis.
 
-This is research-only final evidence synthesis.  It regenerates Q1 and Q3 using
+This is research-only final evidence synthesis. It regenerates Q1 and Q3 using
 their frozen runners solely to prove accepted evidence reproducibility, verifies
 every regenerated evidence-file SHA-256 against the accepted result registries,
-then computes the preregistered Stage-D uncertainty diagnostics.  It does not
+then computes the preregistered Stage-D uncertainty diagnostics. It does not
 reconstruct Q2, tune any candidate, inspect completed-2026 outcomes, or modify
 production forecasting.
 """
@@ -14,6 +14,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import shutil
 
 import pandas as pd
 
@@ -31,6 +32,8 @@ OPENING_REGISTRY = Path("research/ats-nextgen/phase2_stage_d_opening_registry.js
 Q1_RESULT_REGISTRY = Path("research/ats-nextgen/phase2_q1_result_registry.json")
 Q2_RESULT_REGISTRY = Path("research/ats-nextgen/phase2_q2_result_registry.json")
 Q3_RESULT_REGISTRY = Path("research/ats-nextgen/phase2_q3_result_registry.json")
+Q1_CANONICAL_OUTPUT_DIR = Path("research_outputs/ats_nextgen/q1")
+Q3_CANONICAL_OUTPUT_DIR = Path("research_outputs/ats_nextgen/q3")
 
 
 def _sha256(path: Path) -> str:
@@ -122,8 +125,14 @@ def run(
     out.mkdir(parents=True, exist_ok=True)
     opening, q1_registry, q2_registry, q3_registry = _verify_upstream_registries()
 
-    q1_dir = out / "reproduced_q1"
-    q3_dir = out / "reproduced_q3"
+    # Reproduce at the exact canonical paths used by the accepted Stage-A/Stage-C
+    # workflows. Their summary JSON files intentionally contain these relative
+    # output paths, so path identity is part of byte-for-byte reproducibility.
+    q1_dir = Q1_CANONICAL_OUTPUT_DIR
+    q3_dir = Q3_CANONICAL_OUTPUT_DIR
+    shutil.rmtree(q1_dir, ignore_errors=True)
+    shutil.rmtree(q3_dir, ignore_errors=True)
+
     # These calls reproduce already-frozen evidence under the exact accepted runners.
     # They do not create a new candidate or reopen model selection.
     run_q1(str(q1_dir), config_path=config_path)
