@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-23T12:36:03.689009+00:00",
+    "as_of": "2026-09-23T15:31:27.179166+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-23T12:36:09.432667+00:00",
+    "as_of": "2026-09-23T15:31:32.538360+00:00",
     "conflicts": 0,
     "evidence_items_added": 20,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 20
   },
   "coaching": {
-    "as_of": "2026-09-23T12:33:21.635345+00:00",
+    "as_of": "2026-09-23T15:29:02.922673+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -102,15 +102,19 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {},
+    "advisories": {
+      "2026_03_LA_DEN": "newer_reporting_available"
+    },
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 15,
-    "games_expected": 15,
+    "games_expected": 16,
     "max_age_hours": 6.0,
     "new_report_grace_minutes": 5.0,
-    "skipped": {},
-    "status": "healthy"
+    "skipped": {
+      "2026_03_ATL_GB": "missing_entry"
+    },
+    "status": "partial"
   },
   "depth_charts": {
     "season": 2026,
@@ -118,13 +122,13 @@
   },
   "editorial_finalizer": {
     "editorial_version": "story-desk-v3",
-    "games": 15,
+    "games": 16,
     "guardrail": "Final editorial pass changes only public explanation and story hierarchy, never LevLine probabilities.",
     "status": "healthy",
-    "unique_headlines": 15
+    "unique_headlines": 16
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-23T12:35:53.841788+00:00",
+    "as_of": "2026-09-23T15:31:16.956307+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -144,14 +148,14 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 0,
+    "evidence_repairs": 1,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-23T12:33:21.233999+00:00",
+    "generated_utc": "2026-09-23T15:29:02.583895+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
     "signals": 129,
     "status": "healthy"
@@ -166,168 +170,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-23T12:33:21.233999+00:00",
-  "groq_provider_fallback": {
-    "failed_games": [
-      "2026_03_ARI_SF",
-      "2026_03_BAL_DAL",
-      "2026_03_CAR_CLE",
-      "2026_03_CIN_PIT",
-      "2026_03_HOU_IND",
-      "2026_03_KC_MIA",
-      "2026_03_LAC_BUF",
-      "2026_03_LA_DEN",
-      "2026_03_LV_NO",
-      "2026_03_MIN_TB",
-      "2026_03_NE_JAX",
-      "2026_03_NYJ_DET",
-      "2026_03_PHI_CHI",
-      "2026_03_SEA_WAS",
-      "2026_03_TEN_NYG"
-    ],
-    "games": {
-      "2026_03_ARI_SF": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:03:01.555376+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_BAL_DAL": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:05:13.119467+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_CAR_CLE": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T12:54:15.584448+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_CIN_PIT": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:00:50.086007+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_HOU_IND": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T12:56:27.060281+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_KC_MIA": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T12:58:38.583513+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_LAC_BUF": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T12:53:09.848337+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_LA_DEN": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:07:24.663103+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_LV_NO": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:06:18.868781+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_MIN_TB": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:04:07.360847+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_NE_JAX": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T12:57:32.797071+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_NYJ_DET": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T12:55:21.324538+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_PHI_CHI": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:08:30.433462+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_SEA_WAS": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T13:01:55.824340+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_03_TEN_NYG": {
-        "chatgpt_refreshed_at_utc": "2026-09-23T14:25:50.666547+00:00",
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-23T12:59:44.331423+00:00",
-        "requires_chatgpt_refresh": false
-      }
-    },
-    "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "35863102225",
-    "status": "healthy"
-  },
+  "generated_utc": "2026-09-23T15:29:02.583895+00:00",
   "injuries": {
-    "as_of": "2026-09-23T12:33:21.398942+00:00",
+    "as_of": "2026-09-23T15:29:02.730001+00:00",
     "players": 22,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg3",
@@ -335,16 +180,14 @@
     "teams_with_reported_players": 2
   },
   "media_reporting": {
-    "as_of": "2026-09-23T14:25:53.882441+00:00",
+    "as_of": "2026-09-23T15:31:40.253687+00:00",
     "cross_game_titles_rejected": 0,
-    "fallback_checkpoint_bootstrap": true,
-    "fallback_checkpoint_guardrail": "Week-rollover recovery rebuilt the current slate from validated Groq checkpoints for successful games plus exact authorized ChatGPT failed-game inputs.",
-    "games": 15,
-    "games_with_display_reporting": 15,
-    "games_with_reporting": 15,
-    "games_with_substantive_reporting": 13,
-    "games_with_trusted_reporting": 15,
-    "generic_titles_rejected": 6,
+    "games": 16,
+    "games_with_display_reporting": 16,
+    "games_with_reporting": 16,
+    "games_with_substantive_reporting": 14,
+    "games_with_trusted_reporting": 16,
+    "generic_titles_rejected": 4,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -356,12 +199,12 @@
         "status": "unavailable"
       }
     },
-    "signals": 56,
+    "signals": 60,
     "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-23T12:36:08.457035+00:00",
+    "as_of": "2026-09-23T15:31:31.641393+00:00",
     "evidence_items_added": 20,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 20,
@@ -434,7 +277,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-23T12:33:25.562109+00:00",
+    "as_of": "2026-09-23T15:29:06.399914+00:00",
     "charted_plays": 5324,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -467,7 +310,7 @@
     "story_items_added": 16
   },
   "weather": {
-    "as_of": "2026-09-23T12:35:39.043150+00:00",
+    "as_of": "2026-09-23T15:31:01.297007+00:00",
     "games_checked": 14,
     "status": "degraded"
   }
