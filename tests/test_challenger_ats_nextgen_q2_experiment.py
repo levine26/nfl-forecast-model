@@ -15,6 +15,7 @@ from nfl_forecast.challenger_ats_nextgen_q2_experiment import (
 from nfl_forecast.challenger_ats_nextgen_q2_reporting import (
     q2_cover_reliability,
     q2_fixed_slice_metrics,
+    q2_key_mass_calibration,
     q2_metric_table,
 )
 
@@ -152,3 +153,20 @@ def test_reporting_uses_only_frozen_slice_definitions():
     assert set(slices.slice_type).issubset({"key_number", "favorite_size", "market_total"})
     assert "K3" in set(slices["slice"])
     assert set(slices.arm) == set(arms)
+
+
+def test_key_mass_calibration_reports_frozen_absolute_keys_overall_and_by_season():
+    metadata, arms = _report_fixture()
+    table = q2_key_mass_calibration(metadata, arms)
+    assert set(table.absolute_key) == {3, 6, 7, 10, 14}
+    assert set(table.season) == {"ALL", "2022", "2023"}
+    assert set(table.arm) == set(arms)
+
+    overall = table[
+        table.season.eq("ALL")
+        & table.arm.eq("Q2_GN_FULL")
+        & table.absolute_key.eq(3)
+    ].iloc[0]
+    assert overall.observed_absolute_rate == pytest.approx(2.0 / 3.0)
+    assert overall.predicted_absolute_rate == pytest.approx(2.0 / 3.0, abs=1e-9)
+    assert overall.absolute_key_calibration_error == pytest.approx(0.0, abs=1e-9)
