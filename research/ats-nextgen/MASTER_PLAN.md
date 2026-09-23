@@ -63,11 +63,11 @@ The quoted market home spread with no LevLine adjustment. This is the primary me
 
 ### M1 — market-derived probability distribution
 
-A chronology-clean distribution using only market variables available at the frozen historical snapshot: spread, total and vig-free moneyline information when both moneylines exist. No football-state variables.
+A chronology-clean discrete PMF centered directly at `S=-L`, with conditional scale driven only by `abs(S)`, market total, and the frozen `abs(S) x (total-45)` interaction, plus prior-history key-number mass. M1 uses no football state and no Q1 residual correction. Paired moneyline is diagnostic only for M1.
 
 ### M2 — market plus simple line-level calibration
 
-A market-only discrete residual/distribution calibration using only frozen market-state variables and prior history. No football information. M2 isolates whether any improvement is merely market-shape calibration rather than incremental football information.
+The same market-only discrete PMF, but centered at `S + q1_m2_median_residual`, where `q1_m2` is the chronology-clean market-only Q1 quantile calibration using spread, total and paired-moneyline no-vig probability when available. No football information. M2 isolates whether any improvement is merely market-shape calibration rather than incremental football information.
 
 Q1/Q2/Q3 earn an incremental claim only against the relevant market null. Calibration usefulness and incremental football information are separate claims.
 
