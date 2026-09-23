@@ -102,19 +102,15 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {
-      "2026_03_LA_DEN": "newer_reporting_available"
-    },
+    "advisories": {},
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 15,
-    "games_expected": 16,
+    "games_expected": 15,
     "max_age_hours": 6.0,
     "new_report_grace_minutes": 5.0,
-    "skipped": {
-      "2026_03_ATL_GB": "missing_entry"
-    },
-    "status": "partial"
+    "skipped": {},
+    "status": "healthy"
   },
   "depth_charts": {
     "season": 2026,
@@ -122,10 +118,10 @@
   },
   "editorial_finalizer": {
     "editorial_version": "story-desk-v3",
-    "games": 16,
+    "games": 15,
     "guardrail": "Final editorial pass changes only public explanation and story hierarchy, never LevLine probabilities.",
     "status": "healthy",
-    "unique_headlines": 16
+    "unique_headlines": 15
   },
   "editorial_intelligence": {
     "as_of": "2026-09-23T15:31:16.956307+00:00",
@@ -148,7 +144,7 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 1,
+    "evidence_repairs": 0,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
@@ -171,6 +167,150 @@
     "status": "healthy"
   },
   "generated_utc": "2026-09-23T15:29:02.583895+00:00",
+  "groq_provider_fallback": {
+    "failed_games": [
+      "2026_03_ARI_SF",
+      "2026_03_BAL_DAL",
+      "2026_03_CAR_CLE",
+      "2026_03_CIN_PIT",
+      "2026_03_HOU_IND",
+      "2026_03_KC_MIA",
+      "2026_03_LAC_BUF",
+      "2026_03_LA_DEN",
+      "2026_03_LV_NO",
+      "2026_03_MIN_TB",
+      "2026_03_NE_JAX",
+      "2026_03_NYJ_DET",
+      "2026_03_PHI_CHI",
+      "2026_03_SEA_WAS",
+      "2026_03_TEN_NYG"
+    ],
+    "games": {
+      "2026_03_ARI_SF": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:59:36.966310+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_BAL_DAL": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T16:01:50.311230+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_CAR_CLE": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:50:44.134309+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_CIN_PIT": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:57:23.766287+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_HOU_IND": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:52:57.323061+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_KC_MIA": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:55:10.560399+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_LAC_BUF": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:49:37.500639+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_LA_DEN": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T16:04:03.584408+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_LV_NO": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T16:02:56.952388+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_MIN_TB": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T16:00:43.675012+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_NE_JAX": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:54:03.950880+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_NYJ_DET": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:51:50.740399+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_PHI_CHI": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T16:05:10.210585+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_SEA_WAS": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:58:30.369786+00:00",
+        "requires_chatgpt_refresh": false
+      },
+      "2026_03_TEN_NYG": {
+        "fallback_source": "chatgpt",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-23T15:56:17.194619+00:00",
+        "requires_chatgpt_refresh": false
+      }
+    },
+    "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
+    "run_id": "35884149079",
+    "status": "healthy"
+  },
   "injuries": {
     "as_of": "2026-09-23T15:29:02.730001+00:00",
     "players": 22,
@@ -180,13 +320,13 @@
     "teams_with_reported_players": 2
   },
   "media_reporting": {
-    "as_of": "2026-09-23T15:31:40.253687+00:00",
+    "as_of": "2026-09-23T16:05:17.672612+00:00",
     "cross_game_titles_rejected": 0,
-    "games": 16,
-    "games_with_display_reporting": 16,
-    "games_with_reporting": 16,
-    "games_with_substantive_reporting": 14,
-    "games_with_trusted_reporting": 16,
+    "games": 15,
+    "games_with_display_reporting": 15,
+    "games_with_reporting": 15,
+    "games_with_substantive_reporting": 12,
+    "games_with_trusted_reporting": 15,
     "generic_titles_rejected": 4,
     "providers": {
       "bing_news_rss": {
@@ -199,7 +339,7 @@
         "status": "unavailable"
       }
     },
-    "signals": 60,
+    "signals": 57,
     "source_policy": "Matchup relevance is mandatory; betting content is excluded; established reporting outranks low-trust aggregators; source diversity is preferred. X is optional and lower-trust by default. Media never moves LevLine numerically.",
     "status": "healthy"
   },
