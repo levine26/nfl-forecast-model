@@ -13,6 +13,7 @@ from nfl_forecast.challenger_ats_nextgen_q2_experiment import (
     target_data,
 )
 from nfl_forecast.challenger_ats_nextgen_q2_reporting import (
+    _cover_calibration_intercept_slope,
     q2_cover_reliability,
     q2_fixed_slice_metrics,
     q2_key_mass_calibration,
@@ -135,16 +136,33 @@ def _report_fixture() -> tuple[pd.DataFrame, dict[str, np.ndarray]]:
     return metadata, {"M1_GN_FULL": pmf, "Q2_GN_FULL": pmf.copy()}
 
 
-def test_reporting_preserves_pushes_and_fixed_reliability_bins():
+def test_reporting_preserves_pushes_fixed_reliability_and_intervals():
     metadata, arms = _report_fixture()
     metrics = q2_metric_table(metadata, arms)
     overall = metrics[metrics.season.eq("ALL")]
     assert set(overall.arm) == set(arms)
     assert set(overall.nonpush_n) == {1}
     assert np.allclose(overall.empirical_push_rate, 2.0 / 3.0)
+    for level in (50, 80, 90):
+        assert f"interval_{level}_coverage" in metrics.columns
+        assert f"interval_{level}_mean_width" in metrics.columns
+        assert np.allclose(overall[f"interval_{level}_coverage"], 1.0)
+    assert "cover_calibration_intercept" in metrics.columns
+    assert "cover_calibration_slope" in metrics.columns
+
     reliability = q2_cover_reliability(metadata, arms)
     assert reliability.groupby("arm").size().eq(10).all()
     assert reliability.groupby("arm").n.sum().eq(1).all()
+
+
+def test_cover_calibration_intercept_slope_is_finite_when_estimable():
+    intercept, slope = _cover_calibration_intercept_slope(
+        np.asarray([0.2, 0.35, 0.65, 0.8], dtype=float),
+        np.asarray([0.0, 0.0, 1.0, 1.0], dtype=float),
+    )
+    assert np.isfinite(intercept)
+    assert np.isfinite(slope)
+    assert slope > 0.0
 
 
 def test_reporting_uses_only_frozen_slice_definitions():
