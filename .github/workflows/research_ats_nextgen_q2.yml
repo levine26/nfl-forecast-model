@@ -51,3 +51,48 @@ jobs:
             tests/test_challenger_ats_nextgen_q2_experiment.py
       - name: Prove contract tests did not modify production surfaces
         run: git diff --exit-code -- $PROTECTED_SURFACES
+
+  historical:
+    name: Q2 chronology-clean 2022-2025 OOF
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: ats-nextgen-q2-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            ats-nextgen-q2-${{ runner.os }}-
+            ats-nextgen-q1-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Execute frozen Q2 only after contract success
+        run: |
+          rm -rf research_outputs/ats_nextgen/q2
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/run_challenger_ats_nextgen_q2.py
+          test -s research_outputs/ats_nextgen/q2/q2_outer_oof_metadata_2022_2025.csv
+          test -s research_outputs/ats_nextgen/q2/q2_outer_oof_pmfs.npz
+          test -s research_outputs/ats_nextgen/q2/q2_inner_selections.csv
+          test -s research_outputs/ats_nextgen/q2/q2_distribution_metrics.csv
+          test -s research_outputs/ats_nextgen/q2/q2_fixed_slice_metrics.csv
+          test -s research_outputs/ats_nextgen/q2/q2_cover_reliability.csv
+          test -s research_outputs/ats_nextgen/q2/q2_summary.json
+      - name: Prove Q2 execution did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+      - name: Upload immutable Q2 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-nextgen-q2-${{ github.run_id }}
+          path: research_outputs/ats_nextgen/q2/
+          retention-days: 90
