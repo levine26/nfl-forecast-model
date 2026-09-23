@@ -1,0 +1,112 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "B_Q2_PRE_RESULT",
+  "candidate_id": "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1",
+  "status": "IMPLEMENTATION_FROZEN_NO_ACCEPTED_Q2_RESULT",
+  "created_date": "2026-09-23",
+  "branch": "research/ats-nextgen-phase2-q2",
+  "opening_main_sha": "a2581a62e3797a6ac466d614326bc72b7d5a1c57",
+  "q1_result": {
+    "classification": "VALID_NEGATIVE_INCREMENTAL_RESULT",
+    "accepted_result_head": "f14e2fa3ec78bf95578b4a5030fb66e94cd12cd0",
+    "stage_a_merge_sha": "a2581a62e3797a6ac466d614326bc72b7d5a1c57",
+    "accepted_workflow_run": 35920622523,
+    "accepted_artifact_id": 10776898518,
+    "outer_oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
+    "rescue_allowed": false
+  },
+  "implementation_freeze": {
+    "canonical_pre_result_head": "5c67c0c55f6f8a23a9036866075209f083f04981",
+    "accepted_q2_result_before_receipt": false,
+    "supersede_all_prior_q2_result_runs": true,
+    "single_execution_path": true,
+    "removed_pre_result_unused_paths": [
+      "src/nfl_forecast/challenger_ats_nextgen_q2_eval.py",
+      "src/nfl_forecast/challenger_ats_nextgen_q2_runtime.py"
+    ],
+    "blobs": {
+      "distribution_core": "d551c4d3dbaa808556e3183fd65d6d20e8e92212",
+      "experiment_driver": "9249b39ebc2c42e4013a13b763d010c75939bd74",
+      "reporting": "f7bc779e402b2d05230008b1779665484e9f11a6",
+      "historical_runner": "36612cdb6517b1a3f2c777720fc7aa0458ec99f7",
+      "core_tests": "4a691a354b1e577fb64ae66767bee6eb2e985fc2",
+      "experiment_tests": "943dba552d61165fb8f196582cd31af1585ab281",
+      "workflow": "d261d6d92a25aaedf477e99bdde939ed1727a04f",
+      "opening_receipt": "548c60fbaf44cb10fb47bfed3255ed30feb1cbae",
+      "scoring_receipt": "c41a181411d246fd87e0693c40bd6e93e3668807",
+      "research_validation_workflow": "8da5f0c8d98d22d94a07c47c8199aad6e87481f3"
+    },
+    "upstream_identity_checks_before_q2_fit": [
+      "phase2_gate_sha256",
+      "stage_a_q1_outer_oof_sha256",
+      "stage_a_q1_median_predictions_by_game_id_2022_2025"
+    ],
+    "historical_job_requires_contract": true
+  },
+  "candidate_fitting_performed": false,
+  "candidate_performance_generated": false,
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "support": {
+    "min_margin": -75,
+    "max_margin": 75,
+    "discretization": "integrated CDF over half-integer bins with tails folded into endpoint bins",
+    "material_endpoint_mass_threshold": 0.001
+  },
+  "families": {
+    "generalized_normal": {"scipy": "gennorm", "beta_grid": [1.0, 1.25, 1.5, 1.75, 2.0]},
+    "gaussian": {"scipy": "norm"},
+    "student_t": {"scipy": "t", "df_grid": [4, 6, 10]},
+    "empirical": {"total_uniform_dirichlet_pseudocount": 1.0, "per_bin_pseudocount": 0.006622516556291391}
+  },
+  "scale": {
+    "formula": "log(scale)=b0+b1*abs(L)+b2*T_c+b3*abs(L)*T_c",
+    "T_c": "(market_total-training_median_total)/10",
+    "missing_total": "training-median imputation -> T_c=0",
+    "fit_objective": "mean negative discrete observed-bin log likelihood",
+    "optimizer": "scipy.optimize.minimize L-BFGS-B",
+    "deterministic_start": "b0=log(max(training residual SD,1.0)); other coefficients=0",
+    "numerical_scale_guard": [0.25, 100.0],
+    "touching_guard_invalidates_fit": true
+  },
+  "key_excess": {
+    "absolute_keys": [3, 6, 7, 10, 14],
+    "distance_bands": ["<3.5", "3.5-<7.5", ">=7.5"],
+    "shared_positive_negative_coefficients": true,
+    "coefficient_count": 15,
+    "multiplier": "exp(theta[abs(k),band]) on key bins, then renormalize",
+    "penalty_grid": [1, 10, 100],
+    "penalty": "0.5*lambda*sum(theta^2)",
+    "fit_order": "fit scale first, then key coefficients with scale fixed",
+    "tie_break": "larger lambda within CRPS tolerance 1e-12"
+  },
+  "shape_ties": {
+    "tolerance": 1e-12,
+    "generalized_normal": "larger beta",
+    "student_t": "larger df"
+  },
+  "selection_metric": "pooled prior-time discrete CRPS/RPS",
+  "mandatory_ablations": ["no_key_conditional_scale", "key_constant_scale", "key_conditional_scale"],
+  "market_null": "paired M1 uses identical family/scale/key machinery but center C only",
+  "q1_stacking": {
+    "target_center_must_be_out_of_sample": true,
+    "training_centers": "frozen Q1 median model refit on entire prior Q2 training window using target-specific prior-only alpha",
+    "q2_inner_2019": "omitted because no earlier Q1 inner-validation season exists for alpha selection",
+    "q2_inner_2020_plus": "Q1 alpha selected from prior targets 2019..target-1 under frozen Q1 rules",
+    "outer_2022_2025_must_reproduce_stage_a_oof_sha": true
+  },
+  "empirical_reference": {
+    "residual": "observed_margin-training_center",
+    "target_shift": "target_center+training_residual",
+    "binning": "same half-integer bins with endpoint tail folding",
+    "parametric_scale_or_key_head": false
+  },
+  "evaluation": {
+    "discrete_crps": "sum k=-75..74 of (F(k)-I[y<=k])^2",
+    "log_loss_floor_evaluation_only": 1e-15,
+    "ats_or_roi_selecting": false
+  },
+  "historical_execution_allowed_before_contract_tests": false,
+  "q3_opened": false
+}

@@ -1,0 +1,96 @@
+name: ATS NextGen Q2 Stage B
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_ats_nextgen_q2.py'
+      - 'src/nfl_forecast/challenger_ats_nextgen_q2_experiment.py'
+      - 'src/nfl_forecast/challenger_ats_nextgen_q2_reporting.py'
+      - 'scripts/run_challenger_ats_nextgen_q2.py'
+      - 'tests/test_challenger_ats_nextgen_q2.py'
+      - 'tests/test_challenger_ats_nextgen_q2_experiment.py'
+      - 'research/ats-nextgen/**'
+      - '.github/workflows/research_ats_nextgen_q2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ats-nextgen-q2-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py
+    scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  contract:
+    name: Q2 frozen contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Prove opening gate, frozen Q1, and Q2 distribution contract
+        run: |
+          pytest -q \
+            tests/test_challenger_ats_nextgen_phase2_gate.py \
+            tests/test_challenger_ats_nextgen_q1.py \
+            tests/test_challenger_ats_nextgen_q1_reporting.py \
+            tests/test_challenger_ats_nextgen_q2.py \
+            tests/test_challenger_ats_nextgen_q2_experiment.py
+      - name: Prove contract tests did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+
+  closeout:
+    name: Q2 structural invalidation closeout
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify immutable Q2 result registry
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('research/ats-nextgen/phase2_q2_result_registry.json')
+          if not path.exists():
+              raise SystemExit('Q2 closeout requires the frozen result registry')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          assert data['candidate_id'] == 'ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1'
+          assert data['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
+          assert data['controlling_preresult_head'] == '8503dbf250c97b0520cec30f985e9981fce83767'
+          assert data['accepted_q2_outer_oof_artifact'] is None
+          assert data['accepted_q2_primary_performance'] is None
+          assert data['completed_2026_outcomes_used'] == 0
+          assert data['production_changed'] is False
+          assert data['q2_rescue_performed'] is False
+          assert data['support_widened_after_inspection'] is False
+          assert data['q2_jobs']['contract']['conclusion'] == 'success'
+          assert data['q2_jobs']['historical']['conclusion'] == 'failure'
+          failure = data['failure']
+          assert failure['type'] == 'material_endpoint_mass'
+          assert failure['support'] == [-75, 75]
+          assert failure['frozen_threshold'] == 0.001
+          assert failure['observed_max_endpoint_mass'] == 0.0033487075822347966
+          assert failure['observed_max_endpoint_mass'] > failure['frozen_threshold']
+          assert failure['artifact_uploaded'] is False
+          assert failure['complete_outer_oof_generated'] is False
+          assert data['next_stage'] == 'C_Q3'
+          PY
+      - name: Prove closeout did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES

@@ -4,64 +4,73 @@
 
 Phase 1 is **COMPLETE**. PR #556 merged the exact-head validated ATS research/preregistration package at `80f84dc8282205c48dbfd8ca7e9e31c4be663bb6`.
 
-Phase 2 is **IN PROGRESS — STAGE A Q1 COMPLETE; NEGATIVE INCREMENTAL RESULT; STAGE B Q2 NEXT**.
+Phase 2 is **IN PROGRESS — STAGE A Q1 COMPLETE (NEGATIVE); STAGE B Q2 COMPLETE (STRUCTURALLY INVALID); STAGE C Q3 NEXT**.
 
-The opening gate is complete and merged. PR #559 merged at `f43e17ba783e3e389969cd1649889b37bd91afe9` after exact-head validation.
+The Phase-2 opening gate is complete and merged. PR #559 merged at `f43e17ba783e3e389969cd1649889b37bd91afe9` after exact-head validation.
 
-Stage A lives on `research/ats-nextgen-phase2-q1` / PR #560. The frozen Q1 implementation was executed through the dedicated tests-before-results workflow on exact result head `f14e2fa3ec78bf95578b4a5030fb66e94cd12cd0`.
+Stage A Q1 is complete and merged through PR #560 at `a2581a62e3797a6ac466d614326bc72b7d5a1c57`. Its accepted Q1 OOF identity is SHA-256 `d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365` across 1,087 chronology-clean 2022–2025 outer OOF games. Q1 V1 is a valid negative incremental result versus M2 and may not be rescued.
 
-All exact-head workflows succeeded:
+Stage B Q2 is on `research/ats-nextgen-phase2-q2` / PR #561. The controlling pre-result head was `8503dbf250c97b0520cec30f985e9981fce83767`.
 
-- Q1 Stage A `35920622523` (#7): **SUCCESS**;
-- research firewall `35920622410`: **SUCCESS**;
-- ATS Phase-2 opening gate `35920622392`: **SUCCESS**;
-- research validation `35920622570`: **SUCCESS**;
-- Daily NFL model refresh / full pytest and regenerated-output validation `35920622374`: **SUCCESS**.
+## Stage-B Q2 scientific result
 
-The accepted Q1 evidence artifact is ID `10776898518`, digest `sha256:b544a4928a3e2ab80861b7b3fcf581a6b51355961b80aa05ddc5e4a0554d0c36`, with 1,087 chronology-clean OOF rows from 2022–2025. Completed-2026 outcomes used: 0. Production remains `F-ST-01-FROZEN-2026` and Sunday Signal numerical forecasting is unchanged.
+Q2 is `ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1`.
 
-## Stage-A scientific result
+The final pre-result contract froze:
 
-Q1 is `ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1`.
+- support exactly `[-75,+75]`;
+- material folded endpoint mass threshold `1e-3`;
+- fail-closed behavior rather than widening support after historical inspection;
+- the bounded 12-arm M1/Q2 experiment surface;
+- prior-only rolling-origin selection;
+- no completed-2026 outcomes;
+- no production mutation.
 
-Under the preregistered failure rule, Q1 is **not incremental** relative to the market-only M2 comparator:
+On exact head `8503dbf250c97b0520cec30f985e9981fce83767`, all repository/governance gates outside the Q2 historical job succeeded:
 
-- mean frozen-quantile pinball: M2 `4.749986`, Q1 `4.750117`;
-- Q1 minus M2: `+0.000131` (worse, not better);
-- τ=10/21: identical M2/Q1 pinball `4.736212` and identical coverage error `-0.009769`;
-- τ=1/2: Q1 worse (`4.753243` vs M2 `4.749754`) and less calibrated (`-0.013339` vs `-0.011500`);
-- τ=11/21: Q1 modestly better (`4.760897` vs `4.763994`) and modestly better calibrated (`-0.010470` vs `-0.012310`), but this isolated gain does not overcome the full preregistered evidence;
-- raw-line M0 has the best aggregate mean pinball of the three arms at `4.747240`.
+- research firewall `35927280868`: **SUCCESS**;
+- Phase-2 opening gate `35927280994`: **SUCCESS**;
+- Q1 Stage-A reproducibility `35927280912`: **SUCCESS**;
+- Daily NFL model refresh / full repository validation `35927281014`: **SUCCESS**;
+- research validation `35927280856`: **SUCCESS**.
 
-Season mean-pinball Q1 minus M2: 2022 `-0.004140`, 2023 `0.000000`, 2024 `+0.003698`, 2025 `+0.000950`. The effect is not stable across seasons.
+Q2 workflow `35927280982` behaved correctly:
 
-Quantile crossings are diagnostic only: M2 87/1,087 (`8.0037%`), Q1 79/1,087 (`7.2677%`); no repair was applied.
+- pre-result contract job `107405457674`: **SUCCESS**;
+- chronology-clean historical job `107405820497`: **FAILURE** before a complete OOF artifact could be generated/uploaded.
 
-Across the 42 frozen slice × quantile cells, Q1 pinball is better in 12, equal in 14, and worse in 16. Favorable slices cannot rescue the failed overall quantile evidence.
+The exact failure was the preregistered endpoint-mass guard:
 
-The immutable result is recorded in:
+- generalized normal;
+- `beta=1.0`;
+- `no_key_conditional_scale` ablation;
+- no key penalty;
+- observed maximum folded endpoint mass `0.0033487075822347966`;
+- frozen threshold `0.001`.
 
-- `PHASE2_Q1_RESULT_RECEIPT.md`;
-- `phase2_q1_result_registry.json`.
+Therefore Q2 V1 is **structurally invalid under its own frozen support/truncation contract**.
 
-Q1 V1 may not be redesigned or rescued after this result.
+This is not a proper-score loss to M1: no complete Stage-B OOF artifact exists, no accepted primary Q2-vs-M1 CRPS comparison exists, and no candidate-performance result is being inferred from the aborted run.
 
-## Q1-to-Q2 interface
+The invalidation is frozen in:
 
-Q2 may proceed exactly as preregistered using only the chronology-clean Q1 median residual predictions from the frozen Stage-A interface. This handoff does **not** mean Q1 passed its incremental test; it preserves the preregistered Q2 center definition while keeping the Q1 negative result intact.
+- `PHASE2_Q2_RESULT_RECEIPT.md`;
+- `phase2_q2_result_registry.json`.
 
-The frozen Q1 OOF file identity is SHA-256 `d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365`. Any Stage-B regeneration used by Q2 must reproduce that interface identity before Q2 fitting or fail closed.
+No Q2 V1 rescue is authorized. In particular, do not widen support, relax the endpoint threshold, drop the failing arm, change family/shape grids, modify scale/key machinery, or inspect target performance to design a replacement inside Stage B.
 
 ## Exact next actions
 
-1. validate the post-result Stage-A receipt/status head on PR #560;
-2. merge PR #560 only if the Q1 contract/historical workflow, research firewall, opening gate, research validation, and full repository checks are green on the exact final head;
-3. verify merged `main` and record the Stage-A merge identity;
-4. create Stage B from that verified merge;
-5. implement Q2 exactly from `Q2_MARGIN_DISTRIBUTION_PREREGISTRATION.md` without redesigning Q1;
-6. before any Q2 historical score exists, freeze engineering details left open by the preregistration (including exact continuous-to-integer bin integration and Q2-EMP deterministic smoothing) and test them synthetically;
-7. require Q2 to regenerate/verify the frozen Q1 OOF interface before using Q1 median residual centers;
-8. keep completed-2026 outcomes prohibited and production unchanged.
+1. validate the Stage-B result/status head on PR #561;
+2. require research firewall, Phase-2 opening gate, frozen Q1 reproducibility, research validation, full repository validation, and Q2 contract tests to be green on the exact final Stage-B head;
+3. merge PR #561 only after that result record is stable and validated;
+4. verify the Stage-B merge is current `main`;
+5. create Stage C from that exact merged SHA;
+6. read `Q3_COVER_PUSH_LOSS_PREREGISTRATION.md` plus the evaluation/chronology/red-team contracts before implementation;
+7. implement `ATS-Q3-DIRECT-CPL-HURDLE-V1` exactly as frozen;
+8. before any Q3 historical score exists, prove half-point structural zero push and three-outcome cover/push/loss normalization, freeze any open engineering details, and write a pre-result Stage-C receipt;
+9. preserve the completed-2026 outcome firewall and keep production F-ST/Sunday Signal forecasting unchanged;
+10. do not open Stage D until Q3 Stage C is complete.
 
 ## Active firewalls
 
@@ -69,8 +78,9 @@ The frozen Q1 OOF file identity is SHA-256 `d82825c1e5f63d8e183960a931f402d2a776
 - no random K-fold;
 - no historical market-horizon relabeling;
 - no global/full-sample preprocessing that leaks target information;
-- no Q1 post-result rescue learner, quantile, feature, threshold, calibration, slice or alpha-grid change;
-- no Q2 post-result distribution-family, shape-grid, key-number, scale-model, smoothing, or blend rescue;
+- no Q1 post-result rescue;
+- no Q2 post-result support, family, grid, key, scale, smoothing, threshold, slice, or calibration rescue;
+- no Q3 historical execution before its exact-head tests-before-results contract passes;
 - no production F-ST/Sunday Signal forecasting changes.
 
-> 2022–2025 is chronology-clean development evidence for this candidate execution but is not pristine independent confirmation because those seasons have informed prior LevLine research.
+> 2022–2025 is chronology-clean development evidence and is not pristine independent confirmation because those seasons have informed prior LevLine research.

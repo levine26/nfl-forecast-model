@@ -1,0 +1,53 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "B_Q2_RESULT",
+  "candidate_id": "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1",
+  "classification": "STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT",
+  "branch": "research/ats-nextgen-phase2-q2",
+  "pr": 561,
+  "controlling_preresult_head": "8503dbf250c97b0520cec30f985e9981fce83767",
+  "accepted_q2_outer_oof_artifact": null,
+  "accepted_q2_primary_performance": null,
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "q2_rescue_performed": false,
+  "support_widened_after_inspection": false,
+  "q3_opened_before_result_receipt": false,
+  "workflows": {
+    "research_firewall": {"run_id": 35927280868, "conclusion": "success"},
+    "phase2_opening_gate": {"run_id": 35927280994, "conclusion": "success"},
+    "q1_stage_a_reproducibility": {"run_id": 35927280912, "conclusion": "success"},
+    "full_repository_validation": {"run_id": 35927281014, "conclusion": "success"},
+    "research_validation": {"run_id": 35927280856, "conclusion": "success"},
+    "q2_stage_b": {"run_id": 35927280982, "conclusion": "failure"}
+  },
+  "q2_jobs": {
+    "contract": {"job_id": 107405457674, "conclusion": "success"},
+    "historical": {"job_id": 107405820497, "conclusion": "failure"}
+  },
+  "failure": {
+    "type": "material_endpoint_mass",
+    "stage": "inner_rolling_origin_candidate_qualification",
+    "family": "gennorm",
+    "shape": 1.0,
+    "ablation": "no_key_conditional_scale",
+    "key_penalty": null,
+    "observed_max_endpoint_mass": 0.0033487075822347966,
+    "frozen_threshold": 0.001,
+    "support": [-75, 75],
+    "artifact_uploaded": false,
+    "complete_outer_oof_generated": false
+  },
+  "binding_contract": {
+    "support_may_be_widened_after_historical_inspection": false,
+    "threshold_may_be_weakened": false,
+    "failing_arm_may_be_dropped": false,
+    "new_family_or_grid_may_be_added": false
+  },
+  "scientific_conclusion": "Q2 V1 is structurally invalid under its frozen support/truncation contract; no M1-vs-Q2 proper-score conclusion is accepted.",
+  "next_stage": "C_Q3",
+  "q3_candidate_id": "ATS-Q3-DIRECT-CPL-HURDLE-V1",
+  "stage_d_opened": false,
+  "historical_evidence_class": "development_non_pristine"
+}
