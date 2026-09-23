@@ -17,9 +17,14 @@
     "rescue_allowed": false
   },
   "implementation_freeze": {
-    "pre_result_head": "a857d1864a9f94da80fb61d1e7385c4eabcddf88",
+    "canonical_pre_result_head": "5c67c0c55f6f8a23a9036866075209f083f04981",
     "accepted_q2_result_before_receipt": false,
     "supersede_all_prior_q2_result_runs": true,
+    "single_execution_path": true,
+    "removed_pre_result_unused_paths": [
+      "src/nfl_forecast/challenger_ats_nextgen_q2_eval.py",
+      "src/nfl_forecast/challenger_ats_nextgen_q2_runtime.py"
+    ],
     "blobs": {
       "distribution_core": "d551c4d3dbaa808556e3183fd65d6d20e8e92212",
       "experiment_driver": "9249b39ebc2c42e4013a13b763d010c75939bd74",
@@ -28,7 +33,9 @@
       "core_tests": "4a691a354b1e577fb64ae66767bee6eb2e985fc2",
       "experiment_tests": "943dba552d61165fb8f196582cd31af1585ab281",
       "workflow": "d261d6d92a25aaedf477e99bdde939ed1727a04f",
-      "opening_receipt": "548c60fbaf44cb10fb47bfed3255ed30feb1cbae"
+      "opening_receipt": "548c60fbaf44cb10fb47bfed3255ed30feb1cbae",
+      "scoring_receipt": "c41a181411d246fd87e0693c40bd6e93e3668807",
+      "research_validation_workflow": "8da5f0c8d98d22d94a07c47c8199aad6e87481f3"
     },
     "upstream_identity_checks_before_q2_fit": [
       "phase2_gate_sha256",
