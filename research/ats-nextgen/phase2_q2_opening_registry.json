@@ -3,7 +3,7 @@
   "phase": 2,
   "stage": "B_Q2_PRE_RESULT",
   "candidate_id": "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1",
-  "status": "AUTHORIZED_TO_IMPLEMENT_UNTRAINED_NO_Q2_PERFORMANCE",
+  "status": "IMPLEMENTATION_FROZEN_NO_ACCEPTED_Q2_RESULT",
   "created_date": "2026-09-23",
   "branch": "research/ats-nextgen-phase2-q2",
   "opening_main_sha": "a2581a62e3797a6ac466d614326bc72b7d5a1c57",
@@ -15,6 +15,27 @@
     "accepted_artifact_id": 10776898518,
     "outer_oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
     "rescue_allowed": false
+  },
+  "implementation_freeze": {
+    "pre_result_head": "a857d1864a9f94da80fb61d1e7385c4eabcddf88",
+    "accepted_q2_result_before_receipt": false,
+    "supersede_all_prior_q2_result_runs": true,
+    "blobs": {
+      "distribution_core": "d551c4d3dbaa808556e3183fd65d6d20e8e92212",
+      "experiment_driver": "9249b39ebc2c42e4013a13b763d010c75939bd74",
+      "reporting": "f7bc779e402b2d05230008b1779665484e9f11a6",
+      "historical_runner": "36612cdb6517b1a3f2c777720fc7aa0458ec99f7",
+      "core_tests": "4a691a354b1e577fb64ae66767bee6eb2e985fc2",
+      "experiment_tests": "943dba552d61165fb8f196582cd31af1585ab281",
+      "workflow": "d261d6d92a25aaedf477e99bdde939ed1727a04f",
+      "opening_receipt": "548c60fbaf44cb10fb47bfed3255ed30feb1cbae"
+    },
+    "upstream_identity_checks_before_q2_fit": [
+      "phase2_gate_sha256",
+      "stage_a_q1_outer_oof_sha256",
+      "stage_a_q1_median_predictions_by_game_id_2022_2025"
+    ],
+    "historical_job_requires_contract": true
   },
   "candidate_fitting_performed": false,
   "candidate_performance_generated": false,
