@@ -1,20 +1,21 @@
 # Spread & Points Next-Generation — Current State & Next Steps
 
-**Last updated:** 2026-09-22 America/Los_Angeles  
+**Last updated:** 2026-09-23 America/Los_Angeles  
 **Program authority:** `research/spread-points-nextgen/MASTER_PLAN.md`  
 **Phase 0:** **COMPLETE**  
 **Phase 1:** **COMPLETE**  
 **Phase 2:** **COMPLETE**  
 **Phase 3:** **COMPLETE**  
 **Phase 4:** **COMPLETE**  
-**Phase 5 Candidate 5:** **SCIENTIFICALLY COMPLETE — `REJECTED`; repository merge closeout in progress**  
+**Phase 5 Candidate 5:** **COMPLETE — `REJECTED`**  
 **Phase 6 for Candidate 5 V1:** **NOT JUSTIFIED**  
 **Production:** `F-ST-01-FROZEN-2026` — unchanged
 
-Authoritative prior closeout receipts:
+Authoritative closeout receipts:
 
 - `research/spread-points-nextgen/FINAL_PHASE3_RECEIPT.md`
 - `research/spread-points-nextgen/FINAL_PHASE4_RECEIPT.md`
+- `research/spread-points-nextgen/FINAL_PHASE5_RECEIPT.md`
 
 ## Phase 5 frozen identity and evidence boundary
 
@@ -45,7 +46,7 @@ Historical F-ST baseline is the accepted chronology-clean annual reproduction fr
 
 Completed-2026 outcomes did not participate in Candidate 5 design, fitting, tuning, historical evaluation, rescue or survival.
 
-## Phase 5 execution provenance
+## Phase 5 execution and integration provenance
 
 First Phase 5 workflow attempt:
 
@@ -67,6 +68,18 @@ First successful frozen historical execution:
 - frozen historical package: **SUCCESS**
 - exact-run gate: **SUCCESS**
 - evidence preservation commit: `8fce0be359d93d68bc2c4bba852ede4181a38368`
+
+Final integration:
+
+- PR #552 — **MERGED**
+- exact validated head: `a4f892d64ab163a421eed203d9b50983e5bbd04b`
+- merge commit: `a68afb1e1cf9675a7ff9e0e0af1f52343546f029`
+- dedicated Phase 5 validation `35875417408` — **SUCCESS**
+- research firewall `35875417416` — **SUCCESS**
+- full research validation `35875417452` — **SUCCESS**
+- Phase 4 frozen-evidence regression `35875417543` — **SUCCESS**
+
+The Phase 4 regression run initially exposed an operational byte-comparison false positive caused only by machine-level floating-point serialization. Commit `a4f892d64ab163a421eed203d9b50983e5bbd04b` hardened that comparator to exact structure/nonnumeric values plus numeric agreement at `1e-12`. The complete 2025 Phase 4 package then regenerated successfully and matched the frozen evidence semantically. No scientific evidence or production logic changed.
 
 ## Primary scientific result
 
@@ -117,20 +130,14 @@ This is an accepted negative result. There is no model rescue.
 
 Production `F-ST-01-FROZEN-2026` is unchanged. Sunday Signal forecasting behavior is unchanged. No official forecast output was replaced by Candidate 5.
 
-Phase 6 prospective shadow validation is **not justified for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`**, so no Phase 6 handoff is created.
+Phase 6 prospective shadow validation is **not justified for `LEVLINE-HISTORICAL-RESIDUAL-STACK-V1`**, so no Phase 6 handoff exists.
 
 A future materially different research hypothesis would require a separately preregistered new candidate identity and a new evidence clock. It may not reinterpret the spent 2022–2025 evidence as untouched confirmation.
 
 ## Exact next action
 
-Complete repository closeout only:
+**STOP.**
 
-1. reconcile the Phase 5 branch with current `main` while preserving unrelated production/automation commits;
-2. open the Phase 5 PR;
-3. require exact-head dedicated Phase 5 validation, LevLine research firewall and full research validation;
-4. merge only the exact validated head if repository state permits;
-5. re-read the merged Phase 5 package from `main`;
-6. record the immutable final Phase 5 receipt with PR, validated head, CI run IDs, merge SHA, code/config/evidence identities, `REJECTED` disposition, Phase 6 ineligibility, completed-2026 firewall and production-unchanged confirmation;
-7. STOP.
+Phase 5 V1 is closed. Do not start Phase 6 for this identity. Do not rescue the rejected Candidate 5. Do not modify production.
 
-Do not start Phase 6 for Candidate 5 V1. Do not modify production.
+If the research program is later extended, begin only from a separately authorized, materially different preregistered candidate identity with a new evidence boundary and prospective clock.
