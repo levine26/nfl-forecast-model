@@ -2,31 +2,40 @@
 
 ## Current state
 
-The prior Spread & Points Next-Generation program is complete. Its market-relative mean-margin and Candidate-5 hypotheses did not establish incremental value and are closed.
+Phase 1 is **COMPLETE**. PR #556 merged the exact-head validated ATS research/preregistration package at `80f84dc8282205c48dbfd8ca7e9e31c4be663bb6`. Q1/Q2/Q3 remain untrained. No candidate-specific ATS historical performance was generated in Phase 1. Production remains `F-ST-01-FROZEN-2026` and Sunday Signal numerical forecasting is unchanged.
 
-Phase 1 of this new ATS program has established a distinct scientific family centered on:
+The prior Spread & Points negative evidence remains closed. The new ATS family is scientifically distinct and frozen around:
 
 - market-relative conditional quantiles;
 - discrete NFL margin probability mass;
-- key-number/push modeling;
-- heteroskedastic margin uncertainty;
+- key-number and push modeling;
+- conditional margin dispersion;
 - direct cover/push/loss probability estimation;
-- exact wager economics when quoted prices exist.
+- exact side-price economics only when quoted price is genuinely available.
 
-The market is the primary null. Historical 2022–2025 results are development/non-pristine. Completed 2026 outcomes remain prohibited from candidate design and selection. No production code is changed.
+Historical 2022–2025 evidence is development/non-pristine. Completed 2026 outcomes remain prohibited from candidate design, fitting, tuning, selection, rescue, and historical survival decisions.
 
 ## Frozen design summary
 
-**Q1** estimates `R = M + L` at τ={10/21, 1/2, 11/21} using L1-regularized linear quantile regression and the compact frozen feature contract.
+**Q1** — `ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1`: estimates `R=M+L` at τ={10/21,1/2,11/21} with L1-regularized linear quantile regression.
 
-**Q2** builds `P(M=k)` for integer `k∈[-75,75]`, centered on the quoted market plus chronology-clean Q1 median residual, with conditional scale and training-only key-number excess at |margin|={3,6,7,10,14}. Generalized normal is the primary base; Gaussian, Student-t and empirical-residual forms are fixed comparisons, not an open model search.
+**Q2** — `ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1`: produces an integer PMF on [-75,75], centered on the quoted market plus chronology-clean Q1 median residual, with bounded generalized-normal/Gaussian/Student-t/empirical comparisons, fixed conditional-scale terms and training-only key-number excess at |margin|={3,6,7,10,14}.
 
-**Q3** directly estimates cover/push/loss with a two-part hurdle: push probability on whole-number lines and conditional cover probability on non-push outcomes. Half-point lines have `P(push)=0` by construction.
+**Q3** — `ATS-Q3-DIRECT-CPL-HURDLE-V1`: two-part L2-logistic hurdle estimating push on whole-number lines and conditional cover on non-push rows, with half-point push probability structurally zero.
 
-A Q2/Q3 probability blend is authorized only on the fixed weight grid `{0, .25, .50, .75, 1}` using inner chronology-clean multinomial log loss.
+A Q2/Q3 blend is authorized only on `w_Q2={0,.25,.50,.75,1}` selected by inner chronology-clean multinomial log loss.
 
 ## Exact Phase-2 starting action
 
-After the final Phase-1 receipt is merged, create the Phase-2 research branch from the then-current `main`, read the complete Phase-1 package, and implement **data-contract/synthetic grading infrastructure plus Q1 only** before implementing Q2 or Q3. The first Phase-2 gate must prove sign convention, whole-/half-line grading, chronology, feature provenance and 2026-outcome exclusion before any candidate result is interpreted.
+Phase 2 is **NOT STARTED**. When it is explicitly continued:
 
-Phase 2 is not authorized to change production.
+1. create a dedicated Phase-2 research branch from then-current `main`;
+2. read the complete Phase-1 package and final receipt;
+3. implement canonical sign/ATS grading helpers and the preregistered synthetic grading tests;
+4. assert whole-/half-line push logic;
+5. build row-level provenance for spread/total/moneyline and compact football state;
+6. assert outer/inner rolling chronology and completed-2026 exclusion;
+7. freeze implementation/config hashes in a pre-result Phase-2 opening receipt;
+8. only then fit Q1; implement Q2 and Q3 later in the frozen sequence.
+
+Phase 2 remains research-only and is not authorized to change production.

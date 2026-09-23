@@ -2,75 +2,75 @@
 
 **Program:** LEVLINE ATS NEXT-GENERATION RESEARCH PROGRAM  
 **Phase:** 1 — Deep ATS Research, Problem Reformulation & Preregistration  
-**Status:** **PRE-MERGE FREEZE COMPLETE — EXACT-HEAD VALIDATION PENDING**  
+**Status:** **COMPLETE**  
 **Primary branch:** `research/ats-nextgen-phase1`  
-**Scientific package freeze head before this receipt:** `b523ce382077184a97e107bf80c6a298def8c2ce`  
+**Primary PR:** #556 — **MERGED**  
+**Exact validated PR head:** `c1397729b7f973169ef6fda700f481a91ad25538`  
+**Primary merge SHA:** `80f84dc8282205c48dbfd8ca7e9e31c4be663bb6`  
 **Production model:** `F-ST-01-FROZEN-2026` — unchanged  
 **Phase 2:** **NOT STARTED**
 
-This receipt records the Phase-1 scientific freeze before any Q1/Q2/Q3 historical candidate output exists. After the primary Phase-1 PR is validated and merged, this receipt may be amended only with immutable integration metadata (validated PR head, PR number, CI runs, merge SHA, merged-main verification, and final status). Scientific design fields may not be changed in that closeout amendment.
+This receipt closes Phase 1 after exact-head validation and merged-main verification. It records integration metadata only; the scientific specification was frozen before any Q1/Q2/Q3 historical candidate output existed.
+
+## Exact-head validation
+
+All required checks on `c1397729b7f973169ef6fda700f481a91ad25538` passed:
+
+- LevLine research firewall — run `35902704358` (#1952): **SUCCESS**;
+- LevLine research validation — run `35902704158` (#1535): **SUCCESS**;
+- Daily NFL model refresh / full pytest and PR-output validation — run `35902704146` (#1086): **SUCCESS**.
+
+The research-validation foundation included `tests/test_challenger_ats_nextgen_phase1.py`, which freezes candidate IDs, sign semantics, chronology, key-number set, blend grid, production firewall, completed-2026 firewall, and required Phase-1 artifacts. Protected production-surface diff checks passed.
 
 ## Fixed prior evidence accepted
 
-The completed Spread & Points Next-Generation program remains fixed negative evidence. The ATS program does not reopen A0/B0/C0, generic historical residual stacking, large-disagreement heuristics, or Candidate 5 under new names.
+The completed Spread & Points Next-Generation program remains fixed negative evidence. This program does not reopen A0/B0/C0, generic historical residual stacking, large-disagreement heuristics, or Candidate 5 under new names.
 
-Prior authoritative facts include:
+Accepted prior facts include approximately 9.962 independent margin MAE, approximately 9.494 historical market spread MAE, approximately 48.77% raw LevLine model-side ATS hit rate, no validated large-disagreement edge, no A0/B0/C0 incremental market-relative claim, and no Candidate-5 improvement to F-ST.
 
-- independent margin MAE approximately 9.962;
-- historical market spread MAE approximately 9.494;
-- raw LevLine model-side ATS hit rate approximately 48.77%;
-- market beat LevLine on margin MAE;
-- large disagreement was not a validated edge;
-- A0/B0/C0 did not establish standalone/incremental market-relative superiority;
-- Candidate 5 did not improve F-ST.
-
-## Frozen new scientific formulation
-
-The canonical home-oriented contract is:
+## Canonical ATS contract
 
 - `M = home_score - away_score`;
-- `L = sportsbook_home_spread` with home favorite -3 represented as `L=-3`;
+- `L = sportsbook_home_spread`, with home favorite -3 represented as `L=-3`;
 - `R = M + L`;
 - cover iff `R>0`, push iff `R=0`, loss iff `R<0`.
 
-ATS is treated as conditional margin-distribution / cover-probability estimation around the quoted market threshold, not merely unconditional mean-margin MAE minimization.
+ATS is modeled as conditional margin-distribution / cover-probability estimation around the quoted market threshold rather than unconditional mean-margin MAE alone.
 
-## Frozen candidates
-
-### Q1
+## Frozen Q1
 
 `ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1`
 
-- target: `R=M+L`;
+- target `R=M+L`;
 - quantiles exactly `10/21`, `1/2`, `11/21`;
-- learner: sklearn `QuantileRegressor` with L1 penalty;
+- sklearn `QuantileRegressor`, L1 penalty;
 - alpha grid `{0.001,0.01,0.1,1.0}`;
 - inner rolling-origin selection by pinball loss;
-- compact market + PIT-safe football state only;
+- compact market + PIT-safe football state;
 - no nonlinear rescue learner.
 
-### Q2
+## Frozen Q2
 
 `ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1`
 
 - integer PMF on `M=-75,...,+75`;
 - main center `-L + q0.5_Q1(R|X)` using chronology-clean Q1 output;
-- exactly four bounded distribution arms: generalized normal primary, Gaussian, Student-t, empirical discrete residual reference;
+- four bounded arms: generalized normal primary, Gaussian, Student-t, empirical discrete residual;
 - generalized-normal beta grid `{1.0,1.25,1.5,1.75,2.0}`;
 - Student-t df grid `{4,6,10}`;
-- conditional scale uses only favorite size, centered market total, and their fixed interaction;
-- explicit key-number excess only at `|k| in {3,6,7,10,14}` with training-only shrinkage;
+- conditional scale terms fixed to favorite size, centered total, and their interaction;
+- training-only key-number excess at `|k|={3,6,7,10,14}` with frozen shrinkage grid;
 - whole-number push mass modeled directly; half-point push probability exactly zero.
 
-### Q3
+## Frozen Q3
 
 `ATS-Q3-DIRECT-CPL-HURDLE-V1`
 
-- structural two-head L2-logistic hurdle model;
-- Head A estimates push probability on whole-number spread rows and sets push=0 on half-lines;
-- Head B estimates `P(cover | nonpush,X)`;
-- C grid `{0.01,0.1,1.0,10.0}` selected by inner chronology / multinomial log loss;
-- no LightGBM/XGBoost/GAM/neural/isotonic/Platt rescue layer in V1.
+- two-head L2-logistic hurdle;
+- Head A models push probability on whole-number spread rows, with structural `P(push)=0` on half-lines;
+- Head B models `P(cover | nonpush,X)`;
+- C grid `{0.01,0.1,1.0,10.0}` selected by prior-time multinomial log loss;
+- no class reweighting, post-hoc calibration, LightGBM/XGBoost/GAM/neural rescue in V1.
 
 ## Q2/Q3 blend
 
@@ -78,51 +78,34 @@ Authorized before results:
 
 `P_final = w*P_Q2 + (1-w)*P_Q3`
 
-with frozen grid `w in {0,0.25,0.50,0.75,1.0}` selected only on inner prior-time OOF rows by multinomial log loss. No outer-row ATS/ROI tuning or bucket-specific weights.
+with `w ∈ {0,0.25,0.50,0.75,1.0}`, selected only inside prior-time inner validation by multinomial log loss. No outer-row ATS/ROI tuning or slice-specific weights.
 
-## Market null hierarchy
+## Market nulls and economics
 
-- M0 — quoted spread, no LevLine adjustment;
-- M1 — market-derived distribution, no football information;
-- M2 — market + simple line-level calibration only, no football information.
+M0 is the quoted spread with no LevLine adjustment. M1 is a market-derived distribution without football information. M2 is market + simple line-level calibration only, again without football information. Incremental football claims require improvement over the relevant market null on exact common chronology-clean rows.
 
-Incremental football claims must beat the relevant market null on exact common chronology-clean rows.
+Standard -110 implies no-push break-even `110/210 = 52.38095%` and motivates the `10/21`, `1/2`, `11/21` reference quantiles. Exact EV is push-aware: `EV=P(win)*W-P(loss)*R`. Historical spread-side prices may not be fabricated; `REFERENCE_MINUS110` is sensitivity only when actual price is unavailable.
 
-## Evidence boundary
+## Evidence and chronology boundary
 
-- 2022–2025 are development/non-pristine evidence for this new ATS family;
-- historical positive results cannot authorize production;
-- completed 2026 outcomes are prohibited from architecture, features, quantiles, distribution selection, key-mass choices, learner selection, thresholds, calibration, blend selection, rescue, and survival;
-- outcome-blind prospective 2026 inputs may be inspected only for source qualification.
+- 2022–2025 are development/non-pristine for this ATS family;
+- outer targets are 2022–2025; target-season parameters use prior seasons only;
+- inner targets begin in 2019 and are rolling-origin;
+- random K-fold is prohibited;
+- historical nflverse spread fields remain `historical_closing_late_benchmark_exact_horizon_opaque`, not T-120;
+- multi-book latent fair-line work remains prospective/later-extension unless a historical source is separately qualified outcome-blind;
+- player-state expansion is reserved for a later extension.
 
-## Chronology
+Completed 2026 outcomes are prohibited from architecture, features, quantile/distribution/key-number choices, learner selection, thresholds, calibration, blend selection, rescue, fitting, or historical survival decisions. Outcome-blind prospective 2026 inputs may be inspected only for source qualification.
 
-Outer development targets are 2022–2025. For target season `s`, fit only prior seasons. Inner targets begin in 2019 and are themselves rolling-origin. Random K-fold is prohibited. Q1/Q2/Q3 preprocessing, shape/scale/key parameters, calibration and blend selection are all prior-time only.
+## Research conclusion
 
-## Economics / price boundary
+The external evidence supports testing the new family: conditional quantiles around the market threshold, a discrete key-number-aware margin PMF, explicit push mass, heteroskedasticity, and a bounded direct probability head. It does not justify copying external fitted parameters, an unrestricted feature/learner tournament, fabricated historical juice, or treating third-party reported betting records as LevLine evidence.
 
-Standard -110 implies a no-push break-even of `110/210 = 52.38095%` and motivates `10/21`, `1/2`, `11/21` reference quantiles. Exact EV uses actual side price when available and explicitly accounts for push:
+Power remains a central constraint: under the preregistered one-sided alpha .05 / 80% calculation, approximately 2,248 independent decisions are needed to distinguish a true 55% ATS rate from 52.38095%; one 272-game season is not strong confirmation of a modest edge.
 
-`EV = P(win)*W - P(loss)*R`.
+## Production firewall and stop
 
-Historical side price may not be fabricated. A `REFERENCE_MINUS110` sensitivity must be labeled hypothetical/reference rather than actual quoted-price ROI.
+Phase 1 did not modify production F-ST coefficients/artifacts, production winner selection, Sunday Signal numerical forecasting, public fair-spread semantics, official prediction history, forecast locks, or grading. Q1/Q2/Q3 remain untrained and no new candidate-specific historical performance was inspected.
 
-## Data / market boundary
-
-Historical nflverse spread fields remain labeled `historical_closing_late_benchmark_exact_horizon_opaque`; they are not T-120. The repository has a PIT-safe T-120 selector for stored prospective run history, but current historical game-spread data do not establish complete side-price/book/timestamp coverage. Multi-book latent fair-line work therefore remains prospective/later-extension unless a historical source is separately qualified outcome-blind.
-
-## External research conclusion
-
-Peer-reviewed work supports the median/quantile decision framing and shows that market information evolves through the betting week. `nfelo`/`nfelotranslation` provide transferable architecture for market separation and discrete key-number-aware margin distributions. `nfl-bet-engine` provides useful simulator/direct-head/blend architecture but its reported performance is third-party evidence and its broad iterative feature/tuning surface is not imported. David Sasser remains a useful observable product-semantic comparator; no reconstructable public methodology was located.
-
-## Evaluation / power
-
-Primary evidence is proper probability/distribution/quantile quality, not hit rate or ROI alone. Required metrics and fixed slices are in `EVALUATION_PROTOCOL.md`. Pre-result exact-binomial power planning shows approximately 2,248 independent decisions are required for 80% power at one-sided alpha .05 to detect a true 55% rate against 52.38095%; a single 272-game season is inadequate confirmation of modest ATS edge.
-
-## Production firewall
-
-No Phase-1 file modifies production F-ST coefficients/artifacts, production winner selection, Sunday Signal forecasting behavior, public fair-spread semantics, official prediction history, forecast locks, or grading.
-
-## Stop condition
-
-No Q1/Q2/Q3 training or candidate-specific historical performance is authorized in Phase 1. Phase 2 remains **NOT STARTED** until this package is exact-head validated, merged, and the merged-main closeout metadata is recorded.
+**Phase 1 is COMPLETE. Phase 2 is NOT STARTED. STOP.**

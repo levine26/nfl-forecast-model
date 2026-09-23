@@ -1,9 +1,21 @@
 {
   "program": "LEVLINE_ATS_NEXTGEN",
   "phase": 1,
-  "status": "PREREGISTERED_PENDING_MERGE_CLOSEOUT",
+  "status": "COMPLETE",
   "created_date": "2026-09-23",
   "phase1_base_main": "21f153d69ad579f6bd67250d75330b2c77ea1228",
+  "integration": {
+    "branch": "research/ats-nextgen-phase1",
+    "pr_number": 556,
+    "validated_head": "c1397729b7f973169ef6fda700f481a91ad25538",
+    "merge_sha": "80f84dc8282205c48dbfd8ca7e9e31c4be663bb6",
+    "research_firewall_run": 35902704358,
+    "research_firewall_conclusion": "success",
+    "research_validation_run": 35902704158,
+    "research_validation_conclusion": "success",
+    "daily_refresh_run": 35902704146,
+    "daily_refresh_conclusion": "success"
+  },
   "production_model": "F-ST-01-FROZEN-2026",
   "production_changed": false,
   "completed_2026_outcomes_authorized": false,
