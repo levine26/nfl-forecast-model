@@ -1,0 +1,123 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "A_Q1_PRE_RESULT",
+  "candidate_id": "ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1",
+  "status": "EARLIEST_PRE_RESULT_RULES_RESTORED_FOR_EXACT_HEAD_CI",
+  "created_date": "2026-09-23",
+  "branch": "research/ats-nextgen-phase2-q1",
+  "opening_main_sha": "f43e17ba783e3e389969cd1649889b37bd91afe9",
+  "governance_reconciliation_head_before_registry": "f9d126e6deba7303fcddcd5507bdf12b821253f4",
+  "completed_q1_evidence_artifact_exists": false,
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "cancelled_pre_reconciliation_attempt": {
+    "workflow_run": 35920081887,
+    "historical_job": 107381994029,
+    "conclusion": "cancelled",
+    "artifact_uploaded": false,
+    "usable_as_candidate_evidence": false
+  },
+  "frozen_gate": {
+    "rows": 2895,
+    "eligible_rows": 2895,
+    "push_rows": 73,
+    "canonical_game_keyed_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d",
+    "market_evidence_class": "historical_closing_late_benchmark_exact_horizon_opaque"
+  },
+  "q1_contract": {
+    "target": "R=(home_score-away_score)+home_spread",
+    "quantiles": [0.47619047619047616, 0.5, 0.5238095238095238],
+    "learner": "sklearn.linear_model.QuantileRegressor",
+    "alpha_grid": [0.001, 0.01, 0.1, 1.0],
+    "alpha_selection": "inner rolling-origin mean pinball loss separately per quantile",
+    "tie_break": "smaller alpha among losses equal within 1e-12; earliest pre-result receipt controls",
+    "minimum_inner_training_rows": 100,
+    "inner_fold_omission_receipt": "inner_targets_used and inner_targets_omitted",
+    "outer_target_seasons": [2022, 2023, 2024, 2025],
+    "training_floor": 2015,
+    "inner_target_floor": 2019,
+    "random_kfold_allowed": false,
+    "posthoc_quantile_crossing_repair_allowed": false,
+    "completed_2026_outcomes_allowed": false
+  },
+  "preprocessing": {
+    "imputation": "training-fold median only",
+    "scaling": "training-fold StandardScaler only",
+    "market_total_centering": "training-fold median",
+    "missingness_indicators": "fixed for every optional numeric V1 feature",
+    "interactions": [
+      "market_home_margin_center * centered_market_total",
+      "favorite_size * centered_market_total"
+    ]
+  },
+  "comparators": ["Q1-M0", "Q1-M2", "Q1"],
+  "fixed_reporting": {
+    "key_numbers": ["K3", "K6", "K7", "K10", "K14"],
+    "favorite_size": ["<3", "3-<7", "7-<10", "10-<14", ">=14"],
+    "market_total": ["<42", "42-<45", "45-<48", ">=48"]
+  },
+  "execution_gate": {
+    "tests_before_results": true,
+    "historical_job_depends_on_contract_job": true,
+    "runner_must_match_frozen_gate_hash_before_fit": true
+  },
+  "frozen_blobs": {
+    "q1_module": {
+      "path": "src/nfl_forecast/challenger_ats_nextgen_q1.py",
+      "sha": "adee4d024bc7dd824d6702749f7b7ce8dae0d8e7"
+    },
+    "q1_reporting": {
+      "path": "src/nfl_forecast/challenger_ats_nextgen_q1_reporting.py",
+      "sha": "b05c536fae784872666e29dbca3a3e7568e679af"
+    },
+    "q1_runner": {
+      "path": "scripts/run_challenger_ats_nextgen_q1.py",
+      "sha": "e63f046ed5d7ae87645c5c8561e23a31719b3f0e"
+    },
+    "q1_tests": {
+      "path": "tests/test_challenger_ats_nextgen_q1.py",
+      "sha": "f36a887fe0db353f7543dcaf8a515966f151ef90"
+    },
+    "q1_reporting_tests": {
+      "path": "tests/test_challenger_ats_nextgen_q1_reporting.py",
+      "sha": "17f2dde853bfc32eb35bb0b6a8affef6590f11fa"
+    },
+    "q1_workflow": {
+      "path": ".github/workflows/research_ats_nextgen_q1.yml",
+      "sha": "92a45f8a3aab852affdacbe6b1f2eb934c4b38c8"
+    },
+    "research_validation_workflow": {
+      "path": ".github/workflows/research_validation.yml",
+      "sha": "731c91e2265a89009d16690a167dcbb3c34422c3"
+    },
+    "q1_opening_receipt": {
+      "path": "research/ats-nextgen/Q1_STAGE_A_OPENING_RECEIPT.md",
+      "sha": "141666317290c8d9166e1fb7ed4d0ef2f6106309"
+    },
+    "phase2_opening_registry": {
+      "path": "research/ats-nextgen/phase2_opening_registry.json",
+      "sha": "ef64d745cffe7b2e876618e86a4cf8a57e58d875"
+    },
+    "gate_module": {
+      "path": "src/nfl_forecast/challenger_ats_nextgen_gate.py",
+      "sha": "5be2162fbddf492b87b839b55397ca8cbb596b8a"
+    },
+    "model_config": {
+      "path": "config/model.yaml",
+      "sha": "c8db03a11c66254dc4ea897495c76b4152802bea"
+    },
+    "data_loader": {
+      "path": "src/nfl_forecast/data.py",
+      "sha": "2fb21dd6b7254d4b1e7921ae33f77d4dd2578640"
+    },
+    "feature_builder": {
+      "path": "src/nfl_forecast/features.py",
+      "sha": "76c42479cb72ab38509e0b4bcee723eb638789d1"
+    },
+    "elo_builder": {
+      "path": "src/nfl_forecast/elo.py",
+      "sha": "a7e7ae9e312e188a8d8c751c8a65addaa19cfcfe"
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "A_Q1_RESULT",
+  "candidate_id": "ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1",
+  "classification": "VALID_NEGATIVE_INCREMENTAL_RESULT",
+  "result_head": "f14e2fa3ec78bf95578b4a5030fb66e94cd12cd0",
+  "pull_request": 560,
+  "workflow_run": 35920622523,
+  "workflow_run_number": 7,
+  "artifact": {
+    "id": 10776898518,
+    "name": "ats-nextgen-q1-35920622523",
+    "digest": "sha256:b544a4928a3e2ab80861b7b3fcf581a6b51355961b80aa05ddc5e4a0554d0c36",
+    "outer_oof_rows": 1087,
+    "outer_target_seasons": [2022, 2023, 2024, 2025]
+  },
+  "gate_canonical_game_keyed_sha256": "bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d",
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "primary_result": {
+    "mean_pinball": {
+      "M0": 4.747240,
+      "M2": 4.749986,
+      "Q1": 4.750117,
+      "Q1_minus_M2": 0.000131
+    },
+    "by_quantile": {
+      "10_over_21": {"M2_pinball": 4.736212, "Q1_pinball": 4.736212, "M2_coverage_error": -0.009769, "Q1_coverage_error": -0.009769},
+      "1_over_2": {"M2_pinball": 4.749754, "Q1_pinball": 4.753243, "M2_coverage_error": -0.011500, "Q1_coverage_error": -0.013339},
+      "11_over_21": {"M2_pinball": 4.763994, "Q1_pinball": 4.760897, "M2_coverage_error": -0.012310, "Q1_coverage_error": -0.010470}
+    },
+    "incremental_vs_market_only": false,
+    "failure_rule": "Q1 fails because preregistered pinball/probability calibration does not improve relative to M2; ATS slices/ROI cannot rescue it."
+  },
+  "season_mean_pinball_q1_minus_m2": {
+    "2022": -0.004140,
+    "2023": 0.000000,
+    "2024": 0.003698,
+    "2025": 0.000950
+  },
+  "crossings": {
+    "M2": {"rows": 87, "rate": 0.080037},
+    "Q1": {"rows": 79, "rate": 0.072677},
+    "posthoc_repair_applied": false
+  },
+  "fixed_slice_cells": {
+    "count": 42,
+    "q1_pinball_better": 12,
+    "q1_pinball_equal": 14,
+    "q1_pinball_worse": 16,
+    "q1_abs_calibration_better": 3,
+    "q1_abs_calibration_equal": 32,
+    "q1_abs_calibration_worse": 7
+  },
+  "inner_chronology": {
+    "all_expected_targets_used": true,
+    "omitted_targets": 0
+  },
+  "evidence_sha256": {
+    "q1_outer_oof_2022_2025.csv": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
+    "q1_inner_alpha_selections.csv": "22f9c1f12a359e3861c72c0f6d6f5839356b959944dc187fbaf68574b2f4fe45",
+    "q1_quantile_metrics.csv": "0e79c2d5fbf435e8b5a231b056011b7e3b3fce2b3c3bf0edc9d8306af837ce23",
+    "q1_quantile_crossings.csv": "b28bf439afb59f450d5a660dbd657c2802aa22fb10743bf3d1beaa695f724ef9",
+    "q1_fixed_slice_metrics.csv": "c637ee936e5c8f29aa06c41aa8552aaeff66217f2c4f342b8cf64617a542c1ee",
+    "q1_summary.json": "ae4eb4e35b99b05263cf806d9b9f8b6b9c32264217a3a8b83287687e938c31ad"
+  },
+  "q1_rescue_allowed": false,
+  "q2_handoff": {
+    "authorized_after_stage_a_receipt_merge": true,
+    "input": "chronology-clean Q1 median residual predictions from the frozen Stage-A interface",
+    "q1_success_implied": false
+  },
+  "historical_evidence_class": "development_non_pristine"
+}
