@@ -29,6 +29,7 @@ QUANTILES = (10.0 / 21.0, 0.5, 11.0 / 21.0)
 QUANTILE_LABELS = ("low", "med", "high")
 ALPHA_GRID = (0.001, 0.01, 0.1, 1.0)
 TIE_TOLERANCE = 1e-12
+MIN_INNER_TRAIN_ROWS = 100
 
 MANDATORY_MARKET_FEATURES = (
     "home_spread",
@@ -79,6 +80,7 @@ class AlphaSelection:
     mean_pinball_loss: float
     inner_rows: int
     inner_targets_used: tuple[int, ...]
+    inner_targets_omitted: tuple[int, ...]
     alpha_losses: dict[float, float]
 
 
@@ -135,8 +137,6 @@ def _build_unscaled_design(
         values = _numeric(frame, column)
         missing = ~np.isfinite(values.to_numpy(dtype=float))
         design[column] = values.where(~missing, medians[column]).astype(float)
-        # Fixed indicator columns are part of the pre-result V1 contract even if a
-        # particular training fold happens to contain no missing row.
         design[f"{column}__missing"] = missing.astype(float)
 
     if "market_total" not in design.columns:
@@ -145,8 +145,6 @@ def _build_unscaled_design(
     design[INTERACTION_FEATURES[0]] = design["market_home_margin_center"] * centered_total
     design[INTERACTION_FEATURES[1]] = design["favorite_size"] * centered_total
 
-    # Preserve a deterministic semantic order: raw frozen features, their fixed
-    # missing indicators, then the two fixed interactions.
     ordered: list[str] = []
     for column in raw_features:
         ordered.append(column)
@@ -216,7 +214,7 @@ def _fit_quantile_model(
 
 
 def choose_alpha(alpha_losses: dict[float, float]) -> tuple[float, float]:
-    """Choose minimum loss; exact/numerical ties prefer stronger regularization."""
+    """Choose minimum loss; exact/numerical ties prefer the smaller alpha."""
     if set(float(a) for a in alpha_losses) != set(ALPHA_GRID):
         raise ValueError("Q1 alpha search must use the complete frozen alpha grid")
     finite = {float(a): float(loss) for a, loss in alpha_losses.items() if np.isfinite(loss)}
@@ -224,7 +222,7 @@ def choose_alpha(alpha_losses: dict[float, float]) -> tuple[float, float]:
         raise ValueError("Q1 alpha search produced a non-finite loss")
     best_loss = min(finite.values())
     tied = [a for a, loss in finite.items() if abs(loss - best_loss) <= TIE_TOLERANCE]
-    selected = max(tied)
+    selected = min(tied)
     return float(selected), float(finite[selected])
 
 
@@ -242,11 +240,13 @@ def select_alpha(
     alpha_targets: dict[float, list[np.ndarray]] = {a: [] for a in ALPHA_GRID}
     alpha_predictions: dict[float, list[np.ndarray]] = {a: [] for a in ALPHA_GRID}
     targets_used: list[int] = []
+    targets_omitted: list[int] = []
 
     for inner_target in plan.inner_target_seasons:
         train = _eligible(frame, plan.inner_training_seasons[int(inner_target)])
         valid = _eligible(frame, (int(inner_target),))
-        if train.empty or valid.empty:
+        if len(train) < MIN_INNER_TRAIN_ROWS or valid.empty:
+            targets_omitted.append(int(inner_target))
             continue
         targets_used.append(int(inner_target))
         y_valid = pd.to_numeric(valid["ats_residual"], errors="raise").to_numpy(dtype=float)
@@ -262,7 +262,9 @@ def select_alpha(
             alpha_predictions[alpha].append(pred)
 
     if not targets_used:
-        raise RuntimeError("Q1 has no usable inner rolling-origin fold")
+        raise RuntimeError(
+            "Q1 has no usable inner rolling-origin fold after the frozen 100-row minimum"
+        )
 
     losses: dict[float, float] = {}
     total_rows = 0
@@ -284,6 +286,7 @@ def select_alpha(
         mean_pinball_loss=selected_loss,
         inner_rows=int(total_rows),
         inner_targets_used=tuple(targets_used),
+        inner_targets_omitted=tuple(targets_omitted),
         alpha_losses=losses,
     )
 
@@ -339,6 +342,9 @@ def generate_q1_outer_oof(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFra
                         "selected_mean_pinball_loss": selection.mean_pinball_loss,
                         "inner_rows": selection.inner_rows,
                         "inner_targets_used": ",".join(map(str, selection.inner_targets_used)),
+                        "inner_targets_omitted": ",".join(
+                            map(str, selection.inner_targets_omitted)
+                        ),
                         **{
                             f"alpha_{alpha:g}_loss": selection.alpha_losses[float(alpha)]
                             for alpha in ALPHA_GRID
@@ -350,10 +356,7 @@ def generate_q1_outer_oof(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFra
     oof = pd.concat(outputs, ignore_index=True)
     if oof["game_id"].astype(str).duplicated().any():
         raise RuntimeError("Q1 OOF contains duplicate game_id")
-    if pd.to_numeric(oof["season"], errors="raise").tolist() != sorted(
-        pd.to_numeric(oof["season"], errors="raise").tolist()
-    ):
-        oof = oof.sort_values(["season", "game_id"], kind="mergesort").reset_index(drop=True)
+    oof = oof.sort_values(["season", "game_id"], kind="mergesort").reset_index(drop=True)
     tuning = pd.DataFrame(tuning_rows).sort_values(
         ["outer_target_season", "arm", "quantile"], kind="mergesort"
     ).reset_index(drop=True)
