@@ -28,7 +28,7 @@ The Phase-2 opening condition is therefore satisfied and Stage A may begin.
 
 ## Frozen Q1 contract
 
-This stage will implement exactly `Q1_QUANTILE_PREREGISTRATION.md`:
+This stage implements exactly `Q1_QUANTILE_PREREGISTRATION.md`:
 
 - target `R = M + L`;
 - `M = home_score-away_score`;
@@ -41,25 +41,30 @@ This stage will implement exactly `Q1_QUANTILE_PREREGISTRATION.md`:
 - Q1-M2 is the identical quantile learner using market features only;
 - Q1 is market plus the frozen compact football state;
 - training-fold-only median imputation, total centering and scaling;
+- fixed preregistered key-number, favorite-size and market-total reporting slices only;
 - no random K-fold;
-- no post-hoc calibration;
+- no post-hoc calibration or quantile-crossing repair;
 - no nonlinear rescue learner;
 - no player-state/weather/news/juice/book-dispersion expansion;
 - no completed-2026 outcomes.
 
 ## Pre-result implementation decisions required by software, not target results
 
-The frozen scientific documents do not specify a numerical tie-break for exactly equal inner mean pinball losses. Before any Q1 output exists, Stage A fixes the deterministic tie-break to the **smaller alpha** after sorting by `(mean_pinball_loss, alpha)`.
+The frozen scientific documents do not specify a numerical tie-break for numerically equal inner mean pinball losses. Before any Q1 output exists, Stage A fixes the deterministic tie-break to the **larger alpha (stronger regularization)** within numerical tolerance `1e-12`. This is encoded in the implementation and contract test before historical execution.
 
-The fixed feature implementation will create missingness indicators for every optional numeric V1 feature. This is a stable schema choice; indicators may be all-zero in a particular training fold. Missing numeric values are imputed only from that training fold. Market total is centered on the training-fold median before the two frozen spread-total interactions are constructed.
+The fixed feature implementation creates missingness indicators for every optional numeric V1 feature. This is a stable schema choice; indicators may be all-zero in a particular training fold. Missing numeric values are imputed only from that training fold. Market total is centered on the training-fold median before the two frozen spread-total interactions are constructed.
 
-An inner fold is mechanically eligible when it contains target rows and at least 100 eligible prior training rows. A missing/insufficient fold is omitted with an explicit receipt; it is never replaced by random CV. The current gate has ample pre-2019 history, so this guard is not a data-driven tuning parameter.
+The Phase-1 contract did not preregister an arbitrary numeric minimum row count for an inner fold, so Stage A does not introduce one. An inner fold is usable only when both its prior-time training frame and its target frame contain eligible rows. A missing fold is omitted rather than replaced by random CV; the frozen expected inner target seasons and the actual `inner_targets_used` are preserved in the tuning evidence so any omission is auditable.
+
+Quantile crossings are reported as diagnostics only. No sorting, clipping, isotonic repair or other post-hoc monotonicity correction is authorized for Q1 V1.
 
 ## Execution boundary
 
-Q1 historical outer OOF generation is permitted only after Q1 contract tests pass on the exact implementation head. If those tests fail, no Q1 result from that execution is interpretable.
+Q1 historical outer OOF generation is permitted only after the Phase-2 gate tests and Q1 contract/reporting tests pass on the exact implementation head. The dedicated Stage-A workflow enforces this dependency: the historical job cannot start unless the contract job succeeds.
 
-After the first valid Q1 outer OOF result exists, the Q1 learner, quantiles, alpha grid, feature family, chronology, preprocessing semantics, tie-break and comparators may not be redesigned in response to those results.
+The historical runner must first regenerate the 2015–2025 gate and match the frozen canonical game-keyed SHA-256 `bc65419512759d296c98e3ac4e91ae89d32b544c262bcdd604de34bee61b1e6d`; a mismatch fails closed before any Q1 fit.
+
+After the first valid Q1 outer OOF result exists, the Q1 learner, quantiles, alpha grid, feature family, chronology, preprocessing semantics, tie-break, comparators and fixed reporting slices may not be redesigned in response to those results.
 
 Q2 and Q3 remain unopened.
 
