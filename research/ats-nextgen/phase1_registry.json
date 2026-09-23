@@ -1,0 +1,74 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 1,
+  "status": "PREREGISTERED_PENDING_MERGE_CLOSEOUT",
+  "created_date": "2026-09-23",
+  "phase1_base_main": "21f153d69ad579f6bd67250d75330b2c77ea1228",
+  "production_model": "F-ST-01-FROZEN-2026",
+  "production_changed": false,
+  "completed_2026_outcomes_authorized": false,
+  "historical_evidence_class": "2022_2025_DEVELOPMENT_NON_PRISTINE",
+  "canonical_sign": {
+    "margin": "home_score-away_score",
+    "home_spread": "sportsbook home spread; home favorite is negative",
+    "ats_residual": "margin+home_spread",
+    "cover": "ats_residual>0",
+    "push": "ats_residual==0",
+    "loss": "ats_residual<0"
+  },
+  "chronology": {
+    "training_floor": 2015,
+    "outer_target_seasons": [2022, 2023, 2024, 2025],
+    "inner_target_floor": 2019,
+    "random_kfold_allowed": false
+  },
+  "q1": {
+    "id": "ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1",
+    "learner": "L1 regularized linear quantile regression",
+    "target": "R=M+L",
+    "quantiles": [0.47619047619047616, 0.5, 0.5238095238095238],
+    "alpha_grid": [0.001, 0.01, 0.1, 1.0],
+    "primary_metric": "pinball_loss"
+  },
+  "q2": {
+    "id": "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1",
+    "margin_min": -75,
+    "margin_max": 75,
+    "primary_base": "generalized_normal",
+    "comparison_bases": ["gaussian", "student_t", "empirical_discrete_residual"],
+    "generalized_normal_beta_grid": [1.0, 1.25, 1.5, 1.75, 2.0],
+    "student_t_df_grid": [4, 6, 10],
+    "key_abs_margins": [3, 6, 7, 10, 14],
+    "key_distance_bands": [[0.0, 3.5], [3.5, 7.5], [7.5, null]],
+    "key_shrinkage_grid": [1, 10, 100],
+    "conditional_scale_terms": ["intercept", "abs_spread", "centered_total", "abs_spread_x_centered_total"],
+    "primary_metric": "discrete_crps_or_ranked_probability_score"
+  },
+  "q3": {
+    "id": "ATS-Q3-DIRECT-CPL-HURDLE-V1",
+    "learner": "two_part_L2_logistic_hurdle",
+    "push_half_point_probability": 0.0,
+    "C_grid": [0.01, 0.1, 1.0, 10.0],
+    "class_reweighting_allowed": false,
+    "posthoc_calibration_allowed": false,
+    "primary_metric": "multinomial_log_loss"
+  },
+  "blend": {
+    "authorized": true,
+    "formula": "P_final=w*P_Q2+(1-w)*P_Q3",
+    "q2_weight_grid": [0.0, 0.25, 0.5, 0.75, 1.0],
+    "selection_metric": "inner_chronology_multinomial_log_loss",
+    "target_period_weight_selection_allowed": false
+  },
+  "selective_evaluation": ["all", "qualified_positive_ev", "top_20_percent", "top_10_percent"],
+  "key_spread_buckets": {
+    "K3": [2.5, 3.0, 3.5],
+    "K6": [5.5, 6.0, 6.5],
+    "K7": [6.5, 7.0, 7.5],
+    "K10": [9.5, 10.0, 10.5],
+    "K14": [13.5, 14.0, 14.5]
+  },
+  "multi_book_latent_fair_line": "PROSPECTIVE_EXTENSION_ONLY",
+  "player_state_v1": "RESERVED_FOR_LATER_EXTENSION",
+  "phase2_started": false
+}
