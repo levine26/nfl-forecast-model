@@ -1,0 +1,107 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 3,
+  "stage": "SCIENTIFIC_SYNTHESIS_CANDIDATE_SELECTION_AND_FREEZE",
+  "status": "COMPLETE_CLASSIFICATION_ONLY",
+  "phase3_opening": {
+    "branch": "research/ats-nextgen-phase3",
+    "verified_main_base_sha": "a5c7bf6c37b9d1b385bfe88bd1a329ddd3bb63f0",
+    "opening_receipt_commit": "d2be05c3f74e5b6095a9714bd58e7f0984c59276",
+    "phase2_governance_closeout_pr": 567,
+    "phase2_governance_closeout_head": "ee056a281303f2b5e60e7652fb2c45d85337a116",
+    "phase2_governance_closeout_merge": "a5c7bf6c37b9d1b385bfe88bd1a329ddd3bb63f0",
+    "phase2_scientific_closeout_pr": 566,
+    "phase2_scientific_closeout_merge": "89f8b4fa48e22554029392b303225e4665b4b673"
+  },
+  "evidence_boundary": {
+    "historical_evidence_class": "development_non_pristine",
+    "historical_target_seasons": [2022, 2023, 2024, 2025],
+    "completed_2026_outcomes_used": 0,
+    "new_historical_candidate_predictions_generated": false,
+    "candidate_refit_or_retune_performed": false,
+    "candidate_rescue_performed": false,
+    "production_changed": false
+  },
+  "stage_d": {
+    "scientific_origin_pr": 564,
+    "accepted_result_head": "d9a416ff17e2692b1ed86c461b4bd87f5a6cb8ba",
+    "workflow_run": 35938628588,
+    "artifact_id": 10783982962,
+    "artifact_digest": "sha256:a7386fdb000e3dd17ee44563762e8cdb5c9423e62467f41138419978c4a75d7c",
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 26,
+    "bootstrap_blocks": 72,
+    "block_columns": ["season", "week"]
+  },
+  "allowed_statuses": [
+    "REJECTED",
+    "INCONCLUSIVE",
+    "ELIGIBLE_FOR_PROSPECTIVE_SHADOW"
+  ],
+  "eligibility_rule": "Primary proper/quantile metric must improve on the corresponding market null on exact common OOF rows, without material calibration failure, concentration-only improvement, leakage/red-team failure, or preregistered model-identity drift.",
+  "candidates": {
+    "ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1": {
+      "phase3_status": "REJECTED",
+      "reason_code": "FAILED_PRIMARY_INCREMENTAL_QUANTILE_GATE",
+      "structurally_valid": true,
+      "accepted_oof_rows": 1087,
+      "accepted_oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
+      "comparator": "M2",
+      "primary_metric": "mean_three_quantile_pinball",
+      "direction": "lower_is_better",
+      "candidate_minus_null": 0.0001307887665715768,
+      "paired_95pct_ci": [-0.002378435765685505, 0.002555544033066125],
+      "bootstrap_probability_candidate_better": 0.4554,
+      "primary_incremental_gate_passed": false,
+      "material_harm_proven": false,
+      "rescue_allowed": false
+    },
+    "ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1": {
+      "phase3_status": "REJECTED",
+      "reason_code": "STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT",
+      "structurally_valid": false,
+      "accepted_oof_rows": null,
+      "accepted_primary_performance": null,
+      "comparator": "M1",
+      "frozen_support": [-75, 75],
+      "frozen_endpoint_mass_threshold": 0.001,
+      "observed_max_endpoint_mass": 0.0033487075822347966,
+      "primary_incremental_gate_passed": false,
+      "statistical_inconclusive_label_applicable": false,
+      "q2_complementarity_available": false,
+      "q2_q3_blend_available": false,
+      "rescue_allowed": false
+    },
+    "ATS-Q3-DIRECT-CPL-HURDLE-V1": {
+      "phase3_status": "REJECTED",
+      "reason_code": "FAILED_PRIMARY_INCREMENTAL_PROPER_SCORE_GATE",
+      "structurally_valid": true,
+      "accepted_oof_rows": 1087,
+      "accepted_oof_sha256": "18610dfcfa9ffe71ed30259f9fef85a5655cefa68301f46fa1bb1950593dee04",
+      "comparator": "Q3-M2",
+      "primary_metric": "multinomial_cover_push_loss_log_loss",
+      "direction": "lower_is_better",
+      "candidate_minus_null": 0.0013157418572419255,
+      "paired_95pct_ci": [-0.0015590942193462521, 0.004336647782633088],
+      "bootstrap_probability_candidate_better": 0.1842,
+      "nonpush_brier_candidate_minus_null": 0.0006716459171549338,
+      "nonpush_brier_paired_95pct_ci": [-0.0007977772384239724, 0.002212922097716785],
+      "nonpush_brier_probability_candidate_better": 0.1851,
+      "q3_cover_calibration_slope": 0.27094382668690847,
+      "q3_m2_cover_calibration_slope": 0.8130523437112027,
+      "primary_incremental_gate_passed": false,
+      "material_harm_proven": false,
+      "rescue_allowed": false
+    }
+  },
+  "classification_counts": {
+    "REJECTED": 3,
+    "INCONCLUSIVE": 0,
+    "ELIGIBLE_FOR_PROSPECTIVE_SHADOW": 0
+  },
+  "eligible_for_prospective_shadow": [],
+  "prospective_shadow_spec_created": false,
+  "phase4_authorized": false,
+  "phase4_status": "NOT_AUTHORIZED_NOT_STARTED",
+  "production_control": "F-ST-01-FROZEN-2026"
+}
