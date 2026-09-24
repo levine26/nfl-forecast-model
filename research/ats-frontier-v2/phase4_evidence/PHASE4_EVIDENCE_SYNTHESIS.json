@@ -127,7 +127,7 @@
     "common_rows_null": 1087,
     "dropped_for_missing_spread": 0,
     "dynamic_full_minus_no_qb": 0.0002656684749809789,
-    "dynamic_full_minus_static": 0.0003303202768748457,
+    "dynamic_full_minus_static": -0.0002526140634010399,
     "dynamic_no_qb_primary_log_loss": 0.7808845344047226,
     "margin_mae": 9.5093461058206,
     "margin_rmse": 12.366121882572106,
@@ -136,7 +136,8 @@
     "null_primary_log_loss": 0.7804795705044401,
     "oof_n": 1087,
     "paired_delta_candidate_minus_null": 0.0006706323752636537,
-    "static_primary_log_loss": 0.7808198826028289
+    "static_pooling_rule": "prior_only_fixed_ewma_half_life_8_games",
+    "static_primary_log_loss": 0.7814028169431046
   },
   "M3_primary_evidence": "NEGATIVE_PRIMARY_EVIDENCE",
   "M4": {
@@ -242,11 +243,14 @@
     "full_minus_conditional_no_key": -0.0827967470523628,
     "full_minus_constant_key": 4.66831865686729e-05,
     "key_mass_contribution_vs_null": -0.08271837498276481,
+    "margin_mae": 9.494480220791168,
+    "margin_rmse": 12.36028636127993,
     "null_cpl_log_loss": 0.7796790214277723,
     "null_id": "M4-NULL-STUDENTT-CONSTANT-01",
     "null_integer_log_score": 3.9356468604011363,
     "oof_n": 1087,
     "paired_delta_candidate_minus_null": -0.08267169179619614,
+    "ranked_probability_score": 6.9151236594419325,
     "selected_by_outer_season_variant": {
       "2022:CONDITIONAL_SCALE_NO_KEY": {
         "conditional": true,
@@ -520,6 +524,17 @@
         ],
         "use_key": true
       }
+    },
+    "tail_diagnostics": {
+      "endpoint_folding_used": false,
+      "finite_support_used": false,
+      "max_abs_market_residual": 44.0,
+      "max_abs_observed_margin": 50.0,
+      "nonfinite_observed_mass_count": 0,
+      "nonpositive_observed_mass_count": 0,
+      "observed_margin_mass_median": 0.02306624327554578,
+      "observed_margin_mass_min": 0.00021437354104561918,
+      "observed_margin_mass_p01": 0.0013662720772827323
     }
   },
   "M4_primary_evidence": "POSITIVE_PRIMARY_EVIDENCE",
@@ -529,13 +544,14 @@
   "production_changed": false,
   "provenance": {
     "branch": "research/ats-frontier-v2-phase4",
-    "code_sha256": "a80f1bb02945a8c3dabd4d176ac3c378a38f9b5beebe78d4f9534a5fb46b952a",
-    "commit_sha": "84546116537ee3550eae91f9e3d5a6a2bc60f7df",
+    "code_sha256": "155f5afeffe0ea71afdd204b7f7e602d29f1664bb27fab52506ba6df85ac858f",
+    "commit_sha": "4fce9805c2ba9ed9dc6de388600fe40787605720",
     "completed_2026_outcomes_used": 0,
-    "config_sha256": "5e5b026af6efba6eee7d5fc128a74bdb3ee07f6f3fd484ccf9d3db0c72dbf1b9",
+    "config_sha256": "ddc4abf966cbe15a865f4866b29ff76530f2449a07eca87b0ffee4ba07ec3284",
     "dataset_identity_sha256": "8a6d974306abd57ca8060ad3803c7e90ae52f3fbd2900dbb1599c77dbd858129",
     "game_ids_sha256": "03156647fbed7dc936c953a2a6c3400b2423fc3c8ff245388261c9bddd3b2a4f",
     "market_label": "HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE",
+    "original_preflight_code_sha256": "a80f1bb02945a8c3dabd4d176ac3c378a38f9b5beebe78d4f9534a5fb46b952a",
     "pbp_rows": 737117,
     "pbp_seasons": [
       2010,
@@ -574,7 +590,8 @@
       2023,
       2024,
       2025
-    ]
+    ],
+    "superseded_execution_accepted": false
   },
   "status": "EMPIRICAL_EVIDENCE_COMPLETE_PENDING_GITHUB_CLOSEOUT"
 }

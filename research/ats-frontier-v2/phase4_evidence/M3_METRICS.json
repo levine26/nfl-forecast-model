@@ -126,7 +126,7 @@
   "common_rows_null": 1087,
   "dropped_for_missing_spread": 0,
   "dynamic_full_minus_no_qb": 0.0002656684749809789,
-  "dynamic_full_minus_static": 0.0003303202768748457,
+  "dynamic_full_minus_static": -0.0002526140634010399,
   "dynamic_no_qb_primary_log_loss": 0.7808845344047226,
   "margin_mae": 9.5093461058206,
   "margin_rmse": 12.366121882572106,
@@ -135,5 +135,6 @@
   "null_primary_log_loss": 0.7804795705044401,
   "oof_n": 1087,
   "paired_delta_candidate_minus_null": 0.0006706323752636537,
-  "static_primary_log_loss": 0.7808198826028289
+  "static_pooling_rule": "prior_only_fixed_ewma_half_life_8_games",
+  "static_primary_log_loss": 0.7814028169431046
 }

@@ -101,11 +101,14 @@
   "full_minus_conditional_no_key": -0.0827967470523628,
   "full_minus_constant_key": 4.66831865686729e-05,
   "key_mass_contribution_vs_null": -0.08271837498276481,
+  "margin_mae": 9.494480220791168,
+  "margin_rmse": 12.36028636127993,
   "null_cpl_log_loss": 0.7796790214277723,
   "null_id": "M4-NULL-STUDENTT-CONSTANT-01",
   "null_integer_log_score": 3.9356468604011363,
   "oof_n": 1087,
   "paired_delta_candidate_minus_null": -0.08267169179619614,
+  "ranked_probability_score": 6.9151236594419325,
   "selected_by_outer_season_variant": {
     "2022:CONDITIONAL_SCALE_NO_KEY": {
       "conditional": true,
@@ -379,5 +382,16 @@
       ],
       "use_key": true
     }
+  },
+  "tail_diagnostics": {
+    "endpoint_folding_used": false,
+    "finite_support_used": false,
+    "max_abs_market_residual": 44.0,
+    "max_abs_observed_margin": 50.0,
+    "nonfinite_observed_mass_count": 0,
+    "nonpositive_observed_mass_count": 0,
+    "observed_margin_mass_median": 0.02306624327554578,
+    "observed_margin_mass_min": 0.00021437354104561918,
+    "observed_margin_mass_p01": 0.0013662720772827323
   }
 }
