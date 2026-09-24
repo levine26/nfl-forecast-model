@@ -1,6 +1,6 @@
 # ATS Next-Generation — Phase Status
 
-**Authority:** `MASTER_PLAN.md`, `FINAL_PHASE1_RECEIPT.md`, `FINAL_PHASE2_RECEIPT.md`, `PHASE3_OPENING_RECEIPT.md`, `PHASE3_EVIDENCE_SYNTHESIS.md`, `phase3_candidate_registry.json`, candidate result receipts/registries, and `PHASE2_STAGE_D_RESULT_RECEIPT.md` / `phase2_stage_d_result_registry.json`  
+**Authority:** `MASTER_PLAN.md`, `FINAL_PHASE1_RECEIPT.md`, `FINAL_PHASE2_RECEIPT.md`, `PHASE3_OPENING_RECEIPT.md`, `PHASE3_EVIDENCE_SYNTHESIS.md`, `phase3_candidate_registry.json`, `FINAL_PHASE3_RECEIPT.md`, `PHASE3_POST_MERGE_CLOSEOUT.md`, candidate result receipts/registries, and `PHASE2_STAGE_D_RESULT_RECEIPT.md` / `phase2_stage_d_result_registry.json`  
 **Last updated:** 2026-09-23 America/Los_Angeles  
 **Production:** `F-ST-01-FROZEN-2026` — unchanged
 
@@ -8,20 +8,20 @@
 |---|---|---|---|---|---|
 | 1 | Deep ATS Research, Problem Reformulation & Preregistration | **COMPLETE** | PR #556 / merge `80f84dc8282205c48dbfd8ca7e9e31c4be663bb6` | design frozen | closed |
 | 2 | Controlled Implementation & Historical Development | **COMPLETE — SCIENTIFIC + GOVERNANCE CLOSEOUT MERGED** | scientific PR #566 / `89f8b4fa48e22554029392b303225e4665b4b673`; governance PR #567 / `a5c7bf6c37b9d1b385bfe88bd1a329ddd3bb63f0` | Q1 negative; Q2 structurally invalid; Q3 negative; Stage-D uncertainty complete | closed |
-| 3 | Scientific Synthesis, Candidate Selection & Freeze | **COMPLETE — 3 REJECTED / 0 INCONCLUSIVE / 0 ELIGIBLE** | branch `research/ats-nextgen-phase3`; opening base `a5c7bf6c37b9d1b385bfe88bd1a329ddd3bb63f0` | frozen Phase-2 evidence classified; no new predictions/refits | validate and merge Phase-3 classification-only package |
-| 4 | Prospective Shadow Validation | **NOT AUTHORIZED / NOT STARTED** | none | no eligible candidate | do not start; requires a future eligible candidate and explicit user authorization |
+| 3 | Scientific Synthesis, Candidate Selection & Freeze | **COMPLETE — MERGED TERMINAL V1 CLASSIFICATION** | PR #568 / validated head `2fa575f8d570d025d55395ac9951390ab6910a01` / merge `1dff4e9c9a3960dd79610b5b1d22c13f991f9dc5` | 3 REJECTED / 0 INCONCLUSIVE / 0 ELIGIBLE; no new predictions/refits | closed |
+| 4 | Prospective Shadow Validation | **NOT AUTHORIZED / NOT STARTED** | none | no eligible candidate | do not start; requires a future eligible candidate under a new explicitly authorized research amendment/version |
 
-## Phase-3 opening identity
+## Phase-3 merged identity
 
-- Phase-2 governance closeout PR #567 merged only after all seven exact-head workflows on `ee056a281303f2b5e60e7652fb2c45d85337a116` were `SUCCESS`;
-- governance merge / verified Phase-3 base: `a5c7bf6c37b9d1b385bfe88bd1a329ddd3bb63f0`;
-- authoritative Phase-2 scientific closeout remains PR #566 / `89f8b4fa48e22554029392b303225e4665b4b673`;
+- verified Phase-3 base / Phase-2 governance merge: `a5c7bf6c37b9d1b385bfe88bd1a329ddd3bb63f0`;
 - Phase-3 branch: `research/ats-nextgen-phase3`;
 - immutable opening-receipt commit: `d2be05c3f74e5b6095a9714bd58e7f0984c59276`;
+- validated Phase-3 head: `2fa575f8d570d025d55395ac9951390ab6910a01`;
+- PR #568 merge: `1dff4e9c9a3960dd79610b5b1d22c13f991f9dc5`;
 - completed-2026 outcomes used: `0`;
 - production forecasting changed: `no`.
 
-## Phase-3 classifications
+## Final V1 classifications
 
 ### Q1 — `ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1`: **REJECTED**
 
@@ -67,6 +67,12 @@ Reason: `FAILED_PRIMARY_INCREMENTAL_PROPER_SCORE_GATE`.
 - Phase 4 authorized: `no`.
 
 No ATS hit-rate, ROI, selected subset, favorable season/slice, post-hoc calibration, support repair or candidate redesign was used to alter these classifications.
+
+## Terminal disposition
+
+The V1 ATS Next-Generation program is scientifically closed through Phase 3. There is no authorized next phase under the current program because no candidate survived the frozen selection gates.
+
+Any future ATS architecture must begin as a new explicitly authorized research amendment/version with a new pre-result contract. It may not be treated as a continuation or rescue of Q1/Q2/Q3 V1.
 
 ## Evidence boundary
 
