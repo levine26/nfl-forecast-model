@@ -3,30 +3,35 @@
   "phase3_frozen": true,
   "phase4_complete": true,
   "phase4_evidence_complete": true,
-  "phase5_started": false,
+  "phase5_started": true,
+  "phase5_classification_complete": true,
+  "historical_phase6_authorization": "NONE",
   "candidates": [
     {
       "id": "FV2-HIST-M3-DSSM-01",
       "mechanism": "hierarchical_dynamic_state_market_correction",
       "scope": "historical_phase4",
-      "status": "PHASE4_COMPLETE__AWAITING_PHASE5_CLASSIFICATION",
+      "status": "PHASE5_REJECTED",
       "phase4_evidence_label": "NEGATIVE_PRIMARY_EVIDENCE",
-      "phase5_classification": "NOT_APPLIED",
+      "phase5_classification": "REJECTED",
       "primary_metric": "multinomial_cover_push_loss_log_loss",
       "null": "M3-NULL-MARKET-NORMAL-01",
-      "outer_development_seasons": [2022, 2023, 2024, 2025]
+      "outer_development_seasons": [2022, 2023, 2024, 2025],
+      "phase6_authorized": false
     },
     {
       "id": "FV2-HIST-M4-DMARGIN-01",
       "mechanism": "tail_safe_student_t_integer_margin_pmf",
       "scope": "historical_phase4",
-      "status": "PHASE4_COMPLETE__AWAITING_PHASE5_CLASSIFICATION",
+      "status": "PHASE5_REJECTED",
       "phase4_evidence_label": "POSITIVE_PRIMARY_EVIDENCE",
-      "phase5_classification": "NOT_APPLIED",
+      "phase5_classification": "REJECTED",
       "primary_metric": "integer_margin_log_score",
       "null": "M4-NULL-STUDENTT-CONSTANT-01",
       "outer_development_seasons": [2022, 2023, 2024, 2025],
-      "phase4_ablation_note": "key-mass ablation reproduces essentially all primary improvement; conditional scale alone does not improve the null"
+      "phase4_ablation_note": "key-mass ablation reproduces essentially all primary improvement; conditional scale alone does not improve the null",
+      "phase5_rejection_note": "frozen full mechanism rejected because simpler preregistered CONSTANT_SCALE_KEY reproduces the result",
+      "phase6_authorized": false
     },
     {
       "id": "FV2-PROS-M1-MARKETSTATE-01",
@@ -35,7 +40,8 @@
       "status": "HISTORICAL_BLOCKED_PENDING_PAID_SOURCE__PROSPECTIVE_ONLY",
       "primary_horizon_minutes": 120,
       "primary_metric": "multinomial_cover_push_loss_log_loss",
-      "null": "M1-NULL-STATIC-T120-01"
+      "null": "M1-NULL-STATIC-T120-01",
+      "phase5_historical_classification": "NOT_APPLICABLE"
     },
     {
       "id": "FV2-PROS-M2-QBDELTA-01",
@@ -44,7 +50,16 @@
       "status": "PROSPECTIVE_ONLY",
       "primary_horizon_minutes": 120,
       "primary_metric": "multinomial_cover_push_loss_log_loss",
-      "null": "M2-NULL-MARKET-T120-01"
+      "null": "M2-NULL-MARKET-T120-01",
+      "phase5_historical_classification": "NOT_APPLICABLE"
+    }
+  ],
+  "future_version_hypotheses": [
+    {
+      "mechanism": "constant_scale_student_t_with_0_abs3_abs7_key_mass",
+      "source": "M4 preregistered CONSTANT_SCALE_KEY ablation",
+      "status": "FUTURE_VERSION_HYPOTHESIS_ONLY",
+      "phase6_authorized": false
     }
   ]
 }

@@ -1,0 +1,81 @@
+{
+  "program": "LEVLINE_ATS_FRONTIER_V2",
+  "phase": 5,
+  "canonical_phase4_workflow": 36025444929,
+  "canonical_phase4_artifact": 10820397832,
+  "artifact_sha256": "d65adbc7bf0837ee2b5867b551af607549c1095182da1570085e2e50013fb60d",
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "historical_survivor_count": 0,
+  "historical_phase6_authorization": "NONE",
+  "candidates": [
+    {
+      "id": "FV2-HIST-M3-DSSM-01",
+      "null": "M3-NULL-MARKET-NORMAL-01",
+      "oof_n": 1087,
+      "primary_metric": "multinomial_cover_push_loss_log_loss",
+      "candidate_primary": 0.7811502028797036,
+      "null_primary": 0.7804795705044401,
+      "candidate_minus_null": 0.0006706323752636532,
+      "bootstrap_95": [-0.00031937461835433245, 0.0016556867645020252],
+      "bootstrap_probability_favorable": 0.0889,
+      "season_direction": {"2022": "UNFAVORABLE", "2023": "UNFAVORABLE", "2024": "UNFAVORABLE", "2025": "UNFAVORABLE"},
+      "null_calibration": {"n": 1058, "intercept": 0.0, "slope": 0.0},
+      "candidate_calibration": {"n": 1058, "intercept": -0.0008002656550699535, "slope": -1.4064471514780361},
+      "calibration_relative": "MATERIALLY_DEGRADED_SLOPE",
+      "ablation": {"dynamic_no_qb_primary": 0.7808845344047226, "full_minus_no_qb": 0.0002656684749809774, "note": "QB component worsened the frozen full candidate; no-QB ablation is not promoted"},
+      "numerical_red_team": "PASS",
+      "classification": "REJECTED",
+      "triggered_rejection_clauses": [
+        "M3 preregistered failure condition: DYNAMIC_FULL fails to improve paired primary proper score versus MARKET_ONLY",
+        "worse-than-null point estimate with week-block uncertainty excluding a practically meaningful improvement under the frozen Phase-5 futility rule"
+      ]
+    },
+    {
+      "id": "FV2-HIST-M4-DMARGIN-01",
+      "null": "M4-NULL-STUDENTT-CONSTANT-01",
+      "oof_n": 1087,
+      "primary_metric": "integer_margin_log_score",
+      "candidate_primary": 3.852975162486858,
+      "null_primary": 3.935646861629811,
+      "candidate_minus_null": -0.08267169914295289,
+      "bootstrap_95": [-0.10748698706212485, -0.05796293485132338],
+      "bootstrap_probability_favorable": 1.0,
+      "season_direction": {"2022": "FAVORABLE", "2023": "FAVORABLE", "2024": "FAVORABLE", "2025": "FAVORABLE"},
+      "null_calibration": {"n": 1058, "intercept": 0.0, "slope": 0.0},
+      "candidate_calibration": {"n": 1058, "intercept": 0.01477013532177962, "slope": 0.4366590498000353},
+      "calibration_relative": "PASS",
+      "ablation": {
+        "conditional_scale_only_minus_null": 0.00012506107970626913,
+        "constant_scale_key_minus_null": -0.08271839184340689,
+        "full_minus_constant_scale_key": 0.00004669270045401389,
+        "adjudication": "SIMPLER_PREREGISTERED_KEY_MASS_COMPONENT_REPRODUCES_RESULT"
+      },
+      "numerical_tail_red_team": "PASS",
+      "classification": "REJECTED",
+      "triggered_rejection_clauses": [
+        "candidate mechanism ablation shows the claimed full mechanism contributes no improvement while the simpler preregistered CONSTANT_SCALE_KEY component reproduces the result"
+      ]
+    },
+    {
+      "id": "FV2-PROS-M1-MARKETSTATE-01",
+      "scope": "PROSPECTIVE_ONLY",
+      "historical_phase5_classification": "NOT_APPLICABLE",
+      "status": "UNCHANGED__PROSPECTIVE_DATA_CAPTURE_ONLY"
+    },
+    {
+      "id": "FV2-PROS-M2-QBDELTA-01",
+      "scope": "PROSPECTIVE_ONLY",
+      "historical_phase5_classification": "NOT_APPLICABLE",
+      "status": "UNCHANGED__PROSPECTIVE_ONLY"
+    }
+  ],
+  "future_hypotheses": [
+    {
+      "mechanism": "CONSTANT_SCALE_KEY integer-margin representation",
+      "status": "FUTURE_VERSION_HYPOTHESIS_ONLY",
+      "phase6_authorized": false,
+      "requirements": ["new candidate identity", "new preregistration", "fresh scientific governance", "legitimate future validation path"]
+    }
+  ]
+}

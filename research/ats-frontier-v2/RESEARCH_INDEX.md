@@ -14,11 +14,11 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `FUTURE_CHAT_PROTOCOL.md` — mandatory read-first protocol.
 
 ## Prior-evidence reconciliation
-- `LEVLINE_FAILURE_ATLAS.md` — A0/B0/C0/Candidate5/adaptive/Q1/Q2/Q3 failure taxonomy.
-- `MARKET_DOMINANCE_FORENSICS.md` — why market currently dominates LevLine and evidence strength.
+- `LEVLINE_FAILURE_ATLAS.md`
+- `MARKET_DOMINANCE_FORENSICS.md`
 
 ## External research
-- `SOURCE_LEDGER.md` — academic, technical, OSS, practitioner and provider source ledger.
+- `SOURCE_LEDGER.md`
 - `MARKET_EFFICIENCY_REVIEW.md`
 - `MARKET_MICROSTRUCTURE_REVIEW.md`
 - `PLAYER_STATE_RESEARCH.md`
@@ -32,18 +32,26 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `DAVID_SASSER_REVIEW.md`
 - `CROSS_DOMAIN_METHOD_TRANSFER.md`
 
-## Data qualification previews
+## Data qualification
 - `MARKET_DATA_SOURCE_MATRIX.md`
 - `NFL_DATA_SOURCE_MATRIX.md`
 - `DATA_FEASIBILITY_PREVIEW.md`
 
 ## Candidate design and frozen contracts
-- `CANDIDATE_RESEARCH_CARDS.md` — mechanism cards + red-team falsification.
-- `CANDIDATE_SHORTLIST.md` — frozen Phase-1 mechanism shortlist and rejected ideas.
-- `FINAL_MECHANISM_PORTFOLIO.md` — final Phase-3 historical/prospective mechanism portfolio.
-- `M3_PREREGISTRATION.md` — frozen M3 identity, mechanism, grid, null, metrics and ablations.
-- `M4_PREREGISTRATION.md` — frozen M4 identity, distribution, grid, null, metrics and ablations.
-- `CHRONOLOGY_CONTRACT.md`, `MARKET_NULL_CONTRACT.md`, `FEATURE_AND_INPUT_CONTRACT.md`, `MODEL_FAMILY_AND_HYPERPARAMETER_CONTRACT.md`, `EVALUATION_PROTOCOL.md`, `ABLATION_PROTOCOL.md`, `SELECTIVITY_AND_ECONOMICS_CONTRACT.md`, `UNCERTAINTY_PROTOCOL.md`, `RED_TEAM_AND_LEAKAGE_CHECKLIST.md` — Phase-4 governing contracts.
+- `CANDIDATE_RESEARCH_CARDS.md`
+- `CANDIDATE_SHORTLIST.md`
+- `FINAL_MECHANISM_PORTFOLIO.md`
+- `M3_PREREGISTRATION.md`
+- `M4_PREREGISTRATION.md`
+- `CHRONOLOGY_CONTRACT.md`
+- `MARKET_NULL_CONTRACT.md`
+- `FEATURE_AND_INPUT_CONTRACT.md`
+- `MODEL_FAMILY_AND_HYPERPARAMETER_CONTRACT.md`
+- `EVALUATION_PROTOCOL.md`
+- `ABLATION_PROTOCOL.md`
+- `SELECTIVITY_AND_ECONOMICS_CONTRACT.md`
+- `UNCERTAINTY_PROTOCOL.md`
+- `RED_TEAM_AND_LEAKAGE_CHECKLIST.md`
 
 ## Phase receipts and handoffs
 - `OPENING_RECEIPT.md`
@@ -52,37 +60,31 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `FINAL_PHASE3_RECEIPT.md`
 - `PHASE4_HANDOFF.md`
 - `PHASE4_OPENING_RECEIPT.md`
-- `PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md` — corrected, result-blind scientific surface and accepted-execution authorization.
-- `PHASE4_INVALID_RUNS.md` — superseded/unaccepted execution history and correction provenance.
-- `PHASE4_REPRODUCIBILITY_NOTE.md` — corrected-execution reproducibility comparison and canonical-package pin.
-- `FINAL_PHASE4_RECEIPT.md` — immutable Phase-4 repository/scientific closeout; primary PR `#576`, exact validated head `93ed709d24d53d8469f6bc7eaaf49d2a38d7cea3`, primary merge `e425220c1b929629f3a5420bc1915c74835b2a34`.
-- `PHASE5_HANDOFF.md` — Phase-5 entry boundary derived from the accepted Phase-4 package; Phase 5 remains not started until explicitly begun.
+- `PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md`
+- `PHASE4_INVALID_RUNS.md`
+- `PHASE4_REPRODUCIBILITY_NOTE.md`
+- `FINAL_PHASE4_RECEIPT.md`
+- `PHASE5_HANDOFF.md`
 
-## Phase-4 implementation and accepted evidence
-- `phase4_config.json` — frozen Phase-4 deterministic configuration.
-- `phase4_core.py`, `phase4_runner.py` — original Phase-4 implementation surface retained for provenance.
-- `phase4_accepted_runner.py`, `test_phase4_acceptance.py` — corrected contract-compliant accepted execution surface.
-- `PHASE4_RESULT_REGISTRY.json` — machine-readable final Phase-4 execution/result registry; formal Phase-5 disposition remains unapplied.
-- `phase4_evidence/PHASE4_RUN_MANIFEST.json` — final canonical execution provenance, data universe and firewalls.
-- `phase4_evidence/OUTPUT_HASHES.json` — final canonical evidence-file SHA-256 registry.
+## Phase-4 accepted evidence
+- `phase4_config.json`
+- `phase4_core.py`, `phase4_runner.py`, `phase4_accepted_runner.py`, `test_phase4.py`, `test_phase4_acceptance.py`
+- `PHASE4_RESULT_REGISTRY.json`
+- `phase4_evidence/PHASE4_RUN_MANIFEST.json`
+- `phase4_evidence/OUTPUT_HASHES.json`
 - `phase4_evidence/M3_OOF_PREDICTIONS_2022_2025.csv`
 - `phase4_evidence/M3_METRICS.json`
 - `phase4_evidence/M3_ABLATION_RESULTS.csv`
 - `phase4_evidence/M3_TUNING_AUDIT.csv`
 - `phase4_evidence/M3_PER_SEASON_RESULTS.csv`
-- `phase4_evidence/M3_CALIBRATION.json`
-- `phase4_evidence/M3_CALIBRATION_REPORT.md`
-- `phase4_evidence/M3_IMPLEMENTATION_REPORT.md`
+- `phase4_evidence/M3_CALIBRATION.json`, `M3_CALIBRATION_REPORT.md`, `M3_IMPLEMENTATION_REPORT.md`
 - `phase4_evidence/M4_OOF_PREDICTIONS_2022_2025.csv`
 - `phase4_evidence/M4_METRICS.json`
 - `phase4_evidence/M4_ABLATION_RESULTS.csv`
 - `phase4_evidence/M4_TUNING_AUDIT.csv`
 - `phase4_evidence/M4_PER_SEASON_RESULTS.csv`
-- `phase4_evidence/M4_CALIBRATION.json`
-- `phase4_evidence/M4_CALIBRATION_REPORT.md`
-- `phase4_evidence/M4_IMPLEMENTATION_REPORT.md`
-- `phase4_evidence/M4_NUMERICAL_AUDIT.json`
-- `phase4_evidence/M4_NUMERICAL_AUDIT.md`
+- `phase4_evidence/M4_CALIBRATION.json`, `M4_CALIBRATION_REPORT.md`, `M4_IMPLEMENTATION_REPORT.md`
+- `phase4_evidence/M4_NUMERICAL_AUDIT.json`, `M4_NUMERICAL_AUDIT.md`
 - `phase4_evidence/COMMON_ROW_AUDIT.csv`
 - `phase4_evidence/BOOTSTRAP_RESULTS.json`
 - `phase4_evidence/PER_SEASON_RESULTS.csv`
@@ -91,6 +93,17 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `phase4_evidence/PHASE4_EVIDENCE_SYNTHESIS.md` / `.json`
 - `phase4_evidence/PHASE5_HANDOFF.md`
 
+## Phase-5 classification and synthesis
+- `PHASE5_OPENING_RECEIPT.md` — immutable opening boundary and provenance verification.
+- `PHASE5_NULL_CALIBRATION_REPORT.md` — permitted null-side calibration synthesis from canonical preserved OOF probabilities; no recalibration.
+- `PHASE5_M3_CLASSIFICATION.md` — final M3 disposition: `REJECTED`.
+- `PHASE5_M4_CLASSIFICATION.md` — final M4 disposition: `REJECTED`; explicitly applies simpler-preregistered-ablation rejection clause.
+- `PHASE5_SCIENTIFIC_SYNTHESIS.md` — overall scientific synthesis and closed hypotheses.
+- `PHASE5_CANDIDATE_REGISTRY.json` — machine-readable Phase-5 dispositions and provenance.
+- `PHASE5_FUTURE_HYPOTHESES.md` — key-mass-only finding preserved as `FUTURE_VERSION_HYPOTHESIS_ONLY`.
+- `PHASE6_AUTHORIZATION.md` — historical Frontier authorization `NONE`.
+- `FINAL_PHASE5_RECEIPT.md` — to be created only in the post-merge closeout after exact-head CI and primary Phase-5 merge.
+
 ## Current scientific boundary
 
-Phase 4 is `COMPLETE`. M3 and M4 have immutable accepted historical evidence, but their formal Phase-5 survivor classifications remain `NOT_APPLIED`. Production remains `F-ST-01-FROZEN-2026`; completed-2026 outcomes were not used in Phase 4. No prospective shadowing or production promotion is authorized until later phases complete their frozen gates.
+Phase-5 classification is complete but awaits merge/closeout. Both historical candidates are `REJECTED`; no historical candidate is authorized for Phase 6. `CONSTANT_SCALE_KEY` is future-version hypothesis evidence only. M1/M2 prospective-only identities remain separate. Production remains `F-ST-01-FROZEN-2026`; completed-2026 outcomes used remain `0`.
