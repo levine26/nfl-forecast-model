@@ -65,6 +65,8 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `PHASE4_REPRODUCIBILITY_NOTE.md`
 - `FINAL_PHASE4_RECEIPT.md`
 - `PHASE5_HANDOFF.md`
+- `PHASE5_OPENING_RECEIPT.md`
+- `FINAL_PHASE5_RECEIPT.md` — immutable Phase-5 closeout binding classifications to exact-head CI, primary merge and canonical Phase-4 provenance.
 
 ## Phase-4 accepted evidence
 - `phase4_config.json`
@@ -94,16 +96,23 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `phase4_evidence/PHASE5_HANDOFF.md`
 
 ## Phase-5 classification and synthesis
-- `PHASE5_OPENING_RECEIPT.md` — immutable opening boundary and provenance verification.
 - `PHASE5_NULL_CALIBRATION_REPORT.md` — permitted null-side calibration synthesis from canonical preserved OOF probabilities; no recalibration.
-- `PHASE5_M3_CLASSIFICATION.md` — final M3 disposition: `REJECTED`.
-- `PHASE5_M4_CLASSIFICATION.md` — final M4 disposition: `REJECTED`; explicitly applies simpler-preregistered-ablation rejection clause.
-- `PHASE5_SCIENTIFIC_SYNTHESIS.md` — overall scientific synthesis and closed hypotheses.
+- `PHASE5_M3_CLASSIFICATION.md` — M3 `FV2-HIST-M3-DSSM-01`: `REJECTED`.
+- `PHASE5_M4_CLASSIFICATION.md` — M4 `FV2-HIST-M4-DMARGIN-01`: `REJECTED`; simpler-preregistered-ablation rejection clause explicitly applies.
+- `PHASE5_SCIENTIFIC_SYNTHESIS.md` — overall scientific synthesis, negative findings and closed candidate-version hypotheses.
 - `PHASE5_CANDIDATE_REGISTRY.json` — machine-readable Phase-5 dispositions and provenance.
 - `PHASE5_FUTURE_HYPOTHESES.md` — key-mass-only finding preserved as `FUTURE_VERSION_HYPOTHESIS_ONLY`.
 - `PHASE6_AUTHORIZATION.md` — historical Frontier authorization `NONE`.
-- `FINAL_PHASE5_RECEIPT.md` — to be created only in the post-merge closeout after exact-head CI and primary Phase-5 merge.
+
+## Phase-5 repository identity
+
+- primary PR: `#578`;
+- exact validated head: `53e8420fabf0ecd9b2b9753a65e9cd27c3e1e72c`;
+- primary merge: `f6c1b62690c069f6b3e3ef1d8bf721bddcdeef4b`;
+- research firewall run `36040603014`: `SUCCESS`;
+- research validation run `36040602757`: `SUCCESS`;
+- ATS Frontier safety gate run `36040602883`: `SUCCESS`.
 
 ## Current scientific boundary
 
-Phase-5 classification is complete but awaits merge/closeout. Both historical candidates are `REJECTED`; no historical candidate is authorized for Phase 6. `CONSTANT_SCALE_KEY` is future-version hypothesis evidence only. M1/M2 prospective-only identities remain separate. Production remains `F-ST-01-FROZEN-2026`; completed-2026 outcomes used remain `0`.
+Phase 5 is `COMPLETE`. Both historical candidates are `REJECTED`; no historical M3/M4 candidate is authorized for Phase 6. `CONSTANT_SCALE_KEY` remains future-version hypothesis evidence only. M1/M2 prospective-only identities remain separate and unchanged. Production remains `F-ST-01-FROZEN-2026`; completed-2026 outcomes used remain `0`.
