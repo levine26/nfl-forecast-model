@@ -3,25 +3,30 @@
 **Program:** `LEVLINE_ATS_FRONTIER_V2`  
 **Phase 1:** `COMPLETE`  
 **Phase 2:** `COMPLETE`  
-**Phase 3:** `NOT_STARTED`  
-**Phase-2 branch:** `research/ats-frontier-v2-phase2`  
-**Phase-2 opening main:** `03eb004d62fdfa2c99bda3cc08d315c0c7ed8d71`  
-**Exact validated Phase-2 research head:** `995e5207e7ea5e73805bb6091d3f47b9578639de`  
-**Primary Phase-2 PR:** `#572`  
-**Primary Phase-2 merge:** `bdc16905b46c390338814b584a51be2c9784c436`  
-**Phase-2 validation CI:** `35964641547` / `#1675` — `SUCCESS`  
-**Phase-2 research firewall CI:** `35964641631` / `#2093` — `SUCCESS`  
-**Exact validated Phase-1 research head:** `df25820bd607a434430ab1b71891e83a96c4edd9`  
-**Primary Phase-1 PR:** `#570`  
-**Primary Phase-1 merge:** `6569179631afe1b1f480c1408e54c7638de6ab4e`  
-**Production model:** `F-ST-01-FROZEN-2026`  
-**Completed-2026 outcomes used in Phase 2:** 0  
-**Frontier candidate performance inspected in Phase 2:** NO  
-**Historical-odds purchase in Phase 2:** NONE  
-**Current purchase recommendation:** `DO_NOT_PURCHASE_YET__FREE_FIRST_RECONSTRUCTION_REQUIRED`
+**Phase 3:** `PREREGISTRATION_FROZEN__PENDING_VALIDATION_AND_MERGE`  
+**Phase 4:** `NOT_STARTED`  
+**Phase-3 branch:** `research/ats-frontier-v2-phase3`  
+**Phase-3 opening main:** `5d4312bd36e1083d88ae6ac910703d08384088aa`  
+**Production model:** `F-ST-01-FROZEN-2026`
 
-Phase-2 mechanism gates: M1 `PARTIALLY_QUALIFIED__FREE_FIRST_RECONSTRUCTION_REQUIRED`; M2 `PARTIALLY_QUALIFIED`; M3 `DATA_QUALIFIED` (core state); M4 `DATA_QUALIFIED` (numerical/data feasibility only).
+## Immutable prior phase identity
 
-Authoritative Phase-2 closeout receipt: `FINAL_PHASE2_RECEIPT.md`.
+- Phase-2 exact validated research head: `995e5207e7ea5e73805bb6091d3f47b9578639de`
+- Phase-2 primary PR: `#572`
+- Phase-2 primary merge: `bdc16905b46c390338814b584a51be2c9784c436`
 
-Phase 3 remains `NOT_STARTED`.
+## Phase-3 frozen mechanism state pending merge
+
+- M1: `BLOCKED_PENDING_PAID_SOURCE` historically; `PROSPECTIVE_ONLY` identity frozen.
+- M2: `PROSPECTIVE_ONLY`, QB-only identity; broad historical personnel state excluded.
+- M3: `FV2-HIST-M3-DSSM-01` frozen and Phase-4 eligible after Phase-3 closeout.
+- M4: `FV2-HIST-M4-DMARGIN-01` frozen and Phase-4 eligible after Phase-3 closeout.
+
+Historical candidates trained in Phase 3: `0`.  
+Historical candidate OOF generated: `0`.  
+Candidate ATS/ROI/proper-score performance inspected: `NO`.  
+Completed-2026 outcomes used: `0`.  
+Historical odds purchased: `NO`.  
+Production changes: `NO`.
+
+Phase 3 must not be marked `COMPLETE` until exact-head research validation/firewall succeed, the primary PR is merged, merged main is verified, and the immutable closeout receipt is merged.

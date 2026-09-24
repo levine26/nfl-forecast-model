@@ -1,0 +1,24 @@
+{
+  "program": "LEVLINE_ATS_FRONTIER_V2",
+  "frozen": true,
+  "FV2-HIST-M3-DSSM-01": {
+    "family": "linear_gaussian_hierarchical_dynamic_state_space",
+    "states": ["offense", "defense", "qb"],
+    "q_team": [0.04, 0.10, 0.25],
+    "q_qb": [0.10, 0.25, 0.50],
+    "season_carryover": [0.50, 0.75],
+    "ridge_alpha": [10, 100],
+    "within_season_persistence": 1.0,
+    "evaluation_residual_family": "normal_constant_scale_prior_only"
+  },
+  "FV2-HIST-M4-DMARGIN-01": {
+    "family": "market_centered_student_t_integer_pmf",
+    "nu": [4, 6, 10, 30],
+    "lambda_scale": [1, 10],
+    "lambda_key": [1, 10],
+    "conditional_scale_terms": ["log(total_line/45)", "abs(spread_line)/7"],
+    "key_mass_abs_margins": [0, 3, 7],
+    "finite_support": false
+  },
+  "tuning": "nested_chronological_primary_proper_score_only"
+}
