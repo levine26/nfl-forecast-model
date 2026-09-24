@@ -5,7 +5,20 @@
   "phase4_evidence_complete": true,
   "phase5_started": true,
   "phase5_classification_complete": true,
+  "phase5_complete": true,
+  "historical_survivor_count": 0,
   "historical_phase6_authorization": "NONE",
+  "phase5_repository_closeout": {
+    "primary_pr": 578,
+    "exact_validated_head": "53e8420fabf0ecd9b2b9753a65e9cd27c3e1e72c",
+    "primary_merge_sha": "f6c1b62690c069f6b3e3ef1d8bf721bddcdeef4b",
+    "research_firewall_run": 36040603014,
+    "research_validation_run": 36040602757,
+    "ats_frontier_safety_gate_run": 36040602883,
+    "all_exact_head_gates_passed": true,
+    "completed_2026_outcomes_used": 0,
+    "production_changed": false
+  },
   "candidates": [
     {
       "id": "FV2-HIST-M3-DSSM-01",
