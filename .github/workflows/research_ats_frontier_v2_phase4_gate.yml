@@ -8,7 +8,9 @@ on:
       - 'research/ats-frontier-v2/phase4_config.json'
       - 'research/ats-frontier-v2/phase4_core.py'
       - 'research/ats-frontier-v2/phase4_runner.py'
+      - 'research/ats-frontier-v2/phase4_accepted_runner.py'
       - 'research/ats-frontier-v2/test_phase4.py'
+      - 'research/ats-frontier-v2/test_phase4_acceptance.py'
       - '.github/workflows/research_ats_frontier_v2_phase4_gate.yml'
   pull_request:
     paths:
@@ -46,9 +48,9 @@ jobs:
       - name: Compile Phase 4 research surface
         run: python -m compileall -q research/ats-frontier-v2
       - name: Run result-blind Phase 4 contract tests
-        run: pytest -q research/ats-frontier-v2/test_phase4.py
-      - name: Run result-blind preflight receipt
-        run: python research/ats-frontier-v2/phase4_runner.py --preflight-only
+        run: pytest -q research/ats-frontier-v2/test_phase4.py research/ats-frontier-v2/test_phase4_acceptance.py
+      - name: Run corrected result-blind preflight receipt
+        run: python research/ats-frontier-v2/phase4_accepted_runner.py --preflight-only
       - name: Prove completed-2026 loader firewall is literal
         shell: bash
         run: |
