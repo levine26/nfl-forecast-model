@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ats-frontier-v2-phase4-execute-${{ github.ref }}
+  group: ats-frontier-v2-phase4-accepted-v2-${{ github.ref }}
   cancel-in-progress: false
 
 env:
