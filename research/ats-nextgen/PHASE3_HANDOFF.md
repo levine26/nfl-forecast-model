@@ -1,8 +1,28 @@
 # ATS Next-Generation — Phase 3 Handoff
 
-**Status:** READY AFTER PHASE-2 CLOSEOUT MERGE  
+**Status:** READY AFTER GOVERNANCE-ONLY PHASE-2 CLOSEOUT MERGE  
 **Next phase:** Phase 3 — Scientific Synthesis, Candidate Selection & Freeze  
 **Production:** `F-ST-01-FROZEN-2026` — unchanged
+
+## Phase-2 closeout authority
+
+The provenance-correct Phase-2 scientific closeout is already merged:
+
+- corrective merge vehicle: PR #566;
+- validated corrective head: `0ceae72f2643cc9b10a6cf35181576d52bb2fdf7`;
+- scientific closeout merge SHA: `89f8b4fa48e22554029392b303225e4665b4b673`;
+- merged tree: `97086a3e35c6e4c4275662e9ab437cd46a883d2b`.
+
+The accepted Stage-D **scientific result origin** remains PR #564 / `research/ats-nextgen-phase2-stage-d-accepted-artifacts`:
+
+- accepted evidence head `d9a416ff17e2692b1ed86c461b4bd87f5a6cb8ba`;
+- workflow `35938628588`;
+- artifact `10783982962`;
+- artifact digest `sha256:a7386fdb000e3dd17ee44563762e8cdb5c9423e62467f41138419978c4a75d7c`.
+
+PR #563's regeneration-based Stage-D evidence-loading path is superseded for provenance. PR #564 was closed unmerged only as a merge vehicle after branch divergence. PR #565 was closed unmerged and is not authoritative. PR #566 carries the corrected already-validated direct-artifact closeout on `main`.
+
+Before Phase 3 begins, merge this governance-only closeout and bind the Phase-3 opening receipt to the resulting exact verified `main` SHA. The governance closeout changes no scientific result or production behavior.
 
 ## Read-first authority
 
@@ -15,9 +35,12 @@ Before any Phase-3 action, read:
 5. `PHASE2_Q1_RESULT_RECEIPT.md` / `phase2_q1_result_registry.json`;
 6. `PHASE2_Q2_RESULT_RECEIPT.md` / `phase2_q2_result_registry.json`;
 7. `PHASE2_Q3_RESULT_RECEIPT.md` / `phase2_q3_result_registry.json`;
-8. `EVALUATION_PROTOCOL.md`;
-9. `CHRONOLOGY_AND_EVIDENCE_BOUNDARY.md`;
-10. `RED_TEAM_AND_LEAKAGE_CHECKLIST.md`.
+8. `Q1_QUANTILE_PREREGISTRATION.md`;
+9. `Q2_MARGIN_DISTRIBUTION_PREREGISTRATION.md`;
+10. `Q3_DIRECT_ATS_PREREGISTRATION.md`;
+11. `EVALUATION_PROTOCOL.md`;
+12. `CHRONOLOGY_AND_EVIDENCE_BOUNDARY.md`;
+13. `RED_TEAM_AND_LEAKAGE_CHECKLIST.md`.
 
 If chat memory conflicts with those files, the repository controls.
 
@@ -59,19 +82,6 @@ Do not widen support, reconstruct a substitute distribution, rerun a new Q2 vers
 
 No Q3 rescue is authorized.
 
-## Stage-D authority
-
-Accepted final synthesis:
-
-- branch `research/ats-nextgen-phase2-stage-d-accepted-artifacts`;
-- PR #564;
-- exact accepted evidence head `d9a416ff17e2692b1ed86c461b4bd87f5a6cb8ba`;
-- workflow `35938628588`;
-- artifact `10783982962`;
-- artifact digest `sha256:a7386fdb000e3dd17ee44563762e8cdb5c9423e62467f41138419978c4a75d7c`.
-
-The Stage-D uncertainty package used immutable accepted upstream artifacts, not candidate regeneration.
-
 ## Phase-3 task
 
 Phase 3 is **scientific synthesis and classification**, not another historical model-search phase.
@@ -82,15 +92,16 @@ For each frozen architecture, assign exactly one program status allowed by the M
 - `INCONCLUSIVE`;
 - `ELIGIBLE_FOR_PROSPECTIVE_SHADOW`.
 
-The classification must be justified from the already-frozen Phase-2 evidence, preregistered success criteria, uncertainty, calibration evidence, structural validity, and evidence-boundary limitations.
+The classification must be justified only from frozen Phase-2 evidence, preregistered success/failure criteria, uncertainty, calibration/support diagnostics, structural validity, and evidence-boundary limitations.
 
-Phase 3 may preserve an architecture as scientifically interesting while still classifying it `INCONCLUSIVE` or `REJECTED`; it may not change a Phase-2 metric, comparator, feature set, learner, support, hyperparameter grid, slice, threshold, or candidate definition to improve the classification.
+## Critical interpretation rules
 
-## Critical interpretation rule
-
-A 95% bootstrap interval crossing zero is uncertainty about the magnitude/sign of the tiny incremental effect; it is **not** evidence that the candidate passed a preregistered incremental test. Conversely, a negative Phase-2 point result does not by itself prove a large harmful effect. Phase 3 must distinguish lack of demonstrated improvement from evidence of material inferiority.
-
-Q2's absence of valid OOF evidence is a structural-invalidity state, not statistical uncertainty. Do not convert it into a Q2 performance estimate.
+- A 95% bootstrap interval crossing zero is uncertainty about the magnitude/sign of a tiny incremental effect; it is **not** evidence that a candidate passed a preregistered incremental test.
+- Conversely, an adverse Phase-2 point result with an interval crossing zero does not prove a large harmful effect.
+- Q2's lack of valid OOF evidence is structural invalidity, not ordinary statistical uncertainty.
+- The Evaluation Protocol permits `ELIGIBLE_FOR_PROSPECTIVE_SHADOW` only when the candidate's primary proper/quantile metric improves on the relevant market null on exact common OOF rows, calibration does not materially fail, the improvement is not concentrated in one season/week/key bucket, no leakage/red-team failure exists, and the mechanism matches the preregistered identity.
+- Q3's preregistration states that if its proper scores fail versus market-only Q3-M2, it is rejected even if a realized betting subset appears favorable.
+- Q1 is not considered incremental when it fails the preregistered quantile/probability evidence versus the relevant market-only null; favorable ATS slices cannot rescue it.
 
 ## Phase-3 prohibitions
 
@@ -99,9 +110,9 @@ Do not:
 - refit Q1/Q2/Q3;
 - generate new 2022–2025 candidate predictions;
 - inspect completed-2026 outcomes;
-- add candidates, features, distributions, learners, calibration layers, thresholds, or blend weights;
+- add candidates, features, distributions, learners, calibration layers, thresholds, slices, or blend weights;
 - widen Q2 support or version a Q2 rescue;
-- use ATS hit rate, ROI, selective subsets, or favorable slices to override the proper-score evidence;
+- use ATS hit rate, ROI, selective subsets, or favorable slices to override primary proper-score evidence;
 - reconstruct Q2 complementarity or the Q2/Q3 blend;
 - modify production F-ST or Sunday Signal numerical forecasting behavior;
 - promote anything to production.
@@ -110,11 +121,11 @@ Do not:
 
 At minimum, Phase 3 must produce:
 
-1. an immutable opening receipt bound to the verified Phase-2 closeout merge;
+1. an immutable opening receipt bound to the exact verified `main` head after this governance closeout merges;
 2. a candidate-by-candidate evidence table covering structural validity, primary incremental metric, uncertainty, calibration/supporting diagnostics, and evidence limitations;
 3. explicit `REJECTED` / `INCONCLUSIVE` / `ELIGIBLE_FOR_PROSPECTIVE_SHADOW` classifications with rule-based rationales;
 4. a machine-readable Phase-3 registry;
-5. a final Phase-3 receipt and updated `PHASE_STATUS.md` / `CURRENT_STATE_AND_NEXT_STEPS.md`;
+5. a final Phase-3 receipt plus updated `PHASE_STATUS.md` and `CURRENT_STATE_AND_NEXT_STEPS.md`;
 6. if and only if any candidate is `ELIGIBLE_FOR_PROSPECTIVE_SHADOW`, a frozen prospective-shadow specification that remains outcome-blind and does not begin Phase 4 without explicit user authorization.
 
 ## Evidence boundary
@@ -123,9 +134,10 @@ At minimum, Phase 3 must produce:
 
 ## Start condition
 
-Do not begin Phase 3 from this working branch head. First:
+Do not begin Phase 3 from an old working branch. First:
 
-1. validate the final Phase-2 closeout head;
-2. merge PR #564;
-3. verify the merge is present on current `main`;
-4. create the Phase-3 branch from that exact verified merge.
+1. merge the governance-only Phase-2 closeout;
+2. verify its merge is the current `main` head or is an ancestor of current `main` with only unrelated production-refresh advancement;
+3. create the Phase-3 branch from the exact verified current `main` head;
+4. record that exact base SHA and the Phase-2 scientific closeout merge `89f8b4fa48e22554029392b303225e4665b4b673` in the immutable Phase-3 opening receipt;
+5. only then perform classification.
