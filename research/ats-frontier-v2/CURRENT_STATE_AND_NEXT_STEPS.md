@@ -1,35 +1,53 @@
 # CURRENT STATE AND NEXT STEPS
 
-## Current scientific state
+## Current program state
 
-The prior LevLine program family has generated unusually useful negative evidence. Independent football-state models A0 and B0 were materially less accurate than the market in 2025; C0 did not establish incremental information; Candidate 5 residual stacking made zero winner changes; ATS-Q1 and ATS-Q3 failed their market-relative proper-score tests; ATS-Q2 V1 was numerically invalid under its finite-support contract; Adaptive Candidate 3 could not separate path information from later market level.
+`LEVLINE_ATS_FRONTIER_V2` Phase 1 is `COMPLETE`.
 
-The implication is not that forecasting beyond the market is impossible. It is that a new program must pay for genuinely new information, point-in-time fidelity, or state representation—not more algorithms over substantially the same signal set.
+The validated Phase-1 research package is merged. It reconciles prior LevLine failures, records the external evidence base, freezes a four-mechanism shortlist, defines the completed-2026 and production firewalls, and permanently records the seven-phase roadmap. No new Frontier candidate performance was inspected in Phase 1.
 
-## Phase-1 shortlist
+## Frozen Phase-1 shortlist
 
-- M1 dynamic multi-book latent market state — highest data priority.
-- M2 player/QB information-delta — highest non-market information priority.
-- M3 hierarchical latent team/unit state — strongest temporal-state replacement for fixed rolling windows.
-- M4 discrete margin V2 — strongest probability-representation research path, but not independently presumed to contain edge.
+- `FRONTIER-M1-DYNAMIC-MARKET-STATE` — highest market-information/data priority.
+- `FRONTIER-M2-PLAYER-STATE-DELTA` — highest non-market information priority and principal historical PIT-data risk.
+- `FRONTIER-M3-HIERARCHICAL-STATE` — dynamic temporal-state replacement for fixed rolling summaries.
+- `FRONTIER-M4-DISCRETE-MARGIN-V2` — tail-safe integer probability representation; not presumed to contain independent alpha.
 
-## Immediate next action after Phase-1 closeout
+## Phase 2 status
 
-Phase 2 must begin with an outcome-blind data qualification gate, in this order:
+`NOT_STARTED`.
 
-1. Obtain a sample of timestamped historical multi-book NFL spread + side-price + moneyline + total data and verify snapshot semantics, book identity continuity, timestamps, opening/closing definitions, missingness and game joins.
-2. Build a PIT player-state feasibility table: injury/practice report timestamps, depth-chart snapshots, roster changes, starter probabilities, expected role/snap information and replacement candidates.
-3. Validate that each candidate feature can be computed strictly from records available by its prediction timestamp; label any source that cannot satisfy this contract unusable.
-4. Quantify coverage and missingness only. Do not join game outcomes or calculate candidate ATS/proper-score performance.
-5. Eliminate candidates whose required data are not reproducibly available before writing Phase-3 preregistrations.
+A future Phase-2 execution must remain outcome-blind and begin with data qualification/PIT reconstruction, not modeling.
 
-## Recommended market-data acquisition order
+### First authorized actions
 
-1. Use free/current PropLine and existing LevLine sources for schema/prospective qualification.
-2. Request samples/quotes from The Odds API and SportsDataIO for historical timestamped multi-book movement. The Odds API is the cleanest documented self-service archive (featured-market snapshots from 2020; 5-minute snapshots from Sep-2022), while SportsDataIO explicitly retains line-movement revision history across 20+ books.
-3. Treat nflverse schedule odds only as a benchmark with opaque historical horizon, not as dynamic-market evidence.
-4. Do not buy anything in Phase 1. A paid historical odds source becomes justified only after a sample proves the exact PIT fields required by M1.
+1. Obtain sample historical multi-book NFL spread + side-price + moneyline + total records from the strongest candidate sources and verify snapshot semantics, timestamps, bookmaker identity continuity, missingness, opening/closing definitions and joins.
+2. Build a player/QB PIT feasibility audit covering injury/practice-report timestamps, depth-chart snapshots, roster changes, starter probabilities, expected role/snap information and replacement candidates.
+3. Establish a provenance table showing exactly when every potential feature became knowable and whether revisions are reconstructable.
+4. Quantify coverage and missingness only. Do not calculate Frontier proper scores, ATS hit rates, ROI, or candidate-vs-market target performance.
+5. Mark each Phase-1 mechanism `DATA_QUALIFIED` or `DATA_INFEASIBLE` before Phase 3.
 
-## Stop boundary
+## Recommended source qualification order
 
-No Phase-2 ingestion, candidate construction, fitting or performance inspection is authorized until Phase 1 is merged and the final receipt is immutable.
+1. The Odds API and SportsDataIO samples for historical timestamped multi-book market-state reconstruction.
+2. PropLine for schema/prospective history qualification where current access permits.
+3. nflverse and directly sourced roster/depth/injury/transaction materials for player/QB state, with explicit attention to injury-source discontinuity after 2024.
+4. Existing nflverse schedule odds remain a horizon-opaque benchmark only; they are not relabeled as T-120/T-60/etc.
+
+No data purchase is authorized by Phase 1. Historical multi-book odds is the only paid-data category currently judged plausibly material enough to justify a later purchase decision after sample qualification.
+
+## Mandatory future-chat read order
+
+Before Phase 2 begins, read:
+
+1. `MASTER_PLAN.md`
+2. `PHASE_STATUS.md`
+3. `CURRENT_STATE_AND_NEXT_STEPS.md`
+4. `DECISION_LOG.md`
+5. `FINAL_PHASE1_RECEIPT.md`
+6. `EVIDENCE_BOUNDARY.md`
+7. `MARKET_DATA_SOURCE_MATRIX.md`
+8. `NFL_DATA_SOURCE_MATRIX.md`
+9. `DATA_FEASIBILITY_PREVIEW.md`
+
+Do not restart Phase 1. Do not resurrect killed hypotheses without a formal pre-result governance amendment.
