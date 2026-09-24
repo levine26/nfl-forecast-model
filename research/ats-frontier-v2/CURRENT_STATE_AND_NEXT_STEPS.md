@@ -2,9 +2,9 @@
 
 ## Current state
 
-Phase 1 and Phase 2 are complete. Phase 3 architecture/preregistration is frozen on `research/ats-frontier-v2-phase3` and is pending exact-head CI plus merge/immutable closeout.
+Phase 1, Phase 2 and Phase 3 are complete. Phase 3 froze the final architecture/evaluation contracts and merged through primary PR `#574` at `fd44e51c412f8d242b54de989e29b550f0e67255` after exact-head research validation and firewall both succeeded on `8ddad2d6cb40e4296a394b9192bd110f23ba9773`.
 
-No candidate has been trained or scored in Phase 3.
+Phase 4 is `NOT_STARTED`. No candidate was trained, scored or performance-inspected in Phase 3.
 
 ## Free M1 result
 
@@ -16,7 +16,7 @@ The required outcome-blind free reconstruction audit did **not** establish a coh
 - older Wayback PIT data do not create a coherent modern panel;
 - nflverse remains exact-horizon opaque.
 
-Therefore historical M1 is `BLOCKED_PENDING_PAID_SOURCE`; no purchase occurred. The Odds API remains the first bounded fallback, SportsDataIO second.
+Therefore historical M1 is `BLOCKED_PENDING_PAID_SOURCE`; no purchase occurred. The Odds API remains the first bounded fallback, SportsDataIO second, and any purchase still requires an explicit governance amendment/authorization after a bounded data-only qualification plan.
 
 ## Frozen candidate portfolio
 
@@ -44,10 +44,20 @@ There is no third historical candidate merely to fill a quota. Forecast combinat
 - no post-hoc calibration rescue;
 - completed 2026 sealed.
 
-## Next repository action
+## Production and information firewalls
 
-Run exact-head LevLine research firewall and research validation on the frozen Phase-3 head, confirm production paths are unchanged, open/merge the primary Phase-3 PR if valid, then create and merge an immutable Phase-3 closeout receipt/status update.
+- production remains `F-ST-01-FROZEN-2026`;
+- Sunday Signal forecasting behavior is unchanged;
+- completed-2026 outcomes used in Phase 3: `0`;
+- candidate fitting/OOF/performance inspection in Phase 3: `0` / `0` / `NONE`;
+- historical-odds purchase: `NONE`.
 
-## Phase-4 first action after closeout
+## Next authorized program phase
 
-Implement and pass the preregistered synthetic leakage/sign/tail/push tests **before** fitting either historical candidate. Phase 4 remains `NOT_STARTED`.
+Phase 4 — Historical Candidate Implementation & Chronology-Safe Evaluation — may begin only from the frozen Phase-3 contracts after this closeout is merged.
+
+### First Phase-4 action
+
+Implement and pass the preregistered synthetic leakage/sign/tail/push tests **before** fitting either historical candidate. If any pre-result numerical, sign, chronology, or leakage contract fails, repair the implementation without inspecting target candidate performance, rerun the tests, and only then proceed to chronology-safe fitting.
+
+No architecture expansion, new candidate, threshold search, outcome-sensitive source change, or 2026-result use is authorized by the Phase-3 closeout.
