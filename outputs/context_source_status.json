@@ -185,6 +185,159 @@
     "status": "healthy"
   },
   "generated_utc": "2026-09-24T09:29:10.168087+00:00",
+  "groq_provider_fallback": {
+    "failed_games": [
+      "2026_03_ARI_SF",
+      "2026_03_ATL_GB",
+      "2026_03_BAL_DAL",
+      "2026_03_CAR_CLE",
+      "2026_03_CIN_PIT",
+      "2026_03_HOU_IND",
+      "2026_03_KC_MIA",
+      "2026_03_LAC_BUF",
+      "2026_03_LA_DEN",
+      "2026_03_LV_NO",
+      "2026_03_MIN_TB",
+      "2026_03_NE_JAX",
+      "2026_03_NYJ_DET",
+      "2026_03_PHI_CHI",
+      "2026_03_SEA_WAS",
+      "2026_03_TEN_NYG"
+    ],
+    "games": {
+      "2026_03_ARI_SF": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_ARI_SF: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T10:20:51.382828+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_ATL_GB": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-24T09:49:54.533354+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_BAL_DAL": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_BAL_DAL: paragraph1 must name at least two concrete players/coaches found   2026_03_BAL_DAL: paragraph1 contains generic editorial filler obvious passing downs  2026_03_BAL_DAL: paragraph1 contains generic",
+        "recovered_at_utc": "2026-09-24T10:27:29.180352+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_CAR_CLE": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_CAR_CLE: paragraph1 must name at least two concrete players/coaches found   2026_03_CAR_CLE: paragraph1 contains generic editorial filler predictable dropback game  2026_03_CAR_CLE: paragraph1 contains gen",
+        "recovered_at_utc": "2026-09-24T09:54:19.674653+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_CIN_PIT": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_CIN_PIT: paragraph1 must name at least two concrete players/coaches found Aaron Rodgers  2026_03_CIN_PIT: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T10:14:13.492817+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_HOU_IND": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_HOU_IND: paragraph1 must name at least two concrete players/coaches found Jonathan Taylor  2026_03_HOU_IND: paragraph1 contains generic editorial filler keep the full playbook available  2026_03_HOU_IND: p",
+        "recovered_at_utc": "2026-09-24T10:00:57.630296+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_KC_MIA": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_KC_MIA: paragraph1 must name at least two concrete players/coaches found Patrick Mahomes  2026_03_KC_MIA: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T10:07:35.571052+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_LAC_BUF": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
+        "recovered_at_utc": "2026-09-24T09:51:00.188807+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_LA_DEN": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_LA_DEN: paragraph1 must name at least two concrete players/coaches found Myles Garrett  2026_03_LA_DEN: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T10:34:07.328146+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_LV_NO": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_LV_NO: paragraph1 must name at least two concrete players/coaches found ",
+        "recovered_at_utc": "2026-09-24T10:30:48.194888+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_MIN_TB": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_MIN_TB: paragraph1 must name at least two concrete players/coaches found ",
+        "recovered_at_utc": "2026-09-24T10:24:10.275441+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_NE_JAX": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_NE_JAX: paragraph1 must name at least two concrete players/coaches found   2026_03_NE_JAX: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T10:04:16.522970+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_NYJ_DET": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_NYJ_DET: paragraph1 must name at least two concrete players/coaches found   2026_03_NYJ_DET: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T09:57:38.635530+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_PHI_CHI": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_PHI_CHI: paragraph1 must name at least two concrete players/coaches found Caleb Williams  2026_03_PHI_CHI: paragraph1 contains generic editorial filler obvious passing downs  2026_03_PHI_CHI: source titles",
+        "recovered_at_utc": "2026-09-24T10:37:26.406782+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_SEA_WAS": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_SEA_WAS: paragraph1 contains generic editorial filler obvious passing downs  2026_03_SEA_WAS: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T10:17:32.475049+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_03_TEN_NYG": {
+        "fallback_source": "last_validated_editorial",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_03_TEN_NYG: paragraph1 must name at least two concrete players/coaches found   2026_03_TEN_NYG: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-24T10:10:54.559280+00:00",
+        "requires_chatgpt_refresh": true
+      }
+    },
+    "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
+    "run_id": "35983388569",
+    "status": "degraded"
+  },
   "injuries": {
     "as_of": "2026-09-24T09:29:10.275633+00:00",
     "players": 259,
