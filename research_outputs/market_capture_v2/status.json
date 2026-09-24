@@ -2,16 +2,34 @@
   "api_key_configured": true,
   "api_key_value_recorded": false,
   "completed_2026_outcomes_used": 0,
-  "error": "[REDACTED_LEGACY_CREDENTIAL_BEARING_HTTP_ERROR]",
-  "error_type": "HTTPError",
-  "external_request_made": null,
-  "observability_schema": "levline-market-capture-observability-v1",
-  "observed_at_utc": "2026-09-21T23:23:28.142016Z",
+  "configured_market_sources": [
+    "propline",
+    "the_odds_api"
+  ],
+  "due_pairs": 1,
+  "expected_request_cost": 1,
+  "external_request_made": true,
+  "free_tier_only": true,
+  "historical_endpoint_used": false,
+  "market_provider": "propline",
+  "min_close_books": 5,
+  "missed": [
+    "2026_03_ATL_GB:T-60m:event_identity_unresolved"
+  ],
+  "observability_schema": "levline-market-capture-observability-v2",
+  "observed_at_utc": "2026-09-24T23:09:45.442625Z",
   "official_forecast_mutation_authorized": false,
   "probability_feature_authorized": false,
   "production_authorized": false,
-  "reason": "collector_exception",
+  "production_changed": false,
+  "provider_failures_before_success": [],
+  "quota_last_request_cost": null,
+  "quota_remaining": 999,
+  "quota_reserve": 50,
+  "quota_used": 1,
+  "reason": "no_qualified_market_rows",
+  "request_timestamp_utc": "2026-09-24T23:09:44.762849+00:00",
   "research_only": true,
-  "status": "error",
-  "security_note": "Credential-bearing provider exception text was redacted at branch head on 2026-09-22. Rotate the legacy provider key because prior Git history may retain it."
+  "rows_added_this_request": 0,
+  "status": "skipped"
 }
