@@ -1,4 +1,4 @@
-name: ATS NextGen Phase 2 Stage D
+name: ATS NextGen Phase 2 Stage D Closeout
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ats-nextgen-stage-d-${{ github.event.pull_request.number || github.ref }}
+  group: ats-nextgen-stage-d-closeout-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -38,7 +38,7 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - name: Prove frozen gate and accepted-model contracts
+      - name: Re-prove frozen scientific contracts
         run: |
           pytest -q \
             tests/test_challenger_ats_nextgen_phase2_gate.py \
@@ -47,105 +47,67 @@ jobs:
             tests/test_challenger_ats_nextgen_q3.py \
             tests/test_challenger_ats_nextgen_q3_reporting.py \
             tests/test_challenger_ats_nextgen_stage_d.py
-      - name: Verify Stage-D upstream evidence boundary
+      - name: Verify immutable Stage-D result registry
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
-          opening = json.loads(Path('research/ats-nextgen/phase2_stage_d_opening_registry.json').read_text())
-          q1 = json.loads(Path('research/ats-nextgen/phase2_q1_result_registry.json').read_text())
-          q2 = json.loads(Path('research/ats-nextgen/phase2_q2_result_registry.json').read_text())
-          q3 = json.loads(Path('research/ats-nextgen/phase2_q3_result_registry.json').read_text())
-
-          assert opening['status'] == 'FROZEN_PRE_EXECUTION'
-          assert opening['candidate_fitting_authorized'] is False
-          assert opening['candidate_retuning_authorized'] is False
-          assert opening['candidate_rescue_authorized'] is False
-          assert opening['completed_2026_outcomes_authorized'] is False
-          assert opening['production_changes_authorized'] is False
-          assert opening['uncertainty']['bootstrap_samples'] == 10000
-          assert opening['uncertainty']['seed'] == 26
-          assert opening['uncertainty']['block_columns'] == ['season', 'week']
-
-          assert q1['classification'] == 'VALID_NEGATIVE_INCREMENTAL_RESULT'
-          assert q1['q1_rescue_allowed'] is False
-          assert q1['evidence_sha256']['q1_outer_oof_2022_2025.csv'] == opening['accepted_inputs']['q1']['oof_sha256']
-
-          assert q2['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
-          assert q2['accepted_q2_outer_oof_artifact'] is None
-          assert q2['accepted_q2_primary_performance'] is None
-          assert opening['accepted_inputs']['q2']['accepted_oof_available'] is False
-          assert opening['accepted_inputs']['q2']['accepted_primary_performance_available'] is False
-          assert opening['accepted_inputs']['q2']['complementarity_available'] is False
-          assert opening['accepted_inputs']['q2']['q2_q3_blend_available'] is False
-
-          assert q3['classification'] == 'NOT_INCREMENTAL_VS_Q3_M2'
-          assert q3['candidate_repair_or_rescue_performed'] is False
-          assert q3['q2_complementarity_available'] is False
-          assert q3['q2_q3_blend_available'] is False
-          assert q3['artifact']['files_sha256']['q3_outer_oof_2022_2025.csv'] == opening['accepted_inputs']['q3']['oof_sha256']
+          result = json.loads(Path('research/ats-nextgen/phase2_stage_d_result_registry.json').read_text())
+          assert result['status'] == 'COMPLETE_ACCEPTED_EVIDENCE'
+          assert result['classification'] == 'FINAL_PHASE2_EVIDENCE_SYNTHESIS_COMPLETE'
+          assert result['accepted_result_head'] == 'd9a416ff17e2692b1ed86c461b4bd87f5a6cb8ba'
+          assert result['workflow']['run_id'] == 35938628588
+          assert result['workflow']['conclusion'] == 'success'
+          assert result['workflow']['contract_job_id'] == 107441314608
+          assert result['workflow']['synthesis_job_id'] == 107441551438
+          assert result['artifact']['id'] == 10783982962
+          assert result['artifact']['digest'] == 'sha256:a7386fdb000e3dd17ee44563762e8cdb5c9423e62467f41138419978c4a75d7c'
+          assert result['artifact']['files_sha256'] == {
+              'phase2_stage_d_hit_rate_intervals.csv': '885c4627c814286b76e6ba3e91c34bafd97b2079f4937448b385e7220df720b3',
+              'phase2_stage_d_paired_uncertainty.csv': 'c6680a25bc6acc17a6b552bd6c9593df166d17c5e2e750e1ebffa7d538ed6f1e',
+              'phase2_stage_d_season_deltas.csv': '28316ccf2e7009f0a9a9f1fe1a5e2f127a7f449dfb5cd04a15e506c7dd15f0bc',
+              'phase2_stage_d_summary.json': 'd78dcf91965bdb71bea8fbcf0261bbe5ff629e28b0a7538e12ac20e07c1766a9',
+          }
+          assert result['bootstrap'] == {
+              'samples': 10000,
+              'seed': 26,
+              'alpha': 0.05,
+              'block_columns': ['season', 'week'],
+              'blocks': 72,
+              'interval': 'percentile_95pct',
+          }
+          assert result['accepted_inputs']['q1']['classification'] == 'VALID_NEGATIVE_INCREMENTAL_RESULT'
+          assert result['accepted_inputs']['q2']['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
+          assert result['accepted_inputs']['q2']['valid_oof_available'] is False
+          assert result['accepted_inputs']['q2']['q2_q3_blend_available'] is False
+          assert result['accepted_inputs']['q3']['classification'] == 'NOT_INCREMENTAL_VS_Q3_M2'
+          assert result['phase3_classification_performed'] is False
+          assert result['new_candidate_fit_or_selection_performed'] is False
+          assert result['candidate_rescue_performed'] is False
+          assert result['completed_2026_outcomes_used'] == 0
+          assert result['production_changed'] is False
           PY
-      - name: Prove contract tests did not modify production surfaces
+      - name: Verify immutable result-document blobs
+        run: |
+          test "$(git rev-parse HEAD:research/ats-nextgen/PHASE2_STAGE_D_RESULT_RECEIPT.md)" = "649e67eaaa16353d7f8a91109e1c86483dd2153c"
+          test "$(git rev-parse HEAD:research/ats-nextgen/phase2_stage_d_result_registry.json)" = "c4450bbebd78f383b04d51eb85f1129caa684704"
+      - name: Prove closeout checks did not modify production surfaces
         run: git diff --exit-code -- $PROTECTED_SURFACES
 
-  synthesis:
-    name: Stage D frozen evidence synthesis
+  closeout:
+    name: Stage D immutable closeout
     needs: contract
     runs-on: ubuntu-latest
-    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
-      - run: pip install '.[dev]'
-      - uses: actions/cache@v4
-        with:
-          path: .cache/nflreadpy
-          key: nfl-ats-nextgen-stage-d-${{ runner.os }}-${{ github.run_id }}
-          restore-keys: |
-            nfl-ats-nextgen-stage-d-${{ runner.os }}-
-            nfl-research-${{ runner.os }}-
-            nfl-challenger-${{ runner.os }}-
-            nflreadpy-${{ runner.os }}-
-      - name: Verify frozen Stage-D scientific blobs
+      - name: Verify Phase-2 closeout state
         run: |
-          test "$(git rev-parse HEAD:src/nfl_forecast/challenger_ats_nextgen_stage_d.py)" = "d7293b7c9b947590c72d58da1b2d07ce8c0919c0"
-          test "$(git rev-parse HEAD:scripts/run_challenger_ats_nextgen_stage_d.py)" = "7df0df371b93d50265c9061f4215753a87909b15"
-          test "$(git rev-parse HEAD:tests/test_challenger_ats_nextgen_stage_d.py)" = "1b727166aeb00c5b7c19d30e228ec6a9f40ed8ea"
-          test "$(git rev-parse HEAD:research/ats-nextgen/PHASE2_STAGE_D_OPENING_RECEIPT.md)" = "021d641df7585bd878338bc56a073d17ce2e1fe4"
-          test "$(git rev-parse HEAD:research/ats-nextgen/phase2_stage_d_opening_registry.json)" = "630fde8e67b7a15592f3836367222c846d04a12d"
-      - name: Run frozen Stage-D synthesis
-        run: |
-          rm -rf research_outputs/ats_nextgen/stage_d
-          PYTHONPATH="$PWD/src:$PWD/scripts${PYTHONPATH:+:$PYTHONPATH}" \
-            python scripts/run_challenger_ats_nextgen_stage_d.py \
-              --output-dir research_outputs/ats_nextgen/stage_d
-          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_paired_uncertainty.csv
-          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_hit_rate_intervals.csv
-          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_season_deltas.csv
-          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_summary.json
-      - name: Upload failed regeneration diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ats-nextgen-stage-d-regeneration-diagnostic-${{ github.run_id }}
-          path: |
-            research_outputs/ats_nextgen/q1/
-            research_outputs/ats_nextgen/q3/
-          retention-days: 7
-          if-no-files-found: warn
-      - name: Prove synthesis did not modify production surfaces
-        if: success()
+          grep -Fq 'Phase 2 is **COMPLETE' research/ats-nextgen/CURRENT_STATE_AND_NEXT_STEPS.md
+          grep -Fq 'FINAL_PHASE2_EVIDENCE_SYNTHESIS_COMPLETE' research/ats-nextgen/phase2_stage_d_result_registry.json
+          grep -Fq 'PHASE 2 SCIENTIFIC WORK COMPLETE' research/ats-nextgen/FINAL_PHASE2_RECEIPT.md
+          grep -Fq 'READY AFTER PHASE-2 CLOSEOUT MERGE' research/ats-nextgen/PHASE3_HANDOFF.md
+      - name: Prove no production diff was introduced by closeout
         run: git diff --exit-code -- $PROTECTED_SURFACES
-      - name: Upload immutable Stage-D evidence
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ats-nextgen-stage-d-${{ github.run_id }}
-          path: research_outputs/ats_nextgen/stage_d/
-          retention-days: 30
