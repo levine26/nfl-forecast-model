@@ -1,0 +1,20 @@
+{
+  "program_id": "LEVLINE-HIST-KMASS-V1",
+  "base_main_sha": "b4ecbb83dac0c6638395ebbd58e01a752ad33c9d",
+  "source_end_season": 2025,
+  "completed_2026_outcomes_allowed": false,
+  "market_outer_seasons": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+  "levline_outer_seasons": [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+  "student_t_df_grid": [4, 6, 10, 30],
+  "key_l2_grid": [1, 10, 100],
+  "blend_market_weight_grid": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+  "key_ablation_modes": ["NONE", "ZERO_ONLY", "THREE_ONLY", "SEVEN_ONLY", "ZERO_THREE_SEVEN"],
+  "inner_validation_max_seasons": 3,
+  "selection_metric": "integer_margin_log_score",
+  "bootstrap_resamples": 10000,
+  "bootstrap_seed": 20260924,
+  "total_buckets": {"LOW": "<43", "MEDIUM": "43-48", "HIGH": ">48"},
+  "reference_price": "REFERENCE_MINUS110",
+  "levline_margin_surface": "A0-DYNAMIC-OPPONENT-ADJUSTED-JOINT-SCORE-V1 chronology-clean reproduction for 2017-2024 plus frozen 2025 holdout; used because F-ST-01 is a home-win probability stack and has no official archived fair-margin output in repository provenance",
+  "fst_comparison": "chronology-clean annual F-ST probability reproduction; compared on home-win probability metrics, not misrepresented as an archived margin forecast"
+}
