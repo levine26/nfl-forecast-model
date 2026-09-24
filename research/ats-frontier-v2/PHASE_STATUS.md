@@ -1,37 +1,36 @@
 # PHASE STATUS
 
-**Program:** `LEVLINE_ATS_FRONTIER_V2`  
-**Phase 1:** `COMPLETE`  
-**Phase 2:** `COMPLETE`  
-**Phase 3:** `COMPLETE`  
-**Phase 4:** `NOT_STARTED`  
-**Phase-3 branch:** `research/ats-frontier-v2-phase3`  
-**Phase-3 opening main:** `5d4312bd36e1083d88ae6ac910703d08384088aa`  
-**Phase-3 exact validated research head:** `8ddad2d6cb40e4296a394b9192bd110f23ba9773`  
-**Phase-3 primary PR:** `#574`  
-**Phase-3 primary merge:** `fd44e51c412f8d242b54de989e29b550f0e67255`  
-**Phase-3 closeout branch:** `research/ats-frontier-v2-phase3-closeout`  
-**Production model:** `F-ST-01-FROZEN-2026`
+Program: `LEVLINE_ATS_FRONTIER_V2`
 
-## Exact-head Phase-3 CI
+| Phase | State | Notes |
+|---|---|---|
+| Phase 1 — Failure synthesis & deep research | `COMPLETE` | Research program, failure atlas, source review and mechanism shortlist merged. |
+| Phase 2 — Data qualification | `COMPLETE` | Historical/prospective data feasibility and source qualification frozen. |
+| Phase 3 — Final architecture design & preregistration | `COMPLETE` | M3/M4 historical identities, nulls, chronology, grids, ablations, evaluation and prospective M1/M2 identities frozen before fitting. |
+| Phase 4 — Controlled historical development, ablation & empirical validation | `EVIDENCE_COMPLETE__PENDING_REPOSITORY_MERGE` | Final canonical chronology-clean M3/M4 evidence package exists; primary PR/merge and immutable post-merge receipt remain. |
+| Phase 5 — Scientific synthesis & survivor freeze | `NOT_STARTED` | Do not classify survivors until Phase 4 is fully merged and closed. |
+| Phase 6 — Prospective shadow validation | `NOT_STARTED` | No Phase-4 result authorizes shadowing by itself. |
+| Phase 7 — Production decision | `NOT_STARTED` | Production remains frozen. |
 
-- LevLine research validation — run `36018189302`, run number `#1677`, `SUCCESS` on exact head `8ddad2d6cb40e4296a394b9192bd110f23ba9773`.
-- LevLine research firewall — run `36018189349`, run number `#2095`, `SUCCESS` on the same exact head.
+## Phase-4 accepted evidence state
 
-## Frozen mechanism state
+Final canonical execution: workflow run `36025444929`, artifact `10820397832`.
 
-- M1: `BLOCKED_PENDING_PAID_SOURCE` historically; `FV2-PROS-M1-MARKETSTATE-01` retained as `PROSPECTIVE_ONLY` at T-120.
-- M2: historical broad personnel-state candidate excluded; `FV2-PROS-M2-QBDELTA-01` retained as QB-only `PROSPECTIVE_ONLY` at T-120.
-- M3: `FV2-HIST-M3-DSSM-01` frozen and Phase-4 eligible.
-- M4: `FV2-HIST-M4-DMARGIN-01` frozen and Phase-4 eligible.
+Canonical execution commit: `7eda9cacd471a3161424699958509c02a260fc05`.
 
-Historical candidates trained in Phase 3: `0`.  
-Historical candidate OOF generated: `0`.  
-Candidate ATS/ROI/proper-score performance inspected: `NO`.  
-Completed-2026 outcomes used: `0`.  
-Historical odds purchased: `NO`.  
-Production changes: `NO`.
+Validated scientific head: `c1eead294c5ac897041fc35f628b2fec393ab064`.
 
-## Phase-4 boundary
+- M3 `FV2-HIST-M3-DSSM-01`: `NEGATIVE_PRIMARY_EVIDENCE` versus `M3-NULL-MARKET-NORMAL-01`.
+- M4 `FV2-HIST-M4-DMARGIN-01`: `POSITIVE_PRIMARY_EVIDENCE` versus `M4-NULL-STUDENTT-CONSTANT-01`, with the preregistered ablation showing essentially all improvement is reproduced by the key-mass component rather than conditional scale.
+- formal Phase-5 disposition: `NOT_APPLIED`.
+- completed-2026 outcomes used: `0`.
+- production changed: `NO`.
+- red-team audit: `PASS`.
 
-Phase 4 is not started. Its first authorized action is to implement and pass the preregistered synthetic leakage/sign/tail/push tests before fitting either historical candidate. No Phase-4 fitting, scoring, threshold search, or performance inspection is authorized by this closeout.
+Corrected workflow run `36025306390` remains preserved as a successful reproducibility execution. It is scientifically consistent with the canonical package but not byte-identical; the M4 primary paired delta differs by approximately `7.35e-9`, with no change in selected hyperparameters, per-season direction, uncertainty conclusion, ablation attribution or Phase-4 evidence labels. See `PHASE4_REPRODUCIBILITY_NOTE.md`.
+
+Workflow run `36023376614` remains explicitly invalid/unaccepted; its metrics are not part of the scientific record.
+
+## Current repository action
+
+Reconcile current `main`, validate the Phase-4 branch through exact-head research firewall/validation, merge the Phase-4 research package if clean, verify merged `main`, then create and merge the immutable Phase-4 closeout receipt. Only after that may Phase 5 begin.

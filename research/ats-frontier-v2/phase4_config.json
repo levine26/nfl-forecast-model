@@ -1,0 +1,40 @@
+{
+  "program": "LEVLINE_ATS_FRONTIER_V2",
+  "phase": 4,
+  "branch": "research/ats-frontier-v2-phase4",
+  "base_main_sha": "2391ccded6ab7252f89937b98e24afeafd4d7ce6",
+  "market_horizon_label": "HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE",
+  "warmup_start_season": 2010,
+  "outer_development_seasons": [2022, 2023, 2024, 2025],
+  "primary_population": "REG",
+  "completed_2026_outcomes_allowed": false,
+  "bootstrap_seed": 20260924,
+  "bootstrap_resamples": 10000,
+  "m3": {
+    "candidate_id": "FV2-HIST-M3-DSSM-01",
+    "null_id": "M3-NULL-MARKET-NORMAL-01",
+    "q_team_grid": [0.04, 0.10, 0.25],
+    "q_qb_grid": [0.10, 0.25, 0.50],
+    "lambda_grid": [0.50, 0.75],
+    "ridge_alpha_grid": [10.0, 100.0],
+    "ablations": ["MARKET_ONLY", "STATIC_FOOTBALL_STATE", "DYNAMIC_NO_QB", "DYNAMIC_FULL"],
+    "measurement_channels": ["off_epa", "def_epa_allowed", "qb_epa_dropback", "success_rate", "def_success_allowed"],
+    "measurement_composite_rule": "equal_weight_prior_standardized_primary_and_secondary_channels",
+    "static_pooling_rule": "prior_only_fixed_ewma_half_life_8_games",
+    "static_ewma_half_life_games": 8.0,
+    "residual_family": "Normal",
+    "primary_metric": "paired_multinomial_cover_push_loss_log_loss"
+  },
+  "m4": {
+    "candidate_id": "FV2-HIST-M4-DMARGIN-01",
+    "null_id": "M4-NULL-STUDENTT-CONSTANT-01",
+    "nu_grid": [4, 6, 10, 30],
+    "lambda_scale_grid": [1.0, 10.0],
+    "lambda_key_grid": [1.0, 10.0],
+    "key_margins": [0, -3, 3, -7, 7],
+    "scale_features": ["log(total_line/45)", "abs(spread_line)/7"],
+    "ablations": ["CONSTANT_SCALE_NO_KEY", "CONDITIONAL_SCALE_NO_KEY", "CONSTANT_SCALE_KEY", "FULL_CONDITIONAL_SCALE_KEY"],
+    "primary_metric": "integer_margin_log_score",
+    "pmf_normalization_tolerance": 1e-12
+  }
+}

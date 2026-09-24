@@ -1,0 +1,175 @@
+name: ATS Frontier V2 Phase 4 frozen evidence
+
+on:
+  push:
+    branches: [research/ats-frontier-v2-phase4]
+    paths:
+      - 'research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ats-frontier-v2-phase4-accepted-v2-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  VALIDATED_SCIENTIFIC_HEAD: c1eead294c5ac897041fc35f628b2fec393ab064
+  VALIDATED_PREFLIGHT_RUN: '36025017029'
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/fst_production.py src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json
+    src/nfl_forecast/public_forecast.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py
+    src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py
+    scripts/pregame_due.py scripts/verify_pregame_lock.py
+  SCIENTIFIC_SURFACES: >-
+    research/ats-frontier-v2/phase4_config.json
+    research/ats-frontier-v2/phase4_core.py
+    research/ats-frontier-v2/phase4_runner.py
+    research/ats-frontier-v2/phase4_accepted_runner.py
+    research/ats-frontier-v2/test_phase4.py
+    research/ats-frontier-v2/test_phase4_acceptance.py
+
+jobs:
+  frozen-gate:
+    name: Reconfirm immutable pre-result gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - name: Require exact validated pre-result receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
+          grep -F "$VALIDATED_SCIENTIFIC_HEAD" research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
+          grep -F "$VALIDATED_PREFLIGHT_RUN" research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
+          git cat-file -e "${VALIDATED_SCIENTIFIC_HEAD}^{commit}"
+          git diff --exit-code "$VALIDATED_SCIENTIFIC_HEAD"..HEAD -- $SCIENTIFIC_SURFACES
+      - name: Compile and rerun result-blind tests
+        run: |
+          python -m compileall -q research/ats-frontier-v2
+          pytest -q research/ats-frontier-v2/test_phase4.py research/ats-frontier-v2/test_phase4_acceptance.py
+          python research/ats-frontier-v2/phase4_accepted_runner.py --preflight-only
+      - name: Prove protected production surfaces unchanged before execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
+
+  evidence:
+    name: Execute M3/M4 chronology-clean development evidence
+    needs: frozen-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: ats-frontier-v2-phase4-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ats-frontier-v2-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Execute complete frozen Phase 4 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/ats-frontier-v2-phase4
+          mkdir -p /tmp/ats-frontier-v2-phase4
+          python research/ats-frontier-v2/phase4_accepted_runner.py --output-dir /tmp/ats-frontier-v2-phase4
+      - name: Verify required evidence package
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            M3_IMPLEMENTATION_REPORT.md M3_OOF_PREDICTIONS_2022_2025.csv M3_METRICS.json M3_ABLATION_RESULTS.csv M3_CALIBRATION_REPORT.md \
+            M4_IMPLEMENTATION_REPORT.md M4_OOF_PREDICTIONS_2022_2025.csv M4_METRICS.json M4_ABLATION_RESULTS.csv M4_NUMERICAL_AUDIT.md M4_CALIBRATION_REPORT.md \
+            COMMON_ROW_AUDIT.csv BOOTSTRAP_RESULTS.json PER_SEASON_RESULTS.csv ATS_DIAGNOSTICS.json RED_TEAM_AUDIT.md \
+            PHASE4_EVIDENCE_SYNTHESIS.md PHASE4_EVIDENCE_SYNTHESIS.json PHASE5_HANDOFF.md PHASE4_RUN_MANIFEST.json OUTPUT_HASHES.json; do
+            test -s "/tmp/ats-frontier-v2-phase4/$file"
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/ats-frontier-v2-phase4')
+          manifest=json.loads((root/'PHASE4_RUN_MANIFEST.json').read_text())
+          assert manifest['outer_seasons']==[2022,2023,2024,2025]
+          assert manifest['warmup_start']==2010
+          assert manifest['completed_2026_outcomes_used']==0
+          assert manifest['production_changed'] is False
+          assert manifest['phase5_started'] is False
+          assert manifest['market_label']=='HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE'
+          assert manifest['preflight']['status']=='PASS'
+          assert manifest['preflight']['m4_numerical_audit']['status']=='PASS'
+          assert manifest['preflight']['superseded_execution_accepted'] is False
+          assert manifest['M3_OOF_N']>0 and manifest['M4_OOF_N']>0
+          m3=json.loads((root/'M3_METRICS.json').read_text())
+          m4=json.loads((root/'M4_METRICS.json').read_text())
+          assert m3['common_rows_candidate']==m3['common_rows_null']==m3['common_rows_intersection']
+          assert m4['common_rows_candidate']==m4['common_rows_null']==m4['common_rows_intersection']
+          assert m3['bootstrap']['resamples']>=10000
+          assert m4['bootstrap']['resamples']>=10000
+          assert m3['static_pooling_rule']=='prior_only_fixed_ewma_half_life_8_games'
+          assert 'ranked_probability_score' in m4
+          assert 'tail_diagnostics' in m4
+          PY
+      - name: Prove protected production surfaces unchanged after execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
+      - name: Preserve immutable accepted evidence on research branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${GITHUB_REF_NAME}" --quiet
+          git rebase "origin/${GITHUB_REF_NAME}"
+          dest='research/ats-frontier-v2/phase4_evidence'
+          rm -rf "$dest"
+          mkdir -p "$dest"
+          cp -a /tmp/ats-frontier-v2-phase4/. "$dest/"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dest"
+          git commit -m 'research: preserve ATS Frontier V2 Phase 4 evidence [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ats-frontier-v2-phase4-${{ github.run_id }}
+          path: /tmp/ats-frontier-v2-phase4/
+          if-no-files-found: warn
+          retention-days: 90
+
+  gate:
+    name: Phase 4 exact-run gate
+    if: always()
+    needs: [frozen-gate, evidence]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require pre-result gate and complete evidence package
+        env:
+          PREFLIGHT: '${{ needs.frozen-gate.result }}'
+          EVIDENCE: '${{ needs.evidence.result }}'
+        run: |
+          set -euo pipefail
+          echo "preflight=$PREFLIGHT"
+          echo "evidence=$EVIDENCE"
+          test "$PREFLIGHT" = success
+          test "$EVIDENCE" = success

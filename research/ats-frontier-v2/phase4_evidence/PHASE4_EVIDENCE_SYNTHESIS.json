@@ -1,0 +1,597 @@
+{
+  "M3": {
+    "ats_diagnostic": {
+      "REFERENCE_MINUS110_roi_on_risked_units": -0.06530331672108612,
+      "REFERENCE_MINUS110_units_per_1_risked": -69.09090909090912,
+      "actual_historical_roi_claimed": false,
+      "decisions": 1058,
+      "games": 1087,
+      "hit_rate_ex_push": 0.4896030245746692,
+      "losses": 540,
+      "pushes": 29,
+      "wins": 518
+    },
+    "bootstrap": {
+      "ci_2_5": -0.00031937461835433245,
+      "ci_97_5": 0.0016556867645020252,
+      "n": 1087,
+      "point_delta": 0.0006706323752636532,
+      "probability_favorable": 0.0889,
+      "resamples": 10000,
+      "seed": 20260924,
+      "weeks": 72
+    },
+    "calibration": {
+      "intercept": -0.0008002656550699535,
+      "n": 1058,
+      "reliability": [
+        {
+          "bin": "(0.469, 0.488]",
+          "mean_pred": 0.48338027733762917,
+          "n": 106,
+          "observed": 0.5849056603773585
+        },
+        {
+          "bin": "(0.488, 0.492]",
+          "mean_pred": 0.48994359293580625,
+          "n": 106,
+          "observed": 0.5660377358490566
+        },
+        {
+          "bin": "(0.492, 0.495]",
+          "mean_pred": 0.4936965894990787,
+          "n": 106,
+          "observed": 0.49056603773584906
+        },
+        {
+          "bin": "(0.495, 0.497]",
+          "mean_pred": 0.49617263678188084,
+          "n": 105,
+          "observed": 0.4666666666666667
+        },
+        {
+          "bin": "(0.497, 0.499]",
+          "mean_pred": 0.49844449420054526,
+          "n": 106,
+          "observed": 0.41509433962264153
+        },
+        {
+          "bin": "(0.499, 0.502]",
+          "mean_pred": 0.5007770005899835,
+          "n": 106,
+          "observed": 0.5188679245283019
+        },
+        {
+          "bin": "(0.502, 0.505]",
+          "mean_pred": 0.5033788672357986,
+          "n": 105,
+          "observed": 0.3904761904761905
+        },
+        {
+          "bin": "(0.505, 0.508]",
+          "mean_pred": 0.5063813912531425,
+          "n": 106,
+          "observed": 0.42452830188679247
+        },
+        {
+          "bin": "(0.508, 0.512]",
+          "mean_pred": 0.5097005305803236,
+          "n": 106,
+          "observed": 0.5943396226415094
+        },
+        {
+          "bin": "(0.512, 0.534]",
+          "mean_pred": 0.5167025737408443,
+          "n": 106,
+          "observed": 0.5471698113207547
+        }
+      ],
+      "slope": -1.4064471514780361
+    },
+    "candidate_brier": 0.5255261738778846,
+    "candidate_crps": 6.92182144264477,
+    "candidate_id": "FV2-HIST-M3-DSSM-01",
+    "candidate_primary_log_loss": 0.7811502028797036,
+    "chosen_by_outer_season": {
+      "2022": {
+        "alpha": 100.0,
+        "lambda": 0.75,
+        "mean_primary_score": 0.7591620316194408,
+        "q_qb": 0.5,
+        "q_team": 0.04
+      },
+      "2023": {
+        "alpha": 100.0,
+        "lambda": 0.75,
+        "mean_primary_score": 0.7572495823213233,
+        "q_qb": 0.5,
+        "q_team": 0.1
+      },
+      "2024": {
+        "alpha": 100.0,
+        "lambda": 0.75,
+        "mean_primary_score": 0.8042535179373368,
+        "q_qb": 0.5,
+        "q_team": 0.04
+      },
+      "2025": {
+        "alpha": 100.0,
+        "lambda": 0.75,
+        "mean_primary_score": 0.8038892130698136,
+        "q_qb": 0.1,
+        "q_team": 0.25
+      }
+    },
+    "common_rows_candidate": 1087,
+    "common_rows_intersection": 1087,
+    "common_rows_null": 1087,
+    "dropped_for_missing_spread": 0,
+    "dynamic_full_minus_no_qb": 0.0002656684749809774,
+    "dynamic_full_minus_static": -0.00025261406340103823,
+    "dynamic_no_qb_primary_log_loss": 0.7808845344047226,
+    "margin_mae": 9.5093461058206,
+    "margin_rmse": 12.366121882572106,
+    "null_brier": 0.5248541924144955,
+    "null_id": "M3-NULL-MARKET-NORMAL-01",
+    "null_primary_log_loss": 0.7804795705044401,
+    "oof_n": 1087,
+    "paired_delta_candidate_minus_null": 0.0006706323752636532,
+    "static_pooling_rule": "prior_only_fixed_ewma_half_life_8_games",
+    "static_primary_log_loss": 0.7814028169431046
+  },
+  "M3_primary_evidence": "NEGATIVE_PRIMARY_EVIDENCE",
+  "M4": {
+    "ats_diagnostic": {
+      "REFERENCE_MINUS110_roi_on_risked_units": -0.025605774188004842,
+      "REFERENCE_MINUS110_units_per_1_risked": -27.090909090909122,
+      "actual_historical_roi_claimed": false,
+      "decisions": 1058,
+      "games": 1087,
+      "hit_rate_ex_push": 0.5103969754253308,
+      "losses": 518,
+      "pushes": 29,
+      "wins": 540
+    },
+    "bootstrap": {
+      "ci_2_5": -0.10748698706212485,
+      "ci_97_5": -0.05796293485132338,
+      "n": 1087,
+      "point_delta": -0.08267169914295289,
+      "probability_favorable": 1.0,
+      "resamples": 10000,
+      "seed": 20260924,
+      "weeks": 72
+    },
+    "calibration": {
+      "intercept": 0.01477013532177962,
+      "n": 1058,
+      "reliability": [
+        {
+          "bin": "(0.436, 0.447]",
+          "mean_pred": 0.4408694403493524,
+          "n": 106,
+          "observed": 0.46226415094339623
+        },
+        {
+          "bin": "(0.447, 0.46]",
+          "mean_pred": 0.45410837855290026,
+          "n": 106,
+          "observed": 0.5660377358490566
+        },
+        {
+          "bin": "(0.46, 0.463]",
+          "mean_pred": 0.461396478883966,
+          "n": 106,
+          "observed": 0.5
+        },
+        {
+          "bin": "(0.463, 0.485]",
+          "mean_pred": 0.4658673127327121,
+          "n": 105,
+          "observed": 0.49523809523809526
+        },
+        {
+          "bin": "(0.485, 0.487]",
+          "mean_pred": 0.485846402486949,
+          "n": 106,
+          "observed": 0.49056603773584906
+        },
+        {
+          "bin": "(0.487, 0.512]",
+          "mean_pred": 0.4886255716531338,
+          "n": 106,
+          "observed": 0.4339622641509434
+        },
+        {
+          "bin": "(0.512, 0.514]",
+          "mean_pred": 0.5130076597657904,
+          "n": 105,
+          "observed": 0.44761904761904764
+        },
+        {
+          "bin": "(0.514, 0.534]",
+          "mean_pred": 0.5169435641657071,
+          "n": 106,
+          "observed": 0.5188679245283019
+        },
+        {
+          "bin": "(0.534, 0.539]",
+          "mean_pred": 0.537396483100503,
+          "n": 106,
+          "observed": 0.4811320754716981
+        },
+        {
+          "bin": "(0.539, 0.563]",
+          "mean_pred": 0.5515508252687352,
+          "n": 106,
+          "observed": 0.6037735849056604
+        }
+      ],
+      "slope": 0.4366590498000353
+    },
+    "candidate_brier": 0.5237051029160374,
+    "candidate_cpl_log_loss": 0.7695530781979453,
+    "candidate_id": "FV2-HIST-M4-DMARGIN-01",
+    "candidate_integer_log_score": 3.852975162486858,
+    "common_rows_candidate": 1087,
+    "common_rows_intersection": 1087,
+    "common_rows_null": 1087,
+    "conditional_scale_contribution_vs_null": 0.00012506107970626913,
+    "conditional_scale_no_key_integer_log_score": 3.935771922709517,
+    "constant_scale_key_integer_log_score": 3.8529284697864044,
+    "dropped_for_missing_spread_or_total": 0,
+    "full_minus_conditional_no_key": -0.08279676022265915,
+    "full_minus_constant_key": 4.669270045401389e-05,
+    "key_mass_contribution_vs_null": -0.08271839184340689,
+    "margin_mae": 9.494480220791168,
+    "margin_rmse": 12.36028636127993,
+    "null_cpl_log_loss": 0.7796790213523288,
+    "null_id": "M4-NULL-STUDENTT-CONSTANT-01",
+    "null_integer_log_score": 3.935646861629811,
+    "oof_n": 1087,
+    "paired_delta_candidate_minus_null": -0.08267169914295289,
+    "ranked_probability_score": 6.9151235686363295,
+    "selected_by_outer_season_variant": {
+      "2022:CONDITIONAL_SCALE_NO_KEY": {
+        "conditional": true,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 4.004035120233725,
+        "scale_params": [
+          2.55664055487246,
+          0.05753219993634859,
+          -0.009318078376708252
+        ],
+        "use_key": false
+      },
+      "2022:CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "key_params": [
+          -1.6722410911370384,
+          1.1588614287333496,
+          0.7683826196276713
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.9140223035092263,
+        "scale_params": [
+          2.6028013480512615
+        ],
+        "use_key": true
+      },
+      "2022:CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 4.004091573528957,
+        "scale_params": [
+          2.549735069677305
+        ],
+        "use_key": false
+      },
+      "2022:FULL_CONDITIONAL_SCALE_KEY": {
+        "conditional": true,
+        "key_params": [
+          -1.6653680655502963,
+          1.1661200813973478,
+          0.7729747611873284
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.913563631998763,
+        "scale_params": [
+          2.637388989988136,
+          0.05873278843516139,
+          -0.04552542069297655
+        ],
+        "use_key": true
+      },
+      "2023:CONDITIONAL_SCALE_NO_KEY": {
+        "conditional": true,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 10,
+        "objective": 3.9921978718203386,
+        "scale_params": [
+          2.472429208590152,
+          0.08636775992350755,
+          0.0005141205624113914
+        ],
+        "use_key": false
+      },
+      "2023:CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "key_params": [
+          -1.6324405727548965,
+          1.1612255425023463,
+          0.7430744073834465
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.903813189963778,
+        "scale_params": [
+          2.5913351636704527
+        ],
+        "use_key": true
+      },
+      "2023:CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 10,
+        "objective": 3.9922731810055248,
+        "scale_params": [
+          2.4728780010836102
+        ],
+        "use_key": false
+      },
+      "2023:FULL_CONDITIONAL_SCALE_KEY": {
+        "conditional": true,
+        "key_params": [
+          -1.6259042834682562,
+          1.1679964678249282,
+          0.7473113728426607
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.903399226755979,
+        "scale_params": [
+          2.623255363373176,
+          0.07209630700278999,
+          -0.04201969265430008
+        ],
+        "use_key": true
+      },
+      "2024:CONDITIONAL_SCALE_NO_KEY": {
+        "conditional": true,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 10,
+        "objective": 3.9916587891319724,
+        "scale_params": [
+          2.4733240863434514,
+          0.07489473237313275,
+          -0.0011309687320353026
+        ],
+        "use_key": false
+      },
+      "2024:CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "key_params": [
+          -1.7045198972636086,
+          1.1547435036886222,
+          0.7343426993152169
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.903844179567515,
+        "scale_params": [
+          2.5901647017558354
+        ],
+        "use_key": true
+      },
+      "2024:CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 10,
+        "objective": 3.9917151498355974,
+        "scale_params": [
+          2.4722156366232033
+        ],
+        "use_key": false
+      },
+      "2024:FULL_CONDITIONAL_SCALE_KEY": {
+        "conditional": true,
+        "key_params": [
+          -1.6976595131823198,
+          1.1619623071896812,
+          0.7388406863478362
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.9034008389515806,
+        "scale_params": [
+          2.6242228136721217,
+          0.0641964736914005,
+          -0.04470355634177658
+        ],
+        "use_key": true
+      },
+      "2025:CONDITIONAL_SCALE_NO_KEY": {
+        "conditional": true,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 10,
+        "objective": 3.9889910860192286,
+        "scale_params": [
+          2.466231206202045,
+          0.054821276356913425,
+          0.004758841198067074
+        ],
+        "use_key": false
+      },
+      "2025:CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "key_params": [
+          -1.7748847888481707,
+          1.1434447987442702,
+          0.7174677830260342
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.902432450673408,
+        "scale_params": [
+          2.586357066535726
+        ],
+        "use_key": true
+      },
+      "2025:CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "key_params": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "lambda_key": 10.0,
+        "lambda_scale": 10.0,
+        "nu": 10,
+        "objective": 3.989025824572064,
+        "scale_params": [
+          2.469550582427297
+        ],
+        "use_key": false
+      },
+      "2025:FULL_CONDITIONAL_SCALE_KEY": {
+        "conditional": true,
+        "key_params": [
+          -1.7688437203871208,
+          1.1495899464822001,
+          0.7213049973655774
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.9021079242060734,
+        "scale_params": [
+          2.615683045774939,
+          0.05449011797580647,
+          -0.03850699966984993
+        ],
+        "use_key": true
+      }
+    },
+    "tail_diagnostics": {
+      "endpoint_folding_used": false,
+      "finite_support_used": false,
+      "max_abs_market_residual": 44.0,
+      "max_abs_observed_margin": 50.0,
+      "nonfinite_observed_mass_count": 0,
+      "nonpositive_observed_mass_count": 0,
+      "observed_margin_mass_median": 0.023066241663030715,
+      "observed_margin_mass_min": 0.00021437387438126207,
+      "observed_margin_mass_p01": 0.0013662755369972571
+    }
+  },
+  "M4_primary_evidence": "POSITIVE_PRIMARY_EVIDENCE",
+  "completed_2026_outcomes_used": 0,
+  "phase": 4,
+  "phase5_started": false,
+  "production_changed": false,
+  "provenance": {
+    "branch": "research/ats-frontier-v2-phase4",
+    "code_sha256": "155f5afeffe0ea71afdd204b7f7e602d29f1664bb27fab52506ba6df85ac858f",
+    "commit_sha": "7eda9cacd471a3161424699958509c02a260fc05",
+    "completed_2026_outcomes_used": 0,
+    "config_sha256": "ddc4abf966cbe15a865f4866b29ff76530f2449a07eca87b0ffee4ba07ec3284",
+    "dataset_identity_sha256": "8a6d974306abd57ca8060ad3803c7e90ae52f3fbd2900dbb1599c77dbd858129",
+    "game_ids_sha256": "03156647fbed7dc936c953a2a6c3400b2423fc3c8ff245388261c9bddd3b2a4f",
+    "market_label": "HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE",
+    "original_preflight_code_sha256": "a80f1bb02945a8c3dabd4d176ac3c378a38f9b5beebe78d4f9534a5fb46b952a",
+    "pbp_rows": 737117,
+    "pbp_seasons": [
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "production_changed": false,
+    "schedule_rows": 4175,
+    "schedule_seasons": [
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "superseded_execution_accepted": false
+  },
+  "status": "EMPIRICAL_EVIDENCE_COMPLETE_PENDING_GITHUB_CLOSEOUT"
+}
