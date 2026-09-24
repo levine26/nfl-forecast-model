@@ -1,0 +1,31 @@
+{
+  "program": "LEVLINE_ATS_HISTORICAL_KEYMASS_CHALLENGER",
+  "research_only": true,
+  "completed_2026_outcomes_allowed": false,
+  "source_season_max": 2025,
+  "center_archive_seasons": [2021, 2022, 2023, 2024, 2025],
+  "outer_test_seasons": [2022, 2023, 2024, 2025],
+  "candidate_ids": ["KMASS-MARKET", "KMASS-LEVLINE", "KMASS-BLEND"],
+  "blend_weight_grid_market": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+  "nu_grid": [4, 6, 10, 30],
+  "lambda_key_grid": [1.0, 10.0],
+  "lambda_scale": 1.0,
+  "key_margins": [0, -3, 3, -7, 7],
+  "constant_scale_only": true,
+  "primary_metric": "exact_integer_margin_log_score",
+  "bootstrap_seed": 20260924,
+  "bootstrap_resamples": 10000,
+  "fst_stack": {
+    "C": 1.0,
+    "penalty": "l2",
+    "solver": "lbfgs",
+    "max_iter": 3000,
+    "minimum_training_rows": 200
+  },
+  "fair_margin_contract": "NormalDist/normal_ppf(official_home_probability) * prior_only_margin_regression_residual_std",
+  "market_center_contract": "accepted V2 normalized home-margin spread_line (phase4_core.market_margin identity)",
+  "market_horizon_label": "HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE",
+  "blend_tie_break": "minimum_training_objective_then_abs_w_minus_0_5_then_smaller_w",
+  "nuisance_tie_break": "minimum_training_objective_then_nu_then_lambda_key",
+  "production_changed": false
+}
