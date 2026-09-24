@@ -6,9 +6,9 @@
 
 ## Canonical Phase-4 evidence
 
-Use only the accepted Phase-4 evidence package preserved from workflow run `36025306390`, artifact `10820230932` (`ats-frontier-v2-phase4-36025306390`, digest `sha256:c31c5c324db4e56f63488c883252ca2601f39aecf2989d645790aa21704f4fcf`).
+Use only the final branch-preserved accepted Phase-4 evidence package from workflow run `36025444929`, artifact `10820397832` (`ats-frontier-v2-phase4-36025444929`, digest `sha256:d65adbc7bf0837ee2b5867b551af607549c1095182da1570085e2e50013fb60d`).
 
-Execution head: `4fce9805c2ba9ed9dc6de388600fe40787605720`.
+Execution head: `7eda9cacd471a3161424699958509c02a260fc05`.
 
 Validated pre-result scientific head: `c1eead294c5ac897041fc35f628b2fec393ab064`.
 
@@ -18,11 +18,15 @@ Config SHA-256: `ddc4abf966cbe15a865f4866b29ff76530f2449a07eca87b0ffee4ba07ec328
 
 Dataset identity SHA-256: `8a6d974306abd57ca8060ad3803c7e90ae52f3fbd2900dbb1599c77dbd858129`.
 
-M3 accepted OOF SHA-256: `f15bb97c9947bffb123f70658b2b75ebd900a341b9aefe680fbe86beaaf30c40`.
+Game-ID SHA-256: `03156647fbed7dc936c953a2a6c3400b2423fc3c8ff245388261c9bddd3b2a4f`.
 
-M4 accepted OOF SHA-256: `2653434b7264a73166429f6702f83a4da87f2d59eb023c3839d3222afff18190`.
+M3 canonical OOF SHA-256: `9ea3c9062f00518ee7b2535605509b40f817c31dd731e3d178916ae117eac4a1`.
 
-The earlier execution run `36023376614` is `INVALID / NOT ACCEPTED`; do not use its metrics or conclusions.
+M4 canonical OOF SHA-256: `71e7891d9b75622cbb48fb64912566f5cb57ad10959600bc25ecf74bd4bd46cb`.
+
+Corrected workflow run `36025306390` / artifact `10820230932` is retained as a successful near-identical reproducibility execution from the same frozen scientific surface. It is not the canonical branch package. See `PHASE4_REPRODUCIBILITY_NOTE.md`.
+
+Workflow run `36023376614` is `INVALID / NOT ACCEPTED`; do not use its metrics or conclusions.
 
 ## Phase-4 evidence carried forward
 
@@ -33,28 +37,37 @@ Phase-4 technical evidence label: `NEGATIVE_PRIMARY_EVIDENCE`.
 - OOF/common rows: `1087`.
 - candidate CPL log loss: `0.7811502028797036`.
 - market-null CPL log loss: `0.7804795705044401`.
-- paired candidate-minus-null delta: `+0.0006706323752636537`.
-- 10,000-resample week-block 95% interval: `[-0.00031937461835433695, +0.001655686764502027]`.
+- paired candidate-minus-null delta: `+0.0006706323752636532`.
+- 10,000-resample week-block 95% interval: `[-0.00031937461835433245, +0.0016556867645020252]`.
+- descriptive probability favorable: `0.0889`.
 - outer-season delta is unfavorable in 2022, 2023, 2024 and 2025.
 - full dynamic model improves the frozen static ablation slightly but still loses to the market null.
 - adding the QB component is worse than the preregistered `DYNAMIC_NO_QB` ablation on the primary score.
-- candidate calibration intercept/slope: `-0.0008002656550696445 / -1.4064471514780372`.
+- candidate calibration intercept/slope: `-0.0008002656550699535 / -1.4064471514780361`.
+- ATS diagnostic: `518-540-29`; ex-push hit rate `48.96%`; `REFERENCE_MINUS110` sensitivity `-6.53%`; no actual historical ROI claim.
 
 ### M4 — `FV2-HIST-M4-DMARGIN-01`
 
 Phase-4 technical evidence label: `POSITIVE_PRIMARY_EVIDENCE`.
 
 - OOF/common rows: `1087`.
-- candidate integer-margin log score: `3.85297516860494`.
-- strong-null integer-margin log score: `3.9356468604011363`.
-- paired candidate-minus-null delta: `-0.08267169179619614`.
-- 10,000-resample week-block 95% interval: `[-0.10748699203380639, -0.057962887776498655]`.
+- candidate integer-margin log score: `3.852975162486858`.
+- strong-null integer-margin log score: `3.935646861629811`.
+- paired candidate-minus-null delta: `-0.08267169914295289`.
+- 10,000-resample week-block 95% interval: `[-0.10748698706212485, -0.05796293485132338]`.
+- descriptive probability favorable: `1.0`.
 - outer-season delta is favorable in 2022, 2023, 2024 and 2025.
-- conditional-scale-only contribution versus null: `+0.0001250552561666556`.
-- key-mass contribution versus null: `-0.08271837498276481`.
-- full minus `CONSTANT_SCALE_KEY`: `+0.0000466831865686729`; essentially all primary-score improvement is reproduced by the preregistered key-mass component.
-- candidate calibration intercept/slope: `0.014770139195534758 / 0.43665842195187754`.
+- conditional-scale-only contribution versus null: `+0.00012506107970626913`.
+- key-mass contribution versus null: `-0.08271839184340689`.
+- full minus `CONSTANT_SCALE_KEY`: `+0.00004669270045401389`; essentially all primary-score improvement is reproduced by the preregistered key-mass component.
+- candidate calibration intercept/slope: `0.01477013532177962 / 0.4366590498000353`.
+- ranked probability score: `6.9151235686363295`.
+- ATS diagnostic: `540-518-29`; ex-push hit rate `51.04%`; `REFERENCE_MINUS110` sensitivity `-2.56%`; no actual historical ROI claim.
 - PMF/tail audit: `PASS`; no finite-support clipping or endpoint folding.
+
+## Reproducibility note
+
+The two corrected runs are not byte-identical. M3's pooled primary delta differs by approximately `5e-19`; M4's differs by approximately `7.35e-9`. Selected hyperparameter identities, OOF row counts, evidence direction, per-season direction, bootstrap conclusion, ablation attribution and Phase-4 evidence labels are unchanged. The numerical drift is preserved transparently and is not used to select a favorable execution.
 
 ## Firewalls
 
@@ -68,7 +81,7 @@ Phase-4 technical evidence label: `POSITIVE_PRIMARY_EVIDENCE`.
 
 ## Exact Phase-5 first action
 
-After the Phase-4 primary and closeout PRs are merged and Phase 4 is formally marked `COMPLETE`, read the immutable accepted evidence/hashes and apply the frozen `EVALUATION_PROTOCOL.md` classifications independently to M3 and M4.
+After the Phase-4 primary and closeout PRs are merged and Phase 4 is formally marked `COMPLETE`, read the immutable canonical evidence/hashes and apply the frozen `EVALUATION_PROTOCOL.md` classifications independently to M3 and M4.
 
 Before applying the calibration-relative eligibility clause, derive the corresponding null-side calibration intercept/slope from the already preserved candidate/null OOF probabilities if not already materialized. This is a reporting/synthesis calculation only: no refitting, recalibration, changed probabilities, new model, or target-dependent transformation is authorized.
 
