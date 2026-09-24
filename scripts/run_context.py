@@ -71,6 +71,46 @@ def _fetch_injuries(season: int, week: int):
     return espn_rows, {"status":"degraded","provider":"NFL.com primary / ESPN fallback","primary":nfl_status,"fallback":espn_status,"source":nfl_status.get("source"),"as_of":datetime.now(timezone.utc).isoformat()}, False
 
 
+def _preserve_provider_fallback(out: Path, canonical_game_ids: set[str]) -> dict | None:
+    """Carry unresolved game-scoped provider recovery state across context refreshes.
+
+    Context generation owns deterministic reporting, not provider recovery authority.
+    Rebuilding context_source_status.json must therefore preserve any existing
+    groq_provider_fallback ledger for games still on the current canonical slate.
+    """
+    path = out / "context_source_status.json"
+    if not path.is_file():
+        return None
+    try:
+        prior = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    section = prior.get("groq_provider_fallback")
+    if not isinstance(section, dict):
+        return None
+
+    preserved = dict(section)
+    games = section.get("games")
+    if isinstance(games, dict):
+        preserved_games = {
+            str(gid): item
+            for gid, item in games.items()
+            if str(gid) in canonical_game_ids and isinstance(item, dict)
+        }
+        preserved["games"] = preserved_games
+        preserved["failed_games"] = sorted(
+            gid
+            for gid, item in preserved_games.items()
+            if item.get("provider_result") == "failed"
+            and bool(item.get("requires_chatgpt_refresh"))
+        )
+    else:
+        preserved["games"] = {}
+        preserved["failed_games"] = []
+    preserved["context_refresh_preserved"] = True
+    return preserved
+
+
 def _normalize_read(text: str, team_tokens: set[str]) -> str:
     normalized = str(text or "").lower()
     for team in sorted((t for t in team_tokens if t), key=len, reverse=True):
@@ -207,6 +247,12 @@ def main():
     week_values=pd.to_numeric(predictions.get("week"),errors="coerce").dropna()
     if week_values.empty: raise SystemExit("Prediction feed does not contain a valid week number")
     week=int(week_values.iloc[0]); out=Path(args.output_dir); out.mkdir(parents=True,exist_ok=True); generated=datetime.now(timezone.utc).isoformat(); source_status={"generated_utc":generated}
+    preserved_provider_fallback = _preserve_provider_fallback(
+        out,
+        set(predictions["game_id"].astype(str)),
+    )
+    if preserved_provider_fallback is not None:
+        source_status["groq_provider_fallback"] = preserved_provider_fallback
     try:
         schedules=pd.read_csv(NFLVERSE_SCHEDULE_URL,low_memory=False); schedules=schedules[pd.to_numeric(schedules.get("season"),errors="coerce").eq(args.season)].copy(); source_status["schedule"]={"status":"healthy","source":NFLVERSE_SCHEDULE_URL,"rows":int(len(schedules))}
     except Exception as exc:
