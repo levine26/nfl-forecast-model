@@ -18,6 +18,8 @@ Job ID: `107719216108`
 
 Conclusion: `success`
 
+Accepted execution concurrency identity: `ats-frontier-v2-phase4-accepted-v2`
+
 Candidate performance accepted before this receipt: `NO`
 
 Completed-2026 outcomes used: `0`
