@@ -1,3 +1,7 @@
+from pathlib import Path
+import importlib.util
+import json
+
 import pandas as pd
 
 from nfl_forecast.context import (
@@ -74,3 +78,39 @@ def test_qb_questionable_creates_scenario_watch_without_point_penalty():
     scenario = [x for x in items if x.category == "scenario"][0]
     assert "does not invent a quarterback penalty" in scenario.summary
     assert scenario.promoted_to_model is False
+
+
+def test_context_refresh_preserves_current_slate_provider_fallback(tmp_path):
+    script = Path(__file__).resolve().parents[1] / "scripts" / "run_context.py"
+    spec = importlib.util.spec_from_file_location("run_context_script", script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    status = {
+        "groq_provider_fallback": {
+            "status": "degraded",
+            "run_id": "prior",
+            "games": {
+                "2026_03_ATL_GB": {
+                    "provider": "groq",
+                    "provider_result": "failed",
+                    "requires_chatgpt_refresh": True,
+                },
+                "2026_02_OLD_GAME": {
+                    "provider": "groq",
+                    "provider_result": "failed",
+                    "requires_chatgpt_refresh": True,
+                },
+            },
+            "failed_games": ["2026_03_ATL_GB", "2026_02_OLD_GAME"],
+        }
+    }
+    (tmp_path / "context_source_status.json").write_text(json.dumps(status), encoding="utf-8")
+
+    preserved = module._preserve_provider_fallback(tmp_path, {"2026_03_ATL_GB"})
+    assert preserved is not None
+    assert set(preserved["games"]) == {"2026_03_ATL_GB"}
+    assert preserved["failed_games"] == ["2026_03_ATL_GB"]
+    assert preserved["games"]["2026_03_ATL_GB"]["requires_chatgpt_refresh"] is True
+    assert preserved["context_refresh_preserved"] is True
