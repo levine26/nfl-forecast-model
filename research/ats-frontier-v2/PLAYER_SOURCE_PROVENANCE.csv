@@ -1,0 +1,8 @@
+component,source,coverage_or_era,timestamp_semantics,phase2_status,prohibited_use
+ability,nflverse PBP/player stats,1999+ PBP/prior games,postgame source used only after prior game,DATA_QUALIFIED,target-game realized data
+snap/role history,nflverse snap counts/prior games,historical,postgame prior-game only,DATA_QUALIFIED_AS_LAGGED,target-game snaps as pregame role
+injury/practice,nflverse injuries,through 2024,weekly/practice source; source died after 2024,PARTIALLY_QUALIFIED,pretending continuous 2025 coverage
+final practice state,existing 2025 reconstruction,2025,T-120-qualified final practice source in frozen prior research,PARTIALLY_QUALIFIED_2025_ONLY,back-propagation outside contract
+depth chart,nflverse depth charts,2025+,ISO8601 load timestamp; appended snapshots,DATA_QUALIFIED_FOR_TIMESTAMPED_STATE,assigning future snapshot to earlier horizon
+participation,nflverse participation,2016+ with source changes,postgame; 2023+ FTN released after season,TRAINING_LAG_ONLY,same-game pregame participation
+replacement quality,lagged prior play/history,historical,strictly prior observations,DATA_QUALIFIED,reusing future performance

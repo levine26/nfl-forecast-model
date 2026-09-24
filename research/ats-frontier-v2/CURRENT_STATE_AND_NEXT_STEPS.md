@@ -2,52 +2,21 @@
 
 ## Current program state
 
-`LEVLINE_ATS_FRONTIER_V2` Phase 1 is `COMPLETE`.
+Phase 1 is complete. Phase 2 data qualification has been executed outcome-blind on `research/ats-frontier-v2-phase2` and is awaiting/under merge validation. Phase 3 is not started.
 
-The validated Phase-1 research package is merged. It reconciles prior LevLine failures, records the external evidence base, freezes a four-mechanism shortlist, defines the completed-2026 and production firewalls, and permanently records the seven-phase roadmap. No new Frontier candidate performance was inspected in Phase 1.
+## Phase-2 gate
 
-## Frozen Phase-1 shortlist
+- M1 dynamic market state — `PARTIALLY_QUALIFIED`: legitimate PIT historical products exist, but authorized historical real-data access is still needed to quantify book/horizon completeness.
+- M2 player-state delta — `PARTIALLY_QUALIFIED`: lagged ability plus narrowly qualified/timestamped personnel sources survive; broad cross-era availability does not.
+- M3 hierarchical state — `DATA_QUALIFIED` for core lagged team/QB state.
+- M4 discrete margin V2 — `DATA_QUALIFIED` for numerical/data feasibility only.
 
-- `FRONTIER-M1-DYNAMIC-MARKET-STATE` — highest market-information/data priority.
-- `FRONTIER-M2-PLAYER-STATE-DELTA` — highest non-market information priority and principal historical PIT-data risk.
-- `FRONTIER-M3-HIERARCHICAL-STATE` — dynamic temporal-state replacement for fixed rolling summaries.
-- `FRONTIER-M4-DISCRETE-MARGIN-V2` — tail-safe integer probability representation; not presumed to contain independent alpha.
+## Paid-data decision
 
-## Phase 2 status
+No purchase occurred. If the user authorizes an M1 qualification pull, the current first choice is The Odds API because its historical snapshot endpoint explicitly guarantees at-or-before semantics and begins 2020-06-06. A bounded $30/month 20K-credit plan is the lowest listed historical tier at the Phase-2 evidence cutoff. SportsDataIO remains the alternative.
 
-`NOT_STARTED`.
+## Next authorized program phase
 
-A future Phase-2 execution must remain outcome-blind and begin with data qualification/PIT reconstruction, not modeling.
+Phase 3 — Final Architecture Design & Preregistration — must begin by reading the Phase-2 receipt, `MECHANISM_DATA_GATE.md`, provenance manifest and `PHASE3_HANDOFF.md`. It must resolve M1's paid-history dependency before freezing any historical dynamic-market architecture. It may not infer missing M1 coverage from documentation.
 
-### First authorized actions
-
-1. Obtain sample historical multi-book NFL spread + side-price + moneyline + total records from the strongest candidate sources and verify snapshot semantics, timestamps, bookmaker identity continuity, missingness, opening/closing definitions and joins.
-2. Build a player/QB PIT feasibility audit covering injury/practice-report timestamps, depth-chart snapshots, roster changes, starter probabilities, expected role/snap information and replacement candidates.
-3. Establish a provenance table showing exactly when every potential feature became knowable and whether revisions are reconstructable.
-4. Quantify coverage and missingness only. Do not calculate Frontier proper scores, ATS hit rates, ROI, or candidate-vs-market target performance.
-5. Mark each Phase-1 mechanism `DATA_QUALIFIED` or `DATA_INFEASIBLE` before Phase 3.
-
-## Recommended source qualification order
-
-1. The Odds API and SportsDataIO samples for historical timestamped multi-book market-state reconstruction.
-2. PropLine for schema/prospective history qualification where current access permits.
-3. nflverse and directly sourced roster/depth/injury/transaction materials for player/QB state, with explicit attention to injury-source discontinuity after 2024.
-4. Existing nflverse schedule odds remain a horizon-opaque benchmark only; they are not relabeled as T-120/T-60/etc.
-
-No data purchase is authorized by Phase 1. Historical multi-book odds is the only paid-data category currently judged plausibly material enough to justify a later purchase decision after sample qualification.
-
-## Mandatory future-chat read order
-
-Before Phase 2 begins, read:
-
-1. `MASTER_PLAN.md`
-2. `PHASE_STATUS.md`
-3. `CURRENT_STATE_AND_NEXT_STEPS.md`
-4. `DECISION_LOG.md`
-5. `FINAL_PHASE1_RECEIPT.md`
-6. `EVIDENCE_BOUNDARY.md`
-7. `MARKET_DATA_SOURCE_MATRIX.md`
-8. `NFL_DATA_SOURCE_MATRIX.md`
-9. `DATA_FEASIBILITY_PREVIEW.md`
-
-Do not restart Phase 1. Do not resurrect killed hypotheses without a formal pre-result governance amendment.
+Production remains `F-ST-01-FROZEN-2026` and unchanged.

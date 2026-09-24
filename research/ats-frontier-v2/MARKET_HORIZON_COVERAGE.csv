@@ -1,0 +1,14 @@
+provider,historical_start,horizon,status,reason
+The Odds API,2020-06-06,T-2160,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
+The Odds API,2020-06-06,T-720,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
+The Odds API,2020-06-06,T-360,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
+The Odds API,2020-06-06,T-120,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
+The Odds API,2020-06-06,T-60,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
+The Odds API,2020-06-06,T-30,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
+The Odds API,2020-06-06,latest_pre_kick,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
+SportsDataIO,2018_schema,T-2160,NOT_MEASURED__ACCESS_GATED,line-movement schema documented; exhaustive historical real-data audit unavailable
+SportsDataIO,2018_schema,T-120,NOT_MEASURED__ACCESS_GATED,line-movement schema documented; exhaustive historical real-data audit unavailable
+SportsDataIO,2018_schema,latest_pre_kick,NOT_MEASURED__ACCESS_GATED,line-movement schema documented; exhaustive historical real-data audit unavailable
+PropLine,2026-04,T-120,PROSPECTIVE_ONLY,archive too recent for historical Frontier training
+PropLine,2026-04,latest_pre_kick,PROSPECTIVE_ONLY,archive too recent for historical Frontier training
+nflverse schedule odds,1999+,all exact horizons,HORIZON_OPAQUE,closing-late benchmark only; no exact quote timestamp provenance

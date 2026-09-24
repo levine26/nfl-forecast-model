@@ -1,0 +1,5 @@
+provider,book_identity_field,historical_identity_status,notes
+The Odds API,bookmaker key/name,DOCUMENTED,bookmakers only exist in archive from when added to API; continuity must be measured after paid access
+SportsDataIO,Sportsbook/SportsbookId,DOCUMENTED,stable ID field exists in GameOdd schema; historical continuity requires real-data audit
+PropLine,bookmaker/book key,DOCUMENTED_PROSPECTIVE,archive starts 2026-04; includes Pinnacle and multiple current books
+nflverse schedule odds,,NOT_AVAILABLE,no bookmaker identity in canonical closing-late schedule benchmark

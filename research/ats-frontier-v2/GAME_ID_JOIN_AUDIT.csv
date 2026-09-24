@@ -1,0 +1,8 @@
+join_component,key_or_rule,status,notes
+canonical NFL game,nflverse game_id,QUALIFIED,primary research identity
+provider game,provider_event_id,REQUIRED,retain raw provider ID
+teams,canonical team abbreviations + explicit alias table,REQUIRED,no silent fuzzy matching; normalize historical aliases/relocations
+kickoff,kickoff_timestamp_utc,REQUIRED,provider kickoff reconciled to canonical schedule
+season_type,REG/POST indicator,REQUIRED,must match canonical schedule
+fuzzy matching,,PROHIBITED,any unmatched or ambiguous game must be emitted to an exceptions table
+paid-provider join coverage,,NOT_MEASURED__ACCESS_GATED,no fabricated success rate before historical records are acquired
