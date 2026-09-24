@@ -1,0 +1,64 @@
+name: ATS Frontier V2 Phase 4 pre-result gate
+
+on:
+  push:
+    branches: [research/ats-frontier-v2-phase4]
+    paths:
+      - 'research/ats-frontier-v2/PHASE4_OPENING_RECEIPT.md'
+      - 'research/ats-frontier-v2/phase4_config.json'
+      - 'research/ats-frontier-v2/phase4_core.py'
+      - 'research/ats-frontier-v2/phase4_runner.py'
+      - 'research/ats-frontier-v2/test_phase4.py'
+      - '.github/workflows/research_ats_frontier_v2_phase4_gate.yml'
+  pull_request:
+    paths:
+      - 'research/ats-frontier-v2/**'
+      - '.github/workflows/research_ats_frontier_v2_phase4_gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ats-frontier-v2-phase4-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/fst_production.py src/nfl_forecast/artifacts/F-ST-01-FROZEN-2026.json
+    src/nfl_forecast/public_forecast.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py
+    src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py
+    scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  pre-result-gate:
+    name: Frozen pre-result scientific gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - name: Compile Phase 4 research surface
+        run: python -m compileall -q research/ats-frontier-v2
+      - name: Run result-blind Phase 4 contract tests
+        run: pytest -q research/ats-frontier-v2/test_phase4.py
+      - name: Run result-blind preflight receipt
+        run: python research/ats-frontier-v2/phase4_runner.py --preflight-only
+      - name: Prove completed-2026 loader firewall is literal
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F 'list(range(WARMUP, 2026))' research/ats-frontier-v2/phase4_runner.py
+          ! grep -E 'load_core_data\([^)]*2026' research/ats-frontier-v2/phase4_runner.py
+      - name: Prove protected production surfaces are unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- $PROTECTED_SURFACES
