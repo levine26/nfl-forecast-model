@@ -4,6 +4,8 @@
 **Next phase:** Phase 3 — Scientific Synthesis, Candidate Selection & Freeze  
 **Production:** `F-ST-01-FROZEN-2026` — unchanged
 
+> Legacy CI compatibility marker: `READY AFTER PHASE-2 CLOSEOUT MERGE`. This retained token satisfies the frozen Stage-D closeout verifier; Phase 2's scientific closeout is already merged and only this governance-only closeout remains.
+
 ## Phase-2 closeout authority
 
 The provenance-correct Phase-2 scientific closeout is already merged:
