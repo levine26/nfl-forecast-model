@@ -1,0 +1,64 @@
+name: ATS Historical Key-Mass Challenger
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/ats-historical-challenger-20260924
+    paths:
+      - 'research/ats-historical-challenger/**'
+      - '.github/workflows/research_ats_historical_challenger.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  historical-challenger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONHASHSEED: '0'
+      OPENBLAS_NUM_THREADS: '4'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      NUMEXPR_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install frozen project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Syntax check research runner
+        run: python -m py_compile research/ats-historical-challenger/historical_challenger.py
+      - name: Execute leakage-safe historical challenger
+        run: |
+          python research/ats-historical-challenger/historical_challenger.py \
+            --output-dir research/ats-historical-challenger/results
+      - name: Verify production firewall
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('research/ats-historical-challenger/results/RESULTS.json')
+          result = json.loads(p.read_text())
+          assert result['completed_2026_outcomes_used'] == 0
+          assert result['production_changed'] is False
+          assert result['outer_test_seasons'] == [2022, 2023, 2024, 2025]
+          assert all(int(y) <= 2025 for y in result['common_rows_by_season'])
+          print(json.dumps({
+              'common_rows': result['common_rows'],
+              'decision': result['decision'],
+          }, indent=2, sort_keys=True))
+          PY
+      - name: Upload immutable research evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-historical-keymass-${{ github.run_id }}
+          path: research/ats-historical-challenger/results
+          if-no-files-found: warn
+          retention-days: 90

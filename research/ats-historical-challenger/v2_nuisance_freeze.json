@@ -1,0 +1,101 @@
+{
+  "source_program": "LEVLINE_ATS_FRONTIER_V2",
+  "source_phase": 4,
+  "source_workflow_run": 36025444929,
+  "source_artifact_id": 10820397832,
+  "source_artifact_name": "ats-frontier-v2-phase4-36025444929",
+  "source_artifact_digest": "sha256:d65adbc7bf0837ee2b5867b551af607549c1095182da1570085e2e50013fb60d",
+  "source_execution_commit_sha": "7eda9cacd471a3161424699958509c02a260fc05",
+  "source_file": "M4_METRICS.json:selected_by_outer_season_variant",
+  "freeze_rule": "reuse accepted V2 nuisance fits verbatim so center is the experimental variable",
+  "outer_seasons": {
+    "2022": {
+      "CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "use_key": true,
+        "nu": 30,
+        "lambda_scale": 10.0,
+        "lambda_key": 1.0,
+        "scale_params": [2.6028013480512615],
+        "key_params": [-1.6722410911370384, 1.1588614287333496, 0.7683826196276713],
+        "objective": 3.9140223035092263
+      },
+      "CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "use_key": false,
+        "nu": 30,
+        "lambda_scale": 10.0,
+        "lambda_key": 10.0,
+        "scale_params": [2.549735069677305],
+        "key_params": [0.0, 0.0, 0.0],
+        "objective": 4.004091573528957
+      }
+    },
+    "2023": {
+      "CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "use_key": true,
+        "nu": 30,
+        "lambda_scale": 10.0,
+        "lambda_key": 1.0,
+        "scale_params": [2.5913351636704527],
+        "key_params": [-1.6324405727548965, 1.1612255425023463, 0.7430744073834465],
+        "objective": 3.903813189963778
+      },
+      "CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "use_key": false,
+        "nu": 10,
+        "lambda_scale": 10.0,
+        "lambda_key": 10.0,
+        "scale_params": [2.4728780010836102],
+        "key_params": [0.0, 0.0, 0.0],
+        "objective": 3.9922731810055248
+      }
+    },
+    "2024": {
+      "CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "use_key": true,
+        "nu": 30,
+        "lambda_scale": 10.0,
+        "lambda_key": 1.0,
+        "scale_params": [2.5901647017558354],
+        "key_params": [-1.7045198972636086, 1.1547435036886222, 0.7343426993152169],
+        "objective": 3.903844179567515
+      },
+      "CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "use_key": false,
+        "nu": 10,
+        "lambda_scale": 10.0,
+        "lambda_key": 10.0,
+        "scale_params": [2.4722156366232033],
+        "key_params": [0.0, 0.0, 0.0],
+        "objective": 3.9917151498355974
+      }
+    },
+    "2025": {
+      "CONSTANT_SCALE_KEY": {
+        "conditional": false,
+        "use_key": true,
+        "nu": 30,
+        "lambda_scale": 10.0,
+        "lambda_key": 1.0,
+        "scale_params": [2.586357066535726],
+        "key_params": [-1.7748847888481707, 1.1434447987442702, 0.7174677830260342],
+        "objective": 3.902432450673408
+      },
+      "CONSTANT_SCALE_NO_KEY": {
+        "conditional": false,
+        "use_key": false,
+        "nu": 10,
+        "lambda_scale": 10.0,
+        "lambda_key": 10.0,
+        "scale_params": [2.469550582427297],
+        "key_params": [0.0, 0.0, 0.0],
+        "objective": 3.989025824572064
+      }
+    }
+  }
+}
