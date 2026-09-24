@@ -1,14 +1,35 @@
 provider,historical_start,horizon,status,reason
-The Odds API,2020-06-06,T-2160,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
-The Odds API,2020-06-06,T-720,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
-The Odds API,2020-06-06,T-360,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
-The Odds API,2020-06-06,T-120,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
-The Odds API,2020-06-06,T-60,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
-The Odds API,2020-06-06,T-30,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
-The Odds API,2020-06-06,latest_pre_kick,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,documented PIT semantics but historical endpoint paid
-SportsDataIO,2018_schema,T-2160,NOT_MEASURED__ACCESS_GATED,line-movement schema documented; exhaustive historical real-data audit unavailable
-SportsDataIO,2018_schema,T-120,NOT_MEASURED__ACCESS_GATED,line-movement schema documented; exhaustive historical real-data audit unavailable
-SportsDataIO,2018_schema,latest_pre_kick,NOT_MEASURED__ACCESS_GATED,line-movement schema documented; exhaustive historical real-data audit unavailable
+bsr-0 public The Odds API cache,2020 verified examples,T-2160,UNMEASURED_FREE_RECONSTRUCTION_PENDING,genuine timestamped multi-book payloads exist but sparse requested-time coverage must be joined to kickoff and measured
+bsr-0 public The Odds API cache,2020 verified examples,T-720,UNMEASURED_FREE_RECONSTRUCTION_PENDING,genuine timestamped multi-book payloads exist but sparse requested-time coverage must be joined to kickoff and measured
+bsr-0 public The Odds API cache,2020 verified examples,T-360,UNMEASURED_FREE_RECONSTRUCTION_PENDING,do not relabel one-per-day snapshots as exact horizon without frozen at-or-before selector
+bsr-0 public The Odds API cache,2020 verified examples,T-120,UNMEASURED_FREE_RECONSTRUCTION_PENDING,do not relabel one-per-day snapshots as exact horizon without frozen at-or-before selector
+bsr-0 public The Odds API cache,2020 verified examples,T-60,UNMEASURED_FREE_RECONSTRUCTION_PENDING,do not relabel one-per-day snapshots as exact horizon without frozen at-or-before selector
+bsr-0 public The Odds API cache,2020 verified examples,T-30,UNMEASURED_FREE_RECONSTRUCTION_PENDING,do not relabel one-per-day snapshots as exact horizon without frozen at-or-before selector
+bsr-0 public The Odds API cache,2020 verified examples,latest_pre_kick,UNMEASURED_FREE_RECONSTRUCTION_PENDING,strictly pre-kick observations only; equal/post-kick rejected
+bobby-king3 public 2025 DuckDB,2025,T-2160,UNMEASURED_FREE_RECONSTRUCTION_PENDING,real multi-book captures four times daily; exact target coverage not yet measured
+bobby-king3 public 2025 DuckDB,2025,T-720,UNMEASURED_FREE_RECONSTRUCTION_PENDING,real multi-book captures four times daily; exact target coverage not yet measured
+bobby-king3 public 2025 DuckDB,2025,T-360,UNMEASURED_FREE_RECONSTRUCTION_PENDING,real multi-book captures four times daily; exact target coverage not yet measured
+bobby-king3 public 2025 DuckDB,2025,T-120,UNMEASURED_FREE_RECONSTRUCTION_PENDING,four daily captures do not guarantee this horizon
+bobby-king3 public 2025 DuckDB,2025,T-60,UNMEASURED_FREE_RECONSTRUCTION_PENDING,four daily captures do not guarantee this horizon
+bobby-king3 public 2025 DuckDB,2025,T-30,UNMEASURED_FREE_RECONSTRUCTION_PENDING,four daily captures do not guarantee this horizon
+bobby-king3 public 2025 DuckDB,2025,latest_pre_kick,UNMEASURED_FREE_RECONSTRUCTION_PENDING,select latest strictly pre-kick capture only
+Australia Sports Betting,2006+,open,OPEN_ONLY,opening spread total and recent opening moneyline available; no exact quote-time mapping to frozen horizons
+SportsbookReviewsOnline,2007-2021,open_close,OPEN_CLOSE_ONLY,independent historical opener/close benchmark; no exact quote-time mapping to frozen horizons
+VegasInsider Wayback reconstruction,2005-2016,all exact horizons,ROW_LEVEL_PIT_QUALIFICATION_REQUIRED,archive timestamps can support exact horizons only where strict at-or-before provenance passes
+Action Network public/history,2016+ observed artifacts,all exact horizons,HORIZON_OPAQUE,current/latest book states useful but original same-book historical revision path not reliably preserved anonymously
+ESPN public movement,broad/current,all exact horizons,PROSPECTIVE_ONLY,completed-game movement retention not sufficiently verified
+ParlayAPI free tier,current/recent,all exact horizons,PROSPECTIVE_ONLY,free historical depth insufficient for 2020-2025 backfill
+Betfair BASIC,2015+,all exact horizons,SUPPLEMENTAL_NOT_M1_SUBSTITUTE,free tier granularity/exchange structure does not satisfy frozen multi-book sportsbook path
+The Odds API,2020-06-06,T-2160,COMMERCIAL_FALLBACK_NOT_PURCHASED,documented PIT semantics; use only if free-first reconstruction proves inadequate
+The Odds API,2020-06-06,T-720,COMMERCIAL_FALLBACK_NOT_PURCHASED,documented PIT semantics; use only if free-first reconstruction proves inadequate
+The Odds API,2020-06-06,T-360,COMMERCIAL_FALLBACK_NOT_PURCHASED,documented PIT semantics; use only if free-first reconstruction proves inadequate
+The Odds API,2020-06-06,T-120,COMMERCIAL_FALLBACK_NOT_PURCHASED,documented PIT semantics; use only if free-first reconstruction proves inadequate
+The Odds API,2020-06-06,T-60,COMMERCIAL_FALLBACK_NOT_PURCHASED,documented PIT semantics; use only if free-first reconstruction proves inadequate
+The Odds API,2020-06-06,T-30,COMMERCIAL_FALLBACK_NOT_PURCHASED,documented PIT semantics; use only if free-first reconstruction proves inadequate
+The Odds API,2020-06-06,latest_pre_kick,COMMERCIAL_FALLBACK_NOT_PURCHASED,documented PIT semantics; use only if free-first reconstruction proves inadequate
+SportsDataIO,2018_schema,T-2160,COMMERCIAL_FALLBACK_NOT_PURCHASED,line-movement schema documented; free-first reconstruction comes first
+SportsDataIO,2018_schema,T-120,COMMERCIAL_FALLBACK_NOT_PURCHASED,line-movement schema documented; free-first reconstruction comes first
+SportsDataIO,2018_schema,latest_pre_kick,COMMERCIAL_FALLBACK_NOT_PURCHASED,line-movement schema documented; free-first reconstruction comes first
 PropLine,2026-04,T-120,PROSPECTIVE_ONLY,archive too recent for historical Frontier training
 PropLine,2026-04,latest_pre_kick,PROSPECTIVE_ONLY,archive too recent for historical Frontier training
 nflverse schedule odds,1999+,all exact horizons,HORIZON_OPAQUE,closing-late benchmark only; no exact quote timestamp provenance
