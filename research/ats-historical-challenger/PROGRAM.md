@@ -26,7 +26,9 @@ All candidates use the same distributional family and exact integer-margin scori
 - No finite support or endpoint folding.
 - No probability clipping as a modeling device.
 - No extra key numbers, skew, mixtures, or feature expansion.
-- V2 hyperparameter grids are reused: `nu in {4,6,10,30}`, `lambda_key in {1,10}`.
+- The exact accepted V2 `CONSTANT_SCALE_KEY` nuisance fit for each 2022-2025 outer season is reused verbatim from canonical Phase-4 artifact `10820397832`.
+- The exact accepted V2 `CONSTANT_SCALE_NO_KEY` fit for each outer season is reused verbatim for the no-key ablation.
+- These nuisance fits were selected in V2 using only data preceding their respective outer target seasons. They are not retuned here. The center is therefore the experimental variable.
 
 ## LevLine/F-ST center reconstruction
 
@@ -47,19 +49,17 @@ Outer target seasons: `2022, 2023, 2024, 2025`.
 
 For each target season `T`:
 
-- reconstruct all candidate centers only from information available before each scored game/season under the frozen OOF artifacts;
-- fit distribution parameters using common candidate rows with season `< T`;
-- select blend weight using only common rows with season `< T`;
+- reconstruct all candidate centers only from information available before each scored season under the frozen OOF artifacts;
+- reuse that target season's already-accepted V2 constant-scale/key-mass nuisance fit;
+- select the blend weight using only common candidate rows with season `< T`;
 - score season `T` once;
-- never use target-season outcomes for fitting, nuisance selection, blend-weight selection, or calibration rescue.
+- never use target-season outcomes for F-ST fitting, margin-sigma fitting, blend-weight selection, or calibration rescue.
 
-The first 2022 distribution fit uses reconstructed 2021 common-center rows. Later folds expand chronologically.
+The first 2022 blend selection uses reconstructed 2021 common-center rows. Later folds expand chronologically.
 
-## Training-only selection rules
+## Training-only blend selection
 
-For each center, nuisance parameters are selected by the minimum penalized training objective from the frozen V2 grid. Ties are broken by lower `nu`, then lower `lambda_key`.
-
-For `KMASS-BLEND`, each frozen weight is fitted/scored on the same pre-target training rows. The selected weight minimizes the training-only penalized integer-margin objective. Ties are broken by distance to `0.5`, then by lower market weight. No target-season result can enter weight selection.
+For `KMASS-BLEND`, each frozen market weight is scored on the same pre-target common rows using the already-frozen V2 key-mass fit for that outer season. The selected weight minimizes mean exact integer-margin log score. Ties are broken by distance to `0.5`, then by lower market weight. No target-season result can enter weight selection.
 
 ## Common-row contract
 
@@ -84,8 +84,8 @@ Also report:
 - full-slate ATS diagnostic with no confidence threshold;
 - center margin MAE/RMSE;
 - per-season results;
-- constant-scale/no-key ablation for each frozen center;
-- selected nuisance parameters and blend weights by outer season.
+- frozen V2 constant-scale/no-key ablation for each center;
+- selected blend weights by outer season.
 
 ATS ROI shown at reference -110 is diagnostic only and is not an empirical historical price/ROI claim.
 
