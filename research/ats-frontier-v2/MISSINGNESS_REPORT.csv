@@ -1,0 +1,9 @@
+source,field,season_or_era,horizon,missingness_status,notes
+The Odds API,spread+side_price+moneyline+total,2020+,all fixed horizons,NOT_MEASURED__PAID_HISTORY_UNAVAILABLE,do not fabricate coverage from docs
+SportsDataIO,GameOdd line history,2018+ schema,all fixed horizons,NOT_MEASURED__ACCESS_GATED,real historical revision coverage not exhaustively sampled
+PropLine,odds history,pre-2026,all,NOT_AVAILABLE,archive begins 2026-04
+nflverse schedule odds,book/timestamp identity,1999+,all exact horizons,100_PERCENT_MISSING_FOR_EXACT_PIT_PURPOSE,benchmark has no exact quote timestamp/book provenance
+nflverse injuries,injury report,2025+,all,NO_2025_SOURCE_FROM_LEGACY_PIPELINE,source died after 2024
+qualified 2025 reconstruction,final practice state,2025,T-120,APPROX_0.07_PERCENT_UNRESOLVED,within frozen prior qualification scope only
+cross-year availability harmonization,unified player-week state,2022-2025,T-120,FAILED_CLOSED,identity/semantic gates not satisfied
+nflverse depth charts,timestamped depth state,2025+,source-timestamp-dependent,MEASURABLE_IN_PHASE3,appended ISO8601 snapshots; no imputation in Phase2
