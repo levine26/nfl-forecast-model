@@ -11,8 +11,10 @@
 **Primary Phase-1 merge:** `6569179631afe1b1f480c1408e54c7638de6ab4e`  
 **Production model:** `F-ST-01-FROZEN-2026`  
 **Completed-2026 outcomes used in Phase 2:** 0  
-**Frontier candidate performance inspected in Phase 2:** NO
+**Frontier candidate performance inspected in Phase 2:** NO  
+**Historical-odds purchase in Phase 2:** NONE  
+**Current purchase recommendation:** `DO_NOT_PURCHASE_YET__FREE_FIRST_RECONSTRUCTION_REQUIRED`
 
-Phase-2 mechanism gates: M1 `PARTIALLY_QUALIFIED`; M2 `PARTIALLY_QUALIFIED`; M3 `DATA_QUALIFIED` (core state); M4 `DATA_QUALIFIED` (numerical/data feasibility only).
+Phase-2 mechanism gates: M1 `PARTIALLY_QUALIFIED__FREE_FIRST_RECONSTRUCTION_REQUIRED`; M2 `PARTIALLY_QUALIFIED`; M3 `DATA_QUALIFIED` (core state); M4 `DATA_QUALIFIED` (numerical/data feasibility only).
 
 Phase 3 remains `NOT_STARTED`.
