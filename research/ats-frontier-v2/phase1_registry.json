@@ -1,0 +1,60 @@
+{
+  "program": "LEVLINE_ATS_FRONTIER_V2",
+  "phase": 1,
+  "status": "SCIENTIFIC_WORK_COMPLETE_CLOSEOUT_PENDING",
+  "opening_main_sha": "7a37253d5dd392e68e7c3e0168e8a05e89b15029",
+  "opening_tree_sha": "6d7410685c6aa7db834a2e4f9916a28d5ffe1076",
+  "branch": "research/ats-frontier-v2-phase1",
+  "production_model": "F-ST-01-FROZEN-2026",
+  "production_changed": false,
+  "completed_2026_outcomes_authorized": false,
+  "completed_2026_outcomes_used_for_design": 0,
+  "new_frontier_candidate_performance_inspected": false,
+  "phase2_started": false,
+  "canonical_sign": {
+    "margin": "home_score-away_score",
+    "ats_residual": "margin+home_spread",
+    "cover": "ats_residual>0",
+    "push": "ats_residual==0",
+    "loss": "ats_residual<0"
+  },
+  "source_counts": {
+    "serious_academic_or_technical": 32,
+    "open_source_repositories_or_packages": 15,
+    "professional_or_practitioner_systems": 11,
+    "market_or_data_sources": 12
+  },
+  "shortlist": [
+    {
+      "id": "FRONTIER-M1-DYNAMIC-MARKET-STATE",
+      "type": "information_channel",
+      "phase1_status": "SURVIVES_DATA_QUALIFICATION_REQUIRED"
+    },
+    {
+      "id": "FRONTIER-M2-PLAYER-STATE-DELTA",
+      "type": "information_channel",
+      "phase1_status": "SURVIVES_DATA_QUALIFICATION_REQUIRED"
+    },
+    {
+      "id": "FRONTIER-M3-HIERARCHICAL-STATE",
+      "type": "state_representation",
+      "phase1_status": "SURVIVES_DATA_QUALIFICATION_REQUIRED"
+    },
+    {
+      "id": "FRONTIER-M4-DISCRETE-MARGIN-V2",
+      "type": "probability_representation",
+      "phase1_status": "SURVIVES_DATA_QUALIFICATION_REQUIRED"
+    }
+  ],
+  "rejected_before_implementation": [
+    "generic_matchup_interaction_booster",
+    "standalone_backdoor_cover_game_state_simulator",
+    "algorithm_first_deep_learning_candidate",
+    "static_injury_flags",
+    "simple_line_movement_rule",
+    "residual_stacking_or_ensemble_only_candidate",
+    "q1_q2v1_q3_rescue"
+  ],
+  "phase2_first_action": "outcome_blind_historical_multibook_market_and_player_state_PIT_qualification",
+  "promotion_requires_explicit_user_green_light": true
+}
