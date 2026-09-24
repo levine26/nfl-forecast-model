@@ -9,6 +9,12 @@
     "v3_config.json": "5ff21acb56c18e8df37a980159d5a829faccd235",
     "test_phase1.py": "550c0a023bfb019baa4428716ea7d582d21ae4ca"
   },
+  "sha256_validated_by_phase1_ci": {
+    "v3_keymass.py": "53553d0b8014b6ba990a6e3157079f3cc70b9c960f4af78644af875dc9650e69",
+    "fit_frozen_parameters.py": "5de178e7578b776d3782322118722a067f5b46700ccd69b6a8c46a517620ea3c",
+    "v3_config.json": "1ba794458b402b59bd88f1bb35486759f4aa2e38e9340793544c648a4f1cadfb",
+    "test_phase1.py": "32dd59c8bf20c1654c173d486b6a66deadb9cb5ff86727ca658601a5670420d2"
+  },
   "hash_policy": {
     "phase1_ci_emits_sha256_for_frozen_code_config_and_tests": true,
     "phase2_prediction_model_code_hash": "SHA256_OF_EXACT_COMMITTED_V3_KEYMASS_PY_BYTES",
