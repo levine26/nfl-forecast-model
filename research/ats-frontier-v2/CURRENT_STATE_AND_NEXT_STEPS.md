@@ -4,12 +4,13 @@ Program: `LEVLINE_ATS_FRONTIER_V2`
 
 ## Current state
 
-Phases 1–4 are `COMPLETE`.
+Phases 1–5 are `COMPLETE`.
 
-Phase 5 frozen scientific classification is complete on `research/ats-frontier-v2-phase5` and awaits exact-head CI, merge, and immutable post-merge closeout.
+Phase 5 was merged through primary PR `#578` after all exact-head research gates passed, and the immutable closeout is recorded in `FINAL_PHASE5_RECEIPT.md`.
 
 - M3 `FV2-HIST-M3-DSSM-01`: `REJECTED`.
 - M4 `FV2-HIST-M4-DMARGIN-01`: `REJECTED`.
+- historical survivor count: `0`.
 - historical Phase-6 authorization: `NONE`.
 - Phase 6: `NOT_AUTHORIZED` for M3/M4.
 - Phase 7: unavailable for a historical Frontier survivor.
@@ -20,7 +21,20 @@ Completed-2026 outcomes used: `0`.
 
 Historical market label remains `HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE`.
 
-## Canonical evidence provenance
+## Phase-5 repository provenance
+
+- opening live `main`: `5e93d8c274ae3edf18689e6a36d8d049d3104b33`;
+- primary branch: `research/ats-frontier-v2-phase5`;
+- primary PR: `#578`;
+- exact validated Phase-5 head: `53e8420fabf0ecd9b2b9753a65e9cd27c3e1e72c`;
+- primary merge: `f6c1b62690c069f6b3e3ef1d8bf721bddcdeef4b`;
+- exact-head firewall run `36040603014`: `SUCCESS`;
+- exact-head research-validation run `36040602757`: `SUCCESS`;
+- exact-head ATS Frontier safety run `36040602883`: `SUCCESS`.
+
+The primary Phase-5 diff was restricted to `research/ats-frontier-v2/**`. Production forecasting surfaces were not modified.
+
+## Canonical Phase-4 evidence provenance
 
 Phase-4 primary PR `#576`, validated head `93ed709d24d53d8469f6bc7eaaf49d2a38d7cea3`, merge `e425220c1b929629f3a5420bc1915c74835b2a34`.
 
@@ -49,11 +63,11 @@ No probabilities were recalibrated or changed.
 
 M3's candidate primary log loss `0.7811502028797036` is worse than market-null `0.7804795705044401`; delta `+0.0006706323752636532`. Its 95% week-block interval is `[-0.00031937461835433245, +0.0016556867645020252]`, only `8.89%` of bootstrap draws favor the candidate, and every outer season is unfavorable. `DYNAMIC_NO_QB` also outperforms the full candidate, so the QB component is negative evidence rather than a rescue candidate.
 
-Final classification: `REJECTED` under the frozen M3 failure condition and Phase-5 rejection/futility rule. ATS `518-540-29` is diagnostic only.
+Final classification: `REJECTED` under the frozen M3 failure condition and Phase-5 rejection/futility rule. M3 also materially degrades null-relative slope calibration. ATS `518-540-29` is diagnostic only.
 
 ## M4 final disposition
 
-M4's full candidate improves the strong null by `-0.08267169914295289`, with 95% interval `[-0.10748698706212485, -0.05796293485132338]`, favorable direction in all four seasons, and numerical/tail/red-team `PASS`.
+M4's full candidate improves the strong null by `-0.08267169914295289`, with 95% interval `[-0.10748698706212485, -0.05796293485132338]`, favorable direction in all four seasons, numerical/tail/red-team `PASS`, and a passing calibration-relative gate.
 
 But `CONDITIONAL_SCALE_NO_KEY` is slightly worse than null (`+0.00012506107970626913`), while preregistered `CONSTANT_SCALE_KEY` reproduces slightly more than the full gain (`-0.08271839184340689` versus null; full-minus-key `+0.00004669270045401389`). The frozen simpler-ablation rejection clause therefore applies.
 
@@ -68,6 +82,8 @@ Existing prospective-only identities remain separate and unchanged:
 - `FV2-PROS-M1-MARKETSTATE-01` — historical reconstruction remains blocked; existing prospective market-state capture/research may continue under its contracts.
 - `FV2-PROS-M2-QBDELTA-01` — prospective-only QB information-delta research remains under its contracts.
 
-## Exact next action
+## Exact next authorized action
 
-Run exact-head research firewall and research validation on the Phase-5 classification PR. If green, merge it; verify merged `main`; then create the immutable `FINAL_PHASE5_RECEIPT.md` and final status closeout in a separate closeout PR. Do not start Phase 6, refit, create a rescue candidate, combine M3/M4, inspect completed-2026 outcomes, or modify production.
+Do not start historical M3/M4 Phase 6. The only next scientific work authorized by this program state is already-governed prospective M1/M2 point-in-time data capture/research, or a separately governed future-version program with a new preregistered key-mass-only candidate identity and a legitimate future validation path.
+
+Do not refit, rescue, combine M3/M4, inspect completed-2026 outcomes for retrospective design, or modify production.
