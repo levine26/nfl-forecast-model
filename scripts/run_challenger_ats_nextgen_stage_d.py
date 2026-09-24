@@ -2,17 +2,19 @@ from __future__ import annotations
 
 """Run frozen ATS NextGen Phase-2 Stage-D evidence synthesis.
 
-Research only. Stage D consumes the already-accepted immutable Q1 and Q3
-workflow artifacts, verifies every accepted evidence-file SHA-256 against the
-frozen result registries, and then computes the preregistered uncertainty
-analysis. It does not refit/regenerate Q1 or Q3, reconstruct Q2, tune or rescue
-any candidate, inspect completed-2026 outcomes, or modify production forecasting.
+This is research-only final evidence synthesis. It regenerates Q1 and Q3 using
+their frozen runners solely to prove accepted evidence reproducibility, verifies
+every regenerated evidence-file SHA-256 against the accepted result registries,
+then computes the preregistered Stage-D uncertainty diagnostics. It does not
+reconstruct Q2, tune any candidate, inspect completed-2026 outcomes, or modify
+production forecasting.
 """
 
 import argparse
 import hashlib
 import json
 from pathlib import Path
+import shutil
 
 import pandas as pd
 
@@ -23,11 +25,15 @@ from nfl_forecast.challenger_ats_nextgen_stage_d import (
     q3_hit_rate_intervals,
     stage_d_uncertainty,
 )
+from run_challenger_ats_nextgen_q1 import run as run_q1
+from run_challenger_ats_nextgen_q3 import run as run_q3
 
 OPENING_REGISTRY = Path("research/ats-nextgen/phase2_stage_d_opening_registry.json")
 Q1_RESULT_REGISTRY = Path("research/ats-nextgen/phase2_q1_result_registry.json")
 Q2_RESULT_REGISTRY = Path("research/ats-nextgen/phase2_q2_result_registry.json")
 Q3_RESULT_REGISTRY = Path("research/ats-nextgen/phase2_q3_result_registry.json")
+Q1_CANONICAL_OUTPUT_DIR = Path("research_outputs/ats_nextgen/q1")
+Q3_CANONICAL_OUTPUT_DIR = Path("research_outputs/ats_nextgen/q3")
 
 
 def _sha256(path: Path) -> str:
@@ -94,18 +100,16 @@ def _verify_upstream_registries() -> tuple[dict, dict, dict, dict]:
     return opening, q1, q2, q3
 
 
-def _verify_accepted_files(directory: Path, expected: dict[str, str], label: str) -> dict[str, str]:
-    if not directory.is_dir():
-        raise RuntimeError(f"{label} accepted evidence directory is missing: {directory}")
+def _verify_regenerated_files(directory: Path, expected: dict[str, str], label: str) -> dict[str, str]:
     observed: dict[str, str] = {}
     for filename, expected_sha in sorted(expected.items()):
         path = directory / filename
         if not path.is_file():
-            raise RuntimeError(f"{label} accepted artifact missing evidence file: {filename}")
+            raise RuntimeError(f"{label} regeneration missing accepted evidence file: {filename}")
         actual = _sha256(path)
         if actual != expected_sha:
             raise RuntimeError(
-                f"{label} accepted artifact hash mismatch for {filename}: "
+                f"{label} regenerated evidence drifted for {filename}: "
                 f"expected={expected_sha} actual={actual}"
             )
         observed[filename] = actual
@@ -115,24 +119,30 @@ def _verify_accepted_files(directory: Path, expected: dict[str, str], label: str
 def run(
     output_dir: str = "research_outputs/ats_nextgen/stage_d",
     *,
-    q1_evidence_dir: str,
-    q3_evidence_dir: str,
+    config_path: str = "config/model.yaml",
 ) -> dict:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     opening, q1_registry, q2_registry, q3_registry = _verify_upstream_registries()
 
-    # Final synthesis consumes the immutable artifacts accepted by Stage A and
-    # Stage C. It deliberately does not invoke their model runners: Stage D is an
-    # evidence-analysis stage, not a re-fit/re-selection stage.
-    q1_dir = Path(q1_evidence_dir)
-    q3_dir = Path(q3_evidence_dir)
-    q1_hashes = _verify_accepted_files(
+    # Reproduce at the exact canonical paths used by the accepted Stage-A/Stage-C
+    # workflows. Their summary JSON files intentionally contain these relative
+    # output paths, so path identity is part of byte-for-byte reproducibility.
+    q1_dir = Q1_CANONICAL_OUTPUT_DIR
+    q3_dir = Q3_CANONICAL_OUTPUT_DIR
+    shutil.rmtree(q1_dir, ignore_errors=True)
+    shutil.rmtree(q3_dir, ignore_errors=True)
+
+    # These calls reproduce already-frozen evidence under the exact accepted runners.
+    # They do not create a new candidate or reopen model selection.
+    run_q1(str(q1_dir), config_path=config_path)
+    q1_hashes = _verify_regenerated_files(
         q1_dir,
         q1_registry["evidence_sha256"],
         "Q1",
     )
-    q3_hashes = _verify_accepted_files(
+    run_q3(str(q3_dir), config_path=config_path)
+    q3_hashes = _verify_regenerated_files(
         q3_dir,
         q3_registry["artifact"]["files_sha256"],
         "Q3",
@@ -190,17 +200,10 @@ def run(
             "block": "season+week",
             "interval": "percentile_95pct",
         },
-        "accepted_evidence_verification": {
-            "source": "immutable_accepted_github_actions_artifacts",
-            "q1_workflow_run": int(q1_registry["workflow_run"]),
-            "q1_artifact_id": int(q1_registry["artifact"]["id"]),
-            "q1_artifact_digest": q1_registry["artifact"]["digest"],
+        "upstream_reproducibility": {
             "q1_all_accepted_files_match": True,
-            "q1_evidence_sha256": q1_hashes,
-            "q3_workflow_run": int(q3_registry["workflow"]["run_id"]),
-            "q3_artifact_id": int(q3_registry["artifact"]["id"]),
-            "q3_artifact_digest": q3_registry["artifact"]["digest"],
             "q3_all_accepted_files_match": True,
+            "q1_evidence_sha256": q1_hashes,
             "q3_evidence_sha256": q3_hashes,
             "q2_classification": q2_registry["classification"],
             "q2_valid_oof_available": False,
@@ -208,7 +211,7 @@ def run(
         },
         "paired_uncertainty": comparisons,
         "simple_hit_rate_diagnostic": hit_rate.to_dict(orient="records"),
-        "fixed_slice_evidence_preserved_from_accepted_upstream_artifacts": True,
+        "fixed_slice_evidence_recomputed_by_upstream_runners": True,
         "new_slices_created": False,
         "synthetic_historical_juice_used": False,
         "roi_or_ats_used_for_candidate_rescue": False,
@@ -229,14 +232,9 @@ def run(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", default="research_outputs/ats_nextgen/stage_d")
-    parser.add_argument("--q1-evidence-dir", required=True)
-    parser.add_argument("--q3-evidence-dir", required=True)
+    parser.add_argument("--config", default="config/model.yaml")
     args = parser.parse_args()
-    run(
-        args.output_dir,
-        q1_evidence_dir=args.q1_evidence_dir,
-        q3_evidence_dir=args.q3_evidence_dir,
-    )
+    run(args.output_dir, config_path=args.config)
 
 
 if __name__ == "__main__":
