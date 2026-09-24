@@ -1,0 +1,151 @@
+name: ATS NextGen Phase 2 Stage D
+
+on:
+  pull_request:
+    paths:
+      - 'src/nfl_forecast/challenger_ats_nextgen_stage_d.py'
+      - 'scripts/run_challenger_ats_nextgen_stage_d.py'
+      - 'tests/test_challenger_ats_nextgen_stage_d.py'
+      - 'research/ats-nextgen/**'
+      - '.github/workflows/research_ats_nextgen_stage_d.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ats-nextgen-stage-d-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROTECTED_SURFACES: >-
+    outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
+    src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
+    src/nfl_forecast/market.py src/nfl_forecast/market_t120.py src/nfl_forecast/lock_verify.py
+    scripts/run_week.py scripts/refresh_market.py scripts/pregame_due.py scripts/verify_pregame_lock.py
+
+jobs:
+  contract:
+    name: Stage D frozen synthesis contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - name: Prove frozen gate and accepted-model contracts
+        run: |
+          pytest -q \
+            tests/test_challenger_ats_nextgen_phase2_gate.py \
+            tests/test_challenger_ats_nextgen_q1.py \
+            tests/test_challenger_ats_nextgen_q1_reporting.py \
+            tests/test_challenger_ats_nextgen_q3.py \
+            tests/test_challenger_ats_nextgen_q3_reporting.py \
+            tests/test_challenger_ats_nextgen_stage_d.py
+      - name: Verify Stage-D upstream evidence boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          opening = json.loads(Path('research/ats-nextgen/phase2_stage_d_opening_registry.json').read_text())
+          q1 = json.loads(Path('research/ats-nextgen/phase2_q1_result_registry.json').read_text())
+          q2 = json.loads(Path('research/ats-nextgen/phase2_q2_result_registry.json').read_text())
+          q3 = json.loads(Path('research/ats-nextgen/phase2_q3_result_registry.json').read_text())
+
+          assert opening['status'] == 'FROZEN_PRE_EXECUTION'
+          assert opening['candidate_fitting_authorized'] is False
+          assert opening['candidate_retuning_authorized'] is False
+          assert opening['candidate_rescue_authorized'] is False
+          assert opening['completed_2026_outcomes_authorized'] is False
+          assert opening['production_changes_authorized'] is False
+          assert opening['uncertainty']['bootstrap_samples'] == 10000
+          assert opening['uncertainty']['seed'] == 26
+          assert opening['uncertainty']['block_columns'] == ['season', 'week']
+
+          assert q1['classification'] == 'VALID_NEGATIVE_INCREMENTAL_RESULT'
+          assert q1['q1_rescue_allowed'] is False
+          assert q1['evidence_sha256']['q1_outer_oof_2022_2025.csv'] == opening['accepted_inputs']['q1']['oof_sha256']
+
+          assert q2['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
+          assert q2['accepted_q2_outer_oof_artifact'] is None
+          assert q2['accepted_q2_primary_performance'] is None
+          assert opening['accepted_inputs']['q2']['accepted_oof_available'] is False
+          assert opening['accepted_inputs']['q2']['accepted_primary_performance_available'] is False
+          assert opening['accepted_inputs']['q2']['complementarity_available'] is False
+          assert opening['accepted_inputs']['q2']['q2_q3_blend_available'] is False
+
+          assert q3['classification'] == 'NOT_INCREMENTAL_VS_Q3_M2'
+          assert q3['candidate_repair_or_rescue_performed'] is False
+          assert q3['q2_complementarity_available'] is False
+          assert q3['q2_q3_blend_available'] is False
+          assert q3['artifact']['files_sha256']['q3_outer_oof_2022_2025.csv'] == opening['accepted_inputs']['q3']['oof_sha256']
+          PY
+      - name: Prove contract tests did not modify production surfaces
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+
+  synthesis:
+    name: Stage D frozen evidence synthesis
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: nfl-ats-nextgen-stage-d-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            nfl-ats-nextgen-stage-d-${{ runner.os }}-
+            nfl-research-${{ runner.os }}-
+            nfl-challenger-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Verify frozen Stage-D scientific blobs
+        run: |
+          test "$(git rev-parse HEAD:src/nfl_forecast/challenger_ats_nextgen_stage_d.py)" = "d7293b7c9b947590c72d58da1b2d07ce8c0919c0"
+          test "$(git rev-parse HEAD:scripts/run_challenger_ats_nextgen_stage_d.py)" = "7df0df371b93d50265c9061f4215753a87909b15"
+          test "$(git rev-parse HEAD:tests/test_challenger_ats_nextgen_stage_d.py)" = "1b727166aeb00c5b7c19d30e228ec6a9f40ed8ea"
+          test "$(git rev-parse HEAD:research/ats-nextgen/PHASE2_STAGE_D_OPENING_RECEIPT.md)" = "021d641df7585bd878338bc56a073d17ce2e1fe4"
+          test "$(git rev-parse HEAD:research/ats-nextgen/phase2_stage_d_opening_registry.json)" = "630fde8e67b7a15592f3836367222c846d04a12d"
+      - name: Run frozen Stage-D synthesis
+        run: |
+          rm -rf research_outputs/ats_nextgen/stage_d
+          PYTHONPATH="$PWD/src:$PWD/scripts${PYTHONPATH:+:$PYTHONPATH}" \
+            python scripts/run_challenger_ats_nextgen_stage_d.py \
+              --output-dir research_outputs/ats_nextgen/stage_d
+          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_paired_uncertainty.csv
+          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_hit_rate_intervals.csv
+          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_season_deltas.csv
+          test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_summary.json
+      - name: Upload failed regeneration diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-nextgen-stage-d-regeneration-diagnostic-${{ github.run_id }}
+          path: |
+            research_outputs/ats_nextgen/q1/
+            research_outputs/ats_nextgen/q3/
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Prove synthesis did not modify production surfaces
+        if: success()
+        run: git diff --exit-code -- $PROTECTED_SURFACES
+      - name: Upload immutable Stage-D evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-nextgen-stage-d-${{ github.run_id }}
+          path: research_outputs/ats_nextgen/stage_d/
+          retention-days: 30

@@ -4,97 +4,96 @@
 
 Phase 1 is **COMPLETE**.
 
-Phase 2 is **IN PROGRESS — STAGE A Q1 COMPLETE (NEGATIVE); STAGE B Q2 COMPLETE (STRUCTURALLY INVALID); STAGE C Q3 COMPLETE (NEGATIVE); STAGE D NEXT**.
+Phase 2 scientific work is **COMPLETE THROUGH STAGE D**. The only remaining Phase-2 action is exact-head closeout validation and merge of PR #563.
 
 Production remains `F-ST-01-FROZEN-2026`. No completed-2026 outcome has been used by the ATS Next-Generation historical candidate program.
 
-## Stage A — Q1
+## Frozen Phase-2 evidence
 
-`ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1` is a valid negative incremental result versus M2 and is closed without rescue.
+### Q1 — quantile market-residual model
 
-Accepted evidence:
+`ATS-Q1-QUANTILE-MARKET-RESIDUAL-V1` is a **valid negative incremental result** versus M2.
 
-- PR #560 merge/base `a2581a62e3797a6ac466d614326bc72b7d5a1c57`;
-- workflow `35920622523`;
-- artifact ID `10776898518`;
 - 1,087 chronology-clean 2022–2025 outer OOF rows;
-- OOF SHA-256 `d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365`;
-- Q1 minus M2 aggregate frozen-quantile pinball `+0.000131` (worse).
+- accepted OOF SHA-256 `d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365`;
+- Q1 minus M2 mean frozen-quantile pinball `+0.0001307888` (worse);
+- no rescue authorized.
 
-## Stage B — Q2
+### Q2 — discrete key-margin distribution
 
-`ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1` is closed as **structurally invalid under its frozen support/truncation contract**.
+`ATS-Q2-DISCRETE-KEY-MARGIN-DISTRIBUTION-V1` is **structurally invalid under the frozen V1 support/truncation contract**.
 
-The exact pre-result contract required support `[-75,+75]`, a material folded endpoint-mass threshold `1e-3`, and fail-closed behavior rather than widening support after historical inspection. Workflow `35927280982` passed its contract job and then stopped before a complete OOF artifact when a frozen generalized-normal state produced maximum endpoint mass `0.0033487075822347966`.
+- frozen support `[-75,+75]`;
+- maximum folded endpoint mass `0.0033487075822347966` exceeded frozen `0.001` fail-closed threshold;
+- no accepted Q2 OOF artifact or primary performance result;
+- Q2 complementarity and Q2/Q3 blend unavailable;
+- no support/family/grid/key/scale/smoothing rescue authorized.
 
-No valid Q2 OOF or accepted Q2-vs-M1 proper-score comparison exists. No Q2 rescue is authorized.
+### Q3 — direct cover/push/loss hurdle
 
-Stage-B closeout merged through PR #561 at `16859845573c3344ed82ae0b9bd27fa8b891eee4`.
+`ATS-Q3-DIRECT-CPL-HURDLE-V1` is a **valid negative incremental result / not incremental versus Q3-M2**.
 
-## Stage C — Q3
+- 1,087 chronology-clean exact-row OOF games, 2022–2025;
+- accepted OOF SHA-256 `18610dfcfa9ffe71ed30259f9fef85a5655cefa68301f46fa1bb1950593dee04`;
+- Q3 minus Q3-M2 multinomial CPL log loss `+0.0013157419` (worse);
+- no learner/feature/C-grid/class-weight/calibration/threshold/slice rescue authorized.
 
-`ATS-Q3-DIRECT-CPL-HURDLE-V1` is complete and is a **valid negative incremental result versus Q3-M2**.
-
-The full scientific surface was frozen before results at `d9dbfe24af7fd19f5b22e76fd5f57dd83c606a60`; historical execution was authorized only after exact blob verification on head `891d921c24bc045dd58de3b2dd05871f12d09183`.
+## Stage D — accepted final evidence synthesis
 
 Accepted execution:
 
-- branch `research/ats-nextgen-phase2-q3`;
-- PR #562;
-- workflow `35931071604`: **SUCCESS**;
-- contract job `107417650978`: **SUCCESS**;
-- historical job `107418004469`: **SUCCESS**;
-- artifact ID `10781521222`;
-- artifact digest `sha256:6062472dce30fddfcc6ad16d1d5c29203491f6e77d893aa673cc20bbb29a1bfa`;
-- 1,087 chronology-clean exact-row OOF games across 2022–2025;
-- Q3 OOF SHA-256 `18610dfcfa9ffe71ed30259f9fef85a5655cefa68301f46fa1bb1950593dee04`.
+- branch `research/ats-nextgen-phase2-stage-d` / PR #563;
+- scientific execution head `0030de3fcc3fd094f1ce28eb0ab1c20b748ca67a`;
+- scientific tree `cf161bc7b47d8d138fd35dfe4889ccc215c91b5b`;
+- workflow `35936805090`: **SUCCESS**;
+- artifact `10783239110`;
+- artifact digest `sha256:4a3bd19a48528a2772e69232ad10b959b1f66e3885e44b56772f0b379abbcdd2`;
+- 10,000 paired `(season, week)` bootstrap draws over 72 blocks, seed 26;
+- Q1 and Q3 regenerated accepted evidence matched all frozen file hashes exactly;
+- completed-2026 outcomes used: 0;
+- production changed: no.
 
-Primary proper-score result:
+Paired uncertainty:
 
-- Q3-M2 multinomial CPL log loss `0.7716887205239867`;
-- Q3 multinomial CPL log loss `0.7730044623812287`;
-- Q3 minus Q3-M2 `+0.0013157418572419255` — worse.
+- Q1 − M2 mean-three-quantile pinball: `+0.0001307888`, 95% interval `[-0.0023784358,+0.0025555440]`, `P(better)=0.4554`;
+- Q3 − Q3-M2 multinomial CPL log loss: `+0.0013157419`, 95% interval `[-0.0015590942,+0.0043366478]`, `P(better)=0.1842`;
+- Q3 − Q3-M2 non-push conditional-cover Brier: `+0.0006716459`, 95% interval `[-0.0007977772,+0.0022129221]`, `P(better)=0.1851`.
 
-Supporting diagnostics:
+Simple hit-rate diagnostic only:
 
-- Q3-M2 non-push cover Brier `0.24979992069239074`;
-- Q3 non-push cover Brier `0.2504715666095457` — worse;
-- Q3-M2 cover calibration slope `0.8130523437112027`;
-- Q3 cover calibration slope `0.27094382668690847`;
-- season primary deltas: 2022 `+0.00011298`, 2023 `+0.00334784`, 2024 `-0.00130926`, 2025 `+0.00310698`;
-- Q3 worse in 3 of 4 seasons and 10 of 14 frozen reporting slices.
+- Q3-M2 `52.8355%` on 1,058 non-push rows, exact 95% CI `[49.7759%,55.8793%]`;
+- Q3 `52.1739%`, exact 95% CI `[49.1142%,55.2215%]`.
 
-The push head is shared between Q3 and Q3-M2; both arms therefore have mean predicted push `0.023992664002116082` versus empirical `0.02667893284268629`. The failed incremental contribution comes from adding compact football state to the conditional-cover head.
+The hit-rate diagnostic and intervals cannot rescue or reclassify a candidate. Historical side-price provenance remains insufficient for a new ROI/EV claim.
 
-No post-hoc calibration, class weighting, learner replacement, C-grid change, feature change, threshold search, or ATS/ROI rescue is authorized.
+Immutable closeout evidence:
 
-The immutable result is recorded in:
-
-- `PHASE2_Q3_RESULT_RECEIPT.md`;
-- `phase2_q3_result_registry.json`.
+- `PHASE2_STAGE_D_RESULT_RECEIPT.md`;
+- `phase2_stage_d_result_registry.json`.
 
 ## Exact next actions
 
-1. validate the exact final Stage-C closeout head with the research firewall, Phase-2 opening gate, frozen Q1 reproducibility, Q2 closeout, Q3 closeout, research validation, and full repository validation;
-2. update PR #562 to preserve the verified negative result and exact accepted evidence identities;
-3. merge PR #562 only after those exact-head gates are green;
-4. verify the resulting Stage-C merge is current `main`;
-5. create Stage D from that exact merge;
-6. in Stage D, use accepted evidence only and run the final paired season+week block-bootstrap uncertainty analysis with at least 10,000 resamples where defined;
-7. preserve Q2 complementarity/Q2-Q3 blend as **unavailable** because no valid Q2 OOF exists—do not reconstruct or substitute Q2;
-8. produce the final Phase-2 evidence synthesis and Phase-3 handoff without opening any new candidate family.
+1. validate the exact Stage-D closeout head with the Stage-D contract/synthesis workflow, research firewall, opening-gate reproduction, frozen Q1/Q2/Q3 closeout checks, research validation, and full repository validation;
+2. verify PR #563 describes the accepted Stage-D result rather than the obsolete pre-execution state;
+3. merge PR #563 only after required exact-head gates are green;
+4. verify the resulting merge is current `main`;
+5. treat Phase 2 as closed;
+6. begin **Phase 3 — Scientific Synthesis, Candidate Selection & Freeze** only from that verified merge and only with accepted Phase-2 evidence.
 
-## Active firewalls
+## Phase-3 boundary
 
-- no completed-2026 outcome use;
-- no random K-fold;
-- no historical market-horizon relabeling;
-- no full-sample preprocessing leakage;
-- no Q1 rescue;
-- no Q2 support/family/grid/key/scale/smoothing rescue;
-- no Q3 learner/feature/C-grid/class-weight/calibration/threshold/slice rescue;
-- no repeat Q3 historical execution after the accepted result;
-- no substitute Q2 distribution or blend;
-- no production F-ST/Sunday Signal numerical forecasting changes.
+Phase 3 is classification, not another candidate-development round. It must classify each frozen architecture as `REJECTED`, `INCONCLUSIVE`, or `ELIGIBLE_FOR_PROSPECTIVE_SHADOW` using the Phase-2 package.
 
-> 2022–2025 is chronology-clean development evidence for this candidate execution but is not pristine independent confirmation because those seasons have informed prior LevLine research.
+Phase 3 must not:
+
+- redesign or rescue Q1/Q2/Q3;
+- manufacture Q2 OOF, complementarity, or a Q2/Q3 blend;
+- use completed-2026 outcomes;
+- search new thresholds/slices/features/learners;
+- use ATS hit rate or hypothetical ROI to overturn proper-score evidence;
+- change production F-ST/Sunday Signal numerical behavior;
+- promote a candidate directly to production.
+
+Phase 4 remains conditional: it may begin only if Phase 3 earns prospective-shadow eligibility and the user explicitly authorizes continuation.
+
+> Historical 2022–2025 evidence is chronology-clean development evidence, not pristine independent confirmation, because those seasons have informed prior LevLine research.
