@@ -4,19 +4,34 @@
 
 Phase 1 is complete. Phase 2 data qualification has been executed outcome-blind on `research/ats-frontier-v2-phase2` and is awaiting/under merge validation. Phase 3 is not started.
 
+A post-qualification free/open-source deep dive materially changed the market-data access recommendation without changing the frozen M1 mechanism: **do not purchase historical odds yet**. Free-source reconstruction must be empirically exhausted first.
+
 ## Phase-2 gate
 
-- M1 dynamic market state — `PARTIALLY_QUALIFIED`: legitimate PIT historical products exist, but authorized historical real-data access is still needed to quantify book/horizon completeness.
+- M1 dynamic market state — `PARTIALLY_QUALIFIED__FREE_FIRST_RECONSTRUCTION_REQUIRED`: genuine public historical market artifacts were found across 2020–2025, but exact season × game × book × fixed-horizon completeness is still unmeasured. Sparse daily snapshots/openers/closes cannot be relabeled as exact horizons.
 - M2 player-state delta — `PARTIALLY_QUALIFIED`: lagged ability plus narrowly qualified/timestamped personnel sources survive; broad cross-era availability does not.
 - M3 hierarchical state — `DATA_QUALIFIED` for core lagged team/QB state.
 - M4 discrete margin V2 — `DATA_QUALIFIED` for numerical/data feasibility only.
 
-## Paid-data decision
+## Historical-odds decision
 
-No purchase occurred. If the user authorizes an M1 qualification pull, the current first choice is The Odds API because its historical snapshot endpoint explicitly guarantees at-or-before semantics and begins 2020-06-06. A bounded $30/month 20K-credit plan is the lowest listed historical tier at the Phase-2 evidence cutoff. SportsDataIO remains the alternative.
+No purchase occurred and none is currently recommended.
+
+The free deep dive found, among other sources:
+- provider-origin public historical NFL cache payloads covering verified examples in 2020–2024 with timestamps, bookmaker identity, spread/price, h2h and totals;
+- a public dense 2025 multi-book DuckDB corpus with 1.8M+ rows, 636 captures and 30+ operators;
+- broad free opening-line coverage through recent seasons;
+- older archived multi-book PIT reconstructions;
+- prospective free collection paths.
+
+None of those findings is allowed to manufacture unsupported T-360/T-120/T-60/T-30 observations. Rights/licensing is tracked separately from temporal validity.
+
+The Odds API remains the first commercial fallback only if the free-first audit demonstrates an explicit scientific coverage deficiency. SportsDataIO remains the second fallback. Any purchase still requires explicit user authorization.
 
 ## Next authorized program phase
 
-Phase 3 — Final Architecture Design & Preregistration — must begin by reading the Phase-2 receipt, `MECHANISM_DATA_GATE.md`, provenance manifest and `PHASE3_HANDOFF.md`. It must resolve M1's paid-history dependency before freezing any historical dynamic-market architecture. It may not infer missing M1 coverage from documentation.
+Phase 3 — Final Architecture Design & Preregistration — must begin by reading the Phase-2 receipt, `FREE_MARKET_DATA_DEEP_DIVE.md`, `MECHANISM_DATA_GATE.md`, provenance manifest and `PHASE3_HANDOFF.md`.
 
-Production remains `F-ST-01-FROZEN-2026` and unchanged.
+Its first M1 data action is the outcome-blind free reconstruction audit. Only after that audit may Phase 3 either freeze a free-supported M1 architecture or document the exact deficiency and seek authorization for a bounded commercial qualification pull. No source/horizon may be selected from candidate performance.
+
+Production remains `F-ST-01-FROZEN-2026` and unchanged. Completed-2026 outcomes used in Phase 2: 0. Frontier candidate performance inspected in Phase 2: NO.
