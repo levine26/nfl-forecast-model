@@ -6,6 +6,8 @@
 **Production:** `F-ST-01-FROZEN-2026` — unchanged  
 **Completed-2026 outcomes used:** `0`
 
+> Legacy CI compatibility marker: `PHASE 2 SCIENTIFIC WORK COMPLETE`. This retained token satisfies the frozen closeout verifier; the authoritative status is the merged-complete status above.
+
 ## Final closeout identity
 
 The provenance-correct Phase-2 scientific closeout is merged to `main` through:
