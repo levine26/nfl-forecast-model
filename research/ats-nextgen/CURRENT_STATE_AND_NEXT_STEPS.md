@@ -4,7 +4,7 @@
 
 Phase 1 is **COMPLETE**.
 
-Phase 2 scientific work is **COMPLETE THROUGH STAGE D**. The only remaining Phase-2 action is exact-head closeout validation and merge of PR #563.
+Phase 2 is **COMPLETE**. PR #563 passed all eight exact-head validation workflows and merged to `main` at `a9ba2a5759c1308e6a47e682240a4e79dd419726`.
 
 Production remains `F-ST-01-FROZEN-2026`. No completed-2026 outcome has been used by the ATS Next-Generation historical candidate program.
 
@@ -17,6 +17,7 @@ Production remains `F-ST-01-FROZEN-2026`. No completed-2026 outcome has been use
 - 1,087 chronology-clean 2022–2025 outer OOF rows;
 - accepted OOF SHA-256 `d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365`;
 - Q1 minus M2 mean frozen-quantile pinball `+0.0001307888` (worse);
+- Stage-D 95% interval `[-0.0023784358,+0.0025555440]`, `P(better)=0.4554`;
 - no rescue authorized.
 
 ### Q2 — discrete key-margin distribution
@@ -36,13 +37,14 @@ Production remains `F-ST-01-FROZEN-2026`. No completed-2026 outcome has been use
 - 1,087 chronology-clean exact-row OOF games, 2022–2025;
 - accepted OOF SHA-256 `18610dfcfa9ffe71ed30259f9fef85a5655cefa68301f46fa1bb1950593dee04`;
 - Q3 minus Q3-M2 multinomial CPL log loss `+0.0013157419` (worse);
+- Stage-D 95% interval `[-0.0015590942,+0.0043366478]`, `P(better)=0.1842`;
+- non-push Brier delta `+0.0006716459`, `P(better)=0.1851`;
 - no learner/feature/C-grid/class-weight/calibration/threshold/slice rescue authorized.
 
 ## Stage D — accepted final evidence synthesis
 
 Accepted execution:
 
-- branch `research/ats-nextgen-phase2-stage-d` / PR #563;
 - scientific execution head `0030de3fcc3fd094f1ce28eb0ab1c20b748ca67a`;
 - scientific tree `cf161bc7b47d8d138fd35dfe4889ccc215c91b5b`;
 - workflow `35936805090`: **SUCCESS**;
@@ -53,11 +55,19 @@ Accepted execution:
 - completed-2026 outcomes used: 0;
 - production changed: no.
 
-Paired uncertainty:
+Final closeout validation:
 
-- Q1 − M2 mean-three-quantile pinball: `+0.0001307888`, 95% interval `[-0.0023784358,+0.0025555440]`, `P(better)=0.4554`;
-- Q3 − Q3-M2 multinomial CPL log loss: `+0.0013157419`, 95% interval `[-0.0015590942,+0.0043366478]`, `P(better)=0.1842`;
-- Q3 − Q3-M2 non-push conditional-cover Brier: `+0.0006716459`, 95% interval `[-0.0007977772,+0.0022129221]`, `P(better)=0.1851`.
+- closeout head `619959f50bb7f9cbbc1ed9fbc562547db7f17487`;
+- research firewall: **SUCCESS**;
+- Phase-2 opening gate: **SUCCESS**;
+- Q1 frozen reproduction: **SUCCESS**;
+- Q2 structural-invalidity closeout: **SUCCESS**;
+- Q3 negative-result closeout: **SUCCESS**;
+- Stage-D frozen synthesis reproduction: **SUCCESS**;
+- research validation: **SUCCESS**;
+- full pytest / regenerated-output validation: **SUCCESS**;
+- Stage-D reproduction artifact `10784362608`: all four scientific files matched the accepted Stage-D artifact byte-for-byte by SHA-256;
+- PR #563 merge / verified `main`: `a9ba2a5759c1308e6a47e682240a4e79dd419726`.
 
 Simple hit-rate diagnostic only:
 
@@ -66,23 +76,27 @@ Simple hit-rate diagnostic only:
 
 The hit-rate diagnostic and intervals cannot rescue or reclassify a candidate. Historical side-price provenance remains insufficient for a new ROI/EV claim.
 
-Immutable closeout evidence:
+Immutable Phase-2 evidence:
 
 - `PHASE2_STAGE_D_RESULT_RECEIPT.md`;
-- `phase2_stage_d_result_registry.json`.
+- `phase2_stage_d_result_registry.json`;
+- `FINAL_PHASE2_RECEIPT.md`.
 
 ## Exact next actions
 
-1. validate the exact Stage-D closeout head with the Stage-D contract/synthesis workflow, research firewall, opening-gate reproduction, frozen Q1/Q2/Q3 closeout checks, research validation, and full repository validation;
-2. verify PR #563 describes the accepted Stage-D result rather than the obsolete pre-execution state;
-3. merge PR #563 only after required exact-head gates are green;
-4. verify the resulting merge is current `main`;
-5. treat Phase 2 as closed;
-6. begin **Phase 3 — Scientific Synthesis, Candidate Selection & Freeze** only from that verified merge and only with accepted Phase-2 evidence.
+1. merge this governance-only final receipt after its exact-head research/production-firewall validation;
+2. verify the resulting governance merge on `main`;
+3. create the Phase-3 branch from that exact verified merge SHA;
+4. read `PHASE3_HANDOFF.md` and the frozen Phase-1 evaluation/classification rules;
+5. freeze a Phase-3 opening/classification receipt before assigning any disposition;
+6. perform classification only — no candidate development, fitting, rescue, or completed-2026 outcome use;
+7. stop before Phase 4 unless the user explicitly authorizes continuation.
 
 ## Phase-3 boundary
 
-Phase 3 is classification, not another candidate-development round. It must classify each frozen architecture as `REJECTED`, `INCONCLUSIVE`, or `ELIGIBLE_FOR_PROSPECTIVE_SHADOW` using the Phase-2 package.
+Phase 3 is classification, not another candidate-development round. It must classify each frozen architecture as `REJECTED`, `INCONCLUSIVE`, or `ELIGIBLE_FOR_PROSPECTIVE_SHADOW` using the accepted Phase-2 package.
+
+The Phase-1 eligibility gate requires improvement in the candidate's primary proper/quantile metric versus the matching market null on exact common OOF rows, along with no material calibration/systematic failure, no single-season/week/key-bucket dependence, no leakage/red-team failure, and consistency with the preregistered model identity.
 
 Phase 3 must not:
 
