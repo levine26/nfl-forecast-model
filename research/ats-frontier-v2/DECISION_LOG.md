@@ -18,11 +18,11 @@
 
 ## D005 — Player state must be an information delta
 **Decision:** Advance player/QB state only in the form `change in expected lineup value - market-implied change`, not injury flags.  
-**Evidence:** Player-absence literature shows opening-line bias can be removed by the close; nflWAR supports hierarchical player effects. The plausible edge is timing/uncertainty, not the fact of an injury itself.
+**Evidence:** Player-absence literature shows opening-line bias can be removed by the close; QB has disproportionate point-spread value; nflWAR supports hierarchical player effects. The plausible edge is timing/uncertainty, not the fact of an injury itself.
 
 ## D006 — QB is a separately modeled component
 **Decision:** M2 requires dynamic QB ability, starter probability and backup/replacement quality.  
-**Reason:** Public professional systems identify QB adjustment as a major NFL modeling problem; player-value research finds quarterbacks dominate spread value.
+**Reason:** Public professional systems explicitly identify QB injury adjustment as a major NFL modeling problem; player-value research finds quarterbacks dominate spread value.
 
 ## D007 — Fixed rolling windows are a live weakness
 **Decision:** Advance hierarchical latent team/unit state.  
@@ -50,11 +50,11 @@
 
 ## D013 — Generic matchup interaction expansion killed
 **Decision:** Do not create a large OL×pass-rush / man-zone / style interaction ML tournament.  
-**Reason:** Plausible football relationships are not enough; sample size and multiple testing are severe, and no credible mechanism was found for consistent information beyond market state.
+**Reason:** plausible football relationships are not enough; sample size and multiple testing are severe, and no credible mechanism was found for consistent information beyond market state.
 
 ## D014 — Deep learning killed as a default
 **Decision:** No transformer/neural candidate absent a uniquely high-dimensional PIT data source whose structure requires it.  
-**Reason:** Sample efficiency and leakage risk dominate novelty benefits in NFL game-level forecasting.
+**Reason:** sample efficiency and leakage risk dominate novelty benefits in NFL game-level forecasting.
 
 ## D015 — Paid data decision postponed
 **Decision:** Do not purchase data in Phase 1.  
@@ -62,7 +62,7 @@
 
 ## D016 — Free historical M1 fails the Phase-3 reconstruction gate
 **Decision:** Set historical `FRONTIER-M1-DYNAMIC-MARKET-STATE` to `BLOCKED_PENDING_PAID_SOURCE`; retain a prospective identity only.  
-**Reason:** Genuine free/public data exist, but the 2020–2024 bulk cache is sparse and has a documented fixed-time contamination defect, while 2025 has only four fixed captures/day and the required season×game×book×horizon row panel could not be reproducibly materialized. Open/close and older Wayback data cannot be relabeled/stiched into a coherent modern fixed-horizon panel.
+**Reason:** Genuine free/public data exist, but the 2020–2024 bulk cache is sparse and has a documented fixed-time contamination defect, while 2025 has only four fixed captures/day and the required season×game×book×horizon row panel could not be reproducibly materialized. Open/close and older Wayback data cannot be relabeled/stitched into a coherent modern fixed-horizon panel.
 
 ## D017 — Do not preserve M1 with a one-season 2025 historical candidate
 **Decision:** Reject `PARTIAL_HISTORICAL` as the Phase-3 M1 disposition.  
