@@ -1,6 +1,7 @@
 {
   "program": "LEVLINE_ATS_FRONTIER_V2",
   "phase3_frozen": true,
+  "phase4_complete": true,
   "phase4_evidence_complete": true,
   "phase5_started": false,
   "candidates": [
@@ -8,7 +9,7 @@
       "id": "FV2-HIST-M3-DSSM-01",
       "mechanism": "hierarchical_dynamic_state_market_correction",
       "scope": "historical_phase4",
-      "status": "PHASE4_EVIDENCE_COMPLETE__AWAITING_PHASE5_CLASSIFICATION",
+      "status": "PHASE4_COMPLETE__AWAITING_PHASE5_CLASSIFICATION",
       "phase4_evidence_label": "NEGATIVE_PRIMARY_EVIDENCE",
       "phase5_classification": "NOT_APPLIED",
       "primary_metric": "multinomial_cover_push_loss_log_loss",
@@ -19,7 +20,7 @@
       "id": "FV2-HIST-M4-DMARGIN-01",
       "mechanism": "tail_safe_student_t_integer_margin_pmf",
       "scope": "historical_phase4",
-      "status": "PHASE4_EVIDENCE_COMPLETE__AWAITING_PHASE5_CLASSIFICATION",
+      "status": "PHASE4_COMPLETE__AWAITING_PHASE5_CLASSIFICATION",
       "phase4_evidence_label": "POSITIVE_PRIMARY_EVIDENCE",
       "phase5_classification": "NOT_APPLIED",
       "primary_metric": "integer_margin_log_score",
