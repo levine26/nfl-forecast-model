@@ -2,7 +2,7 @@
 
 ## Current program state
 
-Phase 1 is complete. Phase 2 data qualification has been executed outcome-blind on `research/ats-frontier-v2-phase2` and is awaiting/under merge validation. Phase 3 is not started.
+Phase 1 is complete. Phase 2 data qualification, PIT reconstruction feasibility, mechanism gating, and the free/open-source M1 follow-up are complete and merged through PR `#572` at `bdc16905b46c390338814b584a51be2c9784c436`. The authoritative immutable closeout is `FINAL_PHASE2_RECEIPT.md`. Phase 3 is not started.
 
 A post-qualification free/open-source deep dive materially changed the market-data access recommendation without changing the frozen M1 mechanism: **do not purchase historical odds yet**. Free-source reconstruction must be empirically exhausted first.
 
@@ -30,7 +30,7 @@ The Odds API remains the first commercial fallback only if the free-first audit 
 
 ## Next authorized program phase
 
-Phase 3 — Final Architecture Design & Preregistration — must begin by reading the Phase-2 receipt, `FREE_MARKET_DATA_DEEP_DIVE.md`, `MECHANISM_DATA_GATE.md`, provenance manifest and `PHASE3_HANDOFF.md`.
+Phase 3 — Final Architecture Design & Preregistration — must begin by reading `FINAL_PHASE2_RECEIPT.md`, `FREE_MARKET_DATA_DEEP_DIVE.md`, `MECHANISM_DATA_GATE.md`, the provenance manifest, and `PHASE3_HANDOFF.md`.
 
 Its first M1 data action is the outcome-blind free reconstruction audit. Only after that audit may Phase 3 either freeze a free-supported M1 architecture or document the exact deficiency and seek authorization for a bounded commercial qualification pull. No source/horizon may be selected from candidate performance.
 
