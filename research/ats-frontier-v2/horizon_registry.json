@@ -1,0 +1,15 @@
+{
+  "program": "LEVLINE_ATS_FRONTIER_V2",
+  "fixed_market_horizons_minutes": [2160, 720, 360, 120, 60, 30],
+  "latest_pre_kick": true,
+  "selector": "latest quote timestamp <= kickoff - horizon",
+  "future_quote_interpolation": false,
+  "historical_market_state": {
+    "M1": "BLOCKED_PENDING_PAID_SOURCE",
+    "M3_M4_schedule_market": "HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE"
+  },
+  "prospective_primary": {
+    "FV2-PROS-M1-MARKETSTATE-01": 120,
+    "FV2-PROS-M2-QBDELTA-01": 120
+  }
+}

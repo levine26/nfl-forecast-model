@@ -1,0 +1,20 @@
+{
+  "program": "LEVLINE_ATS_FRONTIER_V2",
+  "frozen": true,
+  "FV2-HIST-M3-DSSM-01": {
+    "measurements": ["prior_offense_epa_per_play", "prior_defense_epa_per_play_allowed", "prior_qb_epa_per_dropback", "prior_offense_success_rate", "prior_defense_success_rate_allowed"],
+    "market": ["historical_spread_line_horizon_opaque"],
+    "forbidden": ["target_game_pbp", "same_game_snaps", "final_inactives", "eventual_starter_backfill", "realized_target_weather"]
+  },
+  "FV2-HIST-M4-DMARGIN-01": {
+    "inputs": ["historical_spread_line_horizon_opaque", "historical_total_line"],
+    "scale_terms": ["log_total_over_45", "abs_spread_over_7"],
+    "key_mass_bins": [0, 3, -3, 7, -7]
+  },
+  "FV2-PROS-M1-MARKETSTATE-01": {
+    "inputs": ["consensus_spread", "spread_no_vig_probability", "moneyline_no_vig_probability", "consensus_total", "spread_dispersion", "active_book_count", "median_quote_age", "stale_book_share", "spread_move_T360_T120", "price_only_move_T360_T120", "movement_breadth_T360_T120", "key_3_or_7_crossing", "spread_moneyline_consistency"]
+  },
+  "FV2-PROS-M2-QBDELTA-01": {
+    "inputs": ["lagged_qb_ability", "starter_probability_T120", "expected_role_probability", "replacement_identity_timestamped", "replacement_quality_prior_only", "information_arrival_timestamp", "market_level_T120", "market_change_to_T120", "source_conflict_missingness"]
+  }
+}
