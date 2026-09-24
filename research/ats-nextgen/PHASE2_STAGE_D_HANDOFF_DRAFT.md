@@ -1,11 +1,17 @@
-# ATS Next-Generation Phase 2 — Stage D Pre-Execution Handoff
+# ATS Next-Generation Phase 2 — Stage D Handoff Draft
 
-**Status:** CONTRACT-ONLY; SYNTHESIS NOT YET AUTHORIZED  
-**Branch:** `research/ats-nextgen-phase2-stage-d`  
-**Base:** `539081c59e62a5d4dbc0a8f849d8a332424ea06e`
+**Status:** SUPERSEDED AFTER ACCEPTED STAGE-D EXECUTION
 
-Stage D has frozen its admissible upstream evidence, paired-bootstrap design, uncertainty engine, synthesis runner, tests, and contract-only workflow. No Stage-D historical synthesis result exists yet.
+The pre-execution instructions formerly stored in this file are no longer authoritative.
 
-The next valid action is to open/validate the Stage-D pull request. Only after the exact frozen head passes the Stage-D contract may the workflow be amended to add a historical synthesis job with `needs: contract` and frozen-blob verification.
+Stage D completed successfully on accepted scientific execution head `0030de3fcc3fd094f1ce28eb0ab1c20b748ca67a`, workflow `35936805090`, artifact `10783239110`.
 
-No new candidate, Q2 reconstruction, model rescue, completed-2026 outcome use, or production forecast change is authorized.
+Read instead:
+
+- `PHASE2_STAGE_D_RESULT_RECEIPT.md`;
+- `phase2_stage_d_result_registry.json`;
+- `PHASE_STATUS.md`;
+- `CURRENT_STATE_AND_NEXT_STEPS.md`;
+- `PHASE3_HANDOFF.md`.
+
+No new Phase-2 candidate execution, candidate rescue, Q2 reconstruction, completed-2026 outcome use, or production forecast change is authorized.
