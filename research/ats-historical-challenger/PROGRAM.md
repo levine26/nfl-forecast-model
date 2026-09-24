@@ -55,6 +55,12 @@ For each target season `T`:
 
 The first 2022 distribution fit uses reconstructed 2021 common-center rows. Later folds expand chronologically.
 
+## Training-only selection rules
+
+For each center, nuisance parameters are selected by the minimum penalized training objective from the frozen V2 grid. Ties are broken by lower `nu`, then lower `lambda_key`.
+
+For `KMASS-BLEND`, each frozen weight is fitted/scored on the same pre-target training rows. The selected weight minimizes the training-only penalized integer-margin objective. Ties are broken by distance to `0.5`, then by lower market weight. No target-season result can enter weight selection.
+
 ## Common-row contract
 
 Primary comparisons are paired. Every reported candidate-vs-candidate delta uses identical game IDs. The runner records:
@@ -82,6 +88,17 @@ Also report:
 - selected nuisance parameters and blend weights by outer season.
 
 ATS ROI shown at reference -110 is diagnostic only and is not an empirical historical price/ROI claim.
+
+## Preregistered decision gate
+
+A non-market center (`KMASS-LEVLINE` or `KMASS-BLEND`) advances as the historical research winner only if all of the following hold against `KMASS-MARKET` on the paired outer-test rows:
+
+1. aggregate primary paired delta is favorable (`candidate - market < 0`);
+2. the 95% season/week-block bootstrap interval has an upper bound below `0`;
+3. the primary paired delta is favorable in at least 3 of the 4 outer seasons;
+4. every outer season has at least 200 common scored games and aggregate common N is at least 800.
+
+If both non-market candidates pass, the one with the lower aggregate primary log score is selected; exact ties prefer the simpler pure LevLine center over the blend. If neither passes, the disposition is `RETAIN_KMASS_MARKET`. This gate authorizes only the next research/implementation stage; it never authorizes a production forecast change.
 
 ## Firewalls
 
