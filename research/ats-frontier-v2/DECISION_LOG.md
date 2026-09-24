@@ -1,31 +1,61 @@
 # DECISION LOG
 
-## Phase-1 decisions D001–D015
-The Phase-1 decisions remain authoritative; see repository history / `FINAL_PHASE1_RECEIPT.md`. None is rescinded by Phase 2.
+## D001 — Research-first reset
+**Decision:** Do not create Candidate 4/5/6/Q4 merely because prior candidates failed. Require a mechanism with plausible incremental information conditional on market state.  
+**Reason:** A0/B0/C0/Candidate5/Q1/Q3 and adaptive evidence show repeated failure of generic football-state/residual augmentation.
 
-## D016 — M1 remains partial pending real historical coverage
-**Decision:** `FRONTIER-M1-DYNAMIC-MARKET-STATE` = `PARTIALLY_QUALIFIED`.  
-**Reason:** The Odds API and SportsDataIO document the required PIT-capable structure, but the no-purchase rule prevented an empirical season × book × horizon coverage audit. Documentation is not substituted for measured coverage.
+## D002 — Completed 2026 sealed
+**Decision:** Completed 2026 outcomes are unavailable to Phase-1 design.  
+**Reason:** Preserve prospective validity and prevent outcome-driven architecture selection.
 
-## D017 — PropLine is prospective-only for the historical Frontier program
-**Decision:** Do not use PropLine as pre-2026 historical M1 evidence.  
-**Reason:** Current first-party documentation states that the archive starts in April 2026.
+## D003 — Market is a dynamic state, not one number
+**Decision:** Advance dynamic multi-book market state to the shortlist.  
+**Evidence:** Betting-market literature repeatedly finds information content increasing from earlier to later lines; line/price movement may encode informed activity. LevLine's historical schedule spread has opaque exact horizon and discards book dispersion, side price and path structure.
 
-## D018 — M2 narrowed, not killed
-**Decision:** `FRONTIER-M2-PLAYER-STATE-DELTA` = `PARTIALLY_QUALIFIED`.  
-**Reason:** Lagged ability/replacement quality and narrow timestamped personnel states are legitimate, including the prior qualified 2025 T-120 final-practice reconstruction and 2025+ timestamped depth charts. The nflverse injury source ends after 2024, and the existing 2022–2025 harmonization failed closed.
+## D004 — Static market-path rules are insufficient
+**Decision:** M1 must explicitly test information beyond contemporaneous market level.  
+**Reason:** Adaptive Candidate 3's 2025 +1 winner was duplicated by a level-only market update; path independence was not established.
 
-## D019 — M3 core advances independently of rich personnel state
-**Decision:** `FRONTIER-M3-HIERARCHICAL-STATE` = `DATA_QUALIFIED` for core lagged team/QB state.  
-**Reason:** nflverse PBP is sufficient for chronology-safe prior-game state; current-week rich personnel fields remain governed by M2.
+## D005 — Player state must be an information delta
+**Decision:** Advance player/QB state only in the form `change in expected lineup value - market-implied change`, not injury flags.  
+**Evidence:** Player-absence literature shows opening-line bias can be removed by the close; QB has disproportionate point-spread value; nflWAR supports hierarchical player effects. The plausible edge is timing/uncertainty, not the fact of an injury itself.
 
-## D020 — M4 advances as representation only
-**Decision:** `FRONTIER-M4-DISCRETE-MARGIN-V2` = `DATA_QUALIFIED` for numerical/data feasibility.  
-**Reason:** historical score/spread/total fields exist and the required tail-safe integer-bin / structural-push representation is well-defined. No claim of predictive alpha is made.
+## D006 — QB is a separately modeled component
+**Decision:** M2 requires dynamic QB ability, starter probability and backup/replacement quality.  
+**Reason:** Public professional systems explicitly identify QB injury adjustment as a major NFL modeling problem; player-value research finds quarterbacks dominate spread value.
 
-## D021 — Historical odds is still the only justified paid-data category
-**Decision:** If explicitly authorized, prefer a bounded The Odds API historical qualification pull first; SportsDataIO is the alternative.  
-**Reason:** Exact multi-book timestamp history is the principal missing evidence needed to convert M1 from partial to fully data-qualified. No general football-stat purchase is recommended.
+## D007 — Fixed rolling windows are a live weakness
+**Decision:** Advance hierarchical latent team/unit state.  
+**Reason:** State-space sports literature directly models week-to-week and season-to-season strength changes, whereas fixed windows smear regime changes and express no coherent uncertainty.
 
-## D022 — Completed-2026 and production firewalls remain intact
-**Decision:** Phase 2 uses zero completed-2026 outcomes for candidate design and makes no production forecasting changes.
+## D008 — Q2 V1 is not a negative result
+**Decision:** A new discrete margin experiment is scientifically permitted only if numerically redesigned.  
+**Reason:** Q2 failed its finite-support/truncation contract before valid performance evaluation. V2 must use adaptive/unbounded/tail-safe support and direct whole-number mass handling.
+
+## D009 — Key numbers are representation, not presumed alpha
+**Decision:** Retain conditional key-number mass in M4 but do not treat 3/7 discontinuities as a betting edge.  
+**Evidence:** 2026 Finance Research Letters evidence finds strong betting-demand discontinuities around 3 and 7 but no corresponding realized-return discontinuity.
+
+## D010 — Distributional methods are tools, not hypotheses
+**Decision:** GAMLSS, NGBoost, distributional forests, Student-t/skew families and Bayesian distributional regression remain implementation options only after Phase-2 data qualification and Phase-3 preregistration.  
+**Reason:** Algorithm novelty is not information novelty; NFL samples are small.
+
+## D011 — Forecast combination deferred
+**Decision:** Do not shortlist stacking/model averaging as an independent candidate.  
+**Reason:** Combination is justified only after complementary residual information exists. Candidate5 and prior model families provide no such evidence; forecast-combination literature warns estimated optimal weights can add variance.
+
+## D012 — Game-state/backdoor-cover candidate killed pre-implementation
+**Decision:** Do not advance a separate possession/garbage-time candidate in V2 Phase 1.  
+**Reason:** B0 already implemented a materially different-but-related possession architecture and lost to market; no new PIT information source was identified that would make a game-path simulator independently informative. Reconsider only if M4 diagnostics later isolate systematic tail/game-state misspecification.
+
+## D013 — Generic matchup interaction expansion killed
+**Decision:** Do not create a large OL×pass-rush / man-zone / style interaction ML tournament.  
+**Reason:** plausible football relationships are not enough; sample size and multiple testing are severe, and no credible mechanism was found for consistent information beyond market state.
+
+## D014 — Deep learning killed as a default
+**Decision:** No transformer/neural candidate absent a uniquely high-dimensional PIT data source whose structure requires it.  
+**Reason:** sample efficiency and leakage risk dominate novelty benefits in NFL game-level forecasting.
+
+## D015 — Paid data decision postponed
+**Decision:** Do not purchase data in Phase 1.  
+**Reason:** The Odds API and SportsDataIO appear materially capable of unlocking M1, but Phase 2 must first validate sample schemas and PIT semantics. Historical odds is the one paid-data category with a credible direct scientific benefit.
