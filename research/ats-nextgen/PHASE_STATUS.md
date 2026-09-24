@@ -1,14 +1,14 @@
 # ATS Next-Generation — Phase Status
 
-**Authority:** `MASTER_PLAN.md`, `FINAL_PHASE1_RECEIPT.md`, `PHASE2_OPENING_RECEIPT.md`, `PHASE2_Q1_RESULT_RECEIPT.md`, `PHASE2_Q2_RESULT_RECEIPT.md`, `PHASE2_Q3_RESULT_RECEIPT.md`, and `PHASE2_STAGE_D_RESULT_RECEIPT.md`  
+**Authority:** `MASTER_PLAN.md`, `FINAL_PHASE1_RECEIPT.md`, `PHASE2_OPENING_RECEIPT.md`, `PHASE2_Q1_RESULT_RECEIPT.md`, `PHASE2_Q2_RESULT_RECEIPT.md`, `PHASE2_Q3_RESULT_RECEIPT.md`, `PHASE2_STAGE_D_RESULT_RECEIPT.md`, and `FINAL_PHASE2_RECEIPT.md`  
 **Last updated:** 2026-09-23 America/Los_Angeles  
 **Production:** `F-ST-01-FROZEN-2026` — unchanged
 
 | Phase | Name | Status | Branch / PR | Evidence state | Exact next action |
 |---|---|---|---|---|---|
 | 1 | Deep ATS Research, Problem Reformulation & Preregistration | **COMPLETE** | `research/ats-nextgen-phase1` / PR #556 merged | design frozen | closed |
-| 2 | Controlled Implementation & Historical Development | **FINAL CLOSEOUT — STAGES A/B/C/D COMPLETE; MERGE PENDING** | `research/ats-nextgen-phase2-stage-d` / PR #563 | Q1 negative; Q2 structurally invalid; Q3 negative; Stage-D uncertainty accepted | validate exact closeout head, merge #563, verify `main` |
-| 3 | Scientific Synthesis, Candidate Selection & Freeze | **NOT STARTED** | none | Phase-2 package available after #563 merge | begin only from verified Phase-2 closeout merge |
+| 2 | Controlled Implementation & Historical Development | **COMPLETE** | Stage-D PR #563 merged at `a9ba2a5759c1308e6a47e682240a4e79dd419726` | Q1 negative; Q2 structurally invalid; Q3 negative; Stage-D uncertainty accepted and reproduced | closed |
+| 3 | Scientific Synthesis, Candidate Selection & Freeze | **NOT STARTED** | none | complete Phase-2 package frozen | begin from verified Phase-2 merge using `PHASE3_HANDOFF.md` |
 | 4 | Prospective Shadow Validation | **CONDITIONAL / NOT STARTED** | none | unavailable | only if Phase 3 earns eligibility and continuation is explicitly authorized |
 
 ## Phase 1
@@ -61,16 +61,16 @@ No Q3 rescue or redesign is authorized.
 
 ## Stage D — final evidence synthesis and uncertainty
 
-Stage D has a valid accepted result on the preregistered scientific surface.
+Stage D has a valid accepted result on the preregistered scientific surface and is merged through PR #563.
 
-- branch `research/ats-nextgen-phase2-stage-d` / PR #563;
 - accepted scientific execution head `0030de3fcc3fd094f1ce28eb0ab1c20b748ca67a`;
 - accepted scientific tree `cf161bc7b47d8d138fd35dfe4889ccc215c91b5b`;
 - workflow `35936805090`: **SUCCESS**;
-- contract job `107435539890`: **SUCCESS**;
-- synthesis job `107435848255`: **SUCCESS**;
 - artifact ID `10783239110`;
 - artifact digest `sha256:4a3bd19a48528a2772e69232ad10b959b1f66e3885e44b56772f0b379abbcdd2`;
+- final closeout head `619959f50bb7f9cbbc1ed9fbc562547db7f17487`: all eight exact-head workflows **SUCCESS**;
+- final Stage-D reproducibility run `35938454038`: all four evidence files matched the accepted artifact byte-for-byte by SHA-256;
+- PR #563 merge / verified main `a9ba2a5759c1308e6a47e682240a4e79dd419726`;
 - exactly 10,000 paired `(season, week)` bootstrap draws, 72 blocks, seed 26;
 - completed-2026 outcomes used: 0;
 - production changed: no.
@@ -86,12 +86,7 @@ Simple hit-rate diagnostic, which cannot select or rescue a candidate:
 - Q3-M2: 559/1,058 = `52.8355%`, exact 95% CI `[49.7759%,55.8793%]`;
 - Q3: 552/1,058 = `52.1739%`, exact 95% CI `[49.1142%,55.2215%]`.
 
-The intervals do not erase the previously accepted candidate classifications. Stage D makes no Phase-3 architecture classification.
-
-The immutable Stage-D evidence is recorded in:
-
-- `PHASE2_STAGE_D_RESULT_RECEIPT.md`;
-- `phase2_stage_d_result_registry.json`.
+The intervals do not erase the accepted Phase-2 candidate classifications. Stage D makes no Phase-3 architecture classification.
 
 ## Source-sign contract
 
@@ -103,6 +98,6 @@ The nflverse source field `spread_line` is a home-margin center: positive means 
 
 ## Next-stage boundary
 
-After PR #563 passes exact-head validation and merges, Phase 2 is closed. Phase 3 may then classify each frozen architecture as `REJECTED`, `INCONCLUSIVE`, or `ELIGIBLE_FOR_PROSPECTIVE_SHADOW` using only accepted Phase-2 evidence.
+Phase 2 is closed. Phase 3 may classify each frozen architecture as `REJECTED`, `INCONCLUSIVE`, or `ELIGIBLE_FOR_PROSPECTIVE_SHADOW` using only accepted Phase-2 evidence.
 
 Phase 3 may not reopen candidate design, use completed-2026 outcomes, rescue Q1/Q2/Q3, or authorize production promotion. Phase 4 remains conditional on Phase-3 eligibility plus explicit user authorization.
