@@ -111,3 +111,19 @@
 ## D028 — Final canonical package and corrected-run reproducibility
 **Decision:** Use workflow run `36025444929` and artifact `10820397832` as the final canonical Phase-4 package; retain corrected run `36025306390` as a successful reproducibility execution rather than deleting or relabeling it.  
 **Reason:** Both corrected executions used the same accepted scientific code/config identities, the same 1,087 M3/M4 common rows, the same frozen bootstrap seed and the same completed-2026/production firewalls. They are not byte-identical: M3's paired primary delta differs only at machine precision, while M4's paired primary delta differs by approximately `7.35e-9`. Selected hyperparameter identities, per-season effect directions, uncertainty conclusions, ablation attribution and Phase-4 evidence labels are unchanged. The exact low-level source of the byte-level numerical drift was not isolated and is not asserted. The final branch-preserved package is canonical for repository closeout and Phase 5; the earlier corrected package is retained as corroborating evidence, not used for result shopping.
+
+## D029 — Reject the frozen M3 historical candidate
+**Decision:** Classify `FV2-HIST-M3-DSSM-01` as `REJECTED`; do not rescue it by removing QB or altering the frozen architecture.  
+**Reason:** The full candidate's primary CPL log loss is worse than its market null (`+0.0006706323752636532` candidate-minus-null), the frozen week-block interval is `[-0.00031937461835433245, +0.0016556867645020252]` with only `0.0889` descriptive probability favorable, all four outer seasons are unfavorable, and the full candidate triggers the M3 preregistered failure condition. Phase-5 null-calibration synthesis also shows materially degraded slope calibration versus null. `DYNAMIC_NO_QB` is explanatory negative evidence about the QB component, not a replacement candidate.
+
+## D030 — Reject the frozen M4 full candidate under the preregistered ablation clause
+**Decision:** Classify `FV2-HIST-M4-DMARGIN-01` as `REJECTED` even though its full-model primary score, uncertainty, season stability, numerical safety and calibration-relative gate are favorable.  
+**Reason:** The simpler preregistered `CONSTANT_SCALE_KEY` ablation reproduces essentially the entire gain (`-0.08271839184340689` versus null), conditional scale alone is slightly worse than the null (`+0.00012506107970626913`), and the full model is slightly worse than the simpler key-mass ablation (`+0.00004669270045401389`). The frozen `EVALUATION_PROTOCOL.md` states that a candidate is rejected when its claimed mechanism contributes no improvement while a simpler preregistered component reproduces the result. The mechanism may not be redefined after results.
+
+## D031 — Preserve key-mass evidence without post-hoc promotion
+**Decision:** Record the `CONSTANT_SCALE_KEY` representation as `FUTURE_VERSION_HYPOTHESIS_ONLY`; do not rename it M4-v2, create a replacement candidate, or authorize it for Phase 6.  
+**Reason:** The ablation supplies scientifically interesting evidence about NFL discrete scoring/key-number mass but was not the frozen candidate identity. A legitimate future test requires a new identity, preregistration, governance package and validation path; 2022–2025 remain development/non-pristine evidence.
+
+## D032 — No historical Frontier Phase-6 survivor
+**Decision:** Set historical Phase-6 authorization to `NONE`; do not start Phase 6 or Phase 7 for M3/M4. Preserve prospective M1/M2 identities separately.  
+**Reason:** Both historical Phase-5 candidates are `REJECTED`. `FV2-PROS-M1-MARKETSTATE-01` and `FV2-PROS-M2-QBDELTA-01` remain prospective-only research identities and are not historical survivors. Production remains `F-ST-01-FROZEN-2026`, and completed-2026 outcomes used remain `0`.
