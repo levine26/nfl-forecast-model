@@ -1,0 +1,383 @@
+{
+  "ats_diagnostic": {
+    "REFERENCE_MINUS110_roi_on_risked_units": -0.025605774188004842,
+    "REFERENCE_MINUS110_units_per_1_risked": -27.090909090909122,
+    "actual_historical_roi_claimed": false,
+    "decisions": 1058,
+    "games": 1087,
+    "hit_rate_ex_push": 0.5103969754253308,
+    "losses": 518,
+    "pushes": 29,
+    "wins": 540
+  },
+  "bootstrap": {
+    "ci_2_5": -0.10748699203380639,
+    "ci_97_5": -0.057962887776498655,
+    "n": 1087,
+    "point_delta": -0.08267169179619614,
+    "probability_favorable": 1.0,
+    "resamples": 10000,
+    "seed": 20260924,
+    "weeks": 72
+  },
+  "calibration": {
+    "intercept": 0.014770139195534758,
+    "n": 1058,
+    "reliability": [
+      {
+        "bin": "(0.436, 0.447]",
+        "mean_pred": 0.4408693546427468,
+        "n": 106,
+        "observed": 0.46226415094339623
+      },
+      {
+        "bin": "(0.447, 0.46]",
+        "mean_pred": 0.45410834600747996,
+        "n": 106,
+        "observed": 0.5660377358490566
+      },
+      {
+        "bin": "(0.46, 0.463]",
+        "mean_pred": 0.4613963940456386,
+        "n": 106,
+        "observed": 0.5
+      },
+      {
+        "bin": "(0.463, 0.485]",
+        "mean_pred": 0.4658672324271318,
+        "n": 105,
+        "observed": 0.49523809523809526
+      },
+      {
+        "bin": "(0.485, 0.487]",
+        "mean_pred": 0.48584638919836337,
+        "n": 106,
+        "observed": 0.49056603773584906
+      },
+      {
+        "bin": "(0.487, 0.512]",
+        "mean_pred": 0.4886255492708874,
+        "n": 106,
+        "observed": 0.4339622641509434
+      },
+      {
+        "bin": "(0.512, 0.514]",
+        "mean_pred": 0.5130076814898155,
+        "n": 105,
+        "observed": 0.44761904761904764
+      },
+      {
+        "bin": "(0.514, 0.534]",
+        "mean_pred": 0.5169435758998319,
+        "n": 106,
+        "observed": 0.5188679245283019
+      },
+      {
+        "bin": "(0.534, 0.539]",
+        "mean_pred": 0.5373965585616917,
+        "n": 106,
+        "observed": 0.4811320754716981
+      },
+      {
+        "bin": "(0.539, 0.563]",
+        "mean_pred": 0.5515508928520795,
+        "n": 106,
+        "observed": 0.6037735849056604
+      }
+    ],
+    "slope": 0.43665842195187754
+  },
+  "candidate_brier": 0.5237051055644828,
+  "candidate_cpl_log_loss": 0.769553075493831,
+  "candidate_id": "FV2-HIST-M4-DMARGIN-01",
+  "candidate_integer_log_score": 3.85297516860494,
+  "common_rows_candidate": 1087,
+  "common_rows_intersection": 1087,
+  "common_rows_null": 1087,
+  "conditional_scale_contribution_vs_null": 0.0001250552561666556,
+  "conditional_scale_no_key_integer_log_score": 3.9357719156573028,
+  "constant_scale_key_integer_log_score": 3.8529284854183716,
+  "dropped_for_missing_spread_or_total": 0,
+  "full_minus_conditional_no_key": -0.0827967470523628,
+  "full_minus_constant_key": 4.66831865686729e-05,
+  "key_mass_contribution_vs_null": -0.08271837498276481,
+  "null_cpl_log_loss": 0.7796790214277723,
+  "null_id": "M4-NULL-STUDENTT-CONSTANT-01",
+  "null_integer_log_score": 3.9356468604011363,
+  "oof_n": 1087,
+  "paired_delta_candidate_minus_null": -0.08267169179619614,
+  "selected_by_outer_season_variant": {
+    "2022:CONDITIONAL_SCALE_NO_KEY": {
+      "conditional": true,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 4.004035120234206,
+      "scale_params": [
+        2.556640604837394,
+        0.057532510024996535,
+        -0.009318271447859449
+      ],
+      "use_key": false
+    },
+    "2022:CONSTANT_SCALE_KEY": {
+      "conditional": false,
+      "key_params": [
+        -1.672237771021102,
+        1.1588614014005587,
+        0.7683824069361799
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.9140223035092725,
+      "scale_params": [
+        2.6028013289202665
+      ],
+      "use_key": true
+    },
+    "2022:CONSTANT_SCALE_NO_KEY": {
+      "conditional": false,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 4.004091573528957,
+      "scale_params": [
+        2.549735069677305
+      ],
+      "use_key": false
+    },
+    "2022:FULL_CONDITIONAL_SCALE_KEY": {
+      "conditional": true,
+      "key_params": [
+        -1.665349911850047,
+        1.1661220326377537,
+        0.7729754735428618
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.9135636319993057,
+      "scale_params": [
+        2.63738824654015,
+        0.058731665038335906,
+        -0.04552441068296037
+      ],
+      "use_key": true
+    },
+    "2023:CONDITIONAL_SCALE_NO_KEY": {
+      "conditional": true,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 10,
+      "objective": 3.99219787182101,
+      "scale_params": [
+        2.4724291048199865,
+        0.0863693865395342,
+        0.0005142003413758884
+      ],
+      "use_key": false
+    },
+    "2023:CONSTANT_SCALE_KEY": {
+      "conditional": false,
+      "key_params": [
+        -1.6324456419306843,
+        1.1612263609550764,
+        0.7430735824035828
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.903813189959974,
+      "scale_params": [
+        2.5913350483204765
+      ],
+      "use_key": true
+    },
+    "2023:CONSTANT_SCALE_NO_KEY": {
+      "conditional": false,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 10,
+      "objective": 3.9922731810055248,
+      "scale_params": [
+        2.4728780010836102
+      ],
+      "use_key": false
+    },
+    "2023:FULL_CONDITIONAL_SCALE_KEY": {
+      "conditional": true,
+      "key_params": [
+        -1.6259112660516548,
+        1.1679970626689968,
+        0.7473117196410665
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.903399226756478,
+      "scale_params": [
+        2.6232555327234146,
+        0.07209445697833892,
+        -0.042020007271383934
+      ],
+      "use_key": true
+    },
+    "2024:CONDITIONAL_SCALE_NO_KEY": {
+      "conditional": true,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 10,
+      "objective": 3.9916587891305215,
+      "scale_params": [
+        2.4733239155681557,
+        0.07489104951814259,
+        -0.0011308001384682685
+      ],
+      "use_key": false
+    },
+    "2024:CONSTANT_SCALE_KEY": {
+      "conditional": false,
+      "key_params": [
+        -1.7045026930960672,
+        1.1547440825081658,
+        0.7343427246508304
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.9038441795665686,
+      "scale_params": [
+        2.5901647559227894
+      ],
+      "use_key": true
+    },
+    "2024:CONSTANT_SCALE_NO_KEY": {
+      "conditional": false,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 10,
+      "objective": 3.991715149835597,
+      "scale_params": [
+        2.4722156366232033
+      ],
+      "use_key": false
+    },
+    "2024:FULL_CONDITIONAL_SCALE_KEY": {
+      "conditional": true,
+      "key_params": [
+        -1.6976678222630883,
+        1.1619646866152948,
+        0.738841973900921
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.9034008389698,
+      "scale_params": [
+        2.624223846003126,
+        0.06420925747834677,
+        -0.04470465066134597
+      ],
+      "use_key": true
+    },
+    "2025:CONDITIONAL_SCALE_NO_KEY": {
+      "conditional": true,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 10,
+      "objective": 3.988991086019889,
+      "scale_params": [
+        2.4662313085314396,
+        0.05482236944813455,
+        0.004758932406603117
+      ],
+      "use_key": false
+    },
+    "2025:CONSTANT_SCALE_KEY": {
+      "conditional": false,
+      "key_params": [
+        -1.7748518950779553,
+        1.1434457798313784,
+        0.7174690550073133
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.9024324506694663,
+      "scale_params": [
+        2.586357377759967
+      ],
+      "use_key": true
+    },
+    "2025:CONSTANT_SCALE_NO_KEY": {
+      "conditional": false,
+      "key_params": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "lambda_key": 10.0,
+      "lambda_scale": 10.0,
+      "nu": 10,
+      "objective": 3.989025824572064,
+      "scale_params": [
+        2.4695505165913
+      ],
+      "use_key": false
+    },
+    "2025:FULL_CONDITIONAL_SCALE_KEY": {
+      "conditional": true,
+      "key_params": [
+        -1.7688488785416705,
+        1.1495898716702428,
+        0.7213032006479742
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.902107924209941,
+      "scale_params": [
+        2.6156838387085535,
+        0.05448997500879361,
+        -0.038507331258807495
+      ],
+      "use_key": true
+    }
+  }
+}

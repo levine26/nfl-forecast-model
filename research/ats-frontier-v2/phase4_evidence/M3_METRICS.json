@@ -1,0 +1,139 @@
+{
+  "ats_diagnostic": {
+    "REFERENCE_MINUS110_roi_on_risked_units": -0.06530331672108612,
+    "REFERENCE_MINUS110_units_per_1_risked": -69.09090909090912,
+    "actual_historical_roi_claimed": false,
+    "decisions": 1058,
+    "games": 1087,
+    "hit_rate_ex_push": 0.4896030245746692,
+    "losses": 540,
+    "pushes": 29,
+    "wins": 518
+  },
+  "bootstrap": {
+    "ci_2_5": -0.00031937461835433695,
+    "ci_97_5": 0.001655686764502027,
+    "n": 1087,
+    "point_delta": 0.0006706323752636537,
+    "probability_favorable": 0.0889,
+    "resamples": 10000,
+    "seed": 20260924,
+    "weeks": 72
+  },
+  "calibration": {
+    "intercept": -0.0008002656550696445,
+    "n": 1058,
+    "reliability": [
+      {
+        "bin": "(0.469, 0.488]",
+        "mean_pred": 0.48338027733762917,
+        "n": 106,
+        "observed": 0.5849056603773585
+      },
+      {
+        "bin": "(0.488, 0.492]",
+        "mean_pred": 0.48994359293580625,
+        "n": 106,
+        "observed": 0.5660377358490566
+      },
+      {
+        "bin": "(0.492, 0.495]",
+        "mean_pred": 0.4936965894990787,
+        "n": 106,
+        "observed": 0.49056603773584906
+      },
+      {
+        "bin": "(0.495, 0.497]",
+        "mean_pred": 0.49617263678188084,
+        "n": 105,
+        "observed": 0.4666666666666667
+      },
+      {
+        "bin": "(0.497, 0.499]",
+        "mean_pred": 0.49844449420054526,
+        "n": 106,
+        "observed": 0.41509433962264153
+      },
+      {
+        "bin": "(0.499, 0.502]",
+        "mean_pred": 0.5007770005899835,
+        "n": 106,
+        "observed": 0.5188679245283019
+      },
+      {
+        "bin": "(0.502, 0.505]",
+        "mean_pred": 0.5033788672357986,
+        "n": 105,
+        "observed": 0.3904761904761905
+      },
+      {
+        "bin": "(0.505, 0.508]",
+        "mean_pred": 0.5063813912531425,
+        "n": 106,
+        "observed": 0.42452830188679247
+      },
+      {
+        "bin": "(0.508, 0.512]",
+        "mean_pred": 0.5097005305803236,
+        "n": 106,
+        "observed": 0.5943396226415094
+      },
+      {
+        "bin": "(0.512, 0.534]",
+        "mean_pred": 0.5167025737408443,
+        "n": 106,
+        "observed": 0.5471698113207547
+      }
+    ],
+    "slope": -1.4064471514780372
+  },
+  "candidate_brier": 0.5255261738778846,
+  "candidate_crps": 6.92182144264477,
+  "candidate_id": "FV2-HIST-M3-DSSM-01",
+  "candidate_primary_log_loss": 0.7811502028797036,
+  "chosen_by_outer_season": {
+    "2022": {
+      "alpha": 100.0,
+      "lambda": 0.75,
+      "mean_primary_score": 0.7591620316194408,
+      "q_qb": 0.5,
+      "q_team": 0.04
+    },
+    "2023": {
+      "alpha": 100.0,
+      "lambda": 0.75,
+      "mean_primary_score": 0.7572495823213233,
+      "q_qb": 0.5,
+      "q_team": 0.1
+    },
+    "2024": {
+      "alpha": 100.0,
+      "lambda": 0.75,
+      "mean_primary_score": 0.8042535179373367,
+      "q_qb": 0.5,
+      "q_team": 0.04
+    },
+    "2025": {
+      "alpha": 100.0,
+      "lambda": 0.75,
+      "mean_primary_score": 0.8038892130698136,
+      "q_qb": 0.1,
+      "q_team": 0.25
+    }
+  },
+  "common_rows_candidate": 1087,
+  "common_rows_intersection": 1087,
+  "common_rows_null": 1087,
+  "dropped_for_missing_spread": 0,
+  "dynamic_full_minus_no_qb": 0.0002656684749809789,
+  "dynamic_full_minus_static": 0.0003303202768748457,
+  "dynamic_no_qb_primary_log_loss": 0.7808845344047226,
+  "margin_mae": 9.5093461058206,
+  "margin_rmse": 12.366121882572106,
+  "null_brier": 0.5248541924144955,
+  "null_id": "M3-NULL-MARKET-NORMAL-01",
+  "null_primary_log_loss": 0.7804795705044401,
+  "oof_n": 1087,
+  "paired_delta_candidate_minus_null": 0.0006706323752636537,
+  "static_primary_log_loss": 0.7808198826028289
+}
