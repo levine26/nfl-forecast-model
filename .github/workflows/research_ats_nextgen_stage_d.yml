@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: ats-nextgen-stage-d-${{ github.event.pull_request.number || github.ref }}
@@ -71,6 +72,8 @@ jobs:
           assert q1['classification'] == 'VALID_NEGATIVE_INCREMENTAL_RESULT'
           assert q1['q1_rescue_allowed'] is False
           assert q1['evidence_sha256']['q1_outer_oof_2022_2025.csv'] == opening['accepted_inputs']['q1']['oof_sha256']
+          assert q1['artifact']['id'] == 10776898518
+          assert q1['workflow_run'] == 35920622523
 
           assert q2['classification'] == 'STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT'
           assert q2['accepted_q2_outer_oof_artifact'] is None
@@ -85,6 +88,8 @@ jobs:
           assert q3['q2_complementarity_available'] is False
           assert q3['q2_q3_blend_available'] is False
           assert q3['artifact']['files_sha256']['q3_outer_oof_2022_2025.csv'] == opening['accepted_inputs']['q3']['oof_sha256']
+          assert q3['artifact']['id'] == 10781521222
+          assert q3['workflow']['run_id'] == 35931071604
           PY
       - name: Prove contract tests did not modify production surfaces
         run: git diff --exit-code -- $PROTECTED_SURFACES
@@ -93,7 +98,7 @@ jobs:
     name: Stage D frozen evidence synthesis
     needs: contract
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
@@ -103,47 +108,44 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install '.[dev]'
-      - uses: actions/cache@v4
-        with:
-          path: .cache/nflreadpy
-          key: nfl-ats-nextgen-stage-d-${{ runner.os }}-${{ github.run_id }}
-          restore-keys: |
-            nfl-ats-nextgen-stage-d-${{ runner.os }}-
-            nfl-research-${{ runner.os }}-
-            nfl-challenger-${{ runner.os }}-
-            nflreadpy-${{ runner.os }}-
       - name: Verify frozen Stage-D scientific blobs
         run: |
           test "$(git rev-parse HEAD:src/nfl_forecast/challenger_ats_nextgen_stage_d.py)" = "d7293b7c9b947590c72d58da1b2d07ce8c0919c0"
-          test "$(git rev-parse HEAD:scripts/run_challenger_ats_nextgen_stage_d.py)" = "7df0df371b93d50265c9061f4215753a87909b15"
+          test "$(git rev-parse HEAD:scripts/run_challenger_ats_nextgen_stage_d.py)" = "0696aa9c1715cd3f30299aeaff7380245c2e1ce9"
           test "$(git rev-parse HEAD:tests/test_challenger_ats_nextgen_stage_d.py)" = "1b727166aeb00c5b7c19d30e228ec6a9f40ed8ea"
           test "$(git rev-parse HEAD:research/ats-nextgen/PHASE2_STAGE_D_OPENING_RECEIPT.md)" = "021d641df7585bd878338bc56a073d17ce2e1fe4"
           test "$(git rev-parse HEAD:research/ats-nextgen/phase2_stage_d_opening_registry.json)" = "630fde8e67b7a15592f3836367222c846d04a12d"
-      - name: Run frozen Stage-D synthesis
+      - name: Download accepted Q1 evidence artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ats-nextgen-q1-35920622523
+          path: research_outputs/ats_nextgen/accepted_q1
+          repository: levine26/nfl-forecast-model
+          run-id: 35920622523
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download accepted Q3 evidence artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ats-nextgen-q3-35931071604
+          path: research_outputs/ats_nextgen/accepted_q3
+          repository: levine26/nfl-forecast-model
+          run-id: 35931071604
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run frozen Stage-D synthesis from accepted artifacts
         run: |
           rm -rf research_outputs/ats_nextgen/stage_d
-          PYTHONPATH="$PWD/src:$PWD/scripts${PYTHONPATH:+:$PYTHONPATH}" \
+          PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
             python scripts/run_challenger_ats_nextgen_stage_d.py \
-              --output-dir research_outputs/ats_nextgen/stage_d
+              --output-dir research_outputs/ats_nextgen/stage_d \
+              --q1-evidence-dir research_outputs/ats_nextgen/accepted_q1 \
+              --q3-evidence-dir research_outputs/ats_nextgen/accepted_q3
           test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_paired_uncertainty.csv
           test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_hit_rate_intervals.csv
           test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_season_deltas.csv
           test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_summary.json
-      - name: Upload failed regeneration diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ats-nextgen-stage-d-regeneration-diagnostic-${{ github.run_id }}
-          path: |
-            research_outputs/ats_nextgen/q1/
-            research_outputs/ats_nextgen/q3/
-          retention-days: 7
-          if-no-files-found: warn
       - name: Prove synthesis did not modify production surfaces
-        if: success()
         run: git diff --exit-code -- $PROTECTED_SURFACES
       - name: Upload immutable Stage-D evidence
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ats-nextgen-stage-d-${{ github.run_id }}
