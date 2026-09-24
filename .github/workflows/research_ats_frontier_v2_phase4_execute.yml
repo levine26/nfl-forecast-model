@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  VALIDATED_SCIENTIFIC_HEAD: 0cd5a800e7e978097ca6b96c740ecaff3a607297
-  VALIDATED_PREFLIGHT_RUN: '36023104432'
+  VALIDATED_SCIENTIFIC_HEAD: c1eead294c5ac897041fc35f628b2fec393ab064
+  VALIDATED_PREFLIGHT_RUN: '36025017029'
   PROTECTED_SURFACES: >-
     outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
     src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
@@ -28,7 +28,9 @@ env:
     research/ats-frontier-v2/phase4_config.json
     research/ats-frontier-v2/phase4_core.py
     research/ats-frontier-v2/phase4_runner.py
+    research/ats-frontier-v2/phase4_accepted_runner.py
     research/ats-frontier-v2/test_phase4.py
+    research/ats-frontier-v2/test_phase4_acceptance.py
 
 jobs:
   frozen-gate:
@@ -53,8 +55,8 @@ jobs:
       - name: Compile and rerun result-blind tests
         run: |
           python -m compileall -q research/ats-frontier-v2
-          pytest -q research/ats-frontier-v2/test_phase4.py
-          python research/ats-frontier-v2/phase4_runner.py --preflight-only
+          pytest -q research/ats-frontier-v2/test_phase4.py research/ats-frontier-v2/test_phase4_acceptance.py
+          python research/ats-frontier-v2/phase4_accepted_runner.py --preflight-only
       - name: Prove protected production surfaces unchanged before execution
         shell: bash
         run: |
@@ -88,7 +90,7 @@ jobs:
           set -euo pipefail
           rm -rf /tmp/ats-frontier-v2-phase4
           mkdir -p /tmp/ats-frontier-v2-phase4
-          python research/ats-frontier-v2/phase4_runner.py --output-dir /tmp/ats-frontier-v2-phase4
+          python research/ats-frontier-v2/phase4_accepted_runner.py --output-dir /tmp/ats-frontier-v2-phase4
       - name: Verify required evidence package
         shell: bash
         run: |
@@ -113,6 +115,7 @@ jobs:
           assert manifest['market_label']=='HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE'
           assert manifest['preflight']['status']=='PASS'
           assert manifest['preflight']['m4_numerical_audit']['status']=='PASS'
+          assert manifest['preflight']['superseded_execution_accepted'] is False
           assert manifest['M3_OOF_N']>0 and manifest['M4_OOF_N']>0
           m3=json.loads((root/'M3_METRICS.json').read_text())
           m4=json.loads((root/'M4_METRICS.json').read_text())
@@ -120,6 +123,7 @@ jobs:
           assert m4['common_rows_candidate']==m4['common_rows_null']==m4['common_rows_intersection']
           assert m3['bootstrap']['resamples']>=10000
           assert m4['bootstrap']['resamples']>=10000
+          assert m3['static_pooling_rule']=='prior_only_fixed_ewma_half_life_8_games'
           assert 'ranked_probability_score' in m4
           assert 'tail_diagnostics' in m4
           PY
