@@ -5,11 +5,6 @@ on:
     branches: [research/ats-frontier-v2-phase4]
     paths:
       - 'research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md'
-      - 'research/ats-frontier-v2/phase4_config.json'
-      - 'research/ats-frontier-v2/phase4_core.py'
-      - 'research/ats-frontier-v2/phase4_runner.py'
-      - 'research/ats-frontier-v2/test_phase4.py'
-      - '.github/workflows/research_ats_frontier_v2_phase4_execute.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,6 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  VALIDATED_SCIENTIFIC_HEAD: 0cd5a800e7e978097ca6b96c740ecaff3a607297
+  VALIDATED_PREFLIGHT_RUN: '36023104432'
   PROTECTED_SURFACES: >-
     outputs/ site/ src/nfl_forecast/pipeline.py src/nfl_forecast/models.py
     src/nfl_forecast/features.py src/nfl_forecast/data.py src/nfl_forecast/publish.py
@@ -27,6 +24,11 @@ env:
     src/nfl_forecast/public_forecast.py src/nfl_forecast/market.py src/nfl_forecast/market_t120.py
     src/nfl_forecast/lock_verify.py scripts/run_week.py scripts/refresh_market.py
     scripts/pregame_due.py scripts/verify_pregame_lock.py
+  SCIENTIFIC_SURFACES: >-
+    research/ats-frontier-v2/phase4_config.json
+    research/ats-frontier-v2/phase4_core.py
+    research/ats-frontier-v2/phase4_runner.py
+    research/ats-frontier-v2/test_phase4.py
 
 jobs:
   frozen-gate:
@@ -39,13 +41,15 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11', cache: pip}
       - run: pip install '.[dev]'
-      - name: Require immutable pre-result receipt
+      - name: Require exact validated pre-result receipt
         shell: bash
         run: |
           set -euo pipefail
           test -s research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
-          grep -F '0cd5a800e7e978097ca6b96c740ecaff3a607297' research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
-          grep -F '36023104432' research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
+          grep -F "$VALIDATED_SCIENTIFIC_HEAD" research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
+          grep -F "$VALIDATED_PREFLIGHT_RUN" research/ats-frontier-v2/PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md
+          git cat-file -e "${VALIDATED_SCIENTIFIC_HEAD}^{commit}"
+          git diff --exit-code "$VALIDATED_SCIENTIFIC_HEAD"..HEAD -- $SCIENTIFIC_SURFACES
       - name: Compile and rerun result-blind tests
         run: |
           python -m compileall -q research/ats-frontier-v2
@@ -116,6 +120,8 @@ jobs:
           assert m4['common_rows_candidate']==m4['common_rows_null']==m4['common_rows_intersection']
           assert m3['bootstrap']['resamples']>=10000
           assert m4['bootstrap']['resamples']>=10000
+          assert 'ranked_probability_score' in m4
+          assert 'tail_diagnostics' in m4
           PY
       - name: Prove protected production surfaces unchanged after execution
         shell: bash
