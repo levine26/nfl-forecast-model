@@ -1,8 +1,18 @@
 {
   "program": "LEVLINE_ATS_FRONTIER_V2",
   "phase": 4,
-  "state": "EVIDENCE_COMPLETE__PENDING_REPOSITORY_MERGE",
+  "state": "COMPLETE",
   "phase5_started": false,
+  "repository_closeout": {
+    "primary_pr": 576,
+    "exact_validated_pr_head": "93ed709d24d53d8469f6bc7eaaf49d2a38d7cea3",
+    "primary_merge_sha": "e425220c1b929629f3a5420bc1915c74835b2a34",
+    "research_firewall_run": 36030756862,
+    "research_validation_run": 36030756719,
+    "phase4_gate_run": 36030756851,
+    "all_exact_head_gates_passed": true,
+    "production_changed": false
+  },
   "canonical_accepted_execution": {
     "workflow_run": 36025444929,
     "artifact_id": 10820397832,
@@ -112,5 +122,6 @@
   "red_team_status": "PASS",
   "market_label": "HISTORICAL_CLOSING_LATE_BENCHMARK_EXACT_HORIZON_OPAQUE",
   "formal_phase5_disposition_applied": false,
-  "production_authorization_created": false
+  "production_authorization_created": false,
+  "final_phase4_receipt": "research/ats-frontier-v2/FINAL_PHASE4_RECEIPT.md"
 }

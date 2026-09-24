@@ -54,15 +54,15 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `PHASE4_OPENING_RECEIPT.md`
 - `PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md` — corrected, result-blind scientific surface and accepted-execution authorization.
 - `PHASE4_INVALID_RUNS.md` — superseded/unaccepted execution history and correction provenance.
-- `PHASE4_REPRODUCIBILITY_NOTE.md` — comparison of the two corrected accepted executions; records tiny non-byte-identical numerical drift and pins the final canonical package without result shopping.
-- `PHASE5_HANDOFF.md` — top-level Phase-5 entry boundary derived from the immutable accepted Phase-4 package; Phase 5 remains not started.
-- `FINAL_PHASE4_RECEIPT.md` — created only after the primary Phase-4 research merge and post-merge closeout verification.
+- `PHASE4_REPRODUCIBILITY_NOTE.md` — corrected-execution reproducibility comparison and canonical-package pin.
+- `FINAL_PHASE4_RECEIPT.md` — immutable Phase-4 repository/scientific closeout; primary PR `#576`, exact validated head `93ed709d24d53d8469f6bc7eaaf49d2a38d7cea3`, primary merge `e425220c1b929629f3a5420bc1915c74835b2a34`.
+- `PHASE5_HANDOFF.md` — Phase-5 entry boundary derived from the accepted Phase-4 package; Phase 5 remains not started until explicitly begun.
 
 ## Phase-4 implementation and accepted evidence
 - `phase4_config.json` — frozen Phase-4 deterministic configuration.
 - `phase4_core.py`, `phase4_runner.py` — original Phase-4 implementation surface retained for provenance.
 - `phase4_accepted_runner.py`, `test_phase4_acceptance.py` — corrected contract-compliant accepted execution surface.
-- `PHASE4_RESULT_REGISTRY.json` — machine-readable accepted execution/result registry; no Phase-5 disposition is applied here.
+- `PHASE4_RESULT_REGISTRY.json` — machine-readable final Phase-4 execution/result registry; formal Phase-5 disposition remains unapplied.
 - `phase4_evidence/PHASE4_RUN_MANIFEST.json` — final canonical execution provenance, data universe and firewalls.
 - `phase4_evidence/OUTPUT_HASHES.json` — final canonical evidence-file SHA-256 registry.
 - `phase4_evidence/M3_OOF_PREDICTIONS_2022_2025.csv`
@@ -93,4 +93,4 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 
 ## Current scientific boundary
 
-Phase 4 has accepted empirical development evidence for M3 and M4, but repository merge/closeout is not yet complete and Phase 5 is `NOT_STARTED`. Phase-4 evidence labels are not survivor classifications. Production remains `F-ST-01-FROZEN-2026` and unchanged; completed-2026 outcomes remain excluded.
+Phase 4 is `COMPLETE`. M3 and M4 have immutable accepted historical evidence, but their formal Phase-5 survivor classifications remain `NOT_APPLIED`. Production remains `F-ST-01-FROZEN-2026`; completed-2026 outcomes were not used in Phase 4. No prospective shadowing or production promotion is authorized until later phases complete their frozen gates.

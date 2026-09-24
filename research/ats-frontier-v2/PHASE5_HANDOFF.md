@@ -1,8 +1,24 @@
 # PHASE 5 HANDOFF
 
 **Program:** `LEVLINE_ATS_FRONTIER_V2`  
-**Phase 4 state:** `EVIDENCE_COMPLETE__PENDING_REPOSITORY_MERGE`  
+**Phase 4 state:** `COMPLETE`  
 **Phase 5:** `NOT_STARTED`
+
+## Repository entry receipt
+
+Phase 4 is closed by `FINAL_PHASE4_RECEIPT.md`.
+
+Primary Phase-4 PR: `#576`.
+
+Exact validated primary PR head: `93ed709d24d53d8469f6bc7eaaf49d2a38d7cea3`.
+
+Primary merge SHA: `e425220c1b929629f3a5420bc1915c74835b2a34`.
+
+Exact-head primary-PR gates all passed:
+
+- `LevLine research firewall` run `36030756862`.
+- `LevLine research validation` run `36030756719`.
+- `ATS Frontier V2 Phase 4 pre-result gate` run `36030756851`.
 
 ## Canonical Phase-4 evidence
 
@@ -81,11 +97,11 @@ The two corrected runs are not byte-identical. M3's pooled primary delta differs
 
 ## Exact Phase-5 first action
 
-After the Phase-4 primary and closeout PRs are merged and Phase 4 is formally marked `COMPLETE`, read the immutable canonical evidence/hashes and apply the frozen `EVALUATION_PROTOCOL.md` classifications independently to M3 and M4.
+Phase 4 is complete. When Phase 5 is explicitly begun, read `FINAL_PHASE4_RECEIPT.md`, this handoff, `PHASE4_RESULT_REGISTRY.json`, the immutable canonical OOF/metrics/ablation/calibration/bootstrap/red-team evidence, and the frozen `EVALUATION_PROTOCOL.md`.
 
 Before applying the calibration-relative eligibility clause, derive the corresponding null-side calibration intercept/slope from the already preserved candidate/null OOF probabilities if not already materialized. This is a reporting/synthesis calculation only: no refitting, recalibration, changed probabilities, new model, or target-dependent transformation is authorized.
 
-Then classify each historical candidate exactly one of:
+Then classify each historical candidate independently as exactly one of:
 
 - `REJECTED`
 - `INCONCLUSIVE`
