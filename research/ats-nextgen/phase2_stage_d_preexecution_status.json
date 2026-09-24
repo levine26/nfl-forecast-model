@@ -2,18 +2,20 @@
   "program": "LEVLINE_ATS_NEXTGEN",
   "phase": 2,
   "stage": "D_FINAL_EVIDENCE_SYNTHESIS_AND_UNCERTAINTY",
-  "status": "EXECUTION_AUTHORIZED_NO_RESULT_YET",
+  "status": "DIRECT_ACCEPTED_ARTIFACT_CORRECTION_FROZEN_AWAITING_EXACT_HEAD_CONTRACT",
   "stage_c_merge_base": "539081c59e62a5d4dbc0a8f849d8a332424ea06e",
   "stage_d_results_exist": false,
   "historical_synthesis_authorized": true,
   "historical_synthesis_workflow_job_present": true,
-  "authorization_source": {
-    "contract_head": "67fcd04688dea3d5ec9400d4590dd8c7da5dad23",
-    "contract_run_id": 35935482365,
-    "contract_job_id": 107431443312,
-    "contract_conclusion": "success"
+  "accepted_evidence_loading": "DIRECT_IMMUTABLE_GITHUB_ACTIONS_ARTIFACTS",
+  "superseded_regeneration_run": {
+    "run_id": 35936031216,
+    "contract_job_id": 107433187521,
+    "synthesis_job_id": 107433470129,
+    "stage_d_uncertainty_generated": false
   },
-  "required_execution_gate": "SAME_HEAD_CONTRACT_SUCCESS_AND_FROZEN_BLOB_VERIFICATION",
+  "authorization_source": null,
+  "required_execution_gate": "FRESH_SAME_HEAD_CONTRACT_SUCCESS_FROZEN_BLOB_VERIFICATION_AND_ACCEPTED_ARTIFACT_HASH_VERIFICATION",
   "production_changed": false,
   "completed_2026_outcomes_used": 0
 }
