@@ -20,7 +20,8 @@
     "ablations": ["MARKET_ONLY", "STATIC_FOOTBALL_STATE", "DYNAMIC_NO_QB", "DYNAMIC_FULL"],
     "measurement_channels": ["off_epa", "def_epa_allowed", "qb_epa_dropback", "success_rate", "def_success_allowed"],
     "measurement_composite_rule": "equal_weight_prior_standardized_primary_and_secondary_channels",
-    "static_pooling_rule": "expanding_prior_only_mean_by_entity",
+    "static_pooling_rule": "prior_only_fixed_ewma_half_life_8_games",
+    "static_ewma_half_life_games": 8.0,
     "residual_family": "Normal",
     "primary_metric": "paired_multinomial_cover_push_loss_log_loss"
   },
