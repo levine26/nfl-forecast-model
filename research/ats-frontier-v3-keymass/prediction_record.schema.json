@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FV3-PROS-KMASS-01 prospective prediction",
+  "type": "object",
+  "required": ["schema_version","candidate_id","null_id","game_id","kickoff_timestamp_utc","prediction_timestamp_utc","market_provider","market_horizon","market_target_timestamp_utc","market_request_timestamp_utc","market_quote_max_timestamp_utc","raw_home_spread_point","canonical_home_margin","candidate_pmf","null_pmf","candidate_cover_push_loss","null_cover_push_loss","raw_input_hash","model_code_hash","config_hash","prediction_hash"],
+  "properties": {
+    "candidate_id":{"const":"FV3-PROS-KMASS-01"},
+    "null_id":{"const":"FV3-NULL-STUDENTT-CONSTANT-01"},
+    "market_horizon":{"const":"T-120m"},
+    "prediction_hash":{"type":"string","pattern":"^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": true
+}

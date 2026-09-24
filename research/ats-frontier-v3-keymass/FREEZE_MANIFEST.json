@@ -1,0 +1,27 @@
+{
+  "candidate_id": "FV3-PROS-KMASS-01",
+  "scientific_freeze_timestamp_utc": "2026-09-24T19:04:04Z",
+  "opening_main_sha": "660d1bfc87001d9141ab030ed8f053a875bee3a2",
+  "scientific_design_origin_commit": "e7f597bc107f7c827d88c5012e9ca77490bd4ece",
+  "git_blob_sha1_at_design_origin": {
+    "v3_keymass.py": "9aff7f6729bebc3866f47a45787865a3d279b69a",
+    "fit_frozen_parameters.py": "91d1c14f80901f2678fc98bb5b656a19e671956d",
+    "v3_config.json": "5ff21acb56c18e8df37a980159d5a829faccd235",
+    "test_phase1.py": "550c0a023bfb019baa4428716ea7d582d21ae4ca"
+  },
+  "sha256_validated_by_phase1_ci": {
+    "v3_keymass.py": "53553d0b8014b6ba990a6e3157079f3cc70b9c960f4af78644af875dc9650e69",
+    "fit_frozen_parameters.py": "5de178e7578b776d3782322118722a067f5b46700ccd69b6a8c46a517620ea3c",
+    "v3_config.json": "1ba794458b402b59bd88f1bb35486759f4aa2e38e9340793544c648a4f1cadfb",
+    "test_phase1.py": "32dd59c8bf20c1654c173d486b6a66deadb9cb5ff86727ca658601a5670420d2"
+  },
+  "hash_policy": {
+    "phase1_ci_emits_sha256_for_frozen_code_config_and_tests": true,
+    "phase2_prediction_model_code_hash": "SHA256_OF_EXACT_COMMITTED_V3_KEYMASS_PY_BYTES",
+    "phase2_prediction_config_hash": "SHA256_OF_EXACT_COMMITTED_V3_CONFIG_JSON_BYTES",
+    "phase2_raw_input_hash": "SHA256_OF_CANONICAL_RAW_T120_INPUT_PAYLOAD",
+    "prediction_hash": "SHA256_OF_CANONICAL_JSON_RECORD_WITHOUT_PREDICTION_HASH"
+  },
+  "scientific_design_changes_after_freeze": "PROHIBITED",
+  "operational_bug_fixes": "ALLOWED_IF_DOCUMENTED_AND_NO_HYPOTHESIS_CHANGE"
+}
