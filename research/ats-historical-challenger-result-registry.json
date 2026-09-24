@@ -1,0 +1,120 @@
+{
+  "program": "LEVLINE_ATS_HISTORICAL_KEYMASS_CHALLENGER",
+  "state": "COMPLETE",
+  "executed_head_sha": "8dbe37008324c6d5d3a69116c897ee599b85e22a",
+  "workflow_run": 36065686319,
+  "workflow_conclusion": "success",
+  "artifact": {
+    "id": 10836511323,
+    "name": "ats-historical-keymass-36065686319",
+    "digest": "sha256:93b378de840de1ff8e6158f5c9df1da55a84ad3306ea1c695b1fb4537a5a9a59",
+    "output_hashes": {
+      "CENTER_ARCHIVE_RECEIPT.json": "114d70f3a1c42ecf1a66c7fe0db3257d1df996fde2dcdfb9edcbf852dd8949c8",
+      "OOF_PREDICTIONS_2022_2025.csv": "94568856d2fdaea26b0ba1e04931f1101f8080b285792775565c95841b936e26",
+      "RESULTS.json": "60554e8c8db69a318f9cce3cdebab977ff36b4458ea058a458621a6bce5f69db",
+      "TUNING_AND_BLEND_WEIGHTS.json": "280834288aedb6f51f5ebeab18a73ee7848eba7c9e19a6f4a642a58edba596ab"
+    }
+  },
+  "production_changed": false,
+  "production_authorized": false,
+  "completed_2026_outcomes_used": 0,
+  "outer_test_seasons": [2022, 2023, 2024, 2025],
+  "common_rows": {
+    "aggregate": 1087,
+    "2022": 271,
+    "2023": 272,
+    "2024": 272,
+    "2025": 272
+  },
+  "coverage_note": "All eligible archived F-ST rows joined to the historical game frame on the scored 2021-2025 center archive; no eligible target rows were dropped for missing required center/market/total values.",
+  "primary_metric": "exact_integer_margin_log_score",
+  "primary_scores": {
+    "KMASS-MARKET": 3.8529284697864035,
+    "KMASS-LEVLINE": 3.852007914481647,
+    "KMASS-BLEND": 3.8517646735798237
+  },
+  "paired_comparisons": {
+    "KMASS-LEVLINE_vs_KMASS-MARKET": {
+      "delta_candidate_minus_market": -0.0009205553047568027,
+      "bootstrap_95_ci": [-0.006094539833178175, 0.004308287264421793],
+      "bootstrap_probability_favorable": 0.637,
+      "favorable_outer_seasons": 2,
+      "outer_season_deltas": {
+        "2022": 0.008131274135188259,
+        "2023": 0.0035526594823506895,
+        "2024": -0.005467381120347094,
+        "2025": -0.009865494931513386
+      },
+      "passes_preregistered_gate": false
+    },
+    "KMASS-BLEND_vs_KMASS-MARKET": {
+      "delta_candidate_minus_market": -0.0011637962065803756,
+      "bootstrap_95_ci": [-0.0024836545264246275, 0.0001601218148759597],
+      "bootstrap_probability_favorable": 0.9576,
+      "favorable_outer_seasons": 2,
+      "outer_season_deltas": {
+        "2022": 0.0014263695104603136,
+        "2023": 0.00006003220503481664,
+        "2024": -0.0009450452100819606,
+        "2025": -0.0051870186636573164
+      },
+      "passes_preregistered_gate": false
+    },
+    "KMASS-BLEND_vs_KMASS-LEVLINE": {
+      "delta_candidate_minus_levline": -0.00024324090182357245,
+      "bootstrap_95_ci": [-0.004212959838608856, 0.0037085797395672404],
+      "bootstrap_probability_favorable": 0.5564,
+      "favorable_outer_seasons": 2
+    }
+  },
+  "blend_market_weights_selected_training_only": {
+    "2022": 0.7,
+    "2023": 0.8,
+    "2024": 0.9,
+    "2025": 0.7
+  },
+  "secondary_metrics": {
+    "KMASS-MARKET": {
+      "cover_push_loss_log_loss": 0.7696147398842025,
+      "multiclass_brier": 0.5236787382747605,
+      "center_mae": 9.494480220791168,
+      "center_rmse": 12.36028636127993,
+      "no_key_integer_log_score": 3.935646861629811,
+      "key_minus_no_key": -0.08271839184340689,
+      "ats_diagnostic": {"wins": 540, "losses": 518, "pushes": 29, "hit_rate_ex_push": 0.5103969754253308}
+    },
+    "KMASS-LEVLINE": {
+      "cover_push_loss_log_loss": 0.7703339182125649,
+      "multiclass_brier": 0.5244141023511777,
+      "center_mae": 9.590607552224295,
+      "center_rmse": 12.400586564991228,
+      "no_key_integer_log_score": 3.9388303925293955,
+      "key_minus_no_key": -0.08682247804774916,
+      "ats_diagnostic": {"wins": 535, "losses": 523, "pushes": 29, "hit_rate_ex_push": 0.505671077504726}
+    },
+    "KMASS-BLEND": {
+      "cover_push_loss_log_loss": 0.7691010837671696,
+      "multiclass_brier": 0.5231849537059505,
+      "center_mae": 9.506492945971761,
+      "center_rmse": 12.35455605668453,
+      "no_key_integer_log_score": 3.935216924869065,
+      "key_minus_no_key": -0.08345225128924193,
+      "ats_diagnostic": {"wins": 543, "losses": 515, "pushes": 29, "hit_rate_ex_push": 0.5132325141776938}
+    }
+  },
+  "validation": {
+    "market_score_reproduces_accepted_v2_constant_scale_key": true,
+    "accepted_v2_market_score": 3.852928469786404,
+    "key_mass_remains_material_for_all_centers": true,
+    "coverage_gate_passed": true,
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20260924
+  },
+  "decision": {
+    "selected_research_center": "KMASS-MARKET",
+    "disposition": "RETAIN_KMASS_MARKET",
+    "reason": "Both non-market centers have slightly favorable aggregate primary deltas, but both 95% paired week-block bootstrap intervals cross zero and each is favorable in only 2 of 4 outer seasons. The preregistered advancement gate therefore fails for both.",
+    "next_stage_authorized": false,
+    "production_authorized": false
+  }
+}
