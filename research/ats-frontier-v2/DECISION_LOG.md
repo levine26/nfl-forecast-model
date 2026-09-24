@@ -91,3 +91,7 @@
 ## D023 — Freeze chronology, uncertainty and prospective capture before results
 **Decision:** Historical outer development is 2022–2025 regular season with 2010+ prior history, nested chronological weekly updates, strong paired market nulls, 10,000+ week-block bootstrap, no post-hoc calibration rescue, and explicit pre-result leakage tests. Prospective market capture is frozen to increasingly dense cadence approaching kickoff with immutable raw hashes/timestamps and failed-capture logging.  
 **Reason:** These contracts prevent result-driven rescue and ensure future market-state research has the PIT data Phase 3 found missing.
+
+## D024 — Phase 3 closes with two historical candidates and no performance look
+**Decision:** Mark Phase 3 `COMPLETE` after exact-head validation/firewall success and merge of PR `#574`; keep Phase 4 `NOT_STARTED`.  
+**Reason:** The architecture, data, chronology, null, metric, ablation, selectivity, uncertainty, leakage and prospective-capture contracts were frozen before candidate fitting. Exact validated head `8ddad2d6cb40e4296a394b9192bd110f23ba9773` merged at `fd44e51c412f8d242b54de989e29b550f0e67255`. Phase 3 inspected no candidate performance and used zero completed-2026 outcomes.
