@@ -1,0 +1,90 @@
+{
+  "program": "LEVLINE_ATS_NEXTGEN",
+  "phase": 2,
+  "stage": "D_FINAL_EVIDENCE_SYNTHESIS_AND_UNCERTAINTY",
+  "status": "COMPLETE_ACCEPTED_FINAL_PHASE2_EVIDENCE",
+  "accepted_execution": {
+    "head_sha": "0030de3fcc3fd094f1ce28eb0ab1c20b748ca67a",
+    "tree_sha": "cf161bc7b47d8d138fd35dfe4889ccc215c91b5b",
+    "workflow_run_id": 35936805090,
+    "contract_job_id": 107435539890,
+    "synthesis_job_id": 107435848255,
+    "artifact_id": 10783239110,
+    "artifact_name": "ats-nextgen-stage-d-35936805090",
+    "artifact_digest": "sha256:4a3bd19a48528a2772e69232ad10b959b1f66e3885e44b56772f0b379abbcdd2"
+  },
+  "artifact_files_sha256": {
+    "phase2_stage_d_summary.json": "b6cb8e244d50e87d16c6da3356bcae6c0ee57bf63b9b809780e2e77cade144c2",
+    "phase2_stage_d_paired_uncertainty.csv": "c6680a25bc6acc17a6b552bd6c9593df166d17c5e2e750e1ebffa7d538ed6f1e",
+    "phase2_stage_d_season_deltas.csv": "28316ccf2e7009f0a9a9f1fe1a5e2f127a7f449dfb5cd04a15e506c7dd15f0bc",
+    "phase2_stage_d_hit_rate_intervals.csv": "885c4627c814286b76e6ba3e91c34bafd97b2079f4937448b385e7220df720b3"
+  },
+  "bootstrap": {
+    "block_columns": ["season", "week"],
+    "blocks": 72,
+    "samples": 10000,
+    "seed": 26,
+    "interval": "percentile_95pct"
+  },
+  "paired_uncertainty": {
+    "q1_minus_m2_mean_three_quantile_pinball": {
+      "rows": 1087,
+      "observed_delta": 0.0001307887665715768,
+      "ci_lower": -0.002378435765685505,
+      "ci_upper": 0.002555544033066125,
+      "probability_better": 0.4554
+    },
+    "q3_minus_q3_m2_multinomial_cpl_log_loss": {
+      "rows": 1087,
+      "observed_delta": 0.0013157418572419255,
+      "ci_lower": -0.0015590942193462521,
+      "ci_upper": 0.004336647782633088,
+      "probability_better": 0.1842
+    },
+    "q3_minus_q3_m2_nonpush_conditional_cover_brier": {
+      "rows": 1058,
+      "observed_delta": 0.0006716459171549338,
+      "ci_lower": -0.0007977772384239724,
+      "ci_upper": 0.002212922097716785,
+      "probability_better": 0.1851
+    }
+  },
+  "hit_rate_diagnostic": {
+    "q3_m2": {
+      "rows": 1058,
+      "wins": 559,
+      "hit_rate": 0.5283553875236295,
+      "ci_lower": 0.49775949333669123,
+      "ci_upper": 0.5587931509358325
+    },
+    "q3": {
+      "rows": 1058,
+      "wins": 552,
+      "hit_rate": 0.5217391304347826,
+      "ci_lower": 0.49114173609938455,
+      "ci_upper": 0.5522152927898765
+    },
+    "selection_or_rescue_authorized": false
+  },
+  "upstream_evidence": {
+    "q1_classification": "VALID_NEGATIVE_INCREMENTAL_RESULT",
+    "q1_oof_sha256": "d82825c1e5f63d8e183960a931f402d2a776920f1c5d3b042a34d9c4896fa365",
+    "q2_classification": "STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT",
+    "q2_valid_oof_available": false,
+    "q2_q3_blend_available": false,
+    "q3_classification": "NOT_INCREMENTAL_VS_Q3_M2",
+    "q3_oof_sha256": "18610dfcfa9ffe71ed30259f9fef85a5655cefa68301f46fa1bb1950593dee04"
+  },
+  "phase2_final_evidence_state": {
+    "q1": "VALID_NEGATIVE_INCREMENTAL_RESULT",
+    "q2": "STRUCTURALLY_INVALID_FROZEN_SUPPORT_CONTRACT",
+    "q3": "VALID_NEGATIVE_INCREMENTAL_RESULT_NOT_INCREMENTAL_VS_Q3_M2",
+    "q2_complementarity": "UNAVAILABLE",
+    "q2_q3_blend": "UNAVAILABLE"
+  },
+  "completed_2026_outcomes_used": 0,
+  "production_changed": false,
+  "new_candidate_fit_or_selection_performed": false,
+  "phase3_classification_performed": false,
+  "next_stage": "PHASE_3_SCIENTIFIC_SYNTHESIS_CANDIDATE_SELECTION_AND_FREEZE"
+}
