@@ -127,3 +127,7 @@
 ## D032 — No historical Frontier Phase-6 survivor
 **Decision:** Set historical Phase-6 authorization to `NONE`; do not start Phase 6 or Phase 7 for M3/M4. Preserve prospective M1/M2 identities separately.  
 **Reason:** Both historical Phase-5 candidates are `REJECTED`. `FV2-PROS-M1-MARKETSTATE-01` and `FV2-PROS-M2-QBDELTA-01` remain prospective-only research identities and are not historical survivors. Production remains `F-ST-01-FROZEN-2026`, and completed-2026 outcomes used remain `0`.
+
+## D033 — Close Phase 5 after exact-head validation and primary merge
+**Decision:** Mark Phase 5 `COMPLETE` after exact-head CI success and merge of primary PR `#578`; bind the closeout to validated head `53e8420fabf0ecd9b2b9753a65e9cd27c3e1e72c` and primary merge `f6c1b62690c069f6b3e3ef1d8bf721bddcdeef4b`. Keep historical Phase 6 `NOT_AUTHORIZED`.  
+**Reason:** Exact-head research validation `36040602757`, research firewall `36040603014`, and ATS Frontier safety gate `36040602883` all succeeded; the primary Phase-5 diff was restricted to `research/ats-frontier-v2/**`; both frozen historical candidates were formally rejected under the preregistered rules; no historical survivor exists; completed-2026 outcomes used remain `0`; and production remains `F-ST-01-FROZEN-2026` unchanged. The immutable final state is recorded in `FINAL_PHASE5_RECEIPT.md`.
