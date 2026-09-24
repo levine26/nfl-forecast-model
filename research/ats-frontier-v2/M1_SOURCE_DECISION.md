@@ -25,6 +25,25 @@ The most material gap is T-360 through latest-pre-kick, where dynamic price/path
 
 No purchase is authorized.
 
+## Current The Odds API semantics and cost check
+
+Checked against the provider's public documentation/pricing on 2026-09-24:
+
+- NFL featured-market historical snapshots are available from 2020-06-06;
+- snapshot cadence is documented as 10 minutes historically and 5 minutes from September 2022 onward;
+- the historical endpoint returns the closest available snapshot **equal to or earlier than** the requested `date`, matching the frozen at-or-before requirement;
+- one historical featured-market request costs `10 × regions × markets` usage credits;
+- the intended one-region request for `h2h,spreads,totals` therefore costs 30 credits per requested timestamp;
+- publicly listed monthly plans at this check were 20,000 credits / $30, 100,000 / $59, 5M / $119, and 15M / $249.
+
+The program does **not** assume a plan before generating a deduplicated request manifest. The 100K / $59 tier is the first listed tier that should be evaluated for a bounded multi-season qualification pull after timestamp deduplication, but this is neither a purchase authorization nor a guarantee that 100K credits are sufficient. Exact required credits must be computed as:
+
+`30 × number_of_unique_historical_snapshot_timestamps_requested`
+
+before any purchase decision.
+
+SportsDataIO remains second fallback; a concrete historical-odds sample and current commercial quote are required before treating its product/cost as comparable. No unsupported price is recorded here.
+
 ## Minimum bounded qualification pull
 
 If explicit user authorization is later granted, do not buy an open-ended dataset. First generate the unique requested timestamp set from the canonical NFL schedule and pull only:
