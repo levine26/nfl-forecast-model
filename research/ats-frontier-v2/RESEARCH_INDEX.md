@@ -54,6 +54,7 @@ This directory is the canonical record for `LEVLINE_ATS_FRONTIER_V2`.
 - `PHASE4_OPENING_RECEIPT.md`
 - `PHASE4_PRE_RESULT_IMPLEMENTATION_RECEIPT.md` — corrected, result-blind scientific surface and accepted-execution authorization.
 - `PHASE4_INVALID_RUNS.md` — superseded/unaccepted execution history and correction provenance.
+- `PHASE5_HANDOFF.md` — top-level Phase-5 entry boundary derived from the immutable accepted Phase-4 package; Phase 5 remains not started.
 - `FINAL_PHASE4_RECEIPT.md` — created only after the primary Phase-4 research merge and post-merge closeout verification.
 
 ## Phase-4 implementation and accepted evidence
