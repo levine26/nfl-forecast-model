@@ -11,104 +11,104 @@
     "wins": 540
   },
   "bootstrap": {
-    "ci_2_5": -0.10748699203380639,
-    "ci_97_5": -0.057962887776498655,
+    "ci_2_5": -0.10748698706212485,
+    "ci_97_5": -0.05796293485132338,
     "n": 1087,
-    "point_delta": -0.08267169179619614,
+    "point_delta": -0.08267169914295289,
     "probability_favorable": 1.0,
     "resamples": 10000,
     "seed": 20260924,
     "weeks": 72
   },
   "calibration": {
-    "intercept": 0.014770139195534758,
+    "intercept": 0.01477013532177962,
     "n": 1058,
     "reliability": [
       {
         "bin": "(0.436, 0.447]",
-        "mean_pred": 0.4408693546427468,
+        "mean_pred": 0.4408694403493524,
         "n": 106,
         "observed": 0.46226415094339623
       },
       {
         "bin": "(0.447, 0.46]",
-        "mean_pred": 0.45410834600747996,
+        "mean_pred": 0.45410837855290026,
         "n": 106,
         "observed": 0.5660377358490566
       },
       {
         "bin": "(0.46, 0.463]",
-        "mean_pred": 0.4613963940456386,
+        "mean_pred": 0.461396478883966,
         "n": 106,
         "observed": 0.5
       },
       {
         "bin": "(0.463, 0.485]",
-        "mean_pred": 0.4658672324271318,
+        "mean_pred": 0.4658673127327121,
         "n": 105,
         "observed": 0.49523809523809526
       },
       {
         "bin": "(0.485, 0.487]",
-        "mean_pred": 0.48584638919836337,
+        "mean_pred": 0.485846402486949,
         "n": 106,
         "observed": 0.49056603773584906
       },
       {
         "bin": "(0.487, 0.512]",
-        "mean_pred": 0.4886255492708874,
+        "mean_pred": 0.4886255716531338,
         "n": 106,
         "observed": 0.4339622641509434
       },
       {
         "bin": "(0.512, 0.514]",
-        "mean_pred": 0.5130076814898155,
+        "mean_pred": 0.5130076597657904,
         "n": 105,
         "observed": 0.44761904761904764
       },
       {
         "bin": "(0.514, 0.534]",
-        "mean_pred": 0.5169435758998319,
+        "mean_pred": 0.5169435641657071,
         "n": 106,
         "observed": 0.5188679245283019
       },
       {
         "bin": "(0.534, 0.539]",
-        "mean_pred": 0.5373965585616917,
+        "mean_pred": 0.537396483100503,
         "n": 106,
         "observed": 0.4811320754716981
       },
       {
         "bin": "(0.539, 0.563]",
-        "mean_pred": 0.5515508928520795,
+        "mean_pred": 0.5515508252687352,
         "n": 106,
         "observed": 0.6037735849056604
       }
     ],
-    "slope": 0.43665842195187754
+    "slope": 0.4366590498000353
   },
-  "candidate_brier": 0.5237051055644828,
-  "candidate_cpl_log_loss": 0.769553075493831,
+  "candidate_brier": 0.5237051029160374,
+  "candidate_cpl_log_loss": 0.7695530781979453,
   "candidate_id": "FV2-HIST-M4-DMARGIN-01",
-  "candidate_integer_log_score": 3.85297516860494,
+  "candidate_integer_log_score": 3.852975162486858,
   "common_rows_candidate": 1087,
   "common_rows_intersection": 1087,
   "common_rows_null": 1087,
-  "conditional_scale_contribution_vs_null": 0.0001250552561666556,
-  "conditional_scale_no_key_integer_log_score": 3.9357719156573028,
-  "constant_scale_key_integer_log_score": 3.8529284854183716,
+  "conditional_scale_contribution_vs_null": 0.00012506107970626913,
+  "conditional_scale_no_key_integer_log_score": 3.935771922709517,
+  "constant_scale_key_integer_log_score": 3.8529284697864044,
   "dropped_for_missing_spread_or_total": 0,
-  "full_minus_conditional_no_key": -0.0827967470523628,
-  "full_minus_constant_key": 4.66831865686729e-05,
-  "key_mass_contribution_vs_null": -0.08271837498276481,
+  "full_minus_conditional_no_key": -0.08279676022265915,
+  "full_minus_constant_key": 4.669270045401389e-05,
+  "key_mass_contribution_vs_null": -0.08271839184340689,
   "margin_mae": 9.494480220791168,
   "margin_rmse": 12.36028636127993,
-  "null_cpl_log_loss": 0.7796790214277723,
+  "null_cpl_log_loss": 0.7796790213523288,
   "null_id": "M4-NULL-STUDENTT-CONSTANT-01",
-  "null_integer_log_score": 3.9356468604011363,
+  "null_integer_log_score": 3.935646861629811,
   "oof_n": 1087,
-  "paired_delta_candidate_minus_null": -0.08267169179619614,
-  "ranked_probability_score": 6.9151236594419325,
+  "paired_delta_candidate_minus_null": -0.08267169914295289,
+  "ranked_probability_score": 6.9151235686363295,
   "selected_by_outer_season_variant": {
     "2022:CONDITIONAL_SCALE_NO_KEY": {
       "conditional": true,
@@ -120,27 +120,27 @@
       "lambda_key": 10.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 4.004035120234206,
+      "objective": 4.004035120233725,
       "scale_params": [
-        2.556640604837394,
-        0.057532510024996535,
-        -0.009318271447859449
+        2.55664055487246,
+        0.05753219993634859,
+        -0.009318078376708252
       ],
       "use_key": false
     },
     "2022:CONSTANT_SCALE_KEY": {
       "conditional": false,
       "key_params": [
-        -1.672237771021102,
-        1.1588614014005587,
-        0.7683824069361799
+        -1.6722410911370384,
+        1.1588614287333496,
+        0.7683826196276713
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.9140223035092725,
+      "objective": 3.9140223035092263,
       "scale_params": [
-        2.6028013289202665
+        2.6028013480512615
       ],
       "use_key": true
     },
@@ -163,18 +163,18 @@
     "2022:FULL_CONDITIONAL_SCALE_KEY": {
       "conditional": true,
       "key_params": [
-        -1.665349911850047,
-        1.1661220326377537,
-        0.7729754735428618
+        -1.6653680655502963,
+        1.1661200813973478,
+        0.7729747611873284
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.9135636319993057,
+      "objective": 3.913563631998763,
       "scale_params": [
-        2.63738824654015,
-        0.058731665038335906,
-        -0.04552441068296037
+        2.637388989988136,
+        0.05873278843516139,
+        -0.04552542069297655
       ],
       "use_key": true
     },
@@ -188,27 +188,27 @@
       "lambda_key": 10.0,
       "lambda_scale": 10.0,
       "nu": 10,
-      "objective": 3.99219787182101,
+      "objective": 3.9921978718203386,
       "scale_params": [
-        2.4724291048199865,
-        0.0863693865395342,
-        0.0005142003413758884
+        2.472429208590152,
+        0.08636775992350755,
+        0.0005141205624113914
       ],
       "use_key": false
     },
     "2023:CONSTANT_SCALE_KEY": {
       "conditional": false,
       "key_params": [
-        -1.6324456419306843,
-        1.1612263609550764,
-        0.7430735824035828
+        -1.6324405727548965,
+        1.1612255425023463,
+        0.7430744073834465
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.903813189959974,
+      "objective": 3.903813189963778,
       "scale_params": [
-        2.5913350483204765
+        2.5913351636704527
       ],
       "use_key": true
     },
@@ -231,18 +231,18 @@
     "2023:FULL_CONDITIONAL_SCALE_KEY": {
       "conditional": true,
       "key_params": [
-        -1.6259112660516548,
-        1.1679970626689968,
-        0.7473117196410665
+        -1.6259042834682562,
+        1.1679964678249282,
+        0.7473113728426607
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.903399226756478,
+      "objective": 3.903399226755979,
       "scale_params": [
-        2.6232555327234146,
-        0.07209445697833892,
-        -0.042020007271383934
+        2.623255363373176,
+        0.07209630700278999,
+        -0.04201969265430008
       ],
       "use_key": true
     },
@@ -256,27 +256,27 @@
       "lambda_key": 10.0,
       "lambda_scale": 10.0,
       "nu": 10,
-      "objective": 3.9916587891305215,
+      "objective": 3.9916587891319724,
       "scale_params": [
-        2.4733239155681557,
-        0.07489104951814259,
-        -0.0011308001384682685
+        2.4733240863434514,
+        0.07489473237313275,
+        -0.0011309687320353026
       ],
       "use_key": false
     },
     "2024:CONSTANT_SCALE_KEY": {
       "conditional": false,
       "key_params": [
-        -1.7045026930960672,
-        1.1547440825081658,
-        0.7343427246508304
+        -1.7045198972636086,
+        1.1547435036886222,
+        0.7343426993152169
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.9038441795665686,
+      "objective": 3.903844179567515,
       "scale_params": [
-        2.5901647559227894
+        2.5901647017558354
       ],
       "use_key": true
     },
@@ -290,7 +290,7 @@
       "lambda_key": 10.0,
       "lambda_scale": 10.0,
       "nu": 10,
-      "objective": 3.991715149835597,
+      "objective": 3.9917151498355974,
       "scale_params": [
         2.4722156366232033
       ],
@@ -299,18 +299,18 @@
     "2024:FULL_CONDITIONAL_SCALE_KEY": {
       "conditional": true,
       "key_params": [
-        -1.6976678222630883,
-        1.1619646866152948,
-        0.738841973900921
+        -1.6976595131823198,
+        1.1619623071896812,
+        0.7388406863478362
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.9034008389698,
+      "objective": 3.9034008389515806,
       "scale_params": [
-        2.624223846003126,
-        0.06420925747834677,
-        -0.04470465066134597
+        2.6242228136721217,
+        0.0641964736914005,
+        -0.04470355634177658
       ],
       "use_key": true
     },
@@ -324,27 +324,27 @@
       "lambda_key": 10.0,
       "lambda_scale": 10.0,
       "nu": 10,
-      "objective": 3.988991086019889,
+      "objective": 3.9889910860192286,
       "scale_params": [
-        2.4662313085314396,
-        0.05482236944813455,
-        0.004758932406603117
+        2.466231206202045,
+        0.054821276356913425,
+        0.004758841198067074
       ],
       "use_key": false
     },
     "2025:CONSTANT_SCALE_KEY": {
       "conditional": false,
       "key_params": [
-        -1.7748518950779553,
-        1.1434457798313784,
-        0.7174690550073133
+        -1.7748847888481707,
+        1.1434447987442702,
+        0.7174677830260342
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.9024324506694663,
+      "objective": 3.902432450673408,
       "scale_params": [
-        2.586357377759967
+        2.586357066535726
       ],
       "use_key": true
     },
@@ -360,25 +360,25 @@
       "nu": 10,
       "objective": 3.989025824572064,
       "scale_params": [
-        2.4695505165913
+        2.469550582427297
       ],
       "use_key": false
     },
     "2025:FULL_CONDITIONAL_SCALE_KEY": {
       "conditional": true,
       "key_params": [
-        -1.7688488785416705,
-        1.1495898716702428,
-        0.7213032006479742
+        -1.7688437203871208,
+        1.1495899464822001,
+        0.7213049973655774
       ],
       "lambda_key": 1.0,
       "lambda_scale": 10.0,
       "nu": 30,
-      "objective": 3.902107924209941,
+      "objective": 3.9021079242060734,
       "scale_params": [
-        2.6156838387085535,
-        0.05448997500879361,
-        -0.038507331258807495
+        2.615683045774939,
+        0.05449011797580647,
+        -0.03850699966984993
       ],
       "use_key": true
     }
@@ -390,8 +390,8 @@
     "max_abs_observed_margin": 50.0,
     "nonfinite_observed_mass_count": 0,
     "nonpositive_observed_mass_count": 0,
-    "observed_margin_mass_median": 0.02306624327554578,
-    "observed_margin_mass_min": 0.00021437354104561918,
-    "observed_margin_mass_p01": 0.0013662720772827323
+    "observed_margin_mass_median": 0.023066241663030715,
+    "observed_margin_mass_min": 0.00021437387438126207,
+    "observed_margin_mass_p01": 0.0013662755369972571
   }
 }

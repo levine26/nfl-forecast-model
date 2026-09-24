@@ -11,17 +11,17 @@
     "wins": 518
   },
   "bootstrap": {
-    "ci_2_5": -0.00031937461835433695,
-    "ci_97_5": 0.001655686764502027,
+    "ci_2_5": -0.00031937461835433245,
+    "ci_97_5": 0.0016556867645020252,
     "n": 1087,
-    "point_delta": 0.0006706323752636537,
+    "point_delta": 0.0006706323752636532,
     "probability_favorable": 0.0889,
     "resamples": 10000,
     "seed": 20260924,
     "weeks": 72
   },
   "calibration": {
-    "intercept": -0.0008002656550696445,
+    "intercept": -0.0008002656550699535,
     "n": 1058,
     "reliability": [
       {
@@ -85,7 +85,7 @@
         "observed": 0.5471698113207547
       }
     ],
-    "slope": -1.4064471514780372
+    "slope": -1.4064471514780361
   },
   "candidate_brier": 0.5255261738778846,
   "candidate_crps": 6.92182144264477,
@@ -109,7 +109,7 @@
     "2024": {
       "alpha": 100.0,
       "lambda": 0.75,
-      "mean_primary_score": 0.8042535179373367,
+      "mean_primary_score": 0.8042535179373368,
       "q_qb": 0.5,
       "q_team": 0.04
     },
@@ -125,8 +125,8 @@
   "common_rows_intersection": 1087,
   "common_rows_null": 1087,
   "dropped_for_missing_spread": 0,
-  "dynamic_full_minus_no_qb": 0.0002656684749809789,
-  "dynamic_full_minus_static": -0.0002526140634010399,
+  "dynamic_full_minus_no_qb": 0.0002656684749809774,
+  "dynamic_full_minus_static": -0.00025261406340103823,
   "dynamic_no_qb_primary_log_loss": 0.7808845344047226,
   "margin_mae": 9.5093461058206,
   "margin_rmse": 12.366121882572106,
@@ -134,7 +134,7 @@
   "null_id": "M3-NULL-MARKET-NORMAL-01",
   "null_primary_log_loss": 0.7804795705044401,
   "oof_n": 1087,
-  "paired_delta_candidate_minus_null": 0.0006706323752636537,
+  "paired_delta_candidate_minus_null": 0.0006706323752636532,
   "static_pooling_rule": "prior_only_fixed_ewma_half_life_8_games",
   "static_primary_log_loss": 0.7814028169431046
 }
