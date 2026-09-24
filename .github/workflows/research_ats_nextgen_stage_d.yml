@@ -129,9 +129,21 @@ jobs:
           test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_hit_rate_intervals.csv
           test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_season_deltas.csv
           test -s research_outputs/ats_nextgen/stage_d/phase2_stage_d_summary.json
+      - name: Upload failed regeneration diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-nextgen-stage-d-regeneration-diagnostic-${{ github.run_id }}
+          path: |
+            research_outputs/ats_nextgen/q1/
+            research_outputs/ats_nextgen/q3/
+          retention-days: 7
+          if-no-files-found: warn
       - name: Prove synthesis did not modify production surfaces
+        if: success()
         run: git diff --exit-code -- $PROTECTED_SURFACES
       - name: Upload immutable Stage-D evidence
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ats-nextgen-stage-d-${{ github.run_id }}
