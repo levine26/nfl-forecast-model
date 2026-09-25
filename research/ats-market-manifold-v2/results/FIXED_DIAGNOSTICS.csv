@@ -1,0 +1,27 @@
+dimension,bucket,candidate,null,n,mean_delta_cpl,mean_abs_r_ml
+spread_bucket,3.5-6.5,mm_shapetilt,marketml_iproj,260,0.0010494411716745606,0.16687675291964782
+spread_bucket,<=2,mm_shapetilt,marketml_iproj,142,8.6690397860373348e-05,0.059095047135597101
+spread_bucket,2-3.5,mm_shapetilt,marketml_iproj,409,0.00032836847003279995,0.073845084382896109
+spread_bucket,6.5-7.5,mm_shapetilt,marketml_iproj,103,0.0035049764777694663,0.28650192155520676
+spread_bucket,>7.5,mm_shapetilt,marketml_iproj,173,0.0043731052606155955,0.28325561382244441
+key_bucket,other,mm_shapetilt,marketml_iproj,876,0.0014193283673778409,0.15631200156764893
+key_bucket,abs_spread_7,mm_shapetilt,marketml_iproj,50,0.0016330371439554358,0.27231405389014202
+key_bucket,abs_spread_3,mm_shapetilt,marketml_iproj,161,0.001317041774229605,0.061801211233971087
+r_ml_bucket,"[0.1, 0.2)",mm_shapetilt,marketml_iproj,340,0.0029072815907065807,0.14554447679873861
+r_ml_bucket,"[0.0, 0.025)",mm_shapetilt,marketml_iproj,130,5.148458272741924e-05,0.012401035636025702
+r_ml_bucket,"[0.05, 0.1)",mm_shapetilt,marketml_iproj,202,0.0012208185984547662,0.074148372713642288
+r_ml_bucket,"[0.025, 0.05)",mm_shapetilt,marketml_iproj,107,-0.00018797693699953546,0.04076392134712311
+r_ml_bucket,"[0.2, 10.0)",mm_shapetilt,marketml_iproj,308,0.0010239177644415993,0.29239624499962508
+spread_bucket,3.5-6.5,mm_shapetilt_meanfix,marketml_iproj,260,0.00069981457783893728,0.16687675291964782
+spread_bucket,<=2,mm_shapetilt_meanfix,marketml_iproj,142,7.1593783449414573e-05,0.059095047135597101
+spread_bucket,2-3.5,mm_shapetilt_meanfix,marketml_iproj,409,0.00022608228606641495,0.073845084382896109
+spread_bucket,6.5-7.5,mm_shapetilt_meanfix,marketml_iproj,103,0.0018120277256402338,0.28650192155520676
+spread_bucket,>7.5,mm_shapetilt_meanfix,marketml_iproj,173,0.0007466076433515419,0.28325561382244441
+key_bucket,other,mm_shapetilt_meanfix,marketml_iproj,876,0.00045298475800738757,0.15631200156764893
+key_bucket,abs_spread_7,mm_shapetilt_meanfix,marketml_iproj,50,0.00100676917039082,0.27231405389014202
+key_bucket,abs_spread_3,mm_shapetilt_meanfix,marketml_iproj,161,0.00095176791301771792,0.061801211233971087
+r_ml_bucket,"[0.1, 0.2)",mm_shapetilt_meanfix,marketml_iproj,340,0.0014170032440303075,0.14554447679873861
+r_ml_bucket,"[0.0, 0.025)",mm_shapetilt_meanfix,marketml_iproj,130,3.5455482050295031e-05,0.012401035636025702
+r_ml_bucket,"[0.05, 0.1)",mm_shapetilt_meanfix,marketml_iproj,202,0.0006721216343221313,0.074148372713642288
+r_ml_bucket,"[0.025, 0.05)",mm_shapetilt_meanfix,marketml_iproj,107,-0.00013928538190500803,0.04076392134712311
+r_ml_bucket,"[0.2, 10.0)",mm_shapetilt_meanfix,marketml_iproj,308,-2.2297433039650803e-05,0.29239624499962508

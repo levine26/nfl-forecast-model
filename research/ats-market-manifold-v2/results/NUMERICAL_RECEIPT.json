@@ -1,0 +1,173 @@
+{
+  "folds": [
+    {
+      "max_mean_constraint_error": 2.119193709404499e-12,
+      "max_support_bound": 256,
+      "max_tail_mass": 3.355830139473535e-16,
+      "season": 2022
+    },
+    {
+      "max_mean_constraint_error": 7.105427357601002e-15,
+      "max_support_bound": 256,
+      "max_tail_mass": 2.2479819266755865e-16,
+      "season": 2023
+    },
+    {
+      "max_mean_constraint_error": 5.329070518200751e-15,
+      "max_support_bound": 256,
+      "max_tail_mass": 2.2392775565014325e-16,
+      "season": 2024
+    },
+    {
+      "max_mean_constraint_error": 5.329070518200751e-15,
+      "max_support_bound": 256,
+      "max_tail_mass": 2.2528409475685733e-16,
+      "season": 2025
+    }
+  ],
+  "preflight": {
+    "checks": {
+      "FST_field_mutation_prediction_invariant": true,
+      "N1_mean_preserved_by_meanfix": true,
+      "adaptive_tail_below_tolerance": true,
+      "canonical_common_rows_match": true,
+      "canonical_game_identity_match": true,
+      "completed_2026_outcomes_zero": true,
+      "half_line_push_zero": true,
+      "pre2021_nuisance_strictly_prior": true,
+      "primary_candidate_signature_has_no_FST_input": true,
+      "sign_mass_preserved": true,
+      "target_outcome_mutation_prediction_invariant": true,
+      "theta0_reproduces_N1": true,
+      "whole_line_push_positive": true,
+      "zero_mass_preserved": true
+    },
+    "completed_2026_outcomes_used": 0,
+    "coverage": {
+      "accepted_582_common_rows_match": true,
+      "coverage_by_season": {
+        "2021": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        },
+        "2022": {
+          "common_rows": 271,
+          "frozen_fst_rows": 271,
+          "historical_game_rows": 271,
+          "joined_rows": 271
+        },
+        "2023": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        },
+        "2024": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        },
+        "2025": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        }
+      },
+      "probability_only": true
+    },
+    "historical_game_identity": {
+      "accepted_582_identity_match": true,
+      "completed_2026_rows": 0,
+      "completed_rows": 3663,
+      "first_season": 2012,
+      "game_ids_sha256": "26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156",
+      "historical_rows": 3663,
+      "last_season": 2025,
+      "requested_seasons": [
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "schedule_only": true
+    },
+    "max_errors": {
+      "mean_constraint": 1.1382006448457105e-12,
+      "sign_mass": 2.220446049250313e-16,
+      "tail_mass": 3.355830139473535e-16,
+      "theta0": 0.0,
+      "zero_mass": 0.0
+    },
+    "pre2021_nuisance": {
+      "fit": {
+        "conditional": false,
+        "key_params": [
+          -1.5028301519594889,
+          1.119582910093149,
+          0.7718357228501882
+        ],
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "objective": 3.90635488467704,
+        "scale_params": [
+          2.588418772977001
+        ],
+        "use_key": true
+      },
+      "historical_identity": {
+        "accepted_582_identity_match": true,
+        "completed_2026_rows": 0,
+        "completed_rows": 3663,
+        "first_season": 2012,
+        "game_ids_sha256": "26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156",
+        "historical_rows": 3663,
+        "last_season": 2025,
+        "requested_seasons": [
+          2012,
+          2013,
+          2014,
+          2015,
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023,
+          2024,
+          2025
+        ],
+        "schedule_only": true
+      },
+      "hyperparameters_inherited_from_accepted_constant_scale_key": {
+        "conditional": false,
+        "lambda_key": 1.0,
+        "lambda_scale": 10.0,
+        "nu": 30,
+        "use_key": true
+      },
+      "training_first_season": 2012,
+      "training_last_season": 2020,
+      "training_n": 2304,
+      "validation_season": 2021
+    },
+    "production_changed": false,
+    "status": "PASS"
+  }
+}

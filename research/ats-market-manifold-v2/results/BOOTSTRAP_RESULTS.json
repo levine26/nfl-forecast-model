@@ -1,0 +1,96 @@
+{
+  "bootstrap": {
+    "ATS-MM-SHAPETILT-MEANFIX-V1": {
+      "ci_2_5": -0.0001612205473584841,
+      "ci_97_5": 0.001241627592749454,
+      "n": 1087,
+      "point_delta": 0.0005523346279023598,
+      "probability_favorable": 0.0646,
+      "resamples": 10000,
+      "seed": 20260924,
+      "weeks": 72
+    },
+    "ATS-MM-SHAPETILT-V1": {
+      "ci_2_5": 6.252520030510687e-05,
+      "ci_97_5": 0.002706972613674111,
+      "n": 1087,
+      "point_delta": 0.0014140084937182401,
+      "probability_favorable": 0.0193,
+      "resamples": 10000,
+      "seed": 20260924,
+      "weeks": 72
+    }
+  },
+  "holm": {
+    "ATS-MM-SHAPETILT-MEANFIX-V1": {
+      "holm_adjusted_p": 1.0,
+      "raw_one_sided_bootstrap_p": 0.9354
+    },
+    "ATS-MM-SHAPETILT-V1": {
+      "holm_adjusted_p": 1.0,
+      "raw_one_sided_bootstrap_p": 0.9807
+    }
+  },
+  "robustness": {
+    "ATS-MM-SHAPETILT-MEANFIX-V1": {
+      "leave_one_season_out": [
+        {
+          "delta": 0.0,
+          "left_out_season": 2022,
+          "n": 816
+        },
+        {
+          "delta": 0.0007366720742697731,
+          "left_out_season": 2023,
+          "n": 815
+        },
+        {
+          "delta": 0.0007366720742697731,
+          "left_out_season": 2024,
+          "n": 815
+        },
+        {
+          "delta": 0.0007366720742697731,
+          "left_out_season": 2025,
+          "n": 815
+        }
+      ],
+      "leave_one_week_out": {
+        "full_delta": 0.0005523346279023598,
+        "max_loo_delta": 0.000661396920295737,
+        "min_loo_delta": 0.00039111639994759745,
+        "sign_flips": 0
+      }
+    },
+    "ATS-MM-SHAPETILT-V1": {
+      "leave_one_season_out": [
+        {
+          "delta": 0.0,
+          "left_out_season": 2022,
+          "n": 816
+        },
+        {
+          "delta": 0.0018859229848732847,
+          "left_out_season": 2023,
+          "n": 815
+        },
+        {
+          "delta": 0.0018859229848732847,
+          "left_out_season": 2024,
+          "n": 815
+        },
+        {
+          "delta": 0.0018859229848732847,
+          "left_out_season": 2025,
+          "n": 815
+        }
+      ],
+      "leave_one_week_out": {
+        "full_delta": 0.0014140084937182401,
+        "max_loo_delta": 0.0016228887247989893,
+        "min_loo_delta": 0.0011051644511529258,
+        "sign_flips": 0
+      }
+    }
+  }
+}
