@@ -6,8 +6,9 @@ from statistics import NormalDist
 from typing import Any, Iterable, Mapping
 from zoneinfo import ZoneInfo
 
-PUBLIC_CONTRACT_VERSION = "1.0"
+PUBLIC_CONTRACT_VERSION = "1.1"
 _MIN_PROBABILITY = 1e-6
+_ATS_EDGE_EPSILON = 1e-12
 
 
 class PublicForecastError(RuntimeError):
@@ -70,11 +71,11 @@ def fair_moneyline(probability: float) -> int:
 
 
 def probability_implied_margin(home_probability: float, margin_sigma: float) -> float:
-    """Map the official probability to a coherent home margin for public presentation.
+    """Map the official win probability to a coherent presentation margin.
 
-    This is a deterministic presentation bridge, not a replacement fit for the independent
-    margin model. Under a Normal(margin, sigma) approximation,
-    P(home margin > 0) = home_probability.
+    This remains a deterministic winner-probability presentation bridge. It is not the
+    ATS model line. ATS value is derived separately from the independent expected-margin
+    forecast versus the quoted market margin.
     """
     probability = min(1.0 - _MIN_PROBABILITY, max(_MIN_PROBABILITY, float(home_probability)))
     sigma = float(margin_sigma)
@@ -88,8 +89,6 @@ def _integer_score_pair(total: float, margin: float, home_probability: float) ->
     raw_away = (total - margin) / 2.0
     home = max(0, int(round(raw_home)))
     away = max(0, int(round(raw_away)))
-
-    # Whole-number display scores must not round a non-pick'em official forecast into a tie.
     if home_probability > 0.5 and home <= away:
         home = away + 1
     elif home_probability < 0.5 and away <= home:
@@ -108,6 +107,55 @@ def _winner_for_probability(row: Mapping[str, Any], home_probability: float) -> 
     if home_probability == 0.5:
         return "PICKEM"
     return home if home_probability > 0.5 else away
+
+
+def _ats_value_signal(
+    row: Mapping[str, Any],
+    *,
+    model_margin_home: float | None,
+    market_margin_home: float | None,
+) -> dict[str, Any]:
+    """Return the ATS side from fair model margin versus market margin.
+
+    Repository ``spread_line`` is expected home margin: +6 means home -6 in sportsbook
+    notation. Therefore home ATS value is ``model_margin_home - market_margin_home``.
+    This decision is intentionally independent of the official moneyline winner.
+    """
+    home = _text(row.get("home_team"))
+    away = _text(row.get("away_team"))
+    if not home or not away:
+        raise PublicForecastError("home_team and away_team are required")
+    if model_margin_home is None or market_margin_home is None:
+        return {
+            "status": "UNAVAILABLE",
+            "pick_team": None,
+            "pick_market_spread": None,
+            "home_edge_points": None,
+            "edge_points": None,
+        }
+
+    home_edge = float(model_margin_home) - float(market_margin_home)
+    if math.isclose(home_edge, 0.0, abs_tol=_ATS_EDGE_EPSILON):
+        return {
+            "status": "NO_EDGE",
+            "pick_team": None,
+            "pick_market_spread": None,
+            "home_edge_points": 0.0,
+            "edge_points": 0.0,
+        }
+
+    pick_home = home_edge > 0.0
+    pick_team = home if pick_home else away
+    # Convert canonical expected-home-margin representation to the picked team's
+    # sportsbook spread notation. Example: market_margin_home=+6 => home -6 / away +6.
+    pick_market_spread = -float(market_margin_home) if pick_home else float(market_margin_home)
+    return {
+        "status": "VALUE",
+        "pick_team": pick_team,
+        "pick_market_spread": pick_market_spread,
+        "home_edge_points": home_edge,
+        "edge_points": abs(home_edge),
+    }
 
 
 def _lifecycle(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> str:
@@ -176,11 +224,18 @@ def _public_row(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> d
 
     independent_margin = _number(row.get("expected_margin"))
     independent_total = _number(row.get("expected_total"))
+    market_margin_home = _number(row.get("spread_line"))
     independent_home_score = None
     independent_away_score = None
     if independent_margin is not None and independent_total is not None:
         independent_home_score = (independent_total + independent_margin) / 2.0
         independent_away_score = (independent_total - independent_margin) / 2.0
+
+    ats = _ats_value_signal(
+        row,
+        model_margin_home=independent_margin,
+        market_margin_home=market_margin_home,
+    )
 
     forecast = {
         "contract_version": PUBLIC_CONTRACT_VERSION,
@@ -204,9 +259,23 @@ def _public_row(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> d
         "projected_away_score_raw": projected_away_raw,
         "projected_home_score": projected_home,
         "projected_away_score": projected_away,
-        "market_margin_home": _number(row.get("spread_line")),
+        "market_margin_home": market_margin_home,
         "market_total": _number(row.get("total_line")),
         "levline_vs_market_winner_probability_pp": probability_difference_pp,
+        # First-class ATS contract. These fields may legitimately disagree with
+        # official_winner because a team can be more likely to win while its opponent
+        # offers the better price/number against the spread.
+        "ats_model_margin_home": independent_margin,
+        "ats_model_spread_home": None if independent_margin is None else -independent_margin,
+        "ats_market_margin_home": market_margin_home,
+        "ats_home_edge_points": ats["home_edge_points"],
+        "ats_edge_points": ats["edge_points"],
+        "ats_pick_team": ats["pick_team"],
+        "ats_pick_market_spread": ats["pick_market_spread"],
+        "ats_status": ats["status"],
+        "ats_pick_agrees_with_winner": (
+            None if ats["pick_team"] is None or winner == "PICKEM" else ats["pick_team"] == winner
+        ),
         "forecast_timestamp_utc": _iso(row.get("prediction_timestamp_utc")),
         "market_timestamp_utc": _iso(row.get("market_snapshot_timestamp_utc")),
         "lock_timestamp_utc": _iso(row.get("lock_timestamp_utc")),
@@ -221,6 +290,7 @@ def _public_row(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> d
             },
             "market": {
                 "home_win_probability": market_home_probability,
+                "margin_home": market_margin_home,
                 "timestamp_utc": _iso(row.get("market_snapshot_timestamp_utc")),
                 "source": _text(row.get("market_snapshot_source")),
             },
@@ -228,6 +298,15 @@ def _public_row(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> d
                 "home_win_probability": home_probability,
                 "winner": winner,
                 "winner_probability": winner_probability,
+            },
+            "ats": {
+                "model_margin_home": independent_margin,
+                "market_margin_home": market_margin_home,
+                "home_edge_points": ats["home_edge_points"],
+                "edge_points": ats["edge_points"],
+                "pick_team": ats["pick_team"],
+                "pick_market_spread": ats["pick_market_spread"],
+                "status": ats["status"],
             },
         },
         "diagnostics": {
@@ -267,22 +346,57 @@ def validate_public_forecast(forecast: Mapping[str, Any]) -> None:
     if winner != expected_winner:
         raise PublicForecastError(f"{game_id}: official winner contradicts official probability")
     if not math.isclose(spread, -margin, abs_tol=1e-9):
-        raise PublicForecastError(f"{game_id}: fair spread and fair margin are not opposites")
+        raise PublicForecastError(f"{game_id}: probability-derived fair spread and margin are not opposites")
 
     if p > 0.5:
         if not margin > 0 or not spread < 0 or not home_score > away_score:
-            raise PublicForecastError(f"{game_id}: home-favorite public forecast is contradictory")
+            raise PublicForecastError(f"{game_id}: home-favorite winner presentation is contradictory")
     elif p < 0.5:
         if not margin < 0 or not spread > 0 or not away_score > home_score:
-            raise PublicForecastError(f"{game_id}: away-favorite public forecast is contradictory")
+            raise PublicForecastError(f"{game_id}: away-favorite winner presentation is contradictory")
     else:
         if not math.isclose(margin, 0.0, abs_tol=1e-9) or home_score != away_score:
-            raise PublicForecastError(f"{game_id}: pick'em public forecast is contradictory")
+            raise PublicForecastError(f"{game_id}: pick'em winner presentation is contradictory")
 
     for label in ("football_only_home_win_probability", "market_home_win_probability"):
         value = forecast.get(label)
         if value is not None and not 0.0 <= float(value) <= 1.0:
             raise PublicForecastError(f"{game_id}: {label} must be in [0, 1]")
+
+    model_margin = forecast.get("ats_model_margin_home")
+    model_spread = forecast.get("ats_model_spread_home")
+    market_margin = forecast.get("ats_market_margin_home")
+    ats_status = forecast.get("ats_status")
+    pick_team = forecast.get("ats_pick_team")
+    pick_spread = forecast.get("ats_pick_market_spread")
+    home_edge = forecast.get("ats_home_edge_points")
+
+    if model_margin is None or market_margin is None:
+        if ats_status != "UNAVAILABLE" or pick_team is not None:
+            raise PublicForecastError(f"{game_id}: unavailable ATS inputs must not produce a pick")
+        return
+
+    model_margin = float(model_margin)
+    market_margin = float(market_margin)
+    if model_spread is None or not math.isclose(float(model_spread), -model_margin, abs_tol=1e-9):
+        raise PublicForecastError(f"{game_id}: ATS model spread and model margin are not opposites")
+    expected_edge = model_margin - market_margin
+    if home_edge is None or not math.isclose(float(home_edge), expected_edge, abs_tol=1e-9):
+        raise PublicForecastError(f"{game_id}: ATS edge does not equal model margin minus market margin")
+
+    if math.isclose(expected_edge, 0.0, abs_tol=_ATS_EDGE_EPSILON):
+        if ats_status != "NO_EDGE" or pick_team is not None or pick_spread is not None:
+            raise PublicForecastError(f"{game_id}: zero ATS edge must not invent a side")
+        return
+
+    expected_pick = home if expected_edge > 0.0 else away
+    expected_pick_spread = -market_margin if expected_edge > 0.0 else market_margin
+    if ats_status != "VALUE" or pick_team != expected_pick:
+        raise PublicForecastError(f"{game_id}: ATS pick contradicts model-line versus market-line edge")
+    if pick_spread is None or not math.isclose(float(pick_spread), expected_pick_spread, abs_tol=1e-9):
+        raise PublicForecastError(f"{game_id}: ATS picked-team market spread has wrong sign")
+    # Deliberately no check that ATS pick equals official_winner. Disagreement is valid
+    # and is the core distinction between moneyline winner forecasting and ATS value.
 
 
 def build_public_forecasts(
