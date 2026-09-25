@@ -40,6 +40,15 @@ def row(**overrides):
     return base
 
 
+def build_one(**overrides):
+    payload = build_public_forecasts(
+        [row(**overrides)],
+        [],
+        now_utc=datetime(2026, 9, 10, 21, tzinfo=timezone.utc),
+    )
+    return payload["games"][0]
+
+
 def test_probability_bridge_has_correct_direction_and_is_monotonic():
     sigma = 12.9
     assert probability_implied_margin(0.50, sigma) == pytest.approx(0.0)
@@ -48,10 +57,10 @@ def test_probability_bridge_has_correct_direction_and_is_monotonic():
     assert probability_implied_margin(0.40, sigma) < 0
 
 
-def test_canonical_contract_reconciles_public_margin_without_rewriting_diagnostic():
-    payload = build_public_forecasts([row()], [], now_utc=datetime(2026, 9, 10, 21, tzinfo=timezone.utc))
-    game = payload["games"][0]
+def test_canonical_contract_keeps_winner_and_promotes_independent_ats_line():
+    game = build_one()
 
+    assert game["contract_version"] == "1.1"
     assert game["official_winner"] == "KC"
     assert game["official_winner_probability"] == pytest.approx(0.605)
     assert game["football_only_home_win_probability"] == pytest.approx(0.54)
@@ -60,8 +69,95 @@ def test_canonical_contract_reconciles_public_margin_without_rewriting_diagnosti
     assert game["coherent_fair_spread_home"] < 0
     assert game["projected_home_score"] > game["projected_away_score"]
     assert game["diagnostics"]["independent_margin_home"] == pytest.approx(-1.7)
+    assert game["ats_model_margin_home"] == pytest.approx(-1.7)
+    assert game["ats_model_spread_home"] == pytest.approx(1.7)
+    assert game["ats_market_margin_home"] == pytest.approx(2.5)
+    assert game["ats_home_edge_points"] == pytest.approx(-4.2)
+    assert game["ats_edge_points"] == pytest.approx(4.2)
+    assert game["ats_pick_team"] == "DEN"
+    assert game["ats_pick_market_spread"] == pytest.approx(2.5)
+    assert game["ats_pick_agrees_with_winner"] is False
+    assert game["signals"]["ats"]["pick_team"] == "DEN"
     assert game["levline_vs_market_winner_probability_pp"] == pytest.approx(3.3)
     assert game["lifecycle_status"] == "LIVE_FORECAST"
+
+
+def test_sasser_style_favorite_can_be_winner_while_underdog_is_ats_pick():
+    game = build_one(
+        game_id="2026_03_ATL_GB_TEST",
+        away_team="ATL",
+        home_team="GB",
+        final_home_prob="0.65",
+        expected_margin="3.0",
+        spread_line="6.0",
+    )
+    assert game["official_winner"] == "GB"
+    assert game["ats_model_margin_home"] == pytest.approx(3.0)
+    assert game["ats_market_margin_home"] == pytest.approx(6.0)
+    assert game["ats_home_edge_points"] == pytest.approx(-3.0)
+    assert game["ats_pick_team"] == "ATL"
+    assert game["ats_pick_market_spread"] == pytest.approx(6.0)
+    assert game["ats_pick_agrees_with_winner"] is False
+
+
+def test_favorite_is_ats_pick_when_model_margin_exceeds_market_margin():
+    game = build_one(
+        away_team="ATL",
+        home_team="GB",
+        final_home_prob="0.65",
+        expected_margin="7.0",
+        spread_line="4.5",
+    )
+    assert game["official_winner"] == "GB"
+    assert game["ats_home_edge_points"] == pytest.approx(2.5)
+    assert game["ats_pick_team"] == "GB"
+    assert game["ats_pick_market_spread"] == pytest.approx(-4.5)
+    assert game["ats_pick_agrees_with_winner"] is True
+
+
+def test_current_atl_gb_snapshot_logic_is_not_hardcoded_to_underdog():
+    game = build_one(
+        game_id="2026_03_ATL_GB",
+        away_team="ATL",
+        home_team="GB",
+        final_home_prob="0.6540541332200276",
+        expected_margin="4.973639994905554",
+        spread_line="4.5",
+    )
+    assert game["official_winner"] == "GB"
+    assert game["ats_home_edge_points"] == pytest.approx(0.473639994905554)
+    assert game["ats_pick_team"] == "GB"
+    assert game["ats_pick_market_spread"] == pytest.approx(-4.5)
+
+
+def test_home_underdog_value_has_positive_home_spread_not_sign_reversal():
+    game = build_one(
+        away_team="BUF",
+        home_team="MIA",
+        final_home_prob="0.40",
+        expected_margin="-1.0",
+        spread_line="-4.0",
+    )
+    assert game["official_winner"] == "BUF"
+    assert game["ats_home_edge_points"] == pytest.approx(3.0)
+    assert game["ats_pick_team"] == "MIA"
+    assert game["ats_pick_market_spread"] == pytest.approx(4.0)
+
+
+def test_exact_model_market_equality_returns_no_edge_instead_of_inventing_side():
+    game = build_one(expected_margin="2.5", spread_line="2.5")
+    assert game["ats_status"] == "NO_EDGE"
+    assert game["ats_home_edge_points"] == pytest.approx(0.0)
+    assert game["ats_pick_team"] is None
+    assert game["ats_pick_market_spread"] is None
+
+
+def test_missing_market_margin_fails_closed_for_ats_only():
+    game = build_one(spread_line="")
+    assert game["official_winner"] == "KC"
+    assert game["ats_status"] == "UNAVAILABLE"
+    assert game["ats_pick_team"] is None
+    assert game["ats_pick_market_spread"] is None
 
 
 def test_locked_game_uses_immutable_lock_row_not_newer_current_row():
@@ -102,8 +198,15 @@ def test_after_kickoff_live_row_without_lock_is_rejected():
 
 
 def test_validation_rejects_contradictory_public_score():
-    game = build_public_forecasts([row()], [], now_utc=datetime(2026, 9, 10, 21, tzinfo=timezone.utc))["games"][0]
+    game = build_one()
     game["projected_home_score"] = 20
     game["projected_away_score"] = 24
     with pytest.raises(PublicForecastError, match="contradictory"):
+        validate_public_forecast(game)
+
+
+def test_validation_rejects_ats_side_with_wrong_market_spread_sign():
+    game = build_one(expected_margin="7.0", spread_line="4.5")
+    game["ats_pick_market_spread"] = 4.5
+    with pytest.raises(PublicForecastError, match="wrong sign"):
         validate_public_forecast(game)
