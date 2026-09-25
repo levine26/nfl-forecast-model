@@ -30,8 +30,6 @@ jobs:
       NUMEXPR_NUM_THREADS: '4'
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: research/ats-crossmarket-transfer-v1-20260924
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -127,7 +125,6 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git pull --rebase origin research/ats-crossmarket-transfer-v1-20260924
           git add research/ats-crossmarket-transfer/results research/ats-crossmarket-transfer/preflight_receipt.json
           if git diff --cached --quiet; then
             echo 'No result changes to commit.'
