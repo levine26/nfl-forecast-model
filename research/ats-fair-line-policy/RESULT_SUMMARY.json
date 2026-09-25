@@ -1,0 +1,72 @@
+{
+  "status": "COMPLETE",
+  "policy_id": "ATS-FAIR-LINE-POLICY-V1",
+  "classification": "NOT_ESTABLISHED",
+  "historical_evidence_class": "development_non_pristine",
+  "completed_2026_outcomes_used": 0,
+  "post_result_threshold_tuning_performed": false,
+  "f_st_winner_filter_used": false,
+  "winner_ats_decoupling_is_contingent_on_audit": false,
+  "outer_target_seasons": [2022, 2023, 2024, 2025],
+  "aggregate": {
+    "decisions": 1087,
+    "wins": 517,
+    "losses": 541,
+    "pushes": 29,
+    "no_edge": 0,
+    "hit_rate_ex_push": 0.4886578449905482,
+    "ci_lower": 0.4581320035709572,
+    "ci_upper": 0.5192469370062038,
+    "reference_minus110_net_units": -78.10000000000002,
+    "reference_minus110_roi_on_risk": -0.0671077504725898
+  },
+  "season_results": [
+    {"season": 2022, "wins": 133, "losses": 128, "pushes": 10, "hit_rate_ex_push": 0.5095785440613027},
+    {"season": 2023, "wins": 115, "losses": 143, "pushes": 14, "hit_rate_ex_push": 0.44573643410852715},
+    {"season": 2024, "wins": 130, "losses": 138, "pushes": 4, "hit_rate_ex_push": 0.48507462686567165},
+    {"season": 2025, "wins": 139, "losses": 132, "pushes": 1, "hit_rate_ex_push": 0.5129151291512916}
+  ],
+  "fixed_selective_diagnostics": [
+    {"slice": "TOP_20PCT_ABS_EDGE", "rows": 218, "minimum_abs_edge": 3.9591658590183707, "wins": 103, "losses": 112, "pushes": 3, "hit_rate_ex_push": 0.4790697674418605},
+    {"slice": "TOP_10PCT_ABS_EDGE", "rows": 109, "minimum_abs_edge": 5.332038461484446, "wins": 56, "losses": 52, "pushes": 1, "hit_rate_ex_push": 0.5185185185185185}
+  ],
+  "margin_diagnostics": {
+    "rows": 1087,
+    "levline_margin_mae": 9.961726413439655,
+    "market_spread_center_mae": 9.494480220791168,
+    "levline_minus_market_mae": 0.46724619264848677,
+    "mean_absolute_model_edge": 2.5668784504349365,
+    "median_absolute_model_edge": 2.0566485288558756,
+    "pearson_edge_vs_ats_residual": -0.029309329259260747,
+    "pearson_pvalue": 0.33433704921822355,
+    "spearman_edge_vs_ats_residual": -0.025470957467298775,
+    "spearman_pvalue": 0.401503376817918
+  },
+  "bootstrap": {
+    "samples": 10000,
+    "seed": 20260925,
+    "block": "season_stratified_week",
+    "ci_lower": 0.45881226053639845,
+    "ci_upper": 0.5180955033824114,
+    "probability_hit_rate_gt_50pct": 0.2181,
+    "probability_hit_rate_gt_reference_break_even": 0.0099
+  },
+  "frozen_gate": {
+    "aggregate_hit_rate_gt_reference_break_even": false,
+    "bootstrap_probability_gt_50pct_at_least_0_80": false,
+    "at_least_3_of_4_seasons_at_or_above_50pct": false,
+    "chronology_and_2026_firewall_pass": true
+  },
+  "workflow": {
+    "run_id": 36103926049,
+    "job_id": 107972174355,
+    "head_sha": "dea4fefc096502f1de062ac2fad69e4f781834b4",
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 10850458558,
+    "name": "ats-fair-line-policy-v1-evidence",
+    "digest": "sha256:0d6ff09f27f876642c3d337d62e9b4a8298a77026f0f2e4f9152db153010b843"
+  },
+  "preregistration_sha256": "2326aea417d7c75774008e4d2bd2999ff96ac0ea102dc3a9e457d4957ee7ed39"
+}
