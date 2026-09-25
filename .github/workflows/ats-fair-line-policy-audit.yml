@@ -1,0 +1,62 @@
+name: ATS fair-line policy audit
+
+on:
+  push:
+    branches:
+      - research/ats-fair-line-policy-audit
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install package
+        run: pip install ".[dev]"
+
+      - name: Validate frozen audit logic
+        run: pytest -q tests/test_ats_fair_line_policy.py
+
+      - name: Execute 2022-2025 historical audit
+        run: python scripts/run_ats_fair_line_policy_audit.py --output-dir research_outputs/ats_fair_line_policy
+
+      - name: Validate result firewall and contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('research_outputs/ats_fair_line_policy/ats_fair_line_policy_summary.json')
+          data = json.loads(p.read_text())
+          assert data['status'] == 'COMPLETE'
+          assert data['completed_2026_outcomes_used'] == 0
+          assert data['outer_target_seasons'] == [2022, 2023, 2024, 2025]
+          assert data['post_result_threshold_tuning_performed'] is False
+          assert data['f_st_winner_filter_used'] is False
+          assert data['classification'] in {'HISTORICALLY_INTERESTING', 'NOT_ESTABLISHED'}
+          for row in data['chronology']:
+              assert row['training_max_season'] < row['outer_target_season']
+          print(json.dumps({
+              'classification': data['classification'],
+              'aggregate': data['aggregate'],
+              'bootstrap': data['bootstrap'],
+              'seasons_at_or_above_50pct': data['seasons_at_or_above_50pct'],
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload immutable audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-fair-line-policy-v1-evidence
+          path: research_outputs/ats_fair_line_policy/
+          if-no-files-found: error
+          retention-days: 90
