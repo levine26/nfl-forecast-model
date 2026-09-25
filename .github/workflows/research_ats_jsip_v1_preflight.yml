@@ -1,12 +1,10 @@
 name: ATS JSIP V1 Frozen Preflight
 
 on:
-  push:
-    branches:
-      - research/ats-jsip-v1-execution-20260924
+  pull_request:
+    branches: [main]
     paths:
-      - 'research/ats-joint-score-iprojection-v1/preflight_support_audit.py'
-      - 'research/ats-joint-score-iprojection-v1/IMPLEMENTATION_CLARIFICATION_001.md'
+      - 'research/ats-joint-score-iprojection-v1/**'
       - '.github/workflows/research_ats_jsip_v1_preflight.yml'
   workflow_dispatch:
 
@@ -31,6 +29,15 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+      - name: Enforce research-only diff scope
+        run: |
+          git fetch origin main
+          bad="$(git diff --name-only origin/main...HEAD | grep -Ev '^(research/ats-joint-score-iprojection-v1/|\.github/workflows/research_ats_jsip_v1_preflight\.yml$)' || true)"
+          if [ -n "$bad" ]; then
+            echo 'Production firewall violation:'
+            echo "$bad"
+            exit 1
+          fi
       - name: Install project dependencies
         run: |
           python -m pip install --upgrade pip
@@ -55,9 +62,6 @@ jobs:
           assert r['candidate_target_proper_scores_generated'] is False
           assert r['candidate_target_ats_results_generated'] is False
           assert r['primary_null_reproduction']['status'] == 'PASS'
-          # This workflow is the frozen pre-target structural audit. If the support
-          # invariant is infeasible, FAILED is the correct scientific result and
-          # target scoring must remain absent rather than being rescued post hoc.
           if r['support_invariant']['status'] == 'FAIL':
               assert r['scientific_status'] == 'FAILED'
               assert r['phase_disposition'] == 'FAIL_CLOSED_BEFORE_TARGET_SCORING'
@@ -80,15 +84,3 @@ jobs:
           path: research/ats-joint-score-iprojection-v1/PREFLIGHT_RECEIPT.json
           if-no-files-found: error
           retention-days: 90
-      - name: Preserve preflight receipt on research branch
-        if: success()
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add research/ats-joint-score-iprojection-v1/PREFLIGHT_RECEIPT.json
-          if git diff --cached --quiet; then
-            echo 'No preflight receipt change.'
-          else
-            git commit -m 'research: preserve ATS-JSIP-V1 preflight receipt'
-            git push origin HEAD:research/ats-jsip-v1-execution-20260924
-          fi
