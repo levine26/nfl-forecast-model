@@ -8,9 +8,11 @@ on:
       - 'research/m1_market_state_v1.py'
       - 'research/m1_operational_qualification_v1.py'
       - 'research/run_m1_market_capture_v1.py'
+      - 'research/run_m1_market_capture_phase2_v1.py'
       - 'research/test_m1_market_state_v1.py'
       - 'research/test_m1_operational_qualification_v1.py'
       - 'research/test_run_m1_market_capture_v1.py'
+      - 'research/test_run_m1_market_capture_phase2_v1.py'
       - 'research/ats-frontier-v2/M1_*'
       - '.github/workflows/research_m1_market_state_v1.yml'
   workflow_dispatch:
@@ -36,6 +38,7 @@ jobs:
           research/test_m1_market_state_v1.py
           research/test_m1_operational_qualification_v1.py
           research/test_run_m1_market_capture_v1.py
+          research/test_run_m1_market_capture_phase2_v1.py
       - name: Prove predictor registry excludes diagnostic horizons
         run: |
           python - <<'PY'
@@ -103,7 +106,7 @@ jobs:
         env:
           PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}
           THE_ODDS_API_KEY: ${{ secrets.THE_ODDS_API_KEY }}
-        run: python -m research.run_m1_market_capture_v1 --quota-reserve 50
+        run: python -m research.run_m1_market_capture_phase2_v1 --quota-reserve 50
 
       - name: Derive M1 predictor and diagnostic artifacts
         if: (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true') && steps.capture.outcome == 'success'
