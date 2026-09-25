@@ -6,8 +6,10 @@ on:
       - 'research/m1_market_contract_v1.py'
       - 'research/m1_market_capture_due_v1.py'
       - 'research/m1_market_state_v1.py'
+      - 'research/m1_operational_qualification_v1.py'
       - 'research/run_m1_market_capture_v1.py'
       - 'research/test_m1_market_state_v1.py'
+      - 'research/test_m1_operational_qualification_v1.py'
       - 'research/test_run_m1_market_capture_v1.py'
       - 'research/ats-frontier-v2/M1_*'
       - '.github/workflows/research_m1_market_state_v1.yml'
@@ -28,10 +30,11 @@ jobs:
           python-version: '3.11'
       - name: Install M1 research dependencies
         run: python -m pip install pytest 'pandas==3.0.5' 'numpy==2.4.6' 'requests>=2.32'
-      - name: Validate frozen M1 information boundary and identity semantics
+      - name: Validate frozen M1 information boundary and Phase 2 operational semantics
         run: >-
           python -m pytest -q
           research/test_m1_market_state_v1.py
+          research/test_m1_operational_qualification_v1.py
           research/test_run_m1_market_capture_v1.py
       - name: Prove predictor registry excludes diagnostic horizons
         run: |
@@ -55,6 +58,21 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Restore append-only M1 ledger and qualification state
+        run: |
+          set -euo pipefail
+          git fetch origin research-data/m1-market-state-v1:refs/remotes/origin/research-data/m1-market-state-v1 || true
+          mkdir -p research_outputs/m1_market_state_v1
+          if git show-ref --verify --quiet refs/remotes/origin/research-data/m1-market-state-v1; then
+            for file in market_snapshots.csv status.json predictor_rows.csv diagnostic_rows.csv audit.json horizon_qualification.csv operational_qualification.json; do
+              git show "origin/research-data/m1-market-state-v1:research_outputs/m1_market_state_v1/$file" \
+                > "research_outputs/m1_market_state_v1/$file" 2>/dev/null || true
+            done
+          fi
+
+      - name: Audit Phase 2 horizon state before any provider request
+        run: python -m research.m1_operational_qualification_v1
+
       - name: Cheap local M1 horizon gate
         id: gate
         run: |
@@ -64,19 +82,6 @@ jobs:
             echo 'due=true' >> "$GITHUB_OUTPUT"
           else
             echo 'due=false' >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Restore append-only M1 ledger
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
-        run: |
-          set -euo pipefail
-          git fetch origin research-data/m1-market-state-v1:refs/remotes/origin/research-data/m1-market-state-v1 || true
-          mkdir -p research_outputs/m1_market_state_v1
-          if git show-ref --verify --quiet refs/remotes/origin/research-data/m1-market-state-v1; then
-            for file in market_snapshots.csv status.json predictor_rows.csv diagnostic_rows.csv audit.json; do
-              git show "origin/research-data/m1-market-state-v1:research_outputs/m1_market_state_v1/$file" \
-                > "research_outputs/m1_market_state_v1/$file" 2>/dev/null || true
-            done
           fi
 
       - uses: actions/setup-python@v5
@@ -104,8 +109,12 @@ jobs:
         if: (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true') && steps.capture.outcome == 'success'
         run: python -m research.m1_market_state_v1
 
+      - name: Refresh Phase 2 qualification after successful capture
+        if: (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true') && steps.capture.outcome == 'success'
+        run: python -m research.m1_operational_qualification_v1
+
       - name: Persist M1 research evidence off main
-        if: always() && (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true')
+        if: always()
         run: |
           set -euo pipefail
           DATA_DIR=research_outputs/m1_market_state_v1
@@ -131,7 +140,7 @@ jobs:
             echo 'M1 research ledger unchanged.'
             exit 0
           fi
-          git commit -m 'Capture prospective M1 market state'
+          git commit -m 'Persist prospective M1 Phase 2 operational state'
           git push origin HEAD:research-data/m1-market-state-v1
 
       - name: Surface capture failure after preserving evidence
