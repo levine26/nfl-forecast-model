@@ -8,6 +8,7 @@ on:
     paths:
       - 'research/ats-crossmarket-transfer/run_experiment.py'
       - 'research/ats-crossmarket-transfer/probability_only_entrypoint.py'
+      - 'research/ats-crossmarket-transfer/chronology_strict_entrypoint.py'
       - 'research/ats-crossmarket-transfer/audit_and_postprocess.py'
       - 'research/ats-crossmarket-transfer/config.json'
       - 'research/ats-crossmarket-transfer/EXPERIMENT_CONTRACT.md'
@@ -42,6 +43,7 @@ jobs:
         run: |
           python -m py_compile research/ats-crossmarket-transfer/run_experiment.py
           python -m py_compile research/ats-crossmarket-transfer/probability_only_entrypoint.py
+          python -m py_compile research/ats-crossmarket-transfer/chronology_strict_entrypoint.py
           python -m py_compile research/ats-crossmarket-transfer/audit_and_postprocess.py
       - name: Run independent numerical and leakage preflight before target scoring
         run: |
@@ -49,10 +51,10 @@ jobs:
           python research/ats-crossmarket-transfer/audit_and_postprocess.py \
             --preflight \
             --output research/ats-crossmarket-transfer/preflight_receipt.json
-      - name: Execute frozen historical experiment
+      - name: Execute chronology-strict frozen historical experiment
         run: |
           rm -rf research/ats-crossmarket-transfer/results
-          python research/ats-crossmarket-transfer/probability_only_entrypoint.py \
+          python research/ats-crossmarket-transfer/chronology_strict_entrypoint.py \
             --output-dir research/ats-crossmarket-transfer/results
       - name: Add preregistered secondary diagnostics and final receipts
         run: |
@@ -60,7 +62,7 @@ jobs:
             --postprocess \
             --results-dir research/ats-crossmarket-transfer/results \
             --preflight-path research/ats-crossmarket-transfer/preflight_receipt.json
-      - name: Verify firewalls and evidence
+      - name: Verify firewalls, chronology and evidence
         run: |
           python - <<'PY'
           import json
@@ -69,15 +71,21 @@ jobs:
           result = json.loads((root / 'RESULTS.json').read_text())
           final = json.loads((root / 'FINAL_RECEIPT.json').read_text())
           audit = json.loads((root / 'RED_TEAM_AUDIT.json').read_text())
+          inner = json.loads((root / 'INNER_CHRONOLOGY_RECEIPT.json').read_text())
           assert result['completed_2026_outcomes_used'] == 0
           assert result['production_changed'] is False
           assert final['completed_2026_outcomes_used'] == 0
           assert final['production_changed'] is False
           assert final['preflight_status'] == 'PASS'
           assert audit['status'] == 'PASS'
+          assert inner['status'] == 'PASS'
+          assert inner['target_season_never_used_to_choose_alpha_beta'] is True
           assert result['outer_test_seasons'] == [2022, 2023, 2024, 2025]
           assert result['common_rows'] >= 800
           assert result['numerical_tests']['pass'] is True
+          for fold in result['chronology_selection']:
+              assert all(x.get('season_forward_inner') is True for x in fold['alpha_grid'])
+              assert all(x.get('season_forward_inner') is True for x in fold['beta_grid'])
           required = [
               'OOF_PREDICTIONS.csv', 'RESULTS.json', 'SOURCE_SIGNAL_AUDIT.json',
               'BOOTSTRAP_RESULTS.json', 'NUMERICAL_TEST_RECEIPT.json',
@@ -85,6 +93,7 @@ jobs:
               'CALIBRATION_RESULTS.json', 'TRANSFER_DIAGNOSTICS.csv',
               'IMPLEMENTATION_DECISION.json', 'IMPLEMENTATION_DECISION.md',
               'SECONDARY_DIAGNOSTICS.json', 'RED_TEAM_AUDIT.json',
+              'INNER_CHRONOLOGY_RECEIPT.json',
               'FINAL_RECEIPT.json', 'FINAL_RECEIPT.md', 'MANIFEST.json'
           ]
           for name in required:
@@ -92,6 +101,10 @@ jobs:
           print(json.dumps({
               'common_rows': result['common_rows'],
               'source_signal': result['source_signal'],
+              'selection': [
+                  {'season': x['season'], 'alpha': x['alpha_selected'], 'beta': x['beta_selected']}
+                  for x in result['chronology_selection']
+              ],
               'decisions': result['decisions'],
               'implementation_candidates': result['implementation_candidates'],
               'preflight': final['preflight_status'],
