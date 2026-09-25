@@ -82,14 +82,14 @@ Define
 
 for nonzero cells, with separate positive/negative normalizers enforcing N1 sign totals exactly. Zero remains fixed.
 
-Solve scalar `lambda` so the adaptive-support expected margin equals the baseline `KMASS-MARKET` expected margin. Use a deterministic bracket expansion plus Brent root solve. If the constraint is infeasible or numerical tolerance fails, fail the row closed.
+Solve scalar `lambda` so the adaptive-support expected margin equals **N1's adaptive-support expected margin before the shape tilt**. This prohibits any additional mean drift beyond the strong market-moneyline null while leaving higher-order within-sign shape free to change. Use a deterministic bracket expansion plus Brent root solve. At `theta=0`, lambda must resolve to zero within tolerance and Candidate B must reproduce N1. If the constraint is infeasible or numerical tolerance fails, fail the row closed.
 
 Required tolerances:
 
 - normalization error `<= 5e-11`;
 - sign-mass error `<= 2e-11`;
 - zero-mass error `<= 1e-12`;
-- expected-margin error `<= 2e-9`;
+- N1 expected-margin error `<= 2e-9`;
 - omitted baseline tail `< 1e-12`.
 
 ## 7. Frozen theta selection
@@ -108,9 +108,9 @@ No target-season result may influence theta selection.
 
 Preflight must prove:
 
-1. theta=0 reproduces N1 cell/CPL probabilities within `1e-12`;
+1. theta=0 reproduces N1 CPL probabilities within `1e-12` for both Candidate A and Candidate B;
 2. Candidate A and B preserve N1 positive, negative, and zero masses;
-3. Candidate B preserves baseline expected margin;
+3. Candidate B preserves N1 expected margin;
 4. half-point spreads have zero push mass;
 5. whole-number spreads retain positive push mass when the corresponding cell has positive PMF mass;
 6. mutating `actual_margin` before scoring does not change any forecast probability;
