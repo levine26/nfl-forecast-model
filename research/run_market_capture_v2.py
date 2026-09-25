@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -36,6 +37,44 @@ TEAM_ABBR = {
     "San Francisco 49ers": "SF", "Seattle Seahawks": "SEA", "Tampa Bay Buccaneers": "TB",
     "Tennessee Titans": "TEN", "Washington Commanders": "WAS",
 }
+TEAM_ALIASES = {
+    "Arizona": "ARI", "Atlanta": "ATL", "Baltimore": "BAL", "Buffalo": "BUF",
+    "Carolina": "CAR", "Chicago": "CHI", "Cincinnati": "CIN", "Cleveland": "CLE",
+    "Dallas": "DAL", "Denver": "DEN", "Detroit": "DET", "Green Bay": "GB",
+    "Houston": "HOU", "Indianapolis": "IND", "Jacksonville": "JAX", "Kansas City": "KC",
+    "Las Vegas": "LV", "LA Chargers": "LAC", "L.A. Chargers": "LAC",
+    "LA Rams": "LA", "L.A. Rams": "LA", "Miami": "MIA", "Minnesota": "MIN",
+    "New England": "NE", "New Orleans": "NO", "NY Giants": "NYG", "N.Y. Giants": "NYG",
+    "NY Jets": "NYJ", "N.Y. Jets": "NYJ", "Philadelphia": "PHI", "Pittsburgh": "PIT",
+    "San Francisco": "SF", "Seattle": "SEA", "Tampa Bay": "TB", "Tennessee": "TEN",
+    "Washington": "WAS",
+}
+VALID_TEAM_CODES = frozenset(TEAM_ABBR.values())
+
+
+class ProviderEventIdentityCoverageError(RuntimeError):
+    """A provider returned a valid board that cannot identify the entire due cluster."""
+
+
+def _team_key(value: object) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(value or "").strip().lower()).strip()
+
+
+_TEAM_CANONICAL = {
+    **{_team_key(name): code for name, code in TEAM_ABBR.items()},
+    **{_team_key(name): code for name, code in TEAM_ALIASES.items()},
+    **{_team_key(code): code for code in VALID_TEAM_CODES},
+}
+
+
+def _canonical_team(value: object) -> str | None:
+    """Map provider display variants to the repository's canonical NFL team code.
+
+    Provider event team strings are display labels, not stable identifiers. Only
+    explicitly-known unambiguous NFL labels are accepted; unknown/ambiguous labels fail
+    closed rather than being guessed from substrings.
+    """
+    return _TEAM_CANONICAL.get(_team_key(value))
 
 
 def kickoff_utc(gameday: object, gametime: object) -> datetime:
@@ -64,19 +103,23 @@ def _match_event(
     home_team: str,
     kickoff_timestamp_utc: datetime,
 ) -> dict | None:
-    """Resolve one provider event by team identity and kickoff-time proximity.
+    """Resolve one provider event by canonical team identity and kickoff proximity.
 
-    Team identity alone is insufficient because the endpoint can contain a later
-    rematch. Missing provider kickoff times and ambiguous candidates fail closed.
+    Provider team labels are display strings and may legitimately vary. They are first
+    mapped through an explicit NFL alias table. Kickoff proximity remains mandatory,
+    and missing times, unknown labels, rematches, or ambiguous candidates fail closed.
     """
     target = kickoff_timestamp_utc.astimezone(timezone.utc)
+    expected = (_canonical_team(away_team), _canonical_team(home_team))
+    if None in expected:
+        return None
     candidates: list[tuple[float, dict]] = []
     for event in events:
         matchup = (
-            TEAM_ABBR.get(str(event.get("away_team"))),
-            TEAM_ABBR.get(str(event.get("home_team"))),
+            _canonical_team(event.get("away_team")),
+            _canonical_team(event.get("home_team")),
         )
-        if matchup != (away_team, home_team):
+        if matchup != expected:
             continue
         provider_kickoff = _parse_provider_kickoff(event.get("commence_time"))
         if provider_kickoff is None:
@@ -104,7 +147,6 @@ def _header_int(response: requests.Response, name: str) -> int | None:
         return int(value) if value is not None else None
     except (TypeError, ValueError):
         return None
-
 
 
 def _provider_configs() -> list[dict]:
@@ -147,8 +189,32 @@ def _provider_configs() -> list[dict]:
     return providers
 
 
-def _request_market_events(providers: list[dict]) -> tuple[str, requests.Response, list[dict], list[dict], int]:
-    """Fetch one valid bulk NFL board, failing over without logging credential-bearing URLs."""
+def _provider_covers_due_cluster(events: list[dict], due: list[dict]) -> bool:
+    """Require a unique kickoff-aware event identity for every due game/horizon pair."""
+    for item in due:
+        event = _match_event(
+            events,
+            away_team=str(item["away_team"]),
+            home_team=str(item["home_team"]),
+            kickoff_timestamp_utc=item["kickoff_timestamp_utc"],
+        )
+        if event is None:
+            return False
+    return True
+
+
+def _request_market_events(
+    providers: list[dict],
+    *,
+    due: list[dict] | None = None,
+) -> tuple[str, requests.Response, list[dict], list[dict], int]:
+    """Fetch one usable bulk NFL board with transport + semantic failover.
+
+    A HTTP-200 list is not sufficient when the provider cannot uniquely resolve the
+    preregistered due event identities. In that case the provider is treated as unusable
+    for this capture attempt and the next configured provider is tried. This does not
+    relax any event-identity rule or permit retrospective substitution.
+    """
     failures: list[dict] = []
     for provider in providers:
         try:
@@ -162,6 +228,10 @@ def _request_market_events(providers: list[dict]) -> tuple[str, requests.Respons
             events = response.json()
             if not isinstance(events, list):
                 raise RuntimeError(f"{provider['name']} response must be a list of events")
+            if due is not None and not _provider_covers_due_cluster(events, due):
+                raise ProviderEventIdentityCoverageError(
+                    f"{provider['name']} cannot uniquely resolve the due event cluster"
+                )
             return (
                 str(provider["name"]),
                 response,
@@ -306,7 +376,10 @@ def capture(
             "external_request_made": False,
         }
 
-    provider_name, response, events, provider_failures, request_cost = _request_market_events(providers)
+    provider_name, response, events, provider_failures, request_cost = _request_market_events(
+        providers,
+        due=due,
+    )
 
     rows: list[dict] = []
     missed: list[str] = []
