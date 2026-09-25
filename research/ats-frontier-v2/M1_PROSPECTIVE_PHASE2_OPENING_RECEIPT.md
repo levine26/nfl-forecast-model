@@ -4,13 +4,23 @@ Program: `FV2-PROS-M1-MARKETSTATE-01`
 
 Phase: `PROSPECTIVE PHASE 2 — LIVE ACCUMULATION AND OPERATIONAL QUALIFICATION`
 
-Status: `OPEN — PENDING OPENING-GATE MERGE`
+Status: `OPEN — ACTIVE`
 
-Opened from main: `5b022b69b2b2a85fc37cfb829a5037c3f527f9fd`
+Phase-2 opening merged: `3434f34f1b8760334e457e0a701eca031224871f`
+
+Opening PR: `#597`
+
+Activated at: `2026-09-25T16:35:06Z`
 
 Completed-2026 outcomes used to open Phase 2: `0`
 
 Production changes authorized: `NO`
+
+## Activation evidence
+
+The Phase-2 opening head cleared the M1 contract workflow, research firewall, Frontier-V2 pre-result gate, and full repository research-validation matrix before PR #597 merged. The first scheduled M1 run after activation was workflow run `36161906799`; its local horizon gate returned `due=false`, so all provider/capture steps were correctly skipped and no external market request was made.
+
+That first run is operational evidence only. It is not predictive-performance evidence and does not inspect any completed-game ATS result.
 
 ## Purpose
 
@@ -104,8 +114,8 @@ Phase 2 does not end merely because one capture succeeds. A later closeout must 
 
 The size/duration of a future training window and the opening of any Phase 3 modeling/evaluation stage must be governed separately before M1 outcome inspection. This receipt intentionally does not set a result-driven sample threshold.
 
-## Opening boundary
+## Active boundary
 
-Once this receipt and the Phase-1 PASS receipt clear the exact-head research gates and merge to `main`, **Phase 2 is the active M1 phase**. At that point the scheduled workflow may accumulate prospective research evidence under the frozen contract.
+Phase 2 is now the active M1 phase. The scheduled workflow may accumulate prospective research evidence under the frozen contract.
 
-Stop condition for this transition: do not perform M1 predictive-performance evaluation in the Phase-2 opening work.
+No M1 predictive-performance evaluation is authorized by this receipt.
