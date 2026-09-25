@@ -2,6 +2,10 @@
 
 **Status:** CANONICAL / SCIENTIFICALLY REJECTED
 
+## Receipt correction
+
+**2026-09-24:** The initial post-merge receipt incorrectly described the primary V2 score as the exact integer-margin log score. The frozen experiment contract and accepted result summary establish **multinomial Cover/Push/Loss (CPL) log loss** as the primary metric. This correction changes only the receipt wording; it does not alter the frozen experiment, results, classification, or scientific inference.
+
 ## Merge identity
 
 - Pull request: #585
@@ -21,8 +25,8 @@ All required validation completed successfully on the exact frozen PR head `f560
 
 The frozen Market Manifold V2 result is negative and is preserved without modification:
 
-1. The ordinary spread/moneyline within-sign tilt **worsened** the primary exact integer-margin log score.
-2. The mean-preserving tilt **did not materially improve** the strongest canonical baseline.
+1. The ordinary spread/moneyline within-sign tilt **worsened the primary multinomial CPL log loss** versus `KMASS-MARKETML-IPROJ`.
+2. The mean-preserving tilt **did not materially improve** the strongest canonical baseline on the same primary CPL metric.
 3. Expanding chronological parameter selection converged toward `theta = 0`.
 4. The canonical inference is therefore to **reject continued arbitrary smooth spread/ML residual within-sign transformations under this mechanism**.
 
