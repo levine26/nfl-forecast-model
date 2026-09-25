@@ -42,6 +42,7 @@ jobs:
           python -m py_compile research/ats-crossmarket-transfer/probability_only_entrypoint.py
           python -m py_compile research/ats-crossmarket-transfer/chronology_strict_entrypoint.py
           python -m py_compile research/ats-crossmarket-transfer/audit_and_postprocess.py
+          python -m py_compile research/ats-crossmarket-transfer/fast_audit_entrypoint.py
       - name: Validate committed scientific receipts
         run: |
           python - <<'PY'
@@ -65,7 +66,13 @@ jobs:
           final = json.loads((root / 'FINAL_RECEIPT.json').read_text())
           red = json.loads((root / 'RED_TEAM_AUDIT.json').read_text())
           inner = json.loads((root / 'INNER_CHRONOLOGY_RECEIPT.json').read_text())
+          expected_execution = 'd436ce88450d857b625add926206df4309ca7758'
+          expected_identity = '26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156'
+          expected_counts = {'2022': 271, '2023': 272, '2024': 272, '2025': 272}
+          assert result['execution_sha'] == expected_execution
+          assert final['execution_sha'] == expected_execution
           assert result['outer_test_seasons'] == [2022, 2023, 2024, 2025]
+          assert result['common_rows_by_season'] == expected_counts
           assert result['completed_2026_outcomes_used'] == 0
           assert result['production_changed'] is False
           assert final['completed_2026_outcomes_used'] == 0
@@ -75,12 +82,18 @@ jobs:
           assert inner['status'] == 'PASS'
           assert inner['target_season_never_used_to_choose_alpha_beta'] is True
           assert inner['2021_nuisance']['training_last_season'] < 2021
-          assert result['common_rows'] == final['common_rows']
-          assert result['common_rows'] >= 800
+          assert result['common_rows'] == final['common_rows'] == 1087
+          assert red['preflight']['historical_game_identity']['game_ids_sha256'] == expected_identity
+          assert red['preflight']['historical_game_identity']['accepted_582_identity_match'] is True
           for fold in result['chronology_selection']:
               assert all(x.get('season_forward_inner') is True for x in fold['alpha_grid'])
               assert all(x.get('season_forward_inner') is True for x in fold['beta_grid'])
               assert all(int(s) < int(fold['season']) for s in fold['inner_training_seasons'])
+          assert result['implementation_candidates'] == []
+          assert all(
+              d['classification'] == 'NO_MATERIAL_IMPROVEMENT'
+              for d in result['decisions'].values()
+          )
           manifest = json.loads((root / 'MANIFEST.json').read_text())
           for name, digest in manifest.items():
               p = root / name
@@ -93,5 +106,6 @@ jobs:
               'completed_2026_outcomes_used': final['completed_2026_outcomes_used'],
               'production_changed': final['production_changed'],
               'strict_inner_chronology': True,
+              'accepted_582_identity_match': True,
           }, indent=2, sort_keys=True))
           PY
