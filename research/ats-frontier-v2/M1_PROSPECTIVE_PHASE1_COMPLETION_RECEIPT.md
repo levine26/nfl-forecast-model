@@ -4,7 +4,13 @@ Program: `FV2-PROS-M1-MARKETSTATE-01`
 
 Phase: `PROSPECTIVE PHASE 1 — CONTRACT ALIGNMENT AND CAPTURE QUALIFICATION`
 
-Status: `IMPLEMENTED_PENDING_EXACT_HEAD_VALIDATION`
+Status: `PASS — MERGED`
+
+Phase-1 implementation PR: `#596`
+
+Validated implementation head: `4fefc53db96d9d48402e0023f013728cd9f7176e`
+
+Merged main commit: `5b022b69b2b2a85fc37cfb829a5037c3f527f9fd`
 
 Completed-2026 outcomes used: `0`
 
@@ -36,20 +42,22 @@ Phase 1 now has an isolated research-only M1 stack:
 10. Completed-game outcome-bearing rows are rejected by the derivative.
 11. Raw capture, predictor rows, diagnostic rows, status, and audit evidence persist on `research-data/m1-market-state-v1`, not production surfaces.
 
-## Phase-1 exit evidence required before final PASS
+## Phase-1 exit evidence
 
-The implementation is not declared merged/passed until the exact PR head has:
+All required gates passed on the exact implementation head before merge:
 
-- M1-specific fixture tests green;
-- research firewall green;
-- repository-wide research validation green;
-- applicable Frontier-V2 pre-result gate green;
-- diff audit confirming research-only changes;
-- completed-2026 outcomes used = 0.
+- M1-specific fixture/contract workflow: `SUCCESS`;
+- research firewall: `SUCCESS`;
+- repository-wide research validation: `SUCCESS`;
+- Frontier-V2 pre-result gate: `SUCCESS`;
+- diff audit: nine additive research/workflow files, zero deletions, no production-file changes;
+- completed-2026 outcomes used: `0`.
+
+The first M1-specific CI attempt exposed a fixture-expectation mismatch around kickoff-identity failure semantics. The implementation had already failed closed by making the predictor ineligible; the test was corrected to require that fail-closed behavior. The corrected exact head passed every gate above.
 
 ## Next phase boundary
 
-After those gates pass and this implementation is merged, the next phase is:
+Phase 1 is complete. The next phase is:
 
 `M1 PROSPECTIVE PHASE 2 — LIVE ACCUMULATION AND OPERATIONAL QUALIFICATION`
 
