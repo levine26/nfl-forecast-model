@@ -1,0 +1,68 @@
+{
+  "2021_nuisance": {
+    "fit": {
+      "conditional": false,
+      "key_params": [
+        -1.5028339691722945,
+        1.1195915744109126,
+        0.7718381853662253
+      ],
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "objective": 3.9063548846984157,
+      "scale_params": [
+        2.58842362141403
+      ],
+      "use_key": true
+    },
+    "historical_identity": {
+      "accepted_582_identity_match": true,
+      "completed_2026_rows": 0,
+      "completed_rows": 3663,
+      "first_season": 2012,
+      "game_ids_sha256": "26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156",
+      "historical_rows": 3663,
+      "last_season": 2025,
+      "requested_seasons": [
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "schedule_only": true
+    },
+    "hyperparameters_inherited_from_accepted_constant_scale_key": {
+      "conditional": false,
+      "lambda_key": 1.0,
+      "lambda_scale": 10.0,
+      "nu": 30,
+      "use_key": true
+    },
+    "training_first_season": 2012,
+    "training_last_season": 2020,
+    "training_n": 2304,
+    "validation_season": 2021
+  },
+  "2022_2025_nuisance_source": "research/ats-historical-challenger/v2_nuisance_freeze.json",
+  "frozen_outer_fit_seasons": [
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "inner_parts_cache_is_deterministic_execution_optimization_only": true,
+  "selection_rule": "each inner validation season uses nuisance fit trained strictly before that season",
+  "status": "PASS",
+  "target_season_never_used_to_choose_alpha_beta": true
+}

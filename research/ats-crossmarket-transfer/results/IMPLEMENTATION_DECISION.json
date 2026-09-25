@@ -1,0 +1,57 @@
+{
+  "best_point_estimate_mechanism": "ATS-XM-IPROJ-MEANFIX-V1",
+  "decisions": {
+    "ATS-XM-CPL-OFFSET-V1": {
+      "ats_hit_rate_delta": 0.0,
+      "candidate_minus_null_delta": 0.0003777210652882833,
+      "classification": "NO_MATERIAL_IMPROVEMENT",
+      "favorable_seasons": 2,
+      "gates": {
+        "ats_not_materially_adverse": true,
+        "favorable_seasons_at_least_3": false,
+        "holm_adjusted_support": false,
+        "no_material_calibration_degradation": true,
+        "no_numerical_or_leakage_failure": true,
+        "paired_95_interval_entirely_favorable": false,
+        "primary_better": false,
+        "switches_at_least_10": true
+      },
+      "switches": 81
+    },
+    "ATS-XM-IPROJ-FST-V1": {
+      "ats_hit_rate_delta": -0.001890359168241873,
+      "candidate_minus_null_delta": 0.000900855976004787,
+      "classification": "NO_MATERIAL_IMPROVEMENT",
+      "favorable_seasons": 2,
+      "gates": {
+        "ats_not_materially_adverse": true,
+        "favorable_seasons_at_least_3": false,
+        "holm_adjusted_support": false,
+        "no_material_calibration_degradation": false,
+        "no_numerical_or_leakage_failure": true,
+        "paired_95_interval_entirely_favorable": false,
+        "primary_better": false,
+        "switches_at_least_10": true
+      },
+      "switches": 338
+    },
+    "ATS-XM-IPROJ-MEANFIX-V1": {
+      "ats_hit_rate_delta": 0.011342155009451793,
+      "candidate_minus_null_delta": 0.0002976163362740405,
+      "classification": "NO_MATERIAL_IMPROVEMENT",
+      "favorable_seasons": 2,
+      "gates": {
+        "ats_not_materially_adverse": true,
+        "favorable_seasons_at_least_3": false,
+        "holm_adjusted_support": false,
+        "no_material_calibration_degradation": true,
+        "no_numerical_or_leakage_failure": true,
+        "paired_95_interval_entirely_favorable": false,
+        "primary_better": false,
+        "switches_at_least_10": true
+      },
+      "switches": 164
+    }
+  },
+  "implementation_candidates": []
+}

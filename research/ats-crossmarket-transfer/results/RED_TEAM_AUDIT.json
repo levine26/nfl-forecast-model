@@ -1,0 +1,65 @@
+{
+  "candidate_architecture_changed_by_postprocess": false,
+  "completed_2026_outcomes_used": 0,
+  "postprocess_used_for_model_selection": false,
+  "preflight": {
+    "checks": {
+      "adaptive_tail_below_tolerance": true,
+      "alpha_zero_reproduces_market_null": true,
+      "beta_zero_reproduces_kmass_cpl": true,
+      "completed_2026_outcomes_loaded_zero": true,
+      "fst_target_fold_training_strictly_prior": true,
+      "half_point_no_push_mechanics": true,
+      "historical_game_max_season_le_2025": true,
+      "market_projection_constraint_normalizes": true,
+      "mean_preservation_constraint": true,
+      "nonnegative_cpl_probabilities": true,
+      "outer_results_do_not_define_architecture": true,
+      "pmf_cpl_normalization_error_le_1e_11": true,
+      "repository_spread_sign_convention_verified": true,
+      "target_outcome_mutation_prediction_invariant": true,
+      "target_season_cannot_tune_alpha_beta_by_runner_contract": true,
+      "tie_mass_preserved": true,
+      "whole_line_push_mechanics": true
+    },
+    "completed_2026_outcomes_used": 0,
+    "historical_game_identity": {
+      "accepted_582_identity_match": true,
+      "completed_2026_rows": 0,
+      "completed_rows": 3663,
+      "first_season": 2012,
+      "game_ids_sha256": "26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156",
+      "historical_rows": 3663,
+      "last_season": 2025,
+      "requested_seasons": [
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "schedule_only": true
+    },
+    "max_errors": {
+      "alpha0": 1.1102230246251565e-16,
+      "beta0": 1.1102230246251565e-16,
+      "cpl_normalization": 0.0,
+      "mean_constraint": 1.6324719354088302e-12,
+      "tail_mass": 3.355830139473535e-16,
+      "tie_mass": 0.0
+    },
+    "sample_n": 30,
+    "status": "PASS"
+  },
+  "production_changed": false,
+  "status": "PASS"
+}
