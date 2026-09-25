@@ -50,7 +50,7 @@ where `L` is the repository-normalized expected home margin / ATS threshold used
 then renormalize **separately within M>0 and M<0** so market-moneyline sign masses and baseline tie mass remain exact. No other parameter changes.
 
 ### Candidate B — `ATS-MM-SHAPETILT-MEANFIX-V1`
-Apply Candidate A's shape score while additionally preserving the baseline `KMASS-MARKET` expected margin through one numerical Lagrange multiplier on `m`. Market-moneyline sign masses and baseline tie mass remain exact. This candidate tests whether any shape gain survives when mean drift is prohibited.
+Apply Candidate A's shape score while additionally preserving **N1's expected margin** through one numerical Lagrange multiplier on `m`. Market-moneyline sign masses and baseline tie mass remain exact. Thus Candidate B permits no additional mean drift beyond the already-accepted market-moneyline null and isolates higher-order within-sign shape. At `theta=0`, both Candidate A and Candidate B must reproduce N1.
 
 ## Frozen transfer-weight grid
 
