@@ -8,6 +8,7 @@ on:
     paths:
       - 'research/ats-crossmarket-transfer/run_experiment.py'
       - 'research/ats-crossmarket-transfer/probability_only_entrypoint.py'
+      - 'research/ats-crossmarket-transfer/audit_and_postprocess.py'
       - 'research/ats-crossmarket-transfer/config.json'
       - 'research/ats-crossmarket-transfer/EXPERIMENT_CONTRACT.md'
       - 'research/ats-crossmarket-transfer/DATA_PROVENANCE.md'
@@ -39,12 +40,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e .
-      - name: Syntax check frozen runner
+      - name: Syntax check frozen research package
         run: |
           python -m py_compile research/ats-crossmarket-transfer/run_experiment.py
           python -m py_compile research/ats-crossmarket-transfer/probability_only_entrypoint.py
-      - name: Execute historical experiment
-        run: python research/ats-crossmarket-transfer/probability_only_entrypoint.py --output-dir research/ats-crossmarket-transfer/results
+          python -m py_compile research/ats-crossmarket-transfer/audit_and_postprocess.py
+      - name: Run independent numerical and leakage preflight before target scoring
+        run: |
+          rm -f research/ats-crossmarket-transfer/preflight_receipt.json
+          python research/ats-crossmarket-transfer/audit_and_postprocess.py \
+            --preflight \
+            --output research/ats-crossmarket-transfer/preflight_receipt.json
+      - name: Execute frozen historical experiment
+        run: |
+          rm -rf research/ats-crossmarket-transfer/results
+          python research/ats-crossmarket-transfer/probability_only_entrypoint.py \
+            --output-dir research/ats-crossmarket-transfer/results
+      - name: Add preregistered secondary diagnostics and final receipts
+        run: |
+          python research/ats-crossmarket-transfer/audit_and_postprocess.py \
+            --postprocess \
+            --results-dir research/ats-crossmarket-transfer/results \
+            --preflight-path research/ats-crossmarket-transfer/preflight_receipt.json
       - name: Verify firewalls and evidence
         run: |
           python - <<'PY'
@@ -52,8 +69,14 @@ jobs:
           from pathlib import Path
           root = Path('research/ats-crossmarket-transfer/results')
           result = json.loads((root / 'RESULTS.json').read_text())
+          final = json.loads((root / 'FINAL_RECEIPT.json').read_text())
+          audit = json.loads((root / 'RED_TEAM_AUDIT.json').read_text())
           assert result['completed_2026_outcomes_used'] == 0
           assert result['production_changed'] is False
+          assert final['completed_2026_outcomes_used'] == 0
+          assert final['production_changed'] is False
+          assert final['preflight_status'] == 'PASS'
+          assert audit['status'] == 'PASS'
           assert result['outer_test_seasons'] == [2022, 2023, 2024, 2025]
           assert result['common_rows'] >= 800
           assert result['numerical_tests']['pass'] is True
@@ -62,7 +85,9 @@ jobs:
               'BOOTSTRAP_RESULTS.json', 'NUMERICAL_TEST_RECEIPT.json',
               'PER_SEASON_RESULTS.json', 'ATS_RESULTS.json',
               'CALIBRATION_RESULTS.json', 'TRANSFER_DIAGNOSTICS.csv',
-              'IMPLEMENTATION_DECISION.json', 'MANIFEST.json'
+              'IMPLEMENTATION_DECISION.json', 'IMPLEMENTATION_DECISION.md',
+              'SECONDARY_DIAGNOSTICS.json', 'RED_TEAM_AUDIT.json',
+              'FINAL_RECEIPT.json', 'FINAL_RECEIPT.md', 'MANIFEST.json'
           ]
           for name in required:
               assert (root / name).exists(), name
@@ -71,14 +96,30 @@ jobs:
               'source_signal': result['source_signal'],
               'decisions': result['decisions'],
               'implementation_candidates': result['implementation_candidates'],
+              'preflight': final['preflight_status'],
           }, indent=2, sort_keys=True))
+          PY
+      - name: Refresh manifest after postprocessing
+        run: |
+          python - <<'PY'
+          from hashlib import sha256
+          import json
+          from pathlib import Path
+          root = Path('research/ats-crossmarket-transfer/results')
+          manifest = {}
+          for p in sorted(root.iterdir()):
+              if p.is_file() and p.name != 'MANIFEST.json':
+                  manifest[p.name] = sha256(p.read_bytes()).hexdigest()
+          (root / 'MANIFEST.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
           PY
       - name: Upload immutable evidence artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ats-crossmarket-transfer-${{ github.run_id }}
-          path: research/ats-crossmarket-transfer/results
+          path: |
+            research/ats-crossmarket-transfer/results
+            research/ats-crossmarket-transfer/preflight_receipt.json
           if-no-files-found: warn
           retention-days: 90
       - name: Commit execution evidence to research branch
@@ -86,7 +127,8 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add research/ats-crossmarket-transfer/results
+          git pull --rebase origin research/ats-crossmarket-transfer-v1-20260924
+          git add research/ats-crossmarket-transfer/results research/ats-crossmarket-transfer/preflight_receipt.json
           if git diff --cached --quiet; then
             echo 'No result changes to commit.'
           else
