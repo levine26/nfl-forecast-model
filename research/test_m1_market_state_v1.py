@@ -155,5 +155,7 @@ def test_kickoff_revision_or_event_identity_mismatch_fails_closed() -> None:
     bad["timing_error_minutes"] = -2.0
     bad["kickoff_timestamp_utc"] = (KICKOFF + timedelta(hours=1)).isoformat()
     rows.append(bad)
-    with pytest.raises(ValueError, match="cross-horizon"):
-        build_predictor_row(rows, "2026_04_TEST")
+    predictor, audit = build_predictor_row(rows, "2026_04_TEST")
+    assert predictor is None
+    assert audit["eligible"] is False
+    assert audit["reason"] == "missing_required_predictor_horizon"
