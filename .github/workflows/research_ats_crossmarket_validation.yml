@@ -1,0 +1,86 @@
+name: ATS Cross-Market Transfer Exact-Head Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/ats-crossmarket-transfer/**'
+      - '.github/workflows/research_ats_crossmarket_transfer.yml'
+      - '.github/workflows/research_ats_crossmarket_validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Enforce research-only diff scope
+        run: |
+          git fetch origin main
+          bad="$(git diff --name-only origin/main...HEAD | grep -Ev '^(research/ats-crossmarket-transfer/|\.github/workflows/research_ats_crossmarket_(transfer|validation)\.yml$)' || true)"
+          if [ -n "$bad" ]; then
+            echo 'Production firewall violation:'
+            echo "$bad"
+            exit 1
+          fi
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Syntax check research package
+        run: |
+          python -m py_compile research/ats-crossmarket-transfer/run_experiment.py
+          python -m py_compile research/ats-crossmarket-transfer/probability_only_entrypoint.py
+          python -m py_compile research/ats-crossmarket-transfer/audit_and_postprocess.py
+      - name: Validate committed scientific receipts
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          root = Path('research/ats-crossmarket-transfer/results')
+          required = [
+              'OOF_PREDICTIONS.csv', 'RESULTS.json', 'SOURCE_SIGNAL_AUDIT.json',
+              'BOOTSTRAP_RESULTS.json', 'NUMERICAL_TEST_RECEIPT.json',
+              'PER_SEASON_RESULTS.json', 'ATS_RESULTS.json',
+              'CALIBRATION_RESULTS.json', 'TRANSFER_DIAGNOSTICS.csv',
+              'IMPLEMENTATION_DECISION.json', 'IMPLEMENTATION_DECISION.md',
+              'SECONDARY_DIAGNOSTICS.json', 'RED_TEAM_AUDIT.json',
+              'FINAL_RECEIPT.json', 'FINAL_RECEIPT.md', 'MANIFEST.json'
+          ]
+          for name in required:
+              assert (root / name).is_file(), name
+          result = json.loads((root / 'RESULTS.json').read_text())
+          final = json.loads((root / 'FINAL_RECEIPT.json').read_text())
+          red = json.loads((root / 'RED_TEAM_AUDIT.json').read_text())
+          assert result['outer_test_seasons'] == [2022, 2023, 2024, 2025]
+          assert result['completed_2026_outcomes_used'] == 0
+          assert result['production_changed'] is False
+          assert final['completed_2026_outcomes_used'] == 0
+          assert final['production_changed'] is False
+          assert final['preflight_status'] == 'PASS'
+          assert red['status'] == 'PASS'
+          assert result['common_rows'] == final['common_rows']
+          assert result['common_rows'] >= 800
+          manifest = json.loads((root / 'MANIFEST.json').read_text())
+          for name, digest in manifest.items():
+              p = root / name
+              assert p.is_file(), name
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == digest, name
+          print(json.dumps({
+              'common_rows': final['common_rows'],
+              'implementation_candidates': final['implementation_candidates'],
+              'scientific_execution_sha': final['execution_sha'],
+              'completed_2026_outcomes_used': final['completed_2026_outcomes_used'],
+              'production_changed': final['production_changed'],
+          }, indent=2, sort_keys=True))
+          PY
