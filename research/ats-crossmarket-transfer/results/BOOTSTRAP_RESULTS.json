@@ -1,0 +1,140 @@
+{
+  "bootstrap": {
+    "cpl_offset_vs_kmass_market": {
+      "ci_2_5": -0.0010003390489456761,
+      "ci_97_5": 0.0016853338554897047,
+      "n": 1087,
+      "point_delta": 0.0003777210652882833,
+      "probability_favorable": 0.2882,
+      "resamples": 10000,
+      "seed": 20260924,
+      "weeks": 72
+    },
+    "fst_iproj_vs_marketml_iproj": {
+      "ci_2_5": -0.0010097027463750285,
+      "ci_97_5": 0.002749616685622483,
+      "n": 1087,
+      "point_delta": 0.000900855976004787,
+      "probability_favorable": 0.1749,
+      "resamples": 10000,
+      "seed": 20260924,
+      "weeks": 72
+    },
+    "fst_meanfix_vs_marketml_meanfix": {
+      "ci_2_5": -0.001085668298200987,
+      "ci_97_5": 0.0017166992897076603,
+      "n": 1087,
+      "point_delta": 0.0002976163362740405,
+      "probability_favorable": 0.3504,
+      "resamples": 10000,
+      "seed": 20260924,
+      "weeks": 72
+    }
+  },
+  "holm": {
+    "ATS-XM-CPL-OFFSET-V1": {
+      "holm_adjusted_p": 1.0,
+      "raw_one_sided_bootstrap_p": 0.7118
+    },
+    "ATS-XM-IPROJ-FST-V1": {
+      "holm_adjusted_p": 1.0,
+      "raw_one_sided_bootstrap_p": 0.8251
+    },
+    "ATS-XM-IPROJ-MEANFIX-V1": {
+      "holm_adjusted_p": 1.0,
+      "raw_one_sided_bootstrap_p": 0.6496
+    }
+  },
+  "robustness": {
+    "cpl_offset_vs_kmass_market": {
+      "leave_one_season_out": [
+        {
+          "delta": 1.9946090854570044e-05,
+          "left_out_season": 2022,
+          "n": 816
+        },
+        {
+          "delta": 0.0007474340639164489,
+          "left_out_season": 2023,
+          "n": 815
+        },
+        {
+          "delta": -7.599757449636892e-05,
+          "left_out_season": 2024,
+          "n": 815
+        },
+        {
+          "delta": 0.0008199406685771748,
+          "left_out_season": 2025,
+          "n": 815
+        }
+      ],
+      "leave_one_week_out": {
+        "full_delta": 0.0003777210652882833,
+        "max_loo_delta": 0.0005851695433808227,
+        "min_loo_delta": 0.00018791073953122598,
+        "sign_flips": 0
+      }
+    },
+    "fst_iproj_vs_marketml_iproj": {
+      "leave_one_season_out": [
+        {
+          "delta": 0.0005687812737604109,
+          "left_out_season": 2022,
+          "n": 816
+        },
+        {
+          "delta": 0.0015219493386749326,
+          "left_out_season": 2023,
+          "n": 815
+        },
+        {
+          "delta": 8.212127086771234e-05,
+          "left_out_season": 2024,
+          "n": 815
+        },
+        {
+          "delta": 0.001430979474338478,
+          "left_out_season": 2025,
+          "n": 815
+        }
+      ],
+      "leave_one_week_out": {
+        "full_delta": 0.000900855976004787,
+        "max_loo_delta": 0.0011681834790300118,
+        "min_loo_delta": 0.0005854168965830367,
+        "sign_flips": 0
+      }
+    },
+    "fst_meanfix_vs_marketml_meanfix": {
+      "leave_one_season_out": [
+        {
+          "delta": 0.0003718310510953611,
+          "left_out_season": 2022,
+          "n": 816
+        },
+        {
+          "delta": 0.0007056226716159981,
+          "left_out_season": 2023,
+          "n": 815
+        },
+        {
+          "delta": -0.00039725722479392206,
+          "left_out_season": 2024,
+          "n": 815
+        },
+        {
+          "delta": 0.0005101777861789443,
+          "left_out_season": 2025,
+          "n": 815
+        }
+      ],
+      "leave_one_week_out": {
+        "full_delta": 0.0002976163362740405,
+        "max_loo_delta": 0.0005699682545873674,
+        "min_loo_delta": -3.337405291355054e-05,
+        "sign_flips": 1
+      }
+    }
+  }
+}

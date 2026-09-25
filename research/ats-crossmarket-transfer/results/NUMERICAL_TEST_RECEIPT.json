@@ -1,0 +1,37 @@
+{
+  "folds": [
+    {
+      "max_mean_constraint_error": 2.0410340084708878e-12,
+      "max_meanfix_support_bound": 256,
+      "max_meanfix_tail_mass": 3.355830139473535e-16,
+      "season": 2022
+    },
+    {
+      "max_mean_constraint_error": 2.254196829198918e-12,
+      "max_meanfix_support_bound": 256,
+      "max_meanfix_tail_mass": 2.2479819266755865e-16,
+      "season": 2023
+    },
+    {
+      "max_mean_constraint_error": 3.2933655802480644e-12,
+      "max_meanfix_support_bound": 256,
+      "max_meanfix_tail_mass": 2.2392775565014325e-16,
+      "season": 2024
+    },
+    {
+      "max_mean_constraint_error": 1.652011860642233e-12,
+      "max_meanfix_support_bound": 256,
+      "max_meanfix_tail_mass": 2.2528409475685733e-16,
+      "season": 2025
+    }
+  ],
+  "pretests": {
+    "alpha0_market_null_max_abs_error": 0.0,
+    "beta0_kmass_baseline_max_abs_error": 5.551115123125783e-17,
+    "max_mean_constraint_error": 5.38680211548126e-13,
+    "max_probability_normalization_error": 0.0,
+    "max_tail_mass": 3.355830139473535e-16,
+    "pass": true,
+    "sample_rows": 12
+  }
+}
