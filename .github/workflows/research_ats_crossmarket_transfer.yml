@@ -7,6 +7,7 @@ on:
       - research/ats-crossmarket-transfer-v1-20260924
     paths:
       - 'research/ats-crossmarket-transfer/run_experiment.py'
+      - 'research/ats-crossmarket-transfer/probability_only_entrypoint.py'
       - 'research/ats-crossmarket-transfer/config.json'
       - 'research/ats-crossmarket-transfer/EXPERIMENT_CONTRACT.md'
       - 'research/ats-crossmarket-transfer/DATA_PROVENANCE.md'
@@ -39,9 +40,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
       - name: Syntax check frozen runner
-        run: python -m py_compile research/ats-crossmarket-transfer/run_experiment.py
+        run: |
+          python -m py_compile research/ats-crossmarket-transfer/run_experiment.py
+          python -m py_compile research/ats-crossmarket-transfer/probability_only_entrypoint.py
       - name: Execute historical experiment
-        run: python research/ats-crossmarket-transfer/run_experiment.py --output-dir research/ats-crossmarket-transfer/results
+        run: python research/ats-crossmarket-transfer/probability_only_entrypoint.py --output-dir research/ats-crossmarket-transfer/results
       - name: Verify firewalls and evidence
         run: |
           python - <<'PY'
