@@ -7,6 +7,7 @@ import ExperienceDomFixes from './ExperienceDomFixes.jsx'
 import HistoryReceiptDetails from './HistoryReceiptDetails.jsx'
 import HistoryEditorialGuard from './HistoryEditorialGuard.jsx'
 import BetTracker from './BetTracker.jsx'
+import AtsValueLayer from './AtsValueLayer.jsx'
 import './signal-polish.css'
 
 /**
@@ -27,6 +28,11 @@ import './signal-polish.css'
  * MARKET SIGNAL
  * coherent_fair_margin_home
  * official_winner_probability
+ * ats_model_margin_home
+ * ats_market_margin_home
+ * ats_pick_team
+ * ats_pick_market_spread
+ * Winner and ATS spread value are separate forecasts.
  * FINAL PREGAME
  * LIVE FORECAST
  * IN PROGRESS
@@ -39,6 +45,7 @@ import './signal-polish.css'
  * Completed 2026 outcomes cannot select, tune or refit the frozen production model.
  * presentation_margin = margin_sigma × Φ⁻¹(P_home)
  * Probability-implied line is a presentation translation, not expected margin.
+ * ATS value uses the independent expected-margin forecast versus the sportsbook spread.
  *
  * Forecast movement contract:
  * name="LevLine"
@@ -58,6 +65,7 @@ export default function AppCoherent() {
     <AppSignal/>
     <SignalEnhancements/>
     <ForecastClarity/>
+    <AtsValueLayer/>
     <ForecastHelp/>
     <ExperienceDomFixes/>
     <ExperienceLayer/>
