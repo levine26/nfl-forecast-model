@@ -1,0 +1,96 @@
+name: ATS Cross-Market Transfer V1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/ats-crossmarket-transfer-v1-20260924
+    paths:
+      - 'research/ats-crossmarket-transfer/crossmarket_transfer.py'
+      - 'research/ats-crossmarket-transfer/config.json'
+      - 'research/ats-crossmarket-transfer/EXPERIMENT_CONTRACT.md'
+      - 'research/ats-crossmarket-transfer/DATA_PROVENANCE.md'
+      - 'research/ats-crossmarket-transfer/PROGRAM.md'
+      - '.github/workflows/research_ats_crossmarket_transfer.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONHASHSEED: '0'
+      OPENBLAS_NUM_THREADS: '4'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      NUMEXPR_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/ats-crossmarket-transfer-v1-20260924
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install frozen project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Syntax check frozen runner
+        run: python -m py_compile research/ats-crossmarket-transfer/crossmarket_transfer.py
+      - name: Execute numerical/leakage tests and historical experiment
+        run: |
+          rm -rf research/ats-crossmarket-transfer/results
+          python research/ats-crossmarket-transfer/crossmarket_transfer.py \
+            --output-dir research/ats-crossmarket-transfer/results
+      - name: Verify firewalls and required evidence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('research/ats-crossmarket-transfer/results')
+          receipt = json.loads((root / 'FINAL_RECEIPT.json').read_text())
+          assert receipt['completed_2026_outcomes_used'] == 0
+          assert receipt['production_changed'] is False
+          assert receipt['outer_seasons'] == [2022, 2023, 2024, 2025]
+          assert receipt['numerical_tests']['status'] == 'PASS'
+          assert receipt['leakage_tests']['status'] == 'PASS'
+          assert receipt['common_n'] >= 800
+          required = [
+              'OOF_PREDICTIONS.csv', 'OVERALL_RESULTS.json', 'PER_SEASON_RESULTS.csv',
+              'ATS_RESULTS.json', 'CALIBRATION_REPORT.json', 'BOOTSTRAP_RESULTS.json',
+              'TRANSFER_DIAGNOSTICS.json', 'SOURCE_SIGNAL_AUDIT.json',
+              'NUMERICAL_TEST_RECEIPT.json', 'RED_TEAM_AUDIT.json',
+              'IMPLEMENTATION_DECISION.json', 'IMPLEMENTATION_DECISION.md',
+              'FINAL_RECEIPT.json', 'FINAL_RECEIPT.md', 'MANIFEST.json'
+          ]
+          for name in required:
+              assert (root / name).exists(), name
+          print(json.dumps({
+              'common_n': receipt['common_n'],
+              'selection': {k: {'alpha': v['alpha'], 'beta': v['beta']} for k, v in receipt['selection'].items()},
+              'decision': receipt['decision'],
+          }, indent=2, sort_keys=True))
+          PY
+      - name: Upload immutable evidence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ats-crossmarket-transfer-${{ github.run_id }}
+          path: research/ats-crossmarket-transfer/results
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Commit exact execution evidence to research branch
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/ats-crossmarket-transfer/results
+          if git diff --cached --quiet; then
+            echo 'No result changes to commit.'
+          else
+            git commit -m 'research: preserve ATS cross-market transfer execution evidence'
+            git push origin HEAD:research/ats-crossmarket-transfer-v1-20260924
+          fi
