@@ -1,0 +1,72 @@
+name: ATS Market Manifold V2 Exact-Head Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'research/ats-market-manifold-v2/**'
+      - '.github/workflows/research_ats_market_manifold_v2.yml'
+      - '.github/workflows/research_ats_market_manifold_v2_validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce research-only diff scope
+        run: |
+          git fetch origin main
+          bad="$(git diff --name-only origin/main...HEAD | grep -Ev '^(research/ats-market-manifold-v2/|\.github/workflows/research_ats_market_manifold_v2(_validation)?\.yml$)' || true)"
+          if [ -n "$bad" ]; then
+            echo 'Production firewall violation:'
+            echo "$bad"
+            exit 1
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate committed scientific evidence
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          root = Path('research/ats-market-manifold-v2/results')
+          pre = json.loads(Path('research/ats-market-manifold-v2/preflight_receipt.json').read_text())
+          result = json.loads((root / 'RESULTS.json').read_text())
+          decision = json.loads((root / 'IMPLEMENTATION_DECISION.json').read_text())
+          assert pre['status'] == 'PASS'
+          assert all(pre['checks'].values())
+          assert result['execution_sha'] == '3d1f8cc397cf3b16ac5c800ce214a9bb74110be6'
+          assert result['outer_test_seasons'] == [2022, 2023, 2024, 2025]
+          assert result['common_rows'] == 1087
+          assert result['common_rows_by_season'] == {'2022': 271, '2023': 272, '2024': 272, '2025': 272}
+          assert result['completed_2026_outcomes_used'] == 0
+          assert result['production_changed'] is False
+          assert result['evidence_status'] == 'DEVELOPMENT_NON_PRISTINE'
+          assert result['historical_game_identity']['game_ids_sha256'] == '26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156'
+          assert abs(result['overall']['kmass_market']['cpl_log_loss'] - 0.7696147399) < 1e-9
+          assert abs(result['overall']['marketml_iproj']['cpl_log_loss'] - 0.7682207714) < 1e-9
+          assert [x['theta_selected'] for x in result['chronology_selection']] == [0.75, 0.0, 0.0, 0.0]
+          assert decision['implementation_candidates'] == []
+          assert decision['decisions']['ATS-MM-SHAPETILT-V1']['classification'] == 'NO_MATERIAL_IMPROVEMENT'
+          assert decision['decisions']['ATS-MM-SHAPETILT-MEANFIX-V1']['classification'] == 'NO_MATERIAL_IMPROVEMENT'
+          manifest = json.loads((root / 'MANIFEST.json').read_text())
+          for name, digest in manifest.items():
+              p = root / name
+              assert p.is_file(), name
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == digest, name
+          print(json.dumps({
+              'scientific_execution_sha': result['execution_sha'],
+              'theta_selection': [x['theta_selected'] for x in result['chronology_selection']],
+              'decisions': decision['decisions'],
+              'completed_2026_outcomes_used': 0,
+              'production_changed': False,
+          }, indent=2, sort_keys=True))
+          PY

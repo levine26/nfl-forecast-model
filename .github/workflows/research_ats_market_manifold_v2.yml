@@ -1,0 +1,124 @@
+name: ATS Market Manifold V2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - research/ats-market-manifold-v2-20260924
+    paths:
+      - 'research/ats-market-manifold-v2/run_experiment.py'
+      - 'research/ats-market-manifold-v2/config.json'
+      - 'research/ats-market-manifold-v2/PROGRAM.md'
+      - 'research/ats-market-manifold-v2/EXPERIMENT_CONTRACT.md'
+      - 'research/ats-market-manifold-v2/LITERATURE_AND_RATIONALE.md'
+      - 'research/ats-market-manifold-v2/DATA_PROVENANCE.md'
+      - '.github/workflows/research_ats_market_manifold_v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONHASHSEED: '0'
+      OPENBLAS_NUM_THREADS: '4'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      NUMEXPR_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+      - name: Syntax check frozen V2 runner
+        run: python -m py_compile research/ats-market-manifold-v2/run_experiment.py
+      - name: Run pre-result numerical, chronology, identity, and leakage preflight
+        run: |
+          rm -f research/ats-market-manifold-v2/preflight_receipt.json
+          python research/ats-market-manifold-v2/run_experiment.py \
+            --preflight-only \
+            --preflight-output research/ats-market-manifold-v2/preflight_receipt.json
+          test -s research/ats-market-manifold-v2/preflight_receipt.json
+      - name: Execute frozen 2022-2025 historical experiment
+        run: |
+          rm -rf research/ats-market-manifold-v2/results
+          python research/ats-market-manifold-v2/run_experiment.py \
+            --preflight-output research/ats-market-manifold-v2/preflight_receipt.json \
+            --output-dir research/ats-market-manifold-v2/results
+      - name: Verify firewalls, parity, chronology, and evidence
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          root = Path('research/ats-market-manifold-v2/results')
+          pre = json.loads(Path('research/ats-market-manifold-v2/preflight_receipt.json').read_text())
+          result = json.loads((root / 'RESULTS.json').read_text())
+          assert pre['status'] == 'PASS'
+          assert all(pre['checks'].values())
+          assert result['outer_test_seasons'] == [2022, 2023, 2024, 2025]
+          assert result['common_rows'] == 1087
+          assert result['common_rows_by_season'] == {'2022': 271, '2023': 272, '2024': 272, '2025': 272}
+          assert result['evidence_status'] == 'DEVELOPMENT_NON_PRISTINE'
+          assert result['completed_2026_outcomes_used'] == 0
+          assert result['production_changed'] is False
+          assert result['preflight_status'] == 'PASS'
+          assert result['historical_game_identity']['game_ids_sha256'] == '26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156'
+          assert abs(result['overall']['kmass_market']['cpl_log_loss'] - 0.7696147399) < 1e-9
+          assert abs(result['overall']['marketml_iproj']['cpl_log_loss'] - 0.7682207714) < 1e-9
+          for fold in result['chronology_selection']:
+              assert all(x['season_forward_inner'] is True for x in fold['theta_grid'])
+              assert all(int(s) < int(fold['season']) for s in fold['inner_training_seasons'])
+          required = [
+              'OOF_PREDICTIONS.csv', 'FIXED_DIAGNOSTICS.csv', 'RESULTS.json',
+              'BOOTSTRAP_RESULTS.json', 'PER_SEASON_RESULTS.json',
+              'IMPLEMENTATION_DECISION.json', 'NUMERICAL_RECEIPT.json',
+              'FINAL_RECEIPT.md', 'MANIFEST.json'
+          ]
+          for name in required:
+              assert (root / name).is_file(), name
+          manifest = json.loads((root / 'MANIFEST.json').read_text())
+          for name, digest in manifest.items():
+              p = root / name
+              assert hashlib.sha256(p.read_bytes()).hexdigest() == digest, name
+          print(json.dumps({
+              'execution_sha': result['execution_sha'],
+              'common_rows': result['common_rows'],
+              'theta': [{x['season']: x['theta_selected']} for x in result['chronology_selection']],
+              'decisions': result['decisions'],
+              'implementation_candidates': result['implementation_candidates'],
+          }, indent=2, sort_keys=True))
+          PY
+      - name: Prove production surfaces untouched
+        run: git diff --exit-code -- src/ scripts/ config/ outputs/ site/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ats-market-manifold-v2-${{ github.run_id }}
+          path: |
+            research/ats-market-manifold-v2/results
+            research/ats-market-manifold-v2/preflight_receipt.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Commit immutable execution evidence to research branch
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/ats-market-manifold-v2/results research/ats-market-manifold-v2/preflight_receipt.json
+          if git diff --cached --quiet; then
+            echo 'No result changes to commit.'
+          else
+            git commit -m 'research: preserve ATS market manifold V2 evidence'
+            git push origin HEAD:research/ats-market-manifold-v2-20260924
+          fi

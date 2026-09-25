@@ -1,0 +1,57 @@
+{
+  "decisions": {
+    "ATS-MM-SHAPETILT-MEANFIX-V1": {
+      "ats_hit_rate_delta": -0.001890359168241873,
+      "candidate_minus_N1_delta": 0.0005523346279023598,
+      "classification": "NO_MATERIAL_IMPROVEMENT",
+      "favorable_seasons": 0,
+      "gates": {
+        "ats_not_materially_adverse": true,
+        "favorable_seasons_at_least_3": false,
+        "holm_adjusted_support": false,
+        "no_material_calibration_degradation": true,
+        "no_numerical_or_leakage_failure": true,
+        "no_single_week_switch_concentration": true,
+        "paired_95_interval_entirely_favorable": false,
+        "primary_better": false,
+        "switches_at_least_10": true
+      },
+      "switch_record": {
+        "hit_rate_ex_push": 0.4807692307692308,
+        "losses": 27,
+        "max_single_week_switch_share": 0.1111111111111111,
+        "max_switches_single_season_week": 6,
+        "pushes": 2,
+        "switches": 54,
+        "wins": 25
+      }
+    },
+    "ATS-MM-SHAPETILT-V1": {
+      "ats_hit_rate_delta": -0.006616257088846833,
+      "candidate_minus_N1_delta": 0.0014140084937182401,
+      "classification": "NO_MATERIAL_IMPROVEMENT",
+      "favorable_seasons": 0,
+      "gates": {
+        "ats_not_materially_adverse": true,
+        "favorable_seasons_at_least_3": false,
+        "holm_adjusted_support": false,
+        "no_material_calibration_degradation": false,
+        "no_numerical_or_leakage_failure": true,
+        "no_single_week_switch_concentration": true,
+        "paired_95_interval_entirely_favorable": false,
+        "primary_better": false,
+        "switches_at_least_10": true
+      },
+      "switch_record": {
+        "hit_rate_ex_push": 0.46534653465346537,
+        "losses": 54,
+        "max_single_week_switch_share": 0.09615384615384616,
+        "max_switches_single_season_week": 10,
+        "pushes": 3,
+        "switches": 104,
+        "wins": 47
+      }
+    }
+  },
+  "implementation_candidates": []
+}
