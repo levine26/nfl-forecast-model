@@ -4,7 +4,9 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'research/ats-joint-score-iprojection-v1/**'
+      - 'research/ats-joint-score-iprojection-v1/preflight_support_audit.py'
+      - 'research/ats-joint-score-iprojection-v1/IMPLEMENTATION_CLARIFICATION_001.md'
+      - 'research/ats-joint-score-iprojection-v1/EXECUTION_REQUEST.md'
       - '.github/workflows/research_ats_jsip_v1_preflight.yml'
   workflow_dispatch:
 
@@ -24,6 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
@@ -84,3 +87,15 @@ jobs:
           path: research/ats-joint-score-iprojection-v1/PREFLIGHT_RECEIPT.json
           if-no-files-found: error
           retention-days: 90
+      - name: Preserve preflight receipt on execution branch
+        if: success() && github.event_name == 'pull_request'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/ats-joint-score-iprojection-v1/PREFLIGHT_RECEIPT.json
+          if git diff --cached --quiet; then
+            echo 'No preflight receipt change.'
+          else
+            git commit -m 'research: preserve ATS-JSIP-V1 preflight receipt'
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
