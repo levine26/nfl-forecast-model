@@ -10,6 +10,7 @@ on:
       - 'research/ats-crossmarket-transfer/probability_only_entrypoint.py'
       - 'research/ats-crossmarket-transfer/chronology_strict_entrypoint.py'
       - 'research/ats-crossmarket-transfer/audit_and_postprocess.py'
+      - 'research/ats-crossmarket-transfer/fast_audit_entrypoint.py'
       - 'research/ats-crossmarket-transfer/config.json'
       - 'research/ats-crossmarket-transfer/EXPERIMENT_CONTRACT.md'
       - 'research/ats-crossmarket-transfer/DATA_PROVENANCE.md'
@@ -45,10 +46,11 @@ jobs:
           python -m py_compile research/ats-crossmarket-transfer/probability_only_entrypoint.py
           python -m py_compile research/ats-crossmarket-transfer/chronology_strict_entrypoint.py
           python -m py_compile research/ats-crossmarket-transfer/audit_and_postprocess.py
+          python -m py_compile research/ats-crossmarket-transfer/fast_audit_entrypoint.py
       - name: Run independent numerical and leakage preflight before target scoring
         run: |
           rm -f research/ats-crossmarket-transfer/preflight_receipt.json
-          python research/ats-crossmarket-transfer/audit_and_postprocess.py \
+          python research/ats-crossmarket-transfer/fast_audit_entrypoint.py \
             --preflight \
             --output research/ats-crossmarket-transfer/preflight_receipt.json
       - name: Execute chronology-strict frozen historical experiment
@@ -58,7 +60,7 @@ jobs:
             --output-dir research/ats-crossmarket-transfer/results
       - name: Add preregistered secondary diagnostics and final receipts
         run: |
-          python research/ats-crossmarket-transfer/audit_and_postprocess.py \
+          python research/ats-crossmarket-transfer/fast_audit_entrypoint.py \
             --postprocess \
             --results-dir research/ats-crossmarket-transfer/results \
             --preflight-path research/ats-crossmarket-transfer/preflight_receipt.json
