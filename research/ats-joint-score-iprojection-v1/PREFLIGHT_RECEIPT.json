@@ -1,0 +1,404 @@
+{
+  "candidate": "ATS-JSIP-V1",
+  "candidate_target_ats_results_generated": false,
+  "candidate_target_probabilities_generated": false,
+  "candidate_target_proper_scores_generated": false,
+  "completed_2026_outcomes_used": 0,
+  "controlling_preregistration_commits": [
+    "930320c94ffc1d554f72589328b48a98a3373662",
+    "f67cd216b73ee1861e8019c2eb6553438c3aeb64",
+    "50264684a74b34dbb1d9fa3b4c6c4455c6e111d3"
+  ],
+  "failure_reason": "Frozen adaptive-support invariant is infeasible at the preregistered 160-point ceiling; no legal (df, scale) pair reaches omitted upper-tail mass <1e-12.",
+  "git_sha": "d4a439a455aab86aa4029556a70fad983551fa94",
+  "implementation_clarification": "research/ats-joint-score-iprojection-v1/IMPLEMENTATION_CLARIFICATION_001.md",
+  "next_phase_allowed": "Close ATS-JSIP-V1 as FAILED; a new candidate ID/preregistration is required for any numerical redesign.",
+  "no_post_result_rescue_authorized": true,
+  "phase_disposition": "FAIL_CLOSED_BEFORE_TARGET_SCORING",
+  "preflight_invariants": {
+    "adaptive_support_tail": "FAIL",
+    "canonical_primary_null_identity_and_hash": "PASS",
+    "completed_2026_firewall": "PASS",
+    "half_point_push_zero": "NOT_RUN_FAIL_CLOSED",
+    "joint_pmf_normalization": "NOT_RUN_FAIL_CLOSED",
+    "ml_projection_conditional_win_constraint": "NOT_RUN_FAIL_CLOSED",
+    "ml_projection_tie_preservation": "NOT_RUN_FAIL_CLOSED",
+    "outer_nuisance_chronology": "NOT_RUN_FAIL_CLOSED",
+    "production_firewall": "PASS",
+    "target_outcome_mutation_invariance": "NOT_RUN_FAIL_CLOSED",
+    "whole_number_push_margin_identity": "NOT_RUN_FAIL_CLOSED"
+  },
+  "primary_null_reproduction": {
+    "canonical_oof_sha256": "c50fa8b5aaa088cfe19ef809e0e92f1a3fef0d979073187f8ba69fd545a38f7b",
+    "common_rows": 1087,
+    "coverage": {
+      "accepted_582_common_rows_match": true,
+      "coverage_by_season": {
+        "2021": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        },
+        "2022": {
+          "common_rows": 271,
+          "frozen_fst_rows": 271,
+          "historical_game_rows": 271,
+          "joined_rows": 271
+        },
+        "2023": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        },
+        "2024": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        },
+        "2025": {
+          "common_rows": 272,
+          "frozen_fst_rows": 272,
+          "historical_game_rows": 272,
+          "joined_rows": 272
+        }
+      },
+      "probability_only": true
+    },
+    "historical_identity": {
+      "accepted_582_identity_match": true,
+      "completed_2026_rows": 0,
+      "completed_rows": 3663,
+      "first_season": 2012,
+      "game_ids_sha256": "26aed1cdeb34d0381e1af3fbc4e00a14360330861ad04ecc5c244635b8e0b156",
+      "historical_rows": 3663,
+      "last_season": 2025,
+      "requested_seasons": [
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "schedule_only": true
+    },
+    "max_abs_probability_or_loss_difference": 4.440892098500626e-16,
+    "outer_seasons": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "reproduced_probability_payload_sha256": "4fa2fb0a146e25dcfd1863e64c7de11fedf00106756473a44a35a89598fec064",
+    "row_identity_sha256": "781a3595270f77583ade5fa18e5625afb8b129dd233d667cff95a2492ee122ba",
+    "status": "PASS"
+  },
+  "production_changed": false,
+  "scientific_status": "FAILED",
+  "support_invariant": {
+    "all_rows_have_at_least_one_axis_failing_all_frozen_pairs": true,
+    "all_team_axes_fail_all_frozen_pairs_at_160": true,
+    "best_case_definition": "minimum conditional structural Student-t upper tail over every frozen (df, scale) pair",
+    "best_case_required_bound_max": 360,
+    "best_case_required_bound_median": 360.0,
+    "best_case_required_bound_min": 340,
+    "diagnostic_rows": [
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 3.5596490797541436e-09,
+        "best_case_home_tail_at_160": 5.535201387585518e-09,
+        "game_id": "2022_01_BAL_NYJ",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 18.75,
+        "mu_home": 25.25,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 5.535201387585518e-09,
+        "best_case_home_tail_at_160": 5.942579771011305e-09,
+        "game_id": "2022_01_BUF_LA",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 25.25,
+        "mu_home": 26.25,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 4.570625054291686e-09,
+        "best_case_home_tail_at_160": 3.862451470008172e-09,
+        "game_id": "2022_01_CLE_CAR",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 22.5,
+        "mu_home": 20.0,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 3.6176898250796324e-09,
+        "best_case_home_tail_at_160": 5.438393317820992e-09,
+        "game_id": "2022_01_DEN_SEA",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 19.0,
+        "mu_home": 25.0,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 5.343519210287434e-09,
+        "best_case_home_tail_at_160": 4.4931217466065395e-09,
+        "game_id": "2022_01_GB_MIN",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 24.75,
+        "mu_home": 22.25,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 3.7375087276368395e-09,
+        "best_case_home_tail_at_160": 6.0496715724238075e-09,
+        "game_id": "2022_01_IND_HOU",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 19.5,
+        "mu_home": 26.5,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 4.812794017748064e-09,
+        "best_case_home_tail_at_160": 3.926899421241939e-09,
+        "game_id": "2022_01_JAX_WAS",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 23.25,
+        "mu_home": 20.25,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 5.0701197176317495e-09,
+        "best_case_home_tail_at_160": 7.801151515946587e-09,
+        "game_id": "2022_01_KC_ARI",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 24.0,
+        "mu_home": 30.0,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 6.739796940544861e-09,
+        "best_case_home_tail_at_160": 5.2505404900354756e-09,
+        "game_id": "2022_01_LV_LAC",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 28.0,
+        "mu_home": 24.5,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 5.438393317820992e-09,
+        "best_case_home_tail_at_160": 4.417177986724035e-09,
+        "game_id": "2022_01_NE_MIA",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 25.0,
+        "mu_home": 22.0,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 3.5596490797541436e-09,
+        "best_case_home_tail_at_160": 5.343519210287434e-09,
+        "game_id": "2022_01_NO_ATL",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 18.75,
+        "mu_home": 24.75,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      },
+      {
+        "away_best_case_required_bound": 360,
+        "away_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "away_fails_all_frozen_pairs_at_160": true,
+        "best_case_away_tail_at_160": 5.2505404900354756e-09,
+        "best_case_home_tail_at_160": 3.6176898250796324e-09,
+        "game_id": "2022_01_NYG_TEN",
+        "home_best_case_required_bound": 360,
+        "home_best_pair": {
+          "df": 10,
+          "scale": 8.0
+        },
+        "home_fails_all_frozen_pairs_at_160": true,
+        "mu_away": 24.5,
+        "mu_home": 19.0,
+        "season": 2022,
+        "total_missing": false,
+        "week": 1
+      }
+    ],
+    "frozen_df_grid": [
+      4,
+      6,
+      10
+    ],
+    "frozen_scale_grid": [
+      8.0,
+      10.0,
+      12.0,
+      14.0
+    ],
+    "invariant": "adaptive omitted upper-tail mass < 1e-12 per team marginal at support <= 160",
+    "maximum_best_case_tail_at_160": 9.222892378827844e-09,
+    "maximum_support_bound": 160,
+    "median_best_case_tail_at_160": 4.417177986724035e-09,
+    "minimum_best_case_tail_at_160": 2.2375504136638633e-09,
+    "rows_audited": 1087,
+    "status": "FAIL",
+    "tail_tolerance": 1e-12,
+    "team_axes_audited": 2174,
+    "total_missing_rows": 0
+  }
+}
