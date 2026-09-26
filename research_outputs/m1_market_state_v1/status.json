@@ -1,28 +1,14 @@
 {
   "completed_2026_outcomes_used": 0,
-  "configured_market_sources": [
-    "propline",
-    "the_odds_api"
-  ],
-  "due_pairs": 2,
-  "expected_request_cost": 1,
-  "external_request_made": true,
+  "external_request_made": false,
   "historical_endpoint_used": false,
-  "market_provider": "propline",
-  "minimum_complete_books": 2,
-  "missed": [],
   "phase": "PROSPECTIVE PHASE 2 \u2014 LIVE ACCUMULATION AND OPERATIONAL QUALIFICATION",
   "production_authorized": false,
   "production_changed": false,
   "program_id": "FV2-PROS-M1-MARKETSTATE-01",
-  "provider_failures_before_success": [],
-  "quota_last_request_cost": null,
-  "quota_remaining": 997,
   "quota_reserve": 50,
-  "quota_used": 3,
-  "reason": null,
-  "request_timestamp_utc": "2026-09-26T08:22:26.002050+00:00",
+  "reason": "no_uncaptured_m1_horizon_due",
+  "request_timestamp_utc": "2026-09-26T12:20:13.086162+00:00",
   "research_only": true,
-  "rows_added_this_request": 39,
-  "status": "captured"
+  "status": "skipped"
 }
