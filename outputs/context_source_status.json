@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-09-26T12:34:14.867570+00:00",
+    "as_of": "2026-09-26T15:28:39.618087+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-09-26T12:34:18.486390+00:00",
+    "as_of": "2026-09-26T15:28:43.593595+00:00",
     "conflicts": 0,
     "evidence_items_added": 20,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 20
   },
   "coaching": {
-    "as_of": "2026-09-26T12:31:36.138366+00:00",
+    "as_of": "2026-09-26T15:27:21.543892+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 32,
     "negative_cache_ttl_minutes": 60,
@@ -124,7 +124,7 @@
     "unique_headlines": 16
   },
   "editorial_intelligence": {
-    "as_of": "2026-09-26T12:34:04.706853+00:00",
+    "as_of": "2026-09-26T15:28:29.292275+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -144,14 +144,14 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 0,
+    "evidence_repairs": 77,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
   },
   "evidence": {
     "games": 16,
-    "generated_utc": "2026-09-26T12:31:35.816885+00:00",
+    "generated_utc": "2026-09-26T15:27:21.176754+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
     "signals": 230,
     "status": "healthy"
@@ -166,26 +166,10 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-09-26T12:31:35.816885+00:00",
+  "generated_utc": "2026-09-26T15:27:21.176754+00:00",
   "groq_provider_fallback": {
-    "failed_games": [
-      "2026_03_ARI_SF",
-      "2026_03_ATL_GB",
-      "2026_03_BAL_DAL",
-      "2026_03_CAR_CLE",
-      "2026_03_CIN_PIT",
-      "2026_03_HOU_IND",
-      "2026_03_KC_MIA",
-      "2026_03_LAC_BUF",
-      "2026_03_LA_DEN",
-      "2026_03_LV_NO",
-      "2026_03_MIN_TB",
-      "2026_03_NE_JAX",
-      "2026_03_NYJ_DET",
-      "2026_03_PHI_CHI",
-      "2026_03_SEA_WAS",
-      "2026_03_TEN_NYG"
-    ],
+    "context_refresh_preserved": true,
+    "failed_games": [],
     "games": {
       "2026_03_ARI_SF": {
         "fallback_source": "chatgpt",
@@ -321,7 +305,7 @@
     "status": "healthy"
   },
   "injuries": {
-    "as_of": "2026-09-26T12:31:35.956323+00:00",
+    "as_of": "2026-09-26T15:27:21.360325+00:00",
     "players": 300,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg3",
@@ -329,14 +313,14 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-09-26T13:07:14.394413+00:00",
+    "as_of": "2026-09-26T15:28:50.695864+00:00",
     "cross_game_titles_rejected": 0,
     "games": 16,
     "games_with_display_reporting": 16,
     "games_with_reporting": 16,
     "games_with_substantive_reporting": 16,
     "games_with_trusted_reporting": 16,
-    "generic_titles_rejected": 17,
+    "generic_titles_rejected": 16,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -353,7 +337,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-09-26T12:34:17.568925+00:00",
+    "as_of": "2026-09-26T15:28:42.711141+00:00",
     "evidence_items_added": 20,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 20,
@@ -426,7 +410,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-09-26T12:31:38.499533+00:00",
+    "as_of": "2026-09-26T15:27:24.169629+00:00",
     "charted_plays": 5492,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -459,7 +443,7 @@
     "story_items_added": 16
   },
   "weather": {
-    "as_of": "2026-09-26T12:33:49.899401+00:00",
+    "as_of": "2026-09-26T15:28:14.287259+00:00",
     "games_checked": 13,
     "status": "degraded"
   }
