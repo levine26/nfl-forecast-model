@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import argparse
 import csv
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -33,8 +34,46 @@ def due_rows(feed: Path, now_utc: datetime) -> list[tuple[str, str]]:
     return result
 
 
+def preparation_rows(
+    feed: Path, now_utc: datetime, lookahead_minutes: float
+) -> list[tuple[str, str]]:
+    """Return horizons due now or entering their frozen window during lookahead.
+
+    This is only a workflow preparation signal.  The capture process continues to
+    use the unmodified frozen due_* contract at request time, so lookahead can
+    never admit an early or late market observation.
+    """
+    if lookahead_minutes <= 0:
+        return due_rows(feed, now_utc)
+    seen: set[tuple[str, str]] = set()
+    result: list[tuple[str, str]] = []
+    # Sampling each minute is sufficient because the frozen windows are several
+    # minutes wide; include the exact endpoint for non-integral lookaheads.
+    whole_minutes = int(lookahead_minutes)
+    offsets = [float(i) for i in range(whole_minutes + 1)]
+    if not offsets or offsets[-1] < lookahead_minutes:
+        offsets.append(lookahead_minutes)
+    for offset in offsets:
+        probe = now_utc + timedelta(minutes=offset)
+        for row in due_rows(feed, probe):
+            if row not in seen:
+                seen.add(row)
+                result.append(row)
+    return result
+
+
 def main() -> None:
-    rows = due_rows(Path("outputs/this_week.csv"), datetime.now(timezone.utc))
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--lookahead-minutes",
+        type=float,
+        default=0.0,
+        help="Preparation-only lookahead; does not change capture admissibility.",
+    )
+    args = parser.parse_args()
+    feed = Path("outputs/this_week.csv")
+    now = datetime.now(timezone.utc)
+    rows = preparation_rows(feed, now, args.lookahead_minutes)
     print("due=true" if rows else "due=false")
     for game_id, horizon in rows:
         print(f"{game_id} {horizon}")
