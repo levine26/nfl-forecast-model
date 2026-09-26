@@ -44,7 +44,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 0,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 0,
       "slate_aware": true,
@@ -125,7 +125,7 @@
     ],
     "game_id": "2026_03_ARI_SF",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Arizona\u2019s new-look offense meets San Francisco\u2019s restored defensive core in an NFC West test",
+    "headline": "Arizona tries to steady Brissett against Purdy and San Francisco\u2019s fast-starting attack",
     "key_factors": [
       {
         "advantage_team": null,
@@ -241,19 +241,31 @@
       }
     ],
     "paragraphs": [
-      "Arizona enters the divisional matchup trying to establish a steadier identity around Jacoby Brissett, a deep backfield and Marvin Harrison Jr., while San Francisco\u2019s ceiling still depends on keeping its veteran core available. The Cardinals need efficient early-down offense to keep the 49ers\u2019 pass rush from dictating the game. San Francisco can answer by leaning on Christian McCaffrey, forcing Arizona to tackle in space and creating manageable situations for Brock Purdy.",
-      "LevLine 3.0 gives the 49ers a 78.2% win probability over the Cardinals. Its frozen F-ST engine reconciles a 75.1% football-only signal with a 78.7% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of San Francisco 49ers -10.0, a market line of San Francisco 49ers -8.5, and an approximate coherent score of SF 28 \u2013 ARI 18. Arizona\u2019s path depends on staying ahead of the chains, while San Francisco can stress the Cardinals by combining efficient rushing with a healthier defensive front. The pick: San Francisco 49ers moneyline."
+      "Arizona heads to Santa Clara needing a cleaner offensive response after Seattle held the Cardinals to seven points, with Jacoby Brissett tasked with keeping the offense on schedule and creating chances for Marvin Harrison Jr. San Francisco arrives 2-0 behind an exceptionally efficient start from Brock Purdy, while Kyle Shanahan can keep stressing Arizona horizontally and underneath with Christian McCaffrey. The Cardinals\u2019 clearest counter is avoiding negative early-down plays and keeping San Francisco\u2019s pass rush from controlling long-yardage snaps.",
+      "LevLine 3.0 gives the 49ers a 78.2% win probability over the Cardinals. Its frozen F-ST engine reconciles a 75.1% football-only signal with a 78.7% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of San Francisco 49ers -10.0, a market line of San Francisco 49ers -8.5, and an approximate coherent score of SF 28 \u2013 ARI 18. Arizona needs sustained early-down efficiency to keep manageable down-and-distance, while San Francisco can lean on Purdy\u2019s rhythm and McCaffrey\u2019s versatility to control the matchup. The pick: San Francisco 49ers moneyline."
     ],
     "prediction": "SF to win; SF 30.0 \u2013 ARI 17.0 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "San Francisco 49ers",
+        "source_url": "https://www.49ers.com/video/kyle-shanahan-talks-brock-purdy-s-player-of-the-week-award-previews-cardinals",
+        "title": "Kyle Shanahan Talks Brock Purdy's Player of the Week Award, Previews Cardinals"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "sports.yahoo.com",
+        "source_url": "https://sports.yahoo.com/articles/cardinals-vs-49ers-history-arizona-191747833.html",
+        "title": "Cardinals vs. 49ers history: Arizona struggling in recent meetings"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -285,12 +297,13 @@
       {
         "as_of": "2026-09-24T16:10:00+00:00",
         "source_name": "Yahoo Sports",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909a9cd74bf68f965a26cc0032c5&url=https%3a%2f%2fsports.yahoo.com%2farticles%2fatlanta-falcons-green-bay-packers-231056253.html&c=1548787102397682955&mkt=en-us",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7a4ccf19a43e8bef4964438cf48cf&url=https%3a%2f%2fsports.yahoo.com%2farticles%2fatlanta-falcons-green-bay-packers-231056253.html&c=1548787102397682955&mkt=en-us",
         "title": "Atlanta Falcons at Green Bay Packers inactives: Who\u2019s in & out for Thursday Night Football?"
       }
     ],
     "editorial_version": "story-desk-v3",
     "editorial_voice": {
+      "copilot_researched": true,
       "evidence_led": true,
       "explicit_final_pick": true,
       "explicit_model_explanation": true,
@@ -303,6 +316,7 @@
       "media_led": true,
       "media_source_count": 2,
       "primary_variant": 1,
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 1,
       "slate_aware": true,
@@ -376,7 +390,7 @@
     ],
     "game_id": "2026_03_ATL_GB",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Falcons\u2013Packers: ATL: Samson Ebukam \u2014 Out",
+    "headline": "Penix\u2019s return changes the equation for Atlanta at Lambeau",
     "key_factors": [
       {
         "advantage_team": null,
@@ -487,24 +501,31 @@
       }
     ],
     "paragraphs": [
-      "Falcons\u2013Packers centers on ATL: Samson Ebukam \u2014 Out. The official NFL injury report lists Samson Ebukam (DE) as Out. Hamstring. LevLine does not make up an injury point value for it. For Falcons, that detail changes Falcons' choices against Packers; Packers can exploit it only by forcing Falcons off schedule.",
-      "LevLine 3.0 gives the Packers a 65.4% win probability over the Falcons. Its frozen F-ST engine reconciles a 66.6% football-only signal with a 66.9% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Green Bay Packers -5.1, a market line of Green Bay Packers -4.5, and an approximate coherent score of GB 24 \u2013 ATL 19. Football context: ATL: Samson Ebukam \u2014 Out. The pick: Green Bay Packers moneyline."
+      "Atlanta finally gets Michael Penix Jr. back after an 0-2 start, and his return should let Kevin Stefanski build more of the offense around Bijan Robinson, Drake London and a downfield passing game that never found traction with Cooper Rush. Green Bay is 1-1 after surviving the Jets in overtime, but Jordan Love will operate behind a banged-up line and without Jayden Reed. The central question is whether Atlanta can protect Penix long enough to make Green Bay defend the entire field.",
+      "LevLine 3.0 gives the Packers a 66.8% win probability over the Falcons. Its frozen F-ST engine reconciles a 66.6% football-only signal with a 68.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Green Bay Packers -5.6, a market line of Green Bay Packers -5.5, and an approximate coherent score of GB 25 \u2013 ATL 19. Penix raises Atlanta\u2019s offensive ceiling immediately, but Green Bay still owns the more stable overall setup if its protection holds and Love avoids obvious passing situations. The pick: Green Bay Packers moneyline."
     ],
     "prediction": "GB to win; GB 24.4 \u2013 ATL 19.4 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-25T03:18:00+00:00",
-        "source_name": "ESPN",
-        "source_url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQUXMwWFdKdnc5cENHVjZ5ejVuQUhOS0EzelgyYXhFaGI1V1F3ekFyRGoxSzdJVUNpNm9ycFp0SkY1UUdYbmI4UnIzdWJtbWJQc2FQNjVDODlsbWQ0cnVtMDA1QlU1bUhBWS1xVkV2c1BEUmhUVGtiTVJ3Q1BpTWJKcm5FZGdRT3ZSSnByTWJRYWhwaE9ldmdfOTg2cXVna0VxNE1MNWZqSVNXS2hy?oc=5",
-        "title": "Falcons upset Packers in Michael Penix Jr.'s return from ACL"
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Associated Press",
+        "source_url": "https://apnews.com/article/green-bay-packers-atlanta-falcons-preview-666fc31671073d1728b5fad0fd3c3567",
+        "title": "Falcons hoping Penix\u2019s return sparks their offense as they visit the Packers"
       },
       {
-        "as_of": "2026-09-24T16:10:00+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "NFL.com",
+        "source_url": "https://www.nfl.com/news/falcons-michael-penix-jr-starting-quarterback-week-3-game-vs-packers",
+        "title": "Falcons name Michael Penix Jr. starting quarterback for Week 3 game vs. Packers"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "Yahoo Sports",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909a9cd74bf68f965a26cc0032c5&url=https%3a%2f%2fsports.yahoo.com%2farticles%2fatlanta-falcons-green-bay-packers-231056253.html&c=1548787102397682955&mkt=en-us",
+        "source_url": "https://sports.yahoo.com/articles/atlanta-falcons-green-bay-packers-231056253.html",
         "title": "Atlanta Falcons at Green Bay Packers inactives: Who\u2019s in & out for Thursday Night Football?"
       }
     ],
+    "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
     "story_spine": {
       "primary_advantage_team": "GB",
       "primary_family": "explosives",
@@ -561,7 +582,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 2,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 2,
       "slate_aware": true,
@@ -628,7 +649,7 @@
     ],
     "game_id": "2026_03_BAL_DAL",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Baltimore\u2019s pressure game challenges Dallas in a matchup built around quarterback efficiency",
+    "headline": "Jackson and Prescott bring contrasting pressure points into Rio",
     "key_factors": [
       {
         "advantage_team": null,
@@ -739,19 +760,31 @@
       }
     ],
     "paragraphs": [
-      "Baltimore and Dallas arrive with offenses capable of creating explosive plays, but the deciding issue is likely to be how cleanly each quarterback operates when the pocket compresses. The Ravens can use their run game and movement concepts to keep Dallas from attacking obvious passing downs. The Cowboys need to protect long enough for their receivers to work vertically, while their defense must prevent Baltimore from turning early-down efficiency into sustained scoring drives.",
-      "LevLine 3.0 gives the Ravens a 62.5% win probability over the Cowboys. Its frozen F-ST engine reconciles a 55.3% football-only signal with a 60.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Baltimore Ravens -4.1, a market line of Baltimore Ravens -3.5, and an approximate coherent score of BAL 25 \u2013 DAL 21. Baltimore\u2019s ability to stay multidimensional can reduce obvious passing downs, while Dallas needs protection and explosive completions to keep the game from tilting toward the Ravens. The pick: Baltimore Ravens moneyline."
+      "Lamar Jackson gives Baltimore the ability to punish Dallas when its rush loses contain, while Dak Prescott arrives in Rio after a sharp Week 2 response from the Cowboys offense. Baltimore is also monitoring Zay Flowers, which could change how aggressively the Ravens attack outside. Dallas has defensive injury concerns of its own, so Brian Schottenheimer may need Prescott to sustain drives and keep Jackson from controlling possession with Baltimore\u2019s run game.",
+      "LevLine 3.0 gives the Ravens a 62.5% win probability over the Cowboys. Its frozen F-ST engine reconciles a 55.3% football-only signal with a 60.0% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Baltimore Ravens -4.1, a market line of Baltimore Ravens -3.5, and an approximate coherent score of BAL 25 \u2013 DAL 21. Baltimore can stress Dallas horizontally and vertically through Jackson, while the Cowboys need Prescott to sustain efficient possessions and keep a depleted defense from carrying the matchup. The pick: Baltimore Ravens moneyline."
     ],
     "prediction": "BAL to win; DAL 22.0 \u2013 BAL 23.7 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Dallas Cowboys",
+        "source_url": "https://www.dallascowboys.com/news/big-picture-10-storylines-for-cowboys-ravens-x7187",
+        "title": "Big Picture: 10 Storylines for Cowboys & Ravens"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "baltimoreravens.com",
+        "source_url": "https://www.baltimoreravens.com/news/late-for-work-what-pundits-expect-ravens-cowboys-rio-nfl-week-3-predictions",
+        "title": "Late for Work: What Pundits Expect in Ravens-Cowboys Game in Rio"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -781,10 +814,10 @@
         "title": "Browns vs Panthers Week 3 injury report: Concerns for CAR as 2 weapons added as DNPs"
       },
       {
-        "as_of": "2026-09-24T16:22:00+00:00",
-        "source_name": "Associated Press News",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909a01314e6e89535b8afdf35f8a&url=https%3a%2f%2fapnews.com%2farticle%2fpanthers-browns-preview-013a639638dbdc0a44942412b1db3d01&c=1934303928862736519&mkt=en-us",
-        "title": "Intrigue surrounds possible reaction by Cleveland fans to Watson as Browns, Panthers look to go 2-1"
+        "as_of": "2026-09-24T16:28:00+00:00",
+        "source_name": "ESPN",
+        "source_url": "https://www.espn.com/nfl/preview/_/gameId/401872949",
+        "title": "Panthers vs. Browns (Sep 27, 2026) Pregame"
       },
       {
         "as_of": "2026-09-23T15:40:42+00:00",
@@ -814,7 +847,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 3,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 3,
       "slate_aware": true,
@@ -881,7 +914,7 @@
     ],
     "game_id": "2026_03_CAR_CLE",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Carolina and Cleveland meet in a field-position fight shaped by protection and early downs",
+    "headline": "Bryce Young\u2019s fast start meets a Cleveland front built to disrupt rhythm",
     "key_factors": [
       {
         "advantage_team": null,
@@ -968,28 +1001,34 @@
       }
     ],
     "paragraphs": [
-      "Carolina and Cleveland both need their offenses to avoid the negative plays that turn manageable series into obvious passing situations. The Panthers can help their quarterback by establishing the run and creating play-action opportunities, while Cleveland\u2019s defensive front is built to punish protection breakdowns. On the other side, the Browns need efficient early-down execution so Carolina can\u2019t attack a predictable dropback game. Turnovers and field position loom especially large in this matchup.",
-      "LevLine 3.0 gives the Panthers a 57.9% win probability over the Browns. Its frozen F-ST engine reconciles a 57.1% football-only signal with a 56.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Carolina Panthers -2.6, a market line of Carolina Panthers -2.5, and an approximate coherent score of CAR 24 \u2013 CLE 21. The cleaner offense on early downs should control the matchup, because both defenses have clearer answers when the opponent is forced into predictable passing situations. The pick: Carolina Panthers moneyline."
+      "Bryce Young brings Carolina to Cleveland after the Panthers\u2019 offense found its footing in Week 2, but the availability of Jalen Coker and Xavier Legette bears watching after both appeared on the injury report. Deshaun Watson and the Browns need to answer with more consistency of their own, because Carolina can create pressure if Cleveland falls behind the chains. The matchup turns on whether Young gets clean throws early and whether Watson can avoid giving Carolina short fields.",
+      "LevLine 3.0 gives the Panthers a 57.9% win probability over the Browns. Its frozen F-ST engine reconciles a 57.1% football-only signal with a 56.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Carolina Panthers -2.6, a market line of Carolina Panthers -2.5, and an approximate coherent score of CAR 24 \u2013 CLE 21. Carolina\u2019s offense has the cleaner recent rhythm, while Cleveland\u2019s best counter is forcing Young off his first read and keeping Watson out of obvious rescue situations. The pick: Carolina Panthers moneyline."
     ],
     "prediction": "CAR to win; CLE 21.7 \u2013 CAR 22.8 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Carolina Panthers",
+        "source_url": "https://www.panthers.com/video/panthers-vs-browns-week-3-preview-nfl-daily",
+        "title": "Panthers vs. Browns Week 3 Preview NFL Daily"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "clevelandbrowns.com",
+        "source_url": "https://www.clevelandbrowns.com/news/browns-defense-looks-to-contain-panthers-passing-attack",
+        "title": "Browns' defense looks to contain Panthers' passing attack"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
-      },
-      {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
-        "source_name": "Yahoo Sports",
-        "source_url": "https://sports.yahoo.com/articles/deshaun-watson-browns-prep-panthers-140100045.html",
-        "title": "Deshaun Watson, Browns prep for Panthers. Live updates from Sept. 23"
       }
     ],
     "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
@@ -1031,7 +1070,7 @@
       "media_led": true,
       "media_source_count": 1,
       "primary_variant": 4,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 4,
       "slate_aware": true,
@@ -1112,7 +1151,7 @@
     ],
     "game_id": "2026_03_CIN_PIT",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Cincinnati\u2019s spacing offense runs into Pittsburgh\u2019s pressure plan in an AFC North collision",
+    "headline": "Burrow tests Pittsburgh\u2019s defense while Rodgers searches for more answers",
     "key_factors": [
       {
         "advantage_team": "CIN",
@@ -1228,19 +1267,31 @@
       }
     ],
     "paragraphs": [
-      "Cincinnati\u2019s best route through Pittsburgh is to keep its passing game on schedule and prevent the Steelers\u2019 front from turning the afternoon into a protection test. Pittsburgh can counter by compressing the pocket and forcing throws before deeper concepts develop. When the Steelers have the ball, Aaron Rodgers\u2019 ability to identify pressure and distribute quickly matters against a Bengals defense that cannot afford to surrender easy explosives. Red-zone execution could separate two familiar divisional opponents.",
-      "LevLine 3.0 gives the Bengals a 65.2% win probability over the Steelers. Its frozen F-ST engine reconciles a 55.2% football-only signal with a 62.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Cincinnati Bengals -5.0, a market line of Cincinnati Bengals -3.5, and an approximate coherent score of CIN 25 \u2013 PIT 20. Cincinnati benefits when its passing game stays on schedule, while Pittsburgh\u2019s clearest counter is pressure that forces quicker decisions and limits explosive routes downfield. The pick: Cincinnati Bengals moneyline."
+      "Joe Burrow takes an unbeaten Cincinnati team into Pittsburgh against a Steelers offense that has struggled to generate yardage through two weeks. Aaron Rodgers is getting the ball out more slowly than he did last season, which gives the Bengals a chance to make Pittsburgh\u2019s protection hold up longer. Cincinnati has injury questions along its defensive front, while the Steelers are monitoring several offensive contributors. The divisional matchup hinges on which quarterback can avoid letting pressure dictate the game.",
+      "LevLine 3.0 gives the Bengals a 65.2% win probability over the Steelers. Its frozen F-ST engine reconciles a 55.2% football-only signal with a 62.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Cincinnati Bengals -5.0, a market line of Cincinnati Bengals -3.5, and an approximate coherent score of CIN 25 \u2013 PIT 20. Cincinnati has the stronger offensive baseline behind Burrow, while Pittsburgh needs Rodgers to speed up the passing game and prevent the Bengals from dictating down and distance. The pick: Cincinnati Bengals moneyline."
     ],
     "prediction": "CIN to win; PIT 22.1 \u2013 CIN 23.6 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Cincinnati Bengals",
+        "source_url": "https://www.bengals.com/news/scouting-report-steelers-preview-week-3-2026",
+        "title": "Scouting Report Week 3: Bengals Open Divisional Play in Pittsburgh"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "steelers.com",
+        "source_url": "https://www.steelers.com/news/matt-s-stats-week-3-vs-bengals",
+        "title": "Matt's Stats: Week 3 vs. Bengals"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -1291,7 +1342,7 @@
       "media_led": true,
       "media_source_count": 2,
       "primary_variant": 5,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 5,
       "slate_aware": true,
@@ -1351,7 +1402,7 @@
     ],
     "game_id": "2026_03_HOU_IND",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Houston\u2019s defensive speed tests Indianapolis\u2019 balance in an AFC South leverage game",
+    "headline": "Stroud and Taylor put Houston\u2019s front seven at the center of an AFC South test",
     "key_factors": [
       {
         "advantage_team": "HOU",
@@ -1459,19 +1510,31 @@
       }
     ],
     "paragraphs": [
-      "Houston\u2019s defense can make this difficult if its front creates long-yardage situations and lets the secondary play aggressively behind the rush. Indianapolis therefore needs Jonathan Taylor and the early-down offense to keep the full playbook available rather than asking the passing game to repeatedly rescue drives. Houston\u2019s offense has its own challenge: sustaining protection long enough to create explosives without giving the Colts extra possessions through sacks or turnovers. Third-down efficiency should carry unusual weight.",
-      "LevLine 3.0 gives the Texans a 53.6% win probability over the Colts. Its frozen F-ST engine reconciles a 60.3% football-only signal with a 53.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Houston Texans -1.2, a market line of Houston Texans -1.5, and an approximate coherent score of HOU 23 \u2013 IND 22. Indianapolis is most dangerous when its run game preserves balance, while Houston can seize control by creating long-yardage situations and winning the resulting protection matchups. The pick: Houston Texans moneyline."
+      "C.J. Stroud and Houston need a cleaner offensive performance after a slow start, while Indianapolis can lean on Jonathan Taylor to keep the Texans from turning the game into a pure pass-rush contest. Will Anderson Jr. has emphasized Taylor as a central problem for Houston\u2019s defense, and that matchup should shape how often the Colts can stay balanced. If Indianapolis protects its run threat, Stroud may have fewer possessions to solve a Colts defense that has also struggled early.",
+      "LevLine 3.0 gives the Texans a 53.6% win probability over the Colts. Its frozen F-ST engine reconciles a 60.3% football-only signal with a 53.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Houston Texans -1.2, a market line of Houston Texans -1.5, and an approximate coherent score of HOU 23 \u2013 IND 22. Houston\u2019s clearest path is disrupting Taylor before Indianapolis can dictate tempo, then giving Stroud enough possessions to attack a Colts defense that has shown vulnerability. The pick: Houston Texans moneyline."
     ],
     "prediction": "HOU to win; IND 22.1 \u2013 HOU 23.3 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Houston Texans",
+        "source_url": "https://www.houstontexans.com/video/will-anderson-jr-on-jonathan-taylor-swarm-texans-vs-colts",
+        "title": "Will Anderson Jr. on Jonathan Taylor, SWARM & Texans vs Colts"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "colts.com",
+        "source_url": "https://www.colts.com/news/colts-texans-week-3-preview-tackling-nico-collins-and-game-defining-storylines-as-colts-seek-mandatory-first-win-of-2026-season",
+        "title": "Colts-Texans Week 3 preview: Tackling, Nico Collins and game-defining storylines as Colts seek 'mandatory' first win of 2026 season"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -1495,10 +1558,10 @@
     "case_for_pick": "KC early-down approach vs MIA: early-down leverage favors MIA.",
     "current_reported_sources": [
       {
-        "as_of": "2026-09-25T20:30:00+00:00",
+        "as_of": "2026-09-26T00:45:00+00:00",
         "source_name": "Yahoo Sports",
-        "source_url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNaW0ta3hNQ3NWSmNlYkRKZWhjN0VJZFV5eUpYUUVDbGNndzlZT3FtLTBYdTZITWJkVnVTSno5TEk4OVJsanVuU0NXY3ZjX0twSW43eFFiUDI5NEdaUHc3bHdCazNIbzloQWFiOFhsR2NkMlR3WFVYTC15cFdBQW13djNRZw?oc=5",
-        "title": "Chiefs-Dolphins Week 3 final injury report: Chamarri Conner doubtful"
+        "source_url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPZDBMR2swN1ZGSWlLbVVYYklNOXJZX3pJRDh3eENkNUdVNDFWcWJNM3o3cjRlMXFqaXdySnRVc1JHNjNZUHU1UGNlMHQxcFgwT3kzeHZlSW16Nk1vbUJYTU5uRmRqNnVfMlFuSloybnZWWDd2XzR2dTNINWJoekFXV1FJRUcwcWNVSDc0?oc=5",
+        "title": "Chiefs Announce Patrick Mahomes, 11 More Injury Updates Before Dolphins Game"
       },
       {
         "as_of": "2026-09-25T20:32:05+00:00",
@@ -1528,7 +1591,7 @@
       "media_led": true,
       "media_source_count": 3,
       "primary_variant": 6,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 6,
       "slate_aware": true,
@@ -1602,7 +1665,7 @@
     ],
     "game_id": "2026_03_KC_MIA",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Kansas City\u2019s protection faces Miami\u2019s speed in a matchup that can turn on explosive plays",
+    "headline": "Mahomes takes Kansas City\u2019s unbeaten start into Miami\u2019s speed test",
     "key_factors": [
       {
         "advantage_team": null,
@@ -1721,19 +1784,31 @@
       }
     ],
     "paragraphs": [
-      "Kansas City\u2019s offense is still built around Patrick Mahomes creating answers before and after the snap, but protection remains central as he works behind a line that drew scrutiny entering the season. Miami can stress that structure with speed and simulated pressure, then try to create space for its own playmakers against Kansas City\u2019s defense. The Chiefs need to prevent negative plays from disrupting drives; the Dolphins need explosives without exposing their quarterback to obvious passing-down pressure.",
-      "LevLine 3.0 gives the Chiefs a 86.8% win probability over the Dolphins. Its frozen F-ST engine reconciles a 61.5% football-only signal with a 83.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -14.4, a market line of Kansas City Chiefs -10.0, and an approximate coherent score of KC 30 \u2013 MIA 16. Kansas City\u2019s ability to protect and stay efficient gives Mahomes more answers, while Miami needs speed and explosive plays to prevent the Chiefs from controlling possession and situation. The pick: Kansas City Chiefs moneyline."
+      "Patrick Mahomes takes a 2-0 Chiefs team on the road for the first time this season, with Travis Kelce still central to how Kansas City solves coverage in the middle of the field. Miami needs Tua Tagovailoa to answer with sustained offense rather than relying on isolated explosive plays, because the Chiefs have repeatedly shown they can survive close games. The Dolphins\u2019 best chance is to create pace and space without letting Mahomes control the game\u2019s most important possessions.",
+      "LevLine 3.0 gives the Chiefs a 86.8% win probability over the Dolphins. Its frozen F-ST engine reconciles a 61.5% football-only signal with a 83.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Kansas City Chiefs -14.4, a market line of Kansas City Chiefs -10.0, and an approximate coherent score of KC 30 \u2013 MIA 16. Kansas City has the steadier late-down structure behind Mahomes, while Miami needs Tagovailoa to create sustained drives and keep the Chiefs from owning the game\u2019s leverage moments. The pick: Kansas City Chiefs moneyline."
     ],
     "prediction": "KC to win; MIA 21.3 \u2013 KC 25.0 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Kansas City Chiefs",
+        "source_url": "https://www.chiefs.com/news/kansas-city-chiefs-vs-miami-dolphins-how-when-and-where-to-watch-nfl-week-3",
+        "title": "Kansas City Chiefs vs Miami Dolphins: How, When, and Where to Watch NFL Week 3 ?"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "miamidolphins.com",
+        "source_url": "https://www.miamidolphins.com/news/top-quotes-dolphins-prepare-for-home-opener-against-the-chiefs",
+        "title": "Top Quotes: Dolphins prepare for home opener against the Chiefs"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -1763,12 +1838,6 @@
         "title": "What we learned from Bills, Chargers Thursday injury reports"
       },
       {
-        "as_of": "2026-09-23T06:07:44+00:00",
-        "source_name": "Sports Illustrated on MSN",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909a73884ffa85fe07d1b15fb290&url=https%3a%2f%2fwww.msn.com%2fen-us%2fnews%2fother%2fbuffalo-bills-defense-must-exploit-fatal-flaw-in-los-angeles-chargers-offense%2far-AA2cPhHJ&c=8196458773350067533&mkt=en-us",
-        "title": "Buffalo Bills' defense must exploit fatal flaw in Los Angeles Chargers' offense"
-      },
-      {
         "as_of": "2026-09-25T20:28:00+00:00",
         "source_name": "Sports Illustrated",
         "source_url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPMVpNajJUZF9xdTlHd3FSdkVud2wwNkxhb1RESlAwSjNxMVFuZFp0MWtSVnlPa1J3TFNYTkxrRWoza282Q1VGeEs3al90WS1vQWFaZEkwZmJYbHBrLU1EMlJ5NEVJd2JtYjZ2THJWWlpCRUY5TTlwUUtpbEN1LXRqaERVb2lQbXJtdThySVRIa0NjVkZPWDducTVsN0RpUjRldi1BYUV5T0twN3lQNFY5YWs2TzVyZF8yS3lUMEltdnREQUJWaGc?oc=5",
@@ -1779,6 +1848,12 @@
         "source_name": "ESPN",
         "source_url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5yWklrelNuMXJjV0E3Nk1SUlJhdlpKYzI2YmZQSjZ2cjlXRlNoUThvY2pjS1dUSnhrYVlBM25FWVBub2pLS2Q0ZnMxbmFVWWtDR1lSdFhVRkVkUUFkWHB1dQ?oc=5",
         "title": "Chargers vs. Bills (28 Sep, 2026) Live Score"
+      },
+      {
+        "as_of": "2026-09-26T01:30:00+00:00",
+        "source_name": "USA TODAY",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7a4cc416345d797b6c2bd116f531f&url=https%3a%2f%2fwww.usatoday.com%2fstory%2fsports%2ffootball%2fnfl%2fbills%2f2026%2f09%2f26%2forchard-park-weather-sunday-for-bills-vs-chargers-game-conditions%2f91935691007%2f&c=13336709812160214256&mkt=en-us",
+        "title": "Bills vs Chargers weather forecast for game conditions in Orchard Park"
       }
     ],
     "editorial_version": "story-desk-v3",
@@ -1796,7 +1871,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 7,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 7,
       "slate_aware": true,
@@ -1884,7 +1959,7 @@
     ],
     "game_id": "2026_03_LAC_BUF",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Buffalo\u2019s injury questions sharpen the protection battle against the Chargers",
+    "headline": "Allen\u2019s hot start meets a Chargers team desperate to steady Herbert",
     "key_factors": [
       {
         "advantage_team": null,
@@ -1995,19 +2070,31 @@
       }
     ],
     "paragraphs": [
-      "Buffalo enters Week 3 monitoring defensive tackle Ed Oliver and receiver DJ Moore after Moore suffered a shoulder injury, adding uncertainty to both sides of the ball. The Chargers have protection concerns of their own after reshuffling the interior line, making Buffalo\u2019s ability to generate pressure without overcommitting important. Los Angeles needs Justin Herbert operating from manageable pockets; Buffalo needs Josh Allen to create explosives while avoiding the turnovers that can erase otherwise productive drives.",
-      "LevLine 3.0 gives the Bills a 73.4% win probability over the Chargers. Its frozen F-ST engine reconciles a 72.5% football-only signal with a 74.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Buffalo Bills -8.1, a market line of Buffalo Bills -7.0, and an approximate coherent score of BUF 26 \u2013 LAC 18. Buffalo\u2019s injury picture and Los Angeles\u2019 interior protection make trench execution central, with both quarterbacks most dangerous when pressure does not dictate their down-to-down choices. The pick: Buffalo Bills moneyline."
+      "Josh Allen has opened the season in control of Buffalo\u2019s offense, while Justin Herbert takes the Chargers into a difficult road spot after an uneven start. Los Angeles has acknowledged the urgency of the matchup, and Herbert\u2019s protection will be central against a Bills defense that can force him to extend plays. Buffalo is also managing injuries around Ed Oliver and DJ Moore, so Sean McDermott may need Allen to keep creating points even if the supporting cast is not fully intact.",
+      "LevLine 3.0 gives the Bills a 73.4% win probability over the Chargers. Its frozen F-ST engine reconciles a 72.5% football-only signal with a 74.4% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Buffalo Bills -8.1, a market line of Buffalo Bills -7.0, and an approximate coherent score of BUF 26 \u2013 LAC 18. Buffalo has the stronger quarterback-driven momentum behind Allen, while Los Angeles needs Herbert protected well enough to prevent the Bills from turning pressure into short-field opportunities. The pick: Buffalo Bills moneyline."
     ],
     "prediction": "BUF to win; BUF 26.6 \u2013 LAC 16.6 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Los Angeles Chargers",
+        "source_url": "https://www.chargers.com/news/bills-preview-josh-allen-justin-herbert-2026",
+        "title": "A Chargers-Bills Preview Ahead of Week 3 in Buffalo"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "buffalobills.com",
+        "source_url": "https://www.buffalobills.com/news/buffalo-bills-vs-los-angeles-chargers-where-to-watch-stream-and-listen-week-3",
+        "title": "Buffalo Bills vs. Los Angeles Chargers | Where to watch, stream and listen | Week 3"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49975029/bills-take-ed-oliver-dj-moore-injuries",
         "title": "Bills to take time with Ed Oliver, DJ Moore injuries"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/bills-wr-dj-moore-ruled-out-thursday-vs-lions-with-shoulder-injury",
         "title": "Reports: Bills WR DJ Moore suffers AC joint sprain in win; status up in the air for Week 3 vs. Chargers"
@@ -2070,7 +2157,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 8,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 8,
       "slate_aware": true,
@@ -2137,7 +2224,7 @@
     ],
     "game_id": "2026_03_LA_DEN",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Los Angeles brings a loaded pass rush into Denver\u2019s test of pocket discipline",
+    "headline": "Stafford\u2019s passing game meets Denver\u2019s secondary at altitude",
     "key_factors": [
       {
         "advantage_team": null,
@@ -2224,19 +2311,31 @@
       }
     ],
     "paragraphs": [
-      "The Rams can change this matchup with their defensive front, where Myles Garrett adds another elite pressure threat to an already disruptive group. Denver\u2019s response has to begin with protection, early-down efficiency and throws that keep the quarterback out of extended obvious passing situations. Los Angeles also has enough offensive firepower to punish short fields, so the Broncos cannot let sacks or turnovers compound. Denver\u2019s defense must create pressure of its own without giving up explosive completions.",
-      "LevLine 3.0 gives the Rams a 55.9% win probability over the Broncos. Its frozen F-ST engine reconciles a 54.5% football-only signal with a 54.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Los Angeles Rams -1.9, a market line of Los Angeles Rams -2.5, and an approximate coherent score of LA 24 \u2013 DEN 22. Los Angeles can tilt the game through its pass rush, while Denver needs efficient early downs and disciplined protection to keep the Rams from repeatedly attacking predictable situations. The pick: Los Angeles Rams moneyline."
+      "Los Angeles heads to Denver with Matthew Stafford coming off a sharp Week 2 performance, but the Rams will be without Myles Garrett and could also be missing Puka Nacua. Denver counters with Bo Nix, Jaylen Waddle and a secondary led by Patrick Surtain II, while J.K. Dobbins and RJ Harvey returned to full practice Thursday. The matchup turns on whether the Broncos can pressure Stafford without surrendering explosives and whether Nix can sustain efficient early-down offense against Los Angeles.",
+      "LevLine 3.0 gives the Rams a 55.9% win probability over the Broncos. Its frozen F-ST engine reconciles a 54.5% football-only signal with a 54.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Los Angeles Rams -1.9, a market line of Los Angeles Rams -2.5, and an approximate coherent score of LA 24 \u2013 DEN 22. Los Angeles brings the more explosive passing structure, while Denver\u2019s path depends on disciplined coverage, efficient early downs and avoiding long-yardage situations that narrow its offensive options. The pick: Los Angeles Rams moneyline."
     ],
     "prediction": "LA to win; DEN 23.1 \u2013 LA 22.9 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Los Angeles Rams",
+        "source_url": "https://www.therams.com/news/first-look-rams-head-to-denver-for-sunday-night-football-clash-with-broncos-in-week-3-2026",
+        "title": "First Look: Rams head to Denver for Sunday Night Football clash with Broncos in Week 3"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Denver Broncos",
+        "source_url": "https://www.denverbroncos.com/news/injury-report-rbs-j-k-dobbins-rj-harvey-improve-to-full-practice-participants-thursday-ahead-of-week-3-game-vs-rams",
+        "title": "Injury Report: RBs J.K. Dobbins, RJ Harvey improve to full practice participants Thursday ahead of Week 3 game vs. Rams"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -2278,10 +2377,10 @@
         "title": "Kwity Paye misses practice ahead of Las Vegas Raiders-New Orleans Saints Week 3 matchup"
       },
       {
-        "as_of": "2026-09-25T19:08:09+00:00",
+        "as_of": "2026-09-26T10:00:02+00:00",
         "source_name": "Sports Illustrated",
-        "source_url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNVHBTWEl2WTQ5Q1NabzZPUGJ1aW9USHFzQkZFX1phbk1zN0pBSGQwRV9WN05LUWZhMzlGUmk3TTVjTU1Cc0lTS3FDTzd6MUc3NjlqcGZ3cTVkVGNLdnhCZ0lqcXRsLUU0TlZSR0RGRHp6QVZTMWRSNXFYOUJ4NHVXeVcwOXlxQWRSVWVzWDY1NmVMakl0eFJ6LS0tT1VXMVJMNmNPSXBaeVdzYkhMQXJyc2ZWU1dNY3ZGMEpQWElSbVRiYzBx?oc=5",
-        "title": "Final Major Practice Day for Saints: Two Out for Raiders, Moore Scouts Las Vegas"
+        "source_url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNNm5IZ2FwTG9Rb2hXblE3dXJKaE5mSy1ENldsOWx0alRpWnBjTjZVdzhGbmJ4TzRZdXdqZy1LcHYwWHZ2bUNVMVcybHVnQ3h4SXcxaWRVcGZTM1hhMkVVRC03b2FLZnFSX0M3SFdGWDA2d2tIQXNXZDNFZUxWdE1UVVRpSHNITkNXd0UzVWFncGE?oc=5",
+        "title": "Projecting Raiders Starters for Week 3 Against Saints"
       }
     ],
     "editorial_version": "story-desk-v3",
@@ -2299,7 +2398,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 9,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 9,
       "slate_aware": true,
@@ -2373,7 +2472,7 @@
     ],
     "game_id": "2026_03_LV_NO",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Las Vegas and New Orleans chase offensive stability in a matchup of pressure points",
+    "headline": "Shough-Olave surge meets unbeaten Raiders with Bowers managing knee issue",
     "key_factors": [
       {
         "advantage_team": "NO",
@@ -2476,28 +2575,34 @@
       }
     ],
     "paragraphs": [
-      "Las Vegas and New Orleans both have incentives to keep this game out of obvious passing situations, where protection breakdowns can quickly flip field position. The Raiders need their run game and quick passing concepts to create rhythm before attacking deeper coverage. The Saints can answer by varying pressure and forcing the ball underneath, then asking their offense to finish drives rather than settling for empty possession. Whichever team handles third down and red-zone snaps more cleanly should control the game.",
-      "LevLine 3.0 gives the Saints a 60.8% win probability over the Raiders. Its frozen F-ST engine reconciles a 61.1% football-only signal with a 62.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of New Orleans Saints -3.5, a market line of New Orleans Saints -3.0, and an approximate coherent score of NO 24 \u2013 LV 20. Both offenses benefit from staying on schedule, making third-down protection and red-zone execution more important than raw yardage in deciding which side can sustain scoring drives. The pick: New Orleans Saints moneyline."
+      "New Orleans brings one of the league's hottest passing attacks into its home opener, with Tyler Shough leading the NFL in passing yards and Chris Olave already at 268 receiving yards. Las Vegas arrives 2-0 and must limit explosive completions while sustaining its own offense against the Saints' pressure looks. Brock Bowers has been limited by a knee issue, while Travis Etienne Jr. returned to full practice Friday, making availability and early-down efficiency important to both teams' ability to stay ahead of the chains.",
+      "LevLine 3.0 gives the Saints a 60.8% win probability over the Raiders. Its frozen F-ST engine reconciles a 61.1% football-only signal with a 62.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of New Orleans Saints -3.5, a market line of New Orleans Saints -3.0, and an approximate coherent score of NO 24 \u2013 LV 20. New Orleans' explosive passing game challenges an unbeaten Raiders defense, while both offenses need efficient early downs to protect their quarterbacks and sustain scoring opportunities. The pick: New Orleans Saints moneyline."
     ],
     "prediction": "NO to win; NO 23.6 \u2013 LV 20.3 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Las Vegas Raiders",
+        "source_url": "https://www.raiders.com/news/game-preview-las-vegas-raiders-at-new-orleans-saints-nfl-week-3-092726-tyler-shough-chris-olave",
+        "title": "Game Preview: Another road test awaits the Raiders in New Orleans"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "New Orleans Saints",
+        "source_url": "https://www.neworleanssaints.com/news/injury-report-las-vegas-raiders-vs-new-orleans-saints-2026-nfl-week-3-friday",
+        "title": "Saints Friday Injury Report: 2026 Week 3 vs. Las Vegas Raiders"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
-      },
-      {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
-        "source_name": "Yahoo Sports",
-        "source_url": "https://sports.yahoo.com/articles/saints-vs-raiders-series-history-152757271.html",
-        "title": "Saints vs. Raiders series history: See who has the historical edge"
       }
     ],
     "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
@@ -2518,22 +2623,22 @@
     "case_for_pick": "TB explosives vs MIN prevention: explosive-pass leverage favors TB.",
     "current_reported_sources": [
       {
+        "as_of": "2026-09-25T13:45:00+00:00",
+        "source_name": "ESPN on MSN",
+        "source_url": "https://www.msn.com/en-us/news/other/vikings-aaron-jones-sr-knee-cleared-to-play-vs-buccaneers/ar-AA2cYhN4?ocid=BingNewsVerp",
+        "title": "Vikings' Aaron Jones Sr. (knee) cleared to play vs. Buccaneers"
+      },
+      {
         "as_of": "2026-09-24T22:31:35+00:00",
         "source_name": "Yahoo Sports",
         "source_url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNQWxieHJzaGY2NzduQm82QkYwNUFqcnJvRVBsclZyM0R0aE13amVTaXduNjlWeFg3MWpWNi1qaUJKOVhRNjBDUHZXWDBTbURDYmJmZndnUnpZUU54aTZBaGxRWXYzR2kwYXNHQlJ3TkFlNXVBSGpIZVRlZHZvQUtUSDFBMlUwekJOVUdpMnp4bw?oc=5",
         "title": "Buccaneers vs. Vikings: Thursday injury report for Week 3"
       },
       {
-        "as_of": "2026-09-25T16:33:50+00:00",
-        "source_name": "Sports Illustrated",
-        "source_url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNclFNNjhWNnc3Y0tNVHVqQThUWWJEQlNIYmZUMHBnX2lJSGpleTRnOURZY3BLYUlfak1OUE1hYmRMNjdjalpSWmNfNmJHcEY5VW84TUNpajIxUGF1SmRpS1V3WS1WSEU1T2k1SjVJUUUzaEhvbVFQei1zaTRlU0l4SmNOcjB1aXNENGw3RzVrSzVpRnR0VGluX0J5WTE1LWFQ?oc=5",
-        "title": "Buccaneers Will Be Without Multiple Starters vs. Vikings"
-      },
-      {
-        "as_of": "2026-09-23T15:40:42+00:00",
-        "source_name": "USA Today",
-        "source_url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxPNWFrLWVHZWdYWHdCT1EwSHFDY3hyUGpPRnNVOW42MFF4UDQzYk5JeDl4TmF2ZlJLTlZkM0NRWUlic0pTekdoM0x6WjN1NGJrcC10VUhXcWFBQXh3UnRJTnNzV0tMaXZuVGRpaU1keTh4WEZNU1FMTW4wSG5CSl9RMXplbXUtelVJcXJCLUMwZlVESWwyNnFNZmZwZHQ0cU5EZFgwRi1KTHJhOFNuS0VHaDEtTE8tVUJJV2trUUhveTBHM2ZiT3BmM0ZFZURqOHBKRDk4VmlzM3NyZWxwVHdXMWQ1UVZWQ2FaaTAtVHBB?oc=5",
-        "title": "Minnesota Vikings at Tampa Bay Buccaneers - NFL Game Summary - Sep 27, 2026"
+        "as_of": "2026-09-21T18:55:55+00:00",
+        "source_name": "FOX Sports",
+        "source_url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQcE1mYjl5SUZtSGVfMEhSVk51eGNKeTJsOUJqVHM1Z2FwSzFXeUxJYXJSeU9TY1FpU21fOVo5Ymp1aGRHZVdRdVo1N1ZkREp4cllxdXNHVjcyeERaMldOR0VpbmlvYzdSbFlFcmlQcGlOQTZzR0tzRllKQlpOSGhqajhSQkpITk5wRktDRkx5RkVvUHpfanI1em9yOVZQMUdwMTRCS19JaEVUeVlhNzFVVXlmQ3dHZ2JJ0gG4AUFVX3lxTE9VVXRkWVZFUnU3aHVaTEl0bFF4S2dxcldXQTA1NWhmSG5IU1FkNndSVW5IMzVNUHRzZjlsTy12bmhJRndVOWI5SGNBemZaNUtDMTVOcnp3SWFScWUzWGUzQTdBQWRfZlN5bElFMURlc2NDYWU1ZFJpd29CNHA5SzdFSXFreU91c2N1TVJ3OWF3THFuaUZ3QTk4ZW5ENTE1MDF0eFEzdmFlSW4xUm1uY3BvMktpUFdFZzU?oc=5",
+        "title": "Vikings QB Kyler Murray Clears Concussion Protocol; Expected To Start vs. Buccaneers"
       }
     ],
     "editorial_version": "story-desk-v3",
@@ -2551,7 +2656,7 @@
       "media_led": true,
       "media_source_count": 3,
       "primary_variant": 10,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 10,
       "slate_aware": true,
@@ -2632,7 +2737,7 @@
     ],
     "game_id": "2026_03_MIN_TB",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Minnesota\u2019s pressure packages test Tampa Bay\u2019s answers before the snap",
+    "headline": "Murray\u2019s return meets Tampa Bay\u2019s pressure problem in a blitz-heavy matchup",
     "key_factors": [
       {
         "advantage_team": null,
@@ -2743,28 +2848,34 @@
       }
     ],
     "paragraphs": [
-      "Minnesota\u2019s defense can make this game uncomfortable by disguising pressure and forcing Tampa Bay to solve protection before the snap. The Buccaneers need quick answers, reliable early-down gains and enough rushing efficiency to keep the Vikings from dictating personnel and tempo. Minnesota\u2019s offense faces a different challenge: avoiding negative plays and giving its quarterback manageable third downs against an aggressive Tampa Bay front. Explosive passes matter, but protection discipline and turnover avoidance may matter more.",
-      "LevLine 3.0 gives the Vikings a 52.1% win probability over the Buccaneers. Its frozen F-ST engine reconciles a 61.1% football-only signal with a 52.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Minnesota Vikings -0.7, a market line of Minnesota Vikings -1.5, and an approximate coherent score of MIN 24 \u2013 TB 23. Minnesota can create leverage through disguised pressure, while Tampa Bay\u2019s best response is efficient early-down offense that prevents the Vikings from repeatedly attacking predictable passing situations. The pick: Minnesota Vikings moneyline."
+      "Kyler Murray returns for Minnesota after clearing concussion protocol, giving Justin Jefferson and the Vikings a chance to stress Tampa Bay beyond the short game. Baker Mayfield faces Brian Flores\u2019 league-leading blitz frequency after pressure and turnovers helped sink the Buccaneers\u2019 0-2 start. Tampa Bay also has edge-health concerns with Rueben Bain Jr. missing practice, while Minnesota tackle Brian O\u2019Neill returned to full participation. Protection decisions and turnover avoidance should shape this matchup.",
+      "LevLine 3.0 gives the Vikings a 52.1% win probability over the Buccaneers. Its frozen F-ST engine reconciles a 61.1% football-only signal with a 52.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Minnesota Vikings -0.7, a market line of Minnesota Vikings -1.5, and an approximate coherent score of MIN 24 \u2013 TB 23. Minnesota\u2019s pressure structure can force hurried decisions, while Murray\u2019s return expands the Vikings\u2019 offensive menu; Tampa Bay needs cleaner protection and possession football to answer. The pick: Minnesota Vikings moneyline."
     ],
     "prediction": "MIN to win; TB 22.0 \u2013 MIN 24.0 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Minnesota Vikings",
+        "source_url": "https://www.vikings.com/news/nfl-expert-picks-divided-buccaneers-week-3",
+        "title": "NFL Expert Picks: Opinions Divided for Vikings at Buccaneers in 2026 Week 3"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Tampa Bay Buccaneers",
+        "source_url": "https://www.buccaneers.com/news/2026-game-preview-vikings-buccaneers-week-3",
+        "title": "2026 Game Preview: Minnesota Vikings-Tampa Bay Buccaneers, Week 3"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
-      },
-      {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
-        "source_name": "Yahoo Sports",
-        "source_url": "https://sports.yahoo.com/articles/vikings-kyler-murray-gets-clear-092034626.html",
-        "title": "Vikings\u2019 Kyler Murray Gets Clear Expectations for Buccaneers Game"
       }
     ],
     "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
@@ -2824,7 +2935,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 11,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 11,
       "slate_aware": true,
@@ -2898,7 +3009,7 @@
     ],
     "game_id": "2026_03_NE_JAX",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "New England and Jacksonville meet in a quarterback test shaped by pressure and explosives",
+    "headline": "Maye meets Jacksonville with protection, takeaways and field position in focus",
     "key_factors": [
       {
         "advantage_team": null,
@@ -3001,19 +3112,31 @@
       }
     ],
     "paragraphs": [
-      "New England and Jacksonville both need their quarterbacks to avoid the mistakes that turn competitive possessions into short fields. The Patriots can help themselves with a balanced early-down approach and protection that keeps deeper concepts available. Jacksonville\u2019s offense has enough speed to threaten vertically, but the Jaguars must keep pressure from disrupting timing. Defensively, both teams should prioritize limiting explosive plays and forcing the opponent to string together long drives without a sack, penalty or turnover.",
-      "LevLine 3.0 gives the Jaguars a 57.0% win probability over the Patriots. Its frozen F-ST engine reconciles a 56.0% football-only signal with a 58.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Jacksonville Jaguars -2.3, a market line of Jacksonville Jaguars -3.0, and an approximate coherent score of JAX 25 \u2013 NE 23. This matchup rewards the offense that protects its quarterback and limits negative plays, because both sides become easier to defend when forced into predictable passing situations. The pick: Jacksonville Jaguars moneyline."
+      "Drake Maye brings New England to Jacksonville after the Patriots opened 1-1 behind a defense allowing eight points per game, while Trevor Lawrence and the Jaguars enter 1-1 with a positive turnover margin. New England has allowed six sacks, making protection central against Jacksonville\u2019s front, while Liam Coen needs Lawrence to sustain drives against a Patriots pass defense allowing 166 yards per game. Jacksonville also enters with Jakobi Meyers practicing fully despite a thumb issue.",
+      "LevLine 3.0 gives the Jaguars a 57.0% win probability over the Patriots. Its frozen F-ST engine reconciles a 56.0% football-only signal with a 58.3% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Jacksonville Jaguars -2.3, a market line of Jacksonville Jaguars -3.0, and an approximate coherent score of JAX 25 \u2013 NE 23. New England\u2019s defensive start raises the cost of Jacksonville turnovers, while the Patriots\u2019 protection must hold up well enough for Maye to avoid handing the Jaguars short fields. The pick: Jacksonville Jaguars moneyline."
     ],
     "prediction": "JAX to win; JAX 25.0 \u2013 NE 22.6 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "New England Patriots",
+        "source_url": "https://www.patriots.com/news/game-preview-patriots-at-jaguars-nfl-week-3",
+        "title": "Game Preview: Patriots at Jaguars | NFL Week 3"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Jacksonville Jaguars",
+        "source_url": "https://www.jaguars.com/news/opponent-focus-boston-s-98-5-the-sports-hub-host-kendra-middleton-previews-week-3-patriots-vs-jaguars-matchup",
+        "title": "Opponent Focus: Boston's 98.5 the Sports Hub Host Kendra Middleton Previews Week 3 Patriots vs. Jaguars Matchup"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -3039,7 +3162,7 @@
       {
         "as_of": "2026-09-25T13:47:44+00:00",
         "source_name": "The Associated Press- Sports on MSN",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909a6ce948a8a24f8035b9a34ff3&url=https%3a%2f%2fwww.msn.com%2fen-us%2fsports%2ffootball%2fjets-tight-end-mason-taylor-ruled-out-vs-lions-wide-receiver-adonai-mitchell-uncertain%2far-AA2cY4gX&c=10492357672658198668&mkt=en-us",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7a4ccbaf74f31857d51bf6a0aac70&url=https%3a%2f%2fwww.msn.com%2fen-us%2fsports%2ffootball%2fjets-tight-end-mason-taylor-ruled-out-vs-lions-wide-receiver-adonai-mitchell-uncertain%2far-AA2cY4gX&c=10492357672658198668&mkt=en-us",
         "title": "Jets tight end Mason Taylor ruled out vs. Lions, wide receiver Adonai Mitchell questionable to play"
       },
       {
@@ -3076,7 +3199,7 @@
       "media_led": true,
       "media_source_count": 4,
       "primary_variant": 12,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 12,
       "slate_aware": true,
@@ -3164,7 +3287,7 @@
     ],
     "game_id": "2026_03_NYJ_DET",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Detroit\u2019s offensive balance challenges a Jets defense that must win before the catch",
+    "headline": "Bailey-Sewell trench battle meets Wilson\u2019s chance against Detroit\u2019s battered back end",
     "key_factors": [
       {
         "advantage_team": null,
@@ -3275,19 +3398,31 @@
       }
     ],
     "paragraphs": [
-      "Detroit can stress New York by forcing the Jets to defend the full width of the field while maintaining enough rushing efficiency to keep play-action credible. The Jets need their front to create disruption without sacrificing coverage integrity, because Detroit is comfortable turning short completions into efficient drives. On offense, New York cannot afford repeated long-yardage situations against a Lions defense that can attack predictable protections. Sustained possessions and red-zone finishing are essential to keeping pace.",
-      "LevLine 3.0 gives the Lions a 70.9% win probability over the Jets. Its frozen F-ST engine reconciles a 71.8% football-only signal with a 72.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Detroit Lions -7.1, a market line of Detroit Lions -6.5, and an approximate coherent score of DET 27 \u2013 NYJ 20. Detroit\u2019s balance can force New York to defend every level, while the Jets need early-down disruption and sustained offensive possessions to prevent the game from becoming one-sided. The pick: Detroit Lions moneyline."
+      "New York can test Detroit through Geno Smith and Garrett Wilson, especially with the Lions trying to clean up coverage communication after allowing explosive plays. The counterweight is up front: rookie David Bailey\u2019s early pressure production runs directly into All-Pro tackle Penei Sewell, a matchup that can determine whether Smith gets time to attack. Detroit also enters with offensive-line injuries, while the Jets are managing several offensive and special-teams absences, putting protection and depth under added strain.",
+      "LevLine 3.0 gives the Lions a 70.9% win probability over the Jets. Its frozen F-ST engine reconciles a 71.8% football-only signal with a 72.2% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Detroit Lions -7.1, a market line of Detroit Lions -6.5, and an approximate coherent score of DET 27 \u2013 NYJ 20. New York\u2019s route threats become more dangerous if protection holds, while Detroit\u2019s ability to control the edge and avoid coverage breakdowns can keep its offense in favorable game script. The pick: Detroit Lions moneyline."
     ],
     "prediction": "DET to win; DET 28.3 \u2013 NYJ 18.8 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "New York Jets",
+        "source_url": "https://www.newyorkjets.com/news/under-the-radar-jets-lions-matchups-week-3-09-25-2026",
+        "title": "What is One Under the Radar Jets-Lions Matchup You're Watching this Week?"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Detroit Lions",
+        "source_url": "https://www.detroitlions.com/news/lions-vs-jets-injury-report-sept-25-bartch-miller-harper",
+        "title": "New York Jets vs. Detroit Lions Week 3 injury report and game designations: Friday, Sept. 25"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -3313,14 +3448,14 @@
       {
         "as_of": "2026-09-25T13:01:56+00:00",
         "source_name": "Associated Press News on MSN",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909cb33548a7a0bf55d08a8f1e12&url=https%3a%2f%2fwww.msn.com%2fen-us%2fsports%2ffootball%2fchicago-bears-gearing-up-for-philadelphia-eagles-without-qb-caleb-williams-or-backup-tyson-bagent%2far-AA2cZqbv&c=769323579110006370&mkt=en-us",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7a4ce932e4759995381e4f0456122&url=https%3a%2f%2fwww.msn.com%2fen-us%2fsports%2ffootball%2fchicago-bears-gearing-up-for-philadelphia-eagles-without-qb-caleb-williams-or-backup-tyson-bagent%2far-AA2cZqbv&c=769323579110006370&mkt=en-us",
         "title": "Chicago Bears gearing up for Philadelphia Eagles without QB Caleb Williams or backup Tyson Bagent"
       },
       {
-        "as_of": "2026-09-25T11:43:00+00:00",
+        "as_of": "2026-09-25T01:49:00+00:00",
         "source_name": "Yahoo Sports",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909cb33548a7a0bf55d08a8f1e12&url=https%3a%2f%2fsports.yahoo.com%2farticles%2feagles-could-force-nfl-rule-184307645.html&c=15319919538016368316&mkt=en-us",
-        "title": "Eagles could force NFL rule change not even three weeks into the 2026 season, and the Bears are the ones pushing for it to happen"
+        "source_url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQcTdlNUVsV2RIa3JNTVoyWWhZX21KMVRuY1FCMEtvM2xqSXpQT1ZfeDFSWmpmTDEtYnVGc2RZTElFUDhWQ2F3LU41VktsNUdfS01kUmZrYng5Y1l1YjVLUnFfemxkRUN5NU5nXzgyN2pKWC1RUzduTDF4TU42RFI4WUpFSXQzajlwT0hSdHkwTGhKZw?oc=5",
+        "title": "Caleb Williams Gets Discouraging Injury Update Before Bears-Eagles Game"
       },
       {
         "as_of": "2026-09-25T22:33:00+00:00",
@@ -3344,7 +3479,7 @@
       "media_led": true,
       "media_source_count": 3,
       "primary_variant": 13,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 13,
       "slate_aware": true,
@@ -3418,7 +3553,7 @@
     ],
     "game_id": "2026_03_PHI_CHI",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Philadelphia\u2019s front tests Chicago\u2019s protection in a matchup of explosive-play ceilings",
+    "headline": "Chicago\u2019s quarterback uncertainty meets Philadelphia\u2019s defensive pressure test",
     "key_factors": [
       {
         "advantage_team": null,
@@ -3529,19 +3664,31 @@
       }
     ],
     "paragraphs": [
-      "Philadelphia can dictate this matchup if its defensive front turns Chicago\u2019s protection into the central story, particularly on obvious passing downs. The Bears need Caleb Williams operating on schedule, with the run game and quick concepts reducing the burden on the tackles. Philadelphia\u2019s offense presents the opposite stress: enough rushing and quarterback mobility to force disciplined run fits before attacking downfield. Chicago must prevent explosive plays while still generating pressure, a difficult balance against the Eagles\u2019 multidimensional attack.",
-      "LevLine 3.0 gives the Eagles a 72.1% win probability over the Bears. Its frozen F-ST engine reconciles a 48.8% football-only signal with a 67.5% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Philadelphia Eagles -7.6, a market line of Philadelphia Eagles -4.5, and an approximate coherent score of PHI 26 \u2013 CHI 19. Philadelphia can create pressure without abandoning its broader defensive structure, while Chicago needs efficient early downs to keep Williams away from repeated high-leverage protection situations. The pick: Philadelphia Eagles moneyline."
+      "Chicago\u2019s quarterback situation is the central variable: Caleb Williams and Tyson Bagent missed Friday practice, leaving Case Keenum to run the first-team offense. Philadelphia can stress that uncertainty with Vic Fangio\u2019s defense, while Saquon Barkley\u2019s return to full practice helps the Eagles keep their offense balanced. The Bears need Ben Johnson\u2019s run game and quick passing answers to protect whichever quarterback starts; Philadelphia must account for Chicago\u2019s rushing threat without surrendering explosive throws.",
+      "LevLine 3.0 gives the Eagles a 72.1% win probability over the Bears. Its frozen F-ST engine reconciles a 48.8% football-only signal with a 67.5% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Philadelphia Eagles -7.6, a market line of Philadelphia Eagles -4.5, and an approximate coherent score of PHI 26 \u2013 CHI 19. Philadelphia\u2019s defensive flexibility and healthier backfield give it multiple ways to control the matchup, while Chicago\u2019s quarterback uncertainty raises the importance of efficient early-down offense. The pick: Philadelphia Eagles moneyline."
     ],
     "prediction": "PHI to win; CHI 22.6 \u2013 PHI 22.5 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Philadelphia Eagles",
+        "source_url": "https://www.philadelphiaeagles.com/news/eagles-at-bears-injury-report-2026-nfl-week-3-monday-night-football-caleb-williams-saquon-barkley",
+        "title": "Eagles at Bears Injury Report"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Chicago Bears",
+        "source_url": "https://www.chicagobears.com/news/bears-oc-press-taylor-lauds-case-keenum-for-his-professionalism",
+        "title": "Bears OC Press Taylor lauds Case Keenum for his professionalism"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"
@@ -3564,12 +3711,6 @@
     "case_for_opponent": "SEA early-down approach vs WAS: early-down leverage favors WAS.",
     "case_for_pick": "SEA explosives vs WAS prevention: explosive-pass leverage favors SEA.",
     "current_reported_sources": [
-      {
-        "as_of": "2026-09-25T14:06:00+00:00",
-        "source_name": "Yahoo Sports",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909b4c6d4cc397584960599555ce&url=https%3a%2f%2fsports.yahoo.com%2farticles%2fcommanders-vs-seahawks-injury-report-180049899.html&c=6755672425155970241&mkt=en-us",
-        "title": "Commanders vs. Seahawks injury report: Washington expected to rule several key players out"
-      },
       {
         "as_of": "2026-09-25T21:21:02+00:00",
         "source_name": "The New York Times",
@@ -3596,9 +3737,9 @@
         "SEA early-down approach vs WAS"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 2,
       "primary_variant": 14,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 14,
       "slate_aware": true,
@@ -3686,7 +3827,7 @@
     ],
     "game_id": "2026_03_SEA_WAS",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Seattle prepares for Marcus Mariota as Washington adjusts without Jayden Daniels",
+    "headline": "Darnold returns as Washington turns to Mariota against Seattle",
     "key_factors": [
       {
         "advantage_team": null,
@@ -3789,28 +3930,34 @@
       }
     ],
     "paragraphs": [
-      "Washington will start Marcus Mariota after Jayden Daniels dislocated his left elbow against Dallas, forcing the Commanders to recalibrate their offense for the home matchup. Mariota was efficient in relief, but Seattle can now prepare a full game plan around his tendencies. The Seahawks can emphasize disciplined rush lanes and coverage leverage to make Washington earn possessions snap by snap, while the Commanders need manageable down-and-distance situations and designed movement to keep Mariota away from obvious passing downs.",
-      "LevLine 3.0 gives the Seahawks a 78.6% win probability over the Commanders. Its frozen F-ST engine reconciles a 72.1% football-only signal with a 76.6% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Seattle Seahawks -10.2, a market line of Seattle Seahawks -7.5, and an approximate coherent score of SEA 28 \u2013 WAS 18. Washington\u2019s quarterback change shifts the matchup toward execution and protection, while Seattle can benefit by forcing Mariota to sustain long drives rather than creating easy explosive opportunities. The pick: Seattle Seahawks moneyline."
+      "Sam Darnold is cleared to return for Seattle, while Washington will start Marcus Mariota with Jayden Daniels ruled out because of his left elbow injury. Mike Macdonald's Seahawks can test a Commanders offense also missing guard Samuel Cosmi and linebacker Frankie Luvu, though Seattle enters without starting safeties Julian Love and Ty Okada. Washington needs Mariota to keep the offense on schedule; Seattle's reshuffled secondary must prevent those manageable situations from becoming explosive plays.",
+      "LevLine 3.0 gives the Seahawks a 78.6% win probability over the Commanders. Its frozen F-ST engine reconciles a 72.1% football-only signal with a 76.6% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of Seattle Seahawks -10.2, a market line of Seattle Seahawks -7.5, and an approximate coherent score of SEA 28 \u2013 WAS 18. Seattle regains its starting quarterback while Washington changes quarterbacks and loses important supporting pieces, making protection, early-down execution and Seattle's replacement safeties central matchup variables. The pick: Seattle Seahawks moneyline."
     ],
     "prediction": "SEA to win; WAS 19.1 \u2013 SEA 27.6 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Seattle Seahawks",
+        "source_url": "https://www.seahawks.com/news/week-3-injury-report-seahawks-vs-commanders",
+        "title": "Week 3 Injury Report: Seahawks vs. Commanders"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Washington Commanders",
+        "source_url": "https://www.commanders.com/news/game-status-commanders-seahawks-week-3",
+        "title": "Game Status | Commanders vs. Seahawks, Week 3"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/marcus-mariota-commanders-week-3-qb-jayden-daniels-elbow",
         "title": "Marcus Mariota to start at QB in Commanders' Week 3 game as Jayden Daniels seeks opinions on elbow"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
-      },
-      {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
-        "source_name": "nytimes.com",
-        "source_url": "https://www.nytimes.com/athletic/7617818/2026/09/21/jayden-daniels-injury-update-commanders/",
-        "title": "Commanders QB Jayden Daniels out Week 3, will see specialists about elbow injury"
       }
     ],
     "source_first_guardrail": "Validated provider reporting owns the human matchup Read for this game; current LevLine numbers are deterministically regenerated and provider prose never modifies the forecast.",
@@ -3831,6 +3978,12 @@
     "case_for_pick": "TEN early-down approach vs NYG: early-down leverage favors NYG.",
     "current_reported_sources": [
       {
+        "as_of": "2026-09-25T14:00:00+00:00",
+        "source_name": "ESPN",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7a4cd922440409c39c3fcd7699292&url=https%3a%2f%2fwww.espn.com%2fnfl%2fstory%2f_%2fid%2f50028799%2fwhat-expect-new-york-giants-brian-daboll-tennessee-titans-reunion&c=6504584410328986581&mkt=en-us",
+        "title": "What to expect from the much-anticipated Giants-Daboll reunion"
+      },
+      {
         "as_of": "2026-09-24T17:37:52+00:00",
         "source_name": "Yahoo Sports",
         "source_url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNdmFWbHlkZG5IaTd1b3lveWVYd1hmdWxQRUlJYmY2YnVUS1BCYVp1S3R5cUZzZUZQcG1Wb2VVNlM1TDM4TXNoRkZQVzlZSG9IM3pQZDRKTHpOR21XeDNkUk1PLWJYaDlFdHlnSnU2bGZqSWw4a1g0aVBpUFA4bWg1bUZrelc3Zw?oc=5",
@@ -3839,7 +3992,7 @@
       {
         "as_of": "2026-09-24T07:55:28+00:00",
         "source_name": "USA TODAY Touchdown Wire on MSN",
-        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7909b1dac490c976f506a4809d002&url=https%3a%2f%2fwww.msn.com%2fen-us%2fnews%2fother%2fnew-york-giants-vs-tennessee-titans-3-causes-for-concern-in-week-3%2far-AA2cUvPT&c=5201419521232909054&mkt=en-us",
+        "source_url": "http://www.bing.com/news/apiclick.aspx?ref=FexRss&aid=&tid=6ab7a4cd922440409c39c3fcd7699292&url=https%3a%2f%2fwww.msn.com%2fen-us%2fnews%2fother%2fnew-york-giants-vs-tennessee-titans-3-causes-for-concern-in-week-3%2far-AA2cUvPT&c=5201419521232909054&mkt=en-us",
         "title": "New York Giants vs. Tennessee Titans: 3 causes for concern in Week 3"
       },
       {
@@ -3862,9 +4015,9 @@
         "NYG explosives vs TEN prevention"
       ],
       "media_led": true,
-      "media_source_count": 3,
+      "media_source_count": 4,
       "primary_variant": 15,
-      "provider_freshness_advisory": "provider_artifact_older_than_refresh_window",
+      "provider_freshness_advisory": null,
       "reporting_first": true,
       "secondary_variant": 15,
       "slate_aware": true,
@@ -3938,7 +4091,7 @@
     ],
     "game_id": "2026_03_TEN_NYG",
     "guardrail": "Narrative evidence explains the matchup but does not change the numerical forecast. LevLine changes only when the underlying feature separately passes chronological out-of-sample validation.",
-    "headline": "Tennessee and New York face a protection-and-field-position test with little margin for wasted drives",
+    "headline": "Ward\u2019s ball security meets a Giants offense resetting around Winston in the rain",
     "key_factors": [
       {
         "advantage_team": null,
@@ -4041,19 +4194,31 @@
       }
     ],
     "paragraphs": [
-      "Tennessee and the Giants both need offensive stability more than stylistic fireworks. The Titans can protect their quarterback by creating manageable downs with the run game and quick throws, while New York\u2019s defense should look for pressure opportunities whenever Tennessee falls behind schedule. The Giants face the same constraint against a Titans front capable of punishing obvious passing situations. With both offenses vulnerable to drive-killing plays, sacks, penalties, turnovers and red-zone execution should decide more than total yardage.",
-      "LevLine 3.0 gives the Giants a 50.9% win probability over the Titans. Its frozen F-ST engine reconciles a 67.6% football-only signal with a 55.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of New York Giants -0.3, a market line of New York Giants -2.5, and an approximate coherent score of NYG 23 \u2013 TEN 22. Neither offense wants a high volume of obvious passing downs, so early-down efficiency and turnover avoidance should determine which team controls field position and scoring opportunities. The pick: New York Giants moneyline."
+      "Tennessee\u2019s Cam Ward has protected the football through two games, but the Titans need steadier early-down production to keep New York from dictating obvious pressure situations. The Giants turn to Jameis Winston after Jaxson Dart\u2019s season-ending knee injury, with Malik Nabers available as the offense\u2019s primary separator. Tony Pollard\u2019s return to full practice helps Tennessee, while New York\u2019s Brian Burns and Andrew Thomas have carried injury concerns into a matchup expected to feature heavy rain at MetLife Stadium.",
+      "LevLine 3.0 gives the Giants a 50.9% win probability over the Titans. Its frozen F-ST engine reconciles a 67.6% football-only signal with a 55.1% vig-free market signal under the 2026 production specification; it is not a fixed arithmetic blend. That official probability translates to a probability-implied presentation line of New York Giants -0.3, a market line of New York Giants -2.5, and an approximate coherent score of NYG 23 \u2013 TEN 22. Tennessee\u2019s path depends on staying efficient enough to protect Ward, while New York must stabilize its quarterback transition and avoid allowing weather and negative plays to compress the offense. The pick: New York Giants moneyline."
     ],
     "prediction": "NYG to win; NYG 25.6 \u2013 TEN 18.7 is the central score projection.",
     "reported_sources": [
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "Tennessee Titans",
+        "source_url": "https://www.tennesseetitans.com/news/game-preview-titans-face-giants-in-first-road-test-of-2026",
+        "title": "Game Preview: Titans Face Giants in First Road Test of 2026"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
+        "source_name": "New York Giants",
+        "source_url": "https://www.giants.com/news/week-3-tennessee-titans-john-harbaugh-jaxson-dart-jameis-winston-brian-burns-andrew-thomas-jevon-holland",
+        "title": "10 things to watch in Giants vs. Titans"
+      },
+      {
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "ESPN",
         "source_url": "https://www.espn.com/nfl/story/_/id/49951393/week-2-sunday-games-takeaways-questions-2026",
         "title": "NFL Week 2: Takeaways, questions, fantasy spin for Sunday games"
       },
       {
-        "as_of": "2026-09-23T16:05:13.619585+00:00",
+        "as_of": "2026-09-26T10:56:11.436117+00:00",
         "source_name": "NFL.com",
         "source_url": "https://www.nfl.com/news/2026-nfl-season-week-2-what-we-learned-from-sunday-s-games",
         "title": "2026 NFL season, Week 2: What We Learned from Sunday's games"

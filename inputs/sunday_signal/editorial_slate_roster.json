@@ -1,6 +1,7 @@
 {
-  "frozen": false,
+  "frozen": true,
   "game_ids": [
+    "2026_03_ATL_GB",
     "2026_03_CAR_CLE",
     "2026_03_CIN_PIT",
     "2026_03_HOU_IND",
@@ -17,11 +18,11 @@
     "2026_03_LA_DEN",
     "2026_03_PHI_CHI"
   ],
-  "generated_utc": "2026-09-23T15:49:32.414776+00:00",
-  "policy": "Weekend editorial roster is Saturday/Sunday/Monday for the active NFL week, derived from current rows plus immutable same-week locks and frozen once the weekend boundary is reached.",
+  "generated_utc": "2026-09-26T10:55:52.259945+00:00",
+  "policy": "Editorial roster covers the complete active NFL week, including standalone Thursday/Friday/Saturday games, derived from current rows plus immutable same-week locks and frozen once the first scheduled gameday boundary is reached.",
   "schema_version": 1,
   "season": 2026,
+  "slate_start_local": "2026-09-24T00:00:00-07:00",
   "timezone": "America/Los_Angeles",
-  "week": 3,
-  "weekend_start_local": "2026-09-26T00:00:00-07:00"
+  "week": 3
 }
