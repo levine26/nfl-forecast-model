@@ -49,7 +49,7 @@ jobs:
   capture:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: write
     concurrency:
@@ -76,10 +76,10 @@ jobs:
       - name: Audit Phase 2 horizon state before any provider request
         run: python -m research.m1_operational_qualification_v1
 
-      - name: Cheap local M1 horizon gate
+      - name: Preparation gate for current or imminent M1 horizon
         id: gate
         run: |
-          RESULT=$(python -m research.m1_market_capture_due_v1)
+          RESULT=$(python -m research.m1_market_capture_due_v1 --lookahead-minutes 7.5)
           echo "$RESULT"
           if echo "$RESULT" | grep -q '^due=true'; then
             echo 'due=true' >> "$GITHUB_OUTPUT"
@@ -99,9 +99,28 @@ jobs:
           python -m pip install 'pandas==3.0.5' 'numpy==2.4.6' 'requests>=2.32'
           python -m pip install -e . --no-deps
 
+      - name: Wait for frozen M1 capture window after preparation
+        id: ready
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          # Dependencies are now warm. Wait locally for the *actual* frozen due
+          # contract rather than spending the admissible window on environment setup.
+          for attempt in $(seq 1 60); do
+            RESULT=$(python -m research.m1_market_capture_due_v1)
+            echo "$RESULT"
+            if echo "$RESULT" | grep -q '^due=true'; then
+              echo 'ready=true' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'ready=false' >> "$GITHUB_OUTPUT"
+          echo 'No frozen M1 capture window became due during prepared wait.'
+
       - name: Capture M1 point-in-time market state
         id: capture
-        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
+        if: (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true') && steps.ready.outputs.ready == 'true'
         continue-on-error: true
         env:
           PROPLINE_API_KEY: ${{ secrets.PROPLINE_API_KEY }}
@@ -109,11 +128,11 @@ jobs:
         run: python -m research.run_m1_market_capture_phase2_v1 --quota-reserve 50
 
       - name: Derive M1 predictor and diagnostic artifacts
-        if: (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true') && steps.capture.outcome == 'success'
+        if: steps.capture.outcome == 'success'
         run: python -m research.m1_market_state_v1
 
       - name: Refresh Phase 2 qualification after successful capture
-        if: (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true') && steps.capture.outcome == 'success'
+        if: steps.capture.outcome == 'success'
         run: python -m research.m1_operational_qualification_v1
 
       - name: Persist M1 research evidence off main
@@ -149,6 +168,10 @@ jobs:
       - name: Surface capture failure after preserving evidence
         if: always() && (github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true')
         run: |
+          if [ "${{ steps.ready.outputs.ready }}" != 'true' ]; then
+            echo 'Prepared M1 run never entered a frozen capture window; no provider request was made.' >&2
+            exit 1
+          fi
           if [ "${{ steps.capture.outcome }}" != 'success' ]; then
             echo 'M1 capture failed; preserved evidence remains research-only.' >&2
             exit 1
