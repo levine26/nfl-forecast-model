@@ -91,3 +91,81 @@ def test_existing_lock_fields_are_preserved(tmp_path: Path) -> None:
     assert row["locked_market_spread"] == "8.0"
     assert row["locked_edge"] == "1.0"
     assert row["closing_spread"] == "7.5"
+
+
+def test_sep_27_receipt_backfills_model_selected_home_ats_side_from_frozen_inputs(tmp_path: Path) -> None:
+    path = tmp_path / "prediction_history.csv"
+    path.write_text(
+        "game_id,gameday,snapshot_type,home_team,away_team,expected_margin,spread_line,model_edge\n"
+        "2026_03_LAC_BUF,2026-09-27,FINAL,BUF,LAC,9.9881180843,7.0,2.9881180843\n",
+        encoding="utf-8",
+    )
+
+    normalize_history_for_site(path)
+
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["locked_ats_status"] == "VALUE"
+    assert row["locked_ats_pick_team"] == "BUF"
+    assert float(row["locked_ats_pick_market_spread"]) == -7.0
+    assert float(row["locked_ats_model_margin_home"]) == 9.9881180843
+    assert float(row["locked_ats_market_margin_home"]) == 7.0
+    assert abs(float(row["locked_ats_home_edge_points"]) - 2.9881180843) < 1e-9
+
+
+def test_sep_27_receipt_backfills_model_selected_away_ats_side_from_frozen_inputs(tmp_path: Path) -> None:
+    path = tmp_path / "prediction_history.csv"
+    path.write_text(
+        "game_id,gameday,snapshot_type,home_team,away_team,expected_margin,spread_line,model_edge\n"
+        "2026_03_CAR_CLE,2026-09-27,FINAL,CLE,CAR,-1.124340402,-2.5,1.375659598\n",
+        encoding="utf-8",
+    )
+
+    normalize_history_for_site(path)
+
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["locked_ats_status"] == "VALUE"
+    assert row["locked_ats_pick_team"] == "CAR"
+    assert float(row["locked_ats_pick_market_spread"]) == -2.5
+
+
+def test_pre_policy_receipts_do_not_retroactively_gain_ats_bets(tmp_path: Path) -> None:
+    path = tmp_path / "prediction_history.csv"
+    path.write_text(
+        "game_id,gameday,snapshot_type,home_team,away_team,expected_margin,spread_line,model_edge\n"
+        "2026_02_A_B,2026-09-20,FINAL,B,A,7.0,3.0,4.0\n",
+        encoding="utf-8",
+    )
+
+    normalize_history_for_site(path)
+
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["locked_ats_status"] == ""
+    assert row["locked_ats_pick_team"] == ""
+    assert row["locked_ats_pick_market_spread"] == ""
+
+
+def test_existing_explicit_ats_receipt_is_preserved(tmp_path: Path) -> None:
+    path = tmp_path / "prediction_history.csv"
+    path.write_text(
+        "game_id,gameday,snapshot_type,home_team,away_team,expected_margin,spread_line,"
+        "locked_ats_status,locked_ats_pick_team,locked_ats_pick_market_spread,"
+        "locked_ats_model_margin_home,locked_ats_market_margin_home,locked_ats_home_edge_points\n"
+        "2026_03_A_B,2026-09-27,FINAL,B,A,9.0,7.0,VALUE,A,+7.0,9.0,7.0,-999\n",
+        encoding="utf-8",
+    )
+
+    normalize_history_for_site(path)
+
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["locked_ats_status"] == "VALUE"
+    assert row["locked_ats_pick_team"] == "A"
+    assert row["locked_ats_pick_market_spread"] == "+7.0"
+    assert row["locked_ats_home_edge_points"] == "-999"
