@@ -1,18 +1,18 @@
 {
-  "brier": 0.22969334380313866,
-  "brier_vs_market": -4.7818132947241576e-05,
-  "generated_utc": "2026-09-27T22:43:47.846952+00:00",
-  "graded": 42,
+  "brier": 0.226094897675077,
+  "brier_vs_market": -0.0002040556908664004,
+  "generated_utc": "2026-09-27T23:38:09.512818+00:00",
+  "graded": 44,
   "locked": 47,
-  "margin_mae": 10.999067645610571,
-  "market_brier": 0.22964552567019142,
+  "margin_mae": 10.748117473490744,
+  "market_brier": 0.2258908419842106,
   "notes": [
     "Only immutable official T-120 locks are included.",
     "Brier comparison uses games where both LevLine and market probability are available.",
     "No ROI is shown unless a separately defined, timestamped betting rule is being tracked."
   ],
-  "record": "28-14",
+  "record": "30-14",
   "status": "live_forward_test",
-  "total_mae": 12.297616150086997,
-  "winner_accuracy": 0.6666666666666666
+  "total_mae": 12.322061885455645,
+  "winner_accuracy": 0.6818181818181818
 }
