@@ -8,6 +8,10 @@ import numpy as np
 import pandas as pd
 
 LOCK_WINDOW_MINUTES = 120.0
+ATS_EDGE_EPSILON = 1e-12
+# Winner/ATS decoupling shipped before the Sep. 27 slate. Rows at/after this date
+# can be backfilled only from their own immutable lock-row inputs.
+ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY = "2026-09-27"
 
 CURRENT_COLUMNS = [
     "game_id","season","week","gameday","gametime","away_team","home_team",
@@ -30,8 +34,14 @@ CURRENT_COLUMNS = [
     "market_snapshot_timestamp_utc","market_snapshot_source","market_freshness_status",
 ]
 
+ATS_LOCK_COLUMNS = [
+    "locked_ats_status","locked_ats_pick_team","locked_ats_pick_market_spread",
+    "locked_ats_model_margin_home","locked_ats_market_margin_home","locked_ats_home_edge_points",
+]
+
 LOCK_META_COLUMNS = [
     "kickoff_utc","lock_timestamp_utc","minutes_to_kickoff_at_lock","lock_status",
+    *ATS_LOCK_COLUMNS,
     "actual_home_score","actual_away_score","actual_margin","actual_total","winner_correct",
     "margin_abs_error","total_abs_error","actual_home_cover","actual_over",
 ]
@@ -44,6 +54,52 @@ def kickoff_utc(gameday, gametime) -> datetime:
     text = f"{str(gameday)[:10]} {str(gametime)[:5]}"
     dt = datetime.strptime(text, "%Y-%m-%d %H:%M")
     return dt.replace(tzinfo=ZoneInfo("America/New_York")).astimezone(timezone.utc)
+
+
+def _number(value) -> float | None:
+    parsed = pd.to_numeric(value, errors="coerce")
+    if pd.isna(parsed):
+        return None
+    number = float(parsed)
+    return number if np.isfinite(number) else None
+
+
+def _ats_lock_fields(row) -> dict[str, object]:
+    """Freeze the model-selected ATS side at the sportsbook number in the lock row.
+
+    ``spread_line`` is canonical expected-home-margin notation: +7 means home -7.
+    The ATS side is selected by independent expected margin minus market margin, while
+    the grading number is always the market spread on the selected team's side.
+    """
+    model_margin = _number(row.get("expected_margin"))
+    market_margin = _number(row.get("spread_line"))
+    home = str(row.get("home_team") or "").strip()
+    away = str(row.get("away_team") or "").strip()
+    base = {
+        "locked_ats_status": "UNAVAILABLE",
+        "locked_ats_pick_team": np.nan,
+        "locked_ats_pick_market_spread": np.nan,
+        "locked_ats_model_margin_home": model_margin if model_margin is not None else np.nan,
+        "locked_ats_market_margin_home": market_margin if market_margin is not None else np.nan,
+        "locked_ats_home_edge_points": np.nan,
+    }
+    if model_margin is None or market_margin is None or not home or not away:
+        return base
+
+    home_edge = model_margin - market_margin
+    base["locked_ats_home_edge_points"] = home_edge
+    if abs(home_edge) <= ATS_EDGE_EPSILON:
+        base["locked_ats_status"] = "NO_EDGE"
+        return base
+
+    if home_edge > 0.0:
+        base["locked_ats_pick_team"] = home
+        base["locked_ats_pick_market_spread"] = -market_margin
+    else:
+        base["locked_ats_pick_team"] = away
+        base["locked_ats_pick_market_spread"] = market_margin
+    base["locked_ats_status"] = "VALUE"
+    return base
 
 
 def _available_current_columns(df: pd.DataFrame) -> list[str]:
@@ -83,6 +139,29 @@ def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
             old[c] = pd.NA if c in BOOLEAN_GRADE_COLUMNS else np.nan
     old = old[columns + [c for c in LOCK_META_COLUMNS if c not in columns]]
     return _coerce_grade_dtypes(old)
+
+
+def _backfill_policy_ats_locks(official: pd.DataFrame) -> pd.DataFrame:
+    """Migrate Sep. 27+ receipts from their own frozen model/market inputs only.
+
+    This never reads a later market snapshot. It exists because the ATS public contract
+    was already live when these receipts locked, but dedicated immutable ATS columns
+    had not yet been added to prediction_history.csv.
+    """
+    if official.empty:
+        return official
+    frame = official.copy()
+    for c in ATS_LOCK_COLUMNS:
+        if c not in frame.columns:
+            frame[c] = np.nan
+    gameday = frame.get("gameday", pd.Series("", index=frame.index)).astype(str).str.slice(0, 10)
+    status = frame.get("locked_ats_status", pd.Series("", index=frame.index)).fillna("").astype(str).str.strip()
+    eligible = frame.get("lock_status", pd.Series("", index=frame.index)).astype(str).eq("LOCKED") & gameday.ge(ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY) & status.eq("")
+    for i in frame.index[eligible]:
+        fields = _ats_lock_fields(frame.loc[i])
+        for key, value in fields.items():
+            frame.at[i, key] = value
+    return _coerce_grade_dtypes(frame)
 
 
 def _append_run_history(p: pd.DataFrame, path: Path, columns: list[str]) -> None:
@@ -164,6 +243,7 @@ def _lock_new_games(
             "lock_timestamp_utc": now_utc.isoformat(),
             "minutes_to_kickoff_at_lock": float(minutes),
             "lock_status": "LOCKED",
+            **_ats_lock_fields(row),
             "actual_home_score": np.nan,
             "actual_away_score": np.nan,
             "actual_margin": np.nan,
@@ -247,6 +327,7 @@ def write_outputs(
 
     official_path = out / "prediction_history.csv"
     official = _load_official(official_path, cols)
+    official = _backfill_policy_ats_locks(official)
     official = _lock_new_games(official, p, cols, now_utc, lock_window_minutes)
     official = _grade_locked_games(official, artifacts.games)
     official.to_csv(official_path, index=False)

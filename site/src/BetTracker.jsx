@@ -85,8 +85,10 @@ function resultLabel(result) {
 
 function lineLabel(bet) {
   if (!bet) return '—'
-  if (bet.line < .05) return `${bet.side} PK`
-  return `${bet.side} -${bet.line.toFixed(1)}`
+  const spread=Number(bet.marketSpread)
+  if (!Number.isFinite(spread)) return '—'
+  if (Math.abs(spread)<.05) return `${bet.side} PK`
+  return `${bet.side} ${spread>0?'+':''}${spread.toFixed(1)}`
 }
 
 function toneForProfit(value) {
@@ -158,7 +160,7 @@ function GameIdentity({entry}) {
 function DesktopWeekLedger({entries}) {
   return <div className="ss-week-ledger">
     <div className="ss-week-ledger-labels">
-      <span>MATCHUP</span><span>MONEYLINE</span><span>RESULT</span><span>LEVLINE SPREAD</span><span>RESULT</span><span>GAME P/L</span>
+      <span>MATCHUP</span><span>MONEYLINE</span><span>RESULT</span><span>ATS SIDE</span><span>RESULT</span><span>GAME P/L</span>
     </div>
     {entries.map(entry=>{
       const gameProfit=profitDisplay(entry)
@@ -189,7 +191,7 @@ function MobileWeekLedger({entries}) {
           <ResultChip result={entry.ml?.result}/>
         </div>
         <div>
-          <span>SPR</span>
+          <span>ATS</span>
           <SpreadValue entry={entry}/>
           <ResultChip result={entry.spread?.result}/>
         </div>
@@ -217,7 +219,7 @@ function WeekSummary({week,entries}) {
     <header><span>WEEK {week} SUMMARY</span></header>
     <div className="ss-week-summary-grid">
       <SummaryBlock label="MONEYLINE" summary={ml}/>
-      <SummaryBlock label="LEVLINE SPREAD" summary={spread}/>
+      <SummaryBlock label="ATS SIDE" summary={spread}/>
       <article className="ss-week-net">
         <span>WEEK TOTAL</span>
         <strong className={tone}>{dollars(combined.profit)}</strong>
@@ -256,9 +258,9 @@ function SeasonPerformance({entries}) {
   return <section className="ss-season-performance">
     <header>
       <div><span>SEASON PERFORMANCE</span><h3>Cumulative P/L by week</h3></div>
-      <div className="ss-season-legend"><span><i className="ml"/>Moneyline</span><span><i className="spread"/>LevLine Spread</span></div>
+      <div className="ss-season-legend"><span><i className="ml"/>Moneyline</span><span><i className="spread"/>ATS Side</span></div>
     </header>
-    <div className="ss-season-chart" role="img" aria-label="Cumulative Moneyline and LevLine Spread profit and loss by week">
+    <div className="ss-season-chart" role="img" aria-label="Cumulative Moneyline and ATS side profit and loss by week">
       <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
         <line className="zero" x1={pad} y1={zeroY} x2={width-pad} y2={zeroY}/>
         {mlPoints&&<polyline className="ml" points={mlPoints}/>}
@@ -285,13 +287,13 @@ function BetTrackerPanel({history,currentGames}) {
       <div>
         <span>LEVLINE TRACK RECORD</span>
         <h2>Official 2026 betting record.</h2>
-        <p>$${BET_UNIT_DOLLARS} flat stake · immutable pregame receipts · hypothetical tracking</p>
+        <p>$${BET_UNIT_DOLLARS} flat stake · immutable pregame receipts · ATS graded at the locked sportsbook number</p>
       </div>
     </header>
 
     <div className="ss-track-grid">
       <TrackRecordCard label="MONEYLINE" summary={seasonMl}/>
-      <TrackRecordCard label="LEVLINE SPREAD" summary={seasonSpread}/>
+      <TrackRecordCard label="ATS SIDE" summary={seasonSpread}/>
     </div>
 
     {slate.week!=null&&<section className="ss-this-week">
