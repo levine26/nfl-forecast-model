@@ -114,7 +114,7 @@ def test_sep_27_receipt_backfills_model_selected_home_ats_side_from_frozen_input
     assert abs(float(row["locked_ats_home_edge_points"]) - 2.9881180843) < 1e-9
 
 
-def test_sep_27_receipt_backfills_model_selected_away_ats_side_from_frozen_inputs(tmp_path: Path) -> None:
+def test_sep_27_receipt_backfills_model_selected_home_underdog_from_frozen_inputs(tmp_path: Path) -> None:
     path = tmp_path / "prediction_history.csv"
     path.write_text(
         "game_id,gameday,snapshot_type,home_team,away_team,expected_margin,spread_line,model_edge\n"
@@ -128,8 +128,26 @@ def test_sep_27_receipt_backfills_model_selected_away_ats_side_from_frozen_input
         row = next(csv.DictReader(handle))
 
     assert row["locked_ats_status"] == "VALUE"
-    assert row["locked_ats_pick_team"] == "CAR"
-    assert float(row["locked_ats_pick_market_spread"]) == -2.5
+    assert row["locked_ats_pick_team"] == "CLE"
+    assert float(row["locked_ats_pick_market_spread"]) == 2.5
+
+
+def test_sep_27_receipt_backfills_model_selected_away_ats_side_from_frozen_inputs(tmp_path: Path) -> None:
+    path = tmp_path / "prediction_history.csv"
+    path.write_text(
+        "game_id,gameday,snapshot_type,home_team,away_team,expected_margin,spread_line,model_edge\n"
+        "2026_03_NE_JAX,2026-09-27,FINAL,JAX,NE,2.48956708,3.0,-0.51043292\n",
+        encoding="utf-8",
+    )
+
+    normalize_history_for_site(path)
+
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["locked_ats_status"] == "VALUE"
+    assert row["locked_ats_pick_team"] == "NE"
+    assert float(row["locked_ats_pick_market_spread"]) == 3.0
 
 
 def test_pre_policy_receipts_do_not_retroactively_gain_ats_bets(tmp_path: Path) -> None:
