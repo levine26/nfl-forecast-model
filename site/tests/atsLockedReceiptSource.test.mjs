@@ -1,21 +1,21 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { buildBetLedger } from '../src/betTrackerMath.js'
+import { buildBetLedger, gradeSpreadSelection } from '../src/betTrackerMath.js'
 
-test('policy-era browser grading fails closed without dedicated ATS receipt fields', () => {
+test('policy-era grading does not reconstruct a wager from model and generic market fields', () => {
   const ledger = buildBetLedger([{
     game_id:'2026_03_KC_MIA', season:'2026', week:'3', gameday:'2026-09-27', lock_status:'LOCKED',
     away_team:'KC', home_team:'MIA', pick:'KC', final_home_prob:'0.14',
-    expected_margin:'-3.6876', spread_line:'-10.0', locked_home_moneyline:'+500',
-    actual_home_score:'24', actual_away_score:'20',
+    expected_margin:'-3.6876', spread_line:'-10.0',
+    actual_home_score:'20', actual_away_score:'27',
   }])
 
   assert.equal(ledger.length, 1)
   assert.equal(ledger[0].spread, null)
 })
 
-test('policy-era browser grading consumes the dedicated migrated ATS receipt only', () => {
+test('dedicated ATS receipt remains authoritative even when generic fields disagree', () => {
   const ledger = buildBetLedger([{
     game_id:'2026_03_KC_MIA', season:'2026', week:'3', gameday:'2026-09-27', lock_status:'LOCKED',
     away_team:'KC', home_team:'MIA', pick:'KC', final_home_prob:'0.14',
@@ -25,20 +25,14 @@ test('policy-era browser grading consumes the dedicated migrated ATS receipt onl
     actual_home_score:'20', actual_away_score:'27',
   }])
 
-  assert.equal(ledger.length, 1)
   assert.equal(ledger[0].spread.side, 'MIA')
   assert.equal(ledger[0].spread.marketSpread, 10)
   assert.equal(ledger[0].spread.gradingSource, 'locked_ats_pick_market_spread')
   assert.equal(ledger[0].spread.result, 'win')
 })
 
-test('pre-policy receipt with no dedicated ATS fields remains ungraded', () => {
-  const ledger = buildBetLedger([{
-    game_id:'2026_03_ATL_GB', season:'2026', week:'3', gameday:'2026-09-24', lock_status:'LOCKED',
-    away_team:'ATL', home_team:'GB', pick:'GB', final_home_prob:'0.61',
-    expected_margin:'4.97', spread_line:'4.5',
-  }])
-
-  assert.equal(ledger.length, 1)
-  assert.equal(ledger[0].spread, null)
+test('canonical selected-team formula grades favorite -3.5 as WIN when it wins by 5', () => {
+  assert.equal(gradeSpreadSelection({
+    side:'FAV', marketSpread:-3.5, homeTeam:'FAV', awayTeam:'DOG', finalHomeScore:27, finalAwayScore:22,
+  }), 'win')
 })

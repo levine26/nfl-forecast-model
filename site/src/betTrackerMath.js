@@ -1,7 +1,6 @@
 export const BET_UNIT_DOLLARS = 25
 
 const EPS = 1e-9
-const POLICY_ERA_ATS_START = '2026-09-27'
 
 export function numberOrNull(value) {
   if (value === '' || value == null) return null
@@ -29,6 +28,27 @@ export function roundSpreadToHalfPoint(value) {
 function resultFromEdge(edge) {
   if (Math.abs(edge) <= EPS) return 'push'
   return edge > 0 ? 'win' : 'loss'
+}
+
+export function gradeSpreadSelection({
+  side,
+  marketSpread,
+  homeTeam,
+  awayTeam,
+  finalHomeScore,
+  finalAwayScore,
+}) {
+  const spread = numberOrNull(marketSpread)
+  const homeScore = numberOrNull(finalHomeScore)
+  const awayScore = numberOrNull(finalAwayScore)
+  if (!side || spread == null || homeScore == null || awayScore == null) return 'pending'
+
+  let selectedMargin = null
+  if (side === homeTeam) selectedMargin = homeScore - awayScore
+  else if (side === awayTeam) selectedMargin = awayScore - homeScore
+  else return 'pending'
+
+  return resultFromEdge(selectedMargin + spread)
 }
 
 export function americanWinProfit(stake, odds) {
@@ -69,50 +89,22 @@ function spreadPrice(row, side) {
   return {odds: captured ?? -110, fallback: captured == null}
 }
 
-function policyEraReceiptAtsWager(row) {
-  const gameday = String(row.gameday || '').slice(0,10)
-  if (!gameday || gameday < POLICY_ERA_ATS_START) return null
-  const modelMarginHome = numberOrNull(row.expected_margin)
-  const marketMarginHome = numberOrNull(row.spread_line)
-  if (modelMarginHome == null || marketMarginHome == null) return null
-  const homeEdgePoints = modelMarginHome - marketMarginHome
-  if (Math.abs(homeEdgePoints) <= EPS) return null
-  const pickHome = homeEdgePoints > 0
-  const side = pickHome ? row.home_team : row.away_team
-  const marketSpread = pickHome ? -marketMarginHome : marketMarginHome
-  if (!side || ![row.home_team,row.away_team].includes(side)) return null
+function lockedAtsWager(row) {
+  const status = String(row.locked_ats_status || '').trim().toUpperCase()
+  if (status !== 'VALUE') return null
+
+  const side = String(row.locked_ats_pick_team || '').trim()
+  const marketSpread = numberOrNull(row.locked_ats_pick_market_spread)
+  if (!side || marketSpread == null || ![row.home_team, row.away_team].includes(side)) return null
+
   return {
     side,
     marketSpread,
-    modelMarginHome,
-    marketMarginHome,
-    homeEdgePoints,
-    gradingSource:'policy_era_frozen_receipt_migration',
+    modelMarginHome: numberOrNull(row.locked_ats_model_margin_home),
+    marketMarginHome: numberOrNull(row.locked_ats_market_margin_home),
+    homeEdgePoints: numberOrNull(row.locked_ats_home_edge_points),
+    gradingSource:'locked_ats_pick_market_spread',
   }
-}
-
-function lockedAtsWager(row) {
-  const status = String(row.locked_ats_status || '').trim().toUpperCase()
-  if (status) {
-    if (status !== 'VALUE') return null
-    const side = String(row.locked_ats_pick_team || '').trim()
-    const marketSpread = numberOrNull(row.locked_ats_pick_market_spread)
-    if (!side || marketSpread == null || ![row.home_team, row.away_team].includes(side)) return null
-    return {
-      side,
-      marketSpread,
-      modelMarginHome: numberOrNull(row.locked_ats_model_margin_home),
-      marketMarginHome: numberOrNull(row.locked_ats_market_margin_home),
-      homeEdgePoints: numberOrNull(row.locked_ats_home_edge_points),
-      gradingSource:'locked_ats_pick_market_spread',
-    }
-  }
-
-  // Sep. 27 receipts locked before the dedicated locked_ats_* columns were shipped.
-  // They already froze both the independent model margin and sportsbook spread in
-  // this same receipt, so reconstruct the ATS side from those immutable inputs only.
-  // No current/later market data is consulted, and older receipts are never reinterpreted.
-  return policyEraReceiptAtsWager(row)
 }
 
 export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
@@ -133,8 +125,14 @@ export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
       const lockedAts = lockedAtsWager(row)
       let spread = null
       if (lockedAts) {
-        const sideMargin = graded ? (lockedAts.side === row.home_team ? actualMargin : -actualMargin) : null
-        const spreadResult = graded ? resultFromEdge(sideMargin + lockedAts.marketSpread) : 'pending'
+        const spreadResult = gradeSpreadSelection({
+          side: lockedAts.side,
+          marketSpread: lockedAts.marketSpread,
+          homeTeam: row.home_team,
+          awayTeam: row.away_team,
+          finalHomeScore: homeScore,
+          finalAwayScore: awayScore,
+        })
         const price = spreadPrice(row, lockedAts.side)
         spread = {
           side: lockedAts.side,

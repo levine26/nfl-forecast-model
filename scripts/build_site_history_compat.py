@@ -55,8 +55,11 @@ def _backfill_ats_receipt(row: dict[str, str]) -> None:
     if _value(row, "locked_ats_status"):
         return
 
-    model_margin = _number(row, "expected_margin", "locked_model_spread")
-    market_margin = _number(row, "spread_line", "locked_market_spread")
+    # Prefer dedicated frozen aliases if a newer producer already wrote them.
+    # Generic expected_margin/spread_line are compatibility inputs only for old
+    # immutable lock receipts that predate the dedicated ATS receipt columns.
+    model_margin = _number(row, "locked_model_spread", "expected_margin")
+    market_margin = _number(row, "locked_market_spread", "spread_line")
     home = _value(row, "home_team")
     away = _value(row, "away_team")
 
@@ -121,9 +124,6 @@ def normalize_history_for_site(path: Path) -> None:
         if not _value(row, "lock_timestamp_utc"):
             row["lock_timestamp_utc"] = _value(row, "prediction_timestamp_utc")
 
-        # Canonical prediction_history uses expected_margin, spread_line and
-        # model_edge for the values captured in the immutable FINAL snapshot.
-        # Preserve any newer explicit aliases if they are already present.
         if not _value(row, "locked_model_spread"):
             row["locked_model_spread"] = _value(row, "expected_margin")
         if not _value(row, "locked_market_spread"):
