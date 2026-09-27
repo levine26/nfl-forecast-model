@@ -12,6 +12,8 @@ on:
       - 'scripts/build_public_impact_monitor.py'
       - 'scripts/build_site_history_compat.py'
       - 'tests/test_site_history_compat.py'
+      - 'tests/test_ats_lock_receipt.py'
+      - 'tests/test_ats_site_receipt_contract.py'
       - '.github/workflows/dashboard.yml'
   pull_request:
     paths:
@@ -22,6 +24,8 @@ on:
       - 'scripts/build_public_impact_monitor.py'
       - 'scripts/build_site_history_compat.py'
       - 'tests/test_site_history_compat.py'
+      - 'tests/test_ats_lock_receipt.py'
+      - 'tests/test_ats_site_receipt_contract.py'
       - '.github/workflows/dashboard.yml'
   workflow_run:
     workflows:
@@ -64,8 +68,8 @@ jobs:
           python-version: '3.11'
       - name: Install Python package
         run: pip install '.[dev]'
-      - name: Validate public Impact Monitor contract
-        run: python -m pytest -q tests/test_public_impact_monitor.py tests/test_player_impact_monitor.py tests/test_site_history_compat.py
+      - name: Validate public Impact Monitor and ATS receipt contracts
+        run: python -m pytest -q tests/test_public_impact_monitor.py tests/test_player_impact_monitor.py tests/test_site_history_compat.py tests/test_ats_lock_receipt.py tests/test_ats_site_receipt_contract.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
