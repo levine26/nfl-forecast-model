@@ -15,6 +15,8 @@ on:
       - 'tests/test_public_forecast_contract.py'
       - 'tests/test_ats_lock_receipt.py'
       - 'tests/test_site_history_compat.py'
+      - 'tests/test_ats_site_receipt_contract.py'
+      - 'tests/test_build_public_forecasts_receipt_contract.py'
       - '.github/workflows/dashboard.yml'
   pull_request:
     paths:
@@ -28,6 +30,8 @@ on:
       - 'tests/test_public_forecast_contract.py'
       - 'tests/test_ats_lock_receipt.py'
       - 'tests/test_site_history_compat.py'
+      - 'tests/test_ats_site_receipt_contract.py'
+      - 'tests/test_build_public_forecasts_receipt_contract.py'
       - '.github/workflows/dashboard.yml'
   workflow_run:
     workflows:
@@ -47,9 +51,6 @@ permissions:
   pages: write
   id-token: write
 
-# Only events capable of a production deploy share the production concurrency
-# group. A failed producer creates a no-op workflow_run, and PRs are build-only;
-# neither may cancel an in-progress deployment from a successful producer.
 concurrency:
   group: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') && format('pages-noop-{0}', github.run_id) || github.event_name == 'pull_request' && format('pages-pr-{0}', github.event.pull_request.number) || 'pages-production' }}
   cancel-in-progress: true
@@ -78,6 +79,8 @@ jobs:
           tests/test_site_history_compat.py
           tests/test_public_forecast_contract.py
           tests/test_ats_lock_receipt.py
+          tests/test_ats_site_receipt_contract.py
+          tests/test_build_public_forecasts_receipt_contract.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -96,7 +99,7 @@ jobs:
       - name: Normalize immutable history for Sunday Signal
         run: python scripts/build_site_history_compat.py site/public/data/prediction_history.csv
       - name: Build and validate canonical public forecasts
-        run: python scripts/build_public_forecasts.py --output site/public/data/public_forecasts.json
+        run: python scripts/build_public_forecasts.py --current site/public/data/this_week.csv --official site/public/data/prediction_history.csv --output site/public/data/public_forecasts.json
       - name: Build fail-closed public Impact Monitor
         run: python scripts/build_public_impact_monitor.py --output site/public/data/impact_monitor.json
       - name: Install dashboard dependencies
@@ -104,7 +107,7 @@ jobs:
         run: npm install
       - name: Validate Bet Tracker ATS settlement contract
         working-directory: site
-        run: node --test tests/betTrackerMath.test.mjs tests/atsPolicyEraReceiptMigration.test.mjs tests/atsGradingContract.test.mjs
+        run: node --test tests/betTrackerMath.test.mjs tests/atsPolicyEraReceiptMigration.test.mjs tests/atsGradingContract.test.mjs tests/atsLockedReceiptSource.test.mjs
       - name: Build dashboard
         working-directory: site
         run: npm run build
