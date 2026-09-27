@@ -46,6 +46,10 @@ function lockedModelMargin(row) {
   return firstNumber(row.locked_model_spread, row.expected_margin, row.predicted_margin)
 }
 
+function lockedMarketMarginHome(row) {
+  return firstNumber(row.locked_market_margin_home, row.market_margin_home, row.spread_line)
+}
+
 function pickedTeam(row) {
   if (row.pick && row.pick !== 'PICKEM') return row.pick
   const homeProbability = firstNumber(row.final_home_prob)
@@ -70,6 +74,60 @@ function spreadPrice(row, side) {
   return {odds: captured ?? -110, fallback: captured == null}
 }
 
+function buildLockedSpread(row, modelMargin, graded, actualMargin, stake) {
+  const marketMarginHome = lockedMarketMarginHome(row)
+
+  // Canonical path: the spread wager is the model-determined ATS side at the
+  // immutable sportsbook number captured in the lock receipt. Repository
+  // spread_line is expected home margin (+7 => home -7 / away +7).
+  if (marketMarginHome != null) {
+    const homeEdge = modelMargin - marketMarginHome
+    if (Math.abs(homeEdge) <= EPS) return null
+
+    const pickHome = homeEdge > 0
+    const side = pickHome ? row.home_team : row.away_team
+    const line = Math.abs(marketMarginHome) <= EPS
+      ? 0
+      : pickHome ? -marketMarginHome : marketMarginHome
+    const sideMargin = graded ? (pickHome ? actualMargin : -actualMargin) : null
+    const spreadResult = graded ? resultFromEdge(sideMargin + line) : 'pending'
+    const price = spreadPrice(row, side)
+    return {
+      strategy: 'ATS_MARKET',
+      side,
+      modelMargin,
+      marketMarginHome,
+      edgePoints: Math.abs(homeEdge),
+      line,
+      odds: price.odds,
+      usedFallbackPrice: price.fallback,
+      result: spreadResult,
+      profit: settleBet(spreadResult, price.odds, stake),
+    }
+  }
+
+  // Backward-compatible fallback for legacy synthetic/old receipts that do not
+  // contain a market margin. New production locks always have spread_line.
+  const roundedModelMargin = roundSpreadToHalfPoint(modelMargin)
+  const side = modelMargin > EPS ? row.home_team : modelMargin < -EPS ? row.away_team : pickedTeam(row)
+  if (!side || roundedModelMargin == null) return null
+  const sideMargin = graded ? (side === row.home_team ? actualMargin : -actualMargin) : null
+  const line = Math.abs(roundedModelMargin)
+  const spreadResult = graded ? resultFromEdge(sideMargin - line) : 'pending'
+  const price = spreadPrice(row, side)
+  return {
+    strategy: 'LEGACY_MODEL_LINE',
+    side,
+    modelMargin,
+    roundedModelMargin,
+    line,
+    odds: price.odds,
+    usedFallbackPrice: price.fallback,
+    result: spreadResult,
+    profit: settleBet(spreadResult, price.odds, stake),
+  }
+}
+
 export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
   return (history || [])
     .filter(row => row.lock_status === 'LOCKED' && String(row.season || '2026') === '2026')
@@ -86,25 +144,7 @@ export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
       const mlOdds = moneylinePrice(row, pick)
 
       const modelMargin = lockedModelMargin(row)
-      let spread = null
-      if (modelMargin != null) {
-        const roundedModelMargin = roundSpreadToHalfPoint(modelMargin)
-        const side = modelMargin > EPS ? row.home_team : modelMargin < -EPS ? row.away_team : pick
-        const sideMargin = graded ? (side === row.home_team ? actualMargin : -actualMargin) : null
-        const line = Math.abs(roundedModelMargin)
-        const spreadResult = graded ? resultFromEdge(sideMargin - line) : 'pending'
-        const price = spreadPrice(row, side)
-        spread = {
-          side,
-          modelMargin,
-          roundedModelMargin,
-          line,
-          odds: price.odds,
-          usedFallbackPrice: price.fallback,
-          result: spreadResult,
-          profit: settleBet(spreadResult, price.odds, stake),
-        }
-      }
+      const spread = modelMargin == null ? null : buildLockedSpread(row, modelMargin, graded, actualMargin, stake)
 
       return {
         gameId: row.game_id,
@@ -138,12 +178,34 @@ function previewEntry(game, stake=BET_UNIT_DOLLARS) {
     : homeProbability == null ? null : homeProbability >= .5 ? game.home_team : game.away_team
   if (!pick) return null
 
-  const margin = firstNumber(game.diagnostics?.independent_margin_home, game.independent_margin_home)
+  const margin = firstNumber(game.ats_model_margin_home, game.signals?.ats?.model_margin_home, game.diagnostics?.independent_margin_home, game.independent_margin_home)
+  const atsStatusRaw = game.ats_status ?? game.signals?.ats?.status
+  const atsStatus = atsStatusRaw == null ? null : String(atsStatusRaw).toUpperCase()
+  const atsSide = game.ats_pick_team ?? game.signals?.ats?.pick_team ?? null
+  const atsMarketSpread = firstNumber(game.ats_pick_market_spread, game.signals?.ats?.pick_market_spread)
+  const atsMarketMarginHome = firstNumber(game.ats_market_margin_home, game.signals?.ats?.market_margin_home, game.market_margin_home)
+  const atsEdgePoints = firstNumber(game.ats_edge_points, game.signals?.ats?.edge_points)
+
   let spread = null
-  if (margin != null) {
+  if (atsStatus === 'VALUE' && atsSide && atsMarketSpread != null) {
+    spread = {
+      strategy: 'ATS_MARKET',
+      side: atsSide,
+      modelMargin: margin,
+      marketMarginHome: atsMarketMarginHome,
+      edgePoints: atsEdgePoints,
+      line: Math.abs(atsMarketSpread) <= EPS ? 0 : atsMarketSpread,
+      odds: null,
+      usedFallbackPrice: false,
+      result: 'pending',
+      profit: null,
+    }
+  } else if (atsStatus == null && margin != null) {
+    // Compatibility only for older preview fixtures that predate the ATS contract.
     const roundedModelMargin = roundSpreadToHalfPoint(margin)
     const side = margin > EPS ? game.home_team : margin < -EPS ? game.away_team : pick
     spread = {
+      strategy: 'LEGACY_MODEL_LINE',
       side,
       modelMargin: margin,
       roundedModelMargin,
@@ -225,7 +287,7 @@ export function summarizeBets(entries, kind) {
   const profit = missingProfit ? null : settled.reduce((sum, bet) => sum + bet.profit, 0)
   return {
     bets: bets.length,
-    settled: settled.length,
+    settled,
     pending,
     wins,
     losses,
@@ -258,7 +320,6 @@ export function summarizeCombined(entries) {
     roi: profit == null || risked <= 0 ? null : profit / risked,
   }
 }
-
 
 export function buildSeasonPerformance(entries) {
   const weeks=[...new Set((entries||[]).map(entry=>Number(entry.week)).filter(Number.isFinite))].sort((a,b)=>a-b)
