@@ -8,6 +8,7 @@ import {
   buildCurrentWeekSlate,
   buildSeasonPerformance,
   combinedEntryProfit,
+  gradeSpreadSelection,
   roundSpreadToHalfPoint,
   settleBet,
   summarizeBets,
@@ -21,6 +22,28 @@ test('American odds settle a fixed $25 risk correctly', () => {
   assert.equal(americanWinProfit(25, -125), 20)
   assert.equal(settleBet('loss', -110), -25)
   assert.equal(settleBet('push', -110), 0)
+})
+
+test('canonical ATS grader handles favorite, underdog, home, away, and push contracts', () => {
+  const grade = (side, marketSpread, homeScore, awayScore) => gradeSpreadSelection({
+    side,
+    marketSpread,
+    homeTeam:'HOME',
+    awayTeam:'AWAY',
+    finalHomeScore:homeScore,
+    finalAwayScore:awayScore,
+  })
+
+  assert.equal(grade('HOME', -3.5, 27, 22), 'win')
+  assert.equal(grade('HOME', -3.5, 27, 24), 'loss')
+  assert.equal(grade('AWAY', 3.5, 27, 24), 'win')
+  assert.equal(grade('AWAY', 3.5, 20, 24), 'win')
+  assert.equal(grade('HOME', -3, 27, 24), 'push')
+  assert.equal(grade('HOME', 3.5, 21, 24), 'win')
+  assert.equal(grade('AWAY', -3.5, 20, 24), 'win')
+  assert.equal(grade('AWAY', -3.5, 21, 24), 'loss')
+  assert.equal(grade('OTHER', -3.5, 27, 22), 'pending')
+  assert.equal(grade('HOME', null, 27, 22), 'pending')
 })
 
 test('ATS wager is graded against the immutable selected-side market spread, not the LevLine fair line', () => {
@@ -41,6 +64,23 @@ test('ATS wager is graded against the immutable selected-side market spread, not
   assert.equal(ledger[0].spread.usedFallbackPrice,true)
 })
 
+test('changing only LevLine fair/model spread cannot change the official ATS grade', () => {
+  const base={
+    season:'2026', week:'3', lock_status:'LOCKED', away_team:'A', home_team:'B', pick:'B', final_home_prob:'0.60',
+    locked_ats_status:'VALUE', locked_ats_pick_team:'B', locked_ats_pick_market_spread:'-3.5',
+    locked_ats_market_margin_home:'3.5',
+    actual_home_score:'27', actual_away_score:'22', locked_home_moneyline:'-125',
+  }
+  const ledger=buildBetLedger([
+    {...base, game_id:'FAIR_LOW', expected_margin:'-40', locked_ats_model_margin_home:'-40'},
+    {...base, game_id:'FAIR_HIGH', expected_margin:'40', locked_ats_model_margin_home:'40'},
+  ])
+  assert.equal(ledger[0].spread.result,'win')
+  assert.equal(ledger[1].spread.result,'win')
+  assert.equal(ledger[0].spread.marketSpread,-3.5)
+  assert.equal(ledger[1].spread.marketSpread,-3.5)
+})
+
 test('ATS grading fails closed when immutable ATS fields are absent even if model spread fields exist', () => {
   assert.equal(roundSpreadToHalfPoint(3.1),3)
   assert.equal(roundSpreadToHalfPoint(3.3),3.5)
@@ -48,7 +88,7 @@ test('ATS grading fails closed when immutable ATS fields are absent even if mode
   assert.equal(roundSpreadToHalfPoint(3.25),3.5)
 
   const ledger=buildBetLedger([{
-    game_id:'2026_03_A_B', season:'2026', week:'3', lock_status:'LOCKED',
+    game_id:'2026_03_A_B', season:'2026', week:'3', gameday:'2026-09-27', lock_status:'LOCKED',
     away_team:'A', home_team:'B', pick:'B', final_home_prob:'0.60',
     locked_model_spread:'3.1', expected_margin:'3.1', spread_line:'7.5',
     actual_home_score:'24', actual_away_score:'21', locked_home_moneyline:'-125',
@@ -66,6 +106,7 @@ test('ATS push uses final selected-team margin plus the exact locked market spre
     actual_home_score:'23', actual_away_score:'20', locked_home_moneyline:'-125',
   }])
   const summary=summarizeBets(ledger,'spread')
+  assert.equal(summary.settled,1)
   assert.equal(summary.pushes,1)
   assert.equal(summary.risked,25)
   assert.equal(summary.profit,0)
@@ -79,6 +120,7 @@ test('missing winning ML price fails closed instead of inventing profit', () => 
     actual_home_score:'23', actual_away_score:'20',
   }])
   const ml=summarizeBets(ledger,'ml')
+  assert.equal(ml.settled,1)
   assert.equal(ml.missingProfit,1)
   assert.equal(ml.risked,25)
   assert.equal(ml.profit,null)
@@ -94,6 +136,7 @@ test('combined season ROI uses total dollars risked across moneyline and ATS sid
     locked_home_moneyline:'-125', locked_home_spread_price:'-110',
   }])
   const combined=summarizeCombined(ledger)
+  assert.equal(combined.settled,2)
   assert.equal(combined.risked,50)
   assert.ok(Math.abs(combined.profit-(20+25*100/110))<1e-9)
   assert.ok(Math.abs(combined.roi-combined.profit/50)<1e-12)
@@ -126,7 +169,6 @@ test('receipt editorial accepts only the exact current FINAL_PREGAME preview', (
     preview:{game_id:gameId},
   }),false)
 })
-
 
 test('current-week slate uses locked ATS receipt and public ATS fields for unlocked previews', () => {
   const ledger=buildBetLedger([{
@@ -173,6 +215,7 @@ test('pending ATS wagers do not enter weekly record, profit, or ROI', () => {
   assert.equal(ledger[0].ml.result,'pending')
   assert.equal(ledger[0].spread.result,'pending')
   const ml=summarizeBets(ledger,'ml')
+  assert.equal(ml.settled,0)
   assert.equal(ml.pending,1)
   assert.equal(ml.wins,0)
   assert.equal(ml.losses,0)
@@ -193,7 +236,6 @@ test('game P/L combines settled moneyline and ATS-side wagers', () => {
   const expected=25*100/245 + 25*100/110
   assert.ok(Math.abs(combinedEntryProfit(ledger[0])-expected)<1e-9)
 })
-
 
 test('season performance accumulates Moneyline and ATS-side P/L by week', () => {
   const ledger=buildBetLedger([
