@@ -171,141 +171,157 @@
   },
   "generated_utc": "2026-09-27T15:27:40.359788+00:00",
   "groq_provider_fallback": {
-    "context_refresh_preserved": true,
-    "failed_games": [],
+    "failed_games": [
+      "2026_03_ARI_SF",
+      "2026_03_ATL_GB",
+      "2026_03_BAL_DAL",
+      "2026_03_CAR_CLE",
+      "2026_03_CIN_PIT",
+      "2026_03_HOU_IND",
+      "2026_03_KC_MIA",
+      "2026_03_LAC_BUF",
+      "2026_03_LA_DEN",
+      "2026_03_LV_NO",
+      "2026_03_MIN_TB",
+      "2026_03_NE_JAX",
+      "2026_03_NYJ_DET",
+      "2026_03_PHI_CHI",
+      "2026_03_SEA_WAS",
+      "2026_03_TEN_NYG"
+    ],
     "games": {
       "2026_03_ARI_SF": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:02:19.116233+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:58:30.265859+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_ATL_GB": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:51:12.338425+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:47:23.877119+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_BAL_DAL": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:04:33.112717+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T16:00:43.494296+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_CAR_CLE": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:53:25.592320+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:49:37.160090+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_CIN_PIT": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:00:05.654374+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:56:16.904791+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_HOU_IND": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:55:38.943772+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:51:50.478024+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_KC_MIA": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:57:52.335050+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:54:03.730850+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_LAC_BUF": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:52:18.898623+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:48:30.503557+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_LA_DEN": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:06:46.433677+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T16:02:56.718296+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_LV_NO": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:05:39.848782+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T16:01:50.105844+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_MIN_TB": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:03:26.545973+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:59:36.859142+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_NE_JAX": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:56:45.747714+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:52:57.139956+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_NYJ_DET": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:54:32.349324+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:50:43.849404+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_PHI_CHI": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:07:53.072067+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T16:04:03.371701+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_SEA_WAS": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T13:01:12.453851+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:57:23.520431+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_03_TEN_NYG": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "last_validated_editorial",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "Groq media request failed after 3 attempts: Groq HTTP 404",
-        "recovered_at_utc": "2026-09-27T12:58:59.073263+00:00",
-        "requires_chatgpt_refresh": false
+        "recovered_at_utc": "2026-09-27T15:55:10.304785+00:00",
+        "requires_chatgpt_refresh": true
       }
     },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "36320301861",
-    "status": "healthy"
+    "run_id": "36330753006",
+    "status": "degraded"
   },
   "injuries": {
     "as_of": "2026-09-27T15:27:40.530721+00:00",
