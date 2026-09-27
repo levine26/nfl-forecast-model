@@ -35,6 +35,13 @@ def test_compound_mini_is_default_provider_with_gpt_oss_long_window_fallback():
     assert module.FALLBACK_TOOL_TEMPERATURES == (0.6, 0.2)
 
 
+def test_retired_compound_identifiers_normalize_to_gpt_oss():
+    assert module._normalize_configured_model("groq/compound-mini") == module.FALLBACK_MODEL
+    assert module._normalize_configured_model("groq/compound") == module.FALLBACK_MODEL
+    assert module._normalize_configured_model(module.FALLBACK_MODEL) == module.FALLBACK_MODEL
+    assert module._normalize_configured_model("") == module.FALLBACK_MODEL
+
+
 def test_compound_mini_payload_bounds_reserved_output_budget():
     payload = module._build_payload("research this game", model=module.DEFAULT_MODEL)
     assert payload["model"] == "groq/compound-mini"
@@ -136,6 +143,45 @@ def test_safe_rate_limit_reason_classifies_without_echoing_body():
     assert "tpm" in reason
     assert "model=openai/gpt-oss-120b" in reason
     assert "secret-do-not-log" not in reason
+
+
+def test_safe_not_found_reason_classifies_retired_model_without_leaking_body():
+    exc = _http_error(
+        404,
+        body='{"error":{"message":"The requested model is decommissioned; secret-do-not-log",'
+        '"type":"invalid_request_error","code":"model_decommissioned"}}',
+    )
+    reason = module._safe_not_found_reason(exc)
+    assert reason == "model_unavailable"
+    assert "secret-do-not-log" not in reason
+
+
+def test_run_switches_retired_compound_404_to_gpt_oss_browser_fallback(monkeypatch):
+    calls: list[tuple[str, float | None]] = []
+
+    def fake_request(
+        prompt: str,
+        *,
+        model: str,
+        timeout: int,
+        tool_temperature: float | None = None,
+    ) -> str:
+        calls.append((model, tool_temperature))
+        if len(calls) == 1:
+            raise _http_error(
+                404,
+                body='{"error":{"message":"Model groq/compound-mini not found",'
+                '"type":"invalid_request_error","code":"model_not_found"}}',
+            )
+        return "accepted researched payload"
+
+    monkeypatch.setattr(module, "_request", fake_request)
+    result = module.run("prompt", model=module.DEFAULT_MODEL, timeout=10, attempts=3)
+    assert result == "accepted researched payload"
+    assert calls == [
+        (module.DEFAULT_MODEL, None),
+        (module.FALLBACK_MODEL, 0.6),
+    ]
 
 
 def test_run_switches_compound_tpd_to_gpt_oss_browser_fallback(monkeypatch):
