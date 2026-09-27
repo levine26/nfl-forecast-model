@@ -6,6 +6,8 @@ from pathlib import Path
 
 
 ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY = "2026-09-27"
+ATS_HISTORICAL_BACKFILL_SEASON = "2026"
+ATS_HISTORICAL_BACKFILL_WEEKS = frozenset({1, 2})
 ATS_EDGE_EPSILON = 1e-12
 
 _LOCK_RECEIPT_FIELDS = (
@@ -21,6 +23,7 @@ _LOCK_RECEIPT_FIELDS = (
     "locked_ats_model_margin_home",
     "locked_ats_market_margin_home",
     "locked_ats_home_edge_points",
+    "locked_ats_receipt_source",
 )
 
 
@@ -42,22 +45,62 @@ def _number(row: dict[str, str], *keys: str) -> float | None:
         return None
 
 
-def _backfill_ats_receipt(row: dict[str, str]) -> None:
-    """Add ATS lock aliases using only values frozen in this exact receipt.
+def _week(row: dict[str, str]) -> int | None:
+    try:
+        return int(float(_value(row, "week")))
+    except (TypeError, ValueError):
+        return None
 
-    This is a site-compatibility migration, not a reforecast. It never consults a
-    later market snapshot or game result. The policy applies only to Sep. 27,
-    2026+ receipts because winner/ATS decoupling was live from that slate onward.
+
+def _historical_ats_backfill_eligible(row: dict[str, str]) -> bool:
+    """Return whether this receipt belongs to the explicitly approved legacy cohort.
+
+    Weeks 1-2 of the 2026 season predate the dedicated ``locked_ats_*`` schema, but
+    their immutable pregame receipts already froze both ingredients used by today's
+    ATS-side contract: the independent expected home margin and sportsbook home
+    margin. Only that bounded cohort is reconstructed; Week 3 pre-policy receipts are
+    intentionally left alone.
     """
+    return (
+        _value(row, "season") == ATS_HISTORICAL_BACKFILL_SEASON
+        and _week(row) in ATS_HISTORICAL_BACKFILL_WEEKS
+    )
+
+
+def _ats_backfill_source(row: dict[str, str]) -> str:
+    if _historical_ats_backfill_eligible(row):
+        return "HISTORICAL_W1_W2_FROZEN_PREGAME_V1"
     gameday = _value(row, "gameday")[:10]
-    if not gameday or gameday < ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY:
-        return
+    if gameday and gameday >= ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY:
+        return "POLICY_ERA_FROZEN_PREGAME_V1"
+    return ""
+
+
+def _backfill_ats_receipt(row: dict[str, str]) -> None:
+    """Materialize an ATS receipt using only values frozen before kickoff.
+
+    Dedicated ATS receipts are authoritative and are never rewritten. For 2026 Weeks
+    1-2, which predate the dedicated ATS receipt schema, Sunday Signal now creates a
+    provenance-marked historical receipt from the exact frozen ``expected_margin``
+    and ``spread_line`` values. This is deterministic and outcome-blind: final scores,
+    cover results, and later market data are never consulted.
+
+    Sep. 27, 2026+ compatibility backfills remain supported for policy-era receipts
+    created before the dedicated columns were deployed. Other pre-policy receipts,
+    including Week 3 before Sep. 27, are not retroactively assigned an ATS side.
+    """
     if _value(row, "locked_ats_status"):
+        if not _value(row, "locked_ats_receipt_source"):
+            row["locked_ats_receipt_source"] = "DEDICATED_LOCK_RECEIPT"
         return
 
-    # Prefer dedicated frozen aliases if a newer producer already wrote them.
-    # Generic expected_margin/spread_line are compatibility inputs only for old
-    # immutable lock receipts that predate the dedicated ATS receipt columns.
+    source = _ats_backfill_source(row)
+    if not source:
+        return
+    row["locked_ats_receipt_source"] = source
+
+    # Prefer explicit frozen aliases when present. Generic expected_margin/spread_line
+    # are compatibility inputs from the same immutable pregame receipt.
     model_margin = _number(row, "locked_model_spread", "expected_margin")
     market_margin = _number(row, "locked_market_spread", "spread_line")
     home = _value(row, "home_team")
@@ -91,11 +134,11 @@ def normalize_history_for_site(path: Path) -> None:
     """Add Sunday Signal receipt aliases without changing canonical history values.
 
     FINAL rows are immutable pregame receipts. The site gets explicit aliases for
-    model/market values that existed at lock time. For Sep. 27, 2026+ receipts it
-    also materializes the model-selected ATS side and exact sportsbook spread from
-    those same frozen inputs. A closing spread is intentionally not inferred from
-    the locked market line; it is populated only when an explicit closing-line
-    field already exists.
+    model/market values that existed at lock time. The bounded 2026 Week 1-2 legacy
+    cohort also receives provenance-marked ATS receipts reconstructed solely from its
+    frozen pregame inputs. Sep. 27, 2026+ receipts retain the policy-era compatibility
+    migration. A closing spread is intentionally not inferred from the locked market
+    line; it is populated only when an explicit closing-line field already exists.
     """
     if not path.exists():
         return
