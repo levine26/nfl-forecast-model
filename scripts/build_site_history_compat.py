@@ -55,8 +55,10 @@ def _backfill_ats_receipt(row: dict[str, str]) -> None:
     if _value(row, "locked_ats_status"):
         return
 
-    model_margin = _number(row, "expected_margin", "locked_model_spread")
-    market_margin = _number(row, "spread_line", "locked_market_spread")
+    # Prefer explicit lock aliases when present. Generic receipt columns are used
+    # only for old immutable receipts that predate the dedicated aliases.
+    model_margin = _number(row, "locked_model_spread", "expected_margin")
+    market_margin = _number(row, "locked_market_spread", "spread_line")
     home = _value(row, "home_team")
     away = _value(row, "away_team")
 
