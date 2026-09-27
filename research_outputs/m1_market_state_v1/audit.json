@@ -1,7 +1,7 @@
 {
   "completed_2026_outcomes_used": 0,
   "diagnostic_fields_admitted_to_predictor": false,
-  "eligible_predictor_rows": 11,
+  "eligible_predictor_rows": 13,
   "game_audits": [
     {
       "available_diagnostic_horizons": [],
@@ -44,21 +44,36 @@
       "available_predictor_horizons": [
         "T-2160m",
         "T-720m",
-        "T-360m"
+        "T-360m",
+        "T-120m"
       ],
       "completed_2026_outcomes_used": 0,
       "diagnostic_fields_admitted_to_predictor": false,
-      "eligible": false,
+      "eligible": true,
       "game_id": "2026_03_BAL_DAL",
       "minimum_complete_books": 2,
-      "missing": [
-        "T-120m"
+      "path_common_book_count": 18,
+      "predictor_feature_columns": [
+        "consensus_spread_t120",
+        "spread_favorite_no_vig_t120",
+        "moneyline_favorite_no_vig_t120",
+        "consensus_total_t120",
+        "spread_dispersion_t120",
+        "active_book_count_t120",
+        "median_quote_age_minutes_t120",
+        "stale_book_share_t120",
+        "favorite_spread_strength_move_t360_to_t120",
+        "spread_price_move_unchanged_number_t360_to_t120",
+        "movement_breadth_t360_to_t120",
+        "key_number_crossing_3_or_7_t360_to_t120",
+        "spread_moneyline_logit_residual_t120"
       ],
       "production_authorized": false,
       "program_id": "FV2-PROS-M1-MARKETSTATE-01",
-      "reason": "missing_required_predictor_horizon",
+      "reason": "qualified",
       "schema_version": "levline-m1-market-state-v1",
-      "stale_quote_minutes": 15.0
+      "stale_quote_minutes": 15.0,
+      "unchanged_number_common_book_count": 17
     },
     {
       "available_diagnostic_horizons": [
@@ -285,21 +300,36 @@
       "available_predictor_horizons": [
         "T-2160m",
         "T-720m",
-        "T-360m"
+        "T-360m",
+        "T-120m"
       ],
       "completed_2026_outcomes_used": 0,
       "diagnostic_fields_admitted_to_predictor": false,
-      "eligible": false,
+      "eligible": true,
       "game_id": "2026_03_LV_NO",
       "minimum_complete_books": 2,
-      "missing": [
-        "T-120m"
+      "path_common_book_count": 15,
+      "predictor_feature_columns": [
+        "consensus_spread_t120",
+        "spread_favorite_no_vig_t120",
+        "moneyline_favorite_no_vig_t120",
+        "consensus_total_t120",
+        "spread_dispersion_t120",
+        "active_book_count_t120",
+        "median_quote_age_minutes_t120",
+        "stale_book_share_t120",
+        "favorite_spread_strength_move_t360_to_t120",
+        "spread_price_move_unchanged_number_t360_to_t120",
+        "movement_breadth_t360_to_t120",
+        "key_number_crossing_3_or_7_t360_to_t120",
+        "spread_moneyline_logit_residual_t120"
       ],
       "production_authorized": false,
       "program_id": "FV2-PROS-M1-MARKETSTATE-01",
-      "reason": "missing_required_predictor_horizon",
+      "reason": "qualified",
       "schema_version": "levline-m1-market-state-v1",
-      "stale_quote_minutes": 15.0
+      "stale_quote_minutes": 15.0,
+      "unchanged_number_common_book_count": 14
     },
     {
       "available_diagnostic_horizons": [],
@@ -499,7 +529,7 @@
     }
   ],
   "games_seen": 14,
-  "ineligible_predictor_rows": 3,
+  "ineligible_predictor_rows": 1,
   "production_authorized": false,
   "program_id": "FV2-PROS-M1-MARKETSTATE-01",
   "schema_version": "levline-m1-market-state-v1"
