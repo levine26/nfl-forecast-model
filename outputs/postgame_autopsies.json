@@ -717,5 +717,28 @@
       "The locked forecast got the winner direction right."
     ],
     "winner_correct": true
+  },
+  "2026_03_ATL_GB": {
+    "actual_score": "GB 14 \u2013 ATL 35",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "winner_miss",
+      "margin_miss"
+    ],
+    "game_id": "2026_03_ATL_GB",
+    "margin_abs_error": 25.973639994905557,
+    "matchup": "ATL @ GB",
+    "official_home_prob": 0.6681304936254949,
+    "official_pick": "GB",
+    "projected_score": "GB 24.4 \u2013 ATL 19.4",
+    "total_abs_error": 5.225352941787392,
+    "what_missed": [
+      "The locked forecast missed the outright winner.",
+      "The predicted margin finished 26.0 points from the actual margin."
+    ],
+    "what_went_right": [
+      "The predicted total finished 5.2 points from the actual total."
+    ],
+    "winner_correct": false
   }
 }
