@@ -1,6 +1,7 @@
 export const BET_UNIT_DOLLARS = 25
 
 const EPS = 1e-9
+const POLICY_ERA_ATS_START = '2026-09-27'
 
 export function numberOrNull(value) {
   if (value === '' || value == null) return null
@@ -68,19 +69,50 @@ function spreadPrice(row, side) {
   return {odds: captured ?? -110, fallback: captured == null}
 }
 
-function lockedAtsWager(row) {
-  const status = String(row.locked_ats_status || '').trim().toUpperCase()
-  if (status !== 'VALUE') return null
-  const side = String(row.locked_ats_pick_team || '').trim()
-  const marketSpread = numberOrNull(row.locked_ats_pick_market_spread)
-  if (!side || marketSpread == null || ![row.home_team, row.away_team].includes(side)) return null
+function policyEraReceiptAtsWager(row) {
+  const gameday = String(row.gameday || '').slice(0,10)
+  if (!gameday || gameday < POLICY_ERA_ATS_START) return null
+  const modelMarginHome = numberOrNull(row.expected_margin)
+  const marketMarginHome = numberOrNull(row.spread_line)
+  if (modelMarginHome == null || marketMarginHome == null) return null
+  const homeEdgePoints = modelMarginHome - marketMarginHome
+  if (Math.abs(homeEdgePoints) <= EPS) return null
+  const pickHome = homeEdgePoints > 0
+  const side = pickHome ? row.home_team : row.away_team
+  const marketSpread = pickHome ? -marketMarginHome : marketMarginHome
+  if (!side || ![row.home_team,row.away_team].includes(side)) return null
   return {
     side,
     marketSpread,
-    modelMarginHome: numberOrNull(row.locked_ats_model_margin_home),
-    marketMarginHome: numberOrNull(row.locked_ats_market_margin_home),
-    homeEdgePoints: numberOrNull(row.locked_ats_home_edge_points),
+    modelMarginHome,
+    marketMarginHome,
+    homeEdgePoints,
+    gradingSource:'policy_era_frozen_receipt_migration',
   }
+}
+
+function lockedAtsWager(row) {
+  const status = String(row.locked_ats_status || '').trim().toUpperCase()
+  if (status) {
+    if (status !== 'VALUE') return null
+    const side = String(row.locked_ats_pick_team || '').trim()
+    const marketSpread = numberOrNull(row.locked_ats_pick_market_spread)
+    if (!side || marketSpread == null || ![row.home_team, row.away_team].includes(side)) return null
+    return {
+      side,
+      marketSpread,
+      modelMarginHome: numberOrNull(row.locked_ats_model_margin_home),
+      marketMarginHome: numberOrNull(row.locked_ats_market_margin_home),
+      homeEdgePoints: numberOrNull(row.locked_ats_home_edge_points),
+      gradingSource:'locked_ats_pick_market_spread',
+    }
+  }
+
+  // Sep. 27 receipts locked before the dedicated locked_ats_* columns were shipped.
+  // They already froze both the independent model margin and sportsbook spread in
+  // this same receipt, so reconstruct the ATS side from those immutable inputs only.
+  // No current/later market data is consulted, and older receipts are never reinterpreted.
+  return policyEraReceiptAtsWager(row)
 }
 
 export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
@@ -111,7 +143,7 @@ export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
           modelMarginHome: lockedAts.modelMarginHome,
           marketMarginHome: lockedAts.marketMarginHome,
           homeEdgePoints: lockedAts.homeEdgePoints,
-          gradingSource: 'locked_ats_pick_market_spread',
+          gradingSource: lockedAts.gradingSource,
           odds: price.odds,
           usedFallbackPrice: price.fallback,
           result: spreadResult,
@@ -221,12 +253,12 @@ export function buildCurrentWeekSlate(currentGames, ledger, stake=BET_UNIT_DOLLA
 }
 
 export function combinedEntryProfit(entry) {
-  const bets = [entry?.ml, entry?.spread].filter(Boolean)
+  const bets = [entry?.ml,entry?.spread].filter(Boolean)
   if (!bets.length || bets.some(bet => bet.result === 'pending') || bets.some(bet => bet.profit == null)) return null
-  return bets.reduce((sum, bet) => sum + bet.profit, 0)
+  return bets.reduce((sum,bet) => sum + bet.profit,0)
 }
 
-export function summarizeBets(entries, kind) {
+export function summarizeBets(entries,kind) {
   const bets = entries
     .map(entry => kind === 'ml' ? entry.ml : entry.spread)
     .filter(Boolean)
@@ -238,10 +270,10 @@ export function summarizeBets(entries, kind) {
   const missingProfit = settled.filter(bet => bet.profit == null).length
   const risked = settled.length * BET_UNIT_DOLLARS
   const committed = bets.length * BET_UNIT_DOLLARS
-  const profit = missingProfit ? null : settled.reduce((sum, bet) => sum + bet.profit, 0)
+  const profit = missingProfit ? null : settled.reduce((sum,bet) => sum + bet.profit,0)
   return {
-    bets: bets.length,
-    settled: settled.length,
+    bets:bets.length,
+    settled,
     pending,
     wins,
     losses,
@@ -250,13 +282,13 @@ export function summarizeBets(entries, kind) {
     risked,
     committed,
     profit,
-    roi: profit == null || risked <= 0 ? null : profit / risked,
+    roi:profit == null || risked <= 0 ? null : profit / risked,
   }
 }
 
 export function summarizeCombined(entries) {
-  const ml = summarizeBets(entries, 'ml')
-  const spread = summarizeBets(entries, 'spread')
+  const ml = summarizeBets(entries,'ml')
+  const spread = summarizeBets(entries,'spread')
   const risked = ml.risked + spread.risked
   const committed = ml.committed + spread.committed
   const missingProfit = ml.missingProfit + spread.missingProfit
@@ -264,17 +296,16 @@ export function summarizeCombined(entries) {
   const pending = ml.pending + spread.pending
   const profit = missingProfit ? null : ml.profit + spread.profit
   return {
-    bets: ml.bets + spread.bets,
+    bets:ml.bets + spread.bets,
     settled,
     pending,
     risked,
     committed,
     missingProfit,
     profit,
-    roi: profit == null || risked <= 0 ? null : profit / risked,
+    roi:profit == null || risked <= 0 ? null : profit / risked,
   }
 }
-
 
 export function buildSeasonPerformance(entries) {
   const weeks=[...new Set((entries||[]).map(entry=>Number(entry.week)).filter(Number.isFinite))].sort((a,b)=>a-b)
@@ -292,10 +323,10 @@ export function buildSeasonPerformance(entries) {
     else if (spreadValid) cumulativeSpread+=spread.profit
     return {
       week,
-      mlProfit: ml.profit,
-      spreadProfit: spread.profit,
-      cumulativeMl: mlValid ? cumulativeMl : null,
-      cumulativeSpread: spreadValid ? cumulativeSpread : null,
+      mlProfit:ml.profit,
+      spreadProfit:spread.profit,
+      cumulativeMl:mlValid ? cumulativeMl : null,
+      cumulativeSpread:spreadValid ? cumulativeSpread : null,
     }
   })
 }
