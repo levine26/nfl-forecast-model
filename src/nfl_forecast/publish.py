@@ -38,6 +38,7 @@ ATS_LOCK_COLUMNS = [
     "locked_ats_status","locked_ats_pick_team","locked_ats_pick_market_spread",
     "locked_ats_model_margin_home","locked_ats_market_margin_home","locked_ats_home_edge_points",
 ]
+ATS_TEXT_LOCK_COLUMNS = {"locked_ats_status", "locked_ats_pick_team"}
 
 LOCK_META_COLUMNS = [
     "kickoff_utc","lock_timestamp_utc","minutes_to_kickoff_at_lock","lock_status",
@@ -124,6 +125,21 @@ def _coerce_grade_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
     return frame
 
 
+def _coerce_ats_lock_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
+    """Keep text receipt fields writable under pandas' strict setitem rules."""
+    frame = frame.copy()
+    for c in ATS_LOCK_COLUMNS:
+        if c not in frame.columns:
+            frame[c] = (
+                pd.Series(pd.NA, index=frame.index, dtype="object")
+                if c in ATS_TEXT_LOCK_COLUMNS
+                else np.nan
+            )
+    for c in ATS_TEXT_LOCK_COLUMNS:
+        frame[c] = frame[c].astype("object")
+    return frame
+
+
 def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
     if not path.exists():
         return _empty_official(columns)
@@ -136,9 +152,14 @@ def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
     old = old[old["lock_status"].eq("LOCKED")].copy()
     for c in columns + LOCK_META_COLUMNS:
         if c not in old.columns:
-            old[c] = pd.NA if c in BOOLEAN_GRADE_COLUMNS else np.nan
+            if c in BOOLEAN_GRADE_COLUMNS:
+                old[c] = pd.NA
+            elif c in ATS_TEXT_LOCK_COLUMNS:
+                old[c] = pd.Series(pd.NA, index=old.index, dtype="object")
+            else:
+                old[c] = np.nan
     old = old[columns + [c for c in LOCK_META_COLUMNS if c not in columns]]
-    return _coerce_grade_dtypes(old)
+    return _coerce_grade_dtypes(_coerce_ats_lock_dtypes(old))
 
 
 def _backfill_policy_ats_locks(official: pd.DataFrame) -> pd.DataFrame:
@@ -150,10 +171,7 @@ def _backfill_policy_ats_locks(official: pd.DataFrame) -> pd.DataFrame:
     """
     if official.empty:
         return official
-    frame = official.copy()
-    for c in ATS_LOCK_COLUMNS:
-        if c not in frame.columns:
-            frame[c] = np.nan
+    frame = _coerce_ats_lock_dtypes(official)
     gameday = frame.get("gameday", pd.Series("", index=frame.index)).astype(str).str.slice(0, 10)
     status = frame.get("locked_ats_status", pd.Series("", index=frame.index)).fillna("").astype(str).str.strip()
     eligible = frame.get("lock_status", pd.Series("", index=frame.index)).astype(str).eq("LOCKED") & gameday.ge(ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY) & status.eq("")
