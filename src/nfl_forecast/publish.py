@@ -38,6 +38,7 @@ ATS_LOCK_COLUMNS = [
     "locked_ats_status","locked_ats_pick_team","locked_ats_pick_market_spread",
     "locked_ats_model_margin_home","locked_ats_market_margin_home","locked_ats_home_edge_points",
 ]
+ATS_LOCK_TEXT_COLUMNS = ["locked_ats_status", "locked_ats_pick_team"]
 
 LOCK_META_COLUMNS = [
     "kickoff_utc","lock_timestamp_utc","minutes_to_kickoff_at_lock","lock_status",
@@ -121,6 +122,14 @@ def _coerce_grade_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
             frame[c] = pd.Series(pd.NA, index=frame.index, dtype="boolean")
         else:
             frame[c] = pd.array(frame[c], dtype="boolean")
+    # Pandas 3 rejects assigning text into an all-NA float column. Receipt status
+    # and selected team are semantic strings, so preserve an object dtype even
+    # when legacy CSVs do not yet contain any values for these new columns.
+    for c in ATS_LOCK_TEXT_COLUMNS:
+        if c not in frame.columns:
+            frame[c] = pd.Series(pd.NA, index=frame.index, dtype="object")
+        else:
+            frame[c] = frame[c].astype("object")
     return frame
 
 
@@ -150,7 +159,7 @@ def _backfill_policy_ats_locks(official: pd.DataFrame) -> pd.DataFrame:
     """
     if official.empty:
         return official
-    frame = official.copy()
+    frame = _coerce_grade_dtypes(official)
     for c in ATS_LOCK_COLUMNS:
         if c not in frame.columns:
             frame[c] = np.nan

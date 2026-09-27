@@ -262,15 +262,16 @@ export function summarizeBets(entries,kind) {
   const bets = entries
     .map(entry => kind === 'ml' ? entry.ml : entry.spread)
     .filter(Boolean)
-  const settled = bets.filter(bet => bet.result !== 'pending')
-  const pending = bets.length - settled.length
-  const wins = settled.filter(bet => bet.result === 'win').length
-  const losses = settled.filter(bet => bet.result === 'loss').length
-  const pushes = settled.filter(bet => bet.result === 'push').length
-  const missingProfit = settled.filter(bet => bet.profit == null).length
-  const risked = settled.length * BET_UNIT_DOLLARS
+  const settledBets = bets.filter(bet => bet.result !== 'pending')
+  const settled = settledBets.length
+  const pending = bets.length - settled
+  const wins = settledBets.filter(bet => bet.result === 'win').length
+  const losses = settledBets.filter(bet => bet.result === 'loss').length
+  const pushes = settledBets.filter(bet => bet.result === 'push').length
+  const missingProfit = settledBets.filter(bet => bet.profit == null).length
+  const risked = settled * BET_UNIT_DOLLARS
   const committed = bets.length * BET_UNIT_DOLLARS
-  const profit = missingProfit ? null : settled.reduce((sum,bet) => sum + bet.profit,0)
+  const profit = missingProfit ? null : settledBets.reduce((sum,bet) => sum + bet.profit,0)
   return {
     bets:bets.length,
     settled,
