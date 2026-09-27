@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 from nfl_forecast.publish import _ats_lock_fields, _backfill_policy_ats_locks
 
@@ -13,7 +14,7 @@ def test_ats_lock_fields_select_home_side_at_market_number():
     assert fields["locked_ats_status"] == "VALUE"
     assert fields["locked_ats_pick_team"] == "BUF"
     assert fields["locked_ats_pick_market_spread"] == -7.0
-    assert fields["locked_ats_home_edge_points"] == 2.988
+    assert fields["locked_ats_home_edge_points"] == pytest.approx(2.988)
 
 
 def test_ats_lock_fields_select_away_side_at_market_number():
@@ -26,7 +27,7 @@ def test_ats_lock_fields_select_away_side_at_market_number():
     assert fields["locked_ats_status"] == "VALUE"
     assert fields["locked_ats_pick_team"] == "NE"
     assert fields["locked_ats_pick_market_spread"] == 3.0
-    assert fields["locked_ats_home_edge_points"] == -0.51
+    assert fields["locked_ats_home_edge_points"] == pytest.approx(-0.51)
 
 
 def test_backfill_only_uses_policy_era_locked_receipts_and_their_own_inputs():
