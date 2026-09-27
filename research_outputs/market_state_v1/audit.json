@@ -1,0 +1,25 @@
+{
+  "book_microstructure_features": true,
+  "book_pairing_policy": "same_sportsbook_exact_selected_consensus_request_only",
+  "capture_tolerance_minutes": 7.5,
+  "completed_2026_outcomes_used": 0,
+  "games_with_all_four_horizons": 0,
+  "games_with_any_qualifying_horizon": 9,
+  "games_with_missing_horizons": 9,
+  "horizons": [
+    "T-120m",
+    "T-60m",
+    "T-45m",
+    "T-30m"
+  ],
+  "minimum_consensus_books": 2,
+  "missingness_policy": "preserve_missing_no_imputation",
+  "production_authorized": false,
+  "research_only": true,
+  "schema_version": "levline-market-state-v1",
+  "strict_no_later_than_cutoff": true,
+  "valid_timing_error_minutes": [
+    -7.5,
+    0.0
+  ]
+}
