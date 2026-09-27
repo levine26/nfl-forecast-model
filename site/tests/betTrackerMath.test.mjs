@@ -126,7 +126,6 @@ test('receipt editorial accepts only the exact current FINAL_PREGAME preview', (
   }),false)
 })
 
-
 test('current-week slate includes pending public games and uses locked history when available', () => {
   const ledger=buildBetLedger([{
     game_id:'2026_02_DET_BUF', season:'2026', week:'2', lock_status:'LOCKED',
@@ -188,7 +187,6 @@ test('game P/L combines settled moneyline and spread wagers', () => {
   assert.ok(Math.abs(combinedEntryProfit(ledger[0])-expected)<1e-9)
 })
 
-
 test('season performance accumulates Moneyline and spread P/L by week', () => {
   const ledger=buildBetLedger([
     {
@@ -211,4 +209,55 @@ test('season performance accumulates Moneyline and spread P/L by week', () => {
   assert.ok(series[0].cumulativeSpread>0)
   assert.ok(series[1].cumulativeMl<series[0].cumulativeMl)
   assert.ok(series[1].cumulativeSpread<series[0].cumulativeSpread)
+})
+
+test('locked production receipts use the canonical ATS side at the locked market spread', () => {
+  const rows=[
+    {game_id:'2026_03_LAC_BUF',away_team:'LAC',home_team:'BUF',pick:'BUF',expected_margin:'9.988118084294427',spread_line:'7.0',side:'BUF',line:-7.0},
+    {game_id:'2026_03_CAR_CLE',away_team:'CAR',home_team:'CLE',pick:'CAR',expected_margin:'-1.124340401960138',spread_line:'-2.5',side:'CLE',line:2.5},
+    {game_id:'2026_03_NYJ_DET',away_team:'NYJ',home_team:'DET',pick:'DET',expected_margin:'9.436215430944443',spread_line:'6.5',side:'DET',line:-6.5},
+    {game_id:'2026_03_HOU_IND',away_team:'HOU',home_team:'IND',pick:'HOU',expected_margin:'-1.19003104415717',spread_line:'-1.5',side:'IND',line:1.5},
+    {game_id:'2026_03_NE_JAX',away_team:'NE',home_team:'JAX',pick:'JAX',expected_margin:'2.4895670799105223',spread_line:'3.0',side:'NE',line:3.0},
+    {game_id:'2026_03_KC_MIA',away_team:'KC',home_team:'MIA',pick:'KC',expected_margin:'-3.687627745212781',spread_line:'-10.0',side:'MIA',line:10.0},
+    {game_id:'2026_03_TEN_NYG',away_team:'TEN',home_team:'NYG',pick:'TEN',expected_margin:'6.881925916672355',spread_line:'2.5',side:'NYG',line:-2.5},
+    {game_id:'2026_03_CIN_PIT',away_team:'CIN',home_team:'PIT',pick:'CIN',expected_margin:'-1.4827019057733204',spread_line:'-3.5',side:'PIT',line:3.5},
+    {game_id:'2026_03_SEA_WAS',away_team:'SEA',home_team:'WAS',pick:'SEA',expected_margin:'-8.502736613436035',spread_line:'-8.5',side:'SEA',line:-8.5},
+  ].map(row=>({...row,season:'2026',week:'3',lock_status:'LOCKED',final_home_prob:'0.50'}))
+
+  const ledger=buildBetLedger(rows)
+  assert.equal(ledger.length,9)
+  for (let i=0;i<ledger.length;i+=1) {
+    assert.equal(ledger[i].spread.strategy,'ATS_MARKET')
+    assert.equal(ledger[i].spread.side,rows[i].side)
+    assert.equal(ledger[i].spread.line,rows[i].line)
+    assert.equal(ledger[i].spread.result,'pending')
+  }
+})
+
+test('ATS underdog grading applies the locked sportsbook handicap', () => {
+  const ledger=buildBetLedger([{
+    game_id:'2026_03_A_B',season:'2026',week:'3',lock_status:'LOCKED',
+    away_team:'A',home_team:'B',pick:'A',final_home_prob:'0.45',
+    expected_margin:'-1.0',spread_line:'-2.5',
+    actual_home_score:'24',actual_away_score:'22',
+  }])
+  assert.equal(ledger[0].spread.strategy,'ATS_MARKET')
+  assert.equal(ledger[0].spread.side,'B')
+  assert.equal(ledger[0].spread.line,2.5)
+  assert.equal(ledger[0].spread.result,'win')
+})
+
+test('current public ATS contract drives the pre-lock slate', () => {
+  const slate=buildCurrentWeekSlate([{
+    game_id:'2026_03_TEN_NYG',week:3,away_team:'TEN',home_team:'NYG',
+    official_winner:'TEN',official_home_win_probability:0.4983,
+    kickoff_utc:'2026-09-27T17:00:00+00:00',
+    ats_status:'VALUE',ats_pick_team:'NYG',ats_pick_market_spread:-2.5,
+    ats_model_margin_home:6.8819,ats_market_margin_home:2.5,ats_edge_points:4.3819,
+  }],[])
+  assert.equal(slate.entries.length,1)
+  assert.equal(slate.entries[0].ml.pick,'TEN')
+  assert.equal(slate.entries[0].spread.strategy,'ATS_MARKET')
+  assert.equal(slate.entries[0].spread.side,'NYG')
+  assert.equal(slate.entries[0].spread.line,-2.5)
 })
