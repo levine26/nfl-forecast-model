@@ -92,7 +92,7 @@ jobs:
         run: npm install
       - name: Validate Bet Tracker settlement math
         working-directory: site
-        run: node --test tests/betTrackerMath.test.mjs
+        run: node --test tests/betTrackerMath.test.mjs tests/atsPolicyEraReceiptMigration.test.mjs
       - name: Build dashboard
         working-directory: site
         run: npm run build
