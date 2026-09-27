@@ -16,6 +16,8 @@ function firstNumber(...values) {
   return null
 }
 
+// Retained for backward-compatible consumers/tests. ATS settlement never rounds or
+// substitutes a model line; it uses the exact locked sportsbook number.
 export function roundSpreadToHalfPoint(value) {
   const parsed = numberOrNull(value)
   if (parsed == null) return null
@@ -42,10 +44,6 @@ export function settleBet(result, odds, stake=BET_UNIT_DOLLARS) {
   return americanWinProfit(stake, odds)
 }
 
-function lockedModelMargin(row) {
-  return firstNumber(row.locked_model_spread, row.expected_margin, row.predicted_margin)
-}
-
 function pickedTeam(row) {
   if (row.pick && row.pick !== 'PICKEM') return row.pick
   const homeProbability = firstNumber(row.final_home_prob)
@@ -70,6 +68,21 @@ function spreadPrice(row, side) {
   return {odds: captured ?? -110, fallback: captured == null}
 }
 
+function lockedAtsWager(row) {
+  const status = String(row.locked_ats_status || '').trim().toUpperCase()
+  if (status !== 'VALUE') return null
+  const side = String(row.locked_ats_pick_team || '').trim()
+  const marketSpread = numberOrNull(row.locked_ats_pick_market_spread)
+  if (!side || marketSpread == null || ![row.home_team, row.away_team].includes(side)) return null
+  return {
+    side,
+    marketSpread,
+    modelMarginHome: numberOrNull(row.locked_ats_model_margin_home),
+    marketMarginHome: numberOrNull(row.locked_ats_market_margin_home),
+    homeEdgePoints: numberOrNull(row.locked_ats_home_edge_points),
+  }
+}
+
 export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
   return (history || [])
     .filter(row => row.lock_status === 'LOCKED' && String(row.season || '2026') === '2026')
@@ -85,20 +98,20 @@ export function buildBetLedger(history, stake=BET_UNIT_DOLLARS) {
       const mlResult = !graded ? 'pending' : actualWinner == null ? 'push' : pick === actualWinner ? 'win' : 'loss'
       const mlOdds = moneylinePrice(row, pick)
 
-      const modelMargin = lockedModelMargin(row)
+      const lockedAts = lockedAtsWager(row)
       let spread = null
-      if (modelMargin != null) {
-        const roundedModelMargin = roundSpreadToHalfPoint(modelMargin)
-        const side = modelMargin > EPS ? row.home_team : modelMargin < -EPS ? row.away_team : pick
-        const sideMargin = graded ? (side === row.home_team ? actualMargin : -actualMargin) : null
-        const line = Math.abs(roundedModelMargin)
-        const spreadResult = graded ? resultFromEdge(sideMargin - line) : 'pending'
-        const price = spreadPrice(row, side)
+      if (lockedAts) {
+        const sideMargin = graded ? (lockedAts.side === row.home_team ? actualMargin : -actualMargin) : null
+        const spreadResult = graded ? resultFromEdge(sideMargin + lockedAts.marketSpread) : 'pending'
+        const price = spreadPrice(row, lockedAts.side)
         spread = {
-          side,
-          modelMargin,
-          roundedModelMargin,
-          line,
+          side: lockedAts.side,
+          marketSpread: lockedAts.marketSpread,
+          line: Math.abs(lockedAts.marketSpread),
+          modelMarginHome: lockedAts.modelMarginHome,
+          marketMarginHome: lockedAts.marketMarginHome,
+          homeEdgePoints: lockedAts.homeEdgePoints,
+          gradingSource: 'locked_ats_pick_market_spread',
           odds: price.odds,
           usedFallbackPrice: price.fallback,
           result: spreadResult,
@@ -138,16 +151,19 @@ function previewEntry(game, stake=BET_UNIT_DOLLARS) {
     : homeProbability == null ? null : homeProbability >= .5 ? game.home_team : game.away_team
   if (!pick) return null
 
-  const margin = firstNumber(game.diagnostics?.independent_margin_home, game.independent_margin_home)
+  const atsStatus = String(game.ats_status ?? game.signals?.ats?.status ?? '').toUpperCase()
+  const atsSide = game.ats_pick_team ?? game.signals?.ats?.pick_team ?? null
+  const atsMarketSpread = firstNumber(game.ats_pick_market_spread, game.signals?.ats?.pick_market_spread)
   let spread = null
-  if (margin != null) {
-    const roundedModelMargin = roundSpreadToHalfPoint(margin)
-    const side = margin > EPS ? game.home_team : margin < -EPS ? game.away_team : pick
+  if (atsStatus === 'VALUE' && atsSide && atsMarketSpread != null && [game.home_team, game.away_team].includes(atsSide)) {
     spread = {
-      side,
-      modelMargin: margin,
-      roundedModelMargin,
-      line: Math.abs(roundedModelMargin),
+      side: atsSide,
+      marketSpread: atsMarketSpread,
+      line: Math.abs(atsMarketSpread),
+      modelMarginHome: firstNumber(game.ats_model_margin_home, game.signals?.ats?.model_margin_home),
+      marketMarginHome: firstNumber(game.ats_market_margin_home, game.signals?.ats?.market_margin_home),
+      homeEdgePoints: firstNumber(game.ats_home_edge_points, game.signals?.ats?.home_edge_points),
+      gradingSource: 'public_ats_preview',
       odds: null,
       usedFallbackPrice: false,
       result: 'pending',
