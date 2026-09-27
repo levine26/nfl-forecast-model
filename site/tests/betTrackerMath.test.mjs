@@ -225,12 +225,15 @@ test('locked production receipts use the canonical ATS side at the locked market
   ].map(row=>({...row,season:'2026',week:'3',lock_status:'LOCKED',final_home_prob:'0.50'}))
 
   const ledger=buildBetLedger(rows)
+  const expectedByGame=new Map(rows.map(row=>[row.game_id,{side:row.side,line:row.line}]))
   assert.equal(ledger.length,9)
-  for (let i=0;i<ledger.length;i+=1) {
-    assert.equal(ledger[i].spread.strategy,'ATS_MARKET')
-    assert.equal(ledger[i].spread.side,rows[i].side)
-    assert.equal(ledger[i].spread.line,rows[i].line)
-    assert.equal(ledger[i].spread.result,'pending')
+  for (const entry of ledger) {
+    const expected=expectedByGame.get(entry.gameId)
+    assert.ok(expected)
+    assert.equal(entry.spread.strategy,'ATS_MARKET')
+    assert.equal(entry.spread.side,expected.side)
+    assert.equal(entry.spread.line,expected.line)
+    assert.equal(entry.spread.result,'pending')
   }
 })
 
