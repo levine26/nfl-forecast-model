@@ -7,72 +7,38 @@
       "pick_delta_pp": -1.260265225511148e-08
     },
     {
-      "game_id": "2026_03_LA_DEN",
+      "game_id": "2026_03_PHI_CHI",
       "largest_driver": "No material input move",
-      "pick": "LA",
-      "pick_delta_pp": -2.490008199629301e-10
+      "pick": "PHI",
+      "pick_delta_pp": -2.7639002198043272e-11
     },
     {
-      "game_id": "2026_03_BAL_DAL",
+      "game_id": "2026_01_BAL_IND",
       "largest_driver": "No material input move",
       "pick": "BAL",
-      "pick_delta_pp": -8.135159212940835e-11
+      "pick_delta_pp": -0.0
     }
   ],
-  "generated_utc": "2026-09-27T23:38:09.486725+00:00",
+  "generated_utc": "2026-09-28T14:29:45.719529+00:00",
   "market_disagreements": [
     {
       "confidence": "Solid",
       "game_id": "2026_03_PHI_CHI",
       "matchup": "PHI @ CHI",
       "pick": "PHI",
-      "pick_prob": 0.6879063234263394,
+      "pick_prob": 0.6791262612569438,
       "projected_score": "CHI 22.6 \u2013 PHI 22.4",
-      "pure_market_gap_pp": 16.514276974257637
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_03_BAL_DAL",
-      "matchup": "BAL @ DAL",
-      "pick": "BAL",
-      "pick_prob": 0.6297200604398131,
-      "projected_score": "DAL 22.0 \u2013 BAL 23.6",
-      "pure_market_gap_pp": 7.183830154538345
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_03_LV_NO",
-      "matchup": "LV @ NO",
-      "pick": "NO",
-      "pick_prob": 0.6184845804822511,
-      "projected_score": "NO 23.9 \u2013 LV 20.6",
-      "pure_market_gap_pp": 1.1550031639924518
+      "pure_market_gap_pp": 16.164993765615055
     }
   ],
   "most_uncertain": [
     {
-      "confidence": "Coin Flip",
-      "game_id": "2026_03_LA_DEN",
-      "matchup": "LA @ DEN",
-      "pick": "LA",
-      "pick_prob": 0.5214891435276401,
-      "projected_score": "DEN 23.2 \u2013 LA 22.9"
-    },
-    {
       "confidence": "Solid",
-      "game_id": "2026_03_LV_NO",
-      "matchup": "LV @ NO",
-      "pick": "NO",
-      "pick_prob": 0.6184845804822511,
-      "projected_score": "NO 23.9 \u2013 LV 20.6"
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_03_BAL_DAL",
-      "matchup": "BAL @ DAL",
-      "pick": "BAL",
-      "pick_prob": 0.6297200604398131,
-      "projected_score": "DAL 22.0 \u2013 BAL 23.6"
+      "game_id": "2026_03_PHI_CHI",
+      "matchup": "PHI @ CHI",
+      "pick": "PHI",
+      "pick_prob": 0.6791262612569438,
+      "projected_score": "CHI 22.6 \u2013 PHI 22.4"
     }
   ],
   "strongest": [
@@ -81,24 +47,8 @@
       "game_id": "2026_03_PHI_CHI",
       "matchup": "PHI @ CHI",
       "pick": "PHI",
-      "pick_prob": 0.6879063234263394,
+      "pick_prob": 0.6791262612569438,
       "projected_score": "CHI 22.6 \u2013 PHI 22.4"
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_03_BAL_DAL",
-      "matchup": "BAL @ DAL",
-      "pick": "BAL",
-      "pick_prob": 0.6297200604398131,
-      "projected_score": "DAL 22.0 \u2013 BAL 23.6"
-    },
-    {
-      "confidence": "Solid",
-      "game_id": "2026_03_LV_NO",
-      "matchup": "LV @ NO",
-      "pick": "NO",
-      "pick_prob": 0.6184845804822511,
-      "projected_score": "NO 23.9 \u2013 LV 20.6"
     }
   ],
   "week": 3
