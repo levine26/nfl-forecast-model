@@ -1,0 +1,25 @@
+{
+  "completed_2026_outcomes_used": 0,
+  "component_selection_policy": "latest_capture_generated_at_or_before_horizon_cutoff",
+  "games": 14,
+  "horizons": [
+    "T-120m",
+    "T-60m",
+    "T-45m",
+    "T-30m"
+  ],
+  "learned_cross_channel_weight_defined": false,
+  "market_policy": "strict_selected_consensus_request_at_or_before_nominal_cutoff",
+  "missingness_policy": "preserve_missing_no_imputation",
+  "player_state_selection_policy": "latest_source_commit_available_at_or_before_horizon_cutoff",
+  "production_authorized": false,
+  "records": 56,
+  "records_with_components": 56,
+  "records_with_market": 48,
+  "records_with_player_state": 12,
+  "research_only": true,
+  "schema_version": "levline4-upset-evidence-v1",
+  "strict_pit_complete_records": 10,
+  "threshold_defined": false,
+  "winner_switch_rule_defined": false
+}
