@@ -35,15 +35,15 @@
       "winner_accuracy": 0.5
     },
     "L4-MKT-H-V1__T-120m": {
-      "brier": 0.23566144697663996,
+      "brier": 0.2511191695512558,
       "calibration_intercept": null,
       "calibration_slope": null,
-      "games": 10,
+      "games": 11,
       "gate_sample_ready": false,
-      "log_loss": 0.6627419355164447,
-      "sharpness": 0.1406277897167682,
+      "log_loss": 0.6946013462856423,
+      "sharpness": 0.14029280955051662,
       "weeks": 1,
-      "winner_accuracy": 0.5
+      "winner_accuracy": 0.45454545454545453
     },
     "L4-MKT-H-V1__T-30m": {
       "brier": 0.22622351264035703,
@@ -136,15 +136,15 @@
     },
     "L4-MKT-H-V1__T-120m": {
       "benchmark": "official_T-120_F-ST",
-      "brier_delta": -0.017708173622973493,
+      "brier_delta": -0.021145256332866458,
       "brier_week_block_bootstrap": {
         "ci95_high": null,
         "ci95_low": null,
         "draws": 0,
-        "mean_delta": -0.017708173622973493,
+        "mean_delta": -0.021145256332866458,
         "reason": "fewer_than_two_week_blocks"
       },
-      "games": 10,
+      "games": 11,
       "leave_one_week_out_brier": {
         "all_remaining_negative": null,
         "deltas": {},
@@ -392,11 +392,11 @@
   "evaluation_version": "LEVLINE4-HORIZON-EVAL-V1-PIT-HARDENED",
   "excluded_invalid_probability_rows": 0,
   "excluded_tie_rows": 0,
-  "excluded_ungraded_rows": 1,
+  "excluded_ungraded_rows": 0,
   "formal_family_inference_required": false,
   "gate_status": "ACCUMULATING_PROSPECTIVE_EVIDENCE",
-  "generated_at_utc": "2026-09-29T00:52:33.234100+00:00",
-  "graded_shadow_rows": 86,
+  "generated_at_utc": "2026-09-29T06:53:14.442680+00:00",
+  "graded_shadow_rows": 87,
   "horizon_completeness_audit": {
     "all_four_share_among_games_with_any": 0.6666666666666666,
     "games_with_all_four_eligible_horizons": 10,
