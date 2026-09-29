@@ -1,37 +1,37 @@
 {
   "archive_audit": {
     "archive_id": "NFL-INJURY-SNAPSHOT-2026-V1",
-    "captured_observations": 143,
+    "captured_observations": 144,
     "completed_2026_outcomes_used": 0,
     "failed_observations": 0,
     "failures": [],
     "integrity_ok": true,
-    "observations": 143,
+    "observations": 144,
     "production_authorized": false,
-    "unique_raw_objects": 143,
-    "unique_snapshot_objects": 23
+    "unique_raw_objects": 144,
+    "unique_snapshot_objects": 24
   },
   "observation": {
     "archive_id": "NFL-INJURY-SNAPSHOT-2026-V1",
-    "canonical_snapshot_sha256": "9ebc5344447ea2667b275717f11f864136f958802fce404ab038bb3b8ac52234",
-    "captured_at_utc": "2026-09-29T12:33:41.714323Z",
+    "canonical_snapshot_sha256": "e8595cf14e5ab53a6edcf474e72e8ad5919169eacd49b095761b4c7d8da07c83",
+    "captured_at_utc": "2026-09-29T15:29:47.089051Z",
     "completed_2026_outcomes_used": 0,
     "http_status": 200,
-    "object_created": false,
-    "object_relpath": "objects/9ebc5344447ea2667b275717f11f864136f958802fce404ab038bb3b8ac52234.json.gz",
+    "object_created": true,
+    "object_relpath": "objects/e8595cf14e5ab53a6edcf474e72e8ad5919169eacd49b095761b4c7d8da07c83.json.gz",
     "parser_table_count": 32,
     "players": 301,
     "production_authorized": false,
-    "raw_body_sha256": "e4a20f1c163d78534115fd5bb00e34be9f5cbd4083de42ba6ab14e69e8135474",
+    "raw_body_sha256": "22f9465c8bea577a58e204049a0635b5849262eb2524a2e8c3036e7bcfccb1d9",
     "raw_object_created": true,
-    "raw_object_relpath": "raw/e4a20f1c163d78534115fd5bb00e34be9f5cbd4083de42ba6ab14e69e8135474.html.gz",
+    "raw_object_relpath": "raw/22f9465c8bea577a58e204049a0635b5849262eb2524a2e8c3036e7bcfccb1d9.html.gz",
     "research_only": true,
     "schema_version": 1,
     "season": 2026,
     "source_name": "NFL.com official injury report",
-    "source_url": "https://www.nfl.com/injuries/league/2026/reg3",
+    "source_url": "https://www.nfl.com/injuries/league/2026/reg4",
     "status": "captured",
     "teams_with_reported_players": 32,
-    "week": 3
+    "week": 4
   }
 }
