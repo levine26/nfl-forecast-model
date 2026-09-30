@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "outputs/this_week.csv"
       - "src/nfl_forecast/media_context.py"
       - "src/nfl_forecast/media_editorial.py"
       - "src/nfl_forecast/editorial_model_read.py"
@@ -241,7 +242,7 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GROQ_MEDIA_MODEL: groq/compound-mini
+          GROQ_MEDIA_MODEL: openai/gpt-oss-120b
         run: |
           set -euo pipefail
           test -n "${GROQ_API_KEY:-}" || { echo "GROQ_API_KEY secret is missing"; exit 1; }
@@ -516,7 +517,8 @@ jobs:
           assert not re.search(r'^\s*copilot-requests\s*:', text, flags=re.M)
           assert not re.search(r'^\s*run:\s*npm\s+install\s+-g\s+@github/copilot\s*$', text, flags=re.M)
           assert 'secrets.GROQ_API_KEY' in text
-          assert 'GROQ_MEDIA_MODEL: groq/compound-mini' in text
+          assert 'GROQ_MEDIA_MODEL: openai/gpt-oss-120b' in text
+          assert 'outputs/this_week.csv' in text
           assert 'DEFAULT_MODEL = "groq/compound-mini"' in runner
           assert 'def _build_payload' in runner and '"search_settings"' in runner
           assert 'def _safe_bad_request_reason' in runner
