@@ -185,12 +185,121 @@
   },
   "generated_utc": "2026-09-30T00:38:17.761394+00:00",
   "groq_provider_fallback": {
-    "context_refresh_preserved": true,
-    "failed_games": [],
-    "games": {},
+    "failed_games": [
+      "2026_04_ARI_NYG",
+      "2026_04_ATL_NO",
+      "2026_04_DEN_SF",
+      "2026_04_DET_CAR",
+      "2026_04_GB_TB",
+      "2026_04_JAX_CIN",
+      "2026_04_KC_LV",
+      "2026_04_LAC_SEA",
+      "2026_04_LA_PHI",
+      "2026_04_MIA_MIN",
+      "2026_04_NYJ_CHI",
+      "2026_04_TEN_BAL"
+    ],
+    "games": {
+      "2026_04_ARI_NYG": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T02:56:38.414889+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_ATL_NO": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T03:05:27.155150+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_DEN_SF": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T03:03:14.503073+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_DET_CAR": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T03:04:20.997127+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_GB_TB": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T02:58:50.434076+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_JAX_CIN": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T02:54:06.447259+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_KC_LV": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T03:01:02.515788+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_LAC_SEA": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T03:02:08.479292+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_LA_PHI": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T02:57:44.394832+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_MIA_MIN": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T02:59:56.508980+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_NYJ_CHI": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T02:49:58.966978+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_04_TEN_BAL": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T02:47:04.579215+00:00",
+        "requires_chatgpt_refresh": true
+      }
+    },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "36571306189",
-    "status": "healthy"
+    "run_id": "36660948306",
+    "status": "degraded"
   },
   "injuries": {
     "as_of": "2026-09-30T00:38:17.882665+00:00",
