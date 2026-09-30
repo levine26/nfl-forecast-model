@@ -185,146 +185,156 @@
   },
   "generated_utc": "2026-09-30T18:33:03.536864+00:00",
   "groq_provider_fallback": {
-    "context_refresh_preserved": true,
     "failed_games": [
+      "2026_04_ARI_NYG",
+      "2026_04_ATL_NO",
       "2026_04_DAL_HOU",
+      "2026_04_DEN_SF",
+      "2026_04_DET_CAR",
+      "2026_04_GB_TB",
       "2026_04_IND_WAS",
+      "2026_04_JAX_CIN",
+      "2026_04_KC_LV",
+      "2026_04_LAC_SEA",
+      "2026_04_LA_PHI",
       "2026_04_MIA_MIN",
       "2026_04_NE_BUF",
-      "2026_04_PIT_CLE"
+      "2026_04_NYJ_CHI",
+      "2026_04_PIT_CLE",
+      "2026_04_TEN_BAL"
     ],
     "games": {
       "2026_04_ARI_NYG": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=607, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=999, x-ratelimit-remaining-tokens=",
-        "recovered_at_utc": "2026-09-30T16:05:57.638870+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:03:17.785618+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_ATL_NO": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=105, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
-        "recovered_at_utc": "2026-09-30T16:26:12.169585+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:15:52.039269+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_DAL_HOU": {
-        "fallback_source": "missing",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-30T16:04:51.794449+00:00",
-        "requires_chatgpt_refresh": true
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=99, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens=",
+        "recovered_at_utc": "2026-09-30T19:02:11.006950+00:00",
+        "requires_chatgpt_refresh": false
       },
       "2026_04_DEN_SF": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_04_DEN_SF: paragraph1 must name at least two concrete players/coaches found Rams. San  2026_04_DEN_SF: paragraph1 contains generic editorial filler obvious passing downs  2026_04_DEN_SF: source titles must vi",
-        "recovered_at_utc": "2026-09-30T16:21:46.228871+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:13:40.210369+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_DET_CAR": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_04_DET_CAR: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
-        "recovered_at_utc": "2026-09-30T16:25:06.205650+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:14:46.159650+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_GB_TB": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_04_GB_TB: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
-        "recovered_at_utc": "2026-09-30T16:10:26.017420+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:07:02.734056+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_IND_WAS": {
-        "fallback_source": "missing",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-30T15:54:41.915834+00:00",
-        "requires_chatgpt_refresh": true
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=617, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-30T18:56:39.937609+00:00",
+        "requires_chatgpt_refresh": false
       },
       "2026_04_JAX_CIN": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_04_JAX_CIN: paragraph1 must name at least two concrete players/coaches found Joe Burrow",
-        "recovered_at_utc": "2026-09-30T16:03:35.160493+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:01:05.193285+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_KC_LV": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_04_KC_LV: paragraph1 must name at least two concrete players/coaches found Patrick Mahomes",
-        "recovered_at_utc": "2026-09-30T16:14:52.527337+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:11:28.406274+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_LAC_SEA": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_04_LAC_SEA: paragraph1 contains generic editorial filler obvious passing downs",
-        "recovered_at_utc": "2026-09-30T16:18:26.232107+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:12:34.345682+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_LA_PHI": {
-        "fallback_source": "chatgpt",
+        "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=504, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
-        "recovered_at_utc": "2026-09-30T16:07:05.301866+00:00",
-        "requires_chatgpt_refresh": false
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T19:05:56.882737+00:00",
+        "requires_chatgpt_refresh": true
       },
       "2026_04_MIA_MIN": {
-        "fallback_source": "missing",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-30T16:11:32.036219+00:00",
-        "requires_chatgpt_refresh": true
+        "reason": "focused_validation_failed: 2026_04_MIA_MIN: source titles must visibly cover both matchup teams generic league-wide roundups are insufficient",
+        "recovered_at_utc": "2026-09-30T19:10:22.377899+00:00",
+        "requires_chatgpt_refresh": false
       },
       "2026_04_NE_BUF": {
-        "fallback_source": "missing",
+        "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-30T15:59:08.597298+00:00",
-        "requires_chatgpt_refresh": true
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=285, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-30T18:58:52.477676+00:00",
+        "requires_chatgpt_refresh": false
       },
       "2026_04_NYJ_CHI": {
-        "fallback_source": "chatgpt",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=246, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
-        "recovered_at_utc": "2026-09-30T16:00:14.433406+00:00",
-        "requires_chatgpt_refresh": false
-      },
-      "2026_04_PIT_CLE": {
         "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-09-30T15:53:36.032404+00:00",
+        "recovered_at_utc": "2026-09-30T18:59:59.203337+00:00",
         "requires_chatgpt_refresh": true
       },
-      "2026_04_TEN_BAL": {
+      "2026_04_PIT_CLE": {
         "fallback_source": "chatgpt",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_04_TEN_BAL: paragraph1 must name at least two concrete players/coaches found Lamar Jackson",
-        "recovered_at_utc": "2026-09-30T15:58:02.475011+00:00",
+        "reason": "Groq media request failed after 3 attempts: Groq HTTP 429 class=tpd,model=openai/gpt-oss-120b retry-after=445, x-ratelimit-limit-requests=1000, x-ratelimit-limit-tokens=8000, x-ratelimit-remaining-requests=1000, x-ratelimit-remaining-tokens",
+        "recovered_at_utc": "2026-09-30T18:55:32.798391+00:00",
         "requires_chatgpt_refresh": false
+      },
+      "2026_04_TEN_BAL": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-09-30T18:57:46.636969+00:00",
+        "requires_chatgpt_refresh": true
       }
     },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "36739951083",
+    "run_id": "36761774176",
     "status": "degraded"
   },
   "injuries": {
