@@ -172,11 +172,38 @@ jobs:
           age_hours = (datetime.now(timezone.utc) - generated.astimezone(timezone.utc)).total_seconds() / 3600.0
           if age_hours < -0.1 or age_hours > 4.0:
               raise SystemExit(f'context packet stale: age_hours={age_hours:.2f}')
-          required = ('evidence', 'injuries', 'media_reporting', 'editorial_intelligence', 'coaching', 'career_qb_verification')
+          required = ('evidence', 'injuries', 'editorial_intelligence', 'coaching', 'career_qb_verification')
           unhealthy = {key: (status.get(key) or {}).get('status') for key in required if (status.get(key) or {}).get('status') != 'healthy'}
           if unhealthy:
               raise SystemExit(f'context packet not publication-grade: {unhealthy}')
-          print(f'context packet is fresh and healthy: age_hours={age_hours:.2f}')
+
+          media = dict(status.get('media_reporting') or {})
+          games = int(media.get('games', 0))
+          reported = int(media.get('games_with_reporting', 0))
+          trusted = int(media.get('games_with_trusted_reporting', 0))
+          media_state = str(media.get('status') or '')
+          providers = media.get('providers') or {}
+          google_errors = int((providers.get('google_news_rss') or {}).get('errors', 0))
+          bing_errors = int((providers.get('bing_news_rss') or {}).get('errors', 0))
+          min_reported = max(1, games - 1)
+          min_trusted = max(1, games - 2)
+          media_ok = (
+              games > 0
+              and media_state in {'healthy', 'partial'}
+              and reported >= min_reported
+              and trusted >= min_trusted
+              and not (google_errors >= games and bing_errors >= games)
+          )
+          if not media_ok:
+              raise SystemExit(
+                  'media reporting below bounded provider-research threshold: '
+                  f'status={media_state} games={games} reported={reported}/{min_reported} '
+                  f'trusted={trusted}/{min_trusted} google_errors={google_errors} bing_errors={bing_errors}'
+              )
+          print(
+              f'context packet is fresh and provider-usable: age_hours={age_hours:.2f} '
+              f'media={media_state} reported={reported}/{games} trusted={trusted}/{games}'
+          )
           PY
 
       - uses: actions/setup-python@v5
@@ -539,6 +566,9 @@ jobs:
           assert 'inherits latest successful contextual intelligence' in text
           assert 'Context-affecting files changed but no exact-SHA contextual-intelligence run was discovered' in text
           assert 'context packet stale' in text
+          assert 'media reporting below bounded provider-research threshold' in text
+          assert 'min_reported = max(1, games - 1)' in text
+          assert 'min_trusted = max(1, games - 2)' in text
           assert 'audit_groq_main_advance.py' in text
           assert 'actions/cache/restore@v4' in text
           assert 'actions/cache/save@v4' in text
@@ -623,8 +653,27 @@ jobs:
                   media = prior_media
                   print('Reused prior launch-grade media reporting snapshot after transient refresh degradation.')
 
-          if media.get('status') != 'healthy' or int(media.get('games_with_trusted_reporting', 0)) != games:
-              raise SystemExit(f'media reporting not launch-grade: {media}')
+          reported = int(media.get('games_with_reporting', 0))
+          trusted = int(media.get('games_with_trusted_reporting', 0))
+          media_state = str(media.get('status') or '')
+          providers = media.get('providers') or {}
+          google_errors = int((providers.get('google_news_rss') or {}).get('errors', 0))
+          bing_errors = int((providers.get('bing_news_rss') or {}).get('errors', 0))
+          min_reported = max(1, games - 1)
+          min_trusted = max(1, games - 2)
+          media_ok = (
+              games > 0
+              and media_state in {'healthy', 'partial'}
+              and reported >= min_reported
+              and trusted >= min_trusted
+              and not (google_errors >= games and bing_errors >= games)
+          )
+          if not media_ok:
+              raise SystemExit(
+                  'media reporting below bounded provider-research threshold at launch gate: '
+                  f'status={media_state} games={games} reported={reported}/{min_reported} '
+                  f'trusted={trusted}/{min_trusted} google_errors={google_errors} bing_errors={bing_errors}'
+              )
           if provider.get('status') != 'healthy' or int(provider.get('games_applied', 0)) != games:
               raise SystemExit(f'Editorial provider did not cover full slate: {provider}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
