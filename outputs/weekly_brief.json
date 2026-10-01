@@ -1,25 +1,25 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_01_NE_SEA",
-      "largest_driver": "No material input move",
-      "pick": "SEA",
-      "pick_delta_pp": -1.260265225511148e-08
+      "game_id": "2026_04_DET_CAR",
+      "largest_driver": "Market movement",
+      "pick": "DET",
+      "pick_delta_pp": 0.7162304789641305
     },
     {
-      "game_id": "2026_04_NE_BUF",
-      "largest_driver": "No material input move",
-      "pick": "BUF",
-      "pick_delta_pp": 1.1102230246251565e-14
+      "game_id": "2026_04_GB_TB",
+      "largest_driver": "Market movement",
+      "pick": "GB",
+      "pick_delta_pp": -0.6892555888321883
     },
     {
-      "game_id": "2026_01_BAL_IND",
-      "largest_driver": "No material input move",
+      "game_id": "2026_04_TEN_BAL",
+      "largest_driver": "Market movement",
       "pick": "BAL",
-      "pick_delta_pp": -0.0
+      "pick_delta_pp": -0.6617773625274603
     }
   ],
-  "generated_utc": "2026-10-01T14:28:21.769330+00:00",
+  "generated_utc": "2026-10-01T21:43:45.326441+00:00",
   "market_disagreements": [
     {
       "confidence": "Lean",
@@ -28,7 +28,7 @@
       "pick": "IND",
       "pick_prob": 0.6770453458237989,
       "projected_score": "WAS 23.4 \u2013 IND 21.2",
-      "pure_market_gap_pp": 18.517226120190173
+      "pure_market_gap_pp": 18.517226119378368
     },
     {
       "confidence": "Coin Flip",
@@ -37,7 +37,7 @@
       "pick": "CIN",
       "pick_prob": 0.573936153200025,
       "projected_score": "CIN 21.4 \u2013 JAX 24.2",
-      "pure_market_gap_pp": 14.029636618482627
+      "pure_market_gap_pp": 14.029636617791425
     },
     {
       "confidence": "High",
@@ -46,7 +46,7 @@
       "pick": "MIN",
       "pick_prob": 0.8301265331428447,
       "projected_score": "MIN 26.5 \u2013 MIA 17.9",
-      "pure_market_gap_pp": 13.3640016432523
+      "pure_market_gap_pp": 13.364001641102785
     }
   ],
   "most_uncertain": [
@@ -78,19 +78,19 @@
   "strongest": [
     {
       "confidence": "High",
-      "game_id": "2026_04_TEN_BAL",
-      "matchup": "TEN @ BAL",
-      "pick": "BAL",
-      "pick_prob": 0.8376231681905766,
-      "projected_score": "BAL 30.7 \u2013 TEN 15.6"
-    },
-    {
-      "confidence": "High",
       "game_id": "2026_04_MIA_MIN",
       "matchup": "MIA @ MIN",
       "pick": "MIN",
       "pick_prob": 0.8301265331428447,
       "projected_score": "MIN 26.5 \u2013 MIA 17.9"
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_04_TEN_BAL",
+      "matchup": "TEN @ BAL",
+      "pick": "BAL",
+      "pick_prob": 0.8274960215537771,
+      "projected_score": "BAL 30.7 \u2013 TEN 15.6"
     },
     {
       "confidence": "High",
