@@ -77,33 +77,6 @@ jobs:
           print('ChatGPT ingestion is constrained to the current-bundle namespace; code-only pushes validate without publishing.')
           PY
 
-      - name: Require a complete bundle for production ingestion
-        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
-        run: test -f inputs/chatgpt_media/current/manifest.json
-
-      - name: Validate contextual packet freshness
-        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
-        run: |
-          python - <<'PY'
-          from datetime import datetime, timezone
-          import json
-          from pathlib import Path
-
-          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
-          stamp = str(status.get('generated_utc') or '')
-          if not stamp:
-              raise SystemExit('context packet missing generated_utc')
-          generated = datetime.fromisoformat(stamp.replace('Z', '+00:00'))
-          age_hours = (datetime.now(timezone.utc) - generated.astimezone(timezone.utc)).total_seconds() / 3600.0
-          if age_hours < -0.1 or age_hours > 4.0:
-              raise SystemExit(f'context packet stale: age_hours={age_hours:.2f}')
-          required = ('evidence', 'injuries', 'media_reporting', 'editorial_intelligence', 'coaching', 'career_qb_verification')
-          unhealthy = {key: (status.get(key) or {}).get('status') for key in required if (status.get(key) or {}).get('status') != 'healthy'}
-          if unhealthy:
-              raise SystemExit(f'context packet not publication-grade: {unhealthy}')
-          print(f'context packet is fresh and healthy: age_hours={age_hours:.2f}')
-          PY
-
       - name: Detect whether this event carries a current ChatGPT bundle
         id: current_bundle_diff
         run: |
@@ -132,6 +105,33 @@ jobs:
               ;;
           esac
 
+      - name: Require a complete bundle for production ingestion
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
+        run: test -f inputs/chatgpt_media/current/manifest.json
+
+      - name: Validate contextual packet freshness
+        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import json
+          from pathlib import Path
+
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          stamp = str(status.get('generated_utc') or '')
+          if not stamp:
+              raise SystemExit('context packet missing generated_utc')
+          generated = datetime.fromisoformat(stamp.replace('Z', '+00:00'))
+          age_hours = (datetime.now(timezone.utc) - generated.astimezone(timezone.utc)).total_seconds() / 3600.0
+          if age_hours < -0.1 or age_hours > 4.0:
+              raise SystemExit(f'context packet stale: age_hours={age_hours:.2f}')
+          required = ('evidence', 'injuries', 'media_reporting', 'editorial_intelligence', 'coaching', 'career_qb_verification')
+          unhealthy = {key: (status.get(key) or {}).get('status') for key in required if (status.get(key) or {}).get('status') != 'healthy'}
+          if unhealthy:
+              raise SystemExit(f'context packet not publication-grade: {unhealthy}')
+          print(f'context packet is fresh and healthy: age_hours={age_hours:.2f}')
+          PY
+
       - name: Canonicalize editorial forecast source
         if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         run: |
@@ -156,7 +156,7 @@ jobs:
           echo "All ChatGPT-ingested responses passed the LevLine 3.0 full-slate publication validator."
 
       - name: Reconcile candidate with latest main snapshot
-        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
+        if: github.event_name != 'pull_request' && (github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true')
         run: |
           set -euo pipefail
           git fetch origin main
@@ -200,7 +200,7 @@ jobs:
           PY
 
       - name: Publish editorial-only outputs
-        if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
+        if: github.event_name != 'pull_request' && (github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true')
         run: |
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
