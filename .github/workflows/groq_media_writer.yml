@@ -2,47 +2,6 @@ name: Sunday Signal Groq media writer
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "outputs/this_week.csv"
-      - "src/nfl_forecast/media_context.py"
-      - "src/nfl_forecast/media_editorial.py"
-      - "src/nfl_forecast/editorial_model_read.py"
-      - "src/nfl_forecast/editorial_provider_fallback.py"
-      - "src/nfl_forecast/copilot_media.py"
-      - "src/nfl_forecast/copilot_source_backfill.py"
-      - "src/nfl_forecast/source_policy.py"
-      - "scripts/finalize_editorial.py"
-      - "scripts/build_canonical_editorial_predictions.py"
-      - "scripts/refresh_editorial_slate_roster.py"
-      - "scripts/build_copilot_media_prompt.py"
-      - "scripts/build_single_game_copilot_prompt.py"
-      - "scripts/run_groq_media_prompt.py"
-      - "scripts/recover_groq_focused_game.py"
-      - "scripts/merge_copilot_game_payloads.py"
-      - "scripts/compose_copilot_media_reads.py"
-      - "scripts/render_levline_paragraphs.py"
-      - "scripts/validate_single_copilot_game.py"
-      - "scripts/validate_copilot_media_reads.py"
-      - "scripts/audit_groq_main_advance.py"
-      - "tests/test_canonical_editorial_predictions.py"
-      - "tests/test_editorial_slate_roster.py"
-      - "tests/test_media_context.py"
-      - "tests/test_copilot_media.py"
-      - "tests/test_copilot_composition.py"
-      - "tests/test_copilot_json_handoff.py"
-      - "tests/test_groq_media_runner.py"
-      - "tests/test_editorial_provider_fallback.py"
-      - "tests/test_recover_groq_focused_game.py"
-      - "tests/test_levline_paragraph_renderer.py"
-      - "tests/test_single_copilot_game_validator.py"
-      - "tests/test_read_contract.py"
-      - "tests/test_editorial_finalize.py"
-      - "tests/test_source_policy_direct_reports.py"
-      - "tests/test_groq_main_advance_audit.py"
-      - "pyproject.toml"
-      - ".github/workflows/groq_media_writer.yml"
   pull_request:
     paths:
       - "src/nfl_forecast/media_context.py"
@@ -80,8 +39,6 @@ on:
       - "tests/test_groq_main_advance_audit.py"
       - "pyproject.toml"
       - ".github/workflows/groq_media_writer.yml"
-  schedule:
-    - cron: "37 */3 * 1-2,9-12 *"
 
 permissions:
   contents: write
