@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-10-03T00:38:14.411458+00:00",
+    "as_of": "2026-10-03T03:38:34.417317+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-10-03T00:38:19.079060+00:00",
+    "as_of": "2026-10-03T03:38:37.900266+00:00",
     "conflicts": 0,
     "evidence_items_added": 20,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 20
   },
   "coaching": {
-    "as_of": "2026-10-03T00:36:27.410008+00:00",
+    "as_of": "2026-10-03T03:36:36.655387+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 30,
     "negative_cache_ttl_minutes": 60,
@@ -102,7 +102,10 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {},
+    "advisories": {
+      "2026_04_DAL_HOU": "newer_reporting_available",
+      "2026_04_KC_LV": "newer_reporting_available"
+    },
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 15,
@@ -124,7 +127,7 @@
     "unique_headlines": 15
   },
   "editorial_intelligence": {
-    "as_of": "2026-10-03T00:38:08.391286+00:00",
+    "as_of": "2026-10-03T03:38:24.710588+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -144,14 +147,14 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 0,
+    "evidence_repairs": 73,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
   },
   "evidence": {
     "games": 15,
-    "generated_utc": "2026-10-03T00:36:26.861254+00:00",
+    "generated_utc": "2026-10-03T03:36:36.320854+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
     "signals": 215,
     "status": "healthy"
@@ -166,7 +169,7 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-10-03T00:36:26.861254+00:00",
+  "generated_utc": "2026-10-03T03:36:36.320854+00:00",
   "groq_provider_fallback": {
     "context_refresh_preserved": true,
     "failed_games": [],
@@ -300,7 +303,7 @@
     "status": "healthy"
   },
   "injuries": {
-    "as_of": "2026-10-03T00:36:27.015226+00:00",
+    "as_of": "2026-10-03T03:36:36.468036+00:00",
     "players": 313,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg4",
@@ -308,14 +311,14 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-10-03T02:00:22.797123+00:00",
+    "as_of": "2026-10-03T03:38:43.434608+00:00",
     "cross_game_titles_rejected": 0,
     "games": 15,
     "games_with_display_reporting": 15,
     "games_with_reporting": 15,
     "games_with_substantive_reporting": 15,
     "games_with_trusted_reporting": 15,
-    "generic_titles_rejected": 9,
+    "generic_titles_rejected": 10,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -332,7 +335,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-10-03T00:38:18.247263+00:00",
+    "as_of": "2026-10-03T03:38:37.094843+00:00",
     "evidence_items_added": 20,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 20,
@@ -405,7 +408,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-10-03T00:36:30.261650+00:00",
+    "as_of": "2026-10-03T03:36:38.994206+00:00",
     "charted_plays": 8065,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -438,7 +441,7 @@
     "story_items_added": 15
   },
   "weather": {
-    "as_of": "2026-10-03T00:37:59.637526+00:00",
+    "as_of": "2026-10-03T03:38:10.317802+00:00",
     "games_checked": 12,
     "status": "degraded"
   }
