@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "game_id": "2026_04_IND_WAS",
+  "status": "RECOVERED_MISSED_LOCK",
+  "reason": "Scheduled pregame workflow did not execute inside the normal T-120 lock window. Recovery uses the latest verifiable pre-kickoff production forecast and is not represented as a normal lock.",
+  "source": {
+    "commit_sha": "23c42078664a27685564a681569e3af44e34268c",
+    "commit_message": "Refresh NFL market forecast",
+    "prediction_timestamp_utc": "2026-10-04T11:08:39.459217+00:00",
+    "kickoff_utc": "2026-10-04T13:30:00+00:00",
+    "minutes_before_kickoff": 141.34235,
+    "within_normal_t120_window": false
+  },
+  "frozen_forecast": {
+    "away_team": "IND",
+    "home_team": "WAS",
+    "final_home_prob": 0.29349016441235576,
+    "pick": "IND",
+    "fst_pure_home_prob": 0.5392690763378213,
+    "final_probability_strategy": "F-ST-01-FROZEN-2026",
+    "fst_artifact_id": "F-ST-01-FROZEN-2026",
+    "expected_margin_home": 2.2715550433999208,
+    "expected_total": 44.463254362170765,
+    "market_margin_home": -4.5,
+    "locked_ats_status": "VALUE",
+    "locked_ats_pick_team": "WAS",
+    "locked_ats_pick_market_spread": 4.5
+  },
+  "recovery": {
+    "recorded_utc": "2026-10-04T15:31:00+00:00",
+    "normal_lock_timestamp_utc": null,
+    "methodology_changed": false,
+    "probabilities_recomputed": false,
+    "grading_changed": false
+  }
+}
