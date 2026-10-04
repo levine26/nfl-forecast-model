@@ -102,23 +102,7 @@
     "status": "healthy"
   },
   "copilot_media": {
-    "advisories": {
-      "2026_04_ARI_NYG": "provider_artifact_older_than_refresh_window",
-      "2026_04_ATL_NO": "provider_artifact_older_than_refresh_window",
-      "2026_04_DAL_HOU": "provider_artifact_older_than_refresh_window",
-      "2026_04_DEN_SF": "provider_artifact_older_than_refresh_window",
-      "2026_04_DET_CAR": "provider_artifact_older_than_refresh_window",
-      "2026_04_GB_TB": "provider_artifact_older_than_refresh_window",
-      "2026_04_IND_WAS": "provider_artifact_older_than_refresh_window",
-      "2026_04_JAX_CIN": "provider_artifact_older_than_refresh_window",
-      "2026_04_KC_LV": "provider_artifact_older_than_refresh_window",
-      "2026_04_LAC_SEA": "provider_artifact_older_than_refresh_window",
-      "2026_04_LA_PHI": "provider_artifact_older_than_refresh_window",
-      "2026_04_MIA_MIN": "provider_artifact_older_than_refresh_window",
-      "2026_04_NE_BUF": "provider_artifact_older_than_refresh_window",
-      "2026_04_NYJ_CHI": "provider_artifact_older_than_refresh_window",
-      "2026_04_TEN_BAL": "provider_artifact_older_than_refresh_window"
-    },
+    "advisories": {},
     "authority_policy": "validated_provider_human_read_persists_per_game; canonical_model_paragraph_is_regenerated",
     "file": "outputs/copilot_media_reads.json",
     "games_applied": 15,
@@ -160,7 +144,7 @@
     "status": "healthy"
   },
   "editorial_text_safety": {
-    "evidence_repairs": 79,
+    "evidence_repairs": 0,
     "guardrail": "Punctuation-only publication repair; source facts, standardized status language, and LevLine model values are unchanged.",
     "preview_repairs": 0,
     "status": "healthy"
@@ -324,7 +308,7 @@
     "teams_with_reported_players": 32
   },
   "media_reporting": {
-    "as_of": "2026-10-04T02:49:52.629975+00:00",
+    "as_of": "2026-10-04T03:05:43.005594+00:00",
     "cross_game_titles_rejected": 0,
     "games": 15,
     "games_with_display_reporting": 15,
