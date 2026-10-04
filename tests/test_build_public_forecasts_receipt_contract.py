@@ -75,3 +75,18 @@ def test_policy_era_locked_public_artifact_fails_closed_without_dedicated_receip
                 locked_ats_home_edge_points="",
             )
         ])
+
+
+def test_recovered_missed_lock_keeps_dedicated_ats_receipt_authoritative():
+    recovered = _row(
+        lock_status="RECOVERED_MISSED_LOCK",
+        lock_timestamp_utc="",
+        recovery_source_commit_sha="23c42078664a27685564a681569e3af44e34268c",
+        recovery_source_prediction_timestamp_utc="2026-09-27T17:00:00+00:00",
+        recovery_recorded_utc="2026-09-27T21:00:00+00:00",
+        recovery_reason="test recovery",
+        prediction_timestamp_utc="2026-09-27T17:00:00+00:00",
+    )
+    official = _prepare_locked_receipts([recovered])
+    assert official[0]["expected_margin"] == "7.5"
+    assert official[0]["spread_line"] == "3.5"
