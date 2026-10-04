@@ -1,52 +1,52 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_04_LA_PHI",
-      "largest_driver": "Market movement",
-      "pick": "LA",
-      "pick_delta_pp": 3.2461274519556826
-    },
-    {
       "game_id": "2026_04_DEN_SF",
       "largest_driver": "Market movement",
       "pick": "SF",
-      "pick_delta_pp": 2.5912221276859437
+      "pick_delta_pp": 0.7642384933166491
     },
     {
-      "game_id": "2026_04_NE_BUF",
+      "game_id": "2026_04_LAC_SEA",
       "largest_driver": "Market movement",
-      "pick": "BUF",
-      "pick_delta_pp": 2.263573402532504
+      "pick": "SEA",
+      "pick_delta_pp": -0.37853156272916744
+    },
+    {
+      "game_id": "2026_01_NE_SEA",
+      "largest_driver": "No material input move",
+      "pick": "SEA",
+      "pick_delta_pp": -1.260265225511148e-08
     }
   ],
-  "generated_utc": "2026-10-04T15:58:48.914490+00:00",
+  "generated_utc": "2026-10-04T19:43:47.629440+00:00",
   "market_disagreements": [
-    {
-      "confidence": "Solid",
-      "game_id": "2026_04_IND_WAS",
-      "matchup": "IND @ WAS",
-      "pick": "IND",
-      "pick_prob": 0.7191278613969275,
-      "projected_score": "WAS 23.4 \u2013 IND 21.1",
-      "pure_market_gap_pp": 22.189488894883013
-    },
     {
       "confidence": "Coin Flip",
       "game_id": "2026_04_JAX_CIN",
       "matchup": "JAX @ CIN",
       "pick": "CIN",
-      "pick_prob": 0.5840961553704059,
-      "projected_score": "CIN 21.6 \u2013 JAX 24.2",
-      "pure_market_gap_pp": 14.454089341202042
+      "pick_prob": 0.5840961553692411,
+      "projected_score": "CIN 21.4 \u2013 JAX 24.3",
+      "pure_market_gap_pp": 14.613729409693654
     },
     {
-      "confidence": "Coin Flip",
-      "game_id": "2026_04_ARI_NYG",
-      "matchup": "ARI @ NYG",
-      "pick": "ARI",
-      "pick_prob": 0.5930502095107253,
-      "projected_score": "NYG 23.6 \u2013 ARI 21.6",
-      "pure_market_gap_pp": 12.368490665198074
+      "confidence": "Solid",
+      "game_id": "2026_04_LA_PHI",
+      "matchup": "LA @ PHI",
+      "pick": "LA",
+      "pick_prob": 0.6687889559844356,
+      "projected_score": "PHI 23.6 \u2013 LA 23.3",
+      "pure_market_gap_pp": 11.199347945188604
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_04_MIA_MIN",
+      "matchup": "MIA @ MIN",
+      "pick": "MIN",
+      "pick_prob": 0.8136790932181621,
+      "projected_score": "MIN 26.5 \u2013 MIA 18.0",
+      "pure_market_gap_pp": 10.997523375170658
     }
   ],
   "most_uncertain": [
@@ -55,24 +55,24 @@
       "game_id": "2026_04_ATL_NO",
       "matchup": "ATL @ NO",
       "pick": "NO",
-      "pick_prob": 0.5348042634730239,
-      "projected_score": "NO 22.6 \u2013 ATL 22.0"
+      "pick_prob": 0.5348042634732545,
+      "projected_score": "NO 22.4 \u2013 ATL 21.9"
     },
     {
-      "confidence": "Coin Flip",
+      "confidence": "Lean",
       "game_id": "2026_04_DAL_HOU",
       "matchup": "DAL @ HOU",
       "pick": "HOU",
-      "pick_prob": 0.5468724924828157,
-      "projected_score": "HOU 23.5 \u2013 DAL 19.6"
+      "pick_prob": 0.5600937923836805,
+      "projected_score": "HOU 23.2 \u2013 DAL 19.3"
     },
     {
       "confidence": "Lean",
       "game_id": "2026_04_DEN_SF",
       "matchup": "DEN @ SF",
       "pick": "SF",
-      "pick_prob": 0.5612855722004709,
-      "projected_score": "SF 26.7 \u2013 DEN 21.2"
+      "pick_prob": 0.5689279571336374,
+      "projected_score": "SF 26.9 \u2013 DEN 21.2"
     }
   ],
   "strongest": [
@@ -81,24 +81,24 @@
       "game_id": "2026_04_TEN_BAL",
       "matchup": "TEN @ BAL",
       "pick": "BAL",
-      "pick_prob": 0.8525841427559846,
-      "projected_score": "BAL 30.6 \u2013 TEN 15.5"
+      "pick_prob": 0.8525841427559749,
+      "projected_score": "BAL 30.5 \u2013 TEN 15.9"
     },
     {
       "confidence": "High",
       "game_id": "2026_04_MIA_MIN",
       "matchup": "MIA @ MIN",
       "pick": "MIN",
-      "pick_prob": 0.8136790932183472,
-      "projected_score": "MIN 26.0 \u2013 MIA 18.6"
+      "pick_prob": 0.8136790932181621,
+      "projected_score": "MIN 26.5 \u2013 MIA 18.0"
     },
     {
       "confidence": "High",
       "game_id": "2026_04_NE_BUF",
       "matchup": "NE @ BUF",
       "pick": "BUF",
-      "pick_prob": 0.7389362872803692,
-      "projected_score": "BUF 26.2 \u2013 NE 21.1"
+      "pick_prob": 0.7427692850221449,
+      "projected_score": "BUF 26.3 \u2013 NE 21.1"
     }
   ],
   "week": 4
