@@ -7,6 +7,7 @@ from typing import Any, Iterable, Mapping
 from zoneinfo import ZoneInfo
 
 PUBLIC_CONTRACT_VERSION = "1.1"
+IMMUTABLE_PUBLIC_SNAPSHOT_STATUSES = {"LOCKED", "RECOVERED_MISSED_LOCK"}
 _MIN_PROBABILITY = 1e-6
 _ATS_EDGE_EPSILON = 1e-12
 
@@ -237,6 +238,33 @@ def _public_row(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> d
         market_margin_home=market_margin_home,
     )
 
+    lock_status = _text(row.get("lock_status"))
+    recovery = None
+    if lock_status == "RECOVERED_MISSED_LOCK":
+        prediction_ts = _iso(row.get("prediction_timestamp_utc"))
+        recovery_source_ts = _iso(row.get("recovery_source_prediction_timestamp_utc"))
+        recovery_commit = _text(row.get("recovery_source_commit_sha"))
+        recovery_recorded = _iso(row.get("recovery_recorded_utc"))
+        recovery_reason = _text(row.get("recovery_reason"))
+        kickoff = kickoff_utc(row)
+        if not recovery_commit or len(recovery_commit) != 40 or any(c not in "0123456789abcdefABCDEF" for c in recovery_commit):
+            raise PublicForecastError(f"{game_id}: recovered missed lock requires a 40-character source commit SHA")
+        if prediction_ts is None or recovery_source_ts != prediction_ts:
+            raise PublicForecastError(f"{game_id}: recovered missed lock source timestamp must match prediction_timestamp_utc")
+        if kickoff is None or datetime.fromisoformat(prediction_ts) >= kickoff:
+            raise PublicForecastError(f"{game_id}: recovered missed lock source forecast must predate kickoff")
+        if _text(row.get("lock_timestamp_utc")) is not None or _number(row.get("minutes_to_kickoff_at_lock")) is not None:
+            raise PublicForecastError(f"{game_id}: recovered missed lock must not fabricate a normal lock timestamp")
+        if recovery_recorded is None or recovery_reason is None:
+            raise PublicForecastError(f"{game_id}: recovered missed lock requires recovery provenance")
+        recovery = {
+            "status": "RECOVERED_MISSED_LOCK",
+            "source_commit_sha": recovery_commit,
+            "source_prediction_timestamp_utc": recovery_source_ts,
+            "recorded_utc": recovery_recorded,
+            "reason": recovery_reason,
+        }
+
     forecast = {
         "contract_version": PUBLIC_CONTRACT_VERSION,
         "game_id": game_id,
@@ -282,7 +310,8 @@ def _public_row(row: Mapping[str, Any], *, locked: bool, now_utc: datetime) -> d
         "kickoff_utc": kickoff_utc(row).isoformat() if kickoff_utc(row) else None,
         "lifecycle_status": _lifecycle(row, locked=locked, now_utc=now_utc),
         "immutable": bool(locked),
-        "source_snapshot": "LOCKED" if locked else "LIVE",
+        "source_snapshot": lock_status if locked and lock_status else ("LOCKED" if locked else "LIVE"),
+        "recovery": recovery,
         "signals": {
             "football": {
                 "home_win_probability": football_home_probability,
@@ -413,7 +442,7 @@ def build_public_forecasts(
 
     locked_by_game: dict[str, Mapping[str, Any]] = {}
     for row in official:
-        if _text(row.get("lock_status")) == "LOCKED" and _text(row.get("game_id")):
+        if _text(row.get("lock_status")) in IMMUTABLE_PUBLIC_SNAPSHOT_STATUSES and _text(row.get("game_id")):
             locked_by_game[str(row.get("game_id"))] = row
 
     games: list[dict[str, Any]] = []
