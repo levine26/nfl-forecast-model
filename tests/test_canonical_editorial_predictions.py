@@ -178,13 +178,23 @@ def test_refuses_authorized_roster_game_without_live_or_locked_source():
         )
 
 
-def test_refuses_post_kickoff_live_replacement_without_lock():
+def test_post_kickoff_missing_lock_is_explicit_and_contains_no_live_replacement():
     current = pd.DataFrame([_row("2026_01_AAA_BBB", "AAA", "BBB", 0.61, "BBB")])
     official = pd.DataFrame(columns=["game_id", "lock_status"])
 
-    with pytest.raises(PublicForecastError, match="kickoff has passed without an immutable pregame lock"):
-        MODULE.build_canonical_editorial_predictions(
-            current,
-            official,
-            now_utc=datetime(2026, 9, 13, 18, 0, tzinfo=timezone.utc),
-        )
+    payload = MODULE.build_canonical_editorial_predictions(
+        current,
+        official,
+        now_utc=datetime(2026, 9, 13, 18, 0, tzinfo=timezone.utc),
+    )
+    game = payload["games"][0]
+
+    assert game["lifecycle_status"] == "MISSING_OFFICIAL_LOCK"
+    assert game["source_snapshot"] == "MISSING_LOCK"
+    assert game["official_winner"] is None
+    assert game["official_home_win_probability"] is None
+    assert game["official_winner_probability"] is None
+    assert game["ats_status"] == "UNAVAILABLE"
+    assert game["ats_pick_team"] is None
+    assert game["coherent_fair_margin_home"] is None
+    assert game["projected_home_score"] is None
