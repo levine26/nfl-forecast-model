@@ -643,7 +643,9 @@
       "stale_quote_minutes": 15.0
     },
     {
-      "available_diagnostic_horizons": [],
+      "available_diagnostic_horizons": [
+        "T-60m"
+      ],
       "available_predictor_horizons": [
         "T-120m"
       ],
