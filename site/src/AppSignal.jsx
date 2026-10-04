@@ -111,8 +111,11 @@ function signalFavorite(homeP,game) {
   if (Math.abs(p-.5)<1e-10) return {team:'Pick’em',probability:.5}
   return p>.5 ? {team:game.home_team,probability:p} : {team:game.away_team,probability:1-p}
 }
+function isMissingOfficialLock(game) {
+  return game?.lifecycle_status==='MISSING_OFFICIAL_LOCK' || game?.source_snapshot==='MISSING_LOCK'
+}
 function lifecycleLabel(status) {
-  return ({LIVE_FORECAST:'Updating',FINAL_PREGAME:'Final Pregame',IN_PROGRESS:'Live',GRADED:'Final'})[status] || status || 'Forecast'
+  return ({LIVE_FORECAST:'Updating',FINAL_PREGAME:'Final Pregame',IN_PROGRESS:'Live',GRADED:'Final',MISSING_OFFICIAL_LOCK:'No Official Lock'})[status] || status || 'Forecast'
 }
 function interpretation(game) {
   const marketP=probabilityForTeam(game.market_home_win_probability,game.official_winner,game)
@@ -220,6 +223,19 @@ function SignalFlow({game,variant=''}) {
 }
 
 function ForecastHero({game,compact=false}) {
+  if (isMissingOfficialLock(game)) return <section className={`ss-forecast-hero ${compact?'compact':''}`}>
+    <div className="ss-forecast-title-row"><span>LEVLINE FORECAST</span><Lifecycle game={game}/></div>
+    <div className="ss-forecast-core">
+      <div className="ss-pick"><div><span>No official pregame forecast</span><strong>—</strong><small>IMMUTABLE LOCK WAS NOT CREATED</small></div></div>
+      <div className="ss-metrics">
+        <div><span>Probability-Implied Line</span><b>—</b></div>
+        <div><span>Market Line</span><b>—</b></div>
+        <div className="edge"><span>LevLine vs Market</span><b>—</b></div>
+        <div><span>Approximate Score</span><b>—</b></div>
+      </div>
+    </div>
+    {!compact && <div className="ss-freshness"><span><b>Accountability guardrail:</b> kickoff passed without an immutable pregame lock, so no post-kickoff forecast is substituted.</span></div>}
+  </section>
   return <section className={`ss-forecast-hero ${compact?'compact':''}`}>
     <div className="ss-forecast-title-row">
       <span>LEVLINE FORECAST</span>
@@ -281,6 +297,19 @@ function TopSignals({games,onOpen}) {
 
 function BoardRow({game,preview,onOpen}) {
   const teaser=preview?.headline || preview?.key_factors?.[0]?.title
+  if (isMissingOfficialLock(game)) return <button className="ss-game-row" onClick={onOpen} data-game-open>
+    <div className="ss-row-matchup">
+      <span><TeamMark team={game.away_team} size="sm"/><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} size="sm"/><b>{game.home_team}</b></span>
+      <small>{formatKickoff(game)}</small>
+      {teaser && <p><i>THE SIGNAL</i>{teaser}</p>}
+    </div>
+    <div className="ss-row-pick"><b>No official lock</b><span>Not published</span></div>
+    <strong className="ss-row-prob">—</strong>
+    <span>—</span>
+    <span className="ss-row-edge">—</span>
+    <span><Lifecycle game={game}/></span>
+    <b className="ss-row-arrow" aria-hidden="true">›</b>
+  </button>
   return <button className="ss-game-row" onClick={onOpen} data-game-open>
     <div className="ss-row-matchup">
       <span><TeamMark team={game.away_team} size="sm"/><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} size="sm"/><b>{game.home_team}</b></span>
@@ -465,6 +494,23 @@ function AdvancedNumbers({game,diagnostic}) {
 function MatchupPage({game,runs,evidence,preview,diagnostic,gameMonitor}) {
   if (!game) return <main className="ss-page"><section className="ss-panel"><p className="ss-empty">This matchup is not in the current published slate.</p><button className="ss-text-link" onClick={()=>navigateHash('forecasts')}>Back to forecasts →</button></section></main>
   const meta=[game.venue,game.network,game.weather].filter(Boolean)
+  if (isMissingOfficialLock(game)) return <main className="ss-page ss-matchup-page">
+    <button className="ss-back" onClick={()=>navigateHash('forecasts')}>← Back to Week {game.week||'—'}</button>
+    <section className="ss-matchup-head">
+      <div className="ss-team-side"><TeamMark team={game.away_team} size="xl"/><div><span>{teamName(game.away_team)}</span></div></div>
+      <div className="ss-at"><b>AT</b><span>{formatKickoff(game)}</span></div>
+      <div className="ss-team-side home"><TeamMark team={game.home_team} size="xl"/><div><span>{teamName(game.home_team)}</span></div></div>
+    </section>
+    <ForecastHero game={game}/>
+    <div className="ss-matchup-grid"><div className="ss-matchup-main">
+      <TheSignal preview={preview}/>
+      <KeyDevelopments evidence={evidence} preview={preview}/>
+    </div><aside className="ss-matchup-side"><div className="ss-tech">
+      <p><b>Official status:</b> no immutable pregame lock was created before kickoff.</p>
+      <p><b>Publication rule:</b> Sunday Signal does not substitute a live or post-kickoff probability, pick, score, line, or ATS side for the missing receipt.</p>
+      <p><b>Model provenance:</b> {game.provenance?.artifact_id||'F-ST-01-FROZEN-2026'} remains the production engine; no model methodology was changed by this recovery.</p>
+    </div></aside></div>
+  </main>
   return <main className="ss-page ss-matchup-page">
     <button className="ss-back" onClick={()=>navigateHash('forecasts')}>← Back to Week {game.week||'—'}</button>
     <section className="ss-matchup-head">
