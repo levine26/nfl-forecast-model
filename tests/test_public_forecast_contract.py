@@ -188,6 +188,70 @@ def test_locked_game_uses_immutable_lock_row_not_newer_current_row():
     assert game["lifecycle_status"] == "FINAL_PREGAME"
 
 
+def test_after_kickoff_recovered_missed_lock_uses_verified_prekickoff_snapshot():
+    current = row(
+        game_id="2026_04_IND_WAS",
+        gameday="2026-10-04",
+        gametime="09:30",
+        away_team="IND",
+        home_team="WAS",
+        final_home_prob="0.40",
+        prediction_timestamp_utc="2026-10-04T14:00:00+00:00",
+    )
+    recovered = row(
+        game_id="2026_04_IND_WAS",
+        gameday="2026-10-04",
+        gametime="09:30",
+        away_team="IND",
+        home_team="WAS",
+        final_home_prob="0.29349016441235576",
+        prediction_timestamp_utc="2026-10-04T11:08:39.459217+00:00",
+        lock_status="RECOVERED_MISSED_LOCK",
+        lock_timestamp_utc="",
+        minutes_to_kickoff_at_lock="",
+        recovery_source_commit_sha="23c42078664a27685564a681569e3af44e34268c",
+        recovery_source_prediction_timestamp_utc="2026-10-04T11:08:39.459217+00:00",
+        recovery_recorded_utc="2026-10-04T15:31:00+00:00",
+        recovery_reason="scheduled pregame workflow missed the T-120 window; recovered from the latest verifiable pre-kickoff production forecast",
+    )
+    payload = build_public_forecasts(
+        [current],
+        [recovered],
+        now_utc=datetime(2026, 10, 4, 15, 31, tzinfo=timezone.utc),
+    )
+    game = payload["games"][0]
+
+    assert game["official_home_win_probability"] == pytest.approx(0.29349016441235576)
+    assert game["forecast_timestamp_utc"] == "2026-10-04T11:08:39.459217+00:00"
+    assert game["source_snapshot"] == "RECOVERED_MISSED_LOCK"
+    assert game["immutable"] is True
+    assert game["lock_timestamp_utc"] is None
+    assert game["recovery"]["source_commit_sha"] == "23c42078664a27685564a681569e3af44e34268c"
+
+
+def test_recovered_missed_lock_rejects_fabricated_normal_lock_timestamp():
+    recovered = row(
+        game_id="2026_04_IND_WAS",
+        gameday="2026-10-04",
+        gametime="09:30",
+        away_team="IND",
+        home_team="WAS",
+        prediction_timestamp_utc="2026-10-04T11:08:39.459217+00:00",
+        lock_status="RECOVERED_MISSED_LOCK",
+        lock_timestamp_utc="2026-10-04T12:00:00+00:00",
+        recovery_source_commit_sha="23c42078664a27685564a681569e3af44e34268c",
+        recovery_source_prediction_timestamp_utc="2026-10-04T11:08:39.459217+00:00",
+        recovery_recorded_utc="2026-10-04T15:31:00+00:00",
+        recovery_reason="test",
+    )
+    with pytest.raises(PublicForecastError, match="must not fabricate a normal lock timestamp"):
+        build_public_forecasts(
+            [recovered],
+            [recovered],
+            now_utc=datetime(2026, 10, 4, 15, 31, tzinfo=timezone.utc),
+        )
+
+
 def test_after_kickoff_live_row_without_lock_is_rejected():
     with pytest.raises(PublicForecastError, match="without an immutable pregame lock"):
         build_public_forecasts(

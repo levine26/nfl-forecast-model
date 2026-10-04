@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 LOCK_WINDOW_MINUTES = 120.0
+OFFICIAL_SNAPSHOT_STATUSES = {"LOCKED", "RECOVERED_MISSED_LOCK"}
 ATS_EDGE_EPSILON = 1e-12
 # Winner/ATS decoupling shipped before the Sep. 27 slate. Rows at/after this date
 # can be backfilled only from their own immutable lock-row inputs.
@@ -42,6 +43,7 @@ ATS_LOCK_TEXT_COLUMNS = ["locked_ats_status", "locked_ats_pick_team"]
 
 LOCK_META_COLUMNS = [
     "kickoff_utc","lock_timestamp_utc","minutes_to_kickoff_at_lock","lock_status",
+    "recovery_source_commit_sha","recovery_source_prediction_timestamp_utc","recovery_recorded_utc","recovery_reason",
     *ATS_LOCK_COLUMNS,
     "actual_home_score","actual_away_score","actual_margin","actual_total","winner_correct",
     "margin_abs_error","total_abs_error","actual_home_cover","actual_over",
@@ -142,7 +144,7 @@ def _load_official(path: Path, columns: list[str]) -> pd.DataFrame:
         return _empty_official(columns)
     if "lock_status" not in old.columns:
         return _empty_official(columns)
-    old = old[old["lock_status"].eq("LOCKED")].copy()
+    old = old[old["lock_status"].isin(OFFICIAL_SNAPSHOT_STATUSES)].copy()
     for c in columns + LOCK_META_COLUMNS:
         if c not in old.columns:
             old[c] = pd.NA if c in BOOLEAN_GRADE_COLUMNS else np.nan

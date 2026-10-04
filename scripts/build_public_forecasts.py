@@ -47,7 +47,7 @@ def _prepare_locked_receipts(rows: list[dict[str, str]]) -> list[dict[str, str]]
     prepared: list[dict[str, str]] = []
     for source in rows:
         row = dict(source)
-        if _text(row.get("lock_status")).upper() != "LOCKED":
+        if _text(row.get("lock_status")).upper() not in {"LOCKED", "RECOVERED_MISSED_LOCK"}:
             prepared.append(row)
             continue
 
@@ -95,7 +95,7 @@ def _assert_locked_public_contract(payload: dict, official: list[dict[str, str]]
     locked = {
         _text(row.get("game_id")): row
         for row in official
-        if _text(row.get("lock_status")).upper() == "LOCKED" and _text(row.get("game_id"))
+        if _text(row.get("lock_status")).upper() in {"LOCKED", "RECOVERED_MISSED_LOCK"} and _text(row.get("game_id"))
     }
     for game in payload.get("games", []):
         row = locked.get(_text(game.get("game_id")))
