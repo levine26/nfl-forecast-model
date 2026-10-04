@@ -188,13 +188,25 @@ def test_locked_game_uses_immutable_lock_row_not_newer_current_row():
     assert game["lifecycle_status"] == "FINAL_PREGAME"
 
 
-def test_after_kickoff_live_row_without_lock_is_rejected():
-    with pytest.raises(PublicForecastError, match="without an immutable pregame lock"):
-        build_public_forecasts(
-            [row(gameday="2026-09-10", gametime="20:35")],
-            [],
-            now_utc=datetime(2026, 9, 11, 1, tzinfo=timezone.utc),
-        )
+def test_after_kickoff_live_row_without_lock_publishes_explicit_missing_lock_receipt():
+    payload = build_public_forecasts(
+        [row(gameday="2026-09-10", gametime="20:35")],
+        [],
+        now_utc=datetime(2026, 9, 11, 1, tzinfo=timezone.utc),
+    )
+    game = payload["games"][0]
+
+    assert game["lifecycle_status"] == "MISSING_OFFICIAL_LOCK"
+    assert game["source_snapshot"] == "MISSING_LOCK"
+    assert game["immutable"] is False
+    assert game["official_winner"] is None
+    assert game["official_home_win_probability"] is None
+    assert game["official_winner_probability"] is None
+    assert game["coherent_fair_margin_home"] is None
+    assert game["projected_home_score"] is None
+    assert game["ats_status"] == "UNAVAILABLE"
+    assert game["ats_pick_team"] is None
+    assert "No post-kickoff" in game["publication_note"]
 
 
 def test_validation_rejects_contradictory_public_score():
