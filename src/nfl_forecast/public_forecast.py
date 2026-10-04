@@ -399,6 +399,105 @@ def validate_public_forecast(forecast: Mapping[str, Any]) -> None:
     # and is the core distinction between moneyline winner forecasting and ATS value.
 
 
+def _missing_lock_public_row(row: Mapping[str, Any], *, now_utc: datetime) -> dict[str, Any]:
+    """Publish an explicit missing-lock receipt without leaking a post-kickoff forecast.
+
+    This preserves slate completeness while refusing to promote any current/post-kickoff
+    probability, pick, line, ATS signal, score, or market state into the official record.
+    """
+    game_id = _text(row.get("game_id"))
+    if not game_id:
+        raise PublicForecastError("game_id is required")
+    kickoff = kickoff_utc(row)
+    return {
+        "contract_version": PUBLIC_CONTRACT_VERSION,
+        "game_id": game_id,
+        "season": int(_number(row.get("season")) or 0),
+        "week": int(_number(row.get("week")) or 0),
+        "gameday": _text(row.get("gameday")),
+        "gametime": _text(row.get("gametime")),
+        "away_team": _text(row.get("away_team")),
+        "home_team": _text(row.get("home_team")),
+        "official_winner": None,
+        "official_home_win_probability": None,
+        "official_winner_probability": None,
+        "football_only_home_win_probability": None,
+        "market_home_win_probability": None,
+        "probability_derived_fair_home_moneyline": None,
+        "coherent_fair_margin_home": None,
+        "coherent_fair_spread_home": None,
+        "public_projected_total": None,
+        "projected_home_score_raw": None,
+        "projected_away_score_raw": None,
+        "projected_home_score": None,
+        "projected_away_score": None,
+        "market_margin_home": None,
+        "market_total": None,
+        "levline_vs_market_winner_probability_pp": None,
+        "ats_model_margin_home": None,
+        "ats_model_spread_home": None,
+        "ats_market_margin_home": None,
+        "ats_home_edge_points": None,
+        "ats_edge_points": None,
+        "ats_pick_team": None,
+        "ats_pick_market_spread": None,
+        "ats_status": "UNAVAILABLE",
+        "ats_pick_agrees_with_winner": None,
+        "forecast_timestamp_utc": None,
+        "market_timestamp_utc": None,
+        "lock_timestamp_utc": None,
+        "kickoff_utc": kickoff.isoformat() if kickoff else None,
+        "lifecycle_status": "MISSING_OFFICIAL_LOCK",
+        "immutable": False,
+        "source_snapshot": "MISSING_LOCK",
+        "signals": {
+            "football": {"home_win_probability": None, "kind": None},
+            "market": {
+                "home_win_probability": None,
+                "margin_home": None,
+                "timestamp_utc": None,
+                "source": None,
+            },
+            "official": {
+                "home_win_probability": None,
+                "winner": None,
+                "winner_probability": None,
+            },
+            "ats": {
+                "model_margin_home": None,
+                "market_margin_home": None,
+                "home_edge_points": None,
+                "edge_points": None,
+                "pick_team": None,
+                "pick_market_spread": None,
+                "status": "UNAVAILABLE",
+            },
+        },
+        "diagnostics": {
+            "independent_margin_home": None,
+            "independent_projected_home_score": None,
+            "independent_projected_away_score": None,
+            "legacy_pure_home_probability": None,
+            "legacy_final_home_probability": None,
+            "model_disagreement": None,
+        },
+        "provenance": {
+            "model_version": _text(row.get("model_version")),
+            "probability_strategy": _text(row.get("final_probability_strategy")),
+            "artifact_id": _text(row.get("fst_artifact_id")),
+            "artifact_training_data_sha256": _text(row.get("fst_artifact_training_data_sha256")),
+            "artifact_freeze_implementation_sha": _text(row.get("fst_artifact_freeze_implementation_sha")),
+            "fst_fallback": _bool(row.get("fst_fallback")),
+            "fst_fallback_reason": _text(row.get("fst_fallback_reason")),
+        },
+        "publication_note": (
+            "Kickoff passed without an immutable pregame lock. No post-kickoff "
+            "LevLine probability, pick, line, score, ATS signal, or market state is published."
+        ),
+        "generated_utc": now_utc.isoformat(),
+    }
+
+
 def build_public_forecasts(
     current: Iterable[Mapping[str, Any]],
     official: Iterable[Mapping[str, Any]],
@@ -425,9 +524,8 @@ def build_public_forecasts(
         source = locked_row if locked_row is not None else current_row
         kickoff = kickoff_utc(source)
         if locked_row is None and kickoff is not None and now_utc >= kickoff:
-            raise PublicForecastError(
-                f"{game_id}: kickoff has passed without an immutable pregame lock; refusing to publish a live replacement"
-            )
+            games.append(_missing_lock_public_row(current_row, now_utc=now_utc))
+            continue
         games.append(_public_row(source, locked=locked_row is not None, now_utc=now_utc))
 
     return {
