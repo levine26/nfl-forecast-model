@@ -605,6 +605,26 @@
     {
       "available_diagnostic_horizons": [],
       "available_predictor_horizons": [
+        "T-720m"
+      ],
+      "completed_2026_outcomes_used": 0,
+      "diagnostic_fields_admitted_to_predictor": false,
+      "eligible": false,
+      "game_id": "2026_04_ATL_NO",
+      "minimum_complete_books": 2,
+      "missing": [
+        "T-360m",
+        "T-120m"
+      ],
+      "production_authorized": false,
+      "program_id": "FV2-PROS-M1-MARKETSTATE-01",
+      "reason": "missing_required_predictor_horizon",
+      "schema_version": "levline-m1-market-state-v1",
+      "stale_quote_minutes": 15.0
+    },
+    {
+      "available_diagnostic_horizons": [],
+      "available_predictor_horizons": [
         "T-2160m"
       ],
       "completed_2026_outcomes_used": 0,
@@ -891,8 +911,8 @@
       "stale_quote_minutes": 15.0
     }
   ],
-  "games_seen": 30,
-  "ineligible_predictor_rows": 16,
+  "games_seen": 31,
+  "ineligible_predictor_rows": 17,
   "production_authorized": false,
   "program_id": "FV2-PROS-M1-MARKETSTATE-01",
   "schema_version": "levline-m1-market-state-v1"
