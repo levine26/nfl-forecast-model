@@ -78,31 +78,40 @@ def validate_manifest(
 
 
 def discover_payloads(root: Path, expected_game_ids: Iterable[str]) -> dict[str, Path]:
-    """Require exactly one focused payload file for every canonical matchup."""
+    """Resolve exactly one focused payload for each manifest-declared canonical game.
+
+    The current directory may retain validated payloads for games that have rolled off
+    the active canonical slate. Those historical files are intentionally ignored; the
+    validated manifest is authoritative for production ingestion membership.
+    """
     expected = [str(gid) for gid in expected_game_ids]
-    expected_set = set(expected)
     found: dict[str, Path] = {}
 
     if not root.is_dir():
         raise ValueError(f"ingestion input directory does not exist: {root}")
 
+    for gid in expected:
+        candidates = [
+            path
+            for suffix in sorted(_ALLOWED_PAYLOAD_SUFFIXES)
+            if (path := root / f"{gid}{suffix}").is_file()
+        ]
+        if not candidates:
+            raise ValueError(f"missing focused payloads: {gid}")
+        if len(candidates) > 1:
+            raise ValueError(f"duplicate focused payload for {gid}")
+        found[gid] = candidates[0]
+
+    # Fail closed on unexpected bundle metadata/non-payload files, but preserve
+    # historical game payloads that are no longer members of the validated manifest.
     for path in sorted(root.iterdir()):
-        if path.name == MANIFEST_NAME:
+        if path.name == MANIFEST_NAME or not path.is_file():
+            if path.name != MANIFEST_NAME and not path.is_file():
+                raise ValueError(f"unexpected non-file in ingestion bundle: {path.name}")
             continue
-        if not path.is_file():
-            raise ValueError(f"unexpected non-file in ingestion bundle: {path.name}")
         if path.suffix.lower() not in _ALLOWED_PAYLOAD_SUFFIXES:
             raise ValueError(f"unexpected ingestion bundle file: {path.name}")
-        gid = path.stem
-        if gid not in expected_set:
-            raise ValueError(f"payload game id is not in canonical slate: {gid}")
-        if gid in found:
-            raise ValueError(f"duplicate focused payload for {gid}")
-        found[gid] = path
 
-    missing = [gid for gid in expected if gid not in found]
-    if missing:
-        raise ValueError("missing focused payloads: " + ", ".join(missing))
     return found
 
 
@@ -145,75 +154,12 @@ def ingest(
         for gid in game_ids:
             staged = accepted / f"{gid}.txt"
             shutil.copyfile(payloads[gid], staged)
-            _run(
-                repo_root,
-                [
-                    "scripts/validate_single_copilot_game.py",
-                    "--input",
-                    str(staged),
-                    "--game-id",
-                    gid,
-                    "--predictions",
-                    str(prediction_path),
-                    "--accepted-dir",
-                    str(accepted),
-                ],
-            )
+            _run(repo_root, ["scripts/validate_single_copilot_game.py", "--input", str(staged), "--game-id", gid, "--predictions", str(prediction_path), "--accepted-dir", str(accepted)])
 
-        _run(
-            repo_root,
-            [
-                "scripts/merge_copilot_game_payloads.py",
-                "--input-dir",
-                str(accepted),
-                "--predictions",
-                str(prediction_path),
-                "--output",
-                str(raw),
-            ],
-        )
-        _run(
-            repo_root,
-            [
-                "scripts/compose_copilot_media_reads.py",
-                "--input",
-                str(raw),
-                "--predictions",
-                str(prediction_path),
-                "--previews",
-                str(preview_path),
-                "--evidence",
-                str(evidence_path),
-                "--output",
-                str(composed),
-            ],
-        )
-        _run(
-            repo_root,
-            [
-                "scripts/render_levline_paragraphs.py",
-                "--input",
-                str(composed),
-                "--predictions",
-                str(prediction_path),
-                "--previews",
-                str(preview_path),
-                "--output",
-                str(rendered),
-            ],
-        )
-        _run(
-            repo_root,
-            [
-                "scripts/validate_copilot_media_reads.py",
-                "--input",
-                str(rendered),
-                "--predictions",
-                str(prediction_path),
-                "--output",
-                str(output_path),
-            ],
-        )
+        _run(repo_root, ["scripts/merge_copilot_game_payloads.py", "--input-dir", str(accepted), "--predictions", str(prediction_path), "--output", str(raw)])
+        _run(repo_root, ["scripts/compose_copilot_media_reads.py", "--input", str(raw), "--predictions", str(prediction_path), "--previews", str(preview_path), "--evidence", str(evidence_path), "--output", str(composed)])
+        _run(repo_root, ["scripts/render_levline_paragraphs.py", "--input", str(composed), "--predictions", str(prediction_path), "--previews", str(preview_path), "--output", str(rendered)])
+        _run(repo_root, ["scripts/validate_copilot_media_reads.py", "--input", str(rendered), "--predictions", str(prediction_path), "--output", str(output_path)])
 
     print(f"validated and ingested {len(game_ids)} ChatGPT-researched games -> {output_path}")
 
@@ -226,13 +172,7 @@ def main() -> None:
     parser.add_argument("--evidence", default="outputs/contextual_evidence.json")
     parser.add_argument("--output", default="outputs/copilot_media_reads.json")
     args = parser.parse_args()
-    ingest(
-        input_dir=Path(args.input_dir),
-        predictions=Path(args.predictions),
-        previews=Path(args.previews),
-        evidence=Path(args.evidence),
-        output=Path(args.output),
-    )
+    ingest(input_dir=Path(args.input_dir), predictions=Path(args.predictions), previews=Path(args.previews), evidence=Path(args.evidence), output=Path(args.output))
 
 
 if __name__ == "__main__":
