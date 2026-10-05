@@ -175,6 +175,51 @@ def _backfill_policy_ats_locks(official: pd.DataFrame) -> pd.DataFrame:
     return _coerce_grade_dtypes(frame)
 
 
+def _current_week_publication_rows(
+    p: pd.DataFrame,
+    official: pd.DataFrame,
+    columns: list[str],
+) -> pd.DataFrame:
+    """Build the complete current-week public slate from live and immutable rows.
+
+    The modeling pipeline intentionally scores only unresolved games. Publication must
+    not therefore shrink after Sunday games finish. For the current unresolved week,
+    retain every immutable official receipt from that same season/week and let the
+    immutable row override any newer live row for a game that has already locked.
+    """
+    live = p[columns].copy()
+    if live.empty or not {"season", "week", "game_id"}.issubset(live.columns):
+        return live
+    if official.empty or not {"season", "week", "game_id"}.issubset(official.columns):
+        return live
+
+    season = pd.to_numeric(live["season"], errors="coerce").dropna()
+    week = pd.to_numeric(live["week"], errors="coerce").dropna()
+    if season.empty or week.empty:
+        return live
+    target_season = int(season.iloc[0])
+    target_week = int(week.iloc[0])
+
+    official_season = pd.to_numeric(official["season"], errors="coerce")
+    official_week = pd.to_numeric(official["week"], errors="coerce")
+    locked = official.loc[
+        official_season.eq(target_season) & official_week.eq(target_week),
+        [c for c in columns if c in official.columns],
+    ].copy()
+    if locked.empty:
+        return live
+
+    # Live rows first, immutable receipts second: drop_duplicates therefore keeps the
+    # official row for any game that has already locked while preserving unresolved
+    # games that have no lock receipt yet.
+    published = pd.concat([live, locked], ignore_index=True, sort=False)
+    published = published.drop_duplicates("game_id", keep="last")
+    sort_cols = [c for c in ["gameday", "gametime", "game_id"] if c in published.columns]
+    if sort_cols:
+        published = published.sort_values(sort_cols, kind="stable")
+    return published.reset_index(drop=True)
+
+
 def _append_run_history(p: pd.DataFrame, path: Path, columns: list[str]) -> None:
     audit = p[columns].copy()
     audit["prediction_id"] = (
@@ -328,7 +373,6 @@ def write_outputs(
 
     p = artifacts.predictions.copy()
     cols = _available_current_columns(p)
-    p[cols].to_csv(out / "this_week.csv", index=False)
     _append_run_history(p, out / "run_history.csv", cols)
 
     if hasattr(artifacts, "power_ratings"):
@@ -343,6 +387,9 @@ def write_outputs(
     official = _grade_locked_games(official, artifacts.games)
     official.to_csv(official_path, index=False)
 
+    published = _current_week_publication_rows(p, official, cols)
+    published.to_csv(out / "this_week.csv", index=False)
+
     next_kickoff = None
     if len(p):
         kos = []
@@ -354,13 +401,14 @@ def write_outputs(
         future = [x for x in kos if x > now_utc]
         if future:
             next_kickoff = min(future).isoformat()
-    market_available = p.get("market_available", pd.Series(False, index=p.index)).fillna(False).astype(bool)
-    fallback = p.get("fst_fallback", pd.Series(False, index=p.index)).fillna(False).astype(bool)
-    freshness = p.get("market_freshness_status", pd.Series("unknown", index=p.index)).fillna("unknown").astype(str)
+    status_frame = published if not published.empty else p
+    market_available = status_frame.get("market_available", pd.Series(False, index=status_frame.index)).fillna(False).astype(bool)
+    fallback = status_frame.get("fst_fallback", pd.Series(False, index=status_frame.index)).fillna(False).astype(bool)
+    freshness = status_frame.get("market_freshness_status", pd.Series("unknown", index=status_frame.index)).fillna("unknown").astype(str)
     status = {
         "status": "healthy",
         "generated_utc": now_utc.isoformat(),
-        "games": int(len(p)),
+        "games": int(len(status_frame)),
         "locked_official_predictions": int(len(official)),
         "power_rating_teams": int(len(getattr(artifacts, "power_ratings", []))),
         "next_kickoff_utc": next_kickoff,
