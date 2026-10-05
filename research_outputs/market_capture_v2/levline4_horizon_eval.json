@@ -35,15 +35,15 @@
       "winner_accuracy": 0.5
     },
     "L4-MKT-H-V1__T-120m": {
-      "brier": 0.2511191695512558,
+      "brier": 0.23293152016108845,
       "calibration_intercept": null,
       "calibration_slope": null,
-      "games": 11,
+      "games": 12,
       "gate_sample_ready": false,
-      "log_loss": 0.6946013462856423,
-      "sharpness": 0.14029280955051662,
-      "weeks": 1,
-      "winner_accuracy": 0.45454545454545453
+      "log_loss": 0.6533870483049432,
+      "sharpness": 0.15516060703820544,
+      "weeks": 2,
+      "winner_accuracy": 0.5
     },
     "L4-MKT-H-V1__T-30m": {
       "brier": 0.22622351264035703,
@@ -136,20 +136,24 @@
     },
     "L4-MKT-H-V1__T-120m": {
       "benchmark": "official_T-120_F-ST",
-      "brier_delta": -0.021145256332866458,
+      "brier_delta": -0.01953716025801838,
       "brier_week_block_bootstrap": {
-        "ci95_high": null,
-        "ci95_low": null,
-        "draws": 0,
-        "mean_delta": -0.021145256332866458,
-        "reason": "fewer_than_two_week_blocks"
+        "ci95_high": -0.0018481034346895311,
+        "ci95_low": -0.021145256332866458,
+        "draws": 10000,
+        "mean_delta": -0.01953716025801838,
+        "seed": 20260912,
+        "week_blocks": 2
       },
-      "games": 11,
+      "games": 12,
       "leave_one_week_out_brier": {
-        "all_remaining_negative": null,
-        "deltas": {},
-        "max_remaining_delta": null,
-        "weeks": 1
+        "all_remaining_negative": true,
+        "deltas": {
+          "2026-W3": -0.0018481034346895311,
+          "2026-W4": -0.021145256332866458
+        },
+        "max_remaining_delta": -0.0018481034346895311,
+        "weeks": 2
       }
     },
     "L4-MKT-H-V1__T-30m": {
@@ -392,11 +396,11 @@
   "evaluation_version": "LEVLINE4-HORIZON-EVAL-V1-PIT-HARDENED",
   "excluded_invalid_probability_rows": 0,
   "excluded_tie_rows": 0,
-  "excluded_ungraded_rows": 1,
+  "excluded_ungraded_rows": 0,
   "formal_family_inference_required": false,
   "gate_status": "ACCUMULATING_PROSPECTIVE_EVIDENCE",
-  "generated_at_utc": "2026-10-04T21:20:38.205093+00:00",
-  "graded_shadow_rows": 87,
+  "generated_at_utc": "2026-10-05T00:55:59.635245+00:00",
+  "graded_shadow_rows": 88,
   "horizon_completeness_audit": {
     "all_four_share_among_games_with_any": 0.625,
     "games_with_all_four_eligible_horizons": 10,
@@ -426,7 +430,7 @@
   "minimum_games": 200,
   "minimum_gate_interpretation": "eligibility_for_formal_inference_not_automatic_selection",
   "minimum_weeks": 14,
-  "official_history_rows_available": 62,
+  "official_history_rows_available": 63,
   "paired_model_vs_same_horizon_market": {
     "T-30m": {
       "benchmark": "L4-MKT-H-V1",
