@@ -32,8 +32,22 @@ jobs:
               git clean -fd outputs/
             fi
 
-            PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
-              python scripts/refresh_market.py --season 2026
+            refresh_ok=false
+            for refresh_attempt in 1 2 3; do
+              if PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
+                python scripts/refresh_market.py --season 2026; then
+                refresh_ok=true
+                break
+              fi
+              if [ "$refresh_attempt" -lt 3 ]; then
+                echo "Market generation failed; retrying transient upstream/network failure ($refresh_attempt/3)."
+                sleep $((refresh_attempt * 15))
+              fi
+            done
+            if [ "$refresh_ok" != "true" ]; then
+              echo "Market generation failed on all three attempts; refusing to publish."
+              exit 1
+            fi
             git add outputs/
 
             if git diff --cached --quiet; then
