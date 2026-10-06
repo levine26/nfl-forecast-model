@@ -150,3 +150,41 @@ A candidate family proceeds only if:
 ## 10. Production firewall
 
 No change in this program to F-ST production scoring, Sunday Signal winner logic, official historical locks, grading semantics, public outputs, or production market weighting without explicit final authorization.
+
+
+## 11. Phase 1–2 completion update — 2026-10-06
+
+Phases 1–2 are complete for this research chat.
+
+Authoritative detailed findings:
+- `research/LEVLINE_POST_WEEK4_PHASE1_2_FINDINGS.md`
+
+### Decisions recorded
+
+- Preserve F-ST as the production benchmark.
+- Reject any global increase in PURE weight as the default next move.
+- Treat the market as prior/default; search for sparse residual football information.
+- Prioritize component-residual, margin-derived winner, and explicit early-season-state candidates for immediate historical testing.
+- Treat robust market-quality and player/QB event models as high-value but PIT-data-limited.
+- Keep confidence/actionability separate from official pick identity.
+- Do not use high-capacity neural gating on the current OOS sample.
+
+### Newly identified architectural issue
+
+The current football feature builder carries rolling/EWMA state continuously across seasons and does not consume the declared `features.*` configuration controls. This is not a production-corruption finding and authorizes no immediate change. It creates a specific research hypothesis: an explicit season-boundary shrinkage/state-transition model may improve early-season football estimates.
+
+### Drift finding
+
+Output-level 2026 distributions show only modest movement relative to 2022–2025; no broad regime break is established. Full raw-feature drift remains unresolved because a directly comparable historical frozen/live feature matrix is not currently persisted.
+
+### Next-chat Phase 3 order
+
+1. preregister `MKT-COMP-RESIDUAL-V1`;
+2. preregister `MARGIN-RESIDUAL-WIN-V1`;
+3. preregister `EARLY-STATE-SHRINKAGE-V1`;
+4. build common walk-forward evaluation infrastructure;
+5. execute A/B/C without 2026 selection/tuning;
+6. only then preregister the constrained conditional gate so it cannot choose its base expert post-result;
+7. keep market-quality/player-state candidates prospective where PIT history is insufficient.
+
+No production promotion is authorized.
