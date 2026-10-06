@@ -4,7 +4,7 @@
       "game_id": "2026_04_ATL_NO",
       "largest_driver": "Market movement",
       "pick": "NO",
-      "pick_delta_pp": -0.5199215231948329
+      "pick_delta_pp": -0.5230298770820707
     },
     {
       "game_id": "2026_01_NE_SEA",
@@ -13,43 +13,93 @@
       "pick_delta_pp": -1.260265225511148e-08
     },
     {
-      "game_id": "2026_01_BAL_IND",
+      "game_id": "2026_04_KC_LV",
       "largest_driver": "No material input move",
-      "pick": "BAL",
-      "pick_delta_pp": -0.0
+      "pick": "KC",
+      "pick_delta_pp": -1.79001258260314e-10
     }
   ],
-  "generated_utc": "2026-10-05T23:40:07.417465+00:00",
+  "generated_utc": "2026-10-06T14:28:55.511968+00:00",
   "market_disagreements": [
     {
+      "confidence": "High",
+      "game_id": "2026_05_TB_DAL",
+      "matchup": "TB @ DAL",
+      "pick": "DAL",
+      "pick_prob": 0.8121835696386608,
+      "projected_score": "DAL 24.8 \u2013 TB 20.9",
+      "pure_market_gap_pp": 16.28806015000891
+    },
+    {
       "confidence": "Coin Flip",
-      "game_id": "2026_04_ATL_NO",
-      "matchup": "ATL @ NO",
-      "pick": "NO",
-      "pick_prob": 0.5096735972792682,
-      "projected_score": "NO 22.4 \u2013 ATL 22.1",
-      "pure_market_gap_pp": 2.4941880528401352
+      "game_id": "2026_05_CLE_NYJ",
+      "matchup": "CLE @ NYJ",
+      "pick": "NYJ",
+      "pick_prob": 0.5538977242360308,
+      "projected_score": "NYJ 20.0 \u2013 CLE 22.3",
+      "pure_market_gap_pp": 14.929312199715417
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_05_MIN_NO",
+      "matchup": "MIN @ NO",
+      "pick": "MIN",
+      "pick_prob": 0.5325988326673163,
+      "projected_score": "NO 20.2 \u2013 MIN 25.0",
+      "pure_market_gap_pp": 14.183252781920979
     }
   ],
   "most_uncertain": [
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_04_ATL_NO",
-      "matchup": "ATL @ NO",
-      "pick": "NO",
-      "pick_prob": 0.5096735972792682,
-      "projected_score": "NO 22.4 \u2013 ATL 22.1"
+      "game_id": "2026_05_IND_PIT",
+      "matchup": "IND @ PIT",
+      "pick": "PIT",
+      "pick_prob": 0.5286564164329387,
+      "projected_score": "PIT 25.1 \u2013 IND 21.6"
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_05_MIN_NO",
+      "matchup": "MIN @ NO",
+      "pick": "MIN",
+      "pick_prob": 0.5325988326673163,
+      "projected_score": "NO 20.2 \u2013 MIN 25.0"
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_05_CLE_NYJ",
+      "matchup": "CLE @ NYJ",
+      "pick": "NYJ",
+      "pick_prob": 0.5538977242360308,
+      "projected_score": "NYJ 20.0 \u2013 CLE 22.3"
     }
   ],
   "strongest": [
     {
-      "confidence": "Coin Flip",
-      "game_id": "2026_04_ATL_NO",
-      "matchup": "ATL @ NO",
-      "pick": "NO",
-      "pick_prob": 0.5096735972792682,
-      "projected_score": "NO 22.4 \u2013 ATL 22.1"
+      "confidence": "High",
+      "game_id": "2026_05_TB_DAL",
+      "matchup": "TB @ DAL",
+      "pick": "DAL",
+      "pick_prob": 0.8121835696386608,
+      "projected_score": "DAL 24.8 \u2013 TB 20.9"
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_05_HOU_TEN",
+      "matchup": "HOU @ TEN",
+      "pick": "HOU",
+      "pick_prob": 0.7633786064427055,
+      "projected_score": "TEN 18.1 \u2013 HOU 23.5"
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_05_CIN_MIA",
+      "matchup": "CIN @ MIA",
+      "pick": "CIN",
+      "pick_prob": 0.7605750533948965,
+      "projected_score": "MIA 19.1 \u2013 CIN 25.4"
     }
   ],
-  "week": 4
+  "week": 5
 }
