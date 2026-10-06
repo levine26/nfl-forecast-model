@@ -509,3 +509,54 @@ The highest-value next test is **not “more PURE.”** It is:
 > market prior + small, regularized, independently interpretable football residual channels, with an explicit test of margin-derived winner information and an explicit rebuild of early-season state handling.
 
 That path best matches the historical LevLine evidence, the current failure mode, and the external forecast-combination literature while minimizing the risk of fitting two bad weeks.
+
+
+## Phase 1–2 closure addendum — coefficient interpretation, drift caution, and source verification
+
+### Frozen negative PURE coefficient is a conditional/suppressor coefficient, not a verdict against football
+
+On the 1,087-game 2022–2025 frozen-fit frame, market and nested-PURE forecasts are strongly collinear:
+
+- probability correlation: **0.841**;
+- logit correlation: **0.838**.
+
+Descriptively, large PURE deviations from market are mean-reverting on this same frame. For example, when PURE is at least 10 percentage points more home-favorable than market, mean market home probability is ~34.8%, mean PURE home probability ~50.3%, and realized home win rate ~34.2%. When PURE is at least 10 points less home-favorable than market, mean market home probability is ~69.2%, mean PURE ~54.0%, and realized home win rate ~74.2%.
+
+Because this is the same historical frame from which the frozen relationship was learned, it is **explanatory, not independent validation**. The correct interpretation is that the negative PURE coefficient can be statistically coherent after conditioning on a highly correlated market signal. Phase 3 must not force football coefficients positive; it should test **football residuals relative to market** under chronological validation.
+
+### Drift metric caution
+
+The output-drift section is diagnostic only. In particular, **PSI values from a 63–64 game live sample must not be compared mechanically with universal cutoffs such as 0.1/0.25**. Recent methodological work shows PSI thresholds depend materially on sample size. For Phase 3 governance, standardized shifts, Wasserstein distance, quantiles, and direct distribution plots should accompany any PSI calculation; raw-feature drift claims require a persisted PIT feature snapshot.
+
+### Current persisted history versus audit population
+
+The current `outputs/prediction_history.csv` contains **64 completed rows** through ATL–NO, including two early `0.4.0-accountability` rows before the `0.9.0-fst` path. Those 64 rows grade 40–24 as stored; the 62 rows explicitly tagged `0.9.0-fst` grade 39–23. The formal Week-4 audit used its immutable-lock accountability population and reported **39–24 on 63 locks**. These population definitions must not be silently mixed.
+
+Accordingly, the fresh 2026 margin-error slice in this file remains **hypothesis-generating only** and is not candidate-selection evidence. Phase 3 historical candidate selection must use the frozen 2022–2025 chronological universe; prospective 2026 grading must use the predeclared contract population.
+
+### External open-source margin/early-state hypothesis verified
+
+The public `Damepivot/nfl-game-model` repository was inspected directly. Its README documents:
+
+- a write-once 2023–2025 holdout;
+- opponent-adjusted EPA ratings with ridge shrinkage;
+- smooth prior-season/current-season blending `n/(n+6)`;
+- separate offensive/defensive carryover behavior;
+- quarterback rolling form;
+- margin-first probability mapping `Phi(margin/sigma)`;
+- a reported direct classifier challenger that lost on both accuracy and Brier score.
+
+Its reported holdout win accuracy is **65.3%**, well below LevLine's incumbent benchmark, so it is **not evidence that the external model is superior**. It is useful only as independent support for two Phase 3 mechanisms already justified internally: explicit early-season shrinkage and testing a chronology-clean margin-derived win-probability channel.
+
+### Final Phase 1–2 scientific judgment
+
+The central mechanism is now frozen for Phase 3 design:
+
+> **Treat the market as the prior/offset; preserve football information as residual structure; make state-dependent corrections only through low-capacity, chronology-valid mechanisms with explicit ablations.**
+
+The first three candidates to preregister are:
+1. `MKT-COMP-RESIDUAL-V1`;
+2. `MARGIN-RESIDUAL-WIN-V1`;
+3. `EARLY-STATE-SHRINKAGE-V1`.
+
+`CONSTRAINED-GATE-V1` must be designed only after A/B/C identities are frozen. Market-quality and player-state candidates remain separate PIT/prospective lanes where historical source coverage is inadequate.

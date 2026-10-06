@@ -188,3 +188,51 @@ Output-level 2026 distributions show only modest movement relative to 2022–202
 7. keep market-quality/player-state candidates prospective where PIT history is insufficient.
 
 No production promotion is authorized.
+
+
+## Phase 1–2 completion status — 2026-10-06
+
+**Phases 1–2 are complete. Do not repeat them in the Phase 3 continuation.**
+
+Authoritative findings:
+- `research/LEVLINE_POST_WEEK4_PHASE1_2_FINDINGS.md`
+
+### Findings carried into Phase 3
+
+1. **No global PURE reweighting.** PURE loses market disagreements historically and fixed PURE-heavy blends are rejected.
+2. **Use market-offset residual parameterization.** The frozen negative PURE coefficient is coherent as a conditional suppressor in a highly collinear market/PURE system; do not force a positive football weight.
+3. **Preserve component structure, but do not vote.** Component resolution has some boundary information; unanimity and majority-based upset rules are rejected.
+4. **Do not use a calendar-only early-season rule.** Early-season performance is unstable by season.
+5. **Explicit offseason state is a real architecture question.** The live rolling/EWMA path groups by team across seasons; fixed defaults are used and feature-config controls are not wired into the live builder. This is not a leakage/production defect, but it motivates a research-only hierarchical season-boundary shrinkage candidate.
+6. **Raw margin-gap override is rejected.** A distinct margin-derived winner-probability residual remains eligible because the prior failed bridge tested probability-to-margin, not margin-to-win.
+7. **Generic dynamic Elo, naive weekly refitting, and path-only market innovation are rejected/inconclusive.**
+8. **No broad persisted-output regime break is evident in 2026.** Raw-feature drift remains unresolved because an immutable historical/live feature snapshot is not yet persisted.
+9. **Confidence/actionability is separate from pick identity.** Presentation abstention cannot silently alter official winner grading.
+10. **2026 populations must remain contract-specific.** Do not mix the formal 63-lock Week-4 audit population with the current 64-row persisted history or other diagnostic subsets.
+
+### Phase 3 preregistration order
+
+Freeze candidate identities before target-season results are inspected:
+
+1. `MKT-COMP-RESIDUAL-V1`
+2. `MARGIN-RESIDUAL-WIN-V1`
+3. `EARLY-STATE-SHRINKAGE-V1`
+4. Design `CONSTRAINED-GATE-V1` only after 1–3 are frozen.
+5. Keep `MARKET-QUALITY-PRIOR-V1` and `PLAYER-STATE-EVENT-V1` as separate PIT/prospective lanes if compatible historical coverage is insufficient.
+
+### Required common evaluation
+
+- exact paired 2022–2025 games;
+- season-forward / rolling-origin construction;
+- winner accuracy primary;
+- Brier, log loss and calibration as guardrails;
+- switch count, challenger-only correct, incumbent-only correct, switch win rate;
+- by-season and early-season slices;
+- market-confidence and component-topology slices;
+- week-block uncertainty;
+- leave-one-season-out sensitivity;
+- no completed 2026 outcome in fitting, model selection, thresholding or hyperparameter choice.
+
+### Phase 3 stopping rule
+
+If A/B/C do not produce season-stable paired improvement, do **not** rescue them with 2026-driven thresholds or combine them post hoc. Record the failure. F-ST remains the production incumbent unless a separately frozen candidate earns promotion and the user gives explicit final authorization.
