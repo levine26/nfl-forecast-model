@@ -1,0 +1,119 @@
+{
+  "audit_id": "LEVLINE-2026-WEEK4-PERFORMANCE-AUDIT-V1",
+  "status": "complete_research_diagnostic_only",
+  "production_changed": false,
+  "production_model": "F-ST-01-FROZEN-2026",
+  "audited_main_sha": "723ba40f908b3b11325a5f47ad2b788b1474b5b3",
+  "official_sample_policy": {
+    "include_lock_status": [
+      "LOCKED"
+    ],
+    "exclude_lock_status": [
+      "RECOVERED_MISSED_LOCK"
+    ],
+    "atl_no_result_external_grade_only": true,
+    "atl_no_final_score": "ATL 45, NO 24"
+  },
+  "headline": {
+    "weeks_1_2": {
+      "games": 32,
+      "wins": 24,
+      "losses": 8,
+      "accuracy": 0.75,
+      "expected_wins": 21.2893154295
+    },
+    "weeks_3_4": {
+      "games": 31,
+      "wins": 15,
+      "losses": 16,
+      "accuracy": 0.4838709677,
+      "expected_wins": 20.061191458,
+      "poisson_binomial_p_x_le_observed": 0.0417868493
+    },
+    "weeks_1_4": {
+      "games": 63,
+      "wins": 39,
+      "losses": 24,
+      "accuracy": 0.619047619,
+      "expected_wins": 41.3505068875
+    }
+  },
+  "market_comparison": {
+    "weeks_3_4": {
+      "fst_wins": 15,
+      "market_wins": 16,
+      "both_correct": 15,
+      "both_wrong": 15,
+      "fst_only_correct": 0,
+      "market_only_correct": 1,
+      "side_agreement": 0.9677419355,
+      "fst_brier": 0.246815959,
+      "market_brier": 0.2399238232
+    },
+    "all_63": {
+      "fst_wins": 39,
+      "market_wins": 39,
+      "fst_brier": 0.2315916116,
+      "market_brier": 0.2301328838
+    }
+  },
+  "confidence_weeks_3_4": {
+    "High": {
+      "games": 9,
+      "wins": 7,
+      "accuracy": 0.7777777778,
+      "mean_pick_probability": 0.7768730381
+    },
+    "Lean": {
+      "games": 5,
+      "wins": 3,
+      "accuracy": 0.6,
+      "mean_pick_probability": 0.5769911132
+    },
+    "Solid": {
+      "games": 9,
+      "wins": 4,
+      "accuracy": 0.4444444444,
+      "mean_pick_probability": 0.6539558803
+    },
+    "Coin_Flip": {
+      "games": 8,
+      "wins": 1,
+      "accuracy": 0.125,
+      "mean_pick_probability": 0.5373469533
+    }
+  },
+  "margin_ats_weeks_3_4": {
+    "ats_wins": 17,
+    "ats_losses": 10,
+    "ats_pushes": 3,
+    "ats_pct_excluding_pushes": 0.6296296296,
+    "model_margin_mae": 7.5993682439,
+    "market_spread_mae": 7.6612903226
+  },
+  "integrity": {
+    "model_version": "0.9.0-fst",
+    "artifact_id": "F-ST-01-FROZEN-2026",
+    "training_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+    "freeze_implementation_sha": "59830d23e406d32c34e74919b31d0dd9f85b16ca",
+    "fst_fallbacks_in_official_sample": 0,
+    "evidence_of_pipeline_corruption": false
+  },
+  "architecture": {
+    "intercept": -0.06954359363166639,
+    "market_logit_coefficient": 1.1939087340527093,
+    "nested_pure_logit_coefficient": -0.19342747983803402,
+    "interpretation": "Market-heavy by design; historical winner edge is concentrated in near-coinflip boundary switches."
+  },
+  "decision": {
+    "change_production_now": false,
+    "rationale": "Two-week winner slump is statistically notable but insufficient for post-hoc production modification; high-confidence performance and margin/ATS signal did not collapse, and no integrity fault was found.",
+    "next_actions": [
+      "Preserve F-ST as immutable production benchmark.",
+      "Continue preregistered LevLine 4 prospective selective-switch/component-residual research.",
+      "Add prospective raw-feature/output drift monitoring.",
+      "Persist explicit closing-market consensus snapshots prospectively.",
+      "Keep team residual flags diagnostic only until larger samples accrue."
+    ]
+  }
+}
