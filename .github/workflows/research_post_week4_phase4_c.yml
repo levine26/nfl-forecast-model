@@ -1,0 +1,119 @@
+name: LevLine Phase 4 frozen Candidate C shadow preflight
+on:
+  push:
+    branches:
+      - research/post-week4-phase4-c-shadow-20261007
+    paths:
+      - 'research/post_week4_phase4/FREEZE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-post-week4-c-frozen-artifact
+  cancel-in-progress: false
+
+env:
+  OPENBLAS_NUM_THREADS: '2'
+  OMP_NUM_THREADS: '2'
+  MKL_NUM_THREADS: '2'
+  PYTHONHASHSEED: '26'
+
+jobs:
+  outcome-blind-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - name: Enforce separate frozen preregistration
+        shell: bash
+        run: |
+          git cat-file -e '3274160901cc024bd97fa2201043755e7b04dada^{commit}'
+          git merge-base --is-ancestor 3274160901cc024bd97fa2201043755e7b04dada HEAD
+          test -s research/post_week4_phase4/C_PROSPECTIVE_PREREG_2026_10_07.md
+      - name: Unit tests, input timing, strict ties and immutable scoring
+        run: |
+          python -m compileall -q research/post_week4_phase4
+          python -m pytest -q research/post_week4_phase4/test_c_shadow.py
+      - name: Enforce no production diff
+        shell: bash
+        run: |
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- outputs/ site/ src/nfl_forecast/ scripts/ \
+            .github/workflows/pregame.yml .github/workflows/weekly.yml
+
+  freeze-research-model:
+    needs: outcome-blind-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11', cache: pip}
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: c-phase4-historical-2012-2025-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            nfl-research-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Reuse a previously frozen model if present, never refit after freezing
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest=research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json
+          if test -e "$dest"; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.post_week4_phase4.c_shadow import validate_model
+          p=Path('research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json')
+          validate_model(json.loads(p.read_text()))
+          print('Existing frozen model verified: NO REFIT')
+          PY
+          else
+            PYTHONPATH=src:. python research/post_week4_phase4/freeze_c_model.py --output "$dest"
+          fi
+      - name: Verify frozen artifact and no live-data fitting
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.post_week4_phase4.c_shadow import validate_model
+          p=Path('research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json')
+          m=json.loads(p.read_text())
+          validate_model(m)
+          assert m['training_first_season']==2020 and m['training_last_season']==2025
+          assert m['training_games']==1615
+          assert m['outcomes_2026_used']==0 and m['production_promotion_authorized'] is False
+          print('Frozen model validation PASS')
+          PY
+      - name: Prove no production changes
+        run: |
+          git diff --exit-code -- outputs/ site/ src/nfl_forecast/ scripts/ \
+            .github/workflows/pregame.yml .github/workflows/weekly.yml
+      - name: Preserve frozen artifact solely on isolated research branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'research: freeze validated pre-2026 Candidate C coefficients [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: phase4-c-model-${{ github.run_id }}
+          path: research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json
+          if-no-files-found: warn
+          retention-days: 90

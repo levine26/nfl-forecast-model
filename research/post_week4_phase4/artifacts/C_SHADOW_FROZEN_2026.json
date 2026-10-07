@@ -1,0 +1,46 @@
+{
+  "builder_source_sha256": "8bebb23d278aa3ce3c10d17da931c9220698a815b33c1c7f90983d8288aae9de",
+  "candidate_id": "EARLY-STATE-SHRINKAGE-V1-SHADOW-2026-10-07",
+  "current_season_effective_prior_games": 6,
+  "feature_names": [
+    "off_state_diff",
+    "def_state_diff",
+    "state_uncertainty"
+  ],
+  "frozen_at_utc": "2026-10-07T22:47:31+00:00",
+  "historical_state_source_sha256": "ea0349b734d2483c2940baa096b90c3f38075f3613a67fcce2e2c3d81e7b0d5a",
+  "includes_next_starter_information": false,
+  "legacy_tie_label_caveat": true,
+  "market_logit_offset_coefficient": 1,
+  "means": [
+    0.0005200540460047642,
+    0.00042706395601779486,
+    0.007451552334462546
+  ],
+  "optimizer": "L-BFGS-B",
+  "optimizer_ftol": 1e-12,
+  "optimizer_maxiter": 1000,
+  "outcomes_2026_used": 0,
+  "penalty": 0.02,
+  "pretarget_only": true,
+  "previous_season_league_share": 0.4,
+  "previous_season_team_share": 0.6,
+  "prior_games_last_season": 8,
+  "production_promotion_authorized": false,
+  "stds": [
+    0.07607996121847437,
+    0.061962199296502256,
+    0.017636764306146607
+  ],
+  "theta": [
+    -0.059496396097704365,
+    0.009884004261239991,
+    0.03942660176226387,
+    0.03861681664557462
+  ],
+  "training_cutoff": 2025,
+  "training_data_sha256": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+  "training_first_season": 2020,
+  "training_games": 1615,
+  "training_last_season": 2025
+}
