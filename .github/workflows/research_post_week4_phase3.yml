@@ -1,0 +1,104 @@
+name: LevLine post-Week-4 Phase 3 historical A/B/C research
+
+on:
+  push:
+    branches: [research/post-week4-phase3-execution-20261007]
+    paths:
+      - 'research/post_week4_phase3/EXECUTE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: levline-post-week4-phase3-evaluation
+  cancel-in-progress: false
+
+jobs:
+  frozen-historical-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PYTHONHASHSEED: '26'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Confirm pre-result chronology and no production changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e 'b13fd61e4092db1aef11983df0fbf81e70f3f41e^{commit}'
+          git merge-base --is-ancestor b13fd61e4092db1aef11983df0fbf81e70f3f41e HEAD
+          git fetch origin main --quiet
+          base=$(git merge-base origin/main HEAD)
+          git diff --exit-code "$base"..HEAD -- \
+            outputs/ site/ src/nfl_forecast/ scripts/ \
+            .github/workflows/pregame.yml .github/workflows/weekly.yml
+          test -s research/post_week4_phase3/PREREG_A_B_C_2026_10_07.md
+          test -s research/post_week4_phase3/run_candidates.py
+      - run: pip install '.[dev]'
+      - uses: actions/cache@v4
+        with:
+          path: .cache/nflreadpy
+          key: postweek4-phase3-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            nfl-research-${{ runner.os }}-
+            nflreadpy-${{ runner.os }}-
+      - name: Validate syntax and outcome-blind chronology tests
+        run: |
+          python -m compileall -q research/post_week4_phase3
+          python -m pytest -q research/post_week4_phase3/test_run_candidates.py
+      - name: Evaluate preregistered candidates (A then B then C)
+        run: |
+          set -euo pipefail
+          python research/post_week4_phase3/run_candidates.py --output-dir research/post_week4_phase3/evidence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('research/post_week4_phase3/evidence/summary.json')
+          d = json.loads(p.read_text())
+          assert d['governance']['population'] == 1087
+          assert d['governance']['outcomes_2026_used'] == 0
+          assert d['governance']['production_changed'] is False
+          assert d['governance']['alexandria_used'] is False
+          a = d['candidates']['MKT-COMP-RESIDUAL-V1']
+          assert a['status'] == 'EVALUATED'
+          assert a['metrics']['fst']['correct'] == 741
+          assert a['metrics']['fst']['games'] == 1087
+          assert (Path('research/post_week4_phase3/evidence/candidate_A_oof.csv')).is_file()
+          for key in ['MARGIN-RESIDUAL-WIN-V1','EARLY-STATE-SHRINKAGE-V1']:
+              assert d['candidates'][key]['status'] in ('EVALUATED','NOT_EVALUABLE')
+          PY
+      - name: Confirm no production files modified by execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- \
+            outputs/ site/ src/nfl_forecast/ scripts/ \
+            .github/workflows/pregame.yml .github/workflows/weekly.yml
+      - name: Persist outcome-restricted evidence to research branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/post_week4_phase3/evidence/
+          git diff --cached --name-only | grep -v '^research/post_week4_phase3/evidence/' && exit 1 || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'research: preserve pre-registered Phase 3 A/B/C OOF evidence [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: levline-post-week4-phase3-${{ github.run_id }}
+          path: research/post_week4_phase3/evidence/
+          if-no-files-found: warn
+          retention-days: 90
