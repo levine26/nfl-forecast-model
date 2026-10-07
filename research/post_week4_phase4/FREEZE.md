@@ -7,3 +7,5 @@ This marker invokes an isolated one-shot workflow to (a) pass synthetic PIT/time
 Final acceptance rerun: verify the *already frozen* artifact without refitting, and exercise the 210-game/14-week synthetic formal-evaluation gate after completing the documentation and roadmap updates.
 
 Final acceptance after syntax inspection: revalidate exact team/game identity test and preserved frozen research artifact without any refit.
+
+Final preflight rerun: verify the corrected synthetic game/week identity test; frozen model artifact must be REUSED, never refitted or replaced.
