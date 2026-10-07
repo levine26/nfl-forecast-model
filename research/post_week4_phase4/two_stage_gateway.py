@@ -17,7 +17,7 @@ from typing import Callable
 
 from research.post_week4_phase4.c_shadow import (
     CANDIDATE_ID, CONTRACT_ID, PRODUCTION_ID, canonical_hash, hexsha,
-    iso_utc, number, score_snapshot, validate_model,
+    iso_utc, number, score_snapshot, validate_model, derive_features,
 )
 
 STAGE_SCHEMA = "c_shadow_raw_stage_v1"
@@ -140,6 +140,9 @@ def capture_raw(raw: dict, root: Path, *, source_verifier: Callable | None = Non
                 for previous in games:
                     if iso_utc(previous.get("stats_observed_utc"), "prior stats observed") > now:
                         raise ValueError("Future prior-game source observation")
+        # Validate the complete frozen historical state at the *actual* pre-lock
+        # capture cutoff; do not defer prior-game completeness until lock publication.
+        derive_features(raw, cutoff=now)
         proof = source_verifier(raw) if source_verifier is not None else None
         if proof is not None and (not isinstance(proof, dict) or
                                   proof.get("complete_asof_capture") is not True or
