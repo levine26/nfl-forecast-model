@@ -43,7 +43,7 @@ def evaluate(scored_records: list[dict], official_results: list[dict]) -> dict:
         season,week=row.get("season"),row.get("week")
         if (isinstance(season,bool) or not isinstance(season,int) or season<2026 or
             isinstance(week,bool) or not isinstance(week,int) or not 1<=week<=18 or
-            game!=f"{season}_{week:02d}_{row.get(\'away_team\')}_{row.get(\'home_team\')}"):
+            game!=f"{season}_{week:02d}_{row.get('away_team')}_{row.get('home_team')}"):
             raise ValueError("Frozen game/week/team identity mismatch")
         for k in ("input_snapshot_sha256","frozen_model_sha256","source_sha256","schedule_sha256"):
             hexsha(row.get(k),k)
