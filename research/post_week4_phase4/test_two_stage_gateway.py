@@ -9,7 +9,11 @@ import pytest
 
 from research.post_week4_phase4.c_shadow import canonical_hash
 from research.post_week4_phase4.c_shadow_eval import evaluate
-from research.post_week4_phase4.test_c_shadow import example_model, example_snapshot
+from research.post_week4_phase4.test_c_shadow import example_snapshot
+
+
+def frozen_model():
+    return json.loads(Path('research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json').read_text())
 from research.post_week4_phase4.two_stage_gateway import capture_raw, seal_against_lock
 
 
@@ -19,7 +23,8 @@ def at(value):
 
 def source_verified(_raw):
     return {"complete_asof_capture": True, "storage_rights_verified": True,
-            "verification_ref": "synthetic-independent-source-verifier-NOT-LIVE"}
+            "verification_ref": "synthetic-independent-source-verifier-NOT-LIVE",
+            "football_input_sha256": canonical_hash(_raw)}
 
 
 def data():
@@ -60,7 +65,7 @@ def stage(tmp_path: Path, verified=True):
 
 
 def seal(tmp_path: Path, **kw):
-    return seal_against_lock(tmp_path, "2026_05_BUF_KC", official(), example_model(),
+    return seal_against_lock(tmp_path, "2026_05_BUF_KC", official(), frozen_model(),
         lock_verifier=first_published, clock=at("2026-10-11T18:57:00+00:00"), **kw)
 
 
@@ -71,7 +76,7 @@ def test_qualified_synthetic_two_stage_and_tie_grade(tmp_path):
     b = seal(tmp_path)
     assert b["created"] and b["record"]["gateway_pit_checks_passed"] is True
     assert b["record"]["official_lock_commit_sha"] == "a" * 40
-    assert b["record"]["candidate_id"] == example_model()["candidate_id"]
+    assert b["record"]["candidate_id"] == frozen_model()["candidate_id"]
     pending = evaluate([b["record"]], [])
     assert pending["pending_games"] == 1 and pending["graded_non_tie_games"] == 0
     tie = {"game_id": b["record"]["game_id"], "season": 2026, "week": 5,
@@ -106,7 +111,7 @@ def test_seal_fail_closed(tmp_path, action):
     if action != "missing_stage":
         stage(tmp_path, verified=action != "no_source_proof")
     o = official()
-    m = example_model()
+    m = frozen_model()
     verify = first_published
     now = at("2026-10-11T18:57:00+00:00")
     if action == "wrong_team":
