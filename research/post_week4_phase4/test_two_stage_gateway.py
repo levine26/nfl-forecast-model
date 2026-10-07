@@ -155,7 +155,7 @@ def test_seal_fail_closed(tmp_path, action):
 
 @pytest.mark.parametrize("action", ["post_kickoff","future_source","missing_coverage",
     "outcome_contamination","forecast_contamination","missing_history","changed_team",
-    "stale_age","future_previous_stats","wrong_game"])
+    "stale_age","future_previous_stats","wrong_game","short_prior_history","wrong_completed_count"])
 def test_stage_fail_closed_and_records_missingness(tmp_path, action):
     raw = data()
     now = at("2026-10-11T18:50:00Z")
@@ -179,6 +179,10 @@ def test_stage_fail_closed_and_records_missingness(tmp_path, action):
         raw["team_states"]["home"]["current_season_completed"][0]["stats_observed_utc"] = "2026-10-12T10:00:00Z"
     elif action == "wrong_game":
         raw["game_id"] = "2026_05_BUF_BUF"
+    elif action == "short_prior_history":
+        raw["team_states"]["home"]["last_eight_previous_season"].pop()
+    elif action == "wrong_completed_count":
+        raw["team_states"]["away"]["expected_completed_current_season_games"] = 5
     with pytest.raises((ValueError, TypeError)):
         capture_raw(raw, tmp_path, source_verifier=source_verified, clock=now)
     assert not list((tmp_path / "staged").glob("*.json"))
