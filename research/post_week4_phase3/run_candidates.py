@@ -172,7 +172,7 @@ def audit_historical_identity(panel, games):
     new = games[["game_id", "season", "home_win"]].copy()
     merged = old.merge(new, on="game_id", how="left",
                        validate="one_to_one", suffixes=("", "_rebuilt"), indicator=True)
-    if not merged._merge.eq("both").all():
+    if not merged["_merge"].eq("both").all():
         raise RuntimeError("Historical rebuild lacks frozen F-ST game IDs")
     if not (merged.season == merged.season_rebuilt).all():
         raise RuntimeError("Historical rebuild changes game seasons")
@@ -406,6 +406,7 @@ def execute(outdir):
             evidence["candidates"][key]={"status":"NOT_EVALUABLE",
                                          "reason":"Historical PIT/identity rebuild failed; see historical_rebuild"}
         (outdir/"summary.json").write_text(json.dumps(evidence,indent=2,allow_nan=False))
+        (outdir/"manifest.json").write_text(json.dumps({"outcomes_2026_used":0,"prereg_commit":evidence["governance"]["prereg_commit"],"status":"historical_rebuild_unqualified"},indent=2))
         return evidence
 
     for index in [1,2]:
