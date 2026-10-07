@@ -23,6 +23,8 @@ jobs:
       MKL_NUM_THREADS: '2'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -44,5 +46,6 @@ jobs:
           PY
       - name: Keep production F-ST and outputs unchanged
         run: |
+          git fetch origin main --quiet
           git diff --exit-code origin/main -- outputs/ site/ src/nfl_forecast/ scripts/ \
             .github/workflows/pregame.yml .github/workflows/weekly.yml
