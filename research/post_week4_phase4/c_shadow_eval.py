@@ -140,7 +140,7 @@ def evaluate(scored_records: list[dict], official_results: list[dict]) -> dict:
     for _ in range(BOOTSTRAP_SAMPLES):
         sampled=rng.choice(len(keys),size=len(keys),replace=True)
         positions=np.concatenate([groups[keys[i]] for i in sampled])
-        draws.append(float((cgood[positions]-fgood[positions]).mean()))
+        draws.append(float((cgood[positions].astype(int)-fgood[positions].astype(int)).mean()))
     lo,hi=np.quantile(draws,[.025,.975])
     by_season=defaultdict(list)
     for k,r in enumerate(rows):
