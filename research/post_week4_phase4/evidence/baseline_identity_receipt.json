@@ -1,0 +1,113 @@
+{
+  "contract": "research_only_legacy_label_reconciliation",
+  "outcomes_2026_used": 0,
+  "authoritative_frozen_artifact_training_digest": "6a26713b636a98298bb619982bb38b2e5dbb78816e093e6f910c1cee32ab5aa0",
+  "historical_training_rows": 1615,
+  "paired_games": 1087,
+  "baseline_definitions": {
+    "season_forward": {
+      "correct": 741,
+      "games": 1087,
+      "weeks_1_4": {
+        "correct": 167,
+        "games": 256
+      },
+      "weeks_1_6": {
+        "correct": 243,
+        "games": 372
+      },
+      "by_season": {
+        "2022": {
+          "correct": 182,
+          "games": 271
+        },
+        "2023": {
+          "correct": 185,
+          "games": 272
+        },
+        "2024": {
+          "correct": 195,
+          "games": 272
+        },
+        "2025": {
+          "correct": 179,
+          "games": 272
+        }
+      }
+    },
+    "frozen_final_coefficients": {
+      "correct": 740,
+      "games": 1087,
+      "weeks_1_4": {
+        "correct": 164,
+        "games": 256
+      },
+      "weeks_1_6": {
+        "correct": 241,
+        "games": 372
+      },
+      "by_season": {
+        "2022": {
+          "correct": 181,
+          "games": 271
+        },
+        "2023": {
+          "correct": 185,
+          "games": 272
+        },
+        "2024": {
+          "correct": 195,
+          "games": 272
+        },
+        "2025": {
+          "correct": 179,
+          "games": 272
+        }
+      }
+    },
+    "static_exclude_ties_no_refit": {
+      "fst_prob": {
+        "correct": 738,
+        "games": 1084
+      },
+      "fixed_prob": {
+        "correct": 737,
+        "games": 1084
+      }
+    }
+  },
+  "three_known_ties": [
+    {
+      "game_id": "2022_01_IND_HOU",
+      "real_final": "IND 20 at HOU 20",
+      "legacy_home_win": 0,
+      "season_forward_home_prob": 0.24660538908524196,
+      "frozen_final_home_prob": 0.2518536241826979,
+      "wrongly_credited_as_away_win": true
+    },
+    {
+      "game_id": "2022_13_WAS_NYG",
+      "real_final": "WAS 20 at NYG 20",
+      "legacy_home_win": 0,
+      "season_forward_home_prob": 0.4312867928521521,
+      "frozen_final_home_prob": 0.4550631394632131,
+      "wrongly_credited_as_away_win": true
+    },
+    {
+      "game_id": "2025_04_GB_DAL",
+      "real_final": "GB 40 at DAL 40",
+      "legacy_home_win": 0,
+      "season_forward_home_prob": 0.2251360471540533,
+      "frozen_final_home_prob": 0.23135623619422938,
+      "wrongly_credited_as_away_win": true
+    }
+  ],
+  "tied_game_ids_in_training": [
+    "2022_01_IND_HOU",
+    "2022_13_WAS_NYG",
+    "2025_04_GB_DAL"
+  ],
+  "source_limitation": "Three listed ties are known game keys; full all-year tie inventory requires official complete scoreboard crosscheck.",
+  "interpretation": "Season-forward and frozen-final-coefficient F-ST are different estimands; static tie exclusion is not a retrained tie-excluded OOS result.",
+  "production_changed": false
+}
