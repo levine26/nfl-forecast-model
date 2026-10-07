@@ -141,7 +141,7 @@ def test_evaluation_separates_advance_grades_and_ties():
 def test_changed_model_cannot_be_used_in_same_grade():
     r=score_snapshot(example_snapshot(),example_model())
     x=deepcopy(r)
-    x["game_id"]="2026_06_BUF_KC";x["frozen_model_sha256"]="f"*64
+    x["game_id"]="2026_06_BUF_KC";x["week"]=6;x["frozen_model_sha256"]="f"*64
     with pytest.raises(ValueError,match="Changed frozen"):
         evaluate([r,x],[])
 
