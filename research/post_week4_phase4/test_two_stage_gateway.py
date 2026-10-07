@@ -189,11 +189,11 @@ def test_stage_fail_closed_and_records_missingness(tmp_path, action):
     assert list((tmp_path / "failures").glob("*.json"))
 
 
-def test_stage_without_independent_verification_is_unqualified(tmp_path):
-    response = stage(tmp_path, verified=False)
-    assert response["stage"]["source_proof"] is None
-    with pytest.raises(ValueError, match="source/rights unverified"):
-        seal(tmp_path)
+def test_missing_independent_source_verification_prevents_raw_retention(tmp_path):
+    with pytest.raises(ValueError, match="source/rights verification required"):
+        stage(tmp_path, verified=False)
+    assert not list((tmp_path / "staged").glob("*.json"))
+    assert list((tmp_path / "failures").glob("*.json"))
 
 
 def test_failed_retroactive_stage_is_never_rescued(tmp_path):
