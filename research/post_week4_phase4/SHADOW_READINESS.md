@@ -35,3 +35,7 @@ Do not commit the raw snapshot to public `main` or show licensed payloads. No au
 - Prospective non-tie population reaches at least 200 games and 14 weeks.
 - Positive season/week-robust paired winner edge, nonpathological proper scores, no PIT provenance defects.
 - Explicit user promotion approval, then separate reversible production PR. **Not authorized now.**
+
+## Preflight receipt — 2026-10-07
+
+The one-time research freeze passed GitHub Actions [run #37697761899](https://github.com/levine26/nfl-forecast-model/actions/runs/37697761899). Frozen artifact: `artifacts/C_SHADOW_FROZEN_2026.json`, saved at `2026-10-07T22:47:31+00:00`. It records **1,615** historical (2020–2025) fitting rows, `outcomes_2026_used=0`, L2 penalty 0.02, the same three C features, and immutable historical feature-builder/source digests. The model's saved parameters and proper source provenance have been checked. The frozen artifact **must not be refit** during later shadow captures. Synthetic unit tests pass; no real pre-lock 2026 Candidate C capture has been qualified, and no statistical superiority is claimed.

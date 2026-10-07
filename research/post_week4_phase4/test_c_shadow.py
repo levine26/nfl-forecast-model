@@ -155,3 +155,38 @@ def test_regression_rejects_tampering_or_unqualified_after_lock():
     s["team_states"]["home"]["current_season_completed"][0]["kickoff_utc"]="2026-10-12T00:00:00Z"
     with pytest.raises(ValueError):
         score_snapshot(s,example_model())
+
+def test_formal_checkpoint_requires_accuracy_edge_and_never_promotes():
+    from datetime import datetime,timedelta
+    base=score_snapshot(example_snapshot(),example_model())
+    predictions=[]
+    grades=[]
+    for week in range(1,15):
+        shift=timedelta(days=(week-1)*7)
+        for i in range(15):
+            row=deepcopy(base)
+            row["season"]=2026
+            row["week"]=week
+            row["away_team"]=f"AW{i}"
+            row["home_team"]=f"HT{i}"
+            row["game_id"]=f"2026_{week:02d}_AW{i}_HT{i}"
+            for field in ("kickoff_utc","fst_lock_timestamp_utc","snapshot_captured_utc","source_observed_utc"):
+                row[field]=(datetime.fromisoformat(base[field])+shift).isoformat()
+            predictions.append(row)
+            kick=datetime.fromisoformat(row["kickoff_utc"])
+            grades.append({
+                "game_id":row["game_id"],"season":2026,"week":week,
+                "home_score":24 if i%2==0 else 17,
+                "away_score":17 if i%2==0 else 24,
+                "source_type":"verified_official_game_result",
+                "source_sha256":"a"*64,
+                "result_observed_utc":(kick+timedelta(hours=4)).isoformat(),
+            })
+    report=evaluate(predictions,grades)
+    assert report["graded_non_tie_games"]==210
+    assert report["weeks"]==14
+    assert report["status"]=="FORMAL_REVIEW_ELIGIBLE"
+    assert report["switches"]==0
+    assert report["scientific_preliminary_gate_met"] is False
+    assert report["promotion_authorized"] is False
+    assert report["week_block_accuracy_delta_ci95"]==[0.0,0.0]
