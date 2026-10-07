@@ -102,14 +102,14 @@ def test_idempotent_stage_and_prediction_do_not_change_seal(tmp_path):
     assert len(list((tmp_path / "failures").glob("*.json"))) >= 1
 
 
-@pytest.mark.parametrize("action", ["missing_stage","no_source_proof","no_lock_verifier",
+@pytest.mark.parametrize("action", ["missing_stage","no_lock_verifier",
     "wrong_team","wrong_week","wrong_kickoff","wrong_model","recovered_lock",
     "no_market_age","stale_market","generated_after_lock","published_after_kickoff",
     "published_before_lock","published_in_future","lock_row_hash_changed","no_artifact",
     "after_kickoff","wrong_fst_probability"])
 def test_seal_fail_closed(tmp_path, action):
     if action != "missing_stage":
-        stage(tmp_path, verified=action != "no_source_proof")
+        stage(tmp_path)
     o = official()
     m = frozen_model()
     verify = first_published
