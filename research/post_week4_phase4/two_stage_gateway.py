@@ -192,8 +192,9 @@ def seal_against_lock(root: Path, game_id: str, official: dict, model: dict, *,
         if _game_id(raw) != game_id or stage.get("football_input_sha256") != canonical_hash(raw):
             raise ValueError("Corrupt raw football hash/identity")
         proof = stage.get("source_proof")
-        if not isinstance(proof, dict) or proof.get("complete_asof_capture") is not True or proof.get("storage_rights_verified") is not True or
-            proof.get("football_input_sha256") != canonical_hash(raw):
+        if (not isinstance(proof, dict) or proof.get("complete_asof_capture") is not True or
+            proof.get("storage_rights_verified") is not True or
+            proof.get("football_input_sha256") != canonical_hash(raw)):
             raise ValueError("Original football source/rights unverified")
         now = _now(clock)
         ko = iso_utc(raw["kickoff_utc"], "kickoff")
