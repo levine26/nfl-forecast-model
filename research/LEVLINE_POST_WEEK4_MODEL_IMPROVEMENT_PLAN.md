@@ -236,3 +236,15 @@ Freeze candidate identities before target-season results are inspected:
 ### Phase 3 stopping rule
 
 If A/B/C do not produce season-stable paired improvement, do **not** rescue them with 2026-driven thresholds or combine them post hoc. Record the failure. F-ST remains the production incumbent unless a separately frozen candidate earns promotion and the user gives explicit final authorization.
+
+## 12. Alexandria PIT feasibility addendum — 2026-10-07
+
+**Separate workstream, not a Phase 3 candidate and not new Phase 1–2 modeling.** A connected Firecrawl Alexandria catalogue audit identified StartWho weekly sportsbook-backed player projections and NFL.com official injury/practice reports as *potential* future player-state and market-quality inputs.
+
+Authoritative scope/evidence/gating ledger: [LEVLINE_ALEXANDRIA_PIT_FEASIBILITY_2026_10_07.md](LEVLINE_ALEXANDRIA_PIT_FEASIBILITY_2026_10_07.md).
+
+- Catalogue identifies four relevant 5-credit-per-call tools; only the small StartWho Week-5 payload was successfully smoke-tested; an NFL injury live call was rate-limited. No historical PIT qualification exists.
+- `observed_at_ms` is a fetch clock; StartWho `last_updated` and NFL `report_date` do not prove a specific sportsbook quote or final injury designation was available at the earlier historical cutoff. Do not reconstruct old PIT states from today's historical-week result.
+- Alexandria is **prospective feasibility only**. The snapshot schema and low-rate ingestion strategy are design artifacts, not active collectors. Retention/license/quote timestamp/history coverage remain unresolved.
+- Preserve the existing Phase 3 2022–2025 paired evaluation contract and candidate order. **No modification to Candidate A's frozen identity, features, architecture, training or evaluation. No automatic Alexandria inclusion in Candidates B/C; independent prior preregistration + historical coverage required.**
+- One experimental candidate per chat, Candidate A first; separately scoped research-only GitHub PR for this Alexandria ledger; production F-ST/Sunday Signal untouched.
