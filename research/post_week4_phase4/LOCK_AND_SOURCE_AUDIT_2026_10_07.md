@@ -1,0 +1,29 @@
+# Phase 4 A — Official F-ST lock and football source audit (2026-10-07)
+
+**Research only.** Audited `main` at `d7a35a8ed1f1aadeb9bf87433de2822661973d06`. This is a source-code and published-artifact audit, NOT a proof of a verified pre-lock EPA feed. Frozen Candidate C and production unchanged.
+
+## Lock identity and chronology
+
+- `src/nfl_forecast/publish.py::_lock_new_games` is the sole normal `LOCKED` writer. `write_outputs` first loads `outputs/prediction_history.csv`, retains `LOCKED` and `RECOVERED_MISSED_LOCK`, adds newly eligible game rows when `0 < kickoff - now_utc <= 120 min`, then regrades the history. `lock_timestamp_utc` is the writer's local UTC run clock; `kickoff_utc` derives from nflverse gameday and Eastern gametime. It stores `final_home_prob`, `market_home_prob`, `fst_artifact_id`, `final_probability_strategy`, `prediction_timestamp_utc`, and market freshness fields *when available*.
+- `.github/workflows/pregame.yml` is hourly at minute 25; its due gate considers T-45 through T-165. It runs full model/tests and lock verifier before committing `outputs/` to main. A later Git push is not the same event as the writer's `lock_timestamp_utc`. Job duration, scheduling and retries can delay or prevent externally visible publication. There is no durable per-game independent publication-receipt object in the audited Phase 4 package.
+- `src/nfl_forecast/lock_verify.py` checks one lock row per eligible game, `LOCKED`, probability/pick, timestamp in T-120 and ATS postcondition; this is an internal self-consistency check, NOT independent proof of GitHub publication before kickoff or an earlier observation cutoff.
+- `outputs/this_week.csv` is mutable preview/current slate; it is NOT the official lock. `outputs/prediction_history.csv` is updated/regraded and `_backfill_policy_ats_locks` can fill historical ATS-only receipt columns. Neither the latest file nor the CSV's saved lock timestamp independently proves when a particular row first appeared. The historical `RECOVERED_MISSED_LOCK` class must not be qualified as an actual contemporaneous C comparator.
+- Concrete published example: Week 5 current CSV on main contains `2026_05_TB_DAL` as a MARKET snapshot created 2026-10-07 22:49 UTC, with `market_snapshot_timestamp_utc` equal to that run timestamp. This is NOT a live, verified T-120 lock; do not convert it into one.
+
+## Football inputs and gaps
+
+- `src/nfl_forecast/data.py::load_core_data` downloads nflverse games.csv (schedule/results and game-level moneyline) and nflreadpy season PBP. `_load_pbp_with_live_fallback` intentionally falls back to earlier published seasons if current-season PBP is not yet released. `src/nfl_forecast/pipeline.py` constructs team-game EPA from that bundle. Thus a contemporaneous 2026 complete EPA sample is **not** guaranteed simply because a production F-ST forecast exists.
+- Candidate C requires exactly eight last-season games per team, all earlier completed current-season games, prior-season league reference means, and their *source-observed* timestamps, with NFL game identity and order. Published team-summary EWMA or a latest refreshed PBP file does not meet that contract. No independently timestamped, per-game complete provider state was verified in this audit.
+- Market freshness metadata in a generated file can be a **pipeline fetch clock**, not the bookmaker's actual quote clock. Do not claim individual quote freshness without provider-native evidence.
+- nflverse/nflreadpy licensing and permissibility of private raw capture must be verified from actual source terms; do not publicly commit licensed source rows before verification. GitHub Actions and Git history cannot independently attest provider as-of times without external receipts.
+
+## Required two-stage architecture, preserving Phase 4 preregistration
+
+1. Prior to lock: fetch and validate complete historical team-game EPA, scheduled opponent/kickoff and source timestamps from an approved provider; stage byte-identical raw input with capture-time receipt and SHA-256 in append-only private storage. Independent source completeness check, UTC clock confidence and storage rights are mandatory. Do not include completed target-game outcome, post-kickoff revisions or F-ST forecast in this football stage.
+2. When the official F-ST lock becomes externally published: find the **first independently verifiable publication commit/event**, confirm it occurred before kickoff and after the football stage; identify the exact original `LOCKED` row, frozen strategy and same game/week/teams/kickoff, market probability from that row, plus commit/blob SHA and publication clock. Do not use current CSV if first-seen evidence is absent. Require scoring and sealed output creation **before actual kickoff**.
+3. Candidate C math uses precisely the existing frozen artifact; persist staged-data digest, frozen artifact digest, lock-row digest, publication provenance and output receipt; no overwrite on retry. A missing or late source/lock produces permanent non-eligibility, not a reconstructed observation.
+4. Do not count prospective records until an independent auditor checks the source/capture and lock-publication receipts. Workflows remain **undeployed** until source rights/timing are demonstrably satisfied.
+
+## Independent audit decision
+
+**BLOCKED_FOR_LIVE_SOURCE_QUALIFICATION.** Existing code offers an internally consistent official F-ST lock source, but historical EPA completeness/source age, GitHub first-publication timestamp and storage permissions are not independently established. Build/test local two-stage evidence capture and rejection receipts; do not claim operational prospective enrollment yet. Official F-ST/Sunday Signal/ATS untouched. All 2026 previously completed games remain ineligible for retroactive enrollment.
