@@ -73,3 +73,7 @@ C's preregistered slices: Weeks 1–4 **167/256 vs F-ST 167/256**, Weeks 1–6 *
 - Repository's independently scheduled research validation and firewall checks must pass on final PR head before research merge. A historical experiment is **not** a production authorization.
 
 **Stopping point:** historical Phase 3 A/B/C execution and initial decision are COMPLETE. No fourth model, after-the-fact threshold, candidate combination or production promotion occurs here.
+
+## Historical tie-label qualification — critical interpretation
+
+See [TIE_LABEL_CONTRACT_AUDIT.md](TIE_LABEL_CONTRACT_AUDIT.md). The frozen 1,087/741 historical comparison uses the **legacy binary home-win encoding** and contains **three ties counted as away wins** (`2022_01_IND_HOU`, `2022_13_WAS_NYG`, `2025_04_GB_DAL`). A static, **non-refitted** deletion of those three rows gives F-ST **738/1084**, A **727/1084**, B **734/1084**, C **746/1084**. The exact paired differences do not change, but this is *not* a compliant retest under the separate strict tie-exclusion governance contract: earlier training folds can also contain tied-game labels. Any chronology-clean exclusion needs new prior registration and complete baseline refitting. The three original 1,087-game results remain unchanged and **must not be represented as strict tie-excluded NFL winner accuracy**. No production promotion is justified.
