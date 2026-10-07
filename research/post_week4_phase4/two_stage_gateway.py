@@ -22,6 +22,8 @@ from research.post_week4_phase4.c_shadow import (
 
 STAGE_SCHEMA = "c_shadow_raw_stage_v1"
 GATEWAY_SCHEMA = "c_shadow_two_stage_gateway_v1"
+# SHA-256 over canonical JSON of the immutable checked-in frozen C artifact.
+FROZEN_MODEL_CANONICAL_SHA256 = "6af9358922321c3a03f9285df384e96cbe2d59f6d9780d2cd1ddf7d39c1ccdd5"
 _SHA40 = re.compile(r"[0-9a-f]{40}")
 
 
@@ -143,7 +145,8 @@ def capture_raw(raw: dict, root: Path, *, source_verifier: Callable | None = Non
                                   proof.get("complete_asof_capture") is not True or
                                   proof.get("storage_rights_verified") is not True or
                                   not isinstance(proof.get("verification_ref"), str) or
-                                  not proof["verification_ref"]):
+                                  not proof["verification_ref"] or
+                                  proof.get("football_input_sha256") != canonical_hash(raw)):
             raise ValueError("Independent source verifier did not qualify coverage/rights")
         payload = {"schema": STAGE_SCHEMA, "game_id": game, "captured_at_utc": _stamp(now),
                    "football_input_sha256": canonical_hash(raw), "football_input": raw,
@@ -176,6 +179,8 @@ def seal_against_lock(root: Path, game_id: str, official: dict, model: dict, *,
         if lock_verifier is None:
             raise ValueError("Independent original-lock publication verifier missing")
         validate_model(model)
+        if canonical_hash(model) != FROZEN_MODEL_CANONICAL_SHA256:
+            raise ValueError("Frozen Candidate C artifact hash changed")
         path = root / "staged" / f"{game_id}.json"
         if not path.is_file():
             raise ValueError("No immutable earlier football capture")
@@ -187,7 +192,8 @@ def seal_against_lock(root: Path, game_id: str, official: dict, model: dict, *,
         if _game_id(raw) != game_id or stage.get("football_input_sha256") != canonical_hash(raw):
             raise ValueError("Corrupt raw football hash/identity")
         proof = stage.get("source_proof")
-        if not isinstance(proof, dict) or proof.get("complete_asof_capture") is not True or proof.get("storage_rights_verified") is not True:
+        if not isinstance(proof, dict) or proof.get("complete_asof_capture") is not True or proof.get("storage_rights_verified") is not True or
+            proof.get("football_input_sha256") != canonical_hash(raw):
             raise ValueError("Original football source/rights unverified")
         now = _now(clock)
         ko = iso_utc(raw["kickoff_utc"], "kickoff")
