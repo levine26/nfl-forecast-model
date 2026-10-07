@@ -248,3 +248,16 @@ Authoritative scope/evidence/gating ledger: [LEVLINE_ALEXANDRIA_PIT_FEASIBILITY_
 - Alexandria is **prospective feasibility only**. The snapshot schema and low-rate ingestion strategy are design artifacts, not active collectors. Retention/license/quote timestamp/history coverage remain unresolved.
 - Preserve the existing Phase 3 2022–2025 paired evaluation contract and candidate order. **No modification to Candidate A's frozen identity, features, architecture, training or evaluation. No automatic Alexandria inclusion in Candidates B/C; independent prior preregistration + historical coverage required.**
 - One experimental candidate per chat, Candidate A first; separately scoped research-only GitHub PR for this Alexandria ledger; production F-ST/Sunday Signal untouched.
+
+## 13. Phase 3 A/B/C results — 2026-10-07
+
+**Historical model work complete, no production change.** Preregistration was frozen before evaluation in [PR #627](https://github.com/levine26/nfl-forecast-model/pull/627). The separate research-only implementation/evidence is [PR #628](https://github.com/levine26/nfl-forecast-model/pull/628). Full report: [post_week4_phase3/EVALUATION_REPORT.md](post_week4_phase3/EVALUATION_REPORT.md), with exact 1,087-game OOF CSVs, manifest SHA256s, and result JSON under `research/post_week4_phase3/evidence/`.
+
+- Incumbent chronology-clean F-ST: **741/1087** (68.17%).
+- **A `MKT-COMP-RESIDUAL-V1`: REJECT**, **730/1087** (−11 vs F-ST); lost in all four seasons.
+- **B `MARGIN-RESIDUAL-WIN-V1`: REJECT**, **737/1087** (−4); slightly better probability scores but fewer correctly picked winners.
+- **C `EARLY-STATE-SHRINKAGE-V1`: INCONCLUSIVE**, **749/1087** (+8; 68.91%); gains +6/+3 in 2022/2024, −1 in 2023, 0 in 2025; season-week 95% interval includes zero, proper scoring worse, and only +2 of the gain comes in Weeks 1–6. **No promotion.**
+
+All candidate fits and shrinkage policy were frozen before looking at the 2022–2025 candidate results; completed 2026 outcomes never trained/tuned them. The historical football feature rebuild matched all 1,615 frozen 2020–2025 training-game IDs/targets. Candidate C excludes unqualified retrospective starter states, and its historical evidence remains insufficient for production. An earlier early-season F-ST slice count in Phase 1–2 differs from this exact-key reconstruction; do not make a new early-week gating claim until reconciled.
+
+**Next:** preserve frozen F-ST/Sunday Signal. A/B cannot be retuned under the same identifiers to chase this outcome. If desired, formulate a wholly separate **prospective** research-only C shadow protocol with immutable pre-kickoff snapshots, independent source/timestamp auditing and decision thresholds frozen before results; no automatic gate or combined model. Alexandria remains its own PIT feasibility lane, outside A/B/C. Any production promotion still requires the user's explicit final authorization.
