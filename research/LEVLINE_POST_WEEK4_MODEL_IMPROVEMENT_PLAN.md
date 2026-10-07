@@ -2,7 +2,7 @@
 
 **Program:** LevLine post-Week-4 straight-up winner architecture research  
 **Repository:** `levine26/nfl-forecast-model`  
-**Scope of this chat:** Phase 1 (forensic diagnosis) and Phase 2 (external research + hypothesis synthesis) only  
+**Current program scope:** Phases 1–3 historical research complete; Phase 4 two-stage prospective engineering in progress; preregistered live statistical validation awaits future eligible games.  
 **Production changes authorized:** NO  
 **Production benchmark:** `F-ST-01-FROZEN-2026`  
 **2026 outcome policy:** completed 2026 outcomes may generate/diagnose hypotheses but may not fit, tune, select thresholds, select hyperparameters, or rescue a candidate.
@@ -275,3 +275,39 @@ A/B/C legacy historical results are retained unmodified at **741/1087 F-ST**, A 
 - [Research-only Candidate C shadow preflight](post_week4_phase4/SHADOW_READINESS.md) (PR #631): isolated offline strict-PIT snapshot scorer, outcome-only paired evaluator, immutable research evidence and fixed 2020–2025 trained Candidate C coefficients saved in `post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json`. One-time fit passed, **no 2026 outcomes** fitted. Synthetic gateway/unit tests passed, but there is **no independent official-lock-aligned live source adapter or verified prospective eligible capture yet**.
 
 **Completion boundary:** C model/scorer preflight is `INFRASTRUCTURE_READY / AWAITING_ELIGIBLE_LOCKS`, **not** Phase 4 prospective validation complete. No automation to scrape, refit or publish unverified 2026 records. Prospective statistical claims require strictly pre-lock captured, source-validated game snapshots, then >=200 non-tie games and >=14 weeks, paired week-block inference, probability checks, and final user approval. Until that independent data accumulates, F-ST and Sunday Signal remain unchanged. Alexandria remains separate and source/license-limited; A/B rejected, C still inconclusive.
+
+## 16. Phase 4 execution continuation — engineering and live-source readiness (2026-10-07)
+
+**Authoritative decision:** Frozen Phase 3 findings and the Phase 4 preregistration remain controlling. Candidate A (730/1087) and B (737/1087) remain rejected; Candidate C (749/1087 versus 741/1087 season-forward F-ST) remains historically inconclusive, with worsened probability scoring and known three-tie legacy-label caveat. The independent final-coefficient F-ST (740/1087) is a distinct reconstruction, not the prospective official comparator. The model trained on 1,615 2020–2025 observations is frozen at `post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json` under `EARLY-STATE-SHRINKAGE-V1-SHADOW-2026-10-07`; no 2026 refit or new feature insertion is permitted. Incumbent F-ST stays in production.
+
+### Dependency graph and scoped research integration
+
+A official lock/football provenance and D Alexandria feasibility are independent of each other. A establishes the upstream contract for B two-stage capture. B feeds C adversarial gateway QA. E accepts individually reviewed research-only PRs only after full relevant CI and immutable main verification. D is strictly an independent feasibility lane, **not** an input to B/C or the frozen Candidate C architecture.
+
+- **A — PR #632:** [`LOCK_AND_SOURCE_AUDIT_2026_10_07.md`](post_week4_phase4/LOCK_AND_SOURCE_AUDIT_2026_10_07.md). The official F-ST lock writer is `src/nfl_forecast/publish.py::_lock_new_games` during T-120; history stores the original locked probability, associated market and local lock UTC. `pregame.yml` publishes output only after modeling/verification, and `lock_timestamp_utc` does **not** prove when that first row became public. Published history is also later graded. The live PBP/EPA pipeline can fall back to previous seasons, so a complete prior-game EPA source **cannot be presumed**. A read-only independently verifiable first-publication receipt and source-native PIT clocks remain unresolved.
+- **B — PR #634:** [`two_stage_gateway.py`](post_week4_phase4/two_stage_gateway.py) adds an *offline* raw football capture and later original F-ST lock association, with capture-time clock supplied by the actual process, SHA-256 digests, deterministic game IDs, exclusive-write/sealed outputs, source/lock verifier boundaries, explicit failure ledger, and frozen-model checksum guard. The real source verifier, verifiable lock first-publication adapter, trusted WORM repository and lawful raw-data storage **do not exist yet**. Never run the mock verifier from synthetic QA as a real capture adapter. This is **engineering only, not live capture**.
+- **C — PR #634:** [`test_two_stage_gateway.py`](post_week4_phase4/test_two_stage_gateway.py) contains synthetic pass/fail scenarios for wrong game/team/week, post-kickoff or future inputs, prior-game history gaps, wrong F-ST lock, absent official publication proof, missing artifact, duplicate/conflicting capture, retroactive scoring, tie and pending outcomes. Targeted CI is `.github/workflows/research_phase4_two_stage_gateway.yml`. Synthetic fixtures **never** contribute to the prospective denominator; the independent `c_shadow_eval.py` retains the preregistered paired inference and cutoff.
+- **D — PR #633:** [`ALEXANDRIA_FEASIBILITY_ADDENDUM_2026_10_07.md`](post_week4_phase4/ALEXANDRIA_FEASIBILITY_ADDENDUM_2026_10_07.md). StartWho book-specific quote timestamps and NFL.com report revision histories are unverified; source terms/retention, rate limits and repeatable cost remain gating issues. Previously examined capabilities were 5 credits per call, but prices and remaining balance are dynamic. No Alexandria ingestion for A, B or frozen C, no recurring spend and no historical PIT claims.
+- **E — governance:** Preserve PR-level diff audits; wait for research firewall, targeted synthetic QA and research-validation gate to all succeed before merging #632–634. Verify exact merge SHA, resulting `main`, unchanged model artifact and no diff to `outputs/`, `site/`, `src/nfl_forecast/`, live workflow, official history or ATS scoring. A roadmap update is not a license to bypass outstanding CI or to deploy a collector.
+
+### Qualification and genuine prospective enrollment
+
+1. A restricted, lawful, externally timestamped raw source can supply all earlier games and exact Candidate C EPA state before the lock. Verify provider latency, UTC clocks, coverage, source integrity, and schedule/team identity without hindsight. A preliminary score is **not** eligible.
+2. Recover the **original** `LOCKED` production F-ST row from independently verifiable first appearance/commit evidence. Require it to have been published before kickoff. Compare original `final_home_prob` and exact original `market_home_prob` attached to that lock, never latest odds and never a reconstructed F-ST. Reject `RECOVERED_MISSED_LOCK` and stale/unverifiable market receipts.
+3. Compute Candidate C exactly once using the already-frozen model, after the verified lock exists and **before kickoff**; seal raw-input/lock/model/record hashes in genuinely append-only durable storage. No retroactive score may be counted. Record absent, failed and excluded games with reasons and full scheduled-slate denominator.
+4. Only a separately audited set of *real* independent receipts may enter evaluation. The generic offline grader is not a substitute for upstream provenance qualification. Ties are excluded from winner metrics with counts; missing/delayed results stay pending; all eligible non-ties must remain in the denominator.
+5. Formal paired superiority review **cannot begin** before at least **200 new non-tie games from at least 14 NFL weeks**. Primary paired winner accuracy; week-block 95% confidence intervals and sensitivity; switches; Brier, log loss and calibration; no 0.5 threshold adjustment, no 2026 training, no automatic production promotion. Review and any promotion require the user's explicit final approval.
+
+### Status ledger and stopping rules
+
+| Track | Engineering evidence | Live/prospective status |
+|---|---|---|
+| A — original lock/source audit | Source-code audit and timing gaps recorded in PR #632 | BLOCKED: independent first-published lock and complete PIT EPA not verified |
+| B — capture | Offline two-stage gateway submitted in PR #634 | NOT DEPLOYED; no verified live source adapter |
+| C — adversarial QA | Targeted synthetic gateway tests and research CI in PR #634 | SYNTHETIC ONLY; no live receipt qualification |
+| D — Alexandria | Independent fields, clocks, credits and rights addendum in PR #633 | FEASIBILITY ONLY; no candidate features |
+| E — integration | Separate research PRs #632–634 and this authoritative ledger | Merge only after full CI/production firewall validation |
+| Prospective inference | Frozen `c_shadow_eval.py` and preregistration, unchanged | 0 *independently qualified* prospective game records established during this work; formal review unavailable |
+
+**Next scientifically justified milestone:** first independently verified, legally retainable and completeness-audited pre-lock 2026 football snapshot **plus** original published F-ST lock receipt, followed by an immutable genuine pre-kickoff Candidate C scoring event. If timing, completeness, source rights or lock publication cannot be evidenced, preserve failure receipt and remain blocked rather than creating a retrospective proxy. Do not treat engineering CI or synthetic forecasts as empirical accuracy evidence.
+
