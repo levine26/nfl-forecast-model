@@ -143,8 +143,10 @@ def capture_raw(raw: dict, root: Path, *, source_verifier: Callable | None = Non
         # Validate the complete frozen historical state at the *actual* pre-lock
         # capture cutoff; do not defer prior-game completeness until lock publication.
         derive_features(raw, cutoff=now)
-        proof = source_verifier(raw) if source_verifier is not None else None
-        if proof is not None and (not isinstance(proof, dict) or
+        if source_verifier is None:
+            raise ValueError("Independent source/rights verification required before raw retention")
+        proof = source_verifier(raw)
+        if (not isinstance(proof, dict) or
                                   proof.get("complete_asof_capture") is not True or
                                   proof.get("storage_rights_verified") is not True or
                                   not isinstance(proof.get("verification_ref"), str) or
