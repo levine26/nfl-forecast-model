@@ -28,12 +28,12 @@ class ReadSyncError(RuntimeError):
     """Do not publish forecasts and stale or incomplete editorial Reads together."""
 
 
-def _csv_rows(path: Path) -> list[dict[str, str]]:
+def _csv_rows(path: Path, *, allow_empty: bool = False) -> list[dict[str, str]]:
     if not path.is_file():
         raise ReadSyncError(f"missing canonical forecast source: {path}")
     with path.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
-    if not rows:
+    if not rows and not allow_empty:
         raise ReadSyncError(f"empty canonical forecast source: {path}")
     return rows
 
@@ -126,7 +126,7 @@ def synchronize_reads(
 
 def synchronize_file(output_dir: Path, *, check: bool = False) -> int:
     predictions = _csv_rows(output_dir / "this_week.csv")
-    official = _csv_rows(output_dir / "prediction_history.csv")
+    official = _csv_rows(output_dir / "prediction_history.csv", allow_empty=True)
     previews_path = output_dir / "game_previews.json"
     if not previews_path.is_file():
         raise ReadSyncError(f"missing editorial preview source: {previews_path}")
