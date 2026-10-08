@@ -94,7 +94,7 @@ def test_witness_contract_explicitly_excludes_git_clock_and_self_attestation():
 
 
 def test_older_git_history_without_newer_fst_columns_is_traversable():
-    prior = "game_id,lock_status\\n"
+    prior = "game_id,lock_status" + chr(10)
     report = audit_first_lock("2026_05_BUF_KC", versions=history([
        prior, csv_blob([row()])]))
     assert report["commit_sha"] == format(2, "040x")
