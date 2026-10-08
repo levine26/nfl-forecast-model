@@ -1,6 +1,13 @@
 name: Hourly NFL market refresh
 on:
   workflow_dispatch:
+  # Exercise the repaired market-publication path immediately when it lands on main.
+  # Output-only commits do not match these paths, so refreshes cannot self-trigger.
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/sync_market_reads.py'
+      - '.github/workflows/market_refresh.yml'
   schedule:
     - cron: "35 * * * *"
 permissions:
@@ -17,7 +24,7 @@ jobs:
         with:
           python-version: "3.11.16"
           cache: pip
-      - run: pip install "pandas==3.0.5" "numpy==2.4.6"
+      - run: pip install "pandas==3.0.5" "numpy==2.4.6" "requests>=2.32"
       - run: pip install -e . --no-deps
       - name: Refresh and publish market outputs
         run: |
@@ -48,6 +55,12 @@ jobs:
               echo "Market generation failed on all three attempts; refusing to publish."
               exit 1
             fi
+            # Publish refreshed forecasts and dependent deterministic Reads as one commit.
+            # Do not re-run Groq/context research: preserve validated human editorial.
+            PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+              python scripts/sync_market_reads.py --output-dir outputs --write
+            PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+              python scripts/sync_market_reads.py --output-dir outputs --check
             git add outputs/
 
             if git diff --cached --quiet; then
