@@ -132,3 +132,21 @@ def test_adapters_reject_chronology_or_incomplete_games(tmp_path, mutation):
                     clock=at("2026-10-11T18:50:00Z"))
     assert not list((tmp_path / "staged").glob("*.json"))
     assert list((tmp_path / "failures").glob("*.json"))
+
+
+def test_exact_pbp_epa_aggregation_matches_existing_feature_builder():
+    """Require identical per-game team means, not just plausible synthetic values."""
+    import pandas as pd
+    from nfl_forecast.features import aggregate_team_games
+
+    games, plays, counts, _ = pbp_fixture()
+    expected = team_game_epa(plays, games, counts)
+    frame = pd.DataFrame(plays)
+    frame["pass_attempt"] = 1.0
+    frame["rush_attempt"] = 0.0
+    actual = aggregate_team_games(frame)
+    assert len(actual) == len(expected)
+    for row in actual.itertuples(index=False):
+        item = expected[(row.game_id, row.team)]
+        assert item["off_epa"] == pytest.approx(row.off_epa)
+        assert item["def_epa_allowed"] == pytest.approx(row.def_epa_allowed)
