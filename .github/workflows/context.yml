@@ -181,7 +181,19 @@ jobs:
         run: |
           git config user.name "sunday-signal-context-bot"
           git config user.email "actions@users.noreply.github.com"
+          python -m scripts.sync_market_reads --output-dir outputs --write
+          python -m scripts.sync_market_reads --output-dir outputs --check
           git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json outputs/qb_history_audit.json outputs/career_qb_audit.json
-          git diff --cached --quiet || git commit -m "Refresh Sunday Signal contextual intelligence"
-          git pull --rebase origin main
-          git push
+          if git diff --cached --quiet; then
+            echo "No contextual output changes to publish."
+            exit 0
+          fi
+          git commit -m "Refresh Sunday Signal contextual intelligence"
+          validated_base=$(git rev-parse HEAD^)
+          # Never rebase previously validated editorial outputs onto a newer forecast.
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then
+            echo "Main advanced while contextual Reads were built; aborting stale publication."
+            exit 1
+          fi
+          git push origin HEAD:main
