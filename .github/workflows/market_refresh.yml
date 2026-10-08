@@ -58,7 +58,6 @@ jobs:
             # write_outputs already regenerates and validates deterministic Reads.
             # A second check protects the commit boundary without rerunning Groq.
             PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
-            PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/sync_market_reads.py --output-dir outputs --check
             git add outputs/
 
