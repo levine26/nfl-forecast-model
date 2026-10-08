@@ -41,23 +41,23 @@ jobs:
             echo "due=false" >> "$GITHUB_OUTPUT"
           fi
       - uses: actions/setup-python@v5
-        if: steps.gate.outputs.due == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         with:
           python-version: "3.11"
           cache: pip
       - run: pip install ".[dev]"
-        if: steps.gate.outputs.due == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
       - run: pytest -q
-        if: steps.gate.outputs.due == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
       - uses: actions/cache@v4
-        if: steps.gate.outputs.due == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         with:
           path: .cache/nflreadpy
           key: nflreadpy-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             nflreadpy-${{ runner.os }}-
       - name: Generate and publish final outputs
-        if: steps.gate.outputs.due == 'true'
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.due == 'true'
         run: |
           set -euo pipefail
           git config user.name "levline-model-bot"
