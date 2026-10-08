@@ -257,3 +257,17 @@ def test_unvalidated_context_rebase_forbidden_and_editorial_publishers_check():
         assert "sync_market_reads --output-dir outputs --check" in content
         assert "sync_market_reads --output-dir outputs --write" in content
     assert "git pull --rebase origin main" not in (root / "context.yml").read_text()
+
+
+def test_editorial_only_workflows_use_committed_forecast_snapshot():
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1] / ".github" / "workflows"
+    for name in ("groq_media_writer.yml", "chatgpt_media_ingest.yml",
+                 "chatgpt_failed_game_ingest.yml"):
+        text = (root / name).read_text()
+        publish = text.split("Publish editorial-only", 1)[-1]
+        assert "git restore --source=HEAD -- outputs/this_week.csv" in publish
+        assert publish.index("git restore --source=HEAD -- outputs/this_week.csv") < publish.index(
+            "sync_market_reads --output-dir outputs --write"
+        )
+        assert "git add outputs/this_week.csv" not in publish

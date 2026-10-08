@@ -255,6 +255,10 @@ jobs:
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
           git config user.email "actions@users.noreply.github.com"
+          # Editorial-only jobs may stage an alternate locked-first forecast CSV
+          # for provider composition. Never publish a Read derived from that
+          # uncommitted numerical file: restore the exact canonical HEAD snapshot.
+          git restore --source=HEAD -- outputs/this_week.csv
           python -m scripts.sync_market_reads --output-dir outputs --write
           python -m scripts.sync_market_reads --output-dir outputs --check
           git add inputs/sunday_signal/editorial_slate_roster.json outputs/copilot_media_reads.json outputs/game_previews.json outputs/contextual_evidence.json outputs/context_source_status.json
