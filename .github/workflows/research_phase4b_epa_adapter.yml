@@ -4,6 +4,7 @@ on:
     paths:
       - 'research/post_week4_phase4/nflverse_epa_adapter.py'
       - 'research/post_week4_phase4/test_nflverse_epa_adapter.py'
+      - 'research/post_week4_phase4/source_http_probe.py'
       - 'research/post_week4_phase4/PHASE4B_NFLVERSE_SOURCE_AUDIT.md'
       - '.github/workflows/research_phase4b_epa_adapter.yml'
 permissions:
@@ -41,6 +42,10 @@ jobs:
           assert canonical_hash(obj)=='6af9358922321c3a03f9285df384e96cbe2d59f6d9780d2cd1ddf7d39c1ccdd5'
           print('Frozen Candidate C unchanged')
           PY
+      - name: One-shot public 2026 parquet acquisition and schedule coverage probe
+        run: |
+          python -m pip install 'pyarrow>=17,<25'
+          python -m research.post_week4_phase4.source_http_probe
       - name: Research-only production firewall
         run: |
           git fetch origin main --quiet
