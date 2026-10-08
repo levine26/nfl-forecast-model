@@ -1,6 +1,13 @@
 name: Hourly NFL market refresh
 on:
   workflow_dispatch:
+  # Exercise the repaired market-publication path immediately when it lands on main.
+  # Output-only commits do not match these paths, so refreshes cannot self-trigger.
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/sync_market_reads.py'
+      - '.github/workflows/market_refresh.yml'
   schedule:
     - cron: "35 * * * *"
 permissions:
