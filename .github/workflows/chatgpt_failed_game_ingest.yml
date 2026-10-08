@@ -164,7 +164,7 @@ jobs:
               raise SystemExit('Groq failure list is nonempty but no eligible recovery targets exist.')
           active = bool(targets)
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
-              stream.write(f"active={'true' if active else 'false'}\\n")
+              stream.write(f"active={'true' if active else 'false'}\n")
           if active:
               print(f'Authorized ChatGPT recovery targets: {sorted(targets)}; validating manifest and full editorial slate.')
           else:
