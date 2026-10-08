@@ -22,10 +22,10 @@ def _factor(preview: dict, pick: str, opponent: str) -> str:
     """Existing football-context fallback, shared by editorial and publication."""
     for item in preview.get("key_factors") or []:
         if isinstance(item, dict):
-            title = re.sub(r"\\s+", " ", str(item.get("title") or "")).strip()
+            title = re.sub(r"\s+", " ", str(item.get("title") or "")).strip()
             if title:
                 return f"Football context: {title}"
-    case = re.sub(r"\\s+", " ", str(preview.get("case_for_pick") or "")).strip()
+    case = re.sub(r"\s+", " ", str(preview.get("case_for_pick") or "")).strip()
     return f"Football context: {case or f'{pick} execution against {opponent}'}"
 
 
