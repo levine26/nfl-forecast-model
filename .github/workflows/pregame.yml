@@ -68,6 +68,10 @@ jobs:
             # Shared write_outputs already synchronized all Reads. Check again
             # at the commit boundary to reject any mixed-generation bundle.
             python -m scripts.sync_market_reads --output-dir outputs --check
+            # Write_outputs has already enforced the canonical Read gate; independently
+            # verify that the staged forecast and Read are from one snapshot.
+            PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
+              python scripts/sync_market_reads.py --output-dir outputs --check
             git add outputs/
 
             if git diff --cached --quiet; then
