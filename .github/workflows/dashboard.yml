@@ -105,8 +105,8 @@ jobs:
         run: |
           # Fail closed on missing/malformed previews or immutable lock divergence.
           # Only paragraph 2 is rerendered; no human editorial fields are touched.
-          python scripts/sync_market_reads.py --output-dir site/public/data --write
-          python scripts/sync_market_reads.py --output-dir site/public/data --check
+          python -m scripts.sync_market_reads --output-dir site/public/data --write
+          python -m scripts.sync_market_reads --output-dir site/public/data --check
       - name: Normalize immutable history for Sunday Signal
         run: python scripts/build_site_history_compat.py site/public/data/prediction_history.csv
       - name: Build and validate canonical public forecasts
