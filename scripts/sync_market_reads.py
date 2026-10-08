@@ -16,6 +16,12 @@ import os
 from pathlib import Path
 import re
 import tempfile
+import sys
+
+# Running as `python scripts/sync_market_reads.py` does not add the repository
+# root to sys.path; import the established scripts.render_levline_paragraphs
+# helper without depending on the caller's PYTHONPATH.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from nfl_forecast.editorial_model_read import render_model_paragraph
 from nfl_forecast.public_forecast import build_public_forecasts
@@ -97,6 +103,8 @@ def synchronize_reads(
             game["official_home_win_probability"], row.get("final_home_prob")
         ):
             raise ReadSyncError(f"{gid}: this_week differs from the authoritative locked/public forecast")
+        if not str(row.get("model_version") or "").strip():
+            raise ReadSyncError(f"{gid}: frozen model version/artifact is missing")
         if game["provenance"]["model_version"] != row.get("model_version") or (
             game["provenance"]["artifact_id"] != (row.get("fst_artifact_id") or None)
         ):
