@@ -271,3 +271,19 @@ def test_editorial_only_workflows_use_committed_forecast_snapshot():
             "sync_market_reads --output-dir outputs --write"
         )
         assert "git add outputs/this_week.csv" not in publish
+
+
+def test_contextual_publication_retries_against_newer_canonical_forecast():
+    from pathlib import Path
+    workflow = (Path(__file__).resolve().parents[1] / ".github" / "workflows" / "context.yml").read_text()
+    publish = workflow.split("      - name: Commit contextual outputs", 1)[1]
+    assert "for attempt in 1 2 3" in publish
+    assert "git reset --hard origin/main" in publish
+    assert "python scripts/run_context.py --season 2026" in publish
+    assert "python scripts/finalize_editorial.py" in publish
+    assert "sync_market_reads --output-dir outputs --write" in publish
+    assert "sync_market_reads --output-dir outputs --check" in publish
+    assert "git push origin HEAD:main" in publish
+    assert "git pull --rebase origin main" not in publish
+    assert publish.index("git reset --hard origin/main") < publish.index("sync_market_reads --output-dir outputs --write")
+    assert publish.index("sync_market_reads --output-dir outputs --check") < publish.index("git add outputs/contextual_evidence.json")

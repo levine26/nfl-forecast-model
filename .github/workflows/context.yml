@@ -179,21 +179,46 @@ jobs:
       - name: Commit contextual outputs
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         run: |
+          set -euo pipefail
           git config user.name "sunday-signal-context-bot"
           git config user.email "actions@users.noreply.github.com"
-          python -m scripts.sync_market_reads --output-dir outputs --write
-          python -m scripts.sync_market_reads --output-dir outputs --check
-          git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json outputs/qb_history_audit.json outputs/career_qb_audit.json
-          if git diff --cached --quiet; then
-            echo "No contextual output changes to publish."
-            exit 0
-          fi
-          git commit -m "Refresh Sunday Signal contextual intelligence"
-          validated_base=$(git rev-parse HEAD^)
-          # Never rebase previously validated editorial outputs onto a newer forecast.
-          git fetch origin main
-          if [ "$(git rev-parse origin/main)" != "$validated_base" ]; then
-            echo "Main advanced while contextual Reads were built; aborting stale publication."
-            exit 1
-          fi
-          git push origin HEAD:main
+
+          # The initial contextual packet was built above. A new market/daily
+          # snapshot can land during long-running research, so retry from the
+          # latest canonical HEAD rather than rebasing an old Read onto new data.
+          for attempt in 1 2 3; do
+            if [ "$attempt" -gt 1 ]; then
+              echo "Main advanced during contextual research; regenerating and validating from latest main ($attempt/3)"
+              git reset --hard origin/main
+              git clean -fd outputs/
+              python scripts/run_context.py --season 2026
+              python scripts/polish_publication.py --season 2026 --probe-advanced
+              python scripts/add_advanced_player_context.py --season 2026
+              python scripts/add_career_qb_context.py --season 2026
+              python scripts/finalize_editorial.py
+            fi
+
+            # Read synchronization and all contextual fields must be checked
+            # against the exact forecast snapshot that is about to commit.
+            python -m scripts.sync_market_reads --output-dir outputs --write
+            python -m scripts.sync_market_reads --output-dir outputs --check
+            git add outputs/contextual_evidence.json outputs/game_previews.json outputs/context_source_status.json outputs/coaching_cache.json outputs/qb_history_audit.json outputs/career_qb_audit.json
+            if git diff --cached --quiet; then
+              echo "No contextual output changes to publish."
+              exit 0
+            fi
+
+            git commit -m "Refresh Sunday Signal contextual intelligence"
+            validated_base=$(git rev-parse HEAD^)
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+
+            git fetch origin main
+            if [ "$(git rev-parse origin/main)" = "$validated_base" ]; then
+              echo "Push failed without a main advance; refusing to mask a genuine publication error."
+              exit 1
+            fi
+          done
+          echo "Main advanced during all three contextual publication attempts; refusing stale publication."
+          exit 1
