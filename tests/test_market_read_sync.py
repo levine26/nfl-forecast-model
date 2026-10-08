@@ -15,7 +15,7 @@ NOW = datetime(2026, 10, 7, 12, tzinfo=timezone.utc)
 
 def row(gid: str = "2026_05_CHI_GB", **overrides) -> dict:
     source = dict(
-        game_id=gid, season="2026", week="5", gameday="2026-10-11",
+        game_id=gid, season="2026", week="5", snapshot_type="EARLY", gameday="2026-10-11",
         gametime="13:00", away_team="CHI", home_team="GB", pick="CHI",
         final_home_prob="0.40", fst_pure_home_prob="0.36",
         pure_home_prob="0.34", market_home_prob="0.43",
