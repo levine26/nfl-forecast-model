@@ -234,3 +234,21 @@ def test_mixed_payload_fails_closed_when_successful_game_has_no_provider_authori
         assert "missing both published HUMAN prose and a validated Groq checkpoint" in str(exc)
     else:
         raise AssertionError("successful Groq games must fail closed rather than downgrade to preview prose")
+
+
+def test_idle_historical_fallback_is_not_republished_without_active_groq_failures():
+    """Do not re-ingest a prior week's manifest when current Groq is healthy."""
+    from pathlib import Path
+
+    workflow = (Path(__file__).resolve().parents[1] / ".github" / "workflows"
+                / "chatgpt_failed_game_ingest.yml").read_text()
+    assert "from scripts.ingest_chatgpt_failed_games import _failure_targets" in workflow
+    assert "if not targets.issubset(canonical):" in workflow
+    assert "Missing authoritative Groq failure-state map" in workflow
+    assert "No Groq failures requiring ChatGPT recovery" in workflow
+    required_gate = "if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'"
+    assert workflow.count(required_gate) == 9
+    assert "python scripts/ingest_chatgpt_failed_games.py" in workflow
+    assert 'fallback manifest contains a game outside the canonical slate' in (
+        Path(__file__).resolve().parents[1] / "scripts" / "ingest_chatgpt_failed_games.py"
+    ).read_text()
