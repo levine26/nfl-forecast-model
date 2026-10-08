@@ -1,16 +1,30 @@
 name: Pregame NFL refresh
 on:
   workflow_dispatch:
+  # A change to the lock gate can initiate a real-time repair run without
+  # requiring the external scheduler to fire again.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pregame.yml'
+      - 'scripts/pregame_due.py'
+  # Independent successful or failed production refreshes are an additional
+  # scheduling heartbeat. This workflow reads only trusted current main.
+  workflow_run:
+    workflows:
+      - 'Hourly NFL market refresh'
+      - 'Daily NFL model refresh'
+    types: [completed]
   schedule:
-    # Cheap hourly gate. The gate reads the published slate and only runs the
-    # expensive model when a kickoff is approaching. This is DST-safe and also
-    # catches international, Saturday, holiday, and irregular kickoff times.
-    - cron: "25 * * * *"
+    # More than one opportunity per hour: scheduled GitHub events are best-effort
+    # and can be delayed/dropped. The cheap gate avoids full work after a lock.
+    # This is DST-safe and covers international/irregular kickoff times.
+    - cron: "7,22,37,52 * * * *"
 permissions:
   contents: write
 concurrency:
   group: nfl-forecast-${{ github.workflow }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   forecast:
     runs-on: ubuntu-latest
@@ -19,7 +33,7 @@ jobs:
       - name: Check whether a final refresh is due
         id: gate
         run: |
-          RESULT=$(python scripts/pregame_due.py --min-minutes 45 --max-minutes 165)
+          RESULT=$(python scripts/pregame_due.py --min-minutes 0 --max-minutes 165)
           echo "$RESULT"
           if echo "$RESULT" | grep -q '^due=true'; then
             echo "due=true" >> "$GITHUB_OUTPUT"
