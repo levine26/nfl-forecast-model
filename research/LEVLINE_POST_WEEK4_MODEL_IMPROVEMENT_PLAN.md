@@ -300,3 +300,30 @@ A/B/C legacy historical results are retained unmodified at **741/1087 F-ST**, A 
 - **Live-source readiness:** `BLOCKED_FOR_LIVE_QUALIFICATION`. A true pre-lock complete EPA source with verifiable publication/source clock and retention permission, an independently verifiable first-published F-ST lock row, and trusted UTC/tamper-evident storage are not yet evidenced.
 - **Prospective sample:** `0 verified qualifying games` at this audit; `0 genuinely prospective Candidate C forecasts` have been proven sealed by these workstreams.
 - **Immediate next scientifically justified milestone:** build/test a **read-only** real data adapter against the above proof requirements *without backfilling outcomes*, audit its rights/source clocks and original lock commit provenance; only then start future pre-kickoff enrollment. If verification fails, retain failure ledger and no live activation. Prospective inferential review remains a separate future 200-game/14-week milestone.
+
+
+## 17. Phase 4B NFLverse source qualification, original lock provenance and cross-adapter gate — 2026-10-08
+
+**Research implementation complete to the independently verifiable boundary; LIVE CAPTURE REMAINS DISABLED.** There is exactly one authoritative roadmap (this file). Details, test contracts and unresolved proof obligations live in:
+- [Phase 4B NFLverse adapter audit](post_week4_phase4/PHASE4B_NFLVERSE_SOURCE_AUDIT.md), [PR #642](https://github.com/levine26/nfl-forecast-model/pull/642), research merge `ed32e5d0a12ec4426547f09940dd0c4b35655970`.
+- [Phase 4B original F-ST lock first-Git-appearance audit](post_week4_phase4/PHASE4B_ORIGINAL_LOCK_AUDIT.md), [PR #643](https://github.com/levine26/nfl-forecast-model/pull/643).
+- [Cross-adapter integration and activation decision](post_week4_phase4/PHASE4B_INTEGRATION_AND_ACTIVATION_DECISION.md) plus [two-stage gateway preregistration](post_week4_phase4/TWO_STAGE_GATEWAY.md).
+
+### Completed independent source probe
+
+On **2026-10-08 at 16:57 UTC** a read-only one-shot GitHub Actions probe fetched the actual `play_by_play_2026.parquet` release bytes; measured length 4,849,370 bytes and SHA-256 `9229849dc5bb221890beb64682707a9af9c0c872a60767c2614a48f12a4b83fe`, matching current GitHub release metadata. A separately downloaded 2026 NFLverse games schedule had 64 scored regular-season game IDs, all 64 observed in the PBP file with some non-null EPA. GitHub asset's update timestamp was 2026-10-08T16:29:15Z, versus an *earlier superseded* October 7 release digest. These are **one-time observed facts**, not a guarantee of exact provider-first availability, historical pre-lock state, full play-level completeness or legal permission to retain third-party data.
+
+The research-only adapter uses exactly the frozen C prior-eight/previous-season league/current-completed-team-game EPA state construction. It rejects missing/corrupted independent play manifestations, non-REG/wrong team/week, duplicate games/plays, late response and unverified season coverage. It deliberately supplies **no independently authorized live source_verifier**. The production `nflreadpy` missing-2026 fallback and six-hour cache are NOT acceptable as certified Candidate C pre-lock evidence.
+
+### Original-lock provenance and minimum integration
+
+A read-only Git first-row auditor can preserve the original `LOCKED` row, original probabilities, associated CSV/history blob hash and parent-commit transition while separating commit metadata from publicly witnessed availability. The specific 2026 Week-1 example `2026_01_NE_SEA` was present in historical commit `fc88ef398a310b75eea2bf189ab21d2296237d4e` but absent in its parent. Neither that transition nor its author/committer clock proves external pre-kickoff first publication. Historical prediction-history rows lack `market_snapshot_timestamp_utc` and `market_freshness_status`, so do not synthesize those fields from current market odds or the writer's internal `lock_timestamp_utc`.
+
+A separate synthetic integration test now connects the offline EPA adapter, first-lock auditor and existing two-stage gateway, including a frozen scorer, idempotent seal, source revision conflicts and explicit refusal of unwitnessed original-lock receipts. Its fixtures are **not** prospective forecasts or statistical observations. Existing `O_EXCL` local files remain non-WORM and non-independent timestamps; no authorized private append-only timestamp service or source storage/rights proof has been established.
+
+### Scientific gates preserved
+
+1. **Before activation:** source/provider revision and license/retention clearance; complete independent play and schedule denominator; genuine football-only pre-lock acquisition with trusted UTC uncertainty; external original F-ST LOCKED first-publication evidence and untouched original market probability/freshness; durable independently timestamped private write-once seal; strict no missed/late/backfilled games. Any failed element retains a rejection/failure receipt and is **ineligible**.
+2. **Current Phase 4B qualifying numerator: 0 genuinely verified prospective C seals, 0 qualified non-tie games, 0 distinct eligible weeks**. No unattended research collection job is enabled. The historical Candidate C 749/1,087 vs 741/1,087 F-ST remains **INCONCLUSIVE** and neither gains scientific status nor gets refitted. Three 2022–2025 ties retain the recorded legacy label caveat.
+3. **First statistical review: >=200 newly eligible non-ties AND >=14 distinct NFL weeks**, paired accuracy primary, switch accounting, week-block 95% CI, sensitivity, Brier, log loss, calibration, missingness and ties. No 2026 outcome for fitting/tuning, no favorable-game selection, no production promotion without user final approval.
+4. **Next engineering milestone:** independently timestamp a *future* complete source capture, independently witness a *future* original F-ST publication with native market provenance, and prove private write-once retention and kickoff correctness before adding any unattended research-only operator. No changes are authorized to production `publish.py`, F-ST, Sunday Signal or official forecast/ATS history.

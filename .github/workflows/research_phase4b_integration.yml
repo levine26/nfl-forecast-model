@@ -1,0 +1,49 @@
+name: LevLine Phase 4B synthetic cross-adapter integration QA
+on:
+  pull_request:
+    paths:
+      - 'research/post_week4_phase4/test_phase4b_cross_adapter_integration.py'
+      - 'research/post_week4_phase4/nflverse_epa_adapter.py'
+      - 'research/post_week4_phase4/original_lock_audit.py'
+      - '.github/workflows/research_phase4b_integration.yml'
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: '.:src'
+      PYTHONHASHSEED: '26'
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and install isolated dependencies
+        run: |
+          python -m compileall -q research/post_week4_phase4
+          python -m pip install 'pytest>=8' 'numpy==2.4.6' 'scipy==1.17.1' 'pandas==3.0.5'
+      - name: Frozen C, gateway, source and lock integration tests
+        run: |
+          python -m pytest -q             research/post_week4_phase4/test_c_shadow.py             research/post_week4_phase4/test_two_stage_gateway.py             research/post_week4_phase4/test_nflverse_epa_adapter.py             research/post_week4_phase4/test_original_lock_audit.py             research/post_week4_phase4/test_phase4b_cross_adapter_integration.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research.post_week4_phase4.c_shadow import canonical_hash, validate_model
+          model=json.loads(Path('research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json').read_text())
+          validate_model(model)
+          assert canonical_hash(model)=='6af9358922321c3a03f9285df384e96cbe2d59f6d9780d2cd1ddf7d39c1ccdd5'
+          assert model['outcomes_2026_used']==0
+          print('Frozen model immutable: PASS')
+          PY
+      - name: Production and model file diff guard
+        run: |
+          git fetch origin main --quiet
+          base=$(git merge-base HEAD origin/main)
+          git diff --exit-code "$base" HEAD --             outputs/ site/ src/nfl_forecast/ scripts/             research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json             .github/workflows/pregame.yml .github/workflows/market_refresh.yml .github/workflows/weekly.yml
