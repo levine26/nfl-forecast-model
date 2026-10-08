@@ -101,7 +101,7 @@ jobs:
             power_editorial.json history_scoreboard.json; do
             if [ -f "outputs/$f" ]; then cp "outputs/$f" "site/public/data/$f"; fi
           done
-      - name: Regenerate and gate deterministic Reads against canonical forecasts
+      - name: Fail closed unless published Reads match canonical forecasts
         run: |
           # Fail closed on missing/malformed previews or immutable lock divergence.
           # Published artifacts must already be synchronized; never hide a stale commit.
