@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: "3.11.16"
           cache: pip
-      - run: pip install "pandas==3.0.5" "numpy==2.4.6"
+      - run: pip install "pandas==3.0.5" "numpy==2.4.6" "requests>=2.32"
       - run: pip install -e . --no-deps
       - name: Refresh and publish market outputs
         run: |
