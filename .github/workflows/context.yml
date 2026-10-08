@@ -96,6 +96,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Scheduled/production context jobs may start after numerical refreshes
+      # have moved main. Select latest committed numerical and editorial state
+      # BEFORE research; never rebase a completed stale Read after validation.
+      - name: Base contextual generation on latest main
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
