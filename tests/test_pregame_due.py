@@ -23,8 +23,8 @@ def test_kickoff_uses_new_york_dst_not_fixed_utc_offset():
 def _write_feed(tmp_path):
     feed = tmp_path / "this_week.csv"
     feed.write_text(
-        "game_id,gameday,gametime,away_team,home_team\\n"
-        "2026_05_TB_DAL,2026-10-08,20:15,TB,DAL\\n",
+        "game_id,gameday,gametime,away_team,home_team\n"
+        "2026_05_TB_DAL,2026-10-08,20:15,TB,DAL\n",
         encoding="utf-8",
     )
     return feed
@@ -47,7 +47,7 @@ def test_gate_skips_existing_immutable_official_lock(tmp_path):
     feed = _write_feed(tmp_path)
     history = tmp_path / "prediction_history.csv"
     history.write_text(
-        "game_id,lock_status\\n2026_05_TB_DAL,LOCKED\\n",
+        "game_id,lock_status\n2026_05_TB_DAL,LOCKED\n",
         encoding="utf-8",
     )
     now = datetime(2026, 10, 8, 23, 50, tzinfo=timezone.utc)
@@ -68,7 +68,7 @@ def test_gate_raises_on_malformed_official_history(tmp_path):
 
     feed = _write_feed(tmp_path)
     history = tmp_path / "prediction_history.csv"
-    history.write_text("wrong,columns\\na,b\\n", encoding="utf-8")
+    history.write_text("wrong,columns\na,b\n", encoding="utf-8")
     now = datetime(2026, 10, 8, 23, 50, tzinfo=timezone.utc)
     with pytest.raises(ValueError, match="Malformed official prediction history"):
         pregame_due.due_games(feed, history, now)
