@@ -78,7 +78,7 @@ def test_changed_winner_rewrites_entire_deterministic_paragraph():
 
 
 def test_full_slate_and_duplicate_missing_extra_guards():
-    rows = [row("2026_05_CHI_GB"), row("2026_05_CIN_MIA", away_team="CIN", home_team="MIA", pick="MIA")]
+    rows = [row("2026_05_CHI_GB"), row("2026_05_CIN_MIA", away_team="CIN", home_team="MIA", pick="MIA", final_home_prob="0.60")]
     previews = {r["game_id"]: preview(r) for r in rows}
     good, changed = sync(rows, previews)
     assert changed == 0 and len(good) == 2
@@ -108,7 +108,7 @@ def test_locked_snapshot_cannot_be_replaced_with_later_market_value():
 def test_failure_isolation_and_no_partial_file_write(tmp_path):
     import csv
     first = row()
-    second = row("2026_05_CIN_MIA", away_team="CIN", home_team="MIA", pick="MIA")
+    second = row("2026_05_CIN_MIA", away_team="CIN", home_team="MIA", pick="MIA", final_home_prob="0.60")
     newer = row(final_home_prob="0.42")
     originals = {first["game_id"]: preview(first), second["game_id"]: preview(second)}
     originals[second["game_id"]]["paragraphs"] = ["only one"]
