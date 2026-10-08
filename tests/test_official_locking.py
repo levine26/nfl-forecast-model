@@ -56,7 +56,7 @@ def test_locked_prediction_can_be_graded_without_mutating_forecast(tmp_path):
     games = pd.DataFrame([{"game_id":"2026_01_A_B","home_team":"B","away_team":"A","home_score":None,"away_score":None}])
     write_outputs(SimpleNamespace(predictions=_prediction(0.70), games=games), tmp_path, now_utc=now, enforce_read_sync=False)
     finished = pd.DataFrame([{"game_id":"2026_01_A_B","home_team":"B","away_team":"A","home_score":27,"away_score":20}])
-    write_outputs(SimpleNamespace(predictions=_prediction(0.55), games=finished), tmp_path, now_utc=datetime(2026,9,10,2,0,tzinfo=timezone.utc))
+    write_outputs(SimpleNamespace(predictions=_prediction(0.55), games=finished), tmp_path, now_utc=datetime(2026,9,10,2,0,tzinfo=timezone.utc), enforce_read_sync=False)
     hist = pd.read_csv(tmp_path / "prediction_history.csv")
     assert hist.loc[0, "final_home_prob"] == 0.70
     assert bool(hist.loc[0, "winner_correct"]) is True
