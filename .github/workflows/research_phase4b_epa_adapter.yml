@@ -1,0 +1,55 @@
+name: LevLine Phase 4B EPA research QA
+on:
+  pull_request:
+    paths:
+      - 'research/post_week4_phase4/nflverse_epa_adapter.py'
+      - 'research/post_week4_phase4/test_nflverse_epa_adapter.py'
+      - 'research/post_week4_phase4/source_http_probe.py'
+      - 'research/post_week4_phase4/PHASE4B_NFLVERSE_SOURCE_AUDIT.md'
+      - '.github/workflows/research_phase4b_epa_adapter.yml'
+permissions:
+  contents: read
+jobs:
+  research-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: '.:src'
+      PYTHONHASHSEED: '26'
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile and install isolated prerequisites
+        run: |
+          python -m compileall -q research/post_week4_phase4
+          python -m pip install 'pytest>=8' 'numpy==2.4.6' 'scipy==1.17.1'
+      - name: Frozen C, gateway and Phase 4B adversarial QA
+        run: |
+          python -m pytest -q research/post_week4_phase4/test_c_shadow.py research/post_week4_phase4/test_two_stage_gateway.py research/post_week4_phase4/test_nflverse_epa_adapter.py
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          from research.post_week4_phase4.c_shadow import canonical_hash, validate_model
+          obj=json.loads(Path('research/post_week4_phase4/artifacts/C_SHADOW_FROZEN_2026.json').read_text())
+          validate_model(obj)
+          assert canonical_hash(obj)=='6af9358922321c3a03f9285df384e96cbe2d59f6d9780d2cd1ddf7d39c1ccdd5'
+          print('Frozen Candidate C unchanged')
+          PY
+      - name: One-shot public 2026 parquet acquisition and schedule coverage probe
+        run: |
+          python -m pip install 'pyarrow>=17,<25'
+          python -m research.post_week4_phase4.source_http_probe
+      - name: Research-only production firewall
+        run: |
+          git fetch origin main --quiet
+          base=$(git merge-base HEAD origin/main)
+          if git diff --name-only "$base" HEAD | grep -E '^(outputs/|site/|src/nfl_forecast/|scripts/|\.github/workflows/(pregame|market_refresh|weekly)\.yml)'; then
+            echo 'Unauthorized production diff'; exit 1
+          fi
