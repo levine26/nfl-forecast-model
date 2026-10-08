@@ -128,18 +128,61 @@ jobs:
         if: github.event_name == 'pull_request'
         run: echo "Fallback code and tests validated; no publication on PR."
 
-      - name: Require failed-game bundle
+      # The Week 4 fallback manifest is intentionally retained for provenance.
+      # Only execute that manifest when Groq has an active, authorized current-slate
+      # failure; do not treat a dormant historical bundle as a publication request.
+      - name: Check for active current-slate Groq recovery
         if: github.event_name != 'pull_request'
+        id: fallback_activity
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv
+          import json
+          import os
+          from pathlib import Path
+          from scripts.ingest_chatgpt_failed_games import _failure_targets
+
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          section = status.get('groq_provider_fallback')
+          if not isinstance(section, dict) or not isinstance(section.get('games'), dict):
+              raise SystemExit('Missing authoritative Groq failure-state map; cannot determine fallback eligibility.')
+          entries = section['games']
+          inconsistent = [
+              gid for gid, item in entries.items()
+              if isinstance(item, dict) and item.get('requires_chatgpt_refresh')
+              and item.get('provider_result') != 'failed'
+          ]
+          if inconsistent:
+              raise SystemExit(f'Contradictory Groq failure-state entries: {inconsistent}')
+          with Path('outputs/this_week.csv').open(encoding='utf-8', newline='') as stream:
+              canonical = {str(row['game_id']) for row in csv.DictReader(stream)}
+          targets = _failure_targets(status)
+          if not targets.issubset(canonical):
+              raise SystemExit(f'Groq recovery targets outside current canonical slate: {sorted(targets - canonical)}')
+          if not targets and section.get('failed_games'):
+              raise SystemExit('Groq failure list is nonempty but no eligible recovery targets exist.')
+          active = bool(targets)
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+              stream.write(f"active={'true' if active else 'false'}\n")
+          if active:
+              print(f'Authorized ChatGPT recovery targets: {sorted(targets)}; validating manifest and full editorial slate.')
+          else:
+              print('No Groq failures requiring ChatGPT recovery in this slate; historical fallback manifest is dormant. No editorial publication.')
+          PY
+
+      - name: Require failed-game bundle
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: test -f inputs/chatgpt_media/fallback/manifest.json
 
       - name: Refresh and freeze editorial weekend roster
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
           python scripts/refresh_editorial_slate_roster.py \
             --roster inputs/sunday_signal/editorial_slate_roster.json
 
       - name: Canonicalize current editorial forecast source
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
           python scripts/build_canonical_editorial_predictions.py \
             --editorial-roster inputs/sunday_signal/editorial_slate_roster.json \
@@ -147,7 +190,7 @@ jobs:
           cp /tmp/editorial_predictions.csv outputs/this_week.csv
 
       - name: Restore validated Groq game checkpoints
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         uses: actions/cache/restore@v4
         with:
           path: /tmp/groq-validated-checkpoint
@@ -156,7 +199,7 @@ jobs:
             groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-
 
       - name: Restore same-week launch-grade editorial snapshot when available
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
           set -euo pipefail
           if python scripts/restore_last_good_editorial_snapshot.py \
@@ -168,7 +211,7 @@ jobs:
           fi
 
       - name: Preserve validated media reporting snapshot
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
           python - <<'PY'
           import json
@@ -191,7 +234,7 @@ jobs:
           PY
 
       - name: Overlay ChatGPT only onto Groq-failed games and full-slate validate
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
           python scripts/ingest_chatgpt_failed_games.py \
             --input-dir inputs/chatgpt_media/fallback \
@@ -199,7 +242,7 @@ jobs:
             --output outputs/copilot_media_reads.json
 
       - name: Finalize and enforce publication gate
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
           python scripts/finalize_editorial.py
           python - <<'PY'
@@ -250,7 +293,7 @@ jobs:
           PY
 
       - name: Publish editorial-only recovery
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
           set -euo pipefail
           git config user.name "sunday-signal-media-bot"
