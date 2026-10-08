@@ -18,6 +18,8 @@ import re
 import tempfile
 from nfl_forecast.editorial_model_read import render_model_paragraph
 from nfl_forecast.public_forecast import build_public_forecasts
+
+
 def _factor(preview: dict, pick: str, opponent: str) -> str:
     """Existing football-context fallback, shared by editorial and publication."""
     for item in preview.get("key_factors") or []:
