@@ -116,7 +116,7 @@ def test_git_first_occurrence_alone_cannot_seal_shadow(tmp_path):
 
 
 @pytest.mark.parametrize("mutation", ["late_source", "after_kickoff",
-                                       "missing_prior_game", "changed_kickoff"])
+                                       "missing_prior_game", "wrong_game_identity"])
 def test_adapters_reject_chronology_or_incomplete_games(tmp_path, mutation):
     raw = stitched_raw()
     if mutation == "late_source":
@@ -126,7 +126,7 @@ def test_adapters_reject_chronology_or_incomplete_games(tmp_path, mutation):
     elif mutation == "missing_prior_game":
         raw["team_states"]["away"]["last_eight_previous_season"].pop()
     else:
-        raw["kickoff_utc"] = "2026-10-11T18:53:00Z"
+        raw["home_team"] = "DAL"
     with pytest.raises(ValueError):
         capture_raw(raw, tmp_path, source_verifier=source_verified,
                     clock=at("2026-10-11T18:50:00Z"))
