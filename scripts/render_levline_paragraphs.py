@@ -15,16 +15,7 @@ from pathlib import Path
 import pandas as pd
 
 from nfl_forecast.editorial_model_read import render_model_paragraph
-
-
-def _factor(preview: dict, pick: str, opponent: str) -> str:
-    for item in preview.get("key_factors") or []:
-        if isinstance(item, dict):
-            title = re.sub(r"\s+", " ", str(item.get("title") or "")).strip()
-            if title:
-                return f"Football context: {title}"
-    case = re.sub(r"\s+", " ", str(preview.get("case_for_pick") or "")).strip()
-    return f"Football context: {case or f'{pick} execution against {opponent}'}"
+from nfl_forecast.read_publication import _factor
 
 
 def render(row: pd.Series, preview: dict, model_rationale: str = "") -> str:

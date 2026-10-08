@@ -104,8 +104,7 @@ jobs:
       - name: Regenerate and gate deterministic Reads against canonical forecasts
         run: |
           # Fail closed on missing/malformed previews or immutable lock divergence.
-          # Only paragraph 2 is rerendered; no human editorial fields are touched.
-          python -m scripts.sync_market_reads --output-dir site/public/data --write
+          # Published artifacts must already be synchronized; never hide a stale commit.
           python -m scripts.sync_market_reads --output-dir site/public/data --check
       - name: Normalize immutable history for Sunday Signal
         run: python scripts/build_site_history_compat.py site/public/data/prediction_history.csv
