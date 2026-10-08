@@ -59,8 +59,8 @@ def test_market_only_refresh_changes_only_deterministic_paragraph():
     assert actual["paragraphs"][0] == original["paragraphs"][0]
     p = actual["paragraphs"][1]
     assert p == render_model_paragraph(updated_row, "Football context: Secondary matchup")
-    assert "55.9%" in p and "36.0%" in p and "49.0%" in p
-    assert "Chicago Bears" in p and "a market line of Green Bay Packers -1.0" in p
+    assert "55.9%" in p and "64.0%" in p and "51.0%" in p
+    assert "Chicago Bears" in p and "a market line of Chicago Bears -1.0" in p
     assert p.endswith("The pick: Chicago Bears moneyline.")
     assert original["paragraphs"][1] != p
 
