@@ -28,7 +28,7 @@ def _read(path: Path) -> tuple[list[str], list[dict[str, str]]]:
     with path.open("r", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fields = reader.fieldnames
-        if not fields or set(fields) < REQUIRED or len(fields) != len(set(fields)):
+        if not fields or not REQUIRED.issubset(fields) or len(fields) != len(set(fields)):
             raise ValueError("QB1 snapshot ledger schema mismatch")
         rows = list(reader)
     known = set()
