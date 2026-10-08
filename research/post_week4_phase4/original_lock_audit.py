@@ -27,8 +27,10 @@ def history_rows(csv_text: str) -> list[dict]:
     reader = csv.DictReader(io.StringIO(csv_text))
     if not reader.fieldnames or len(reader.fieldnames) != len(set(reader.fieldnames)):
         raise ValueError("Missing/duplicate CSV columns")
-    if any(k not in reader.fieldnames for k in REQUIRED):
-        raise ValueError("Original CSV lacks minimum lock fields")
+    # Earlier Git blobs can legitimately predate F-ST column additions. Traverse
+    # them to establish absence, and validate the full schema only on first lock.
+    if "game_id" not in reader.fieldnames or "lock_status" not in reader.fieldnames:
+        raise ValueError("Historical CSV has no game/lock identity")
     rows = list(reader)
     if any(None in row or any(value is None for value in row.values()) for row in rows):
         raise ValueError("Malformed CSV row")
