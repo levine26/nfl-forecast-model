@@ -28,7 +28,7 @@ jobs:
       - name: Compile and install isolated dependencies
         run: |
           python -m compileall -q research/post_week4_phase4
-          python -m pip install 'pytest>=8' 'numpy==2.4.6' 'scipy==1.17.1'
+          python -m pip install 'pytest>=8' 'numpy==2.4.6' 'scipy==1.17.1' 'pandas==3.0.5'
       - name: Frozen C, gateway, source and lock integration tests
         run: |
           python -m pytest -q             research/post_week4_phase4/test_c_shadow.py             research/post_week4_phase4/test_two_stage_gateway.py             research/post_week4_phase4/test_nflverse_epa_adapter.py             research/post_week4_phase4/test_original_lock_audit.py             research/post_week4_phase4/test_phase4b_cross_adapter_integration.py
