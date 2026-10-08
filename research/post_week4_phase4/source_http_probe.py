@@ -22,8 +22,9 @@ ASSET = "play_by_play_2026.parquet"
 
 
 def get_bytes(url: str) -> tuple[bytes, str]:
+    accept = "application/vnd.github+json" if url == RELEASE_API else "application/octet-stream"
     req = Request(url, headers={"User-Agent": "LevLine-research-PBP-audit/1",
-                                "Accept": "application/octet-stream"})
+                                "Accept": accept})
     with urlopen(req, timeout=90) as response:
         data = response.read()
     observed = datetime.now(timezone.utc).isoformat()
