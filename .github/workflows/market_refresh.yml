@@ -9,6 +9,9 @@ on:
       - 'scripts/sync_market_reads.py'
       - '.github/workflows/market_refresh.yml'
   schedule:
+    # Secondary scheduled opportunity mitigates delayed/skipped GitHub cron events.
+    # Both executions use the same canonical validation and optimistic push guard.
+    - cron: "05 * * * *"
     - cron: "35 * * * *"
 permissions:
   contents: write
