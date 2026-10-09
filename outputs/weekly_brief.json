@@ -7,72 +7,72 @@
       "pick_delta_pp": -0.5230298770820707
     },
     {
-      "game_id": "2026_05_CIN_MIA",
-      "largest_driver": "Market movement",
-      "pick": "CIN",
-      "pick_delta_pp": 0.42489031666611
-    },
-    {
       "game_id": "2026_01_NE_SEA",
       "largest_driver": "No material input move",
       "pick": "SEA",
       "pick_delta_pp": -1.260265225511148e-08
+    },
+    {
+      "game_id": "2026_04_KC_LV",
+      "largest_driver": "No material input move",
+      "pick": "KC",
+      "pick_delta_pp": -1.79001258260314e-10
     }
   ],
-  "generated_utc": "2026-10-08T16:25:54.398774+00:00",
+  "generated_utc": "2026-10-09T00:07:38.342770+00:00",
   "market_disagreements": [
     {
       "confidence": "High",
       "game_id": "2026_05_TB_DAL",
       "matchup": "TB @ DAL",
       "pick": "DAL",
-      "pick_prob": 0.8072266250135486,
+      "pick_prob": 0.8169076742769229,
       "projected_score": "DAL 24.8 \u2013 TB 20.9",
-      "pure_market_gap_pp": 15.846636395502623
+      "pure_market_gap_pp": 16.710472438366374
+    },
+    {
+      "confidence": "Coin Flip",
+      "game_id": "2026_05_CLE_NYJ",
+      "matchup": "CLE @ NYJ",
+      "pick": "NYJ",
+      "pick_prob": 0.5642284592083471,
+      "projected_score": "NYJ 20.0 \u2013 CLE 22.3",
+      "pure_market_gap_pp": 15.79906979463075
     },
     {
       "confidence": "Lean",
       "game_id": "2026_05_BAL_ATL",
       "matchup": "BAL @ ATL",
       "pick": "ATL",
-      "pick_prob": 0.6223690634909445,
+      "pick_prob": 0.6159055400151034,
       "projected_score": "ATL 21.6 \u2013 BAL 22.9",
-      "pure_market_gap_pp": 15.140042415077131
-    },
-    {
-      "confidence": "Coin Flip",
-      "game_id": "2026_05_CLE_NYJ",
-      "matchup": "CLE @ NYJ",
-      "pick": "NYJ",
-      "pick_prob": 0.541672204826507,
-      "projected_score": "NYJ 20.0 \u2013 CLE 22.3",
-      "pure_market_gap_pp": 13.9017116036868
+      "pure_market_gap_pp": 14.592116072152573
     }
   ],
   "most_uncertain": [
     {
       "confidence": "Coin Flip",
-      "game_id": "2026_05_CLE_NYJ",
-      "matchup": "CLE @ NYJ",
-      "pick": "NYJ",
-      "pick_prob": 0.541672204826507,
-      "projected_score": "NYJ 20.0 \u2013 CLE 22.3"
+      "game_id": "2026_05_CHI_GB",
+      "matchup": "CHI @ GB",
+      "pick": "CHI",
+      "pick_prob": 0.5482570319944859,
+      "projected_score": "GB 20.2 \u2013 CHI 24.2"
     },
     {
-      "confidence": "Coin Flip",
-      "game_id": "2026_05_MIN_NO",
-      "matchup": "MIN @ NO",
-      "pick": "MIN",
-      "pick_prob": 0.5430158672630078,
-      "projected_score": "NO 20.2 \u2013 MIN 25.0"
-    },
-    {
-      "confidence": "Coin Flip",
+      "confidence": "Lean",
       "game_id": "2026_05_IND_PIT",
       "matchup": "IND @ PIT",
       "pick": "PIT",
-      "pick_prob": 0.543161254106056,
+      "pick_prob": 0.5534841824717781,
       "projected_score": "PIT 25.1 \u2013 IND 21.6"
+    },
+    {
+      "confidence": "Lean",
+      "game_id": "2026_05_MIN_NO",
+      "matchup": "MIN @ NO",
+      "pick": "MIN",
+      "pick_prob": 0.5574487320814463,
+      "projected_score": "NO 20.2 \u2013 MIN 25.0"
     }
   ],
   "strongest": [
@@ -81,7 +81,7 @@
       "game_id": "2026_05_TB_DAL",
       "matchup": "TB @ DAL",
       "pick": "DAL",
-      "pick_prob": 0.8072266250135486,
+      "pick_prob": 0.8169076742769229,
       "projected_score": "DAL 24.8 \u2013 TB 20.9"
     },
     {
@@ -89,16 +89,16 @@
       "game_id": "2026_05_HOU_TEN",
       "matchup": "HOU @ TEN",
       "pick": "HOU",
-      "pick_prob": 0.803174845316549,
+      "pick_prob": 0.8031748453163106,
       "projected_score": "TEN 18.1 \u2013 HOU 23.5"
     },
     {
       "confidence": "High",
-      "game_id": "2026_05_CIN_MIA",
-      "matchup": "CIN @ MIA",
-      "pick": "CIN",
-      "pick_prob": 0.7395344446911911,
-      "projected_score": "MIA 19.1 \u2013 CIN 25.4"
+      "game_id": "2026_05_PHI_JAX",
+      "matchup": "PHI @ JAX",
+      "pick": "JAX",
+      "pick_prob": 0.7596917947960845,
+      "projected_score": "JAX 29.7 \u2013 PHI 18.5"
     }
   ],
   "week": 5
