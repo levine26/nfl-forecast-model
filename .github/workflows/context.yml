@@ -82,7 +82,10 @@ on:
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   schedule:
+    # A second opportunity per three-hour interval reduces reliance on one
+    # best-effort GitHub scheduled event; publication guards remain unchanged.
     - cron: "17 */3 * * *"
+    - cron: "47 */3 * * *"
 
 permissions:
   contents: write
