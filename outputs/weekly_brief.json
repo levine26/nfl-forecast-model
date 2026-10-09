@@ -1,34 +1,34 @@
 {
   "biggest_movers": [
     {
+      "game_id": "2026_05_TB_DAL",
+      "largest_driver": "Market movement",
+      "pick": "DAL",
+      "pick_delta_pp": 0.9066883924432445
+    },
+    {
+      "game_id": "2026_05_PHI_JAX",
+      "largest_driver": "Market movement",
+      "pick": "JAX",
+      "pick_delta_pp": -0.718502538150434
+    },
+    {
       "game_id": "2026_04_ATL_NO",
       "largest_driver": "Market movement",
       "pick": "NO",
       "pick_delta_pp": -0.5230298770820707
-    },
-    {
-      "game_id": "2026_01_NE_SEA",
-      "largest_driver": "No material input move",
-      "pick": "SEA",
-      "pick_delta_pp": -1.260265225511148e-08
-    },
-    {
-      "game_id": "2026_04_KC_LV",
-      "largest_driver": "No material input move",
-      "pick": "KC",
-      "pick_delta_pp": -1.79001258260314e-10
     }
   ],
-  "generated_utc": "2026-10-09T00:07:38.342770+00:00",
+  "generated_utc": "2026-10-09T00:17:13.839970+00:00",
   "market_disagreements": [
     {
       "confidence": "High",
       "game_id": "2026_05_TB_DAL",
       "matchup": "TB @ DAL",
       "pick": "DAL",
-      "pick_prob": 0.8169076742769229,
+      "pick_prob": 0.8259745582013553,
       "projected_score": "DAL 24.8 \u2013 TB 20.9",
-      "pure_market_gap_pp": 16.710472438366374
+      "pure_market_gap_pp": 17.5261824081549
     },
     {
       "confidence": "Coin Flip",
@@ -37,7 +37,7 @@
       "pick": "NYJ",
       "pick_prob": 0.5642284592083471,
       "projected_score": "NYJ 20.0 \u2013 CLE 22.3",
-      "pure_market_gap_pp": 15.79906979463075
+      "pure_market_gap_pp": 15.799069794630743
     },
     {
       "confidence": "Lean",
@@ -46,7 +46,7 @@
       "pick": "ATL",
       "pick_prob": 0.6159055400151034,
       "projected_score": "ATL 21.6 \u2013 BAL 22.9",
-      "pure_market_gap_pp": 14.592116072152573
+      "pure_market_gap_pp": 14.59211607215256
     }
   ],
   "most_uncertain": [
@@ -81,7 +81,7 @@
       "game_id": "2026_05_TB_DAL",
       "matchup": "TB @ DAL",
       "pick": "DAL",
-      "pick_prob": 0.8169076742769229,
+      "pick_prob": 0.8259745582013553,
       "projected_score": "DAL 24.8 \u2013 TB 20.9"
     },
     {
@@ -97,7 +97,7 @@
       "game_id": "2026_05_PHI_JAX",
       "matchup": "PHI @ JAX",
       "pick": "JAX",
-      "pick_prob": 0.7596917947960845,
+      "pick_prob": 0.7525067694145802,
       "projected_score": "JAX 29.7 \u2013 PHI 18.5"
     }
   ],
