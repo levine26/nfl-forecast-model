@@ -1432,5 +1432,28 @@
       "The predicted total finished 4.1 points from the actual total."
     ],
     "winner_correct": true
+  },
+  "2026_05_TB_DAL": {
+    "actual_score": "DAL 16 \u2013 TB 24",
+    "causal_analysis_status": "Quantitative autopsy only. Play-level causal analysis is added when current-season PBP is available and verified.",
+    "error_tags": [
+      "winner_miss",
+      "margin_miss"
+    ],
+    "game_id": "2026_05_TB_DAL",
+    "margin_abs_error": 11.915087817761156,
+    "matchup": "TB @ DAL",
+    "official_home_prob": 0.8169076742777085,
+    "official_pick": "DAL",
+    "projected_score": "DAL 24.8 \u2013 TB 20.9",
+    "total_abs_error": 5.666228244179763,
+    "what_missed": [
+      "The locked forecast missed the outright winner.",
+      "The predicted margin finished 11.9 points from the actual margin."
+    ],
+    "what_went_right": [
+      "The predicted total finished 5.7 points from the actual total."
+    ],
+    "winner_correct": false
   }
 }
