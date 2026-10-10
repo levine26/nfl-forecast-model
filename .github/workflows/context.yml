@@ -39,7 +39,7 @@ on:
       - "tests/test_read_contract.py"
       - "tests/test_advanced_player_context.py"
       - "tests/test_career_qb_context.py"
-      - "tests/test_editorial_finalize.py tests/test_editorial_acceptance.py"
+      - "tests/test_editorial_finalize.py tests/test_editorial_acceptance.py tests/test_context_fresh_main_checkout.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   pull_request:
@@ -99,6 +99,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Re-anchor scheduled/manual/push production context to current canonical
+      # outputs BEFORE any expensive research. Completed work is never rebased
+      # across a new model/market generation after validation.
+      - name: Start contextual research from latest committed main
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          echo "Context research starting from $(git rev-parse HEAD)"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
