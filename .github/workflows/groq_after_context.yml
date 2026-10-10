@@ -1,17 +1,97 @@
-name: DEPRECATED — Groq post-context dispatcher
+name: Sunday Signal Groq post-context dispatcher
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/groq_after_context.yml"
+      - "scripts/groq_dispatch_due.py"
+  workflow_run:
+    workflows:
+      - "Sunday Signal contextual intelligence"
+    types: [completed]
+    branches: [main]
+  pull_request:
+    paths:
+      - ".github/workflows/groq_after_context.yml"
+      - "scripts/groq_dispatch_due.py"
+      - "tests/test_groq_dispatch_due.py"
 
 permissions:
   contents: read
+  actions: write
+
+concurrency:
+  group: sunday-signal-groq-dispatch
+  cancel-in-progress: false
 
 jobs:
-  deprecated:
+  validate:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Groq production dispatch disabled
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install pytest
+      - run: python -m pytest -q tests/test_groq_dispatch_due.py
+
+  dispatch:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Require current-slate Groq replacement or freshness advisory
+        id: due
+        run: python scripts/groq_dispatch_due.py --github-output "$GITHUB_OUTPUT"
+
+      - name: Guard provider dispatch against an in-progress writer
+        if: steps.due.outputs.due == 'true'
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          echo "Groq is no longer an automatic Sunday Signal editorial provider."
-          echo "ChatGPT current-bundle ingestion is the production editorial path."
-          echo "This workflow remains only as an explicit rollback marker and performs no dispatch."
+          set -euo pipefail
+          active=$(gh run list --workflow "Sunday Signal Groq media writer" --branch main --limit 10 --json status --jq '[.[] | select(.status != "completed")] | length')
+          if [ "$active" -gt 0 ]; then
+            echo "A Groq editorial writer is already active. Do not duplicate provider spend."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          last=$(gh run list --workflow "Sunday Signal Groq media writer" --branch main --limit 1 --json conclusion,createdAt --jq 'if length == 0 then "" else (.[0].createdAt + "|" + (.[0].conclusion // "")) end')
+          if LAST="$last" python - <<'PY'
+          from datetime import datetime, timezone
+          import os
+          entry=os.environ.get("LAST","").split("|")
+          if len(entry)!=2 or entry[1] not in {"failure","timed_out"}:
+              raise SystemExit(1)
+          try:
+              stamp=datetime.fromisoformat(entry[0].replace("Z","+00:00"))
+          except ValueError:
+              raise SystemExit(1)
+          raise SystemExit(0 if (datetime.now(timezone.utc)-stamp).total_seconds()<6*3600 else 1)
+          PY
+          then
+            echo "Recent Groq failure within six-hour cooldown; leaving previous validated HUMAN content untouched."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Dispatch autonomous Groq editorial research
+        if: steps.due.outputs.due == 'true' && steps.guard.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run groq_media_writer.yml --ref main
+          echo "Dispatch requested. This is not a Groq success or publication receipt."
