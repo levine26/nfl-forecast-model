@@ -18,6 +18,8 @@ on:
       - "scripts/build_copilot_media_prompt.py"
       - "scripts/build_single_game_copilot_prompt.py"
       - "scripts/run_groq_media_prompt.py"
+      - "scripts/groq_quota_circuit.py"
+      - "tests/test_groq_quota_circuit.py"
       - "scripts/recover_groq_focused_game.py"
       - "scripts/merge_copilot_game_payloads.py"
       - "scripts/compose_copilot_media_reads.py"
@@ -177,7 +179,7 @@ jobs:
 
       - name: Test media editorial guardrails
         run: |
-          pytest -q tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_editorial_provider_fallback.py tests/test_recover_groq_focused_game.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_direct_report_resolution.py tests/test_editorial_quality.py tests/test_groq_main_advance_audit.py
+          pytest -q tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_groq_quota_circuit.py tests/test_editorial_provider_fallback.py tests/test_recover_groq_focused_game.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_direct_report_resolution.py tests/test_editorial_quality.py tests/test_groq_main_advance_audit.py
           python -m py_compile scripts/recover_groq_focused_game.py src/nfl_forecast/editorial_provider_fallback.py
 
       - name: Refresh and freeze editorial weekend roster
@@ -300,6 +302,7 @@ jobs:
 
           total_games=${#game_ids[@]}
           game_index=0
+          quota_exhausted=0
           for gid in "${game_ids[@]}"; do
             game_index=$((game_index + 1))
             feedback="/tmp/groq-${gid}-feedback.txt"
@@ -323,11 +326,31 @@ jobs:
 
             if [ "$accepted" -ne 1 ]; then
               for attempt in 1 2 3; do
+                if [ "$quota_exhausted" -eq 1 ]; then
+                  provider_failed=1
+                  echo "$gid: shared Groq daily quota exhausted; skipping provider requests and checking only this game's validated fallback."
+                  if recover_game "$gid" "groq_shared_long_window_quota_exhausted" "$feedback"; then
+                    accepted=1
+                  fi
+                  break
+                fi
                 provider_attempted=1
                 echo "$gid focused Groq editorial attempt $attempt/3"
                 prompt="$prompts/$gid.txt"
                 python scripts/build_single_game_copilot_prompt.py --game-id "$gid" --prompt-file "$prompt" --feedback-file "$feedback"
-                if ! python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 3; then
+                provider_log="/tmp/groq-${gid}-provider-stderr.log"
+                provider_ok=0
+                if python scripts/run_groq_media_prompt.py --prompt-file "$prompt" --output-file "$parts/$gid.txt" --attempts 3 2> "$provider_log"; then
+                  provider_ok=1
+                fi
+                if [ -s "$provider_log" ]; then
+                  cat "$provider_log"
+                fi
+                if python scripts/groq_quota_circuit.py --stderr-file "$provider_log"; then
+                  quota_exhausted=1
+                  echo "::warning title=Groq shared quota exhausted::The Groq provider returned a long-window daily quota error. Remaining game-scoped requests are suppressed; verified ChatGPT/last-good recovery only."
+                fi
+                if [ "$provider_ok" -ne 1 ]; then
                   provider_failed=1
                   if recover_game "$gid" "groq_provider_request_failed" "$feedback"; then
                     accepted=1
@@ -364,10 +387,10 @@ jobs:
               fi
             fi
             if [ "$accepted" -ne 1 ]; then
-              echo "$gid could not be recovered safely after its Groq failure; recording it and continuing so every canonical game receives an independent provider attempt."
+              echo "$gid could not be recovered safely after its Groq failure; recording it without inventing a provider result or retrying an exhausted shared quota."
               rm -f "$parts/$gid.txt"
             fi
-            if [ "$game_index" -lt "$total_games" ] && [ "$provider_attempted" -eq 1 ]; then
+            if [ "$game_index" -lt "$total_games" ] && [ "$provider_attempted" -eq 1 ] && [ "$quota_exhausted" -eq 0 ]; then
               sleep 65
             fi
           done
@@ -387,7 +410,7 @@ jobs:
           )
           if [ "${#unresolved_ids[@]}" -gt 0 ]; then
             printf '%s\n' "${unresolved_ids[@]}" | tee /tmp/groq-unresolved-game-ids.txt
-            echo "Groq completed the full canonical attempt sweep, but ${#unresolved_ids[@]} game(s) still require exact game-scoped ChatGPT refresh; refusing partial publication."
+            echo "Groq quota-aware recovery sweep ended, but ${#unresolved_ids[@]} game(s) still require exact game-scoped ChatGPT refresh; refusing partial publication."
             exit 2
           fi
 
@@ -533,7 +556,9 @@ jobs:
           assert 'audit_groq_main_advance.py' in text
           assert 'actions/cache/restore@v4' in text
           assert 'actions/cache/save@v4' in text
-          assert 'recording it and continuing so every canonical game receives an independent provider attempt' in text
+          assert 'scripts/groq_quota_circuit.py' in text
+          assert 'quota_exhausted=1' in text
+          assert 'shared Groq daily quota exhausted; skipping provider requests' in text
           assert 'Persist exact unresolved Groq failure state' in text
           assert 'refusing partial publication' in text
           assert text.count('--editorial-roster inputs/sunday_signal/editorial_slate_roster.json') >= 2
