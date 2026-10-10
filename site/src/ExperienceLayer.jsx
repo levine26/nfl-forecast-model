@@ -191,7 +191,7 @@ function MiniProbability({game}) {
 function lifecycle(game,now) {
   const state=lockCountdownState(game,now)
   if (game.lifecycle_status==='GRADED') return {key:'final',label:'FINAL',detail:'Pregame forecast preserved'}
-  if (game.lifecycle_status==='IN_PROGRESS') return {key:'live',label:'GAME IN PROGRESS',detail:state.actualLockMillis?`Pregame forecast locked ${formatTime(game.lock_timestamp_utc)}`:'Official pregame lock receipt unavailable'}
+  if (game.lifecycle_status==='IN_PROGRESS') return {key:'live',label:'GAME IN PROGRESS',detail:game.lock_timestamp_utc?`Pregame forecast locked ${formatTime(game.lock_timestamp_utc)}`:'Official pregame lock receipt unavailable'}
   if (state.phase==='locked') return {key:'locked',label:'LOCKED',detail:state.actualLockMillis?formatTime(game.lock_timestamp_utc):'Immutable pregame receipt preserved'}
   if (state.phase==='missed') return {key:'overdue',label:'LOCK NOT VERIFIED',detail:'Kickoff passed without a published immutable lock'}
   if (state.phase==='overdue') return {key:'overdue',label:'LOCK DUE',detail:'Scheduled T-120 deadline passed; awaiting official lock receipt'}
