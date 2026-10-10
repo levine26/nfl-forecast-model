@@ -74,7 +74,8 @@ def test_stale_future_and_wrong_artifact_fail_closed():
     row=snapshot(TARGET-timedelta(hours=3))
     with pytest.raises(FastLockError,match="stale"):
         plan_fast_locks([row],[],status(),now_utc=TARGET)
-    row=snapshot(TARGET+timedelta(minutes=5))
+    row=snapshot()
+    row["prediction_timestamp_utc"]=(TARGET+timedelta(minutes=5)).isoformat()
     with pytest.raises(FastLockError,match="stale/future"):
         plan_fast_locks([row],[],status(),now_utc=TARGET)
     row=snapshot()
