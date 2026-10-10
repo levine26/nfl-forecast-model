@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {OFFICIAL_LOCK_LEAD_MINUTES, officialLockTiming} from '../src/officialLockCountdown.mjs'
+import {OFFICIAL_LOCK_LEAD_MINUTES, officialLockTiming, serverClockOffsetMs} from '../src/officialLockCountdown.mjs'
 
 const game = (kickoff_utc, rest = {}) => ({kickoff_utc, lifecycle_status:'LIVE_FORECAST', immutable:false, ...rest})
 
@@ -60,4 +60,23 @@ test('client-clock variations affect displayed due status but cannot create a re
 test('in-progress game without immutable receipt must not claim a lock', () => {
   const result=officialLockTiming(game('2026-10-11T13:30:00Z',{lifecycle_status:'IN_PROGRESS'}),Date.parse('2026-10-11T14:00:00Z'))
   assert.equal(result.state,'due')
+})
+
+
+test('server Date corrects a five-minute-slow client clock', () => {
+  const remote='Sat, 10 Oct 2026 16:00:00 GMT'
+  const start=Date.parse('2026-10-10T15:54:59Z')
+  const finish=Date.parse('2026-10-10T15:55:01Z')
+  assert.equal(serverClockOffsetMs(remote,start,finish),5*60_000)
+  const realDeadline=Date.parse('2026-10-11T11:30:00Z')
+  const localClock=realDeadline-5*60_000
+  const g=game('2026-10-11T13:30:00Z')
+  assert.equal(officialLockTiming(g,localClock).state,'countdown')
+  assert.equal(officialLockTiming(g,localClock+serverClockOffsetMs(remote,start,finish)).state,'due')
+})
+
+test('invalid or backwards server timing does not invent clock correction', () => {
+  const begin=Date.parse('2026-10-10T15:59:00Z')
+  assert.equal(serverClockOffsetMs('',begin,begin+100),null)
+  assert.equal(serverClockOffsetMs('Sat, 10 Oct 2026 16:00:00 GMT',begin+100,begin),null)
 })
