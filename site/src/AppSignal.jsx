@@ -1,3 +1,4 @@
+import { canonicalReportLink } from './editorialSourceLinks.mjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   CartesianGrid,
@@ -348,7 +349,8 @@ function ForecastBoard({games,previews,onOpen,status}) {
 }
 
 function sourceLink(item) {
-  return item?.source_url ? <a href={item.source_url} target="_blank" rel="noreferrer" onClick={event=>event.stopPropagation()}>Source ↗</a> : null
+  const original=canonicalReportLink(item?.source_url)
+  return original ? <a href={original} target="_blank" rel="noopener noreferrer" onClick={event=>event.stopPropagation()}>Original report ↗</a> : null
 }
 
 function KeyDevelopments({evidence=[],preview}) {
