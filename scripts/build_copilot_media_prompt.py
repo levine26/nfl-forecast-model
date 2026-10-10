@@ -14,6 +14,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from nfl_forecast.source_policy import is_direct_media_report_url
+
 
 def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
     gid = str(row.get("game_id"))
@@ -22,14 +24,17 @@ def _packet(row: pd.Series, previews: dict, evidence: dict) -> dict:
     for item in preview.get("reported_sources") or []:
         if not isinstance(item, dict):
             continue
-        # Discovery URLs can be Google/Bing RSS redirects. They are deliberately
-        # omitted from the provider packet so the writer cannot echo an aggregator
-        # URL as public provenance. The deterministic composer resolves/canonicalizes
-        # source URLs after research.
+        source_url = str(item.get("source_url") or "")
+        # A direct URL candidate is a research lead, not verified article content.
+        # Do not send Google/Bing intermediaries or generic landing pages to Groq.
         reported.append({
             "name": item.get("source_name"),
             "title": item.get("title"),
             "as_of": item.get("as_of"),
+            "direct_source_url_candidate": (
+                source_url if source_url.startswith("https://")
+                and is_direct_media_report_url(source_url) else ""
+            ),
         })
 
     football = []
