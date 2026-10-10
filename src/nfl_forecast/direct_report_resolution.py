@@ -27,7 +27,10 @@ def _url_identity(url: str) -> tuple[str, str]:
         return "", ""
     if parsed.scheme != "https" or not parsed.hostname:
         return "", ""
-    if parsed.username or parsed.password or parsed.port not in (None, 443):
+    try:
+        if parsed.username or parsed.password or parsed.port not in (None, 443):
+            return "", ""
+    except ValueError:
         return "", ""
     host = parsed.hostname.lower().rstrip(".")
     if host in _DISCOVERY_HOSTS:
