@@ -11,6 +11,7 @@ import pandas as pd
 
 from nfl_forecast.copilot_media import apply_copilot_reads
 from nfl_forecast.editorial_finalize import finalize_previews
+from nfl_forecast.editorial_acceptance import audit_editorial_acceptance
 from nfl_forecast.editorial_model_read import render_model_paragraph
 from nfl_forecast.editorial_text_safety import sanitize_public_evidence, sanitize_preview_text
 from nfl_forecast.media_context import fetch_media_context
@@ -194,6 +195,16 @@ def main() -> None:
     }
 
     status["editorial_finalizer"] = finalize_previews(predictions, previews, evidence)
+    # Operational source retrieval and deterministic completion do not establish
+    # HUMAN editorial acceptance. Report that distinction explicitly per game.
+    status["editorial_acceptance"] = audit_editorial_acceptance(predictions, previews)
+    print(
+        "HUMAN EDITORIAL ACCEPTANCE:",
+        status["editorial_acceptance"]["status"],
+        status["editorial_acceptance"]["games_with_structurally_eligible_human_reads"],
+        "/",
+        status["editorial_acceptance"]["games_expected"],
+    )
 
     evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
