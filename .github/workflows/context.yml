@@ -39,7 +39,7 @@ on:
       - "tests/test_read_contract.py"
       - "tests/test_advanced_player_context.py"
       - "tests/test_career_qb_context.py"
-      - "tests/test_editorial_finalize.py tests/test_editorial_acceptance.py"
+      - "tests/test_editorial_finalize.py tests/test_editorial_acceptance.py tests/test_context_checkout_freshness.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   pull_request:
@@ -99,6 +99,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Main may advance between event dispatch and runner allocation.
+      # Base this research on the latest committed numerical snapshot; the
+      # existing optimistic publication guard still rejects later races.
+      - name: Rebase context acquisition on current production main
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
