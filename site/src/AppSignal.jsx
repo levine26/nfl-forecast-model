@@ -1,4 +1,5 @@
 import { canonicalReportLink } from './editorialSourceLinks.mjs'
+import {hasPublishedHumanRead} from './editorialReadStatus.mjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   CartesianGrid,
@@ -246,6 +247,7 @@ function ForecastHero({game,compact=false}) {
 }
 
 function TheSignal({preview,compact=false}) {
+  if (!hasPublishedHumanRead(preview)) return <section className={`ss-the-signal ${compact?'compact':''}`}><div><span>THE SIGNAL</span><h2>Independent matchup reporting is under review.</h2>{!compact&&<p>The canonical LevLine forecast is available above. A human matchup Read will appear only after provider, source-attribution, and full-slate acceptance checks pass.</p>}</div></section>
   const headline=preview?.headline || preview?.key_factors?.[0]?.title
   const paragraphs=Array.isArray(preview?.paragraphs) ? preview.paragraphs.filter(Boolean) : []
   const fallback=preview?.key_factors?.[0]?.summary
@@ -281,7 +283,7 @@ function TopSignals({games,onOpen}) {
 }
 
 function BoardRow({game,preview,onOpen}) {
-  const teaser=preview?.headline || preview?.key_factors?.[0]?.title
+  const teaser=hasPublishedHumanRead(preview) ? preview.headline : null
   return <button className="ss-game-row" onClick={onOpen} data-game-open>
     <div className="ss-row-matchup">
       <span><TeamMark team={game.away_team} size="sm"/><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} size="sm"/><b>{game.home_team}</b></span>
