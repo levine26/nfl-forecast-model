@@ -19,7 +19,8 @@ from nfl_forecast.editorial_model_read import (
     pick_side_probability,
     render_model_paragraph,
 )
-from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS
+from nfl_forecast.source_policy import APPROVED_MEDIA_DOMAINS, is_direct_media_report_url
+from nfl_forecast.editorial_quality import assess_human_read
 
 BANNED = (
     "coverage highlights", "pressure note", "history note", "pure has",
@@ -299,6 +300,7 @@ def main() -> None:
         if not 12 <= len(headline) <= 150:
             failures.append(f"{gid}: headline length invalid")
 
+        failures.extend(f"{gid}: editorial quality: {issue}" for issue in assess_human_read(headline, paragraph1))
         combined = f"{headline} {paragraph1} {paragraph2}"
         low = combined.lower()
         for phrase in BANNED:
@@ -384,7 +386,7 @@ def main() -> None:
             name = str(source.get("name") or "").strip()
             title = str(source.get("title") or "").strip()
             url = str(source.get("url") or "").strip()
-            if not name or not title or not url or not _domain_allowed(url):
+            if not name or not title or not url or not is_direct_media_report_url(url):
                 failures.append(f"{gid}: invalid source {source}")
                 continue
             valid_sources.append({"name": name, "title": title, "url": url})
