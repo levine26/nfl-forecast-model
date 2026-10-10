@@ -25,6 +25,15 @@ STOCK_PATTERNS = (
     (r"\bturn manageable series into\b", "reusable generic analysis"),
     (r"\b(?:achilles levline|market gap:)\b", "malformed editorial stitching"),
 )
+HUMAN_READ_MIN_WORDS = 55
+HUMAN_READ_MAX_WORDS = 100
+
+
+def human_read_length_valid(text: str) -> bool:
+    words = re.findall(r"\b[\w'-]+\b", str(text or ""))
+    return HUMAN_READ_MIN_WORDS <= len(words) <= HUMAN_READ_MAX_WORDS
+
+
 TACTICAL_FAMILIES = {
     "passing": r"\b(?:quarterback|passing|pass game|dropbacks?|pocket|receivers?|routes?|throw(?:ing|s)?|downfield|tight ends?)\b",
     "protection": r"\b(?:protection|pass.rush|rushers?|blitz|pressure|sacks?|offensive line|tackles?)\b",
