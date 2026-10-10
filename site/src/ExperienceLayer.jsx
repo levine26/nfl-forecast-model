@@ -1,4 +1,5 @@
 import { canonicalReportLink } from './editorialSourceLinks.mjs'
+import {hasPublishedHumanRead} from './editorialReadStatus.mjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './experience-v2.css'
@@ -296,6 +297,7 @@ function researchMeta(preview,evidence) {
   return {sources,latest:stamps.length?new Date(Math.max(...stamps)).toISOString():null}
 }
 function SignalV2({preview,evidence=[]}) {
+  if (!hasPublishedHumanRead(preview)) return <section className="ss-exp-signal ss-exp-empty-signal"><span>THE SIGNAL</span><h2>Matchup analysis is awaiting source and editorial acceptance.</h2><p>LevLine's numerical forecast remains available. This section does not publish deterministic template prose as a validated human Read.</p></section>
   const {sources,latest}=researchMeta(preview,evidence)
   const paragraphs=Array.isArray(preview?.paragraphs)?preview.paragraphs.filter(Boolean):[]
   const factors=(preview?.key_factors||[]).filter(x=>x?.title).slice(0,3)
@@ -378,7 +380,7 @@ function ReceiptPage({row,autopsy,preview}) {
     <button onClick={()=>nav('history')}>← Back to Official History</button>
     <section className="ss-exp-receipt-hero"><span>OFFICIAL PREGAME RECEIPT · WEEK {row.week||'—'}</span><h1>{row.away_team} @ {row.home_team}</h1><p>Published, locked before kickoff, and preserved after the result.</p></section>
     <section className="ss-exp-receipt-grid"><article><small>PICK OF RECORD</small><img src={teamLogo(pick)} alt=""/><strong>{teamName(pick)}</strong><b>{pct(p)}</b></article><article><small>LOCKED</small><strong>{formatTime(row.lock_timestamp_utc,{withDay:true})}</strong><span>Later refreshes cannot replace this forecast.</span></article><article className={correct===true?'correct':correct===false?'miss':'pending'}><small>RESULT</small><strong>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</strong><span>{score?`${row.away_team} ${score.away} – ${row.home_team} ${score.home}`:'Final score not stored in this receipt.'}</span></article></section>
-    <section className="ss-exp-receipt-analysis"><span>THE SIGNAL</span>{preview?.headline?<><h2>{preview.headline}</h2>{(preview.paragraphs||[]).slice(0,2).map((x,i)=><p key={i}>{x}</p>)}</>:<div className="ss-exp-empty"><b>The immutable forecast receipt is available.</b><span>Archived editorial analysis is not published for this game artifact.</span></div>}</section>
+    <section className="ss-exp-receipt-analysis"><span>THE SIGNAL</span>{hasPublishedHumanRead(preview)?<><h2>{preview.headline}</h2>{(preview.paragraphs||[]).slice(0,2).map((x,i)=><p key={i}>{x}</p>)}</>:<div className="ss-exp-empty"><b>The immutable forecast receipt is available.</b><span>Archived editorial analysis is not published for this game artifact.</span></div>}</section>
     {text&&<section className="ss-exp-receipt-analysis"><span>POSTGAME AUTOPSY</span><h2>What the result taught us.</h2><p>{text}</p></section>}
   </main>
 }
