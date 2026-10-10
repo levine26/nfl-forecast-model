@@ -10,7 +10,10 @@ import re
 import pandas as pd
 
 from nfl_forecast.copilot_media import apply_copilot_reads
+from nfl_forecast.copilot_source_backfill import canonical_direct_url
+from nfl_forecast.source_policy import media_domain_family
 from nfl_forecast.editorial_finalize import finalize_previews
+from nfl_forecast.editorial_acceptance import audit_editorial_acceptance
 from nfl_forecast.editorial_model_read import render_model_paragraph
 from nfl_forecast.editorial_text_safety import sanitize_public_evidence, sanitize_preview_text
 from nfl_forecast.media_context import fetch_media_context
@@ -53,6 +56,7 @@ def _display_media(media: dict[str, list[dict]]) -> tuple[dict[str, list[dict]],
     out: dict[str, list[dict]] = {}
     generic_rejected = 0
     cross_game_rejected = 0
+    intermediary_rejected = 0
 
     for game_id, items in media.items():
         candidates = []
@@ -66,7 +70,15 @@ def _display_media(media: dict[str, list[dict]]) -> tuple[dict[str, list[dict]],
             if _is_generic_visible_title(item):
                 generic_rejected += 1
                 continue
-            candidates.append(item)
+            # RSS headlines alone do not provide original-report provenance.
+            # Never attach Google News / Bing intermediary links to a public Read.
+            direct = canonical_direct_url(str(item.get("source_url") or ""))
+            if not direct:
+                intermediary_rejected += 1
+                continue
+            candidate = dict(item)
+            candidate["source_url"] = direct
+            candidates.append(candidate)
 
         def rank(item: dict) -> tuple[bool, bool, float]:
             meta = item.get("metadata") or {}
@@ -84,10 +96,17 @@ def _display_media(media: dict[str, list[dict]]) -> tuple[dict[str, list[dict]],
         if candidates:
             out[game_id] = candidates
 
+    two_family_games = sum(
+        len({media_domain_family(str(item.get("source_url") or "")) for item in items}) >= 2
+        for items in out.values()
+    )
     return out, {
         "games_with_display_reporting": len(out),
+        "games_with_two_independent_direct_report_url_candidates": two_family_games,
+        "intermediary_only_urls_rejected": intermediary_rejected,
         "generic_titles_rejected": generic_rejected,
         "cross_game_titles_rejected": cross_game_rejected,
+        "direct_url_guardrail": "Never publish Google News or Bing redirect as journalism. Link-shape approval does not verify source content or claim support.",
     }
 
 
@@ -194,6 +213,16 @@ def main() -> None:
     }
 
     status["editorial_finalizer"] = finalize_previews(predictions, previews, evidence)
+    # Operational source retrieval and deterministic completion do not establish
+    # HUMAN editorial acceptance. Report that distinction explicitly per game.
+    status["editorial_acceptance"] = audit_editorial_acceptance(predictions, previews)
+    print(
+        "HUMAN EDITORIAL ACCEPTANCE:",
+        status["editorial_acceptance"]["status"],
+        status["editorial_acceptance"]["games_with_structurally_eligible_human_reads"],
+        "/",
+        status["editorial_acceptance"]["games_expected"],
+    )
 
     evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
     previews_path.write_text(json.dumps(previews, indent=2, sort_keys=True) + "\n")
