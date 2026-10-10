@@ -31,6 +31,7 @@ def _compact_packet(packet: dict) -> dict:
             "name": _clip(item.get("name"), 80),
             "title": _clip(item.get("title"), 180),
             "as_of": _clip(item.get("as_of"), 40),
+            "direct_source_url_candidate": _clip(item.get("direct_source_url_candidate"), 250),
         })
         if len(reporting) >= 4:
             break
@@ -91,7 +92,7 @@ Write:
 - model_rationale: HARD RANGE 18-40 words of verified football context supporting the selected side. Target 22-28 words and count the words before returning. Do NOT use the word LevLine in this field. No numbers, percentages, spreads, scores, model/PURE/MARKET/F-ST terms, "moneyline", or final-pick wording.
 - sources: at least TWO independent DIRECT article/report URLs from different approved publishers returned by your web search. Sources must be genuinely matchup-relevant: at least one must materially concern the away team and at least one the home team (a single article can satisfy both only if it is specifically about this matchup).
 
-Research priority: ESPN/The Athletic/NYT; NFL.com/official teams; AP/CBS/Yahoo/NBC/FOX/SI. Prefer last 7 days and last 48 hours for availability. Do not use generic week-roundup articles as the only support if direct team/matchup reporting exists. Use packet leads only as leads; newest verified reporting wins. Search broadly enough that one search returns multiple publishers. Do not fabricate URLs, stats, injuries, starters, or causal claims. Standard official status wording may repeat; substantive prose may not.
+Research priority: ESPN/The Athletic/NYT; NFL.com/official teams; AP/CBS/Yahoo/NBC/FOX/SI. Prefer last 7 days and last 48 hours for availability. Do not use generic week-roundup articles as the only support if direct team/matchup reporting exists. Treat all packet leads, including direct original-URL candidates, as unverified until you have checked the publisher article and its current claim support. Verify 2026 rosters and starters; the newest verified reporting wins. Search broadly enough that one search returns multiple publishers. Do not fabricate URLs, stats, injuries, starters, or causal claims. Standard official status wording may repeat; substantive prose may not.
 
 Return exactly:
 {{"games":{{"{args.game_id}":{{"headline":"...","paragraph1":"...","model_rationale":"...","sources":[{{"name":"publisher","title":"report title","url":"https://direct.publisher/article"}},{{"name":"second publisher","title":"report title","url":"https://direct.second/article"}}]}}}}}}
