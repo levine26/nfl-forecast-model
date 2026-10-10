@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 import hashlib
 import io
 import json
+import math
 import os
 from pathlib import Path
 import tempfile
@@ -129,7 +130,7 @@ def plan_fast_locks(
         locked["lock_timestamp_utc"] = now_utc.isoformat()
         locked["minutes_to_kickoff_at_lock"] = str(minutes_to_kickoff)
         locked["lock_status"] = "LOCKED"
-        locked.update({k: "" if v is None else v for k,v in _ats_lock_fields(row).items()})
+        locked.update({k: "" if v is None or (isinstance(v, float) and math.isnan(v)) else v for k,v in _ats_lock_fields(row).items()})
         due.append(locked)
     return due
 
