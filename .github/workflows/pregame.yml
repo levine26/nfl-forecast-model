@@ -1,6 +1,11 @@
 name: Pregame NFL refresh
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/audit_official_lock_timeliness.py'
+      - 'tests/test_audit_official_lock_timeliness.py'
+      - '.github/workflows/pregame.yml'
   # A change to the lock gate can initiate a real-time repair run without
   # requiring the external scheduler to fire again.
   push:
@@ -26,7 +31,19 @@ concurrency:
   group: nfl-forecast-${{ github.workflow }}
   cancel-in-progress: false
 jobs:
+  audit-tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pytest
+      - run: python -m pytest -q tests/test_audit_official_lock_timeliness.py
+
   forecast:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -78,6 +95,7 @@ jobs:
             # not create or modify locks; write_outputs remains authoritative.
             PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/verify_pregame_lock.py
+            python scripts/audit_official_lock_timeliness.py --season 2026
 
             # Confirm canonical forecasts and deterministic Reads match before commit.
             PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
