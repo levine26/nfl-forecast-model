@@ -117,7 +117,7 @@ jobs:
         run: npm install
       - name: Validate Bet Tracker ATS settlement contract
         working-directory: site
-        run: node --test tests/betTrackerMath.test.mjs tests/atsPolicyEraReceiptMigration.test.mjs tests/atsGradingContract.test.mjs tests/atsLockedReceiptSource.test.mjs
+        run: node --test tests/betTrackerMath.test.mjs tests/atsPolicyEraReceiptMigration.test.mjs tests/atsGradingContract.test.mjs tests/atsLockedReceiptSource.test.mjs tests/officialLockCountdown.test.mjs
       - name: Build dashboard
         working-directory: site
         run: npm run build
