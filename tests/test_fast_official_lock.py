@@ -85,10 +85,10 @@ def test_never_locks_early_and_never_backdates_after_delayed_dispatch():
     history = csv_text(COLUMNS, [])
     early, _, rows = build_new_receipts(feed, history, status(), NOW - timedelta(minutes=15))
     assert early == history and not rows
-    late, _, ids = build_new_receipts(feed, history, status(), NOW + timedelta(minutes=85))
+    late, _, ids = build_new_receipts(feed, history, status(), NOW + timedelta(minutes=65))
     assert ids == ["fresh"]
     row = list(csv.DictReader(io.StringIO(late)))[0]
-    assert row["lock_timestamp_utc"] == (NOW + timedelta(minutes=85)).isoformat()
+    assert row["lock_timestamp_utc"] == (NOW + timedelta(minutes=65)).isoformat()
 
 
 def test_rejects_stale_future_or_noncanonical_snapshots():
