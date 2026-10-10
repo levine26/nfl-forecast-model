@@ -22,6 +22,8 @@ import requests
 from bs4 import BeautifulSoup
 
 from nfl_forecast.context import TEAM_META
+from nfl_forecast.direct_report_resolution import resolve_original_report_url
+from nfl_forecast.source_policy import media_domain_family
 
 GOOGLE_NEWS_RSS = "https://news.google.com/rss/search"
 BING_NEWS_RSS = "https://www.bing.com/news/search"
@@ -348,7 +350,7 @@ def _as_editorial_item(row: dict[str, Any]) -> dict[str, Any]:
         "summary": str(row.get("summary") or "").strip()[:500],
         "strength": "Strong" if bool(row.get("substantive")) and bool(row.get("trusted_source")) else "Moderate",
         "source_name": str(row.get("source_name") or "Unknown source"),
-        "source_url": str(row.get("source_url") or row.get("publisher_url") or ""),
+        "source_url": str(row.get("direct_source_url") or ""),
         "as_of": published.isoformat() if isinstance(published, datetime) else _now().isoformat(),
         "side": "neutral",
         "relevance": "Fresh external reporting selects the human preview angle; editorial only.",
@@ -362,6 +364,9 @@ def _as_editorial_item(row: dict[str, Any]) -> dict[str, Any]:
             "publisher_url": row.get("publisher_url"),
             "published_utc": published.isoformat() if isinstance(published, datetime) else None,
             "social_verified": row.get("social_verified"),
+            "original_article_url_state": row.get("original_article_url_state", "unverified"),
+            "article_content_verified": False,
+            "claim_support_verified": False,
             "promoted_to_model": False,
         },
     }
@@ -379,6 +384,12 @@ def _fetch_game(game: pd.Series, session, lookback_days: int, max_items: int, ti
     bing_rows, bing_error = _fetch_feed(session, bing_url, "bing_news", timeout)
     x_rows, x_status = _fetch_x(session, away_name, home_name, timeout)
     ranked = _dedupe_and_rank(google_rows + bing_rows + x_rows, away_name, home_name, lookback_days, max_items)
+    for row in ranked:
+        direct, state = resolve_original_report_url(
+            str(row.get("source_url") or ""), session=session, timeout=min(timeout, 5),
+        )
+        row["direct_source_url"] = direct
+        row["original_article_url_state"] = state
     return gid, [_as_editorial_item(row) for row in ranked], {
         "google_error": bool(google_error),
         "bing_error": bool(bing_error),
@@ -425,6 +436,12 @@ def fetch_media_context(
         1 for items in out.values()
         if any(bool((item.get("metadata") or {}).get("trusted_source")) for item in items)
     )
+    direct_games = 0
+    pair_games = 0
+    for items in out.values():
+        direct_urls = [item["source_url"] for item in items if item.get("source_url")]
+        direct_games += bool(direct_urls)
+        pair_games += len({media_domain_family(url) for url in direct_urls}) >= 2
     status_name = "healthy" if games_with_reporting == len(predictions) and len(predictions) else "partial" if games_with_reporting else "degraded"
     return out, {
         "status": status_name,
@@ -433,6 +450,10 @@ def fetch_media_context(
         "games_with_reporting": games_with_reporting,
         "games_with_substantive_reporting": substantive_games,
         "games_with_trusted_reporting": trusted_games,
+        "games_with_direct_report_url_candidates": direct_games,
+        "games_with_two_independent_direct_report_url_candidates": pair_games,
+        "direct_reporting_state": "ready" if pair_games == len(predictions) and len(predictions) else "incomplete",
+        "direct_reporting_caveat": "Publisher URLs remain candidates until article content and claims are verified.",
         "signals": total_items,
         "providers": {
             "google_news_rss": {"errors": provider_errors["google_news"]},
