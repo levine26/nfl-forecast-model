@@ -1,3 +1,4 @@
+import { lockCountdownState } from './lockDeadline.js'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './experience-v2.css'
@@ -188,12 +189,15 @@ function MiniProbability({game}) {
   </div>
 }
 function lifecycle(game,now) {
-  const lock=game.lock_timestamp_utc || game.kickoff_utc
+  const state=lockCountdownState(game,now)
   if (game.lifecycle_status==='GRADED') return {key:'final',label:'FINAL',detail:'Pregame forecast preserved'}
-  if (game.lifecycle_status==='IN_PROGRESS') return {key:'live',label:'GAME IN PROGRESS',detail:game.lock_timestamp_utc?`Pregame forecast locked ${formatTime(game.lock_timestamp_utc)}`:'Pregame forecast locked'}
-  if (game.lifecycle_status==='FINAL_PREGAME' || game.immutable) return {key:'locked',label:'LOCKED',detail:game.lock_timestamp_utc?formatTime(game.lock_timestamp_utc):'Pregame receipt preserved'}
-  const left=countdown(lock,now)
-  return {key:'forecast',label:'LIVE FORECAST',detail:left?`Locks in ${left}`:(game.forecast_timestamp_utc?`Updated ${formatTime(game.forecast_timestamp_utc)}`:'Published')}
+  if (game.lifecycle_status==='IN_PROGRESS') return {key:'live',label:'GAME IN PROGRESS',detail:state.actualLockMillis?`Pregame forecast locked ${formatTime(game.lock_timestamp_utc)}`:'Official pregame lock receipt unavailable'}
+  if (state.phase==='locked') return {key:'locked',label:'LOCKED',detail:state.actualLockMillis?formatTime(game.lock_timestamp_utc):'Immutable pregame receipt preserved'}
+  if (state.phase==='missed') return {key:'overdue',label:'LOCK NOT VERIFIED',detail:'Kickoff passed without a published immutable lock'}
+  if (state.phase==='overdue') return {key:'overdue',label:'LOCK DUE',detail:'Scheduled T-120 deadline passed; awaiting official lock receipt'}
+  if (state.phase==='unknown') return {key:'forecast',label:'LIVE FORECAST',detail:'Official lock schedule unavailable'}
+  const left=countdown(new Date(state.deadlineMillis).toISOString(),now)
+  return {key:'forecast',label:'LIVE FORECAST',detail:left?`Locks in ${left}`:'Official lock due'}
 }
 
 function TopSignalsV2({games}) {
@@ -215,7 +219,8 @@ function TopSignalsV2({games}) {
 function ForecastExplorer({games,runs}) {
   const [sort,setSort]=useState('kickoff')
   const [filter,setFilter]=useState('all')
-  const now=Date.now()
+  const [now,setNow]=useState(Date.now())
+  useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),30000);return()=>clearInterval(id)},[])
   const rows=useMemo(()=>{
     let next=[...games]
     if (filter==='upcoming') next=next.filter(g=>!['IN_PROGRESS','GRADED'].includes(g.lifecycle_status))
