@@ -86,3 +86,34 @@ def test_syntactically_plausible_same_publisher_is_not_independent():
         {"source_url": "https://www.nfl.com/news/a-second-report"},
     ]
     assert "fewer_than_two_independent_direct_report_url_candidates" in audit_editorial_acceptance(_frame(), games)["issues"]["g2"]
+
+def test_public_display_strips_search_intermediaries_and_only_retains_direct_sources():
+    from scripts.finalize_editorial import _display_media
+
+    items = {
+        "g1": [
+            {"title": "Cowboys Buccaneers game context",
+             "source_url": "https://news.google.com/rss/articles/abc"},
+            {"title": "Dallas defensive adjustments vs Tampa Bay",
+             "source_url": "https://www.nfl.com/news/cowboys-buccaneers-defensive-adjustments"},
+            {"title": "How the Buccaneers attack Dallas coverage",
+             "source_url": "https://www.cbssports.com/nfl/news/buccaneers-cowboys-coverage"},
+        ]
+    }
+    visible, counts = _display_media(items)
+    assert counts["intermediary_only_urls_rejected"] == 1
+    assert counts["games_with_two_independent_direct_report_url_candidates"] == 1
+    assert len(visible["g1"]) == 2
+    assert all("news.google.com" not in item["source_url"] for item in visible["g1"])
+
+
+def test_public_display_does_not_invent_source_link_from_publisher_name():
+    from scripts.finalize_editorial import _display_media
+
+    media = {"g1": [{"source_name": "Associated Press",
+                     "title": "A plausible matchup report",
+                     "source_url": "https://www.bing.com/news/apiclick.aspx?id=opaque"}]}
+    displayed, counts = _display_media(media)
+    assert displayed == {}
+    assert counts["games_with_display_reporting"] == 0
+    assert counts["intermediary_only_urls_rejected"] == 1
