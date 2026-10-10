@@ -44,6 +44,9 @@ jobs:
       - name: Install dashboard dependencies
         working-directory: site
         run: npm install
+      - name: Validate countdown clock-skew regressions
+        working-directory: site
+        run: node --test tests/officialLockCountdown.test.mjs
       - name: Install browser
         working-directory: site
         run: npx playwright install --with-deps chromium

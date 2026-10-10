@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './experience-v2.css'
-import {officialLockTiming} from './officialLockCountdown.mjs'
+import {officialLockTiming, serverClockOffsetMs} from './officialLockCountdown.mjs'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -133,6 +133,30 @@ function countdown(target,now) {
   if (hours>0) return `${hours}h ${minutes}m`
   return `${minutes}m`
 }
+function useOfficialLockClock() {
+  const [localNow,setLocalNow]=useState(Date.now())
+  const [serverOffset,setServerOffset]=useState(0)
+  useEffect(()=>{
+    const timer=setInterval(()=>setLocalNow(Date.now()),30000)
+    return ()=>clearInterval(timer)
+  },[])
+  useEffect(()=>{
+    let active=true
+    const requestStarted=Date.now()
+    fetch(BASE+'data/status.json',{method:'HEAD',cache:'no-store'})
+      .then(response=>{
+        const responseReceived=Date.now()
+        const offset=response.ok
+          ? serverClockOffsetMs(response.headers.get('Date'),requestStarted,responseReceived)
+          : null
+        if(active && offset!==null) setServerOffset(offset)
+      })
+      .catch(()=>{}) // Device-clock fallback if the CDN omits a Date header.
+    return ()=>{active=false}
+  },[])
+  return localNow+serverOffset
+}
+
 function movementRows(game,runs) {
   const cutoff=Date.parse(game.lock_timestamp_utc || game.forecast_timestamp_utc || '')
   return runs.filter(row=>row.game_id===game.game_id && row.prediction_timestamp_utc).map(row=>({
@@ -217,7 +241,7 @@ function TopSignalsV2({games}) {
 function ForecastExplorer({games,runs}) {
   const [sort,setSort]=useState('kickoff')
   const [filter,setFilter]=useState('all')
-  const now=Date.now()
+  const now=useOfficialLockClock()
   const rows=useMemo(()=>{
     let next=[...games]
     if (filter==='upcoming') next=next.filter(g=>!['IN_PROGRESS','GRADED'].includes(g.lifecycle_status))
@@ -255,8 +279,7 @@ function ForecastExplorer({games,runs}) {
 }
 
 function LifecycleRibbon({game}) {
-  const [now,setNow]=useState(Date.now())
-  useEffect(()=>{const id=setInterval(()=>setNow(Date.now()),30000);return()=>clearInterval(id)},[])
+  const now=useOfficialLockClock()
   const state=lifecycle(game,now)
   return <div className={`ss-exp-lifecycle ${state.key}`}><span><i/>{state.label}</span><b>{state.detail}</b>{game.market_timestamp_utc&&<small>Market updated {formatTime(game.market_timestamp_utc)}</small>}</div>
 }
