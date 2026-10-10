@@ -303,12 +303,130 @@
   },
   "generated_utc": "2026-10-10T15:57:13.566130+00:00",
   "groq_provider_fallback": {
-    "context_refresh_preserved": true,
-    "failed_games": [],
-    "games": {},
+    "failed_games": [
+      "2026_05_BAL_ATL",
+      "2026_05_BUF_LA",
+      "2026_05_CIN_MIA",
+      "2026_05_CLE_NYJ",
+      "2026_05_DEN_LAC",
+      "2026_05_DET_ARI",
+      "2026_05_HOU_TEN",
+      "2026_05_IND_PIT",
+      "2026_05_LV_NE",
+      "2026_05_MIN_NO",
+      "2026_05_NYG_WAS",
+      "2026_05_SF_SEA",
+      "2026_05_TB_DAL"
+    ],
+    "games": {
+      "2026_05_BAL_ATL": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:21:16.709318+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_BUF_LA": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:22:22.650448+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_CIN_MIA": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_05_CIN_MIA: editorial quality: no concrete tactical action-and-counteraction explanation",
+        "recovered_at_utc": "2026-10-10T16:06:22.287736+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_CLE_NYJ": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_05_CLE_NYJ: repeats substantive seven-word phrase with 2026_05_CHI_GB: to rely on a thin receiving corps",
+        "recovered_at_utc": "2026-10-10T16:10:11.530017+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_DEN_LAC": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:17:58.831358+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_DET_ARI": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:19:04.783992+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_HOU_TEN": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:12:29.077429+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_IND_PIT": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:13:34.988351+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_LV_NE": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:14:40.923735+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_MIN_NO": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:15:46.882877+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_NYG_WAS": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:16:52.876604+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_SF_SEA": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-10T16:20:10.781295+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_TB_DAL": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "focused_validation_failed: 2026_05_TB_DAL: paragraph1 must discuss both teams",
+        "recovered_at_utc": "2026-10-10T16:01:18.298594+00:00",
+        "requires_chatgpt_refresh": true
+      }
+    },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "36798600244",
-    "status": "healthy"
+    "run_id": "38065866668",
+    "status": "degraded"
   },
   "injuries": {
     "as_of": "2026-10-10T15:57:13.735078+00:00",
