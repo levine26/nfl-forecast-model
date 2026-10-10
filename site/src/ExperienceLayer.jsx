@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './experience-v2.css'
+import {officialLockTiming} from './officialLockCountdown.mjs'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -188,12 +189,13 @@ function MiniProbability({game}) {
   </div>
 }
 function lifecycle(game,now) {
-  const lock=game.lock_timestamp_utc || game.kickoff_utc
-  if (game.lifecycle_status==='GRADED') return {key:'final',label:'FINAL',detail:'Pregame forecast preserved'}
-  if (game.lifecycle_status==='IN_PROGRESS') return {key:'live',label:'GAME IN PROGRESS',detail:game.lock_timestamp_utc?`Pregame forecast locked ${formatTime(game.lock_timestamp_utc)}`:'Pregame forecast locked'}
-  if (game.lifecycle_status==='FINAL_PREGAME' || game.immutable) return {key:'locked',label:'LOCKED',detail:game.lock_timestamp_utc?formatTime(game.lock_timestamp_utc):'Pregame receipt preserved'}
-  const left=countdown(lock,now)
-  return {key:'forecast',label:'LIVE FORECAST',detail:left?`Locks in ${left}`:(game.forecast_timestamp_utc?`Updated ${formatTime(game.forecast_timestamp_utc)}`:'Published')}
+  const timing=officialLockTiming(game,now)
+  if (game.lifecycle_status==='GRADED') return {key:'final',label:'FINAL',detail:timing.actualLockUtc?`Official lock: ${formatTime(timing.actualLockUtc)}`:'Official lock receipt unavailable'}
+  if (game.lifecycle_status==='IN_PROGRESS') return {key:'live',label:'GAME IN PROGRESS',detail:timing.actualLockUtc?`Pregame forecast locked ${formatTime(timing.actualLockUtc)}`:'Official pregame lock receipt unavailable'}
+  if (timing.state==='locked') return {key:'locked',label:'LOCKED',detail:timing.actualLockUtc?formatTime(timing.actualLockUtc):'Pregame receipt preserved'}
+  if (timing.state==='unavailable') return {key:'forecast',label:'LOCK TIME UNAVAILABLE',detail:'Canonical kickoff time missing'}
+  if (timing.state==='due') return {key:'forecast',label:'LOCK DUE',detail:'Awaiting official immutable receipt'}
+  return {key:'forecast',label:'LIVE FORECAST',detail:`Locks in ${countdown(timing.scheduledLockUtc,now)}`}
 }
 
 function TopSignalsV2({games}) {
