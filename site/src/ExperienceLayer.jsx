@@ -297,7 +297,7 @@ function researchMeta(preview,evidence) {
   return {sources,latest:stamps.length?new Date(Math.max(...stamps)).toISOString():null}
 }
 function SignalV2({preview,evidence=[]}) {
-  if (!hasPublishedHumanRead(preview)) return <section className="ss-exp-signal ss-exp-empty-signal"><span>THE SIGNAL</span><h2>Matchup analysis is awaiting source and editorial acceptance.</h2><p>LevLine's numerical forecast remains available. This section does not publish deterministic template prose as a validated human Read.</p></section>
+  if (!hasPublishedHumanRead(preview)) return <section className="ss-exp-signal ss-exp-empty-signal"><header><div><span>THE SIGNAL</span><small>Source and editorial validation pending</small></div><b>Matchup preview pending</b></header><h2>Matchup analysis is awaiting source and editorial acceptance.</h2><p className="ss-exp-bottom-line">LevLine's numerical forecast remains available. This section does not publish deterministic template prose as a validated human Read.</p></section>
   const {sources,latest}=researchMeta(preview,evidence)
   const paragraphs=Array.isArray(preview?.paragraphs)?preview.paragraphs.filter(Boolean):[]
   const factors=(preview?.key_factors||[]).filter(x=>x?.title).slice(0,3)
