@@ -56,3 +56,15 @@ def test_tactical_interaction_is_required_even_with_jargon():
     assert "no concrete tactical action-and-counteraction explanation" in assess_human_read(
         "Bills and Rams football preview", text
     )
+
+
+def test_fast_and_first_are_not_false_positive_fst_mentions():
+    text = GOOD_READ + " Atlanta's fast tempo forces the defense to react first."
+    issues = assess_human_read(GOOD_HEADLINE, text)
+    assert not any("model or betting" in issue for issue in issues)
+
+
+def test_literal_fst_name_is_rejected_in_human_matchup_paragraph():
+    text = GOOD_READ + " The F-ST model confirms that football analysis."
+    issues = assess_human_read(GOOD_HEADLINE, text)
+    assert any("model or betting" in issue for issue in issues)

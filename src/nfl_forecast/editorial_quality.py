@@ -46,7 +46,7 @@ INTERACTION = re.compile(
     re.I,
 )
 MODEL_LEAKAGE = re.compile(
-    r"\b(?:levline|f.st|pure model|moneyline|probability.implied|"
+    r"\b(?:levline|f[-–—]st|pure model|moneyline|probability.implied|"
     r"market gap|vig.free|expected.margin)\b",
     re.I,
 )
