@@ -8,11 +8,6 @@ on:
       - "tests/test_chatgpt_media_ingest.py"
       - "inputs/chatgpt_media/current/**"
       - ".github/workflows/chatgpt_media_ingest.yml"
-  push:
-    branches: [main]
-    paths:
-      - "inputs/chatgpt_media/current/**"
-      - ".github/workflows/chatgpt_media_ingest.yml"
 
 permissions:
   contents: write
