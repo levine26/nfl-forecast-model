@@ -293,8 +293,8 @@ def main() -> None:
 
         p1_words = re.findall(r"\b[\w'-]+\b", paragraph1)
         p2_words = re.findall(r"\b[\w'-]+\b", paragraph2)
-        if not 45 <= len(p1_words) <= 120:
-            failures.append(f"{gid}: paragraph1 length {len(p1_words)} outside 45-120")
+        if not 55 <= len(p1_words) <= 100:
+            failures.append(f"{gid}: paragraph1 length {len(p1_words)} outside 55-100")
         if not 50 <= len(p2_words) <= 125:
             failures.append(f"{gid}: paragraph2 length {len(p2_words)} outside 50-125")
         if not 12 <= len(headline) <= 150:
