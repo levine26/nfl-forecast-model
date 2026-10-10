@@ -73,6 +73,13 @@ def test_media_context_prioritizes_major_reporting_and_rejects_noise(monkeypatch
     assert status["games_with_substantive_reporting"] == 1
     assert status["games_with_trusted_reporting"] == 1
     assert status["providers"]["x_recent_search"]["status"] == "unavailable"
+    # Discovery metadata alone cannot be counted as validated original reporting.
+    assert items[0]["source_url"] == ""
+    assert items[0]["metadata"]["original_article_url_state"] == "unapproved_discovery_url"
+    assert items[0]["metadata"]["article_content_verified"] is False
+    assert status["games_with_direct_report_url_candidates"] == 0
+    assert status["games_with_two_independent_direct_report_url_candidates"] == 0
+    assert status["direct_reporting_state"] == "incomplete"
 
 
 def test_media_led_read_is_matchup_preview_then_model_explanation():
