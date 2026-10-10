@@ -1,4 +1,4 @@
-from nfl_forecast.editorial_quality import assess_human_read
+from nfl_forecast.editorial_quality import assess_human_read, human_read_length_valid
 
 
 GOOD_HEADLINE = "Falcons rush challenges depleted Saints linebackers"
@@ -68,3 +68,10 @@ def test_literal_fst_name_is_rejected_in_human_matchup_paragraph():
     text = GOOD_READ + " The F-ST model confirms that football analysis."
     issues = assess_human_read(GOOD_HEADLINE, text)
     assert any("model or betting" in issue for issue in issues)
+
+
+def test_human_paragraph_length_contract_has_exact_55_to_100_bounds():
+    for size in (54, 101):
+        assert not human_read_length_valid("football " * size)
+    for size in (55, 75, 100):
+        assert human_read_length_valid("football " * size)
