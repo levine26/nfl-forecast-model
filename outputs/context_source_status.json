@@ -1,6 +1,6 @@
 {
   "advanced_sources": {
-    "as_of": "2026-10-10T15:58:21.331780+00:00",
+    "as_of": "2026-10-10T16:28:58.682587+00:00",
     "matrix": [
       {
         "automation": "production",
@@ -75,7 +75,7 @@
     "status": "healthy"
   },
   "career_qb_verification": {
-    "as_of": "2026-10-10T15:58:26.325126+00:00",
+    "as_of": "2026-10-10T16:29:02.546088+00:00",
     "conflicts": 0,
     "evidence_items_added": 24,
     "guardrail": "Career facts come from full weekly player stats with a 10-attempt meaningful-game threshold and are cross-checked against the recent PBP game IDs; conflicts fail closed and are not published.",
@@ -88,7 +88,7 @@
     "verified": 24
   },
   "coaching": {
-    "as_of": "2026-10-10T15:57:13.931062+00:00",
+    "as_of": "2026-10-10T16:27:19.437987+00:00",
     "current_retry_recoveries": 0,
     "current_team_coverage": 30,
     "negative_cache_ttl_minutes": 60,
@@ -259,7 +259,7 @@
     "unique_headlines": 15
   },
   "editorial_intelligence": {
-    "as_of": "2026-10-10T15:58:14.858230+00:00",
+    "as_of": "2026-10-10T16:28:48.336359+00:00",
     "families": [
       "pressure",
       "explosives",
@@ -286,9 +286,9 @@
   },
   "evidence": {
     "games": 15,
-    "generated_utc": "2026-10-10T15:57:13.566130+00:00",
+    "generated_utc": "2026-10-10T16:27:19.127037+00:00",
     "guardrail": "Context is explanatory only unless a feature is separately validated and promoted into the numerical model.",
-    "signals": 233,
+    "signals": 232,
     "status": "healthy"
   },
   "ftn": {
@@ -301,8 +301,9 @@
     ],
     "status": "healthy"
   },
-  "generated_utc": "2026-10-10T15:57:13.566130+00:00",
+  "generated_utc": "2026-10-10T16:27:19.127037+00:00",
   "groq_provider_fallback": {
+    "context_refresh_preserved": true,
     "failed_games": [
       "2026_05_BAL_ATL",
       "2026_05_BUF_LA",
@@ -429,7 +430,7 @@
     "status": "degraded"
   },
   "injuries": {
-    "as_of": "2026-10-10T15:57:13.735078+00:00",
+    "as_of": "2026-10-10T16:27:19.265924+00:00",
     "players": 357,
     "provider": "NFL.com",
     "source": "https://www.nfl.com/injuries/league/2026/reg5",
@@ -437,17 +438,20 @@
     "teams_with_reported_players": 30
   },
   "media_reporting": {
-    "as_of": "2026-10-10T15:58:33.656678+00:00",
+    "as_of": "2026-10-10T16:29:10.641942+00:00",
     "cross_game_titles_rejected": 0,
+    "direct_reporting_caveat": "Publisher URLs remain candidates until article content and claims are verified.",
+    "direct_reporting_state": "incomplete",
     "direct_url_guardrail": "Never publish Google News or Bing redirect as journalism. Link-shape approval does not verify source content or claim support.",
     "games": 15,
-    "games_with_display_reporting": 2,
+    "games_with_direct_report_url_candidates": 0,
+    "games_with_display_reporting": 0,
     "games_with_reporting": 15,
     "games_with_substantive_reporting": 15,
     "games_with_trusted_reporting": 15,
     "games_with_two_independent_direct_report_url_candidates": 0,
     "generic_titles_rejected": 12,
-    "intermediary_only_urls_rejected": 46,
+    "intermediary_only_urls_rejected": 48,
     "providers": {
       "bing_news_rss": {
         "errors": 0
@@ -464,7 +468,7 @@
     "status": "healthy"
   },
   "nextgen_qb_context": {
-    "as_of": "2026-10-10T15:58:25.441595+00:00",
+    "as_of": "2026-10-10T16:29:01.633495+00:00",
     "evidence_items_added": 22,
     "guardrail": "NGS adds player-level explanatory context only; it does not alter LevLine without separate chronological validation.",
     "qb_profiles_matched": 22,
@@ -537,7 +541,7 @@
     "status": "healthy"
   },
   "scheme": {
-    "as_of": "2026-10-10T15:57:16.852229+00:00",
+    "as_of": "2026-10-10T16:27:22.234338+00:00",
     "charted_plays": 10996,
     "season": 2026,
     "source": "https://nflreadr.nflverse.com/articles/dictionary_ftn_charting.html",
@@ -570,7 +574,7 @@
     "story_items_added": 15
   },
   "weather": {
-    "as_of": "2026-10-10T15:58:05.889491+00:00",
+    "as_of": "2026-10-10T16:28:33.227404+00:00",
     "games_checked": 11,
     "status": "degraded"
   }
