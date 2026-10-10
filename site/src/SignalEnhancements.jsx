@@ -1,3 +1,4 @@
+import { canonicalReportLink } from './editorialSourceLinks.mjs'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './signal-enhancements.css'
@@ -254,21 +255,22 @@ function EnhancedSignal({preview}) {
   const factors=(preview.key_factors||[]).filter(item=>item?.title).slice(0,3)
   const sources=[]
   const seen=new Set()
-  for (const item of preview.evidence_used||[]) {
-    const key=item.source_name||item.source_url
-    if (!key || seen.has(key)) continue
-    seen.add(key); sources.push(item)
+  for (const item of [...(preview.current_reported_sources||[]),...(preview.evidence_used||[])]) {
+    const original=canonicalReportLink(item.source_url)
+    if (!original || seen.has(original)) continue
+    seen.add(original)
+    sources.push({...item,source_url:original})
     if (sources.length>=6) break
   }
   return <section className="ss-plus-signal ss-the-signal">
-    <div className="ss-plus-signal-head"><div><span>THE SIGNAL</span><small>{preview.editorial_voice?.media_source_count||sources.length||0} researched sources · {preview.editorial_version||'editorial desk'}</small></div><strong>Same game. A clearer edge.</strong></div>
+    <div className="ss-plus-signal-head"><div><span>THE SIGNAL</span><small>{sources.length} direct report links · {preview.editorial_version||'editorial desk'}</small></div><strong>Same game. A clearer edge.</strong></div>
     {headline?<h2>{headline}</h2>:<p className="ss-empty">Game-specific editorial intelligence has not cleared the publication threshold yet.</p>}
     {paragraphs.slice(0,2).map((text,index)=><p key={index}>{text}</p>)}
     {!paragraphs.length&&preview.key_factors?.[0]?.summary&&<p>{preview.key_factors[0].summary}</p>}
     {factors.length>0&&<div className="ss-plus-what-matters"><span>WHAT MATTERS</span><div>{factors.map((factor,index)=><article key={`${factor.title}-${index}`}>
       <header><b>{factor.advantage_team||'WATCH'}</b><small>{factor.strength||factor.family||'Context'}</small></header><strong>{factor.title}</strong>{factor.summary&&<p>{factor.summary}</p>}
     </article>)}</div></div>}
-    {sources.length>0&&<details className="ss-plus-sources"><summary>Research trail <span>{sources.length} source groups</span></summary><div>{sources.map((source,index)=><a key={`${source.source_name}-${index}`} href={source.source_url||undefined} target={source.source_url?'_blank':undefined} rel="noreferrer"><span>{String(source.category||'source').replaceAll('_',' ')}</span><b>{source.source_name}</b><small>{source.strength||''}</small></a>)}</div></details>}
+    {sources.length>0&&<details className="ss-plus-sources"><summary>Original reporting <span>{sources.length} direct links; claims not independently audited</span></summary><div>{sources.map((source,index)=><a key={`${source.source_name}-${index}`} href={source.source_url||undefined} target={source.source_url?'_blank':undefined} rel="noreferrer"><span>{String(source.category||'source').replaceAll('_',' ')}</span><b>{source.source_name}</b><small>{source.strength||''}</small></a>)}</div></details>}
     {preview.guardrail&&<small className="ss-plus-guardrail">{preview.guardrail}</small>}
   </section>
 }
