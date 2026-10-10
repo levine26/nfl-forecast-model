@@ -1,0 +1,112 @@
+name: Sunday Signal fast official T-120 lock
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Independent five-minute opportunities. GitHub scheduling is best-effort;
+    # this never claims strict execution at the exact minute.
+    - cron: "*/5 * * * *"
+  workflow_run:
+    workflows:
+      - "Hourly NFL market refresh"
+      - "Daily NFL model refresh"
+      - "Pregame NFL refresh"
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/fast_official_lock.yml"
+      - "scripts/fast_official_lock.py"
+  pull_request:
+    paths:
+      - ".github/workflows/fast_official_lock.yml"
+      - "scripts/fast_official_lock.py"
+      - "tests/test_fast_official_lock.py"
+      - "scripts/audit_official_lock_timeliness.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sunday-signal-fast-official-t120-lock
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install numpy pandas pytest requests
+      - name: Verify append-only lock safety and model identity
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" python -m pytest -q \
+            tests/test_fast_official_lock.py \
+            tests/test_official_locking.py \
+            tests/test_verify_pregame_lock.py \
+            tests/test_audit_official_lock_timeliness.py
+
+  lock:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Cheap deadline gate without a model run
+        id: due
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          python scripts/pregame_due.py --min-minutes 0 --max-minutes 123 | tee /tmp/lock-due.txt
+          if grep -q '^due=true$' /tmp/lock-due.txt; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "due=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        if: steps.due.outputs.due == 'true'
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install only lock/publication dependencies
+        if: steps.due.outputs.due == 'true'
+        run: pip install numpy pandas requests
+      - name: Append immutable receipts from current canonical snapshot
+        if: steps.due.outputs.due == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "levline-lock-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          for attempt in 1 2 3; do
+            # Never rebase an already-created receipt across refreshed model
+            # output. Re-read current main and recompute lock eligibility.
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd outputs/lock_fast_path_receipts/
+            export PYTHONPATH="$PWD/src:$PWD"
+            python scripts/fast_official_lock.py --output-dir outputs
+            if git diff --quiet -- outputs/prediction_history.csv; then
+              echo "No new eligible official locks; do not publish anything."
+              exit 0
+            fi
+            python scripts/audit_official_lock_timeliness.py --season 2026
+            python -m scripts.sync_market_reads --output-dir outputs --check
+            git add outputs/prediction_history.csv outputs/status.json \
+              outputs/official_lock_timeliness.json outputs/lock_fast_path_receipts/
+            git commit -m "Append on-time official T-120 lock from canonical F-ST snapshot"
+            if git push origin HEAD:main; then
+              echo "Fast official lock published atomically with provenance."
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Fast-lock publication lost three main races; fail closed."
+              exit 1
+            fi
+          done
