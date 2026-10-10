@@ -14,6 +14,7 @@ from compose_copilot_media_reads import _domain_family, _extract_json
 from nfl_forecast.copilot_source_backfill import backfill_direct_sources
 from nfl_forecast.editorial_provider_fallback import recover_focused_payload
 from nfl_forecast.source_policy import is_direct_media_report_url
+from nfl_forecast.editorial_quality import assess_human_read
 from validate_copilot_media_reads import _mentions_any, _team_aliases, _team_name, _unique_ngrams
 
 
@@ -303,6 +304,7 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
         failures.append(
             f"{gid}: paragraph1 must name at least two concrete players/coaches; found {sorted(named_people)}"
         )
+    failures.extend(f"{gid}: editorial quality: {issue}" for issue in assess_human_read(headline, paragraph1))
     paragraph1_lower = paragraph1.lower()
     for phrase in GENERIC_HUMAN_PHRASES:
         if phrase in paragraph1_lower:
