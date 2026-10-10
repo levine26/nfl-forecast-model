@@ -1,29 +1,51 @@
-# ChatGPT-primary Sunday Signal editorial path
+# Sunday Signal editorial provider authority — October 2026
+
+This document supersedes the historical ChatGPT-primary experiment that temporarily
+retired autonomous Groq dispatch. The official forecasting system remains
+`F-ST-01-FROZEN-2026`, with an immutable prediction-lock history.
 
 ## Production authority
 
-Sunday Signal HUMAN editorial content is produced from the ChatGPT current bundle under `inputs/chatgpt_media/current/`.
+Groq is the primary automated human-matchup writer. The
+`Sunday Signal Groq post-context dispatcher` observes successful contextual
+intelligence runs and dispatches the existing Groq media writer only when the
+current slate lacks complete validated human layers, material freshness
+advisories exist, or the current provider artifact is older than 36 hours.
 
-The production numerical forecast remains `F-ST-01-FROZEN-2026`. This migration does not change model features, probabilities, grading, locks, expected-margin diagnostics, or the canonical public-forecast bridge.
+Provider spend is bounded by deduplication against active writer runs and a
+six-hour retry cooldown after a failed provider run. The writer itself still
+requires fresh contextual inputs and enforces focused game validation,
+independent direct reporting, full-slate validation, and exact deterministic
+F-ST numerical paragraph parity before publication.
 
-## Runtime
+## ChatGPT recovery
 
-1. Contextual intelligence refreshes reporting/evidence.
-2. ChatGPT refreshes only stale, contradicted, or missing HUMAN-layer game payloads using current direct reporting.
-3. The complete current bundle remains present for the full 16-game slate.
-4. `Sunday Signal ChatGPT primary editorial ingestion` performs focused validation, composition, deterministic LevLine paragraph rendering, full-slate validation, and atomic publication.
-5. A failed ChatGPT refresh retains the last validated HUMAN Read for that game unless the existing copy is factually unsafe.
+The ChatGPT consumer application cannot be invoked autonomously by GitHub
+Actions. The `inputs/chatgpt_media/fallback/<game_id>.json` and
+`inputs/chatgpt_media/fallback/manifest.json` contract is an honest,
+explicit human handoff for failed Groq games. The `ChatGPT primary editorial
+ingestion` workflow remains manual-only as an emergency recovery surface.
+It must not automatically overwrite newer validated Groq human prose.
 
-## Groq retirement
+Successful Groq games survive unrelated contextual and numerical refreshes.
+Fresh deterministic paragraph 2 comes only from canonical F-ST/market
+data. Missing ChatGPT payloads do not count as successful recoveries.
 
-Automatic Groq dispatch and scheduled/push production runs are disabled. The legacy Groq writer remains manual-only as an explicit rollback mechanism and is not a production authority.
+## Operational conditions
 
-Legacy `groq_provider_fallback` status is historical compatibility data after this migration and must not be used as the current production-health gate. Production health is determined by the validated ChatGPT current bundle, full-slate validator, deterministic paragraph-2 renderer, canonical forecast provenance, and live deployment.
+1. If a current game is absent from the provider artifact, expect an
+   autonomous Groq dispatch after the next successful contextual run.
+2. If a writer is already active, do not dispatch another writer.
+3. If the last writer failed within six hours, report the failure and wait
+   for the next eligible context heartbeat rather than repeatedly billing
+   the provider.
+4. If the Groq secret is absent, the writer fails; no generic text is
+   promoted as provider-authored content.
+5. A green Groq workflow is not a live editorial acceptance receipt:
+   inspect the current complete output and the deployed site.
+6. If the context workflow fails, leave the last published canonical
+   model and validated human content intact; do not run a provider
+   against stale source evidence.
 
-## Safety properties
-
-- ChatGPT editorial content cannot change LevLine probabilities.
-- Paragraph 2 is regenerated from the latest canonical prediction row.
-- Existing validated HUMAN prose survives unrelated context refreshes.
-- Refresh failure is game-scoped.
-- Publication remains fail-closed on focused/full-slate/source/uniqueness/pick validation.
+The official model, official win probabilities, historical locks,
+grading, and research firewall are out of scope for editorial changes.
