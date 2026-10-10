@@ -39,7 +39,7 @@ on:
       - "tests/test_read_contract.py"
       - "tests/test_advanced_player_context.py"
       - "tests/test_career_qb_context.py"
-      - "tests/test_editorial_finalize.py"
+      - "tests/test_editorial_finalize.py tests/test_editorial_acceptance.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   pull_request:
@@ -78,7 +78,7 @@ on:
       - "tests/test_read_contract.py"
       - "tests/test_advanced_player_context.py"
       - "tests/test_career_qb_context.py"
-      - "tests/test_editorial_finalize.py"
+      - "tests/test_editorial_finalize.py tests/test_editorial_acceptance.py"
       - "pyproject.toml"
       - ".github/workflows/context.yml"
   schedule:
@@ -105,7 +105,7 @@ jobs:
           cache: pip
       - run: pip install ".[dev]"
       - name: Test contextual intelligence
-        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py tests/test_publication_polish.py tests/test_media_context.py tests/test_read_contract.py tests/test_advanced_player_context.py tests/test_career_qb_context.py tests/test_editorial_finalize.py
+        run: pytest -q tests/test_context.py tests/test_context_plus.py tests/test_coaching.py tests/test_qb_history_portability.py tests/test_injuries.py tests/test_personnel_impact.py tests/test_staff_impact.py tests/test_narrative.py tests/test_publication_polish.py tests/test_media_context.py tests/test_read_contract.py tests/test_advanced_player_context.py tests/test_career_qb_context.py tests/test_editorial_finalize.py tests/test_editorial_acceptance.py
       - uses: actions/cache@v4
         with:
           path: .cache/nflreadpy
