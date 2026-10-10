@@ -25,3 +25,18 @@ export function officialLockTiming(game, nowMs = Date.now()) {
     scheduledLockUtc: new Date(scheduledMs).toISOString(),
   }
 }
+
+
+/**
+ * Correct countdowns for an inaccurate device clock using the same-origin
+ * HTTP Date header. Network RTT is centered on the local send/receive times.
+ * A missing, invalid, or reversed response has no usable clock correction.
+ */
+export function serverClockOffsetMs(httpDate, requestStartedMs, responseReceivedMs) {
+  const remoteMs = Date.parse(httpDate || '')
+  if (!Number.isFinite(remoteMs) || !Number.isFinite(requestStartedMs) ||
+      !Number.isFinite(responseReceivedMs) || responseReceivedMs < requestStartedMs) {
+    return null
+  }
+  return Math.round(remoteMs - (requestStartedMs + responseReceivedMs) / 2)
+}
