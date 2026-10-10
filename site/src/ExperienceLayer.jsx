@@ -1,3 +1,4 @@
+import { canonicalReportLink } from './editorialSourceLinks.mjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './experience-v2.css'
@@ -264,9 +265,9 @@ function LifecycleRibbon({game}) {
 function researchMeta(preview,evidence) {
   const sources=[]
   const seen=new Set()
-  for (const item of preview?.evidence_used||[]) {
-    const key=item.source_name||item.source_url
-    if (key&&!seen.has(key)) { seen.add(key);sources.push(item) }
+  for (const item of [...(preview?.current_reported_sources||[]),...(preview?.evidence_used||[])]) {
+    const original=canonicalReportLink(item.source_url)
+    if (original&&!seen.has(original)) { seen.add(original);sources.push({...item,source_url:original}) }
   }
   const stamps=[preview?.updated_utc,preview?.generated_utc,...sources.map(x=>x.as_of||x.published_at||x.timestamp),...evidence.map(x=>x.as_of)].filter(Boolean).map(Date.parse).filter(Number.isFinite)
   return {sources,latest:stamps.length?new Date(Math.max(...stamps)).toISOString():null}
@@ -279,10 +280,10 @@ function SignalV2({preview,evidence=[]}) {
   const bottom=paragraphs[0]||factors[0]?.summary
   if (!headline) return <section className="ss-exp-signal ss-exp-empty-signal"><span>THE SIGNAL</span><h2>Matchup analysis is being researched.</h2><p>The LevLine forecast is live. The Signal will appear after the research and source-validation pipeline clears publication.</p></section>
   return <section className="ss-exp-signal">
-    <header><div><span>THE SIGNAL</span><small>{latest?`Research updated ${relativeFreshness(latest)}`:'Research timestamp unavailable'} · {sources.length||preview?.editorial_voice?.media_source_count||0} sources checked</small></div><b>Quick matchup read</b></header>
+    <header><div><span>THE SIGNAL</span><small>{latest?`Research updated ${relativeFreshness(latest)}`:'Research timestamp unavailable'} · {sources.length} direct article links (verification pending)</small></div><b>Quick matchup read</b></header>
     <h2>{headline}</h2>{bottom&&<p className="ss-exp-bottom-line">{bottom}</p>}
     {factors.length>0&&<div className="ss-exp-what-matters"><span>WHAT MATTERS</span><div>{factors.map((factor,index)=><article key={`${factor.title}-${index}`}><header><b>{factor.advantage_team||'WATCH'}</b><small>{factor.strength||factor.family||'Context'}</small></header><strong>{factor.title}</strong>{factor.summary&&<p>{factor.summary}</p>}</article>)}</div></div>}
-    <details><summary>Read full analysis <span>Research trail & supporting context</span></summary><div className="ss-exp-full-analysis">{paragraphs.slice(bottom===paragraphs[0]?1:0).map((text,index)=><p key={index}>{text}</p>)}{sources.length>0&&<div className="ss-exp-sources">{sources.slice(0,8).map((source,index)=><a key={`${source.source_name||source.source_url}-${index}`} href={source.source_url||undefined} target={source.source_url?'_blank':undefined} rel="noreferrer"><small>{String(source.category||'source').replaceAll('_',' ')}</small><b>{source.source_name||'Source'}</b></a>)}</div>}</div></details>
+    <details><summary>Read full analysis <span>Direct source links & supporting context</span></summary><div className="ss-exp-full-analysis">{paragraphs.slice(bottom===paragraphs[0]?1:0).map((text,index)=><p key={index}>{text}</p>)}{sources.length>0&&<div className="ss-exp-sources">{sources.slice(0,8).map((source,index)=><a key={`${source.source_name||source.source_url}-${index}`} href={source.source_url||undefined} target={source.source_url?'_blank':undefined} rel="noreferrer"><small>{String(source.category||'source').replaceAll('_',' ')}</small><b>{source.source_name||'Source'}</b></a>)}</div>}</div></details>
   </section>
 }
 
