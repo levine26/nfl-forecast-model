@@ -14,7 +14,7 @@ from compose_copilot_media_reads import _domain_family, _extract_json
 from nfl_forecast.copilot_source_backfill import backfill_direct_sources
 from nfl_forecast.editorial_provider_fallback import recover_focused_payload
 from nfl_forecast.source_policy import is_direct_media_report_url
-from nfl_forecast.editorial_quality import assess_human_read
+from nfl_forecast.editorial_quality import assess_human_read, human_read_length_valid
 from validate_copilot_media_reads import _mentions_any, _team_aliases, _team_name, _unique_ngrams
 
 
@@ -295,7 +295,7 @@ def validate(path: Path, gid: str, predictions: pd.DataFrame, accepted_dir: Path
 
     if not 12 <= len(headline) <= 150:
         failures.append(f"{gid}: headline length invalid")
-    if not 55 <= len(p1_words) <= 100:
+    if not human_read_length_valid(paragraph1):
         failures.append(f"{gid}: paragraph1 length {len(p1_words)} outside 55-100")
     if not _mentions_any(paragraph1, _team_aliases(away)) or not _mentions_any(paragraph1, _team_aliases(home)):
         failures.append(f"{gid}: paragraph1 must discuss both teams")
