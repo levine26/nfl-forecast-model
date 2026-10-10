@@ -47,6 +47,9 @@ jobs:
       - name: Validate countdown clock-skew regressions
         working-directory: site
         run: node --test tests/officialLockCountdown.test.mjs
+      - name: Verify provider Read acceptance controls
+        working-directory: site
+        run: node --test tests/editorialReadStatus.test.mjs
       - name: Install browser
         working-directory: site
         run: npx playwright install --with-deps chromium
