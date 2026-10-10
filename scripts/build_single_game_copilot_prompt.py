@@ -84,11 +84,11 @@ def main() -> None:
         if prior:
             feedback = "\nPrior validator feedback to fix without inventing facts:\n" + prior[-1800:] + "\n"
 
-    prompt = f"""You are Sunday Signal's senior NFL analyst. Use ONE current web search to research this matchup, then return only valid JSON. Deterministic code owns every LevLine number; you own only the human football analysis.
+    prompt = f"""You are Sunday Signal's senior NFL analyst. Use current original-publisher reporting to verify this matchup, then return only valid JSON. Deterministic code owns every LevLine number; you own only the human football analysis.
 
 Write:
 - headline: matchup-specific football tension, written like a strong NFL beat-column headline, not betting/SEO copy and not a template.
-- paragraph1: 65-105 words, BOTH teams, and at least TWO concrete named football subjects (players or coaches). Lead with the most important current development, then explain the matchup consequence. Use specific actions, roles and tactical consequences; avoid generic filler such as "stay on schedule," "obvious passing downs," "clean pocket," "field position looms large," "third-down efficiency matters," or interchangeable "pressure/explosive-play" boilerplate unless tied to a named player/unit and a reported current development. The paragraph should sound like a human NFL analyst who watched/researched the teams, not a model summary.
+- paragraph1: 65-95 words (hard publication gate is 55-100), BOTH teams, and at least TWO concrete named football subjects (players or coaches). Lead with the most important current development, then explain the matchup consequence. Use specific actions, roles and tactical consequences; avoid generic filler such as "stay on schedule," "obvious passing downs," "clean pocket," "field position looms large," "third-down efficiency matters," or interchangeable "pressure/explosive-play" boilerplate unless tied to a named player/unit and a reported current development. The paragraph should sound like a human NFL analyst who watched/researched the teams, not a model summary.
 - model_rationale: HARD RANGE 18-40 words of verified football context supporting the selected side. Target 22-28 words and count the words before returning. Do NOT use the word LevLine in this field. No numbers, percentages, spreads, scores, model/PURE/MARKET/F-ST terms, "moneyline", or final-pick wording.
 - sources: at least TWO independent DIRECT article/report URLs from different approved publishers returned by your web search. Sources must be genuinely matchup-relevant: at least one must materially concern the away team and at least one the home team (a single article can satisfy both only if it is specifically about this matchup).
 
