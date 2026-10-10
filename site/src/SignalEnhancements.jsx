@@ -1,4 +1,5 @@
 import { canonicalReportLink } from './editorialSourceLinks.mjs'
+import {hasPublishedHumanRead} from './editorialReadStatus.mjs'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './signal-enhancements.css'
@@ -250,6 +251,7 @@ function GameCommandBar({game,runs,preview,diagnostic}) {
 
 function EnhancedSignal({preview}) {
   if (!preview) return null
+  if (!hasPublishedHumanRead(preview)) return <section className="ss-plus-signal ss-the-signal"><div className="ss-plus-signal-head"><div><span>THE SIGNAL</span><small>Independent reporting and editorial acceptance pending</small></div></div><p>Human matchup analysis is withheld until it passes the publication gate. The official LevLine forecast remains unchanged.</p></section>
   const headline=preview.headline || preview.key_factors?.[0]?.title
   const paragraphs=Array.isArray(preview.paragraphs)?preview.paragraphs.filter(Boolean):[]
   const factors=(preview.key_factors||[]).filter(item=>item?.title).slice(0,3)
