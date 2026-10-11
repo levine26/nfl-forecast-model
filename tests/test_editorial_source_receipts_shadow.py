@@ -136,3 +136,9 @@ def test_article_publish_timestamp_cannot_postdate_retrieval():
     fake["published_utc"] = (datetime.now(timezone.utc)+timedelta(hours=1)).isoformat()
     with pytest.raises(EvidenceInsufficient, match="postdates retrieval"):
         _verify(fetched=fake)
+
+
+def test_active_cardinals_official_article_domain_is_allowlisted():
+    from nfl_forecast.source_policy import is_direct_media_report_url
+    assert is_direct_media_report_url("https://www.azcardinals.com/news/3x3-week-5-cardinals-vs-lions")
+    assert not is_direct_media_report_url("https://www.azcardinals.com.evil.example/news/same-story")
