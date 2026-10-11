@@ -49,7 +49,9 @@ OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE = {
     "WAS": "commanders.com",
 }
 
-OFFICIAL_TEAM_MEDIA_DOMAINS = frozenset(OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE.values())
+# The Cardinals' active official editorial site uses azcardinals.com in 2026.
+# Preserve the legacy arizonacardinals.com alias for compatibility.
+OFFICIAL_TEAM_MEDIA_DOMAINS = frozenset(OFFICIAL_TEAM_MEDIA_DOMAIN_BY_CODE.values()) | frozenset({"azcardinals.com"})
 
 APPROVED_MEDIA_DOMAINS = frozenset(
     {
