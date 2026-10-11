@@ -58,3 +58,22 @@ def test_scope_excludes_other_weeks_and_nonofficial_rows():
     r = audit_history([historic, pending, record("week5", 119)], season=2026, week=5)
     assert r["locked_count"] == 1
     assert r["all_locks_on_time"]
+
+def test_week6_t60_receipts_get_new_target_without_regrading_week5():
+    kickoff = datetime(2026, 10, 18, 17, 0, tzinfo=timezone.utc)
+    def week6(gid, minutes):
+        return {"game_id": gid, "season": "2026", "week": "6",
+                "lock_status": "LOCKED", "kickoff_utc": kickoff.isoformat(),
+                "lock_timestamp_utc": (kickoff-timedelta(minutes=minutes)).isoformat()}
+    week5 = record("2026_05_TB_DAL", 19.34158358)
+    result = audit_history([week5, week6("2026_06_CHI_GB", 60),
+                            week6("2026_06_CIN_MIA", 48)])
+    assert result["official_lock_target_minutes"] is None
+    assert result["observed_target_minutes"] == [60.0, 120.0]
+    by_id = {x["game_id"]: x for x in result["games"]}
+    assert by_id["2026_05_TB_DAL"]["official_target_minutes"] == 120
+    assert by_id["2026_05_TB_DAL"]["classification"] == "late"
+    assert by_id["2026_06_CHI_GB"]["official_target_minutes"] == 60
+    assert by_id["2026_06_CHI_GB"]["classification"] == "on_time"
+    assert by_id["2026_06_CIN_MIA"]["classification"] == "late"
+    assert by_id["2026_06_CIN_MIA"]["minutes_late_vs_target"] == 12
