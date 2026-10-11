@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from scripts.avoid_noop_challenger_calibration_churn import (
+from research.avoid_noop_challenger_calibration_churn import (
     is_precision_only_rewrite, restore_prior_bytes_if_no_material_change,
 )
 
