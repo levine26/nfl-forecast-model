@@ -62,6 +62,7 @@ def test_week6_lock_verifier_uses_new_t60_window():
     current.loc[0, "gametime"] = "13:00"
     locked = locked_history()
     locked.loc[0, "game_id"] = "2026_06_NE_SEA"
+    locked.loc[0, "locked_ats_status"] = "UNAVAILABLE"
     locked.loc[0, "lock_timestamp_utc"] = (kickoff-timedelta(minutes=59)).isoformat()
     assert verify_pregame_locks(current, pd.DataFrame(),
                                kickoff-timedelta(minutes=61)) == []
