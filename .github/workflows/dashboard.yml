@@ -120,6 +120,18 @@ jobs:
           from nfl_forecast.read_publication import synchronize_file
           synchronize_file(Path("site/public/data"))
           PY
+      - name: Stage missing-lock incident Read for PR validation only
+        if: github.event_name == 'pull_request'
+        run: |
+          # Keep the default production Pages build immutable/fail-closed.
+          # PRs use a *temporary staged copy* to verify the repaired publication
+          # contract; no staged Read is committed to the repository by CI.
+          python - <<'PY'
+          from pathlib import Path
+          from nfl_forecast.read_publication import synchronize_file
+          count = synchronize_file(Path("site/public/data"), check=False)
+          print(f"PR-only incident staging: {count} canonical Read rows refreshed")
+          PY
       - name: Fail closed unless published Reads match canonical forecasts
         run: |
           # Fail closed on missing/malformed previews or immutable lock divergence.
