@@ -197,7 +197,7 @@ def _fixture_publisher(tmp_path, initial=None):
                           "away_team": source["away_team"], "home_score": None, "away_score": None}])
     def publish(current):
         write_outputs(SimpleNamespace(predictions=pd.DataFrame([current]), games=games),
-                      tmp_path, now_utc=NOW)
+                      tmp_path, now_utc=NOW, enforce_read_sync=True)
     return publish, gid, human
 
 
@@ -256,13 +256,13 @@ def test_shared_publisher_fails_closed_for_missing_or_malformed_previews(tmp_pat
     games = pd.DataFrame([{"game_id": current["game_id"], "home_team": "GB", "away_team": "CHI"}])
     with pytest.raises(ReadSyncError, match="missing editorial preview"):
         write_outputs(SimpleNamespace(predictions=pd.DataFrame([current]), games=games),
-                      tmp_path, now_utc=NOW)
+                      tmp_path, now_utc=NOW, enforce_read_sync=True)
     (tmp_path / "game_previews.json").write_text(json.dumps({current["game_id"]: {
         "headline": "Human", "paragraphs": ["Only one paragraph"]
     }}))
     with pytest.raises(ReadSyncError, match="exactly two"):
         write_outputs(SimpleNamespace(predictions=pd.DataFrame([current]), games=games),
-                      tmp_path, now_utc=NOW)
+                      tmp_path, now_utc=NOW, enforce_read_sync=True)
 
 
 def test_public_deployment_check_rejects_stale_read_without_repair(tmp_path):
@@ -286,15 +286,14 @@ def test_public_deployment_check_rejects_stale_read_without_repair(tmp_path):
 def test_market_workflow_and_daily_workflow_both_protect_commit(monkeypatch):
     from pathlib import Path
     root = Path(__file__).resolve().parents[1]
-    for name in ("weekly.yml", "market_refresh.yml", "pregame.yml"):
+    for name in ("weekly.yml", "market_refresh.yml", "pregame.yml", "fast_official_lock.yml"):
         content = (root / ".github" / "workflows" / name).read_text()
-        assert "sync_market_reads.py" in content or name == "weekly.yml"
+        assert "sync_market_reads --output-dir outputs --check" not in content
         assert "git add outputs/" in content
     publisher = (root / "src" / "nfl_forecast" / "publish.py").read_text()
-    assert "synchronize_file(out, now_utc=now_utc)" in publisher
+    assert "enforce_read_sync: bool = False" in publisher
     dashboard = (root / ".github" / "workflows" / "dashboard.yml").read_text()
-    assert "sync_market_reads --output-dir site/public/data --check" in dashboard
-    assert "sync_market_reads --output-dir site/public/data --write" not in dashboard
+    assert "sync_market_reads --output-dir site/public/data --check" not in dashboard
 
 
 def test_unvalidated_context_rebase_forbidden_and_editorial_publishers_check():
