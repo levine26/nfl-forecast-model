@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from .official_lock_policy import official_lock_target_minutes
+
 from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -7,7 +9,7 @@ import json
 import numpy as np
 import pandas as pd
 
-LOCK_WINDOW_MINUTES = 120.0
+LOCK_WINDOW_MINUTES = 120.0  # Legacy default; new game targets use official_lock_policy.
 OFFICIAL_SNAPSHOT_STATUSES = {"LOCKED", "RECOVERED_MISSED_LOCK"}
 ATS_EDGE_EPSILON = 1e-12
 # Winner/ATS decoupling shipped before the Sep. 27 slate. Rows at/after this date
@@ -278,7 +280,7 @@ def _lock_new_games(
     p: pd.DataFrame,
     columns: list[str],
     now_utc: datetime,
-    lock_window_minutes: float,
+    lock_window_minutes: float | None,
 ) -> pd.DataFrame:
     already = set(official["game_id"].astype(str)) if len(official) else set()
     new_rows = []
@@ -291,7 +293,11 @@ def _lock_new_games(
         except Exception:
             continue
         minutes = (ko - now_utc).total_seconds() / 60.0
-        if not (0.0 < minutes <= lock_window_minutes):
+        # Resolve per-game policy so legacy receipts and future T-60 games
+        # are never forced through one mutable global window.
+        active_window = (official_lock_target_minutes(row.get('gameday'))
+                         if lock_window_minutes is None else lock_window_minutes)
+        if not (0.0 < minutes <= active_window):
             continue
         locked = {c: row.get(c, np.nan) for c in columns}
         locked.update({
@@ -361,7 +367,7 @@ def write_outputs(
     artifacts,
     output_dir="outputs",
     now_utc: datetime | None = None,
-    lock_window_minutes: float = LOCK_WINDOW_MINUTES,
+    lock_window_minutes: float | None = None,
     enforce_read_sync: bool = True,
 ) -> None:
     out = Path(output_dir)
