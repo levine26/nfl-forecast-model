@@ -74,7 +74,7 @@ jobs:
           p = Path("/tmp/sunday-signal-source-provenance.json")
           r = json.loads(p.read_text(encoding="utf-8"))
           assert r["publication_authorized"] is False
-          assert r["claim_support_verified"] is False
+          assert r["full_slate_claim_support_verified"] is False
           print("Evidence retrieval report is shadow-only and never a factual acceptance receipt.")
           PY
       - name: Persist full game-by-game source-retrieval diagnostics
