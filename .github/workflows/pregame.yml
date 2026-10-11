@@ -13,6 +13,8 @@ on:
     paths:
       - '.github/workflows/pregame.yml'
       - 'scripts/pregame_due.py'
+      - 'src/nfl_forecast/public_forecast.py'
+      - 'src/nfl_forecast/read_publication.py'
   # Independent successful or failed production refreshes are an additional
   # scheduling heartbeat. This workflow reads only trusted current main.
   workflow_run:
