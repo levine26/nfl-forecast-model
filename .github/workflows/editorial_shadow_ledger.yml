@@ -1,0 +1,52 @@
+name: Sunday Signal editorial shadow ledger validation
+
+on:
+  pull_request:
+    paths:
+      - "src/nfl_forecast/editorial_shadow_ledger.py"
+      - "tests/test_editorial_shadow_ledger.py"
+      - ".github/workflows/editorial_shadow_ledger.yml"
+  push:
+    branches: [main]
+    paths:
+      - "src/nfl_forecast/editorial_shadow_ledger.py"
+      - "tests/test_editorial_shadow_ledger.py"
+      - ".github/workflows/editorial_shadow_ledger.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: editorial-shadow-ledger-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ledger-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install test environment
+        run: pip install ".[dev]"
+      - name: Exercise shadow acceptance state and fault injection
+        run: |
+          pytest -q tests/test_editorial_shadow_ledger.py
+          python -m py_compile src/nfl_forecast/editorial_shadow_ledger.py
+      - name: Enforce shadow-only numerical governance boundary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          content = Path('src/nfl_forecast/editorial_shadow_ledger.py').read_text()
+          assert 'F-ST-01-FROZEN-2026' in content
+          assert 'def prepare_shadow_release' in content
+          assert 'NOT a production publisher' in content
+          assert 'from nfl_forecast.fst_production' not in content
+          assert 'outputs/this_week.csv' not in content
+          assert 'outputs/prediction_history.csv' not in content
+          print('Editorial shadow ledger is isolated from numerical forecast and official locks.')
+          PY
