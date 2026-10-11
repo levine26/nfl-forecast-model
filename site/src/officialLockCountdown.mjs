@@ -7,7 +7,7 @@
 export const OFFICIAL_LOCK_LEAD_MINUTES = 120 // Legacy Weeks 1-5
 export const NEW_OFFICIAL_LOCK_LEAD_MINUTES = 60 // Week 6+ (2026)
 export function officialLockLeadMinutes(game) {
-  const match=String(game?.game_id||'').match(/^(\\d{4})_(\\d{2})_/)
+  const match=String(game?.game_id||'').match(/^(\d{4})_(\d{2})_/)
   const season=Number(game?.season ?? match?.[1])
   const week=Number(game?.week ?? match?.[2])
   if (!Number.isInteger(season)||!Number.isInteger(week)||week<1||week>22||season<2000) return null
