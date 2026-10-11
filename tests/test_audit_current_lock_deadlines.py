@@ -110,3 +110,22 @@ def test_stalled_production_lock_job_has_a_bounded_timeout():
     lock_block = text.split("\n  lock:\n", 1)[1]
     assert "    timeout-minutes: 15" in lock_block
     assert "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in text
+
+def test_week6_missing_lock_alert_uses_t60_plus_grace_not_historical_t120():
+    kickoff = datetime(2026, 10, 18, 17, 0, tzinfo=timezone.utc)
+    game = {"game_id": "2026_06_CHI_GB", "season": 2026, "week": 6,
+            "gameday": "2026-10-18", "gametime": "13:00"}
+    prior = audit_current_deadlines([game], [],
+        now_utc=kickoff-timedelta(minutes=51))
+    assert prior["target_minutes_before_kickoff"] == 60
+    assert not prior["issues"]
+    overdue = audit_current_deadlines([game], [],
+        now_utc=kickoff-timedelta(minutes=49))
+    assert set(overdue["issues"]) == {"2026_06_CHI_GB"}
+    ontime = audit_current_deadlines([game], [{
+        "game_id": "2026_06_CHI_GB",
+        "lock_status": "LOCKED",
+        "lock_timestamp_utc": (kickoff-timedelta(minutes=60)).isoformat()
+    }], now_utc=kickoff-timedelta(minutes=49))
+    assert ontime["games"]["2026_06_CHI_GB"]["state"] == "on_time_lock"
+    assert ontime["games"]["2026_06_CHI_GB"]["minutes_late_vs_target"] == 0
