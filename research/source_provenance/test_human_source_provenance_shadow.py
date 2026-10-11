@@ -182,3 +182,35 @@ def test_missing_active_forecast_never_falls_back_to_old_roster(tmp_path):
         validate_active_slate({"game_ids": ["2026_05_TB_DAL"]},
                               current_csv=tmp_path / "missing.csv",
                               historical_roster=frozen)
+
+
+def test_partial_recovery_batch_does_not_masquerade_as_verified_full_slate(tmp_path):
+    active_ids = ["2026_05_TB_DAL", "2026_05_PHI_JAX"]
+    current = _current_forecast_csv(tmp_path, active_ids)
+    manifest = {"game_ids": ["2026_05_TB_DAL"]}
+    frozen = _frozen_roster(tmp_path, week=4, ids=["2026_04_PIT_CLE"])
+    with pytest.raises(SlateProvenanceError, match="ACTIVE canonical forecast"):
+        validate_active_slate(manifest, current_csv=current, historical_roster=frozen)
+    result = validate_active_slate(
+        manifest, current_csv=current, historical_roster=frozen, allow_partial=True,
+    )
+    assert result["games_expected"] == 2
+    assert result["candidate_games_audited"] == 1
+    assert result["candidate_is_partial"] is True
+    assert result["unaudited_canonical_game_ids"] == ["2026_05_PHI_JAX"]
+    assert result["publication_authorized"] is False
+    # Even a 1/1 source-audit outcome cannot verify unseen active games.
+    audited = audit_slate(manifest, input_dir=tmp_path, fetch=_fetch)
+    audited["full_slate_article_resolution_verified"] = (
+        audited["full_slate_article_resolution_verified"] and not result["candidate_is_partial"]
+    )
+    assert audited["full_slate_article_resolution_verified"] is False
+
+
+def test_partial_mode_still_rejects_noncanonical_game(tmp_path):
+    current = _current_forecast_csv(tmp_path, ["2026_05_TB_DAL"])
+    with pytest.raises(SlateProvenanceError, match="ACTIVE canonical forecast"):
+        validate_active_slate(
+            {"game_ids": ["2026_05_PHI_JAX"]}, current_csv=current,
+            historical_roster=tmp_path / "missing.json", allow_partial=True,
+        )
