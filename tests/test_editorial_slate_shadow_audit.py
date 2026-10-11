@@ -26,10 +26,15 @@ def fixture(tmp_path):
         "claim_support_verified": False,
         "issues": {gid: ["no_accepted_provider_human_read"] for gid in IDS},
     }}))
+    candidates = tmp_path / "candidates"
+    candidates.mkdir()
+    for gid in IDS:
+        (candidates / f"{gid}.json").write_text("{}")
+    draft_hashes = {gid: sha256((candidates / f"{gid}.json").read_bytes()).hexdigest() for gid in IDS}
     sources = tmp_path / "sources.json"
     src = {
         "canonical_slate_sha256": sha, "games_expected": 2,
-        "games": {gid: {"status": "provenance_ready_semantics_pending",
+        "games": {gid: {"status": "provenance_ready_semantics_pending", "candidate_sha256": draft_hashes[gid],
                         "sources": [{"url": "https://a.example"}, {"url": "https://b.example"}]}
                   for gid in IDS},
     }
@@ -37,15 +42,11 @@ def fixture(tmp_path):
     queue = tmp_path / "queue.json"
     queued = {
         "canonical_slate_sha256": sha, "games_expected": 2, "games_queued": 2,
-        "games": {gid: {"status": "pending_independent_clause_and_claim_review",
+        "games": {gid: {"status": "pending_independent_clause_and_claim_review", "candidate_file_sha256": draft_hashes[gid],
                         "sentences": [{"text": "This statement is not yet verified."}],
                         "issues": []} for gid in IDS}
     }
     queue.write_text(json.dumps(queued))
-    candidates = tmp_path / "candidates"
-    candidates.mkdir()
-    for gid in IDS:
-        (candidates / f"{gid}.json").write_text("{}")
     return canonical, status, sources, queue, candidates
 
 
@@ -121,3 +122,13 @@ def test_duplicate_canonical_game_cannot_be_audited_as_complete(tmp_path):
     import pytest
     with pytest.raises(ValueError, match="unique"):
         audit(inputs)
+
+
+def test_changed_candidate_rejects_old_source_and_claim_evidence(tmp_path):
+    inputs = fixture(tmp_path)
+    target = inputs[4] / f"{IDS[0]}.json"
+    target.write_text('{"games": {"revised": true}}')
+    v = audit(inputs)
+    assert v["games"][IDS[0]]["state"] == "stale_or_mismatched_snapshot"
+    assert "candidate_provenance_version_mismatch" in v["games"][IDS[0]]["issues"]
+    assert v["games"][IDS[1]]["state"] == "draft_available_but_unverified"
