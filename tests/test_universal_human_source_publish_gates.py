@@ -30,8 +30,9 @@ def test_all_active_primary_human_writer_publication_paths_require_real_source_a
 @pytest.mark.parametrize("path,publish_step", WORKFLOWS)
 def test_source_acceptance_is_after_slate_validation_and_before_main_write(path, publish_step):
     text = (ROOT / path).read_text(encoding="utf-8")
-    publish_start = text.index(f"      - name: {publish_step}")
-    gate_location = text.index("require_verified_human_sources(status, games_expected=games)")
-    slate_location = text.index("if finalizer.get('status') != 'healthy'")
-    assert slate_location < gate_location < publish_start
-    assert "git push origin HEAD:main" in text[publish_start:]
+    before_publish, after_publish = text.split(f"      - name: {publish_step}", 1)
+    final_launch = before_publish.rsplit("      - name: Finalize and enforce full-slate launch gate", 1)[1]
+    gate_location = final_launch.index("require_verified_human_sources(status, games_expected=games)")
+    slate_location = final_launch.index("if finalizer.get('status') != 'healthy'")
+    assert slate_location < gate_location
+    assert "git push origin HEAD:main" in after_publish
