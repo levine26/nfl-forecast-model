@@ -107,6 +107,11 @@ def _validate_record(entry: dict[str, Any]) -> None:
         raise EditorialLedgerError(f"{gid}: missing independent validation receipt")
     if receipt.get("game_id") != gid or receipt.get("status") != "accepted":
         raise EditorialLedgerError(f"{gid}: not independently accepted")
+    # Bind the claimed validation to the exact candidate that will be persisted.
+    # The separate trusted validator must compute and attach this checksum.
+    candidate = {key: value for key, value in entry.items() if key != "acceptance_receipt"}
+    if receipt.get("candidate_sha256") != _sha(_encoded(candidate)):
+        raise EditorialLedgerError(f"{gid}: validation receipt does not match candidate content")
     if not isinstance(receipt.get("validator_version"), str) or not receipt["validator_version"]:
         raise EditorialLedgerError(f"{gid}: missing validator version")
     if receipt.get("article_resolution_verified") is not True or receipt.get("claim_support_verified") is not True:
