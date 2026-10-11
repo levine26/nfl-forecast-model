@@ -9,6 +9,7 @@ on:
       - "scripts/refresh_editorial_slate_roster.py"
       - "scripts/restore_last_good_editorial_snapshot.py"
       - "tests/test_chatgpt_failed_game_ingest.py"
+      - "tests/test_fallback_batch_trigger.py"
       - "tests/test_editorial_provider_fallback.py"
       - "tests/test_editorial_text_safety.py"
       - "tests/test_canonical_editorial_predictions.py"
@@ -55,7 +56,7 @@ jobs:
 
       - name: Test game-scoped fallback boundary
         run: |
-          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py tests/test_fallback_batch_trigger.py
           python -m py_compile scripts/ingest_chatgpt_failed_games.py scripts/restore_last_good_editorial_snapshot.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
 
       - name: Enforce editorial-only fallback wiring
