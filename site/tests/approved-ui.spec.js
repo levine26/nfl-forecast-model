@@ -43,7 +43,7 @@ test('History and Performance Lab do not depend on downloading run_history.csv',
   })
   await page.goto('./#/history')
   await expect(page.locator('.ss-exp-performance:visible')).toBeVisible()
-  await expect(page.locator('.ss-exp-history:visible')).toBeVisible()
+  await expect(page.locator('section.ss-exp-history:visible')).toBeVisible()
   await expect(page.getByText('PROBABILITY CALIBRATION',{exact:true})).toBeVisible()
   expect(heavyRequests).toHaveLength(0)
 })
