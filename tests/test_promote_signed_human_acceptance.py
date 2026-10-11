@@ -87,7 +87,7 @@ def test_publisher_workflows_only_promote_after_structural_finalizer():
     for p in ("chatgpt_failed_game_ingest.yml", "chatgpt_media_ingest.yml", "groq_media_writer.yml"):
         text = (root / ".github/workflows" / p).read_text()
         assert "promote_verified_acceptance()" in text
-        assert text.index("promote_verified_acceptance()") < text.index(
+        assert text.rindex("promote_verified_acceptance()") < text.rindex(
             "require_verified_human_sources(status, games_expected=games)"
         )
         assert "SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY" in text
