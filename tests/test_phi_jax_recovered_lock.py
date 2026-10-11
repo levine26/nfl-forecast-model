@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from nfl_forecast.public_forecast import build_public_forecasts
+from nfl_forecast.read_publication import synchronize_file
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,3 +73,15 @@ def test_phi_jax_public_contract_exposes_provenance_without_laundering_recovery(
     assert game["lock_timestamp_utc"] is None
     assert game["recovery"]["source_commit_sha"] == SOURCE_COMMIT
     assert game["official_home_win_probability"] == float(SOURCE_PROB)
+
+
+def test_recovered_publication_is_full_slate_and_reads_are_synchronized():
+    current = _rows(ROOT / "outputs" / "this_week.csv")
+    history = _rows(ROOT / "outputs" / "prediction_history.csv")
+    matching = next(row for row in current if row.get("game_id") == GAME)
+    official = next(row for row in history if row.get("game_id") == GAME)
+    assert matching["final_home_prob"] == official["final_home_prob"] == SOURCE_PROB
+    assert matching["prediction_timestamp_utc"] == SOURCE_PREDICTION_AT
+    assert matching["market_home_prob"] == official["market_home_prob"]
+    assert len(current) == len({row["game_id"] for row in current})
+    assert synchronize_file(ROOT / "outputs", check=True) == 0
