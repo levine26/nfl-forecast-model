@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "game_id": "2026_05_TB_DAL",
+  "source_workflow_run": 38098893556,
+  "original_artifact_sha256": "3efe41ffe64e36b17b8077fc58fb9cbeb8b63fe129d59d2a80375941541482cc",
+  "retrieved_from": "Exact original GitHub Actions Groq cache via CI 38105029339; provenance artifact 11688734797",
+  "last_verified": "2026-10-10",
+  "validation_scope": "2026 Week5 focused validator only",
+  "publication_eligible": false,
+  "article_resolution_verified": false,
+  "claim_support_verified": false,
+  "reason": "The original HUMAN prose was successfully recovered and passed the old focused validator, but one cited CBS article is a where-to-watch/prediction/odds page. This does not meet the independent direct factual reporting contract. Keep for forensic comparison; do not publish or treat as a substitute for a trusted editorial ledger revision.",
+  "archived_normalized_payload": {
+    "games": {
+      "2026_05_TB_DAL": {
+        "headline": "Prescott’s Precision Meets Daniels’ Rookie Nerves in Thursday Night Showdown",
+        "paragraph1": "Dallas is banking on Dak Prescott’s laser‑accurate timing with his top target CeeDee Lamb, whose 37 receptions have already led the league. Meanwhile, Tampa Bay’s rookie quarterback Jalon Daniels, fresh off a shaky debut, will rely on the newly hired offensive coordinator Zac Robinson to simplify the play‑call and get the Bucs’ line moving for Bucky Irving’s inside runs. The clash pits a veteran’s rhythm against a freshman’s poise, with each side’s game plan hinging on protecting the ball and exploiting mismatches.",
+        "model_rationale": "Prescott’s chemistry with Lamb should stretch the Bucs’ secondary, while Daniels’ inexperience may struggle against Dallas’s aggressive pass rush.",
+        "sources": [
+          {
+            "name": "CBS Sports",
+            "title": "Cowboys vs. Buccaneers: Prediction, where to watch TNF",
+            "url": "https://www.cbssports.com/nfl/news/cowboys-vs-buccaneers-prediction-where-to-watch-tnf/"
+          },
+          {
+            "name": "Tampa Bay Buccaneers",
+            "title": "Bucs vs. Cowboys TNF Game Preview | NFL Week 5 2026",
+            "url": "https://www.buccaneers.com/news/2026-game-preview-buccaneers-cowboys-week-5"
+          }
+        ]
+      }
+    }
+  }
+}
