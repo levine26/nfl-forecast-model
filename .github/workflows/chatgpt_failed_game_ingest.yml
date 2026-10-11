@@ -241,6 +241,15 @@ jobs:
             --provider-checkpoint-dir /tmp/groq-validated-checkpoint \
             --output outputs/copilot_media_reads.json
 
+      - name: Upload complete game-scoped rejection diagnostics
+        if: failure() && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-recovery-diagnostics-${{ github.run_id }}
+          path: outputs/editorial_recovery_diagnostics.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Finalize and enforce publication gate
         if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
         run: |
