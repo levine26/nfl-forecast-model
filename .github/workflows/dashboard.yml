@@ -8,6 +8,7 @@ on:
       - 'outputs/**'
       - 'src/nfl_forecast/public_forecast.py'
       - 'src/nfl_forecast/publish.py'
+      - 'src/nfl_forecast/lock_policy.py'
       - 'src/nfl_forecast/player_impact_monitor.py'
       - 'scripts/build_public_forecasts.py'
       - 'scripts/sync_market_reads.py'
@@ -140,7 +141,9 @@ jobs:
           assert report["forecast_path_identity"] == "F-ST-01-FROZEN-2026"
           assert sum(report["counts"].values()) == report["locked_count"]
           assert len(report["games"]) == report["locked_count"]
-          assert report["official_lock_target_minutes"] == 120.0
+          assert report["official_lock_target_minutes"] in (None, 60.0, 120.0)
+          assert all(row["official_target_minutes"] in (60.0, 120.0) for row in report["games"])
+          assert all("minutes_late_vs_target" in row for row in report["games"])
           print("Public lock audit: real recorded lock receipt timing only:", report["counts"])
           PY
       - name: Normalize immutable history for Sunday Signal
