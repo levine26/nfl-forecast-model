@@ -532,7 +532,10 @@ def build_public_forecasts(
     official: Iterable[Mapping[str, Any]],
     *,
     now_utc: datetime | None = None,
+    missing_lock_policy: str = "reject",
 ) -> dict[str, Any]:
+    if missing_lock_policy not in {"reject", "explicit_unavailable"}:
+        raise ValueError("Unsupported missed-official-lock publication policy")
     now_utc = now_utc or datetime.now(timezone.utc)
     if now_utc.tzinfo is None:
         now_utc = now_utc.replace(tzinfo=timezone.utc)
@@ -553,6 +556,11 @@ def build_public_forecasts(
         source = locked_row if locked_row is not None else current_row
         kickoff = kickoff_utc(source)
         if locked_row is None and kickoff is not None and now_utc >= kickoff:
+            if missing_lock_policy == "reject":
+                raise PublicForecastError(
+                    f"{game_id}: kickoff passed without an immutable official lock; "
+                    "refusing to substitute an editorial or numerical forecast"
+                )
             games.append(_missing_lock_public_row(current_row, now_utc=now_utc))
             continue
         games.append(_public_row(source, locked=locked_row is not None, now_utc=now_utc))
