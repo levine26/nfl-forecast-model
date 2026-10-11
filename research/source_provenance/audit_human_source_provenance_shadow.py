@@ -45,6 +45,7 @@ def validate_active_slate(
     manifest: dict[str, Any], *,
     current_csv: Path,
     historical_roster: Path,
+    allow_partial: bool = False,
 ) -> dict[str, Any]:
     """Check a candidate against current canonical forecasts, not an older freeze.
 
@@ -78,7 +79,8 @@ def validate_active_slate(
         raise SlateProvenanceError("active forecast CSV lacks valid game identity") from exc
     if len(current_ids) != len(set(current_ids)):
         raise SlateProvenanceError("duplicate games in active canonical forecast")
-    if set(ids) != set(current_ids) or len(ids) != len(current_ids):
+    if (not set(ids).issubset(set(current_ids))
+            or (not allow_partial and (set(ids) != set(current_ids) or len(ids) != len(current_ids)))):
         missing = sorted(set(current_ids) - set(ids))
         extra = sorted(set(ids) - set(current_ids))
         raise SlateProvenanceError(
@@ -104,6 +106,9 @@ def validate_active_slate(
     return {
         "season": season, "week": week, "games_expected": len(current_ids),
         "canonical_game_ids": sorted(current_ids),
+        "candidate_games_audited": len(ids),
+        "candidate_is_partial": len(ids) != len(current_ids),
+        "unaudited_canonical_game_ids": sorted(set(current_ids) - set(ids)),
         "historical_roster_status": roster_status,
         "publication_authorized": False,
     }
@@ -239,14 +244,25 @@ def main() -> int:
     parser.add_argument("--current", type=Path, default=Path("outputs/this_week.csv"))
     parser.add_argument("--output", type=Path, default=Path("/tmp/sunday_signal_article_provenance_shadow.json"))
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--allow-partial", action="store_true",
+                        help="Audit an exact authorized recovery subset without claiming whole-slate coverage")
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     canonical = validate_active_slate(
         manifest, current_csv=args.current,
         historical_roster=Path("inputs/sunday_signal/editorial_slate_roster.json"),
+        allow_partial=args.allow_partial,
     )
     result = audit_slate(manifest, input_dir=args.input_dir, max_workers=args.workers)
     result["canonical_slate_reference"] = canonical
+    result["active_slate_games_expected"] = canonical["games_expected"]
+    result["audited_subset_only"] = canonical["candidate_is_partial"]
+    result["unaudited_canonical_game_ids"] = canonical["unaudited_canonical_game_ids"]
+    if canonical["candidate_is_partial"]:
+        # A 13/13 recovery batch is NOT a verified 15/15 active slate.
+        result["full_slate_article_resolution_verified"] = False
+        result["full_slate_claim_support_verified"] = False
+        result["publication_authorized"] = False
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"Shadow article verification: {result['games_with_verified_article_resolutions']}/"
