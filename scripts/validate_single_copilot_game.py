@@ -212,6 +212,9 @@ def _valid_sources(sources: object) -> tuple[list[dict], set[str], list[str]]:
         if not name or not title or not url:
             failures.append("source is missing name, title, or URL")
             continue
+        if not is_direct_media_report_url(url):
+            failures.append(f"source URL is not a direct approved article/report: {title} ({url})")
+            continue
         if not is_substantive_report_candidate(title=title, url=url):
             failures.append(f"source is not an original substantive direct report: {title} ({url})")
             continue
