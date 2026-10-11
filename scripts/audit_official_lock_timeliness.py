@@ -9,6 +9,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from nfl_forecast.official_lock_policy import official_lock_lead_minutes
+
 
 IDENTITY = "F-ST-01-FROZEN-2026"
 TARGET_MINUTES = 120.0
@@ -23,7 +25,7 @@ def _utc(value: object) -> datetime:
 
 
 def audit_history(rows: list[dict[str, Any]], *, season: int | None = None, week: int | None = None) -> dict[str, Any]:
-    """Count locks that genuinely completed near T-120, not merely before kickoff."""
+    """Score every immutable receipt against its original applicable lead time."""
     reviewed = []
     seen: set[str] = set()
     for row in rows:
@@ -43,7 +45,8 @@ def audit_history(rows: list[dict[str, Any]], *, season: int | None = None, week
         except (ValueError, TypeError) as exc:
             raise ValueError(f"{gid}: malformed official lock time: {exc}") from exc
         minutes = (kickoff - actual).total_seconds() / 60.0
-        delay = TARGET_MINUTES - minutes
+        lead = official_lock_lead_minutes(row)
+        delay = lead - minutes
         classification = (
             "premature" if delay < -0.1 else
             "on_time" if delay <= ALLOWED_LATENESS_MINUTES else
@@ -51,17 +54,22 @@ def audit_history(rows: list[dict[str, Any]], *, season: int | None = None, week
         )
         reviewed.append({
             "game_id": gid,
-            "scheduled_lock_utc": (kickoff-timedelta(minutes=TARGET_MINUTES)).isoformat(),
+            "scheduled_lock_utc": (kickoff-timedelta(minutes=lead)).isoformat(),
+            "target_minutes_before_kickoff": lead,
+            "minutes_late_vs_target": round(delay, 4),
             "actual_lock_utc": actual.isoformat(),
             "minutes_before_kickoff": round(minutes, 4),
-            "minutes_late_vs_t120": round(delay, 4),
+            "minutes_late_vs_t120": round(delay, 4) if lead == TARGET_MINUTES else None,
             "classification": classification,
         })
+    targets = sorted({x["target_minutes_before_kickoff"] for x in reviewed})
     groups = {state: sum(x["classification"] == state for x in reviewed)
               for state in ("on_time", "late", "at_or_after_kickoff", "premature")}
     return {
         "forecast_path_identity": IDENTITY,
-        "official_lock_target_minutes": TARGET_MINUTES,
+        "official_lock_target_minutes": targets[0] if len(targets) == 1 else None,
+        "official_lock_targets_minutes": targets,
+        "policy_effective_2026_week": 6,
         "allowed_timing_lateness_minutes": ALLOWED_LATENESS_MINUTES,
         "season": season,
         "week": week,
@@ -87,8 +95,8 @@ def main() -> None:
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     for entry in report["games"]:
         if entry["classification"] != "on_time":
-            print(f"::warning title=Official lock timing::{entry['game_id']}: {entry['classification']} ({entry['minutes_late_vs_t120']:.1f} minutes after T-120)")
-    print(f"Official T-120 audit: {report['counts']} -> {args.output}")
+            print(f"::warning title=Official lock timing::{entry['game_id']}: {entry['classification']} ({entry['minutes_late_vs_target']:.1f} minutes after T-{entry['target_minutes_before_kickoff']:g})")
+    print(f"Official policy-aware lock audit: {report['counts']} -> {args.output}")
 
 
 if __name__ == "__main__":

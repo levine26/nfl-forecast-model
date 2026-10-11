@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Lightweight immutable T-120 lock from the *already published* frozen forecast.
+"""Lightweight policy-aware immutable lock from the *already published* frozen forecast.
 
 This is a deadline-safety path, not a model run. No features, probabilities or
 historical lock records are recomputed, retuned, backdated or rewritten.
@@ -19,6 +19,7 @@ from pathlib import Path
 import tempfile
 from typing import Any
 
+from nfl_forecast.official_lock_policy import official_lock_lead_minutes
 from nfl_forecast.publish import (
     ATS_LOCK_COLUMNS, CURRENT_COLUMNS, LOCK_META_COLUMNS,
     OFFICIAL_SNAPSHOT_STATUSES, _ats_lock_fields, kickoff_utc,
@@ -115,7 +116,7 @@ def plan_fast_locks(
         except (KeyError, ValueError) as exc:
             raise FastLockError(f"{gid}: unparseable canonical kickoff") from exc
         minutes_to_kickoff = (kickoff - now_utc).total_seconds() / 60.0
-        if not (0.0 < minutes_to_kickoff <= LOCK_WINDOW_MINUTES):
+        if not (0.0 < minutes_to_kickoff <= min(LOCK_WINDOW_MINUTES, official_lock_lead_minutes(row))):
             continue
 
         generated = _timestamp(row.get("prediction_timestamp_utc"))
@@ -204,7 +205,7 @@ def write_fast_locks(output_dir: Path, now_utc: datetime) -> list[str]:
 
 
 def main() -> int:
-    parser=argparse.ArgumentParser(description="Lock only fresh canonical F-ST snapshots at the official T-120 boundary")
+    parser=argparse.ArgumentParser(description="Lock only fresh canonical F-ST snapshots inside the official game-specific deadline")
     parser.add_argument("--output-dir",type=Path,default=Path("outputs"))
     args=parser.parse_args()
     now=datetime.now(timezone.utc)
@@ -212,7 +213,7 @@ def main() -> int:
         locked=write_fast_locks(args.output_dir,now)
     except (FastLockError, OSError, ValueError, KeyError) as exc:
         parser.exit(1,f"FAIL CLOSED: official lock deadline safety path: {exc}\n")
-    print(f"Fast immutable T-120 lock: {len(locked)} newly locked at {now.isoformat()}: {', '.join(locked)}")
+    print(f"Fast immutable official lock: {len(locked)} newly locked at {now.isoformat()}: {', '.join(locked)}")
     return 0
 
 
