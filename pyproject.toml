@@ -21,6 +21,7 @@ dependencies = [
   "beautifulsoup4>=4.12",
   "lxml>=5.0",
   "json-repair>=0.63,<1",
+  "cryptography>=43,<48",
 ]
 
 [project.optional-dependencies]
