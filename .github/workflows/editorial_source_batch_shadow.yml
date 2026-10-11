@@ -7,6 +7,7 @@ on:
       - "tests/test_editorial_source_batch_shadow.py"
       - "scripts/audit_editorial_slate_shadow.py"
       - "tests/test_editorial_slate_shadow_audit.py"
+      - "tests/test_editorial_source_workflow_ownership.py"
       - ".github/workflows/editorial_source_batch_shadow.yml"
   push:
     branches: [main]
@@ -45,7 +46,7 @@ jobs:
           PYTHONPATH: "src:."
         run: |
           python -m py_compile scripts/audit_editorial_sources_shadow.py
-          pytest -q tests/test_editorial_source_batch_shadow.py tests/test_editorial_slate_shadow_audit.py
+          pytest -q tests/test_editorial_source_batch_shadow.py tests/test_editorial_slate_shadow_audit.py tests/test_editorial_source_workflow_ownership.py
           python - <<'PY'
           from pathlib import Path
           script = Path("scripts/audit_editorial_sources_shadow.py").read_text()
