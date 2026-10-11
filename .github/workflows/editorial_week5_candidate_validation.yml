@@ -1,0 +1,61 @@
+name: Sunday Signal Week 5 candidate slate validation
+
+on:
+  pull_request:
+    paths:
+      - "inputs/chatgpt_media/fallback/**"
+      - ".github/workflows/editorial_week5_candidate_validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sunday-signal-week5-candidate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-game-candidates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install editorial project dependencies
+        run: pip install ".[dev]"
+      - name: Validate every authorized recovery game independently
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from scripts.ingest_chatgpt_failed_games import _failure_targets, _validate_recovery_targets
+
+          repo = Path.cwd()
+          status = json.loads((repo / "outputs/context_source_status.json").read_text())
+          targets = sorted(_failure_targets(status))
+          if len(targets) != 14:
+              raise SystemExit(f"Expected exactly 14 known Week 5 recovery targets, found {len(targets)}: {targets}")
+          with TemporaryDirectory(prefix="pr-week5-slate-") as work:
+              root = Path(work)
+              accepted = root / "accepted"
+              accepted.mkdir()
+              try:
+                  entries = _validate_recovery_targets(
+                      repo_root=repo,
+                      input_root=repo / "inputs/chatgpt_media/fallback",
+                      prediction_path=repo / "outputs/this_week.csv",
+                      accepted=accepted,
+                      targets=targets,
+                      report_path=root / "editorial_recovery_diagnostics.json",
+                  )
+              except Exception:
+                  if (root / "editorial_recovery_diagnostics.json").is_file():
+                      print((root / "editorial_recovery_diagnostics.json").read_text(), flush=True)
+                  raise
+              assert set(entries) == set(targets), (len(entries), len(targets))
+              print(f"All {len(entries)} current Week 5 Groq-failed candidates passed focused validation.")
+          PY
