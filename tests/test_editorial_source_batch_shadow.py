@@ -57,6 +57,7 @@ def test_full_slate_captures_two_independent_sources_per_game_without_authorizin
     for game in result["games"].values():
         assert game["errors"] == []
         assert len(game["sources"]) == 2
+        assert len(game["candidate_sha256"]) == 64
         assert all(s["semantic_claim_entailment_verified"] is False for s in game["sources"])
         assert "body_text" not in game["sources"][0]
         assert game["editorial_publication_authorized"] is False
