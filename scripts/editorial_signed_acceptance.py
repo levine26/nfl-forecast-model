@@ -120,11 +120,25 @@ def verify_signed_claim_receipts(
             except (ValueError, KeyError) as exc:
                 raise ClaimAcceptanceBlocked("canonical kickoff unavailable") from exc
 
+            cited = public_previews[gid].get("reported_sources")
+            if not isinstance(cited, list) or len(cited) < 2:
+                raise ClaimAcceptanceBlocked("published HUMAN Read lacks two cited article URLs")
+            cited_urls = []
+            for link in cited:
+                if not isinstance(link, dict):
+                    raise ClaimAcceptanceBlocked("malformed public source citation")
+                cited_url = link.get("source_url") or link.get("url")
+                if not isinstance(cited_url, str) or not cited_url.startswith("https://"):
+                    raise ClaimAcceptanceBlocked("published article citation is invalid")
+                cited_urls.append(cited_url)
+            if len(cited_urls) != len(set(cited_urls)):
+                raise ClaimAcceptanceBlocked("duplicate published article citation")
             sources = rec.get("sources")
             if not isinstance(sources, list) or len(sources) < 2:
                 raise ClaimAcceptanceBlocked("two independently reviewed source receipts required")
             families: set[str] = set()
             source_hashes: set[str] = set()
+            approved_source_urls: set[str] = set()
             for source in sources:
                 if not isinstance(source, dict):
                     raise ClaimAcceptanceBlocked("malformed signed source receipt")
@@ -142,6 +156,9 @@ def verify_signed_claim_receipts(
                     raise ClaimAcceptanceBlocked("source article body not independently reviewed")
                 families.add(family)
                 source_hashes.add(fingerprint)
+                approved_source_urls.add(url)
+            if approved_source_urls != set(cited_urls):
+                raise ClaimAcceptanceBlocked("signed source receipts do not match public cited URLs")
             claims = rec.get("claims")
             if not isinstance(claims, list) or not claims:
                 raise ClaimAcceptanceBlocked("no independently verified factual claim inventory")
