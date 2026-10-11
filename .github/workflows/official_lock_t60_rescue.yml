@@ -14,12 +14,12 @@ on:
     # Stagger from the canonical */5 worker. Cover NFL weekend, international
     # starts, Thursday/Sunday/Monday nights and spillover UTC dates.
     # Additional nonstandard kickoff dates can use workflow_dispatch.
-    - cron: "3,18,33,48 11-23 * * 0"
-    - cron: "3,18,33,48 0-5,18-23 * * 1"
-    - cron: "3,18,33,48 0-5 * * 2"
-    - cron: "3,18,33,48 18-23 * * 4"
-    - cron: "3,18,33,48 0-5 * * 5"
-    - cron: "3,18,33,48 11-23 * * 6"
+    - cron: "3,13,23,33,43,53 11-23 * * 0"
+    - cron: "3,13,23,33,43,53 0-5,18-23 * * 1"
+    - cron: "3,13,23,33,43,53 0-5 * * 2"
+    - cron: "3,13,23,33,43,53 18-23 * * 4"
+    - cron: "3,13,23,33,43,53 0-5 * * 5"
+    - cron: "3,13,23,33,43,53 11-23 * * 6"
 
 permissions:
   contents: read
