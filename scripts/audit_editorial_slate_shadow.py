@@ -75,6 +75,7 @@ def audit_slate(
         faults: list[str] = []
         draft_file = candidate_dir / f"{gid}.json"
         draft_exists = draft_file.is_file()
+        draft_sha = sha256(draft_file.read_bytes()).hexdigest() if draft_exists else None
         if not draft_exists:
             faults.append("missing_candidate_draft")
         if not source_snapshot_ok:
@@ -83,6 +84,10 @@ def audit_slate(
             faults.append("claim_queue_snapshot_mismatch")
         sg = source_games.get(gid)
         qg = queue_games.get(gid)
+        if draft_exists and isinstance(sg, dict) and isinstance(qg, dict):
+            if (sg.get("candidate_sha256") != draft_sha
+                    or qg.get("candidate_file_sha256") != draft_sha):
+                faults.append("candidate_provenance_version_mismatch")
         if source_snapshot_ok:
             if not isinstance(sg, dict) or sg.get("status") != "provenance_ready_semantics_pending":
                 faults.append("source_retrieval_or_independence_incomplete")
@@ -102,7 +107,7 @@ def audit_slate(
             faults.append("independent_semantic_claim_verification_missing")
         if not draft_exists:
             state = "missing_content"
-        elif not (source_snapshot_ok and queue_snapshot_ok):
+        elif not (source_snapshot_ok and queue_snapshot_ok) or "candidate_provenance_version_mismatch" in faults:
             state = "stale_or_mismatched_snapshot"
         elif not isinstance(sg, dict) or sg.get("status") != "provenance_ready_semantics_pending":
             state = "research_incomplete"
