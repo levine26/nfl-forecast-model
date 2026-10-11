@@ -107,7 +107,9 @@ export async function runTick(env, nowMs, http = fetch) {
 
 export default {
   scheduled(event, env, ctx) {
-    ctx.waitUntil(runTick(env, Number(event.scheduledTime || Date.now())));
+    // A cron event can start late. Use actual execution time for all dispatch
+    // eligibility and overdue checks; event.scheduledTime is NOT wall clock.
+    ctx.waitUntil(runTick(env, Date.now()));
   },
   async fetch(request, env) {
     if (!env.HEALTH_TOKEN || request.headers.get("Authorization") !== "Bearer " + env.HEALTH_TOKEN) {
