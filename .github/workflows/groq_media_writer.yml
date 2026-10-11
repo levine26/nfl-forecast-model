@@ -179,7 +179,7 @@ jobs:
 
       - name: Test media editorial guardrails
         run: |
-          pytest -q tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_groq_quota_circuit.py tests/test_editorial_provider_fallback.py tests/test_recover_groq_focused_game.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_direct_report_resolution.py tests/test_editorial_quality.py tests/test_groq_main_advance_audit.py tests/test_universal_human_source_publish_gates.py
+          pytest -q tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_media_context.py tests/test_copilot_media.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_groq_media_runner.py tests/test_groq_quota_circuit.py tests/test_editorial_provider_fallback.py tests/test_recover_groq_focused_game.py tests/test_levline_paragraph_renderer.py tests/test_single_copilot_game_validator.py tests/test_read_contract.py tests/test_editorial_finalize.py tests/test_source_policy_direct_reports.py tests/test_direct_report_resolution.py tests/test_editorial_quality.py tests/test_groq_main_advance_audit.py tests/test_universal_human_source_publish_gates.py tests/test_groq_checkpoint_handoff.py
           python -m py_compile scripts/recover_groq_focused_game.py src/nfl_forecast/editorial_provider_fallback.py
 
       - name: Refresh and freeze editorial weekend roster
@@ -227,6 +227,7 @@ jobs:
           key: groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-${{ github.run_id }}
           restore-keys: |
             groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-
+            groq-validated-${{ runner.os }}-
 
       - name: Research, compose and validate human game Reads with Groq and immediate ChatGPT fallback
         if: github.event_name != 'pull_request'
@@ -457,6 +458,15 @@ jobs:
         with:
           path: /tmp/groq-validated-checkpoint
           key: groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-${{ github.run_id }}
+
+      - name: Archive game-scoped Groq checkpoints for exact-run recovery
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: groq-validated-game-checkpoints-${{ github.run_id }}
+          path: /tmp/groq-validated-checkpoint/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Persist exact unresolved Groq failure state
         if: failure() && github.event_name != 'pull_request'
