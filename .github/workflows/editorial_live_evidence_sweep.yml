@@ -12,6 +12,8 @@ on:
       - "scripts/editorial_live_evidence_sweep.py"
       - "tests/test_editorial_live_evidence_sweep.py"
       - ".github/workflows/editorial_live_evidence_sweep.yml"
+      # Exactly one research audit per newly committed recovery bundle.
+      - "inputs/chatgpt_media/fallback/manifest.json"
   workflow_dispatch:
 
 permissions:
