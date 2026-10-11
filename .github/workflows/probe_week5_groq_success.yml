@@ -1,0 +1,60 @@
+name: Probe historic Week 5 Groq success checkpoint
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/probe_week5_groq_success.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independently-verify-historical-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install ".[dev]"
+      - name: Restore the exact Week 5 Groq run checkpoint, never a wildcard
+        id: original
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/groq-validated-checkpoint
+          key: groq-validated-Linux-ec691b3e1713cf60c5510077a6f200ae9a8c981de2ec8b2957ba73c2326295c1-38098893556
+      - name: Independently validate original successful TB DAL game
+        run: |
+          set -euo pipefail
+          test -s /tmp/groq-validated-checkpoint/2026_05_TB_DAL.txt
+          python scripts/validate_single_copilot_game.py \
+            --input /tmp/groq-validated-checkpoint/2026_05_TB_DAL.txt \
+            --game-id 2026_05_TB_DAL \
+            --predictions outputs/this_week.csv
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          p = Path('/tmp/groq-validated-checkpoint/2026_05_TB_DAL.txt')
+          payload = json.loads(p.read_text())
+          assert set(payload['games']) == {'2026_05_TB_DAL'}
+          sha = hashlib.sha256(p.read_bytes()).hexdigest()
+          Path('/tmp/groq-validated-checkpoint/provenance.json').write_text(
+              json.dumps({'source_workflow_run': 38098893556,
+                          'source_game_id': '2026_05_TB_DAL',
+                          'sha256': sha, 'validation': 'focused_current_canonical_only'},
+                         indent=2, sort_keys=True) + '\n'
+          )
+          print('Original Groq HUMAN checkpoint revalidated:', sha)
+          PY
+      - name: Preserve checkpoint for durable migration review, not direct publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: verified-week5-original-groq-checkpoint-${{ github.run_id }}
+          path: |
+            /tmp/groq-validated-checkpoint/2026_05_TB_DAL.txt
+            /tmp/groq-validated-checkpoint/provenance.json
+          retention-days: 30
