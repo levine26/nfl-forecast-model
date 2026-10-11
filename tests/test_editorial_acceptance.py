@@ -117,3 +117,34 @@ def test_public_display_does_not_invent_source_link_from_publisher_name():
     assert displayed == {}
     assert counts["games_with_display_reporting"] == 0
     assert counts["intermediary_only_urls_rejected"] == 1
+
+
+def test_unambiguous_city_only_matchup_names_pass_structural_team_reference():
+    from nfl_forecast.editorial_acceptance import _mentions_team
+
+    assert _mentions_team("Cleveland's quick releases challenge New York's coverage", "CLE", opponent_code="NYJ")
+    assert _mentions_team("Cleveland's quick releases challenge New York's coverage", "NYJ", opponent_code="CLE")
+    assert _mentions_team("Minnesota and New Orleans both protect the ball", "MIN", opponent_code="NO")
+    assert _mentions_team("Minnesota and New Orleans both protect the ball", "NO", opponent_code="MIN")
+    assert _mentions_team("Dallas pressure tests Tampa Bay protection", "TB", opponent_code="DAL")
+    assert _mentions_team("Dallas pressure tests Tampa Bay protection", "DAL", opponent_code="TB")
+
+
+def test_identical_team_cities_cannot_satisfy_both_sides_without_distinct_names():
+    from nfl_forecast.editorial_acceptance import _mentions_team
+
+    assert not _mentions_team("New York needs better protection", "NYJ", opponent_code="NYG")
+    assert not _mentions_team("New York needs better protection", "NYG", opponent_code="NYJ")
+    assert _mentions_team("The Giants and Jets must both improve", "NYG", opponent_code="NYJ")
+    assert _mentions_team("The Giants and Jets must both improve", "NYJ", opponent_code="NYG")
+    assert not _mentions_team("Los Angeles needs better third downs", "LA", opponent_code="LAC")
+    assert not _mentions_team("Los Angeles needs better third downs", "LAC", opponent_code="LA")
+
+
+def test_city_alias_does_not_certify_factual_claim_or_article_resolution():
+    frame = pd.DataFrame([{"game_id": "city", "away_team": "CLE", "home_team": "NYJ"}])
+    p = _preview("Cleveland", "New York", "unique routes and edge protection")
+    result = audit_editorial_acceptance(frame, {"city": p})
+    assert "human_paragraph_does_not_discuss_both_teams" not in result["issues"].get("city", [])
+    assert result["article_resolution_verified"] is False
+    assert result["claim_support_verified"] is False
