@@ -415,6 +415,14 @@ def test_orphaned_provider_success_is_detected_without_trusting_deterministic_pr
     )
     assert present == []  # Never replace a persisted Groq game.
 
+    truncated_base = module.audit_missing_nonfallback_human(
+        canonical_game_ids=game_ids,
+        fallback_targets=[game_ids[1]],
+        provider_artifact={"games": {game_ids[2]: {"headline": "unusable truncated"} }},
+        checkpoint_entries={game_ids[2]: source},
+    )
+    assert truncated_base == [game_ids[0]]  # Retain valid independent checkpoint.
+
 
 def test_orphaned_success_appears_in_same_report_as_every_failed_fallback_game(tmp_path, monkeypatch):
     import subprocess
