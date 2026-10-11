@@ -113,3 +113,19 @@ def test_historical_t120_and_new_t60_retain_distinct_timing_classifications():
 
 def test_importability_from_explicit_cli_path():
     assert official_lock_target_minutes("2026-10-15T16:15") == 60
+
+def test_pregame_publication_postcondition_waits_until_t60_for_week6():
+    import pandas as pd
+    from nfl_forecast.lock_verify import verify_pregame_locks
+
+    current = pd.DataFrame([week6_prediction(KICKOFF-timedelta(minutes=90))])
+    # Merely having a live prediction before the new window must not
+    # obligate production to manufacture an earlier immutable lock.
+    assert verify_pregame_locks(current, pd.DataFrame(),
+        KICKOFF-timedelta(minutes=90)) == []
+
+    receipt = dict(week6_prediction(KICKOFF-timedelta(minutes=60)))
+    receipt.update(lock_status="LOCKED",
+                   lock_timestamp_utc=(KICKOFF-timedelta(minutes=60)).isoformat())
+    assert verify_pregame_locks(current, pd.DataFrame([receipt]),
+        KICKOFF-timedelta(minutes=59)) == ["2026_06_X_Y"]
