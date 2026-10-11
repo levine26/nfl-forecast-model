@@ -5,7 +5,6 @@ import ForecastHelp from './ForecastHelp.jsx'
 import ExperienceLayer from './ExperienceLayer.jsx'
 import ExperienceDomFixes from './ExperienceDomFixes.jsx'
 import HistoryReceiptDetails from './HistoryReceiptDetails.jsx'
-import HistoryEditorialGuard from './HistoryEditorialGuard.jsx'
 import BetTracker from './BetTracker.jsx'
 import AtsValueLayer from './AtsValueLayer.jsx'
 import './signal-polish.css'
@@ -70,7 +69,6 @@ export default function AppCoherent() {
     <ExperienceDomFixes/>
     <ExperienceLayer/>
     <HistoryReceiptDetails/>
-    <HistoryEditorialGuard/>
     <BetTracker/>
   </>
 }
