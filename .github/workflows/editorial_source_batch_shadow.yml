@@ -1,0 +1,48 @@
+name: Sunday Signal all-game article audit shadow
+
+on:
+  pull_request:
+    paths:
+      - "scripts/audit_editorial_sources_shadow.py"
+      - "tests/test_editorial_source_batch_shadow.py"
+      - ".github/workflows/editorial_source_batch_shadow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-shadow-source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded article parser and test requirements
+        run: python -m pip install "nflreadpy==0.1.5" "requests>=2.32" "beautifulsoup4>=4.12" "pytest>=8.0"
+      - name: Assert every game is audited with no source-to-publication escalation
+        env:
+          PYTHONPATH: "src:."
+        run: |
+          python -m py_compile scripts/audit_editorial_sources_shadow.py
+          pytest -q tests/test_editorial_source_batch_shadow.py
+          python - <<'PY'
+          from pathlib import Path
+          script = Path("scripts/audit_editorial_sources_shadow.py").read_text()
+          assert '"editorial_publication_authorized": False' in script
+          assert '"semantic_claim_entailment_verified": False' in script
+          print("Shadow source audit has no production publishing authority.")
+          PY
+      - name: Retrieve and inspect actual canonical-slate sources (shadow only)
+        env:
+          PYTHONPATH: "src:."
+        run: |
+          python scripts/audit_editorial_sources_shadow.py --out /tmp/week5-article-audit-shadow.json
+      - name: Upload provenance results without publisher article text
+        uses: actions/upload-artifact@v4
+        with:
+          name: week5-source-provenance-shadow
+          path: /tmp/week5-article-audit-shadow.json
+          retention-days: 7
