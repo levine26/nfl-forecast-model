@@ -458,7 +458,6 @@ function MatchupPage({game,runs,diagnostic,gameMonitor}) {
 
     <div className="ss-matchup-grid">
       <div className="ss-matchup-main">
-        <TheSignal preview={preview} acceptance={acceptance} expectedGames={expectedGames}/>
         <ForecastMovement game={game} runs={runs} evidence={[]}/>
         <SignalFlow game={game} variant="ss-mobile-flow"/>
         <ImpactMonitor gameMonitor={gameMonitor}/>
