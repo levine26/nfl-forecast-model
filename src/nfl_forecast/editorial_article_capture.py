@@ -72,12 +72,18 @@ def _article_text(soup: BeautifulSoup) -> str:
 
 
 def _page_title(soup: BeautifulSoup) -> str:
-    h1 = soup.find("h1")
+    # Publisher sites often include a branding H1 before the story H1.
+    # The article-scoped heading (or OpenGraph title) is the source identity.
+    article = soup.find("article")
+    h1 = article.find("h1") if article is not None else None
     if h1 and h1.get_text(" ", strip=True):
         return _clean(h1.get_text(" ", strip=True))
     meta = soup.find("meta", attrs={"property": "og:title"})
     if meta and meta.get("content"):
         return _clean(meta["content"])
+    h1 = soup.find("h1")
+    if h1 and h1.get_text(" ", strip=True):
+        return _clean(h1.get_text(" ", strip=True))
     title = soup.find("title")
     return _clean(title.get_text(" ", strip=True) if title else "")
 
