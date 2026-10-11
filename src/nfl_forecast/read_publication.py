@@ -152,14 +152,14 @@ def synchronize_reads(
     return result, changed
 
 
-def synchronize_file(output_dir: Path, *, check: bool = False) -> int:
+def synchronize_file(output_dir: Path, *, check: bool = False, now_utc: datetime | None = None) -> int:
     predictions = _csv_rows(output_dir / "this_week.csv")
     official = _csv_rows(output_dir / "prediction_history.csv", allow_empty=True)
     previews_path = output_dir / "game_previews.json"
     if not previews_path.is_file():
         raise ReadSyncError(f"missing editorial preview source: {previews_path}")
     previews = json.loads(previews_path.read_text(encoding="utf-8"))
-    updated, changed = synchronize_reads(predictions, official, previews)
+    updated, changed = synchronize_reads(predictions, official, previews, now_utc=now_utc)
     if check and changed:
         raise ReadSyncError(f"{changed}/{len(predictions)} Sunday Signal Reads disagree with canonical forecasts")
     if changed and not check:
