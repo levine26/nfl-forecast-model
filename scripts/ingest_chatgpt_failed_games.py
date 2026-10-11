@@ -308,7 +308,15 @@ def _validate_recovery_targets(
             "--accepted-dir", str(accepted),
         ]
         try:
-            _run(repo_root, args)
+            result = subprocess.run(
+                [sys.executable, *args],
+                cwd=repo_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            if result.stdout.strip():
+                print(result.stdout.strip(), flush=True)
             payload = json.loads(staged.read_text(encoding="utf-8"))
             entry = payload["games"][gid]
             if not isinstance(entry, dict):
