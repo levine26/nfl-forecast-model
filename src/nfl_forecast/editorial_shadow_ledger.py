@@ -251,15 +251,18 @@ class EditorialShadowLedger:
         if not DIGEST.fullmatch(canonical_sha256) or not game_ids or len(set(game_ids)) != len(game_ids):
             raise EditorialLedgerError("invalid canonical snapshot fingerprint or slate IDs")
         entries: dict[str, str] = {}
-        for gid in game_ids:
-            pointer = self.pointer(gid)
-            if not pointer:
-                raise EditorialLedgerError(f"{gid}: missing accepted HUMAN article")
-            if not allow_freshness_review and pointer.get("freshness") != "current":
-                raise EditorialLedgerError(f"{gid}: unresolved freshness review")
-            revision = str(pointer["accepted_revision"])
-            self.read_revision(gid, revision)
-            entries[gid] = revision
+        # Single coherent point-in-time snapshot; do not mix pointers from
+        # overlapping candidate acceptances or freshness transitions.
+        with self._lock():
+            for gid in game_ids:
+                pointer = self.pointer(gid)
+                if not pointer:
+                    raise EditorialLedgerError(f"{gid}: missing accepted HUMAN article")
+                if not allow_freshness_review and pointer.get("freshness") != "current":
+                    raise EditorialLedgerError(f"{gid}: unresolved freshness review")
+                revision = str(pointer["accepted_revision"])
+                self.read_revision(gid, revision)
+                entries[gid] = revision
         return {
             "status": "shadow_only",
             "forecast_path_identity": MODEL,
