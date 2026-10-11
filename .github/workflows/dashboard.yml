@@ -19,6 +19,8 @@ on:
       - 'tests/test_site_history_compat.py'
       - 'tests/test_ats_site_receipt_contract.py'
       - 'tests/test_build_public_forecasts_receipt_contract.py'
+      - 'scripts/audit_official_lock_timeliness.py'
+      - 'tests/test_dashboard_lock_slo_artifact.py'
       - '.github/workflows/dashboard.yml'
   pull_request:
     paths:
@@ -36,6 +38,8 @@ on:
       - 'tests/test_site_history_compat.py'
       - 'tests/test_ats_site_receipt_contract.py'
       - 'tests/test_build_public_forecasts_receipt_contract.py'
+      - 'scripts/audit_official_lock_timeliness.py'
+      - 'tests/test_dashboard_lock_slo_artifact.py'
       - '.github/workflows/dashboard.yml'
   workflow_run:
     workflows:
@@ -90,6 +94,7 @@ jobs:
           tests/test_ats_site_receipt_contract.py
           tests/test_build_public_forecasts_receipt_contract.py
           tests/test_dashboard_production_concurrency.py
+          tests/test_dashboard_lock_slo_artifact.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -110,6 +115,24 @@ jobs:
           # Fail closed on missing/malformed previews or immutable lock divergence.
           # Published artifacts must already be synchronized; never hide a stale commit.
           python -m scripts.sync_market_reads --output-dir site/public/data --check
+      - name: Publish actual immutable-lock deadline audit (read-only)
+        run: |
+          # This is an *accountability artifact*, NOT a rerun, promotion, or
+          # correction of historic forecast locks. Preserve lateness and misses.
+          python scripts/audit_official_lock_timeliness.py \
+            --history site/public/data/prediction_history.csv \
+            --output site/public/data/official_lock_timeliness.json \
+            --season 2026
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("site/public/data/official_lock_timeliness.json").read_text())
+          assert report["forecast_path_identity"] == "F-ST-01-FROZEN-2026"
+          assert sum(report["counts"].values()) == report["locked_count"]
+          assert len(report["games"]) == report["locked_count"]
+          assert report["official_lock_target_minutes"] == 120.0
+          print("Public lock audit: real recorded lock receipt timing only:", report["counts"])
+          PY
       - name: Normalize immutable history for Sunday Signal
         run: python scripts/build_site_history_compat.py site/public/data/prediction_history.csv
       - name: Build and validate canonical public forecasts
