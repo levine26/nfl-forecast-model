@@ -54,6 +54,28 @@ LOCK_META_COLUMNS = [
 BOOLEAN_GRADE_COLUMNS = ["winner_correct", "actual_home_cover", "actual_over"]
 
 
+def _status_boolean_series(frame: pd.DataFrame, column: str) -> pd.Series:
+    """Decode bools after CSV/history joins; bool("False") is incorrectly True."""
+    values = frame.get(column, pd.Series(False, index=frame.index))
+
+    def decode(value) -> bool:
+        if value is None or pd.isna(value):
+            return False
+        if isinstance(value, (bool, np.bool_)):
+            return bool(value)
+        if isinstance(value, (int, float, np.integer, np.floating)) and value in (0, 1):
+            return bool(value)
+        if isinstance(value, str):
+            cleaned = value.strip().lower()
+            if cleaned in {"true", "1"}:
+                return True
+            if cleaned in {"false", "0", ""}:
+                return False
+        raise ValueError(f"Unrecognized {column} boolean flag: {value!r}")
+
+    return values.map(decode).astype(bool)
+
+
 def kickoff_utc(gameday, gametime) -> datetime:
     """nflverse gametime is Eastern time; convert the scheduled kickoff to UTC."""
     text = f"{str(gameday)[:10]} {str(gametime)[:5]}"
@@ -405,8 +427,8 @@ def write_outputs(
         if future:
             next_kickoff = min(future).isoformat()
     status_frame = published if not published.empty else p
-    market_available = status_frame.get("market_available", pd.Series(False, index=status_frame.index)).fillna(False).astype(bool)
-    fallback = status_frame.get("fst_fallback", pd.Series(False, index=status_frame.index)).fillna(False).astype(bool)
+    market_available = _status_boolean_series(status_frame, "market_available")
+    fallback = _status_boolean_series(status_frame, "fst_fallback")
     freshness = status_frame.get("market_freshness_status", pd.Series("unknown", index=status_frame.index)).fillna("unknown").astype(str)
     status = {
         "status": "healthy",
