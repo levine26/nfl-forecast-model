@@ -28,9 +28,20 @@ def _words(value: object) -> list[str]:
     return _WORD.findall(str(value or ""))
 
 
-def _mentions_team(value: object, code: str) -> bool:
+def _team_city(code: str) -> str:
+    full = str((TEAM_META.get(code) or {}).get("name") or code).strip()
+    return full.rsplit(" ", 1)[0] if " " in full else ""
+
+
+def _mentions_team(value: object, code: str, *, opponent_code: str | None = None) -> bool:
     full = str((TEAM_META.get(code) or {}).get("name") or code)
-    aliases = (code.lower(), full.lower(), full.split()[-1].lower())
+    aliases = [code.lower(), full.lower(), full.split()[-1].lower()]
+    city = _team_city(code)
+    # Use city-only shorthand when unambiguous within the matchup.
+    # A Rams/Chargers or Giants/Jets passage mentioning only its shared city
+    # does not prove that BOTH teams were independently discussed.
+    if city and (opponent_code is None or city != _team_city(opponent_code)):
+        aliases.append(city.lower())
     text = str(value or "").lower()
     return any(re.search(r"\b" + re.escape(alias) + r"\b", text) for alias in aliases)
 
@@ -91,7 +102,8 @@ def audit_editorial_acceptance(predictions, previews: dict[str, Any]) -> dict[st
         if not 55 <= word_count <= 100:
             errors.append("human_paragraph_outside_55_100_words")
         away, home = str(row.get("away_team") or ""), str(row.get("home_team") or "")
-        if not (_mentions_team(first, away) and _mentions_team(first, home)):
+        if not (_mentions_team(first, away, opponent_code=home)
+                and _mentions_team(first, home, opponent_code=away)):
             errors.append("human_paragraph_does_not_discuss_both_teams")
         if any(pattern.search(f"{headline} {first}") for pattern in _FALLBACK_SHAPES):
             errors.append("mechanical_injury_or_stock_template")

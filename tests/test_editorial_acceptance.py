@@ -117,3 +117,35 @@ def test_public_display_does_not_invent_source_link_from_publisher_name():
     assert displayed == {}
     assert counts["games_with_display_reporting"] == 0
     assert counts["intermediary_only_urls_rejected"] == 1
+
+
+def test_city_only_references_identify_distinct_matchup_teams() -> None:
+    from nfl_forecast.editorial_acceptance import _mentions_team
+    narrative = (
+        "Cleveland can attack New York's outside leverage with quick releases; "
+        "New York must disguise pressure while Cleveland rotates coverage."
+    )
+    assert _mentions_team(narrative, "CLE", opponent_code="NYJ")
+    assert _mentions_team(narrative, "NYJ", opponent_code="CLE")
+    assert _mentions_team("Philadelphia must disrupt Jacksonville's early-down rhythm.", "PHI", opponent_code="JAX")
+    assert _mentions_team("Philadelphia must disrupt Jacksonville's early-down rhythm.", "JAX", opponent_code="PHI")
+
+
+def test_shared_city_cannot_falsely_certify_both_teams() -> None:
+    from nfl_forecast.editorial_acceptance import _mentions_team
+    assert not _mentions_team("Los Angeles has improved against pressure.", "LA", opponent_code="LAC")
+    assert not _mentions_team("Los Angeles has improved against pressure.", "LAC", opponent_code="LA")
+    assert _mentions_team("The Rams have improved against Los Angeles.", "LA", opponent_code="LAC")
+    assert not _mentions_team("The Rams have improved against Los Angeles.", "LAC", opponent_code="LA")
+    assert not _mentions_team("New York adjusted its coverages.", "NYG", opponent_code="NYJ")
+    assert not _mentions_team("New York adjusted its coverages.", "NYJ", opponent_code="NYG")
+
+
+def test_city_alias_improves_structure_not_independent_claim_verification() -> None:
+    games = {"g1": _preview("Tampa Bay", "Dallas", "Dallas adjustments"),
+             "g2": _preview("Philadelphia", "Jacksonville", "Jacksonville spacing")}
+    audit = audit_editorial_acceptance(_frame(), games)
+    assert "human_paragraph_does_not_discuss_both_teams" not in audit["issues"].get("g1", [])
+    assert "human_paragraph_does_not_discuss_both_teams" not in audit["issues"].get("g2", [])
+    assert audit["article_resolution_verified"] is False
+    assert audit["claim_support_verified"] is False
