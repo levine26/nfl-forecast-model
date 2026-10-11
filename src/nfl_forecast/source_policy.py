@@ -159,8 +159,8 @@ NON_REPORTING_SOURCE_TITLE_RE = re.compile(
     r"watch[ ,:-]+listen[ ,:-]+(?:and[ ,:-]+)?follow|"
     r"tv[ -]+channels?|streaming[ ,:-]+|live[ -]+stream|"
     r"betting[ -]+picks?|fantasy[ -]+rankings?|"
-    r"nfl[ -]+week[ -]+\\d+[ -]+picks?|"
-    r"week[ -]+\\d+[ -]+schedule|"
+    r"nfl[ -]+week[ -]+\d+[ -]+picks?|"
+    r"week[ -]+\d+[ -]+schedule|"
     r"odds[ ,:/-]+(?:injur|pick|preview|prediction)|"
     r"prediction[ ,:/-]+(?:pick|odds|where)|"
     r"league[ -]+wide[ -]+roundup)\b",
