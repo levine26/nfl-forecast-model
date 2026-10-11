@@ -132,7 +132,13 @@ def audit_slate(
         "games_expected": len(ids),
         "games_audited": len(games),
         "games_with_resolved_source_receipts": sum(
-            source_snapshot_ok and g["resolved_source_receipts"] >= 2 for g in games.values()
+            1 for gid, g in games.items()
+            if (source_snapshot_ok
+                and isinstance(source_games.get(gid), dict)
+                and source_games[gid].get("status") == "provenance_ready_semantics_pending"
+                and g["resolved_source_receipts"] >= 2
+                and g["draft_present"]
+                and "candidate_provenance_version_mismatch" not in g["issues"])
         ),
         "games_with_independently_verified_human_reads": 0,
         "source_snapshot_compatible": source_snapshot_ok,
