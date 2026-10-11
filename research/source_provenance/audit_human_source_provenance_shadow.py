@@ -9,6 +9,7 @@ release artifacts, and it does not store copyrighted article bodies.
 """
 
 import argparse
+import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -38,6 +39,75 @@ NICKNAMES = {
 
 class SlateProvenanceError(ValueError):
     pass
+
+
+def validate_active_slate(
+    manifest: dict[str, Any], *,
+    current_csv: Path,
+    historical_roster: Path,
+) -> dict[str, Any]:
+    """Check a candidate against current canonical forecasts, not an older freeze.
+
+    The frozen editorial roster is only authoritative when its season/week
+    matches the active forecasts. Never rewrite or thaw an earlier week's
+    immutable roster to make a research audit pass.
+    """
+    ids = manifest.get("game_ids")
+    if (not isinstance(ids, list) or not ids
+            or not all(isinstance(g, str) and g for g in ids)
+            or len(ids) != len(set(ids))):
+        raise SlateProvenanceError("manifest needs unique canonical game IDs")
+    try:
+        with current_csv.open("r", newline="", encoding="utf-8") as stream:
+            rows = list(csv.DictReader(stream))
+    except OSError as exc:
+        raise SlateProvenanceError("active canonical forecast CSV unavailable") from exc
+    if not rows:
+        raise SlateProvenanceError("active canonical forecast CSV is empty")
+    try:
+        seasons_weeks = {(int(r["season"]), int(r["week"])) for r in rows}
+        if len(seasons_weeks) != 1:
+            raise SlateProvenanceError("active forecast CSV mixes seasons or weeks")
+        season, week = next(iter(seasons_weeks))
+        current_ids = [str(r["game_id"]) for r in rows]
+        for row in rows:
+            expected = f"{season}_{week:02d}_{row['away_team']}_{row['home_team']}"
+            if row["game_id"] != expected:
+                raise SlateProvenanceError("active forecast CSV game identity mismatch")
+    except (KeyError, ValueError, TypeError) as exc:
+        raise SlateProvenanceError("active forecast CSV lacks valid game identity") from exc
+    if len(current_ids) != len(set(current_ids)):
+        raise SlateProvenanceError("duplicate games in active canonical forecast")
+    if set(ids) != set(current_ids) or len(ids) != len(current_ids):
+        missing = sorted(set(current_ids) - set(ids))
+        extra = sorted(set(ids) - set(current_ids))
+        raise SlateProvenanceError(
+            f"candidate manifest differs from ACTIVE canonical forecast: "
+            f"missing={missing}; extra={extra}"
+        )
+    roster_status = "absent"
+    if historical_roster.is_file():
+        try:
+            historic = json.loads(historical_roster.read_text(encoding="utf-8"))
+            roster_season, roster_week = int(historic["season"]), int(historic["week"])
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            raise SlateProvenanceError("historical editorial roster has invalid identity") from exc
+        if (roster_season, roster_week) == (season, week):
+            frozen_ids = historic.get("game_ids")
+            if (not isinstance(frozen_ids, list)
+                    or len(frozen_ids) != len(set(frozen_ids))
+                    or set(frozen_ids) != set(current_ids)):
+                raise SlateProvenanceError("same-week frozen roster differs from active slate")
+            roster_status = "same_week_validated"
+        else:
+            roster_status = "different_week_historical_not_authoritative"
+    return {
+        "season": season, "week": week, "games_expected": len(current_ids),
+        "canonical_game_ids": sorted(current_ids),
+        "historical_roster_status": roster_status,
+        "publication_authorized": False,
+    }
+
 
 
 def audit_game(
@@ -166,16 +236,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=Path("inputs/chatgpt_media/fallback/manifest.json"))
     parser.add_argument("--input-dir", type=Path, default=Path("inputs/chatgpt_media/fallback"))
+    parser.add_argument("--current", type=Path, default=Path("outputs/this_week.csv"))
     parser.add_argument("--output", type=Path, default=Path("/tmp/sunday_signal_article_provenance_shadow.json"))
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    roster_path = Path("inputs/sunday_signal/editorial_slate_roster.json")
-    if roster_path.is_file():
-        roster = json.loads(roster_path.read_text(encoding="utf-8"))
-        if set(manifest.get("game_ids") or []) != set(roster.get("game_ids") or []):
-            raise SlateProvenanceError("manifest differs from canonical editorial slate roster")
+    canonical = validate_active_slate(
+        manifest, current_csv=args.current,
+        historical_roster=Path("inputs/sunday_signal/editorial_slate_roster.json"),
+    )
     result = audit_slate(manifest, input_dir=args.input_dir, max_workers=args.workers)
+    result["canonical_slate_reference"] = canonical
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"Shadow article verification: {result['games_with_verified_article_resolutions']}/"
