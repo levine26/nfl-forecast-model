@@ -6,7 +6,8 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from .publish import ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY, LOCK_WINDOW_MINUTES, kickoff_utc
+from .publish import ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY, kickoff_utc
+from .lock_policy import official_lock_target_minutes
 
 
 def _as_utc(value: str | None) -> datetime:
@@ -57,7 +58,7 @@ def verify_pregame_locks(
     current: pd.DataFrame,
     official: pd.DataFrame,
     now_utc: datetime,
-    lock_window_minutes: float = LOCK_WINDOW_MINUTES,
+    lock_window_minutes: float | None = None,
 ) -> list[str]:
     """Validate that every currently eligible game has one coherent lock row.
 
@@ -87,7 +88,8 @@ def verify_pregame_locks(
         except Exception:
             continue
         minutes = (kickoff - now_utc).total_seconds() / 60.0
-        if not (0.0 < minutes <= lock_window_minutes):
+        effective_window = official_lock_target_minutes(row) if lock_window_minutes is None else lock_window_minutes
+        if not (0.0 < minutes <= effective_window):
             continue
         eligible.append(gid)
 
@@ -107,8 +109,8 @@ def verify_pregame_locks(
         try:
             lock_time = _as_utc(str(locked.get("lock_timestamp_utc")))
             lock_minutes = (kickoff - lock_time).total_seconds() / 60.0
-            if not (0.0 < lock_minutes <= lock_window_minutes):
-                failures.append(f"{gid}: stored lock time is outside T-120 ({lock_minutes:.1f} minutes)")
+            if not (0.0 < lock_minutes <= effective_window):
+                failures.append(f"{gid}: stored lock time is outside T-{int(effective_window)} ({lock_minutes:.1f} minutes)")
         except Exception as exc:
             failures.append(f"{gid}: invalid lock timestamp ({exc})")
 
