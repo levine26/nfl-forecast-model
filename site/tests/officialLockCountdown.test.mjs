@@ -80,3 +80,14 @@ test('invalid or backwards server timing does not invent clock correction', () =
   assert.equal(serverClockOffsetMs('',begin,begin+100),null)
   assert.equal(serverClockOffsetMs('Sat, 10 Oct 2026 16:00:00 GMT',begin+100,begin),null)
 })
+
+test('Week 6 2026 uses T-60 without reclassifying legacy Week 5', () => {
+  const old = officialLockTiming(game('2026-10-11T13:30:00Z',{season:2026,week:5}),0)
+  const updated = officialLockTiming(game('2026-10-18T17:00:00Z',{season:2026,week:6}),0)
+  assert.equal(old.scheduledLockUtc,'2026-10-11T11:30:00.000Z')
+  assert.equal(updated.scheduledLockUtc,'2026-10-18T16:00:00.000Z')
+  assert.equal(officialLockTiming(game('2026-10-18T17:00:00Z',{game_id:'2026_06_CHI_GB'}),0).scheduledLockUtc,
+    '2026-10-18T16:00:00.000Z')
+  assert.equal(officialLockTiming(game('2026-10-18T17:00:00Z',{season:2026,week:6}),
+    Date.parse('2026-10-18T16:00:00Z')).state,'due')
+})
