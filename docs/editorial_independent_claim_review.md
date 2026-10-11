@@ -1,33 +1,34 @@
-# Sunday Signal: independent HUMAN claim approval
+# Sunday Signal: independent HUMAN claim acceptance
 
-**Status:** fail-closed production engineering prerequisite, NOT independent factual verification or launch approval.
+**Operational state:** This safeguard is a fail-closed verification prerequisite. It is not a source-review service, evidence archive, semantic fact checker or launch authorization.
 
-## Required external reviewer
+## Separation of duties
 
-The existing structural editorial acceptance gate is not enough: its JSON booleans do not authenticate independent review. All three HUMAN production publishers additionally require a complete, provenance-bound HMAC-SHA256 dossier signed with a trusted independent review key. The new signer must be separate from Groq, ChatGPT and candidate publishing; no current reviewer service, signing key or factual approval is presumed.
+The authoring providers (Groq, ChatGPT and candidate publishers) do not approve their own factual assertions. A separately controlled reviewer must inspect original publisher articles, point-in-time captures and every substantive football clause. Only that reviewer holds the **Ed25519 private signing key**. Production workflows receive the **Ed25519 public verification key only**, as the GitHub Actions repository variable `SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY` (PEM SubjectPublicKeyInfo). They cannot use that public key to fabricate a signature.
 
-Configure a secure GitHub Actions secret named SUNDAY_SIGNAL_REVIEW_KEY only after establishing independently controlled reviewer infrastructure. The key must contain at least 32 UTF-8 bytes and must never be committed or passed to the generating model. Dossier location: inputs/sunday_signal/independent_claim_approvals.json. No dossier or key means no HUMAN publication.
+The signed review dossier path is `inputs/sunday_signal/independent_claim_approvals.json`. No trusted reviewer, public key or valid exact-slate dossier means no new HUMAN Read can publish. Never commit a private signing key or provide one to generation providers.
 
-Top-level dossier structure: {"payload": {...}, "signature": "lowercase HMAC SHA-256 hex"}. Serialize payload using Python json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False) and HMAC-SHA256 with the reviewer secret.
+## Dossier contract
 
-Payload schema_version is 1; canonical_slate_sha256 is the SHA-256 of outputs/this_week.csv raw bytes; games is an exact mapping of every canonical current game ID.
+A JSON object with exactly two top-level keys: `payload` and `signature`. The signature is the standard base64 encoding of the 64-byte Ed25519 signature over the UTF-8 bytes of `json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"), allow_nan=False)`.
 
-Each game's record requires:
-- official_forecast_sha256: SHA-256 of canonical compact sorted JSON of the current CSV row.
-- human_paragraph_sha256: SHA-256 of exact first public matchup Read paragraph.
-- reviewer_id and timestamp reviewed_utc.
-- all_material_factual_clauses_reviewed, independent_semantic_review_complete and point_in_time_evidence_review_complete explicitly true.
-- sources: at least two independent publisher families with canonical HTTPS URLs, actual article-content SHA-256, original_article_content_reviewed true, publication and independently archived capture timestamps **before kickoff**.
-- claims: comprehensive independently enumerated factual subclaims; every material statement has judgment verified, exact substantive supporting excerpt, matching article-content SHA-256 and independently_entails_claim true.
+The `payload` schema must contain:
 
-The gate checks the authenticated attestation, exact byte/snapshot freshness, timestamps, source identity, publisher diversity and per-claim fields. **It does NOT itself prove claim truth, article excerpt presence or reviewer independence.** Those must be established by the trusted external review process. Never fabricate attestations or treat HMAC as a semantic judge.
+- `schema_version: 1`, SHA-256 of the exact bytes of canonical `outputs/this_week.csv`, and a game map covering every current canonical game ID exactly once.
+- For each game: SHA-256 of the canonical JSON representation of the CSV prediction row, SHA-256 of the exact published first HUMAN paragraph, independent `reviewer_id`, timezone-aware `reviewed_utc`, and positive attestations of complete factual-clause review, independent semantic review and point-in-time verification.
+- At least two independent publisher source receipts, with canonical HTTPS URLs **identical to the article URLs publicly cited in the same Read**, article-content SHA-256, independent original-article review, publication time and verifiable archive capture time both preceding kickoff.
+- Every independently enumerated factual subclaim, exact statement, `judgment: "verified"`, substantive verbatim supporting excerpt, article fingerprint linking that claim to reviewed source bytes, and `independently_entails_claim: true`.
 
-## Operational handling
+This gate verifies signer authenticity, full-slate identity, citation-to-receipt linkage, per-game hash consistency, timeframe, source-family diversity and explicit proof fields. It cannot independently establish semantic entailment, completeness of factual-clause extraction, excerpt presence in archived body text or reviewer authorization. Those remain the responsibility of the independent reviewing service and evidence archive. False affirmations by a reviewer do not become true merely because the signature verifies.
 
-With no approved evidence, signing key, or exact dossier, the gate fails closed; public numerics remain usable but factual HUMAN Reads must be withheld. A new forecast row, human paragraph or slate requires a new approval; stale approvals cannot be reused. Missing pre-kickoff original-article captures cannot be manufactured after the game.
+## Release, recovery and rollback
 
-Offline regression: python -m pytest -q tests/test_editorial_signed_acceptance.py tests/test_verified_human_source_gate.py.
+With missing public verification key, absent dossier, invalid signature, stale official prediction bytes, changed Read text, unreviewed cited source, post-kickoff capture or unverified claim, fail closed without publishing HUMAN content. Keep accurate official numerical forecasts visible with appropriate degraded editorial status. Re-run external evidence capture, independent claim review, and signing for the exact current slate rather than changing flags.
 
-Keep frozen F-ST official probabilities, past locks, past results and official model governance untouched. Recover by preserving last-good accepted editorial data, not by flipping status flags. After an audit failure, repair sources or claims, independently review, re-sign exact bytes, test, then publish. Key compromise requires key rotation and review of previously approved releases.
+Focused offline regression command:
 
-**Remaining launch blockers:** This PR neither supplies a reviewer or credential nor verifies any of the 15 Week 5 claim sets. The finalizer still records the existing evidence and claim acceptance fields as false. Launch stays blocked until those substantive prerequisites are satisfied.
+`python -m pytest -q tests/test_editorial_signed_acceptance.py tests/test_verified_human_source_gate.py`
+
+Rollback is editorial-only. Preserve last-good independently accepted text when snapshot-compatible, never substitute stale editorial content under newer forecast numbers, and never rewrite F-ST, historical locks, grades or research candidates. If the private signing key is compromised, revoke the corresponding public key and require genuinely new reviews under a new signing identity.
+
+**Known launch blockers:** no independently authorized review service, signing arrangement, complete timestamped original-article evidence archive or accepted claim inventory is connected. The current Week 5 acceptance audit remains unverified. This engineering change makes mispublication harder; it does not fix the underlying football writing quality by itself.
