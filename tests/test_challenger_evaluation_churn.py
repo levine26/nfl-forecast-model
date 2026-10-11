@@ -68,6 +68,9 @@ def test_workflow_stabilizes_before_git_add_and_commit():
     workflow = (root / ".github/workflows/challenger_shadow_lock.yml").read_text()
     marker = "research/avoid_noop_challenger_calibration_churn.py"
     assert marker in workflow
+    # Bash must receive exactly one trailing backslash to continue the CLI arguments.
+    assert (marker + " " + chr(92) + "\n") in workflow
+    assert (marker + " " + chr(92) * 2 + "\n") not in workflow
     assert workflow.index("scripts/run_challenger_fst_evaluation.py") < workflow.index(marker)
     assert workflow.index(marker) < workflow.index("git add challenger_outputs/prediction_history_shadow.csv")
     assert "git diff --cached --quiet" in workflow
