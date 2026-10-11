@@ -26,7 +26,7 @@ def main() -> None:
     parser.add_argument("--feed", default="outputs/this_week.csv")
     parser.add_argument("--history", default="outputs/prediction_history.csv")
     parser.add_argument("--now-utc", default=None, help="ISO-8601 UTC timestamp; defaults to current time")
-    parser.add_argument("--lock-window-minutes", type=float, default=LOCK_WINDOW_MINUTES)
+    parser.add_argument("--lock-window-minutes", type=float, default=None)
     args = parser.parse_args()
 
     feed_path = Path(args.feed)
@@ -40,7 +40,7 @@ def main() -> None:
     if eligible:
         print("verified locked games:", ", ".join(eligible))
     else:
-        print("no games currently inside the official T-120 lock window")
+        print("no games currently inside their official per-game lock windows")
 
 
 if __name__ == "__main__":
