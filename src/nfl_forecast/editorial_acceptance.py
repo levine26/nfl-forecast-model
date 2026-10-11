@@ -34,16 +34,22 @@ def _team_city(code: str) -> str:
 
 
 def _mentions_team(value: object, code: str, *, opponent_code: str | None = None) -> bool:
-    full = str((TEAM_META.get(code) or {}).get("name") or code)
-    aliases = [code.lower(), full.lower(), full.split()[-1].lower()]
+    full = str((TEAM_META.get(code) or {}).get("name") or code).strip()
+    if not code or not full:
+        return False
+    aliases = [full.lower(), full.split()[-1].lower()]
     city = _team_city(code)
     # Use city-only shorthand when unambiguous within the matchup.
     # A Rams/Chargers or Giants/Jets passage mentioning only its shared city
     # does not prove that BOTH teams were independently discussed.
     if city and (opponent_code is None or city != _team_city(opponent_code)):
         aliases.append(city.lower())
-    text = str(value or "").lower()
-    return any(re.search(r"\b" + re.escape(alias) + r"\b", text) for alias in aliases)
+    raw = str(value or "")
+    text = raw.lower()
+    # Match short team codes only as explicit uppercase abbreviations. Otherwise
+    # the ordinary English word "no" wrongly qualifies as a Saints reference.
+    explicit_code = bool(code) and bool(re.search(r"\b" + re.escape(code) + r"\b", raw))
+    return explicit_code or any(re.search(r"\b" + re.escape(alias) + r"\b", text) for alias in aliases)
 
 
 def _substantive_seven_grams(value: object) -> set[str]:

@@ -149,3 +149,19 @@ def test_city_alias_improves_structure_not_independent_claim_verification() -> N
     assert "human_paragraph_does_not_discuss_both_teams" not in audit["issues"].get("g2", [])
     assert audit["article_resolution_verified"] is False
     assert audit["claim_support_verified"] is False
+
+
+def test_abbreviated_team_code_must_not_match_unrelated_lowercase_prose():
+    from nfl_forecast.editorial_acceptance import _mentions_team
+
+    assert not _mentions_team(
+        "Minnesota faces a defense with no clear coverage answer.",
+        "NO", opponent_code="MIN",
+    )
+    assert _mentions_team("Minnesota and NO face off.", "NO", opponent_code="MIN")
+    assert _mentions_team("Minnesota faces the Saints.", "NO", opponent_code="MIN")
+    assert _mentions_team("Minnesota faces New Orleans.", "NO", opponent_code="MIN")
+    assert not _mentions_team(
+        "Los Angeles has questions to answer.", "LAC", opponent_code="LA",
+    )
+    assert not _mentions_team("", "", opponent_code="MIN")
