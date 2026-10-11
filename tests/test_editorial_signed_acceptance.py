@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import csv
 from hashlib import sha256
-import hmac
+import base64
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives import serialization
 import json
 from pathlib import Path
 import pytest
@@ -12,7 +14,11 @@ from scripts.editorial_signed_acceptance import (
     verify_signed_claim_receipts,
 )
 
-KEY = "fixture-independent-review-secret-kept-out-of-model-provider"
+PRIVATE_SIGNER = Ed25519PrivateKey.generate()
+PUBLIC_VERIFICATION_KEY = PRIVATE_SIGNER.public_key().public_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PublicFormat.SubjectPublicKeyInfo,
+).decode("utf-8")
 
 
 def evidence(tmp_path: Path):
@@ -57,14 +63,15 @@ def evidence(tmp_path: Path):
     return forecast, previews, dossier, payload
 
 
-def sign(path: Path, payload: dict, key: str = KEY):
+def sign(path: Path, payload: dict):
     path.write_text(json.dumps({"payload": payload,
-                                "signature": hmac.new(key.encode(), _canonical(payload), "sha256").hexdigest()}))
+                                "signature": base64.b64encode(PRIVATE_SIGNER.sign(_canonical(payload))).decode("ascii")}))
 
 
 def verify(items):
     forecast, previews, dossier, _ = items
-    return verify_signed_claim_receipts(forecast=forecast, previews=previews, dossier=dossier, review_key=KEY)
+    return verify_signed_claim_receipts(forecast=forecast, previews=previews, dossier=dossier,
+                                        review_public_key_pem=PUBLIC_VERIFICATION_KEY)
 
 
 def test_valid_independent_pre_kickoff_attestation_is_bound_to_exact_bytes(tmp_path):
@@ -74,13 +81,13 @@ def test_valid_independent_pre_kickoff_attestation_is_bound_to_exact_bytes(tmp_p
 
 def test_missing_key_or_dossier_fails_closed_even_if_provider_reports_success(tmp_path, monkeypatch):
     f, p, d, _ = evidence(tmp_path)
-    with pytest.raises(ClaimAcceptanceBlocked, match="signing key"):
-        verify_signed_claim_receipts(forecast=f, previews=p, dossier=d, review_key="")
-    monkeypatch.delenv("SUNDAY_SIGNAL_REVIEW_KEY", raising=False)
-    with pytest.raises(ClaimAcceptanceBlocked, match="signing key"):
+    with pytest.raises(ClaimAcceptanceBlocked, match="public verification key"):
+        verify_signed_claim_receipts(forecast=f, previews=p, dossier=d, review_public_key_pem="")
+    monkeypatch.delenv("SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY", raising=False)
+    with pytest.raises(ClaimAcceptanceBlocked, match="public verification key"):
         require_signed_claim_receipts(forecast=f, previews=p, dossier=d)
     with pytest.raises(ClaimAcceptanceBlocked, match="inputs missing"):
-        verify_signed_claim_receipts(forecast=f, previews=p, dossier=tmp_path / "missing.json", review_key=KEY)
+        verify_signed_claim_receipts(forecast=f, previews=p, dossier=tmp_path / "missing.json", review_public_key_pem=PUBLIC_VERIFICATION_KEY)
 
 
 def test_changed_prediction_or_human_prose_invalidates_signature_provenance(tmp_path):
@@ -142,4 +149,4 @@ def test_all_three_human_publishers_require_separate_signed_claim_review():
         assert "require_verified_human_sources(status, games_expected=games)" in before_publish
         assert "from scripts.editorial_signed_acceptance import require_signed_claim_receipts" in before_publish
         assert "require_signed_claim_receipts()" in before_publish
-        assert "secrets.SUNDAY_SIGNAL_REVIEW_KEY" in text
+        assert "vars.SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY" in text
