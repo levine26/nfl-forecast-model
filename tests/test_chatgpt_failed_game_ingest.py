@@ -396,7 +396,7 @@ def test_orphaned_provider_success_is_detected_without_trusting_deterministic_pr
     source = {
         "headline": "Accepted provider headline",
         "paragraph1": "Accepted provider human paragraph",
-        "model_rationale": "Tactical mechanism for the accepted game",
+        "model_rationale": "The trusted accepted football preview explains how pass protection counters edge pressure while the defense adjusts its coverage responsibilities against both opponents.",
         "sources": [{"url": "https://www.nfl.com/news/a", "name": "NFL", "title": "Matchup"}],
     }
     missing = module.audit_missing_nonfallback_human(
