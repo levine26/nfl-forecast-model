@@ -11,8 +11,10 @@ on:
       - "tests/test_chatgpt_failed_game_ingest.py"
       - "scripts/verify_human_source_acceptance.py"
       - "scripts/editorial_signed_acceptance.py"
+      - "scripts/promote_signed_human_acceptance.py"
       - "tests/test_verified_human_source_gate.py"
       - "tests/test_editorial_signed_acceptance.py"
+      - "tests/test_promote_signed_human_acceptance.py"
       - "tests/test_fallback_batch_trigger.py"
       - "tests/test_editorial_provider_fallback.py"
       - "tests/test_editorial_text_safety.py"
@@ -60,7 +62,7 @@ jobs:
 
       - name: Test game-scoped fallback boundary
         run: |
-          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py tests/test_fallback_batch_trigger.py tests/test_verified_human_source_gate.py tests/test_editorial_signed_acceptance.py
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py tests/test_fallback_batch_trigger.py tests/test_verified_human_source_gate.py tests/test_editorial_signed_acceptance.py tests/test_promote_signed_human_acceptance.py
           python -m py_compile scripts/ingest_chatgpt_failed_games.py scripts/restore_last_good_editorial_snapshot.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
 
       - name: Enforce editorial-only fallback wiring
@@ -343,6 +345,11 @@ jobs:
           # Existing URL-shape and prose checks are NOT article/claim fact-checking.
           # The independently regenerated acceptance audit must authorize HUMAN
           # publication for all games, otherwise the last-good release survives.
+          # Only a complete externally signed claim review may promote the
+          # finalizer's structurally_eligible status into source-verified authority.
+          from scripts.promote_signed_human_acceptance import promote_verified_acceptance
+          promote_verified_acceptance()
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
           from scripts.verify_human_source_acceptance import require_verified_human_sources
           require_verified_human_sources(status, games_expected=games)
           # Status booleans and publisher URL checks are not trusted factual approvals.
