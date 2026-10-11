@@ -21,6 +21,7 @@ from nfl_forecast.copilot_source_backfill import backfill_direct_sources
 from nfl_forecast.editorial_model_read import render_model_paragraph
 from nfl_forecast.source_policy import (
     is_direct_media_report_url,
+    is_substantive_report_candidate,
     media_domain_allowed,
     media_domain_family,
 )
@@ -152,7 +153,7 @@ def _canonical_sources(entry: dict, preview: dict, evidence_items: list[dict]) -
         if not name or not title:
             continue
         url = _canonical_url(source.get("url") or "", name)
-        if not url or not is_direct_media_report_url(url):
+        if not url or not is_substantive_report_candidate(title=title, url=url):
             continue
         family = _domain_family(url)
         title_key = re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
