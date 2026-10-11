@@ -122,6 +122,10 @@ def main() -> int:
     result["canonical_slate_sha256"] = sha256(raw).hexdigest()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    for gid, game in sorted(result["games"].items()):
+        print(json.dumps({"game_id": gid, "status": game["status"],
+                          "verified_sources": len(game["sources"]), "issues": game["errors"]},
+                         sort_keys=True))
     print(f"ARTICLE SHADOW: {result['games_with_verified_article_provenance']}/"
           f"{result['games_expected']} article-ready; zero claims verified; publication prohibited")
     return 0
