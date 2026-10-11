@@ -58,7 +58,7 @@ jobs:
 
       - name: Test game-scoped fallback boundary
         run: |
-          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py tests/test_fallback_batch_trigger.py tests/test_verified_human_source_gate.py tests/test_verified_human_source_gate.py
+          pytest -q tests/test_editorial_provider_fallback.py tests/test_chatgpt_failed_game_ingest.py tests/test_editorial_text_safety.py tests/test_canonical_editorial_predictions.py tests/test_editorial_slate_roster.py tests/test_restore_last_good_editorial_snapshot.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py tests/test_fallback_batch_trigger.py tests/test_verified_human_source_gate.py tests/test_groq_checkpoint_handoff.py
           python -m py_compile scripts/ingest_chatgpt_failed_games.py scripts/restore_last_good_editorial_snapshot.py src/nfl_forecast/editorial_provider_fallback.py src/nfl_forecast/editorial_text_safety.py
 
       - name: Enforce editorial-only fallback wiring
@@ -235,6 +235,36 @@ jobs:
           key: groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-${{ github.run_id }}
           restore-keys: |
             groq-validated-${{ runner.os }}-${{ hashFiles('outputs/contextual_evidence.json', 'outputs/this_week.csv') }}-
+            groq-validated-${{ runner.os }}-
+
+      - name: Identify exact Groq provider run for validated checkpoint recovery
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
+        id: groq_producer
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          status = json.loads(Path('outputs/context_source_status.json').read_text(encoding='utf-8'))
+          raw = (status.get('groq_provider_fallback') or {}).get('run_id')
+          run_id = str(raw or '')
+          if not run_id.isascii() or not run_id.isdecimal() or int(run_id) < 1:
+              raise SystemExit('Missing valid producing Groq run id; refusing unverifiable cross-run checkpoint import.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'run_id={run_id}\\n')
+          print('Recovering only from authoritative Groq producer run', run_id)
+          PY
+
+      - name: Restore checkpoint artifact from authoritative Groq run
+        if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: groq-validated-game-checkpoints-${{ steps.groq_producer.outputs.run_id }}
+          run-id: ${{ steps.groq_producer.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: /tmp/groq-validated-checkpoint
 
       - name: Restore same-week launch-grade editorial snapshot when available
         if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'
