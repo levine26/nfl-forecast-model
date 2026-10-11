@@ -24,6 +24,7 @@ Run from the project root. The `demo` uses **fabricated games, fabricated quotes
 - `player_models.py`: leak-aware prior-only player features, trainable touchdown Logistic/HGB candidates, yardage HGB baselines, season-forward holdout; no sports data included
 - `joint_simulator.py`: **synthetic / uncalibrated** drive-score and TD scenario test generator; shared pace creates within-game correlations
 - `risk.py`: conservative-stake *simulation* with hard $45 session budget, per-game exposure caps and no-bet gating for unqualified forecasts
+- `sources.py`: create-only SHA-256 archival envelopes; qualified manual quotes; unqualified provider subquotes blocked without per-book quote timestamps
 - `ledger.py`: verified append-only implementation receipts
 - `cli.py`: manually invoked synthetic demonstration and ledger audit
 

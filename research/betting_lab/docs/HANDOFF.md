@@ -13,6 +13,7 @@ User wants a serious scientifically evaluated NFL wagering research system handl
 - B04: explicit correlated outcomes across legs of same game, toy shared-pace scoring/TD simulator (uncalibrated), wallet/portfolio distribution.
 - B05: conservative paper stake and $45 risk caps, explicit lack-of-evidence abstention; no execution.
 - B06: docs, ledger and CLI.
+- B07A: timestamp/contract-provenance adapter and create-only SHA256 snapshot receipts; Alexandria per-book subquotes remain explicitly unqualified without their own timestamps.
 - All local tests: see actual latest test result and receipt; no claims about remote CI without confirmation.
 
 ## Commands
@@ -32,7 +33,7 @@ The 2022–2025 LevLine history is *development/nonpristine*, not an untouched h
 
 ## Exact next steps
 
-1. Verify remote branch/PR state and merge only if repository gates permit; preserve production firewall.
+1. GitHub PR #697 opened from `research/betting-lab-v02-20261010` at commit `6d82e5577546c542865fbfb2706fe7562f5eb6ee`; verify its checks and update PR with B07A. Do not claim merge without remote confirmation.
 2. Acquire/source-qualify actual 2022–2025 pregame bookmaker spread/total/moneyline, TD and prop snapshots and 2026 prospective snapshots with timestamps; reject reconstructed pregame prices.
 3. Implement a source adapter to frozen quote model (manual/current, The Odds API or Alexandria where provenance/licensing is established), with append-only protected snapshot receipts.
 4. Build empirical key-number/score distribution using training-only data, fit and calibrate on separate years/weeks; evaluate over the market-only null using heldout proper scores and exact market economics.
