@@ -68,3 +68,7 @@ python -m betlab.cli frozen-oof-audit \
 ```
 
 Do not rerun source outcomes to choose a new candidate or retrospectively tune stake/edge thresholds. Append scientific receipts, and keep production unchanged.
+
+### B08B result closeout (2026-10-11)
+
+Archived result: `research/betting_lab/reports/b08_sprint/B08B_OOF_2022_2024_RESULTS.json`, paired 815 archived 2022-24 regular-season OOF games (813 for binary ML after excluding 2 ties). Market ML accuracy 68.2657%, A0 62.9766%. Original frozen research candidates did not demonstrate superiority over the market on ML calibration/margin/total error. This is retrospective model research, not an ATS/ML/totals wagering ROI trial. Source SHA identities are in the result and ledger. No 2021 requirement. Do not reactively tune the current live betting ranking to these outcomes. Keep separate F-ST winner archive for 2022-2025. B08B evaluator implemented, independently computed result published, validation CI gate pending before merging PR #697.
