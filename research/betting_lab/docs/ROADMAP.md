@@ -1,0 +1,36 @@
+# LevLine Betting Lab — Master Roadmap and Phase Register
+
+**As of 2026-10-10** · Repository target `levine26/nfl-forecast-model` · Separate research-only program.
+
+| Phase | Name | Current status | Acceptance and remaining work |
+|---|---|---|---|
+| B00 | Evidence inventory / v0.1 snapshot | BASELINE ARCHIVED | V0.1 local prototype has 9 passing tests; no validated edge |
+| B01 | Contract pricing and settlement | CODE COMPLETE — TESTED | Moneyline, spreads, totals, TD, player props; quote age and pushes; need operator contract certification |
+| B02 | Historical evaluation | CODE COMPLETE — NO QUALIFIED DATA | Outcome-blind chronology guard, proper scores, ROI, CLV, bootstrap; qualify truly timestamped data before historical runs |
+| B03 | Player TD and yards candidates | CODE COMPLETE — SYNTHETIC SMOKE ONLY | Trainable logistic/gradient boosting + deterministic pregame feature shifts; source archival and real model evaluation pending |
+| B04 | Correlated market construction | ENGINEERING PROTOTYPE — NOT CALIBRATED | Explicit joint scenario ticket pricing, teaser/round robin and portfolio, demo joint TD/score generator; calibrate game score/TD joint distribution and compare to no-edge benchmark |
+| B05 | Allocation and reliability | CODE COMPLETE — PAPER MODE ONLY | Hard $45 cap, per-game exposure cap, abstention, optional conservative fractional Kelly, qualified-model gate; validate risk policy on sealed real out-of-time outcomes |
+| B06 | Reproducible packaging and handoff | CODE COMPLETE — TESTED | Standalone CLI, scientific protocol, roadmap, immutable receipt ledger, instructions; GitHub PR/review/publish outstanding |
+| B07 | Point-in-time provider qualification | NOT STARTED | Confirm quote timestamps, license, source coverage, missingness. Firecrawl Alexandria has no guaranteed per-book quote timestamps; do not infer them |
+| B08 | Historical real-data comparative backtest | NOT STARTED | Fixed pre-result evaluation spec, market-only vs betting candidates, ROI / CLV / calibration by market, leakage audit |
+| B09 | Prospective weekly paper betting | NOT STARTED | Snapshot before games, immutable prices, grading after games, append-only performance receipt. No wager execution |
+| B10 | Production promotion review | BLOCKED | Requires prospective proof AND explicit user approval; never automatic |
+
+## Execution plan for continuation
+
+1. Lock/merge isolated engineering foundation after CI passes; do not touch protected production surfaces.
+2. Qualify a source archive that truly captured each bookmaker quote at the decision horizon; implement fresh-data ingestion and price/source receipts before opening an outcome dataset.
+3. Preregister target markets and train/validation/holdout splits, baseline comparisons and economic/no-bet acceptance criteria.
+4. Develop/score a market-calibrated, discrete game score and player TD joint distribution. Compare with simple market priors and opponent/team usage. Keep experiment IDs fixed.
+5. Retest the player TD and yardage candidates on source-qualified historical snapshots; report raw counts, log-loss/Brier, ROC-AUC/PR-AUC, reliability, calibration slope, baseline delta with intervals; include selection/coverage/dropout failures.
+6. Run correlation, bookmaker-specific parlay, teaser and round robin evaluation using actual quoted settlement and odds. Stress every bet combination and record worst plausible return.
+7. Start immutable weekly shadow picks; record forecast/version/book/line/timestamp/units before kickoff; evaluate CLV and realized ROI only after games.
+8. Only consider production promotion after pre-defined performance thresholds and explicit approval.
+
+## Rules for every future implementation
+
+- **Before:** read `docs/HANDOFF.md`, `docs/SCIENTIFIC_PROTOCOL.md`, `docs/ROADMAP.md` and `docs/IMPLEMENTATION_LOG.jsonl`; inspect current main and active PRs. Do not restart V1 research or change frozen models.
+- **During:** edit only isolated betting-lab research paths, lock pre-result method, write meaningful tests, prefer reproducible artifacts and market-only baselines.
+- **After each implementation:** append an immutable JSONL receipt (`id`, `date`, `status`, `scope`, `files`, `proof`, `limitations`, `next`), update this roadmap and handoff, run tests, commit to isolated branch, open/update PR and cite commit/CI IDs. `IMPLEMENTATION_LOG` may append records, never overwrite old statuses.
+- **If interrupted:** write blockers and the next exact runnable command in `HANDOFF.md`; never claim tests or merges that have not actually happened.
+- **Never:** place a wager automatically; promote models without approval; import odds lacking pregame provenance; turn reference -110 outcomes into claimed actual ROI; fabricate results; cite synthetic model figures as NFL prediction accuracy.
