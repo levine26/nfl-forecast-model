@@ -23,14 +23,18 @@ on:
       - ".github/workflows/fast_official_lock.yml"
       - "scripts/fast_official_lock.py"
       - "tests/test_fast_official_lock.py"
+      - "scripts/audit_current_lock_deadlines.py"
+      - "tests/test_audit_current_lock_deadlines.py"
       - "scripts/audit_official_lock_timeliness.py"
 
 permissions:
   contents: write
 
 concurrency:
-  group: sunday-signal-fast-official-t120-lock
-  cancel-in-progress: false
+  # Keep PR validation separate from the frequent production deadline heartbeat.
+  # Production locks must never be cancelled by newer scheduled lock triggers.
+  group: ${{ github.event_name == 'pull_request' && format('sunday-signal-fast-lock-pr-{0}', github.event.pull_request.number) || 'sunday-signal-fast-official-t120-lock' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
@@ -48,11 +52,13 @@ jobs:
             tests/test_fast_official_lock.py \
             tests/test_official_locking.py \
             tests/test_verify_pregame_lock.py \
-            tests/test_audit_official_lock_timeliness.py
+            tests/test_audit_official_lock_timeliness.py \
+            tests/test_audit_current_lock_deadlines.py
 
   lock:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 15  # A stuck Actions runner cannot monopolize all future lock opportunities.
     steps:
       - uses: actions/checkout@v4
         with:
@@ -110,3 +116,17 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Independently audit every current-slate lock deadline
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        run: |
+          python -m scripts.audit_current_lock_deadlines --output /tmp/levline-current-lock-deadlines.json
+
+      - name: Retain deadline failures and timing evidence
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-slate-lock-deadline-audit-${{ github.run_id }}
+          path: /tmp/levline-current-lock-deadlines.json
+          if-no-files-found: warn
+          retention-days: 14
