@@ -134,6 +134,8 @@ def verify_state(state: dict[str, Any]) -> None:
             raise LedgerConflict("accepted entry lacks authoritative validation receipt")
         if receipt.get("candidate_sha256") != version["candidate_sha256"]:
             raise LedgerConflict("accepted entry validation receipt hash mismatch")
+        if version.get("validation_receipt_sha256") != digest(receipt):
+            raise LedgerConflict("accepted entry validation receipt integrity mismatch")
     freshness = state.get("freshness")
     if not isinstance(freshness, dict) or freshness.get("state") not in {
         "current", "review_required", "withheld_factual_contradiction"
@@ -188,6 +190,7 @@ def accept_candidate(
         "candidate_sha256": fingerprint,
         "candidate": record,
         "validation_receipt": deepcopy(validation_receipt),
+        "validation_receipt_sha256": digest(validation_receipt),
     })
     state["accepted_revision"] = revision + 1
     state["freshness"] = {"state": "current", "reason": ""}
