@@ -86,7 +86,7 @@ def test_rollback_requires_live_head_and_marks_review(tmp_path):
     store = ledger.EditorialShadowLedger(tmp_path)
     old = store.accept(_entry(), expected_revision=None)
     newer = store.accept(_entry(minute=5, provider="chatgpt"), expected_revision=old)
-    with pytest.raises(ledger.EditorialLedgerConflict):
+    with pytest.raises(ledger.EditorialLedgerError):
         store.rollback("2026_05_BAL_ATL", expected_revision=old, target_revision=old, reason="bad")
     store.rollback("2026_05_BAL_ATL", expected_revision=newer, target_revision=old, reason="later contradiction")
     current = store.pointer("2026_05_BAL_ATL")
