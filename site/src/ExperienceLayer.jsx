@@ -335,7 +335,22 @@ function Calibration({rows,autopsies}) {
   const buckets=[[.5,.6,'50–59%'],[.6,.7,'60–69%'],[.7,.8,'70–79%'],[.8,1.01,'80%+']]
   return <section className="ss-exp-calibration"><header><span>PROBABILITY CALIBRATION</span><small>When LevLine said X%, how often did the pick actually win?</small></header><div>{buckets.map(([low,high,label])=>{const group=graded.filter(r=>r._p>=low&&r._p<high);const wins=group.filter(r=>r._correct).length;const actual=group.length?wins/group.length:null;return <article key={label}><span>{label}</span><b>{actual==null?'—':pct(actual,0)}</b><small>{group.length?`${wins}-${group.length-wins} · ${group.length} picks`:'No graded picks'}</small><i><em style={{width:`${actual==null?0:actual*100}%`}}/></i></article>})}</div></section>
 }
-function HistoryExplorer({history,autopsies}) {
+function PerformanceSummary({scoreboard}) {
+  const graded=num(scoreboard?.graded)
+  const modelBrier=num(scoreboard?.brier)
+  const marketBrier=num(scoreboard?.market_brier)
+  const record=typeof scoreboard?.record==='string'?scoreboard.record:null
+  return <section className="ss-exp-performance" aria-label="2026 Performance Lab">
+    <header><span>PERFORMANCE LAB · 2026</span><small>Published forward-test scoreboard; not a verified betting return</small></header>
+    <div className="ss-exp-performance-cards">
+      <article><span>GRADED WINNER PICKS</span><b>{graded==null?'—':graded}</b><small>{record?record+' winner record':'Official locked-pick cohort'}</small></article>
+      <article><span>LEVLINE BRIER</span><b>{modelBrier==null?'—':modelBrier.toFixed(3)}</b><small>Lower is better</small></article>
+      <article><span>MARKET BRIER</span><b>{marketBrier==null?'—':marketBrier.toFixed(3)}</b><small>Paired market benchmark where available</small></article>
+    </div>
+    <p>Descriptive results from the published scoreboard. Locked records can include late locks; this is not an on-time-only causal evaluation. Historical market quotes may differ in observation horizon. No statistical superiority or profitable ATS edge is established by these figures.</p>
+  </section>
+}
+function HistoryExplorer({history,autopsies,scoreboard}) {
   const locked=history.filter(row=>row.lock_status==='LOCKED'&&String(row.season||'2026')==='2026')
   const weeks=[...new Set(locked.map(r=>r.week).filter(Boolean))].sort((a,b)=>Number(a)-Number(b))
   const [week,setWeek]=useState('all'),[tier,setTier]=useState('all'),[result,setResult]=useState('all')
@@ -344,6 +359,7 @@ function HistoryExplorer({history,autopsies}) {
     return (week==='all'||String(row.week)===week)&&(tier==='all'||t===tier)&&(result==='all'||(result==='correct'&&c===true)||(result==='miss'&&c===false)||(result==='pending'&&c==null))
   })
   return <section className="ss-exp-history">
+    <PerformanceSummary scoreboard={scoreboard}/>
     <Calibration rows={locked} autopsies={autopsies}/>
     <div className="ss-exp-history-toolbar"><label>Week<select value={week} onChange={e=>setWeek(e.target.value)}><option value="all">All</option>{weeks.map(w=><option key={w} value={String(w)}>{w}</option>)}</select></label><label>Tier<select value={tier} onChange={e=>setTier(e.target.value)}><option value="all">All</option><option value="strong">Strong signal</option><option value="signal">Signal</option><option value="lean">Lean</option><option value="watch">Watch</option></select></label><label>Result<select value={result} onChange={e=>setResult(e.target.value)}><option value="all">All</option><option value="correct">Correct</option><option value="miss">Miss</option><option value="pending">Pending</option></select></label></div>
     {rows.length===0?<div className="ss-exp-empty"><b>No receipts match these filters.</b><span>Change a filter to inspect the immutable record.</span></div>:<div className="ss-exp-history-list">{rows.map(row=>{const p=receiptProbability(row),pick=receiptPick(row),correct=truthy(autopsies[row.game_id]?.winner_correct ?? autopsies[row.game_id]?.correct ?? row.winner_correct);return <button key={row.game_id} onClick={()=>nav(`receipt/${encodeURIComponent(row.game_id)}`)}><span>WEEK {row.week||'—'}</span><b>{row.away_team} @ {row.home_team}</b><strong>{pick} {pct(p)}</strong><span>{signalTier(p).label}</span><span>{row.lock_timestamp_utc?`Locked ${formatTime(row.lock_timestamp_utc)}`:'Locked pregame'}</span><em className={correct===true?'correct':correct===false?'miss':'pending'}>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</em><i>View receipt →</i></button>})}</div>}
@@ -379,11 +395,11 @@ function PresentationTextPass({route}) {
 
 export default function ExperienceLayer() {
   const [route,setRoute]=useState(()=>parseRoute())
-  const [data,setData]=useState({games:[],runs:[],history:[],autopsies:{},status:{}})
+  const [data,setData]=useState({games:[],runs:[],history:[],autopsies:{},status:{},scoreboard:{}})
   useEffect(()=>{const onHash=()=>setRoute(parseRoute());window.addEventListener('hashchange',onHash);return()=>window.removeEventListener('hashchange',onHash)},[])
-  useEffect(()=>{;(async()=>{const [forecasts,runs,history,autopsies,status]=await Promise.all([
-    fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('status.json',{}),
-  ]);setData({games:Array.isArray(forecasts.games)?forecasts.games:[],runs,history,autopsies,status})})()},[])
+  useEffect(()=>{;(async()=>{const [forecasts,runs,history,autopsies,status,scoreboard]=await Promise.all([
+    fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('status.json',{}),fetchJSON('history_scoreboard.json',{}),
+  ]);setData({games:Array.isArray(forecasts.games)?forecasts.games:[],runs,history,autopsies,status,scoreboard})})()},[])
   useEffect(()=>{
     const classes=['ss-exp-forecasts','ss-exp-game','ss-exp-history','ss-exp-receipt']
     document.body.classList.remove(...classes)
@@ -404,7 +420,7 @@ export default function ExperienceLayer() {
       <Portal anchor=".ss-movement" position="afterend" id="ss-exp-movement"><MovementContextV2 game={game} runs={data.runs} evidence={[]}/></Portal>
       {game.lifecycle_status==='GRADED'&&<Portal anchor=".ss-matchup-grid" position="beforebegin" id="ss-exp-postgame"><PostgameReceipt game={game} historyRow={historyRow} autopsy={data.autopsies[game.game_id]}/></Portal>}
     </>}
-    {route.page==='history'&&<Portal anchor=".ss-history-stats" position="afterend" id="ss-exp-history"><HistoryExplorer history={data.history} autopsies={data.autopsies}/></Portal>}
+    {route.page==='history'&&<Portal anchor=".ss-history-stats" position="afterend" id="ss-exp-history"><HistoryExplorer history={data.history} autopsies={data.autopsies} scoreboard={data.scoreboard}/></Portal>}
     {route.page==='receipt'&&<Portal anchor=".ss-header" position="afterend" id="ss-exp-receipt"><ReceiptPage row={receiptRow} autopsy={data.autopsies[route.gameId]}/></Portal>}
   </>
 }
