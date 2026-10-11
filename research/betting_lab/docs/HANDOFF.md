@@ -6,7 +6,7 @@ User wants a serious scientifically evaluated NFL wagering research system handl
 
 ## Last verified local implementation
 
-- Local package: `betlab`, v0.2.0-research. Original v0.1 snapshot lives outside this package in the earlier session and remains unmodified.
+- Local package: `betlab`, v0.3.0-research. Original v0.1 snapshot lives outside this package in the earlier session and remains unmodified.
 - B01: quote normalization, actual odds arithmetic, pushes, moneyline/TD/player-market grading, bookmaker settlement contracts and joint-ticket arithmetic.
 - B02: point-in-time historical evaluation, CLV quote checking, calibration, ROI and season-week block bootstrap; qualified historical quotes not yet supplied.
 - B03: TD and yardage trainable candidates with strict prior-result publication-time feature shift; **the tests use fabricated samples**, so there is no claimed NFL accuracy.
@@ -51,3 +51,7 @@ The 2022–2025 LevLine history is *development/nonpristine*, not an untouched h
 ## Recording process
 
 Any completed implementation has an immutable line in `docs/IMPLEMENTATION_LOG.jsonl` and documented acceptance tests. Never delete previous entries; append a correction with a new ID if earlier evidence was wrong. After a merged PR, add an integration receipt listing exact merge SHA and CI check IDs. On interruption record remaining concrete blockers here.
+
+## 2026-10-10 operational MVP continuation
+
+B07B-MVP added `betlab/live_board.py`, `tests/test_live_board.py`, `docs/TOMORROW_RUNBOOK.md` and `fixtures/manual_quote_template.json`. Run actual pregame research board with `python -m betlab.cli board --slate ../../outputs/this_week.csv --quotes /private/quotes.json --outdir /private/outputs`, from the `research/betting_lab` root. The quote template is intentionally synthetic and not executable as a live source; substitute verified actual direct-book quotes with as-of timestamp and verified kickoff. Board is research-only with no positive-EV eligibility. See the runbook. Explicitly never treat 25%/50% scenario probabilities as validated. Local unit test count at this addition: 41. PR #697 branch `research/betting-lab-v02-20261010` must pass full CI before merge.

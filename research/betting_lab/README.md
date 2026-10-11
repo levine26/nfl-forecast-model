@@ -1,4 +1,4 @@
-# LevLine Betting Lab — research v0.2.0
+# LevLine Betting Lab — research v0.3.0
 
 **Status: RESEARCH ONLY / UNVALIDATED / NO BETTING AUTOMATION.**
 
@@ -26,7 +26,8 @@ Run from the project root. The `demo` uses **fabricated games, fabricated quotes
 - `risk.py`: conservative-stake *simulation* with hard $45 session budget, per-game exposure caps and no-bet gating for unqualified forecasts
 - `sources.py`: create-only SHA-256 archival envelopes; qualified manual quotes; unqualified provider subquotes blocked without per-book quote timestamps
 - `ledger.py`: verified append-only implementation receipts
-- `cli.py`: manually invoked synthetic demonstration and ledger audit
+- `live_board.py`: tomorrow-ready manual timestamp-qualified direct-operator quote board against the current LevLine CSV; no claim of validated value
+- `cli.py`: manually invoked research board, synthetic demonstration and ledger audit
 
 ## What this is NOT
 
@@ -39,3 +40,7 @@ Run from the project root. The `demo` uses **fabricated games, fabricated quotes
 - The rule-based Kelly allocation is a paper simulation, not an authorization to stake money.
 
 See `docs/HANDOFF.md`, `docs/ROADMAP.md`, `docs/SCIENTIFIC_PROTOCOL.md` and `docs/IMPLEMENTATION_LOG.jsonl` before continuing.
+
+## Sunday pregame operating instructions
+
+See `docs/TOMORROW_RUNBOOK.md`. Run `python -m betlab.cli board --slate ../../outputs/this_week.csv --quotes /private/direct-book.json --outdir /private/immutable-reports`. Every board row remains research-only with $0 automatic stake. Verify your direct-book quote and event time before using it.

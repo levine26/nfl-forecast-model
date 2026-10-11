@@ -12,6 +12,7 @@
 | B05 | Allocation and reliability | CODE COMPLETE — PAPER MODE ONLY | Hard $45 cap, per-game exposure cap, abstention, optional conservative fractional Kelly, qualified-model gate; validate risk policy on sealed real out-of-time outcomes |
 | B06 | Reproducible packaging and handoff | CODE COMPLETE — TESTED | Standalone CLI, scientific protocol, roadmap, immutable receipt ledger, instructions; GitHub PR/review/publish outstanding |
 | B07 | Point-in-time provider qualification | B07A PARTIAL — CODE TESTED | SHA256 immutable capture and source adapter in place, with as-of-specific capture IDs (B07A-CORRECTION1); verify real source contracts/timestamps/licensing and build production-quality data archive (B07B) |
+| B07B-MVP | Tomorrow pregame quote board | CODE COMPLETE — 41 LOCAL TESTS PASS | Current LevLine CSV + directly time-stamped two-sided operator quotes; market-only vs 25%/50% LevLine sensitivity; create-only JSON/Markdown report. **Not a live feed or validated edge**. |
 | B08 | Historical real-data comparative backtest | NOT STARTED | Fixed pre-result evaluation spec, market-only vs betting candidates, ROI / CLV / calibration by market, leakage audit |
 | B09 | Prospective weekly paper betting | NOT STARTED | Snapshot before games, immutable prices, grading after games, append-only performance receipt. No wager execution |
 | B10 | Production promotion review | BLOCKED | Requires prospective proof AND explicit user approval; never automatic |

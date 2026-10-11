@@ -10,6 +10,7 @@ from .settlement import GameResult,Ticket
 from .scenarios import Scenario, price_ticket, portfolio_distribution
 from .risk import Candidate,recommend_simulated_allocation
 from .joint_simulator import GameInputs, synthetic_joint_slate
+from .live_board import analyze_live_slate, save_report, render_markdown
 
 
 def run_demo(seed:int=20261010,n:int=2000):
@@ -38,7 +39,16 @@ def main():
     demo.add_argument('--out',type=Path)
     ledger=sub.add_parser('ledger',help='verify implementation ledger')
     ledger.add_argument('--path',type=Path,default=Path(__file__).resolve().parents[1]/'docs/IMPLEMENTATION_LOG.jsonl')
+    board=sub.add_parser('board',help='research-only actual LevLine CSV + manual sportsbook quote report')
+    board.add_argument('--slate',type=Path,required=True,help='LevLine outputs/this_week.csv')
+    board.add_argument('--quotes',type=Path,required=True,help='exact-time manual operator quote JSON')
+    board.add_argument('--outdir',type=Path,required=True,help='immutable output folder (create-only)')
     args=parser.parse_args()
+    if args.cmd=='board':
+        report=analyze_live_slate(args.slate,args.quotes)
+        print(json.dumps(save_report(report,args.outdir),sort_keys=True))
+        print(render_markdown(report))
+        return
     result=run_demo(n=args.samples) if args.cmd=='demo' else verify_ledger(args.path)
     s=json.dumps(result,indent=2,sort_keys=True)+'\n'
     if getattr(args,'out',None):args.out.write_text(s)
