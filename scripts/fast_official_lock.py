@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from nfl_forecast.official_lock_policy import official_lock_target_minutes
+
 """Lightweight immutable T-120 lock from the *already published* frozen forecast.
 
 This is a deadline-safety path, not a model run. No features, probabilities or
@@ -26,7 +28,7 @@ from nfl_forecast.publish import (
 
 IDENTITY = "F-ST-01-FROZEN-2026"
 MAX_CANONICAL_AGE_MINUTES = 90.0
-LOCK_WINDOW_MINUTES = 120.0
+LOCK_WINDOW_MINUTES = 120.0  # Legacy bound, future window comes from official_lock_policy.
 EXPECTED_HEADER = CURRENT_COLUMNS + LOCK_META_COLUMNS
 
 
@@ -115,7 +117,8 @@ def plan_fast_locks(
         except (KeyError, ValueError) as exc:
             raise FastLockError(f"{gid}: unparseable canonical kickoff") from exc
         minutes_to_kickoff = (kickoff - now_utc).total_seconds() / 60.0
-        if not (0.0 < minutes_to_kickoff <= LOCK_WINDOW_MINUTES):
+        window = official_lock_target_minutes(row.get('gameday'))
+        if not (0.0 < minutes_to_kickoff <= window):
             continue
 
         generated = _timestamp(row.get("prediction_timestamp_utc"))
@@ -204,7 +207,7 @@ def write_fast_locks(output_dir: Path, now_utc: datetime) -> list[str]:
 
 
 def main() -> int:
-    parser=argparse.ArgumentParser(description="Lock only fresh canonical F-ST snapshots at the official T-120 boundary")
+    parser=argparse.ArgumentParser(description="Lock only fresh canonical F-ST snapshots at the game's versioned official deadline")
     parser.add_argument("--output-dir",type=Path,default=Path("outputs"))
     args=parser.parse_args()
     now=datetime.now(timezone.utc)
@@ -212,7 +215,7 @@ def main() -> int:
         locked=write_fast_locks(args.output_dir,now)
     except (FastLockError, OSError, ValueError, KeyError) as exc:
         parser.exit(1,f"FAIL CLOSED: official lock deadline safety path: {exc}\n")
-    print(f"Fast immutable T-120 lock: {len(locked)} newly locked at {now.isoformat()}: {', '.join(locked)}")
+    print(f"Fast immutable official deadline lock: {len(locked)} newly locked at {now.isoformat()}: {', '.join(locked)}")
     return 0
 
 
