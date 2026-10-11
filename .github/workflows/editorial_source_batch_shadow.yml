@@ -8,7 +8,23 @@ on:
       - "scripts/audit_editorial_slate_shadow.py"
       - "tests/test_editorial_slate_shadow_audit.py"
       - ".github/workflows/editorial_source_batch_shadow.yml"
+  push:
+    branches: [main]
+    paths:
+      - "inputs/chatgpt_media/fallback/manifest.json"
+      - ".github/workflows/editorial_source_batch_shadow.yml"
   workflow_dispatch:
+  # Small, read-only pregame provenance opportunities. GitHub cron is best effort;
+  # these are NOT immutable archive proofs or editorial publication credentials.
+  schedule:
+    - cron: "0 19 * * 3"   # Wednesday, before Thursday games
+    - cron: "0 19 * * 6"   # Saturday, before Sunday games
+    - cron: "0 9 * * 0"    # Early Sunday, before London morning kickoffs
+    - cron: "0 16 * * 1"   # Monday, before MNF
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('sunday-signal-source-pr-{0}', github.event.pull_request.number) || 'sunday-signal-source-production-shadow' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -55,16 +71,17 @@ jobs:
           import json
           from pathlib import Path
           a=json.loads(Path('/tmp/week5-full-slate-editorial-shadow.json').read_text())
-          assert a['games_expected'] == a['games_audited'] == 15
+          assert a['games_expected'] > 0
+          assert a['games_expected'] == a['games_audited']
           assert a['source_snapshot_compatible']
           assert a['claim_queue_snapshot_compatible']
           assert a['games_with_independently_verified_human_reads'] == 0
           assert a['editorial_publication_authorized'] is False
-          print('Per-game diagnostic for all 15 canonical games; no semantic fact-checking approval.')
+          print(f"Per-game diagnostic for {a['games_audited']} canonical games; no semantic fact-checking approval.")
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: week5-complete-editorial-diagnostic-shadow
+          name: current-slate-editorial-diagnostic-shadow-${{ github.run_id }}
           path: |
             /tmp/week5-full-slate-editorial-shadow.json
             /tmp/week5-claim-review-queue-shadow.json
@@ -72,6 +89,6 @@ jobs:
       - name: Upload provenance results without publisher article text
         uses: actions/upload-artifact@v4
         with:
-          name: week5-source-provenance-shadow
+          name: current-slate-source-provenance-shadow-${{ github.run_id }}
           path: /tmp/week5-article-audit-shadow.json
           retention-days: 7
