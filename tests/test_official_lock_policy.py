@@ -129,3 +129,38 @@ def test_pregame_publication_postcondition_waits_until_t60_for_week6():
                    lock_timestamp_utc=(KICKOFF-timedelta(minutes=60)).isoformat())
     assert verify_pregame_locks(current, pd.DataFrame([receipt]),
         KICKOFF-timedelta(minutes=59)) == ["2026_06_X_Y"]
+
+
+def test_main_production_publisher_waits_for_t60_then_preserves_immutable_snapshot(tmp_path):
+    from types import SimpleNamespace
+    import pandas as pd
+    from nfl_forecast.publish import write_outputs
+
+    first = week6_prediction(KICKOFF-timedelta(minutes=61))
+    games = pd.DataFrame([{
+        "game_id": first["game_id"], "home_team": first["home_team"],
+        "away_team": first["away_team"],
+        "home_score": None, "away_score": None,
+    }])
+    def publish(at, probability):
+        row = week6_prediction(at)
+        row["final_home_prob"] = str(probability)
+        write_outputs(SimpleNamespace(predictions=pd.DataFrame([row]), games=games),
+                      tmp_path, now_utc=at, enforce_read_sync=False)
+
+    publish(KICKOFF-timedelta(minutes=61), 0.65)
+    initial = pd.read_csv(tmp_path / "prediction_history.csv")
+    assert initial.empty
+
+    publish(KICKOFF-timedelta(minutes=60), 0.71)
+    official = pd.read_csv(tmp_path / "prediction_history.csv")
+    assert len(official) == 1
+    assert official.iloc[0]["lock_status"] == "LOCKED"
+    assert official.iloc[0]["final_home_prob"] == 0.71
+    assert float(official.iloc[0]["minutes_to_kickoff_at_lock"]) == 60.0
+
+    publish(KICKOFF-timedelta(minutes=45), 0.81)
+    immutable = pd.read_csv(tmp_path / "prediction_history.csv")
+    assert len(immutable) == 1
+    assert immutable.iloc[0]["final_home_prob"] == 0.71
+    assert float(immutable.iloc[0]["minutes_to_kickoff_at_lock"]) == 60.0
