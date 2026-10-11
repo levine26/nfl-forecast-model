@@ -1,5 +1,3 @@
-import { canonicalReportLink } from './editorialSourceLinks.mjs'
-import {hasPublishedHumanRead} from './editorialReadStatus.mjs'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './signal-enhancements.css'
@@ -216,10 +214,10 @@ function ModelMarketScanner({games}) {
   </section>
 }
 
-function ShareButton({game,preview}) {
+function ShareButton({game}) {
   const [state,setState]=useState('Share')
   const share=async()=>{
-    const text=`Sunday Signal — ${game.away_team} @ ${game.home_team}\nLevLine: ${game.official_winner} ${pct(game.official_winner_probability)}\nImplied: ${lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)} · Market: ${lineText(game.market_margin_home,game.home_team,game.away_team)}\n${preview?.headline?`The Signal: ${preview.headline}\n`:''}powered by LevLine`
+    const text=`Sunday Signal — ${game.away_team} @ ${game.home_team}\nLevLine: ${game.official_winner} ${pct(game.official_winner_probability)}\nImplied: ${lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)} · Market: ${lineText(game.market_margin_home,game.home_team,game.away_team)}\npowered by LevLine`
     try {
       if (navigator.share) await navigator.share({title:`Sunday Signal: ${game.away_team} @ ${game.home_team}`,text,url:window.location.href})
       else if (navigator.clipboard) { await navigator.clipboard.writeText(`${text}\n${window.location.href}`); setState('Copied'); setTimeout(()=>setState('Share'),1800) }
@@ -235,7 +233,7 @@ function uncertaintyFor(diagnostic) {
   const label=value<.035?'Tight':value<.065?'Mixed':'Wide'
   return {value,scaled,label}
 }
-function GameCommandBar({game,runs,preview,diagnostic}) {
+function GameCommandBar({game,runs,diagnostic}) {
   const move=movementFor(game,runs)
   const edge=num(game.levline_vs_market_winner_probability_pp)
   const uncertainty=uncertaintyFor(diagnostic)
@@ -245,35 +243,7 @@ function GameCommandBar({game,runs,preview,diagnostic}) {
     <div className="ss-plus-what-changed"><span>WHAT CHANGED</span>{move?<><b>LevLine {pp(move.levline)}</b><small>{move.market==null?'Market comparison unavailable':`Market ${pp(move.market)} since the prior distinct forecast.`}</small></>:<><b>No comparable move yet</b><small>A second distinct forecast will populate this.</small></>}</div>
     <div className={`ss-plus-disagreement ${edge!=null&&Math.abs(edge)>=2.5?'active':''}`}><span>{edge!=null&&Math.abs(edge)>=2.5?'MARKET DISAGREEMENT':'MODEL VS MARKET'}</span><b>{edge==null?'—':pp(edge)}</b><small>{edge==null?'Current market comparison unavailable.':edge>=0?`LevLine is more confident in ${game.official_winner} than the market (${pct(marketP)}).`:`The market is more confident in ${game.official_winner} than LevLine (${pct(marketP)}).`}</small></div>
     <div className="ss-plus-uncertainty"><span>COMPONENT SPREAD</span>{uncertainty?<><b>{uncertainty.label} · {pct(uncertainty.value,1)}</b><i><em style={{width:`${uncertainty.scaled}%`}}/></i><small>Supporting model disagreement diagnostic.</small></>:<><b>Unavailable</b><small>Diagnostic not published for this state.</small></>}</div>
-    <ShareButton game={game} preview={preview}/>
-  </section>
-}
-
-function EnhancedSignal({preview}) {
-  if (!preview) return null
-  if (!hasPublishedHumanRead(preview)) return <section className="ss-plus-signal ss-the-signal"><div className="ss-plus-signal-head"><div><span>THE SIGNAL</span><small>Independent reporting and editorial acceptance pending</small></div></div><p>Human matchup analysis is withheld until it passes the publication gate. The official LevLine forecast remains unchanged.</p></section>
-  const headline=preview.headline || preview.key_factors?.[0]?.title
-  const paragraphs=Array.isArray(preview.paragraphs)?preview.paragraphs.filter(Boolean):[]
-  const factors=(preview.key_factors||[]).filter(item=>item?.title).slice(0,3)
-  const sources=[]
-  const seen=new Set()
-  for (const item of [...(preview.current_reported_sources||[]),...(preview.evidence_used||[])]) {
-    const original=canonicalReportLink(item.source_url)
-    if (!original || seen.has(original)) continue
-    seen.add(original)
-    sources.push({...item,source_url:original})
-    if (sources.length>=6) break
-  }
-  return <section className="ss-plus-signal ss-the-signal">
-    <div className="ss-plus-signal-head"><div><span>THE SIGNAL</span><small>{sources.length} direct report links · {preview.editorial_version||'editorial desk'}</small></div><strong>Same game. A clearer edge.</strong></div>
-    {headline?<h2>{headline}</h2>:<p className="ss-empty">Game-specific editorial intelligence has not cleared the publication threshold yet.</p>}
-    {paragraphs.slice(0,2).map((text,index)=><p key={index}>{text}</p>)}
-    {!paragraphs.length&&preview.key_factors?.[0]?.summary&&<p>{preview.key_factors[0].summary}</p>}
-    {factors.length>0&&<div className="ss-plus-what-matters"><span>WHAT MATTERS</span><div>{factors.map((factor,index)=><article key={`${factor.title}-${index}`}>
-      <header><b>{factor.advantage_team||'WATCH'}</b><small>{factor.strength||factor.family||'Context'}</small></header><strong>{factor.title}</strong>{factor.summary&&<p>{factor.summary}</p>}
-    </article>)}</div></div>}
-    {sources.length>0&&<details className="ss-plus-sources"><summary>Original reporting <span>{sources.length} direct links; claims not independently audited</span></summary><div>{sources.map((source,index)=><a key={`${source.source_name}-${index}`} href={source.source_url||undefined} target={source.source_url?'_blank':undefined} rel="noreferrer"><span>{String(source.category||'source').replaceAll('_',' ')}</span><b>{source.source_name}</b><small>{source.strength||''}</small></a>)}</div></details>}
-    {preview.guardrail&&<small className="ss-plus-guardrail">{preview.guardrail}</small>}
+    <ShareButton game={game}/>
   </section>
 }
 
@@ -322,10 +292,10 @@ function SundaySignalStandard({compact=false}) {
   </section>
 }
 
-function StatusStrip({games,previews,status}) {
-  const researched=games.filter(game=>previews?.[game.game_id]?.headline).length
+function StatusStrip({games,status}) {
+  const locked=games.filter(game=>game.immutable).length
   const disagreements=games.filter(game=>Math.abs(num(game.levline_vs_market_winner_probability_pp)||0)>=2.5).length
-  return <section className="ss-plus-status-strip"><span><i/>{games.length} games published</span><span>{researched}/{games.length} researched reads</span><span>{disagreements} notable market disagreements</span><span>Feed {status?.generated_utc?formatTime(status.generated_utc):'—'}</span><b>Locked picks stay locked.</b></section>
+  return <section className="ss-plus-status-strip"><span><i/>{games.length} games published</span><span>{locked}/{games.length} official locks</span><span>{disagreements} notable market disagreements</span><span>Feed {status?.generated_utc?formatTime(status.generated_utc):'—'}</span><b>Locked picks stay locked.</b></section>
 }
 
 function MoreStandard() {
@@ -334,7 +304,7 @@ function MoreStandard() {
 
 export default function SignalEnhancements() {
   const [route,setRoute]=useState(()=>routeFromHash())
-  const [data,setData]=useState({games:[],runs:[],history:[],ratings:[],previews:{},evidence:{},status:{},current:[]})
+  const [data,setData]=useState({games:[],runs:[],history:[],ratings:[],status:{},current:[]})
 
   useEffect(()=>{
     const onHash=()=>setRoute(routeFromHash())
@@ -351,10 +321,10 @@ export default function SignalEnhancements() {
   },[route.page])
 
   useEffect(()=>{;(async()=>{
-    const [forecastPayload,runs,history,ratings,previews,evidence,status,current]=await Promise.all([
-      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchCSV('power_ratings.csv'),fetchJSON('game_previews.json',{}),fetchJSON('contextual_evidence.json',{}),fetchJSON('status.json',{}),fetchCSV('this_week.csv'),
+    const [forecastPayload,runs,history,ratings,status,current]=await Promise.all([
+      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchCSV('power_ratings.csv'),fetchJSON('status.json',{}),fetchCSV('this_week.csv'),
     ])
-    setData({games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],runs,history,ratings,previews,evidence,status,current})
+    setData({games:Array.isArray(forecastPayload.games)?forecastPayload.games:[],runs,history,ratings,status,current})
   })()},[])
 
   const selected=route.page==='game'?data.games.find(game=>game.game_id===route.gameId):null
@@ -367,12 +337,11 @@ export default function SignalEnhancements() {
       <PortalSlot anchor=".ss-week" position="beforebegin" id="ss-plus-market-scanner"><ModelMarketScanner games={data.games}/></PortalSlot>
     </>}
     {route.page==='game'&&selected&&<>
-      <PortalSlot anchor=".ss-matchup-page > .ss-forecast-hero" position="afterend" id="ss-plus-game-command"><GameCommandBar game={selected} runs={data.runs} preview={data.previews[selected.game_id]} diagnostic={diagnostic}/></PortalSlot>
-      <PortalSlot anchor=".ss-matchup-main > .ss-the-signal" position="beforebegin" id="ss-plus-signal"><EnhancedSignal preview={data.previews[selected.game_id]}/></PortalSlot>
+      <PortalSlot anchor=".ss-matchup-page > .ss-forecast-hero" position="afterend" id="ss-plus-game-command"><GameCommandBar game={selected} runs={data.runs} diagnostic={diagnostic}/></PortalSlot>
     </>}
     {route.page==='power'&&<PortalSlot anchor=".ss-power-board" position="beforebegin" id="ss-plus-power-board"><EnhancedPower ratings={data.ratings}/></PortalSlot>}
     {route.page==='history'&&<PortalSlot anchor=".ss-history-stats" position="afterend" id="ss-plus-history"><HistoryTiers history={data.history}/></PortalSlot>}
     {route.page==='more'&&<PortalSlot anchor=".ss-more-grid" position="afterend" id="ss-plus-standard"><MoreStandard/></PortalSlot>}
-    <PortalSlot anchor=".ss-footer" position="beforebegin" id="ss-plus-status"><StatusStrip games={data.games} previews={data.previews} status={data.status}/></PortalSlot>
+    <PortalSlot anchor=".ss-footer" position="beforebegin" id="ss-plus-status"><StatusStrip games={data.games} status={data.status}/></PortalSlot>
   </>
 }
