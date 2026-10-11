@@ -58,6 +58,7 @@ jobs:
   lock:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 15  # A stuck Actions runner cannot monopolize all future lock opportunities.
     steps:
       - uses: actions/checkout@v4
         with:
