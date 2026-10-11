@@ -161,7 +161,7 @@ NON_REPORTING_SOURCE_TITLE_RE = re.compile(
     r"betting[ -]+picks?|fantasy[ -]+rankings?|"
     r"nfl[ -]+week[ -]+\d+[ -]+picks?|"
     r"week[ -]+\d+[ -]+schedule|"
-    r"odds[ ,:/-]+(?:injur|pick|preview|prediction)|"
+    r"odds[ ,:/-]+(?:injur(?:y|ies)|picks?|preview|predictions?)|"
     r"prediction[ ,:/-]+(?:pick|odds|where)|"
     r"league[ -]+wide[ -]+roundup)\b",
     flags=re.I,
