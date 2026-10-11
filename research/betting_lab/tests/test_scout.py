@@ -36,7 +36,10 @@ class ScoutTests(unittest.TestCase):
     def test_frozen_prob_market_only_reference(self):
         report=make_scout_report(self.slate,'2026-10-11')
         ml=report['model_opinions_by_market']['moneyline']
-        self.assertEqual(ml[0]['model_opinion'],'CHI ML (relative model-market shade only)')
+        self.assertTrue(ml[0]['model_opinion'].startswith('CHI ML (relative to archived market'))
+        self.assertEqual(ml[0]['official_fst_most_likely_winner'],'CHI')
+        self.assertAlmostEqual(ml[0]['official_fst_moneyline_prob_home'],.4716)
+        self.assertNotIn('winner_margin_split',ml[0])
         self.assertFalse(any(x['book_price_verified'] for x in ml))
 
     def test_extreme_total_marks_caution(self):
@@ -44,6 +47,40 @@ class ScoutTests(unittest.TestCase):
         ja=next(r for r in report['model_opinions_by_market']['total'] if r['game_id'].endswith('PHI_JAX'))
         self.assertNotIn('EXTREME_TOTAL_DISAGREEMENT_INDEPENDENT_VALIDATION_REQUIRED',ja['flags'])
         self.assertTrue(ja['model_opinion'].startswith('Over 41.5'))
+
+    def test_moneyline_cannot_determine_ats(self):
+        before=make_scout_report(self.slate,'2026-10-11')
+        # The winner probability can flip independent of margin and ATS outcome.
+        self.slate.write_text(self.slate.read_text().replace(',.4716,',',.95,'))
+        after=make_scout_report(self.slate,'2026-10-11')
+        def ats(r):
+            return next(x for x in r['model_opinions_by_market']['spread'] if x['game_id'].endswith('CHI_GB'))
+        self.assertEqual(ats(before)['model_opinion'],ats(after)['model_opinion'])
+        self.assertEqual(ats(before)['exploratory_cover_probability'],ats(after)['exploratory_cover_probability'])
+        self.assertEqual(before['model_opinions_by_market']['moneyline'][0]['official_fst_moneyline_prob_home'],.4716)
+        self.assertNotEqual(before['model_opinions_by_market']['moneyline'][0]['official_fst_moneyline_prob_home'],.95)
+
+    def test_margin_can_change_without_moneyline_probability_change(self):
+        before=make_scout_report(self.slate,'2026-10-11')
+        self.slate.write_text(self.slate.read_text().replace(',-4.3025,',',5.0,'))
+        after=make_scout_report(self.slate,'2026-10-11')
+        def selected(r,market):
+            return next(x for x in r['model_opinions_by_market'][market] if x['game_id'].endswith('CHI_GB'))
+        self.assertEqual(selected(before,'moneyline')['official_fst_moneyline_prob_home'],selected(after,'moneyline')['official_fst_moneyline_prob_home'])
+        self.assertNotEqual(selected(before,'spread')['model_opinion'],selected(after,'spread')['model_opinion'])
+
+    def test_no_winner_margin_conflict_flags(self):
+        r=make_scout_report(self.slate,'2026-10-11')
+        for rows in r['model_opinions_by_market'].values():
+            for x in rows:
+                self.assertNotIn('WINNER_MARGIN_DISAGREEMENT',x.get('flags',[]))
+
+    def test_spread_push_mass_integer_line(self):
+        self.slate.write_text(self.slate.read_text().replace(',7.5,41.5',',7,41.5'))
+        r=make_scout_report(self.slate,'2026-10-11')
+        j=next(x for x in r['model_opinions_by_market']['spread'] if x['game_id'].endswith('PHI_JAX'))
+        self.assertGreater(j['exploratory_push_probability'],0)
+        self.assertLessEqual(j['exploratory_cover_probability']+j['exploratory_push_probability'],1)
 
     def test_immutable_save(self):
         report=make_scout_report(self.slate,'2026-10-11')

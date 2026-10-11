@@ -1,4 +1,4 @@
-# LevLine Betting Lab — research v0.3.1
+# LevLine Betting Lab — research v0.3.2
 
 **Status: RESEARCH ONLY / UNVALIDATED / NO BETTING AUTOMATION.**
 
@@ -51,3 +51,8 @@ See `docs/TOMORROW_RUNBOOK.md`. Run `python -m betlab.cli board --slate ../../ou
 `python -m betlab.cli scout --slate ../../outputs/this_week.csv --status ../../outputs/status.json --date 2026-10-11 --outdir /private/reports`
 
 This returns model watchlists, **not** validated profitable bets. Historical ATS candidate failures and unqualified source-market timing are explicit. See `docs/TOMORROW_RUNBOOK.md`.
+
+
+## B07D — Critical separation of moneyline versus spread/total (2026-10-10)
+
+See [`docs/SCOUT_MARKET_SEPARATION_CORRECTION.md`](docs/SCOUT_MARKET_SEPARATION_CORRECTION.md) for the supersession receipt. F-ST outright winner probabilities **never determine** ATS cover rates. Spread and total scenario probabilities use independent margin/total forecasts, with integer push approximations and no profitability or calibration guarantee. Old Scout B07C reports are superseded; use newly generated market-specific v0.3.2 output. Local 59-test suite passed. Research-only PR #697 remains CI-gated; no production model changes or injuries.

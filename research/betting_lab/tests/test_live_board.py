@@ -46,7 +46,7 @@ class LiveBoardTests(unittest.TestCase):
         self.snapshot['quotes']=self.snapshot['quotes'][:1];self.write()
         r=analyze_live_slate(self.slate,self.quotes)
         self.assertIsNone(r['rows'][0]['market_reference_no_vig'])
-        self.assertIsNone(r['rows'][0]['scenario_25pct_ev_no_push'])
+        self.assertIsNone(r['rows'][0]['scenario_25pct_ev_push_aware'])
     def test_book_mismatch_cannot_create_devig(self):
         self.snapshot['quotes'][1]['bookmaker']='OTHER_BOOK';self.write()
         r=analyze_live_slate(self.slate,self.quotes)
@@ -67,6 +67,30 @@ class LiveBoardTests(unittest.TestCase):
         self.snapshot['quotes'][1]['line']=47.5;self.write()
         r=analyze_live_slate(self.slate,self.quotes)
         self.assertIsNone(r['rows'][0]['market_reference_no_vig'])
+    def test_spread_prob_independent_from_moneyline_probability(self):
+        self.snapshot['quotes'][0].update(market='spread',side='home',line=-8,american=-110)
+        self.snapshot['quotes'][1].update(market='spread',side='away',line=8,american=-110)
+        self.write()
+        original=analyze_live_slate(self.slate,self.quotes)
+        # Flip moneyline probability, keep projected margin unchanged.
+        csvtext=self.slate.read_text().replace('0.766','0.120')
+        self.slate.write_text(csvtext)
+        modified=analyze_live_slate(self.slate,self.quotes)
+        for a,b in zip(original['rows'],modified['rows']):
+            self.assertEqual(a['full_levline_exploratory_probability'],b['full_levline_exploratory_probability'])
+            self.assertEqual(a['exploratory_push_probability'],b['exploratory_push_probability'])
+
+    def test_spread_whole_number_models_push_and_push_aware_ev(self):
+        self.snapshot['quotes'][0].update(market='spread',side='home',line=-7,american=-110)
+        self.snapshot['quotes'][1].update(market='spread',side='away',line=7,american=-110)
+        self.write()
+        r=analyze_live_slate(self.slate,self.quotes)
+        for item in r['rows']:
+            self.assertGreater(item['exploratory_push_probability'],0)
+            self.assertIsNotNone(item['scenario_25pct_ev_push_aware'])
+            self.assertLessEqual(item['full_levline_exploratory_probability']+item['exploratory_push_probability'],1.)
+        self.assertAlmostEqual(r['rows'][0]['exploratory_push_probability'],r['rows'][1]['exploratory_push_probability'])
+
     def test_invalid_quote_game_rejected(self):
         self.snapshot['quotes'][0]['game_id']='WRONG';self.write()
         with self.assertRaisesRegex(ValueError,'not in actual LevLine'):analyze_live_slate(self.slate,self.quotes)
