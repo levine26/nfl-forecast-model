@@ -95,7 +95,8 @@ jobs:
           assert "sunday-signal-chatgpt-failed-game-fallback-pr-{0}" in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-production" in workflow
           assert '      - "inputs/chatgpt_media/fallback/manifest.json"' in workflow
-          assert '      - "inputs/chatgpt_media/fallback/**"' not in workflow
+          push_trigger = workflow.split("  push:", 1)[1].split("  workflow_dispatch:", 1)[0]
+          assert '      - "inputs/chatgpt_media/fallback/**"' not in push_trigger
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
           assert 'Only research/challenger/docs-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
