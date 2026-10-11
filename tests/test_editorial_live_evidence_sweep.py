@@ -108,3 +108,22 @@ def test_atomic_shadow_report_is_explicitly_not_a_publication(tmp_path: Path):
     assert stored["editorial_publication_authorized"] is False
     assert stored["games"][DET]["status"] == "provenance_candidates_resolved"
     assert not any(file.suffix == ".tmp" for file in path.parent.iterdir())
+
+
+def test_third_unresolved_citation_blocks_provenance_even_if_two_others_work():
+    c = candidates()
+    c[DET]["sources"].append({
+        "title": "Purported late injury report",
+        "url": "https://www.detroitlions.com/news/bad-404-article",
+    })
+
+    def partial(url, **kwargs):
+        if "bad-404" in url:
+            raise ArticleCaptureError("source HTTP status 404, not article success")
+        return _capture(url, **kwargs)
+
+    report = audit_slate([rows()[0]], {DET: c[DET]}, capture=partial, now=NOW)
+    assert report["games_with_two_resolved_independent_reporters"] == 0
+    assert report["games"][DET]["status"] == "provenance_incomplete"
+    assert "source[2]_not_retrieved_or_verified" in report["games"][DET]["errors"]
+    assert len(report["games"][DET]["source_checks"]) == 3
