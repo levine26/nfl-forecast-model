@@ -23,6 +23,8 @@ on:
       - ".github/workflows/fast_official_lock.yml"
       - "scripts/fast_official_lock.py"
       - "tests/test_fast_official_lock.py"
+      - "scripts/audit_current_lock_deadlines.py"
+      - "tests/test_audit_current_lock_deadlines.py"
       - "scripts/audit_official_lock_timeliness.py"
 
 permissions:
@@ -48,7 +50,8 @@ jobs:
             tests/test_fast_official_lock.py \
             tests/test_official_locking.py \
             tests/test_verify_pregame_lock.py \
-            tests/test_audit_official_lock_timeliness.py
+            tests/test_audit_official_lock_timeliness.py \
+            tests/test_audit_current_lock_deadlines.py
 
   lock:
     if: github.event_name != 'pull_request'
@@ -110,3 +113,17 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Independently audit every current-slate lock deadline
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        run: |
+          python scripts/audit_current_lock_deadlines.py --output /tmp/levline-current-lock-deadlines.json
+
+      - name: Retain deadline failures and timing evidence
+        if: ${{ always() && github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-slate-lock-deadline-audit-${{ github.run_id }}
+          path: /tmp/levline-current-lock-deadlines.json
+          if-no-files-found: warn
+          retention-days: 14
