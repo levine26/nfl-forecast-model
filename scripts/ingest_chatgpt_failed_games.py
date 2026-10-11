@@ -222,14 +222,15 @@ def audit_missing_nonfallback_human(
     for gid in canonical_game_ids:
         if gid in target_set:
             continue
-        entry = provider_games.get(gid)
-        if not isinstance(entry, dict):
-            entry = checkpoint_entries.get(gid)
-        if not isinstance(entry, dict):
-            missing.append(gid)
-            continue
-        raw = _base_raw_entry(entry)
-        if not (raw["headline"] and raw["paragraph1"] and raw["model_rationale"] and raw["sources"]):
+        def usable(candidate: object) -> bool:
+            if not isinstance(candidate, dict):
+                return False
+            raw = _base_raw_entry(candidate)
+            return bool(raw["headline"] and raw["paragraph1"] and raw["model_rationale"] and raw["sources"])
+
+        # An invalid or truncated base artifact must not hide a separate good
+        # checkpoint, nor should a good base be overwritten by a bad checkpoint.
+        if not usable(provider_games.get(gid)) and not usable(checkpoint_entries.get(gid)):
             missing.append(gid)
     return missing
 
