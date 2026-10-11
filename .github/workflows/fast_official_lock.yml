@@ -23,6 +23,7 @@ on:
       - ".github/workflows/fast_official_lock.yml"
       - "scripts/fast_official_lock.py"
       - "scripts/fast_lock_prepare.py"
+      - "src/nfl_forecast/lock_policy.py"
   pull_request:
     paths:
       - ".github/workflows/fast_official_lock.yml"
@@ -33,6 +34,8 @@ on:
       - "scripts/audit_current_lock_deadlines.py"
       - "tests/test_audit_current_lock_deadlines.py"
       - "scripts/audit_official_lock_timeliness.py"
+      - "src/nfl_forecast/lock_policy.py"
+      - "tests/test_lock_policy.py"
 
 permissions:
   contents: write
@@ -57,6 +60,7 @@ jobs:
         run: |
           PYTHONPATH="$PWD/src:$PWD" python -m pytest -q \
             tests/test_fast_official_lock.py \
+            tests/test_lock_policy.py \
             tests/test_fast_lock_prepare.py \
             tests/test_official_locking.py \
             tests/test_verify_pregame_lock.py \
@@ -134,7 +138,7 @@ jobs:
               git add outputs/prediction_history.csv outputs/status.json \
                 outputs/official_lock_timeliness.json outputs/lock_fast_path_receipts/
             fi
-            git commit -m "Append on-time official T-120 lock from canonical F-ST snapshot"
+            git commit -m "Append immutable official pregame lock under versioned policy"
             if git push origin HEAD:main; then
               echo "Fast official lock published atomically with provenance."
               exit 0
