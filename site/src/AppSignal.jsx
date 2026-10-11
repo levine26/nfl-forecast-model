@@ -1,3 +1,4 @@
+import {fetchPublicText} from './publicDataClient.js'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   CartesianGrid,
@@ -58,14 +59,12 @@ function parseCSV(text) {
 
 async function fetchCSV(name) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? parseCSV(await response.text()) : []
+    return parseCSV(await fetchPublicText(name))
   } catch { return [] }
 }
 async function fetchJSON(name,fallback={}) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? await response.json() : fallback
+    return JSON.parse(await fetchPublicText(name))
   } catch { return fallback }
 }
 
@@ -161,7 +160,7 @@ function BrandLockup({compact=false}) {
 }
 
 function Header({route,week}) {
-  const primary=[['forecasts','Forecasts'],['power','Power'],['history','History'],['methodology','Methodology']]
+  const primary=[['forecasts','Forecasts'],['power','Power'],['history','Performance'],['methodology','Methodology']]
   return <>
     <header className="ss-header">
       <button className="ss-brand-button" onClick={()=>navigateHash('forecasts')} aria-label="Sunday Signal forecasts">

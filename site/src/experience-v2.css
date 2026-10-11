@@ -150,3 +150,23 @@ body.ss-exp-receipt .ss-board{display:none!important}
   .ss-exp-receipt-page{padding:18px 15px 40px}.ss-exp-receipt-grid{grid-template-columns:1fr}.ss-exp-receipt-grid article{min-height:0}
 }
 @media(max-width:480px){.ss-exp-calibration>div{grid-template-columns:1fr}.ss-exp-history-list>button{grid-template-columns:48px 1fr .75fr}.ss-exp-history-list>button>span:nth-of-type(1){display:none}.ss-exp-history-list>button>em{justify-self:end}.ss-exp-mobile-board>button>div:last-child{grid-template-columns:1fr}.ss-exp-lifecycle{display:flex;flex-wrap:wrap}.ss-exp-lifecycle>b{margin-left:auto}}
+
+/* U5: priority metrics are readable on small screens. */
+@media(max-width:480px){
+  .ss-exp-mobile-board>button>div:last-child{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .ss-exp-mobile-board>button>div:last-child span:last-child{grid-column:1/-1}
+  .ss-exp-mobile-board>button>div:last-child b{font-size:12px;line-height:1.35}
+  .ss-exp-mobile-board>button>div:last-child small{font-size:10px}
+}
+/* U7: paired-score performance without converting it into a wagering claim. */
+.ss-exp-performance{margin:0 0 20px;border:1px solid var(--ss-border-soft);border-radius:12px;background:rgba(13,15,16,.74);padding:18px}
+.ss-exp-performance>header{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-bottom:13px}
+.ss-exp-performance>header span{font:900 15px var(--ss-display);letter-spacing:.06em}
+.ss-exp-performance>header small{font-size:11px;color:var(--ss-muted)}
+.ss-exp-performance-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ss-exp-performance-cards article{border:1px solid var(--ss-border-soft);border-radius:9px;padding:13px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.ss-exp-performance-cards span{font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--ss-muted)}
+.ss-exp-performance-cards b{font:900 26px var(--ss-display);font-variant-numeric:tabular-nums}
+.ss-exp-performance-cards small{font-size:11px;color:var(--ss-muted)}
+.ss-exp-performance>p{margin:14px 0 0;color:var(--ss-muted);font-size:11px;line-height:1.5}
+@media(max-width:768px){.ss-exp-performance>header{flex-direction:column}.ss-exp-performance-cards{grid-template-columns:1fr}}

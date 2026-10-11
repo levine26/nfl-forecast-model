@@ -1,3 +1,4 @@
+import {fetchPublicText} from './publicDataClient.js'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './signal-enhancements.css'
@@ -47,14 +48,12 @@ function parseCSV(text) {
 }
 async function fetchCSV(name) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? parseCSV(await response.text()) : []
+    return parseCSV(await fetchPublicText(name))
   } catch { return [] }
 }
 async function fetchJSON(name,fallback={}) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? await response.json() : fallback
+    return JSON.parse(await fetchPublicText(name))
   } catch { return fallback }
 }
 
@@ -333,7 +332,6 @@ export default function SignalEnhancements() {
   return <>
     {route.page==='forecasts'&&<>
       <PortalSlot anchor=".ss-board-hero" position="afterend" id="ss-plus-search"><SearchMatchups games={data.games}/></PortalSlot>
-      <PortalSlot anchor=".ss-top-signals" position="beforebegin" id="ss-plus-top-signals"><EnhancedTopSignals games={data.games} runs={data.runs}/></PortalSlot>
       <PortalSlot anchor=".ss-week" position="beforebegin" id="ss-plus-market-scanner"><ModelMarketScanner games={data.games}/></PortalSlot>
     </>}
     {route.page==='game'&&selected&&<>

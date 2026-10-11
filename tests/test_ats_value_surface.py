@@ -21,11 +21,14 @@ def test_ats_value_layer_uses_canonical_public_contract_fields():
         'official_winner_probability',
     ):
         assert field in source
-    assert 'ATS VALUE' in source
+    assert 'ATS MODEL COMPARISON' in source
     assert 'OUTRIGHT FORECAST' in source
-    assert 'ATS SIDE' in source
-    assert 'LEVLINE MODEL LINE' in source
-    assert 'MARKET LINE' in source
+    assert 'ATS MODEL PREFERENCE' in source
+    assert 'ATS EXPECTED-MARGIN LINE' in source
+    assert 'SPORTSBOOK SPREAD' in source
+    assert 'Betting value: not verified.' in source
+    assert 'validated cover probability' in source
+    assert 'ATS VALUE</span>' not in source
     assert 'Winner / ATS split' in source
     assert "pick!==game.official_winner" in source
 

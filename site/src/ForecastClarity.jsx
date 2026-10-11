@@ -1,3 +1,4 @@
+import {fetchPublicText} from './publicDataClient.js'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './forecast-clarity.css'
@@ -22,7 +23,7 @@ const num = value => {
   return Number.isFinite(parsed) ? parsed : null
 }
 const pct = (value,digits=1) => num(value)==null ? '—' : `${(num(value)*100).toFixed(digits)}%`
-const pts = value => num(value)==null ? '—' : `${num(value)>=0?'+':''}${num(value).toFixed(1)} pts`
+const pp = value => num(value)==null ? '—' : `${num(value)>=0?'+':''}${num(value).toFixed(1)} pp`
 const teamName = team => TEAM[team]?.[0] || team || '—'
 const teamLogo = team => `https://a.espncdn.com/i/teamlogos/nfl/500/${TEAM[team]?.[1] || String(team || '').toLowerCase()}.png`
 
@@ -46,14 +47,12 @@ function parseCSV(text) {
 }
 async function fetchCSV(name) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? parseCSV(await response.text()) : []
+    return parseCSV(await fetchPublicText(name))
   } catch { return [] }
 }
 async function fetchJSON(name,fallback={}) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? await response.json() : fallback
+    return JSON.parse(await fetchPublicText(name))
   } catch { return fallback }
 }
 function formatTime(value) {
@@ -87,7 +86,7 @@ function signalFavorite(homeP,game) {
 function signalTier(probability) {
   const p=num(probability)
   if (p==null) return {key:'watch',label:'Watch'}
-  if (p>=.67) return {key:'strong',label:'Strong signal'}
+  if (p>=.67) return {key:'strong',label:'High win probability'}
   if (p>=.61) return {key:'signal',label:'Signal'}
   if (p>=.56) return {key:'lean',label:'Lean'}
   return {key:'watch',label:'Watch'}
@@ -234,9 +233,9 @@ function ForecastClarityCard({game,runs,diagnostic}) {
       </div>
       <ProbabilityBar game={game}/>
       <div className="ss-clarity-metrics">
-        <article><span>LEVLINE FAIR SPREAD</span><b>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</b><small>Spread equivalent of the LevLine win forecast</small></article>
+        <article><span>PROBABILITY-IMPLIED LINE</span><b>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</b><small>Translation of win probability; not an independent ATS margin</small></article>
         <article><span>SPORTSBOOK SPREAD</span><b>{lineText(game.market_margin_home,game.home_team,game.away_team)}</b><small>Current consensus market line</small></article>
-        <article className="edge"><span>WIN-PROBABILITY EDGE</span><b>{game.official_winner} {pts(edge)}</b><small>LevLine {pct(winnerP)} − Market {pct(marketP)}</small></article>
+        <article className="edge"><span>WIN-PROBABILITY DIFFERENCE</span><b>{game.official_winner} {pp(edge)}</b><small>LevLine {pct(winnerP)} − Market {pct(marketP)}</small></article>
         <article><span>MODEL SCORE ESTIMATE</span><b>{scoreText(game)}</b><small>Approximate score consistent with the forecast</small></article>
       </div>
       <div className="ss-clarity-freshness"><span><b>Forecast</b> {game.immutable?'locked':'updated'} {formatTime(stamp)}</span><span><b>Market updated</b> {formatTime(game.market_timestamp_utc)}</span></div>
@@ -244,9 +243,9 @@ function ForecastClarityCard({game,runs,diagnostic}) {
 
     <div className="ss-clarity-diagnostics">
       <article><span>FORECAST TIER</span><b className={`tier ${tier.key}`}>{tier.label}</b><small>Presentation shorthand derived from the published win probability, not a second probability.</small></article>
-      <article><span>SINCE LAST FORECAST</span>{previous&&latest?<><b>{game.official_winner} {pct(previous.official)} → {pct(latest.official)} {delta>=0?'↑':'↓'}</b><small>LevLine {pts(delta)}{marketDelta==null?'':` · Market ${pts(marketDelta)}`}</small></>:<><b>No comparable move yet</b><small>A second distinct forecast will populate this.</small></>}</article>
-      <article className={edge!=null&&Math.abs(edge)>=2.5?'active':''}><span>LEVLINE EDGE VS MARKET</span><b>{game.official_winner} {pts(edge)}</b><small>{marketP==null?'Market comparison unavailable.':`LevLine ${pct(winnerP)} vs market-implied ${pct(marketP)}.`}</small></article>
-      <article><span>MODEL AGREEMENT</span>{agreement?<><b>{agreement.label} · {(agreement.value*100).toFixed(1)} pts</b><small>Published component-disagreement diagnostic; lower means tighter agreement.</small></>:<><b>Unavailable</b><small>Diagnostic not published for this state.</small></>}</article>
+      <article><span>SINCE LAST FORECAST</span>{previous&&latest?<><b>{game.official_winner} {pct(previous.official)} → {pct(latest.official)} {delta>=0?'↑':'↓'}</b><small>LevLine {pp(delta)}{marketDelta==null?'':` · Market ${pp(marketDelta)}`}</small></>:<><b>No comparable move yet</b><small>A second distinct forecast will populate this.</small></>}</article>
+      <article className={edge!=null&&Math.abs(edge)>=2.5?'active':''}><span>LEVLINE VS MARKET PROBABILITY</span><b>{game.official_winner} {pp(edge)}</b><small>{marketP==null?'Market comparison unavailable.':`LevLine ${pct(winnerP)} vs market-implied ${pct(marketP)}.`}</small></article>
+      <article><span>MODEL AGREEMENT</span>{agreement?<><b>{agreement.label} · {(agreement.value*100).toFixed(1)} pp</b><small>Published component-disagreement diagnostic; lower means tighter agreement.</small></>:<><b>Unavailable</b><small>Diagnostic not published for this state.</small></>}</article>
       <ShareButton game={game}/>
     </div>
 
@@ -254,9 +253,9 @@ function ForecastClarityCard({game,runs,diagnostic}) {
       <summary>How to read LevLine <span>Definitions for every headline number</span></summary>
       <div>
         <article><b>Win probability</b><p>LevLine's estimated chance that the listed team wins the game.</p></article>
-        <article><b>Fair spread</b><p>The point spread corresponding to LevLine's published win probability.</p></article>
+        <article><b>Probability-implied line</b><p>A presentation translation of LevLine's win probability, not the independent ATS expected margin.</p></article>
         <article><b>Sportsbook spread</b><p>The current consensus market line used for comparison.</p></article>
-        <article><b>Win-probability edge</b><p>LevLine probability minus market-implied probability, expressed in percentage points.</p></article>
+        <article><b>Win-probability difference</b><p>LevLine probability minus market-implied probability, expressed in percentage points.</p></article>
         <article><b>Model score estimate</b><p>An approximate score consistent with the forecast, not a literal exact-score prediction.</p></article>
         <article><b>Model agreement</b><p>A supporting diagnostic describing how tightly component views line up with one another.</p></article>
       </div>

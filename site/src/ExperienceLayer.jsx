@@ -1,3 +1,4 @@
+import {fetchPublicText} from './publicDataClient.js'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './experience-v2.css'
@@ -23,7 +24,7 @@ const num = value => {
   return Number.isFinite(parsed) ? parsed : null
 }
 const pct = (value,digits=1) => num(value)==null ? '—' : `${(num(value)*100).toFixed(digits)}%`
-const pts = value => num(value)==null ? '—' : `${num(value)>=0?'+':''}${num(value).toFixed(1)} pts`
+const pp = value => num(value)==null ? '—' : `${num(value)>=0?'+':''}${num(value).toFixed(1)} pp`
 const teamName = team => TEAM[team]?.[0] || team || '—'
 const teamLogo = team => `https://a.espncdn.com/i/teamlogos/nfl/500/${TEAM[team]?.[1] || String(team || '').toLowerCase()}.png`
 
@@ -47,14 +48,12 @@ function parseCSV(text) {
 }
 async function fetchCSV(name) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? parseCSV(await response.text()) : []
+    return parseCSV(await fetchPublicText(name))
   } catch { return [] }
 }
 async function fetchJSON(name,fallback={}) {
   try {
-    const response=await fetch(`${BASE}data/${name}`,{cache:'no-store'})
-    return response.ok ? await response.json() : fallback
+    return JSON.parse(await fetchPublicText(name))
   } catch { return fallback }
 }
 function parseRoute() {
@@ -87,7 +86,7 @@ function probabilityForTeam(homeP,team,game) {
 function signalTier(probability) {
   const p=num(probability)
   if (p==null) return {key:'watch',label:'Watch'}
-  if (p>=.67) return {key:'strong',label:'Strong signal'}
+  if (p>=.67) return {key:'strong',label:'High win probability'}
   if (p>=.61) return {key:'signal',label:'Signal'}
   if (p>=.56) return {key:'lean',label:'Lean'}
   return {key:'watch',label:'Watch'}
@@ -228,18 +227,18 @@ function TopSignalsV2({games}) {
   const strongest=[...valid].sort((a,b)=>num(b.official_winner_probability)-num(a.official_winner_probability))[0]
   const largest=[...valid].filter(g=>g.game_id!==strongest?.game_id && num(g.levline_vs_market_winner_probability_pp)!=null).sort((a,b)=>Math.abs(num(b.levline_vs_market_winner_probability_pp))-Math.abs(num(a.levline_vs_market_winner_probability_pp)))[0]
   const closest=[...valid].filter(g=>g.game_id!==strongest?.game_id&&g.game_id!==largest?.game_id).sort((a,b)=>Math.abs(num(a.official_winner_probability)-.5)-Math.abs(num(b.official_winner_probability)-.5))[0]
-  const cards=[['Strongest Forecast',strongest],['Largest Edge vs Market',largest],['Closest Game',closest]].filter(([,g])=>g)
+  const cards=[['Highest Win Probability',strongest],['Largest Probability Difference',largest],['Closest Game',closest]].filter(([,g])=>g)
   return <section className="ss-exp-top-signals">
     <header><div><span>TOP SIGNALS</span><small>Three different reasons to open a matchup.</small></div></header>
     <div>{cards.map(([label,game],index)=><button key={`${label}-${game.game_id}`} onClick={()=>nav(`game/${encodeURIComponent(game.game_id)}`)}>
       <i>0{index+1}</i><span>{label}</span><TeamPair game={game}/><strong>{game.official_winner} {pct(game.official_winner_probability)}</strong>
-      <small>{label==='Largest Edge vs Market'?`${game.official_winner} ${pts(game.levline_vs_market_winner_probability_pp)} vs market`:label==='Closest Game'?'Lowest separation from 50/50 on this slate':`${signalTier(game.official_winner_probability).label} · ${lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}`}</small>
+      <small>{label==='Largest Probability Difference'?`${game.official_winner} ${pp(game.levline_vs_market_winner_probability_pp)} vs market`:label==='Closest Game'?'Lowest separation from 50/50 on this slate':`${signalTier(game.official_winner_probability).label} · ${lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}`}</small>
     </button>)}</div>
   </section>
 }
 
 function ForecastExplorer({games,runs}) {
-  const [sort,setSort]=useState('kickoff')
+  const [sort,setSort]=useState('next')
   const [filter,setFilter]=useState('all')
   const now=useOfficialLockClock()
   const rows=useMemo(()=>{
@@ -248,31 +247,38 @@ function ForecastExplorer({games,runs}) {
     if (filter==='locked') next=next.filter(g=>g.lifecycle_status==='FINAL_PREGAME'||g.immutable)
     if (filter==='live') next=next.filter(g=>g.lifecycle_status==='IN_PROGRESS')
     const move=g=>Math.abs(latestMovement(g,runs)?.delta||0)
-    if (sort==='probability') next.sort((a,b)=>num(b.official_winner_probability)-num(a.official_winner_probability))
+    if (sort==='next') {
+      const rank=g=>{
+        const kick=Date.parse(g.kickoff_utc||'')
+        return Number.isFinite(kick)&&kick>now ? 0 : g.lifecycle_status==='IN_PROGRESS' ? 1 : 2
+      }
+      next.sort((a,b)=>rank(a)-rank(b)||(Date.parse(a.kickoff_utc||0)-Date.parse(b.kickoff_utc||0)))
+    }
+    else if (sort==='probability') next.sort((a,b)=>num(b.official_winner_probability)-num(a.official_winner_probability))
     else if (sort==='edge') next.sort((a,b)=>Math.abs(num(b.levline_vs_market_winner_probability_pp)||0)-Math.abs(num(a.levline_vs_market_winner_probability_pp)||0))
     else if (sort==='movement') next.sort((a,b)=>move(b)-move(a))
     else next.sort((a,b)=>Date.parse(a.kickoff_utc||0)-Date.parse(b.kickoff_utc||0))
     return next
-  },[games,runs,sort,filter])
+  },[games,runs,sort,filter,now])
   return <section className="ss-exp-forecast-explorer">
     <div className="ss-exp-toolbar">
-      <div><span>SORT</span>{[['kickoff','Kickoff'],['probability','Win Probability'],['edge','Edge'],['movement','Movement']].map(([key,label])=><button key={key} className={sort===key?'active':''} onClick={()=>setSort(key)}>{label}</button>)}</div>
+      <div><span>SORT</span>{[['next','Next Up'],['kickoff','Kickoff'],['probability','Win Probability'],['edge','Edge'],['movement','Movement']].map(([key,label])=><button key={key} className={sort===key?'active':''} onClick={()=>setSort(key)}>{label}</button>)}</div>
       <div><span>SHOW</span>{[['all','All'],['upcoming','Upcoming'],['locked','Locked'],['live','Live']].map(([key,label])=><button key={key} className={filter===key?'active':''} onClick={()=>setFilter(key)}>{label}</button>)}</div>
     </div>
     {rows.length===0?<div className="ss-exp-empty"><b>No games match this view.</b><span>Change the filter to return to the published slate.</span></div>:<>
-      <div className="ss-exp-board-labels"><span>MATCHUP</span><span>LEVLINE FAIR SPREAD</span><span>WIN PROBABILITY</span><span>SPORTSBOOK SPREAD</span><span>EDGE VS MARKET</span><span>STATUS</span></div>
+      <div className="ss-exp-board-labels"><span>MATCHUP</span><span>PROBABILITY-IMPLIED LINE</span><span>WIN PROBABILITY</span><span>SPORTSBOOK SPREAD</span><span>PROB. DIFFERENCE</span><span>STATUS</span></div>
       <div className="ss-exp-board-rows">{rows.map(game=>{const state=lifecycle(game,now);const move=latestMovement(game,runs);return <button key={game.game_id} onClick={()=>nav(`game/${encodeURIComponent(game.game_id)}`)}>
         <div><TeamPair game={game}/><small>{formatTime(game.kickoff_utc,{withDay:true})}</small></div>
         <strong>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</strong>
         <MiniProbability game={game}/>
         <span>{lineText(game.market_margin_home,game.home_team,game.away_team)}</span>
-        <span className="ss-exp-edge"><b>{game.official_winner}</b> {pts(game.levline_vs_market_winner_probability_pp)}{move&&<small>{move.delta>=0?'↑':'↓'} {Math.abs(move.delta).toFixed(1)} since prior forecast</small>}</span>
+        <span className="ss-exp-edge"><b>{game.official_winner}</b> {pp(game.levline_vs_market_winner_probability_pp)}{move&&<small>{move.delta>=0?'↑':'↓'} {Math.abs(move.delta).toFixed(1)} since prior forecast</small>}</span>
         <span className={`ss-exp-state ${state.key}`}><b>{state.label}</b><small>{state.detail}</small></span>
       </button>})}</div>
       <div className="ss-exp-mobile-board">{rows.map(game=>{const state=lifecycle(game,now);return <button key={`m-${game.game_id}`} onClick={()=>nav(`game/${encodeURIComponent(game.game_id)}`)}>
         <header><small>{formatTime(game.kickoff_utc,{withDay:true})}</small><span className={`ss-exp-state ${state.key}`}><b>{state.label}</b></span></header>
         <TeamPair game={game}/><MiniProbability game={game}/>
-        <div><span><small>Fair spread</small><b>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</b></span><span><small>Sportsbook</small><b>{lineText(game.market_margin_home,game.home_team,game.away_team)}</b></span><span><small>Edge</small><b>{game.official_winner} {pts(game.levline_vs_market_winner_probability_pp)}</b></span></div>
+        <div><span><small>Implied line</small><b>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</b></span><span><small>Sportsbook</small><b>{lineText(game.market_margin_home,game.home_team,game.away_team)}</b></span><span><small>Prob. difference</small><b>{game.official_winner} {pp(game.levline_vs_market_winner_probability_pp)}</b></span></div>
       </button>})}</div>
     </>}
   </section>
@@ -286,12 +292,12 @@ function LifecycleRibbon({game}) {
 
 function MovementContextV2({game,runs,evidence=[]}) {
   const rows=movementRows(game,runs)
-  if (rows.length<2) return <section className="ss-exp-movement-context"><header><span>WHAT CHANGED</span><small>Chronology without causal overreach</small></header><div className="ss-exp-empty"><b>Movement needs two comparable forecasts.</b><span>This timeline will populate after another published run.</span></div></section>
+  if (rows.length<2) return <section className="ss-exp-movement-context"><header><span>WHAT CHANGED</span><small>Win-probability history · context is not attribution</small></header><div className="ss-exp-empty"><b>Movement needs two comparable forecasts.</b><span>This timeline will populate after another published run.</span></div></section>
   const items=[]
   for (let i=Math.max(1,rows.length-5);i<rows.length;i+=1) {
     const prev=rows[i-1],cur=rows[i]
-    if (Math.abs(cur.official-prev.official)>.0005) items.push({x:cur.x,time:cur.timestamp,type:'forecast',title:`LevLine ${game.official_winner} ${pct(prev.official)} → ${pct(cur.official)}`,note:`${pts((cur.official-prev.official)*100)} change in published win probability.`})
-    if (cur.market!=null&&prev.market!=null&&Math.abs(cur.market-prev.market)>.0005) items.push({x:cur.x,time:cur.timestamp,type:'market',title:`Market ${game.official_winner} ${pct(prev.market)} → ${pct(cur.market)}`,note:`${pts((cur.market-prev.market)*100)} change in vig-free market probability.`})
+    if (Math.abs(cur.official-prev.official)>.0005) items.push({x:cur.x,time:cur.timestamp,type:'forecast',title:`LevLine ${game.official_winner} ${pct(prev.official)} → ${pct(cur.official)}`,note:`${pp((cur.official-prev.official)*100)} change in published win probability.`})
+    if (cur.market!=null&&prev.market!=null&&Math.abs(cur.market-prev.market)>.0005) items.push({x:cur.x,time:cur.timestamp,type:'market',title:`Market ${game.official_winner} ${pct(prev.market)} → ${pct(cur.market)}`,note:`${pp((cur.market-prev.market)*100)} change in vig-free market probability.`})
   }
   const first=rows[0],last=rows.at(-1)
   evidence.filter(x=>x.title&&Number.isFinite(Date.parse(x.as_of||''))).forEach(x=>items.push({x:Date.parse(x.as_of),time:x.as_of,type:x.promoted_to_model?'validated':'context',title:x.title,note:x.promoted_to_model?'Validated model input published alongside this period.':'Context surfaced in this period; not claimed as the cause of movement.'}))
@@ -300,7 +306,7 @@ function MovementContextV2({game,runs,evidence=[]}) {
   return <section className="ss-exp-movement-context">
     <header><div><span>WHAT CHANGED</span><small>Chronology without causal overreach</small></div><b>LevLine {game.official_winner} {pct(first.official)} → {pct(last.official)}</b></header>
     {visible.length?<div className="ss-exp-timeline">{visible.map((item,index)=><article key={`${item.x}-${item.type}-${index}`} className={item.type}><time>{formatTime(item.time)}</time><i/><div><span>{item.type==='validated'?'VALIDATED INPUT':item.type==='context'?'CONTEXT':item.type==='market'?'MARKET':'LEVLINE'}</span><b>{item.title}</b><small>{item.note}</small></div></article>)}</div>:<div className="ss-exp-empty"><b>No distinct movement events yet.</b><span>The published forecast is stable across comparable runs.</span></div>}
-    <footer>Context markers are shown as chronology only. They are never presented as the cause of a forecast move unless the underlying data explicitly establishes that relationship.</footer>
+    <footer>These changes are percentage points of win probability, not sportsbook spread movement. Context markers are chronological only; they do not establish what caused a forecast change.</footer>
   </section>
 }
 
@@ -329,7 +335,22 @@ function Calibration({rows,autopsies}) {
   const buckets=[[.5,.6,'50–59%'],[.6,.7,'60–69%'],[.7,.8,'70–79%'],[.8,1.01,'80%+']]
   return <section className="ss-exp-calibration"><header><span>PROBABILITY CALIBRATION</span><small>When LevLine said X%, how often did the pick actually win?</small></header><div>{buckets.map(([low,high,label])=>{const group=graded.filter(r=>r._p>=low&&r._p<high);const wins=group.filter(r=>r._correct).length;const actual=group.length?wins/group.length:null;return <article key={label}><span>{label}</span><b>{actual==null?'—':pct(actual,0)}</b><small>{group.length?`${wins}-${group.length-wins} · ${group.length} picks`:'No graded picks'}</small><i><em style={{width:`${actual==null?0:actual*100}%`}}/></i></article>})}</div></section>
 }
-function HistoryExplorer({history,autopsies}) {
+function PerformanceSummary({scoreboard}) {
+  const graded=num(scoreboard?.graded)
+  const modelBrier=num(scoreboard?.brier)
+  const marketBrier=num(scoreboard?.market_brier)
+  const record=typeof scoreboard?.record==='string'?scoreboard.record:null
+  return <section className="ss-exp-performance" aria-label="2026 Performance Lab">
+    <header><span>PERFORMANCE LAB · 2026</span><small>Published forward-test scoreboard; not a verified betting return</small></header>
+    <div className="ss-exp-performance-cards">
+      <article><span>GRADED WINNER PICKS</span><b>{graded==null?'—':graded}</b><small>{record?record+' winner record':'Official locked-pick cohort'}</small></article>
+      <article><span>LEVLINE BRIER</span><b>{modelBrier==null?'—':modelBrier.toFixed(3)}</b><small>Lower is better</small></article>
+      <article><span>MARKET BRIER</span><b>{marketBrier==null?'—':marketBrier.toFixed(3)}</b><small>Paired market benchmark where available</small></article>
+    </div>
+    <p>Descriptive results from the published scoreboard. Locked records can include late locks; this is not an on-time-only causal evaluation. Historical market quotes may differ in observation horizon. No statistical superiority or profitable ATS edge is established by these figures.</p>
+  </section>
+}
+function HistoryExplorer({history,autopsies,scoreboard}) {
   const locked=history.filter(row=>row.lock_status==='LOCKED'&&String(row.season||'2026')==='2026')
   const weeks=[...new Set(locked.map(r=>r.week).filter(Boolean))].sort((a,b)=>Number(a)-Number(b))
   const [week,setWeek]=useState('all'),[tier,setTier]=useState('all'),[result,setResult]=useState('all')
@@ -338,6 +359,7 @@ function HistoryExplorer({history,autopsies}) {
     return (week==='all'||String(row.week)===week)&&(tier==='all'||t===tier)&&(result==='all'||(result==='correct'&&c===true)||(result==='miss'&&c===false)||(result==='pending'&&c==null))
   })
   return <section className="ss-exp-history">
+    <PerformanceSummary scoreboard={scoreboard}/>
     <Calibration rows={locked} autopsies={autopsies}/>
     <div className="ss-exp-history-toolbar"><label>Week<select value={week} onChange={e=>setWeek(e.target.value)}><option value="all">All</option>{weeks.map(w=><option key={w} value={String(w)}>{w}</option>)}</select></label><label>Tier<select value={tier} onChange={e=>setTier(e.target.value)}><option value="all">All</option><option value="strong">Strong signal</option><option value="signal">Signal</option><option value="lean">Lean</option><option value="watch">Watch</option></select></label><label>Result<select value={result} onChange={e=>setResult(e.target.value)}><option value="all">All</option><option value="correct">Correct</option><option value="miss">Miss</option><option value="pending">Pending</option></select></label></div>
     {rows.length===0?<div className="ss-exp-empty"><b>No receipts match these filters.</b><span>Change a filter to inspect the immutable record.</span></div>:<div className="ss-exp-history-list">{rows.map(row=>{const p=receiptProbability(row),pick=receiptPick(row),correct=truthy(autopsies[row.game_id]?.winner_correct ?? autopsies[row.game_id]?.correct ?? row.winner_correct);return <button key={row.game_id} onClick={()=>nav(`receipt/${encodeURIComponent(row.game_id)}`)}><span>WEEK {row.week||'—'}</span><b>{row.away_team} @ {row.home_team}</b><strong>{pick} {pct(p)}</strong><span>{signalTier(p).label}</span><span>{row.lock_timestamp_utc?`Locked ${formatTime(row.lock_timestamp_utc)}`:'Locked pregame'}</span><em className={correct===true?'correct':correct===false?'miss':'pending'}>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</em><i>View receipt →</i></button>})}</div>}
@@ -373,11 +395,11 @@ function PresentationTextPass({route}) {
 
 export default function ExperienceLayer() {
   const [route,setRoute]=useState(()=>parseRoute())
-  const [data,setData]=useState({games:[],runs:[],history:[],autopsies:{},status:{}})
+  const [data,setData]=useState({games:[],runs:[],history:[],autopsies:{},status:{},scoreboard:{}})
   useEffect(()=>{const onHash=()=>setRoute(parseRoute());window.addEventListener('hashchange',onHash);return()=>window.removeEventListener('hashchange',onHash)},[])
-  useEffect(()=>{;(async()=>{const [forecasts,runs,history,autopsies,status]=await Promise.all([
-    fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('status.json',{}),
-  ]);setData({games:Array.isArray(forecasts.games)?forecasts.games:[],runs,history,autopsies,status})})()},[])
+  useEffect(()=>{;(async()=>{const [forecasts,runs,history,autopsies,status,scoreboard]=await Promise.all([
+    fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('status.json',{}),fetchJSON('history_scoreboard.json',{}),
+  ]);setData({games:Array.isArray(forecasts.games)?forecasts.games:[],runs,history,autopsies,status,scoreboard})})()},[])
   useEffect(()=>{
     const classes=['ss-exp-forecasts','ss-exp-game','ss-exp-history','ss-exp-receipt']
     document.body.classList.remove(...classes)
@@ -398,7 +420,7 @@ export default function ExperienceLayer() {
       <Portal anchor=".ss-movement" position="afterend" id="ss-exp-movement"><MovementContextV2 game={game} runs={data.runs} evidence={[]}/></Portal>
       {game.lifecycle_status==='GRADED'&&<Portal anchor=".ss-matchup-grid" position="beforebegin" id="ss-exp-postgame"><PostgameReceipt game={game} historyRow={historyRow} autopsy={data.autopsies[game.game_id]}/></Portal>}
     </>}
-    {route.page==='history'&&<Portal anchor=".ss-history-stats" position="afterend" id="ss-exp-history"><HistoryExplorer history={data.history} autopsies={data.autopsies}/></Portal>}
+    {route.page==='history'&&<Portal anchor=".ss-history-stats" position="afterend" id="ss-exp-history"><HistoryExplorer history={data.history} autopsies={data.autopsies} scoreboard={data.scoreboard}/></Portal>}
     {route.page==='receipt'&&<Portal anchor=".ss-header" position="afterend" id="ss-exp-receipt"><ReceiptPage row={receiptRow} autopsy={data.autopsies[route.gameId]}/></Portal>}
   </>
 }
