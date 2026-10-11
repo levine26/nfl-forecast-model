@@ -110,3 +110,13 @@ test("health is independent of green GitHub research jobs and never grants publi
   assert.equal(healthReport(new Date(now-6*60_000).toISOString(),now).scheduler_healthy,true);
   assert.equal(healthReport(new Date(now).toISOString(),now).release_authority,false);
 });
+
+
+test("delayed cron execution evaluates against the actual runtime clock",async()=>{
+  // The live handler must not pass a potentially delayed scheduledTime to
+  // runTick. Pure runTick/planTick behavior is independently tested above.
+  const {readFile} = await import("node:fs/promises");
+  const source = await readFile(new URL("./worker.mjs",import.meta.url),"utf8");
+  assert.ok(source.includes("ctx.waitUntil(runTick(env, Date.now()))"));
+  assert.ok(!source.includes("runTick(env, Number(event.scheduledTime"));
+});
