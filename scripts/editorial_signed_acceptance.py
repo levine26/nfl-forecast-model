@@ -4,8 +4,9 @@ from __future__ import annotations
 
 This is an *approval verifier*, NOT a fact-checker. A separately trusted human
 reviewer must inspect the original captured articles and every factual clause,
-then sign the complete provenance-bound dossier using a secret never given to
-Groq, ChatGPT, candidate-generation jobs, or submitted candidate files.
+then sign the complete provenance-bound dossier using a private signing key never given to
+Groq, ChatGPT, candidate-generation or publisher jobs. Only its public
+verification key reaches production.
 
 Absent trusted review, receipts, or key -> no HUMAN publication. This module
 never modifies official forecasts, historical locks, or published artifacts.
@@ -14,7 +15,11 @@ never modifies official forecasts, historical locks, or published artifacts.
 import csv
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
-import hmac
+import base64
+import binascii
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 import json
 import os
 from pathlib import Path
@@ -51,7 +56,7 @@ def _date(value: Any, label: str) -> datetime:
 
 
 def verify_signed_claim_receipts(
-    *, forecast: Path, previews: Path, dossier: Path, review_key: str,
+    *, forecast: Path, previews: Path, dossier: Path, review_public_key_pem: str,
 ) -> dict[str, Any]:
     """Validate a separate trusted attestation against exact canonical bytes.
 
@@ -60,18 +65,28 @@ def verify_signed_claim_receipts(
     preservation. A valid signature authenticates that reviewer's *attestation*;
     it does not prove the underlying football facts independently.
     """
-    if not isinstance(review_key, str) or len(review_key.encode("utf-8")) < 32:
-        raise ClaimAcceptanceBlocked("independent review signing key unavailable or too weak")
+    if not isinstance(review_public_key_pem, str) or not review_public_key_pem.strip():
+        raise ClaimAcceptanceBlocked("independent review public verification key unavailable")
+    try:
+        public_key = serialization.load_pem_public_key(review_public_key_pem.encode("utf-8"))
+        if not isinstance(public_key, Ed25519PublicKey):
+            raise ValueError("review key must be Ed25519, not another algorithm")
+    except (ValueError, TypeError) as exc:
+        raise ClaimAcceptanceBlocked("invalid independent Ed25519 public verification key") from exc
     try:
         signed = json.loads(dossier.read_text(encoding="utf-8"))
         if not isinstance(signed, dict) or set(signed) != {"payload", "signature"}:
             raise ClaimAcceptanceBlocked("signed dossier must contain only payload/signature")
         payload, signature = signed["payload"], signed["signature"]
-        if not isinstance(payload, dict) or not isinstance(signature, str) or not _SHA.fullmatch(signature):
+        if not isinstance(payload, dict) or not isinstance(signature, str):
             raise ClaimAcceptanceBlocked("invalid signed dossier structure")
-        expected = hmac.new(review_key.encode("utf-8"), _canonical(payload), "sha256").hexdigest()
-        if not hmac.compare_digest(expected, signature):
-            raise ClaimAcceptanceBlocked("claim dossier has no valid independent reviewer signature")
+        try:
+            signature_bytes = base64.b64decode(signature, validate=True)
+            if len(signature_bytes) != 64:
+                raise ValueError("Ed25519 signature length invalid")
+            public_key.verify(signature_bytes, _canonical(payload))
+        except (InvalidSignature, binascii.Error, ValueError) as exc:
+            raise ClaimAcceptanceBlocked("claim dossier has no valid independent reviewer signature") from exc
         raw_forecast = forecast.read_bytes()
         with forecast.open(encoding="utf-8-sig", newline="") as fh:
             rows = list(csv.DictReader(fh))
@@ -181,7 +196,7 @@ def verify_signed_claim_receipts(
                                      + json.dumps(failures, sort_keys=True))
     return {"games_verified_by_signed_independent_review": len(ids),
             "canonical_slate_sha256": sha256(raw_forecast).hexdigest(),
-            "review_basis": "HMAC-authenticated independent HUMAN semantic attestation"}
+            "review_basis": "Ed25519-authenticated independent HUMAN semantic attestation"}
 
 
 def require_signed_claim_receipts(
@@ -192,5 +207,5 @@ def require_signed_claim_receipts(
     """Production gate: no secret or no independent signed dossier means BLOCK."""
     return verify_signed_claim_receipts(
         forecast=forecast, previews=previews, dossier=dossier,
-        review_key=os.environ.get("SUNDAY_SIGNAL_REVIEW_KEY", ""),
+        review_public_key_pem=os.environ.get("SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY", ""),
     )
