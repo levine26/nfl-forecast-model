@@ -425,7 +425,7 @@ def test_missing_authority_cannot_override_an_existing_validated_groq_checkpoint
     checkpoint = {
         "headline": "Persisted Groq headline",
         "paragraph1": "A credible specific football tactical interaction for both opponents.",
-        "model_rationale": "Coverage adjustments and pressure timing shape offensive choices from drive to drive.",
+        "model_rationale": "Coverage adjustments and pressure timing shape offensive choices from drive to drive, forcing quarterbacks to respond with protection shifts, quick releases, and disciplined route timing.",
         "sources": [{"name": "NFL", "title": "Report", "url": "https://www.nfl.com/news/example"}],
     }
     gaps = module.missing_accepted_editorial_authority(
