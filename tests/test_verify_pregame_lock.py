@@ -52,3 +52,18 @@ def test_rejects_duplicate_official_rows():
 def test_rejects_lock_timestamp_outside_window():
     with pytest.raises(RuntimeError, match="outside T-120"):
         verify_pregame_locks(current_feed(), locked_history("2026-09-09T22:19:00+00:00"), NOW)
+
+def test_week6_lock_verifier_uses_new_t60_window():
+    from datetime import timedelta
+    kickoff = datetime(2026, 10, 18, 17, 0, tzinfo=timezone.utc)
+    current = current_feed()
+    current.loc[0, "game_id"] = "2026_06_NE_SEA"
+    current.loc[0, "gameday"] = "2026-10-18"
+    current.loc[0, "gametime"] = "13:00"
+    locked = locked_history()
+    locked.loc[0, "game_id"] = "2026_06_NE_SEA"
+    locked.loc[0, "lock_timestamp_utc"] = (kickoff-timedelta(minutes=59)).isoformat()
+    assert verify_pregame_locks(current, pd.DataFrame(),
+                               kickoff-timedelta(minutes=61)) == []
+    assert verify_pregame_locks(current, locked,
+                               kickoff-timedelta(minutes=59)) == ["2026_06_NE_SEA"]
