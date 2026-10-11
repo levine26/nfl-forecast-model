@@ -140,7 +140,9 @@ jobs:
           assert report["forecast_path_identity"] == "F-ST-01-FROZEN-2026"
           assert sum(report["counts"].values()) == report["locked_count"]
           assert len(report["games"]) == report["locked_count"]
-          assert report["official_lock_target_minutes"] == 120.0
+          assert report["policy_effective_2026_week"] == 6
+          assert report["official_lock_targets_minutes"]
+          assert all(row["target_minutes_before_kickoff"] in (60.0, 120.0) for row in report["games"])
           print("Public lock audit: real recorded lock receipt timing only:", report["counts"])
           PY
       - name: Normalize immutable history for Sunday Signal
