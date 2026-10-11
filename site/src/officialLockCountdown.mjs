@@ -1,10 +1,16 @@
 /**
- * Presentation-only timing for the official T-120 lock boundary.
+ * Presentation-only timing for the versioned official lock boundary (T−120 legacy; T−60 Week 6 onward).
  * The immutable receipt, not the browser clock, decides whether a forecast locked.
  * Canonical kickoff_utc is offset-aware; arithmetic on epoch milliseconds is DST-safe.
  * This module never creates, changes, or backdates a prediction lock.
  */
-export const OFFICIAL_LOCK_LEAD_MINUTES = 120
+export const OFFICIAL_LOCK_LEAD_MINUTES = 120 // Historical Week 1–5 policy
+export const T60_EFFECTIVE_GAMEDAY = '2026-10-15'
+export function officialLockLeadMinutes(game) {
+  const gameday = String(game?.gameday || '').slice(0,10)
+  return /^\\d{4}-\\d{2}-\\d{2}$/.test(gameday) && gameday >= T60_EFFECTIVE_GAMEDAY
+    ? 60 : OFFICIAL_LOCK_LEAD_MINUTES
+}
 
 export function officialLockTiming(game, nowMs = Date.now()) {
   const status = String(game?.lifecycle_status || '')
@@ -18,7 +24,7 @@ export function officialLockTiming(game, nowMs = Date.now()) {
   if (!Number.isFinite(kickoffMs)) {
     return {state: 'unavailable', actualLockUtc: null, scheduledLockUtc: null}
   }
-  const scheduledMs = kickoffMs - OFFICIAL_LOCK_LEAD_MINUTES * 60_000
+  const scheduledMs = kickoffMs - officialLockLeadMinutes(game) * 60_000
   return {
     state: Number.isFinite(nowMs) && nowMs < scheduledMs ? 'countdown' : 'due',
     actualLockUtc: null,
