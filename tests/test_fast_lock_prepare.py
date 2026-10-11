@@ -69,7 +69,7 @@ def test_accepts_offset_aware_clock_and_dst_kickoffs():
     from datetime import timezone as tz
     fallback = row(gameday="2026-11-01", gametime="13:00",
                    prediction_timestamp_utc="2026-11-01T10:00:00+00:00")
-    at_target = datetime(2026, 11, 1, 16, 0, tzinfo=tz.utc)
+    at_target = datetime(2026, 11, 1, 17, 0, tzinfo=tz.utc)  # T-60 after DST fall-back
     assert stale_due_games([fallback], [], now_utc=at_target) == ["2026_05_CHI_GB"]
 
 
