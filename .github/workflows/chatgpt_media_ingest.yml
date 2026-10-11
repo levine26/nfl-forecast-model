@@ -195,6 +195,8 @@ jobs:
               raise SystemExit(f'ingested editorial payload did not cover full slate: {provider}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
               raise SystemExit(f'final editorial gate failed: {finalizer}')
+          from scripts.verify_human_source_acceptance import require_verified_human_sources
+          require_verified_human_sources(status, games_expected=games)
           print('ChatGPT ingestion matchup/model/pick launch gate passed:', games, 'games')
           PY
 
