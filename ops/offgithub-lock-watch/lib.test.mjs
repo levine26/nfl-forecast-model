@@ -117,6 +117,6 @@ test("delayed cron execution evaluates against the actual runtime clock",async()
   // runTick. Pure runTick/planTick behavior is independently tested above.
   const {readFile} = await import("node:fs/promises");
   const source = await readFile(new URL("./worker.mjs",import.meta.url),"utf8");
-  assert.match(source,/scheduled\\(event, env, ctx\\)[\\s\\S]*?runTick\\(env, Date\\.now\\(\\)\\)/);
-  assert.doesNotMatch(source,/runTick\\(env,\\s*Number\\(event\\.scheduledTime/);
+  assert.ok(source.includes("ctx.waitUntil(runTick(env, Date.now()))"));
+  assert.ok(!source.includes("runTick(env, Number(event.scheduledTime"));
 });
