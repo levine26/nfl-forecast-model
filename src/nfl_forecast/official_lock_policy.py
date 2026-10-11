@@ -31,6 +31,9 @@ def official_lock_lead_minutes(game: Mapping[str, Any]) -> float:
         if not match:
             raise ValueError("Missing season/week and invalid canonical game_id for official lock policy")
         season, week = int(match.group(1)), int(match.group(2))
+    canonical = _ID.match(str(game.get("game_id") or ""))
+    if canonical and (season, week) != (int(canonical.group(1)), int(canonical.group(2))):
+        raise ValueError("Official lock season/week contradicts canonical game_id")
     if season < 2000 or not 1 <= week <= 22:
         raise ValueError(f"Invalid official lock season/week: {season}/{week}")
     return NEW_LEAD_MINUTES if (season, week) >= (EFFECTIVE_SEASON, EFFECTIVE_WEEK) else ORIGINAL_LEAD_MINUTES
