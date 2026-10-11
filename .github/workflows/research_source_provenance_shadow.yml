@@ -68,6 +68,7 @@ jobs:
             --input-dir inputs/chatgpt_media/fallback \
             --current outputs/this_week.csv \
             --output /tmp/sunday-signal-source-provenance.json \
+            --allow-partial \
             --workers 2
           python - <<'PY'
           import json
@@ -76,6 +77,9 @@ jobs:
           r = json.loads(p.read_text(encoding="utf-8"))
           assert r["publication_authorized"] is False
           assert r["full_slate_claim_support_verified"] is False
+          if r.get("audited_subset_only"):
+              assert r["full_slate_article_resolution_verified"] is False
+              print(f"Recovery subset only: {r[\'games_expected\']}/{r[\'active_slate_games_expected\']} game sources audited; whole-slate unverified.")
           print("Evidence retrieval report is shadow-only and never a factual acceptance receipt.")
           PY
       - name: Persist full game-by-game source-retrieval diagnostics
