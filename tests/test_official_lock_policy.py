@@ -10,7 +10,29 @@ from scripts.audit_current_lock_deadlines import audit_current_deadlines
 from scripts.audit_official_lock_timeliness import audit_history
 from scripts.fast_official_lock import plan_fast_locks
 from scripts.fast_lock_prepare import stale_due_games
-from tests.test_fast_official_lock import snapshot, status
+from nfl_forecast.publish import CURRENT_COLUMNS
+
+
+def status():
+    return {"games": 1,
+            "final_probability_strategy": "F-ST-01-FROZEN-2026",
+            "fst_artifact_id": "F-ST-01-FROZEN-2026"}
+
+
+def snapshot(now):
+    row = {key: "" for key in CURRENT_COLUMNS}
+    row.update({
+        "game_id": "2026_05_PHI_JAX", "season": "2026", "week": "5",
+        "gameday": "2026-10-11", "gametime": "09:30",
+        "away_team": "PHI", "home_team": "JAX", "pick": "JAX",
+        "final_home_prob": "0.70", "expected_margin": "6.0",
+        "spread_line": "3.5", "market_home_prob": "0.65",
+        "model_version": "0.9.0-fst",
+        "prediction_timestamp_utc": (now-timedelta(minutes=15)).isoformat(),
+        "final_probability_strategy": "F-ST-01-FROZEN-2026",
+        "fst_artifact_id": "F-ST-01-FROZEN-2026",
+    })
+    return row
 
 
 KICKOFF = datetime(2026, 10, 15, 20, 15, tzinfo=timezone.utc)
