@@ -1,0 +1,9 @@
+name = "sunday-signal-offgithub-lock-watch"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+# The external operator must configure KV binding LOCK_WATCH_STATE.
+# Credentials and webhook addresses belong in Cloudflare secrets only.
