@@ -102,8 +102,14 @@ def audit_slate(
                 problems.append("independence_or_combined_coverage: " + str(exc)[:280])
         else:
             problems.append("fewer_than_two_resolved_independent_sources")
+        candidate_sha256 = (
+            hashlib.sha256(json.dumps(entry, sort_keys=True, ensure_ascii=False,
+                                     separators=(",", ":")).encode("utf-8")).hexdigest()
+            if isinstance(entry, dict) else None
+        )
         result[gid] = {
             "status": "provenance_candidates_resolved" if not problems else "provenance_incomplete",
+            "candidate_sha256": candidate_sha256,
             "errors": problems,
             "source_checks": details,
             "article_resolution_verified": not problems,
@@ -172,6 +178,10 @@ def main() -> None:
                 pass
     report = audit_slate(rows, candidates)
     report["canonical_prediction_sha256"] = hashlib.sha256(args.predictions.read_bytes()).hexdigest()
+    manifest = args.input_dir / "manifest.json"
+    report["fallback_manifest_sha256"] = (
+        hashlib.sha256(manifest.read_bytes()).hexdigest() if manifest.is_file() else None
+    )
     write_report(args.output, report)
     print(
         f"Shadow article provenance: {report['games_with_two_resolved_independent_reporters']}"
