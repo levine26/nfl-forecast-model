@@ -150,6 +150,39 @@ def is_direct_media_report_url(url: str) -> bool:
     return len(segments) >= 2
 
 
+# A publisher's /news/ URL is not proof that the content is original game
+# reporting. Keep this strict shallow classification distinct from article
+# fetch/quote verification and independent claim entailment.
+NON_REPORTING_SOURCE_TITLE_RE = __import__("re").compile(
+    r"\\b(?:how[ -]+to[ -]+watch|where[ -]+to[ -]+watch|"
+    r"watch[ ,:-]+listen[ ,:-]+(?:and[ ,:-]+)?follow|"
+    r"tv[ -]+channels?|streaming[ ,:-]+|live[ -]+stream|"
+    r"betting[ -]+picks?|fantasy[ -]+rankings?|"
+    r"nfl[ -]+week[ -]+\\d+[ -]+picks?|"
+    r"week[ -]+\\d+[ -]+schedule|"
+    r"odds[ ,:/-]+(?:injur|pick|preview|prediction)|"
+    r"prediction[ ,:/-]+(?:pick|odds|where)|"
+    r"league[ -]+wide[ -]+roundup)\\b",
+    flags=__import__("re").I,
+)
+
+
+def is_substantive_report_candidate(*, title: str, url: str) -> bool:
+    """Exclude unmistakable viewing, betting and generic roundups.
+
+    A True result is *only* provisional suitability: it does not prove URL
+    resolution, 2026 roster accuracy, source content or actual claim support.
+    """
+    if not str(title or "").strip() or not is_direct_media_report_url(url):
+        return False
+    from urllib.parse import unquote
+    path = unquote(urlparse(url).path).replace("-", " ").replace("_", " ")
+    return not (
+        NON_REPORTING_SOURCE_TITLE_RE.search(str(title))
+        or NON_REPORTING_SOURCE_TITLE_RE.search(path)
+    )
+
+
 SOURCE_MATRIX = [
     {
         "role": "quantitative_backbone",
