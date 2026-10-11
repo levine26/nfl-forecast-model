@@ -252,14 +252,41 @@ def test_recovered_missed_lock_rejects_fabricated_normal_lock_timestamp():
         )
 
 
-def test_after_kickoff_live_row_without_lock_is_rejected():
-    with pytest.raises(PublicForecastError, match="without an immutable pregame lock"):
+def test_after_kickoff_missing_lock_remains_publicly_visible_but_never_invents_numbers():
+    payload = build_public_forecasts(
+        [row(gameday="2026-09-10", gametime="20:35")], [],
+        now_utc=datetime(2026, 9, 11, 1, tzinfo=timezone.utc),
+        missing_lock_policy="explicit_unavailable",
+    )
+    game = payload["games"][0]
+    assert game["source_snapshot"] == "MISSING_LOCK"
+    assert game["lifecycle_status"] == "MISSING_OFFICIAL_LOCK"
+    assert game["immutable"] is False
+    assert game["official_winner"] is None
+    assert game["official_home_win_probability"] is None
+    assert game["coherent_fair_margin_home"] is None
+    assert game["market_home_win_probability"] is None
+    assert game["ats_pick_team"] is None
+    assert "No post-kickoff" in game["publication_note"]
+
+
+def test_default_editorial_bridge_still_rejects_missed_game():
+    with pytest.raises(PublicForecastError, match="kickoff has passed without an immutable pregame lock"):
         build_public_forecasts(
-            [row(gameday="2026-09-10", gametime="20:35")],
-            [],
+            [row(gameday="2026-09-10", gametime="20:35")], [],
             now_utc=datetime(2026, 9, 11, 1, tzinfo=timezone.utc),
         )
 
+
+def test_missed_game_does_not_block_future_matchup_from_same_slate():
+    past = row(game_id="2026_05_PHI_JAX", gameday="2026-10-11", gametime="09:30")
+    future = row(game_id="2026_05_CHI_GB", gameday="2026-10-11", gametime="13:00")
+    result = build_public_forecasts([past, future], [],
+        now_utc=datetime(2026, 10, 11, 15, 30, tzinfo=timezone.utc),
+        missing_lock_policy="explicit_unavailable")
+    assert [g["source_snapshot"] for g in result["games"]] == ["MISSING_LOCK", "LIVE"]
+    assert result["games"][0]["official_home_win_probability"] is None
+    assert result["games"][1]["official_home_win_probability"] is not None
 
 def test_validation_rejects_contradictory_public_score():
     game = build_one()

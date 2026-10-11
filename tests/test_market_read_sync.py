@@ -105,6 +105,37 @@ def test_locked_snapshot_cannot_be_replaced_with_later_market_value():
     assert count == 0 and updated[locked["game_id"]]["paragraphs"] == original["paragraphs"]
 
 
+
+def test_missed_lock_is_isolated_from_unaffected_future_slate_reads():
+    past = row("2026_05_PHI_JAX", gameday="2026-10-11", gametime="09:30",
+               away_team="PHI", home_team="JAX", pick="JAX",
+               final_home_prob="0.75")
+    future = row("2026_05_CHI_GB", gameday="2026-10-11", gametime="13:00",
+                 away_team="CHI", home_team="GB", pick="CHI",
+                 final_home_prob="0.41")
+    old = {past["game_id"]: preview(past),
+           future["game_id"]: preview(row("2026_05_CHI_GB",
+                 gameday="2026-10-11", gametime="13:00"))}
+    updated, count = synchronize_reads(
+        [past, future], [], old,
+        now_utc=datetime(2026, 10, 11, 15, 30, tzinfo=timezone.utc),
+    )
+    assert count == 2
+    missing = updated[past["game_id"]]
+    assert missing["paragraphs"][0] == old[past["game_id"]]["paragraphs"][0]
+    assert "No official pregame forecast" in missing["paragraphs"][1]
+    assert "The pick:" not in missing["paragraphs"][1]
+    live = updated[future["game_id"]]
+    assert "59.0%" in live["paragraphs"][1]
+    assert live["paragraphs"][1].endswith("The pick: Chicago Bears moneyline.")
+    again, changed = synchronize_reads(
+        [past, future], [], updated,
+        now_utc=datetime(2026, 10, 11, 15, 30, tzinfo=timezone.utc),
+    )
+    assert changed == 0
+    assert again == updated
+
+
 def test_failure_isolation_and_no_partial_file_write(tmp_path):
     import csv
     first = row()
