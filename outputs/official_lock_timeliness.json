@@ -3,7 +3,7 @@
   "allowed_timing_lateness_minutes": 10.0,
   "counts": {
     "at_or_after_kickoff": 0,
-    "late": 70,
+    "late": 73,
     "on_time": 2,
     "premature": 0
   },
@@ -15,7 +15,9 @@
       "game_id": "2026_01_NE_SEA",
       "minutes_before_kickoff": 96.041,
       "minutes_late_vs_t120": 23.959,
-      "scheduled_lock_utc": "2026-09-09T22:20:00+00:00"
+      "minutes_late_vs_target": 23.959,
+      "scheduled_lock_utc": "2026-09-09T22:20:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-10T22:41:08.100535+00:00",
@@ -23,7 +25,9 @@
       "game_id": "2026_01_SF_LA",
       "minutes_before_kickoff": 113.865,
       "minutes_late_vs_t120": 6.135,
-      "scheduled_lock_utc": "2026-09-10T22:35:00+00:00"
+      "minutes_late_vs_target": 6.135,
+      "scheduled_lock_utc": "2026-09-10T22:35:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -31,7 +35,9 @@
       "game_id": "2026_01_CHI_CAR",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -39,7 +45,9 @@
       "game_id": "2026_01_TB_CIN",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -47,7 +55,9 @@
       "game_id": "2026_01_NO_DET",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -55,7 +65,9 @@
       "game_id": "2026_01_BUF_HOU",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -63,7 +75,9 @@
       "game_id": "2026_01_BAL_IND",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -71,7 +85,9 @@
       "game_id": "2026_01_CLE_JAX",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -79,7 +95,9 @@
       "game_id": "2026_01_ATL_PIT",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T15:37:41.752256+00:00",
@@ -87,7 +105,9 @@
       "game_id": "2026_01_NYJ_TEN",
       "minutes_before_kickoff": 82.3041,
       "minutes_late_vs_t120": 37.6959,
-      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00"
+      "minutes_late_vs_target": 37.6959,
+      "scheduled_lock_utc": "2026-09-13T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T18:43:29.746900+00:00",
@@ -95,7 +115,9 @@
       "game_id": "2026_01_ARI_LAC",
       "minutes_before_kickoff": 101.5042,
       "minutes_late_vs_t120": 18.4958,
-      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00"
+      "minutes_late_vs_target": 18.4958,
+      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T18:43:29.746900+00:00",
@@ -103,7 +125,9 @@
       "game_id": "2026_01_MIA_LV",
       "minutes_before_kickoff": 101.5042,
       "minutes_late_vs_t120": 18.4958,
-      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00"
+      "minutes_late_vs_target": 18.4958,
+      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T18:43:29.746900+00:00",
@@ -111,7 +135,9 @@
       "game_id": "2026_01_GB_MIN",
       "minutes_before_kickoff": 101.5042,
       "minutes_late_vs_t120": 18.4958,
-      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00"
+      "minutes_late_vs_target": 18.4958,
+      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T18:43:29.746900+00:00",
@@ -119,7 +145,9 @@
       "game_id": "2026_01_WAS_PHI",
       "minutes_before_kickoff": 101.5042,
       "minutes_late_vs_t120": 18.4958,
-      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00"
+      "minutes_late_vs_target": 18.4958,
+      "scheduled_lock_utc": "2026-09-13T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-13T22:40:33.180637+00:00",
@@ -127,7 +155,9 @@
       "game_id": "2026_01_DAL_NYG",
       "minutes_before_kickoff": 99.447,
       "minutes_late_vs_t120": 20.553,
-      "scheduled_lock_utc": "2026-09-13T22:20:00+00:00"
+      "minutes_late_vs_target": 20.553,
+      "scheduled_lock_utc": "2026-09-13T22:20:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-14T22:40:25.863509+00:00",
@@ -135,7 +165,9 @@
       "game_id": "2026_01_DEN_KC",
       "minutes_before_kickoff": 94.5689,
       "minutes_late_vs_t120": 25.4311,
-      "scheduled_lock_utc": "2026-09-14T22:15:00+00:00"
+      "minutes_late_vs_target": 25.4311,
+      "scheduled_lock_utc": "2026-09-14T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-17T22:36:25.721707+00:00",
@@ -143,7 +175,9 @@
       "game_id": "2026_02_DET_BUF",
       "minutes_before_kickoff": 98.5713,
       "minutes_late_vs_t120": 21.4287,
-      "scheduled_lock_utc": "2026-09-17T22:15:00+00:00"
+      "minutes_late_vs_target": 21.4287,
+      "scheduled_lock_utc": "2026-09-17T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -151,7 +185,9 @@
       "game_id": "2026_02_CAR_ATL",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -159,7 +195,9 @@
       "game_id": "2026_02_NO_BAL",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -167,7 +205,9 @@
       "game_id": "2026_02_MIN_CHI",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -175,7 +215,9 @@
       "game_id": "2026_02_CIN_HOU",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -183,7 +225,9 @@
       "game_id": "2026_02_PIT_NE",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -191,7 +235,9 @@
       "game_id": "2026_02_GB_NYJ",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -199,7 +245,9 @@
       "game_id": "2026_02_CLE_TB",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T15:42:31.653559+00:00",
@@ -207,7 +255,9 @@
       "game_id": "2026_02_PHI_TEN",
       "minutes_before_kickoff": 77.4724,
       "minutes_late_vs_t120": 42.5276,
-      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00"
+      "minutes_late_vs_target": 42.5276,
+      "scheduled_lock_utc": "2026-09-20T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T18:39:49.917609+00:00",
@@ -215,7 +265,9 @@
       "game_id": "2026_02_JAX_DEN",
       "minutes_before_kickoff": 85.168,
       "minutes_late_vs_t120": 34.832,
-      "scheduled_lock_utc": "2026-09-20T18:05:00+00:00"
+      "minutes_late_vs_target": 34.832,
+      "scheduled_lock_utc": "2026-09-20T18:05:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T18:39:49.917609+00:00",
@@ -223,7 +275,9 @@
       "game_id": "2026_02_LV_LAC",
       "minutes_before_kickoff": 85.168,
       "minutes_late_vs_t120": 34.832,
-      "scheduled_lock_utc": "2026-09-20T18:05:00+00:00"
+      "minutes_late_vs_target": 34.832,
+      "scheduled_lock_utc": "2026-09-20T18:05:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T18:39:49.917609+00:00",
@@ -231,7 +285,9 @@
       "game_id": "2026_02_SEA_ARI",
       "minutes_before_kickoff": 105.168,
       "minutes_late_vs_t120": 14.832,
-      "scheduled_lock_utc": "2026-09-20T18:25:00+00:00"
+      "minutes_late_vs_target": 14.832,
+      "scheduled_lock_utc": "2026-09-20T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T18:39:49.917609+00:00",
@@ -239,7 +295,9 @@
       "game_id": "2026_02_WAS_DAL",
       "minutes_before_kickoff": 105.168,
       "minutes_late_vs_t120": 14.832,
-      "scheduled_lock_utc": "2026-09-20T18:25:00+00:00"
+      "minutes_late_vs_target": 14.832,
+      "scheduled_lock_utc": "2026-09-20T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T18:39:49.917609+00:00",
@@ -247,7 +305,9 @@
       "game_id": "2026_02_MIA_SF",
       "minutes_before_kickoff": 105.168,
       "minutes_late_vs_t120": 14.832,
-      "scheduled_lock_utc": "2026-09-20T18:25:00+00:00"
+      "minutes_late_vs_target": 14.832,
+      "scheduled_lock_utc": "2026-09-20T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-20T22:44:18.680200+00:00",
@@ -255,7 +315,9 @@
       "game_id": "2026_02_IND_KC",
       "minutes_before_kickoff": 95.6887,
       "minutes_late_vs_t120": 24.3113,
-      "scheduled_lock_utc": "2026-09-20T22:20:00+00:00"
+      "minutes_late_vs_target": 24.3113,
+      "scheduled_lock_utc": "2026-09-20T22:20:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-21T22:42:37.986388+00:00",
@@ -263,7 +325,9 @@
       "game_id": "2026_02_NYG_LA",
       "minutes_before_kickoff": 92.3669,
       "minutes_late_vs_t120": 27.6331,
-      "scheduled_lock_utc": "2026-09-21T22:15:00+00:00"
+      "minutes_late_vs_target": 27.6331,
+      "scheduled_lock_utc": "2026-09-21T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-24T22:44:42.277956+00:00",
@@ -271,7 +335,9 @@
       "game_id": "2026_03_ATL_GB",
       "minutes_before_kickoff": 90.2954,
       "minutes_late_vs_t120": 29.7046,
-      "scheduled_lock_utc": "2026-09-24T22:15:00+00:00"
+      "minutes_late_vs_target": 29.7046,
+      "scheduled_lock_utc": "2026-09-24T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -279,7 +345,9 @@
       "game_id": "2026_03_LAC_BUF",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -287,7 +355,9 @@
       "game_id": "2026_03_CAR_CLE",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -295,7 +365,9 @@
       "game_id": "2026_03_NYJ_DET",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -303,7 +375,9 @@
       "game_id": "2026_03_HOU_IND",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -311,7 +385,9 @@
       "game_id": "2026_03_NE_JAX",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -319,7 +395,9 @@
       "game_id": "2026_03_KC_MIA",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -327,7 +405,9 @@
       "game_id": "2026_03_TEN_NYG",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -335,7 +415,9 @@
       "game_id": "2026_03_CIN_PIT",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T15:45:19.953975+00:00",
@@ -343,7 +425,9 @@
       "game_id": "2026_03_SEA_WAS",
       "minutes_before_kickoff": 74.6674,
       "minutes_late_vs_t120": 45.3326,
-      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00"
+      "minutes_late_vs_target": 45.3326,
+      "scheduled_lock_utc": "2026-09-27T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T18:45:36.363844+00:00",
@@ -351,7 +435,9 @@
       "game_id": "2026_03_ARI_SF",
       "minutes_before_kickoff": 79.3939,
       "minutes_late_vs_t120": 40.6061,
-      "scheduled_lock_utc": "2026-09-27T18:05:00+00:00"
+      "minutes_late_vs_target": 40.6061,
+      "scheduled_lock_utc": "2026-09-27T18:05:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T18:45:36.363844+00:00",
@@ -359,7 +445,9 @@
       "game_id": "2026_03_MIN_TB",
       "minutes_before_kickoff": 79.3939,
       "minutes_late_vs_t120": 40.6061,
-      "scheduled_lock_utc": "2026-09-27T18:05:00+00:00"
+      "minutes_late_vs_target": 40.6061,
+      "scheduled_lock_utc": "2026-09-27T18:05:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T18:45:36.363844+00:00",
@@ -367,7 +455,9 @@
       "game_id": "2026_03_BAL_DAL",
       "minutes_before_kickoff": 99.3939,
       "minutes_late_vs_t120": 20.6061,
-      "scheduled_lock_utc": "2026-09-27T18:25:00+00:00"
+      "minutes_late_vs_target": 20.6061,
+      "scheduled_lock_utc": "2026-09-27T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T18:45:36.363844+00:00",
@@ -375,7 +465,9 @@
       "game_id": "2026_03_LV_NO",
       "minutes_before_kickoff": 99.3939,
       "minutes_late_vs_t120": 20.6061,
-      "scheduled_lock_utc": "2026-09-27T18:25:00+00:00"
+      "minutes_late_vs_target": 20.6061,
+      "scheduled_lock_utc": "2026-09-27T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-27T22:43:46.914089+00:00",
@@ -383,7 +475,9 @@
       "game_id": "2026_03_LA_DEN",
       "minutes_before_kickoff": 96.2181,
       "minutes_late_vs_t120": 23.7819,
-      "scheduled_lock_utc": "2026-09-27T22:20:00+00:00"
+      "minutes_late_vs_target": 23.7819,
+      "scheduled_lock_utc": "2026-09-27T22:20:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-09-28T22:39:54.993011+00:00",
@@ -391,7 +485,9 @@
       "game_id": "2026_03_PHI_CHI",
       "minutes_before_kickoff": 95.0834,
       "minutes_late_vs_t120": 24.9166,
-      "scheduled_lock_utc": "2026-09-28T22:15:00+00:00"
+      "minutes_late_vs_target": 24.9166,
+      "scheduled_lock_utc": "2026-09-28T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-01T22:44:03.329384+00:00",
@@ -399,7 +495,9 @@
       "game_id": "2026_04_PIT_CLE",
       "minutes_before_kickoff": 90.9445,
       "minutes_late_vs_t120": 29.0555,
-      "scheduled_lock_utc": "2026-10-01T22:15:00+00:00"
+      "minutes_late_vs_target": 29.0555,
+      "scheduled_lock_utc": "2026-10-01T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -407,7 +505,9 @@
       "game_id": "2026_04_TEN_BAL",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -415,7 +515,9 @@
       "game_id": "2026_04_NE_BUF",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -423,7 +525,9 @@
       "game_id": "2026_04_NYJ_CHI",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -431,7 +535,9 @@
       "game_id": "2026_04_JAX_CIN",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -439,7 +545,9 @@
       "game_id": "2026_04_DAL_HOU",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -447,7 +555,9 @@
       "game_id": "2026_04_ARI_NYG",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -455,7 +565,9 @@
       "game_id": "2026_04_LA_PHI",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T15:58:47.967542+00:00",
@@ -463,7 +575,9 @@
       "game_id": "2026_04_GB_TB",
       "minutes_before_kickoff": 61.2005,
       "minutes_late_vs_t120": 58.7995,
-      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00"
+      "minutes_late_vs_target": 58.7995,
+      "scheduled_lock_utc": "2026-10-04T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T18:07:25.914244+00:00",
@@ -471,7 +585,9 @@
       "game_id": "2026_04_MIA_MIN",
       "minutes_before_kickoff": 117.5681,
       "minutes_late_vs_t120": 2.4319,
-      "scheduled_lock_utc": "2026-10-04T18:05:00+00:00"
+      "minutes_late_vs_target": 2.4319,
+      "scheduled_lock_utc": "2026-10-04T18:05:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T19:43:46.915197+00:00",
@@ -479,7 +595,9 @@
       "game_id": "2026_04_KC_LV",
       "minutes_before_kickoff": 41.2181,
       "minutes_late_vs_t120": 78.7819,
-      "scheduled_lock_utc": "2026-10-04T18:25:00+00:00"
+      "minutes_late_vs_target": 78.7819,
+      "scheduled_lock_utc": "2026-10-04T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T19:43:46.915197+00:00",
@@ -487,7 +605,9 @@
       "game_id": "2026_04_LAC_SEA",
       "minutes_before_kickoff": 41.2181,
       "minutes_late_vs_t120": 78.7819,
-      "scheduled_lock_utc": "2026-10-04T18:25:00+00:00"
+      "minutes_late_vs_target": 78.7819,
+      "scheduled_lock_utc": "2026-10-04T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T19:43:46.915197+00:00",
@@ -495,7 +615,9 @@
       "game_id": "2026_04_DEN_SF",
       "minutes_before_kickoff": 41.2181,
       "minutes_late_vs_t120": 78.7819,
-      "scheduled_lock_utc": "2026-10-04T18:25:00+00:00"
+      "minutes_late_vs_target": 78.7819,
+      "scheduled_lock_utc": "2026-10-04T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-04T22:44:11.857961+00:00",
@@ -503,7 +625,9 @@
       "game_id": "2026_04_DET_CAR",
       "minutes_before_kickoff": 95.8024,
       "minutes_late_vs_t120": 24.1976,
-      "scheduled_lock_utc": "2026-10-04T22:20:00+00:00"
+      "minutes_late_vs_target": 24.1976,
+      "scheduled_lock_utc": "2026-10-04T22:20:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-05T22:40:47.156532+00:00",
@@ -511,7 +635,9 @@
       "game_id": "2026_04_ATL_NO",
       "minutes_before_kickoff": 94.2141,
       "minutes_late_vs_t120": 25.7859,
-      "scheduled_lock_utc": "2026-10-05T22:15:00+00:00"
+      "minutes_late_vs_target": 25.7859,
+      "scheduled_lock_utc": "2026-10-05T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-08T23:55:39.504985+00:00",
@@ -519,7 +645,9 @@
       "game_id": "2026_05_TB_DAL",
       "minutes_before_kickoff": 19.3416,
       "minutes_late_vs_t120": 100.6584,
-      "scheduled_lock_utc": "2026-10-08T22:15:00+00:00"
+      "minutes_late_vs_target": 100.6584,
+      "scheduled_lock_utc": "2026-10-08T22:15:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -527,7 +655,9 @@
       "game_id": "2026_05_CHI_GB",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -535,7 +665,9 @@
       "game_id": "2026_05_CIN_MIA",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -543,7 +675,9 @@
       "game_id": "2026_05_CLE_NYJ",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -551,7 +685,9 @@
       "game_id": "2026_05_HOU_TEN",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -559,7 +695,9 @@
       "game_id": "2026_05_IND_PIT",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -567,7 +705,9 @@
       "game_id": "2026_05_LV_NE",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -575,7 +715,9 @@
       "game_id": "2026_05_MIN_NO",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     },
     {
       "actual_lock_utc": "2026-10-11T16:42:02.936276+00:00",
@@ -583,11 +725,47 @@
       "game_id": "2026_05_NYG_WAS",
       "minutes_before_kickoff": 17.9511,
       "minutes_late_vs_t120": 102.0489,
-      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00"
+      "minutes_late_vs_target": 102.0489,
+      "scheduled_lock_utc": "2026-10-11T15:00:00+00:00",
+      "target_minutes_before_kickoff": 120.0
+    },
+    {
+      "actual_lock_utc": "2026-10-11T18:46:03.369091+00:00",
+      "classification": "late",
+      "game_id": "2026_05_DEN_LAC",
+      "minutes_before_kickoff": 78.9438,
+      "minutes_late_vs_t120": 41.0562,
+      "minutes_late_vs_target": 41.0562,
+      "scheduled_lock_utc": "2026-10-11T18:05:00+00:00",
+      "target_minutes_before_kickoff": 120.0
+    },
+    {
+      "actual_lock_utc": "2026-10-11T18:46:03.369091+00:00",
+      "classification": "late",
+      "game_id": "2026_05_DET_ARI",
+      "minutes_before_kickoff": 98.9438,
+      "minutes_late_vs_t120": 21.0562,
+      "minutes_late_vs_target": 21.0562,
+      "scheduled_lock_utc": "2026-10-11T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
+    },
+    {
+      "actual_lock_utc": "2026-10-11T18:46:03.369091+00:00",
+      "classification": "late",
+      "game_id": "2026_05_SF_SEA",
+      "minutes_before_kickoff": 98.9438,
+      "minutes_late_vs_t120": 21.0562,
+      "minutes_late_vs_target": 21.0562,
+      "scheduled_lock_utc": "2026-10-11T18:25:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     }
   ],
-  "locked_count": 72,
+  "locked_count": 75,
   "official_lock_target_minutes": 120.0,
+  "official_lock_targets_minutes": [
+    120.0
+  ],
+  "policy_effective_2026_week": 6,
   "season": 2026,
   "warning": "Historical late receipts are preserved as originally recorded. This diagnostic never creates or backdates predictions.",
   "week": null

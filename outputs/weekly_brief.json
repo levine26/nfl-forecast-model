@@ -19,78 +19,25 @@
       "pick_delta_pp": -1.79001258260314e-10
     }
   ],
-  "generated_utc": "2026-10-11T18:58:41.392722+00:00",
+  "generated_utc": "2026-10-11T21:52:40.742686+00:00",
   "market_disagreements": [
-    {
-      "confidence": "Coin Flip",
-      "game_id": "2026_05_CLE_NYJ",
-      "matchup": "CLE @ NYJ",
-      "pick": "NYJ",
-      "pick_prob": 0.5785113878884602,
-      "projected_score": "NYJ 20.2 \u2013 CLE 22.5",
-      "pure_market_gap_pp": 17.32379824311418
-    },
     {
       "confidence": "Lean",
       "game_id": "2026_05_BAL_ATL",
       "matchup": "BAL @ ATL",
       "pick": "ATL",
       "pick_prob": 0.6223690634909445,
-      "projected_score": "ATL 21.4 \u2013 BAL 23.2",
-      "pure_market_gap_pp": 14.091401484703498
+      "projected_score": "ATL 21.4 \u2013 BAL 22.9",
+      "pure_market_gap_pp": 15.50754467735334
     },
     {
       "confidence": "Solid",
-      "game_id": "2026_05_NYG_WAS",
-      "matchup": "NYG @ WAS",
-      "pick": "WAS",
-      "pick_prob": 0.6241908375784295,
-      "projected_score": "WAS 21.3 \u2013 NYG 21.7",
-      "pure_market_gap_pp": 12.32169240615394
-    }
-  ],
-  "most_uncertain": [
-    {
-      "confidence": "Coin Flip",
-      "game_id": "2026_05_CHI_GB",
-      "matchup": "CHI @ GB",
-      "pick": "CHI",
-      "pick_prob": 0.5360064217310785,
-      "projected_score": "GB 20.0 \u2013 CHI 24.1"
-    },
-    {
-      "confidence": "Lean",
-      "game_id": "2026_05_MIN_NO",
-      "matchup": "MIN @ NO",
-      "pick": "MIN",
-      "pick_prob": 0.5574487320832077,
-      "projected_score": "NO 20.4 \u2013 MIN 25.0"
-    },
-    {
-      "confidence": "Coin Flip",
-      "game_id": "2026_05_CLE_NYJ",
-      "matchup": "CLE @ NYJ",
-      "pick": "NYJ",
-      "pick_prob": 0.5785113878884602,
-      "projected_score": "NYJ 20.2 \u2013 CLE 22.5"
-    }
-  ],
-  "strongest": [
-    {
-      "confidence": "High",
-      "game_id": "2026_05_CIN_MIA",
-      "matchup": "CIN @ MIA",
-      "pick": "CIN",
-      "pick_prob": 0.7648093270560568,
-      "projected_score": "MIA 19.0 \u2013 CIN 25.4"
-    },
-    {
-      "confidence": "High",
-      "game_id": "2026_05_HOU_TEN",
-      "matchup": "HOU @ TEN",
-      "pick": "HOU",
-      "pick_prob": 0.7462995902824545,
-      "projected_score": "TEN 18.1 \u2013 HOU 23.8"
+      "game_id": "2026_05_BUF_LA",
+      "matchup": "BUF @ LA",
+      "pick": "LA",
+      "pick_prob": 0.6196224226227074,
+      "projected_score": "LA 23.6 \u2013 BUF 23.1",
+      "pure_market_gap_pp": 12.61096294712033
     },
     {
       "confidence": "High",
@@ -98,7 +45,60 @@
       "matchup": "DET @ ARI",
       "pick": "DET",
       "pick_prob": 0.7163942049164744,
-      "projected_score": "ARI 19.3 \u2013 DET 23.6"
+      "projected_score": "ARI 19.6 \u2013 DET 23.6",
+      "pure_market_gap_pp": 4.2471613866105375
+    }
+  ],
+  "most_uncertain": [
+    {
+      "confidence": "Lean",
+      "game_id": "2026_05_SF_SEA",
+      "matchup": "SF @ SEA",
+      "pick": "SEA",
+      "pick_prob": 0.5899632425167408,
+      "projected_score": "SEA 24.7 \u2013 SF 22.5"
+    },
+    {
+      "confidence": "Solid",
+      "game_id": "2026_05_BUF_LA",
+      "matchup": "BUF @ LA",
+      "pick": "LA",
+      "pick_prob": 0.6196224226227074,
+      "projected_score": "LA 23.6 \u2013 BUF 23.1"
+    },
+    {
+      "confidence": "Lean",
+      "game_id": "2026_05_BAL_ATL",
+      "matchup": "BAL @ ATL",
+      "pick": "ATL",
+      "pick_prob": 0.6223690634909445,
+      "projected_score": "ATL 21.4 \u2013 BAL 22.9"
+    }
+  ],
+  "strongest": [
+    {
+      "confidence": "High",
+      "game_id": "2026_05_DET_ARI",
+      "matchup": "DET @ ARI",
+      "pick": "DET",
+      "pick_prob": 0.7163942049164744,
+      "projected_score": "ARI 19.6 \u2013 DET 23.6"
+    },
+    {
+      "confidence": "Solid",
+      "game_id": "2026_05_DEN_LAC",
+      "matchup": "DEN @ LAC",
+      "pick": "DEN",
+      "pick_prob": 0.6508103043642381,
+      "projected_score": "LAC 20.6 \u2013 DEN 22.8"
+    },
+    {
+      "confidence": "Lean",
+      "game_id": "2026_05_BAL_ATL",
+      "matchup": "BAL @ ATL",
+      "pick": "ATL",
+      "pick_prob": 0.6223690634909445,
+      "projected_score": "ATL 21.4 \u2013 BAL 22.9"
     }
   ],
   "week": 5
