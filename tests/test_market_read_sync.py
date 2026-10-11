@@ -215,7 +215,7 @@ def test_shared_publisher_daily_refresh_rebuilds_read_without_replacing_human(tm
     assert "49.0% vig-free market signal" in result["paragraphs"][1]
     assert "a market line of Chicago Bears -1.0" in result["paragraphs"][1]
     assert result["paragraphs"][1].endswith("The pick: Chicago Bears moneyline.")
-    assert synchronize_file(tmp_path, check=True) == 0
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
 
 
 def test_shared_publisher_market_refresh_and_idempotence(tmp_path):
@@ -226,7 +226,7 @@ def test_shared_publisher_market_refresh_and_idempotence(tmp_path):
     publish(row(final_home_prob="0.42", market_home_prob="0.48"))
     assert (tmp_path / "game_previews.json").read_bytes() == second
     assert "58.0% win probability" in json.loads(second)[gid]["paragraphs"][1]
-    assert synchronize_file(tmp_path, check=True) == 0
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
 
 
 def test_shared_publisher_fails_closed_for_missing_or_malformed_previews(tmp_path):
