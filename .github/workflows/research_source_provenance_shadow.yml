@@ -66,6 +66,7 @@ jobs:
           python research/source_provenance/audit_human_source_provenance_shadow.py \
             --manifest inputs/chatgpt_media/fallback/manifest.json \
             --input-dir inputs/chatgpt_media/fallback \
+            --current outputs/this_week.csv \
             --output /tmp/sunday-signal-source-provenance.json \
             --workers 2
           python - <<'PY'

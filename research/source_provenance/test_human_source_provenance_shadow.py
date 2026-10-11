@@ -5,7 +5,7 @@ import json
 import pytest
 
 from research.source_provenance.audit_human_source_provenance_shadow import (
-    SlateProvenanceError, audit_game, audit_slate,
+    SlateProvenanceError, audit_game, audit_slate, validate_active_slate,
 )
 
 
@@ -108,3 +108,77 @@ def test_report_never_changes_authored_input_or_produces_release_file(tmp_path):
     assert report["full_slate_article_resolution_verified"] is True
     assert report["full_slate_claim_support_verified"] is False
     assert report["publication_authorized"] is False
+
+
+
+def _current_forecast_csv(tmp_path, ids):
+    p = tmp_path / "this_week.csv"
+    rows = ["game_id,season,week,away_team,home_team"]
+    for gid in ids:
+        year, week, away, home = gid.split("_")
+        rows.append(f"{gid},{year},{int(week)},{away},{home}")
+    p.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    return p
+
+
+def _frozen_roster(tmp_path, *, week, ids):
+    p = tmp_path / "historical_roster.json"
+    p.write_text(json.dumps({"season": 2026, "week": week, "frozen": True,
+                             "game_ids": ids}), encoding="utf-8")
+    return p
+
+
+def test_current_week_audit_accepts_manifest_without_mutating_frozen_prior_week(tmp_path):
+    current_ids = ["2026_05_TB_DAL", "2026_05_PHI_JAX"]
+    active = _current_forecast_csv(tmp_path, current_ids)
+    frozen = _frozen_roster(tmp_path, week=4, ids=["2026_04_PIT_CLE"])
+    frozen_bytes = frozen.read_bytes()
+    active_bytes = active.read_bytes()
+    status = validate_active_slate({"game_ids": list(reversed(current_ids))},
+                                   current_csv=active, historical_roster=frozen)
+    assert status["games_expected"] == 2
+    assert status["season"] == 2026 and status["week"] == 5
+    assert status["canonical_game_ids"] == sorted(current_ids)
+    assert status["historical_roster_status"] == "different_week_historical_not_authoritative"
+    assert status["publication_authorized"] is False
+    assert frozen.read_bytes() == frozen_bytes
+    assert active.read_bytes() == active_bytes
+
+
+def test_same_week_frozen_roster_cannot_disagree_with_live_forecasts(tmp_path):
+    active = _current_forecast_csv(tmp_path, ["2026_05_TB_DAL", "2026_05_PHI_JAX"])
+    frozen = _frozen_roster(tmp_path, week=5, ids=["2026_05_TB_DAL"])
+    with pytest.raises(SlateProvenanceError, match="same-week frozen roster differs"):
+        validate_active_slate(
+            {"game_ids": ["2026_05_TB_DAL", "2026_05_PHI_JAX"]},
+            current_csv=active, historical_roster=frozen,
+        )
+
+
+def test_missing_or_extra_game_cannot_pass_current_slate_even_at_same_cardinality(tmp_path):
+    active = _current_forecast_csv(tmp_path, ["2026_05_TB_DAL", "2026_05_PHI_JAX"])
+    missing_roster = tmp_path / "missing.json"
+    with pytest.raises(SlateProvenanceError, match="ACTIVE canonical forecast"):
+        validate_active_slate(
+            {"game_ids": ["2026_05_TB_DAL", "2026_05_CHI_GB"]},
+            current_csv=active, historical_roster=missing_roster,
+        )
+
+
+@pytest.mark.parametrize("bad_ids", [
+    ["2026_05_TB_DAL", "2026_05_TB_DAL"],
+    ["2026_05_TB_DAL", "2026_06_PHI_JAX"],
+])
+def test_duplicate_or_mixed_week_forecasts_fail_closed(tmp_path, bad_ids):
+    active = _current_forecast_csv(tmp_path, bad_ids)
+    with pytest.raises(SlateProvenanceError):
+        validate_active_slate({"game_ids": bad_ids}, current_csv=active,
+                              historical_roster=tmp_path / "absent.json")
+
+
+def test_missing_active_forecast_never_falls_back_to_old_roster(tmp_path):
+    frozen = _frozen_roster(tmp_path, week=4, ids=["2026_04_PIT_CLE"])
+    with pytest.raises(SlateProvenanceError, match="active canonical forecast CSV unavailable"):
+        validate_active_slate({"game_ids": ["2026_05_TB_DAL"]},
+                              current_csv=tmp_path / "missing.csv",
+                              historical_roster=frozen)
