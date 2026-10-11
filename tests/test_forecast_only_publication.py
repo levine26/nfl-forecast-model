@@ -8,6 +8,7 @@ from nfl_forecast.publish import write_outputs
 def test_forecast_and_lock_writer_does_not_require_editorial_artifact(tmp_path):
     row = dict(
         game_id="2026_06_CHI_GB", season=2026, week=6,
+        snapshot_type="EARLY", prediction_timestamp_utc="2026-10-18T16:25:00+00:00",
         gameday="2026-10-18", gametime="13:00", home_team="GB", away_team="CHI",
         final_home_prob=0.63, market_home_prob=0.61, pick="GB",
         model_version="0.9.0-fst", final_probability_strategy="F-ST-01-FROZEN-2026",
