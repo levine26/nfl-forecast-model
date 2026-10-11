@@ -315,8 +315,9 @@ def _validate_recovery_targets(
                 capture_output=True,
                 text=True,
             )
-            if result.stdout.strip():
-                print(result.stdout.strip(), flush=True)
+            stdout = str(result.stdout or "").strip()
+            if stdout:
+                print(stdout, flush=True)
             payload = json.loads(staged.read_text(encoding="utf-8"))
             entry = payload["games"][gid]
             if not isinstance(entry, dict):
