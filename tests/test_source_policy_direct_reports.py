@@ -47,8 +47,9 @@ def test_substantive_gate_rejects_real_but_nonsubstantive_news_urls():
         ("NFL Week 5 Schedule: How to Watch, TV Channels, Streaming, Game Previews",
          "https://www.foxsports.com/stories/nfl/nfl-week-5-schedule-how-watch-tv-channels-streaming-game-previews"),
     ]
+    # URLs may be rejected at either layer: hard navigation URL rejection or
+    # the additional substantive-editorial classification. Neither may pass.
     assert all(
-        is_direct_media_report_url(url) and
         not is_substantive_report_candidate(title=title, url=url)
         for title, url in cases
     )
