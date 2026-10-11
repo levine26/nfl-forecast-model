@@ -34,3 +34,22 @@ test('approved mobile cards expose distinct implied spread and percentage-point 
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)
   expect(overflow).toBeLessThanOrEqual(1)
 })
+
+test('History and Performance Lab do not depend on downloading run_history.csv', async ({page}) => {
+  const heavyRequests=[]
+  await page.route('**/data/run_history.csv',async route=>{
+    heavyRequests.push(route.request().url())
+    await route.abort('failed')
+  })
+  await page.goto('./#/history')
+  await expect(page.locator('.ss-exp-performance:visible')).toBeVisible()
+  await expect(page.locator('.ss-exp-history:visible')).toBeVisible()
+  await expect(page.getByText('PROBABILITY CALIBRATION',{exact:true})).toBeVisible()
+  expect(heavyRequests).toHaveLength(0)
+})
+
+test('there is no redundant hidden legacy Top Signals DOM tree', async ({page}) => {
+  await page.goto('./')
+  await expect(page.locator('.ss-exp-top-signals:visible')).toHaveCount(1)
+  await expect(page.locator('.ss-top-signals')).toHaveCount(0)
+})
