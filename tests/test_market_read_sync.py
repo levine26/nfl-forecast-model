@@ -215,7 +215,7 @@ def test_shared_publisher_daily_refresh_rebuilds_read_without_replacing_human(tm
     assert "49.0% vig-free market signal" in result["paragraphs"][1]
     assert "a market line of Chicago Bears -1.0" in result["paragraphs"][1]
     assert result["paragraphs"][1].endswith("The pick: Chicago Bears moneyline.")
-    assert synchronize_file(tmp_path, check=True) == 0
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
 
 
 def test_shared_publisher_market_refresh_and_idempotence(tmp_path):
@@ -226,7 +226,25 @@ def test_shared_publisher_market_refresh_and_idempotence(tmp_path):
     publish(row(final_home_prob="0.42", market_home_prob="0.48"))
     assert (tmp_path / "game_previews.json").read_bytes() == second
     assert "58.0% win probability" in json.loads(second)[gid]["paragraphs"][1]
-    assert synchronize_file(tmp_path, check=True) == 0
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
+
+
+
+def test_publication_uses_explicit_simulated_clock_across_read_boundaries(tmp_path):
+    publish, gid, original = _fixture_publisher(tmp_path)
+    # The fixture publishes days BEFORE kickoff even if CI runs AFTER kickoff.
+    publish(row())
+    serialized = json.loads((tmp_path / "game_previews.json").read_text())
+    assert "The pick:" in serialized[gid]["paragraphs"][1]
+    assert "No official pregame forecast" not in serialized[gid]["paragraphs"][1]
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
+    # The exact same unlocked row must be withheld when independently viewed
+    # after kickoff, without pretending the prior simulation was an on-time lock.
+    with pytest.raises(ReadSyncError, match="disagree with canonical"):
+        synchronize_file(
+            tmp_path, check=True,
+            now_utc=datetime(2026, 10, 12, 0, tzinfo=timezone.utc)
+        )
 
 
 def test_shared_publisher_fails_closed_for_missing_or_malformed_previews(tmp_path):
@@ -273,7 +291,7 @@ def test_market_workflow_and_daily_workflow_both_protect_commit(monkeypatch):
         assert "sync_market_reads.py" in content or name == "weekly.yml"
         assert "git add outputs/" in content
     publisher = (root / "src" / "nfl_forecast" / "publish.py").read_text()
-    assert "synchronize_file(out)" in publisher
+    assert "synchronize_file(out, now_utc=now_utc)" in publisher
     dashboard = (root / ".github" / "workflows" / "dashboard.yml").read_text()
     assert "sync_market_reads --output-dir site/public/data --check" in dashboard
     assert "sync_market_reads --output-dir site/public/data --write" not in dashboard

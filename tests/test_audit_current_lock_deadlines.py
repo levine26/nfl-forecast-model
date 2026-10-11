@@ -62,6 +62,53 @@ def test_historical_late_lock_remains_truthful_without_modifying_row():
     assert aged["issues"] == {}
 
 
+
+def test_old_late_receipt_remains_reported_without_poisoning_new_lock_worker():
+    old = lock("2026_05_PHI_JAX", KICKOFF - timedelta(minutes=19))
+    current = lock("2026_05_DEN_LAC")
+    result = audit_current_deadlines(slate(), [old, current],
+                                     now_utc=KICKOFF + timedelta(minutes=2))
+    assert "2026_05_PHI_JAX" in result["issues"]
+    assert result["games"]["2026_05_PHI_JAX"]["state"] == "historically_late_lock"
+    assert result["actionable_issues"] == {}
+    assert result["status"] == "active_lock_timing_violation"
+
+
+def test_missing_prekickoff_receipt_still_blocks_worker_at_t120_deadline():
+    result = audit_current_deadlines(slate(), [lock("2026_05_DEN_LAC")],
+                                     now_utc=GRACE_END + timedelta(minutes=1))
+    assert set(result["actionable_issues"]) == {"2026_05_PHI_JAX"}
+    assert set(result["issues"]) == {"2026_05_PHI_JAX"}
+
+
+def test_cli_does_not_fail_future_runs_for_immutable_historically_late_lock(tmp_path, monkeypatch):
+    import csv
+    import json
+    import sys
+    from scripts.audit_current_lock_deadlines import main as run_audit
+
+    current = tmp_path / "current.csv"
+    history = tmp_path / "history.csv"
+    output = tmp_path / "audit.json"
+    with current.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=["game_id", "gameday", "gametime"])
+        writer.writeheader()
+        writer.writerows(slate())
+    with history.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=["game_id", "lock_status", "lock_timestamp_utc"])
+        writer.writeheader()
+        writer.writerows([lock("2026_05_PHI_JAX", KICKOFF-timedelta(minutes=19)),
+                          lock("2026_05_DEN_LAC")])
+    monkeypatch.setattr(sys, "argv", ["audit", "--current", str(current),
+                                     "--history", str(history), "--output", str(output),
+                                     "--now-utc", (KICKOFF+timedelta(minutes=2)).isoformat()])
+    run_audit()
+    report = json.loads(output.read_text())
+    assert report["issues"]
+    assert report["actionable_issues"] == {}
+    assert report["historical_lock_records_modified"] is False
+
+
 def test_missing_lock_after_kickoff_is_visible_during_bounded_window():
     x = audit_current_deadlines(slate(), [], now_utc=KICKOFF+timedelta(hours=1))
     assert x["counts"]["overdue_missing_official_lock"] == 2
