@@ -180,7 +180,7 @@ jobs:
       - name: Finalize and enforce full-slate launch gate
         if: github.event_name == 'workflow_dispatch' || steps.current_bundle_diff.outputs.changed == 'true'
         env:
-          SUNDAY_SIGNAL_REVIEW_KEY: ${{ secrets.SUNDAY_SIGNAL_REVIEW_KEY }}
+          SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY: ${{ vars.SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY }}
         run: |
           python scripts/finalize_editorial.py
           python - <<'PY'
