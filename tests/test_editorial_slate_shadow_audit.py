@@ -132,3 +132,27 @@ def test_changed_candidate_rejects_old_source_and_claim_evidence(tmp_path):
     assert v["games"][IDS[0]]["state"] == "stale_or_mismatched_snapshot"
     assert "candidate_provenance_version_mismatch" in v["games"][IDS[0]]["issues"]
     assert v["games"][IDS[1]]["state"] == "draft_available_but_unverified"
+
+
+def test_rejected_but_fetched_sources_are_not_counted_as_valid(tmp_path):
+    inputs = fixture(tmp_path)
+    sources = inputs[2]
+    data = json.loads(sources.read_text())
+    data["games"][IDS[0]]["status"] = "source_blocked"
+    # A failed independence/claim-context check might still have two URLs.
+    assert len(data["games"][IDS[0]]["sources"]) == 2
+    sources.write_text(json.dumps(data))
+    result = audit(inputs)
+    assert result["games_with_resolved_source_receipts"] == 1
+    assert result["games"][IDS[0]]["state"] == "research_incomplete"
+
+
+def test_stale_candidate_source_fingerprint_not_counted(tmp_path):
+    inputs = fixture(tmp_path)
+    sources = inputs[2]
+    data = json.loads(sources.read_text())
+    data["games"][IDS[0]]["candidate_sha256"] = "a" * 64
+    sources.write_text(json.dumps(data))
+    result = audit(inputs)
+    assert result["games_with_resolved_source_receipts"] == 1
+    assert result["games"][IDS[0]]["state"] == "stale_or_mismatched_snapshot"
