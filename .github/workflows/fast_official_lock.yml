@@ -117,7 +117,7 @@ jobs:
       - name: Independently audit every current-slate lock deadline
         if: ${{ always() && github.event_name != 'pull_request' }}
         run: |
-          python scripts/audit_current_lock_deadlines.py --output /tmp/levline-current-lock-deadlines.json
+          python -m scripts.audit_current_lock_deadlines --output /tmp/levline-current-lock-deadlines.json
 
       - name: Retain deadline failures and timing evidence
         if: ${{ always() && github.event_name != 'pull_request' }}
