@@ -19,3 +19,12 @@ In this slice, the module is *not wired* into the production writer or the sourc
 5. Retire legacy URL-only acceptance after equivalent/new quality is demonstrated.
 
 **Scope:** no edits to F-ST-01-FROZEN-2026, features, probabilities, history, locks, grading, challengers, or public website.
+
+
+## Consolidated verification pipeline (October 10 repair)
+
+The **sole evidence-verification authority in shadow** is `editorial_source_receipts_shadow.verify_retrieved_article` from PR #674. This module is its limited HTTP acquisition adapter, **not** an independent second acceptance engine. Use `capture_and_verify_source(game_id, url, expected_title, team_aliases, claims)` to fetch one approved original article and submit actual extracted content to that verifier. The resulting receipt proves URL/title/body identity and quote presence only; semantic football claim entailment, roster verification and final HUMAN editorial approval remain separate and are not asserted.
+
+Downloads use streamed, redirect-disabled HTTPS requests with a total one-megabyte byte cap; responses are always closed. An article about one team can supply part of the evidence packet, but the final packet must cover both teams through **two independent publisher families** using `require_independent_publishers(..., expected_teams=...)` and ultimately `audit_matchup_receipts` from the sole verifier.
+
+No production writer or canonical numerical file imports this acquisition module. It must remain in shadow until a trusted factual-claim reviewer and full-slate publisher have been independently validated.
