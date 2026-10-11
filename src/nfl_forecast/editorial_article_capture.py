@@ -62,7 +62,10 @@ def _safe_article_url(value: str) -> str:
 
 
 def _article_text(soup: BeautifulSoup) -> str:
-    for element in soup(["script", "style", "nav", "header", "footer", "aside", "form"]):
+    # A headline can name both teams while the article body concerns a
+    # different matchup. Team coverage must be established by reporting text,
+    # never by the title or a surrounding navigation/link shell.
+    for element in soup(["script", "style", "nav", "header", "footer", "aside", "form", "h1"]):
         element.decompose()
     root = soup.find("article") or soup.find("main") or soup.find("body")
     return _clean(root.get_text(" ", strip=True) if root else "")
