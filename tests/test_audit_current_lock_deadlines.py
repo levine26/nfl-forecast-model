@@ -32,7 +32,7 @@ def test_all_missing_locks_are_reported_together_after_grace():
     x = audit_current_deadlines(slate(), [], now_utc=GRACE_END+timedelta(seconds=1))
     assert set(x["issues"]) == {"2026_05_PHI_JAX", "2026_05_DEN_LAC"}
     assert x["games_audited"] == 2
-    assert x["status"] == "overdue_missing_locks"
+    assert x["status"] == "active_lock_timing_violation"
 
 
 def test_one_lock_does_not_mask_another_missing_lock():
@@ -50,15 +50,23 @@ def test_historical_late_lock_remains_truthful_without_modifying_row():
     assert before == original
     assert x["games"]["2026_05_PHI_JAX"]["state"] == "historically_late_lock"
     assert x["games"]["2026_05_PHI_JAX"]["minutes_late_vs_t120"] == 101
-    assert x["issues"] == {}
+    assert "2026_05_PHI_JAX" in x["issues"]
+    assert "2026_05_DEN_LAC" not in x["issues"]
+    assert x["status"] == "active_lock_timing_violation"
     assert x["historical_lock_records_modified"] is False
+    # The historic row stays classified as late indefinitely, but an alert
+    # isn't kept red forever after the active post-kickoff watch expires.
+    aged = audit_current_deadlines(slate(), [before, lock("2026_05_DEN_LAC")],
+                                  now_utc=KICKOFF+timedelta(hours=4))
+    assert aged["games"]["2026_05_PHI_JAX"]["state"] == "historically_late_lock"
+    assert aged["issues"] == {}
 
 
 def test_missing_lock_after_kickoff_is_visible_during_bounded_window():
     x = audit_current_deadlines(slate(), [], now_utc=KICKOFF+timedelta(hours=1))
     assert x["counts"]["overdue_missing_official_lock"] == 2
     beyond = audit_current_deadlines(slate(), [], now_utc=KICKOFF+timedelta(hours=4))
-    assert beyond["status"] == "no_current_missing_lock_overdue"
+    assert beyond["status"] == "no_active_lock_timing_violation"
     assert beyond["counts"]["missing_lock_outside_active_watch_window"] == 2
 
 
