@@ -1,0 +1,30 @@
+name: External lock clock deployment-kit tests
+
+on:
+  pull_request:
+    paths:
+      - "ops/offgithub-lock-watch/**"
+      - ".github/workflows/offgithub_lock_watch.yml"
+  push:
+    branches: [main]
+    paths:
+      - "ops/offgithub-lock-watch/**"
+      - ".github/workflows/offgithub_lock_watch.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify independent clock policy and failure modes
+        run: |
+          node --check ops/offgithub-lock-watch/lib.mjs
+          node --check ops/offgithub-lock-watch/worker.mjs
+          node --test ops/offgithub-lock-watch/lib.test.mjs
