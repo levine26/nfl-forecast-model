@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from nfl_forecast.official_lock_policy import official_lock_target_minutes
+
 """Read-only freshness gate for the independent official T-120 lock worker.
 
 When the latest *published* frozen F-ST snapshot is too old to be eligible,
@@ -17,7 +19,7 @@ from typing import Any
 from scripts.pregame_due import kickoff_utc
 
 MAX_AGE_MINUTES = 90.0
-LOCK_WINDOW_MINUTES = 120.0
+LOCK_WINDOW_MINUTES = 120.0  # Retained for legacy tests; use policy target by game.
 
 
 class LockPreparationError(ValueError):
@@ -68,7 +70,7 @@ def stale_due_games(
         except (KeyError, ValueError, TypeError) as exc:
             raise LockPreparationError(f"{gid}: invalid kickoff") from exc
         minutes_to_kickoff = (kickoff - now).total_seconds() / 60.0
-        if not 0.0 < minutes_to_kickoff <= LOCK_WINDOW_MINUTES:
+        if not 0.0 < minutes_to_kickoff <= official_lock_target_minutes(row.get('gameday')):
             continue
 
         generated = _timestamp(row.get("prediction_timestamp_utc"))
