@@ -83,7 +83,7 @@ def synchronize_reads(
 
     # The public bridge independently validates lock/lifecycle coherence, probability
     # sign, presentation spread and score. Locked games MUST use the lock snapshot.
-    public = build_public_forecasts(predictions, official, now_utc=now_utc)
+    public = build_public_forecasts(predictions, official, now_utc=now_utc, missing_lock_policy="explicit_unavailable")
     by_id = {str(game["game_id"]): game for game in public["games"]}
     if len(by_id) != len(ids):
         raise ReadSyncError("duplicate canonical public forecast games")
