@@ -67,8 +67,8 @@ def test_bad_or_missing_structural_gate_also_masks_publisher_booleans(tmp_path):
 def test_pages_pipeline_enforces_verification_on_site_copy():
     repo = Path(__file__).resolve().parents[1]
     script = (repo / ".github/workflows/dashboard.yml").read_text()
-    assert "scripts/gate_public_editorial_copy.py" in script
+    assert "scripts.gate_public_editorial_copy" in script
     assert "vars.SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY" in script
-    assert script.index("scripts/gate_public_editorial_copy.py") < script.index(
+    assert script.index("scripts.gate_public_editorial_copy") < script.index(
         "npm run build"
     )
