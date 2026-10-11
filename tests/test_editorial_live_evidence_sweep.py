@@ -127,3 +127,17 @@ def test_third_unresolved_citation_blocks_provenance_even_if_two_others_work():
     assert report["games"][DET]["status"] == "provenance_incomplete"
     assert "source[2]_not_retrieved_or_verified" in report["games"][DET]["errors"]
     assert len(report["games"][DET]["source_checks"]) == 3
+
+
+def test_real_publisher_heading_mismatch_not_marked_verified():
+    def misleading_heading(url, **kwargs):
+        report = _capture(url, **kwargs)
+        if "azcardinals" in url:
+            report["article_title"] = "Unrelated Cardinals article from another week"
+        return report
+
+    report = audit_slate([rows()[0]], {DET: candidates()[DET]},
+                         capture=misleading_heading, now=NOW)
+    assert report["games"][DET]["status"] == "provenance_incomplete"
+    assert "source[0]_not_retrieved_or_verified" in report["games"][DET]["errors"]
+    assert "headline differs" in report["games"][DET]["source_checks"][0]["reason"]
