@@ -4,7 +4,7 @@
   "counts": {
     "at_or_after_kickoff": 0,
     "late": 73,
-    "on_time": 2,
+    "on_time": 3,
     "premature": 0
   },
   "forecast_path_identity": "F-ST-01-FROZEN-2026",
@@ -758,9 +758,19 @@
       "minutes_late_vs_target": 21.0562,
       "scheduled_lock_utc": "2026-10-11T18:25:00+00:00",
       "target_minutes_before_kickoff": 120.0
+    },
+    {
+      "actual_lock_utc": "2026-10-11T22:20:04.254406+00:00",
+      "classification": "on_time",
+      "game_id": "2026_05_BAL_ATL",
+      "minutes_before_kickoff": 119.9291,
+      "minutes_late_vs_t120": 0.0709,
+      "minutes_late_vs_target": 0.0709,
+      "scheduled_lock_utc": "2026-10-11T22:20:00+00:00",
+      "target_minutes_before_kickoff": 120.0
     }
   ],
-  "locked_count": 75,
+  "locked_count": 76,
   "official_lock_target_minutes": 120.0,
   "official_lock_targets_minutes": [
     120.0
