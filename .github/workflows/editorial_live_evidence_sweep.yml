@@ -1,0 +1,81 @@
+name: Sunday Signal shadow live article-provenance sweep
+
+on:
+  pull_request:
+    paths:
+      - "scripts/editorial_live_evidence_sweep.py"
+      - "tests/test_editorial_live_evidence_sweep.py"
+      - ".github/workflows/editorial_live_evidence_sweep.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/editorial_live_evidence_sweep.py"
+      - "tests/test_editorial_live_evidence_sweep.py"
+      - ".github/workflows/editorial_live_evidence_sweep.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sunday-signal-shadow-evidence-sweep-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit-guardrails:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install ".[dev]"
+      - name: Prove all-game isolation and refusal to publish
+        run: |
+          python -m py_compile scripts/editorial_live_evidence_sweep.py
+          pytest -q tests/test_editorial_live_evidence_sweep.py
+          python - <<'PY'
+          from pathlib import Path
+          content = Path("scripts/editorial_live_evidence_sweep.py").read_text()
+          assert 'editorial_publication_authorized": False' in content
+          assert 'fact_checking_complete": False' in content
+          assert "sync_market_reads" not in content
+          assert "prediction_history.csv" not in content
+          print("Shadow-only article audit cannot publish or mutate official predictions.")
+          PY
+
+  live-source-receipts:
+    if: github.event_name != 'pull_request'
+    needs: [audit-guardrails]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install ".[dev]"
+      - name: Inspect current slate against original publisher HTML
+        run: |
+          PYTHONPATH="$PWD/src:$PWD" python scripts/editorial_live_evidence_sweep.py \
+            --predictions outputs/this_week.csv \
+            --input-dir inputs/chatgpt_media/fallback \
+            --output /tmp/editorial-article-provenance.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/editorial-article-provenance.json').read_text())
+          assert result["editorial_publication_authorized"] is False
+          assert result["fact_checking_complete"] is False
+          print("This report is a shadow-only provenance diagnosis, NOT a HUMAN release permit.")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: editorial-live-provenance-${{ github.run_id }}
+          path: /tmp/editorial-article-provenance.json
+          if-no-files-found: warn
+          retention-days: 14
