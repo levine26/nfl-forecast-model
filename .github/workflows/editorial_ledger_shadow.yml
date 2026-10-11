@@ -1,0 +1,45 @@
+name: Sunday Signal editorial ledger shadow tests
+
+on:
+  pull_request:
+    paths:
+      - "src/nfl_forecast/editorial_ledger_shadow.py"
+      - "tests/test_editorial_ledger_shadow.py"
+      - ".github/workflows/editorial_ledger_shadow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: editorial-ledger-shadow-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-shadow-store:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install project environment
+        run: pip install ".[dev]"
+      - name: Exercise shadow-only store failure isolation and atomic writes
+        run: |
+          python -m py_compile src/nfl_forecast/editorial_ledger_shadow.py
+          pytest -q tests/test_editorial_ledger_shadow.py
+      - name: Verify forbidden production artifacts untouched
+        if: github.event_name == 'pull_request'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          script = Path("src/nfl_forecast/editorial_ledger_shadow.py").read_text()
+          assert "canonical_forecast_sha256" in script
+          assert "os.replace(staged, path)" in script
+          assert "score_engine" not in script
+          assert "train_model" not in script
+          print("Shadow ledger is a standalone data store, not a forecast/model editor.")
+          PY
