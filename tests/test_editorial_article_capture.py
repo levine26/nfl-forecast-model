@@ -139,3 +139,13 @@ def test_requires_two_distinct_successful_publisher_content_receipts():
         require_independent_publishers([one])
     with pytest.raises(ArticleCaptureError, match="two independently verified"):
         require_independent_publishers([one, dict(other, article_resolution_verified=False)])
+
+
+def test_article_scoped_title_takes_priority_over_branding_page_h1():
+    rich_body = article_html().decode()
+    page = rich_body.replace(
+        '<body><nav>',
+        '<body><h1>New York Jets Official Website</h1><nav>',
+    ).encode()
+    record = capture(response=Response(body=page))
+    assert record["article_title"] == ARTICLE_TITLE
