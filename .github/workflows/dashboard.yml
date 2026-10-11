@@ -110,6 +110,16 @@ jobs:
             power_editorial.json history_scoreboard.json; do
             if [ -f "outputs/$f" ]; then cp "outputs/$f" "site/public/data/$f"; fi
           done
+      - name: Reconcile missing-lock incident only in PR build sandbox
+        if: github.event_name == 'pull_request'
+        run: |
+          # Production Pages remains check-only. Never rewrite committed outputs here.
+          # This PR sandbox can verify the publisher's deterministic quarantine.
+          python - <<'PY'
+          from pathlib import Path
+          from nfl_forecast.read_publication import synchronize_file
+          synchronize_file(Path("site/public/data"))
+          PY
       - name: Fail closed unless published Reads match canonical forecasts
         run: |
           # Fail closed on missing/malformed previews or immutable lock divergence.
