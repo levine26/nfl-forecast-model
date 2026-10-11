@@ -113,6 +113,36 @@ def _blank(game_id: str) -> dict[str, Any]:
     }
 
 
+def verify_state(state: dict[str, Any]) -> None:
+    """Reject tampered or structurally incomplete accepted revisions."""
+    if not isinstance(state, dict) or state.get("schema_version") != SCHEMA_VERSION:
+        raise LedgerConflict("invalid ledger schema")
+    gid = str(state.get("game_id") or "")
+    revisions = state.get("revisions")
+    if not _GAME_ID_RE.fullmatch(gid) or not isinstance(revisions, list):
+        raise LedgerConflict("invalid ledger game/revision history")
+    if not isinstance(state.get("accepted_revision"), int) or state["accepted_revision"] != len(revisions):
+        raise LedgerConflict("accepted revision count mismatch")
+    for index, version in enumerate(revisions, 1):
+        if not isinstance(version, dict) or version.get("revision") != index:
+            raise LedgerConflict("nonconsecutive accepted revision history")
+        data = _payload(version.get("candidate"))
+        if data["game_id"] != gid or version.get("candidate_sha256") != digest(data):
+            raise LedgerConflict("accepted editorial bytes fail checksum")
+        receipt = version.get("validation_receipt")
+        if not isinstance(receipt, dict) or receipt.get("passed") is not True or receipt.get("article_claims_verified") is not True:
+            raise LedgerConflict("accepted entry lacks authoritative validation receipt")
+        if receipt.get("candidate_sha256") != version["candidate_sha256"]:
+            raise LedgerConflict("accepted entry validation receipt hash mismatch")
+    freshness = state.get("freshness")
+    if not isinstance(freshness, dict) or freshness.get("state") not in {
+        "current", "review_required", "withheld_factual_contradiction"
+    }:
+        raise LedgerConflict("unrecognized freshness status")
+    if freshness["state"] != "current" and not str(freshness.get("reason") or "").strip():
+        raise LedgerConflict("freshness rejection missing reason")
+
+
 def accept_candidate(
     current: dict[str, Any] | None,
     candidate: dict[str, Any],
@@ -129,13 +159,10 @@ def accept_candidate(
     record = _payload(candidate)
     game_id = record["game_id"]
     state = deepcopy(current) if current is not None else _blank(game_id)
-    if state.get("schema_version") != SCHEMA_VERSION or state.get("game_id") != game_id:
-        raise LedgerConflict("ledger schema or game ownership mismatch")
-    if not isinstance(state.get("revisions"), list):
-        raise LedgerConflict("ledger revision history missing")
-    revision = state.get("accepted_revision")
-    if not isinstance(revision, int) or revision != len(state["revisions"]):
-        raise LedgerConflict("ledger revision history inconsistent")
+    verify_state(state)
+    if state.get("game_id") != game_id:
+        raise LedgerConflict("ledger game ownership mismatch")
+    revision = state["accepted_revision"]
     fingerprint = digest(record)
     latest = state["revisions"][-1] if state["revisions"] else None
     if latest and latest.get("candidate_sha256") == fingerprint:
@@ -177,6 +204,7 @@ def flag_freshness(current: dict[str, Any], *, status: str, reason: str) -> dict
     if not state.get("accepted_revision"):
         raise LedgerConflict("no accepted revision to retain")
     state["freshness"] = {"state": status, "reason": str(reason)}
+    verify_state(state)
     return state
 
 
@@ -198,6 +226,7 @@ def release_index(
     refs = {}
     for gid in sorted(expected):
         state = ledger_states[gid]
+        verify_state(state)
         if state.get("game_id") != gid or not state.get("accepted_revision"):
             raise LedgerConflict(f"{gid}: missing accepted human revision")
         if state.get("freshness", {}).get("state") == "withheld_factual_contradiction":
@@ -236,9 +265,10 @@ def modify_json_atomically(
         if actual_digest != expected_file_digest:
             raise LedgerConflict("ledger file advanced after the caller's read")
         current = json.loads(raw) if raw is not None else None
+        if current is not None:
+            verify_state(current)
         updated = transform(deepcopy(current))
-        if not isinstance(updated, dict):
-            raise LedgerConflict("transform must return ledger object")
+        verify_state(updated)
         if current == updated:
             return updated
         staged = None
