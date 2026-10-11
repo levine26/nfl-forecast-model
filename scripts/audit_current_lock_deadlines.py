@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-"""Read-only, all-game T-120 deadline audit for the independent fast-lock worker.
+"""Read-only, versioned per-game official-lock deadline audit.
 
-Never creates, moves, or backdates a lock. A missing lock after T-110 is a
+Never creates, moves, or backdates a lock. A missing lock after its target + 10 minutes is a
 failure even if the separate scheduling mechanism has not fired. The official
 history is authoritative; an earlier recorded late lock is reported truthfully
 without mutating it or causing permanent new-run failures.
@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.pregame_due import kickoff_utc
+from nfl_forecast.lock_policy import official_lock_target_minutes
 
 TARGET_MINUTES = 120.0
 GRACE_MINUTES = 10.0
@@ -57,13 +58,15 @@ def audit_current_deadlines(
     for row in games:
         gid = str(row["game_id"])
         kickoff = kickoff_utc(str(row.get("gameday") or ""), str(row.get("gametime") or ""))
-        target = kickoff - timedelta(minutes=TARGET_MINUTES)
+        target_minutes = official_lock_target_minutes(row)
+        target = kickoff - timedelta(minutes=target_minutes)
         grace_end = target + timedelta(minutes=GRACE_MINUTES)
         locked = lock_by_id.get(gid)
         minutes_to_kickoff = (kickoff - now_utc).total_seconds() / 60.0
         result: dict[str, Any] = {
             "kickoff_utc": kickoff.isoformat(),
             "target_lock_utc": target.isoformat(),
+            "target_minutes_before_kickoff": target_minutes,
             "grace_end_utc": grace_end.isoformat(),
             "minutes_to_kickoff_now": round(minutes_to_kickoff, 3),
             "lock_status": locked.get("lock_status") if locked else "missing",
@@ -73,25 +76,27 @@ def audit_current_deadlines(
             actual = _timestamp(locked.get("lock_timestamp_utc"))
             result["actual_lock_utc"] = actual.isoformat()
             delay = (actual - target).total_seconds() / 60.0
-            result["minutes_late_vs_t120"] = round(delay, 3)
+            result["minutes_late_vs_t120"] = round((actual - (kickoff - timedelta(minutes=TARGET_MINUTES))).total_seconds() / 60.0, 3)
+            result["minutes_late_vs_target"] = round(delay, 3)
             result["state"] = (
                 "premature_lock" if delay < -0.1 else
                 "on_time_lock" if delay <= GRACE_MINUTES else "historically_late_lock"
             )
             if (result["state"] == "historically_late_lock"
                     and grace_end <= now_utc <= kickoff + timedelta(minutes=WATCH_AFTER_KICKOFF_MINUTES)):
-                issues[gid] = [f"Official lock occurred {round(delay, 3)} minutes after the T-120 target; deadline exceeded 10-minute grace"]
+                issues[gid] = [f"Official lock occurred {round(delay, 3)} minutes after the T-{int(target_minutes)} target; deadline exceeded 10-minute grace"]
         elif locked and locked.get("lock_status") == "RECOVERED_MISSED_LOCK":
             result["state"] = "recorded_missed_lock_recovery"
         elif grace_end <= now_utc <= kickoff + timedelta(minutes=WATCH_AFTER_KICKOFF_MINUTES):
             result["state"] = "overdue_missing_official_lock"
-            issues[gid] = ["No immutable official lock found after T-120 plus 10 minutes"]
+            issues[gid] = ["No immutable official lock found after its T-{int(target_minutes)} target plus 10 minutes"]
         elif now_utc < grace_end:
             result["state"] = "deadline_not_elapsed"
         else:
             result["state"] = "missing_lock_outside_active_watch_window"
         games_out[gid] = result
 
+    target_values = sorted({x["target_minutes_before_kickoff"] for x in games_out.values()})
     counts = {state: sum(v["state"] == state for v in games_out.values())
               for state in sorted({v["state"] for v in games_out.values()})}
     return {
@@ -100,14 +105,16 @@ def audit_current_deadlines(
         "generated_utc": now_utc.isoformat(),
         "games_expected": len(games),
         "games_audited": len(games_out),
-        "target_minutes_before_kickoff": TARGET_MINUTES,
+        "target_minutes_before_kickoff": target_values[0] if len(target_values) == 1 else None,
+        "observed_target_minutes": target_values,
+        "target_policy": "2026_week_6_t60_prospective; earlier_t120",
         "grace_minutes": GRACE_MINUTES,
         "status": "active_lock_timing_violation" if issues else "no_active_lock_timing_violation",
         "issues": issues,
         "counts": counts,
         "games": games_out,
         "historical_lock_records_modified": False,
-        "warning": "GitHub Actions scheduled workflows are best-effort and cannot guarantee exact T-120 execution.",
+        "warning": "GitHub Actions scheduled workflows are best-effort and cannot guarantee exact versioned target execution.",
     }
 
 
