@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-"""All-game, read-only publisher-article capture; no semantic or release authority."""
+"""All-game, read-only publisher-article capture; no semantic or release authority.
+
+A retrieval made today does not prove what an article said before kickoff; even
+an unchanged-looking live page needs independently verified point-in-time
+archive evidence before any time-sensitive football claim may be accepted.
+"""
 
 import argparse
 import csv
