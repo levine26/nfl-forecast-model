@@ -388,3 +388,93 @@ def test_partial_recovery_status_retains_only_active_unresolved_game_ids():
     assert completed["groq_provider_fallback"]["failed_games"] == []
     assert completed["groq_provider_fallback"]["status"] == "healthy"
     assert module._failure_targets(completed) == set()
+
+
+def test_unpersisted_provider_success_is_an_authority_gap_not_a_groq_failure(tmp_path):
+    status = _status()
+    base = {"games": {
+        "g1": {
+            "headline": "Accepted provider headline",
+            "paragraph1": "a researched and previously accepted tactical explanation",
+            "model_rationale": "A valid football mechanism links pressure to routes and third downs.",
+            "sources": [{"name": "NFL", "title": "Report", "url": "https://www.nfl.com/news/example"}],
+        }
+    }}
+    missing = module.missing_accepted_editorial_authority(
+        canonical_game_ids=["g1", "g2", "g3"],
+        status=status,
+        base_artifact=base,
+        checkpoint_entries={},
+        preview_artifact={"g3": {"headline": "generic context", "paragraphs": ["fallback", "formula"]}},
+        strict_bootstrap=True,
+    )
+    assert missing == {"g2", "g3"}
+    assert module._failure_targets(status) == {"g1"}
+    # Explicitly allow only a demonstrated gap, not every provider success.
+    root = tmp_path / "fallback"
+    _manifest(root, ["g2"], "2026-09-12T15:30:00Z")
+    assert module.validate_fallback_manifest(
+        root, ["g1", "g2", "g3"], status,
+        missing_accepted_authority=missing,
+        now=datetime(2026, 9, 12, 16, tzinfo=timezone.utc),
+    ) == ["g2"]
+
+
+def test_missing_authority_cannot_override_an_existing_validated_groq_checkpoint(tmp_path):
+    status = _status()
+    checkpoint = {
+        "headline": "Persisted Groq headline",
+        "paragraph1": "A credible specific football tactical interaction for both opponents.",
+        "model_rationale": "Coverage adjustments and pressure timing shape offensive choices from drive to drive, forcing quarterbacks to respond with protection shifts, quick releases, and disciplined route timing.",
+        "sources": [{"name": "NFL", "title": "Report", "url": "https://www.nfl.com/news/example"}],
+    }
+    gaps = module.missing_accepted_editorial_authority(
+        canonical_game_ids=["g1", "g2"],
+        status=status, base_artifact={"games": {}},
+        checkpoint_entries={"g2": checkpoint},
+        preview_artifact={},
+        strict_bootstrap=True,
+    )
+    assert "g2" not in gaps
+    root = tmp_path / "fallback"
+    _manifest(root, ["g2"], "2026-09-12T15:30:00Z")
+    with __import__("pytest").raises(ValueError, match="only Groq-failed games"):
+        module.validate_fallback_manifest(
+            root, ["g1", "g2"], status, missing_accepted_authority=gaps,
+            now=datetime(2026, 9, 12, 16, tzinfo=timezone.utc),
+        )
+
+
+def test_recovered_missing_editorial_authority_preserves_true_provider_outcome():
+    old = _status()
+    repaired = module.mark_chatgpt_recovered(
+        old, ["g2"], missing_authority_recovered={"g2"},
+        now=datetime(2026, 9, 12, 16, tzinfo=timezone.utc),
+    )
+    original = repaired["groq_provider_fallback"]["games"]["g2"]
+    assert original["provider_result"] == "success"
+    assert original["editorial_recovery_reason"] == "missing_accepted_human_authority"
+    assert original["fallback_source"] == "chatgpt"
+    assert original["requires_chatgpt_refresh"] is False
+    # Do not clear the other game, which still genuinely needs failed-Groq recovery.
+    assert repaired["groq_provider_fallback"]["failed_games"] == ["g1"]
+    assert repaired["groq_provider_fallback"]["status"] == "degraded"
+    assert old["groq_provider_fallback"]["games"]["g2"] == {
+        "provider_result": "success", "requires_chatgpt_refresh": False,
+    }
+
+
+def test_deterministic_preview_is_not_human_authority_in_same_week_mode():
+    status = _status()
+    gaps = module.missing_accepted_editorial_authority(
+        canonical_game_ids=["g1", "g2"], status=status,
+        base_artifact={"games": {}}, checkpoint_entries={},
+        preview_artifact={"g2": {
+            "headline": "Stock deterministic preview",
+            "paragraphs": ["A generic football paragraph", "A deterministic model paragraph"],
+            "reported_sources": [{"name": "NFL", "title": "Report", "url": "https://www.nfl.com/news/a"}],
+            "editorial_voice": {"copilot_researched": False},
+        }},
+        strict_bootstrap=False,
+    )
+    assert gaps == {"g2"}
