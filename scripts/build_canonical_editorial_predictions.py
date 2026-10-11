@@ -25,7 +25,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from nfl_forecast.public_forecast import build_public_forecasts  # noqa: E402
+from nfl_forecast.public_forecast import PublicForecastError, build_public_forecasts  # noqa: E402
 
 
 _GAME_ID_RE = re.compile(r"^\d{4}_\d{2}_[A-Z0-9]{2,4}_[A-Z0-9]{2,4}$")
@@ -147,6 +147,16 @@ def build_canonical_editorial_predictions(
             )
 
     public = build_public_forecasts(bridge_records, official_records, now_utc=now_utc)
+    missing_lock_games = [
+        str(game.get("game_id"))
+        for game in public["games"]
+        if game.get("source_snapshot") == "MISSING_LOCK"
+    ]
+    if missing_lock_games:
+        raise PublicForecastError(
+            f"{missing_lock_games[0]}: kickoff has passed without an immutable pregame lock; "
+            "refusing to use a live replacement for editorial predictions"
+        )
 
     bridge_by_game = {
         str(row.get("game_id")): row
