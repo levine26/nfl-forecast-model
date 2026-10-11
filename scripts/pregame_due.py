@@ -3,7 +3,7 @@ from __future__ import annotations
 """Cheap DST-safe gate for FINAL forecast refreshes.
 
 The gate is only an optimization. write_outputs is the authority that creates
-immutable locks within the T-120 window, including legitimate late locks.
+immutable locks inside each game's versioned T-120 or T-60 window.
 """
 
 import argparse
@@ -46,7 +46,7 @@ def due_games(
 ) -> list[tuple[str, float]]:
     """Return unlocked games eligible for a pregame model refresh.
 
-    The final model can begin before T-120 to finish within the window, and
+    The final model can begin before the applicable lock target to finish within its window, and
     still run up to kickoff if delayed. It must never fabricate a prior lock.
     """
     locked = locked_game_ids(history)
