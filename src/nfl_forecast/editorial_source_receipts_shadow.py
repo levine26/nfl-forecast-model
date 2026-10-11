@@ -116,7 +116,8 @@ def verify_retrieved_article(
     if published and published > retrieved + timedelta(minutes=5):
         raise EvidenceInsufficient("publication timestamp postdates retrieval")
 
-    joined = " " + _normalized(article_title + " " + body) + " "
+    # Headlines alone cannot establish matchup relevance; require team identity in reported body.
+    joined = " " + _normalized(body) + " "
     relevant: list[str] = []
     for team, aliases in team_aliases.items():
         if not re.fullmatch(r"[A-Z]{2,3}", team) or not isinstance(aliases, list):
