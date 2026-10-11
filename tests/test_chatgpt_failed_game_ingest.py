@@ -388,3 +388,105 @@ def test_partial_recovery_status_retains_only_active_unresolved_game_ids():
     assert completed["groq_provider_fallback"]["failed_games"] == []
     assert completed["groq_provider_fallback"]["status"] == "healthy"
     assert module._failure_targets(completed) == set()
+
+
+
+def test_orphaned_provider_success_is_detected_without_trusting_deterministic_preview():
+    game_ids = ["2026_05_TB_DAL", "2026_05_CHI_GB", "2026_05_PHI_JAX"]
+    source = {
+        "headline": "Accepted provider headline",
+        "paragraph1": "Accepted provider human paragraph",
+        "model_rationale": "Tactical mechanism for the accepted game",
+        "sources": [{"url": "https://www.nfl.com/news/a", "name": "NFL", "title": "Matchup"}],
+    }
+    missing = module.audit_missing_nonfallback_human(
+        canonical_game_ids=game_ids,
+        fallback_targets=[game_ids[1]],
+        provider_artifact={"games": {}},  # Week 4 artifact; no Week 5 HUMAN
+        checkpoint_entries={game_ids[2]: source},
+    )
+    assert missing == [game_ids[0]]
+
+    present = module.audit_missing_nonfallback_human(
+        canonical_game_ids=game_ids,
+        fallback_targets=[game_ids[1]],
+        provider_artifact={"games": {game_ids[0]: source}},
+        checkpoint_entries={game_ids[2]: source},
+    )
+    assert present == []  # Never replace a persisted Groq game.
+
+
+def test_orphaned_success_appears_in_same_report_as_every_failed_fallback_game(tmp_path, monkeypatch):
+    import subprocess
+
+    ids = [f"2026_05_TEST_{i:02d}" for i in range(15)]
+    # Real canonical game codes use letters; here the mocked focused
+    # subprocess only needs stable distinct IDs.
+    targets = ids[:14]
+    orphaned = [ids[14]]
+    source = tmp_path / "inputs"
+    accepted = tmp_path / "work" / "accepted"
+    source.mkdir()
+    accepted.mkdir(parents=True)
+    for gid in targets:
+        (source / f"{gid}.json").write_text(json.dumps({
+            "games": {gid: {"headline": gid, "paragraph1": "provider human text"}}
+        }))
+    failures = {targets[3], targets[11]}
+    visited = []
+
+    def validate(cmd, **kwargs):
+        gid = cmd[cmd.index("--game-id") + 1]
+        visited.append(gid)
+        if gid in failures:
+            raise subprocess.CalledProcessError(
+                1, cmd,
+                stderr=f"Focused editorial game validation failed: {gid}: headline lacks specific matchup mechanism",
+            )
+        return subprocess.CompletedProcess(cmd, 0, stdout="valid")
+
+    monkeypatch.setattr(module.subprocess, "run", validate)
+    report = tmp_path / "results.json"
+    with __import__("pytest").raises(ValueError, match="3/15 games"):
+        module._validate_recovery_targets(
+            repo_root=tmp_path,
+            input_root=source,
+            prediction_path=tmp_path / "forecast.csv",
+            accepted=accepted,
+            targets=targets,
+            report_path=report,
+            orphaned_success_game_ids=orphaned,
+        )
+    payload = json.loads(report.read_text())
+    assert visited == targets  # Never abort on the first failed game.
+    assert payload["games_expected"] == 15
+    assert payload["games_accepted"] == 12
+    assert payload["games_rejected"] == 3
+    assert payload["publication_authorized"] is False
+    issue = payload["games"][orphaned[0]]["errors"][0]
+    assert issue["validation_rule"] == "provider_success_without_durable_human"
+    assert issue["suggested_repair_category"] == "recover_missing_authoritative_human"
+    assert set(x.stem for x in accepted.glob("*.txt")) == set(targets) - failures
+
+
+def test_orphan_success_alone_blocks_publication_without_deleting_accepted_games(tmp_path, monkeypatch):
+    import subprocess
+
+    gid, orphan = "2026_05_BAL_ATL", "2026_05_TB_DAL"
+    inputs = tmp_path / "inputs"
+    accepted = tmp_path / "work" / "accepted"
+    inputs.mkdir()
+    accepted.mkdir(parents=True)
+    (inputs / f"{gid}.json").write_text(json.dumps({"games": {gid: {
+        "headline": "Existing accepted fallback", "paragraph1": "Valid match preview",
+    }}}))
+    monkeypatch.setattr(module.subprocess, "run", lambda cmd, **kw: subprocess.CompletedProcess(cmd, 0, stdout="ok"))
+    report = tmp_path / "all.json"
+    with __import__("pytest").raises(ValueError, match="1/2 games"):
+        module._validate_recovery_targets(
+            repo_root=tmp_path, input_root=inputs, prediction_path=tmp_path / "canonical.csv",
+            accepted=accepted, targets=[gid], report_path=report,
+            orphaned_success_game_ids=[orphan],
+        )
+    assert (accepted / f"{gid}.txt").is_file()
+    assert json.loads(report.read_text())["games"][gid]["state"] == "accepted"
