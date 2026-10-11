@@ -7,6 +7,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/sync_market_reads.py'
+      - 'src/nfl_forecast/public_forecast.py'
+      - 'src/nfl_forecast/read_publication.py'
       - '.github/workflows/market_refresh.yml'
   schedule:
     # Secondary scheduled opportunity mitigates delayed/skipped GitHub cron events.
