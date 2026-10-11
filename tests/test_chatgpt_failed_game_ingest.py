@@ -252,3 +252,110 @@ def test_idle_historical_fallback_is_not_republished_without_active_groq_failure
     assert 'fallback manifest contains a game outside the canonical slate' in (
         Path(__file__).resolve().parents[1] / "scripts" / "ingest_chatgpt_failed_games.py"
     ).read_text()
+
+
+def test_recovery_validates_entire_slate_and_preserves_accepted_games(tmp_path, monkeypatch):
+    """Two rejected games must not suppress evaluation of the other thirteen."""
+    import subprocess
+
+    targets = [f"2026_05_TEST_{i:02d}" for i in range(15)]
+    failures = {targets[4], targets[10]}
+    inputs = tmp_path / "inputs"
+    accepted = tmp_path / "work" / "accepted"
+    inputs.mkdir()
+    accepted.mkdir(parents=True)
+    for gid in targets:
+        (inputs / f"{gid}.json").write_text(json.dumps({
+            "games": {gid: {"headline": f"Game {gid}", "paragraph1": "verified"}}
+        }))
+    visited = []
+
+    def fake_validator(command, **kwargs):
+        gid = command[command.index("--game-id") + 1]
+        visited.append(gid)
+        if gid in failures:
+            raise subprocess.CalledProcessError(
+                1, command,
+                stderr=f"Focused editorial game validation failed: {gid}: "
+                       "editorial quality: no concrete tactical action-and-counteraction explanation",
+            )
+        return subprocess.CompletedProcess(command, 0, stdout=f"validated {gid}")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_validator)
+    report_path = tmp_path / "diagnostics.json"
+    try:
+        module._validate_recovery_targets(
+            repo_root=tmp_path,
+            input_root=inputs,
+            prediction_path=tmp_path / "predictions.csv",
+            accepted=accepted,
+            targets=targets,
+            report_path=report_path,
+        )
+    except ValueError as exc:
+        assert "2/15 games" in str(exc)
+    else:
+        raise AssertionError("incomplete slate must not pass")
+
+    report = json.loads(report_path.read_text())
+    assert visited == targets
+    assert report["games_accepted"] == 13
+    assert report["games_rejected"] == 2
+    assert report["publication_authorized"] is False
+    assert {path.stem for path in accepted.glob("*.txt")} == set(targets) - failures
+    for gid in failures:
+        detail = report["games"][gid]
+        assert detail["state"] == "rejected"
+        assert detail["errors"][0]["game_id"] == gid
+        assert detail["errors"][0]["suggested_repair_category"] == "editorial_quality"
+        assert "tactical action-and-counteraction" in detail["errors"][0]["rejection_reason"]
+
+
+def test_recovery_success_keeps_game_ownership_and_report_locked_until_slate_gate(tmp_path, monkeypatch):
+    import subprocess
+
+    targets = ["2026_05_A_B", "2026_05_C_D"]
+    inputs = tmp_path / "inputs"
+    accepted = tmp_path / "work" / "accepted"
+    inputs.mkdir()
+    accepted.mkdir(parents=True)
+    for gid in targets:
+        (inputs / f"{gid}.json").write_text(json.dumps({
+            "games": {gid: {"headline": gid, "paragraph1": "valid distinct read"}}
+        }))
+
+    def fake_validator(command, **kwargs):
+        gid = command[command.index("--game-id") + 1]
+        accepted_dir = Path(command[command.index("--accepted-dir") + 1])
+        assert set(path.stem for path in accepted_dir.glob("*.txt")).issubset(set(targets))
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(module.subprocess, "run", fake_validator)
+    report_path = tmp_path / "diagnostics.json"
+    accepted_games = module._validate_recovery_targets(
+        repo_root=tmp_path,
+        input_root=inputs,
+        prediction_path=tmp_path / "predictions.csv",
+        accepted=accepted,
+        targets=targets,
+        report_path=report_path,
+    )
+    assert list(accepted_games) == targets
+    assert set(path.stem for path in accepted.glob("*.txt")) == set(targets)
+    report = json.loads(report_path.read_text())
+    assert report["games_rejected"] == 0
+    assert report["publication_authorized"] is False  # Only full-slate validation unlocks publication.
+
+
+def test_recovery_error_classifier_reports_source_and_identity_separately():
+    gid = "2026_05_A_B"
+    errors = module._recovery_error_records(
+        gid,
+        "Focused editorial game validation failed: "
+        f"{gid}: source URL is not a direct approved article/report: https://example.com; "
+        f"{gid}: paragraph1 must discuss both teams",
+    )
+    assert len(errors) == 2
+    assert [e["suggested_repair_category"] for e in errors] == [
+        "source_research", "factual_or_identity"
+    ]
