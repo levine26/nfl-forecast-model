@@ -90,3 +90,14 @@ def test_invalid_datetime_refused():
         audit_current_deadlines(
             [{"game_id": "2026_05_PHI_JAX", "gameday": "bad", "gametime": "bad"}],
             [], now_utc=TARGET)
+
+def test_production_fast_lock_and_pr_validation_have_isolated_concurrency():
+    from pathlib import Path
+    workflow = (Path(__file__).resolve().parents[1] /
+                ".github/workflows/fast_official_lock.yml").read_text()
+    concurrency = workflow.split("\nconcurrency:\n", 1)[1].split("\njobs:\n", 1)[0]
+    assert "sunday-signal-fast-lock-pr-{0}" in concurrency
+    assert "'sunday-signal-fast-official-t120-lock'" in concurrency
+    assert "github.event_name == 'pull_request'" in concurrency
+    assert "cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in concurrency
+    assert "cancel-in-progress: true" not in concurrency
