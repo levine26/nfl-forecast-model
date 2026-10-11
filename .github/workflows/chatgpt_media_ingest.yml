@@ -39,7 +39,7 @@ jobs:
 
       - name: Test free-ingestion boundary
         run: |
-          pytest -q tests/test_editorial_quality.py tests/test_chatgpt_media_ingest.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py
+          pytest -q tests/test_editorial_quality.py tests/test_chatgpt_media_ingest.py tests/test_single_copilot_game_validator.py tests/test_copilot_composition.py tests/test_copilot_json_handoff.py tests/test_levline_paragraph_renderer.py tests/test_source_policy_direct_reports.py tests/test_universal_human_source_publish_gates.py
           python -m py_compile scripts/ingest_chatgpt_media_payloads.py
 
       - name: Enforce editorial-only ingestion wiring
@@ -195,6 +195,8 @@ jobs:
               raise SystemExit(f'ingested editorial payload did not cover full slate: {provider}')
           if finalizer.get('status') != 'healthy' or int(finalizer.get('unique_headlines', 0)) != games:
               raise SystemExit(f'final editorial gate failed: {finalizer}')
+          from scripts.verify_human_source_acceptance import require_verified_human_sources
+          require_verified_human_sources(status, games_expected=games)
           print('ChatGPT ingestion matchup/model/pick launch gate passed:', games, 'games')
           PY
 
