@@ -1,0 +1,33 @@
+name: Sunday Signal source provenance shadow tests
+
+on:
+  pull_request:
+    paths:
+      - "scripts/audit_human_source_provenance_shadow.py"
+      - "tests/test_human_source_provenance_shadow.py"
+      - "src/nfl_forecast/editorial_article_capture.py"
+      - "src/nfl_forecast/editorial_source_receipts_shadow.py"
+      - "src/nfl_forecast/source_policy.py"
+      - ".github/workflows/editorial_source_provenance_shadow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-provenance-shadow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install source-only test dependencies
+        run: python -m pip install "pytest>=8" "requests>=2.32" "beautifulsoup4>=4.12" "nflreadpy==0.1.5"
+      - name: Check source capture isolation and fail-closed report
+        env:
+          PYTHONPATH: src:.
+        run: |
+          python -m py_compile scripts/audit_human_source_provenance_shadow.py
+          python -m pytest -q tests/test_human_source_provenance_shadow.py tests/test_editorial_article_capture.py tests/test_editorial_source_receipts_shadow.py
