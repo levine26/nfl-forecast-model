@@ -13,7 +13,7 @@ import pandas as pd
 from compose_copilot_media_reads import _domain_family, _extract_json
 from nfl_forecast.copilot_source_backfill import backfill_direct_sources
 from nfl_forecast.editorial_provider_fallback import recover_focused_payload
-from nfl_forecast.source_policy import is_direct_media_report_url
+from nfl_forecast.source_policy import is_direct_media_report_url, is_substantive_report_candidate
 from nfl_forecast.editorial_quality import assess_human_read, human_read_length_valid
 from validate_copilot_media_reads import _mentions_any, _team_aliases, _team_name, _unique_ngrams
 
@@ -212,8 +212,8 @@ def _valid_sources(sources: object) -> tuple[list[dict], set[str], list[str]]:
         if not name or not title or not url:
             failures.append("source is missing name, title, or URL")
             continue
-        if not is_direct_media_report_url(url):
-            failures.append(f"source URL is not a direct approved article/report: {url}")
+        if not is_substantive_report_candidate(title=title, url=url):
+            failures.append(f"source is not an original substantive direct report: {title} ({url})")
             continue
         family = _domain_family(url)
         families.add(family)
