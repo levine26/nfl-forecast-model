@@ -1,0 +1,50 @@
+name: Sunday Signal shadow source receipts
+
+on:
+  pull_request:
+    paths:
+      - "src/nfl_forecast/editorial_source_receipts_shadow.py"
+      - "tests/test_editorial_source_receipts_shadow.py"
+      - ".github/workflows/editorial_source_receipts_shadow.yml"
+  push:
+    branches: [main]
+    paths:
+      - "src/nfl_forecast/editorial_source_receipts_shadow.py"
+      - "tests/test_editorial_source_receipts_shadow.py"
+      - ".github/workflows/editorial_source_receipts_shadow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: editorial-source-receipts-shadow-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evidence-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install test dependencies
+        run: pip install ".[dev]"
+      - name: Verify shadow article evidence and refusal boundaries
+        run: |
+          pytest -q tests/test_editorial_source_receipts_shadow.py
+          python -m py_compile src/nfl_forecast/editorial_source_receipts_shadow.py
+      - name: Confirm evidence check is not a production authorizer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path("src/nfl_forecast/editorial_source_receipts_shadow.py").read_text()
+          assert '"editorial_publication_authorized": False' in text
+          assert '"semantic_claim_entailment_verified": False' in text
+          assert "outputs/this_week.csv" not in text
+          assert "outputs/prediction_history.csv" not in text
+          print("Evidence quote checks have no production model or publication authority.")
+          PY
