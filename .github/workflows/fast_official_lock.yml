@@ -23,6 +23,7 @@ on:
       - ".github/workflows/fast_official_lock.yml"
       - "scripts/fast_official_lock.py"
       - "scripts/fast_lock_prepare.py"
+      - "src/nfl_forecast/official_lock_policy.py"
   pull_request:
     paths:
       - ".github/workflows/fast_official_lock.yml"
@@ -30,6 +31,8 @@ on:
       - "tests/test_fast_official_lock.py"
       - "scripts/fast_lock_prepare.py"
       - "tests/test_fast_lock_prepare.py"
+      - "src/nfl_forecast/official_lock_policy.py"
+      - "tests/test_official_lock_policy.py"
       - "scripts/audit_current_lock_deadlines.py"
       - "tests/test_audit_current_lock_deadlines.py"
       - "scripts/audit_official_lock_timeliness.py"
@@ -58,6 +61,7 @@ jobs:
           PYTHONPATH="$PWD/src:$PWD" python -m pytest -q \
             tests/test_fast_official_lock.py \
             tests/test_fast_lock_prepare.py \
+            tests/test_official_lock_policy.py \
             tests/test_official_locking.py \
             tests/test_verify_pregame_lock.py \
             tests/test_audit_official_lock_timeliness.py \
@@ -77,7 +81,7 @@ jobs:
           set -euo pipefail
           git fetch origin main
           git reset --hard origin/main
-          python scripts/pregame_due.py --min-minutes 0 --max-minutes 123 | tee /tmp/lock-due.txt
+          python scripts/pregame_due.py --min-minutes 0 --max-minutes 123 --policy-gate-extra-minutes 3 | tee /tmp/lock-due.txt
           if grep -q '^due=true$' /tmp/lock-due.txt; then
             echo "due=true" >> "$GITHUB_OUTPUT"
           else
@@ -134,7 +138,7 @@ jobs:
               git add outputs/prediction_history.csv outputs/status.json \
                 outputs/official_lock_timeliness.json outputs/lock_fast_path_receipts/
             fi
-            git commit -m "Append on-time official T-120 lock from canonical F-ST snapshot"
+            git commit -m "Append official policy-window lock from canonical frozen F-ST snapshot"
             if git push origin HEAD:main; then
               echo "Fast official lock published atomically with provenance."
               exit 0
