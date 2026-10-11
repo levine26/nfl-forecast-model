@@ -24,7 +24,7 @@ import fcntl
 
 SCHEMA_VERSION = 1
 _SHA_RE = re.compile(r"^[a-f0-9]{64}$")
-_GAME_ID_RE = re.compile(r"^20\\d\\d_\\d{2}_[A-Z]{2,3}_[A-Z]{2,3}$")
+_GAME_ID_RE = re.compile(r"^20\d\d_\d{2}_[A-Z]{2,3}_[A-Z]{2,3}$")
 _FORBIDDEN = {
     "pick", "probability", "probabilities", "final_home_prob", "pure_home_prob",
     "market_home_prob", "win_probability", "coherent_score", "fair_line",
@@ -245,7 +245,7 @@ def modify_json_atomically(
         try:
             with tempfile.NamedTemporaryFile(dir=path.parent, prefix=path.name + ".", suffix=".tmp", delete=False) as f:
                 staged = Path(f.name)
-                f.write(json.dumps(updated, sort_keys=True, indent=2, ensure_ascii=False).encode("utf-8") + b"\\n")
+                f.write(json.dumps(updated, sort_keys=True, indent=2, ensure_ascii=False).encode("utf-8") + b"\n")
                 f.flush()
                 os.fsync(f.fileno())
             os.replace(staged, path)
