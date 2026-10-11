@@ -304,10 +304,11 @@
   },
   "generated_utc": "2026-10-11T19:34:29.461012+00:00",
   "groq_provider_fallback": {
-    "context_refresh_preserved": true,
     "failed_games": [
       "2026_05_BAL_ATL",
       "2026_05_BUF_LA",
+      "2026_05_CHI_GB",
+      "2026_05_CIN_MIA",
       "2026_05_CLE_NYJ",
       "2026_05_DEN_LAC",
       "2026_05_DET_ARI",
@@ -316,8 +317,7 @@
       "2026_05_LV_NE",
       "2026_05_MIN_NO",
       "2026_05_NYG_WAS",
-      "2026_05_SF_SEA",
-      "2026_05_TB_DAL"
+      "2026_05_SF_SEA"
     ],
     "games": {
       "2026_05_BAL_ATL": {
@@ -325,7 +325,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.626912+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.501864+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_BUF_LA": {
@@ -333,15 +333,31 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.663639+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.529733+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_CHI_GB": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_provider_request_failed",
+        "recovered_at_utc": "2026-10-11T19:39:50.183516+00:00",
+        "requires_chatgpt_refresh": true
+      },
+      "2026_05_CIN_MIA": {
+        "fallback_source": "missing",
+        "provider": "groq",
+        "provider_result": "failed",
+        "reason": "groq_shared_long_window_quota_exhausted",
+        "recovered_at_utc": "2026-10-11T19:39:50.212125+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_CLE_NYJ": {
         "fallback_source": "missing",
         "provider": "groq",
         "provider_result": "failed",
-        "reason": "groq_provider_request_failed",
-        "recovered_at_utc": "2026-10-11T13:04:01.283824+00:00",
+        "reason": "groq_shared_long_window_quota_exhausted",
+        "recovered_at_utc": "2026-10-11T19:39:50.240789+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_DEN_LAC": {
@@ -349,7 +365,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.512692+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.414056+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_DET_ARI": {
@@ -357,7 +373,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.551255+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.445437+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_HOU_TEN": {
@@ -365,7 +381,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.321290+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.269043+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_IND_PIT": {
@@ -373,7 +389,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.359448+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.298721+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_LV_NE": {
@@ -381,7 +397,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.397571+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.327753+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_MIN_NO": {
@@ -389,7 +405,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.436551+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.356066+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_NYG_WAS": {
@@ -397,7 +413,7 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.475106+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.385053+00:00",
         "requires_chatgpt_refresh": true
       },
       "2026_05_SF_SEA": {
@@ -405,20 +421,12 @@
         "provider": "groq",
         "provider_result": "failed",
         "reason": "groq_shared_long_window_quota_exhausted",
-        "recovered_at_utc": "2026-10-11T13:04:01.588985+00:00",
-        "requires_chatgpt_refresh": true
-      },
-      "2026_05_TB_DAL": {
-        "fallback_source": "missing",
-        "provider": "groq",
-        "provider_result": "failed",
-        "reason": "focused_validation_failed: 2026_05_TB_DAL: paragraph1 must discuss both teams",
-        "recovered_at_utc": "2026-10-11T12:55:21.677519+00:00",
+        "recovered_at_utc": "2026-10-11T19:39:50.473593+00:00",
         "requires_chatgpt_refresh": true
       }
     },
     "policy": "Groq failures are game-specific; successful Groq games remain authoritative and failed games use validated ChatGPT/last-good editorial fallback.",
-    "run_id": "38141043961",
+    "run_id": "38168739599",
     "status": "degraded"
   },
   "injuries": {
