@@ -135,7 +135,7 @@ def main() -> int:
 
     current = _read_csv(args.current)
     official = _prepare_locked_receipts(_read_csv(args.official))
-    payload = build_public_forecasts(current, official, now_utc=now)
+    payload = build_public_forecasts(current, official, now_utc=now, missing_lock_policy="explicit_unavailable")
     _assert_locked_public_contract(payload, official)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
