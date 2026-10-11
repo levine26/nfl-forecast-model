@@ -13,6 +13,7 @@ import csv
 from datetime import datetime, timezone
 import hashlib
 import json
+import re
 from pathlib import Path
 import tempfile
 from typing import Any, Callable
@@ -80,6 +81,11 @@ def audit_slate(
                         home_name=str(TEAM_META[home]["name"]),
                         now=now,
                     )
+                    # A loose title overlap from HTTP acquisition is useful for
+                    # navigation, but insufficient to certify cited-title identity.
+                    normalize = lambda s: re.sub(r"[^a-z0-9]+", " ", str(s or "").lower()).strip()
+                    if normalize(packet["article_title"]) != normalize(title):
+                        raise ArticleCaptureError("retrieved article headline differs from cited article title")
                     verified.append(packet)
                     item.update({
                         "status": "article_resolved",
