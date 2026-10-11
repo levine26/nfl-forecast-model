@@ -125,7 +125,7 @@ def test_pregame_publication_postcondition_waits_until_t60_for_week6():
         KICKOFF-timedelta(minutes=90)) == []
 
     receipt = dict(week6_prediction(KICKOFF-timedelta(minutes=60)))
-    receipt.update(lock_status="LOCKED",
+    receipt.update(lock_status="LOCKED", locked_ats_status="UNAVAILABLE",
                    lock_timestamp_utc=(KICKOFF-timedelta(minutes=60)).isoformat())
     assert verify_pregame_locks(current, pd.DataFrame([receipt]),
         KICKOFF-timedelta(minutes=59)) == ["2026_06_X_Y"]
