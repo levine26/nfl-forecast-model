@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-"""Publication postconditions for the immutable T-120 lock."""
+"""Publication postconditions for immutable per-game official locks."""
 
 from datetime import datetime, timezone
 
 import pandas as pd
 
 from .publish import ATS_LOCK_POLICY_EFFECTIVE_GAMEDAY, LOCK_WINDOW_MINUTES, kickoff_utc
+from .official_lock_policy import official_lock_lead_minutes
 
 
 def _as_utc(value: str | None) -> datetime:
@@ -87,7 +88,8 @@ def verify_pregame_locks(
         except Exception:
             continue
         minutes = (kickoff - now_utc).total_seconds() / 60.0
-        if not (0.0 < minutes <= lock_window_minutes):
+        game_window = min(lock_window_minutes, official_lock_lead_minutes(row))
+        if not (0.0 < minutes <= game_window):
             continue
         eligible.append(gid)
 
@@ -107,8 +109,8 @@ def verify_pregame_locks(
         try:
             lock_time = _as_utc(str(locked.get("lock_timestamp_utc")))
             lock_minutes = (kickoff - lock_time).total_seconds() / 60.0
-            if not (0.0 < lock_minutes <= lock_window_minutes):
-                failures.append(f"{gid}: stored lock time is outside T-120 ({lock_minutes:.1f} minutes)")
+            if not (0.0 < lock_minutes <= game_window):
+                failures.append(f"{gid}: stored lock time is outside T-{game_window:g} ({lock_minutes:.1f} minutes)")
         except Exception as exc:
             failures.append(f"{gid}: invalid lock timestamp ({exc})")
 
