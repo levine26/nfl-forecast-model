@@ -112,7 +112,7 @@ jobs:
         run: |
           # Never block numerically valid official predictions due to HUMAN issues.
           # Mask forged/unreviewed editorial flags in the deploy artifact only.
-          python scripts/gate_public_editorial_copy.py
+          python -m scripts.gate_public_editorial_copy
       - name: Fail closed unless published Reads match canonical forecasts
         run: |
           # Fail closed on missing/malformed previews or immutable lock divergence.
