@@ -9,7 +9,19 @@ on:
       - "src/nfl_forecast/editorial_source_receipts_shadow.py"
       - "src/nfl_forecast/source_policy.py"
       - ".github/workflows/research_source_provenance_shadow.yml"
+  push:
+    branches: [main]
+    paths:
+      - "research/source_provenance/**"
+      - "inputs/chatgpt_media/fallback/manifest.json"
+      - "src/nfl_forecast/editorial_article_capture.py"
+      - "src/nfl_forecast/editorial_source_receipts_shadow.py"
+      - ".github/workflows/research_source_provenance_shadow.yml"
   workflow_dispatch:
+
+concurrency:
+  group: sunday-signal-single-source-provenance-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -31,3 +43,45 @@ jobs:
         run: |
           python -m py_compile research/source_provenance/audit_human_source_provenance_shadow.py
           python -m pytest -q research/source_provenance/test_human_source_provenance_shadow.py tests/test_editorial_article_capture.py tests/test_editorial_source_receipts_shadow.py
+
+  live-provenance:
+    name: Live publisher-source diagnostic (NOT a release)
+    if: github.event_name != 'pull_request'
+    needs: source-provenance-shadow
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install restricted source dependencies
+        run: python -m pip install "requests>=2.32" "beautifulsoup4>=4.12" "nflreadpy==0.1.5"
+      - name: Retrieve actual original articles for every current recovery game
+        env:
+          PYTHONPATH: src:.
+        run: |
+          set -euo pipefail
+          python research/source_provenance/audit_human_source_provenance_shadow.py \
+            --manifest inputs/chatgpt_media/fallback/manifest.json \
+            --input-dir inputs/chatgpt_media/fallback \
+            --output /tmp/sunday-signal-source-provenance.json \
+            --workers 2
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("/tmp/sunday-signal-source-provenance.json")
+          r = json.loads(p.read_text(encoding="utf-8"))
+          assert r["publication_authorized"] is False
+          assert r["full_slate_claim_support_verified"] is False
+          print("Evidence retrieval report is shadow-only and never a factual acceptance receipt.")
+          PY
+      - name: Persist full game-by-game source-retrieval diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: week5-source-provenance-${{ github.run_id }}
+          path: /tmp/sunday-signal-source-provenance.json
+          if-no-files-found: warn
+          retention-days: 14
