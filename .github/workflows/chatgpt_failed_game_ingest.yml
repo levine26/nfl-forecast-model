@@ -252,7 +252,7 @@ jobs:
           if not run_id.isascii() or not run_id.isdecimal() or int(run_id) < 1:
               raise SystemExit('Missing valid producing Groq run id; refusing unverifiable cross-run checkpoint import.')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
-              output.write(f'run_id={run_id}\\n')
+              output.write(f'run_id={run_id}\n')
           print('Recovering only from authoritative Groq producer run', run_id)
           PY
 
