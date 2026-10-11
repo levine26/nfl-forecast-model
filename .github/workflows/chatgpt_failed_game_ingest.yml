@@ -20,7 +20,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "inputs/chatgpt_media/fallback/**"
+      # Candidate payload commits never start or cancel a recovery run. Commit manifest LAST.
+      - "inputs/chatgpt_media/fallback/manifest.json"
       - ".github/workflows/chatgpt_failed_game_ingest.yml"
   workflow_dispatch:
 
