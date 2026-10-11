@@ -122,8 +122,7 @@ jobs:
 
             PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}" \
               python scripts/run_week.py --season 2026 --snapshot EARLY
-            # The shared write_outputs publication gate must already have succeeded.
-            python -m scripts.sync_market_reads --output-dir outputs --check
+            # Forecast and official lock publication has no editorial dependency.
             git add outputs/
 
             if git diff --cached --quiet; then

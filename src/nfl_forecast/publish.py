@@ -364,7 +364,7 @@ def write_outputs(
     output_dir="outputs",
     now_utc: datetime | None = None,
     lock_window_minutes: float = LOCK_WINDOW_MINUTES,
-    enforce_read_sync: bool = True,
+    enforce_read_sync: bool = False,
 ) -> None:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -429,10 +429,8 @@ def write_outputs(
     }
     (out / "status.json").write_text(json.dumps(status, indent=2), encoding="utf-8")
 
-    # This is the LAST shared numerical publication boundary: run_week, market
-    # refresh and pregame locks all call write_outputs. A failed full-slate Read
-    # reconstruction aborts the caller before any GitHub output commit.
-    # Only isolated lock-unit fixtures may disable this gate explicitly.
+    # Legacy Read reconstruction is opt-in for offline tests only. Forecast
+    # generation and official locks never depend on editorial acceptance.
     if enforce_read_sync:
         from nfl_forecast.read_publication import synchronize_file
         # Reuse this exact publication timestamp for every canonical and Read

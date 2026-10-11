@@ -14,7 +14,6 @@ on:
       - '.github/workflows/pregame.yml'
       - 'scripts/pregame_due.py'
       - 'src/nfl_forecast/public_forecast.py'
-      - 'src/nfl_forecast/read_publication.py'
   # Independent successful or failed production refreshes are an additional
   # scheduling heartbeat. This workflow reads only trusted current main.
   workflow_run:
@@ -99,9 +98,7 @@ jobs:
               python scripts/verify_pregame_lock.py
             python scripts/audit_official_lock_timeliness.py --season 2026
 
-            # Confirm canonical forecasts and deterministic Reads match before commit.
-            PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
-              python scripts/sync_market_reads.py --output-dir outputs --check
+            # Publish the numerical snapshot without an editorial dependency.
             git add outputs/
 
             if git diff --cached --quiet; then

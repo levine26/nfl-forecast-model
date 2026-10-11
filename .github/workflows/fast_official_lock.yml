@@ -128,11 +128,9 @@ jobs:
               exit 0
             fi
             python scripts/audit_official_lock_timeliness.py --season 2026
-            python -m scripts.sync_market_reads --output-dir outputs --check
             if [ "$cache_recovered" = true ]; then
-              # The existing validated market publisher may have updated the
-              # canonical input, Read and run-history atomically with locks.
-              # Do not publish only the history and leave a stale Read behind.
+              # The existing validated market publisher can update the canonical
+              # numerical snapshot and run history atomically with lock receipts.
               git add outputs/
             else
               git add outputs/prediction_history.csv outputs/status.json \
