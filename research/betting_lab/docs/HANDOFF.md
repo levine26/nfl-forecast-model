@@ -66,3 +66,8 @@ The screenshot-based prices in conversation are NOT timestamp-qualified live quo
 ## B07D — Critical separation of moneyline versus spread/total (2026-10-10)
 
 See [`docs/SCOUT_MARKET_SEPARATION_CORRECTION.md`](SCOUT_MARKET_SEPARATION_CORRECTION.md) for the supersession receipt. F-ST outright winner probabilities **never determine** ATS cover rates. Spread and total scenario probabilities use independent margin/total forecasts, with integer push approximations and no profitability or calibration guarantee. Old Scout B07C reports are superseded; use newly generated market-specific v0.3.2 output. Local 59-test suite passed. Research-only PR #697 remains CI-gated; no production model changes or injuries.
+
+
+## Latest scope override — B08A / External prop sourcing (2026-10-10)
+
+For Sunday, DO NOT run multi-year touchdown or yards history. Focus on ML, ATS and game totals. Code in `betlab/historical_games.py` supports 2021–2025 *if real pre-kickoff prediction records exist*. Existing frozen chronological F-ST headline covers 2022–2025 only; historical new fair profitability remains unavailable without time-qualified book odds. External prop vendor registry/comparison contract in `betlab/external_props.py`; provider priors are not calibrated weights and no output should be considered bettable. Read docs B08 sprint, vendor strategy, Sunday operating contract first. Apply existing separated ML/ATS scout corrections. Commit research only, wait for CI, append B08 receipt.

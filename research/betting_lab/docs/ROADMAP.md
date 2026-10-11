@@ -46,3 +46,8 @@
 ## B07D — Critical separation of moneyline versus spread/total (2026-10-10)
 
 See [`docs/SCOUT_MARKET_SEPARATION_CORRECTION.md`](SCOUT_MARKET_SEPARATION_CORRECTION.md) for the supersession receipt. F-ST outright winner probabilities **never determine** ATS cover rates. Spread and total scenario probabilities use independent margin/total forecasts, with integer push approximations and no profitability or calibration guarantee. Old Scout B07C reports are superseded; use newly generated market-specific v0.3.2 output. Local 59-test suite passed. Research-only PR #697 remains CI-gated; no production model changes or injuries.
+
+
+## 2026-10-10 B08A Sunday scope compression
+
+User directed focus on **tomorrow-ready ML/ATS/totals historical auditing**, explicitly **exclude historic TD/props tests**. B08A provides no-refit, chronological per-game evaluator and imports already verified 2022–25 F-ST results; 2021 same-method OOF remains unavailable. B08B qualified historical per-game source joins remain to do. External TD/yards delegated to separate *provider comparison contract* (CHZN1, JMutammara, Custom Venom, GameDay Analytics; StartWho market-only), with zero assumed live predictions absent authorization and source records. Exact handoff: `docs/B08_SPRINT_GAME_MARKETS.md`, `docs/EXTERNAL_PROP_PROVIDER_STRATEGY.md`, `docs/SUNDAY_2026-10-11_PRIORITY.md`. **No production changes; no automatic stakes.**
