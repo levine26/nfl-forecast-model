@@ -72,3 +72,37 @@ def test_workflow_calls_hard_gate_before_editorial_publication():
     before_publish = final_gate.split("      - name: Publish editorial-only recovery", 1)[0]
     assert "require_verified_human_sources(status, games_expected=games)" in before_publish
     assert "tests/test_verified_human_source_gate.py" in content
+
+
+def test_source_gate_reports_every_game_level_rejection_in_one_failure():
+    status = _status()
+    status["editorial_acceptance"].update(
+        status="degraded",
+        article_resolution_verified=False,
+        claim_support_verified=False,
+        games_with_structurally_eligible_human_reads=13,
+        games_rejected=2,
+        issues={
+            "2026_05_CLE_NYJ": ["insufficient_tactical_action", "unverified_source_claim"],
+            "2026_05_DEN_LAC": ["unverified_source_claim", "unverified_source_claim"],
+        },
+    )
+    with pytest.raises(SourceAcceptanceBlocked) as caught:
+        require_verified_human_sources(status, games_expected=15)
+    message = str(caught.value)
+    assert "article_resolution_verified=false" in message
+    assert "claim_support_verified=false" in message
+    assert "CLE_NYJ" in message and "DEN_LAC" in message
+    assert "insufficient_tactical_action" in message
+    # Each rejection rule is reported once per game; no fail-fast hiding.
+    assert message.count("2026_05_CLE_NYJ") == 1
+    assert message.count("2026_05_DEN_LAC") == 1
+    assert message.count('"unverified_source_claim"') == 2
+
+
+def test_missing_game_issue_map_still_fails_closed_with_diagnostic_caveat():
+    status = _status()
+    status["editorial_acceptance"]["claim_support_verified"] = False
+    status["editorial_acceptance"]["issues"] = "invalid"
+    with pytest.raises(SourceAcceptanceBlocked, match="all_game_rejection_rules=unavailable"):
+        require_verified_human_sources(status, games_expected=15)
