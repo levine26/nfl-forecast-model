@@ -225,3 +225,65 @@ def require_independent_publishers(
         covered = set().union(*(set(r.get("reported_teams") or []) for r in verified))
         if not set(expected_teams).issubset(covered):
             raise ArticleCaptureError("two-source reporting packet does not cover both matchup teams")
+
+
+def capture_and_verify_source(
+    *,
+    game_id: str,
+    url: str,
+    expected_title: str,
+    team_aliases: dict[str, list[str]],
+    claims: list[dict[str, str]],
+    session: Any = requests,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Combine real HTTP acquisition with the ONE shadow evidence verifier.
+
+    The source verifier audits title/URL/article identity and literal quotations.
+    Its result is expressly NOT a semantic factual attestation and may not be
+    passed to the editorial acceptance ledger as article_claims_verified=True.
+    """
+    from nfl_forecast.editorial_source_receipts_shadow import verify_retrieved_article
+
+    parts = game_id.split("_")
+    if len(parts) != 4 or set(team_aliases) != {parts[2], parts[3]}:
+        raise ArticleCaptureError("team aliases must match canonical game identity")
+    for code in (parts[2], parts[3]):
+        if not isinstance(team_aliases[code], list) or not team_aliases[code]:
+            raise ArticleCaptureError("missing trusted canonical team aliases")
+    report = capture_report(
+        url,
+        expected_title=expected_title,
+        away_name=team_aliases[parts[2]][0],
+        home_name=team_aliases[parts[3]][0],
+        session=session,
+        now=now,
+    )
+    raw_timestamp = report.get("published_or_updated_raw")
+    published: str | None = None
+    if raw_timestamp:
+        try:
+            parsed = datetime.fromisoformat(str(raw_timestamp).replace("Z", "+00:00"))
+            if parsed.tzinfo is not None:
+                published = parsed.astimezone(timezone.utc).isoformat()
+        except ValueError:
+            pass  # Keep unparseable time as raw metadata; do not fabricate.
+    receipt = verify_retrieved_article(
+        game_id=game_id,
+        candidate_url=url,
+        candidate_title=expected_title,
+        fetched={
+            "status_code": 200,
+            "final_url": report["url"],
+            "title": report["article_title"],
+            "article_text": report["body_text"],
+            "retrieved_utc": report["retrieved_utc"],
+            "published_utc": published,
+        },
+        claims=claims,
+        team_aliases=team_aliases,
+    )
+    receipt["http_content_sha256"] = report["content_sha256"]
+    receipt["extracted_body_sha256"] = report["extracted_body_sha256"]
+    receipt["published_or_updated_raw"] = raw_timestamp
+    return receipt
