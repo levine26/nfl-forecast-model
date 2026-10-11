@@ -1,0 +1,51 @@
+name: Sunday Signal HUMAN claim review queue shadow
+
+on:
+  pull_request:
+    paths:
+      - "scripts/prepare_editorial_claim_review_shadow.py"
+      - "tests/test_editorial_claim_review_shadow.py"
+      - ".github/workflows/editorial_claim_review_shadow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  claim-review-queue-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install offline test dependency
+        run: python -m pip install "pytest>=8.0"
+      - name: Check claim queue is descriptive only and run offline tests
+        env:
+          PYTHONPATH: "src:."
+        run: |
+          python -m py_compile scripts/prepare_editorial_claim_review_shadow.py
+          python -m pytest -q tests/test_editorial_claim_review_shadow.py
+      - name: Enumerate all canonical matchup sentences without factual approval
+        run: |
+          python scripts/prepare_editorial_claim_review_shadow.py --out /tmp/levline-claim-review-shadow.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("/tmp/levline-claim-review-shadow.json").read_text())
+          assert d["games_expected"] == d["games_queued"] == 15
+          assert d["sentences_queued"] >= 15
+          assert not d["editorial_publication_authorized"]
+          assert not d["semantic_claim_entailment_verified"]
+          assert all(not g["editorial_publication_authorized"] for g in d["games"].values())
+          assert all(not g["issues"] for g in d["games"].values()), "Fix all missing candidates"
+          print(f"Shadow review queue: {d['games_queued']} games; {d['sentences_queued']} unverified sentences.")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: week5-human-claim-review-queue-shadow
+          path: /tmp/levline-claim-review-shadow.json
+          if-no-files-found: error
+          retention-days: 7
