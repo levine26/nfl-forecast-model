@@ -669,6 +669,11 @@ jobs:
           unresolved = [gid for gid, item in (fallback.get('games') or {}).items() if isinstance(item, dict) and item.get('requires_chatgpt_refresh')]
           if unresolved:
               raise SystemExit(f'Groq/ChatGPT fallback still unresolved for: {sorted(unresolved)}')
+          # Only a complete externally signed claim review may promote the
+          # finalizer's structurally_eligible status into source-verified authority.
+          from scripts.promote_signed_human_acceptance import promote_verified_acceptance
+          promote_verified_acceptance()
+          status = json.loads(Path('outputs/context_source_status.json').read_text())
           from scripts.verify_human_source_acceptance import require_verified_human_sources
           require_verified_human_sources(status, games_expected=games)
           # Status booleans and publisher URL checks are not trusted factual approvals.
