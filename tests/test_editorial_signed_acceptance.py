@@ -25,7 +25,8 @@ def evidence(tmp_path: Path):
         w.writerow(row)
     human = "Tampa Bay faces Dallas in a tactical line-of-scrimmage matchup."
     previews = tmp_path / "game_previews.json"
-    previews.write_text(json.dumps({row["game_id"]: {"paragraphs": [human, "Model-only paragraph"]}}))
+    previews.write_text(json.dumps({row["game_id"]: {"paragraphs": [human, "Model-only paragraph"],
+        "reported_sources": [{"source_url": f"https://{fam}.example/report"} for fam in ("tampa", "dallas")]}}))
     sources = [
         {"publisher_family": fam, "canonical_url": f"https://{fam}.example/report",
          "article_content_sha256": sha256(fam.encode()).hexdigest(),
@@ -118,6 +119,16 @@ def test_failed_point_in_time_and_unsupported_source_receipts_are_rejected(tmp_p
     rec["claims"][0]["article_content_sha256"] = "a" * 64
     sign(d, data)
     with pytest.raises(ClaimAcceptanceBlocked, match="detached"):
+        verify(items)
+
+
+def test_unrelated_signed_article_cannot_cover_different_public_citation(tmp_path):
+    items = evidence(tmp_path)
+    _, previews, _, _ = items
+    original = json.loads(previews.read_text())
+    original["2026_05_TB_DAL"]["reported_sources"][0]["source_url"] = "https://unrelated.example/report"
+    previews.write_text(json.dumps(original))
+    with pytest.raises(ClaimAcceptanceBlocked, match="do not match public cited URLs"):
         verify(items)
 
 
