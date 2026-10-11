@@ -7,6 +7,8 @@ import json
 import numpy as np
 import pandas as pd
 
+from .lock_policy import official_lock_target_minutes
+
 LOCK_WINDOW_MINUTES = 120.0
 OFFICIAL_SNAPSHOT_STATUSES = {"LOCKED", "RECOVERED_MISSED_LOCK"}
 ATS_EDGE_EPSILON = 1e-12
@@ -278,7 +280,7 @@ def _lock_new_games(
     p: pd.DataFrame,
     columns: list[str],
     now_utc: datetime,
-    lock_window_minutes: float,
+    lock_window_minutes: float | None,
 ) -> pd.DataFrame:
     already = set(official["game_id"].astype(str)) if len(official) else set()
     new_rows = []
@@ -291,7 +293,8 @@ def _lock_new_games(
         except Exception:
             continue
         minutes = (ko - now_utc).total_seconds() / 60.0
-        if not (0.0 < minutes <= lock_window_minutes):
+        effective_window = official_lock_target_minutes(row) if lock_window_minutes is None else lock_window_minutes
+        if not (0.0 < minutes <= effective_window):
             continue
         locked = {c: row.get(c, np.nan) for c in columns}
         locked.update({
@@ -361,7 +364,7 @@ def write_outputs(
     artifacts,
     output_dir="outputs",
     now_utc: datetime | None = None,
-    lock_window_minutes: float = LOCK_WINDOW_MINUTES,
+    lock_window_minutes: float | None = None,
     enforce_read_sync: bool = True,
 ) -> None:
     out = Path(output_dir)
