@@ -172,6 +172,7 @@ def test_mark_recovered_clears_refresh_requirement_only_for_target() -> None:
     assert section["games"]["g1"]["requires_chatgpt_refresh"] is False
     assert section["games"]["g2"]["requires_chatgpt_refresh"] is False
     assert section["status"] == "healthy"
+    assert section["failed_games"] == []
 
 
 
@@ -359,3 +360,31 @@ def test_recovery_error_classifier_reports_source_and_identity_separately():
     assert [e["suggested_repair_category"] for e in errors] == [
         "source_research", "factual_or_identity"
     ]
+
+
+def test_partial_recovery_status_retains_only_active_unresolved_game_ids():
+    status = _status()
+    status["groq_provider_fallback"]["games"]["g3"] = {
+        "provider_result": "failed",
+        "requires_chatgpt_refresh": True,
+        "fallback_source": "missing",
+    }
+    status["groq_provider_fallback"]["failed_games"] = ["g1", "g3"]
+    result = module.mark_chatgpt_recovered(
+        status,
+        ["g1"],
+        now=datetime(2026, 9, 12, 16, tzinfo=timezone.utc),
+    )
+    section = result["groq_provider_fallback"]
+    assert section["status"] == "degraded"
+    assert section["failed_games"] == ["g3"]
+    assert module._failure_targets(result) == {"g3"}
+    assert status["groq_provider_fallback"]["failed_games"] == ["g1", "g3"]  # input untouched
+    completed = module.mark_chatgpt_recovered(
+        result,
+        ["g3"],
+        now=datetime(2026, 9, 12, 17, tzinfo=timezone.utc),
+    )
+    assert completed["groq_provider_fallback"]["failed_games"] == []
+    assert completed["groq_provider_fallback"]["status"] == "healthy"
+    assert module._failure_targets(completed) == set()

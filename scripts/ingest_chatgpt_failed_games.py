@@ -215,12 +215,17 @@ def mark_chatgpt_recovered(status: dict[str, Any], game_ids: list[str], *, now: 
         })
         games[gid] = item
     section["games"] = games
-    section["failed_games"] = sorted(games)
-    section["status"] = (
-        "degraded"
-        if any(bool(item.get("requires_chatgpt_refresh")) for item in games.values() if isinstance(item, dict))
-        else "healthy"
+    # This is an ACTIVE unresolved-failure list, not a history of all provider
+    # failures. Leaving recovered IDs here contradicts the next workflow's
+    # authorization gate even when every game was successfully validated.
+    unresolved = sorted(
+        gid for gid, item in games.items()
+        if isinstance(item, dict)
+        and item.get("provider_result") == "failed"
+        and bool(item.get("requires_chatgpt_refresh"))
     )
+    section["failed_games"] = unresolved
+    section["status"] = "degraded" if unresolved else "healthy"
     result["groq_provider_fallback"] = section
     return result
 
