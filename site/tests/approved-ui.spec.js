@@ -11,7 +11,7 @@ test('approved forecast UI has one featured section and upcoming-first controls'
   await expect(first.locator('.ss-exp-edge')).toContainText(/pp|—/)
   await first.click()
   await expect(page.locator('.ss-ats-betting-note:visible')).toContainText('Betting value: not verified')
-  await expect(page.locator('.ss-clarity-shell:visible').getByText('PROBABILITY-IMPLIED LINE')).toBeVisible()
+  await expect(page.locator('.ss-clarity-shell:visible .ss-clarity-metrics').getByText('PROBABILITY-IMPLIED LINE',{exact:true})).toBeVisible()
 })
 
 test('Performance Lab is descriptive and does not present an on-time-only claim', async ({page}) => {
