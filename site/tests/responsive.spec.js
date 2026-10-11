@@ -23,12 +23,12 @@ for (const [name, width, height] of viewports) {
     await expect(topSignals.locator('button').first()).toBeVisible()
     await expect(page.getByRole('button', { name: 'Win Probability', exact: true })).toBeVisible()
     if (width > 768) {
-      await expect(page.locator('.ss-exp-board-labels:visible').getByText('LEVLINE FAIR SPREAD', { exact: true })).toBeVisible()
+      await expect(page.locator('.ss-exp-board-labels:visible').getByText('PROBABILITY-IMPLIED LINE', { exact: true })).toBeVisible()
       await expect(page.locator('.ss-exp-board-labels:visible').getByText('SPORTSBOOK SPREAD', { exact: true })).toBeVisible()
     } else {
       const mobileRows=page.locator('.ss-exp-mobile-board:visible > button')
       await expect(mobileRows.first()).toBeVisible()
-      await expect(mobileRows.first().getByText('Fair spread', { exact: true })).toBeVisible()
+      await expect(mobileRows.first().getByText('Implied line', { exact: true })).toBeVisible()
     }
     await expect(page.getByText('Fair line', { exact: true })).toHaveCount(0)
     await expect(page.getByText('Model Line', { exact: true })).toHaveCount(0)
@@ -46,9 +46,9 @@ for (const [name, width, height] of viewports) {
     const clarity = page.locator('.ss-clarity-shell:visible').first()
     await expect(clarity).toBeVisible()
     await expect(clarity.locator('.ss-clarity-head').getByText('LEVLINE FORECAST', { exact: true })).toBeVisible()
-    await expect(clarity.getByText('LEVLINE FAIR SPREAD', { exact: true })).toBeVisible()
+    await expect(clarity.getByText('PROBABILITY-IMPLIED LINE', { exact: true })).toBeVisible()
     await expect(clarity.getByText('SPORTSBOOK SPREAD', { exact: true })).toBeVisible()
-    await expect(clarity.getByText('WIN-PROBABILITY EDGE', { exact: true })).toBeVisible()
+    await expect(clarity.getByText('WIN-PROBABILITY DIFFERENCE', { exact: true })).toBeVisible()
     await expect(clarity.getByText('FORECAST TIER', { exact: true })).toBeVisible()
     await expect(clarity.getByText('SINCE LAST FORECAST', { exact: true })).toBeVisible()
     await expect(page.locator('.ss-exp-lifecycle:visible')).toBeVisible()
