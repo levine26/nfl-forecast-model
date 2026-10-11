@@ -3,13 +3,17 @@ from __future__ import annotations
 """Cheap DST-safe gate for FINAL forecast refreshes.
 
 The gate is only an optimization. write_outputs is the authority that creates
-immutable locks within the T-120 window, including legitimate late locks.
+immutable locks within the game-specific official window, including legitimate late locks.
 """
 
 import argparse
 import csv
 from datetime import datetime, timezone
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+from nfl_forecast.official_lock_policy import official_lock_lead_minutes
 from zoneinfo import ZoneInfo
 
 
@@ -43,6 +47,7 @@ def due_games(
     now_utc: datetime,
     min_minutes: float = 0,
     max_minutes: float = 165,
+    policy_gate_extra_minutes: float | None = None,
 ) -> list[tuple[str, float]]:
     """Return unlocked games eligible for a pregame model refresh.
 
@@ -63,7 +68,10 @@ def due_games(
             except (TypeError, ValueError):
                 continue
             minutes = (kickoff - now_utc).total_seconds() / 60
-            if 0.0 < minutes and min_minutes <= minutes <= max_minutes:
+            gate = max_minutes
+            if policy_gate_extra_minutes is not None:
+                gate = min(max_minutes, official_lock_lead_minutes(row) + policy_gate_extra_minutes)
+            if 0.0 < minutes and min_minutes <= minutes <= gate:
                 due.append((gid, minutes))
     return due
 
@@ -74,6 +82,7 @@ def main() -> None:
     ap.add_argument("--history", default="outputs/prediction_history.csv")
     ap.add_argument("--min-minutes", type=float, default=0)
     ap.add_argument("--max-minutes", type=float, default=165)
+    ap.add_argument("--policy-gate-extra-minutes", type=float, default=None)
     args = ap.parse_args()
     due = due_games(
         Path(args.feed),
@@ -81,6 +90,7 @@ def main() -> None:
         datetime.now(timezone.utc),
         args.min_minutes,
         args.max_minutes,
+        args.policy_gate_extra_minutes,
     )
     print("due=true" if due else "due=false")
     for gid, minutes in due:
