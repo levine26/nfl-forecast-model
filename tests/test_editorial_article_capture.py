@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import pytest
 
 from nfl_forecast.editorial_article_capture import (
-    ArticleCaptureError, capture_report, locate_quote, require_independent_publishers,
+    ArticleCaptureError, capture_report, capture_and_verify_source, locate_quote, require_independent_publishers,
 )
 
 
@@ -42,6 +42,16 @@ class Response:
         self.status_code = code
         self.content = article_html() if body is None else body
         self.headers = {"content-type": mime}
+        self.closed = False
+        self.chunks_seen = 0
+
+    def iter_content(self, chunk_size=65536):
+        for i in range(0, len(self.content), chunk_size):
+            self.chunks_seen += 1
+            yield self.content[i:i + chunk_size]
+
+    def close(self):
+        self.closed = True
 
 
 class FakeSession:
@@ -59,7 +69,7 @@ def capture(url=JETS_URL, *, response=None, title=ARTICLE_TITLE):
     record = capture_report(
         url, expected_title=title, session=sess, now=NOW, **MATCHUP,
     )
-    assert sess.calls[0][1] == {"timeout": 9, "allow_redirects": False}
+    assert sess.calls[0][1] == {"timeout": 9, "allow_redirects": False, "stream": True}
     return record
 
 
@@ -101,7 +111,7 @@ def test_rejects_fabricated_url_navigation_page_and_unapproved_host():
 
 def test_rejects_wrong_team_article_and_nonarticle_shell():
     unrelated = ("The Detroit Lions will play the Chicago Bears in Chicago. " * 15).strip()
-    with pytest.raises(ArticleCaptureError, match="does not cover matchup team"):
+    with pytest.raises(ArticleCaptureError, match="does not cover either matchup team"):
         capture(response=Response(body=article_html(body=unrelated)))
     with pytest.raises(ArticleCaptureError, match="navigation shell"):
         capture(response=Response(body=article_html(body="New York Jets Cleveland Browns preview.")))
@@ -158,3 +168,75 @@ def test_actual_week5_groq_cbs_viewing_betting_source_is_rejected():
     title = "Where to watch Cowboys vs. Buccaneers: Prediction, pick, odds, streaming for TNF"
     with pytest.raises(ArticleCaptureError, match="generic or missing"):
         capture(url=url, response=Response(body=article_html(title=title)), title=title)
+
+
+def test_streamed_large_response_aborts_before_full_download_and_closes():
+    body = b"x" * 2_000_000
+    response = Response(body=body)
+    with pytest.raises(ArticleCaptureError, match="exceeds"):
+        capture(response=response)
+    assert response.closed
+    assert response.chunks_seen < 25  # never consumes full oversized content
+
+
+def test_one_sided_reporting_is_accepted_per_source_but_pair_covers_both():
+    jets_body = (
+        "The New York Jets prepare to adjust defensive looks around their front seven and "
+        "change pressure packages to protect the secondary when the passing rhythm shifts. "
+        * 7
+    )
+    browns_body = (
+        "The Cleveland Browns have been working on protection calls and passing concepts "
+        "because their offensive staff expects complicated coverage changes after the snap. "
+        * 7
+    )
+    one = capture(response=Response(body=article_html(body=jets_body)))
+    other = capture(url=BROWNS_URL, response=Response(body=article_html(body=browns_body)))
+    assert one["reported_teams"] == ["New York Jets"]
+    assert other["reported_teams"] == ["Cleveland Browns"]
+    require_independent_publishers(
+        [one, other], expected_teams=list(MATCHUP.values()),
+    )
+    with pytest.raises(ArticleCaptureError, match="both matchup teams"):
+        require_independent_publishers(
+            [one, dict(other, reported_teams=["New York Jets"])],
+            expected_teams=list(MATCHUP.values()),
+        )
+
+
+def test_real_capture_flows_into_single_shadow_validator_and_stays_unverified_semantically():
+    paragraph = (
+        "The Jets can counter Cleveland's pressure with underneath timing routes, while Browns "
+        "rushers can change their approach by disguising coverage."
+    )
+    assert paragraph in article_html().decode()
+    receipt = capture_and_verify_source(
+        game_id="2026_05_CLE_NYJ",
+        url=JETS_URL,
+        expected_title=ARTICLE_TITLE,
+        team_aliases={"CLE": ["Cleveland Browns", "Browns"],
+                      "NYJ": ["New York Jets", "Jets"]},
+        claims=[{"statement": "The Jets have an underneath passing response to pressure",
+                 "supporting_excerpt": paragraph}],
+        session=FakeSession(Response()),
+        now=NOW,
+    )
+    assert receipt["verification_status"] == "quote_present_semantic_review_required"
+    assert receipt["semantic_claim_entailment_verified"] is False
+    assert receipt["url_title_and_quote_presence_verified"] is True
+    assert len(receipt["http_content_sha256"]) == 64
+
+
+def test_combined_verifier_rejects_fake_quoted_evidence():
+    with pytest.raises(ValueError, match="supporting excerpt"):
+        capture_and_verify_source(
+            game_id="2026_05_CLE_NYJ",
+            url=JETS_URL,
+            expected_title=ARTICLE_TITLE,
+            team_aliases={"CLE": ["Cleveland Browns", "Browns"],
+                          "NYJ": ["New York Jets", "Jets"]},
+            claims=[{"statement": "The Jets practice underwater",
+                     "supporting_excerpt": "No real paragraph in the original article says that underwater football is required for both teams to play."}],
+            session=FakeSession(Response()),
+            now=NOW,
+        )
