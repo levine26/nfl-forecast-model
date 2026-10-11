@@ -89,6 +89,7 @@ jobs:
           tests/test_ats_lock_receipt.py
           tests/test_ats_site_receipt_contract.py
           tests/test_build_public_forecasts_receipt_contract.py
+          tests/test_public_editorial_approval_gate.py
           tests/test_dashboard_production_concurrency.py
       - uses: actions/setup-node@v4
         with:
@@ -105,6 +106,13 @@ jobs:
             power_editorial.json history_scoreboard.json; do
             if [ -f "outputs/$f" ]; then cp "outputs/$f" "site/public/data/$f"; fi
           done
+      - name: Require independently signed HUMAN authority in public site copy
+        env:
+          SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY: ${{ vars.SUNDAY_SIGNAL_REVIEW_PUBLIC_KEY }}
+        run: |
+          # Never block numerically valid official predictions due to HUMAN issues.
+          # Mask forged/unreviewed editorial flags in the deploy artifact only.
+          python scripts/gate_public_editorial_copy.py
       - name: Fail closed unless published Reads match canonical forecasts
         run: |
           # Fail closed on missing/malformed previews or immutable lock divergence.
