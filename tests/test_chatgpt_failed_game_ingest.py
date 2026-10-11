@@ -248,7 +248,8 @@ def test_idle_historical_fallback_is_not_republished_without_active_groq_failure
     assert "Missing authoritative Groq failure-state map" in workflow
     assert "No Groq failures requiring ChatGPT recovery" in workflow
     required_gate = "if: github.event_name != 'pull_request' && steps.fallback_activity.outputs.active == 'true'"
-    assert workflow.count(required_gate) == 9
+    # Original recovery gates plus the exact-run producer lookup and artifact import.
+    assert workflow.count(required_gate) == 11
     assert "python scripts/ingest_chatgpt_failed_games.py" in workflow
     assert 'fallback manifest contains a game outside the canonical slate' in (
         Path(__file__).resolve().parents[1] / "scripts" / "ingest_chatgpt_failed_games.py"
