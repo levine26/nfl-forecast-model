@@ -271,7 +271,7 @@ def test_after_kickoff_missing_lock_remains_publicly_visible_but_never_invents_n
 
 
 def test_default_editorial_bridge_still_rejects_missed_game():
-    with pytest.raises(PublicForecastError, match="kickoff passed without an immutable official lock"):
+    with pytest.raises(PublicForecastError, match="kickoff has passed without an immutable pregame lock"):
         build_public_forecasts(
             [row(gameday="2026-09-10", gametime="20:35")], [],
             now_utc=datetime(2026, 9, 11, 1, tzinfo=timezone.utc),
