@@ -92,7 +92,7 @@ def audit_current_deadlines(
             result["state"] = "recorded_missed_lock_recovery"
         elif grace_end <= now_utc <= kickoff + timedelta(minutes=WATCH_AFTER_KICKOFF_MINUTES):
             result["state"] = "overdue_missing_official_lock"
-            issues[gid] = ["No immutable official lock found after T-{target_minutes:g} plus 10 minutes"]
+            issues[gid] = [f"No immutable official lock found after T-{target_minutes:g} plus 10 minutes"]
         elif now_utc < grace_end:
             result["state"] = "deadline_not_elapsed"
         else:
