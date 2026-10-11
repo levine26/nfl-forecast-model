@@ -55,10 +55,13 @@ def audit_slate(
             if not isinstance(sources, list) or len(sources) < 2:
                 problems.append("fewer_than_two_source_candidates")
                 sources = sources if isinstance(sources, list) else []
+            if len(sources) > 8:
+                problems.append("more_than_eight_cited_sources_need_explicit_review")
             for index, source in enumerate(sources[:8]):
                 item: dict[str, Any] = {"index": index, "status": "rejected"}
                 if not isinstance(source, dict):
                     item["reason"] = "source_is_not_an_object"
+                    problems.append(f"source[{index}]_is_not_an_object")
                     details.append(item)
                     continue
                 url = str(source.get("url") or "")
@@ -66,6 +69,7 @@ def audit_slate(
                 item.update(url=url, claimed_title=title)
                 if not url or not title:
                     item["reason"] = "missing_url_or_title"
+                    problems.append(f"source[{index}]_missing_url_or_title")
                     details.append(item)
                     continue
                 try:
@@ -90,6 +94,7 @@ def audit_slate(
                     })
                 except (ArticleCaptureError, KeyError, OSError, ValueError) as exc:
                     item["reason"] = str(exc)[:360]
+                    problems.append(f"source[{index}]_not_retrieved_or_verified")
                 details.append(item)
 
         if len(verified) >= 2:
