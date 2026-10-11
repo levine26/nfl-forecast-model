@@ -1,25 +1,25 @@
 {
   "biggest_movers": [
     {
-      "game_id": "2026_05_NYG_WAS",
-      "largest_driver": "Market movement",
-      "pick": "WAS",
-      "pick_delta_pp": -1.7141673417654157
-    },
-    {
-      "game_id": "2026_05_HOU_TEN",
-      "largest_driver": "Market movement",
-      "pick": "HOU",
-      "pick_delta_pp": -0.8823035396283541
-    },
-    {
       "game_id": "2026_04_ATL_NO",
       "largest_driver": "Market movement",
       "pick": "NO",
       "pick_delta_pp": -0.5230298770820707
+    },
+    {
+      "game_id": "2026_01_NE_SEA",
+      "largest_driver": "No material input move",
+      "pick": "SEA",
+      "pick_delta_pp": -1.260265225511148e-08
+    },
+    {
+      "game_id": "2026_04_KC_LV",
+      "largest_driver": "No material input move",
+      "pick": "KC",
+      "pick_delta_pp": -1.79001258260314e-10
     }
   ],
-  "generated_utc": "2026-10-11T16:51:37.404212+00:00",
+  "generated_utc": "2026-10-11T17:32:40.186811+00:00",
   "market_disagreements": [
     {
       "confidence": "Coin Flip",
@@ -27,8 +27,8 @@
       "matchup": "CLE @ NYJ",
       "pick": "NYJ",
       "pick_prob": 0.5785113878884602,
-      "projected_score": "NYJ 20.0 \u2013 CLE 22.3",
-      "pure_market_gap_pp": 15.784092423585678
+      "projected_score": "NYJ 20.2 \u2013 CLE 22.5",
+      "pure_market_gap_pp": 17.32379824311418
     },
     {
       "confidence": "Lean",
@@ -36,17 +36,17 @@
       "matchup": "BAL @ ATL",
       "pick": "ATL",
       "pick_prob": 0.6223690634909445,
-      "projected_score": "ATL 21.9 \u2013 BAL 23.0",
-      "pure_market_gap_pp": 15.190975541465829
+      "projected_score": "ATL 21.4 \u2013 BAL 23.2",
+      "pure_market_gap_pp": 14.091401484703498
     },
     {
       "confidence": "Solid",
-      "game_id": "2026_05_BUF_LA",
-      "matchup": "BUF @ LA",
-      "pick": "LA",
-      "pick_prob": 0.6196224226227074,
-      "projected_score": "LA 23.0 \u2013 BUF 23.2",
-      "pure_market_gap_pp": 13.963193912719046
+      "game_id": "2026_05_NYG_WAS",
+      "matchup": "NYG @ WAS",
+      "pick": "WAS",
+      "pick_prob": 0.6241908375784295,
+      "projected_score": "WAS 21.3 \u2013 NYG 21.7",
+      "pure_market_gap_pp": 12.32169240615395
     }
   ],
   "most_uncertain": [
@@ -56,7 +56,7 @@
       "matchup": "CHI @ GB",
       "pick": "CHI",
       "pick_prob": 0.5360064217310785,
-      "projected_score": "GB 20.0 \u2013 CHI 24.3"
+      "projected_score": "GB 20.0 \u2013 CHI 24.1"
     },
     {
       "confidence": "Lean",
@@ -72,7 +72,7 @@
       "matchup": "CLE @ NYJ",
       "pick": "NYJ",
       "pick_prob": 0.5785113878884602,
-      "projected_score": "NYJ 20.0 \u2013 CLE 22.3"
+      "projected_score": "NYJ 20.2 \u2013 CLE 22.5"
     }
   ],
   "strongest": [
@@ -82,15 +82,7 @@
       "matchup": "CIN @ MIA",
       "pick": "CIN",
       "pick_prob": 0.7648093270560568,
-      "projected_score": "MIA 19.2 \u2013 CIN 25.4"
-    },
-    {
-      "confidence": "High",
-      "game_id": "2026_05_PHI_JAX",
-      "matchup": "PHI @ JAX",
-      "pick": "JAX",
-      "pick_prob": 0.7525067694149652,
-      "projected_score": "JAX 29.5 \u2013 PHI 18.8"
+      "projected_score": "MIA 19.0 \u2013 CIN 25.4"
     },
     {
       "confidence": "High",
@@ -98,7 +90,15 @@
       "matchup": "HOU @ TEN",
       "pick": "HOU",
       "pick_prob": 0.7462995902824545,
-      "projected_score": "TEN 18.0 \u2013 HOU 24.0"
+      "projected_score": "TEN 18.1 \u2013 HOU 23.8"
+    },
+    {
+      "confidence": "High",
+      "game_id": "2026_05_DET_ARI",
+      "matchup": "DET @ ARI",
+      "pick": "DET",
+      "pick_prob": 0.7044673143871445,
+      "projected_score": "ARI 19.3 \u2013 DET 23.6"
     }
   ],
   "week": 5
