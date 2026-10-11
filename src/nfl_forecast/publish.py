@@ -7,6 +7,8 @@ import json
 import numpy as np
 import pandas as pd
 
+from .official_lock_policy import official_lock_lead_minutes
+
 LOCK_WINDOW_MINUTES = 120.0
 OFFICIAL_SNAPSHOT_STATUSES = {"LOCKED", "RECOVERED_MISSED_LOCK"}
 ATS_EDGE_EPSILON = 1e-12
@@ -291,7 +293,7 @@ def _lock_new_games(
         except Exception:
             continue
         minutes = (ko - now_utc).total_seconds() / 60.0
-        if not (0.0 < minutes <= lock_window_minutes):
+        if not (0.0 < minutes <= min(lock_window_minutes, official_lock_lead_minutes(row))):
             continue
         locked = {c: row.get(c, np.nan) for c in columns}
         locked.update({
