@@ -31,8 +31,10 @@ permissions:
   contents: write
 
 concurrency:
-  group: sunday-signal-fast-official-t120-lock
-  cancel-in-progress: false
+  # Keep PR validation separate from the frequent production deadline heartbeat.
+  # Production locks must never be cancelled by newer scheduled lock triggers.
+  group: ${{ github.event_name == 'pull_request' && format('sunday-signal-fast-lock-pr-{0}', github.event.pull_request.number) || 'sunday-signal-fast-official-t120-lock' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
