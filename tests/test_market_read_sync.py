@@ -215,7 +215,7 @@ def test_shared_publisher_daily_refresh_rebuilds_read_without_replacing_human(tm
     assert "49.0% vig-free market signal" in result["paragraphs"][1]
     assert "a market line of Chicago Bears -1.0" in result["paragraphs"][1]
     assert result["paragraphs"][1].endswith("The pick: Chicago Bears moneyline.")
-    assert synchronize_file(tmp_path, check=True) == 0
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
 
 
 def test_shared_publisher_market_refresh_and_idempotence(tmp_path):
@@ -226,7 +226,7 @@ def test_shared_publisher_market_refresh_and_idempotence(tmp_path):
     publish(row(final_home_prob="0.42", market_home_prob="0.48"))
     assert (tmp_path / "game_previews.json").read_bytes() == second
     assert "58.0% win probability" in json.loads(second)[gid]["paragraphs"][1]
-    assert synchronize_file(tmp_path, check=True) == 0
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
 
 
 
@@ -291,7 +291,7 @@ def test_market_workflow_and_daily_workflow_both_protect_commit(monkeypatch):
         assert "sync_market_reads.py" in content or name == "weekly.yml"
         assert "git add outputs/" in content
     publisher = (root / "src" / "nfl_forecast" / "publish.py").read_text()
-    assert "synchronize_file(out)" in publisher
+    assert "synchronize_file(out, now_utc=now_utc)" in publisher
     dashboard = (root / ".github" / "workflows" / "dashboard.yml").read_text()
     assert "sync_market_reads --output-dir site/public/data --check" in dashboard
     assert "sync_market_reads --output-dir site/public/data --write" not in dashboard
