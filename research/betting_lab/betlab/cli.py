@@ -11,6 +11,7 @@ from .scenarios import Scenario, price_ticket, portfolio_distribution
 from .risk import Candidate,recommend_simulated_allocation
 from .joint_simulator import GameInputs, synthetic_joint_slate
 from .live_board import analyze_live_slate, save_report, render_markdown
+from .levline_scout import make_scout_report,save_scout,render_scout_markdown
 
 
 def run_demo(seed:int=20261010,n:int=2000):
@@ -43,7 +44,18 @@ def main():
     board.add_argument('--slate',type=Path,required=True,help='LevLine outputs/this_week.csv')
     board.add_argument('--quotes',type=Path,required=True,help='exact-time manual operator quote JSON')
     board.add_argument('--outdir',type=Path,required=True,help='immutable output folder (create-only)')
+    scout=sub.add_parser('scout',help='full-slate LevLine model-opinion watchlist; requires no invented bookmaker quotes')
+    scout.add_argument('--slate',type=Path,required=True,help='actual LevLine forecast outputs/this_week.csv')
+    scout.add_argument('--date',type=str,required=True,help='exact YYYY-MM-DD slate date')
+    scout.add_argument('--outdir',type=Path,required=True,help='immutable report output directory')
+    scout.add_argument('--status',type=Path,help='optional actual outputs/status.json for market timestamp audit')
     args=parser.parse_args()
+    if args.cmd=='scout':
+        status=json.loads(args.status.read_text()) if args.status else None
+        result=make_scout_report(args.slate,args.date,source_status=status)
+        print(json.dumps(save_scout(result,args.outdir),sort_keys=True))
+        print(render_scout_markdown(result))
+        return
     if args.cmd=='board':
         report=analyze_live_slate(args.slate,args.quotes)
         print(json.dumps(save_report(report,args.outdir),sort_keys=True))

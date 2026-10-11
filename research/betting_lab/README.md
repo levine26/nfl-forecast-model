@@ -1,4 +1,4 @@
-# LevLine Betting Lab — research v0.3.0
+# LevLine Betting Lab — research v0.3.1
 
 **Status: RESEARCH ONLY / UNVALIDATED / NO BETTING AUTOMATION.**
 
@@ -26,6 +26,7 @@ Run from the project root. The `demo` uses **fabricated games, fabricated quotes
 - `risk.py`: conservative-stake *simulation* with hard $45 session budget, per-game exposure caps and no-bet gating for unqualified forecasts
 - `sources.py`: create-only SHA-256 archival envelopes; qualified manual quotes; unqualified provider subquotes blocked without per-book quote timestamps
 - `ledger.py`: verified append-only implementation receipts
+- `levline_scout.py`: existing-LevLine F-ST, margin and total bridge that ranks per-game scouting angles *without* inventing sportsbook prices or treating prior ATS research as proven profitable
 - `live_board.py`: tomorrow-ready manual timestamp-qualified direct-operator quote board against the current LevLine CSV; no claim of validated value
 - `cli.py`: manually invoked research board, synthetic demonstration and ledger audit
 
@@ -44,3 +45,9 @@ See `docs/HANDOFF.md`, `docs/ROADMAP.md`, `docs/SCIENTIFIC_PROTOCOL.md` and `doc
 ## Sunday pregame operating instructions
 
 See `docs/TOMORROW_RUNBOOK.md`. Run `python -m betlab.cli board --slate ../../outputs/this_week.csv --quotes /private/direct-book.json --outdir /private/immutable-reports`. Every board row remains research-only with $0 automatic stake. Verify your direct-book quote and event time before using it.
+
+## Sunday full-slate scout (no manual odds needed)
+
+`python -m betlab.cli scout --slate ../../outputs/this_week.csv --status ../../outputs/status.json --date 2026-10-11 --outdir /private/reports`
+
+This returns model watchlists, **not** validated profitable bets. Historical ATS candidate failures and unqualified source-market timing are explicit. See `docs/TOMORROW_RUNBOOK.md`.
