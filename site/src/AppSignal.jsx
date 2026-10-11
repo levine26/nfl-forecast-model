@@ -246,8 +246,8 @@ function ForecastHero({game,compact=false}) {
   </section>
 }
 
-function TheSignal({preview,compact=false}) {
-  if (!hasPublishedHumanRead(preview)) return <section className={`ss-the-signal ${compact?'compact':''}`}><div><span>THE SIGNAL</span><h2>Independent matchup reporting is under review.</h2>{!compact&&<p>The canonical LevLine forecast is available above. A human matchup Read will appear only after provider, source-attribution, and full-slate acceptance checks pass.</p>}</div></section>
+function TheSignal({preview,compact=false,acceptance,expectedGames}) {
+  if (!hasPublishedHumanRead(preview,acceptance,expectedGames)) return <section className={`ss-the-signal ${compact?'compact':''}`}><div><span>THE SIGNAL</span><h2>Independent matchup reporting is under review.</h2>{!compact&&<p>The canonical LevLine forecast is available above. A human matchup Read will appear only after provider, source-attribution, and full-slate acceptance checks pass.</p>}</div></section>
   const headline=preview?.headline || preview?.key_factors?.[0]?.title
   const paragraphs=Array.isArray(preview?.paragraphs) ? preview.paragraphs.filter(Boolean) : []
   const fallback=preview?.key_factors?.[0]?.summary
@@ -282,8 +282,8 @@ function TopSignals({games,onOpen}) {
   </section>
 }
 
-function BoardRow({game,preview,onOpen}) {
-  const teaser=hasPublishedHumanRead(preview) ? preview.headline : null
+function BoardRow({game,preview,onOpen,acceptance,expectedGames}) {
+  const teaser=hasPublishedHumanRead(preview,acceptance,expectedGames) ? preview.headline : null
   return <button className="ss-game-row" onClick={onOpen} data-game-open>
     <div className="ss-row-matchup">
       <span><TeamMark team={game.away_team} size="sm"/><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} size="sm"/><b>{game.home_team}</b></span>
@@ -299,7 +299,7 @@ function BoardRow({game,preview,onOpen}) {
   </button>
 }
 
-function MobileGameCard({game,preview,onOpen}) {
+function MobileGameCard({game,preview,onOpen,acceptance,expectedGames}) {
   return <article className="ss-mobile-card">
     <button className="ss-card-open" onClick={onOpen} data-game-open>
       <div className="ss-card-top"><span>{formatKickoff(game)}</span><Lifecycle game={game}/></div>
@@ -307,13 +307,13 @@ function MobileGameCard({game,preview,onOpen}) {
         <span><TeamMark team={game.away_team}/><b>{game.away_team}</b></span><em>AT</em><span><TeamMark team={game.home_team}/><b>{game.home_team}</b></span>
       </div>
       <ForecastHero game={game} compact/>
-      <TheSignal preview={preview} compact/>
+      <TheSignal preview={preview} compact acceptance={acceptance} expectedGames={expectedGames}/>
       <div className="ss-view-matchup">View Matchup <span>→</span></div>
     </button>
   </article>
 }
 
-function ForecastBoard({games,previews,onOpen,status}) {
+function ForecastBoard({games,previews,onOpen,status,acceptance}) {
   const sorted=[...games].sort((a,b)=>new Date(a.kickoff_utc||0)-new Date(b.kickoff_utc||0))
   const live=sorted.filter(g=>g.lifecycle_status==='IN_PROGRESS').length
   const locked=sorted.filter(g=>g.immutable).length
@@ -343,9 +343,9 @@ function ForecastBoard({games,previews,onOpen,status}) {
       </div>
       <div className="ss-board-table">
         <div className="ss-board-labels"><span>MATCHUP</span><span>LEVLINE PICK</span><span>WIN PROB.</span><span>MARKET LINE</span><span>VS MARKET</span><span>STATUS</span><span/></div>
-        {sorted.map(game=><BoardRow key={game.game_id} game={game} preview={previews[game.game_id]} onOpen={()=>onOpen(game)}/>) }
+        {sorted.map(game=><BoardRow key={game.game_id} game={game} preview={previews[game.game_id]} acceptance={acceptance} expectedGames={games.length} onOpen={()=>onOpen(game)}/>) }
       </div>
-      <div className="ss-mobile-cards">{sorted.map(game=><MobileGameCard key={game.game_id} game={game} preview={previews[game.game_id]} onOpen={()=>onOpen(game)}/>)}</div>
+      <div className="ss-mobile-cards">{sorted.map(game=><MobileGameCard key={game.game_id} game={game} preview={previews[game.game_id]} acceptance={acceptance} expectedGames={games.length} onOpen={()=>onOpen(game)}/>)}</div>
     </section>
   </main>
 }
@@ -466,7 +466,7 @@ function AdvancedNumbers({game,diagnostic}) {
   return <div className="ss-advanced-grid">{rows.map(([label,value])=><div key={label}><span>{label}</span><b>{value}</b></div>)}<p>The independent margin model remains preserved for research and diagnostics. It does not override the probability-implied presentation line or official winner.</p></div>
 }
 
-function MatchupPage({game,runs,evidence,preview,diagnostic,gameMonitor}) {
+function MatchupPage({game,runs,evidence,preview,diagnostic,gameMonitor,acceptance,expectedGames}) {
   if (!game) return <main className="ss-page"><section className="ss-panel"><p className="ss-empty">This matchup is not in the current published slate.</p><button className="ss-text-link" onClick={()=>navigateHash('forecasts')}>Back to forecasts →</button></section></main>
   const meta=[game.venue,game.network,game.weather].filter(Boolean)
   return <main className="ss-page ss-matchup-page">
@@ -482,7 +482,7 @@ function MatchupPage({game,runs,evidence,preview,diagnostic,gameMonitor}) {
 
     <div className="ss-matchup-grid">
       <div className="ss-matchup-main">
-        <TheSignal preview={preview}/>
+        <TheSignal preview={preview} acceptance={acceptance} expectedGames={expectedGames}/>
         <ForecastMovement game={game} runs={runs} evidence={evidence}/>
         <KeyDevelopments evidence={evidence} preview={preview}/>
         <SignalFlow game={game} variant="ss-mobile-flow"/>
@@ -631,7 +631,7 @@ export default function App() {
   const [route,setRoute]=useState(()=>parseRoute())
   const [forecastPayload,setForecastPayload]=useState({games:[]})
   const [impactMonitor,setImpactMonitor]=useState({games:[]})
-  const [runs,setRuns]=useState([]), [evidence,setEvidence]=useState({}), [previews,setPreviews]=useState({}), [status,setStatus]=useState({})
+  const [runs,setRuns]=useState([]), [evidence,setEvidence]=useState({}), [previews,setPreviews]=useState({}), [status,setStatus]=useState({}), [editorialAcceptance,setEditorialAcceptance]=useState(null)
   const [ratings,setRatings]=useState([]), [models,setModels]=useState([]), [history,setHistory]=useState([]), [profiles,setProfiles]=useState([]), [autopsies,setAutopsies]=useState({}), [editorial,setEditorial]=useState({teams:[]}), [currentRaw,setCurrentRaw]=useState([])
   const [error,setError]=useState('')
 
@@ -642,11 +642,11 @@ export default function App() {
   },[])
 
   useEffect(()=>{;(async()=>{try{
-    const [publicForecasts,runRows,context,previewRows,statusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows,impactRows]=await Promise.all([
-      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchJSON('contextual_evidence.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),fetchJSON('impact_monitor.json',{games:[]}),
+    const [publicForecasts,runRows,context,previewRows,statusRows,sourceStatusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows,impactRows]=await Promise.all([
+      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchJSON('contextual_evidence.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('status.json',{}),fetchJSON('context_source_status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),fetchJSON('impact_monitor.json',{games:[]}),
     ])
     if (!Array.isArray(publicForecasts.games) || !publicForecasts.games.length) throw new Error('Canonical public forecast contract is unavailable.')
-    setForecastPayload(publicForecasts);setImpactMonitor(impactRows);setRuns(runRows);setEvidence(context);setPreviews(previewRows);setStatus(statusRows);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
+    setForecastPayload(publicForecasts);setImpactMonitor(impactRows);setRuns(runRows);setEvidence(context);setPreviews(previewRows);setStatus(statusRows);setEditorialAcceptance(sourceStatusRows?.editorial_acceptance||null);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
   }catch(err){setError(String(err?.message||err))}})()},[])
 
   const games=forecastPayload.games||[]
@@ -660,8 +660,8 @@ export default function App() {
 
   return <div className="ss-app">
     <Header route={route} week={week}/>
-    {route.page==='forecasts'&&<ForecastBoard games={games} previews={previews} onOpen={openGame} status={status}/>} 
-    {route.page==='game'&&<MatchupPage game={selected} runs={runs} evidence={selected?(evidence[selected.game_id]||[]):[]} preview={selected?previews[selected.game_id]:null} diagnostic={selected?diagnostics[selected.game_id]:null} gameMonitor={selectedMonitor}/>} 
+    {route.page==='forecasts'&&<ForecastBoard games={games} previews={previews} onOpen={openGame} status={status} acceptance={editorialAcceptance}/>} 
+    {route.page==='game'&&<MatchupPage game={selected} runs={runs} evidence={selected?(evidence[selected.game_id]||[]):[]} preview={selected?previews[selected.game_id]:null} diagnostic={selected?diagnostics[selected.game_id]:null} gameMonitor={selectedMonitor} acceptance={editorialAcceptance} expectedGames={games.length}/>} 
     {route.page==='power'&&<PowerPage ratings={ratings} editorial={editorial}/>} 
     {route.page==='history'&&<HistoryPage history={history} autopsies={autopsies}/>} 
     {route.page==='methodology'&&<MethodologyPage models={models}/>} 

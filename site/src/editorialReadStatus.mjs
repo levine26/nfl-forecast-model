@@ -1,11 +1,16 @@
 import {canonicalReportLink} from './editorialSourceLinks.mjs'
 
 /**
- * A HUMAN Read must be accepted by the provider publication pipeline.
- * Headline+paragraph existence alone is NOT an editorial acceptance receipt.
- * This checks visible attribution structure, not article-content or claim support.
+ * Visible HUMAN Read authority requires independent full-slate acceptance.
+ * Provider-written prose and direct URL shapes are NOT article or claim proof.
+ * The canonical production audit is generated separately from provider input.
+ * Missing/stale audits fail closed; model forecasts remain visible.
  */
-export function hasPublishedHumanRead(preview) {
+export function hasPublishedHumanRead(preview, acceptance, expectedGames) {
+  if (!acceptance || typeof acceptance !== 'object' || !Number.isInteger(expectedGames) || expectedGames <= 0) return false
+  if (acceptance.status !== 'healthy' || acceptance.article_resolution_verified !== true || acceptance.claim_support_verified !== true) return false
+  if (acceptance.games_expected !== expectedGames || acceptance.games_with_structurally_eligible_human_reads !== expectedGames || acceptance.games_rejected !== 0) return false
+  if (acceptance.issues && Object.keys(acceptance.issues).length > 0) return false
   if (!preview || typeof preview !== 'object') return false
   const voice = preview.editorial_voice || {}
   if (voice.copilot_researched !== true || voice.two_paragraph_contract !== true) return false
