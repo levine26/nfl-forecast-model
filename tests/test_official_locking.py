@@ -61,3 +61,22 @@ def test_locked_prediction_can_be_graded_without_mutating_forecast(tmp_path):
     assert hist.loc[0, "final_home_prob"] == 0.70
     assert bool(hist.loc[0, "winner_correct"]) is True
     assert hist.loc[0, "actual_margin"] == 7.0
+
+def test_week6_publisher_does_not_lock_before_t60(tmp_path):
+    kickoff = datetime(2026, 10, 18, 17, 0, tzinfo=timezone.utc)
+    predictions = _prediction()
+    predictions.loc[0, "game_id"] = "2026_06_A_B"
+    predictions.loc[0, "week"] = 6
+    predictions.loc[0, "gameday"] = "2026-10-18"
+    predictions.loc[0, "gametime"] = "13:00"
+    games = pd.DataFrame([{"game_id": "2026_06_A_B",
+                           "home_team": "B", "away_team": "A",
+                           "home_score": None, "away_score": None}])
+    write_outputs(SimpleNamespace(predictions=predictions, games=games), tmp_path,
+                  now_utc=kickoff-timedelta(minutes=61), enforce_read_sync=False)
+    assert pd.read_csv(tmp_path / "prediction_history.csv").empty
+    write_outputs(SimpleNamespace(predictions=predictions, games=games), tmp_path,
+                  now_utc=kickoff-timedelta(minutes=59), enforce_read_sync=False)
+    locked = pd.read_csv(tmp_path / "prediction_history.csv")
+    assert len(locked) == 1
+    assert float(locked.loc[0, "minutes_to_kickoff_at_lock"]) == 59
