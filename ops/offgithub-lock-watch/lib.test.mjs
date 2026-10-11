@@ -110,3 +110,21 @@ test("health is independent of green GitHub research jobs and never grants publi
   assert.equal(healthReport(new Date(now-6*60_000).toISOString(),now).scheduler_healthy,true);
   assert.equal(healthReport(new Date(now).toISOString(),now).release_authority,false);
 });
+
+
+test("delayed cron execution uses real wall clock, not the nominal trigger time", async()=>{
+  const worker=(await import("./worker.mjs")).default;
+  const k=kit();
+  const actual=Date.parse("2026-10-18T16:00:00Z");
+  const old=Date.now;
+  const promises=[];
+  Date.now=()=>actual;
+  try {
+    worker.scheduled({scheduledTime:actual-15*60_000},k.env,{waitUntil:p=>promises.push(p)});
+    await Promise.all(promises);
+  } finally {
+    Date.now=old;
+  }
+  assert.equal(k.requests.filter(x=>x.url.endsWith("fast_official_lock.yml/dispatches")).length,1);
+  assert.equal(k.kv.get("last_success_utc"),new Date(actual).toISOString());
+});
