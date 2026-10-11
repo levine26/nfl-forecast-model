@@ -20,7 +20,10 @@ on:
   push:
     branches: [main]
     paths:
-      - "inputs/chatgpt_media/fallback/**"
+      # The manifest is the transaction commit marker. Updating each of 14
+      # individual candidate files must NOT launch/cancel 14 recovery jobs.
+      # Write all game JSON first, then update manifest.json once as final handoff.
+      - "inputs/chatgpt_media/fallback/manifest.json"
       - ".github/workflows/chatgpt_failed_game_ingest.yml"
   workflow_dispatch:
 
@@ -91,6 +94,8 @@ jobs:
           assert 'fallback_checkpoint_bootstrap' in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-pr-{0}" in workflow
           assert "sunday-signal-chatgpt-failed-game-fallback-production" in workflow
+          assert '      - "inputs/chatgpt_media/fallback/manifest.json"' in workflow
+          assert '      - "inputs/chatgpt_media/fallback/**"' not in workflow
           assert "challenger_outputs/fst/(prospective_evaluation\\.json|prospective_weekly\\.csv)" in workflow
           assert 'Only research/challenger/docs-isolated files advanced; rebasing the already validated editorial output commit.' in workflow
           assert 'git restore --worktree -- .' in workflow
