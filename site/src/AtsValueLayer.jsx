@@ -57,19 +57,19 @@ function AtsValueCard({game}) {
   const atsLine=pickedSpread(pick,marketSpread)
   const split=status==='VALUE' && pick && game.official_winner && pick!==game.official_winner
 
-  let explanation='The ATS signal is unavailable until both the independent LevLine margin and a sportsbook spread are present.'
+  let explanation='An ATS model preference is unavailable until the independent expected margin and a sportsbook spread are both present.'
   if (status==='NO_EDGE') {
-    explanation=`LevLine's independent margin and the sportsbook spread are aligned at ${marketLine}, so there is no ATS side advantage from the fair-line comparison.`
+    explanation=`LevLine's independent margin and the sportsbook spread are aligned at ${marketLine}, so the model does not prefer either ATS side from this comparison.`
   } else if (status==='VALUE' && split) {
-    explanation=`${game.official_winner} remains LevLine's more likely outright winner. ${atsLine} is the ATS value because LevLine's independent model line is ${modelLine} versus ${marketLine} in the market.`
+    explanation=`${game.official_winner} remains LevLine's more likely outright winner. ${atsLine} is the ATS model preference because LevLine's independent expected-margin line is ${modelLine} versus ${marketLine} in the market.`
   } else if (status==='VALUE' && pick) {
-    explanation=`${game.official_winner} is LevLine's more likely outright winner, and ${atsLine} is also the ATS value. The independent model line is ${modelLine} versus ${marketLine} in the market.`
+    explanation=`${game.official_winner} is LevLine's more likely outright winner, and ${atsLine} is also the ATS model preference. The independent expected-margin line is ${modelLine} versus ${marketLine} in the market.`
   }
 
-  return <section className={`ss-ats-value ${status.toLowerCase()}`} aria-label="LevLine ATS value">
+  return <section className={`ss-ats-value ${status.toLowerCase()}`} aria-label="ATS model comparison and betting-value limitations">
     <div className="ss-ats-value-head">
-      <div><span>ATS VALUE</span><small>Winner and spread value are separate forecasts</small></div>
-      <b>{status==='VALUE'?'MODEL vs MARKET':status==='NO_EDGE'?'NO EDGE':'UNAVAILABLE'}</b>
+      <div><span>ATS MODEL COMPARISON</span><small>Separate from the straight-up winner probability</small></div>
+      <b>{status==='VALUE'?'MODEL LINE DIFFERENCE':status==='NO_EDGE'?'LINES ALIGNED':'UNAVAILABLE'}</b>
     </div>
     <div className="ss-ats-value-grid">
       <article className="winner">
@@ -78,22 +78,23 @@ function AtsValueCard({game}) {
         <small>Frozen F-ST win probability</small>
       </article>
       <article className="ats">
-        <span>ATS SIDE</span>
-        <strong>{status==='VALUE'?atsLine:status==='NO_EDGE'?'No edge':'—'}</strong>
+        <span>ATS MODEL PREFERENCE</span>
+        <strong>{status==='VALUE'?atsLine:status==='NO_EDGE'?'No model preference':'—'}</strong>
         <small>{status==='VALUE' && num(edge)!=null ? `${num(edge).toFixed(1)} pts between model and market` : 'Independent margin vs sportsbook line'}</small>
       </article>
       <article>
-        <span>LEVLINE MODEL LINE</span>
+        <span>ATS EXPECTED-MARGIN LINE</span>
         <strong>{modelLine}</strong>
         <small>Independent expected-margin forecast</small>
       </article>
       <article>
-        <span>MARKET LINE</span>
+        <span>SPORTSBOOK SPREAD</span>
         <strong>{marketLine}</strong>
         <small>Sportsbook spread</small>
       </article>
     </div>
     <p className={split?'split':''}>{split && <b>Winner / ATS split · </b>}{explanation}</p>
+    <div className="ss-ats-betting-note" role="note"><b>Betting value: not verified.</b> A point-spread difference is not a validated cover probability, expected value, or recommendation to bet. Actual available odds, fees, and a qualified cover/push/loss model would be required.</div>
   </section>
 }
 
