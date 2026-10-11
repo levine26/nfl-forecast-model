@@ -50,6 +50,8 @@ def test_policy_is_explicit_and_mixed_history_cannot_shift():
     assert official_lock_lead_minutes({"season": "2025", "week": "22"}) == 120.0
     with pytest.raises(ValueError, match="season/week"):
         official_lock_lead_minutes({"game_id": "bad"})
+    with pytest.raises(ValueError, match="contradicts"):
+        official_lock_lead_minutes({"game_id":"2026_06_A_B","season":2026,"week":5})
 
 
 def test_new_lock_cannot_be_created_at_t120_or_t61():
