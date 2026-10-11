@@ -558,7 +558,7 @@ def build_public_forecasts(
         if locked_row is None and kickoff is not None and now_utc >= kickoff:
             if missing_lock_policy == "reject":
                 raise PublicForecastError(
-                    f"{game_id}: kickoff passed without an immutable official lock; "
+                    f"{game_id}: kickoff has passed without an immutable pregame lock; "
                     "refusing to substitute an editorial or numerical forecast"
                 )
             games.append(_missing_lock_public_row(current_row, now_utc=now_utc))
