@@ -435,5 +435,7 @@ def write_outputs(
     # Only isolated lock-unit fixtures may disable this gate explicitly.
     if enforce_read_sync:
         from nfl_forecast.read_publication import synchronize_file
+        # Reuse this exact publication timestamp for every canonical and Read
+        # lifecycle decision. Do not use a later real wall clock at the boundary.
         synchronize_file(out, now_utc=now_utc)
         synchronize_file(out, check=True, now_utc=now_utc)

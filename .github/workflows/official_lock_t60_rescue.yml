@@ -1,0 +1,78 @@
+name: Sunday Signal independent T-60 official lock rescue
+
+# This is a SECOND scheduling opportunity, not a new model, lock publisher,
+# or substitute for the original T-120 accountability target.
+# GitHub cron is best-effort and cannot guarantee a precise clock-time SLA.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/official_lock_t60_rescue.yml"
+      - "tests/test_t60_rescue_heartbeat.py"
+      - "scripts/pregame_due.py"
+  schedule:
+    # Stagger from the canonical */5 worker. Cover NFL weekend, international
+    # starts, Thursday/Sunday/Monday nights and spillover UTC dates.
+    # Additional nonstandard kickoff dates can use workflow_dispatch.
+    - cron: "3,13,23,33,43,53 11-23 * * 0"
+    - cron: "3,13,23,33,43,53 0-5,18-23 * * 1"
+    - cron: "3,13,23,33,43,53 0-5 * * 2"
+    - cron: "3,13,23,33,43,53 18-23 * * 4"
+    - cron: "3,13,23,33,43,53 0-5 * * 5"
+    - cron: "3,13,23,33,43,53 11-23 * * 6"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: sunday-signal-independent-t60-rescue-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'production' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pytest
+      - name: Validate rescue's due-game gates and immutable policy
+        run: python -m pytest -q tests/test_t60_rescue_heartbeat.py tests/test_pregame_due.py
+
+  rescue:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Check the latest official immutable receipt set
+        id: due
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          # Only genuinely UNLOCKED games in the final 65 minutes are eligible.
+          # The canonical worker still validates F-ST identity and cache age,
+          # never revisits locked games, and refuses post-kickoff backfills.
+          python scripts/pregame_due.py \
+            --feed outputs/this_week.csv \
+            --history outputs/prediction_history.csv \
+            --min-minutes 0 --max-minutes 65 | tee /tmp/levline-t60-rescue-due.txt
+          if grep -qx 'due=true' /tmp/levline-t60-rescue-due.txt; then
+            echo "due=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Dispatch the EXISTING guarded production official lock worker
+        if: steps.due.outputs.due == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # workflow_dispatch is a supported trigger even with GITHUB_TOKEN.
+          # No research candidate data or post-kickoff snapshots are promoted.
+          gh workflow run fast_official_lock.yml --ref main
+          echo "::warning title=T-60 official lock rescue::A game remains unlocked inside 65 minutes. Dispatched the existing frozen F-ST fast-lock worker; verify its resulting immutable receipt separately."

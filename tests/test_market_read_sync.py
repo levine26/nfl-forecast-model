@@ -229,6 +229,24 @@ def test_shared_publisher_market_refresh_and_idempotence(tmp_path):
     assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
 
 
+
+def test_publication_uses_explicit_simulated_clock_across_read_boundaries(tmp_path):
+    publish, gid, original = _fixture_publisher(tmp_path)
+    # The fixture publishes days BEFORE kickoff even if CI runs AFTER kickoff.
+    publish(row())
+    serialized = json.loads((tmp_path / "game_previews.json").read_text())
+    assert "The pick:" in serialized[gid]["paragraphs"][1]
+    assert "No official pregame forecast" not in serialized[gid]["paragraphs"][1]
+    assert synchronize_file(tmp_path, check=True, now_utc=NOW) == 0
+    # The exact same unlocked row must be withheld when independently viewed
+    # after kickoff, without pretending the prior simulation was an on-time lock.
+    with pytest.raises(ReadSyncError, match="disagree with canonical"):
+        synchronize_file(
+            tmp_path, check=True,
+            now_utc=datetime(2026, 10, 12, 0, tzinfo=timezone.utc)
+        )
+
+
 def test_shared_publisher_fails_closed_for_missing_or_malformed_previews(tmp_path):
     import pandas as pd
     from types import SimpleNamespace

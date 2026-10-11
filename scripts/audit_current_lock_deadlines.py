@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-"""Read-only, per-game-policy deadline audit for the independent fast-lock worker.
+"""Read-only, all-game T-120 deadline audit for the independent fast-lock worker.
 
-Never creates, moves, or backdates a lock. A missing lock after deadline+10 is a
+Never creates, moves, or backdates a lock. A missing lock after T-110 is a
 failure even if the separate scheduling mechanism has not fired. The official
 history is authoritative; an earlier recorded late lock is reported truthfully
 without mutating it or causing permanent new-run failures.
@@ -97,6 +97,14 @@ def audit_current_deadlines(
             result["state"] = "missing_lock_outside_active_watch_window"
         games_out[gid] = result
 
+    # Separate actionable prekickoff lock gaps from already-recorded historic
+    # lateness. Both remain visible in issues, but no future lock worker can
+    # retroactively make an immutable earlier receipt on time.
+    actionable_issues = {
+        gid: problem for gid, problem in issues.items()
+        if games_out[gid]["state"] == "overdue_missing_official_lock"
+        and games_out[gid]["minutes_to_kickoff_now"] > 0.0
+    }
     counts = {state: sum(v["state"] == state for v in games_out.values())
               for state in sorted({v["state"] for v in games_out.values()})}
     return {
@@ -110,6 +118,7 @@ def audit_current_deadlines(
         "grace_minutes": GRACE_MINUTES,
         "status": "active_lock_timing_violation" if issues else "no_active_lock_timing_violation",
         "issues": issues,
+        "actionable_issues": actionable_issues,
         "counts": counts,
         "games": games_out,
         "historical_lock_records_modified": False,
@@ -139,9 +148,22 @@ def main() -> int:
     for gid, state in sorted(report["games"].items()):
         if state["state"] in {"overdue_missing_official_lock", "historically_late_lock", "recorded_missed_lock_recovery"}:
             print(f"::warning title=Official lock deadline::{gid}: {state['state']}")
+    if report["actionable_issues"]:
+        raise SystemExit(
+            f"FAIL CLOSED: {len(report['actionable_issues'])} still-unlocked games "
+            f"are past the T-120 deadline but have not kicked off: "
+            f"{sorted(report['actionable_issues'])}"
+        )
+    # Already-locked late receipts and uncorrectable post-kickoff misses stay in
+    # the JSON artifact and workflow annotations. Do not make every subsequent
+    # worker fail solely because immutable history cannot be backdated.
     if report["issues"]:
-        raise SystemExit(f"FAIL CLOSED: {len(report['issues'])} current-slate games have overdue missing official lock: {sorted(report['issues'])}")
-    print(f"Lock deadline audit: {report['games_audited']}/{report['games_expected']} canonical games checked; no missing overdue lock.")
+        print(
+            f"ACCOUNTABILITY: {len(report['issues'])} past/late lock incidents "
+            "recorded; no *actionable* missing prekickoff lock remains."
+        )
+    else:
+        print(f"Lock deadline audit: {report['games_audited']}/{report['games_expected']} canonical games checked; no active violations.")
     return 0
 
 
