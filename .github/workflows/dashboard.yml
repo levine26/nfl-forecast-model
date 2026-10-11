@@ -57,7 +57,10 @@ permissions:
 
 concurrency:
   group: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') && format('pages-noop-{0}', github.run_id) || github.event_name == 'pull_request' && format('pages-pr-{0}', github.event.pull_request.number) || 'pages-production' }}
-  cancel-in-progress: true
+  # Never abort a production Pages build/deploy when a newer forecast completes.
+  # GitHub retains the running deployment and coalesces new pending runs.
+  # PR checks may still cancel superseded in-progress runs.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -86,6 +89,7 @@ jobs:
           tests/test_ats_lock_receipt.py
           tests/test_ats_site_receipt_contract.py
           tests/test_build_public_forecasts_receipt_contract.py
+          tests/test_dashboard_production_concurrency.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
