@@ -78,6 +78,9 @@ def audit_current_deadlines(
                 "premature_lock" if delay < -0.1 else
                 "on_time_lock" if delay <= GRACE_MINUTES else "historically_late_lock"
             )
+            if (result["state"] == "historically_late_lock"
+                    and grace_end <= now_utc <= kickoff + timedelta(minutes=WATCH_AFTER_KICKOFF_MINUTES)):
+                issues[gid] = [f"Official lock occurred {round(delay, 3)} minutes after the T-120 target; deadline exceeded 10-minute grace"]
         elif locked and locked.get("lock_status") == "RECOVERED_MISSED_LOCK":
             result["state"] = "recorded_missed_lock_recovery"
         elif grace_end <= now_utc <= kickoff + timedelta(minutes=WATCH_AFTER_KICKOFF_MINUTES):
@@ -99,7 +102,7 @@ def audit_current_deadlines(
         "games_audited": len(games_out),
         "target_minutes_before_kickoff": TARGET_MINUTES,
         "grace_minutes": GRACE_MINUTES,
-        "status": "overdue_missing_locks" if issues else "no_current_missing_lock_overdue",
+        "status": "active_lock_timing_violation" if issues else "no_active_lock_timing_violation",
         "issues": issues,
         "counts": counts,
         "games": games_out,
