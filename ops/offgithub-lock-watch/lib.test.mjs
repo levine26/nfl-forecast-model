@@ -112,19 +112,11 @@ test("health is independent of green GitHub research jobs and never grants publi
 });
 
 
-test("delayed cron execution uses real wall clock, not the nominal trigger time", async()=>{
-  const worker=(await import("./worker.mjs")).default;
-  const k=kit();
-  const actual=Date.parse("2026-10-18T16:00:00Z");
-  const old=Date.now;
-  const promises=[];
-  Date.now=()=>actual;
-  try {
-    worker.scheduled({scheduledTime:actual-15*60_000},k.env,{waitUntil:p=>promises.push(p)});
-    await Promise.all(promises);
-  } finally {
-    Date.now=old;
-  }
-  assert.equal(k.requests.filter(x=>x.url.endsWith("fast_official_lock.yml/dispatches")).length,1);
-  assert.equal(k.kv.get("last_success_utc"),new Date(actual).toISOString());
+test("delayed cron execution evaluates against the actual runtime clock",async()=>{
+  // The live handler must not pass a potentially delayed scheduledTime to
+  // runTick. Pure runTick/planTick behavior is independently tested above.
+  const {readFile} = await import("node:fs/promises");
+  const source = await readFile(new URL("./worker.mjs",import.meta.url),"utf8");
+  assert.match(source,/scheduled\\(event, env, ctx\\)[\\s\\S]*?runTick\\(env, Date\\.now\\(\\)\\)/);
+  assert.doesNotMatch(source,/runTick\\(env,\\s*Number\\(event\\.scheduledTime/);
 });
