@@ -103,6 +103,22 @@ def synchronize_reads(
             raise ReadSyncError(f"{gid}: Read has an empty or malformed paragraph")
         if not isinstance(preview.get("headline"), str) or not preview["headline"].strip():
             raise ReadSyncError(f"{gid}: required human headline missing")
+        # A missed kickoff lock is an operational incident, not permission to
+        # convert a mutable market row into a post-kickoff official Read.
+        # Quarantine only this game; continue enforcing strict canonical
+        # numerical equality for every unaffected matchup in the slate.
+        if game["source_snapshot"] == "MISSING_LOCK":
+            updated = dict(preview)
+            updated["paragraphs"] = [
+                paragraphs[0],
+                "No official pregame forecast was locked before kickoff. "
+                "LevLine does not publish a post-kickoff replacement pick, "
+                "probability, line, score, or ATS recommendation.",
+            ]
+            result[gid] = updated
+            changed += int(updated["paragraphs"][1] != paragraphs[1])
+            continue
+
         if game["official_winner"] != row.get("pick") or not _near(
             game["official_home_win_probability"], row.get("final_home_prob")
         ):
