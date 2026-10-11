@@ -79,7 +79,7 @@ jobs:
           assert r["full_slate_claim_support_verified"] is False
           if r.get("audited_subset_only"):
               assert r["full_slate_article_resolution_verified"] is False
-              print(f"Recovery subset only: {r[\'games_expected\']}/{r[\'active_slate_games_expected\']} game sources audited; whole-slate unverified.")
+              print('Recovery subset only: {}/{} game sources audited; whole-slate unverified.'.format(r['games_expected'], r['active_slate_games_expected']))
           print("Evidence retrieval report is shadow-only and never a factual acceptance receipt.")
           PY
       - name: Persist full game-by-game source-retrieval diagnostics
