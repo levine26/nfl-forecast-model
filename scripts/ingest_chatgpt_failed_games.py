@@ -201,6 +201,39 @@ def build_mixed_raw_payload(
     return {"games": output}
 
 
+def audit_missing_nonfallback_human(
+    *,
+    canonical_game_ids: list[str],
+    fallback_targets: list[str],
+    provider_artifact: dict[str, Any],
+    checkpoint_entries: dict[str, dict[str, Any]],
+) -> list[str]:
+    """Detect false provider-success without durable accepted HUMAN text.
+
+    A successful provider status is not an accepted editorial record. Do not
+    allow an inherited deterministic preview to stand in for HUMAN prose.
+    This read-only audit does NOT authorize a fallback overwrite.
+    """
+    target_set = set(fallback_targets)
+    provider_games = provider_artifact.get("games") if isinstance(provider_artifact, dict) else None
+    if not isinstance(provider_games, dict):
+        provider_games = {}
+    missing: list[str] = []
+    for gid in canonical_game_ids:
+        if gid in target_set:
+            continue
+        entry = provider_games.get(gid)
+        if not isinstance(entry, dict):
+            entry = checkpoint_entries.get(gid)
+        if not isinstance(entry, dict):
+            missing.append(gid)
+            continue
+        raw = _base_raw_entry(entry)
+        if not (raw["headline"] and raw["paragraph1"] and raw["model_rationale"] and raw["sources"]):
+            missing.append(gid)
+    return missing
+
+
 def mark_chatgpt_recovered(status: dict[str, Any], game_ids: list[str], *, now: datetime | None = None) -> dict[str, Any]:
     current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     result = dict(status)
@@ -291,6 +324,7 @@ def _validate_recovery_targets(
     accepted: Path,
     targets: list[str],
     report_path: Path,
+    orphaned_success_game_ids: list[str] | None = None,
 ) -> dict[str, dict[str, Any]]:
     """Check EVERY recovery target; never leak rejected candidates into accepted-dir.
 
@@ -337,21 +371,37 @@ def _validate_recovery_targets(
             diagnostics[gid] = {"state": "rejected", "errors": errors}
             print(f"rejected recovery candidate {gid}: {detail}", file=sys.stderr, flush=True)
 
+    orphaned = list(orphaned_success_game_ids or [])
+    if set(orphaned) & set(targets) or len(set(orphaned)) != len(orphaned):
+        raise ValueError("recovery targets and missing-provider-success records must be disjoint")
+    for gid in orphaned:
+        diagnostics[gid] = {
+            "state": "rejected",
+            "errors": [{
+                "game_id": gid,
+                "failing_field": "accepted_human_artifact",
+                "validation_rule": "provider_success_without_durable_human",
+                "relevant_evidence": "No validated provider artifact or checkpoint; deterministic preview cannot replace accepted human prose",
+                "rejection_reason": "Provider status is not proof of a persisted HUMAN Read",
+                "suggested_repair_category": "recover_missing_authoritative_human",
+            }],
+        }
+    total = len(targets) + len(orphaned)
     report = {
         "schema_version": 1,
-        "validation_stage": "independent_focused_games",
-        "games_expected": len(targets),
+        "validation_stage": "independent_focused_games_and_persistence",
+        "games_expected": total,
         "games_accepted": len(entries),
-        "games_rejected": len(targets) - len(entries),
+        "games_rejected": total - len(entries),
         "games": diagnostics,
         "publication_authorized": False,
     }
     _write_recovery_report(report_path, report)
-    if len(entries) != len(targets):
+    if len(entries) != total:
         rejected = [gid for gid, item in diagnostics.items() if item["state"] == "rejected"]
         raise ValueError(
-            "Failed-game editorial validation rejected "
-            f"{len(rejected)}/{len(targets)} games: {', '.join(rejected)}. "
+            "Full-slate HUMAN editorial validation rejected "
+            f"{len(rejected)}/{total} games: {', '.join(rejected)}. "
             f"Complete diagnostics: {report_path}"
         )
     return entries
@@ -387,6 +437,13 @@ def ingest(
     targets = validate_fallback_manifest(input_root, game_ids, status)
     base = json.loads(provider_path.read_text(encoding="utf-8"))
     previews_payload = json.loads(preview_path.read_text(encoding="utf-8"))
+    checkpoints = _checkpoint_entries(checkpoint_path)
+    orphans = audit_missing_nonfallback_human(
+        canonical_game_ids=game_ids,
+        fallback_targets=targets,
+        provider_artifact=base,
+        checkpoint_entries=checkpoints,
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(prefix="chatgpt-failed-game-ingest-") as tmp:
@@ -402,6 +459,7 @@ def ingest(
             accepted=accepted,
             targets=targets,
             report_path=resolve(Path("outputs/editorial_recovery_diagnostics.json")),
+            orphaned_success_game_ids=orphans,
         )
 
         raw = work / "mixed-raw.json"
@@ -413,7 +471,7 @@ def ingest(
                 base_artifact=base,
                 chatgpt_entries=chatgpt_entries,
                 preview_artifact=previews_payload,
-                checkpoint_entries=_checkpoint_entries(checkpoint_path),
+                checkpoint_entries=checkpoints,
             ), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
