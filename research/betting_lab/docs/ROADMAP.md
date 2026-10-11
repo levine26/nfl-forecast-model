@@ -51,3 +51,20 @@ See [`docs/SCOUT_MARKET_SEPARATION_CORRECTION.md`](SCOUT_MARKET_SEPARATION_CORRE
 ## 2026-10-10 B08A Sunday scope compression
 
 User directed focus on **tomorrow-ready ML/ATS/totals historical auditing**, explicitly **exclude historic TD/props tests**. B08A provides no-refit, chronological per-game evaluator and imports already verified 2022–25 F-ST results; 2021 same-method OOF remains unavailable. B08B qualified historical per-game source joins remain to do. External TD/yards delegated to separate *provider comparison contract* (CHZN1, JMutammara, Custom Venom, GameDay Analytics; StartWho market-only), with zero assumed live predictions absent authorization and source records. Exact handoff: `docs/B08_SPRINT_GAME_MARKETS.md`, `docs/EXTERNAL_PROP_PROVIDER_STRATEGY.md`, `docs/SUNDAY_2026-10-11_PRIORITY.md`. **No production changes; no automatic stakes.**
+
+## B08B — User-approved 2022 start and paired archived OOF comparisons (2026-10-11)
+
+User explicitly authorized beginning historical evaluation in **2022** rather than making 2021 compulsory. Scope is game-market ML, ATS and totals only. New `betlab/frozen_oof_audit.py` and CLI `frozen-oof-audit` compare 2022–2024 archived A0/B0/C0 OOF against original baseline files on the exact same 815 game IDs, including source/provenance assertions, season-before training-gate, quoted-market-vs-model margin and total comparisons, moneyline proper scores, per-season metrics and push-aware spread/total selections. Exclude tied games from *binary ML accuracy and proper scores* but retain them in ATS/totals. Check source SHA-256 and treat late/closing market odds as opaque-horizon references; do not report real betting ROI. **This is an audit of archival candidates, not production F-ST and not 2025 game-level forecast reconstruction.** The separate F-ST 2022–2025 chronological historical summary remains authoritative for current winner model context. Historical props and TD tests are deferred; third-party provider comparison is only a vetted schema at this stage.
+
+From repository root, run:
+
+```bash
+cd research/betting_lab
+python -m unittest discover -s tests -q
+python -m betlab.cli frozen-oof-audit \
+ --baselines ../../research/spread-points-nextgen/phase3/evidence/BASELINES_2022_2024.csv \
+ --oof ../../research/spread-points-nextgen/phase3/evidence/FUTURE_CANDIDATE5_OOF_SURFACES_2022_2024.csv \
+ --out /private/immutable-reports/B08B_FROZEN_OOF_2022_2024.json
+```
+
+Do not rerun source outcomes to choose a new candidate or retrospectively tune stake/edge thresholds. Append scientific receipts, and keep production unchanged.

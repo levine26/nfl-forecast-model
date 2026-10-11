@@ -13,6 +13,7 @@ from .joint_simulator import GameInputs, synthetic_joint_slate
 from .live_board import analyze_live_slate, save_report, render_markdown
 from .levline_scout import make_scout_report,save_scout,render_scout_markdown
 from .historical_games import audit_game_csv, save_audit
+from .frozen_oof_audit import audit_existing_oof, save_audit as save_oof_audit
 from .external_props import REGISTRY, combine_external_forecasts
 
 
@@ -54,12 +55,21 @@ def main():
     hist=sub.add_parser('historical-games',help='historical 2021-25 game-market evaluation on pregame forecast+result CSV')
     hist.add_argument('--csv',type=Path,required=True,help='joined pregame OOF forecast+game results CSV (not outcome-derived forecasts)')
     hist.add_argument('--out',type=Path,required=True,help='create-only report JSON destination')
+    oof=sub.add_parser('frozen-oof-audit',help='audit existing 2022-24 A0/B0/C0 OOF on matched historical game markets')
+    oof.add_argument('--baselines',type=Path,required=True)
+    oof.add_argument('--oof',type=Path,required=True)
+    oof.add_argument('--out',type=Path,required=True,help='create-only immutable report JSON')
     providers=sub.add_parser('prop-providers',help='review external model provider qualification (no odds/orders)')
     providers.add_argument('--out',type=Path,help='optional create-only JSON output')
     prop=sub.add_parser('external-prop-consensus',help='compare authorized externally supplied forecasts; no inferred provider outputs')
     prop.add_argument('--input',type=Path,required=True,help='JSON array, each forecast with source/time/license evidence')
     prop.add_argument('--out',type=Path,required=True,help='create-only comparison output')
     args=parser.parse_args()
+    if args.cmd=='frozen-oof-audit':
+        report=audit_existing_oof(args.baselines,args.oof)
+        save_oof_audit(report,args.out)
+        print(json.dumps({'created':str(args.out),'matched_games':report['game_rows_matched'], 'scope':report['historical_scope'],'roi_available':False},indent=2))
+        return
     if args.cmd=='historical-games':
         report=audit_game_csv(args.csv);save_audit(report,args.out)
         print(json.dumps({'created':str(args.out),'qualified_games':report['qualified_games'],
