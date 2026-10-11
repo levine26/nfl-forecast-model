@@ -12,6 +12,7 @@ from nfl_forecast.editorial_ledger_shadow import (
     flag_freshness,
     modify_json_atomically,
     release_index,
+    verify_state,
 )
 
 
@@ -199,3 +200,15 @@ def test_atomic_cas_prevents_stale_writes_and_survives_crash(tmp_path):
     assert updated["revisions"] == first["revisions"]
     assert updated["freshness"]["state"] == "review_required"
     assert not list(path.parent.glob("*.tmp"))
+
+
+def test_tampered_human_prose_or_verifier_receipt_is_rejected():
+    original = accepted()
+    tampered = deepcopy(original)
+    tampered["revisions"][0]["candidate"]["paragraph1"] = "Unverified edited text"
+    with pytest.raises(LedgerConflict, match="checksum"):
+        verify_state(tampered)
+    forged = deepcopy(original)
+    forged["revisions"][0]["validation_receipt"]["validator_version"] = "changed-without-receipt"
+    with pytest.raises(LedgerConflict, match="receipt integrity"):
+        verify_state(forged)
