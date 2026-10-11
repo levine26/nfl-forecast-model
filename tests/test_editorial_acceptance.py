@@ -117,3 +117,28 @@ def test_public_display_does_not_invent_source_link_from_publisher_name():
     assert displayed == {}
     assert counts["games_with_display_reporting"] == 0
     assert counts["intermediary_only_urls_rejected"] == 1
+
+
+def test_human_paragraph_city_aliases_are_structural_not_factual_approval():
+    from nfl_forecast.editorial_acceptance import _mentions_team
+
+    assert _mentions_team("Cleveland can attack New York's outside leverage.", "CLE", "NYJ")
+    assert _mentions_team("Cleveland can attack New York's outside leverage.", "NYJ", "CLE")
+    assert _mentions_team("Tampa Bay faces Dallas.", "TB", "DAL")
+    assert _mentions_team("Philadelphia faces Jacksonville.", "PHI", "JAX")
+    assert _mentions_team("San Francisco travels to Seattle.", "SF", "SEA")
+    assert _mentions_team("Las Vegas faces New England.", "LV", "NE")
+    # Sharing the same metropolitan label cannot prove TWO different clubs
+    # were separately discussed.
+    assert not _mentions_team("Los Angeles prepares for Sunday.", "LA", "LAC")
+    assert not _mentions_team("Los Angeles prepares for Sunday.", "LAC", "LA")
+    assert _mentions_team("The Rams face the Chargers.", "LA", "LAC")
+    assert _mentions_team("The Rams face the Chargers.", "LAC", "LA")
+
+
+def test_lowercase_no_does_not_falsely_reference_saints():
+    from nfl_forecast.editorial_acceptance import _mentions_team
+
+    assert not _mentions_team("There is no clear protection plan for Minnesota.", "NO", "MIN")
+    assert _mentions_team("NO needs a better protection plan.", "NO", "MIN")
+    assert _mentions_team("The Saints need a better protection plan.", "NO", "MIN")
