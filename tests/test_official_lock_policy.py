@@ -120,7 +120,7 @@ def test_combined_timeliness_report_preserves_prior_lateness_and_new_target():
 
 def test_week6_overdue_watch_begins_at_t50_not_t110():
     p = new_row()
-    base = {"game_id":p["game_id"],"gameday":p["gameday"],"gametime":p["gametime"],"season":6 if False else 2026,"week":6}
+    base = {"game_id":p["game_id"],"gameday":p["gameday"],"gametime":p["gametime"],"season":2026,"week":6}
     at_t110 = audit_current_deadlines([base],[],now_utc=KICKOFF-timedelta(minutes=110))
     assert not at_t110["issues"]
     at_t50 = audit_current_deadlines([base],[],now_utc=KICKOFF-timedelta(minutes=50))
