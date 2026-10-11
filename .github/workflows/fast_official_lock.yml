@@ -11,6 +11,10 @@ on:
       - "Hourly NFL market refresh"
       - "Daily NFL model refresh"
       - "Pregame NFL refresh"
+      # Independent research capture cron heartbeats are used only as timing
+      # signals. Never read research data or promote candidate probabilities.
+      - "LevLine research market capture v2"
+      - "LevLine research weather capture v1"
     types: [completed]
     branches: [main]
   push:
@@ -18,11 +22,14 @@ on:
     paths:
       - ".github/workflows/fast_official_lock.yml"
       - "scripts/fast_official_lock.py"
+      - "scripts/fast_lock_prepare.py"
   pull_request:
     paths:
       - ".github/workflows/fast_official_lock.yml"
       - "scripts/fast_official_lock.py"
       - "tests/test_fast_official_lock.py"
+      - "scripts/fast_lock_prepare.py"
+      - "tests/test_fast_lock_prepare.py"
       - "scripts/audit_current_lock_deadlines.py"
       - "tests/test_audit_current_lock_deadlines.py"
       - "scripts/audit_official_lock_timeliness.py"
@@ -50,6 +57,7 @@ jobs:
         run: |
           PYTHONPATH="$PWD/src:$PWD" python -m pytest -q \
             tests/test_fast_official_lock.py \
+            tests/test_fast_lock_prepare.py \
             tests/test_official_locking.py \
             tests/test_verify_pregame_lock.py \
             tests/test_audit_official_lock_timeliness.py \
@@ -97,6 +105,19 @@ jobs:
             git reset --hard origin/main
             git clean -fd outputs/lock_fast_path_receipts/
             export PYTHONPATH="$PWD/src:$PWD"
+            # The separate hourly market workflow may miss its cron or be
+            # blocked by another game's missed-lock receipt. Do not weaken the
+            # 90-minute official-cache freshness requirement: proactively
+            # regenerate the same frozen F-ST canonical forecast through the
+            # existing production market publisher, then lock the new receipt.
+            preparation=$(python -m scripts.fast_lock_prepare --output-dir outputs)
+            printf '%s\n' "$preparation"
+            cache_recovered=false
+            if printf '%s\n' "$preparation" | grep -qx 'action=refresh'; then
+              echo "Due game cache is stale; refreshing existing canonical F-ST path before lock."
+              python scripts/refresh_market.py --season 2026 --output-dir outputs
+              cache_recovered=true
+            fi
             python scripts/fast_official_lock.py --output-dir outputs
             if git diff --quiet -- outputs/prediction_history.csv; then
               echo "No new eligible official locks; do not publish anything."
@@ -104,8 +125,15 @@ jobs:
             fi
             python scripts/audit_official_lock_timeliness.py --season 2026
             python -m scripts.sync_market_reads --output-dir outputs --check
-            git add outputs/prediction_history.csv outputs/status.json \
-              outputs/official_lock_timeliness.json outputs/lock_fast_path_receipts/
+            if [ "$cache_recovered" = true ]; then
+              # The existing validated market publisher may have updated the
+              # canonical input, Read and run-history atomically with locks.
+              # Do not publish only the history and leave a stale Read behind.
+              git add outputs/
+            else
+              git add outputs/prediction_history.csv outputs/status.json \
+                outputs/official_lock_timeliness.json outputs/lock_fast_path_receipts/
+            fi
             git commit -m "Append on-time official T-120 lock from canonical F-ST snapshot"
             if git push origin HEAD:main; then
               echo "Fast official lock published atomically with provenance."
