@@ -42,5 +42,5 @@ def test_scheduled_shadow_checks_do_not_compete_with_pr_or_claim_exact_deadline(
     assert '0 16 * * 1' in workflow
     assert "sunday-signal-source-pr-{0}" in workflow
     assert "'sunday-signal-source-production-shadow'" in workflow
-    assert "cancel-in-progress: \${{ github.event_name == 'pull_request' }}" in workflow
+    assert "cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in workflow
     assert "best effort" in workflow.lower()
