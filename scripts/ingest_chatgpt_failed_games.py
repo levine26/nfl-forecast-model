@@ -60,6 +60,7 @@ def validate_fallback_manifest(
     status: dict[str, Any],
     *,
     now: datetime | None = None,
+    missing_accepted_authority: set[str] | None = None,
 ) -> list[str]:
     path = root / MANIFEST_NAME
     if not path.is_file():
@@ -86,11 +87,14 @@ def validate_fallback_manifest(
     if not set(target_ids).issubset(canonical):
         raise ValueError("fallback manifest contains a game outside the canonical slate")
 
-    allowed = _failure_targets(status)
+    # Preserve every already-accepted Groq Read. A success flag with no persisted
+    # HUMAN content is a separate authority gap, not an accepted provider result.
+    allowed = _failure_targets(status) | set(missing_accepted_authority or ())
     unauthorized = sorted(set(target_ids) - allowed)
     if unauthorized:
         raise ValueError(
-            "ChatGPT fallback may replace only Groq-failed games requiring refresh: "
+            "ChatGPT fallback may replace only Groq-failed games requiring refresh "
+            "or audited games missing accepted HUMAN authority: "
             + ", ".join(unauthorized)
         )
 
@@ -154,6 +158,48 @@ def _checkpoint_entries(checkpoint_dir: Path | None) -> dict[str, dict[str, Any]
     return entries
 
 
+def missing_accepted_editorial_authority(
+    *,
+    canonical_game_ids: list[str],
+    status: dict[str, Any],
+    base_artifact: dict[str, Any],
+    checkpoint_entries: dict[str, dict[str, Any]],
+    preview_artifact: dict[str, Any],
+    strict_bootstrap: bool,
+) -> set[str]:
+    """Find editorial PERSISTENCE gaps independently from Groq provider outcomes.
+
+    A provider success flag is never accepted HUMAN authority by itself.
+    Validated provider and cached revisions are checked before authorizing
+    any fallback replacement. The current output stays protected until an
+    independently validated newer game-specific candidate exists.
+    """
+    failed = _failure_targets(status)
+    games = base_artifact.get("games") if isinstance(base_artifact, dict) else None
+    if not isinstance(games, dict):
+        games = {}
+    missing: set[str] = set()
+    for gid in canonical_game_ids:
+        if gid in failed:
+            continue
+        entries = [games.get(gid), checkpoint_entries.get(gid)]
+        valid = any(
+            isinstance(entry, dict)
+            and all(_base_raw_entry(entry).get(field) for field in (
+                "headline", "paragraph1", "model_rationale", "sources"
+            ))
+            for entry in entries
+        )
+        if not valid and not strict_bootstrap:
+            preview = preview_artifact.get(gid) if isinstance(preview_artifact, dict) else None
+            if isinstance(preview, dict) and bool((preview.get("editorial_voice") or {}).get("copilot_researched")):
+                raw = _preview_raw_entry(preview)
+                valid = all(raw.get(field) for field in ("headline", "paragraph1", "model_rationale", "sources"))
+        if not valid:
+            missing.add(gid)
+    return missing
+
+
 def build_mixed_raw_payload(
     *,
     canonical_game_ids: list[str],
@@ -201,13 +247,23 @@ def build_mixed_raw_payload(
     return {"games": output}
 
 
-def mark_chatgpt_recovered(status: dict[str, Any], game_ids: list[str], *, now: datetime | None = None) -> dict[str, Any]:
+def mark_chatgpt_recovered(
+    status: dict[str, Any], game_ids: list[str], *,
+    now: datetime | None = None,
+    missing_authority_recovered: set[str] | None = None,
+) -> dict[str, Any]:
     current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     result = dict(status)
     section = dict(result.get("groq_provider_fallback") or {})
     games = dict(section.get("games") or {})
+    authority_gaps = missing_authority_recovered or set()
     for gid in game_ids:
         item = dict(games.get(gid) or {})
+        if gid in authority_gaps:
+            # A lost checkpoint is not a Groq API failure. Record the actual
+            # persistence fault and preserve the upstream provider outcome.
+            item["provider_result"] = item.get("provider_result") or "success"
+            item["editorial_recovery_reason"] = "missing_accepted_human_authority"
         item.update({
             "fallback_source": "chatgpt",
             "requires_chatgpt_refresh": False,
@@ -384,9 +440,20 @@ def ingest(
         raise ValueError("canonical predictions are missing game_id")
     game_ids = list(frame["game_id"].astype(str))
     status = json.loads(context_status_path.read_text(encoding="utf-8"))
-    targets = validate_fallback_manifest(input_root, game_ids, status)
     base = json.loads(provider_path.read_text(encoding="utf-8"))
     previews_payload = json.loads(preview_path.read_text(encoding="utf-8"))
+    checkpoints = _checkpoint_entries(checkpoint_path)
+    missing_authority = missing_accepted_editorial_authority(
+        canonical_game_ids=game_ids,
+        status=status,
+        base_artifact=base,
+        checkpoint_entries=checkpoints,
+        preview_artifact=previews_payload,
+        strict_bootstrap=checkpoint_path is not None,
+    )
+    targets = validate_fallback_manifest(
+        input_root, game_ids, status, missing_accepted_authority=missing_authority,
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(prefix="chatgpt-failed-game-ingest-") as tmp:
@@ -413,7 +480,7 @@ def ingest(
                 base_artifact=base,
                 chatgpt_entries=chatgpt_entries,
                 preview_artifact=previews_payload,
-                checkpoint_entries=_checkpoint_entries(checkpoint_path),
+                checkpoint_entries=checkpoints if checkpoint_path is not None else None,
             ), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
@@ -448,9 +515,14 @@ def ingest(
         report["validation_stage"] = "full_slate_validated"
         _write_recovery_report(diagnostic_path, report)
 
-    updated_status = mark_chatgpt_recovered(status, targets)
+    updated_status = mark_chatgpt_recovered(
+        status, targets, missing_authority_recovered=set(targets) & missing_authority,
+    )
     context_status_path.write_text(json.dumps(updated_status, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"validated ChatGPT fallback for {len(targets)} Groq-failed games without replacing successful Groq games")
+    print(f"validated ChatGPT recovery for {len(targets)} games: "
+          f"{len(set(targets) & missing_authority)} missing persisted authority, "
+          f"{len(set(targets) - missing_authority)} Groq-failed; "
+          "existing accepted Groq articles were never eligible for replacement")
     return targets
 
 
