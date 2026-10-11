@@ -8,6 +8,7 @@ cross-checks. StatMuse is deliberately *not* an automated production dependency.
 """
 
 from datetime import datetime, timezone
+import re
 from typing import Any, Callable
 from urllib.parse import urlparse
 
@@ -153,8 +154,8 @@ def is_direct_media_report_url(url: str) -> bool:
 # A publisher's /news/ URL is not proof that the content is original game
 # reporting. Keep this strict shallow classification distinct from article
 # fetch/quote verification and independent claim entailment.
-NON_REPORTING_SOURCE_TITLE_RE = __import__("re").compile(
-    r"\\b(?:how[ -]+to[ -]+watch|where[ -]+to[ -]+watch|"
+NON_REPORTING_SOURCE_TITLE_RE = re.compile(
+    r"\b(?:how[ -]+to[ -]+watch|where[ -]+to[ -]+watch|"
     r"watch[ ,:-]+listen[ ,:-]+(?:and[ ,:-]+)?follow|"
     r"tv[ -]+channels?|streaming[ ,:-]+|live[ -]+stream|"
     r"betting[ -]+picks?|fantasy[ -]+rankings?|"
@@ -162,8 +163,8 @@ NON_REPORTING_SOURCE_TITLE_RE = __import__("re").compile(
     r"week[ -]+\\d+[ -]+schedule|"
     r"odds[ ,:/-]+(?:injur|pick|preview|prediction)|"
     r"prediction[ ,:/-]+(?:pick|odds|where)|"
-    r"league[ -]+wide[ -]+roundup)\\b",
-    flags=__import__("re").I,
+    r"league[ -]+wide[ -]+roundup)\b",
+    flags=re.I,
 )
 
 
