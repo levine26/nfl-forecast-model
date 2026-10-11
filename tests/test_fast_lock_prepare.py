@@ -84,3 +84,10 @@ def test_fast_lock_worker_preserves_freshness_gate_and_atomically_publishes_refr
     assert "git add outputs/" in workflow  # Include canonical forecast, Read and lock in recovery transaction.
     assert "cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in workflow
     assert "git reset --hard origin/main" in workflow
+
+def test_prospective_week6_stale_preflight_only_checks_at_t60():
+    target = datetime(2026, 10, 18, 16, 0, tzinfo=timezone.utc)
+    future = row(game_id="2026_06_CHI_GB", gameday="2026-10-18",
+                 gametime="13:00", prediction_timestamp_utc="2026-10-18T12:00:00+00:00")
+    assert stale_due_games([future], [], now_utc=target-timedelta(seconds=1)) == []
+    assert stale_due_games([future], [], now_utc=target) == ["2026_06_CHI_GB"]
