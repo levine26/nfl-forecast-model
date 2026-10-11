@@ -11,7 +11,7 @@
 | B04 | Correlated market construction | ENGINEERING PROTOTYPE — NOT CALIBRATED | Explicit joint scenario ticket pricing, teaser/round robin and portfolio, demo joint TD/score generator; calibrate game score/TD joint distribution and compare to no-edge benchmark |
 | B05 | Allocation and reliability | CODE COMPLETE — PAPER MODE ONLY | Hard $45 cap, per-game exposure cap, abstention, optional conservative fractional Kelly, qualified-model gate; validate risk policy on sealed real out-of-time outcomes |
 | B06 | Reproducible packaging and handoff | CODE COMPLETE — TESTED | Standalone CLI, scientific protocol, roadmap, immutable receipt ledger, instructions; GitHub PR/review/publish outstanding |
-| B07 | Point-in-time provider qualification | B07A PARTIAL — CODE TESTED | SHA256 immutable capture and source adapter in place; verify real source contracts/timestamps/licensing and build production-quality data archive (B07B) |
+| B07 | Point-in-time provider qualification | B07A PARTIAL — CODE TESTED | SHA256 immutable capture and source adapter in place, with as-of-specific capture IDs (B07A-CORRECTION1); verify real source contracts/timestamps/licensing and build production-quality data archive (B07B) |
 | B08 | Historical real-data comparative backtest | NOT STARTED | Fixed pre-result evaluation spec, market-only vs betting candidates, ROI / CLV / calibration by market, leakage audit |
 | B09 | Prospective weekly paper betting | NOT STARTED | Snapshot before games, immutable prices, grading after games, append-only performance receipt. No wager execution |
 | B10 | Production promotion review | BLOCKED | Requires prospective proof AND explicit user approval; never automatic |

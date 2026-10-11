@@ -35,10 +35,14 @@ class Capture:
     def receipt(self)->dict:
         self.validate()
         canonical=json.dumps(self.payload,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode('utf-8')
+        raw_sha=sha256(canonical).hexdigest()
+        identity=json.dumps({'provider':self.provider,'capability':self.capability,
+                             'filters':self.filters,'received_utc':self.received_utc,
+                             'raw_sha256':raw_sha},sort_keys=True,separators=(',',':')).encode('utf-8')
         return {'provider':self.provider,'capability':self.capability,'filters':self.filters,
                 'received_utc':self.received_utc,'source_updated_utc':self.source_updated_utc,
-                'raw_sha256':sha256(canonical).hexdigest(),'byte_count':len(canonical),
-                'contractual_access':self.contractual_access,
+                'raw_sha256':raw_sha,'snapshot_id':sha256(identity).hexdigest(),
+                'byte_count':len(canonical), 'contractual_access':self.contractual_access,
                 'predictive_eligibility':'UNQUALIFIED_UNTIL_PER_SOURCE_AUDIT'}
 
 
@@ -49,7 +53,7 @@ def archive_capture(capture:Capture,directory:Path)->dict:
     """
     rec=capture.receipt()
     directory.mkdir(parents=True,exist_ok=True)
-    stem=rec['raw_sha256']
+    stem=rec['snapshot_id']
     payload=directory/(stem+'.json')
     receipt_path=directory/(stem+'.receipt.json')
     raw=json.dumps(capture.payload,indent=2,ensure_ascii=False,sort_keys=True)+'\n'

@@ -14,6 +14,7 @@ User wants a serious scientifically evaluated NFL wagering research system handl
 - B05: conservative paper stake and $45 risk caps, explicit lack-of-evidence abstention; no execution.
 - B06: docs, ledger and CLI.
 - B07A: timestamp/contract-provenance adapter and create-only SHA256 snapshot receipts; Alexandria per-book subquotes remain explicitly unqualified without their own timestamps.
+- B07A-CORRECTION1: make snapshot ID include provider, filters, receipt timestamp and raw SHA so repeated unchanged data at different capture times can be archived separately. Earlier receipt remains append-only.
 - All local tests: see actual latest test result and receipt; no claims about remote CI without confirmation.
 
 ## Commands

@@ -15,6 +15,10 @@ class Sources(unittest.TestCase):
         self.assertTrue(Path(r['payload_path']).exists())
         self.assertEqual(len(r['raw_sha256']),64)
         with self.assertRaises(FileExistsError):archive_capture(cap,Path(d))
+        later=Capture('startwho-com','projections',{'week':5},'2026-10-11T05:31:00Z',None,{'players':[]})
+        later_receipt=archive_capture(later,Path(d))
+        self.assertNotEqual(r['snapshot_id'],later_receipt['snapshot_id'])
+        self.assertEqual(r['raw_sha256'],later_receipt['raw_sha256'])
  def test_manual_quote_gate(self):
     raw={'id':'s','game_id':'g','market':'moneyline','selection':'home ML','american':-200,
        'observed_utc':'2026-10-11T05:25:00Z','source':'User manually captured operator quote',
