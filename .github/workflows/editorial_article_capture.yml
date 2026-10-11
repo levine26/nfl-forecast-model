@@ -1,0 +1,36 @@
+name: Sunday Signal article verification shadow tests
+
+on:
+  pull_request:
+    paths:
+      - "src/nfl_forecast/editorial_article_capture.py"
+      - "tests/test_editorial_article_capture.py"
+      - ".github/workflows/editorial_article_capture.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-direct-article-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install test dependencies
+        run: pip install ".[dev]"
+      - name: Assert source existence and quote checks do not masquerade as fact checking
+        run: |
+          python -m py_compile src/nfl_forecast/editorial_article_capture.py
+          pytest -q tests/test_editorial_article_capture.py
+          python - <<'PY'
+          from nfl_forecast.editorial_article_capture import capture_report
+          import inspect
+          src = inspect.getsource(capture_report)
+          assert '"claim_entailment_verified": False' in src
+          print("Article capture produces provenance only. Separate factual verification remains mandatory.")
+          PY
