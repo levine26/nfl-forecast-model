@@ -28,11 +28,26 @@ def _words(value: object) -> list[str]:
     return _WORD.findall(str(value or ""))
 
 
-def _mentions_team(value: object, code: str) -> bool:
+def _mentions_team(value: object, code: str, opponent_code: str = "") -> bool:
+    """Check explicit club names and an unambiguous city in this matchup.
+
+    City-only football references ("Cleveland", "Tampa Bay", "New York") are
+    legitimate team discussion, except that two clubs sharing a city must
+    still be distinguished by nickname or abbreviation. Team codes are
+    matched case-sensitively: ordinary English "no" is not a Saints mention.
+    This is ONLY a structural test, never verification of football facts.
+    """
+    raw = str(value or "")
     full = str((TEAM_META.get(code) or {}).get("name") or code)
-    aliases = (code.lower(), full.lower(), full.split()[-1].lower())
-    text = str(value or "").lower()
-    return any(re.search(r"\b" + re.escape(alias) + r"\b", text) for alias in aliases)
+    opposing = str((TEAM_META.get(opponent_code) or {}).get("name") or opponent_code)
+    city = full.rsplit(" ", 1)[0]
+    opposing_city = opposing.rsplit(" ", 1)[0]
+    aliases = [full, full.rsplit(" ", 1)[-1]]
+    if city.casefold() != opposing_city.casefold():
+        aliases.append(city)
+    if any(re.search(r"\b" + re.escape(alias) + r"\b", raw, re.I) for alias in aliases):
+        return True
+    return bool(re.search(r"\b" + re.escape(str(code)) + r"\b", raw))
 
 
 def _substantive_seven_grams(value: object) -> set[str]:
@@ -91,7 +106,7 @@ def audit_editorial_acceptance(predictions, previews: dict[str, Any]) -> dict[st
         if not 55 <= word_count <= 100:
             errors.append("human_paragraph_outside_55_100_words")
         away, home = str(row.get("away_team") or ""), str(row.get("home_team") or "")
-        if not (_mentions_team(first, away) and _mentions_team(first, home)):
+        if not (_mentions_team(first, away, home) and _mentions_team(first, home, away)):
             errors.append("human_paragraph_does_not_discuss_both_teams")
         if any(pattern.search(f"{headline} {first}") for pattern in _FALLBACK_SHAPES):
             errors.append("mechanical_injury_or_stock_template")
