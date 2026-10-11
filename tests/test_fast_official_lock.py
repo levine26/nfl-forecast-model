@@ -137,3 +137,17 @@ def test_rejects_schema_drift_without_touching_history(tmp_path):
     with pytest.raises(FastLockError,match="schema"):
         write_fast_locks(tmp_path,TARGET)
     assert (tmp_path/"prediction_history.csv").read_bytes()==old
+
+def test_week6_fast_lock_starts_at_t60_and_never_prematurely_at_t120():
+    kickoff = datetime(2026, 10, 18, 17, 0, tzinfo=timezone.utc)
+    target = kickoff - timedelta(minutes=60)
+    before = snapshot(target)
+    before.update(game_id="2026_06_PHI_JAX", season="2026", week="6",
+                  gameday="2026-10-18", gametime="13:00")
+    assert plan_fast_locks([before], [], status(),
+                           now_utc=target-timedelta(seconds=1)) == []
+    locked = plan_fast_locks([before], [], status(), now_utc=target)
+    assert len(locked) == 1
+    assert locked[0]["final_home_prob"] == before["final_home_prob"]
+    assert float(locked[0]["minutes_to_kickoff_at_lock"]) == pytest.approx(60.0)
+    assert locked[0]["lock_timestamp_utc"] == target.isoformat()
