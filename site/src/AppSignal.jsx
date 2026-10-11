@@ -160,7 +160,7 @@ function BrandLockup({compact=false}) {
 }
 
 function Header({route,week}) {
-  const primary=[['forecasts','Forecasts'],['power','Power'],['history','History'],['methodology','Methodology']]
+  const primary=[['forecasts','Forecasts'],['power','Power'],['history','Performance'],['methodology','Methodology']]
   return <>
     <header className="ss-header">
       <button className="ss-brand-button" onClick={()=>navigateHash('forecasts')} aria-label="Sunday Signal forecasts">
