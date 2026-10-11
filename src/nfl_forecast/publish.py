@@ -439,5 +439,7 @@ def write_outputs(
     # Only isolated lock-unit fixtures may disable this gate explicitly.
     if enforce_read_sync:
         from nfl_forecast.read_publication import synchronize_file
-        synchronize_file(out)
-        synchronize_file(out, check=True)
+        # Synchronize against this exact production snapshot clock, not a
+        # separately sampled wall clock that may cross kickoff mid-publish.
+        synchronize_file(out, now_utc=now_utc)
+        synchronize_file(out, check=True, now_utc=now_utc)
