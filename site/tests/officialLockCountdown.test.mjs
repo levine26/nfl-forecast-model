@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {OFFICIAL_LOCK_LEAD_MINUTES, officialLockTiming, serverClockOffsetMs} from '../src/officialLockCountdown.mjs'
+import {OFFICIAL_LOCK_LEAD_MINUTES, officialLockLeadMinutes, officialLockTiming, serverClockOffsetMs} from '../src/officialLockCountdown.mjs'
 
 const game = (kickoff_utc, rest = {}) => ({kickoff_utc, lifecycle_status:'LIVE_FORECAST', immutable:false, ...rest})
 
@@ -79,4 +79,26 @@ test('invalid or backwards server timing does not invent clock correction', () =
   const begin=Date.parse('2026-10-10T15:59:00Z')
   assert.equal(serverClockOffsetMs('',begin,begin+100),null)
   assert.equal(serverClockOffsetMs('Sat, 10 Oct 2026 16:00:00 GMT',begin+100,begin),null)
+})
+
+test('Week 6 switches only future unlocked games to T-60', () => {
+  const future=game('2026-10-15T20:15:00Z',{gameday:'2026-10-15'})
+  const legacy=game('2026-10-11T17:00:00Z',{gameday:'2026-10-11'})
+  assert.equal(officialLockLeadMinutes(future),60)
+  assert.equal(officialLockLeadMinutes(legacy),120)
+  assert.equal(officialLockTiming(future,0).scheduledLockUtc,'2026-10-15T19:15:00.000Z')
+  assert.equal(officialLockTiming(legacy,0).scheduledLockUtc,'2026-10-11T15:00:00.000Z')
+  assert.equal(officialLockTiming(future,Date.parse('2026-10-15T19:14:00Z')).state,'countdown')
+  assert.equal(officialLockTiming(future,Date.parse('2026-10-15T19:15:00Z')).state,'due')
+  assert.equal(officialLockTiming(future,Date.parse('2026-10-15T19:20:00Z')).state,'due')
+})
+
+test('T-60 cutover never changes a prior immutable receipt', () => {
+  const old=game('2026-10-11T17:00:00Z',{
+    gameday:'2026-10-11', immutable:true, lifecycle_status:'FINAL_PREGAME',
+    lock_timestamp_utc:'2026-10-11T16:42:02Z'
+  })
+  assert.deepEqual(officialLockTiming(old,Date.now()),{
+    state:'locked',actualLockUtc:'2026-10-11T16:42:02Z',scheduledLockUtc:null
+  })
 })
