@@ -90,8 +90,8 @@ def test_kickoff_timezone_is_dst_safe():
     row=snapshot()
     row["gameday"]="2026-11-01"
     row["gametime"]="13:00" # 18:00 UTC after the fall-back
-    row["prediction_timestamp_utc"]="2026-11-01T15:30:00+00:00"
-    due=datetime(2026,11,1,16,0,tzinfo=timezone.utc)
+    row["prediction_timestamp_utc"]="2026-11-01T16:30:00+00:00"
+    due=datetime(2026,11,1,17,0,tzinfo=timezone.utc)  # T-60 after DST fall-back
     locked=plan_fast_locks([row],[],status(),now_utc=due)
     assert locked[0]["kickoff_utc"]=="2026-11-01T18:00:00+00:00"
 
