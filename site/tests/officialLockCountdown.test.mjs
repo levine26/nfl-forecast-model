@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {OFFICIAL_LOCK_LEAD_MINUTES, officialLockTiming, serverClockOffsetMs} from '../src/officialLockCountdown.mjs'
+import {OFFICIAL_LOCK_LEAD_MINUTES, NEW_OFFICIAL_LOCK_LEAD_MINUTES, officialLockLeadMinutes, officialLockTiming, serverClockOffsetMs} from '../src/officialLockCountdown.mjs'
 
-const game = (kickoff_utc, rest = {}) => ({kickoff_utc, lifecycle_status:'LIVE_FORECAST', immutable:false, ...rest})
+const game = (kickoff_utc, rest = {}) => ({game_id:'2026_05_CHI_GB',season:2026,week:5,kickoff_utc, lifecycle_status:'LIVE_FORECAST', immutable:false, ...rest})
 
 test('counts down to official T-120, not kickoff (early Week 5 game)', () => {
   const target = officialLockTiming(game('2026-10-11T13:30:00Z'), Date.parse('2026-10-10T15:30:00Z'))
@@ -79,4 +79,23 @@ test('invalid or backwards server timing does not invent clock correction', () =
   const begin=Date.parse('2026-10-10T15:59:00Z')
   assert.equal(serverClockOffsetMs('',begin,begin+100),null)
   assert.equal(serverClockOffsetMs('Sat, 10 Oct 2026 16:00:00 GMT',begin+100,begin),null)
+})
+
+
+test('Week 6 T-60 countdown preserves historic T-120 games', () => {
+  const kickoff='2026-10-16T00:15:00Z'
+  const newGame=game(kickoff,{game_id:'2026_06_A_B',week:6})
+  const oldGame=game(kickoff,{game_id:'2026_05_A_B',week:5})
+  assert.equal(NEW_OFFICIAL_LOCK_LEAD_MINUTES,60)
+  assert.equal(officialLockLeadMinutes(oldGame),120)
+  assert.equal(officialLockLeadMinutes(newGame),60)
+  assert.equal(officialLockTiming(oldGame,0).scheduledLockUtc,'2026-10-15T22:15:00.000Z')
+  assert.equal(officialLockTiming(newGame,0).scheduledLockUtc,'2026-10-15T23:15:00.000Z')
+  assert.equal(officialLockTiming(newGame,Date.parse('2026-10-15T23:14:00Z')).state,'countdown')
+  assert.equal(officialLockTiming(newGame,Date.parse('2026-10-15T23:15:00Z')).state,'due')
+})
+
+test('malformed canonical identity does not fabricate a policy deadline', () => {
+  const g=game('2026-10-16T00:15:00Z',{season:null,week:null,game_id:'bad'})
+  assert.equal(officialLockTiming(g,0).state,'unavailable')
 })
