@@ -149,3 +149,12 @@ def test_article_scoped_title_takes_priority_over_branding_page_h1():
     ).encode()
     record = capture(response=Response(body=page))
     assert record["article_title"] == ARTICLE_TITLE
+
+
+def test_actual_week5_groq_cbs_viewing_betting_source_is_rejected():
+    # Original Groq TB_DAL checkpoint was structurally accepted despite this
+    # publicly resolving to a viewing/prediction/odds article, not direct reporting.
+    url = "https://www.cbssports.com/nfl/news/cowboys-vs-buccaneers-prediction-where-to-watch-tnf/"
+    title = "Where to watch Cowboys vs. Buccaneers: Prediction, pick, odds, streaming for TNF"
+    with pytest.raises(ArticleCaptureError, match="generic or missing"):
+        capture(url=url, response=Response(body=article_html(title=title)), title=title)
