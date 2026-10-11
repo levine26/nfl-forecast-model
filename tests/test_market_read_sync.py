@@ -273,7 +273,7 @@ def test_market_workflow_and_daily_workflow_both_protect_commit(monkeypatch):
         assert "sync_market_reads.py" in content or name == "weekly.yml"
         assert "git add outputs/" in content
     publisher = (root / "src" / "nfl_forecast" / "publish.py").read_text()
-    assert "synchronize_file(out)" in publisher
+    assert "synchronize_file(out, now_utc=now_utc)" in publisher
     dashboard = (root / ".github" / "workflows" / "dashboard.yml").read_text()
     assert "sync_market_reads --output-dir site/public/data --check" in dashboard
     assert "sync_market_reads --output-dir site/public/data --write" not in dashboard
