@@ -1,17 +1,9 @@
 name: Sunday Signal ChatGPT primary editorial ingestion
 
+# Retired from automatic production execution: prioritizing numerical forecasts
+# and timely official locks. Manual-only archival workflow.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "scripts/ingest_chatgpt_media_payloads.py"
-      - "src/nfl_forecast/editorial_quality.py"
-      - "scripts/validate_single_copilot_game.py"
-      - "scripts/validate_copilot_media_reads.py"
-      - "tests/test_editorial_quality.py"
-      - "tests/test_chatgpt_media_ingest.py"
-      - "inputs/chatgpt_media/current/**"
-      - ".github/workflows/chatgpt_media_ingest.yml"
 
 permissions:
   contents: write

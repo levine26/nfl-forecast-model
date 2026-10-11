@@ -52,7 +52,7 @@ for (const [name, width, height] of viewports) {
     await expect(clarity.getByText('FORECAST TIER', { exact: true })).toBeVisible()
     await expect(clarity.getByText('SINCE LAST FORECAST', { exact: true })).toBeVisible()
     await expect(page.locator('.ss-exp-lifecycle:visible')).toBeVisible()
-    await expect(page.locator('.ss-exp-signal:visible').getByText('THE SIGNAL', { exact: true })).toBeVisible()
+    await expect(page.locator('.ss-exp-signal, .ss-plus-signal, .ss-the-signal')).toHaveCount(0)
     await expect(page.locator('.ss-exp-movement-context:visible')).toBeVisible()
     await expect(clarity.locator('.ss-clarity-share')).toBeVisible()
     await expect(page.getByText('WHY LEVLINE?', { exact: true })).toHaveCount(0)

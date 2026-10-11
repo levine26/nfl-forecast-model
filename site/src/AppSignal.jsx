@@ -1,5 +1,3 @@
-import { canonicalReportLink } from './editorialSourceLinks.mjs'
-import {hasPublishedHumanRead} from './editorialReadStatus.mjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   CartesianGrid,
@@ -256,23 +254,6 @@ function ForecastHero({game,compact=false}) {
   </section>
 }
 
-function TheSignal({preview,compact=false,acceptance,expectedGames}) {
-  if (!hasPublishedHumanRead(preview,acceptance,expectedGames)) return <section className={`ss-the-signal ${compact?'compact':''}`}><div><span>THE SIGNAL</span><h2>Independent matchup reporting is under review.</h2>{!compact&&<p>The canonical LevLine forecast is available above. A human matchup Read will appear only after provider, source-attribution, and full-slate acceptance checks pass.</p>}</div></section>
-  const headline=preview?.headline || preview?.key_factors?.[0]?.title
-  const paragraphs=Array.isArray(preview?.paragraphs) ? preview.paragraphs.filter(Boolean) : []
-  const fallback=preview?.key_factors?.[0]?.summary
-  return <section className={`ss-the-signal ${compact?'compact':''}`}>
-    <div className="ss-signal-mark" aria-hidden="true"><img src={`${BASE}brand/sunday-signal-icon.svg`} alt=""/></div>
-    <div>
-      <span>THE SIGNAL</span>
-      {headline && <h2>{headline}</h2>}
-      {!compact && paragraphs.slice(0,3).map((text,index)=><p key={index}>{text}</p>)}
-      {!compact && !paragraphs.length && fallback && <p>{fallback}</p>}
-      {!headline && <p className="ss-empty">Game-specific editorial intelligence has not cleared the publication threshold yet.</p>}
-    </div>
-  </section>
-}
-
 function TopSignals({games,onOpen}) {
   if (!games.length) return null
   const valid=games.filter(game=>num(game.official_winner_probability)!=null)
@@ -292,17 +273,15 @@ function TopSignals({games,onOpen}) {
   </section>
 }
 
-function BoardRow({game,preview,onOpen,acceptance,expectedGames}) {
+function BoardRow({game,onOpen}) {
   if (isMissingOfficialLock(game)) return <button className="ss-game-row" onClick={onOpen} data-game-open>
     <div className="ss-row-matchup"><span><TeamMark team={game.away_team} size="sm"/><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} size="sm"/><b>{game.home_team}</b></span><small>{formatKickoff(game)}</small></div>
     <div className="ss-row-pick"><b>No official lock</b><span>Not published</span></div><strong className="ss-row-prob">—</strong><span>—</span><span className="ss-row-edge">—</span><span><Lifecycle game={game}/></span><b className="ss-row-arrow" aria-hidden="true">›</b>
   </button>
-  const teaser=hasPublishedHumanRead(preview,acceptance,expectedGames) ? preview.headline : null
   return <button className="ss-game-row" onClick={onOpen} data-game-open>
     <div className="ss-row-matchup">
       <span><TeamMark team={game.away_team} size="sm"/><b>{game.away_team}</b></span><em>@</em><span><TeamMark team={game.home_team} size="sm"/><b>{game.home_team}</b></span>
       <small>{formatKickoff(game)}</small>
-      {teaser && <p><i>THE SIGNAL</i>{teaser}</p>}
     </div>
     <div className="ss-row-pick"><b>{game.official_winner}</b><span>{lineText(game.coherent_fair_margin_home,game.home_team,game.away_team)}</span></div>
     <strong className="ss-row-prob">{pct(game.official_winner_probability,0)}</strong>
@@ -313,7 +292,7 @@ function BoardRow({game,preview,onOpen,acceptance,expectedGames}) {
   </button>
 }
 
-function MobileGameCard({game,preview,onOpen,acceptance,expectedGames}) {
+function MobileGameCard({game,onOpen}) {
   return <article className="ss-mobile-card">
     <button className="ss-card-open" onClick={onOpen} data-game-open>
       <div className="ss-card-top"><span>{formatKickoff(game)}</span><Lifecycle game={game}/></div>
@@ -321,13 +300,12 @@ function MobileGameCard({game,preview,onOpen,acceptance,expectedGames}) {
         <span><TeamMark team={game.away_team}/><b>{game.away_team}</b></span><em>AT</em><span><TeamMark team={game.home_team}/><b>{game.home_team}</b></span>
       </div>
       <ForecastHero game={game} compact/>
-      {!isMissingOfficialLock(game) && <TheSignal preview={preview} compact acceptance={acceptance} expectedGames={expectedGames}/>}
       <div className="ss-view-matchup">View Matchup <span>→</span></div>
     </button>
   </article>
 }
 
-function ForecastBoard({games,previews,onOpen,status,acceptance}) {
+function ForecastBoard({games,onOpen,status}) {
   const sorted=[...games].sort((a,b)=>new Date(a.kickoff_utc||0)-new Date(b.kickoff_utc||0))
   const live=sorted.filter(g=>g.lifecycle_status==='IN_PROGRESS').length
   const locked=sorted.filter(g=>g.immutable).length
@@ -357,37 +335,11 @@ function ForecastBoard({games,previews,onOpen,status,acceptance}) {
       </div>
       <div className="ss-board-table">
         <div className="ss-board-labels"><span>MATCHUP</span><span>LEVLINE PICK</span><span>WIN PROB.</span><span>MARKET LINE</span><span>VS MARKET</span><span>STATUS</span><span/></div>
-        {sorted.map(game=><BoardRow key={game.game_id} game={game} preview={previews[game.game_id]} acceptance={acceptance} expectedGames={games.length} onOpen={()=>onOpen(game)}/>) }
+        {sorted.map(game=><BoardRow key={game.game_id} game={game} onOpen={()=>onOpen(game)}/>) }
       </div>
-      <div className="ss-mobile-cards">{sorted.map(game=><MobileGameCard key={game.game_id} game={game} preview={previews[game.game_id]} acceptance={acceptance} expectedGames={games.length} onOpen={()=>onOpen(game)}/>)}</div>
+      <div className="ss-mobile-cards">{sorted.map(game=><MobileGameCard key={game.game_id} game={game} onOpen={()=>onOpen(game)}/>)}</div>
     </section>
   </main>
-}
-
-function sourceLink(item) {
-  const original=canonicalReportLink(item?.source_url)
-  return original ? <a href={original} target="_blank" rel="noopener noreferrer" onClick={event=>event.stopPropagation()}>Original report ↗</a> : null
-}
-
-function KeyDevelopments({evidence=[],preview}) {
-  const priority=['injury','personnel','weather','travel','coaching','structural_change','scheme','matchup']
-  const rank=category=>{
-    const idx=priority.indexOf(String(category||'').toLowerCase())
-    return idx<0 ? priority.length : idx
-  }
-  const items=[...evidence].sort((a,b)=>rank(a.category)-rank(b.category)).filter(item=>item.title && item.summary).slice(0,5)
-  if (!items.length && !preview?.headline) return null
-  return <section className="ss-panel ss-developments">
-    <div className="ss-section-head"><div><span>KEY DEVELOPMENTS</span><small>Published context with governance preserved</small></div></div>
-    <div className="ss-development-list">{items.map((item,index)=><article key={`${item.title}-${index}`}>
-      <div className="ss-dev-icon" aria-hidden="true">{String(item.category||'context').toLowerCase()==='injury'?'✚':'◆'}</div>
-      <div className="ss-dev-copy">
-        <header><span>{String(item.category||'context').replaceAll('_',' ')}</span><small>{item.as_of?formatTime(item.as_of):''}</small></header>
-        <b>{item.title}</b><p>{item.summary}</p>
-        <footer><span>{item.promoted_to_model?'Validated model input':'Context only'}</span><span>{item.source_name||''}</span>{sourceLink(item)}</footer>
-      </div>
-    </article>)}</div>
-  </section>
 }
 
 function movementRows(game,runs) {
@@ -480,7 +432,7 @@ function AdvancedNumbers({game,diagnostic}) {
   return <div className="ss-advanced-grid">{rows.map(([label,value])=><div key={label}><span>{label}</span><b>{value}</b></div>)}<p>The independent margin model remains preserved for research and diagnostics. It does not override the probability-implied presentation line or official winner.</p></div>
 }
 
-function MatchupPage({game,runs,evidence,preview,diagnostic,gameMonitor,acceptance,expectedGames}) {
+function MatchupPage({game,runs,diagnostic,gameMonitor}) {
   if (!game) return <main className="ss-page"><section className="ss-panel"><p className="ss-empty">This matchup is not in the current published slate.</p><button className="ss-text-link" onClick={()=>navigateHash('forecasts')}>Back to forecasts →</button></section></main>
   if (isMissingOfficialLock(game)) return <main className="ss-page ss-matchup-page">
     <button className="ss-back" onClick={()=>navigateHash('forecasts')}>← Back to Week {game.week||'—'}</button>
@@ -490,7 +442,7 @@ function MatchupPage({game,runs,evidence,preview,diagnostic,gameMonitor,acceptan
       <div className="ss-team-side home"><TeamMark team={game.home_team} size="xl"/><div><span>{teamName(game.home_team)}</span></div></div>
     </section>
     <ForecastHero game={game}/>
-    <section className="ss-panel"><h2>Official forecast unavailable</h2><p>This game crossed kickoff without a valid official immutable lock. No post-kickoff LevLine prediction, market signal, ATS recommendation, or editorial Read is substituted. Other games remain available.</p></section>
+    <section className="ss-panel"><h2>Official forecast unavailable</h2><p>This game crossed kickoff without a valid official immutable lock. No post-kickoff LevLine prediction, market signal, ATS recommendation, is substituted. Other games remain available.</p></section>
   </main>
   const meta=[game.venue,game.network,game.weather].filter(Boolean)
   return <main className="ss-page ss-matchup-page">
@@ -506,9 +458,7 @@ function MatchupPage({game,runs,evidence,preview,diagnostic,gameMonitor,acceptan
 
     <div className="ss-matchup-grid">
       <div className="ss-matchup-main">
-        <TheSignal preview={preview} acceptance={acceptance} expectedGames={expectedGames}/>
-        <ForecastMovement game={game} runs={runs} evidence={evidence}/>
-        <KeyDevelopments evidence={evidence} preview={preview}/>
+        <ForecastMovement game={game} runs={runs} evidence={[]}/>
         <SignalFlow game={game} variant="ss-mobile-flow"/>
         <ImpactMonitor gameMonitor={gameMonitor}/>
       </div>
@@ -655,7 +605,7 @@ export default function App() {
   const [route,setRoute]=useState(()=>parseRoute())
   const [forecastPayload,setForecastPayload]=useState({games:[]})
   const [impactMonitor,setImpactMonitor]=useState({games:[]})
-  const [runs,setRuns]=useState([]), [evidence,setEvidence]=useState({}), [previews,setPreviews]=useState({}), [status,setStatus]=useState({}), [editorialAcceptance,setEditorialAcceptance]=useState(null)
+  const [runs,setRuns]=useState([]), [status,setStatus]=useState({})
   const [ratings,setRatings]=useState([]), [models,setModels]=useState([]), [history,setHistory]=useState([]), [profiles,setProfiles]=useState([]), [autopsies,setAutopsies]=useState({}), [editorial,setEditorial]=useState({teams:[]}), [currentRaw,setCurrentRaw]=useState([])
   const [error,setError]=useState('')
 
@@ -666,11 +616,11 @@ export default function App() {
   },[])
 
   useEffect(()=>{;(async()=>{try{
-    const [publicForecasts,runRows,context,previewRows,statusRows,sourceStatusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows,impactRows]=await Promise.all([
-      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchJSON('contextual_evidence.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('status.json',{}),fetchJSON('context_source_status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),fetchJSON('impact_monitor.json',{games:[]}),
+    const [publicForecasts,runRows,statusRows,powerRows,modelRows,historyRows,profileRows,autopsyRows,editorialRows,currentRows,impactRows]=await Promise.all([
+      fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchJSON('status.json',{}),fetchCSV('power_ratings.csv'),fetchCSV('model_leaderboard.csv'),fetchCSV('prediction_history.csv'),fetchCSV('team_profiles.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('power_editorial.json',{teams:[]}),fetchCSV('this_week.csv'),fetchJSON('impact_monitor.json',{games:[]}),
     ])
     if (!Array.isArray(publicForecasts.games) || !publicForecasts.games.length) throw new Error('Canonical public forecast contract is unavailable.')
-    setForecastPayload(publicForecasts);setImpactMonitor(impactRows);setRuns(runRows);setEvidence(context);setPreviews(previewRows);setStatus(statusRows);setEditorialAcceptance(sourceStatusRows?.editorial_acceptance||null);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
+    setForecastPayload(publicForecasts);setImpactMonitor(impactRows);setRuns(runRows);setStatus(statusRows);setRatings(powerRows);setModels(modelRows);setHistory(historyRows);setProfiles(profileRows);setAutopsies(autopsyRows);setEditorial(editorialRows);setCurrentRaw(currentRows)
   }catch(err){setError(String(err?.message||err))}})()},[])
 
   const games=forecastPayload.games||[]
@@ -684,8 +634,8 @@ export default function App() {
 
   return <div className="ss-app">
     <Header route={route} week={week}/>
-    {route.page==='forecasts'&&<ForecastBoard games={games} previews={previews} onOpen={openGame} status={status} acceptance={editorialAcceptance}/>} 
-    {route.page==='game'&&<MatchupPage game={selected} runs={runs} evidence={selected?(evidence[selected.game_id]||[]):[]} preview={selected?previews[selected.game_id]:null} diagnostic={selected?diagnostics[selected.game_id]:null} gameMonitor={selectedMonitor} acceptance={editorialAcceptance} expectedGames={games.length}/>} 
+    {route.page==='forecasts'&&<ForecastBoard games={games} onOpen={openGame} status={status}/>} 
+    {route.page==='game'&&<MatchupPage game={selected} runs={runs} diagnostic={selected?diagnostics[selected.game_id]:null} gameMonitor={selectedMonitor}/>} 
     {route.page==='power'&&<PowerPage ratings={ratings} editorial={editorial}/>} 
     {route.page==='history'&&<HistoryPage history={history} autopsies={autopsies}/>} 
     {route.page==='methodology'&&<MethodologyPage models={models}/>} 

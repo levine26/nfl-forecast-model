@@ -6,9 +6,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/sync_market_reads.py'
       - 'src/nfl_forecast/public_forecast.py'
-      - 'src/nfl_forecast/read_publication.py'
       - '.github/workflows/market_refresh.yml'
   schedule:
     # Secondary scheduled opportunity mitigates delayed/skipped GitHub cron events.
@@ -60,10 +58,6 @@ jobs:
               echo "Market generation failed on all three attempts; refusing to publish."
               exit 1
             fi
-            # write_outputs already regenerates and validates deterministic Reads.
-            # A second check protects the commit boundary without rerunning Groq.
-            PYTHONPATH="$PWD/src:$PWD${PYTHONPATH:+:$PYTHONPATH}" \
-              python scripts/sync_market_reads.py --output-dir outputs --check
             git add outputs/
 
             if git diff --cached --quiet; then

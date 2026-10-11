@@ -1,5 +1,3 @@
-import { canonicalReportLink } from './editorialSourceLinks.mjs'
-import {hasPublishedHumanRead} from './editorialReadStatus.mjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './experience-v2.css'
@@ -286,32 +284,6 @@ function LifecycleRibbon({game}) {
   return <div className={`ss-exp-lifecycle ${state.key}`}><span><i/>{state.label}</span><b>{state.detail}</b>{game.market_timestamp_utc&&<small>Market updated {formatTime(game.market_timestamp_utc)}</small>}</div>
 }
 
-function researchMeta(preview,evidence) {
-  const sources=[]
-  const seen=new Set()
-  for (const item of [...(preview?.current_reported_sources||[]),...(preview?.evidence_used||[])]) {
-    const original=canonicalReportLink(item.source_url)
-    if (original&&!seen.has(original)) { seen.add(original);sources.push({...item,source_url:original}) }
-  }
-  const stamps=[preview?.updated_utc,preview?.generated_utc,...sources.map(x=>x.as_of||x.published_at||x.timestamp),...evidence.map(x=>x.as_of)].filter(Boolean).map(Date.parse).filter(Number.isFinite)
-  return {sources,latest:stamps.length?new Date(Math.max(...stamps)).toISOString():null}
-}
-function SignalV2({preview,evidence=[]}) {
-  if (!hasPublishedHumanRead(preview)) return <section className="ss-exp-signal ss-exp-empty-signal"><header><div><span>THE SIGNAL</span><small>Source and editorial validation pending</small></div><b>Matchup preview pending</b></header><h2>Matchup analysis is awaiting source and editorial acceptance.</h2><p className="ss-exp-bottom-line">LevLine's numerical forecast remains available. This section does not publish deterministic template prose as a validated human Read.</p></section>
-  const {sources,latest}=researchMeta(preview,evidence)
-  const paragraphs=Array.isArray(preview?.paragraphs)?preview.paragraphs.filter(Boolean):[]
-  const factors=(preview?.key_factors||[]).filter(x=>x?.title).slice(0,3)
-  const headline=preview?.headline||factors[0]?.title
-  const bottom=paragraphs[0]||factors[0]?.summary
-  if (!headline) return <section className="ss-exp-signal ss-exp-empty-signal"><span>THE SIGNAL</span><h2>Matchup analysis is being researched.</h2><p>The LevLine forecast is live. The Signal will appear after the research and source-validation pipeline clears publication.</p></section>
-  return <section className="ss-exp-signal">
-    <header><div><span>THE SIGNAL</span><small>{latest?`Research updated ${relativeFreshness(latest)}`:'Research timestamp unavailable'} · {sources.length} direct article links (verification pending)</small></div><b>Quick matchup read</b></header>
-    <h2>{headline}</h2>{bottom&&<p className="ss-exp-bottom-line">{bottom}</p>}
-    {factors.length>0&&<div className="ss-exp-what-matters"><span>WHAT MATTERS</span><div>{factors.map((factor,index)=><article key={`${factor.title}-${index}`}><header><b>{factor.advantage_team||'WATCH'}</b><small>{factor.strength||factor.family||'Context'}</small></header><strong>{factor.title}</strong>{factor.summary&&<p>{factor.summary}</p>}</article>)}</div></div>}
-    <details><summary>Read full analysis <span>Direct source links & supporting context</span></summary><div className="ss-exp-full-analysis">{paragraphs.slice(bottom===paragraphs[0]?1:0).map((text,index)=><p key={index}>{text}</p>)}{sources.length>0&&<div className="ss-exp-sources">{sources.slice(0,8).map((source,index)=><a key={`${source.source_name||source.source_url}-${index}`} href={source.source_url||undefined} target={source.source_url?'_blank':undefined} rel="noreferrer"><small>{String(source.category||'source').replaceAll('_',' ')}</small><b>{source.source_name||'Source'}</b></a>)}</div>}</div></details>
-  </section>
-}
-
 function MovementContextV2({game,runs,evidence=[]}) {
   const rows=movementRows(game,runs)
   if (rows.length<2) return <section className="ss-exp-movement-context"><header><span>WHAT CHANGED</span><small>Chronology without causal overreach</small></header><div className="ss-exp-empty"><b>Movement needs two comparable forecasts.</b><span>This timeline will populate after another published run.</span></div></section>
@@ -372,7 +344,7 @@ function HistoryExplorer({history,autopsies}) {
   </section>
 }
 
-function ReceiptPage({row,autopsy,preview}) {
+function ReceiptPage({row,autopsy}) {
   if (!row) return <main className="ss-exp-receipt-page"><button onClick={()=>nav('history')}>← Back to History</button><div className="ss-exp-empty"><b>This receipt is not available in the published history.</b><span>The archive only opens immutable picks that exist in the current public record.</span></div></main>
   const pick=receiptPick(row),p=receiptProbability(row),correct=truthy(autopsy?.winner_correct ?? autopsy?.correct ?? row.winner_correct),score=finalScore(row)
   const text=autopsy?.summary||autopsy?.headline||autopsy?.analysis||autopsy?.takeaway
@@ -380,7 +352,6 @@ function ReceiptPage({row,autopsy,preview}) {
     <button onClick={()=>nav('history')}>← Back to Official History</button>
     <section className="ss-exp-receipt-hero"><span>OFFICIAL PREGAME RECEIPT · WEEK {row.week||'—'}</span><h1>{row.away_team} @ {row.home_team}</h1><p>Published, locked before kickoff, and preserved after the result.</p></section>
     <section className="ss-exp-receipt-grid"><article><small>PICK OF RECORD</small><img src={teamLogo(pick)} alt=""/><strong>{teamName(pick)}</strong><b>{pct(p)}</b></article><article><small>LOCKED</small><strong>{formatTime(row.lock_timestamp_utc,{withDay:true})}</strong><span>Later refreshes cannot replace this forecast.</span></article><article className={correct===true?'correct':correct===false?'miss':'pending'}><small>RESULT</small><strong>{correct==null?'Pending':correct?'✓ Correct':'✕ Miss'}</strong><span>{score?`${row.away_team} ${score.away} – ${row.home_team} ${score.home}`:'Final score not stored in this receipt.'}</span></article></section>
-    <section className="ss-exp-receipt-analysis"><span>THE SIGNAL</span>{hasPublishedHumanRead(preview)?<><h2>{preview.headline}</h2>{(preview.paragraphs||[]).slice(0,2).map((x,i)=><p key={i}>{x}</p>)}</>:<div className="ss-exp-empty"><b>The immutable forecast receipt is available.</b><span>Archived editorial analysis is not published for this game artifact.</span></div>}</section>
     {text&&<section className="ss-exp-receipt-analysis"><span>POSTGAME AUTOPSY</span><h2>What the result taught us.</h2><p>{text}</p></section>}
   </main>
 }
@@ -402,11 +373,11 @@ function PresentationTextPass({route}) {
 
 export default function ExperienceLayer() {
   const [route,setRoute]=useState(()=>parseRoute())
-  const [data,setData]=useState({games:[],runs:[],history:[],autopsies:{},previews:{},evidence:{},status:{}})
+  const [data,setData]=useState({games:[],runs:[],history:[],autopsies:{},status:{}})
   useEffect(()=>{const onHash=()=>setRoute(parseRoute());window.addEventListener('hashchange',onHash);return()=>window.removeEventListener('hashchange',onHash)},[])
-  useEffect(()=>{;(async()=>{const [forecasts,runs,history,autopsies,previews,evidence,status]=await Promise.all([
-    fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('game_previews.json',{}),fetchJSON('contextual_evidence.json',{}),fetchJSON('status.json',{}),
-  ]);setData({games:Array.isArray(forecasts.games)?forecasts.games:[],runs,history,autopsies,previews,evidence,status})})()},[])
+  useEffect(()=>{;(async()=>{const [forecasts,runs,history,autopsies,status]=await Promise.all([
+    fetchJSON('public_forecasts.json',{games:[]}),fetchCSV('run_history.csv'),fetchCSV('prediction_history.csv'),fetchJSON('postgame_autopsies.json',{}),fetchJSON('status.json',{}),
+  ]);setData({games:Array.isArray(forecasts.games)?forecasts.games:[],runs,history,autopsies,status})})()},[])
   useEffect(()=>{
     const classes=['ss-exp-forecasts','ss-exp-game','ss-exp-history','ss-exp-receipt']
     document.body.classList.remove(...classes)
@@ -424,11 +395,10 @@ export default function ExperienceLayer() {
     </>}
     {route.page==='game'&&game&&<>
       <Portal anchor=".ss-clarity-head" position="afterend" id="ss-exp-lifecycle"><LifecycleRibbon game={game}/></Portal>
-      <Portal anchor=".ss-plus-signal" position="beforebegin" id="ss-exp-signal"><SignalV2 preview={data.previews[game.game_id]} evidence={data.evidence[game.game_id]||[]}/></Portal>
-      <Portal anchor=".ss-movement" position="afterend" id="ss-exp-movement"><MovementContextV2 game={game} runs={data.runs} evidence={data.evidence[game.game_id]||[]}/></Portal>
+      <Portal anchor=".ss-movement" position="afterend" id="ss-exp-movement"><MovementContextV2 game={game} runs={data.runs} evidence={[]}/></Portal>
       {game.lifecycle_status==='GRADED'&&<Portal anchor=".ss-matchup-grid" position="beforebegin" id="ss-exp-postgame"><PostgameReceipt game={game} historyRow={historyRow} autopsy={data.autopsies[game.game_id]}/></Portal>}
     </>}
     {route.page==='history'&&<Portal anchor=".ss-history-stats" position="afterend" id="ss-exp-history"><HistoryExplorer history={data.history} autopsies={data.autopsies}/></Portal>}
-    {route.page==='receipt'&&<Portal anchor=".ss-header" position="afterend" id="ss-exp-receipt"><ReceiptPage row={receiptRow} autopsy={data.autopsies[route.gameId]} preview={data.previews[route.gameId]}/></Portal>}
+    {route.page==='receipt'&&<Portal anchor=".ss-header" position="afterend" id="ss-exp-receipt"><ReceiptPage row={receiptRow} autopsy={data.autopsies[route.gameId]}/></Portal>}
   </>
 }

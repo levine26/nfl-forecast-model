@@ -80,7 +80,7 @@ def test_fast_lock_worker_preserves_freshness_gate_and_atomically_publishes_refr
     assert "python scripts/refresh_market.py --season 2026 --output-dir outputs" in workflow
     assert workflow.index("scripts.fast_lock_prepare") < workflow.index("scripts/refresh_market.py")
     assert workflow.index("scripts/refresh_market.py") < workflow.index("scripts/fast_official_lock.py --output-dir")
-    assert "python -m scripts.sync_market_reads --output-dir outputs --check" in workflow
-    assert "git add outputs/" in workflow  # Include canonical forecast, Read and lock in recovery transaction.
+    assert "python -m scripts.sync_market_reads --output-dir outputs --check" not in workflow
+    assert "git add outputs/" in workflow  # Include canonical forecast and lock in recovery transaction.
     assert "cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in workflow
     assert "git reset --hard origin/main" in workflow

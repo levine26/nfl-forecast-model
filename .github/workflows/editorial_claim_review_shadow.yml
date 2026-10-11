@@ -1,11 +1,8 @@
 name: Sunday Signal HUMAN claim review queue shadow
 
+# Retired from automatic production execution: prioritizing numerical forecasts
+# and timely official locks. Manual-only archival workflow.
 on:
-  pull_request:
-    paths:
-      - "scripts/prepare_editorial_claim_review_shadow.py"
-      - "tests/test_editorial_claim_review_shadow.py"
-      - ".github/workflows/editorial_claim_review_shadow.yml"
   workflow_dispatch:
 
 permissions:
