@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 
 IDENTITY = "F-ST-01-FROZEN-2026"
@@ -45,7 +46,11 @@ def audit_history(rows: list[dict[str, Any]], *, season: int | None = None, week
         except (ValueError, TypeError) as exc:
             raise ValueError(f"{gid}: malformed official lock time: {exc}") from exc
         minutes = (kickoff - actual).total_seconds() / 60.0
-        target_minutes = official_lock_target_minutes(row.get('gameday'))
+        # Older pre-policy receipts and synthetic tests may not carry a
+        # gameday field; infer its Eastern schedule date from the immutable
+        # kickoff timestamp, not from the current date or run time.
+        scheduled_day = (row.get('gameday') or kickoff.astimezone(ZoneInfo('America/New_York')).date())
+        target_minutes = official_lock_target_minutes(scheduled_day)
         delay = target_minutes - minutes
         classification = (
             "premature" if delay < -0.1 else
@@ -56,7 +61,7 @@ def audit_history(rows: list[dict[str, Any]], *, season: int | None = None, week
             "game_id": gid,
             "scheduled_lock_utc": (kickoff-timedelta(minutes=target_minutes)).isoformat(),
             "target_minutes_before_kickoff": target_minutes,
-            "lock_policy": official_lock_policy_name(row.get('gameday')), 
+            "lock_policy": official_lock_policy_name(scheduled_day), 
             "actual_lock_utc": actual.isoformat(),
             "minutes_before_kickoff": round(minutes, 4),
             "minutes_late_vs_target": round(delay, 4),
