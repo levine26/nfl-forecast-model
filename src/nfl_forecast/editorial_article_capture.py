@@ -119,18 +119,43 @@ def capture_report(
     """
     url = _safe_article_url(url)
     try:
-        response = session.get(url, timeout=9, allow_redirects=False)
+        # Stream with a hard byte cap. Accessing response.content before checking its
+        # size would download arbitrarily large pages into memory.
+        response = session.get(url, timeout=9, allow_redirects=False, stream=True)
     except requests.RequestException as exc:
         raise ArticleCaptureError(f"source could not be retrieved: {type(exc).__name__}") from exc
-    status = int(response.status_code)
-    if status != 200:
-        raise ArticleCaptureError(f"source HTTP status {status}, not article success")
-    kind = str(response.headers.get("content-type") or "").lower()
-    if "text/html" not in kind:
-        raise ArticleCaptureError("source did not return HTML reporting")
-    content = response.content
-    if not isinstance(content, bytes) or not content or len(content) > MAX_ARTICLE_BYTES:
-        raise ArticleCaptureError("article body missing or exceeds bounded response size")
+    try:
+        status = int(response.status_code)
+        if status != 200:
+            raise ArticleCaptureError(f"source HTTP status {status}, not article success")
+        kind = str(response.headers.get("content-type") or "").lower()
+        if "text/html" not in kind:
+            raise ArticleCaptureError("source did not return HTML reporting")
+        declared = response.headers.get("content-length")
+        if declared:
+            try:
+                if int(declared) > MAX_ARTICLE_BYTES:
+                    raise ArticleCaptureError("article body exceeds bounded response size")
+            except ValueError as exc:
+                if isinstance(exc, ArticleCaptureError):
+                    raise
+                raise ArticleCaptureError("invalid article content length") from exc
+        parts: list[bytes] = []
+        size = 0
+        for chunk in response.iter_content(chunk_size=65536):
+            if not isinstance(chunk, bytes):
+                raise ArticleCaptureError("article download returned non-byte content")
+            size += len(chunk)
+            if size > MAX_ARTICLE_BYTES:
+                raise ArticleCaptureError("article body missing or exceeds bounded response size")
+            parts.append(chunk)
+        content = b"".join(parts)
+        if not content:
+            raise ArticleCaptureError("article body missing or exceeds bounded response size")
+    except requests.RequestException as exc:
+        raise ArticleCaptureError(f"source interrupted during retrieval: {type(exc).__name__}") from exc
+    finally:
+        response.close()
     soup = BeautifulSoup(content, "html.parser")
     title = _page_title(soup)
     if len(title) < 12 or GENERIC_REPORT_TITLE.search(title):
@@ -142,10 +167,15 @@ def capture_report(
     body = _article_text(soup)
     if len(TOKEN.findall(body)) < MIN_ARTICLE_WORDS:
         raise ArticleCaptureError("source is a navigation shell, not substantial reporting")
+    # A first-party personnel report may cover only one side; full matchup
+    # coverage is enforced across independent verified sources at the slate gate.
+    reported_teams = []
     for team in (away_name, home_name):
         nickname = _clean(team).split(" ")[-1]
-        if not nickname or not re.search(r"\b" + re.escape(nickname) + r"\b", body, re.I):
-            raise ArticleCaptureError(f"article text does not cover matchup team {team}")
+        if nickname and re.search(r"\b" + re.escape(nickname) + r"\b", body, re.I):
+            reported_teams.append(team)
+    if not reported_teams:
+        raise ArticleCaptureError("article text does not cover either matchup team")
     timestamp = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).isoformat()
     return {
         "url": url,
@@ -159,6 +189,7 @@ def capture_report(
         "quote_location_verified": False,
         "claim_entailment_verified": False,
         "matchup_teams": [away_name, home_name],
+        "reported_teams": reported_teams,
         "body_text": body,
     }
 
@@ -181,9 +212,16 @@ def locate_quote(report: dict[str, Any], *, quote: str) -> dict[str, str]:
     }
 
 
-def require_independent_publishers(reports: list[dict[str, Any]]) -> None:
+def require_independent_publishers(
+    reports: list[dict[str, Any]], *, expected_teams: list[str] | None = None,
+) -> None:
+    """Only verify independent retrieval and combined team coverage, never entailment."""
     if len(reports) < 2:
         raise ArticleCaptureError("fewer than two source-content receipts")
     verified = [r for r in reports if r.get("article_resolution_verified") is True]
-    if len({r.get("publisher_family") for r in verified}) < 2:
+    if len(verified) != len(reports) or len({r.get("publisher_family") for r in verified}) < 2:
         raise ArticleCaptureError("two independently verified publisher families required")
+    if expected_teams:
+        covered = set().union(*(set(r.get("reported_teams") or []) for r in verified))
+        if not set(expected_teams).issubset(covered):
+            raise ArticleCaptureError("two-source reporting packet does not cover both matchup teams")
