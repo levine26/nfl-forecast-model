@@ -1,17 +1,8 @@
 name: Sunday Signal shadow source receipts
 
+# Retired from automatic production execution: prioritizing numerical forecasts
+# and timely official locks. Manual-only archival workflow.
 on:
-  pull_request:
-    paths:
-      - "src/nfl_forecast/editorial_source_receipts_shadow.py"
-      - "tests/test_editorial_source_receipts_shadow.py"
-      - ".github/workflows/editorial_source_receipts_shadow.yml"
-  push:
-    branches: [main]
-    paths:
-      - "src/nfl_forecast/editorial_source_receipts_shadow.py"
-      - "tests/test_editorial_source_receipts_shadow.py"
-      - ".github/workflows/editorial_source_receipts_shadow.yml"
   workflow_dispatch:
 
 permissions:

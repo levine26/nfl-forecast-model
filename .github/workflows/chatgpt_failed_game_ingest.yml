@@ -1,33 +1,8 @@
 name: Sunday Signal ChatGPT failed-game fallback
 
+# Retired from automatic production execution: prioritizing numerical forecasts
+# and timely official locks. Manual-only archival workflow.
 on:
-  pull_request:
-    paths:
-      - "scripts/ingest_chatgpt_failed_games.py"
-      - "scripts/finalize_editorial.py"
-      - "scripts/build_canonical_editorial_predictions.py"
-      - "scripts/refresh_editorial_slate_roster.py"
-      - "scripts/restore_last_good_editorial_snapshot.py"
-      - "tests/test_chatgpt_failed_game_ingest.py"
-      - "scripts/verify_human_source_acceptance.py"
-      - "tests/test_verified_human_source_gate.py"
-      - "tests/test_fallback_batch_trigger.py"
-      - "tests/test_editorial_provider_fallback.py"
-      - "tests/test_editorial_text_safety.py"
-      - "tests/test_canonical_editorial_predictions.py"
-      - "tests/test_editorial_slate_roster.py"
-      - "tests/test_restore_last_good_editorial_snapshot.py"
-      - "src/nfl_forecast/editorial_provider_fallback.py"
-      - "src/nfl_forecast/editorial_text_safety.py"
-      - "src/nfl_forecast/editorial_acceptance.py"
-      - "tests/test_editorial_acceptance.py"
-      - ".github/workflows/chatgpt_failed_game_ingest.yml"
-  push:
-    branches: [main]
-    paths:
-      # Candidate payload commits never start or cancel a recovery run. Commit manifest LAST.
-      - "inputs/chatgpt_media/fallback/manifest.json"
-      - ".github/workflows/chatgpt_failed_game_ingest.yml"
   workflow_dispatch:
 
 permissions:

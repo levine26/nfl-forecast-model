@@ -1,11 +1,8 @@
 name: Sunday Signal article verification shadow tests
 
+# Retired from automatic production execution: prioritizing numerical forecasts
+# and timely official locks. Manual-only archival workflow.
 on:
-  pull_request:
-    paths:
-      - "src/nfl_forecast/editorial_article_capture.py"
-      - "tests/test_editorial_article_capture.py"
-      - ".github/workflows/editorial_article_capture.yml"
   workflow_dispatch:
 
 permissions:

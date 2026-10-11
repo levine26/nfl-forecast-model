@@ -1,10 +1,8 @@
 name: Sunday Signal Week 5 candidate slate validation
 
+# Retired from automatic production execution: prioritizing numerical forecasts
+# and timely official locks. Manual-only archival workflow.
 on:
-  pull_request:
-    paths:
-      - "inputs/chatgpt_media/fallback/**"
-      - ".github/workflows/editorial_week5_candidate_validation.yml"
   workflow_dispatch:
 
 permissions:

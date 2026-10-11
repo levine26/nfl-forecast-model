@@ -1,22 +1,9 @@
 name: Sunday Signal Groq post-context dispatcher
 
+# Retired from automatic production execution: prioritizing numerical forecasts
+# and timely official locks. Manual-only archival workflow.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/groq_after_context.yml"
-      - "scripts/groq_dispatch_due.py"
-  workflow_run:
-    workflows:
-      - "Sunday Signal contextual intelligence"
-    types: [completed]
-    branches: [main]
-  pull_request:
-    paths:
-      - ".github/workflows/groq_after_context.yml"
-      - "scripts/groq_dispatch_due.py"
-      - "tests/test_groq_dispatch_due.py"
 
 permissions:
   contents: read
