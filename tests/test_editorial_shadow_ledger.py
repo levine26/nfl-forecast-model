@@ -10,6 +10,12 @@ import pytest
 from nfl_forecast import editorial_shadow_ledger as ledger
 
 
+def _sign(entry):
+    candidate = {k: v for k, v in entry.items() if k != "acceptance_receipt"}
+    entry["acceptance_receipt"]["candidate_sha256"] = ledger._sha(ledger._encoded(candidate))
+    return entry
+
+
 def _entry(game_id="2026_05_BAL_ATL", *, minute=0, provider="groq"):
     p1 = (
         "Baltimore has to protect its quarterback long enough to attack the Atlanta "
@@ -22,7 +28,7 @@ def _entry(game_id="2026_05_BAL_ATL", *, minute=0, provider="groq"):
     )
     assert 55 <= len(p1.split()) <= 100
     now = datetime.now(timezone.utc) - timedelta(hours=3) + timedelta(minutes=minute)
-    return {
+    return _sign({
         "game_id": game_id,
         "forecast_path_identity": ledger.MODEL,
         "provider": provider,
@@ -45,7 +51,7 @@ def _entry(game_id="2026_05_BAL_ATL", *, minute=0, provider="groq"):
             "article_resolution_verified": True,
             "claim_support_verified": True,
         },
-    }
+    })
 
 
 def test_accepted_prose_survives_refresh_and_rejected_new_content(tmp_path):
@@ -72,6 +78,7 @@ def test_idempotency_stale_writes_and_preserved_immutable_revision(tmp_path):
     assert store.accept(first, expected_revision="wrong") == old
     new = _entry(minute=5, provider="chatgpt")
     new["headline"] = "Falcons motion forces a Ravens second-level adjustment"
+    _sign(new)
     newer = store.accept(new, expected_revision=old)
     assert newer != old
     with pytest.raises(ledger.EditorialLedgerConflict):
@@ -116,10 +123,12 @@ def test_unverified_source_receipts_are_not_promoted(tmp_path):
     store = ledger.EditorialShadowLedger(tmp_path)
     bad = _entry()
     bad["sources"][1]["publisher_family"] = bad["sources"][0]["publisher_family"]
+    _sign(bad)
     with pytest.raises(ledger.EditorialLedgerError, match="not independent"):
         store.accept(bad, expected_revision=None)
     bad = _entry()
     bad["sources"][0]["content_sha256"] = ""
+    _sign(bad)
     with pytest.raises(ledger.EditorialLedgerError, match="content hash"):
         store.accept(bad, expected_revision=None)
     bad = _entry()
@@ -155,3 +164,12 @@ def test_immutable_revision_integrity_is_checked_on_read(tmp_path):
     (directory / f"{rev}.json").write_text("{}\n")
     with pytest.raises(ledger.EditorialLedgerError, match="content hash mismatch"):
         store.read_revision(entry["game_id"], rev)
+
+
+def test_validation_receipt_rejects_mutation_after_independent_acceptance(tmp_path):
+    store = ledger.EditorialShadowLedger(tmp_path)
+    candidate = _entry()
+    candidate["paragraph1"] += " Changing this phrase after the validator signed the content."
+    with pytest.raises(ledger.EditorialLedgerError, match="does not match candidate content"):
+        store.accept(candidate, expected_revision=None)
+    assert store.pointer(candidate["game_id"]) is None
