@@ -101,3 +101,12 @@ def test_production_fast_lock_and_pr_validation_have_isolated_concurrency():
     assert "github.event_name == 'pull_request'" in concurrency
     assert "cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in concurrency
     assert "cancel-in-progress: true" not in concurrency
+
+
+def test_stalled_production_lock_job_has_a_bounded_timeout():
+    from pathlib import Path
+    text = (Path(__file__).resolve().parents[1] /
+            ".github/workflows/fast_official_lock.yml").read_text()
+    lock_block = text.split("\n  lock:\n", 1)[1]
+    assert "    timeout-minutes: 15" in lock_block
+    assert "  cancel-in-progress: ${{ github.event_name == 'pull_request' }}" in text
